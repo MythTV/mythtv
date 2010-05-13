@@ -12,7 +12,7 @@ using namespace std;
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 #include "util.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "x11colors.h"
@@ -46,9 +46,9 @@ XMLParse::~XMLParse()
 
 bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
-    usetrans = gContext->GetNumSetting("PlayBoxTransparency", 1);
+    usetrans = gCoreContext->GetNumSetting("PlayBoxTransparency", 1);
 
-    fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
+    fontSizeType = gCoreContext->GetSetting("ThemeFontSizeType", "default");
 
     QStringList searchpath = ui->GetThemeSearchPath();
     for (QStringList::const_iterator ii = searchpath.begin();

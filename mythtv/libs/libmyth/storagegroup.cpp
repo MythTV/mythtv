@@ -4,7 +4,7 @@
 #include <QUrl>
 
 #include "storagegroup.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "util.h"
@@ -118,7 +118,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
     if (allowFallback && !m_dirlist.size())
     {
         QString msg = "Unable to find any Storage Group Directories.  ";
-        QString tmpDir = gContext->GetSetting("RecordFilePrefix");
+        QString tmpDir = gCoreContext->GetSetting("RecordFilePrefix");
         if (tmpDir != "")
         {
             msg += QString("Using old 'RecordFilePrefix' value of '%1'")
@@ -457,7 +457,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
     {
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =
-            gContext->GetSetting("RecordFilePrefix") + "/" + filename;
+            gCoreContext->GetSetting("RecordFilePrefix") + "/" + filename;
         checkFile.setFile(tmpFile);
         if (checkFile.exists() || checkFile.isSymLink())
             result = tmpFile;
@@ -546,7 +546,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     query.prepare("SELECT groupname, dirname "
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME;");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("StorageGroup::CheckAllStorageGroupDirs()", query);
@@ -709,8 +709,8 @@ StorageGroupEditor::StorageGroupEditor(QString group) :
     else if (StorageGroup::kSpecialGroups.contains(group))
         dispGroup = QObject::tr(group.toLatin1().constData());
 
-    if (gContext->GetSetting("MasterServerIP","master") ==
-            gContext->GetSetting("BackendServerIP","me"))
+    if (gCoreContext->GetSetting("MasterServerIP","master") ==
+            gCoreContext->GetSetting("BackendServerIP","me"))
     {
         listbox->setLabel(tr("'%1' Storage Group Directories").arg(dispGroup));
     }
@@ -731,7 +731,7 @@ void StorageGroupEditor::open(QString name)
     {
         name = "";
         SGPopupResult result = StorageGroupPopup::showPopup(
-            gContext->GetMainWindow(), 
+            GetMythMainWindow(), 
             tr("Add Storage Group Directory"),
             tr("Enter directory name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -749,14 +749,14 @@ void StorageGroupEditor::open(QString name)
                       "VALUES (:NAME, :HOSTNAME, :DIRNAME);");
         query.bindValue(":NAME", m_group);
         query.bindValue(":DIRNAME", name);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupEditor::open", query);
         else
             lastValue = name;
     } else {
         SGPopupResult result = StorageGroupPopup::showPopup(
-            gContext->GetMainWindow(), 
+            GetMythMainWindow(), 
             tr("Edit Storage Group Directory"),
             tr("Enter directory name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -774,7 +774,7 @@ void StorageGroupEditor::open(QString name)
                           "AND hostname = :HOSTNAME;");
         query.bindValue(":NAME", m_group);
         query.bindValue(":DIRNAME", lastValue);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupEditor::open", query);
 
@@ -782,7 +782,7 @@ void StorageGroupEditor::open(QString name)
                       "VALUES (:NAME, :HOSTNAME, :DIRNAME);");
         query.bindValue(":NAME", m_group);
         query.bindValue(":DIRNAME", name);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupEditor::open", query);
         else
@@ -800,7 +800,7 @@ void StorageGroupEditor::doDelete(void)
         tr("Remove '%1'\nDirectory From Storage Group?").arg(name);
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), "", message,
+        GetMythMainWindow(), "", message,
         tr("Yes, remove directory"),
         tr("No, Don't remove directory"),
         kDialogCodeButton1);
@@ -814,7 +814,7 @@ void StorageGroupEditor::doDelete(void)
                           "AND hostname = :HOSTNAME;");
         query.bindValue(":NAME", m_group);
         query.bindValue(":DIRNAME", name);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupEditor::doDelete", query);
 
@@ -836,7 +836,7 @@ void StorageGroupEditor::Load(void)
                   "WHERE groupname = :NAME AND hostname = :HOSTNAME "
                   "ORDER BY id;");
     query.bindValue(":NAME", m_group);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive())
         MythDB::DBError("StorageGroupEditor::doDelete", query);
     else
@@ -882,8 +882,8 @@ MythDialog* StorageGroupEditor::dialogWidget(MythMainWindow* parent,
 StorageGroupListEditor::StorageGroupListEditor(void) :
     listbox(new ListBoxSetting(this)), lastValue("")
 {
-    if (gContext->GetSetting("MasterServerIP","master") ==
-            gContext->GetSetting("BackendServerIP","me"))
+    if (gCoreContext->GetSetting("MasterServerIP","master") ==
+            gCoreContext->GetSetting("BackendServerIP","me"))
         listbox->setLabel(
             tr("Storage Groups (directories for new recordings)"));
     else
@@ -907,7 +907,7 @@ void StorageGroupListEditor::open(QString name)
         {
             name = "";
             SGPopupResult result = StorageGroupPopup::showPopup(
-                gContext->GetMainWindow(), 
+                GetMythMainWindow(), 
                 tr("Create New Storage Group"),
                 tr("Enter group name or press SELECT to enter text via the "
                    "On Screen Keyboard"), name);
@@ -929,8 +929,8 @@ void StorageGroupListEditor::doDelete(void)
     if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
         return;
 
-    bool is_master_host = gContext->GetSetting("MasterServerIP","master") ==
-                          gContext->GetSetting("BackendServerIP","me");
+    bool is_master_host = gCoreContext->GetSetting("MasterServerIP","master") ==
+                          gCoreContext->GetSetting("BackendServerIP","me");
 
     QString dispGroup = name;
     if (name == "Default")
@@ -952,7 +952,7 @@ void StorageGroupListEditor::doDelete(void)
     }
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(),
+        GetMythMainWindow(),
         "", message,
         tr("Yes, delete group"),
         tr("No, Don't delete group"), kDialogCodeButton1);
@@ -980,7 +980,7 @@ void StorageGroupListEditor::doDelete(void)
         query.prepare(sql);
         query.bindValue(":NAME", name);
         if (!is_master_host || (name == "Default"))
-            query.bindValue(":HOSTNAME", gContext->GetHostName());
+            query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupListEditor::doDelete", query);
 
@@ -999,15 +999,15 @@ void StorageGroupListEditor::Load(void)
     QStringList masterNames;
     bool createAddDefaultButton = false;
     bool createAddSpecialGroupButton[StorageGroup::kSpecialGroups.size()];
-    bool isMaster = (gContext->GetSetting("MasterServerIP","master") ==
-                     gContext->GetSetting("BackendServerIP","me"));
+    bool isMaster = (gCoreContext->GetSetting("MasterServerIP","master") ==
+                     gCoreContext->GetSetting("BackendServerIP","me"));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT distinct groupname "
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME "
                   "ORDER BY groupname;");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec())
         MythDB::DBError("StorageGroup::Load getting local group names",
                              query);

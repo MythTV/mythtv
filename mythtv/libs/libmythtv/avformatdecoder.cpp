@@ -15,7 +15,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
 #include "programinfo.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "iso639.h"
 #include "mpegtables.h"
@@ -468,7 +468,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  bool no_hardware_decode)
     : DecoderBase(parent, pginfo),
       d(new AvFormatDecoderPrivate(allow_libmpeg2)),
-      is_db_ignored(gContext->IsDatabaseIgnored()),
+      is_db_ignored(gCoreContext->IsDatabaseIgnored()),
       m_h264_parser(new H264Parser()),
       ic(NULL),
       frame_decoded(0),             decoded_video_frame(NULL),
@@ -517,17 +517,17 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
 
-    max_channels = (uint) gContext->GetNumSetting("MaxChannels", 2);
-    allow_ac3_passthru = (max_channels > 2) ? gContext->GetNumSetting("AC3PassThru", false) : false;
-    allow_dts_passthru = (max_channels > 2) ? gContext->GetNumSetting("DTSPassThru", false) : false;
-    internal_vol = gContext->GetNumSetting("MythControlsVolume", 0);
+    max_channels = (uint) gCoreContext->GetNumSetting("MaxChannels", 2);
+    allow_ac3_passthru = (max_channels > 2) ? gCoreContext->GetNumSetting("AC3PassThru", false) : false;
+    allow_dts_passthru = (max_channels > 2) ? gCoreContext->GetNumSetting("DTSPassThru", false) : false;
+    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
     itv = GetNVP()->GetInteractiveTV();
 
     cc608_build_parity_table(cc608_parity_table);
 
-    if (gContext->GetNumSetting("CCBackground", 0))
+    if (gCoreContext->GetNumSetting("CCBackground", 0))
         CC708Window::forceWhiteOnBlackText = true;
 
     no_dts_hack = false;
@@ -1427,7 +1427,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         directrendering = true;
         if (
-        !gContext->GetNumSetting("DecodeExtraAudio", 0) &&
+        !gCoreContext->GetNumSetting("DecodeExtraAudio", 0) &&
         !CODEC_IS_HWACCEL(codec))
     {
         SetLowBuffers(false);
@@ -2355,7 +2355,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // video params are set properly
     if (selectedVideoIndex == -1)
     {
-        QString tvformat = gContext->GetSetting("TVFormat").toLower();
+        QString tvformat = gCoreContext->GetSetting("TVFormat").toLower();
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
         {

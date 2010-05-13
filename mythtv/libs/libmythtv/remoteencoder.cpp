@@ -6,7 +6,7 @@
 #include "programinfo.h"
 #include "util.h"
 #include "decodeencode.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"
 #include "mythdb.h"
@@ -39,9 +39,9 @@ bool RemoteEncoder::Setup(void)
         VERBOSE(VB_NETWORK|VB_EXTRA, "RemoteEncoder::Setup(): Connecting...");
 
         QString ann = QString("ANN Playback %1 %2")
-            .arg(gContext->GetHostName()).arg(false);
+            .arg(gCoreContext->GetHostName()).arg(false);
 
-        controlSock = gContext->ConnectCommandSocket(
+        controlSock = gCoreContext->ConnectCommandSocket(
             remotehost, remoteport, ann);
 
         if (controlSock)

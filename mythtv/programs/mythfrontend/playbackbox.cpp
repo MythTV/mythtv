@@ -24,7 +24,7 @@
 #include "mythsystemevent.h"
 
 // libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 #include "storagegroup.h"
 #include "programinfo.h"
@@ -372,48 +372,48 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_player_selected_new_show(false),
       m_helper(this)
 {
-    m_formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
-    m_formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_formatTime         = gContext->GetSetting("TimeFormat", "h:mm AP");
-    m_recGroup           = gContext->GetSetting("DisplayRecGroup",
+    m_formatShortDate    = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    m_formatLongDate     = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_formatTime         = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    m_recGroup           = gCoreContext->GetSetting("DisplayRecGroup",
                                                 "All Programs");
-    int pbOrder        = gContext->GetNumSetting("PlayBoxOrdering", 1);
+    int pbOrder        = gCoreContext->GetNumSetting("PlayBoxOrdering", 1);
     // Split out sort order modes, wacky order for backward compatibility
     m_listOrder = (pbOrder >> 1) ^ (m_allOrder = pbOrder & 1);
-    m_watchListStart     = gContext->GetNumSetting("PlaybackWLStart", 0);
+    m_watchListStart     = gCoreContext->GetNumSetting("PlaybackWLStart", 0);
 
-    m_watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
-    m_watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
-    m_watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
-    m_groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
+    m_watchListAutoExpire= gCoreContext->GetNumSetting("PlaybackWLAutoExpire", 0);
+    m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
+    m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2);
+    m_groupnameAsAllProg = gCoreContext->GetNumSetting("DispRecGroupAsAllProg", 0);
 
-    bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
+    bool displayCat  = gCoreContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
-    m_viewMask = (ViewMask)gContext->GetNumSetting(
+    m_viewMask = (ViewMask)gCoreContext->GetNumSetting(
                                     "DisplayGroupDefaultViewMask",
                                     VIEW_TITLES | VIEW_WATCHED);
 
     // Translate these external settings into mask values
-    if (gContext->GetNumSetting("PlaybackWatchList", 1) &&
+    if (gCoreContext->GetNumSetting("PlaybackWatchList", 1) &&
         !(m_viewMask & VIEW_WATCHLIST))
     {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_WATCHLIST);
-        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+        gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
-    else if (! gContext->GetNumSetting("PlaybackWatchList", 1) &&
+    else if (! gCoreContext->GetNumSetting("PlaybackWatchList", 1) &&
              m_viewMask & VIEW_WATCHLIST)
     {
         m_viewMask = (ViewMask)(m_viewMask & ~VIEW_WATCHLIST);
-        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+        gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
 
     // This setting is deprecated in favour of viewmask, this just ensures the
     // that it is converted over when upgrading from earlier versions
-    if (gContext->GetNumSetting("LiveTVInAllPrograms",0) &&
+    if (gCoreContext->GetNumSetting("LiveTVInAllPrograms",0) &&
         !(m_viewMask & VIEW_LIVETVGRP))
     {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_LIVETVGRP);
-        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+        gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
 
     if (player)
@@ -439,14 +439,14 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
         m_recGroupPassword = getRecGroupPassword(m_recGroup);
 
     // misc setup
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 
     if (m_fanartTimer)
     {
@@ -542,7 +542,7 @@ void PlaybackBox::Init()
 
     if (!m_player && !m_recGroupPassword.isEmpty())
         displayRecGroup(m_recGroup);
-    else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+    else if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
         showGroupFilter();
     else
     {
@@ -555,7 +555,7 @@ void PlaybackBox::Init()
         }
     }
 
-    if (!gContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
+    if (!gCoreContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
         SetFocusWidget(m_recordingList);
 }
 
@@ -632,8 +632,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         {
             static int itemsPast = 0;
             QString artworkHost;
-            if (gContext->GetNumSetting("MasterBackendOverride", 0))
-                artworkHost = gContext->GetMasterHostName();
+            if (gCoreContext->GetNumSetting("MasterBackendOverride", 0))
+                artworkHost = gCoreContext->GetMasterHostName();
             else
                 artworkHost = (*(m_progLists[groupname].begin()))->hostname;
 
@@ -837,8 +837,8 @@ void PlaybackBox::UpdateUIListItem(
             QString artworkTitle = pginfo->title;
             QString artworkSeriesID = pginfo->seriesid;
 
-            if (gContext->GetNumSetting("MasterBackendOverride", 0))
-                artworkHost = gContext->GetMasterHostName();
+            if (gCoreContext->GetNumSetting("MasterBackendOverride", 0))
+                artworkHost = gCoreContext->GetMasterHostName();
             else
                 artworkHost = pginfo->hostname;
 
@@ -1429,7 +1429,7 @@ bool PlaybackBox::UpdateUILists(void)
     m_progLists[""] = ProgramList(false);
     m_progLists[""].setAutoDelete(false);
 
-    ViewTitleSort titleSort = (ViewTitleSort)gContext->GetNumSetting(
+    ViewTitleSort titleSort = (ViewTitleSort)gCoreContext->GetNumSetting(
                                 "DisplayGroupTitleSort", TitleSortAlphabetical);
 
     QMap<QString, QString> sortedList;
@@ -1594,7 +1594,7 @@ bool PlaybackBox::UpdateUILists(void)
         return false;
     }
 
-    QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
+    QString episodeSort = gCoreContext->GetSetting("PlayBoxEpisodeSort", "Date");
 
     if (episodeSort == "OrigAirDate")
     {
@@ -1960,7 +1960,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
         return;
 
     bool undelete_possible =
-            gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
 
     if (pginfo->recgroup == "Deleted" && undelete_possible)
     {
@@ -2260,17 +2260,17 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
     if (imagetype == "fanart")
     {
         sgroup = "Fanart";
-        localDir = gContext->GetSetting("mythvideo.fanartDir");
+        localDir = gCoreContext->GetSetting("mythvideo.fanartDir");
     }
     else if (imagetype == "banner")
     {
         sgroup = "Banners";
-        localDir = gContext->GetSetting("mythvideo.bannerDir");
+        localDir = gCoreContext->GetSetting("mythvideo.bannerDir");
     }
     else if (imagetype == "coverart")
     {
         sgroup = "Coverart";
-        localDir = gContext->GetSetting("VideoArtworkDir");
+        localDir = gCoreContext->GetSetting("VideoArtworkDir");
     }
 
     // Attempts to match image file in specified directory.
@@ -2360,9 +2360,9 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
                 foundFile =
                     QString("myth://%1@")
                     .arg(StorageGroup::GetGroupToUse(host, sgroup)) +
-                    gContext->GetSettingOnHost("BackendServerIP", host) +
+                    gCoreContext->GetSettingOnHost("BackendServerIP", host) +
                     QString(":") +
-                    gContext->GetSettingOnHost("BackendServerPort", host) +
+                    gCoreContext->GetSettingOnHost("BackendServerPort", host) +
                     QString("/") +
                     *it;
                 break;
@@ -2659,10 +2659,10 @@ void PlaybackBox::showPlaylistJobPopup(void)
         m_popupMenu->AddButton(tr("Stop Commercial Flagging"),
                          SLOT(stopPlaylistFlagging()));
 
-    command = gContext->GetSetting("UserJob1", "");
+    command = gCoreContext->GetSetting("UserJob1", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc1");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc1");
 
         if (!isRunningUserJob1)
             m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
@@ -2672,10 +2672,10 @@ void PlaybackBox::showPlaylistJobPopup(void)
                              SLOT(stopPlaylistUserJob1()));
     }
 
-    command = gContext->GetSetting("UserJob2", "");
+    command = gCoreContext->GetSetting("UserJob2", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc2");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc2");
 
         if (!isRunningUserJob2)
             m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
@@ -2685,10 +2685,10 @@ void PlaybackBox::showPlaylistJobPopup(void)
                              SLOT(stopPlaylistUserJob2()));
     }
 
-    command = gContext->GetSetting("UserJob3", "");
+    command = gCoreContext->GetSetting("UserJob3", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc3");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc3");
 
         if (!isRunningUserJob3)
             m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
@@ -2698,10 +2698,10 @@ void PlaybackBox::showPlaylistJobPopup(void)
                              SLOT(stopPlaylistUserJob3()));
     }
 
-    command = gContext->GetSetting("UserJob4", "");
+    command = gCoreContext->GetSetting("UserJob4", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc4");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc4");
 
         if (!isRunningUserJob4)
             m_popupMenu->AddButton(QString("%1 %2")
@@ -2835,10 +2835,10 @@ void PlaybackBox::showJobPopup()
         m_popupMenu->AddButton(tr("Begin Commercial Flagging"),
                                     SLOT(doBeginFlagging()));
 
-    command = gContext->GetSetting("UserJob1", "");
+    command = gCoreContext->GetSetting("UserJob1", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, pginfo->chanid,
                                    pginfo->recstartts))
@@ -2849,10 +2849,10 @@ void PlaybackBox::showJobPopup()
                                     SLOT(doBeginUserJob1()));
     }
 
-    command = gContext->GetSetting("UserJob2", "");
+    command = gCoreContext->GetSetting("UserJob2", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, pginfo->chanid,
                                    pginfo->recstartts))
@@ -2863,10 +2863,10 @@ void PlaybackBox::showJobPopup()
                                     SLOT(doBeginUserJob2()));
     }
 
-    command = gContext->GetSetting("UserJob3", "");
+    command = gCoreContext->GetSetting("UserJob3", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, pginfo->chanid,
                                    pginfo->recstartts))
@@ -2877,10 +2877,10 @@ void PlaybackBox::showJobPopup()
                                     SLOT(doBeginUserJob3()));
     }
 
-    command = gContext->GetSetting("UserJob4", "");
+    command = gCoreContext->GetSetting("UserJob4", "");
     if (!command.isEmpty())
     {
-        jobTitle = gContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
+        jobTitle = gCoreContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, pginfo->chanid,
                                    pginfo->recstartts))
@@ -3153,7 +3153,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
     else
     {
         QString jobHost;
-        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+        if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = pginfo->hostname;
 
         JobQueue::QueueJob(jobType, pginfo->chanid,
@@ -3180,7 +3180,7 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
                                     tmpItem->recstartts)))
     {
             QString jobHost;
-            if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+            if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
                 jobHost = tmpItem->hostname;
 
             JobQueue::QueueJob(jobType, tmpItem->chanid,
@@ -3572,7 +3572,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
                     .arg(clientID);
 
                 MythEvent me(msg);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
                 return;
             }
 
@@ -3586,7 +3586,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
                 QString msg = QString("NETWORK_CONTROL RESPONSE %1 OK")
                                       .arg(clientID);
                 MythEvent me(msg);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
 
                 if (tokens[1] == "PLAY")
                     tmpItem->setIgnoreBookmark(true);
@@ -3604,7 +3604,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
                                           "chanid %2 @ %3").arg(clientID)
                                           .arg(tokens[3]).arg(tokens[4]);
                 MythEvent me(message);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
             }
         }
     }
@@ -3810,12 +3810,12 @@ void PlaybackBox::customEvent(QEvent *event)
                     Qt::KeypadModifier;
                 keyevent = new QKeyEvent(QEvent::KeyPress, Qt::Key_LaunchMedia,
                                       modifiers);
-                QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()),
+                QCoreApplication::postEvent((QObject*)(GetMythMainWindow()),
                                         keyevent);
 
                 keyevent = new QKeyEvent(QEvent::KeyRelease, Qt::Key_LaunchMedia,
                                       modifiers);
-                QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()),
+                QCoreApplication::postEvent((QObject*)(GetMythMainWindow()),
                                         keyevent);
             }
         }
@@ -4166,8 +4166,8 @@ void PlaybackBox::saveViewChanges()
 {
     if (m_viewMask == VIEW_NONE)
         m_viewMask = VIEW_TITLES;
-    gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
-    gContext->SaveSetting("PlaybackWatchList",
+    gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+    gCoreContext->SaveSetting("PlaybackWatchList",
                                             (bool)(m_viewMask & VIEW_WATCHLIST));
 }
 
@@ -4318,13 +4318,13 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
 
     UpdateUILists();
 
-    if (gContext->GetNumSetting("RememberRecGroup",1))
-        gContext->SaveSetting("DisplayRecGroup", m_recGroup);
+    if (gCoreContext->GetNumSetting("RememberRecGroup",1))
+        gCoreContext->SaveSetting("DisplayRecGroup", m_recGroup);
 
     if (m_recGroupType[m_recGroup] == "recgroup")
-        gContext->SaveSetting("DisplayRecGroupIsCategory", 0);
+        gCoreContext->SaveSetting("DisplayRecGroupIsCategory", 0);
     else
-        gContext->SaveSetting("DisplayRecGroupIsCategory", 1);
+        gCoreContext->SaveSetting("DisplayRecGroupIsCategory", 1);
 }
 
 QString PlaybackBox::getRecGroupPassword(const QString &group)
@@ -4360,7 +4360,7 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
     }
 
     m_recGroupPwCache["All Programs"] =
-                                gContext->GetSetting("AllRecGroupPassword", "");
+                                gCoreContext->GetSetting("AllRecGroupPassword", "");
 }
 
 /// \brief Used to change the recording group of a program or playlist.
@@ -4575,7 +4575,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
         return;
     }
 
-    int defaultAutoExpire = gContext->GetNumSetting("AutoExpireDefault", 0);
+    int defaultAutoExpire = gCoreContext->GetNumSetting("AutoExpireDefault", 0);
 
     if (m_op_on_playlist)
     {
@@ -4676,7 +4676,7 @@ void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
 {
     if (m_recGroup == "All Programs")
     {
-        gContext->SaveSetting("AllRecGroupPassword", newPassword);
+        gCoreContext->SaveSetting("AllRecGroupPassword", newPassword);
     }
     else
     {

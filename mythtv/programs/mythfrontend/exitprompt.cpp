@@ -63,7 +63,7 @@ bool DBusHalt(void)
 void ExitPrompter::halt()
 {
 
-    QString halt_cmd = gContext->GetSetting("HaltCommand","");
+    QString halt_cmd = gCoreContext->GetSetting("HaltCommand","");
     if (!halt_cmd.isEmpty()) /* Use user specified command if it exists */
     {
         myth_system(halt_cmd);
@@ -119,7 +119,7 @@ bool DBusReboot(void)
 void ExitPrompter::reboot()
 {
 
-    QString reboot_cmd = gContext->GetSetting("RebootCommand","");
+    QString reboot_cmd = gCoreContext->GetSetting("RebootCommand","");
     if (!reboot_cmd.isEmpty()) /* Use user specified command if it exists */
     {
         myth_system(reboot_cmd);
@@ -134,13 +134,13 @@ void ExitPrompter::handleExit()
 {
     // IsFrontendOnly() triggers a popup if there is no BE connection.
     // We really don't need that right now. This hack prevents it.
-    gContext->SetMainWindow(NULL);
+    gContext->SetDisableEventPopup(true);
 
     // first of all find out, if this is a frontend only host...
-    bool frontendOnly = gContext->IsFrontendOnly();
+    bool frontendOnly = gCoreContext->IsFrontendOnly();
 
     // Undo the hack, just in case we _don't_ quit:
-    gContext->SetMainWindow(MythMainWindow::getMainWindow());
+    gContext->SetDisableEventPopup(false);
 
 
     // how do you want to quit today?
@@ -148,7 +148,7 @@ void ExitPrompter::handleExit()
     bool allowReboot   = false;
     bool allowShutdown = false;
 
-    switch (gContext->GetNumSetting("OverrideExitMenu", 0))
+    switch (gCoreContext->GetNumSetting("OverrideExitMenu", 0))
     {
         case 0:
             allowExit = true;

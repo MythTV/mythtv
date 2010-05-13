@@ -9,7 +9,7 @@
 #include <QDir>
 
 #include "mythdb.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 
 /// Check that a directory path exists and is writable
@@ -44,7 +44,7 @@ bool checkStoragePaths(QStringList &probs)
     bool problemFound = false;
 
     QString recordFilePrefix =
-            gContext->GetSetting("RecordFilePrefix", "EMPTY");
+            gCoreContext->GetSetting("RecordFilePrefix", "EMPTY");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -71,7 +71,7 @@ bool checkStoragePaths(QStringList &probs)
     query.prepare("SELECT groupname, dirname "
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME;");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("checkStoragePaths", query);
@@ -79,8 +79,8 @@ bool checkStoragePaths(QStringList &probs)
     }
     else if (query.size() < 1)
     {
-        if (gContext->GetSetting("MasterServerIP","master") ==
-            gContext->GetSetting("BackendServerIP","me"))
+        if (gCoreContext->GetSetting("MasterServerIP","master") ==
+            gCoreContext->GetSetting("BackendServerIP","me"))
         {
             // Master backend must have a defined Default SG
             QString trMesg =
@@ -125,7 +125,7 @@ bool checkImageStoragePaths(QStringList &probs)
     query.prepare("SELECT groupname "
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME;");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("checkImageStoragePaths", query);

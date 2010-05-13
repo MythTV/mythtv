@@ -879,7 +879,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
 static int calc_eit_utc_offset(void)
 {
-    QString config_offset = gContext->GetSetting("EITTimeOffset", "Auto");
+    QString config_offset = gCoreContext->GetSetting("EITTimeOffset", "Auto");
 
     if (config_offset == "Auto")
         return calc_utc_offset();

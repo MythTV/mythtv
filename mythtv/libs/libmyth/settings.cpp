@@ -1270,7 +1270,7 @@ HostnameSetting::HostnameSetting(Storage *storage) : Setting(storage)
 {
     setVisible(false);
     
-    setValue(gContext->GetHostName());
+    setValue(gCoreContext->GetHostName());
 }
 
 void ChannelSetting::fillSelections(SelectSetting* setting) {

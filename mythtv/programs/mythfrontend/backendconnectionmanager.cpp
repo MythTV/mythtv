@@ -5,7 +5,7 @@
 #include <QEvent>
 #include <QTimer>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
@@ -23,17 +23,17 @@ class Reconnect : public QRunnable
 
     virtual void run(void)
     {
-        if (gContext->GetMasterHostPrefix().isEmpty())
-            gContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
+        if (gCoreContext->GetMasterHostPrefix().isEmpty())
+            gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
         else
-            gContext->dispatch(MythEvent(QString("RECONNECT_SUCCESS")));
+            gCoreContext->dispatch(MythEvent(QString("RECONNECT_SUCCESS")));
     }
 };
 
 BackendConnectionManager::BackendConnectionManager() :
     QObject(), m_reconnecting(NULL), m_reconnect_timer(NULL), m_first_time(true)
 {
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     uint reconnect_timeout = 1;
     m_reconnect_timer = new QTimer(this);
@@ -47,7 +47,7 @@ BackendConnectionManager::~BackendConnectionManager()
 {
     while (m_reconnecting)
         usleep(250*1000);
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 }
 
 void BackendConnectionManager::customEvent(QEvent *event)

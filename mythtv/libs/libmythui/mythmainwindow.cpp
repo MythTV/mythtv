@@ -40,6 +40,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "compat.h"
 #include "mythsignalingtimer.h"
+#include "mythcorecontext.h"
 
 // Libmythui headers
 #include "screensaver.h"
@@ -205,7 +206,6 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
 
 static MythMainWindow *mainWin = NULL;
 static QMutex mainLock;
-static QThread *UIThread = NULL;
 
 /**
  * \brief Return the existing main window, or create one
@@ -223,22 +223,19 @@ MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
     QMutexLocker lock(&mainLock);
 
     if (!mainWin)
+    {
         mainWin = new MythMainWindow(useDB);
-
-    UIThread = QThread::currentThread();
+        gCoreContext->SetGUIObject(mainWin);
+    }
 
     return mainWin;
 }
 
 void MythMainWindow::destroyMainWindow(void)
 {
+    gCoreContext->SetGUIObject(NULL);
     delete mainWin;
     mainWin = NULL;
-}
-
-bool IsUIThread(void)
-{
-    return (QThread::currentThread() == UIThread);
 }
 
 MythMainWindow *GetMythMainWindow(void)
@@ -1878,6 +1875,14 @@ void MythMainWindow::customEvent(QEvent *ce)
                         .arg(sse->getSSEventType()));
             }
         }
+    }
+    else if (ce->type() == MythEvent::kDisableDrawingEventType)
+    {
+        SetDrawEnabled(false);
+    }
+    else if (ce->type() == MythEvent::kEnableDrawingEventType)
+    {
+        SetDrawEnabled(true);
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
     {

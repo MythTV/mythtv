@@ -5,7 +5,7 @@
 #include <QListIterator>
 
 /* MythTV includes */
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythosdmenueditor.h"

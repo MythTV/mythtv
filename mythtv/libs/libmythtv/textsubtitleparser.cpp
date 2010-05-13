@@ -17,7 +17,7 @@ using std::lower_bound;
 #include <QTextCodec>
 
 // MythTV
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "RingBuffer.h"
 #include "textsubtitleparser.h"
 #include "xine_demux_sputext.h"
@@ -130,7 +130,7 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     target.SetFrameBasedTiming(!sub_data.uses_time);
 
     QTextCodec *textCodec = NULL;
-    QString codec = gContext->GetSetting("SubtitleCodec", "");
+    QString codec = gCoreContext->GetSetting("SubtitleCodec", "");
     if (!codec.isEmpty())
         textCodec = QTextCodec::codecForName(codec.toLatin1());
     if (!textCodec)

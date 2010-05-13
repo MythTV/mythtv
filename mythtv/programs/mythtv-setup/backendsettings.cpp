@@ -2,7 +2,7 @@
 
 #include "backendsettings.h"
 #include "frequencies.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "settings.h"
 #include "channelsettings.h" // for ChannelTVFormat::GetFormats()
 #include <unistd.h>
@@ -680,7 +680,7 @@ static GlobalLineEdit *JobQueueCommFlagCommand()
 static HostCheckBox *JobAllowUserJob(uint job_num)
 {
     QString dbStr = QString("JobAllowUserJob%1").arg(job_num);
-    QString desc  = gContext->GetSetting(QString("UserJobDesc%1").arg(job_num));
+    QString desc  = gCoreContext->GetSetting(QString("UserJobDesc%1").arg(job_num));
     QString label = QObject::tr("Allow %1 jobs").arg(desc);
 
     HostCheckBox *bc = new HostCheckBox(dbStr);
@@ -690,7 +690,7 @@ static HostCheckBox *JobAllowUserJob(uint job_num)
     // It would be nice to disable inactive jobs,
     // but enabling them currently requires a restart of mythtv-setup
     // after entering the job command string. Will improve this logic later:
-    // if (QString(gContext->GetSetting(QString("UserJob%1").arg(job_num)))
+    // if (QString(gCoreContext->GetSetting(QString("UserJob%1").arg(job_num)))
     //            .length() == 0)
     //     bc->setEnabled(false);
     bc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
@@ -974,7 +974,7 @@ BackendSettings::BackendSettings() {
     server->setLabel(QObject::tr("Host Address Backend Setup"));
     VerticalConfigurationGroup* localServer = new VerticalConfigurationGroup();
     localServer->setLabel(QObject::tr("Local Backend") + " (" +
-                          gContext->GetHostName() + ")");
+                          gCoreContext->GetHostName() + ")");
     HorizontalConfigurationGroup* localIP =
               new HorizontalConfigurationGroup(false, false, true, true);
     localIP->addChild(LocalServerIP());

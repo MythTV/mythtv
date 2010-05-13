@@ -4,7 +4,7 @@
 // MythTV headers
 #include "NuppelVideoPlayer.h"
 #include "frame.h"          // VideoFrame
-#include "mythcontext.h"
+#include "mythverbose.h"
 
 // Commercial Flagging headers
 #include "pgm.h"

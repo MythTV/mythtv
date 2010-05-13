@@ -5,7 +5,7 @@
 
 #include "recordingprofile.h"
 #include "cardutil.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythwizard.h"
@@ -1269,7 +1269,7 @@ void RecordingProfile::loadByID(int profileId)
 
     if (isEncoder)
     {
-        QString tvFormat = gContext->GetSetting("TVFormat");
+        QString tvFormat = gCoreContext->GetSetting("TVFormat");
         if (type.toUpper() != "HDPVR")
             addChild(new ImageSize(*this, tvFormat, profileName));
 
@@ -1317,7 +1317,7 @@ void RecordingProfile::FiltersChanged(const QString &val)
 
 bool RecordingProfile::loadByType(const QString &name, const QString &cardtype)
 {
-    QString hostname = gContext->GetHostName().toLower();
+    QString hostname = gCoreContext->GetHostName().toLower();
     uint recid = 0;
 
     MSqlQuery result(MSqlQuery::InitCon());
@@ -1397,7 +1397,7 @@ void RecordingProfile::setCodecTypes()
 DialogCode RecordingProfile::exec(void)
 {
     MythDialog *dialog = dialogWidget(
-        gContext->GetMainWindow(), "Recording Profile");
+        GetMythMainWindow(), "Recording Profile");
 
     dialog->Show();
     if (tr_lossless)
@@ -1437,7 +1437,7 @@ void RecordingProfileEditor::open(int id)
     {
         QString profName;
         RPPopupResult result = RecordingProfilePopup::showPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             tr("Add Recording Profile"),
             tr("Enter the name of the new profile"), profName);
         if (result == RPPopup_CANCEL)

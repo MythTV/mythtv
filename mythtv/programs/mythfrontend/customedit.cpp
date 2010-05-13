@@ -8,7 +8,7 @@
 #include "mythdb.h"
 
 // libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 // libmythui
 #include "mythuibuttonlist.h"
@@ -36,14 +36,14 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
     seSuffix = QString(" (%1)").arg(tr("stored search"));
     exSuffix = QString(" (%1)").arg(tr("stored example"));
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 CustomEdit::~CustomEdit(void)
 {
     delete m_pginfo;
 
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 }
 
 bool CustomEdit::Create()

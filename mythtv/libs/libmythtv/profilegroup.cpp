@@ -1,7 +1,6 @@
 #include "recordingprofile.h"
 #include "videosource.h"
 #include "profilegroup.h"
-#include "mythcontext.h"
 #include "mythdb.h"
 #include "mythuihelper.h"
 #include "cardutil.h"
@@ -247,7 +246,7 @@ DialogCode ProfileGroupEditor::exec(void)
 
         Load();
 
-        dialog = new ConfigurationDialogWidget(gContext->GetMainWindow(),
+        dialog = new ConfigurationDialogWidget(GetMythMainWindow(),
                                                "ProfileGroupEditor");
 
         connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
@@ -290,7 +289,7 @@ void ProfileGroupEditor::callDelete(void)
                           QString("\n'%1'?").arg(ProfileGroup::getName(id));
 
         DialogCode value = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             "", message,
             QObject::tr("Yes, delete group"),
             QObject::tr("No, Don't delete group"), kDialogCodeButton1);

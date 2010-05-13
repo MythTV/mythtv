@@ -15,7 +15,6 @@
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
-#include "mythcontext.h"
 #include "compat.h"
 #include "mythverbose.h"
 #include "mythconfig.h"

@@ -25,7 +25,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythwidgets.h"
 #include "mythdialogs.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "videosource.h"
 #include "datadirect.h"
 #include "scanwizard.h"
@@ -96,7 +96,7 @@ void VideoSourceSelector::Load(void)
     }
 
     query.prepare(querystr);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec() || !query.isActive() || query.size() <= 0)
         return;
@@ -223,7 +223,7 @@ TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
 
 void TransFreqTableSelector::Load(void)
 {
-    int idx = getValueIndex(gContext->GetSetting("FreqTable"));
+    int idx = getValueIndex(gCoreContext->GetSetting("FreqTable"));
     if (idx >= 0)
         setValue(idx);
 
@@ -264,7 +264,7 @@ void TransFreqTableSelector::Save(void)
 
     if ((loaded_freq_table == getValue()) ||
         ((loaded_freq_table.toLower() == "default") &&
-         (getValue() == gContext->GetSetting("FreqTable"))))
+         (getValue() == gCoreContext->GetSetting("FreqTable"))))
     {
         return;
     }
@@ -457,7 +457,7 @@ void XMLTV_generic_config::Save()
     {
         VERBOSE(VB_IMPORTANT, "\n" << err_msg);
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), QObject::tr("Warning."), err_msg);
+            GetMythMainWindow(), QObject::tr("Warning."), err_msg);
     }
 */
 }
@@ -2052,7 +2052,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
         "ORDER BY cardid";
 
     query.prepare(qstr);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec())
     {
@@ -2487,7 +2487,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
 
     // If there are channels sort them, then add theme
     // (selecting the old start channel if it is there).
-    QString order = gContext->GetSetting("ChannelOrdering", "channum");
+    QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(channels, order);
     for (uint i = 0; i < channels.size(); i++)
     {
@@ -2662,7 +2662,7 @@ void CardInput::CreateNewInputGroup(void)
     {
         tmp_name = "";
         bool ok = MythPopupBox::showGetTextPopup(
-            gContext->GetMainWindow(), tr("Create Input Group"),
+            GetMythMainWindow(), tr("Create Input Group"),
             tr("Enter new group name"), tmp_name);
 
         new_name = tmp_name;
@@ -2673,7 +2673,7 @@ void CardInput::CreateNewInputGroup(void)
         if (new_name.isEmpty())
         {
             MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(), tr("Error"),
+                GetMythMainWindow(), tr("Error"),
                 tr("Sorry, this Input Group name can not be blank."));
             continue;
         }
@@ -2694,7 +2694,7 @@ void CardInput::CreateNewInputGroup(void)
         if (query.next())
         {
             MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(), tr("Error"),
+                GetMythMainWindow(), tr("Error"),
                 tr("Sorry, this Input Group name is already in use."));
             continue;
         }
@@ -2908,7 +2908,7 @@ void CaptureCardEditor::Load(void)
     listbox->clearSelections();
     listbox->addSelection(QObject::tr("(New capture card)"), "0");
     listbox->addSelection(QObject::tr("(Delete all capture cards on %1)")
-                          .arg(gContext->GetHostName()), "-1");
+                          .arg(gCoreContext->GetHostName()), "-1");
     listbox->addSelection(QObject::tr("(Delete all capture cards)"), "-2");
     CaptureCard::fillSelections(listbox);
 }
@@ -2933,7 +2933,7 @@ void CaptureCardEditor::menu(void)
     else
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             "",
             tr("Capture Card Menu"),
             tr("Edit.."),
@@ -2953,9 +2953,9 @@ void CaptureCardEditor::edit(void)
     if (-1 == cardid)
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(), "",
+            GetMythMainWindow(), "",
             tr("Are you sure you want to delete "
-               "ALL capture cards on %1?").arg(gContext->GetHostName()),
+               "ALL capture cards on %1?").arg(gCoreContext->GetHostName()),
             tr("Yes, delete capture cards"),
             tr("No, don't"), kDialogCodeButton1);
 
@@ -2967,15 +2967,15 @@ void CaptureCardEditor::edit(void)
                 "SELECT cardid "
                 "FROM capturecard "
                 "WHERE hostname = :HOSTNAME");
-            cards.bindValue(":HOSTNAME", gContext->GetHostName());
+            cards.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
             if (!cards.exec() || !cards.isActive())
             {
                 MythPopupBox::showOkPopup(
-                    gContext->GetMainWindow(),
+                    GetMythMainWindow(),
                     tr("Error getting list of cards for this host"),
                     tr("Unable to delete capturecards for %1")
-                    .arg(gContext->GetHostName()));
+                    .arg(gCoreContext->GetHostName()));
 
                 MythDB::DBError("Selecting cardids for deletion", cards);
                 return;
@@ -2988,7 +2988,7 @@ void CaptureCardEditor::edit(void)
     else if (-2 == cardid)
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(), "",
+            GetMythMainWindow(), "",
             tr("Are you sure you want to delete "
                "ALL capture cards?"),
             tr("Yes, delete capture cards"),
@@ -3012,7 +3012,7 @@ void CaptureCardEditor::edit(void)
 void CaptureCardEditor::del(void)
 {
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), "",
+        GetMythMainWindow(), "",
         tr("Are you sure you want to delete this capture card?"),
         tr("Yes, delete capture card"),
         tr("No, don't"), kDialogCodeButton1);
@@ -3066,7 +3066,7 @@ void VideoSourceEditor::menu(void)
     else
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             "",
             tr("Video Source Menu"),
             tr("Edit.."),
@@ -3086,7 +3086,7 @@ void VideoSourceEditor::edit(void)
     if (-1 == sourceid)
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(), "",
+            GetMythMainWindow(), "",
             tr("Are you sure you want to delete "
                "ALL video sources?"),
             tr("Yes, delete video sources"),
@@ -3110,7 +3110,7 @@ void VideoSourceEditor::edit(void)
 void VideoSourceEditor::del()
 {
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), "",
+        GetMythMainWindow(), "",
         tr("Are you sure you want to delete "
            "this video source?"),
         tr("Yes, delete video source"),
@@ -3153,7 +3153,7 @@ void CardInputEditor::Load(void)
         "FROM capturecard "
         "WHERE hostname = :HOSTNAME "
         "ORDER BY cardid");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec())
     {

@@ -2,7 +2,7 @@
 
 #include "dialogbox.h"
 #include "langsettings.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "util.h"
 
@@ -34,7 +34,7 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
     // Users and developers can choose to live dangerously,
     // either to silently and automatically upgrade,
     // or an expert option to allow use of existing:
-    switch (gContext->GetNumSetting("DBSchemaAutoUpgrade"))
+    switch (gCoreContext->GetNumSetting("DBSchemaAutoUpgrade"))
     {
         case  1: m_autoUpgrade = true; break;
         case -1: m_expertMode  = true; break;
@@ -96,7 +96,7 @@ MythDBBackupStatus SchemaUpgradeWizard::BackupDB(void)
 
 int SchemaUpgradeWizard::Compare(void)
 {
-    DBver = gContext->GetSetting(m_schemaSetting);
+    DBver = gCoreContext->GetSetting(m_schemaSetting);
 
     // No current schema? Investigate further:
     if (DBver.isEmpty() || DBver == "0")
@@ -188,7 +188,7 @@ MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
                                                  bool upgradable, bool expert)
 {
     DialogBox       * dlg;
-    MythMainWindow  * win = gContext->GetMainWindow();
+    MythMainWindow  * win = GetMythMainWindow();
 
     if (!win)
         return MYTH_SCHEMA_ERROR;
@@ -263,7 +263,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
 
     connections = CountClients() > 1;
-    gui         = GetMythUI()->IsScreenSetup() && gContext->GetMainWindow();
+    gui         = GetMythUI()->IsScreenSetup() && GetMythMainWindow();
     validDBMS   = (minDBMSmajor == 0)   // If the caller provided no version,
                   ? true                // the upgrade code can't be fussy!
                   : CompareDBMSVersion(minDBMSmajor,
@@ -392,7 +392,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         if (returnValue == MYTH_SCHEMA_ERROR)
         {
             // Display error, return warning to caller
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "", message);
+            MythPopupBox::showOkPopup(GetMythMainWindow(), "", message);
             return MYTH_SCHEMA_ERROR;
         }
 

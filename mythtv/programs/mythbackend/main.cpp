@@ -42,7 +42,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "housekeeper.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "mythdb.h"

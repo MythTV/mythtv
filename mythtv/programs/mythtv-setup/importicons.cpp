@@ -4,7 +4,6 @@
 #include <QDir>
 #include <QFileInfo>
 
-#include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythverbose.h"

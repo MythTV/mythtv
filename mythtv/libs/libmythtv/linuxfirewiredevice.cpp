@@ -33,7 +33,7 @@ using namespace std;
 // MythTV headers
 #include "linuxfirewiredevice.h"
 #include "firewirerecorder.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "linuxavcinfo.h"
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
@@ -131,9 +131,9 @@ LinuxFirewireDevice::LinuxFirewireDevice(
     m_use_p2p(use_p2p), m_priv(new LFDPriv())
 {
     if (!m_bufsz)
-        m_bufsz = gContext->GetNumSetting("HDRingbufferSize");
+        m_bufsz = gCoreContext->GetNumSetting("HDRingbufferSize");
 
-    m_db_reset_disabled = gContext->GetNumSetting("DisableFirewireReset", 0);
+    m_db_reset_disabled = gCoreContext->GetNumSetting("DisableFirewireReset", 0);
 
     UpdateDeviceList();
 }

@@ -724,7 +724,7 @@ bool MHIContext::TuneTo(int channel)
 
     // Post an event requesting a channel change.
     MythEvent me(QString("NETWORK_CONTROL CHANID %1").arg(channel));
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
     // Reset the NBI version here to prevent a reboot.
     QMutexLocker locker(&m_dsmccLock);
     m_lastNbiVersion = NBI_VERSION_UNSET;

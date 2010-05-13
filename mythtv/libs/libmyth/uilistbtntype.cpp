@@ -27,7 +27,6 @@ using namespace std;
 #include <QPixmap>
 #include <QPainter>
 
-#include "mythcontext.h"
 #include "mythverbose.h"
 #include "lcddevice.h"
 
@@ -1472,7 +1471,7 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
 
 bool UIListBtnType::incSearchStart(void)
 {
-    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(),
                                            "incserach_popup");
 
     QLabel *caption = popup->addLabel(tr("Search"), MythPopupBox::Large);

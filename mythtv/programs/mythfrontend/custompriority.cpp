@@ -9,7 +9,7 @@
 #include "mythverbose.h"
 
 // libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 // libmythtv
 #include "scheduledrecording.h"
@@ -34,14 +34,14 @@ CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
     else
         m_pginfo = new ProgramInfo();
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 CustomPriority::~CustomPriority(void)
 {
     delete m_pginfo;
 
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 }
 
 bool CustomPriority::Create()

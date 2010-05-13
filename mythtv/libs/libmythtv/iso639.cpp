@@ -2,7 +2,7 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
 #include "iso639.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythuihelper.h"
 
 QMap<int, QString>    _iso639_key_to_english_name;
@@ -35,7 +35,7 @@ QStringList iso639_get_language_list(void)
         for (uint i = 0; true; i++)
         {
             QString q = QString("ISO639Language%1").arg(i);
-            QString lang = gContext->GetSetting(q, "").toLower();
+            QString lang = gCoreContext->GetSetting(q, "").toLower();
             if (lang == "")
                 break;
             _languages << lang;

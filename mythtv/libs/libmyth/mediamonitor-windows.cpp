@@ -8,7 +8,6 @@
 #include "compat.h"
 
 #include "mediamonitor-windows.h"
-#include "mythcontext.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
 #include "mythverbose.h"

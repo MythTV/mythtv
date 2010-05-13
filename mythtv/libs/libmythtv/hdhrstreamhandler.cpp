@@ -246,7 +246,7 @@ void HDHRStreamHandler::RunTS(void)
     int remainder = 0;
 
     /* Calculate buffer size */
-    uint buffersize = gContext->GetNumSetting(
+    uint buffersize = gCoreContext->GetNumSetting(
         "HDRingbufferSize", 50 * TSPacket::SIZE) * 1024;
     buffersize /= VIDEO_DATA_PACKET_SIZE;
     buffersize *= VIDEO_DATA_PACKET_SIZE;

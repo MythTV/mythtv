@@ -32,7 +32,6 @@
 #endif
 
 #include "mythcontext.h"
-#include "mythverbose.h"
 #include "mythmainwindow.h"
 
 #ifdef USING_XV
@@ -81,7 +80,7 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 {
     VideoSync *trial = NULL;
     tryingVideoSync  = true;
-    bool tryOpenGL   = (gContext->GetNumSetting("UseOpenGLVSync", 1) &&
+    bool tryOpenGL   = (gCoreContext->GetNumSetting("UseOpenGLVSync", 1) &&
                         (getenv("NO_OPENGL_VSYNC") == NULL));
 
     // m_forceskip allows for skipping one sync method

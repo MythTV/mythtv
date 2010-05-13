@@ -16,7 +16,7 @@ using namespace std;
 // MythTV headers
 #include "mythmediamonitor.h"
 #include "mythcdrom.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdialogs.h"
 #include "mythconfig.h"
 #include "mythdialogbox.h"
@@ -182,7 +182,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
         (((int)kDialogCodeButton0) + buttonmsgs.size() - 1);
 
     DialogCode ret = MythPopupBox::ShowButtonPopup(
-        gContext->GetMainWindow(), "select drive", label,
+        GetMythMainWindow(), "select drive", label,
         buttonmsgs, cancelbtn);
 
     // If the user cancelled, return a special value
@@ -288,13 +288,13 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
 {
     // MediaMonitor object is always created,
     // but the user can elect not to actually do monitoring:
-    m_StartThread = gContext->GetNumSetting("MonitorDrives");
+    m_StartThread = gCoreContext->GetNumSetting("MonitorDrives");
 
     // or not send status changed events:
-    m_SendEvent = gContext->GetNumSetting("MediaChangeEvents");
+    m_SendEvent = gCoreContext->GetNumSetting("MediaChangeEvents");
 
     // User can specify that some devices are not monitored
-    QString ignore = gContext->GetSetting("IgnoreDevices", "");
+    QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
 
     if (ignore.length())
         m_IgnoreList = ignore.split(',', QString::SkipEmptyParts);
@@ -683,7 +683,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
         // postEvent() would result in pDevice's media type changing
         // ... before the plugin's event chain would process it.
         // Another way would be to send an exact copy of pDevice instead.
-        QCoreApplication::sendEvent((QObject*)gContext->GetMainWindow(), e);
+        QCoreApplication::sendEvent((QObject*)GetMythMainWindow(), e);
         delete e;
     }
     else
@@ -777,7 +777,7 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
                                     QString label,
                                     const char *hardCodedDefault)
 {
-    QString device = gContext->GetSetting(dbSetting);
+    QString device = gCoreContext->GetSetting(dbSetting);
 
     VERBOSE(VB_MEDIA+VB_EXTRA,
             QString("MediaMonitor::defaultDevice(%1,..,%2) dbSetting='%3'")

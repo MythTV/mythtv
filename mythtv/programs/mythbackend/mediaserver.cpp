@@ -183,7 +183,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
         // VERBOSE(VB_UPNP, QString( "MediaServer::Adding Context Listener" ));
 
-        // gContext->addListener( this );
+        // gCoreContext->addListener( this );
 
         Start();
 
@@ -200,7 +200,7 @@ MediaServer::~MediaServer()
 {
     // -=>TODO: Need to check to see if calling this more than once is ok.
 
-//    gContext->removeListener(this);
+//    gCoreContext->removeListener(this);
 
     delete m_pHttpServer;
 }

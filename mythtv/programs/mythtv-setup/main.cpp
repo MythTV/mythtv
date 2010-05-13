@@ -138,7 +138,7 @@ bool resetTheme(QString themedir, const QString badtheme)
                 QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
-    gContext->OverrideSettingForSession("Theme", themename);
+    gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
 
     LanguageSettings::reload();
@@ -424,7 +424,7 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                   .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        gContext->SetSetting("Theme", DEFAULT_UI_THEME);
+        gCoreContext->SetSetting("Theme", DEFAULT_UI_THEME);
         GetMythUI()->LoadQtConfig();
 
         QString fileprefix = GetConfDir();
@@ -577,12 +577,11 @@ int main(int argc, char *argv[])
     }
 
     // If "System Exit key" is set to "No exit key", override for setup
-    if (0 == gContext->GetNumSetting("AllowQuitShutdown", 4))
-        gContext->OverrideSettingForSession("AllowQuitShutdown", "4");
+    if (0 == gCoreContext->GetNumSetting("AllowQuitShutdown", 4))
+        gCoreContext->OverrideSettingForSession("AllowQuitShutdown", "4");
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
     themeBase = new MythThemeBase();
@@ -602,7 +601,7 @@ int main(int argc, char *argv[])
         startPrompt = new StartPrompter();
     startPrompt->handleStart();
 
-    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {

@@ -1,4 +1,3 @@
-#include "mythcontext.h"
 #include "mythdb.h"
 #include "playgroup.h"
 #include "programinfo.h"
@@ -226,7 +225,7 @@ void PlayGroupEditor::open(QString name)
     if (name == "__CREATE_NEW_GROUP__")
     {
         name = "";
-        bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(),
+        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(), 
             tr("Create New Playback Group"),
             tr("Enter group name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -265,7 +264,7 @@ void PlayGroupEditor::doDelete(void)
         QString("\n'%1'?").arg(name);
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(),
+        GetMythMainWindow(),
         "", message,
         tr("Yes, delete group"),
         tr("No, Don't delete group"), kDialogCodeButton1);

@@ -239,7 +239,6 @@ int main(int argc, char **argv)
     }
 
     //  Get the Myth context and db hooks
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -250,10 +249,10 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    gContext->ConnectToMasterServer(false);
+    gCoreContext->ConnectToMasterServer(false);
 
     //  Figure out port to listen on
-    int assigned_port = gContext->GetNumSetting("LCDServerPort", 6545);
+    int assigned_port = gCoreContext->GetNumSetting("LCDServerPort", 6545);
     if (special_port > 0)
     {
         assigned_port = special_port;

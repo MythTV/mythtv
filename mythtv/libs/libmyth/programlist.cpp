@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "util.h"
 #include "programlist.h"
@@ -124,7 +124,7 @@ static bool FromProgramQuery(
     if (!sql.contains(" ORDER BY "))
     {
         querystr += " ORDER BY program.starttime, ";
-        QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+        QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
         if (chanorder != "channum")
             querystr += chanorder + " ";
         else // approximation which the DB can handle
@@ -240,10 +240,10 @@ bool LoadFromRecorded(
 
     QString     fs_db_name = "";
     QDateTime   rectime    = QDateTime::currentDateTime().addSecs(
-                              -gContext->GetNumSetting("RecordOverTime"));
+                              -gCoreContext->GetNumSetting("RecordOverTime"));
 
-    QString ip        = gContext->GetSetting("BackendServerIP");
-    QString port      = gContext->GetSetting("BackendServerPort");
+    QString ip        = gCoreContext->GetSetting("BackendServerIP");
+    QString port      = gCoreContext->GetSetting("BackendServerPort");
 
     // ----------------------------------------------------------------------
 
@@ -339,7 +339,7 @@ bool LoadFromRecorded(
     thequery += "ORDER BY recorded.starttime";
     thequery += (orderDescending) ? " DESC " : "";
 
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+    QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
     if (chanorder != "channum")
         thequery += ", " + chanorder;
     else // approximation which the DB can handle
@@ -394,7 +394,7 @@ bool LoadFromRecorded(
         proginfo->pathname = query.value(28).toString();
 
         if (proginfo->hostname.isEmpty())
-            proginfo->hostname = gContext->GetHostName();
+            proginfo->hostname = gCoreContext->GetHostName();
 
         if (!query.value(7).toString().isEmpty())
         {
@@ -489,7 +489,7 @@ bool LoadFromScheduler(
     destination.clear();
     hasConflicts = false;
 
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
         return false;
 
     QString query;
@@ -504,7 +504,7 @@ bool LoadFromScheduler(
     }
 
     QStringList slist( query );
-    if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
+    if (!gCoreContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
         VERBOSE(VB_IMPORTANT,
                 "LoadFromScheduler(): Error querying master.");

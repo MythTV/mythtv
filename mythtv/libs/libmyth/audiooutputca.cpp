@@ -26,7 +26,7 @@
 
 using namespace std;
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "audiooutputca.h"
 #include "config.h"
 #include "SoundTouch.h" 
@@ -246,9 +246,9 @@ bool AudioOutputCA::OpenDevice()
 
     if (internal_vol && set_initial_vol)
     {
-        QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+        QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
-        SetCurrentVolume(gContext->GetNumSetting(controlLabel, 80));
+        SetCurrentVolume(gCoreContext->GetNumSetting(controlLabel, 80));
     }
 
     return true;

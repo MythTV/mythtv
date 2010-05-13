@@ -6,7 +6,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mainserver.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 #include "inputinfo.h"
 #include "decodeencode.h"
@@ -18,7 +18,7 @@ PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
                            QString lhostname, PlaybackSockEventsMode eventsMode)
 {
     m_parent = parent;
-    QString localhostname = gContext->GetHostName();
+    QString localhostname = gCoreContext->GetHostName();
 
     refCount = 0;
 
@@ -113,7 +113,7 @@ bool PlaybackSock::SendReceiveStringList(
                 strlist.pop_front();
                 strlist.pop_front();
                 MythEvent me(message, strlist);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
             }
 
             ok = sock->readStringList(strlist);

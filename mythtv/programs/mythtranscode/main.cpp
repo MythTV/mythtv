@@ -425,7 +425,6 @@ int main(int argc, char *argv[])
         print_verbose_messages = VB_NONE;
 
     //  Load the context
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -442,7 +441,7 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                           .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -739,9 +738,9 @@ int transUnlink(QString filename, ProgramInfo *pginfo)
     if (pginfo != NULL && !pginfo->storagegroup.isEmpty() &&
         !pginfo->hostname.isEmpty())
     {
-        QString ip = gContext->GetSettingOnHost("BackendServerIP",
+        QString ip = gCoreContext->GetSettingOnHost("BackendServerIP",
                                                 pginfo->hostname);
-        QString port = gContext->GetSettingOnHost("BackendServerPort",
+        QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   pginfo->hostname);
         QString basename = filename.section('/', -1);
         QString uri = QString("myth://%1@%2:%3/%4").arg(pginfo->storagegroup)
@@ -810,10 +809,10 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                     .arg(tmpfile).arg(newfile) + ENO);
         }
 
-        if (!gContext->GetNumSetting("SaveTranscoding", 0))
+        if (!gCoreContext->GetNumSetting("SaveTranscoding", 0))
         {
             int err;
-            bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
+            bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
 
             VERBOSE(VB_FILE, QString("mythtranscode: About to unlink/delete "
                                      "file: %1").arg(oldfile));

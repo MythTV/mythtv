@@ -503,7 +503,6 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -521,7 +520,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
-    gContext->LogEntry("mythfilldatabase", LP_INFO,
+    gCoreContext->LogEntry("mythfilldatabase", LP_INFO,
                        "Listings Download Started", "");
 
     if (!grab_data)
@@ -638,7 +637,7 @@ int main(int argc, char *argv[])
                   VERBOSE(VB_IMPORTANT,
                           "There are no channel sources defined, did you run "
                           "the setup program?");
-                  gContext->LogEntry("mythfilldatabase", LP_CRITICAL,
+                  gCoreContext->LogEntry("mythfilldatabase", LP_CRITICAL,
                                      "No channel sources defined",
                                      "Could not find any defined channel "
                                      "sources - did you run the setup "
@@ -657,7 +656,7 @@ int main(int argc, char *argv[])
         if (!fill_data.Run(sourcelist))
         {
              VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
-             gContext->LogEntry("mythfilldatabase", LP_WARNING,
+             gCoreContext->LogEntry("mythfilldatabase", LP_WARNING,
                                 "Failed to fetch some program info", "");
         }
         else
@@ -709,7 +708,7 @@ int main(int argc, char *argv[])
             VERBOSE(VB_GENERAL,
                     QString("    %1 replacements made").arg(update_count));
 
-        gContext->LogEntry("mythfilldatabase", LP_INFO,
+        gCoreContext->LogEntry("mythfilldatabase", LP_INFO,
                            "Listings Download Finished", "");
     }
 
@@ -791,7 +790,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_GENERAL, "Marking repeats.");
 
-        int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
+        int newEpiWindow = gCoreContext->GetNumSetting( "NewEpisodeWindow", 14);
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("UPDATE program SET previouslyshown = 1 "
@@ -935,13 +934,13 @@ int main(int argc, char *argv[])
     }
 
     if ((usingDataDirect) &&
-        (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
+        (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
     {
         fill_data.ddprocessor.GrabNextSuggestedTime();
     }
 
     if (usingDataDirectLabs ||
-        !gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+        !gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
     {
         DataDirectProcessor::FixProgramIDs();
     }

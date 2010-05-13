@@ -52,6 +52,8 @@ class MPUBLIC MythEvent : public QEvent
     static Type MythEventMessage;
     static Type kExitToMainMenuEventType;
     static Type kMythPostShowEventType;
+    static Type kDisableDrawingEventType;
+    static Type kEnableDrawingEventType;
 
   private:
     QString message;

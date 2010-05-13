@@ -49,7 +49,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(void)
     bzero(&av_pause_frame, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
 
-    if (gContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
 }
 

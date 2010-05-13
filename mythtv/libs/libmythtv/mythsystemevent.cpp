@@ -4,7 +4,7 @@
 #include <QRunnable>
 #include <QThreadPool>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythsystem.h"
 #include "mythsystemevent.h"
 #include "mythverbose.h"
@@ -63,7 +63,7 @@ class SystemEventThread : public QRunnable
             return;
 
         RemoteSendMessage(QString("SYSTEM_EVENT_RESULT %1 SENDER %2 RESULT %3")
-                                  .arg(m_event).arg(gContext->GetHostName())
+                                  .arg(m_event).arg(gCoreContext->GetHostName())
                                   .arg(result));
     }
 
@@ -81,7 +81,7 @@ class SystemEventThread : public QRunnable
  */
 MythSystemEventHandler::MythSystemEventHandler(void)
 {
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 /** \fn MythSystemEventHandler::~MythSystemEventHandler()
@@ -91,7 +91,7 @@ MythSystemEventHandler::MythSystemEventHandler(void)
  */
 MythSystemEventHandler::~MythSystemEventHandler()
 {
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 }
 
 /** \fn MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
@@ -270,7 +270,7 @@ void MythSystemEventHandler::customEvent(QEvent *e)
         if (msg.startsWith("GLOBAL_SYSTEM_EVENT "))
         {
             RemoteSendMessage(msg.mid(7) + QString(" SENDER %1")
-                              .arg(gContext->GetHostName()));
+                              .arg(gCoreContext->GetHostName()));
             return;
         }
 
@@ -283,13 +283,13 @@ void MythSystemEventHandler::customEvent(QEvent *e)
         // Return if this event is for another host
         if ((tokens.size() >= 4) &&
             (tokens[2] == "HOST") &&
-            (tokens[3] != gContext->GetHostName()))
+            (tokens[3] != gCoreContext->GetHostName()))
             return;
 
         QString cmd;
 
         // See if this system has a command that runs for all system events
-        cmd = gContext->GetSetting("EventCmdAll");
+        cmd = gCoreContext->GetSetting("EventCmdAll");
         if (!cmd.isEmpty())
         {
             SubstituteMatches(tokens, cmd);
@@ -299,7 +299,7 @@ void MythSystemEventHandler::customEvent(QEvent *e)
         }
 
         // Check for an EventCmd for this particular event
-        cmd = gContext->GetSetting(EventNameToSetting(tokens[1]));
+        cmd = gCoreContext->GetSetting(EventNameToSetting(tokens[1]));
         if (!cmd.isEmpty())
         {
             SubstituteMatches(tokens, cmd);
@@ -320,7 +320,7 @@ void MythSystemEventHandler::customEvent(QEvent *e)
 void SendMythSystemEvent(const QString msg)
 {
     RemoteSendMessage(QString("SYSTEM_EVENT %1 SENDER %2")
-                              .arg(msg).arg(gContext->GetHostName()));
+                              .arg(msg).arg(gCoreContext->GetHostName()));
 }
 
 /** \fn SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
@@ -352,7 +352,7 @@ void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
     if (pginfo)
         SendMythSystemEvent(
             QString("%1 HOSTNAME %2 CHANID %3 STARTTIME %4")
-                    .arg(msg).arg(gContext->GetHostName())
+                    .arg(msg).arg(gCoreContext->GetHostName())
                     .arg(pginfo->chanid)
                     .arg(pginfo->recstartts.toString(Qt::ISODate)));
     else

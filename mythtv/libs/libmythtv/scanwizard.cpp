@@ -142,7 +142,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
                 .arg(scantype).arg(sourceid).arg(cardid));
 
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("ScanWizard"),
+            GetMythMainWindow(), tr("ScanWizard"),
             tr("Programmer Error, see console"));
     }
 
@@ -161,7 +161,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             start_chan["mod_sys"],        start_chan["rolloff"]))
     {
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("ScanWizard"),
+            GetMythMainWindow(), tr("ScanWizard"),
             tr("Error parsing parameters"));
 
         do_scan = false;

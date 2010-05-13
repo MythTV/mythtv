@@ -13,7 +13,7 @@
 #include "util-osx-cocoa.h"
 #include "videoouttypes.h"
 #include "storagegroup.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")
@@ -98,7 +98,7 @@ void PlayerContext::SetInitialTVState(bool islivetv)
     }
     else if (playingInfo)
     {
-        int overrecordseconds = gContext->GetNumSetting("RecordOverTime");
+        int overrecordseconds = gCoreContext->GetNumSetting("RecordOverTime");
         QDateTime curtime = QDateTime::currentDateTime();
         QDateTime recendts = playingInfo->recendts.addSecs(overrecordseconds);
 
@@ -435,7 +435,7 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
                               WId embedwinid, const QRect *embedbounds,
                               bool muted)
 {
-    int exact_seeking = gContext->GetNumSetting("ExactSeeking", 0);
+    int exact_seeking = gCoreContext->GetNumSetting("ExactSeeking", 0);
 
     if (HasNVP())
     {
@@ -450,9 +450,9 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
         _nvp->DisableHardwareDecoders();
 
     _nvp->SetPlayerInfo(tv, widget, exact_seeking, this);
-    _nvp->SetAudioInfo(gContext->GetSetting("AudioOutputDevice"),
-                       gContext->GetSetting("PassThruOutputDevice"),
-                       gContext->GetNumSetting("AudioSampleRate", 44100));
+    _nvp->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"),
+                       gCoreContext->GetSetting("PassThruOutputDevice"),
+                       gCoreContext->GetNumSetting("AudioSampleRate", 44100));
     _nvp->SetAudioStretchFactor(ts_normal);
     _nvp->SetLength(playingLen);
 
@@ -763,7 +763,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
     QString filters     = baseFilters;
     QString chanFilters = QString::null;
 
-    if (gContext->IsDatabaseIgnored())
+    if (gCoreContext->IsDatabaseIgnored())
         return baseFilters;
 
     LockPlayingInfo(__FILE__, __LINE__);
@@ -872,9 +872,9 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
         if (IsPIP())
             seed = "PIP";
 
-        seed += gContext->GetHostName();
+        seed += gCoreContext->GetHostName();
 
-        tvchain->InitializeNewChain(gContext->GetHostName());
+        tvchain->InitializeNewChain(gCoreContext->GetHostName());
     }
 }
 
@@ -894,7 +894,7 @@ void PlayerContext::SetRingBuffer(RingBuffer *buf)
  */
 void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
 {
-    bool ignoreDB = gContext->IsDatabaseIgnored();
+    bool ignoreDB = gCoreContext->IsDatabaseIgnored();
 
     QMutexLocker locker(&playingInfoLock);
 

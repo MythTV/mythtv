@@ -69,7 +69,7 @@ OSDListTreeType::OSDListTreeType(
       m_wmult(wmult),                   m_hmult(hmult),
       m_depth(0),                        m_levelnum(-1),
       m_visible(true),
-      m_arrowAccel(gContext->GetNumSetting("UseArrowAccels", 1)),
+      m_arrowAccel(gCoreContext->GetNumSetting("UseArrowAccels", 1)),
       m_listener(NULL)
 {
     m_wmult        = (wmult == 0.0f) ? 1.0f : wmult;
@@ -200,7 +200,7 @@ static bool has_action(QString action, const QStringList &actions)
 bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
 {
     QStringList actions;
-    bool handled = gContext->GetMainWindow()->TranslateKeyPress(
+    bool handled = GetMythMainWindow()->TranslateKeyPress(
         "TV Playback", e, actions);
 
     if (handled)

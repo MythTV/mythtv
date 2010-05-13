@@ -7,7 +7,7 @@
 
 #include "mythfexml.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 #include "mythdbcon.h"
 
@@ -117,9 +117,9 @@ void MythFEXML::GetScreenShot( HTTPRequest *pRequest )
     // Read Icon file path from database
 
     QString sFileName = QString("/%1/myth-screenshot-XML.jpg")
-                    .arg(gContext->GetSetting("ScreenShotPath","/tmp/"));
+                    .arg(gCoreContext->GetSetting("ScreenShotPath","/tmp/"));
 
-    if (!gContext->GetMainWindow()->screenShot(sFileName,nWidth, nHeight))
+    if (!GetMythMainWindow()->screenShot(sFileName,nWidth, nHeight))
     {
         VERBOSE(VB_GENERAL, "MythFEXML: Failed to take screenshot. Aborting");
         return;

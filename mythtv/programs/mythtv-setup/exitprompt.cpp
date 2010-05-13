@@ -2,8 +2,7 @@
 
 // MythTV stuff
 #include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
@@ -35,7 +34,7 @@ ExitPrompter::~ExitPrompter()
 
 void ExitPrompter::masterPromptExit()
 {
-    if (gContext->IsMasterHost())
+    if (gCoreContext->IsMasterHost())
     {
         QString label = tr("If this is the master backend server,"
                            " please run 'mythfilldatabase' to populate"
@@ -122,9 +121,9 @@ void ExitPrompter::customEvent(QEvent *event)
 void ExitPrompter::quit()
 {
     // If the backend was stopped restart it here
-    if (gContext->GetSetting("AutoRestartBackend") == "1")
+    if (gCoreContext->GetSetting("AutoRestartBackend") == "1")
     {
-        QString commandString = gContext->GetSetting("BackendStartCommand");
+        QString commandString = gCoreContext->GetSetting("BackendStartCommand");
         if (!commandString.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, "backendrestart"+commandString);
@@ -134,7 +133,7 @@ void ExitPrompter::quit()
     else
     {
         // No need to run this if the backend has just restarted
-        if (gContext->BackendIsRunning())
+        if (gCoreContext->BackendIsRunning())
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
         }

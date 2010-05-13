@@ -20,7 +20,6 @@
 
 // MythTV headers
 #include "mythterminal.h"
-#include "mythcontext.h"
 
 MythTerminal::MythTerminal(QString _program, QStringList _arguments) :
     lock(QMutex::Recursive), running(false),
@@ -166,7 +165,8 @@ bool MythTerminalKeyFilter::eventFilter(QObject *obj, QEvent *event)
     {
         QKeyEvent *e = (QKeyEvent*)(event);
         QStringList actions;
-        bool handled = gContext->TranslateKeyPress("qt", e, actions, false);
+        bool handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions,
+                                                              false);
         if (!handled && !actions.isEmpty())
         {
             if (actions.contains("LEFT") || actions.contains("RIGHT"))

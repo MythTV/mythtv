@@ -16,7 +16,7 @@
 #include "httprequest.h"
 #include "storagegroup.h"
 #include "util.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 
 /*
@@ -182,7 +182,7 @@ bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // WMP11 compatibility code
 
     if (( pRequest->m_sObjectId                  == "13") &&
-        ( gContext->GetSetting("UPnP/WMPSource") !=  "1") )
+        ( gCoreContext->GetSetting("UPnP/WMPSource") !=  "1") )
     {
         pRequest->m_sObjectId = "RecTv/0";
 
@@ -222,7 +222,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
     if ( bOurs && ( pRequest->m_sObjectId == "0" ))
     {
-        if ( gContext->GetSetting("UPnP/WMPSource") != "1") // GetBoolSetting()?
+        if ( gCoreContext->GetSetting("UPnP/WMPSource") != "1") // GetBoolSetting()?
         {
             pRequest->m_sObjectId = "RecTv/0";
             pRequest->m_sParentId = '8';        // -=>TODO: Not sure why this was added
@@ -264,10 +264,10 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     // ----------------------------------------------------------------------
 
     if (!m_mapBackendIp.contains( sHostName ))
-        m_mapBackendIp[ sHostName ] = gContext->GetSettingOnHost( "BackendServerIp", sHostName);
+        m_mapBackendIp[ sHostName ] = gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
 
     if (!m_mapBackendPort.contains( sHostName ))
-        m_mapBackendPort[ sHostName ] = gContext->GetSettingOnHost("BackendStatusPort", sHostName);
+        m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
 
     // ----------------------------------------------------------------------
     // Build Support Strings

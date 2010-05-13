@@ -33,7 +33,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include <mythcontext.h>
+#include <mythcorecontext.h>
 #include <mythmainwindow.h>
 
 // MythUI headers
@@ -143,7 +143,7 @@ bool MythControls::Create(void)
 
     BuildFocusList();
 
-    LoadData(gContext->GetHostName());
+    LoadData(gCoreContext->GetHostName());
 
     /* start off with the actions by contexts view */
     m_currentView = kActionsByContext;

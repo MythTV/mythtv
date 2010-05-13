@@ -190,7 +190,7 @@ MainServer::MainServer(bool master, int port,
         threadPool.push_back(prt);
     }
 
-    masterBackendOverride = gContext->GetNumSetting("MasterBackendOverride", 0);
+    masterBackendOverride = gCoreContext->GetNumSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer();
     if (!mythserver->listen(QHostAddress::Any, port))
@@ -204,7 +204,7 @@ MainServer::MainServer(bool master, int port,
     connect(mythserver, SIGNAL(newConnect(MythSocket *)),
             SLOT(newConnection(MythSocket *)));
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     if (!ismaster)
     {
@@ -675,7 +675,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         for (int i = 3; i < listline.size(); i++)
             extra << listline[i];
         MythEvent me(message, extra);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
     }
     else if (command == "REFRESH_BACKEND")
     {
@@ -746,7 +746,7 @@ void MainServer::customEvent(QEvent *e)
                 // or already "deleted" programs
                 if (recInfo.recgroup != "LiveTV" &&
                     recInfo.recgroup != "Deleted" &&
-                    (gContext->GetNumSetting("RerecordWatched", 0) ||
+                    (gCoreContext->GetNumSetting("RerecordWatched", 0) ||
                      !(recInfo.GetProgramFlags() & FL_WATCHED)))
                 {
                     recInfo.ForgetHistory();
@@ -875,7 +875,7 @@ void MainServer::customEvent(QEvent *e)
         }
 
         if (me->Message() == "CLEAR_SETTINGS_CACHE")
-            gContext->ClearSettingsCache();
+            gCoreContext->ClearSettingsCache();
 
         if (me->Message().left(14) == "RESET_IDLETIME" && m_sched)
             m_sched->ResetIdleTime();
@@ -903,7 +903,7 @@ void MainServer::customEvent(QEvent *e)
                 evinfo.LoadProgramFromRecorded(chanid, recstartts))
             {
                 QDateTime rectime = QDateTime::currentDateTime().addSecs(
-                    -gContext->GetNumSetting("RecordOverTime"));
+                    -gCoreContext->GetNumSetting("RecordOverTime"));
 
                 if (m_sched && evinfo.recendts > rectime)
                     evinfo.recstatus = m_sched->GetRecStatus(evinfo);
@@ -942,7 +942,7 @@ void MainServer::customEvent(QEvent *e)
         {
             broadcast[1].replace("GLOBAL_", "LOCAL_");
             MythEvent me(broadcast[1], broadcast[2]);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
 
             sendGlobal = true;
         }
@@ -950,7 +950,7 @@ void MainServer::customEvent(QEvent *e)
         vector<PlaybackSock*> sentSet;
 
         bool isSystemEvent = broadcast[1].startsWith("SYSTEM_EVENT ");
-        QStringList sentSetSystemEvent(gContext->GetHostName());
+        QStringList sentSetSystemEvent(gCoreContext->GetHostName());
 
         vector<PlaybackSock*>::const_iterator iter;
         for (iter = localPBSList.begin(); iter != localPBSList.end(); ++iter)
@@ -1182,7 +1182,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         QString message = QString("LOCAL_SLAVE_BACKEND_ONLINE %2")
                                   .arg(commands[2]);
         MythEvent me(message);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
 
         pbs->setBlockShutdown(false);
 
@@ -1234,7 +1234,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             if (wantgroup.isEmpty())
                 wantgroup = "Default";
 
-            StorageGroup sgroup(wantgroup, gContext->GetHostName(), false);
+            StorageGroup sgroup(wantgroup, gCoreContext->GetHostName(), false);
             QString dir = sgroup.FindNextDirMostFree();
             if (dir.isEmpty())
             {
@@ -1377,8 +1377,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QStringList outputlist(QString::number(destination.size()));
     QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
-    QString ip   = gContext->GetSetting("BackendServerIP");
-    QString port = gContext->GetSetting("BackendServerPort");
+    QString ip   = gCoreContext->GetSetting("BackendServerIP");
+    QString port = gCoreContext->GetSetting("BackendServerPort");
 
     ProgramList::iterator it = destination.begin();
     for (it = destination.begin(); it != destination.end(); ++it)
@@ -1386,10 +1386,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         ProgramInfo *proginfo = *it;
         PlaybackSock *slave = NULL;
 
-        if (proginfo->hostname != gContext->GetHostName())
+        if (proginfo->hostname != gCoreContext->GetHostName())
             slave = getSlaveByHostname(proginfo->hostname);
 
-        if ((proginfo->hostname == gContext->GetHostName()) ||
+        if ((proginfo->hostname == gCoreContext->GetHostName()) ||
             (!slave && masterBackendOverride))
         {
             proginfo->pathname = QString("myth://") + ip + ':' + port
@@ -1446,11 +1446,11 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 ProgramInfo *p = proginfo;
                 if (!backendIpMap.contains(p->hostname))
                     backendIpMap[p->hostname] =
-                        gContext->GetSettingOnHost("BackendServerIp",
+                        gCoreContext->GetSettingOnHost("BackendServerIp",
                                                    p->hostname);
                 if (!backendPortMap.contains(p->hostname))
                     backendPortMap[p->hostname] =
-                        gContext->GetSettingOnHost("BackendServerPort",
+                        gCoreContext->GetSettingOnHost("BackendServerPort",
                                                    p->hostname);
                 p->pathname = QString("myth://") +
                     backendIpMap[p->hostname] + ":" +
@@ -1526,10 +1526,10 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     pginfo->FromStringList(slist, 2);
 
     QString lpath = GetPlaybackURL(pginfo);
-    QString ip = gContext->GetSetting("BackendServerIP");
-    QString port = gContext->GetSetting("BackendServerPort");
+    QString ip = gCoreContext->GetSetting("BackendServerIP");
+    QString port = gCoreContext->GetSetting("BackendServerPort");
 
-    if (playbackhost == gContext->GetHostName())
+    if (playbackhost == gCoreContext->GetHostName())
         pginfo->pathname = lpath;
     else
         pginfo->pathname = QString("myth://") + ip + ":" + port
@@ -1581,7 +1581,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                               "will NOT be deleted.")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
-        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Unable to open database connection for %1. "
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
@@ -1599,7 +1599,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                               "Recording will NOT be deleted.")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
-        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Unable to retrieve program info for %1. "
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
@@ -1618,7 +1618,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                     "doesn't exist.  Database metadata"
                     "will not be removed.")
                 .arg(ds->filename));
-        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
                            QString("File %1 does not exist for %2 when trying "
                                    "to delete recording.")
                            .arg(ds->filename).arg(logInfo));
@@ -1634,8 +1634,8 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     if (tvchain)
         tvchain->DeleteProgram(pginfo.get());
 
-    bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
-    bool slowDeletes = gContext->GetNumSetting("TruncateDeletesSlowly", 0);
+    bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
+    bool slowDeletes = gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0);
     int fd = -1;
     off_t size = 0;
     bool errmsg = false;
@@ -1665,7 +1665,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         VERBOSE(VB_IMPORTANT,
             QString("Error deleting file: %1. Keeping metadata in database.")
                     .arg(ds->filename));
-        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
                            QString("File %1 for %2 could not be deleted.")
                                    .arg(ds->filename).arg(logInfo));
 
@@ -1721,7 +1721,7 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("RecordedFiles deletion", query);
-        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording Files",
+        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording Files",
                            QString("Error querying recordedfiles for %1.")
                                    .arg(logInfo));
     }
@@ -1746,14 +1746,14 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
             StorageGroup sgroup(storagegroup);
             QString localFile = sgroup.FindRecordingFile(basename);
             QString url = QString("myth://%1@%2:%3/%4").arg(storagegroup)
-                .arg(gContext->GetSettingOnHost("BackendServerIP", hostname))
-                .arg(gContext->GetSettingOnHost("BackendServerPort", hostname))
+                .arg(gCoreContext->GetSettingOnHost("BackendServerIP", hostname))
+                .arg(gCoreContext->GetSettingOnHost("BackendServerPort", hostname))
                 .arg(basename);
 
-            if ((((hostname == gContext->GetHostName()) ||
+            if ((((hostname == gCoreContext->GetHostName()) ||
                   (!localFile.isEmpty())) &&
                  (HandleDeleteFile(basename, storagegroup))) ||
-                (((hostname != gContext->GetHostName()) ||
+                (((hostname != gCoreContext->GetHostName()) ||
                   (localFile.isEmpty())) &&
                  (RemoteFile::DeleteFile(url))))
             {
@@ -1773,7 +1773,7 @@ void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
             if (!update.exec())
             {
                 MythDB::DBError("RecordedFiles deletion", update);
-                gContext->LogEntry("mythbackend", LP_ERROR,
+                gCoreContext->LogEntry("mythbackend", LP_ERROR,
                        "Delete Recording Files",
                        QString("Error querying recordedfile (%1) for %2.")
                                .arg(query.value(1).toString())
@@ -1798,7 +1798,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Recorded program deletion", query);
-        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Error deleting recorded table for %1.")
                                    .arg(logInfo));
     }
@@ -1821,7 +1821,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedmarkup", query);
-        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Error deleting recordedmarkup for %1.")
                                    .arg(logInfo));
     }
@@ -1834,7 +1834,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedseek", query);
-        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Error deleting recordedseek for %1.")
                                    .arg(logInfo));
     }
@@ -2014,7 +2014,7 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
 
     int result = 0;
 
-    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    if (ismaster && pginfo->hostname != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
         if (slave)
@@ -2057,7 +2057,7 @@ void MainServer::DoHandleStopRecording(
     if (pbs)
         pbssock = pbs->getSocket();
 
-    if (ismaster && recinfo.hostname != gContext->GetHostName())
+    if (ismaster && recinfo.hostname != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(recinfo.hostname);
 
@@ -2172,7 +2172,7 @@ void MainServer::DoHandleDeleteRecording(
         pbssock = pbs->getSocket();
 
     bool justexpire = expirer ? false :
-            (gContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
+            (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
             (recinfo.recgroup != "Deleted") && (recinfo.recgroup != "LiveTV"));
 
     QString filename = GetPlaybackURL(&recinfo, false);
@@ -2208,7 +2208,7 @@ void MainServer::DoHandleDeleteRecording(
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
-    if (ismaster && recinfo.hostname != gContext->GetHostName())
+    if (ismaster && recinfo.hostname != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(recinfo.hostname);
 
@@ -2307,7 +2307,7 @@ void MainServer::DoHandleDeleteRecording(
                 QString("ERROR when trying to delete file: %1. File doesn't "
                         "exist.  Database metadata will not be removed.")
                         .arg(filename));
-        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+        gCoreContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
                            QString("File %1 does not exist for %2 when trying "
                                    "to delete recording.")
                                    .arg(filename).arg(logInfo));
@@ -2353,7 +2353,7 @@ void MainServer::DoHandleUndeleteRecording(
 {
     bool ret = -1;
     bool undelete_possible =
-            gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
     MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
@@ -2416,7 +2416,7 @@ void MainServer::HandleGoToSleep(PlaybackSock *pbs)
 {
     QStringList strlist;
 
-    QString sleepCmd = gContext->GetSetting("SleepCommand");
+    QString sleepCmd = gCoreContext->GetSetting("SleepCommand");
     if (!sleepCmd.isEmpty())
     {
         strlist << "OK";
@@ -2532,7 +2532,7 @@ void MainServer::HandleQueryHostname(PlaybackSock *pbs)
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
 
-    strlist << gContext->GetHostName();
+    strlist << gCoreContext->GetHostName();
 
     SendResponse(pbssock, strlist);
 }
@@ -2590,7 +2590,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     int exists = 0;
 
     if ((ismaster) &&
-        (pginfo->hostname != gContext->GetHostName()) &&
+        (pginfo->hostname != gCoreContext->GetHostName()) &&
         (checkSlaves))
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
@@ -2656,7 +2656,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
     if (storageGroup.isEmpty())
         storageGroup = "Default";
 
-    StorageGroup sgroup(storageGroup, gContext->GetHostName());
+    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
 
     QString fullname = sgroup.FindRecordingFile(filename);
     QString hash = FileHash(fullname);
@@ -2693,7 +2693,7 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
     if (storageGroup.isEmpty())
         storageGroup = "Default";
 
-    StorageGroup sgroup(storageGroup, gContext->GetHostName());
+    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName());
 
     QString fullname = sgroup.FindRecordingFile(filename);
 
@@ -2841,7 +2841,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
 {
     MythSocket *pbssock = pbs->getSocket();
 
-    QString host = gContext->GetHostName();
+    QString host = gCoreContext->GetHostName();
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString path = sList.at(3);
@@ -2856,7 +2856,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     VERBOSE(VB_FILE, QString("HandleSGGetFileList: group = %1  host = %2  path = %3 wanthost = %4").arg(groupname).arg(host).arg(path).arg(wantHost));
 
     if ((host.toLower() == wantHost.toLower()) ||
-        (gContext->GetSetting("BackendServerIP") == wantHost))
+        (gCoreContext->GetSetting("BackendServerIP") == wantHost))
     {
         StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting local info"));
@@ -2898,7 +2898,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
 {
     MythSocket *pbssock = pbs->getSocket();
 
-    QString host = gContext->GetHostName();
+    QString host = gCoreContext->GetHostName();
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString filename = sList.at(3);
@@ -2962,7 +2962,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
             continue;
 
         if (elink->IsLocal())
-            enchost = gContext->GetHostName();
+            enchost = gCoreContext->GetHostName();
         else
             enchost = elink->GetHostName();
 
@@ -3070,7 +3070,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
     bool lastcard = false;
 
-    if (gContext->GetSetting("LastFreeCard", "0") == "1")
+    if (gCoreContext->GetSetting("LastFreeCard", "0") == "1")
         lastcard = true;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
@@ -3081,7 +3081,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         if (!lastcard)
         {
             if (elink->IsLocal())
-                enchost = gContext->GetHostName();
+                enchost = gCoreContext->GetHostName();
             else
                 enchost = elink->GetHostName();
 
@@ -3114,15 +3114,15 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     {
         if (encoder->IsLocal())
         {
-            strlist << gContext->GetSetting("BackendServerIP");
-            strlist << gContext->GetSetting("BackendServerPort");
+            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gContext->GetSettingOnHost("BackendServerIP",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
                                                   encoder->GetHostName(),
                                                   "nohostname");
-            strlist << gContext->GetSettingOnHost("BackendServerPort",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
     }
@@ -3247,15 +3247,15 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
     {
         if (encoder->IsLocal())
         {
-            strlist << gContext->GetSetting("BackendServerIP");
-            strlist << gContext->GetSetting("BackendServerPort");
+            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gContext->GetSettingOnHost("BackendServerIP",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
                                                   encoder->GetHostName(),
                                                   "nohostname");
-            strlist << gContext->GetSettingOnHost("BackendServerPort",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
     }
@@ -3830,7 +3830,7 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
     QStringList retlist;
     QString queryhostname = slist[1];
 
-    if (gContext->GetHostName() != queryhostname)
+    if (gCoreContext->GetHostName() != queryhostname)
     {
         PlaybackSock *slave = getSlaveByHostname(queryhostname);
         if (slave != NULL)
@@ -3887,7 +3887,7 @@ size_t MainServer::GetCurrentMaxBitrate(void)
 void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
-    QString allHostList = gContext->GetHostName();
+    QString allHostList = gCoreContext->GetHostName();
     long long totalKB = -1, usedKB = -1;
     QMap <QString, bool>foundDirs;
     QString driveKey;
@@ -3903,7 +3903,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                            "GROUP BY dirname;").arg(specialGroups);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(sql);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (query.exec() && query.isActive())
     {
@@ -3960,7 +3960,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                         bSize = statbuf.f_bsize;
                     }
 
-                    strlist << gContext->GetHostName();
+                    strlist << gCoreContext->GetHostName();
                     strlist << currentDir;
                     strlist << localStr;
                     strlist << "-1"; // Ignore fsID
@@ -4208,7 +4208,7 @@ void *MainServer::SpawnTruncateThread(void *param)
 
 void MainServer::DoTruncateThread(const DeleteStruct *ds)
 {
-    if (gContext->GetNumSetting("TruncateDeletesSlowly", 0))
+    if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0))
         TruncateAndClose(NULL, ds->fd, ds->filename, ds->size);
     else
     {
@@ -4256,7 +4256,7 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     }
 
     QFile checkFile(fullfile);
-    bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
+    bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
     int fd = -1;
     off_t size = 0;
 
@@ -4475,7 +4475,7 @@ void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
     QString setting = tokens[2];
     QStringList retlist;
 
-    QString retvalue = gContext->GetSettingOnHost(setting, hostname, "-1");
+    QString retvalue = gCoreContext->GetSettingOnHost(setting, hostname, "-1");
 
     retlist << retvalue;
     if (pbssock)
@@ -4497,7 +4497,7 @@ void MainServer::HandleSetSetting(QStringList &tokens,
     QString svalue = tokens[3];
     QStringList retlist;
 
-    if (gContext->SaveSettingOnHost(setting, svalue, hostname))
+    if (gCoreContext->SaveSettingOnHost(setting, svalue, hostname))
         retlist << "OK";
     else
         retlist << "ERROR";
@@ -4623,15 +4623,15 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     {
         if (encoder->IsLocal())
         {
-            strlist << gContext->GetSetting("BackendServerIP");
-            strlist << gContext->GetSetting("BackendServerPort");
+            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gContext->GetSettingOnHost("BackendServerIP",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
                                                   encoder->GetHostName(),
                                                   "nohostname");
-            strlist << gContext->GetSettingOnHost("BackendServerPort",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
     }
@@ -4663,15 +4663,15 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
     {
         if (encoder->IsLocal())
         {
-            strlist << gContext->GetSetting("BackendServerIP");
-            strlist << gContext->GetSetting("BackendServerPort");
+            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gContext->GetSettingOnHost("BackendServerIP",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
                                                   encoder->GetHostName(),
                                                   "nohostname");
-            strlist << gContext->GetSettingOnHost("BackendServerPort",
+            strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
     }
@@ -4699,12 +4699,12 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     if (extra_data.empty())
     {
         MythEvent me(message);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
     }
     else
     {
         MythEvent me(message, extra_data);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
     }
 
     QStringList retlist( "OK" );
@@ -4821,7 +4821,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     pginfo->pathname = GetPlaybackURL(pginfo);
 
     if ((ismaster) &&
-        (pginfo->hostname != gContext->GetHostName()) &&
+        (pginfo->hostname != gCoreContext->GetHostName()) &&
         ((!masterBackendOverride) ||
          (pginfo->pathname.left(1) != "/")))
     {
@@ -4901,7 +4901,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     QStringList strlist;
 
     if ((ismaster) &&
-        (pginfo->hostname != gContext->GetHostName()) &&
+        (pginfo->hostname != gCoreContext->GetHostName()) &&
         ((!masterBackendOverride) ||
          (pginfo->pathname.left(1) != "/")))
     {
@@ -5051,7 +5051,7 @@ void MainServer::HandlePixmapGetIfModified(
     }
 
     // handle remote ...
-    if (ismaster && pginfo.hostname != gContext->GetHostName())
+    if (ismaster && pginfo.hostname != gCoreContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo.hostname);
         if (!slave)
@@ -5081,7 +5081,7 @@ void MainServer::HandlePixmapGetIfModified(
 
 void MainServer::HandleBackendRefresh(MythSocket *socket)
 {
-    gContext->RefreshBackendConfig();
+    gCoreContext->RefreshBackendConfig();
 
     QStringList retlist( "OK" );
     SendResponse(socket, retlist);
@@ -5140,7 +5140,7 @@ void MainServer::connectionClosed(MythSocket *socket)
             masterServer->DownRef();
             masterServer = NULL;
             MythEvent me("LOCAL_RECONNECT_TO_MASTER");
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
             return;
         }
         else if (sock == socket)
@@ -5171,10 +5171,10 @@ void MainServer::connectionClosed(MythSocket *socket)
                 QString message = QString("LOCAL_SLAVE_BACKEND_OFFLINE %1")
                                           .arg(pbs->getHostname());
                 MythEvent me(message);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
 
                 MythEvent me2("RECORDING_LIST_CHANGE");
-                gContext->dispatch(me2);
+                gCoreContext->dispatch(me2);
 
                 SendMythSystemEvent(QString("SLAVE_DISCONNECTED HOSTNAME %1")
                                     .arg(pbs->getHostname()));
@@ -5505,8 +5505,8 @@ void MainServer::reconnectTimeout(void)
 {
     MythSocket *masterServerSock = new MythSocket();
 
-    QString server = gContext->GetSetting("MasterServerIP", "127.0.0.1");
-    int port = gContext->GetNumSetting("MasterServerPort", 6543);
+    QString server = gCoreContext->GetSetting("MasterServerIP", "127.0.0.1");
+    int port = gCoreContext->GetNumSetting("MasterServerPort", 6543);
 
     VERBOSE(VB_IMPORTANT, QString("Connecting to master server: %1:%2")
                            .arg(server).arg(port));
@@ -5530,8 +5530,8 @@ void MainServer::reconnectTimeout(void)
     VERBOSE(VB_IMPORTANT, "Connected successfully");
 
     QString str = QString("ANN SlaveBackend %1 %2")
-                          .arg(gContext->GetHostName())
-                          .arg(gContext->GetSetting("BackendServerIP"));
+                          .arg(gCoreContext->GetHostName())
+                          .arg(gCoreContext->GetSetting("BackendServerIP"));
 
     masterServerSock->Lock();
 

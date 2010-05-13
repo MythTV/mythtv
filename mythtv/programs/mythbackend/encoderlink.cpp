@@ -6,7 +6,7 @@ using namespace std;
 #include <unistd.h>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "encoderlink.h"
 #include "playbacksock.h"
 #include "tv_rec.h"
@@ -94,7 +94,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
     {
         lsock->UpRef();
 
-        if (gContext->GetSettingOnHost("SleepCommand", hostname).isEmpty())
+        if (gCoreContext->GetSettingOnHost("SleepCommand", hostname).isEmpty())
             SetSleepStatus(sStatus_Undefined);
         else
             SetSleepStatus(sStatus_Awake);

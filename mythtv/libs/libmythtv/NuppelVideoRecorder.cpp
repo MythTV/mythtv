@@ -337,8 +337,8 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 {
     SetOption("videodevice", videodev);
     SetOption("vbidevice", vbidev);
-    SetOption("tvformat", gContext->GetSetting("TVFormat"));
-    SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+    SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
+    SetOption("vbiformat", gCoreContext->GetSetting("VbiFormat"));
     SetOption("audiodevice", audiodev);
 
     QString setting = QString::null;

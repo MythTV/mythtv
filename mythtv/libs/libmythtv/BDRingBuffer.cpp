@@ -3,7 +3,7 @@
 #include "libbdnav/bdparse.h"
 
 #include "BDRingBuffer.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythdirs.h"
 #include "bluray.h"
 

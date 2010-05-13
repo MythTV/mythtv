@@ -31,7 +31,7 @@ extern "C" {
 // MythTV headers
 #include "mpegrecorder.h"
 #include "RingBuffer.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "programinfo.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
@@ -322,8 +322,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     SetOption("audiodevice", audiodev);
 
-    SetOption("tvformat", gContext->GetSetting("TVFormat"));
-    SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+    SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
+    SetOption("vbiformat", gCoreContext->GetSetting("VbiFormat"));
 
     SetIntOption(profile, "mpeg2bitrate");
     SetIntOption(profile, "mpeg2maxbitrate");

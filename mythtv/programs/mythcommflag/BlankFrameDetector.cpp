@@ -3,7 +3,7 @@
 #include <cmath>
 
 // MythTV headers
-#include "mythcontext.h"    /* gContext */
+#include "mythcorecontext.h"    /* gContext */
 #include "decodeencode.h"           /* for absLongLong */
 #include "NuppelVideoPlayer.h"
 
@@ -379,7 +379,7 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     , fps(0.0f)
     , debugLevel(0)
 {
-    skipcommblanks = gContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
+    skipcommblanks = gCoreContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
 
     VERBOSE(VB_COMMFLAG, QString("BlankFrameDetector: skipcommblanks=%1")
             .arg(skipcommblanks ? "true" : "false"));
@@ -389,7 +389,7 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
      *      0: no debugging
      *      2: extra verbosity [O(nframes)]
      */
-    debugLevel = gContext->GetNumSetting("BlankFrameDetectorDebugLevel", 0);
+    debugLevel = gCoreContext->GetNumSetting("BlankFrameDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
         createDebugDirectory(debugdir,

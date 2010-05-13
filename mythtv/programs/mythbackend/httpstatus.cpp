@@ -25,7 +25,7 @@
 #include "httpstatus.h"
 #include "mythxml.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "decodeencode.h"
 #include "mythdbcon.h"
 #include "compat.h"
@@ -45,7 +45,7 @@ HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, Auto
     m_pExpirer  = expirer;
     m_bIsMaster = bIsMaster;
 
-    m_nPreRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
+    m_nPreRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
 
     m_pMainServer = NULL;
 }
@@ -141,13 +141,13 @@ void HttpStatus::GetStatusHTML( HTTPRequest *pRequest )
 
 void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 {
-    QString   dateFormat   = gContext->GetSetting("DateFormat", "M/d/yyyy");
+    QString   dateFormat   = gCoreContext->GetSetting("DateFormat", "M/d/yyyy");
 
     if (dateFormat.indexOf(QRegExp("yyyy")) < 0)
         dateFormat += " yyyy";
 
-    QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     QDateTime qdtNow          = QDateTime::currentDateTime();
 
     // Add Root Node.
@@ -191,7 +191,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             //encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
 
             if (isLocal)
-                encoder.setAttribute("hostname", gContext->GetHostName());
+                encoder.setAttribute("hostname", gCoreContext->GetHostName());
             else
                 encoder.setAttribute("hostname", elink->GetHostName());
 
@@ -438,13 +438,13 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                                                      Qt::ISODate);
     }
 
-    guide.setAttribute("start", gContext->GetSetting("mythfilldatabaseLastRunStart"));
-    guide.setAttribute("end", gContext->GetSetting("mythfilldatabaseLastRunEnd"));
-    guide.setAttribute("status", gContext->GetSetting("mythfilldatabaseLastRunStatus"));
-    if (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
+    guide.setAttribute("start", gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
+    guide.setAttribute("end", gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
+    guide.setAttribute("status", gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
+    if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
     {
         guide.setAttribute("next",
-            gContext->GetSetting("MythFillSuggestedRunTime"));
+            gCoreContext->GetSetting("MythFillSuggestedRunTime"));
     }
 
     if (!GuideDataThrough.isNull())
@@ -453,12 +453,12 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         guide.setAttribute("guideDays", qdtNow.daysTo(GuideDataThrough));
     }
 
-    QDomText dataDirectMessage = pDoc->createTextNode(gContext->GetSetting("DataDirectMessage"));
+    QDomText dataDirectMessage = pDoc->createTextNode(gCoreContext->GetSetting("DataDirectMessage"));
     guide.appendChild(dataDirectMessage);
 
     // Add Miscellaneous information
 
-    QString info_script = gContext->GetSetting("MiscStatusScript");
+    QString info_script = gCoreContext->GetSetting("MiscStatusScript");
     if ((!info_script.isEmpty()) && (info_script != "none"))
     {
         QDomElement misc = pDoc->createElement("Miscellaneous");
@@ -532,8 +532,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 {
 
-    QString shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    QString timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    QString timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     os.setCodec("UTF-8");
 
@@ -684,7 +684,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 
 int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 {
-    QString timeformat   = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString timeformat   = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     int     nNumEncoders = 0;
 
     if (encoders.isNull())
@@ -828,8 +828,8 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 {
     QDateTime qdtNow          = QDateTime::currentDateTime();
-    QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     if (scheduled.isNull())
         return( 0 );
@@ -954,8 +954,8 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 
 int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 {
-    QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     if (jobs.isNull())
         return( 0 );
@@ -971,8 +971,8 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
         QString jobColor;
         QString timeDateFormat;
 
-        timeDateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d") +
-                         ' ' + gContext->GetSetting("TimeFormat", "h:mm AP");
+        timeDateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d") +
+                         ' ' + gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
         os << "    Jobs currently in Queue or recently ended:\r\n<br />"
            << "    <div class=\"schedule\">\r\n";
@@ -1099,8 +1099,8 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 
 int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 {
-    QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     QString   sRep;
 
     if (info.isNull())

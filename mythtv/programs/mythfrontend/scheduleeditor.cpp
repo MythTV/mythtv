@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 
 // Libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "storagegroup.h"
 
 // Libmythtv
@@ -582,7 +582,7 @@ void SchedOptEditor::Load()
     new MythUIButtonListItem(m_dupscopeList,
                              tr("Exclude unidentified episodes"),
                              ENUM_TO_QVARIANT(kDupsExGeneric | kDupsInAll));
-    if (gContext->GetNumSetting("HaveRepeats", 0))
+    if (gCoreContext->GetNumSetting("HaveRepeats", 0))
     {
         new MythUIButtonListItem(m_dupscopeList,
                                  tr("Exclude old episodes"),
@@ -1040,7 +1040,7 @@ void PostProcEditor::Load()
     UIUtilW::Assign(this, userjob1Text, "userjob1text");
     if (userjob1Text)
         userjob1Text->SetText(tr("Run '%1'")
-                    .arg(gContext->GetSetting("UserJobDesc1"), "User Job 1"));
+                    .arg(gCoreContext->GetSetting("UserJobDesc1"), "User Job 1"));
 
     // User Job #2
     m_userjob2Check->SetCheckState(m_recordingRule->m_autoUserJob2);
@@ -1048,7 +1048,7 @@ void PostProcEditor::Load()
     UIUtilW::Assign(this, userjob2Text, "userjob2text");
     if (userjob2Text)
         userjob2Text->SetText(tr("Run '%1'")
-                    .arg(gContext->GetSetting("UserJobDesc2", "User Job 2")));
+                    .arg(gCoreContext->GetSetting("UserJobDesc2", "User Job 2")));
 
     // User Job #3
     m_userjob3Check->SetCheckState(m_recordingRule->m_autoUserJob3);
@@ -1056,7 +1056,7 @@ void PostProcEditor::Load()
     UIUtilW::Assign(this, userjob3Text, "userjob3text");
     if (userjob3Text)
         userjob3Text->SetText(tr("Run '%1'")
-                    .arg(gContext->GetSetting("UserJobDesc3", "User Job 3")));
+                    .arg(gCoreContext->GetSetting("UserJobDesc3", "User Job 3")));
 
     // User Job #4
     m_userjob4Check->SetCheckState(m_recordingRule->m_autoUserJob4);
@@ -1064,7 +1064,7 @@ void PostProcEditor::Load()
     UIUtilW::Assign(this, userjob4Text, "userjob4text");
     if (userjob4Text)
         userjob4Text->SetText(tr("Run '%1'")
-                    .arg(gContext->GetSetting("UserJobDesc4", "User Job 4")));
+                    .arg(gCoreContext->GetSetting("UserJobDesc4", "User Job 4")));
 
     QHash<QString, QString> progMap;
     if (m_recInfo)

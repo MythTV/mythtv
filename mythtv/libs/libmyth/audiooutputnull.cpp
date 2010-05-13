@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "audiooutputnull.h"
 
 AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :

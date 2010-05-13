@@ -9,7 +9,7 @@
 #include <QEvent>
 #include <QMap>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdialogs.h"
 #include "mythversion.h"
 #include "networkcontrol.h"
@@ -86,7 +86,6 @@ NetworkControl::NetworkControl() :
     jumpMap["zoneminderevents"]      = "ZoneMinder Events";
     jumpMap["snapshot"]              = "ScreenShot";
 
-    // These jump point names match the (lowercased) locations from gContext
     jumpMap["channelrecpriority"]    = "Channel Recording Priorities";
     jumpMap["viewscheduled"]         = "Manage Recordings / Fix Conflicts";
     jumpMap["manualbox"]             = "Manual Record Scheduling";
@@ -216,7 +215,7 @@ NetworkControl::NetworkControl() :
     stopCommandThread = false;
     pthread_create(&command_thread, NULL, CommandThread, this);
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     connect(this, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
@@ -447,7 +446,7 @@ QString NetworkControl::processJump(NetworkCommand *nc)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
 
-    gContext->GetMainWindow()->JumpTo(jumpMap[nc->getArg(1)]);
+    GetMythMainWindow()->JumpTo(jumpMap[nc->getArg(1)]);
 
     // Fixme, should do some better checking here, but that would
     // depend on all Locations matching their jumppoints
@@ -471,16 +470,13 @@ QString NetworkControl::processKey(NetworkCommand *nc)
 
     QObject *keyDest = NULL;
 
-    if (!gContext)
-        return QString("ERROR: Application has no gContext!\n");
-
-    if (gContext->GetMainWindow())
-        keyDest = gContext->GetMainWindow();
+    if (GetMythMainWindow())
+        keyDest = GetMythMainWindow();
     else
         return QString("ERROR: Application has no main window!\n");
 
-    if (gContext->GetMainWindow()->currentWidget())
-        keyDest = gContext->GetMainWindow()->currentWidget()->focusWidget();
+    if (GetMythMainWindow()->currentWidget())
+        keyDest = GetMythMainWindow()->currentWidget()->focusWidget();
 
     int curToken = 1;
     int tokenLen = 0;
@@ -579,7 +575,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     {
         if (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu")
         {
-            gContext->GetMainWindow()->JumpTo(jumpMap["mainmenu"]);
+            GetMythMainWindow()->JumpTo(jumpMap["mainmenu"]);
 
             QTime timer;
             timer.start();
@@ -592,7 +588,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         {
             QString msg = QString("HANDLE_MEDIA Internal %1").arg(nc->getFrom(2));
             MythEvent me(msg);
-            QCoreApplication::postEvent(gContext->GetMainWindow(), me.clone());
+            QCoreApplication::postEvent(GetMythMainWindow(), me.clone());
         }
         else
             return QString("Unable to change to main menu to start playback!");
@@ -607,7 +603,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         {
             QString message = QString("NETWORK_CONTROL STOP");
             MythEvent me(message);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
 
             QTime timer;
             timer.start();
@@ -618,7 +614,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
         if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
         {
-            gContext->GetMainWindow()->JumpTo(jumpMap["playbackbox"]);
+            GetMythMainWindow()->JumpTo(jumpMap["playbackbox"]);
 
             QTime timer;
             timer.start();
@@ -642,7 +638,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                                       .arg(action).arg(nc->getArg(2))
                                       .arg(nc->getArg(3).toUpper()).arg(clientID);
             MythEvent me(message);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
 
             result.clear();
         }
@@ -742,7 +738,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     if (!message.isEmpty())
     {
         MythEvent me(message);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
     }
 
     return result;
@@ -776,7 +772,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
             gotAnswer = false;
             QString message = QString("NETWORK_CONTROL QUERY POSITION");
             MythEvent me(message);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
 
             QTime timer;
             timer.start();
@@ -805,7 +801,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         extern const char *myth_source_version;
         extern const char *myth_source_path;
 
-        int dbSchema = gContext->GetNumSetting("DBSchemaVer");
+        int dbSchema = gCoreContext->GetNumSetting("DBSchemaVer");
 
         return QString("VERSION: %1/%2 %3 %4 QT/%5 DBSchema/%6")
                        .arg(myth_source_version)
@@ -1268,7 +1264,7 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
     gotAnswer = false;
     QString message = QString("NETWORK_CONTROL QUERY POSITION");
     MythEvent me(message);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     QTime timer;
     timer.start();

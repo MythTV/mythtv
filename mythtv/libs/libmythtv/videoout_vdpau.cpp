@@ -1,4 +1,4 @@
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "NuppelVideoPlayer.h"
 #include "videooutbase.h"
 #include "videoout_vdpau.h"
@@ -64,7 +64,7 @@ VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
     m_sharpen(0.0f),         m_studio(false),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
 {
-    if (gContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
 }
 

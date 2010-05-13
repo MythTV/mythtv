@@ -2,7 +2,7 @@
 #include "channeleditor.h"
 
 #include "settings.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythdb.h"
 
 #include <QSqlDatabase>

@@ -6,7 +6,7 @@ using namespace std;
 #include <QRegExp>
 #include <QHostAddress>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 #include "mythdb.h"
 #include "mythverbose.h"
@@ -53,11 +53,11 @@ Q_DECLARE_METATYPE(LogLine)
 StatusBox::StatusBox(MythScreenStack *parent)
           : MythScreenType(parent, "StatusBox")
 {
-    m_dateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
-    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     m_timeDateFormat = QString("%1 %2").arg(m_timeFormat).arg(m_dateFormat);
 
-    m_minLevel = gContext->GetNumSetting("LogDefaultView",5);
+    m_minLevel = gCoreContext->GetNumSetting("LogDefaultView",5);
 
     m_iconState = NULL;
     m_categoryList = m_logList = NULL;
@@ -65,9 +65,9 @@ StatusBox::StatusBox(MythScreenStack *parent)
 
     QStringList strlist;
     strlist << "QUERY_IS_ACTIVE_BACKEND";
-    strlist << gContext->GetHostName();
+    strlist << gCoreContext->GetHostName();
 
-    gContext->SendReceiveStringList(strlist);
+    gCoreContext->SendReceiveStringList(strlist);
 
     if (QString(strlist[0]) == "TRUE")
         m_isBackendActive = true;
@@ -80,7 +80,7 @@ StatusBox::StatusBox(MythScreenStack *parent)
 StatusBox::~StatusBox(void)
 {
     if (m_logList)
-        gContext->SaveSetting("StatusBoxItemCurrent",
+        gCoreContext->SaveSetting("StatusBoxItemCurrent",
                                                     m_logList->GetCurrentPos());
 }
 
@@ -145,7 +145,7 @@ void StatusBox::Init()
                             qVariantFromValue((void*)SLOT(doAutoExpireList())));
     item->DisplayState("autoexpire", "icon");
 
-    int itemCurrent = gContext->GetNumSetting("StatusBoxItemCurrent", 0);
+    int itemCurrent = gCoreContext->GetNumSetting("StatusBoxItemCurrent", 0);
     m_categoryList->SetItemCurrent(itemCurrent);
 }
 
@@ -498,11 +498,11 @@ void StatusBox::doListingsStatus()
         GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
                                                  Qt::ISODate);
 
-    mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
-    mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
-    mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
-    mfdNextRunStart = gContext->GetSetting("MythFillSuggestedRunTime");
-    DataDirectMessage = gContext->GetSetting("DataDirectMessage");
+    mfdLastRunStart = gCoreContext->GetSetting("mythfilldatabaseLastRunStart");
+    mfdLastRunEnd = gCoreContext->GetSetting("mythfilldatabaseLastRunEnd");
+    mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
+    mfdNextRunStart = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+    DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
 
     mfdNextRunStart.replace('T', ' ');
 
@@ -740,7 +740,7 @@ void StatusBox::doTunerStatus()
         QStringList strlist( cmd );
         strlist << "GET_STATE";
 
-        gContext->SendReceiveStringList(strlist);
+        gCoreContext->SendReceiveStringList(strlist);
         int state = strlist[0].toInt();
 
         QString status;
@@ -751,7 +751,7 @@ void StatusBox::doTunerStatus()
             strlist << QString("QUERY_REMOTEENCODER %1").arg(cardid);
             strlist << "GET_SLEEPSTATUS";
 
-            gContext->SendReceiveStringList(strlist);
+            gCoreContext->SendReceiveStringList(strlist);
             state = strlist[0].toInt();
 
             if (state == -1)
@@ -783,7 +783,7 @@ void StatusBox::doTunerStatus()
         {
             strlist = QStringList( QString("QUERY_RECORDER %1").arg(cardid));
             strlist << "GET_RECORDING";
-            gContext->SendReceiveStringList(strlist);
+            gCoreContext->SendReceiveStringList(strlist);
             ProgramInfo *proginfo = new ProgramInfo;
             proginfo->FromStringList(strlist, 0);
 

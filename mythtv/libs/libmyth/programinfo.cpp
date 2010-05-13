@@ -20,7 +20,7 @@ using namespace std;
 // MythTV headers
 #include "programinfo.h"
 #include "util.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"
 #include "mythdb.h"
@@ -860,16 +860,16 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 {
     // NOTE: Format changes and relevant additions made here should be
     //       reflected in RecordingRule
-    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    QString dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
     QString fullDateFormat = dateFormat;
     if (!fullDateFormat.contains("yyyy"))
         fullDateFormat += " yyyy";
-    QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    QString shortDateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
     QString channelFormat =
-        gContext->GetSetting("ChannelFormat", "<num> <sign>");
+        gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     QString longChannelFormat =
-        gContext->GetSetting("LongChannelFormat", "<num> <name>");
+        gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     QDateTime timeNow = QDateTime::currentDateTime();
 
@@ -1212,7 +1212,7 @@ ProgramInfo::LPADT ProgramInfo::LoadProgramAtDateTime(
     {
         QMutexLocker locker(&staticDataLock);
         if (unknownTitle.isEmpty())
-            unknownTitle = gContext->GetSetting("UnknownTitle");
+            unknownTitle = gCoreContext->GetSetting("UnknownTitle");
         title = unknownTitle;
         title.detach();
     }
@@ -1549,22 +1549,22 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
     switch (type)
     {
         case kSingleRecord:
-            return gContext->GetNumSetting("SingleRecordRecPriority", 1);
+            return gCoreContext->GetNumSetting("SingleRecordRecPriority", 1);
         case kTimeslotRecord:
-            return gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
+            return gCoreContext->GetNumSetting("TimeslotRecordRecPriority", 0);
         case kWeekslotRecord:
-            return gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
+            return gCoreContext->GetNumSetting("WeekslotRecordRecPriority", 0);
         case kChannelRecord:
-            return gContext->GetNumSetting("ChannelRecordRecPriority", 0);
+            return gCoreContext->GetNumSetting("ChannelRecordRecPriority", 0);
         case kAllRecord:
-            return gContext->GetNumSetting("AllRecordRecPriority", 0);
+            return gCoreContext->GetNumSetting("AllRecordRecPriority", 0);
         case kFindOneRecord:
         case kFindDailyRecord:
         case kFindWeeklyRecord:
-            return gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+            return gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
         case kOverrideRecord:
         case kDontRecord:
-            return gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+            return gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
         default:
             return 0;
     }
@@ -1750,11 +1750,11 @@ QString ProgramInfo::GetPlaybackURL(
     if (basename.isEmpty())
         return "";
 
-    bool alwaysStream = gContext->GetNumSetting("AlwaysStreamFiles", 0);
+    bool alwaysStream = gCoreContext->GetNumSetting("AlwaysStreamFiles", 0);
 
     if ((!alwaysStream) ||
         (forceCheckLocal) ||
-        (hostname == gContext->GetHostName()))
+        (hostname == gCoreContext->GetHostName()))
     {
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
@@ -1767,7 +1767,7 @@ QString ProgramInfo::GetPlaybackURL(
                     QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
             return tmpURL;
         }
-        else if (hostname == gContext->GetHostName())
+        else if (hostname == gCoreContext->GetHostName())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("GetPlaybackURL: '%1' should be local, but it can "
@@ -1781,12 +1781,12 @@ QString ProgramInfo::GetPlaybackURL(
 
     // Check to see if we should stream from the master backend
     if ((checkMaster) &&
-        (gContext->GetNumSetting("MasterBackendOverride", 0)) &&
+        (gCoreContext->GetNumSetting("MasterBackendOverride", 0)) &&
         (RemoteCheckFile(this, false)))
     {
         tmpURL = QString("myth://") +
-        gContext->GetSetting("MasterServerIP") + ':' +
-        gContext->GetSetting("MasterServerPort") + '/' + basename;
+        gCoreContext->GetSetting("MasterServerIP") + ':' +
+        gCoreContext->GetSetting("MasterServerPort") + '/' + basename;
         VERBOSE(VB_FILE, LOC +
                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
@@ -1794,8 +1794,8 @@ QString ProgramInfo::GetPlaybackURL(
 
     // Fallback to streaming from the backend the recording was created on
     tmpURL = QString("myth://") +
-        gContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
-        gContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
+        gCoreContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
+        gCoreContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
         basename;
 
     VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
@@ -2007,7 +2007,7 @@ QStringList ProgramInfo::GetDVDBookmark(QString serialid, bool delbookmark) cons
 
     if (delbookmark)
     {
-        int days = -(gContext->GetNumSetting("DVDBookmarkDays", 10));
+        int days = -(gCoreContext->GetNumSetting("DVDBookmarkDays", 10));
         QDateTime removedate = mythCurrentDateTime().addDays(days);
         query.prepare(" DELETE from dvdbookmark "
                         " WHERE timestamp < ? ");
@@ -3571,7 +3571,7 @@ QString ProgramInfo::GetRecGroupPassword(QString group)
 
     if (group == "All Programs")
     {
-        result = gContext->GetSetting("AllRecGroupPassword");
+        result = gCoreContext->GetSetting("AllRecGroupPassword");
     }
     else
     {
@@ -3685,7 +3685,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
         query.bindValue(":CHANID",    chanid);
         query.bindValue(":STARTTIME", recstartts);
-        query.bindValue(":HOSTNAME",  gContext->GetHostName());
+        query.bindValue(":HOSTNAME",  gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",  inUseForWhat);
 
         if (!query.exec())
@@ -3702,7 +3702,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     QString recDir = "";
     QFileInfo testFile(pathname);
-    if (testFile.exists() || hostname == gContext->GetHostName())
+    if (testFile.exists() || hostname == gCoreContext->GetHostName())
     {
         // we may be recording this file and it may not exist yet so we need
         // to do some checking to see what is in pathname
@@ -3733,7 +3733,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         // recDir = "";
     }
-    else if (!gContext->IsBackend() &&
+    else if (!gCoreContext->IsBackend() &&
               RemoteCheckFile(this) && pathname.left(1) == "/")
     {
         testFile.setFile(pathname);
@@ -3750,7 +3750,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
     query.bindValue(":CHANID",    chanid);
     query.bindValue(":STARTTIME", recstartts);
-    query.bindValue(":HOSTNAME",  gContext->GetHostName());
+    query.bindValue(":HOSTNAME",  gCoreContext->GetHostName());
     query.bindValue(":RECUSAGE",  inUseForWhat);
 
     if (!query.exec())
@@ -3770,7 +3770,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
         query.bindValue(":CHANID",     chanid);
         query.bindValue(":STARTTIME",  recstartts);
-        query.bindValue(":HOSTNAME",   gContext->GetHostName());
+        query.bindValue(":HOSTNAME",   gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",   inUseForWhat);
         query.bindValue(":UPDATETIME", inUseTime);
         
@@ -3790,7 +3790,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             "  :UPDATETIME,   :RECHOST,   :RECDIR)");
         query.bindValue(":CHANID",     chanid);
         query.bindValue(":STARTTIME",  recstartts);
-        query.bindValue(":HOSTNAME",   gContext->GetHostName());
+        query.bindValue(":HOSTNAME",   gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",   inUseForWhat);
         query.bindValue(":UPDATETIME", inUseTime);
         query.bindValue(":RECHOST",    hostname);

@@ -2,7 +2,7 @@
 #include <iostream>
 
 // myth
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythdb.h"
 #include "channelutil.h"
 #include "channelgroup.h"
@@ -144,7 +144,7 @@ void ChannelGroupEditor::open(QString name)
     {
         name = "";
 
-        bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(),
+        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(), 
             tr("Create New Channel Group"),
             tr("Enter group name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -176,7 +176,7 @@ void ChannelGroupEditor::doDelete(void)
     QString message = tr("Delete '%1' Channel group?").arg(name);
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(),
+        GetMythMainWindow(),
         "", message,
         tr("Yes, delete group"),
         tr("No, Don't delete group"), kDialogCodeButton1);

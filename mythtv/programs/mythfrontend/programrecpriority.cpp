@@ -385,12 +385,12 @@ ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                      m_channumText(NULL), m_callsignText(NULL),
                      m_recProfileText(NULL), m_currentItem(NULL)
 {
-    m_sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting",
+    m_sortType = (SortType)gCoreContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
-    m_reverseSort = gContext->GetNumSetting("ProgramRecPriorityReverse", 0);
-    m_formatShortDate = gContext->GetSetting("ShortDateFormat", "M/d");
-    m_formatLongDate  = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_formatTime      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_reverseSort = gCoreContext->GetNumSetting("ProgramRecPriorityReverse", 0);
+    m_formatShortDate = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    m_formatLongDate  = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_formatTime      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 }
 
 ProgramRecPriority::~ProgramRecPriority()
@@ -476,9 +476,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
         else if (action == "ESCAPE")
         {
             saveRecPriority();
-            gContext->SaveSetting("ProgramRecPrioritySorting",
+            gCoreContext->SaveSetting("ProgramRecPrioritySorting",
                                     (int)m_sortType);
-            gContext->SaveSetting("ProgramRecPriorityReverse",
+            gCoreContext->SaveSetting("ProgramRecPriorityReverse",
                                     (int)m_reverseSort);
             Close();
         }
@@ -885,25 +885,25 @@ void ProgramRecPriority::scheduleChanged(int recid)
         int rtRecPriors[11];
         rtRecPriors[0] = 0;
         rtRecPriors[kSingleRecord] =
-            gContext->GetNumSetting("SingleRecordRecPriority", 1);
+            gCoreContext->GetNumSetting("SingleRecordRecPriority", 1);
         rtRecPriors[kTimeslotRecord] =
-            gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
+            gCoreContext->GetNumSetting("TimeslotRecordRecPriority", 0);
         rtRecPriors[kChannelRecord] =
-            gContext->GetNumSetting("ChannelRecordRecPriority", 0);
+            gCoreContext->GetNumSetting("ChannelRecordRecPriority", 0);
         rtRecPriors[kAllRecord] =
-            gContext->GetNumSetting("AllRecordRecPriority", 0);
+            gCoreContext->GetNumSetting("AllRecordRecPriority", 0);
         rtRecPriors[kWeekslotRecord] =
-            gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
+            gCoreContext->GetNumSetting("WeekslotRecordRecPriority", 0);
         rtRecPriors[kFindOneRecord] =
-            gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+            gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
         rtRecPriors[kOverrideRecord] =
-            gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+            gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
         rtRecPriors[kDontRecord] =
-            gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+            gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
         rtRecPriors[kFindDailyRecord] =
-            gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+            gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
         rtRecPriors[kFindWeeklyRecord] =
-            gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+            gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
 
         // set the recording priorities of that program
         pgRecInfo->recpriority = recPriority;
@@ -1133,7 +1133,7 @@ void ProgramRecPriority::FillList(void)
     int cnt = 999, rtRecPriors[11];
     vector<ProgramInfo *> recordinglist;
 
-    int autopriority = gContext->GetNumSetting("AutoRecPriority", 0);
+    int autopriority = gCoreContext->GetNumSetting("AutoRecPriority", 0);
 
     m_programData.clear();
     m_sortedProgram.clear();
@@ -1157,25 +1157,25 @@ void ProgramRecPriority::FillList(void)
     // get all the recording type recording priority values
     rtRecPriors[0] = 0;
     rtRecPriors[kSingleRecord] =
-        gContext->GetNumSetting("SingleRecordRecPriority", 1);
+        gCoreContext->GetNumSetting("SingleRecordRecPriority", 1);
     rtRecPriors[kTimeslotRecord] =
-        gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
+        gCoreContext->GetNumSetting("TimeslotRecordRecPriority", 0);
     rtRecPriors[kChannelRecord] =
-        gContext->GetNumSetting("ChannelRecordRecPriority", 0);
+        gCoreContext->GetNumSetting("ChannelRecordRecPriority", 0);
     rtRecPriors[kAllRecord] =
-        gContext->GetNumSetting("AllRecordRecPriority", 0);
+        gCoreContext->GetNumSetting("AllRecordRecPriority", 0);
     rtRecPriors[kWeekslotRecord] =
-        gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
+        gCoreContext->GetNumSetting("WeekslotRecordRecPriority", 0);
     rtRecPriors[kFindOneRecord] =
-        gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
     rtRecPriors[kOverrideRecord] =
-        gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+        gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
     rtRecPriors[kDontRecord] =
-        gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+        gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
     rtRecPriors[kFindDailyRecord] =
-        gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
     rtRecPriors[kFindWeeklyRecord] =
-        gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
 
     // get recording types associated with each program from db
     // (hope this is ok to do here, it's so much lighter doing

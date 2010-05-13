@@ -13,6 +13,7 @@ using namespace std;
 #include "mythexp.h"
 #include "mythtimer.h"
 #include "mythsystem.h"
+#include "mythevent.h"
 
 class QFile;
 
@@ -48,6 +49,9 @@ MPUBLIC int     intResponse(const QString &query, int def);
 MPUBLIC QString getSymlinkTarget(const QString &start_file,
                                  QStringList   *intermediaries = NULL,
                                  unsigned       maxLinks       = 255);
+
+MPUBLIC void sendPlaybackStart();
+MPUBLIC void sendPlaybackEnd();
 
 inline float clamp(float val, float minimum, float maximum)
 {

@@ -14,7 +14,7 @@ using namespace std;
 #include <QDateTime>
 
 // myth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "dbchannelinfo.h"
@@ -233,19 +233,19 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_changrpid = changrpid;
     m_changrplist = ChannelGroup::GetChannelGroups(false);
 
-    m_jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 1);
-    m_sortReverse = gContext->GetNumSetting("EPGSortReverse", 0);
-    m_selectRecThreshold = gContext->GetNumSetting("SelChangeRecThreshold", 16);
+    m_jumpToChannelEnabled = gCoreContext->GetNumSetting("EPGEnableJumpToChannel", 1);
+    m_sortReverse = gCoreContext->GetNumSetting("EPGSortReverse", 0);
+    m_selectRecThreshold = gCoreContext->GetNumSetting("SelChangeRecThreshold", 16);
 
-    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    m_dateFormat = gContext->GetSetting("ShortDateFormat", "ddd d");
+    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateFormat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
 
-    m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
-    m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
+    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     m_channelFormat.replace(' ', "\n");
 
-    m_unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
-    m_unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
+    m_unknownTitle = gCoreContext->GetSetting("UnknownTitle", "Unknown");
+    m_unknownCategory = gCoreContext->GetSetting("UnknownCategory", "Unknown");
 
     for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
         m_programs[y] = NULL;
@@ -359,12 +359,12 @@ void GuideGrid::Init(void)
     if (m_changroupname)
         m_changroupname->SetText(changrpname);
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 GuideGrid::~GuideGrid()
 {
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 
     for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
     {
@@ -389,7 +389,7 @@ GuideGrid::~GuideGrid()
         m_previewVideoRefreshTimer = NULL;
     }
 
-    gContext->SaveSetting("EPGSortReverse", m_sortReverse ? "1" : "0");
+    gCoreContext->SaveSetting("EPGSortReverse", m_sortReverse ? "1" : "0");
 
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
@@ -1448,7 +1448,7 @@ void GuideGrid::updateChannels(void)
     if (m_player)
         m_player->ClearTunableCache();
 
-    bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
+    bool showChannelIcon = gCoreContext->GetNumSetting("EPGShowChannelIcon", 0);
 
     for (unsigned int y = 0; (y < (unsigned int)m_channelCount) && chinfo; ++y)
     {
@@ -1536,7 +1536,7 @@ void GuideGrid::updateInfo(void)
 
     PixmapChannel *chinfo = GetChannelInfo(chanNum);
 
-    bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
+    bool showChannelIcon = gCoreContext->GetNumSetting("EPGShowChannelIcon", 0);
 
     if (m_channelImage)
     {

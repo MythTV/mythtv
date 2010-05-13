@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "audiooutputalsa.h"
     
 #define LOC QString("ALSA: ")
@@ -753,17 +753,17 @@ void AudioOutputALSA::OpenMixer(bool setstartingvolume)
 {
     int volume;
 
-    mixer_control = gContext->GetSetting("MixerControl", "PCM");
+    mixer_control = gCoreContext->GetSetting("MixerControl", "PCM");
 
     SetupMixer();
 
     if (mixer_handle != NULL && setstartingvolume)
     {
-        volume = gContext->GetNumSetting("MasterMixerVolume", 80);
+        volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
         SetCurrentVolume("Master", 0, volume);
         SetCurrentVolume("Master", 1, volume);
 
-        volume = gContext->GetNumSetting("PCMMixerVolume", 80);
+        volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         SetCurrentVolume("PCM", 0, volume);
         SetCurrentVolume("PCM", 1, volume);
     }
@@ -780,7 +780,7 @@ void AudioOutputALSA::SetupMixer(void)
 {
     int err;
 
-    QString alsadevice = gContext->GetSetting("MixerDevice", "default");
+    QString alsadevice = gCoreContext->GetSetting("MixerDevice", "default");
     QString device = alsadevice.remove(QString("ALSA:"));
 
     if (mixer_handle != NULL)

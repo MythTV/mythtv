@@ -3,7 +3,7 @@
 #include <cmath>
 
 // MythTV headers
-#include "mythcontext.h"    /* gContext */
+#include "mythcorecontext.h"    /* gContext */
 #include "NuppelVideoPlayer.h"
 
 // Commercial Flagging headers
@@ -115,7 +115,7 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
      *      0: no debugging
      *      2: extra verbosity [O(nframes)]
      */
-    debugLevel = gContext->GetNumSetting("SceneChangeDetectorDebugLevel", 0);
+    debugLevel = gCoreContext->GetNumSetting("SceneChangeDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
     {

@@ -2,7 +2,6 @@
 
 #include "mythconfigdialogs.h"
 #include "mythwizard.h"
-#include "mythcontext.h"
 
 #include "mythuihelper.h"
 
@@ -89,7 +88,7 @@ DialogCode ConfigurationPopupDialog::exec(bool saveOnAccept)
     storage->Load();
 
     dialog = (ConfigPopupDialogWidget*)
-        dialogWidget(gContext->GetMainWindow(), "ConfigurationPopupDialog");
+        dialogWidget(GetMythMainWindow(), "ConfigurationPopupDialog");
     dialog->ShowPopup(this);
 
     DialogCode ret = dialog->exec();
@@ -105,7 +104,7 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
     bool handled = false;
     QStringList actions;
 
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -167,7 +166,7 @@ DialogCode ConfigurationDialog::exec(bool saveOnAccept, bool doLoad)
         Load();
 
     MythDialog *dialog = dialogWidget(
-        gContext->GetMainWindow(), "Configuration Dialog");
+        GetMythMainWindow(), "Configuration Dialog");
 
     dialog->Show();
 

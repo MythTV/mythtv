@@ -29,10 +29,10 @@ static void *run_priv_thread(void *data)
     (void)data;
     while (true) 
     {
-        gContext->waitPrivRequest();
+        gCoreContext->waitPrivRequest();
         
-        for (MythPrivRequest req = gContext->popPrivRequest(); 
-             true; req = gContext->popPrivRequest()) 
+        for (MythPrivRequest req = gCoreContext->popPrivRequest(); 
+             true; req = gCoreContext->popPrivRequest()) 
         {
             bool done = false;
 
@@ -140,7 +140,6 @@ int main(int argc, char *argv[])
         MythUIHelper::ParseGeometryOverride(cmdline.GetGeometry());
     }
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
@@ -156,7 +155,7 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                           .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -173,7 +172,7 @@ int main(int argc, char *argv[])
     }
     setuid(getuid());
 
-    QString themename = gContext->GetSetting("Theme");
+    QString themename = gCoreContext->GetSetting("Theme");
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {   
@@ -192,7 +191,7 @@ int main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
     // Mac OS X doesn't define the AudioOutputDevice setting
 #else
-    QString auddevice = gContext->GetSetting("AudioOutputDevice");
+    QString auddevice = gCoreContext->GetSetting("AudioOutputDevice");
     if (auddevice.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
@@ -203,7 +202,6 @@ int main(int argc, char *argv[])
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    gContext->SetMainWindow(mainWindow);
     MythThemeBase *theme = new MythThemeBase();
 
     TV::InitKeys();
@@ -247,7 +245,7 @@ int main(int argc, char *argv[])
     
     if (priv_thread_created)
     {
-        gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
+        gCoreContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, NULL);
     }
     delete theme;

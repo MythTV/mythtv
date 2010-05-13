@@ -13,7 +13,6 @@
 #include "mythcdrom.h"
 #include "mythcdrom-linux.h"
 #include "mythconfig.h"      // for WORDS_BIGENDIAN
-#include "mythcontext.h"
 #include "mythverbose.h"
 
 #define LOC     QString("MythCDROMLinux:")

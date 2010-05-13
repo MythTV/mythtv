@@ -39,7 +39,7 @@ MythComboBox::MythComboBox(bool rw, QWidget *parent, const char *name) :
 {
     setObjectName(name);
     setEditable(rw);
-    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
+    useVirtualKeyboard = gCoreContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
 MythComboBox::~MythComboBox()
@@ -70,8 +70,8 @@ void MythComboBox::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
 
-    popup = new VirtualKeyboardQt(gContext->GetMainWindow(), this);
-    gContext->GetMainWindow()->detach(popup);
+    popup = new VirtualKeyboardQt(GetMythMainWindow(), this);
+    GetMythMainWindow()->detach(popup);
     popup->exec();
 
     qt_delete(popup);
@@ -82,7 +82,8 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false, updated = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard); 
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions,
+                                                     !allowVirtualKeyboard); 
 
     if ((!popup || popup->isHidden()) && !handled)
     {
@@ -211,7 +212,7 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
     bool handled = false;
     QStringList actions;
 
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for ( int i = 0; i < actions.size() && !handled; i++)
     {
@@ -262,7 +263,7 @@ void MythRadioButton::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -323,7 +324,7 @@ void MythSpinBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -375,7 +376,7 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -435,7 +436,7 @@ MythLineEdit::MythLineEdit(QWidget *parent, const char *name) :
     popupPosition(VKQT_POSBELOWEDIT)
 {
     setObjectName(name);
-    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
+    useVirtualKeyboard = gCoreContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
 MythLineEdit::MythLineEdit(
@@ -447,7 +448,7 @@ MythLineEdit::MythLineEdit(
     popupPosition(VKQT_POSBELOWEDIT)
 {
     setObjectName(name);
-    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
+    useVirtualKeyboard = gCoreContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
 MythLineEdit::~MythLineEdit()
@@ -470,8 +471,8 @@ void MythLineEdit::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
 
-    popup = new VirtualKeyboardQt(gContext->GetMainWindow(), this);
-    gContext->GetMainWindow()->detach(popup);
+    popup = new VirtualKeyboardQt(GetMythMainWindow(), this);
+    GetMythMainWindow()->detach(popup);
     popup->exec();
 
     qt_delete(popup);
@@ -481,7 +482,7 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions, false);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions, false);
 
     if ((!popup || popup->isHidden()) && !handled)
     {
@@ -645,7 +646,7 @@ void MythRemoteLineEdit::Init()
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
 
     popup = NULL;
-    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
+    useVirtualKeyboard = gCoreContext->GetNumSetting("UseVirtualKeyboard", 1);
     popupPosition = VKQT_POSBELOWEDIT;
 }
 
@@ -868,7 +869,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions, false);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions, false);
 
     if ((!popup || popup->isHidden()) && !handled)
     {
@@ -1142,8 +1143,8 @@ void MythRemoteLineEdit::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
 
-    popup = new VirtualKeyboardQt(gContext->GetMainWindow(), this);
-    gContext->GetMainWindow()->detach(popup);
+    popup = new VirtualKeyboardQt(GetMythMainWindow(), this);
+    GetMythMainWindow()->detach(popup);
     popup->exec();
 
     qt_delete(popup);
@@ -1200,7 +1201,8 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     keyPressActions.clear();
 
-    handled = gContext->TranslateKeyPress("qt", (QKeyEvent *)e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
+                                                     actions);
 
     if (!handled && !actions.isEmpty())
     {
@@ -1370,7 +1372,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

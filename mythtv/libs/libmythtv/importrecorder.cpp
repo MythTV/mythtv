@@ -65,8 +65,8 @@ void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     (void)profile;
 
     SetOption("videodevice", videodev);
-    SetOption("tvformat",    gContext->GetSetting("TVFormat"));
-    SetOption("vbiformat",   gContext->GetSetting("VbiFormat"));
+    SetOption("tvformat",    gCoreContext->GetSetting("TVFormat"));
+    SetOption("vbiformat",   gCoreContext->GetSetting("VbiFormat"));
 }
 
 void ImportRecorder::StartRecording(void)

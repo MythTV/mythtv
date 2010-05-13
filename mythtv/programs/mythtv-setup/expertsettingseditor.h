@@ -1,7 +1,7 @@
 #ifndef EXPERTSETTINGSEDITOR_H
 #define EXPERTSETTINGSEDITOR_H
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "rawsettingseditor.h"
 
@@ -18,7 +18,7 @@ class ExpertSettingsEditor : public RawSettingsEditor
         query.prepare("SELECT value, data "
                         "FROM settings "
                         "WHERE hostname = :HOSTNAME");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
         if (query.exec())
         {

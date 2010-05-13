@@ -969,7 +969,7 @@ void DataDirectProcessor::FixProgramIDs(void)
     }
 
     if (found_table["settings"])
-        gContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
+        gCoreContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
 
     VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- end");
 }
@@ -1181,7 +1181,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     {
         int daysToSuggested =
             QDateTime::currentDateTime().daysTo(NextSuggestedTime);
-        int desiredPeriod = gContext->GetNumSetting("MythFillPeriod", 1);
+        int desiredPeriod = gCoreContext->GetNumSetting("MythFillPeriod", 1);
 
 
         if (daysToSuggested > desiredPeriod)

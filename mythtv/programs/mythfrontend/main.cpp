@@ -222,7 +222,7 @@ void startOSDMenuEditor(void)
 void startGuide(void)
 {
     uint chanid = 0;
-    QString channum = gContext->GetSetting("DefaultTVChannel");
+    QString channum = gCoreContext->GetSetting("DefaultTVChannel");
     channum = (channum.isEmpty()) ? "3" : channum;
     GuideGrid::RunProgramGuide(chanid, channum);
 }
@@ -493,7 +493,7 @@ void TVMenuCallback(void *data, QString &selection)
     if (sel.left(9) == "settings ")
     {
         GetMythUI()->AddCurrentLocation("Setup");
-        gContext->ActivateSettingsCache(false);
+        gCoreContext->ActivateSettingsCache(false);
     }
 
     if (sel == "tv_watch_live")
@@ -591,7 +591,7 @@ void TVMenuCallback(void *data, QString &selection)
         mainsettings.exec();
         menu->ReloadExitKey();
         QStringList strlist( QString("REFRESH_BACKEND") );
-        gContext->SendReceiveStringList(strlist);
+        gCoreContext->SendReceiveStringList(strlist);
     }
     else if (sel == "settings playback")
     {
@@ -649,7 +649,7 @@ void TVMenuCallback(void *data, QString &selection)
     {
         GetMythUI()->RemoveCurrentLocation();
 
-        gContext->ActivateSettingsCache(true);
+        gCoreContext->ActivateSettingsCache(true);
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
         if (sel == "settings general" ||
@@ -660,7 +660,7 @@ void TVMenuCallback(void *data, QString &selection)
 
 void handleExit(void)
 {
-    if (gContext->GetNumSetting("NoPromptOnExit", 1) == 0)
+    if (gCoreContext->GetNumSetting("NoPromptOnExit", 1) == 0)
         qApp->quit();
     else
     {
@@ -848,7 +848,7 @@ void gotoMainMenu(void)
     // to cause the menu to reload
     QKeyEvent *event =
         new QKeyEvent(QEvent::KeyPress, Qt::Key_L, Qt::ControlModifier);
-    QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+    QCoreApplication::postEvent((QObject*)(GetMythMainWindow()), event);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
@@ -864,7 +864,7 @@ bool resetTheme(QString themedir, const QString badtheme)
                 QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
-    gContext->OverrideSettingForSession("Theme", themename);
+    gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
 
     LanguageSettings::reload();
@@ -895,7 +895,7 @@ int reloadTheme(void)
 
     GetMythMainWindow()->SetEffectsEnabled(true);
 
-    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
@@ -927,7 +927,7 @@ void reloadTheme_void(void)
 
 void getScreenShot(void)
 {
-    (void) gContext->GetMainWindow()->screenShot();
+    (void) GetMythMainWindow()->screenShot();
 }
 
 void InitJumpPoints(void)
@@ -978,9 +978,9 @@ void InitJumpPoints(void)
 void signal_USR1_handler(int){
       VERBOSE(VB_GENERAL, "SIG USR1 received, reloading theme");
       RemoteSendMessage("CLEAR_SETTINGS_CACHE");
-      gContext->ActivateSettingsCache(false);
+      gCoreContext->ActivateSettingsCache(false);
       GetMythMainWindow()->JumpTo("Reload Theme");
-      gContext->ActivateSettingsCache(true);
+      gCoreContext->ActivateSettingsCache(true);
 }
 
 void signal_USR2_handler(int)
@@ -1005,16 +1005,16 @@ static void *run_priv_thread(void *data)
     (void)data;
     while (true)
     {
-        gContext->waitPrivRequest();
+        gCoreContext->waitPrivRequest();
 
-        for (MythPrivRequest req = gContext->popPrivRequest();
-             true; req = gContext->popPrivRequest())
+        for (MythPrivRequest req = gCoreContext->popPrivRequest();
+             true; req = gCoreContext->popPrivRequest())
         {
             bool done = false;
             switch (req.getType())
             {
             case MythPrivRequest::MythRealtime:
-                if (gContext->GetNumSetting("RealtimePriority", 1))
+                if (gCoreContext->GetNumSetting("RealtimePriority", 1))
                 {
                     pthread_t *target_thread = (pthread_t *)(req.getData());
                     // Raise the given thread to realtime priority
@@ -1062,7 +1062,7 @@ void CleanupMyOldInUsePrograms(void)
 
     query.prepare("DELETE FROM inuseprograms "
                   "WHERE hostname = :HOSTNAME and recusage = 'player' ;");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec())
         MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
@@ -1351,7 +1351,7 @@ int main(int argc, char **argv)
         QStringList::const_iterator it = settingsQuery.begin();
         for (; it != settingsQuery.end(); ++it)
         {
-            QString value = gContext->GetSetting(*it);
+            QString value = gCoreContext->GetSetting(*it);
             QString out = QString("\tSettings Value : %1 = %2")
                 .arg(*it).arg(value);
             cout << out.toLocal8Bit().constData() << endl;
@@ -1373,7 +1373,7 @@ int main(int argc, char **argv)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("update settings set data='EN' "
                       "WHERE hostname = :HOSTNAME and value='Language' ;");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("Updating language", query);
 
@@ -1387,7 +1387,7 @@ int main(int argc, char **argv)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                           .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -1417,7 +1417,7 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
 
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
@@ -1431,7 +1431,6 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
     GetMythUI()->UpdateImageCache();
@@ -1478,9 +1477,9 @@ int main(int argc, char **argv)
     }
 
     NetworkControl *networkControl = NULL;
-    if (gContext->GetNumSetting("NetworkControlEnabled", 0))
+    if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
     {
-        int networkPort = gContext->GetNumSetting("NetworkControlPort", 6545);
+        int networkPort = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
         networkControl = new NetworkControl();
         if (!networkControl->listen(QHostAddress::Any,networkPort))
             VERBOSE(VB_IMPORTANT,
@@ -1488,7 +1487,7 @@ int main(int argc, char **argv)
                     .arg(networkPort));
     }
 
-    themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
@@ -1524,7 +1523,7 @@ int main(int argc, char **argv)
 
     if (priv_thread_created)
     {
-        gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
+        gCoreContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, NULL);
     }
 

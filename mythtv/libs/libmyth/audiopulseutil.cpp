@@ -23,7 +23,7 @@
 #include "util.h" // for IsPulseAudioRunning()
 #include "exitcodes.h"
 #include "mythverbose.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 #ifdef USING_PULSE
 
@@ -342,7 +342,7 @@ int pulseaudio_handle_startup(void)
         VERBOSE(VB_IMPORTANT, "WARNING: You have told MythTV to ignore it.");
         VERBOSE(VB_IMPORTANT, "WARNING: ");
     }
-    else if (gContext->GetSetting("AudioOutputDevice")
+    else if (gCoreContext->GetSetting("AudioOutputDevice")
              .toLower().contains("pulseaudio"))
     {
         // Don't disable PulseAudio if we're using it explicitly

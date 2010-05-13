@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "NuppelVideoPlayer.h"
 
 // Commercial Flagging headers
@@ -42,16 +42,16 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
       logoInfoAvailable(false)
 {
     commDetectLogoSamplesNeeded =
-        gContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
+        gCoreContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
     commDetectLogoSampleSpacing =
-        gContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
+        gCoreContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
     commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
                                   commDetectLogoSampleSpacing;
     commDetectLogoGoodEdgeThreshold =
-        gContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
+        gCoreContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
         .toDouble();
     commDetectLogoBadEdgeThreshold =
-        gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
+        gCoreContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
         .toDouble();
 }
 

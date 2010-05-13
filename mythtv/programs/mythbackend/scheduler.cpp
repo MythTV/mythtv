@@ -331,7 +331,7 @@ static bool comp_timechannel(RecordingInfo *a, RecordingInfo *b)
 
 bool Scheduler::FillRecordList(void)
 {
-    schedMoveHigher = (bool)gContext->GetNumSetting("SchedMoveHigher");
+    schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
     VERBOSE(VB_SCHEDULE, "BuildWorkList...");
@@ -1136,7 +1136,7 @@ void Scheduler::SchedNewRecords(void)
         cout << "- = unschedule a showing in favor of another one" << endl;
     }
 
-    int openEnd = gContext->GetNumSetting("SchedOpenEnd", 0);
+    int openEnd = gCoreContext->GetNumSetting("SchedOpenEnd", 0);
 
     RecIter i = worklist.begin();
     while (i != worklist.end())
@@ -1567,7 +1567,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
-    int wakeThreshold = gContext->GetNumSetting("WakeUpThreshold", 240);
+    int wakeThreshold = gCoreContext->GetNumSetting("WakeUpThreshold", 240);
 
     int secsleft;
     EncoderLink *nexttv = NULL;
@@ -1582,7 +1582,7 @@ void Scheduler::RunScheduler(void)
 
     RecIter startIter = reclist.begin();
 
-    bool blockShutdown = gContext->GetNumSetting("blockSDWUwithoutClient", 1);
+    bool blockShutdown = gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
     QDateTime idleSince = QDateTime();
     int idleTimeoutSecs = 0;
     int idleWaitForRecordingTime = 0;
@@ -1689,7 +1689,7 @@ void Scheduler::RunScheduler(void)
                         matchTime + placeTime, matchTime, placeTime);
 
             VERBOSE(VB_GENERAL, msg);
-            gContext->LogEntry("scheduler", LP_INFO, "Scheduled items", msg);
+            gCoreContext->LogEntry("scheduler", LP_INFO, "Scheduled items", msg);
 
             fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
@@ -1699,11 +1699,11 @@ void Scheduler::RunScheduler(void)
 
             // Determine if the user wants us to start recording early
             // and by how many seconds
-            prerollseconds = gContext->GetNumSetting("RecordPreRoll");
+            prerollseconds = gCoreContext->GetNumSetting("RecordPreRoll");
 
-            idleTimeoutSecs = gContext->GetNumSetting("idleTimeoutSecs", 0);
+            idleTimeoutSecs = gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
             idleWaitForRecordingTime =
-                       gContext->GetNumSetting("idleWaitForRecordingTime", 15);
+                       gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
 
             if (firstRun)
             {
@@ -1735,7 +1735,7 @@ void Scheduler::RunScheduler(void)
                     VERBOSE(VB_IMPORTANT, "Seem to be woken up by USER");
                 }
 
-                QString startupCommand = gContext->GetSetting("startupCommand",
+                QString startupCommand = gCoreContext->GetSetting("startupCommand",
                                                               "");
                 if (!startupCommand.isEmpty())
                 {
@@ -2010,7 +2010,7 @@ void Scheduler::RunScheduler(void)
                 nextRecording->RecStatusText() + ")";
 
             VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details));
-            gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
+            gCoreContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
             if (is_rec)
                 UpdateNextRecord();
@@ -2020,14 +2020,14 @@ void Scheduler::RunScheduler(void)
                 MythEvent me(QString("FORCE_DELETE_RECORDING %1 %2")
                          .arg(nextRecording->chanid)
                          .arg(nextRecording->recstartts.toString(Qt::ISODate)));
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
             }
         }
 
         if (statuschanged)
         {
             MythEvent me("SCHEDULE_CHANGE");
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
             idleSince = QDateTime();
         }
 
@@ -2119,7 +2119,7 @@ void Scheduler::RunScheduler(void)
                                 VERBOSE(VB_IMPORTANT, msg);
                                 MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                              .arg(idleTimeoutSecs));
-                                gContext->dispatch(me);
+                                gCoreContext->dispatch(me);
                             }
                             else if (itime % 10 == 0)
                             {
@@ -2129,7 +2129,7 @@ void Scheduler::RunScheduler(void)
                                 VERBOSE(VB_IDLE, msg);
                                 MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                              .arg(idleTimeoutSecs - itime));
-                                gContext->dispatch(me);
+                                gCoreContext->dispatch(me);
                             }
                         }
                     }
@@ -2140,7 +2140,7 @@ void Scheduler::RunScheduler(void)
                     if (idleSince.isValid())
                     {
                         MythEvent me(QString("SHUTDOWN_COUNTDOWN -1"));
-                        gContext->dispatch(me);
+                        gCoreContext->dispatch(me);
                     }
                     idleSince = QDateTime();
                 }
@@ -2155,7 +2155,7 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
 {
     (void)prerollseconds;
     bool retval = false;
-    QString preSDWUCheckCommand = gContext->GetSetting("preSDWUCheckCommand",
+    QString preSDWUCheckCommand = gCoreContext->GetSetting("preSDWUCheckCommand",
                                                        "");
     if (!preSDWUCheckCommand.isEmpty())
     {
@@ -2181,7 +2181,7 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                     // (needs a clientconnection again,
                     // before shutdown is executed)
                     blockShutdown
-                             = gContext->GetNumSetting("blockSDWUwithoutClient",
+                             = gCoreContext->GetNumSetting("blockSDWUwithoutClient",
                                                        1);
                     idleSince = QDateTime();
                     break;
@@ -2216,13 +2216,13 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
         QDateTime restarttime = nextRecording->recstartts.addSecs((-1) *
                                                                prerollseconds);
 
-        int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
+        int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
 
-        QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat",
+        QString wakeup_timeformat = gCoreContext->GetSetting("WakeupTimeFormat",
                                                          "hh:mm yyyy-MM-dd");
-        QString setwakeup_cmd = gContext->GetSetting("SetWakeuptimeCommand",
+        QString setwakeup_cmd = gCoreContext->GetSetting("SetWakeuptimeCommand",
                                                      "echo \'Wakeuptime would "
                                                      "be $time if command "
                                                      "set.\'");
@@ -2261,9 +2261,9 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
     // tell anyone who is listening the master server is going down now
     MythEvent me(QString("SHUTDOWN_NOW"));
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
-    QString halt_cmd = gContext->GetSetting("ServerHaltCommand",
+    QString halt_cmd = gCoreContext->GetSetting("ServerHaltCommand",
                                             "sudo /sbin/halt -p");
 
     if (!halt_cmd.isEmpty())
@@ -2310,7 +2310,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             "Scheduler, Checking for slaves that can be shut down");
 
     int sleepThreshold =
-        gContext->GetNumSetting( "SleepThreshold", 60 * 45);
+        gCoreContext->GetNumSetting( "SleepThreshold", 60 * 45);
 
     VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("  Getting list of slaves that "
             "will be active in the next %1 minutes.")
@@ -2382,9 +2382,9 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             (!SlavesInUse.contains(enc->GetHostName())) &&
             (!enc->IsFallingAsleep()))
         {
-            QString sleepCommand = gContext->GetSettingOnHost("SleepCommand",
+            QString sleepCommand = gCoreContext->GetSettingOnHost("SleepCommand",
                 enc->GetHostName());
-            QString wakeUpCommand = gContext->GetSettingOnHost("WakeUpCommand",
+            QString wakeUpCommand = gCoreContext->GetSettingOnHost("WakeUpCommand",
                 enc->GetHostName());
 
             if (!sleepCommand.isEmpty() && !wakeUpCommand.isEmpty())
@@ -2433,7 +2433,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 
 bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
 {
-    if (slaveHostname == gContext->GetHostName())
+    if (slaveHostname == gCoreContext->GetHostName())
     {
         VERBOSE(VB_IMPORTANT, QString("Tried to Wake Up %1, but this is the "
                 "master backend and it is not asleep.")
@@ -2441,7 +2441,7 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
         return false;
     }
 
-    QString wakeUpCommand = gContext->GetSettingOnHost( "WakeUpCommand",
+    QString wakeUpCommand = gCoreContext->GetSettingOnHost( "WakeUpCommand",
         slaveHostname);
 
     if (wakeUpCommand.isEmpty()) {
@@ -2495,7 +2495,7 @@ void Scheduler::WakeUpSlaves(void)
 
         thisSlave = enc->GetHostName();
 
-        if ((!gContext->GetSettingOnHost("WakeUpCommand", thisSlave)
+        if ((!gCoreContext->GetSettingOnHost("WakeUpCommand", thisSlave)
                 .isEmpty()) &&
             (!SlavesThatCanWake.contains(thisSlave)))
             SlavesThatCanWake << thisSlave;
@@ -2974,15 +2974,15 @@ void Scheduler::AddNewRecords(void)
         }
     }
 
-    prefinputpri        = gContext->GetNumSetting("PrefInputPriority", 2);
-    int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
-    int wspriority      = gContext->GetNumSetting("WSRecPriority", 0);
-    int autopriority    = gContext->GetNumSetting("AutoRecPriority", 0);
-    int slpriority      = gContext->GetNumSetting("SignLangRecPriority", 0);
-    int onscrpriority   = gContext->GetNumSetting("OnScrSubRecPriority", 0);
-    int ccpriority      = gContext->GetNumSetting("CCRecPriority", 0);
-    int hhpriority      = gContext->GetNumSetting("HardHearRecPriority", 0);
-    int adpriority      = gContext->GetNumSetting("AudioDescRecPriority", 0);
+    prefinputpri        = gCoreContext->GetNumSetting("PrefInputPriority", 2);
+    int hdtvpriority    = gCoreContext->GetNumSetting("HDTVRecPriority", 0);
+    int wspriority      = gCoreContext->GetNumSetting("WSRecPriority", 0);
+    int autopriority    = gCoreContext->GetNumSetting("AutoRecPriority", 0);
+    int slpriority      = gCoreContext->GetNumSetting("SignLangRecPriority", 0);
+    int onscrpriority   = gCoreContext->GetNumSetting("OnScrSubRecPriority", 0);
+    int ccpriority      = gCoreContext->GetNumSetting("CCRecPriority", 0);
+    int hhpriority      = gCoreContext->GetNumSetting("HardHearRecPriority", 0);
+    int adpriority      = gCoreContext->GetNumSetting("AudioDescRecPriority", 0);
 
     int autostrata = autopriority * 2 + 1;
 
@@ -3729,7 +3729,7 @@ void Scheduler::GetNextLiveTVDir(int cardid)
     EncoderLink *tv = (*m_tvList)[cardid];
 
     if (tv->IsLocal())
-        pginfo->hostname = gContext->GetHostName();
+        pginfo->hostname = gCoreContext->GetHostName();
     else
         pginfo->hostname = tv->GetHostName();
 
@@ -3787,23 +3787,23 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     }
 
     int weightPerRecording =
-            gContext->GetNumSetting("SGweightPerRecording", 10);
+            gCoreContext->GetNumSetting("SGweightPerRecording", 10);
     int weightPerPlayback =
-            gContext->GetNumSetting("SGweightPerPlayback", 5);
+            gCoreContext->GetNumSetting("SGweightPerPlayback", 5);
     int weightPerCommFlag =
-            gContext->GetNumSetting("SGweightPerCommFlag", 5);
+            gCoreContext->GetNumSetting("SGweightPerCommFlag", 5);
     int weightPerTranscode =
-            gContext->GetNumSetting("SGweightPerTranscode", 5);
+            gCoreContext->GetNumSetting("SGweightPerTranscode", 5);
 
     QString storageScheduler =
-            gContext->GetSetting("StorageScheduler", "Combination");
+            gCoreContext->GetSetting("StorageScheduler", "Combination");
     int localStartingWeight =
-            gContext->GetNumSetting("SGweightLocalStarting",
+            gCoreContext->GetNumSetting("SGweightLocalStarting",
                                     (storageScheduler != "Combination") ? 0
                                         : (int)(-1.99 * weightPerRecording));
     int remoteStartingWeight =
-            gContext->GetNumSetting("SGweightRemoteStarting", 0);
-    int maxOverlap = gContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
+            gCoreContext->GetNumSetting("SGweightRemoteStarting", 0);
+    int maxOverlap = gCoreContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
 
     FillDirectoryInfoCache();
 
@@ -3830,7 +3830,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
 
         fs->weight = tmpWeight;
 
-        tmpWeight = gContext->GetNumSetting(QString("SGweightPerDir:%1:%2")
+        tmpWeight = gCoreContext->GetNumSetting(QString("SGweightPerDir:%1:%2")
                                 .arg(fs->hostname).arg(fs->directory), 0);
         fs->weight += tmpWeight;
 
@@ -4024,7 +4024,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                           pginfo->recstartts.secsTo(pginfo->recendts) / 1024;
 
     bool simulateAutoExpire =
-        ((gContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
+        ((gCoreContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
          (expirer) &&
          (fsInfoList.size() > 1));
 
@@ -4078,7 +4078,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                         (*fslistit)->directory + "/" + (*it)->pathname;
 
                     // recording is local
-                    if ((*it)->hostname == gContext->GetHostName())
+                    if ((*it)->hostname == gCoreContext->GetHostName())
                     {
                         QFile checkFile(filename);
 
@@ -4242,7 +4242,7 @@ void Scheduler::SchedPreserveLiveTV(void)
         return;
     }
 
-    livetvpriority = gContext->GetNumSetting("LiveTVPriority", 0);
+    livetvpriority = gCoreContext->GetNumSetting("LiveTVPriority", 0);
 
     // Build a list of active livetv programs
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -4290,7 +4290,7 @@ bool Scheduler::WasStartedAutomatically()
     bool autoStart = false;
 
     QDateTime startupTime = QDateTime();
-    QString s = gContext->GetSetting("MythShutdownWakeupTime", "");
+    QString s = gCoreContext->GetSetting("MythShutdownWakeupTime", "");
     if (s.length())
         startupTime = QDateTime::fromString(s, Qt::ISODate);
 

@@ -6,14 +6,14 @@
 #include "cardutil.h"
 #include "inputinfo.h"
 #include "programinfo.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "decodeencode.h"
 #include "remoteencoder.h"
 #include "tv_rec.h"
 
 uint RemoteGetFlags(uint cardid)
 {
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
     {
         const TVRec *rec = TVRec::GetTVRec(cardid);
         if (rec)
@@ -22,7 +22,7 @@ uint RemoteGetFlags(uint cardid)
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "GET_FLAGS";
-    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return 0;
 
     return strlist[0].toInt();
@@ -30,7 +30,7 @@ uint RemoteGetFlags(uint cardid)
 
 uint RemoteGetState(uint cardid)
 {
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
     {
         const TVRec *rec = TVRec::GetTVRec(cardid);
         if (rec)
@@ -39,7 +39,7 @@ uint RemoteGetState(uint cardid)
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "GET_STATE";
-    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return kState_ChangingState;
 
     return strlist[0].toInt();
@@ -49,7 +49,7 @@ uint RemoteGetState(uint cardid)
 bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
                          int secsleft, bool hasLater)
 {
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
     {
         TVRec *rec = TVRec::GetTVRec(cardid);
         if (rec)
@@ -65,7 +65,7 @@ bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
     strlist << QString::number(hasLater);
     pginfo->ToStringList(strlist);
 
-    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return false;
 
     return strlist[0].toUpper() == "OK";
@@ -73,7 +73,7 @@ bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
 
 bool RemoteStopLiveTV(uint cardid)
 {
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
     {
         TVRec *rec = TVRec::GetTVRec(cardid);
         if (rec)
@@ -86,7 +86,7 @@ bool RemoteStopLiveTV(uint cardid)
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "STOP_LIVETV";
 
-    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return false;
 
     return strlist[0].toUpper() == "OK";
@@ -94,7 +94,7 @@ bool RemoteStopLiveTV(uint cardid)
 
 bool RemoteStopRecording(uint cardid)
 {
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
     {
         TVRec *rec = TVRec::GetTVRec(cardid);
         if (rec)
@@ -107,7 +107,7 @@ bool RemoteStopRecording(uint cardid)
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "STOP_RECORDING";
 
-    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return false;
 
     return strlist[0].toUpper() == "OK";
@@ -118,7 +118,7 @@ void RemoteStopRecording(const ProgramInfo *pginfo)
     QStringList strlist(QString("STOP_RECORDING"));
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
+    gCoreContext->SendReceiveStringList(strlist);
 }
 
 void RemoteCancelNextRecording(uint cardid, bool cancel)
@@ -127,7 +127,7 @@ void RemoteCancelNextRecording(uint cardid, bool cancel)
     strlist << "CANCEL_NEXT_RECORDING";
     strlist << QString::number((cancel) ? 1 : 0);
 
-    gContext->SendReceiveStringList(strlist);
+    gCoreContext->SendReceiveStringList(strlist);
 }
 
 RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
@@ -135,7 +135,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
     QStringList strlist( "GET_NEXT_FREE_RECORDER" );
     strlist << QString("%1").arg(curr);
 
-    if (!gContext->SendReceiveStringList(strlist, true))
+    if (!gCoreContext->SendReceiveStringList(strlist, true))
         return NULL;
 
     int num = strlist[0].toInt();
@@ -153,7 +153,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList(
 {
     QStringList strlist( "GET_FREE_RECORDER_LIST" );
 
-    if (!gContext->SendReceiveStringList(strlist, true))
+    if (!gCoreContext->SendReceiveStringList(strlist, true))
         return NULL;
 
     for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
@@ -176,7 +176,7 @@ RemoteEncoder *RemoteRequestRecorder(void)
 {
     QStringList strlist( "GET_FREE_RECORDER" );
 
-    if (!gContext->SendReceiveStringList(strlist, true))
+    if (!gCoreContext->SendReceiveStringList(strlist, true))
         return NULL;
 
     int num = strlist[0].toInt();
@@ -191,7 +191,7 @@ RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo)
     QStringList strlist( "GET_RECORDER_NUM" );
     pginfo->ToStringList(strlist);
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if (!gCoreContext->SendReceiveStringList(strlist))
         return NULL;
 
     int num = strlist[0].toInt();
@@ -206,7 +206,7 @@ RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
     QStringList strlist( "GET_RECORDER_FROM_NUM" );
     strlist << QString("%1").arg(recordernum);
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if (!gCoreContext->SendReceiveStringList(strlist))
         return NULL;
 
     QString hostname = strlist[0];
@@ -225,7 +225,7 @@ vector<InputInfo> RemoteRequestFreeInputList(
     for (uint i = 0; i < excluded_cardids.size(); i++)
         strlist << QString::number(excluded_cardids[i]);
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if (!gCoreContext->SendReceiveStringList(strlist))
         return list;
 
     QStringList::const_iterator it = strlist.begin();
@@ -250,7 +250,7 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
     QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
     strlist << "GET_BUSY_INPUT";
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if (!gCoreContext->SendReceiveStringList(strlist))
         return blank;
 
     QStringList::const_iterator it = strlist.begin();
@@ -269,17 +269,17 @@ void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
     QStringList strlist( "QUERY_GENPIXMAP" );
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
+    gCoreContext->SendReceiveStringList(strlist);
 }
 
 bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
 {
     //VERBOSE(VB_IMPORTANT, QString("RemoteIsBusy(%1) %2")
-    //        .arg(cardid).arg(gContext->IsBackend() ? "be" : "fe"));
+    //        .arg(cardid).arg(gCoreContext->IsBackend() ? "be" : "fe"));
 
     busy_input.Clear();
 
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
     {
         const TVRec *rec = TVRec::GetTVRec(cardid);
         if (rec)
@@ -288,7 +288,7 @@ bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "IS_BUSY";
-    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
         return true;
 
     QStringList::const_iterator it = strlist.begin();
@@ -327,7 +327,7 @@ bool RemoteGetRecordingStatus(
         {
             strlist = QStringList(cmd);
             strlist << "GET_STATE";
-            gContext->SendReceiveStringList(strlist);
+            gCoreContext->SendReceiveStringList(strlist);
 
             if (strlist.empty())
                 break;
@@ -346,7 +346,7 @@ bool RemoteGetRecordingStatus(
 
             strlist = QStringList(QString("QUERY_RECORDER %1").arg(cardid));
             strlist << "GET_RECORDING";
-            gContext->SendReceiveStringList(strlist);
+            gCoreContext->SendReceiveStringList(strlist);
 
             ProgramInfo progInfo;
             QStringList::const_iterator it = strlist.constBegin();

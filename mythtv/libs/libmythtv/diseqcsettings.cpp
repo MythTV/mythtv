@@ -8,7 +8,6 @@
 #include <cmath>
 
 // MythTV headers
-#include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "diseqcsettings.h"
@@ -457,7 +456,7 @@ void RotorPosMap::edit(void)
 
     QString angle;
     if (MythPopupBox::showGetTextPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             DeviceTree::tr("Position Index %1").arg(id),
             DeviceTree::tr("Orbital Position"), angle))
     {
@@ -972,7 +971,7 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
 
 bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
 {
-    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(), "");
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "");
     popup->addLabel(tr("Select Type of Device"));
 
     MythListBox *list = new MythListBox(popup);

@@ -29,7 +29,7 @@
 
 #include "inputselectorsetting.h"
 #include "cardutil.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 
 InputSelector::InputSelector(
@@ -57,7 +57,7 @@ void InputSelector::Load(void)
         "      cardinput.sourceid = :SOURCEID            AND "
         "      cardinput.cardid   = capturecard.cardid");
 
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())

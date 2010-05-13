@@ -8,7 +8,6 @@ using namespace std;
 
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
-#include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "decoderbase.h"

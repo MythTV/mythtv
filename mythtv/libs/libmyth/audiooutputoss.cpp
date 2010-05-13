@@ -24,7 +24,7 @@ using namespace std;
 #define LOC_WARN QString("AudioOuputOSS, Warning: ")
 #define LOC_ERR  QString("AudioOuputOSS, Error: ")
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "audiooutputoss.h"
 #include "util.h"
 
@@ -316,14 +316,14 @@ void AudioOutputOSS::VolumeInit()
     mixerfd = -1;
     int volume = 0;
 
-    QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
+    QString device = gCoreContext->GetSetting("MixerDevice", "/dev/mixer");
     if (device.toLower() == "software")
         return;
 
     QByteArray dev = device.toAscii();
     mixerfd = open(dev.constData(), O_RDONLY);
 
-    QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+    QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
 
     if (controlLabel == "Master")
     {
@@ -344,7 +344,7 @@ void AudioOutputOSS::VolumeInit()
     if (set_initial_vol)
     {
         int tmpVol;
-        volume = gContext->GetNumSetting("MasterMixerVolume", 80);
+        volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)
@@ -353,7 +353,7 @@ void AudioOutputOSS::VolumeInit()
                     QString("Error Setting initial Master Volume") + ENO);
         }
 
-        volume = gContext->GetNumSetting("PCMMixerVolume", 80);
+        volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
         if (ret < 0)

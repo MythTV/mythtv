@@ -150,29 +150,29 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     preRoll(0),                                postRoll(0)
 {
     commDetectBorder =
-        gContext->GetNumSetting("CommDetectBorder", 20);
+        gCoreContext->GetNumSetting("CommDetectBorder", 20);
     commDetectBlankFrameMaxDiff =
-        gContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
+        gCoreContext->GetNumSetting("CommDetectBlankFrameMaxDiff", 25);
     commDetectDarkBrightness =
-        gContext->GetNumSetting("CommDetectDarkBrightness", 80);
+        gCoreContext->GetNumSetting("CommDetectDarkBrightness", 80);
     commDetectDimBrightness =
-        gContext->GetNumSetting("CommDetectDimBrightness", 120);
+        gCoreContext->GetNumSetting("CommDetectDimBrightness", 120);
     commDetectBoxBrightness =
-        gContext->GetNumSetting("CommDetectBoxBrightness", 30);
+        gCoreContext->GetNumSetting("CommDetectBoxBrightness", 30);
     commDetectDimAverage =
-        gContext->GetNumSetting("CommDetectDimAverage", 35);
+        gCoreContext->GetNumSetting("CommDetectDimAverage", 35);
     commDetectMaxCommBreakLength =
-        gContext->GetNumSetting("CommDetectMaxCommBreakLength", 395);
+        gCoreContext->GetNumSetting("CommDetectMaxCommBreakLength", 395);
     commDetectMinCommBreakLength =
-        gContext->GetNumSetting("CommDetectMinCommBreakLength", 60);
+        gCoreContext->GetNumSetting("CommDetectMinCommBreakLength", 60);
     commDetectMinShowLength =
-        gContext->GetNumSetting("CommDetectMinShowLength", 65);
+        gCoreContext->GetNumSetting("CommDetectMinShowLength", 65);
     commDetectMaxCommLength =
-        gContext->GetNumSetting("CommDetectMaxCommLength", 125);
+        gCoreContext->GetNumSetting("CommDetectMaxCommLength", 125);
 
-    skipAllBlanks = !!gContext->GetNumSetting("CommSkipAllBlanks", 1);
+    skipAllBlanks = !!gCoreContext->GetNumSetting("CommSkipAllBlanks", 1);
     commDetectBlankCanHaveLogo =
-        !!gContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
+        !!gCoreContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
 }
 
 void ClassicCommDetector::Init()
@@ -334,7 +334,7 @@ bool ClassicCommDetector::go()
     if ((wereRecording) && (!stillRecording) && (secsSince < requiredHeadStart))
         return false;
 
-    aggressiveDetection = gContext->GetNumSetting("AggressiveCommDetect", 1);
+    aggressiveDetection = gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
 
     if (!nvp->InitVideo())
     {

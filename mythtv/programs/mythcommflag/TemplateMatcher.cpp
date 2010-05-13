@@ -15,7 +15,7 @@ using namespace std;
 
 // MythTV headers
 #include "NuppelVideoPlayer.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
@@ -355,7 +355,7 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
      *      1: cache frame edge counts into debugdir [1 file]
      *      2: extra verbosity [O(nframes)]
      */
-    debugLevel = gContext->GetNumSetting("TemplateMatcherDebugLevel", 0);
+    debugLevel = gCoreContext->GetNumSetting("TemplateMatcherDebugLevel", 0);
 
     if (debugLevel >= 1)
     {

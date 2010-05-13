@@ -20,7 +20,6 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
-#include "mythcontext.h"
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
 #include "programinfo.h"

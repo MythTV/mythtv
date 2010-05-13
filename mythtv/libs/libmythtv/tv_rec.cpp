@@ -14,7 +14,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "tv_rec.h"
 #include "osd.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "recordingprofile.h"
 #include "util.h"
@@ -248,17 +248,17 @@ bool TVRec::Init(void)
     if (!CreateChannel(startchannel))
         return false;
 
-    eitIgnoresSource  = gContext->GetNumSetting("EITIgnoresSource", 0);
+    eitIgnoresSource  = gCoreContext->GetNumSetting("EITIgnoresSource", 0);
     transcodeFirst    =
-        gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
-    earlyCommFlag     = gContext->GetNumSetting("AutoCommflagWhileRecording", 0);
-    runJobOnHostOnly  = gContext->GetNumSetting("JobsRunOnRecordHost", 0);
-    eitTransportTimeout=gContext->GetNumSetting("EITTransportTimeout", 5) * 60;
-    eitCrawlIdleStart = gContext->GetNumSetting("EITCrawIdleStart", 60);
-    audioSampleRateDB = gContext->GetNumSetting("AudioSampleRate");
-    overRecordSecNrml = gContext->GetNumSetting("RecordOverTime");
-    overRecordSecCat  = gContext->GetNumSetting("CategoryOverTime") * 60;
-    overRecordCategory= gContext->GetSetting("OverTimeCategory");
+        gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
+    earlyCommFlag     = gCoreContext->GetNumSetting("AutoCommflagWhileRecording", 0);
+    runJobOnHostOnly  = gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0);
+    eitTransportTimeout=gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60;
+    eitCrawlIdleStart = gCoreContext->GetNumSetting("EITCrawIdleStart", 60);
+    audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
+    overRecordSecNrml = gCoreContext->GetNumSetting("RecordOverTime");
+    overRecordSecCat  = gCoreContext->GetNumSetting("CategoryOverTime") * 60;
+    overRecordCategory= gCoreContext->GetSetting("OverTimeCategory");
 
     pthread_create(&event_thread, NULL, EventThread, this);
 
@@ -601,7 +601,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             {
                 QString message = QString("QUIT_LIVETV %1").arg(cardids2[i]);
                 MythEvent me(message);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
             }
 
             VERBOSE(VB_RECORD, LOC + QString(
@@ -638,7 +638,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         {
             QString message = QString("LIVETV_EXITED");
             MythEvent me(message, tvchain->GetID());
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
             tvchain = NULL;
         }
 
@@ -668,7 +668,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         QStringList prog;
         rcinfo->ToStringList(prog);
         MythEvent me(message, prog);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
 
         retval = rsRecording;
     }
@@ -856,7 +856,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec)
                      .arg(curRec->startts.toString(Qt::ISODate))
                      .arg(curRec->recstatus)
                      .arg(curRec->recendts.toString(Qt::ISODate)));
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
     }
 
     curRec->FinishedRecording(curRec->recstatus != rsRecorded);
@@ -1097,7 +1097,7 @@ void TVRec::TeardownRecorder(bool killFile)
         QString message = QString("DONE_RECORDING %1 %2 %3")
             .arg(cardid).arg(secsSince).arg(GetFramesWritten());
         MythEvent me(message);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
 
         recorder->StopRecording();
         pthread_join(recorder_thread, NULL);
@@ -1414,7 +1414,7 @@ void TVRec::RunTV(void)
                     {
                         QString message = QString("QUIT_LIVETV %1").arg(cardid);
                         MythEvent me(message);
-                        gContext->dispatch(me);
+                        gCoreContext->dispatch(me);
                     }
                     else
                         ChangeState(kState_None);
@@ -1486,7 +1486,7 @@ void TVRec::RunTV(void)
                 VERBOSE(VB_RECORD, LOC + "Enabling Full LiveTV UI.");
                 QString message = QString("LIVETV_WATCH %1 0").arg(cardid);
                 MythEvent me(message);
-                gContext->dispatch(me);
+                gCoreContext->dispatch(me);
             }
         }
 
@@ -1660,7 +1660,7 @@ void TVRec::HandlePendingRecordings(void)
         QStringList msg;
         (*it).info->ToStringList(msg);
         MythEvent me(query, msg);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
 
         (*it).ask = (*it).doNotAsk = false;
     }
@@ -2652,8 +2652,8 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     tvchain->ReloadAll();
 
     QString hostprefix = QString("myth://%1:%2/")
-                                .arg(gContext->GetSetting("BackendServerIP"))
-                                .arg(gContext->GetSetting("BackendServerPort"));
+                                .arg(gCoreContext->GetSetting("BackendServerIP"))
+                                .arg(gCoreContext->GetSetting("BackendServerPort"));
 
     tvchain->SetHostPrefix(hostprefix);
     tvchain->SetCardType(genOpt.cardtype);
@@ -2790,7 +2790,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     QStringList prog;
     rec->ToStringList(prog);
     MythEvent me("SCHEDULER_ADD_RECORDING", prog);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     // Allow scheduler to end this recording before post-roll,
     // if it has another recording for this recorder.
@@ -2852,7 +2852,7 @@ void TVRec::SetLiveRecording(int recording)
                  .arg(recstat)
                  .arg(curRecording->recendts.toString(Qt::ISODate)));
 
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 }
 
 /** \fn TVRec::StopLiveTV(void)
@@ -3714,7 +3714,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         QStringList slist;
         slist<<"message"<<QObject::tr("On known multiplex...");
         MythEvent me(QString("SIGNAL %1").arg(cardid), slist);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
 
         SetFlags(kFlagNeedToStartRecorder);
         return;
@@ -3926,7 +3926,7 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
     if (rt)
     {
         // queue up real-time (i.e. on-line) commercial flagging.
-        QString host = (on_host) ? gContext->GetHostName() : "";
+        QString host = (on_host) ? gCoreContext->GetHostName() : "";
         JobQueue::QueueJob(JOB_COMMFLAG,
                            rec->chanid, rec->recstartts, "", "",
                            host, JOB_LIVE_REC);
@@ -4030,7 +4030,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         {
             QString message = QString("QUIT_LIVETV %1").arg(cardid);
             MythEvent me(message);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
         }
         goto err_ret;
     }
@@ -4049,7 +4049,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         {
             QString message = QString("QUIT_LIVETV %1").arg(cardid);
             MythEvent me(message);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
         }
         TeardownRecorder(true);
         goto err_ret;
@@ -4327,7 +4327,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
 
     // Dispatch this early, the response can take a while.
     MythEvent me(QString("QUERY_NEXT_LIVETV_DIR %1").arg(cardid));
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     uint    sourceid = channel->GetCurrentSourceID();
     QString channum  = channel->GetCurrentName();
@@ -4342,7 +4342,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
         return false;
     }
 
-    int hoursMax = gContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
+    int hoursMax = gCoreContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
     if (hoursMax <= 0)
         hoursMax = 8;
 
@@ -4379,7 +4379,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     }
     else
     {
-        StorageGroup sgroup("LiveTV", gContext->GetHostName());
+        StorageGroup sgroup("LiveTV", gCoreContext->GetHostName());
         prog->pathname = sgroup.FindNextDirMostFree();
     }
 

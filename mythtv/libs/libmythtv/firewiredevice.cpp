@@ -13,7 +13,7 @@
 // MythTV headers
 #include "linuxfirewiredevice.h"
 #include "darwinfirewiredevice.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "pespacket.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))

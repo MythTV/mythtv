@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "audiooutputjack.h"
 #include "util.h"
 
@@ -213,7 +213,7 @@ void AudioOutputJACK::VolumeInit(void)
 {
     int volume = 100;
     if (set_initial_vol)
-        volume = gContext->GetNumSetting("MasterMixerVolume", 80);
+        volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
 
     JACK_SetAllVolume(audioid, volume);
 }

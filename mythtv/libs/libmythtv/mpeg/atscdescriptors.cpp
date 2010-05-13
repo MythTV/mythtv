@@ -5,7 +5,7 @@
 using namespace std;
 
 #include "atscdescriptors.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "iso639.h"
 #include "atsc_huffman.h"
 

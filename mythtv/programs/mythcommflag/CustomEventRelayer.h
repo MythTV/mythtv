@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 /* This is a simple class that relays a QT custom event to an ordinary function
  * pointer.  Useful when you have a relativly small app like mythcommflag that
@@ -18,17 +18,17 @@ class CustomEventRelayer : public QObject
   public:
     CustomEventRelayer(void (*fp_in)(QEvent*)) : fp(fp_in)
     {
-        gContext->addListener(this);
+        gCoreContext->addListener(this);
     }
 
     CustomEventRelayer()
     {
-        gContext->addListener(this);
+        gCoreContext->addListener(this);
     }
 
     virtual void deleteLater(void)
     {
-        gContext->removeListener(this);
+        gCoreContext->removeListener(this);
         QObject::deleteLater();
     }
 

@@ -24,7 +24,7 @@
 
 // MythTV headers
 #include "mythconfig.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "dbsettings.h"
@@ -548,7 +548,7 @@ static GlobalCheckBox *AutoRunUserJob(uint job_num)
     bc->setHelpText(QObject::tr("This is the default value used for the "
                     "'Run %1' setting when a new scheduled "
                     "recording is created.")
-                    .arg(gContext->GetSetting(QString("UserJobDesc%1")
+                    .arg(gCoreContext->GetSetting(QString("UserJobDesc%1")
                          .arg(job_num))));
     return bc;
 }
@@ -1156,7 +1156,7 @@ PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename) :
     groupid(0), last_main(NULL)
 {
     groupid = VideoDisplayProfile::GetProfileGroupID(
-        profilename, gContext->GetHostName());
+        profilename, gCoreContext->GetHostName());
 
     items = VideoDisplayProfile::LoadDB(groupid);
 
@@ -1401,7 +1401,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
 {
     setLabel(QObject::tr("Playback Profiles") + str);
 
-    QString host = gContext->GetHostName();
+    QString host = gCoreContext->GetHostName();
     QStringList profiles = VideoDisplayProfile::GetProfiles(host);
     if (profiles.empty())
     {
@@ -1476,7 +1476,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
     {
         QString name;
 
-        QString host = gContext->GetHostName();
+        QString host = gCoreContext->GetHostName();
         QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
 
         bool ok = true;
@@ -1485,7 +1485,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
             QString msg = QObject::tr("Enter Playback Group Name");
 
             ok = MythPopupBox::showGetTextPopup(
-                gContext->GetMainWindow(), msg, msg, name);
+                GetMythMainWindow(), msg, msg, name);
 
             if (!ok)
                 return;
@@ -1500,7 +1500,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
                         "'%1' is already being used.").arg(name);
 
                 MythPopupBox::showOkPopup(
-                    gContext->GetMainWindow(), QObject::tr("Error"), msg);
+                    GetMythMainWindow(), QObject::tr("Error"), msg);
 
                 continue;
             }
@@ -1508,7 +1508,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
             break;
         }
 
-        VideoDisplayProfile::CreateProfileGroup(name, gContext->GetHostName());
+        VideoDisplayProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
         addTarget(name, new PlaybackProfileConfig(name));
 
         if (grouptrigger)
@@ -1521,7 +1521,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
         {
             removeTarget(name);
             VideoDisplayProfile::DeleteProfileGroup(
-                name, gContext->GetHostName());
+                name, gCoreContext->GetHostName());
         }
     }
 
@@ -1694,7 +1694,7 @@ static HostComboBox *OSDCCFont()
 
 static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
 {
-    QString beVBI = gContext->GetSetting("VbiFormat");
+    QString beVBI = gCoreContext->GetSetting("VbiFormat");
     QString fmt = beVBI.toLower().left(4);
     int sel = (fmt == "pal ") ? 1 : ((fmt == "ntsc") ? 2 : 0);
 
@@ -2559,10 +2559,10 @@ static HostComboBox *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (scr.size() && (gContext->GetSetting("GuiVidModeResolution").isEmpty()))
+    if (scr.size() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
         int w = 0, h = 0;
-        gContext->GetResolutionSetting("GuiVidMode", w, h);
+        gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
         if ((w <= 0) || (h <= 0))
             (w = 640), (h = 480);
 
@@ -3554,10 +3554,10 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
 {
     widget->clearSelections();
     QString q = QString("ISO639Language%1").arg(i);
-    QString lang = gContext->GetSetting(q, "").toLower();
+    QString lang = gCoreContext->GetSetting(q, "").toLower();
 
     if ((lang.isEmpty() || lang == "aar") &&
-        !gContext->GetSetting("Language", "").isEmpty())
+        !gCoreContext->GetSetting("Language", "").isEmpty())
     {
         lang = iso639_str2_to_str3(GetMythUI()->GetLanguage().toLower());
     }

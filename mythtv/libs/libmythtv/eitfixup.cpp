@@ -3,7 +3,6 @@
 
 // MythTV headers
 #include "eitfixup.h"
-#include "mythcontext.h"
 #include "dvbdescriptors.h" // for MythCategoryType
 #include "channelutil.h" // for GetDefaultAuthority()
 

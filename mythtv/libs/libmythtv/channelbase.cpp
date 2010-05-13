@@ -20,7 +20,7 @@ using namespace std;
 #include "channelbase.h"
 #include "frequencies.h"
 #include "tv_rec.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "exitcodes.h"
 #include "mythdb.h"
 #include "mythverbose.h"
@@ -796,7 +796,7 @@ bool ChannelBase::InitializeInputs(void)
     }
 
     m_allchannels.clear();
-    QString order = gContext->GetSetting("ChannelOrdering", "channum");
+    QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
         uint sourceid = query.value(5).toUInt();
@@ -930,7 +930,7 @@ bool ChannelBase::CheckChannel(const QString &channum,
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":INPUT",    channelinput);
     query.bindValue(":CARDID",   GetCardID());
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
     {
@@ -957,7 +957,7 @@ bool ChannelBase::CheckChannel(const QString &channum,
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":CARDID",   GetCardID());
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
     {

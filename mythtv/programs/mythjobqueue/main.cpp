@@ -315,11 +315,11 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                           .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
-    if (!gContext->ConnectToMasterServer())
+    if (!gCoreContext->ConnectToMasterServer())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect to master server");
         return GENERIC_EXIT_UNKNOWN_ERROR;

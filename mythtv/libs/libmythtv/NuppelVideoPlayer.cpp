@@ -41,7 +41,7 @@ using namespace std;
 #include "osdtypeteletext.h"
 #include "remoteutil.h"
 #include "programinfo.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "fifowriter.h"
 #include "filtermanager.h"
 #include "util.h"
@@ -229,15 +229,15 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
     // Playback (output) zoom control
     detect_letter_box = new DetectLetterbox(this);
 
-    vbimode = VBIMode::Parse(gContext->GetSetting("VbiFormat"));
+    vbimode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
 
-    commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
-    commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
-    decode_extra_audio=gContext->GetNumSetting("DecodeExtraAudio", 0);
-    itvEnabled       = gContext->GetNumSetting("EnableMHEG", 0);
-    db_prefer708     = gContext->GetNumSetting("Prefer708Captions", 1);
+    commrewindamount = gCoreContext->GetNumSetting("CommRewindAmount",0);
+    commnotifyamount = gCoreContext->GetNumSetting("CommNotifyAmount",0);
+    decode_extra_audio=gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
+    itvEnabled       = gCoreContext->GetNumSetting("EnableMHEG", 0);
+    db_prefer708     = gCoreContext->GetNumSetting("Prefer708Captions", 1);
     autocommercialskip = (CommSkipMode)
-        gContext->GetNumSetting("AutoCommercialSkip", kCommSkipOff);
+        gCoreContext->GetNumSetting("AutoCommercialSkip", kCommSkipOff);
 
     lastIgnoredManualSkip = QDateTime::currentDateTime().addSecs(-10);
 
@@ -246,7 +246,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
     bzero(&tc_wrap,    sizeof(tc_wrap));
 
     // Get VBI page number
-    QString mypage = gContext->GetSetting("VBIpageNr", "888");
+    QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
     bool valid = false;
     uint tmp = mypage.toInt(&valid, 16);
     ttPageNum = (valid) ? tmp : ttPageNum;
@@ -686,7 +686,7 @@ bool NuppelVideoPlayer::InitVideo(void)
 
         if (!widget)
         {
-            MythMainWindow *window = gContext->GetMainWindow();
+            MythMainWindow *window = GetMythMainWindow();
 
             widget = window->findChild<QWidget*>("video playback window");
 
@@ -740,7 +740,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         videoOutput->EmbedInWidget(embx, emby, embw, embh);
     }
 
-    SetCaptionsEnabled(gContext->GetNumSetting("DefaultCCMode"), false);
+    SetCaptionsEnabled(gCoreContext->GetNumSetting("DefaultCCMode"), false);
 
     InitFilters();
 
@@ -859,7 +859,7 @@ QString NuppelVideoPlayer::ReinitAudio(void)
 
     if (!audioOutput && !using_null_videoout && player_ctx->IsAudioNeeded())
     {
-        bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
+        bool setVolume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audio_main_device,
                                              audio_passthru_device,
                                              audio_bits, audio_channels,
@@ -1144,8 +1144,8 @@ void NuppelVideoPlayer::OpenDummy(void)
     isDummy = true;
 
     float displayAspect =
-        gContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
-                                        gContext->GetHostName(), 1.3333);
+        gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
+                                        gCoreContext->GetHostName(), 1.3333);
 
     if (!videoOutput)
     {
@@ -3448,11 +3448,11 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
         // Request that the video output thread run with realtime priority.
         // If mythyv/mythfrontend was installed SUID root, this will work.
 #if !CONFIG_DARWIN
-        gContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
+        gCoreContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
 #endif
 
         // Use realtime prio for decoder thread as well
-        //gContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);
+        //gCoreContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);
     }
 
     if (bookmarkseek > 30)
@@ -3472,7 +3472,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
         GetDecoder()->setExactSeeks(seeks);
 
-        if (gContext->GetNumSetting("ClearSavedPosition", 1) &&
+        if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
             !player_ctx->IsPIP())
         {
             if (player_ctx->buffer->isDVD())
@@ -3740,7 +3740,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
             ++deleteIter;
             if (deleteIter.key() == totalFrames)
             {
-                if (!(gContext->GetNumSetting("EndOfRecordingExitPrompt") == 1
+                if (!(gCoreContext->GetNumSetting("EndOfRecordingExitPrompt") == 1
                       && !player_ctx->IsPIP() &&
                       player_ctx->GetState() == kState_WatchingPreRecorded))
                 {
@@ -3914,7 +3914,7 @@ PIPLocation NuppelVideoPlayer::GetNextPIPLocation(void) const
 
     if (sim_pip_players.isEmpty())
     {
-        return (PIPLocation)gContext->GetNumSetting("PIPLocation", kPIPTopLeft);
+        return (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
     }
 
     // order of preference, could be stored in db if we want it configurable
@@ -4175,7 +4175,7 @@ long long NuppelVideoPlayer::GetBookmark(void) const
 {
     long long bookmark = 0;
 
-    if (gContext->IsDatabaseIgnored())
+    if (gCoreContext->IsDatabaseIgnored())
         bookmark = 0;
     else if (player_ctx->buffer->isDVD())
         bookmark = GetDVDBookmark();
@@ -4898,7 +4898,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->GetMainWindow()->TranslateKeyPress("TV Editing", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Editing", e, actions);
 
     if (handled)
         return true;
@@ -5562,7 +5562,7 @@ void NuppelVideoPlayer::SaveCutList(void)
 void NuppelVideoPlayer::LoadCutList(void)
 {
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->playingInfo && !gContext->IsDatabaseIgnored())
+    if (player_ctx->playingInfo && !gCoreContext->IsDatabaseIgnored())
         player_ctx->playingInfo->GetCutList(deleteMap);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
@@ -6367,7 +6367,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
 
 void NuppelVideoPlayer::MergeShortCommercials(void)
 {
-    double maxMerge = gContext->GetNumSetting("MergeShortCommBreaks", 0) *
+    double maxMerge = gCoreContext->GetNumSetting("MergeShortCommBreaks", 0) *
                        video_frame_rate;
     if (maxMerge <= 0.0 || (commBreakIter == commBreakMap.end()))
         return;
@@ -6709,7 +6709,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
     {
         int skipped_seconds = (int)((commBreakIter.key() -
                 framesPlayed) / video_frame_rate);
-        int maxskip = gContext->GetNumSetting("MaximumCommercialSkip", 3600);
+        int maxskip = gCoreContext->GetNumSetting("MaximumCommercialSkip", 3600);
         QString skipTime;
         skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                          abs(skipped_seconds) % 60);

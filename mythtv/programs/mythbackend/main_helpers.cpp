@@ -62,7 +62,7 @@
 bool setupTVs(bool ismaster, bool &error)
 {
     error = false;
-    QString localhostname = gContext->GetHostName();
+    QString localhostname = gCoreContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -143,7 +143,7 @@ bool setupTVs(bool ismaster, bool &error)
                 "Please run setup and confirm all of the capture cards.\n";
 
             VERBOSE(VB_IMPORTANT, msg);
-            gContext->LogEntry("mythbackend", LP_CRITICAL,
+            gCoreContext->LogEntry("mythbackend", LP_CRITICAL,
                                "Problem with capture cards", msg);
             continue;
         }
@@ -176,7 +176,7 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    gContext->LogEntry("mythbackend", LP_CRITICAL,
+                    gCoreContext->LogEntry("mythbackend", LP_CRITICAL,
                                        "Problem with capture cards",
                                        cidmsg + " failed init");
                     delete tv;
@@ -198,7 +198,7 @@ bool setupTVs(bool ismaster, bool &error)
                 }
                 else
                 {
-                    gContext->LogEntry("mythbackend", LP_CRITICAL,
+                    gCoreContext->LogEntry("mythbackend", LP_CRITICAL,
                                        "Problem with capture cards",
                                        cidmsg + "failed init");
                     delete tv;
@@ -217,7 +217,7 @@ bool setupTVs(bool ismaster, bool &error)
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "No valid capture cards are defined in the database.");
 
-        gContext->LogEntry("mythbackend", LP_WARNING,
+        gCoreContext->LogEntry("mythbackend", LP_WARNING,
                            "No capture cards are defined",
                            "This backend will not be used for recording.");
     }
@@ -234,7 +234,7 @@ bool setup_context(const MythCommandLineParser &cmdline)
         gContext = NULL;
         return false;
     }
-    gContext->SetBackend(!cmdline.HasBackendCommand());
+    gCoreContext->SetBackend(!cmdline.HasBackendCommand());
 
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
@@ -244,7 +244,7 @@ bool setup_context(const MythCommandLineParser &cmdline)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                     .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -307,7 +307,7 @@ void log_rotate_handler(int)
 
 void upnp_rebuild(int)
 {
-    if (gContext->IsMasterHost())
+    if (gCoreContext->IsMasterHost())
     {
         g_pUPnp->RebuildMediaMap();
     }
@@ -503,12 +503,12 @@ int handle_command(const MythCommandLineParser &cmdline)
     QString eventString = cmdline.GetEventString();
     if (!eventString.isEmpty())
     {
-        if (gContext->ConnectToMasterServer())
+        if (gCoreContext->ConnectToMasterServer())
         {
             if (eventString.startsWith("SYSTEM_EVENT"))
             {
                 eventString += QString(" SENDER %1")
-                    .arg(gContext->GetHostName());
+                    .arg(gCoreContext->GetHostName());
             }
 
             RemoteSendMessage(eventString);
@@ -529,7 +529,7 @@ int handle_command(const MythCommandLineParser &cmdline)
 
     if (cmdline.SetVerbose())
     {
-        if (gContext->ConnectToMasterServer())
+        if (gCoreContext->ConnectToMasterServer())
         {
             QString message = "SET_VERBOSE ";
             message += cmdline.GetNewVerbose();
@@ -548,7 +548,7 @@ int handle_command(const MythCommandLineParser &cmdline)
 
     if (cmdline.ClearSettingsCache())
     {
-        if (gContext->ConnectToMasterServer())
+        if (gCoreContext->ConnectToMasterServer())
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
             VERBOSE(VB_IMPORTANT, "Sent CLEAR_SETTINGS_CACHE message");
@@ -567,7 +567,7 @@ int handle_command(const MythCommandLineParser &cmdline)
     {
         sched = new Scheduler(false, &tvList);
         if (!cmdline.IsTestSchedulerEnabled() &&
-            gContext->ConnectToMasterServer())
+            gCoreContext->ConnectToMasterServer())
         {
             cout << "Retrieving Schedule from Master backend.\n";
             sched->FillRecordListFromMaster();
@@ -588,7 +588,7 @@ int handle_command(const MythCommandLineParser &cmdline)
     if (cmdline.Reschedule())
     {
         bool ok = false;
-        if (gContext->ConnectToMasterServer())
+        if (gCoreContext->ConnectToMasterServer())
         {
             VERBOSE(VB_IMPORTANT, "Connected to master for reschedule");
             ScheduledRecording::signalChange(-1);
@@ -627,10 +627,10 @@ int connect_to_master(void)
 {
     MythSocket *tempMonitorConnection = new MythSocket();
     if (tempMonitorConnection->connect(
-            gContext->GetSetting("MasterServerIP", "127.0.0.1"),
-            gContext->GetNumSetting("MasterServerPort", 6543)))
+            gCoreContext->GetSetting("MasterServerIP", "127.0.0.1"),
+            gCoreContext->GetNumSetting("MasterServerPort", 6543)))
     {
-        if (!gContext->CheckProtoVersion(tempMonitorConnection))
+        if (!gCoreContext->CheckProtoVersion(tempMonitorConnection))
         {
             VERBOSE(VB_IMPORTANT, "Master backend is incompatible with "
                     "this backend.\nCannot become a slave.");
@@ -767,7 +767,7 @@ int run_backend(const MythCommandLineParser &cmdline)
 
     ///////////////////////////////////////////
 
-    bool ismaster = gContext->IsMasterHost();
+    bool ismaster = gCoreContext->IsMasterHost();
 
     g_pUPnp = new MediaServer(ismaster, !cmdline.IsUPnPEnabled() );
 
@@ -778,8 +778,8 @@ int run_backend(const MythCommandLineParser &cmdline)
             return ret;
     }
 
-    QString myip = gContext->GetSetting("BackendServerIP");
-    int     port = gContext->GetNumSetting("BackendServerPort", 6543);
+    QString myip = gCoreContext->GetSetting("BackendServerIP");
+    int     port = gCoreContext->GetNumSetting("BackendServerPort", 6543);
     if (myip.isEmpty())
     {
         cerr << "No setting found for this machine's BackendServerIP.\n"
@@ -793,13 +793,13 @@ int run_backend(const MythCommandLineParser &cmdline)
     if (ismaster)
     {
         VERBOSE(VB_GENERAL, LOC + "Starting up as the master server.");
-        gContext->LogEntry("mythbackend", LP_INFO,
+        gCoreContext->LogEntry("mythbackend", LP_INFO,
                            "MythBackend started as master server", "");
     }
     else
     {
         VERBOSE(VB_GENERAL, LOC + "Running as a slave backend.");
-        gContext->LogEntry("mythbackend", LP_INFO,
+        gCoreContext->LogEntry("mythbackend", LP_INFO,
                            "MythBackend started as a slave backend", "");
     }
 
@@ -882,7 +882,7 @@ int run_backend(const MythCommandLineParser &cmdline)
 
     StorageGroup::CheckAllStorageGroupDirs();
 
-    if (gContext->IsMasterBackend())
+    if (gCoreContext->IsMasterBackend())
         SendMythSystemEvent("MASTER_STARTED");
 
     ///////////////////////////////
@@ -891,13 +891,13 @@ int run_backend(const MythCommandLineParser &cmdline)
     ///////////////////////////////
     ///////////////////////////////
 
-    if (gContext->IsMasterBackend())
+    if (gCoreContext->IsMasterBackend())
     {
         SendMythSystemEvent("MASTER_SHUTDOWN");
         qApp->processEvents();
     }
 
-    gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
+    gCoreContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
 
     delete sysEventHandler;
     delete mainServer;

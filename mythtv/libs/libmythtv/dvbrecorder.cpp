@@ -153,7 +153,7 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                         const QString&, const QString&)
 {
     SetOption("videodevice", videodev);
-    DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    DTVRecorder::SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
     SetStrOption(profile,  "recordingtype");
 }
 

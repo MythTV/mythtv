@@ -14,7 +14,7 @@
 
 #include "upnpcdsmusic.h"
 #include "httprequest.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 /*
    Music                            Music
@@ -283,13 +283,13 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     // ----------------------------------------------------------------------
 
 //    if (!m_mapBackendIp.contains( sHostName ))
-//        m_mapBackendIp[ sHostName ] = gContext->GetSettingOnHost( "BackendServerIp", sHostName);
+//        m_mapBackendIp[ sHostName ] = gCoreContext->GetSettingOnHost( "BackendServerIp", sHostName);
 //
 //    if (!m_mapBackendPort.contains( sHostName ))
-//        m_mapBackendPort[ sHostName ] = gContext->GetSettingOnHost("BackendStatusPort", sHostName);
+//        m_mapBackendPort[ sHostName ] = gCoreContext->GetSettingOnHost("BackendStatusPort", sHostName);
 
-    QString sServerIp = gContext->GetSetting( "BackendServerIp"   );
-    QString sPort     = gContext->GetSetting( "BackendStatusPort" );
+    QString sServerIp = gCoreContext->GetSetting( "BackendServerIp"   );
+    QString sPort     = gCoreContext->GetSetting( "BackendStatusPort" );
 
     // ----------------------------------------------------------------------
     // Build Support Strings

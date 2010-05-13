@@ -12,7 +12,6 @@ using namespace std;
 
 #include "config.h"
 #include "mythcontext.h"
-#include "mythsocket.h"
 #include "exitcodes.h"
 #include "oldsettings.h"
 #include "util.h"
@@ -24,7 +23,7 @@ using namespace std;
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "mythxdisplay.h"
-#include "mythsocket.h"
+#include "mythevent.h"
 #include "themeinfo.h"
 #include "dbutil.h"
 #include "DisplayRes.h"
@@ -40,7 +39,6 @@ using namespace std;
 #include "upnp.h"
 
 #ifdef USING_MINGW
-#include <winsock2.h>
 #include <unistd.h>
 #include "compat.h"
 #endif
@@ -50,7 +48,6 @@ using namespace std;
 #define LOC_ERR  QString("MythContext, Error: ")
 
 MythContext *gContext = NULL;
-QMutex *avcodeclock = new QMutex(QMutex::Recursive);
 
 // Some common UPnP search and XML value strings
 const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
@@ -74,7 +71,6 @@ class MythContextPrivate : public QObject
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
 
-    void LoadLogSettings(void);
     void LoadDatabaseSettings(void);
 
     bool LoadSettingsFile(void);
@@ -96,8 +92,6 @@ class MythContextPrivate : public QObject
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
 
-    bool WaitForWOL(int timeout_ms = INT_MAX);
-
   protected:
     bool event(QEvent*);
 
@@ -112,10 +106,7 @@ class MythContextPrivate : public QObject
     MythContext *parent;
 
     bool      m_gui;               ///< Should this context use GUI elements?
-    bool      m_backend;           ///< Is this host any sort of backend?
 
-    QMutex  m_hostnamelock;      ///< Locking for thread-safe copying of:
-    QString m_localhostname;     ///< hostname from mysql.txt or gethostname()
     QString m_masterhostname;    ///< master backend hostname
 
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
@@ -125,29 +116,11 @@ class MythContextPrivate : public QObject
     XmlConfiguration *m_XML;
     HttpServer       *m_HTTP;
 
-    QMutex         WOLInProgressLock;
-    QWaitCondition WOLInProgressWaitCondition;
-    bool           WOLInProgress;
-
-    MythMainWindow *mainWindow;
-
-    QMutex      sockLock;        ///< protects both serverSock and eventSock
-    MythSocket *serverSock;      ///< socket for sending MythProto requests
-    MythSocket *eventSock;       ///< socket events arrive on
-
+    bool disableeventpopup;
     bool disablelibrarypopup;
 
     MythPluginManager *pluginmanager;
 
-    int m_logenable, m_logmaxcount, m_logprintlevel;
-    QMap<QString,int> lastLogCounts;
-    QMap<QString,QString> lastLogStrings;
-
-    QMutex m_priv_mutex;
-    queue<MythPrivRequest> m_priv_requests;
-    QWaitCondition m_priv_queued;
-
-    MythDB *m_database;
     MythUIHelper *m_ui;
     MythContextSlotHandler *m_sh;
 
@@ -178,7 +151,7 @@ static void exec_program_tv_cb(const QString &cmd)
     else
         strlist << "LOCK_TUNER";
 
-    gContext->SendReceiveStringList(strlist);
+    gCoreContext->SendReceiveStringList(strlist);
     int cardid = strlist[0].toInt();
 
     if (cardid >= 0)
@@ -191,7 +164,7 @@ static void exec_program_tv_cb(const QString &cmd)
         myth_system(s);
 
         strlist = QStringList(QString("FREE_TUNER %1").arg(cardid));
-        gContext->SendReceiveStringList(strlist);
+        gCoreContext->SendReceiveStringList(strlist);
         QString ret = strlist[0];
     }
     else
@@ -244,17 +217,12 @@ static void eject_cb(void)
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
-      m_gui(false), m_backend(false),
-      m_localhostname(QString::null),
+      m_gui(false),
       m_UPnP(NULL), m_XML(NULL), m_HTTP(NULL),
-      WOLInProgress(false),
-      mainWindow(NULL),
-      sockLock(QMutex::NonRecursive),
-      serverSock(NULL), eventSock(NULL),
+      disableeventpopup(false),
       disablelibrarypopup(false),
       pluginmanager(NULL),
-      m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
-      m_database(GetMythDB()), m_ui(NULL),
+      m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
       MBEconnectPopup(NULL),
       MBEversionPopup(NULL)
@@ -265,19 +233,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 MythContextPrivate::~MythContextPrivate()
 {
     DeleteUPnP();
-    QMutexLocker locker(&sockLock);
-    if (serverSock)
-    {
-        serverSock->DownRef();
-        serverSock = NULL;
-    }
-    if (eventSock)
-    {
-        eventSock->DownRef();
-        eventSock = NULL;
-    }
-    if (m_database)
-        DestroyMythDB();
     if (m_ui)
         DestroyMythUI();
     if (m_sh)
@@ -296,21 +251,20 @@ MythContextPrivate::~MythContextPrivate()
  */
 void MythContextPrivate::TempMainWindow(bool languagePrompt)
 {
-    if (mainWindow)
+    if (HasMythMainWindow())
         return;
 
     SilenceDBerrors();
 
-    m_database->SetSetting("Theme", DEFAULT_UI_THEME);
+    gCoreContext->SetSetting("Theme", DEFAULT_UI_THEME);
 #ifdef Q_WS_MACX
     // Qt 4.4 has window-focus problems
-    m_database->SetSetting("RunFrontendInWindow", "1");
+    gCoreContext->SetSetting("RunFrontendInWindow", "1");
 #endif
     GetMythUI()->LoadQtConfig();
 
     MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
     mainWindow->Init();
-    parent->SetMainWindow(mainWindow);
 
     if (languagePrompt)
     {
@@ -322,7 +276,6 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
 void MythContextPrivate::EndTempWindow(void)
 {
-    parent->SetMainWindow(NULL);
     DestroyMythMainWindow();
     EnableDBerrors();
 }
@@ -332,7 +285,7 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
                               const bool noPrompt,
                               const bool ignoreDB)
 {
-    m_database->IgnoreDatabase(ignoreDB);
+    gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
     m_gui = gui;
     if (UPnPclient)
     {
@@ -492,13 +445,6 @@ NoDBfound:
     return false;
 }
 
-void MythContextPrivate::LoadLogSettings(void)
-{
-    m_logenable = parent->GetNumSetting("LogEnabled", 0);
-    m_logmaxcount = parent->GetNumSetting("LogMaxCount", 0);
-    m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
-}
-
 /**
  * Load database and host settings from mysql.txt, or set some defaults
  *
@@ -524,16 +470,16 @@ void MythContextPrivate::LoadDatabaseSettings(void)
         m_DBparams.wolReconnect  = 0;
         m_DBparams.wolRetry      = 5;
         m_DBparams.wolCommand    = "echo 'WOLsqlServerCommand not set'";
-        m_database->SetDatabaseParams(m_DBparams);
+        gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
     // so we check for missing values and warn user
     FindSettingsProbs();
 
-    m_localhostname = m_DBparams.localHostName;
-    if (m_localhostname.isEmpty() ||
-        m_localhostname == "my-unique-identifier-goes-here")
+    QString hostname = m_DBparams.localHostName;
+    if (hostname.isEmpty() ||
+        hostname == "my-unique-identifier-goes-here")
     {
         char localhostname[1024];
         if (gethostname(localhostname, 1024))
@@ -542,13 +488,13 @@ void MythContextPrivate::LoadDatabaseSettings(void)
                     "MCP: Error, could not determine host name." + ENO);
             localhostname[0] = '\0';
         }
-        m_localhostname = localhostname;
+        hostname = localhostname;
         VERBOSE(VB_IMPORTANT, "Empty LocalHostName.");
     }
 
     VERBOSE(VB_GENERAL, QString("Using localhost value of %1")
-            .arg(m_localhostname));
-    m_database->SetLocalHostname(m_localhostname);
+            .arg(hostname));
+    gCoreContext->SetLocalHostname(hostname);
 }
 
 /**
@@ -556,7 +502,7 @@ void MythContextPrivate::LoadDatabaseSettings(void)
  */
 bool MythContextPrivate::LoadSettingsFile(void)
 {
-    Settings *oldsettings = m_database->GetOldSettings();
+    Settings *oldsettings = gCoreContext->GetDB()->GetOldSettings();
 
     if (!oldsettings->LoadSettingsFiles("mysql.txt", GetInstallPrefix(),
                                         GetConfDir()))
@@ -579,7 +525,7 @@ bool MythContextPrivate::LoadSettingsFile(void)
 
     m_DBparams.wolRetry   = oldsettings->GetNumSetting("WOLsqlConnectRetry");
     m_DBparams.wolCommand = oldsettings->GetSetting("WOLsqlCommand");
-    m_database->SetDatabaseParams(m_DBparams);
+    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
 
     return true;
 }
@@ -714,7 +660,7 @@ bool MythContextPrivate::FindSettingsProbs(void)
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
     }
-    m_database->SetDatabaseParams(m_DBparams);
+    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
     return problems;
 }
 
@@ -727,7 +673,8 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 
         // Tell the user what went wrong:
         if (error.length())
-            MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
+            MythPopupBox::showOkPopup(GetMythMainWindow(), "DB connect failure",
+                                      error);
 
         // ask user for database parameters
         DatabaseSettings settings(m_DBhostCp);
@@ -809,7 +756,9 @@ QString MythContextPrivate::TestDBconnection(void)
     //    appearing to hang if we cannot route to the machine:
 
     // No need to ping myself
-    if (host == "localhost" || host == "127.0.0.1" || host == m_localhostname)
+    if ((host == "localhost") ||
+        (host == "127.0.0.1") ||
+        (host == gCoreContext->GetHostName()))
         doPing = false;
 
     // If WOL is setup, the backend might be sleeping:
@@ -884,7 +833,7 @@ void MythContextPrivate::SilenceDBerrors(void)
 {
     // This silences any DB errors from Get*Setting(),
     // (which is the vast majority of them)
-    m_database->IgnoreDatabase(true);
+    gCoreContext->GetDB()->IgnoreDatabase(true);
 
     // Save the configured hostname, so that we can
     // still display it in the DatabaseSettings screens
@@ -892,7 +841,7 @@ void MythContextPrivate::SilenceDBerrors(void)
         m_DBhostCp = m_DBparams.dbHostName;
 
     m_DBparams.dbHostName = "";
-    m_database->SetDatabaseParams(m_DBparams);
+    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
 }
 
 void MythContextPrivate::EnableDBerrors(void)
@@ -901,10 +850,10 @@ void MythContextPrivate::EnableDBerrors(void)
     if (m_DBparams.dbHostName.isNull() && m_DBhostCp.length())
     {
         m_DBparams.dbHostName = m_DBhostCp;
-        m_database->SetDatabaseParams(m_DBparams);
+        gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
     }
 
-    m_database->IgnoreDatabase(false);
+    gCoreContext->GetDB()->IgnoreDatabase(false);
 }
 
 
@@ -921,9 +870,9 @@ void MythContextPrivate::EnableDBerrors(void)
  */
 void MythContextPrivate::ResetDatabase(void)
 {
-    m_database->GetDBManager()->CloseDatabases();
-    m_database->SetDatabaseParams(m_DBparams);
-    parent->ClearSettingsCache();
+    gCoreContext->GetDBManager()->CloseDatabases();
+    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
+    gCoreContext->ClearSettingsCache();
 }
 
 
@@ -1000,11 +949,12 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     // Tell the user what went wrong:
     if (error.length())
-        MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
+        MythPopupBox::showOkPopup(GetMythMainWindow(), "DB connect failure",
+                                  error);
 
     VERBOSE(VB_GENERAL, "Putting up the UPnP backend chooser");
 
-    BackendSelect *BEsel = new BackendSelect(mainWindow, &m_DBparams);
+    BackendSelect *BEsel = new BackendSelect(GetMythMainWindow(), &m_DBparams);
     switch (BEsel->exec())
     {
         case kDialogCodeRejected:
@@ -1030,7 +980,8 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     message = QObject::tr("Save that backend or database as the default?");
 
     DialogCode selected = MythPopupBox::ShowButtonPopup(
-        mainWindow, "Save default", message, buttons, kDialogCodeButton2);
+        GetMythMainWindow(), "Save default", message, buttons,
+        kDialogCodeButton2);
     switch (selected)
     {
         case kDialogCodeButton0:
@@ -1196,7 +1147,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
         {
             m_DBparams.localHostName = localHostName;
             m_DBparams.localEnabled  = true;
-            m_database->SetDatabaseParams(m_DBparams);
+            gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
         }
 
         return true;
@@ -1221,7 +1172,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
-            m_database->SetDatabaseParams(m_DBparams);
+            gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
             VERBOSE(VB_UPNP,
                     loc + "Got database hostname: " + m_DBparams.dbHostName);
             return true;
@@ -1252,29 +1203,13 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     return true;
 }
 
-/// If another thread has already started WOL process, wait on them...
-///
-/// Note: Caller must be holding WOLInProgressLock.
-bool MythContextPrivate::WaitForWOL(int timeout_in_ms)
-{
-    int timeout_remaining = timeout_in_ms;
-    while (WOLInProgress && (timeout_remaining > 0))
-    {
-        VERBOSE(VB_GENERAL, LOC + "Wake-On-LAN in progress, waiting...");
-
-        int max_wait = min(1000, timeout_remaining);
-        WOLInProgressWaitCondition.wait(
-            &WOLInProgressLock, max_wait);
-        timeout_remaining -= max_wait;
-    }
-
-    return !WOLInProgress;
-}
-
 bool MythContextPrivate::event(QEvent *e)
 {
     if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
     {
+        if (disableeventpopup)
+            return true;
+
         MythEvent *me = (MythEvent*)e;
         if (me->Message() == "VERSION_MISMATCH" && (1 == me->ExtraDataCount()))
             ShowVersionMismatchPopup(me->ExtraData(0).toUInt());
@@ -1305,7 +1240,7 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
             "it running?  Is the IP address set for it in the "
             "setup program correct?");
 
-    if (mainWindow && m_ui && m_ui->IsScreenSetup())
+    if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {
         MBEconnectPopup = ShowOkPopup(
             message, m_sh, SLOT(ConnectFailurePopupClosed()));
@@ -1334,7 +1269,7 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
             "the backend and frontend.")
         .arg(remote_version).arg(MYTH_PROTO_VERSION);
 
-    if (mainWindow && m_ui && m_ui->IsScreenSetup())
+    if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {
         MBEversionPopup = ShowOkPopup(
             message, m_sh, SLOT(VersionMismatchPopupClosed()));
@@ -1370,6 +1305,14 @@ MythContext::MythContext(const QString &binversion)
 #endif
 
     d = new MythContextPrivate(this);
+
+    gCoreContext = new MythCoreContext(app_binary_version, d);
+
+    if (!gCoreContext || !gCoreContext->Init())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to allocate MythCoreContext");
+        qApp->exit(GENERIC_EXIT_NO_MYTHCONTEXT);
+    }
 }
 
 bool MythContext::Init(const bool gui, UPnp *UPnPclient,
@@ -1397,7 +1340,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         if (gui)
         {
             d->TempMainWindow(false);
-            MythPopupBox::showOkPopup(d->mainWindow,
+            MythPopupBox::showOkPopup(GetMythMainWindow(),
                                       "Library version error", warning);
         }
         VERBOSE(VB_IMPORTANT, warning);
@@ -1428,7 +1371,8 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         if (gui)
         {
             d->TempMainWindow(false);
-            MythPopupBox::showOkPopup(d->mainWindow, "HOME error", warning);
+            MythPopupBox::showOkPopup(GetMythMainWindow(), "HOME error",
+                                      warning);
         }
         VERBOSE(VB_IMPORTANT, warning + " or MYTHCONFDIR");
 
@@ -1441,7 +1385,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         return false;
     }
 
-    ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     return true;
 }
@@ -1454,771 +1398,11 @@ MythContext::~MythContext()
                 "~MythContext waiting for threads to exit.");
     }
     QThreadPool::globalInstance()->waitForDone();
+
+    delete gCoreContext;
+    gCoreContext = NULL;
+
     delete d;
-}
-
-// Assumes that either sockLock is held, or the app is still single
-// threaded (i.e. during startup).
-bool MythContext::ConnectToMasterServer(bool blockingClient)
-{
-    if (gContext->IsMasterBackend())
-    {
-        // Should never get here unless there is a bug in the code somewhere.
-        // If this happens, it can cause endless event loops.
-        VERBOSE(VB_IMPORTANT, "ERROR: Master backend tried to connect back "
-                "to itself!");
-        return false;
-    }
-
-    QString server = GetSetting("MasterServerIP", "localhost");
-    int     port   = GetNumSetting("MasterServerPort", 6543);
-    bool    proto_mismatch = false;
-
-    if (!d->serverSock)
-    {
-        QString ann = QString("ANN %1 %2 %3")
-            .arg(blockingClient ? "Playback" : "Monitor")
-            .arg(d->m_localhostname).arg(false);
-        d->serverSock = ConnectCommandSocket(
-            server, port, ann, &proto_mismatch);
-    }
-
-    if (!d->serverSock)
-        return false;
-
-    if (!d->eventSock)
-        d->eventSock = ConnectEventSocket(server, port);
-
-    if (!d->eventSock)
-    {
-        d->serverSock->DownRef();
-        d->serverSock = NULL;
-
-        QCoreApplication::postEvent(
-            d, new MythEvent("CONNECTION_FAILURE"));
-
-        return false;
-    }
-
-    return true;
-}
-
-bool do_command_socket_setup(
-    MythSocket *serverSock, const QString &announcement, uint timeout_in_ms,
-    bool &proto_mismatch, MythContextPrivate *d)
-{
-    proto_mismatch = false;
-
-#ifndef IGNORE_PROTO_VER_MISMATCH
-    if (!MythContext::CheckProtoVersion(serverSock, timeout_in_ms, d))
-    {
-        proto_mismatch = true;
-        return false;
-    }
-#endif
-
-    QStringList strlist(announcement);
-
-    if (!serverSock->writeStringList(strlist))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Connecting server socket to "
-                "master backend, socket write failed");
-        return false;
-    }
-
-    if (!serverSock->readStringList(strlist, true) || strlist.empty() ||
-        (strlist[0] == "ERROR"))
-    {
-        if (!strlist.empty())
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
-                    "server socket to master backend");
-        else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
-                    "server socket to master backend");
-        return false;
-    }
-
-    return true;
-}
-
-MythSocket *MythContext::ConnectCommandSocket(
-    const QString &hostname, int port, const QString &announce,
-    bool *p_proto_mismatch, bool gui, int maxConnTry, int setup_timeout)
-{
-    MythSocket *serverSock = NULL;
-
-    {
-        QMutexLocker locker(&d->WOLInProgressLock);
-        d->WaitForWOL();
-    }
-
-    QString WOLcmd = GetSetting("WOLbackendCommand", "");
-
-    if (maxConnTry < 1)
-        maxConnTry = max(GetNumSetting("BackendConnectRetry", 1), 1);
-
-    int WOLsleepTime = 0, WOLmaxConnTry = 0;
-    if (!WOLcmd.isEmpty())
-    {
-        WOLsleepTime  = GetNumSetting("WOLbackendReconnectWaitTime", 0);
-        WOLmaxConnTry = max(GetNumSetting("WOLbackendConnectRetry", 1), 1);
-        maxConnTry    = max(maxConnTry, WOLmaxConnTry);
-    }
-
-    bool we_attempted_wol = false;
-
-    if (setup_timeout <= 0)
-        setup_timeout = MythSocket::kShortTimeout;
-
-    bool proto_mismatch = false;
-    for (int cnt = 1; cnt <= maxConnTry; cnt++)
-    {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Connecting to backend server: %1:%2 (try %3 of %4)")
-                .arg(hostname).arg(port).arg(cnt).arg(maxConnTry));
-
-        serverSock = new MythSocket();
-
-        int sleepms = 0;
-        if (serverSock->connect(hostname, port))
-        {
-            if (do_command_socket_setup(
-                    serverSock, announce, setup_timeout, proto_mismatch, d))
-            {
-                break;
-            }
-
-            if (proto_mismatch)
-            {
-                if (p_proto_mismatch)
-                    *p_proto_mismatch = true;
-
-                serverSock->DownRef();
-                serverSock = NULL;
-                break;
-            }
-
-            setup_timeout *= 1.5f;
-        }
-        else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
-        {
-            if (!we_attempted_wol)
-            {
-                QMutexLocker locker(&d->WOLInProgressLock);
-                if (d->WOLInProgress)
-                {
-                    d->WaitForWOL();
-                    continue;
-                }
-
-                d->WOLInProgress = we_attempted_wol = true;
-            }
-
-            myth_system(WOLcmd);
-            sleepms = WOLsleepTime * 1000;
-        }
-
-        serverSock->DownRef();
-        serverSock = NULL;
-
-        if (!serverSock && (cnt == 1))
-        {
-            QCoreApplication::postEvent(
-                d, new MythEvent("CONNECTION_FAILURE"));
-        }
-
-        if (sleepms)
-            usleep(sleepms * 1000);
-    }
-
-    if (we_attempted_wol)
-    {
-        QMutexLocker locker(&d->WOLInProgressLock);
-        d->WOLInProgress = false;
-        d->WOLInProgressWaitCondition.wakeAll();
-    }
-
-    if (!serverSock && !proto_mismatch)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Connection to master server timed out.\n\t\t\t"
-                "Either the server is down or the master server settings"
-                "\n\t\t\t"
-                "in mythtv-settings does not contain the proper IP address\n");
-    }
-    else
-    {
-        QCoreApplication::postEvent(
-            d, new MythEvent("CONNECTION_RESTABLISHED"));
-    }
-
-    return serverSock;
-}
-
-MythSocket *MythContext::ConnectEventSocket(const QString &hostname, int port)
-{
-    MythSocket *eventSock = new MythSocket();
-
-    while (eventSock->state() != MythSocket::Idle)
-    {
-        usleep(5000);
-    }
-
-    // Assume that since we _just_ connected the command socket,
-    // this one won't need multiple retries to work...
-    if (!eventSock->connect(hostname, port))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect event "
-                "socket to master backend");
-        eventSock->DownRef();
-        eventSock = NULL;
-        return NULL;
-    }
-
-    eventSock->Lock();
-
-    QString str = QString("ANN Monitor %1 %2")
-        .arg(d->m_localhostname).arg(true);
-    QStringList strlist(str);
-    eventSock->writeStringList(strlist);
-    if (!eventSock->readStringList(strlist) || strlist.empty() ||
-        (strlist[0] == "ERROR"))
-    {
-        if (!strlist.empty())
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
-                    "event socket to master backend");
-        else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
-                    "event socket to master backend");
-
-        eventSock->DownRef();
-        eventSock->Unlock();
-        eventSock = NULL;
-        return NULL;
-    }
-
-    eventSock->Unlock();
-    eventSock->setCallbacks(this);
-
-    return eventSock;
-}
-
-bool MythContext::IsConnectedToMaster(void)
-{
-    QMutexLocker locker(&d->sockLock);
-    return d->serverSock;
-}
-
-void MythContext::BlockShutdown(void)
-{
-    QStringList strlist;
-
-    QMutexLocker locker(&d->sockLock);
-    if (d->serverSock == NULL)
-        return;
-
-    strlist << "BLOCK_SHUTDOWN";
-    d->serverSock->writeStringList(strlist);
-    d->serverSock->readStringList(strlist);
-
-    if (d->eventSock == NULL || d->eventSock->state() != MythSocket::Connected)
-        return;
-
-    strlist.clear();
-    strlist << "BLOCK_SHUTDOWN";
-
-    d->eventSock->Lock();
-
-    d->eventSock->writeStringList(strlist);
-    d->eventSock->readStringList(strlist);
-
-    d->eventSock->Unlock();
-}
-
-void MythContext::AllowShutdown(void)
-{
-    QStringList strlist;
-
-    QMutexLocker locker(&d->sockLock);
-    if (d->serverSock == NULL)
-        return;
-
-    strlist << "ALLOW_SHUTDOWN";
-    d->serverSock->writeStringList(strlist);
-    d->serverSock->readStringList(strlist);
-
-    if (d->eventSock == NULL || d->eventSock->state() != MythSocket::Connected)
-        return;
-
-    strlist.clear();
-    strlist << "ALLOW_SHUTDOWN";
-
-    d->eventSock->Lock();
-
-    d->eventSock->writeStringList(strlist);
-    d->eventSock->readStringList(strlist);
-
-    d->eventSock->Unlock();
-}
-
-void MythContext::SetBackend(bool backend)
-{
-    d->m_backend = backend;
-}
-
-bool MythContext::IsBackend(void)
-{
-    return d->m_backend;
-}
-
-bool MythContext::IsMasterHost(void)
-{
-    QString myip = gContext->GetSetting("BackendServerIP");
-    QString masterip = gContext->GetSetting("MasterServerIP");
-
-    return (masterip == myip);
-}
-
-bool MythContext::IsMasterBackend(void)
-{
-    return (IsBackend() && IsMasterHost());
-}
-
-bool MythContext::BackendIsRunning(void)
-{
-#if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
-    const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
-#elif defined USING_MINGW
-    const char *command = "%systemroot%\\system32\\tasklist.exe "
-       " | %systemroot%\\system32\\find.exe /i \"mythbackend.exe\" ";
-#else
-    const char *command = "ps -ae | grep mythbackend > /dev/null";
-#endif
-    bool res = myth_system(command,
-                           MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                           MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
-    return !res;
-}
-
-bool MythContext::IsFrontendOnly(void)
-{
-    // find out if a backend runs on this host...
-    bool backendOnLocalhost = false;
-
-    QStringList strlist("QUERY_IS_ACTIVE_BACKEND");
-    strlist << GetHostName();
-
-    SendReceiveStringList(strlist);
-
-    if (QString(strlist[0]) == "FALSE")
-        backendOnLocalhost = false;
-    else
-        backendOnLocalhost = true;
-
-    return !backendOnLocalhost;
-}
-
-QString MythContext::GetMasterHostPrefix(void)
-{
-    QString ret;
-
-    QMutexLocker locker(&d->sockLock);
-    if (!d->serverSock)
-    {
-        bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
-        ConnectToMasterServer(blockingClient);
-    }
-
-    if (d->serverSock)
-        ret = QString("myth://%1:%2/")
-                     .arg(d->serverSock->peerAddress().toString())
-                     .arg(d->serverSock->peerPort());
-    return ret;
-}
-
-QString MythContext::GetMasterHostName(void)
-{
-    QMutexLocker locker(&d->m_hostnamelock);
-
-    if (d->m_masterhostname.isEmpty())
-    {
-        QStringList strlist("QUERY_HOSTNAME");
-
-        SendReceiveStringList(strlist);
-
-        d->m_masterhostname = strlist[0];
-    }
-
-    QString ret = d->m_masterhostname;
-    ret.detach();
-
-    return ret;
-}
-
-void MythContext::ClearSettingsCache(const QString &myKey)
-{
-    d->m_database->ClearSettingsCache(myKey);
-}
-
-void MythContext::ActivateSettingsCache(bool activate)
-{
-    d->m_database->ActivateSettingsCache(activate);
-}
-
-QString MythContext::GetHostName(void)
-{
-    QMutexLocker (&d->m_hostnamelock);
-    QString tmp = d->m_localhostname;
-    tmp.detach();
-    return tmp;
-}
-
-QString MythContext::GetFilePrefix(void)
-{
-    return GetSetting("RecordFilePrefix");
-}
-
-void MythContext::RefreshBackendConfig(void)
-{
-    d->LoadLogSettings();
-}
-
-void MythContext::GetResolutionSetting(const QString &type,
-                                       int &width, int &height,
-                                       double &forced_aspect,
-                                       double &refresh_rate,
-                                       int index)
-{
-    d->m_database->GetResolutionSetting(type, width, height, forced_aspect,
-                                        refresh_rate, index);
-}
-
-void MythContext::GetResolutionSetting(const QString &t, int &w, int &h, int i)
-{
-    d->m_database->GetResolutionSetting(t, w, h, i);
-}
-
-MDBManager *MythContext::GetDBManager(void)
-{
-    return d->m_database->GetDBManager();
-}
-
-/** /brief Returns true if database is being ignored.
- *
- *  This was created for some command line only programs which
- *  still need myth libraries, such as channel scanners, channel
- *  change programs, and the off-line commercial flagger.
- */
-bool MythContext::IsDatabaseIgnored(void) const
-{
-    return d->m_database->IsDatabaseIgnored();
-}
-
-void MythContext::SaveSetting(const QString &key, int newValue)
-{
-    d->m_database->SaveSetting(key, newValue);
-}
-
-void MythContext::SaveSetting(const QString &key, const QString &newValue)
-{
-    d->m_database->SaveSetting(key, newValue);
-}
-
-bool MythContext::SaveSettingOnHost(const QString &key,
-                                    const QString &newValue,
-                                    const QString &host)
-{
-    return d->m_database->SaveSettingOnHost(key, newValue, host);
-}
-
-QString MythContext::GetSetting(const QString &key, const QString &defaultval)
-{
-    return d->m_database->GetSetting(key, defaultval);
-}
-
-int MythContext::GetNumSetting(const QString &key, int defaultval)
-{
-    return d->m_database->GetNumSetting(key, defaultval);
-}
-
-double MythContext::GetFloatSetting(const QString &key, double defaultval)
-{
-    return d->m_database->GetFloatSetting(key, defaultval);
-}
-
-QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
-                                      const QString &defaultval)
-{
-    return d->m_database->GetSettingOnHost(key, host, defaultval);
-}
-
-int MythContext::GetNumSettingOnHost(const QString &key, const QString &host,
-                                     int defaultval)
-{
-    return d->m_database->GetNumSettingOnHost(key, host, defaultval);
-}
-
-double MythContext::GetFloatSettingOnHost(
-    const QString &key, const QString &host, double defaultval)
-{
-    return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
-}
-
-void MythContext::SetSetting(const QString &key, const QString &newValue)
-{
-    d->m_database->SetSetting(key, newValue);
-}
-
-/**
- *  \brief Overrides the given setting for the execution time of the process.
- *
- * This allows defining settings for the session only, without touching the
- * settings in the data base.
- */
-void MythContext::OverrideSettingForSession(const QString &key,
-                                            const QString &value)
-{
-    d->m_database->OverrideSettingForSession(key, value);
-}
-
-bool MythContext::SendReceiveStringList(QStringList &strlist,
-                                        bool quickTimeout, bool block)
-{
-    if (HasMythMainWindow() && IsUIThread())
-    {
-        QString msg = "SendReceiveStringList(";
-        for (uint i=0; i<(uint)strlist.size() && i<2; i++)
-            msg += (i?",":"") + strlist[i];
-        msg += (strlist.size() > 2) ? "...)" : ")";
-        msg += " called from UI thread";
-        VERBOSE(VB_IMPORTANT, msg);
-    }
-
-    QString query_type = "UNKNOWN";
-
-    if (!strlist.isEmpty())
-        query_type = strlist[0];
-
-    QMutexLocker locker(&d->sockLock);
-
-    if (!d->serverSock)
-    {
-        bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
-        ConnectToMasterServer(blockingClient);
-    }
-
-    bool ok = false;
-
-    if (d->serverSock)
-    {
-        QStringList sendstrlist = strlist;
-        d->serverSock->writeStringList(sendstrlist);
-        ok = d->serverSock->readStringList(strlist, quickTimeout);
-
-        if (!ok)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Connection to backend server lost"));
-            d->serverSock->DownRef();
-            d->serverSock = NULL;
-
-            bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
-            ConnectToMasterServer(blockingClient);
-
-            if (d->serverSock)
-            {
-                d->serverSock->writeStringList(sendstrlist);
-                ok = d->serverSock->readStringList(strlist, quickTimeout);
-            }
-        }
-
-        // this should not happen
-        while (ok && strlist[0] == "BACKEND_MESSAGE")
-        {
-            // oops, not for us
-            VERBOSE(VB_IMPORTANT, "SRSL you shouldn't see this!!");
-            QString message = strlist[1];
-            strlist.pop_front(); strlist.pop_front();
-
-            MythEvent me(message, strlist);
-            dispatch(me);
-
-            ok = d->serverSock->readStringList(strlist, quickTimeout);
-        }
-        // .
-
-        if (!ok)
-        {
-            if (d->serverSock)
-            {
-                d->serverSock->DownRef();
-                d->serverSock = NULL;
-            }
-
-            VERBOSE(VB_IMPORTANT,
-                    QString("Reconnection to backend server failed"));
-
-            QCoreApplication::postEvent(
-                d, new MythEvent("PERSISTENT_CONNECTION_FAILURE"));
-        }
-    }
-
-    if (ok)
-    {
-        if (strlist.isEmpty())
-            ok = false;
-        else if (strlist[0] == "ERROR")
-        {
-            if (strlist.size() == 2)
-                VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
-                                            "with the error '%2'")
-                                            .arg(query_type).arg(strlist[1]));
-            else
-                VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
-                                        "with an error, but no error message.")
-                                        .arg(query_type));
-
-            ok = false;
-        }
-
-    }
-
-    return ok;
-}
-
-void MythContext::readyRead(MythSocket *sock)
-{
-    while (sock->state() == MythSocket::Connected &&
-           sock->bytesAvailable() > 0)
-    {
-        QStringList strlist;
-        if (!sock->readStringList(strlist))
-            continue;
-
-        QString prefix = strlist[0];
-        QString message = strlist[1];
-
-        if (prefix == "OK")
-        {
-        }
-        else if (prefix != "BACKEND_MESSAGE")
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Received a: %1 message from the backend"
-                    "\n\t\t\tBut I don't know what to do with it.")
-                    .arg(prefix));
-        }
-        else if (message == "CLEAR_SETTINGS_CACHE")
-        {
-            // No need to dispatch this message to ourself, so handle it
-            VERBOSE(VB_GENERAL, "Received a remote 'Clear Cache' request");
-            ClearSettingsCache();
-        }
-        else
-        {
-            strlist.pop_front();
-            strlist.pop_front();
-            MythEvent me(message, strlist);
-            dispatch(me);
-        }
-    }
-}
-
-bool MythContext::CheckProtoVersion(
-    MythSocket *socket, uint timeout_ms, MythContextPrivate *d)
-{
-    if (!socket)
-        return false;
-
-    QStringList strlist(QString("MYTH_PROTO_VERSION %1")
-                        .arg(MYTH_PROTO_VERSION));
-    socket->writeStringList(strlist);
-
-    if (!socket->readStringList(strlist, timeout_ms) || strlist.empty())
-    {
-        VERBOSE(VB_IMPORTANT, "Protocol version check failure.\n\t\t\t"
-                "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
-                "This happens when the backend is too busy to respond,\n\t\t\t"
-                "or has deadlocked in due to bugs or hardware failure.");
-
-        return false;
-    }
-    else if (strlist[0] == "REJECT" && strlist.size() >= 2)
-    {
-        VERBOSE(VB_GENERAL, QString("Protocol version mismatch (frontend=%1,"
-                                    "backend=%2)\n")
-                                    .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
-
-        QStringList list(strlist[1]);
-        QCoreApplication::postEvent(
-            d, new MythEvent("VERSION_MISMATCH", list));
-
-        return false;
-    }
-    else if (strlist[0] == "ACCEPT")
-    {
-        VERBOSE(VB_IMPORTANT, QString("Using protocol version %1")
-                               .arg(MYTH_PROTO_VERSION));
-        return true;
-    }
-
-    VERBOSE(VB_GENERAL, QString("Unexpected response to MYTH_PROTO_VERSION: %1")
-                               .arg(strlist[0]));
-    return false;
-}
-
-void MythContext::connected(MythSocket *sock)
-{
-    (void)sock;
-}
-
-void MythContext::connectionClosed(MythSocket *sock)
-{
-    (void)sock;
-
-    VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
-            "No connection to the backend."));
-
-    QMutexLocker locker(&d->sockLock);
-    if (d->serverSock)
-    {
-        d->serverSock->DownRef();
-        d->serverSock = NULL;
-    }
-
-    if (d->eventSock)
-    {
-        d->eventSock->DownRef();
-        d->eventSock = NULL;
-    }
-
-    dispatch(MythEvent(QString("BACKEND_SOCKETS_CLOSED")));
-}
-
-void MythContext::SetMainWindow(MythMainWindow *mainwin)
-{
-    d->mainWindow = mainwin;
-}
-
-MythMainWindow *MythContext::GetMainWindow(void)
-{
-    return d->mainWindow;
-}
-
-/*
- * Convenience method, so that we don't have to do:
- *   if (gContext->GetMainWindow()->TranslateKeyPress(...))
- */
-bool MythContext::TranslateKeyPress(const QString &context,
-                                    QKeyEvent     *e,
-                                    QStringList   &actions, bool allowJumps)
-{
-    if (!d->mainWindow)
-    {
-        VERBOSE(VB_IMPORTANT, "MC::TranslateKeyPress() called, but no window");
-        return false;
-    }
-
-    return d->mainWindow->TranslateKeyPress(context, e, actions, allowJumps);
 }
 
 bool MythContext::TestPopupVersion(const QString &name,
@@ -2237,10 +1421,15 @@ bool MythContext::TestPopupVersion(const QString &name,
                                 "match libraries (%3)")
                                 .arg(name).arg(pluginversion).arg(libversion));
 
-    if (GetMainWindow() && !d->disablelibrarypopup)
+    if (GetMythMainWindow() && !d->disablelibrarypopup)
         ShowOkPopup(err.arg(name));
 
     return false;
+}
+
+void MythContext::SetDisableEventPopup(bool check)
+{
+    d->disableeventpopup = check;
 }
 
 void MythContext::SetDisableLibraryPopup(bool check)
@@ -2256,129 +1445,6 @@ void MythContext::SetPluginManager(MythPluginManager *pmanager)
 MythPluginManager *MythContext::getPluginManager(void)
 {
     return d->pluginmanager;
-}
-
-void MythContext::LogEntry(const QString &module, int priority,
-                           const QString &message, const QString &details)
-{
-    unsigned int logid;
-    int howmany;
-
-    if (d->m_database->IsDatabaseIgnored())
-        return;
-
-    if (d->m_logenable == -1) // Haven't grabbed the settings yet
-        d->LoadLogSettings();
-    if (d->m_logenable == 1)
-    {
-        QString fullMsg = message;
-        if (!details.isEmpty())
-            fullMsg += ": " + details;
-
-        if (message.left(21) != "Last message repeated")
-        {
-            if (fullMsg == d->lastLogStrings[module])
-            {
-                d->lastLogCounts[module] += 1;
-                return;
-            }
-            else
-            {
-                if (0 < d->lastLogCounts[module])
-                {
-                    LogEntry(module, priority,
-                             QString("Last message repeated %1 times")
-                                    .arg(d->lastLogCounts[module]),
-                             d->lastLogStrings[module]);
-                }
-
-                d->lastLogCounts[module] = 0;
-                d->lastLogStrings[module] = fullMsg;
-            }
-        }
-
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("INSERT INTO mythlog (module, priority, "
-                      "logdate, host, message, details) "
-                      "values (:MODULE, :PRIORITY, now(), :HOSTNAME, "
-                      ":MESSAGE, :DETAILS );");
-
-        query.bindValue(":MODULE", module);
-        query.bindValue(":PRIORITY", priority);
-        query.bindValue(":HOSTNAME", d->m_localhostname);
-        query.bindValue(":MESSAGE", message);
-        query.bindValue(":DETAILS", details);
-
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("LogEntry", query);
-
-        if (d->m_logmaxcount > 0)
-        {
-            query.prepare("SELECT logid FROM mythlog WHERE "
-                          "module= :MODULE ORDER BY logdate ASC ;");
-            query.bindValue(":MODULE", module);
-            if (!query.exec() || !query.isActive())
-            {
-                MythDB::DBError("DelLogEntry#1", query);
-            }
-            else
-            {
-                howmany = query.size();
-                if (howmany > d->m_logmaxcount)
-                {
-                    MSqlQuery delquery(MSqlQuery::InitCon());
-                    while (howmany > d->m_logmaxcount)
-                    {
-                        query.next();
-                        logid = query.value(0).toUInt();
-                        delquery.prepare("DELETE FROM mythlog WHERE "
-                                         "logid= :LOGID ;");
-                        delquery.bindValue(":LOGID", logid);
-
-                        if (!delquery.exec() || !delquery.isActive())
-                        {
-                            MythDB::DBError("DelLogEntry#2", delquery);
-                        }
-                        howmany--;
-                    }
-                }
-            }
-        }
-
-        if (priority <= d->m_logprintlevel)
-        {
-            QByteArray tmp =
-                QString("%1: %2").arg(module).arg(fullMsg).toUtf8();
-            VERBOSE(VB_IMPORTANT, tmp.constData());
-        }
-    }
-}
-
-void MythContext::addPrivRequest(MythPrivRequest::Type t, void *data)
-{
-    QMutexLocker lockit(&d->m_priv_mutex);
-    d->m_priv_requests.push(MythPrivRequest(t, data));
-    d->m_priv_queued.wakeAll();
-}
-
-void MythContext::waitPrivRequest() const
-{
-    d->m_priv_mutex.lock();
-    while (d->m_priv_requests.empty())
-        d->m_priv_queued.wait(&d->m_priv_mutex);
-    d->m_priv_mutex.unlock();
-}
-
-MythPrivRequest MythContext::popPrivRequest()
-{
-    QMutexLocker lockit(&d->m_priv_mutex);
-    MythPrivRequest ret_val(MythPrivRequest::PrivEnd, NULL);
-    if (!d->m_priv_requests.empty()) {
-        ret_val = d->m_priv_requests.front();
-        d->m_priv_requests.pop();
-    }
-    return ret_val;
 }
 
 DatabaseParams MythContext::GetDatabaseParams(void)
@@ -2413,39 +1479,13 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
         {
             // Save the new settings:
             d->m_DBparams = params;
-            d->m_database->SetDatabaseParams(d->m_DBparams);
+            gCoreContext->GetDB()->SetDatabaseParams(d->m_DBparams);
 
             // If database has changed, force its use:
             d->ResetDatabase();
         }
     }
     return ret;
-}
-
-void MythContext::dispatch(const MythEvent &event)
-{
-    VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
-
-    MythObservable::dispatch(event);
-}
-
-void MythContext::dispatchNow(const MythEvent &event)
-{
-    VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
-
-    MythObservable::dispatchNow(event);
-}
-
-void MythContext::sendPlaybackStart(void)
-{
-    MythEvent me(QString("PLAYBACK_START %1").arg(GetHostName()));
-    dispatchNow(me);
-}
-
-void MythContext::sendPlaybackEnd(void)
-{
-    MythEvent me(QString("PLAYBACK_END %1").arg(GetHostName()));
-    dispatchNow(me);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

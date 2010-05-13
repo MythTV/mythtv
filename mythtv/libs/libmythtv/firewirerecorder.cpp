@@ -7,7 +7,7 @@
 // MythTV includes
 #include "firewirerecorder.h"
 #include "firewirechannel.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mpegtables.h"
 #include "mpegstreamdata.h"
 #include "tv_rec.h"

@@ -21,7 +21,7 @@ using namespace std;
 #include "recordingrule.h"
 #include "scheduledrecording.h"
 #include "util.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
@@ -487,7 +487,7 @@ void RecordingInfo::StartedRecording(QString ext)
         record->LoadByProgram(this);
     }
 
-    hostname = gContext->GetHostName();
+    hostname = gCoreContext->GetHostName();
     pathname = CreateRecordBasename(ext);
 
     int count = 0;
@@ -712,7 +712,7 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
                                         .arg(chanid);
 
         VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details));
-        gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
+        gCoreContext->LogEntry("scheduler", LP_NOTICE, msg, details);
     }
 
     SendUpdateEvent();

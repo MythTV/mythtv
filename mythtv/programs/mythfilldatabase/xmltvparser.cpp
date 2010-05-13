@@ -13,7 +13,7 @@
 
 // libmyth headers
 #include "exitcodes.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 
 // libmythtv headers
@@ -588,7 +588,7 @@ bool XMLTVParser::parseFile(
 
     // now we calculate the localTimezoneOffset, so that we can fix
     // the programdata if needed
-    QString config_offset = gContext->GetSetting("TimeOffset", "None");
+    QString config_offset = gCoreContext->GetSetting("TimeOffset", "None");
     // we disable this feature by setting it invalid (> 840min = 14hr)
     int localTimezoneOffset = 841;
 

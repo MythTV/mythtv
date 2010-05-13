@@ -3,7 +3,6 @@
 #include <QDir>
 
 // libmyth headers
-#include "mythcontext.h"
 #include "mythdirs.h"
 
 // filldata headers

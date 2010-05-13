@@ -82,17 +82,17 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(tmp_buff,           0, sizeof(short) * kAudioTempBufSize);
     memset(&audiotime_updated, 0, sizeof(audiotime_updated));
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
-    orig_config_channels = gContext->GetNumSetting("MaxChannels", 2);
-    src_quality = gContext->GetNumSetting("AudioUpmixType", 2);
+    orig_config_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
+    src_quality = gCoreContext->GetNumSetting("AudioUpmixType", 2);
         //Set default upsampling quality to medium if using stereo
     if (orig_config_channels == 2)
         src_quality = 1;
 
         // Handle override of SRC quality settings
-    if (gContext->GetNumSetting("AdvancedAudioSettings", false) &&
-        gContext->GetNumSetting("SRCQualityOverride", false))
+    if (gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
+        gCoreContext->GetNumSetting("SRCQualityOverride", false))
     {
-        src_quality = gContext->GetNumSetting("SRCQuality", 1);
+        src_quality = gCoreContext->GetNumSetting("SRCQuality", 1);
             // Extra test to keep backward compatibility with earlier SRC code setting
         if (src_quality > 2)
             src_quality = 2;
@@ -100,14 +100,14 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     }
 
     if (!settings.upmixer)
-        configured_audio_channels = gContext->GetNumSetting("AudioDefaultUpmix", false) ? orig_config_channels : 2;
+        configured_audio_channels = gCoreContext->GetNumSetting("AudioDefaultUpmix", false) ? orig_config_channels : 2;
     else
         if (settings.upmixer == 1)
             configured_audio_channels = 2;
         else
             configured_audio_channels = 6;
 
-    allow_ac3_passthru = (orig_config_channels > 2) ? gContext->GetNumSetting("AC3PassThru", false) : false;
+    allow_ac3_passthru = (orig_config_channels > 2) ? gCoreContext->GetNumSetting("AC3PassThru", false) : false;
 
     // You need to call Reconfigure from your concrete class.
     // Reconfigure(laudio_bits,       laudio_channels,
@@ -278,7 +278,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     killaudio = false;
     pauseaudio = false;
     was_paused = true;
-    internal_vol = gContext->GetNumSetting("MythControlsVolume", 0);
+    internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
     numlowbuffer = 0;
 
@@ -378,9 +378,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // Only used for software volume
     if (set_initial_vol && internal_vol) 
     {
-        QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+        QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
-        volume = gContext->GetNumSetting(controlLabel, 80);
+        volume = gCoreContext->GetNumSetting(controlLabel, 80);
     }
 
     SyncVolume();
@@ -392,9 +392,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (audio_buffer_unused < 0)
         audio_buffer_unused = 0;
 
-    if (!gContext->GetNumSetting("AdvancedAudioSettings", false))
+    if (!gCoreContext->GetNumSetting("AdvancedAudioSettings", false))
         audio_buffer_unused = 0;
-    else if (!gContext->GetNumSetting("AggressiveSoundcardBuffer", false))
+    else if (!gCoreContext->GetNumSetting("AggressiveSoundcardBuffer", false))
         audio_buffer_unused = 0;
 
     audbuf_timecode = 0;
@@ -410,7 +410,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         VERBOSE(VB_AUDIO, LOC + QString("create upmixer"));
         if (configured_audio_channels == 6)
         {
-            surround_mode = gContext->GetNumSetting("AudioUpmixType", 2);
+            surround_mode = gCoreContext->GetNumSetting("AudioUpmixType", 2);
         }
 
         upmixer = new FreeSurround(
@@ -684,9 +684,9 @@ void AudioOutputBase::SetSWVolume(int new_volume, bool save)
     volume = new_volume;
     if (save)
     {
-        QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+        QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
-        gContext->SaveSetting(controlLabel, volume);
+        gCoreContext->SaveSetting(controlLabel, volume);
     }
 }
 

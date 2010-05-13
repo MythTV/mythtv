@@ -2,7 +2,7 @@
 #include <QTranslator>
 
 #include "langsettings.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
 
@@ -23,8 +23,8 @@ class LangEditorSetting : public ListBoxSetting, public Storage
 
     virtual void Save(void)
     {
-        gContext->SetSetting("Language", getValue());
-        gContext->SaveSetting("Language", getValue());
+        gCoreContext->SetSetting("Language", getValue());
+        gCoreContext->SaveSetting("Language", getValue());
         LanguageSettings::reload();
     }
 
@@ -47,12 +47,12 @@ public:
         if (!m_loaded)
         {
             m_loaded = "loaded";
-            m_language = gContext->GetSetting("Language");
+            m_language = gCoreContext->GetSetting("Language");
         }
     };
 
     bool LanguageChanged(void) {
-        QString cur_language = gContext->GetSetting("Language");
+        QString cur_language = gCoreContext->GetSetting("Language");
         bool ret = false;
         if (!cur_language.isEmpty() &&
             cur_language.compare(m_language))
@@ -81,8 +81,8 @@ void LanguageSettings::load(QString module_name)
 
         if (lang == "en")
         {
-            gContext->SetSetting("Language", "EN_US");
-            gContext->SaveSetting("Language", "EN_US");
+            gCoreContext->SetSetting("Language", "EN_US");
+            gCoreContext->SaveSetting("Language", "EN_US");
             lang = "en_us";
         }
 
@@ -127,7 +127,7 @@ void LanguageSettings::prompt(bool force)
     // no change -- during bootstrapping, we don't
     // actually get to write to the database until
     // a later run, so do it every time.
-    gContext->SaveSetting("Language", d.m_language);
+    gCoreContext->SaveSetting("Language", d.m_language);
 }
 
 void LanguageSettings::reload(void)

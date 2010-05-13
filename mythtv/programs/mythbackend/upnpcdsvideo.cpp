@@ -15,7 +15,7 @@
 #include "httprequest.h"
 #include "upnpmedia.h"
 #include "util.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 #define LOC QString("UPnpCDSVideo: ")
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")
@@ -127,7 +127,7 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // ----------------------------------------------------------------------
 
     if (( pRequest->m_sObjectId                  == "13") &&
-        ( gContext->GetSetting("UPnP/WMPSource") ==  "1"))
+        ( gCoreContext->GetSetting("UPnP/WMPSource") ==  "1"))
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -177,7 +177,7 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     if (  bOurs && ( pRequest->m_sObjectId == "0"))
     {
 
-        if ( gContext->GetSetting("UPnP/WMPSource") == "1") // GetBoolSetting()?
+        if ( gCoreContext->GetSetting("UPnP/WMPSource") == "1") // GetBoolSetting()?
         {
             pRequest->m_sObjectId = "Videos/0";
             pRequest->m_sParentId = '8';        // -=>TODO: Not sure why this was added.
@@ -391,8 +391,8 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
     // ----------------------------------------------------------------------
-    QString sServerIp = gContext->GetSetting("BackendServerIp"   );
-    QString sPort     = gContext->GetSetting("BackendStatusPort" );
+    QString sServerIp = gCoreContext->GetSetting("BackendServerIp"   );
+    QString sPort     = gCoreContext->GetSetting("BackendStatusPort" );
 
     // ----------------------------------------------------------------------
     // Build Support Strings

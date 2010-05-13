@@ -11,7 +11,7 @@
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "recordinginfo.h"
 #include "tv.h"
 #include "mythuitext.h"
@@ -93,12 +93,12 @@ void ProgFinder::Init(void)
 {
     m_allowKeypress = true;
 
-    m_timeFormat = gContext->GetSetting("TimeFormat");
-    m_dateFormat = gContext->GetSetting("DateFormat");
+    m_timeFormat = gCoreContext->GetSetting("TimeFormat");
+    m_dateFormat = gCoreContext->GetSetting("DateFormat");
 
     initAlphabetList();
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     connect(m_timesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateInfo()));
@@ -121,7 +121,7 @@ void ProgFinder::Init(void)
 
 ProgFinder::~ProgFinder()
 {
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
@@ -394,7 +394,7 @@ void ProgFinder::showGuide()
 {
     if (m_allowEPG)
     {
-        QString startchannel = gContext->GetSetting("DefaultTVChannel");
+        QString startchannel = gCoreContext->GetSetting("DefaultTVChannel");
         if (startchannel.isEmpty())
             startchannel = '3';
         uint startchanid = 0;

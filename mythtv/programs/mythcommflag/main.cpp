@@ -661,7 +661,7 @@ int FlagCommercials(
     }
 
     if (commDetectMethod == COMM_DETECT_UNINIT)
-        commDetectMethod = (enum SkipTypes)gContext->GetNumSetting(
+        commDetectMethod = (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
     QMap<long long, int> blanks;
     recorder = NULL;
@@ -747,7 +747,7 @@ int FlagCommercials(
 
     if (program_info->recendts > QDateTime::currentDateTime())
     {
-        gContext->ConnectToMasterServer();
+        gCoreContext->ConnectToMasterServer();
 
         recorder = RemoteGetExistingRecorder(program_info);
         if (recorder && (recorder->GetRecorderNumber() != -1))
@@ -775,7 +775,7 @@ int FlagCommercials(
     {
         JobQueue::QueueJob(JOB_COMMFLAG, program_info->chanid,
                            program_info->recstartts, "", "",
-                           gContext->GetHostName(), JOB_EXTERNAL,
+                           gCoreContext->GetHostName(), JOB_EXTERNAL,
                            JOB_RUNNING);
         fakeJobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
                                        program_info->recstartts);
@@ -1197,7 +1197,6 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(
             false/*use gui*/, NULL/*upnp*/, false/*prompt for backend*/,
@@ -1216,7 +1215,7 @@ int main(int argc, char *argv[])
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                           .arg(it.key()).arg(*it));
-            gContext->OverrideSettingForSession(it.key(), *it);
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -1283,7 +1282,7 @@ int main(int argc, char *argv[])
 
     if (inJobQueue)
     {
-        int jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
+        int jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
 
         if (jobQueueCPU < 2)
             myth_nice(17);

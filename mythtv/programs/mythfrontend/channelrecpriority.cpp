@@ -7,7 +7,7 @@ using namespace std;
 
 #include "tv.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "scheduledrecording.h"
@@ -56,23 +56,23 @@ ChannelRecPriority::ChannelRecPriority(MythScreenStack *parent)
                     m_sourceidText(NULL), m_priorityText(NULL),
                     m_iconImage(NULL)
 {
-    m_sortType = (SortType)gContext->GetNumSetting("ChannelRecPrioritySorting",
+    m_sortType = (SortType)gCoreContext->GetNumSetting("ChannelRecPrioritySorting",
                                                  (int)byChannel);
 
     m_longchannelformat =
-        gContext->GetSetting("m_longchannelformat", "<num> <name>");
+        gCoreContext->GetSetting("m_longchannelformat", "<num> <name>");
 
     m_currentItem = NULL;
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 ChannelRecPriority::~ChannelRecPriority()
 {
     saveRecPriority();
-    gContext->SaveSetting("ChannelRecPrioritySorting",
+    gCoreContext->SaveSetting("ChannelRecPrioritySorting",
                             (int)m_sortType);
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 }
 
 bool ChannelRecPriority::Create()

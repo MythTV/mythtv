@@ -6,10 +6,9 @@ using namespace std;
 #include "mythdb.h"
 #include "remotefile.h"
 #include "decodeencode.h"
-// #include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "compat.h"
-#include "mythverbose.h"
 
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
                        int _retries,

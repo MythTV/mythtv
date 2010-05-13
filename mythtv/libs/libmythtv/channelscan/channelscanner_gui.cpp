@@ -35,7 +35,6 @@
 using namespace std;
 
 // MythTV headers
-#include "mythcontext.h"
 #include "scanwizard.h"
 #include "channelscanner_gui.h"
 #include "channelscanner_gui_scan_pane.h"
@@ -156,7 +155,7 @@ void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports)
 
 void ChannelScannerGUI::InformUser(const QString &error)
 {
-    MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+    MythPopupBox::showOkPopup(GetMythMainWindow(),
                               tr("ScanWizard"), error);
 }
 

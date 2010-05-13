@@ -1,4 +1,4 @@
-#include <mythcontext.h>
+#include <mythcorecontext.h>
 
 #include <unistd.h>
 
@@ -110,7 +110,7 @@ MythWelcomeSettings::MythWelcomeSettings()
     vcg->addChild(AutoStartFrontend());
 
     // this setting only makes sense on frontend only machines
-    if (gContext->IsFrontendOnly())
+    if (gCoreContext->IsFrontendOnly())
     {
         vcg->addChild(ShutdownWithBE());
     }

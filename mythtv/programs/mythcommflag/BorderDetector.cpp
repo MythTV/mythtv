@@ -3,7 +3,7 @@
 extern "C" {
 #include "avcodec.h"        /* AVPicture */
 }
-#include "mythcontext.h"    /* gContext */
+#include "mythcorecontext.h"    /* gContext */
 #include "compat.h"
 
 #include "CommDetector2.h"
@@ -31,7 +31,7 @@ BorderDetector::BorderDetector(void)
     , time_reported(false)
 {
     bzero(&analyze_time, sizeof(analyze_time));
-    debugLevel = gContext->GetNumSetting("BorderDetectorDebugLevel", 0);
+    debugLevel = gCoreContext->GetNumSetting("BorderDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
         VERBOSE(VB_COMMFLAG,

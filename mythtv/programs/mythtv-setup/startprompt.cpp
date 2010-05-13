@@ -3,7 +3,7 @@
 
 // MythTV stuff
 #include "exitcodes.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
@@ -35,7 +35,7 @@ StartPrompter::~StartPrompter()
 void StartPrompter::handleStart()
 {
     // Offer to stop the backend if sensible
-    if (gContext->BackendIsRunning() && gContext->IsMasterHost())
+    if (gCoreContext->BackendIsRunning() && gCoreContext->IsMasterHost())
     {
         backendRunningPrompt();
     }    
@@ -44,27 +44,27 @@ void StartPrompter::handleStart()
 void StartPrompter::leaveBackendRunning()
 {
     VERBOSE(VB_GENERAL, "Continuing with backend running");
-    gContext->SetSetting("AutoRestartBackend", "0");
+    gCoreContext->SetSetting("AutoRestartBackend", "0");
 }
 
 void StartPrompter::stopBackend()
 {
     VERBOSE(VB_GENERAL, "Trying to stop backend");
 
-    QString commandString = gContext->GetSetting("BackendStopCommand");
+    QString commandString = gCoreContext->GetSetting("BackendStopCommand");
     if (!commandString.isEmpty())
     {
         myth_system(commandString);
     }
-    gContext->SetSetting("AutoRestartBackend", "1");
+    gCoreContext->SetSetting("AutoRestartBackend", "1");
 }
 
 void StartPrompter::backendRunningPrompt(void)
 {
     bool backendIsRecording = false;
     // Get recording status
-    if (!gContext->IsConnectedToMaster() &&
-        gContext->ConnectToMasterServer(false))
+    if (!gCoreContext->IsConnectedToMaster() &&
+        gCoreContext->ConnectToMasterServer(false))
     {
         backendIsRecording = RemoteGetRecordingStatus(NULL, false);
     }
@@ -96,7 +96,7 @@ void StartPrompter::backendRunningPrompt(void)
 
     m_d->stk->AddScreen(dia);
 
-    QString commandString = gContext->GetSetting("BackendStopCommand");
+    QString commandString = gCoreContext->GetSetting("BackendStopCommand");
     if (!commandString.isEmpty())
     {
         // Only show option to stop backend if command is defined.

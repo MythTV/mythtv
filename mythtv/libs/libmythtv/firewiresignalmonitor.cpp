@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythdbcon.h"
 #include "atscstreamdata.h"
 #include "mpegtables.h"

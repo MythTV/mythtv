@@ -4,7 +4,6 @@
 #include <QKeyEvent>
 
 #include "virtualkeyboard_qt.h"
-#include "mythcontext.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
 #include "mythverbose.h"
@@ -235,7 +234,7 @@ void VirtualKeyboardQt::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions, false);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions, false);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -29,7 +29,7 @@ using namespace std;
 #include <QSize>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "filtermanager.h"
 #include "videoout_directfb.h"
 #include "frame.h"

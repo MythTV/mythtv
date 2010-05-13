@@ -6,7 +6,7 @@
 #include "tv_play.h"
 #include "recordingrule.h"
 #include "mythverbose.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "remoteutil.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
@@ -32,11 +32,11 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
              : ScheduleCommon(parent, "ViewScheduled")
 {
-    m_shortdateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
-    m_dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    m_showAll = !gContext->GetNumSetting("ViewSchedShowLevel", 0);
+    m_shortdateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    m_dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
+    m_showAll = !gCoreContext->GetNumSetting("ViewSchedShowLevel", 0);
 
     m_player = player;
 
@@ -52,13 +52,13 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
     m_defaultGroup = QDate();
     m_currentGroup = m_defaultGroup;
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 ViewScheduled::~ViewScheduled()
 {
-    gContext->removeListener(this);
-    gContext->SaveSetting("ViewSchedShowLevel", !m_showAll);
+    gCoreContext->removeListener(this);
+    gCoreContext->SaveSetting("ViewSchedShowLevel", !m_showAll);
 
     // if we have a player, we need to tell we are done
     if (m_player)

@@ -6,7 +6,6 @@
 
 #include "mythexp.h"
 
-class MythContext;
 class MythSocket;
 
 class MPUBLIC RemoteFile

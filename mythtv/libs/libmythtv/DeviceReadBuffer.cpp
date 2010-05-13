@@ -2,7 +2,7 @@
 using namespace std;
 
 #include "DeviceReadBuffer.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "tspacket.h"
 #include "compat.h"
 #include "mythverbose.h"
@@ -65,7 +65,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
     request_pause = false;
     paused        = false;
 
-    size          = gContext->GetNumSetting("HDRingbufferSize",
+    size          = gCoreContext->GetNumSetting("HDRingbufferSize",
                                             50 * TSPacket::SIZE) * 1024;
     used          = 0;
     dev_read_size = TSPacket::SIZE * (using_poll ? 256 : 48);

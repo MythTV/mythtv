@@ -3,7 +3,7 @@
 #include "PrePostRollFlagger.h"
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "programinfo.h"
 #include "NuppelVideoPlayer.h"
 
@@ -61,7 +61,7 @@ bool PrePostRollFlagger::go()
     if ((wereRecording) && (!stillRecording) && (secsSince < requiredHeadStart))
         return false;
 
-    aggressiveDetection = gContext->GetNumSetting("AggressiveCommDetect", 1);
+    aggressiveDetection = gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
 
     if (!nvp->InitVideo())
     {

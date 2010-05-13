@@ -45,7 +45,7 @@ using namespace std;
 #include "DisplayRes.h"
 #include "yuv2rgb.h"
 #include "uitypes.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "filtermanager.h"
 #define AVCODEC_AVCODEC_H   // prevent clash with QuickTime CodecType
 #include "videoout_quartz.h"
@@ -653,7 +653,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
         }
 
         // switch screen resolution if desired
-        if (gContext->GetNumSetting("UseVideoModes", 0))
+        if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         {
             DisplayRes *disp = DisplayRes::GetDisplayRes();
             disp->SwitchToVideo(parentData->srcWidth, parentData->srcHeight);
@@ -684,7 +684,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
         }
 
         // return screen resolution to normal
-        if (gContext->GetNumSetting("UseVideoModes", 0))
+        if (gCoreContext->GetNumSetting("UseVideoModes", 0))
             DisplayRes::GetDisplayRes()->SwitchToGUI();
 
         if (d)
@@ -1338,10 +1338,10 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     }
 
     // Global configuration options
-    data->scaleUpVideo = gContext->GetNumSetting("MacScaleUp", 1);
-    data->drawInWindow = gContext->GetNumSetting("GuiSizeForTV", 0);
-    data->windowedMode = gContext->GetNumSetting("RunFrontendInWindow", 0);
-    data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
+    data->scaleUpVideo = gCoreContext->GetNumSetting("MacScaleUp", 1);
+    data->drawInWindow = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
+    data->windowedMode = gCoreContext->GetNumSetting("RunFrontendInWindow", 0);
+    data->correctGamma = gCoreContext->GetNumSetting("MacGammaCorrect", 0);
 
     data->convertI420to2VUY = get_i420_2vuy_conv();
 
@@ -1373,25 +1373,25 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     {
         // Fullscreen will take over everything
         tmp = new VoqvFullscreen(data);
-        tmp->SetFrameSkip(gContext->GetNumSetting("MacFullSkip", 0));
+        tmp->SetFrameSkip(gCoreContext->GetNumSetting("MacFullSkip", 0));
         data->views.push_back(tmp);
     }
     else if (!data->windowedMode)
     {
         // Full GUI is hidden, only show the main window
         tmp = new VoqvMainWindow(data, 1.0);
-        tmp->SetFrameSkip(gContext->GetNumSetting("MacFullSkip", 0));
+        tmp->SetFrameSkip(gCoreContext->GetNumSetting("MacFullSkip", 0));
         data->views.push_back(tmp);
     }
     else
     {
         // Full GUI is shown, many output options
-        if (gContext->GetNumSetting("MacMainEnabled", 1))
+        if (gCoreContext->GetNumSetting("MacMainEnabled", 1))
         {
             float opacity =
-                gContext->GetNumSetting("MacMainOpacity", 100) / 100.0;
+                gCoreContext->GetNumSetting("MacMainOpacity", 100) / 100.0;
             tmp = new VoqvMainWindow(data, opacity);
-            tmp->SetFrameSkip(gContext->GetNumSetting("MacMainSkip", 0));
+            tmp->SetFrameSkip(gCoreContext->GetNumSetting("MacMainSkip", 0));
             data->views.push_back(tmp);
         }
         else
@@ -1401,24 +1401,24 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
             VERBOSE(VB_PLAYBACK, QString("Shrinking Main Window to 1x1"));
             SizeWindow(data->window, 1, 1, true);
         }
-        if (gContext->GetNumSetting("MacFloatEnabled", 0))
+        if (gCoreContext->GetNumSetting("MacFloatEnabled", 0))
         {
             float opacity =
-                gContext->GetNumSetting("MacFloatOpacity", 100) / 100.0;
+                gCoreContext->GetNumSetting("MacFloatOpacity", 100) / 100.0;
             tmp = new VoqvFloater(data, opacity);
-            tmp->SetFrameSkip(gContext->GetNumSetting("MacFloatSkip", 0));
+            tmp->SetFrameSkip(gCoreContext->GetNumSetting("MacFloatSkip", 0));
             data->views.push_back(tmp);
         }
-        if (gContext->GetNumSetting("MacDesktopEnabled", 0))
+        if (gCoreContext->GetNumSetting("MacDesktopEnabled", 0))
         {
             tmp = new VoqvDesktop(data);
-            tmp->SetFrameSkip(gContext->GetNumSetting("MacDesktopSkip", 0));
+            tmp->SetFrameSkip(gCoreContext->GetNumSetting("MacDesktopSkip", 0));
             data->views.push_back(tmp);
         }
-        if (gContext->GetNumSetting("MacDockEnabled", 1))
+        if (gCoreContext->GetNumSetting("MacDockEnabled", 1))
         {
             tmp = new VoqvDock(data);
-            tmp->SetFrameSkip(gContext->GetNumSetting("MacDockSkip", 3));
+            tmp->SetFrameSkip(gCoreContext->GetNumSetting("MacDockSkip", 3));
             data->views.push_back(tmp);
         }
     }

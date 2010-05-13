@@ -10,7 +10,7 @@
 #include "transcode.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "jobqueue.h"
 #include "exitcodes.h"
 
@@ -595,8 +595,8 @@ int Transcode::TranscodeFile(
         nvr->SetOption("width", newWidth);
         nvr->SetOption("height", newHeight);
 
-        nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
-        nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+        nvr->SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
+        nvr->SetOption("vbiformat", gCoreContext->GetSetting("VbiFormat"));
 
         nvr->SetFrameRate(video_frame_rate);
         nvr->SetVideoAspect(video_aspect);

@@ -53,8 +53,8 @@ bool V4LChannel::Init(QString &inputname, QString &startchannel, bool setchan)
 {
     if (setchan)
     {
-        SetFormat(gContext->GetSetting("TVFormat"));
-        SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
+        SetFormat(gCoreContext->GetSetting("TVFormat"));
+        SetDefaultFreqTable(gCoreContext->GetSetting("FreqTable"));
     }
     return ChannelBase::Init(inputname, startchannel, setchan);
 }
@@ -272,7 +272,7 @@ bool V4LChannel::InitializeInputs(void)
         return false;
 
     // Get global TVFormat setting
-    QString fmt = gContext->GetSetting("TVFormat");
+    QString fmt = gCoreContext->GetSetting("TVFormat");
     VERBOSE(VB_CHANNEL, QString("Global TVFormat Setting '%1'").arg(fmt));
     int videomode_v4l1 = format_to_mode(fmt.toUpper(), 1);
     int videomode_v4l2 = format_to_mode(fmt.toUpper(), 2);

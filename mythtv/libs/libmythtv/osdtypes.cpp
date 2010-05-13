@@ -2373,7 +2373,7 @@ OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
 
     QRect rect = QRect(0, 0, 0, 0);
     m_box = new OSDTypeBox("cc_background", rect, wmult, hmult);
-    m_ccbackground = gContext->GetNumSetting("CCBackground", 0);
+    m_ccbackground = gCoreContext->GetNumSetting("CCBackground", 0);
 }
 
 OSDTypeCC::~OSDTypeCC()

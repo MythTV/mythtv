@@ -1,5 +1,5 @@
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
@@ -99,12 +99,12 @@ void RawSettingsEditor::Load(void)
     QList<QString>settingsList = m_settings.keys();
     QList<QString>::iterator it = settingsList.begin();
 
-    // FIXME, optimize this using gContext->GetSettings()
+    // FIXME, optimize this using gCoreContext->GetSettings()
     // QMap<QString,QString> kv;
 
     while (it != settingsList.end())
     {
-        QString value = gContext->GetSetting(*it);
+        QString value = gCoreContext->GetSetting(*it);
         m_settingValues[*it] = value;
         m_origValues[*it] = value;
 
@@ -154,14 +154,14 @@ void RawSettingsEditor::Save(void)
             ((m_origValues.contains(it.key())) &&
              (!m_origValues.value(it.key()).isEmpty())))
         {
-            gContext->SaveSetting(it.key(), it.value());
+            gCoreContext->SaveSetting(it.key(), it.value());
             changed = true;
         }
 
         ++it;
     }
 
-    if (changed && (!gContext->IsMasterHost() || gContext->BackendIsRunning()))
+    if (changed && (!gCoreContext->IsMasterHost() || gCoreContext->BackendIsRunning()))
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
     Close();

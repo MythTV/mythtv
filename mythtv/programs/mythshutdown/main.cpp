@@ -214,11 +214,11 @@ QDateTime getDailyWakeupTime(QString sPeriod)
 
 bool isRecording()
 {
-    if (!gContext->IsConnectedToMaster())
+    if (!gCoreContext->IsConnectedToMaster())
     {
         VERBOSE(VB_IMPORTANT,
                 "isRecording: Attempting to connect to master server...");
-        if (!gContext->ConnectToMasterServer(false))
+        if (!gCoreContext->ConnectToMasterServer(false))
         {
             VERBOSE(VB_IMPORTANT,
                     "isRecording: Could not connect to master server!");
@@ -274,7 +274,7 @@ int getStatus(bool bWantRecStatus)
     if (isRunning("mtd"))
     {
         VERBOSE(VB_GENERAL, "MTD seems to be running. Let's see if it is busy");
-        int port = gContext->GetNumSetting("MTDPort", 2442);
+        int port = gCoreContext->GetNumSetting("MTDPort", 2442);
         QAbstractSocket *connection = new QTcpSocket();
         connection->connectToHost(QString("localhost"), port);
         if (!connection->waitForConnected(1000)) 
@@ -431,11 +431,11 @@ int setWakeupTime(QString sWakeupTime)
 
 int setScheduledWakeupTime()
 {
-    if (!gContext->IsConnectedToMaster())
+    if (!gCoreContext->IsConnectedToMaster())
     {
         VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
                               "Attempting to connect to master server...");
-        if (!gContext->ConnectToMasterServer(false))
+        if (!gCoreContext->ConnectToMasterServer(false))
         {
             VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
                                   "Could not connect to master server!");
@@ -449,11 +449,11 @@ int setScheduledWakeupTime()
     // set the wakeup time for the next scheduled recording
     if (!nextRecordingStart.isNull())
     {
-        int m_preRollSeconds = gContext->GetNumSetting("RecordPreRoll");
+        int m_preRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll");
         QDateTime restarttime = nextRecordingStart
             .addSecs((-1) * m_preRollSeconds);
 
-        int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
+        int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
 
@@ -621,17 +621,17 @@ int shutdown()
 
     int shutdownmode = 0; // default to poweroff no reboot
     QString nvramRestartCmd =
-            gContext->GetSetting("MythShutdownNvramRestartCmd", "");
+            gCoreContext->GetSetting("MythShutdownNvramRestartCmd", "");
 
     if (dtWakeupTime.isValid())
     {
         // dont't shutdown if we are within 15 mins of the next wakeup time
         if (dtCurrent.secsTo(dtWakeupTime) > 15 * 60)
         {
-            QString nvramCommand = gContext->GetSetting("MythShutdownNvramCmd",
+            QString nvramCommand = gCoreContext->GetSetting("MythShutdownNvramCmd",
                      "/usr/bin/nvram-wakeup --settime $time");
 
-            QString wakeup_timeformat = gContext->GetSetting(
+            QString wakeup_timeformat = gCoreContext->GetSetting(
                 "MythShutdownWakeupTimeFmt", "time_t");
 
             if (wakeup_timeformat == "time_t")
@@ -683,7 +683,7 @@ int shutdown()
         case 0:
         {
             VERBOSE(VB_IMPORTANT, "everything looks fine, shutting down ...");
-            QString poweroffCmd = gContext->GetSetting(
+            QString poweroffCmd = gCoreContext->GetSetting(
                 "MythShutdownPoweroff", "/sbin/poweroff");
             VERBOSE(VB_IMPORTANT, "..");
             VERBOSE(VB_IMPORTANT, ".");
@@ -707,7 +707,7 @@ int shutdown()
             VERBOSE(VB_IMPORTANT, "rebooting ...");
 
             QString rebootCmd =
-                    gContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
+                    gCoreContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
             myth_system(rebootCmd);
             res = 0;
             break;

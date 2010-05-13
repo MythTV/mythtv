@@ -6,7 +6,7 @@
 using namespace std;
 
 #define _WIN32_WINNT 0x500
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "videoout_d3d.h"
 #include "osd.h"
 #include "osdsurface.h"

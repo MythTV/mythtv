@@ -88,7 +88,7 @@ bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
 {
     if (hostname.isEmpty())
-        hostname = gContext->GetHostName();
+        hostname = gCoreContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
@@ -152,7 +152,7 @@ QStringList CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
     QStringList list;
 
     if (hostname.isEmpty())
-        hostname = gContext->GetHostName();
+        hostname = gCoreContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
@@ -453,7 +453,7 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
     vector<uint> list;
 
     if (hostname.isEmpty())
-        hostname = gContext->GetHostName();
+        hostname = gCoreContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =

@@ -176,7 +176,7 @@ void LiveTVChain::BroadcastUpdate(void)
 {
     QString message = QString("LIVETV_CHAIN UPDATE %1").arg(m_id);
     MythEvent me(message);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 }
 
 void LiveTVChain::DestroyChain(void)

@@ -29,7 +29,7 @@ match they will be ignored.
 #include <QDomDocument>
 
 #include "udpnotify.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythverbose.h"
 
 UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name, uint timeout)
@@ -81,7 +81,7 @@ UDPNotify::UDPNotify(uint udp_port) :
 
     m_socket->bind(udp_port);
 
-    m_db_osd_udpnotify_timeout = gContext->GetNumSetting("OSDNotifyTimeout", 5);
+    m_db_osd_udpnotify_timeout = gCoreContext->GetNumSetting("OSDNotifyTimeout", 5);
 }
 
 void UDPNotify::deleteLater(void)

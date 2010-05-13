@@ -7,7 +7,7 @@
 #include <QString>
 
 /* MythTV includes */
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythmainwindow.h"
 #include "myththemebase.h"
 #include "mythuihelper.h"
@@ -106,8 +106,8 @@ void MythAppearance::getSettings()
 
 void MythAppearance::getScreenInfo()
 {
-    m_xoffset_old = gContext->GetNumSetting("GuiOffsetX", 0);
-    m_yoffset_old = gContext->GetNumSetting("GuiOffsetY", 0);
+    m_xoffset_old = gCoreContext->GetNumSetting("GuiOffsetX", 0);
+    m_yoffset_old = gCoreContext->GetNumSetting("GuiOffsetY", 0);
     m_xoffset = m_xoffset_old;
     m_yoffset = m_yoffset_old;
 }
@@ -317,20 +317,20 @@ void MythAppearance::slotChangeCoarseFine()
 
 void MythAppearance::updateSettings()
 {
-    gContext->SaveSetting("GuiOffsetX", m_xoffset);
-    gContext->SaveSetting("GuiOffsetY", m_yoffset);
-    gContext->SaveSetting("GuiWidth", m_xsize);
-    gContext->SaveSetting("GuiHeight", m_ysize);
+    gCoreContext->SaveSetting("GuiOffsetX", m_xoffset);
+    gCoreContext->SaveSetting("GuiOffsetY", m_yoffset);
+    gCoreContext->SaveSetting("GuiWidth", m_xsize);
+    gCoreContext->SaveSetting("GuiHeight", m_ysize);
     VERBOSE(VB_IMPORTANT, "Updated screen size settings");
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
 void MythAppearance::slotResetSettings()
 {
-     gContext->SaveSetting("GuiOffsetX", 0);
-     gContext->SaveSetting("GuiOffsetY", 0);
-     gContext->SaveSetting("GuiWidth", 0);
-     gContext->SaveSetting("GuiHeight", 0);
+     gCoreContext->SaveSetting("GuiOffsetX", 0);
+     gCoreContext->SaveSetting("GuiOffsetY", 0);
+     gCoreContext->SaveSetting("GuiWidth", 0);
+     gCoreContext->SaveSetting("GuiHeight", 0);
      m_changed = false;
      GetMythMainWindow()->JumpTo("Reload Theme");
 }

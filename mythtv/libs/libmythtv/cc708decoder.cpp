@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdlib>
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "cc708decoder.h"
 
 #define LOC QString("CC708: ")

@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 // libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 
@@ -280,7 +280,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 */
 void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
 {
-    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     QString message = recinfo.title;
 

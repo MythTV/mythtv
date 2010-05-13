@@ -8,7 +8,7 @@ using namespace std;
 #include "videodisplayprofile.h" // for "1214"
 
 #include "dbutil.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "mythdb.h"
 #include "mythverbose.h"
@@ -457,9 +457,9 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 
 
     GetMythDB()->SetSuppressDBMessages(true);
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
 
-    if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+    if (!gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
     DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "MythTV",
@@ -471,7 +471,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 
     if (DBup->versionsBehind == 0)  // same schema
     {
-        gContext->ActivateSettingsCache(true);
+        gCoreContext->ActivateSettingsCache(true);
         GetMythDB()->SetSuppressDBMessages(false);
         return true;
     }
@@ -489,7 +489,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                                    upgradeIfNoUI, MINIMUM_DBMS_VERSION))
     {
         case MYTH_SCHEMA_USE_EXISTING:
-            gContext->ActivateSettingsCache(true);
+            gCoreContext->ActivateSettingsCache(true);
             GetMythDB()->SetSuppressDBMessages(false);
             return true;
         case MYTH_SCHEMA_ERROR:
@@ -503,7 +503,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(QString("ALTER DATABASE %1 DEFAULT"
                             " CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                    .arg(gContext->GetDatabaseParams().dbName)))
+                    .arg(gCoreContext->GetDatabaseParams().dbName)))
         MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
 
 
@@ -524,7 +524,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
         VERBOSE(VB_IMPORTANT, "Database Schema upgrade FAILED, unlocking.");
 
     DBUtil::unlockSchema(query);
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     GetMythDB()->SetSuppressDBMessages(false);
     return ret;
@@ -545,7 +545,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
  */
 static bool doUpgradeTVDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("DBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("DBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
     {
@@ -556,7 +556,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         if (!InitializeDatabase())
             return false;
-        dbver = gContext->GetSetting("DBSchemaVer");
+        dbver = gCoreContext->GetSetting("DBSchemaVer");
     }
 
     if (dbver.isEmpty() || dbver.toInt() <  1027)
@@ -1061,7 +1061,7 @@ NULL
         if (!performActualUpdate(updates, "1057", dbver))
             return false;
 
-        if (gContext->GetNumSetting("AutoCommercialFlag", 1))
+        if (gCoreContext->GetNumSetting("AutoCommercialFlag", 1))
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("UPDATE record SET autocommflag = 1;");
@@ -3081,8 +3081,8 @@ NULL
 
         MSqlQuery ppuq(MSqlQuery::InitCon());
 
-        int oncepriority = gContext->GetNumSetting("OnceRecPriority", 0);
-        int ccpriority   = gContext->GetNumSetting("CCRecPriority", 0);
+        int oncepriority = gCoreContext->GetNumSetting("OnceRecPriority", 0);
+        int ccpriority   = gCoreContext->GetNumSetting("CCRecPriority", 0);
 
         if (oncepriority)
         {
@@ -3738,7 +3738,7 @@ NULL
         // Perform the actual upgrade
         QString qtmp = QString(
             "ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-            .arg(gContext->GetDatabaseParams().dbName);
+            .arg(gCoreContext->GetDatabaseParams().dbName);
         QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
 tmp.constData(),
@@ -3988,7 +3988,7 @@ NULL
         QString qtmp = QString(
             "ALTER DATABASE %1 DEFAULT CHARACTER SET "
             "utf8 COLLATE utf8_general_ci;")
-            .arg(gContext->GetDatabaseParams().dbName);
+            .arg(gCoreContext->GetDatabaseParams().dbName);
         QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
 tmp.constData(),
@@ -4792,7 +4792,7 @@ NULL
             {
                 QString videosource = query.value(0).toString();
                 QString configpath =
-                                gContext->GetSetting(QString("XMLTVConfig.%1")
+                                gCoreContext->GetSetting(QString("XMLTVConfig.%1")
                                 .arg(videosource));
 
                 if (!configpath.isEmpty())
@@ -5161,7 +5161,7 @@ NULL
 
     if (dbver == "1253")
     {
-        if (gContext->GetNumSetting("have-nit-fix") == 1)
+        if (gCoreContext->GetNumSetting("have-nit-fix") == 1)
         {
             // User has previously applied patch from ticket #7486.
             VERBOSE (VB_IMPORTANT, "Sneaky schema change detected");
@@ -5220,7 +5220,7 @@ bool InitializeDatabase(void)
     VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
     QString qtmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8;")
-        .arg(gContext->GetDatabaseParams().dbName);
+        .arg(gCoreContext->GetDatabaseParams().dbName);
     QByteArray tmp = qtmp.toAscii();
 
     const char *updates[] = {

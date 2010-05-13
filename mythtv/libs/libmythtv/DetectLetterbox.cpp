@@ -4,11 +4,11 @@
 #include "DetectLetterbox.h"
 #include "NuppelVideoPlayer.h"
 #include "videoouttypes.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
 {
-    int dbAdjustFill = gContext->GetNumSetting("AdjustFill", 0);
+    int dbAdjustFill = gCoreContext->GetNumSetting("AdjustFill", 0);
     isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
     firstFrameChecked = 0;
     detectLetterboxDefaultMode = (AdjustFillMode) max((int) kAdjustFill_Off,
@@ -17,7 +17,7 @@ DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
     detectLetterboxPossibleHalfFrame = -1;
     detectLetterboxPossibleFullFrame = -1;
     detectLetterboxDetectedMode = nvp->GetAdjustFill();
-    detectLetterboxLimit = gContext->GetNumSetting("DetectLeterboxLimit", 75);
+    detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
     nupple_video_player = nvp;
 }
 

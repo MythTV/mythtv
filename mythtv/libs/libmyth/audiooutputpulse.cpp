@@ -547,7 +547,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                                      (char*)"under");
     if (set_initial_vol)
     {
-        int volume = gContext->GetNumSetting("MasterMixerVolume", 80);
+        int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
         pa_cvolume_set(&volume_control, audio_channels,
                        (float)volume * (float)PA_VOLUME_NORM / 100.0f);
     }

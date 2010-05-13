@@ -27,7 +27,6 @@
  */
 
 // MythTV headers
-#include <mythcontext.h>
 #include <mythdb.h>
 #include <mythmainwindow.h>
 
@@ -283,8 +282,8 @@ void KeyBindings::CommitAction(const ActionID &id)
         return;
     }
 
-    gContext->GetMainWindow()->ClearKey(id.GetContext(), id.GetAction());
-    gContext->GetMainWindow()->BindKey(id.GetContext(), id.GetAction(), keys);
+    GetMythMainWindow()->ClearKey(id.GetContext(), id.GetAction());
+    GetMythMainWindow()->BindKey(id.GetContext(), id.GetAction(), keys);
 }
 
 /** \fn KeyBindings::CommitJumppoint(const ActionID&)
@@ -312,8 +311,8 @@ void KeyBindings::CommitJumppoint(const ActionID &id)
         return;
     }
 
-    gContext->GetMainWindow()->ClearJump(id.GetAction());
-    gContext->GetMainWindow()->BindJump(id.GetAction(), keys);
+    GetMythMainWindow()->ClearJump(id.GetAction());
+    GetMythMainWindow()->BindJump(id.GetAction(), keys);
 }
 
 /** \fn KeyBindings::CommitChanges(void)

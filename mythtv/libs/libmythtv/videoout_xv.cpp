@@ -39,7 +39,7 @@ using namespace std;
 #include "util-xvmc.h"
 
 // MythTV General headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "filtermanager.h"
 #include "videodisplayprofile.h"
@@ -190,7 +190,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
 
-    if (gContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
 }
 

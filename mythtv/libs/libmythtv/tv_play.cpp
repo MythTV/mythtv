@@ -23,7 +23,7 @@ using namespace std;
 #include "osdsurface.h"
 #include "osdtypes.h"
 #include "osdlistbtntype.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
 #include "remoteutil.h"
@@ -218,7 +218,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
         delete p;
     }
 
-    gContext->sendPlaybackStart();
+    sendPlaybackStart();
 
     if (curProgram)
     {
@@ -302,7 +302,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
                 it++;
             }
             DialogCode ret = MythPopupBox::ShowButtonPopup(
-                gContext->GetMainWindow(), "",
+                GetMythMainWindow(), "",
                 tr("All Tuners are Busy.\nSelect a Current Recording"),
                 recTitles, kDialogCodeButton1);
 
@@ -409,7 +409,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
             list.push_back("0"); // do not force delete
             list.push_back(allowrerecord ? "1" : "0");
             MythEvent me("LOCAL_PBB_DELETE_RECORDINGS", list);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
         }
         else if (!curProgram->isVideo)
         {
@@ -433,7 +433,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
             ss->AddScreen(dlg);
     }
 
-    gContext->sendPlaybackEnd();
+    sendPlaybackEnd();
 
     VERBOSE(VB_PLAYBACK, LOC + "StartTV -- end");
 
@@ -993,7 +993,7 @@ TV::TV(void)
 
     osdMenuEntries = new TVOSDMenuEntryList();
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     playerLock.lockForWrite();
     player.push_back(new PlayerContext(kPlayerInUseID));
@@ -1024,8 +1024,8 @@ bool TV::Init(bool createWindow)
 
     if (createWindow)
     {
-        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
+        bool fullscreen = !gCoreContext->GetNumSetting("GuiSizeForTV", 0);
+        bool switchMode = gCoreContext->GetNumSetting("UseVideoModes", 0);
 
         saved_gui_bounds = QRect(GetMythMainWindow()->geometry().topLeft(),
                                  GetMythMainWindow()->size());
@@ -1048,7 +1048,7 @@ bool TV::Init(bool createWindow)
         if (!fullscreen)
         {
             int gui_width = 0, gui_height = 0;
-            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
+            gCoreContext->GetResolutionSetting("Gui", gui_width, gui_height);
             fullscreen |= (0 == gui_width && 0 == gui_height);
         }
 
@@ -1129,7 +1129,7 @@ TV::~TV(void)
         udpnotify = NULL;
     }
 
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 
     GetMythMainWindow()->SetDrawEnabled(true);
 
@@ -1145,7 +1145,7 @@ TV::~TV(void)
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- lock");
 
     // restore window to gui size and position
-    MythMainWindow* mwnd = gContext->GetMainWindow();
+    MythMainWindow* mwnd = GetMythMainWindow();
     mwnd->setGeometry(saved_gui_bounds);
     mwnd->setFixedSize(saved_gui_bounds.size());
     mwnd->show();
@@ -1200,10 +1200,10 @@ TV::~TV(void)
  */
 void TV::SaveChannelGroup(void)
 {
-    int remember_last_changrp = gContext->GetNumSetting("ChannelGroupRememberLast", 0);
+    int remember_last_changrp = gCoreContext->GetNumSetting("ChannelGroupRememberLast", 0);
 
     if (remember_last_changrp)
-       gContext->SaveSetting("ChannelGroupDefault", channel_group_id);
+       gCoreContext->SaveSetting("ChannelGroupDefault", channel_group_id);
 }
 
 /**
@@ -1279,7 +1279,7 @@ bool TV::LiveTV(bool showDialogs, bool startInGuide)
             query.prepare("SELECT keylist FROM keybindings WHERE "
                           "context = 'TV Playback' AND action = 'GUIDE' AND "
                           "hostname = :HOSTNAME ;");
-            query.bindValue(":HOSTNAME", gContext->GetHostName());
+            query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
             if (query.exec() && query.isActive() && query.size() > 0)
             {
@@ -2533,7 +2533,7 @@ void TV::timerEvent(QTimerEvent *te)
             pbinfo = mctx->recorder->GetRecording();
             if (pbinfo)
                 RemoteFillProginfo(pbinfo,
-                                   gContext->GetHostName());
+                                   gCoreContext->GetHostName());
         }
         if (!ok || !pbinfo)
         {
@@ -3369,7 +3369,7 @@ void TV::HandleSpeedChangeTimerEvent(void)
 
 bool TV::eventFilter(QObject *o, QEvent *e)
 {
-    const MythMainWindow *mainWindow = gContext->GetMainWindow();
+    const MythMainWindow *mainWindow = GetMythMainWindow();
     if (mainWindow == o)
     {
         if (e->type() == QEvent::Resize)
@@ -3552,7 +3552,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 
     if (ignoreKeys)
     {
-        handled = gContext->GetMainWindow()->TranslateKeyPress(
+        handled = GetMythMainWindow()->TranslateKeyPress(
                   "TV Playback", e, actions);
 
         if (handled || actions.isEmpty())
@@ -3619,7 +3619,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     if (actx->nvp && (actx->nvp->GetCaptionMode() == kDisplayTeletextMenu))
     {
         QStringList tt_actions;
-        handled = gContext->GetMainWindow()->TranslateKeyPress(
+        handled = GetMythMainWindow()->TranslateKeyPress(
                   "Teletext Menu", e, tt_actions);
 
         if (!handled && !tt_actions.isEmpty())
@@ -3639,7 +3639,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     if (actx->nvp && actx->nvp->GetInteractiveTV())
     {
         QStringList itv_actions;
-        handled = gContext->GetMainWindow()->TranslateKeyPress(
+        handled = GetMythMainWindow()->TranslateKeyPress(
                   "TV Playback", e, itv_actions);
 
         if (!handled && !itv_actions.isEmpty())
@@ -3656,7 +3656,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     }
     actx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    handled = gContext->GetMainWindow()->TranslateKeyPress(
+    handled = GetMythMainWindow()->TranslateKeyPress(
               "TV Playback", e, actions);
 
     if (handled || actions.isEmpty())
@@ -4992,7 +4992,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             QString message = QString("NETWORK_CONTROL ANSWER %1")
                                 .arg(infoStr);
             MythEvent me(message);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
         }
     }
 }
@@ -5059,7 +5059,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
         mctx->buffer->Unpause();
 
     bool ok = mctx->CreateNVP(
-        this, gContext->GetMainWindow(), mctx->GetState(), 0, &mctx->embedBounds);
+        this, GetMythMainWindow(), mctx->GetState(), 0, &mctx->embedBounds);
 
     if (ok)
     {
@@ -5186,7 +5186,7 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
     }
     else
     {
-        ok = ctx->CreateNVP(this, gContext->GetMainWindow(), desiredState,
+        ok = ctx->CreateNVP(this, GetMythMainWindow(), desiredState,
                             mctx->embedWinID, &mctx->embedBounds);
         ScheduleStateChange(ctx);
     }
@@ -5573,7 +5573,7 @@ void TV::PBPRestartMainNVP(PlayerContext *mctx)
     mctx->SetPIPState(kPIPOff);
     mctx->buffer->Seek(0, SEEK_SET);
 
-    if (mctx->CreateNVP(this, gContext->GetMainWindow(), mctx->GetState(),
+    if (mctx->CreateNVP(this, GetMythMainWindow(), mctx->GetState(),
                         mctx->embedWinID, &mctx->embedBounds))
     {
         ScheduleStateChange(mctx);
@@ -6533,7 +6533,7 @@ void TV::SwitchCards(PlayerContext *ctx,
             PlayerContext *mctx = GetPlayer(ctx, 0);
 
             if (ctx->CreateNVP(
-                    this, gContext->GetMainWindow(), ctx->GetState(),
+                    this, GetMythMainWindow(), ctx->GetState(),
                     mctx->embedWinID, &mctx->embedBounds, muted))
             {
                 ScheduleStateChange(ctx);
@@ -8121,7 +8121,7 @@ void TV::DoEditSchedule(int editType)
         mctx->nvp->getVideoOutput()->ResizeForGui();
     mctx->UnlockDeleteNVP(__FILE__, __LINE__);
     ReturnPlayerLock(actx);
-    MythMainWindow *mwnd = gContext->GetMainWindow();
+    MythMainWindow *mwnd = GetMythMainWindow();
     if (!db_use_gui_size_for_tv || !db_use_fixed_size)
     {
         mwnd->setGeometry(saved_gui_bounds.left(), saved_gui_bounds.top(),
@@ -8179,7 +8179,7 @@ void TV::EditSchedule(const PlayerContext *ctx, int editType)
     // on the main thread and avoid a deadlock on Win32
     QString message = QString("START_EPG %1").arg(editType);
     MythEvent* me = new MythEvent(message);
-    qApp->postEvent(gContext->GetMainWindow(), me);
+    qApp->postEvent(GetMythMainWindow(), me);
 }
 
 void TV::ChangeVolume(PlayerContext *ctx, bool up)
@@ -8551,7 +8551,7 @@ void TV::SetMuteTimer(PlayerContext *ctx, int timeout)
     // this will properly set the mute timer
     // otherwise it never fires on Win32
     QString message = QString("UNMUTE %1 %2").arg((long long)ctx).arg(timeout);
-    qApp->postEvent(gContext->GetMainWindow(), new MythEvent(message));
+    qApp->postEvent(GetMythMainWindow(), new MythEvent(message));
 }
 
 bool TV::MuteChannelChange(PlayerContext *ctx)
@@ -8878,7 +8878,7 @@ void TV::customEvent(QEvent *e)
         // Resize the window back to the MythTV Player size
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         PlayerContext *mctx;
-        MythMainWindow *mwnd = gContext->GetMainWindow();
+        MythMainWindow *mwnd = GetMythMainWindow();
 
         StopEmbedding(actx);                // Undo any embedding
 
@@ -11198,7 +11198,7 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
     else
     {
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), QObject::tr("Channel Change Error"),
+            GetMythMainWindow(), QObject::tr("Channel Change Error"),
             errorText);
     }
     ReturnOSDLock(ctx, osd);
@@ -11676,7 +11676,7 @@ bool TV::PromptRecGroupPassword(PlayerContext *ctx)
             .arg(lastProgram->recgroup);
         MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok,
                                                 recGroupPassword,
-                                                gContext->GetMainWindow());
+                                                GetMythMainWindow());
         pwd->exec();
         pwd->deleteLater();
         pwd = NULL;
@@ -11719,7 +11719,7 @@ void TV::DoDisplayJumpMenu(void)
     progLists.clear();
     vector<ProgramInfo*> *infoList = RemoteGetRecordedList(false);
 
-    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
+    bool LiveTVInAllPrograms = gCoreContext->GetNumSetting("LiveTVInAllPrograms",0);
     if (infoList)
     {
         QList<QString> titles_seen;

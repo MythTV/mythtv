@@ -274,12 +274,12 @@ void *PreviewGenerator::PreviewRun(void *param)
 
 bool PreviewGenerator::RemotePreviewSetup(void)
 {
-    QString server = gContext->GetSetting("MasterServerIP", "localhost");
-    int     port   = gContext->GetNumSetting("MasterServerPort", 6543);
+    QString server = gCoreContext->GetSetting("MasterServerIP", "localhost");
+    int     port   = gCoreContext->GetNumSetting("MasterServerPort", 6543);
     QString ann    = QString("ANN Monitor %2 %3")
-        .arg(gContext->GetHostName()).arg(false);
+        .arg(gCoreContext->GetHostName()).arg(false);
 
-    serverSock = gContext->ConnectCommandSocket(server, port, ann);
+    serverSock = gCoreContext->ConnectCommandSocket(server, port, ann);
     return serverSock;
 }
 
@@ -321,7 +321,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     }
     else
     {
-        ok = gContext->SendReceiveStringList(strlist);
+        ok = gCoreContext->SendReceiveStringList(strlist);
     }
 
     if (!ok || strlist.empty() || (strlist[0] != "OK"))
@@ -447,8 +447,8 @@ bool PreviewGenerator::SavePreview(QString filename,
     bool desired_size_exactly_specified = true;
     if ((ppw < 1.0f) && (pph < 1.0f))
     {
-        ppw = gContext->GetNumSetting("PreviewPixmapWidth",  320);
-        pph = gContext->GetNumSetting("PreviewPixmapHeight", 240);
+        ppw = gCoreContext->GetNumSetting("PreviewPixmapWidth",  320);
+        pph = gCoreContext->GetNumSetting("PreviewPixmapHeight", 240);
         desired_size_exactly_specified = false;
     }
 
@@ -514,7 +514,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
         timeInSeconds = true;
         int startEarly = 0;
         int programDuration = 0;
-        int preroll =  gContext->GetNumSetting("RecordPreRoll", 0);
+        int preroll =  gCoreContext->GetNumSetting("RecordPreRoll", 0);
         if (programInfo.startts.isValid() &&
             programInfo.endts.isValid() &&
             (programInfo.startts != programInfo.endts))

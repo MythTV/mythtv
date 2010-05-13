@@ -16,7 +16,7 @@ using namespace std;
 #include <QFile>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythtimer.h"
 #include "mythdb.h"
 
@@ -116,7 +116,7 @@ QString expandURLString(const QString &url)
         {
             QString no_mapping("no_URL_mapping");
             QString search_string = expandtarget.cap(1);
-            QString expanded_text = gContext->GetSetting(
+            QString expanded_text = gCoreContext->GetSetting(
                     QString(BASEURLMAP_START) + search_string, no_mapping);
             if (expanded_text != no_mapping)
             {

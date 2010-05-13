@@ -39,7 +39,7 @@ using namespace std;
 #include <QFileInfo>
 
 // Myth headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "exitcodes.h"
 #include "mythxdisplay.h"
 #include "mythmediamonitor.h"
@@ -397,11 +397,11 @@ static void print_timezone_info(QString master_zone_id, QString local_zone_id,
  */
 bool checkTimeZone(void)
 {
-    if (gContext->IsMasterBackend())
+    if (gCoreContext->IsMasterBackend())
         return true;
 
     QStringList master_settings(QString("QUERY_TIME_ZONE"));
-    if (!gContext->SendReceiveStringList(master_settings))
+    if (!gCoreContext->SendReceiveStringList(master_settings))
     {
         VERBOSE(VB_IMPORTANT, "Unable to determine master backend time zone "
                               "settings.  If those settings differ from local "
@@ -1138,6 +1138,18 @@ QString getSymlinkTarget(const QString &start_file,
 #endif
 
     return (!fi.isSymLink()) ? cur_file : QString::null;
+}
+
+void sendPlaybackStart(void)
+{
+    MythEvent me(QString("PLAYBACK_START %1").arg(gCoreContext->GetHostName()));
+    gCoreContext->dispatchNow(me);
+}
+
+void sendPlaybackEnd(void)
+{
+    MythEvent me(QString("PLAYBACK_END %1").arg(gCoreContext->GetHostName()));
+    gCoreContext->dispatchNow(me);
 }
 
 bool IsMACAddress(QString MAC)

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "audiooutputdx.h"
 
 #include <windows.h>

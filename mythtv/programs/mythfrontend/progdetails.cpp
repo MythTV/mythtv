@@ -4,7 +4,7 @@
 #include <QFile>
 
 // myth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdialogbox.h"
 #include "uitypes.h"
 #include "recordingrule.h"
@@ -49,7 +49,7 @@ bool ProgDetails::Create(void)
 
     SetFocusWidget(m_browser);
 
-    float zoom = gContext->GetSetting("ProgDetailsZoom", "1.0").toFloat();
+    float zoom = gCoreContext->GetSetting("ProgDetailsZoom", "1.0").toFloat();
     m_browser->SetZoom(zoom);
 
     return true;
@@ -117,7 +117,7 @@ void ProgDetails::Init()
 ProgDetails::~ProgDetails(void)
 {
     float zoom = m_browser->GetZoom();
-    gContext->SaveSetting("ProgDetailsZoom", QString().setNum(zoom));
+    gCoreContext->SaveSetting("ProgDetailsZoom", QString().setNum(zoom));
 }
 
 bool ProgDetails::keyPressEvent(QKeyEvent *event)
@@ -206,7 +206,7 @@ void ProgDetails::loadPage(void)
     loadHTML();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString fullDateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
+    QString fullDateFormat = gCoreContext->GetSetting("DateFormat", "M/d/yyyy");
     if (!fullDateFormat.contains("yyyy"))
         fullDateFormat += " yyyy";
     QString category_type, showtype, year, epinum, rating, colorcode,

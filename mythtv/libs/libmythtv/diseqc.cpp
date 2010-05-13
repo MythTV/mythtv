@@ -16,7 +16,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "diseqc.h"
@@ -1981,8 +1981,8 @@ double DiSEqCDevRotor::CalculateAzimuth(double angle) const
     // Thomas Bergwinkl <Thomas.Bergwinkl@t-online.de>
 
     // Earth Station Latitude and Longitude in radians
-    double P  = gContext->GetSetting("Latitude",  "").toFloat() * TO_RADS;
-    double Ue = gContext->GetSetting("Longitude", "").toFloat() * TO_RADS;
+    double P  = gCoreContext->GetSetting("Latitude",  "").toFloat() * TO_RADS;
+    double Ue = gCoreContext->GetSetting("Longitude", "").toFloat() * TO_RADS;
 
     // Satellite Longitude in radians
     double Us = angle * TO_RADS;

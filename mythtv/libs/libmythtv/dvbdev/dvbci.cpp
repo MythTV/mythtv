@@ -40,7 +40,6 @@
 
 #include <QString>
 
-#include "mythcontext.h"
 #include "mythverbose.h"
 
 #ifndef MALLOC

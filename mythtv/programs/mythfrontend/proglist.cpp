@@ -13,7 +13,7 @@ using namespace std;
 #include <QRegExp>
 
 // MythTV
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "remoteutil.h"
 #include "scheduledrecording.h"
 #include "recordingrule.h"
@@ -40,11 +40,11 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_startTime = QDateTime::currentDateTime();
     m_searchTime = m_startTime;
 
-    m_dayFormat = gContext->GetSetting("DateFormat");
-    m_hourFormat = gContext->GetSetting("TimeFormat");
+    m_dayFormat = gCoreContext->GetSetting("DateFormat");
+    m_hourFormat = gCoreContext->GetSetting("TimeFormat");
     m_fullDateFormat = m_dayFormat + ' ' + m_hourFormat;
-    m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
-    m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
+    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     m_schedText = m_curviewText = m_positionText = m_messageText = NULL;
     m_positionText = NULL;
@@ -83,12 +83,12 @@ ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
     m_startTime = QDateTime::currentDateTime();
     m_searchTime = m_startTime;
 
-    m_dayFormat = gContext->GetSetting("DateFormat");
-    m_hourFormat = gContext->GetSetting("TimeFormat");
-    m_timeFormat = gContext->GetSetting("ShortDateFormat") + ' ' + m_hourFormat;
+    m_dayFormat = gCoreContext->GetSetting("DateFormat");
+    m_hourFormat = gCoreContext->GetSetting("TimeFormat");
+    m_timeFormat = gCoreContext->GetSetting("ShortDateFormat") + ' ' + m_hourFormat;
     m_fullDateFormat = m_dayFormat + ' ' + m_hourFormat;
-    m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
-    m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
+    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     m_schedText = m_curviewText = m_positionText = m_messageText = NULL;
     m_positionText = NULL;
@@ -107,7 +107,7 @@ ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
 ProgLister::~ProgLister()
 {
     m_itemList.clear();
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 }
 
 bool ProgLister::Create()
@@ -161,7 +161,7 @@ bool ProgLister::Create()
     if (m_schedText)
         m_schedText->SetText(value);
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 
     LoadInBackground();
 
@@ -197,7 +197,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
     bool needUpdate = false;
 
     QStringList actions;
-    handled = gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
@@ -2390,8 +2390,8 @@ void EditPowerSearchPopup::initLists(void)
     }
 
     // channel
-    QString channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
-    QString channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    QString channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
+    QString channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     m_channels.clear();
     new MythUIButtonListItem(m_channelList, tr("(Any Channel)"), NULL, false);

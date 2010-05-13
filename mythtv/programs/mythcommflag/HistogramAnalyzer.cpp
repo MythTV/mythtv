@@ -5,7 +5,7 @@
 #include <cmath>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "NuppelVideoPlayer.h"
 
 // Commercial Flagging headers
@@ -173,7 +173,7 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
      *      0: no debugging
      *      1: cache frame information into debugdata [1 file]
      */
-    debugLevel = gContext->GetNumSetting("HistogramAnalyzerDebugLevel", 0);
+    debugLevel = gCoreContext->GetNumSetting("HistogramAnalyzerDebugLevel", 0);
 
     if (debugLevel >= 1)
     {

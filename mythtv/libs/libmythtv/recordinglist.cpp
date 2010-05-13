@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
 // MythTV headers
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "util.h"
 #include "recordinginfo.h"
@@ -103,7 +103,7 @@ bool LoadFromScheduler(
     destination.clear();
     hasConflicts = false;
 
-    if (gContext->IsBackend())
+    if (gCoreContext->IsBackend())
         return false;
 
     QString query;
@@ -118,7 +118,7 @@ bool LoadFromScheduler(
     }
 
     QStringList slist( query );
-    if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
+    if (!gCoreContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
         VERBOSE(VB_IMPORTANT,
                 "LoadFromScheduler(): Error querying master.");

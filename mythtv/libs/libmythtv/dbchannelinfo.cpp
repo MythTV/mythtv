@@ -9,7 +9,7 @@
 
 // MythTV headers
 #include "dbchannelinfo.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mpegstreamdata.h" // for CryptStatus
@@ -103,7 +103,7 @@ bool PixmapChannel::CacheChannelIcon(void)
         return true;
 
     // Get address of master backed
-    QString url = gContext->GetMasterHostPrefix();
+    QString url = gCoreContext->GetMasterHostPrefix();
     if (url.length() < 1)
     {
         icon.clear();

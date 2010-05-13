@@ -31,7 +31,6 @@ using namespace std;
 // MythTV headers
 #include "mythmediamonitor.h"
 #include "mediamonitor-unix.h"
-#include "mythcontext.h"
 #include "mythdialogs.h"
 #include "mythconfig.h"
 #include "mythcdrom.h"

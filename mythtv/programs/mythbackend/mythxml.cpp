@@ -19,7 +19,7 @@
 #include "mythxml.h"
 #include "backendutil.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
@@ -62,7 +62,7 @@ MythXML::MythXML( UPnpDevice *pDevice , const QString &sSharePath)
     m_pSched    = sched;
     m_pExpirer  = expirer;
 
-    m_nPreRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
+    m_nPreRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
 
     // Add any event variables...
 
@@ -465,7 +465,7 @@ void MythXML::PutSetting( HTTPRequest *pRequest )
     {
         NameValues list;
 
-        if ( gContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
+        if ( gCoreContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
             list.push_back( NameValue( "Result", "True" ));
         else
             list.push_back( NameValue( "Result", "False" ));
@@ -885,7 +885,7 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
     if (!query.exec())
         MythDB::DBError("Select ArtId", query);
 
-    QString musicbasepath = gContext->GetSetting("MusicLocation", "");
+    QString musicbasepath = gCoreContext->GetSetting("MusicLocation", "");
 
     if (query.next())
     {
@@ -1090,7 +1090,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         return;
     }
 
-    if ( pInfo->hostname != gContext->GetHostName())
+    if ( pInfo->hostname != gCoreContext->GetHostName())
     {
         // We only handle requests for local resources
         delete pInfo;
@@ -1291,7 +1291,7 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
             return;
         }
 
-        if ( pInfo->hostname != gContext->GetHostName())
+        if ( pInfo->hostname != gCoreContext->GetHostName())
         {
             // We only handle requests for local resources
 
@@ -1377,7 +1377,7 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
 
     if (pData == NULL)
     {
-        QString sBasePath = gContext->GetSetting( "MusicLocation", "");
+        QString sBasePath = gCoreContext->GetSetting( "MusicLocation", "");
 
         // ------------------------------------------------------------------
         // Load Track's FileName
@@ -1542,7 +1542,7 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
                          = "no-cache=\"Ext\", max-age = 5000";
 
     QString sPin         = pRequest->m_mapParams[ "Pin" ];
-    QString sSecurityPin = gContext->GetSetting( "SecurityPin", "");
+    QString sSecurityPin = gCoreContext->GetSetting( "SecurityPin", "");
 
     if ( sSecurityPin.isEmpty() )
     {
@@ -1558,11 +1558,11 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
         return;
     }
 
-    DatabaseParams params = gContext->GetDatabaseParams();
+    DatabaseParams params = gCoreContext->GetDatabaseParams();
 
     // Check for DBHostName of "localhost" and change to public name or IP
 
-    QString sServerIP = gContext->GetSetting( "BackendServerIP", "localhost" );
+    QString sServerIP = gCoreContext->GetSetting( "BackendServerIP", "localhost" );
     QString sPeerIP   = pRequest->GetPeerAddress();
 
     if ((params.dbHostName == "localhost") &&
@@ -1702,8 +1702,8 @@ void MythXML::FillChannelInfo( QDomElement &channel,
     if (pInfo)
     {
 /*
-        QString sHostName = gContext->GetHostName();
-        QString sPort     = gContext->GetSettingOnHost( "BackendStatusPort",
+        QString sHostName = gCoreContext->GetHostName();
+        QString sPort     = gCoreContext->GetSettingOnHost( "BackendStatusPort",
                                                         sHostName);
         QString sIconURL  = QString( "http://%1:%2/getChannelIcon?ChanId=%3" )
                                    .arg( sHostName )

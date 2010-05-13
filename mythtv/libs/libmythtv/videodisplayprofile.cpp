@@ -3,7 +3,7 @@
 using namespace std;
 
 #include "videodisplayprofile.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "videooutbase.h"
@@ -219,7 +219,7 @@ VideoDisplayProfile::VideoDisplayProfile()
     QMutexLocker locker(&safe_lock);
     init_statics();
 
-    QString hostname    = gContext->GetHostName();
+    QString hostname    = gCoreContext->GetHostName();
     QString cur_profile = GetDefaultProfileName(hostname);
     uint    groupid     = GetProfileGroupID(cur_profile, hostname);
 
@@ -775,7 +775,7 @@ QStringList VideoDisplayProfile::GetProfiles(const QString &hostname)
 QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 {
     QString tmp =
-        gContext->GetSettingOnHost("DefaultVideoPlaybackProfile", hostname);
+        gCoreContext->GetSettingOnHost("DefaultVideoPlaybackProfile", hostname);
 
     QStringList profiles = GetProfiles(hostname);
 
@@ -790,7 +790,7 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 
         if (!tmp.isEmpty())
         {
-            gContext->SaveSettingOnHost(
+            gCoreContext->SaveSettingOnHost(
                 "DefaultVideoPlaybackProfile", tmp, hostname);
         }
     }
@@ -801,7 +801,7 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
 void VideoDisplayProfile::SetDefaultProfileName(
     const QString &profilename, const QString &hostname)
 {
-    gContext->SaveSettingOnHost(
+    gCoreContext->SaveSettingOnHost(
         "DefaultVideoPlaybackProfile", profilename, hostname);
 }
 

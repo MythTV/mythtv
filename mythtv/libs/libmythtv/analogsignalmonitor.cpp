@@ -6,7 +6,7 @@
 #include <sys/ioctl.h>
 
 #include "videodev_myth.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"
 

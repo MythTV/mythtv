@@ -4,7 +4,6 @@
 
 #include "mythcdrom.h"
 #include "mythcdrom-freebsd.h"
-#include "mythcontext.h"
 #include "mythverbose.h"
 
 

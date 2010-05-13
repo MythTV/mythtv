@@ -18,7 +18,7 @@ using namespace std;
 // MythTV headers
 #include "housekeeper.h"
 #include "jobqueue.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythdb.h"
 #include "util.h"
 #include "compat.h"
@@ -168,17 +168,17 @@ void HouseKeeper::RunHouseKeeping(void)
 
     while (1)
     {
-        gContext->LogEntry("mythbackend", LP_DEBUG,
+        gCoreContext->LogEntry("mythbackend", LP_DEBUG,
                            "Running housekeeping thread", "");
 
         // These tasks are only done from the master backend
         if (isMaster)
         {
             // Clean out old database entries
-            if (gContext->GetNumSetting("LogEnabled", 0) &&
-                gContext->GetNumSetting("LogCleanEnabled", 0))
+            if (gCoreContext->GetNumSetting("LogEnabled", 0) &&
+                gCoreContext->GetNumSetting("LogCleanEnabled", 0))
             {
-                period = gContext->GetNumSetting("LogCleanPeriod",1);
+                period = gCoreContext->GetNumSetting("LogCleanPeriod",1);
                 if (wantToRun("LogClean", period, 0, 24))
                 {
                     VERBOSE(VB_GENERAL, "Running LogClean");
@@ -188,7 +188,7 @@ void HouseKeeper::RunHouseKeeping(void)
             }
 
             // Run mythfilldatabase to grab the TV listings
-            if (gContext->GetNumSetting("MythFillEnabled", 0))
+            if (gCoreContext->GetNumSetting("MythFillEnabled", 0))
             {
                 if (HouseKeeper_filldb_running)
                 {
@@ -197,8 +197,8 @@ void HouseKeeper::RunHouseKeeping(void)
                 }
                 else
                 {
-                    period = gContext->GetNumSetting("MythFillPeriod", 1);
-                    minhr = gContext->GetNumSetting("MythFillMinHour", -1);
+                    period = gCoreContext->GetNumSetting("MythFillPeriod", 1);
+                    minhr = gCoreContext->GetNumSetting("MythFillMinHour", -1);
                     if (minhr == -1)
                     {
                         minhr = 0;
@@ -206,7 +206,7 @@ void HouseKeeper::RunHouseKeeping(void)
                     }
                     else
                     {
-                        maxhr = gContext->GetNumSetting("MythFillMaxHour", 24);
+                        maxhr = gCoreContext->GetNumSetting("MythFillMaxHour", 24);
                     }
 
                     bool grabberSupportsNextTime = false;
@@ -228,10 +228,10 @@ void HouseKeeper::RunHouseKeeping(void)
 
                     bool runMythFill = false;
                     if (grabberSupportsNextTime &&
-                        gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+                        gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
                     {
                         QDateTime nextRun = QDateTime::fromString(
-                            gContext->GetSetting("MythFillSuggestedRunTime",
+                            gCoreContext->GetSetting("MythFillSuggestedRunTime",
                             "1970-01-01T00:00:00"), Qt::ISODate);
                         QDateTime lastRun = getLastRun("MythFillDB");
                         QDateTime now = QDateTime::currentDateTime();
@@ -249,7 +249,7 @@ void HouseKeeper::RunHouseKeeping(void)
                     if (runMythFill)
                     {
                         QString msg = "Running mythfilldatabase";
-                        gContext->LogEntry("mythbackend", LP_DEBUG, msg, "");
+                        gCoreContext->LogEntry("mythbackend", LP_DEBUG, msg, "");
                         VERBOSE(VB_GENERAL, msg);
                         runFillDatabase();
                         updateLastrun("MythFillDB");
@@ -267,7 +267,7 @@ void HouseKeeper::RunHouseKeeping(void)
             }
         }
 
-        dbTag = QString("JobQueueRecover-%1").arg(gContext->GetHostName());
+        dbTag = QString("JobQueueRecover-%1").arg(gCoreContext->GetHostName());
         if (wantToRun(dbTag, 1, 0, 24))
         {
             JobQueue::RecoverOldJobsInQueue();
@@ -276,7 +276,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
         if (wantToRun("DBCleanup", 1, 0, 24))
         {
-            gContext->GetDBManager()->PurgeIdleConnections();
+            gCoreContext->GetDBManager()->PurgeIdleConnections();
         }
 
         initialRun = false;
@@ -287,8 +287,8 @@ void HouseKeeper::RunHouseKeeping(void)
 
 void HouseKeeper::flushLogs()
 {
-    int numdays = gContext->GetNumSetting("LogCleanDays", 14);
-    int maxdays = gContext->GetNumSetting("LogCleanMax", 30);
+    int numdays = gCoreContext->GetNumSetting("LogCleanDays", 14);
+    int maxdays = gCoreContext->GetNumSetting("LogCleanMax", 30);
 
     QDateTime days = QDateTime::currentDateTime();
     days = days.addDays(0 - numdays);
@@ -322,10 +322,10 @@ void *HouseKeeper::runMFDThread(void *param)
 
 void HouseKeeper::RunMFD(void)
 {
-    QString mfpath = gContext->GetSetting("MythFillDatabasePath",
+    QString mfpath = gCoreContext->GetSetting("MythFillDatabasePath",
                                           "mythfilldatabase");
-    QString mfarg = gContext->GetSetting("MythFillDatabaseArgs", "");
-    QString mflog = gContext->GetSetting("MythFillDatabaseLog",
+    QString mfarg = gCoreContext->GetSetting("MythFillDatabaseArgs", "");
+    QString mflog = gCoreContext->GetSetting("MythFillDatabaseLog",
                                          "/var/log/mythfilldatabase.log");
 
     if (mfpath == "mythfilldatabase")
@@ -391,7 +391,7 @@ void HouseKeeper::CleanupMyOldRecordings(void)
     query.prepare("DELETE FROM inuseprograms "
                   "WHERE hostname = :HOSTNAME AND "
                     "( recusage = 'recorder' OR recusage LIKE 'Unknown %' );");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec())
         MythDB::DBError("HouseKeeper::CleanupMyOldRecordings", query);
 }
@@ -608,7 +608,7 @@ void HouseKeeper::CleanupProgramListings(void)
     if (!query.exec())
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
-    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 10);
+    int cleanOldRecorded = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);
 
     query.prepare("DELETE FROM oldrecorded WHERE "
                   "recstatus <> :RECORDED AND duplicate = 0 AND "

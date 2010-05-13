@@ -34,7 +34,7 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 #include "mythxdisplay.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "dithertable.h"
 
 extern "C" {
@@ -87,11 +87,11 @@ VideoOutWindow::VideoOutWindow() :
     embedding(false), needrepaint(false),
     allowpreviewepg(true), pip_state(kPIPOff)
 {
-    db_pip_size = gContext->GetNumSetting("PIPSize", 26);
+    db_pip_size = gCoreContext->GetNumSetting("PIPSize", 26);
 
-    db_move = QPoint(gContext->GetNumSetting("xScanDisplacement", 0),
-                     gContext->GetNumSetting("yScanDisplacement", 0));
-    db_use_gui_size = gContext->GetNumSetting("GuiSizeForTV", 0);
+    db_move = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
+                     gCoreContext->GetNumSetting("yScanDisplacement", 0));
+    db_use_gui_size = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
 
     QDesktopWidget *desktop = NULL;
     if (QApplication::type() == QApplication::GuiClient)
@@ -103,7 +103,7 @@ VideoOutWindow::VideoOutWindow() :
         using_xinerama  = (GetNumberXineramaScreens() > 1);
         if (using_xinerama)
         {
-            screen_num = gContext->GetNumSetting("XineramaScreen", screen_num);
+            screen_num = gCoreContext->GetNumSetting("XineramaScreen", screen_num);
             if (screen_num >= desktop->numScreens())
                 screen_num = 0;
         }
@@ -613,9 +613,9 @@ void VideoOutWindow::SetVideoScalingAllowed(bool change)
     if (change)
     {
         db_scale_vert =
-            gContext->GetNumSetting("VertScanPercentage", 0) * 0.01f;
+            gCoreContext->GetNumSetting("VertScanPercentage", 0) * 0.01f;
         db_scale_horiz =
-            gContext->GetNumSetting("HorizScanPercentage", 0) * 0.01f;
+            gCoreContext->GetNumSetting("HorizScanPercentage", 0) * 0.01f;
         db_scaling_allowed = true;
     }
     else

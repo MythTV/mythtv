@@ -9,7 +9,7 @@
 #include "mythverbose.h"
 
 // libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "programinfo.h"
 
 // libmythtv
@@ -32,8 +32,8 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
     m_nowDateTime = QDateTime::currentDateTime();
     m_startDateTime = m_nowDateTime;
 
-    m_dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateformat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     m_daysahead = 0;
     m_titleEdit = NULL;
@@ -68,9 +68,9 @@ bool ManualSchedule::Create(void)
         return false;
     }
 
-    QString longChannelFormat = gContext->GetSetting("LongChannelFormat",
+    QString longChannelFormat = gCoreContext->GetSetting("LongChannelFormat",
                                                      "<num> <name>");
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+    QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
     DBChanList channels = ChannelUtil::GetChannels(0, false, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
@@ -108,7 +108,7 @@ bool ManualSchedule::Create(void)
     m_starthourSpin->SetRange(0,23,1);
     m_starthourSpin->SetValue(thisTime.hour());
     int minute_increment =
-        gContext->GetNumSetting("ManualScheduleMinuteIncrement", 5);
+        gCoreContext->GetNumSetting("ManualScheduleMinuteIncrement", 5);
     m_startminuteSpin->SetRange(0, 60-minute_increment, minute_increment);
     m_startminuteSpin->SetValue((thisTime.minute()/5)*5);
     m_durationSpin->SetRange(5,360,5);
@@ -202,7 +202,7 @@ void ManualSchedule::recordClicked(void)
 {
     ProgramInfo p;
 
-    QString channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    QString channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     p.chanid = m_chanids[m_channelList->GetCurrentPos()];
 
     MSqlQuery query(MSqlQuery::InitCon());

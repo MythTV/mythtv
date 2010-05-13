@@ -62,7 +62,7 @@ OSD::OSD() :
     QObject(),                          m_listener(NULL),
     osdBounds(),                        frameint(0),
     needPillarBox(false),
-    themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
+    themepath(FindTheme(gCoreContext->GetSetting("OSDTheme"))),
     wscale(1.0f),                       fscale(1.0f),
     m_themeinfo(new ThemeInfo(themepath)),
     m_themeaspect(4.0f/3.0f),
@@ -185,7 +185,7 @@ void OSD::Init(const QRect &osd_bounds, int   frameRate,
     if (themepath.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Couldn't find OSD theme: "
-                <<gContext->GetSetting("OSDTheme"));
+                <<gCoreContext->GetSetting("OSDTheme"));
         InitDefaults();
         return;
     }
@@ -194,7 +194,7 @@ void OSD::Init(const QRect &osd_bounds, int   frameRate,
     if (!LoadTheme())
     {
         VERBOSE(VB_IMPORTANT, "Couldn't load OSD theme: "
-                <<gContext->GetSetting("OSDTheme")<<" at "<<themepath);
+                <<gCoreContext->GetSetting("OSDTheme")<<" at "<<themepath);
     }
 
     InitDefaults();
@@ -238,7 +238,7 @@ bool OSD::InitCC608(void)
         QString name = "cc_font";
         int fontsize = m_themeinfo->BaseRes()->height() / 27;
 
-        ccfont = LoadFont(gContext->GetSetting("OSDCCFont"), fontsize);
+        ccfont = LoadFont(gCoreContext->GetSetting("OSDCCFont"), fontsize);
 
         if (ccfont)
             fontMap[name] = ccfont;
@@ -293,7 +293,7 @@ bool OSD::InitCC708(void)
 
     // Create fonts...
     TTFFont* ccfonts[48];
-    uint z = gContext->GetNumSetting("OSDCC708TextZoom", 100) *
+    uint z = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100) *
                     m_themeinfo->BaseRes()->height();
     uint fontsizes[3] = { z / 3600, z / 2900, z / 2200 };
     for (uint i = 0; i < 48; i++)
@@ -360,7 +360,7 @@ bool OSD::InitTeletext(void)
     if (!font)
     {
         int fontsize = (size->height() - (2 * safe_y)) / 26;
-        font = LoadFont(gContext->GetSetting("OSDCCFont"), fontsize);
+        font = LoadFont(gCoreContext->GetSetting("OSDCCFont"), fontsize);
 
         if (font)
             fontMap[fontname] = font;
@@ -468,7 +468,7 @@ void OSD::SetTextSubtitles(const QStringList &lines)
     TTFFont *font = GetFont(fontname);
     if (!font)
     {
-        font = LoadFont(gContext->GetSetting("OSDCCFont"), SUBTITLE_FONT_SIZE);
+        font = LoadFont(gCoreContext->GetSetting("OSDCCFont"), SUBTITLE_FONT_SIZE);
 
         if (font)
         {
@@ -536,7 +536,7 @@ bool OSD::InitMenu(void)
 
     if (!actfont)
     {
-        actfont = LoadFont(gContext->GetSetting("OSDFont"), 16);
+        actfont = LoadFont(gCoreContext->GetSetting("OSDFont"), 16);
 
         if (actfont)
             fontMap["treemenulistfont"] = actfont;
@@ -684,8 +684,8 @@ QString OSD::FindTheme(QString name)
     if (dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find OSD theme: %1. "
-                "Switching to default.").arg(gContext->GetSetting("OSDTheme")));
-        gContext->OverrideSettingForSession("OSDTheme", "BlackCurves-OSD");
+                "Switching to default.").arg(gCoreContext->GetSetting("OSDTheme")));
+        gCoreContext->OverrideSettingForSession("OSDTheme", "BlackCurves-OSD");
         return testdir;
     }
 
@@ -852,7 +852,7 @@ QString OSD::getFirstText(QDomElement &element)
 void OSD::parseFont(QDomElement &element)
 {
     QString name;
-    QString fontfile = gContext->GetSetting("OSDFont");
+    QString fontfile = gCoreContext->GetSetting("OSDFont");
     int size = -1;
     int sizeSmall = -1;
     int sizeBig = -1;
@@ -930,7 +930,7 @@ void OSD::parseFont(QDomElement &element)
         return;
     }
 
-    QString fontSizeType = gContext->GetSetting("OSDThemeFontSizeType",
+    QString fontSizeType = gCoreContext->GetSetting("OSDThemeFontSizeType",
                                                 "default");
     if (fontSizeType == "small")
     {
@@ -1728,7 +1728,7 @@ bool OSD::LoadTheme(void)
             {
                 timeFormat = getFirstText(e);
                 if (timeFormat.toUpper() == "FROMSETTINGS")
-                    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+                    timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
             }
             else if (e.tagName() == "fadeaway")
             {
@@ -3111,7 +3111,7 @@ QRect OSD::GetSubtitleBounds()
     return QRect(xoffset, yoffset, displaywidth, displayheight);
 }
 
-#define OSD_STRDUP(X) strdup(gContext->GetSetting(X).toLocal8Bit().constData())
+#define OSD_STRDUP(X) strdup(gCoreContext->GetSetting(X).toLocal8Bit().constData())
 
 static void initialize_osd_fonts(void)
 {
@@ -3120,7 +3120,7 @@ static void initialize_osd_fonts(void)
         return;
     cc708_defaults_initialized = true;
 
-    QString default_font_type = gContext->GetSetting(
+    QString default_font_type = gCoreContext->GetSetting(
         "OSDCC708DefaultFontType", "MonoSerif");
 
     // 0

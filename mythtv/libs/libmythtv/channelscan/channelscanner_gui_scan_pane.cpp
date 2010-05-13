@@ -28,7 +28,6 @@
  */
 
 #include "channelscanner_gui_scan_pane.h"
-#include "mythcontext.h"
 #include "loglist.h"
 
 ChannelScannerGUIScanPane::ChannelScannerGUIScanPane(

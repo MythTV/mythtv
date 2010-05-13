@@ -7,7 +7,6 @@ using namespace std;
 #include "mythconfig.h"
 #include "osdsurface.h"
 #include "dithertable.h"
-#include "mythcontext.h"
 #include "compat.h"
 
 #ifdef MMX

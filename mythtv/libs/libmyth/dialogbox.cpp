@@ -2,7 +2,6 @@
 using namespace std;
 
 #include "dialogbox.h"
-#include "mythcontext.h"
 #include "mythwidgets.h"
 
 #ifdef USING_MINGW

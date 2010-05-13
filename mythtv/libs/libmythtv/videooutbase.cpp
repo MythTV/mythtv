@@ -8,7 +8,7 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
@@ -340,28 +340,28 @@ VideoOutput::VideoOutput() :
 
 {
     bzero(&pip_tmp_image, sizeof(pip_tmp_image));
-    db_display_dim = QSize(gContext->GetNumSetting("DisplaySizeWidth",  0),
-                           gContext->GetNumSetting("DisplaySizeHeight", 0));
+    db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
+                           gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
 
     db_pict_attr[kPictureAttribute_Brightness] =
-        gContext->GetNumSetting("PlaybackBrightness", 50);
+        gCoreContext->GetNumSetting("PlaybackBrightness", 50);
     db_pict_attr[kPictureAttribute_Contrast] =
-        gContext->GetNumSetting("PlaybackContrast",   50);
+        gCoreContext->GetNumSetting("PlaybackContrast",   50);
     db_pict_attr[kPictureAttribute_Colour] =
-        gContext->GetNumSetting("PlaybackColour",     50);
+        gCoreContext->GetNumSetting("PlaybackColour",     50);
     db_pict_attr[kPictureAttribute_Hue] =
-        gContext->GetNumSetting("PlaybackHue",         0);
+        gCoreContext->GetNumSetting("PlaybackHue",         0);
 
     db_aspectoverride = (AspectOverrideMode)
-        gContext->GetNumSetting("AspectOverride",      0);
+        gCoreContext->GetNumSetting("AspectOverride",      0);
     db_adjustfill = (AdjustFillMode)
-        gContext->GetNumSetting("AdjustFill",          0);
+        gCoreContext->GetNumSetting("AdjustFill",          0);
     db_letterbox_colour = (LetterBoxColour)
-        gContext->GetNumSetting("LetterboxColour",     0);
+        gCoreContext->GetNumSetting("LetterboxColour",     0);
     db_use_picture_controls =
-        gContext->GetNumSetting("UseOutputPictureControls", 0);
+        gCoreContext->GetNumSetting("UseOutputPictureControls", 0);
 
-    if (!gContext->IsDatabaseIgnored())
+    if (!gCoreContext->IsDatabaseIgnored())
         db_vdisp_profile = new VideoDisplayProfile();
 
     windows.push_back(VideoOutWindow());
@@ -890,7 +890,7 @@ void VideoOutput::SetPictureAttributeDBValue(
         dbName = "PlaybackHue";
 
     if (!dbName.isEmpty())
-        gContext->SaveSetting(dbName, newValue);
+        gCoreContext->SaveSetting(dbName, newValue);
 
     db_pict_attr[attributeType] = newValue;
 }
@@ -1533,7 +1533,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
         if (!fullscreen)
         {
             int gui_width = 0, gui_height = 0;
-            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
+            gCoreContext->GetResolutionSetting("Gui", gui_width, gui_height);
             fullscreen |= (0 == gui_width && 0 == gui_height);
         }
 
@@ -1541,7 +1541,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
         {
             QSize sz(display_res->GetWidth(), display_res->GetHeight());
             const QRect display_visible_rect =
-                    QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
+                    QRect(GetMythMainWindow()->geometry().topLeft(), sz);
             windows[0].SetDisplayVisibleRect(display_visible_rect);
             MoveResize();
             // Resize X window to fill new resolution
@@ -1567,7 +1567,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     QSize max_size = sz1.expandedTo(sz2);
 
     if (windows[0].UsingGuiSize())
-        max_size = gContext->GetMainWindow()->geometry().size();
+        max_size = GetMythMainWindow()->geometry().size();
 
     if (display_res)
     {
@@ -1577,8 +1577,8 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
 
     if (resize)
     {
-        MoveResizeWindow(QRect(gContext->GetMainWindow()->geometry().x(),
-                               gContext->GetMainWindow()->geometry().y(),
+        MoveResizeWindow(QRect(GetMythMainWindow()->geometry().x(),
+                               GetMythMainWindow()->geometry().y(),
                                max_size.width(), max_size.height()));
     }
 
@@ -1621,9 +1621,9 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     if (windows[0].UsingXinerama())
     {
         source = "Xinerama";
-        disp_aspect = gContext->GetFloatSettingOnHost(
+        disp_aspect = gCoreContext->GetFloatSettingOnHost(
             "XineramaMonitorAspectRatio",
-            gContext->GetHostName(), pixel_aspect);
+            gCoreContext->GetHostName(), pixel_aspect);
         if (disp_dim.height() <= 0)
             disp_dim.setHeight(300);
         disp_dim.setWidth((int) ((disp_dim.height() * disp_aspect) + 0.5));

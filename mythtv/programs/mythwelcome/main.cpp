@@ -155,7 +155,6 @@ int main(int argc, char **argv)
         }
     }
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
@@ -190,12 +189,11 @@ int main(int argc, char **argv)
 
 #ifdef Q_WS_MACX
     // Mac OS 10.4 and Qt 4.4 have window-focus problems
-    gContext->SetSetting("RunFrontendInWindow", "1");
+    gCoreContext->SetSetting("RunFrontendInWindow", "1");
 #endif
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    gContext->SetMainWindow(mainWindow);
 
     MythThemeBase *themeBase = new MythThemeBase();
 

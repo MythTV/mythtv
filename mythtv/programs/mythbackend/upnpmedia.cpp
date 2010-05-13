@@ -6,7 +6,7 @@
 #include <QFileInfo>
 #include <QDir>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "httprequest.h"
 #include "upnpmedia.h"
 #include "mythdb.h"
@@ -22,7 +22,7 @@
 UPnpMedia::UPnpMedia(bool runthread, bool ismaster)
 {
 
-    if (gContext->GetNumSetting("UPnP/RebuildDelay",30) > 0)
+    if (gCoreContext->GetNumSetting("UPnP/RebuildDelay",30) > 0)
     {
         VERBOSE(VB_GENERAL,"Enabling Upnpmedia rebuild thread.");
         if ((runthread) && (ismaster))
@@ -46,7 +46,7 @@ void UPnpMedia::RunRebuildLoop(void)
 
     int irebuildDelay = 1800;
 
-    irebuildDelay = gContext->GetNumSetting("UPnP/RebuildDelay",30) * 60;
+    irebuildDelay = gCoreContext->GetNumSetting("UPnP/RebuildDelay",30) * 60;
 
     if (irebuildDelay < 60)
         irebuildDelay = 60;
@@ -227,7 +227,7 @@ void UPnpMedia::BuildMediaMap(void)
 
     if (sMediaType == "VIDEO")
     {
-        QString RootVidDir = gContext->GetSetting("VideoStartupDir");
+        QString RootVidDir = gCoreContext->GetSetting("VideoStartupDir");
 
         if (!RootVidDir.isEmpty())
         {
@@ -266,7 +266,7 @@ void UPnpMedia::BuildMediaMap(void)
                 nextID = buildFileList(*it,STARTING_VIDEO_OBJECTID, nextID,
                                                                         query);
 
-                if (!gContext->GetSetting("UPnP/RecordingsUnderVideos").isEmpty())
+                if (!gCoreContext->GetSetting("UPnP/RecordingsUnderVideos").isEmpty())
                 {
                     VERBOSE(VB_ALL, "uPnP Unspecified error line 275, "
                                     "upnpmedia.cpp");

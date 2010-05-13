@@ -5,7 +5,7 @@
 #include "mythdb.h"
 
 // libmyth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 // libmythtv
 #include "scheduledrecording.h" // For signalChange()
@@ -25,26 +25,26 @@ RecordingRule::RecordingRule()
     m_searchType(kNoSearch),
     m_recPriority(0),
     m_prefInput(0),
-    m_startOffset(gContext->GetNumSetting("DefaultStartOffset", 0)),
-    m_endOffset(gContext->GetNumSetting("DefaultEndOffset", 0)),
+    m_startOffset(gCoreContext->GetNumSetting("DefaultStartOffset", 0)),
+    m_endOffset(gCoreContext->GetNumSetting("DefaultEndOffset", 0)),
     m_dupMethod(static_cast<RecordingDupMethodType>(
-                gContext->GetNumSetting("prefDupMethod", kDupCheckSubDesc))),
+                gCoreContext->GetNumSetting("prefDupMethod", kDupCheckSubDesc))),
     m_dupIn(kDupsInAll),
     m_recProfile(QObject::tr("Default")),
     m_recGroup("Default"),
     m_storageGroup("Default"),
     m_playGroup("Default"),
-    m_autoExpire(gContext->GetNumSetting("AutoExpireDefault", 0)),
+    m_autoExpire(gCoreContext->GetNumSetting("AutoExpireDefault", 0)),
     m_maxEpisodes(0),
     m_maxNewest(false),
-    m_autoCommFlag(gContext->GetNumSetting("AutoCommercialFlag", 1)),
-    m_autoTranscode(gContext->GetNumSetting("AutoTranscode", 0)),
-    m_transcoder(gContext->GetNumSetting("DefaultTranscoder",
+    m_autoCommFlag(gCoreContext->GetNumSetting("AutoCommercialFlag", 1)),
+    m_autoTranscode(gCoreContext->GetNumSetting("AutoTranscode", 0)),
+    m_transcoder(gCoreContext->GetNumSetting("DefaultTranscoder",
                 RecordingProfile::TranscoderAutodetect)),
-    m_autoUserJob1(gContext->GetNumSetting("AutoRunUserJob1", 0)),
-    m_autoUserJob2(gContext->GetNumSetting("AutoRunUserJob2", 0)),
-    m_autoUserJob3(gContext->GetNumSetting("AutoRunUserJob3", 0)),
-    m_autoUserJob4(gContext->GetNumSetting("AutoRunUserJob4", 0)),
+    m_autoUserJob1(gCoreContext->GetNumSetting("AutoRunUserJob1", 0)),
+    m_autoUserJob2(gCoreContext->GetNumSetting("AutoRunUserJob2", 0)),
+    m_autoUserJob3(gCoreContext->GetNumSetting("AutoRunUserJob3", 0)),
+    m_autoUserJob4(gCoreContext->GetNumSetting("AutoRunUserJob4", 0)),
     m_nextRecording(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastRecorded(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastDeleted(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
@@ -414,12 +414,12 @@ bool RecordingRule::Delete(bool sendSig)
 
 void RecordingRule::ToMap(QHash<QString, QString> &infoMap) const
 {
-    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    QString dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
     QString fullDateFormat = dateFormat;
     if (!fullDateFormat.contains("yyyy"))
         fullDateFormat += " yyyy";
-    QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    QString shortDateFormat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
 
     infoMap["title"] = m_title;
     infoMap["subtitle"] = m_subtitle;

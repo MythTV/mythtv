@@ -31,11 +31,10 @@
 # endif
 
 // libmythdb headers
+#include "mythcorecontext.h"
+#include "mythevent.h"
 #include "mythverbose.h"
 #include "exitcodes.h"
-
-// Mythui headers
-#include "mythmainwindow.h"
 
 #ifdef USE_LIRC
 #include "lircevent.h"
@@ -55,9 +54,7 @@ uint myth_system(const QString &command, int flags)
 {
     (void)flags; /* Kill warning */
 
-    bool ready_to_lock = HasMythMainWindow() && IsUIThread();
-
-    (void)ready_to_lock; /* Kill warning */
+    bool ready_to_lock = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
 
     uint result = GENERIC_EXIT_NOT_OK;
 
@@ -78,8 +75,14 @@ uint myth_system(const QString &command, int flags)
     flags |= MYTH_SYSTEM_DONT_BLOCK_PARENT;
 #endif
 
+    // This needs to be a send event so that the MythUI m_drawState change is
+    // flagged immediately instead of after existing events are processed
+    // since this function could be called inside one of those events.
     if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
-        GetMythMainWindow()->SetDrawEnabled(false);
+    {
+        QEvent event(MythEvent::kDisableDrawingEventType);
+        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+    }
 
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
 
@@ -102,7 +105,7 @@ uint myth_system(const QString &command, int flags)
 
         /* Try to attach stdin to /dev/null */
         int fd = open("/dev/null", O_RDONLY);
-        if (fd > 0)
+        if (fd >= 0)
         {
             // Note: dup2() will close old stdin descriptor.
             if (dup2(fd, 0) < 0)
@@ -208,8 +211,14 @@ uint myth_system(const QString &command, int flags)
     }
 #endif
 
+    // This needs to be a send event so that the MythUI m_drawState change is
+    // flagged immediately instead of after existing events are processed
+    // since this function could be called inside one of those events.
     if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
-        GetMythMainWindow()->SetDrawEnabled(true);
+    {
+        QEvent event(MythEvent::kEnableDrawingEventType);
+        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+    }
 
     return result;
 }

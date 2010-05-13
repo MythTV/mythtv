@@ -1295,7 +1295,7 @@ bool DVDRingBufferPriv::SeekCellStart(void)
 void DVDRingBufferPriv::SetDVDSpeed(void)
 {
     QMutexLocker lock(&m_seekLock);
-    int dvdDriveSpeed = gContext->GetNumSetting("DVDDriveSpeed", 12);
+    int dvdDriveSpeed = gCoreContext->GetNumSetting("DVDDriveSpeed", 12);
     SetDVDSpeed(dvdDriveSpeed);
 }
 

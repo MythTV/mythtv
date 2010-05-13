@@ -51,7 +51,7 @@
 #include <QGroupBox>
 #include <QLabel>
 
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 class MythWizardPrivate
 {
@@ -565,7 +565,7 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -587,7 +587,7 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
             {
                 back();
                 QCoreApplication::postEvent(
-                    gContext->GetMainWindow(), 
+                    GetMythMainWindow(), 
                     new QEvent(MythEvent::kExitToMainMenuEventType));
             }
         }

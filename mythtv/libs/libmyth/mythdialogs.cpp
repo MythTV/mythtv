@@ -31,7 +31,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "mythverbose.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -204,7 +204,7 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
     bool handled = false;
     QStringList actions;
 
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -259,7 +259,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
 {
     float wmult, hmult;
 
-    if (gContext->GetNumSetting("UseArrowAccels", 1))
+    if (gCoreContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
     else
         arrowAccel = false;
@@ -274,8 +274,8 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     popupForegroundColor = palette().color(foregroundRole());
     setFont(parent->font());
 
-    hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
-    wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
+    hpadding = gCoreContext->GetNumSetting("PopupHeightPadding", 120);
+    wpadding = gCoreContext->GetNumSetting("PopupWidthPadding", 80);
 
     vbox = new QVBoxLayout(this);
     vbox->setMargin((int)(10 * hmult));
@@ -291,7 +291,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
 {
     float wmult, hmult;
 
-    if (gContext->GetNumSetting("UseArrowAccels", 1))
+    if (gCoreContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
     else
         arrowAccel = false;
@@ -306,8 +306,8 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     setPalette(parent->palette());
     setFont(parent->font());
 
-    hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
-    wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
+    hpadding = gCoreContext->GetNumSetting("PopupHeightPadding", 120);
+    wpadding = gCoreContext->GetNumSetting("PopupWidthPadding", 80);
 
     vbox = new QVBoxLayout(this);
     vbox->setMargin((int)(10 * hmult));
@@ -577,7 +577,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -843,7 +843,7 @@ DialogCode MythPopupBox::ShowButtonPopup(
 MythProgressDialog::MythProgressDialog(
     const QString &message, int totalSteps,
     bool cancelButton, const QObject *target, const char *slot)
-    : MythDialog(gContext->GetMainWindow(), "progress", false)
+    : MythDialog(GetMythMainWindow(), "progress", false)
 {
     setObjectName("MythProgressDialog");
     int screenwidth, screenheight;
@@ -963,7 +963,7 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -1066,7 +1066,7 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
             QString(tr("Could not locate '%1' in theme '%2'."
                        "\n\nReturning to the previous menu."))
             .arg(window_name).arg(theme_filename);
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+        MythPopupBox::showOkPopup(GetMythMainWindow(),
                                   tr("Missing UI Element"), msg);
         reject();
         return;
@@ -1760,7 +1760,7 @@ void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -1819,7 +1819,7 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

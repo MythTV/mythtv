@@ -17,7 +17,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "programinfo.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "util.h"
 #include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"
@@ -43,11 +43,11 @@ using namespace std;
 JobQueue::JobQueue(bool master)
 {
     isMaster = master;
-    m_hostname = gContext->GetHostName();
+    m_hostname = gCoreContext->GetHostName();
 
     runningJobsLock = new QMutex(QMutex::Recursive);
 
-    jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
+    jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
 
     jobsRunning = 0;
 
@@ -61,7 +61,7 @@ JobQueue::JobQueue(bool master)
             "you compiled with the --enable-valgrind option.");
 #endif // USING_VALGRIND
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 JobQueue::~JobQueue(void)
@@ -69,7 +69,7 @@ JobQueue::~JobQueue(void)
     pthread_cancel(queueThread);
     pthread_join(queueThread, NULL);
 
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 
     delete runningJobsLock;
 }
@@ -181,8 +181,8 @@ void JobQueue::ProcessQueue(void)
         pthread_testcancel();
 
         startedJobAlready = false;
-        sleepTime = gContext->GetNumSetting("JobQueueCheckFrequency", 30);
-        maxJobs = gContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
+        sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);
+        maxJobs = gCoreContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
         VERBOSE(VB_JOBQUEUE, LOC +
                 QString("Currently set to run up to %1 job(s) max.")
                         .arg(maxJobs));
@@ -483,7 +483,7 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
     {
         QString jobHost;
 
-        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+        if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = pinfo->hostname;
 
         return JobQueue::QueueJobs(jobTypes, pinfo->chanid, pinfo->recstartts,
@@ -582,7 +582,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
 bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
                          QString args, QString comment, QString host)
 {
-    if (gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0))
+    if (gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0))
     {
         if (jobTypes & JOB_TRANSCODE)
             QueueJob(JOB_TRANSCODE, chanid, starttime, args, comment, host);
@@ -597,7 +597,7 @@ bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
         {
             QDateTime schedruntime = QDateTime::currentDateTime();
 
-            int defer = gContext->GetNumSetting("DeferAutoTranscodeDays", 0);
+            int defer = gCoreContext->GetNumSetting("DeferAutoTranscodeDays", 0);
             if (defer)
             {
                 schedruntime = schedruntime.addDays(defer);
@@ -695,7 +695,7 @@ bool JobQueue::PauseJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB PAUSE ID %1").arg(jobID);
     MythEvent me(message);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     return ChangeJobCmds(jobID, JOB_PAUSE);
 }
@@ -704,7 +704,7 @@ bool JobQueue::ResumeJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB RESUME ID %1").arg(jobID);
     MythEvent me(message);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     return ChangeJobCmds(jobID, JOB_RESUME);
 }
@@ -713,7 +713,7 @@ bool JobQueue::RestartJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB RESTART ID %1").arg(jobID);
     MythEvent me(message);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     return ChangeJobCmds(jobID, JOB_RESTART);
 }
@@ -722,7 +722,7 @@ bool JobQueue::StopJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB STOP ID %1").arg(jobID);
     MythEvent me(message);
-    gContext->dispatch(me);
+    gCoreContext->dispatch(me);
 
     return ChangeJobCmds(jobID, JOB_STOP);
 }
@@ -1078,7 +1078,7 @@ QString JobQueue::JobText(int jobType)
     {
         QString settingName =
             QString("UserJobDesc%1").arg(UserJobTypeToIndex(jobType));
-        return gContext->GetSetting(settingName, settingName);
+        return gCoreContext->GetSetting(settingName, settingName);
     }
 
     return tr("Unknown Job");
@@ -1105,8 +1105,8 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
     bool inTimeWindow = false;
     orStartsWithinMins = orStartsWithinMins < 0 ? 0 : orStartsWithinMins;
 
-    queueStartTimeStr = gContext->GetSetting("JobQueueWindowStart", "00:00");
-    queueEndTimeStr = gContext->GetSetting("JobQueueWindowEnd", "23:59");
+    queueStartTimeStr = gCoreContext->GetSetting("JobQueueWindowStart", "00:00");
+    queueEndTimeStr = gCoreContext->GetSetting("JobQueueWindowEnd", "23:59");
 
     queueStartTime = QTime::fromString(queueStartTimeStr, "hh:mm");
     if (!queueStartTime.isValid())
@@ -1234,7 +1234,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     QString logInfo;
     int jobCount = 0;
     bool commflagWhileRecording =
-             gContext->GetNumSetting("AutoCommflagWhileRecording", 0);
+             gCoreContext->GetNumSetting("AutoCommflagWhileRecording", 0);
 
     jobs.clear();
 
@@ -1404,7 +1404,7 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
         }
     }
 
-    if (gContext->GetNumSetting(allowSetting, 1))
+    if (gCoreContext->GetNumSetting(allowSetting, 1))
         return true;
 
     return false;
@@ -1533,7 +1533,7 @@ void JobQueue::RecoverQueue(bool justOld)
     {
         QMap<int, JobQueueEntry>::Iterator it;
         QDateTime oldDate = QDateTime::currentDateTime().addDays(-1);
-        QString hostname = gContext->GetHostName();
+        QString hostname = gCoreContext->GetHostName();
         int tmpStatus;
         int tmpCmds;
 
@@ -1565,7 +1565,7 @@ void JobQueue::RecoverQueue(bool justOld)
 
                 ChangeJobStatus((*it).id, JOB_QUEUED, "");
                 ChangeJobCmds((*it).id, JOB_RUN);
-                if (!gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                if (!gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
                     ChangeJobHost((*it).id, "");
             }
             else
@@ -1714,7 +1714,7 @@ QString JobQueue::GetJobDescription(int jobType)
     QString descSetting =
         QString("UserJobDesc%1").arg(UserJobTypeToIndex(jobType));
 
-    return gContext->GetSetting(descSetting, "Unknown Job");
+    return gCoreContext->GetSetting(descSetting, "Unknown Job");
 }
 
 QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
@@ -1724,7 +1724,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 
     if (jobType == JOB_TRANSCODE)
     {
-        command = gContext->GetSetting("JobQueueTranscodeCommand");
+        command = gCoreContext->GetSetting("JobQueueTranscodeCommand");
         if (command.trimmed().isEmpty())
             command = "mythtranscode";
 
@@ -1733,7 +1733,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
     }
     else if (jobType == JOB_COMMFLAG)
     {
-        command = gContext->GetSetting("JobQueueCommFlagCommand");
+        command = gCoreContext->GetSetting("JobQueueCommFlagCommand");
         if (command.trimmed().isEmpty())
             command = "mythcommflag";
 
@@ -1742,7 +1742,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
     }
     else if (jobType & JOB_USERJOB)
     {
-        command = gContext->GetSetting(
+        command = gCoreContext->GetSetting(
                     QString("UserJob%1").arg(UserJobTypeToIndex(jobType)), "");
     }
 
@@ -1944,7 +1944,7 @@ void JobQueue::DoTranscodeThread(int jobID)
         VERBOSE(VB_GENERAL, LOC + QString("%1 for %2")
                 .arg(msg).arg(details.constData()));
 
-        gContext->LogEntry("transcode", LP_NOTICE, msg, detailstr);
+        gCoreContext->LogEntry("transcode", LP_NOTICE, msg, detailstr);
 
         VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                            .arg(command));
@@ -1966,7 +1966,7 @@ void JobQueue::DoTranscodeThread(int jobID)
 
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("%1 for %2").arg(msg).arg(details.constData()));
-            gContext->LogEntry("transcode", LP_WARNING, msg, detailstr);
+            gCoreContext->LogEntry("transcode", LP_WARNING, msg, detailstr);
         }
         else if (result == TRANSCODE_EXIT_RESTART && retrylimit > 0)
         {
@@ -1977,7 +1977,7 @@ void JobQueue::DoTranscodeThread(int jobID)
             program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
 
             msg = QString("Transcode restarting");
-            gContext->LogEntry("transcode", LP_NOTICE, msg, details);
+            gCoreContext->LogEntry("transcode", LP_NOTICE, msg, details);
         }
         else
         {
@@ -2042,7 +2042,7 @@ void JobQueue::DoTranscodeThread(int jobID)
             }
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
-            gContext->LogEntry("transcode", LP_NOTICE, msg, details);
+            gCoreContext->LogEntry("transcode", LP_NOTICE, msg, details);
             VERBOSE(VB_GENERAL, LOC + msg + ": " + details);
         }
     }
@@ -2117,7 +2117,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
     QString msg = tr("Commercial Flagging Starting");
     VERBOSE(VB_GENERAL, LOC + "Commercial Flagging Starting for " + detailstr);
-    gContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
+    gCoreContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
 
     int breaksFound = 0;
     QString path;
@@ -2199,7 +2199,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         details = detailstr.toLocal8Bit();
     }
 
-    gContext->LogEntry("commflag", priority, msg, detailstr);
+    gCoreContext->LogEntry("commflag", priority, msg, detailstr);
 
     if (priority <= LP_WARNING)
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
@@ -2242,7 +2242,7 @@ void JobQueue::DoUserJobThread(int jobID)
     QByteArray amsg = msg.toLocal8Bit();
 
     VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
-    gContext->LogEntry("jobqueue", LP_NOTICE,
+    gCoreContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Started").arg(jobDesc), msg);
 
     switch (jobQueueCPU)
@@ -2269,7 +2269,7 @@ void JobQueue::DoUserJobThread(int jobID)
         VERBOSE(VB_IMPORTANT, LOC + QString("Current PATH: '%1'")
                                             .arg(getenv("PATH")));
 
-        gContext->LogEntry("jobqueue", LP_WARNING,
+        gCoreContext->LogEntry("jobqueue", LP_WARNING,
                            "User Job Errored", msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
@@ -2280,7 +2280,7 @@ void JobQueue::DoUserJobThread(int jobID)
         msg = QString("User Job '%1' failed.").arg(command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
-        gContext->LogEntry("jobqueue", LP_WARNING, "User Job Errored", msg);
+        gCoreContext->LogEntry("jobqueue", LP_WARNING, "User Job Errored", msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
             "ERROR: User Job returned non-zero, check logs.");
@@ -2299,7 +2299,7 @@ void JobQueue::DoUserJobThread(int jobID)
 
         VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
 
-        gContext->LogEntry("jobqueue", LP_NOTICE,
+        gCoreContext->LogEntry("jobqueue", LP_NOTICE,
                            QString("Job \"%1\" Finished").arg(jobDesc), msg);
 
         ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");

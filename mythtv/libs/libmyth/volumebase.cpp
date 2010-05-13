@@ -7,14 +7,14 @@ using namespace std;
 #include <QString>
 
 #include "volumebase.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 VolumeBase::VolumeBase() :
     internal_vol(false), volume(80), 
     current_mute_state(kMuteOff)
 {
     swvol = swvol_setting =
-        (gContext->GetSetting("MixerDevice", "default").toLower() == "software");
+        (gCoreContext->GetSetting("MixerDevice", "default").toLower() == "software");
 }
 
 bool VolumeBase::SWVolume(void)
@@ -39,9 +39,9 @@ void VolumeBase::SetCurrentVolume(int value)
     volume = max(min(value, 100), 0);
     UpdateVolume();
 
-    QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+    QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
     controlLabel += "MixerVolume";
-    gContext->SaveSetting(controlLabel, volume);    
+    gCoreContext->SaveSetting(controlLabel, volume);    
 }
 
 void VolumeBase::AdjustCurrentVolume(int change)

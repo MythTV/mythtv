@@ -18,7 +18,7 @@
 #include "mythuibutton.h"
 #include "mythuistatetype.h"
 #include "mythuifilebrowser.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 
 /////////////////////////////////////////////////////////////////////
 MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
@@ -699,7 +699,7 @@ bool MythUIFileBrowser::GetRemoteFileList(const QString &url,
     list << path;
     list << "0";
 
-    bool ok = gContext->SendReceiveStringList(list);
+    bool ok = gCoreContext->SendReceiveStringList(list);
 
     if ((list.size() == 1) && (list[0] == "EMPTY LIST"))
         list.clear();

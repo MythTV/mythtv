@@ -12,7 +12,7 @@
 
 // MythTV headers
 #include "NuppelVideoPlayer.h"
-#include "mythcontext.h"    /* gContext */
+#include "mythcorecontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
 #include "util.h"           /* myth_system */
 
@@ -765,7 +765,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
      *      2: extra verbosity [O(nframes)]
      *      3: dump frames into debugdir [O(nframes) files]
      */
-    debugLevel = gContext->GetNumSetting("TemplateFinderDebugLevel", 0);
+    debugLevel = gCoreContext->GetNumSetting("TemplateFinderDebugLevel", 0);
 
     if (debugLevel >= 1)
     {

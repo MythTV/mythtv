@@ -305,7 +305,7 @@ void SignalMonitor::MonitorLoop()
         {
             QStringList slist = GetStatusList(false);
             MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
-            gContext->dispatch(me);
+            gCoreContext->dispatch(me);
             //cerr<<"sent SIGNAL"<<endl;
         }
 
@@ -319,7 +319,7 @@ void SignalMonitor::MonitorLoop()
     {
         QStringList slist = GetStatusList(false);
         MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
-        gContext->dispatch(me);
+        gCoreContext->dispatch(me);
     }
 
     //signal(SIGALRM, SIG_DFL);

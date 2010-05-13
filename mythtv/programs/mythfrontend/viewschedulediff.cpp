@@ -1,5 +1,5 @@
 // myth
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "remoteutil.h"
 #include "recordinginfo.h"
@@ -21,9 +21,9 @@ ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
                                    int recordidDiff, QString title)
         : MythScreenType(parent, "ViewScheduleDiff")
 {
-    m_dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    m_dateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
+    m_timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     m_altTable = altTable;
     m_recordid = recordidDiff;
@@ -104,7 +104,7 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
     if (!pi)
         return;
 
-    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     QString message = pi->title;
 

@@ -10,7 +10,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "tvremoteutil.h"
 #include "programinfo.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
@@ -229,7 +229,7 @@ PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
     m_previewGeneratorRunning(0), m_previewGeneratorMaxThreads(2)
 {
     m_previewGeneratorMode =
-        gContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
+        gCoreContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
         PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
 
     int idealThreads = QThread::idealThreadCount();

@@ -12,7 +12,7 @@
 #include "osdsurface.h"
 #include "osdchromakey.h"
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "videoout_xv.h"
 #include "mythxdisplay.h"
 

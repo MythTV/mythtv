@@ -36,7 +36,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
                                          ? "No new channels to process"
                                          : "No channels to process.."));
             MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), QObject::tr("Channel Importer"),
                 ChannelUtil::GetChannelCount()
                 ? QObject::tr("Failed to find any new channels!")
                 : QObject::tr("Failed to find any channels."));
@@ -1187,7 +1187,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
         do
         {
             ret = MythPopupBox::ShowButtonPopup(
-                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), QObject::tr("Channel Importer"),
                 msg, buttons, kDialogCodeButton0);
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
@@ -1249,7 +1249,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         do
         {
             ret = MythPopupBox::ShowButtonPopup(
-                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), QObject::tr("Channel Importer"),
                 msg, buttons, kDialogCodeButton0);
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
@@ -1306,7 +1306,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
         do
         {
             ret = MythPopupBox::ShowButtonPopup(
-                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), QObject::tr("Channel Importer"),
                 msg, buttons, kDialogCodeButton0);
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
@@ -1429,7 +1429,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
             ret = ShowManualChannelPopup(
-                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), QObject::tr("Channel Importer"),
                 msg2, val);
 
             if (kOCTOk != ret)
@@ -1510,7 +1510,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
             ret = ShowManualChannelPopup(
-                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), QObject::tr("Channel Importer"),
                 msg2, val);
 
             if (kOCTOk != ret)

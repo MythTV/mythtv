@@ -695,7 +695,7 @@ UIImageType::UIImageType(const QString &name, const QString &filename, int dorde
     m_drop_x = 0;
     m_drop_y = 0;
     m_show = false;
-    m_transparent = gContext->GetNumSetting("PlayBoxTransparency", 1);
+    m_transparent = gCoreContext->GetNumSetting("PlayBoxTransparency", 1);
 }
 
 UIImageType::~UIImageType()
@@ -2984,7 +2984,7 @@ bool UIManagedTreeListType::moveDownByAmount(int number_down, bool do_refresh)
 
 bool UIManagedTreeListType::incSearchStart(void)
 {
-    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(),
                                            "incsearch_popup");
 
     QLabel *caption = popup->addLabel(tr("Search"), MythPopupBox::Large);
@@ -4711,7 +4711,7 @@ void UIKeyboardType::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions, false);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions, false);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
