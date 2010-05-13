@@ -1567,8 +1567,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
-    int wakeThreshold = gCoreContext->GetNumSetting("WakeUpThreshold", 240);
-
+    int wakeThreshold = gCoreContext->GetNumSetting("WakeUpThreshold", 300);
     int secsleft;
     EncoderLink *nexttv = NULL;
 
@@ -1816,7 +1815,7 @@ void Scheduler::RunScheduler(void)
                 }
             }
             else if ((nexttv->IsWaking()) &&
-                     ((secsleft - prerollseconds) < 90) &&
+                     ((secsleft - prerollseconds) < 210) &&
                      (nexttv->GetSleepStatusTime().secsTo(curtime) < 300) &&
                      (nexttv->GetLastWakeTime().secsTo(curtime) > 10))
             {
@@ -1828,6 +1827,27 @@ void Scheduler::RunScheduler(void)
                     Reschedule(0);
                     continue;
                 }
+            }
+            else if ((nexttv->IsWaking()) &&
+                     ((secsleft - prerollseconds) < 150) &&
+                     (nexttv->GetSleepStatusTime().secsTo(curtime) < 300))
+            {
+                VERBOSE(VB_SCHEDULE, QString("WARNING: Slave Backend %1 "
+                        "has NOT come back from sleep yet in 150 seconds. "
+                        "Setting slave status to unknown and attempting "
+                        "to reschedule around its tuners.")
+                        .arg(nexttv->GetHostName()));
+
+                QMap<int, EncoderLink *>::Iterator enciter =
+                    m_tvList->begin();
+                for (; enciter != m_tvList->end(); ++enciter)
+                {
+                    EncoderLink *enc = *enciter;
+                    if (enc->GetHostName() == nexttv->GetHostName())
+                        enc->SetSleepStatus(sStatus_Undefined);
+                }
+
+                Reschedule(0);
             }
         }
 
@@ -1928,8 +1948,9 @@ void Scheduler::RunScheduler(void)
                 else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
                 {
                     VERBOSE(VB_SCHEDULE, QString("WARNING: Slave Backend %1 "
-                            "has NOT come back from sleep yet in 300 seconds. "
-                            "Attempting to reschedule around sleeping tuners.")
+                            "has NOT come back from sleep yet. "
+                            "Setting slave status to unknown and attempting "
+                            "to reschedule around its tuners.")
                             .arg(nexttv->GetHostName()));
 
                     QMap<int, EncoderLink *>::Iterator enciter =
