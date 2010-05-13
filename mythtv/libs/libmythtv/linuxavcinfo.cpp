@@ -1,7 +1,7 @@
 #include "linuxavcinfo.h"
 
 // MythTV headers
-#include "mythverbose.h"
+#include "mythcontext.h"
 
 #define LOC      QString("LAVCInfo(): ")
 #define LOC_WARN QString("LAVCInfo(), Warning: ")

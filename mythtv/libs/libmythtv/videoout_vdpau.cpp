@@ -1,4 +1,4 @@
-#include "mythcorecontext.h"
+#include "mythcontext.h"
 #include "NuppelVideoPlayer.h"
 #include "videooutbase.h"
 #include "videoout_vdpau.h"
