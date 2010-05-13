@@ -6,8 +6,10 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
+#ifndef _WIN32
 #include <pwd.h>
 #include <grp.h>
+#endif
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
@@ -870,6 +872,10 @@ int main(int argc, char **argv)
 
     if (!username.isEmpty())
     {
+#ifdef _WIN32
+        VERBOSE(VB_IMPORTANT, "--user option is not supported on Windows");
+        return BACKEND_EXIT_INVALID_CMDLINE;
+#else // ! _WIN32
         struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
         const uid_t user_id = geteuid();
 
@@ -914,6 +920,7 @@ int main(int argc, char **argv)
                     .arg(username));
             return BACKEND_EXIT_PERMISSIONS_ERROR;
         }
+#endif // ! _WIN32
     }
 
     if (pidfs)
