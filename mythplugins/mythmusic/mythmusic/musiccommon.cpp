@@ -100,9 +100,6 @@ MusicCommon::~MusicCommon(void)
 bool MusicCommon::CreateCommon(void)
 {
     bool err = false;
-    UIUtilW::Assign(this, m_titleText,     "title", &err);
-    UIUtilW::Assign(this, m_artistText,    "artist", &err);
-    UIUtilW::Assign(this, m_albumText,     "album", &err);
     UIUtilW::Assign(this, m_timeText,      "time", &err);
     UIUtilW::Assign(this, m_infoText,      "info", &err);
     UIUtilW::Assign(this, m_visualText,    "visualizername", &err);
@@ -1229,13 +1226,11 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
     if (!mdata)
         return;
 
+    MetadataMap metadataMap;
+    mdata->toMap(metadataMap);
+    SetTextFromMap(metadataMap);
+    
     m_maxTime = mdata->Length() / 1000;
-    if (m_titleText)
-        m_titleText->SetText(mdata->FormatTitle());
-    if (m_artistText)
-        m_artistText->SetText(mdata->FormatArtist());
-    if (m_albumText)
-        m_albumText->SetText(mdata->Album());
     if (m_coverartImage)
     {
         //FIXME: change this to use the filename

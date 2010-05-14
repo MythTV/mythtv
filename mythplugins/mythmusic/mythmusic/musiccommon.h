@@ -111,9 +111,6 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     int                    m_currentTrack;
 
-    MythUIText            *m_titleText;
-    MythUIText            *m_artistText;
-    MythUIText            *m_albumText;
     MythUIText            *m_timeText;
     MythUIText            *m_infoText;
     MythUIText            *m_visualText;
