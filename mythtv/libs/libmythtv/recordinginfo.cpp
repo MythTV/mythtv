@@ -938,7 +938,7 @@ void RecordingInfo::SetDupHistory(void)
     ScheduledRecording::signalChange(0);
 }
 
-/** \fn RecordingInfo::SubstituteMatches(QString)
+/**
  *  \brief Replace %MATCH% vars in the specified string
  *  \param str QString containing matches to be substituted
  */

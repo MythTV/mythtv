@@ -266,7 +266,7 @@ QStringList StorageGroup::GetFileInfo(QString filename)
     return details;
 }
 
-/** \fn StorageGroup::GetRelativePathname(const Qstring&)
+/**
  *  \brief Returns the relative pathname of a file by comparing the filename
  *         against all Storage Group directories (and MythVideo's startupdir)
  *
@@ -349,7 +349,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     return result;
 }
 
-/** \fn StorageGroup::FindDirs(const QString, const QString)
+/**
  *  \brief Finds and and optionally initialize a directory list
  *         associated with a Storage Group
  *

@@ -8,8 +8,7 @@
 #include "rawsettingseditor.h"
 #include "remoteutil.h"
 
-/** \fn RawSettingsEditor::RawSettingsEditor(MythScreenStack *parent,
-                                             const char name)
+/**
   * \brief Raw Settings Editor constructor
   *
   * Initializes necessary variables.
