@@ -1426,7 +1426,12 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
     }
 #endif
 
-    if (QDir::homePath() == "/" && ! getenv("MYTHCONFDIR"))
+    // If HOME isn't defined, we won't be able to use default confdir of
+    // $HOME/.mythtv nor can we rely on a MYTHCONFDIR that references $HOME
+    QString homedir = QDir::homePath();
+    QString confdir = getenv("MYTHCONFDIR");
+    if ((homedir.isEmpty() || homedir == "/") &&
+        (confdir.isEmpty() || confdir.contains("$HOME")))
     {
         QString warning = "Cannot locate your home directory."
                           " Please set the environment variable HOME";
@@ -1435,7 +1440,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
             d->TempMainWindow(false);
             MythPopupBox::showOkPopup(d->mainWindow, "HOME error", warning);
         }
-        VERBOSE(VB_IMPORTANT, warning + " or MYTHCONFDIR");
+        VERBOSE(VB_IMPORTANT, warning);
 
         return false;
     }

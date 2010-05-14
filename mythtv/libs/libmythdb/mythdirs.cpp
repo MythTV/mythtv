@@ -37,8 +37,7 @@ void InitializeMythDirs(void)
     if (QDir(installprefix).isRelative())
     {
         // If the PREFIX is relative, evaluate it relative to our
-        // executable directory. This can be fragile on Unix, so#include <QMutex>
-
+        // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
 
         VERBOSE(VB_IMPORTANT+VB_EXTRA,
@@ -54,7 +53,7 @@ void InitializeMythDirs(void)
     if (tmp_confdir)
     {
         confdir = QString(tmp_confdir);
-        //VERBOSE(VB_IMPORTANT, QString("Read conf dir = %1").arg(dir));
+        VERBOSE(VB_IMPORTANT, QString("Read conf dir = %1").arg(confdir));
         confdir.replace("$HOME", QDir::homePath());
     }
     else
