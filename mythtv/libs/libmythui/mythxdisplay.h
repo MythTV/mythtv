@@ -18,19 +18,19 @@ class MPUBLIC MythXDisplay
   public:
     MythXDisplay();
     ~MythXDisplay();
-    Display *GetDisplay(void) { return m_disp;       }
-    int      GetScreen(void)  { return m_screen_num; }
-    void     Lock(void)       { m_lock.lock();       }
-    void     Unlock(void)     { m_lock.unlock();     }
-    int      GetDepth(void)   { return m_depth;      }
-    Window   GetRoot(void)    { return m_root;       }
-    GC       GetGC(void)      { return m_gc;         }
-    unsigned long GetBlack(void) { return m_black;   }
+    Display *GetDisplay(void)          { return m_disp;       }
+    int      GetScreen(void) const     { return m_screen_num; }
+    void     Lock(void)                { m_lock.lock();       }
+    void     Unlock(void)              { m_lock.unlock();     }
+    int      GetDepth(void) const      { return m_depth;      }
+    Window   GetRoot(void) const       { return m_root;       }
+    GC       GetGC(void) const         { return m_gc;         }
+    unsigned long GetBlack(void) const { return m_black;      }
     bool     Open(void);
     bool     CreateGC(Window win);
     void     SetForeground(unsigned long color);
-    void     FillRectangle(Window win, const QRect rect);
-    void     MoveResizeWin(Window win, const QRect rect);
+    void     FillRectangle(Window win, const QRect &rect);
+    void     MoveResizeWin(Window win, const QRect &rect);
     int      GetNumberXineramaScreens(void);
     QSize    GetDisplaySize(void);
     QSize    GetDisplayDimensions(void);

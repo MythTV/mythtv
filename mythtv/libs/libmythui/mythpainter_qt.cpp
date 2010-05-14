@@ -269,7 +269,7 @@ MythImage *MythQtPainter::GetFormatImage()
 
 void MythQtPainter::DeleteFormatImage(MythImage *im)
 {
-    MythQtImage *qim = (MythQtImage *)im;
+    MythQtImage *qim = static_cast<MythQtImage *>(im);
 
     QMutexLocker locker(&m_imageDeleteLock);
     if (qim->GetPixmap())

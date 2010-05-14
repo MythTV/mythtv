@@ -63,8 +63,8 @@ class JoystickMap
 
         typedef std::vector<buttonMapType> button_map_t;
         typedef std::vector<axisMapType> axis_map_t;
-        const button_map_t &buttonMap() { return m_buttonMap; }
-        const axis_map_t &axisMap() { return m_axisMap; }
+        const button_map_t &buttonMap() const { return m_buttonMap; }
+        const axis_map_t &axisMap() const { return m_axisMap; }
 
         button_map_t m_buttonMap;
         axis_map_t m_axisMap;

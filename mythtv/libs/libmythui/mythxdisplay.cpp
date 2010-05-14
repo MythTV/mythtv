@@ -179,7 +179,7 @@ void MythXDisplay::SetForeground(unsigned long color)
     XLOCK(this, XSetForeground(m_disp, m_gc, color));
 }
 
-void MythXDisplay::FillRectangle(Window win, const QRect rect)
+void MythXDisplay::FillRectangle(Window win, const QRect &rect)
 {
     if (!m_gc)
         return;
@@ -188,7 +188,7 @@ void MythXDisplay::FillRectangle(Window win, const QRect rect)
                               rect.width(), rect.height()));
 }
 
-void MythXDisplay::MoveResizeWin(Window win, const QRect rect)
+void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
 {
     XLOCK(this, XMoveResizeWindow(m_disp, win,
                                  rect.left(), rect.top(),

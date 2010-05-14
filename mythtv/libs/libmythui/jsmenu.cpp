@@ -68,17 +68,11 @@ JoystickMenuThread::~JoystickMenuThread()
         m_fd = -1;
     }
 
-    if (m_axes)
-    {
-        delete [] m_axes;
-        m_axes = NULL;
-    }
+    delete [] m_axes;
+    m_axes = NULL;
 
-    if (m_buttons)
-    {
-        delete [] m_buttons;
-        m_buttons = NULL;
-    }
+    delete [] m_buttons;
+    m_buttons = NULL;
 }
 
 /**

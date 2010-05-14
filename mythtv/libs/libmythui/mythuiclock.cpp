@@ -30,11 +30,8 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
 
 MythUIClock::~MythUIClock()
 {
-    if (m_Font)
-    {
-        delete m_Font;
-        m_Font = NULL;
-    }
+    delete m_Font;
+    m_Font = NULL;
 }
 
 void MythUIClock::Pulse(void)

@@ -177,7 +177,7 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
     display = OpenMythXDisplay();
     if (!display)
     {
-        cerr<<"DisplaResX: MythXOpenDisplay call failed"<<endl;
+        VERBOSE(VB_IMPORTANT, "DisplaResX: MythXOpenDisplay call failed");
         return NULL;
     }
 
@@ -190,12 +190,9 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
 
     if (!cfg)
     {
-        if (display)
-        {
-            delete display;
-            display = NULL;
-        }
-        cerr<<"DisplaResX: Unable to XRRgetScreenInfo"<<endl;
+        delete display;
+        display = NULL;
+        VERBOSE(VB_IMPORTANT, "DisplaResX: Unable to XRRgetScreenInfo");
     }
 
     return cfg;

@@ -9,6 +9,8 @@
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
   public:
+    SortableMythGenericTreeList() : m_sortType(SORT_ATTRIBUTE),
+                                    m_attributeIndex(0) { }
     enum SortType {SORT_ATTRIBUTE=0, SORT_STRING=1, SORT_SELECTABLE=3,
                    SORT_ATT_THEN_STRING};
 
