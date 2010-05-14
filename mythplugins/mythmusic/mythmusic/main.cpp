@@ -473,8 +473,6 @@ int mythplugin_init(const char *libversion)
 
     gPlayer = new MusicPlayer(NULL, chooseCD());
     gMusicData = new MusicData();
-    gMusicData->all_music = NULL;
-    gMusicData->all_playlists = NULL;
 
     return 0;
 }
@@ -593,6 +591,7 @@ int mythplugin_config(void)
 
 void mythplugin_destroy(void)
 {
+    postMusic();
     gPlayer->deleteLater();
     delete gMusicData;
 }
@@ -602,7 +601,7 @@ void runMusicPlayback(void)
     GetMythUI()->AddCurrentLocation("playmusic");
     preMusic();
     startPlayback();
-    postMusic();
+    //postMusic();
     GetMythUI()->RemoveCurrentLocation();
 }
 
@@ -611,7 +610,7 @@ void runMusicSelection(void)
     GetMythUI()->AddCurrentLocation("musicplaylists");
     preMusic();
     startDatabaseTree();
-    postMusic();
+    //postMusic();
     GetMythUI()->RemoveCurrentLocation();
 }
 
@@ -652,7 +651,7 @@ void showMiniPlayer(void)
 {
     if (!gMusicData->all_music)
         return;
-
+    
     // only show the miniplayer if there isn't already a client attached
     if (!gPlayer->hasClient())
         gPlayer->showMiniPlayer();
