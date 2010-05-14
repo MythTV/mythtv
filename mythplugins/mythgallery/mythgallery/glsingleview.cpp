@@ -50,6 +50,7 @@ GLSDialog::GLSDialog(const ThumbList& itemList,
     : MythDialog(parent, name)
 {
     QBoxLayout *l = new QVBoxLayout(this);
+    l->setContentsMargins(0, 0, 0, 0);
     m_view = new GLSingleView(itemList, pos, slideShow, sortOrder, this);
     l->addWidget(m_view);
 
