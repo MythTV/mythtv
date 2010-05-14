@@ -15,7 +15,6 @@ using namespace std;
 
 #include "mythcorecontext.h"
 #include "mythsocket.h"
-#include "mythsocket.h"
 #include "mythsystem.h"
 
 #include "mythversion.h"
