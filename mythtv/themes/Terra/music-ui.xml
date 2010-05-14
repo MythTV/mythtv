@@ -15,19 +15,11 @@
                     <imagetype name="pauseicon">
                         <filename>music/miniplayer_pauseicon.png</filename>
                     </imagetype>
-                    <textarea name="text">
-                        <area>0,0,10,30</area>
-                        <value>P</value>
-                    </textarea>
                 </state>
                 <state name="stopped">
                     <imagetype name="stopicon">
                         <filename>music/miniplayer_stopicon.png</filename>
                     </imagetype>
-                    <textarea name="text">
-                        <area>0,0,10,30</area>
-                        <value>S</value>
-                    </textarea>
                 </state>
             </statetype>
 
@@ -38,10 +30,11 @@
                 <align>allcenter</align>
             </textarea>
 
-            <textarea name="artisttitle" from="label">
+            <textarea name="artist" from="label">
                 <area>110,0,460,25</area>
                 <value>None</value>
                 <align>left,vcenter</align>
+                <template>%TITLE%  by  %ARTIST%</template>
             </textarea>
         </window>
 
