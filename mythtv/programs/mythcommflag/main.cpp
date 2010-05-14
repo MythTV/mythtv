@@ -48,6 +48,34 @@ using namespace std;
 #define LOC_WARN QString("MythCommFlag, Warning: ")
 #define LOC_ERR  QString("MythCommFlag, Error: ")
 
+namespace
+{
+    void cleanup()
+    {
+        delete gContext;
+        gContext = NULL;
+
+    }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
+}
+
 bool quiet = false;
 bool force = false;
 
@@ -1197,6 +1225,8 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
+    CleanupGuard callCleanup(cleanup);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(
             false/*use gui*/, NULL/*upnp*/, false/*prompt for backend*/,
@@ -1298,8 +1328,6 @@ int main(int argc, char *argv[])
 
         int breaksFound = FlagCommercials(
             chanid, starttime, outputfilename, useDB);
-
-        delete gContext;
 
         return breaksFound; // exit(breaksFound);
     }
@@ -1513,8 +1541,6 @@ int main(int argc, char *argv[])
             return COMMFLAG_EXIT_DB_ERROR;
         }
     }
-
-    delete gContext;
 
     time_now = time(NULL);
 
