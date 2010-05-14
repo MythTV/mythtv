@@ -240,13 +240,11 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             {
                 newFont->m_color = QColor(getFirstText(info));
             }
-            else if (info.tagName() == "dropcolor" ||
-                     info.tagName() == "shadowcolor")
+            else if (info.tagName() == "shadowcolor")
             {
                 newFont->m_shadowColor = QColor(getFirstText(info));
             }
-            else if (info.tagName() == "shadow" ||
-                     info.tagName() == "shadowoffset")
+            else if (info.tagName() == "shadowoffset")
             {
                 newFont->m_hasShadow = true;
                 newFont->m_shadowOffset = parsePoint(info);
