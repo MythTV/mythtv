@@ -497,7 +497,7 @@ class VoqvMainWindow : public VideoOutputQuartzView
     {
         alpha = fminf(1.0, fmaxf(0.0, alphaBlend));
         applyMoveResize = true;
-        name = "Main window: ";
+        name = (char *) "Main window: ";
     };
 
    ~VoqvMainWindow()
@@ -577,7 +577,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
     : VideoOutputQuartzView(pData)
     {
         m_desired = QRect(x, y, w, h);
-        name = "Embedded window: ";
+        name = (char *) "Embedded window: ";
     };
 
    ~VoqvEmbedded()
@@ -627,7 +627,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
     : VideoOutputQuartzView(pData)
     {
         applyMoveResize = true;
-        name = "Full screen: ";
+        name = (char *) "Full screen: ";
     };
 
    ~VoqvFullscreen()
@@ -722,7 +722,7 @@ class VoqvDock : public VideoOutputQuartzView
     VoqvDock(QuartzData *pData)
     : VideoOutputQuartzView(pData)
     {
-        name = "Dock icon: ";
+        name = (char *) "Dock icon: ";
     };
 
    ~VoqvDock()
@@ -766,7 +766,7 @@ class VoqvFloater : public VideoOutputQuartzView
     {
         alpha = fminf(1.0, fmaxf(0.0, alphaBlend));
         resizing = false;
-        name = "Floating window: ";
+        name = (char *) "Floating window: ";
     };
 
    ~VoqvFloater()
@@ -1004,7 +1004,7 @@ class VoqvDesktop : public VideoOutputQuartzView
     VoqvDesktop(QuartzData *pData)
     : VideoOutputQuartzView(pData)
     {
-        name = "Desktop: ";
+        name = (char *) "Desktop: ";
     };
 
    ~VoqvDesktop()
@@ -1440,7 +1440,8 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
 void VideoOutputQuartz::SetVideoFrameRate(float playback_fps)
 {
-    VERBOSE(VB_PLAYBACK, "SetVideoFrameRate("<<playback_fps<<")");
+    VERBOSE(VB_PLAYBACK, QString("SetVideoFrameRate(%1) - unimplemented?")
+                         .arg(playback_fps));
 }
 
 void VideoOutputQuartz::SetDVDVDecoder(DVDV *dvdvdec)
@@ -1477,8 +1478,8 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
-    VERBOSE(VB_PLAYBACK, LOC + "CreateQuartzBuffers() "
-            <<QString("render: %1, allowed: %2")
+    VERBOSE(VB_PLAYBACK,
+            (LOC + "CreateQuartzBuffers() render: %1, allowed: %2")
             .arg(tmp).arg(toCommaList(renderers)));
 
     if (renderers.contains(tmp))
