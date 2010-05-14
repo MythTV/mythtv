@@ -46,12 +46,15 @@ There are also a few simple \ref testing "testing shortcuts".
 
 \section libs Libraries
 
-%MythTV is divided up into 17 libraries:
+%MythTV is divided up into 20 libraries:
 <dl>
-  <dt>libmythdb              <dd>Lowest-level %MythTV library. Used by the Plugins.
-      Contains the \ref database_subsystem "database", \ref lcd_subsystem "LCD",
+  <dt>libmythdb
+  <dd>Lowest-level %MythTV library. Used by the Plugins.
+
+      Contains the \ref database_subsystem "database",
       and network support code (used by the
-      \ref myth_network_protocol "myth network protocol").
+      \ref myth_network_protocol "myth network protocol" and 
+      \ref lcd_subsystem "LCDproc interface").
 
       This also contains some other basic functionality and classes which
       are used by one or more of libmyth, libmythui and libmythtv.
@@ -59,7 +62,9 @@ There are also a few simple \ref testing "testing shortcuts".
       Any changes to this library's ABI may trigger a myth binary version
       change because the plugins depend on it.
 
-  <dt>libmythui              <dd>Main user interface rendering library. Used by the Plugins.
+  <dt>libmythui
+  <dd>Main user interface rendering library. Used by the Plugins.
+
       The mouse/touchscreen gesture, remote control
       (\ref lirc_subsystem "LIRC" and AppleRemote)
       and screen saver control code are also contained in this library.
@@ -67,7 +72,7 @@ There are also a few simple \ref testing "testing shortcuts".
       This library depends on libmyth. Any changes to this library's ABI
       may trigger a myth binary version change because the plugins depend on it.
 
-  <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
+  <dt>libmythupnp            <dd>Simple uPnP (universal Plug and Play) support.
 
       This library depends on libmythdb.
 
@@ -77,21 +82,22 @@ There are also a few simple \ref testing "testing shortcuts".
       language support,
       \ref plugin_arch "plugin manager",
       \ref myth_media "media manager",
-      and some UI widgets are implemented by libmyth.
+      and some old UI widgets are implemented by libmyth.
 
-      This library depends on both libmyth, libmythupnp and libmythui.
+      This library depends on libav*, libmythdb, libmythui, libmythupnp,
+      libmythsamplerate, libmythsoundtouch and libmythfreesurround.
+
       Any changes to this library's ABI may trigger a myth binary version
       change because the plugins depend on it.
-
-  <dt>libmythtv              <dd>%MythTV %TV functionality library. Used by some Plugins.
+		
+  <dt>libmythtv
+      <dd>%MythTV %TV functionality library. Used by some Plugins.
       The
       \ref osd_subsystem "OSD",
       \ref recorder_subsystem "recorders", \ref video_subsystem "video" and
-      \ref av_player_subsystem "A/V players" are supported by libmythtv.
+      \ref av_player_subsystem "A/V players" are implemented by libmythtv.
 
-      This library depends on libmythdb, libmythui and libmyth.
-      It also depends on avlib, libmythmpeg2, libmythsamplerate,
-      libmythsoundtouch, libdvdnav, libfreemheg and liblivemedia.
+      This library basically depends on all the other libraries!
 
       This library is used by some plugins so changes to it's ABI may
       require a myth binary version change.
@@ -103,7 +109,8 @@ There are also a few simple \ref testing "testing shortcuts".
 
   <dt>libavcodec/libavformat/libavutil/libpostproc/libswscale
       <dd>These together form the FFmpeg A/V decoding library (aka avlib).
-      <a href="http://ffmpeg.mplayerhq.hu/documentation.html">Documented Externally</a>.
+      <a href="http://ffmpeg.mplayerhq.hu/documentation.html">
+          Documented Externally</a>.
 
       These should be modified as little as possible, and any changes
       should be sent upstream for inclusion in the FFmpeg project's
@@ -112,16 +119,15 @@ There are also a few simple \ref testing "testing shortcuts".
       These libraries do not depend on any of our libraries.
 
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
-      <a href="http://libmpeg2.sourceforge.net/">External Website</a>.
-
-      This is an alternate MPEG-2 decoding library. It is offered as
+      <a href="http://libmpeg2.sourceforge.net/">Documented externally</a>.
+      This is offered as
       an option for software decoding of MPEG-1 and MPEG-2 files.
       FFmpeg is still used for decoding MPEG still frames when this
       library is selected for playback.
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythsamplerate      <dd>Audio resampling library
+  <dt>libmythsamplerate      <dd>Audio resampling library.
       <a href="http://www.mega-nerd.com/SRC/api.html">Documented Externally</a>.
       We use this to support different output sample rates than the sample
       rate used in the audio streams we play.
@@ -134,20 +140,30 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythdvdnav
-      <dd>Used for navigating DVD menus when using the internal player
+  <dt>libmythbdnav/libmythdvdnav
+      <dd>Used for navigating Blu Ray and DVD menus
+      when using the internal player.
 
       This library should not depend on any of our libraries.
 
-  <dt>libmythfreemheg        <dd>UK interactive %TV viewer
+  <dt>libmythfreemheg        <dd>UK interactive %TV viewer.
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device
+  <dt>libmythfreesurround
+  <dd>Support for some multi-channel audio transforms.
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythhdhomerun       <dd>Support for the HDHomeRun recorder device
+  <dt>libmythnvctrl          <dd>Interface between X-windows and NVidia drivers.
+
+      This library does not depend on any of our libraries.
+
+  <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device.
+
+      This library does not depend on any of our libraries.
+
+  <dt>libmythhdhomerun       <dd>Support for the HDHomeRun recorder device.
 
       This library does not depend on any of our libraries.
 
@@ -158,7 +174,7 @@ libmythsamplerate resamples audio with better quality when we only need
 to match the hardware sample rate to the A/V streams audio sample rate.
 
 \section db Database Schema
-The database schema is documented here \ref db_schema.
+The database schema is documented \ref db_schema "here".
 
 \section apps Applications
 %MythTV contains 12 applications which are installed by make install
@@ -574,8 +590,8 @@ This line is filler that is ignored by Doxygen.
 Most MythTV programs follow a common sequence:
 <ol>
   <li>Process (parse) command-line arguments</li>
-  <li>Create a MythContext object, which stores paths for later location
-      of runtime assets (filters/fonts/plugins/themes/translations)</li>
+  <li>Create a MythContext object (which contains a MythCoreContext object
+      for server and DB communication, logging and some housekeeping)</li>
   <li>(optionally) Create a UPnP client or server</li>
   <li>Initialise the MythContext, which:</li>
   <ul>
@@ -965,6 +981,7 @@ The internal video playback can be tested by the programs/mythavtest tool:
 
 \verbatim
 mythavtest /myth/tv/1003_20060302232800.mpg
+mythavtest db:\\
 mythavtest dvd:\\
 mythavtest dvd:\\/path/to/dvd.iso
 \endverbatim
