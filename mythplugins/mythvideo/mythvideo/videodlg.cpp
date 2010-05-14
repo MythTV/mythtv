@@ -2376,7 +2376,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
     return icon_file;
 }
 
-/** \fn VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
+/**
  *  \brief Find the first image of "type" within a folder structure.
  *  \return QString local or myth:// for the image.
  *
