@@ -73,6 +73,7 @@ MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
     if (class LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
+        lcd->setFunctionLEDs(FUNC_MUSIC, true);
     }
 }
 
@@ -94,6 +95,12 @@ MusicCommon::~MusicCommon(void)
 
         delete m_mainvisual;
         m_mainvisual = NULL;
+    }
+
+    if (class LCD *lcd = LCD::Get())
+    {
+        lcd->switchToTime();
+        lcd->setFunctionLEDs(FUNC_MUSIC, false);
     }
 }
 

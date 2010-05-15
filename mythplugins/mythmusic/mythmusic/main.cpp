@@ -162,8 +162,92 @@ void SavePending(int pending)
     }
 }
 
+static void loadMusic()
+{
+    // only do this once
+    if (gMusicData->initialized)
+        return;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    QString message = QObject::tr("Loading Music. Please wait ...");
+
+    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
+                                                  "musicscanbusydialog");
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+        busy = NULL;
+
+    srand(time(NULL));
+
+    CheckFreeDBServerFile();
+
+    MSqlQuery count_query(MSqlQuery::InitCon());
+
+    bool musicdata_exists = false;
+    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
+    {
+        if(count_query.next() &&
+            0 != count_query.value(0).toInt())
+        {
+            musicdata_exists = true;
+        }
+    }
+
+    //  Load all available info about songs (once!)
+    QString startdir = gCoreContext->GetSetting("MusicLocation");
+    startdir = QDir::cleanPath(startdir);
+    if (!startdir.endsWith("/"))
+        startdir += "/";
+
+    Metadata::SetStartdir(startdir);
+
+    Decoder::SetLocationFormatUseTags();
+
+    // Only search music files if a directory was specified & there
+    // is no data in the database yet (first run).  Otherwise, user
+    // can choose "Setup" option from the menu to force it.
+    if (!startdir.isEmpty() && !musicdata_exists)
+    {
+        FileScanner *fscan = new FileScanner();
+        fscan->SearchDir(startdir);
+        delete fscan;
+    }
+
+    QString paths = gCoreContext->GetSetting("TreeLevels");
+
+    // Set the various track formatting modes
+    Metadata::setArtistAndTrackFormats();
+
+    AllMusic *all_music = new AllMusic(paths, startdir);
+
+    //  Load all playlists into RAM (once!)
+    PlaylistContainer *all_playlists = new PlaylistContainer(
+            all_music, gCoreContext->GetHostName());
+
+    gMusicData->paths = paths;
+    gMusicData->startdir = startdir;
+    gMusicData->all_playlists = all_playlists;
+    gMusicData->all_music = all_music;
+    gMusicData->initialized = true;
+
+    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
+    {
+        qApp->processEvents();
+        usleep(50000);
+    }
+    gMusicData->all_playlists->postLoad();
+
+    gPlayer->constructPlaylist();
+
+    if (busy)
+        busy->Close();
+
+}
+
 void startPlayback(void)
 {
+    loadMusic();
     PlaybackBoxMusic *pbb;
     pbb = new PlaybackBoxMusic(GetMythMainWindow(),
                                "music_play", "music-", chooseCD(), "music_playback");
@@ -175,6 +259,7 @@ void startPlayback(void)
 
 void startDatabaseTree(void)
 {
+    loadMusic();
     DatabaseBox *dbbox = new DatabaseBox(GetMythMainWindow(),
                          chooseCD(), "music_select", "music-", "music database");
     dbbox->exec();
@@ -185,6 +270,8 @@ void startDatabaseTree(void)
 
 void startRipper(void)
 {
+    loadMusic();
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());
@@ -199,6 +286,8 @@ void startRipper(void)
 
 void startImport(void)
 {
+    loadMusic();
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     ImportMusicDialog *import = new ImportMusicDialog(mainStack);
@@ -218,7 +307,7 @@ void RebuildMusicTree(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     QString message = QObject::tr("Rebuilding music tree");
-    
+
     MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
                                                   "musicscanbusydialog");
                                                   
@@ -238,8 +327,6 @@ void RebuildMusicTree(void)
     if (busy)
         busy->Close();
 }
-
-static void postMusic(void);
 
 void MusicCallback(void *data, QString &selection)
 {
@@ -282,14 +369,6 @@ void MusicCallback(void *data, QString &selection)
     {
         MusicRipperSettings settings;
         settings.exec();
-    }
-    else if (sel == "exiting_menu")
-    {
-        if (gMusicData)
-        {
-            if (gMusicData->runPost)
-                postMusic();
-        }
     }
 }
 
@@ -477,104 +556,17 @@ int mythplugin_init(const char *libversion)
     return 0;
 }
 
-static void preMusic()
-{
-    srand(time(NULL));
-
-    CheckFreeDBServerFile();
-
-    MSqlQuery count_query(MSqlQuery::InitCon());
-
-    bool musicdata_exists = false;
-    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
-    {
-        if(count_query.next() &&
-           0 != count_query.value(0).toInt())
-        {
-            musicdata_exists = true;
-        }
-    }
-
-    //  Load all available info about songs (once!)
-    QString startdir = gCoreContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanPath(startdir);
-    if (!startdir.endsWith("/"))
-        startdir += "/";
-
-    Metadata::SetStartdir(startdir);
-
-    Decoder::SetLocationFormatUseTags();
-
-    // Only search music files if a directory was specified & there
-    // is no data in the database yet (first run).  Otherwise, user
-    // can choose "Setup" option from the menu to force it.
-    if (!startdir.isEmpty() && !musicdata_exists)
-    {
-        FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(startdir);
-        delete fscan;
-    }
-
-    QString paths = gCoreContext->GetSetting("TreeLevels");
-
-    // Set the various track formatting modes
-    Metadata::setArtistAndTrackFormats();
-
-    AllMusic *all_music = new AllMusic(paths, startdir);
-
-    //  Load all playlists into RAM (once!)
-    PlaylistContainer *all_playlists = new PlaylistContainer(
-        all_music, gCoreContext->GetHostName());
-
-    gMusicData->paths = paths;
-    gMusicData->startdir = startdir;
-    gMusicData->all_playlists = all_playlists;
-    gMusicData->all_music = all_music;
-
-    if (LCD *lcd = LCD::Get())
-    {
-        lcd->setFunctionLEDs(FUNC_MUSIC, true);
-    }
-}
-
-static void postMusic()
-{
-    // Automagically save all playlists and metadata (ratings) that have changed
-    if (gMusicData->all_music->cleanOutThreads())
-    {
-        gMusicData->all_music->save();
-    }
-
-    if (gMusicData->all_playlists->cleanOutThreads())
-    {
-        gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
-    }
-
-    delete gMusicData->all_music;
-    gMusicData->all_music = NULL;
-    delete gMusicData->all_playlists;
-    gMusicData->all_playlists = NULL;
-
-    if (LCD *lcd = LCD::Get())
-    {
-        lcd->setFunctionLEDs(FUNC_MUSIC, false);
-    }
-}
 
 int mythplugin_run(void)
 {
-    gMusicData->runPost = true;
-
-    preMusic();
-
     return runMenu("musicmenu.xml");
 }
 
 int mythplugin_config(void)
 {
-    gMusicData->runPost = false;
+    //TODO do we need this here?
+    loadMusic();
+
     gMusicData->paths = gCoreContext->GetSetting("TreeLevels");
     gMusicData->startdir = gCoreContext->GetSetting("MusicLocation");
     gMusicData->startdir = QDir::cleanPath(gMusicData->startdir);
@@ -591,32 +583,44 @@ int mythplugin_config(void)
 
 void mythplugin_destroy(void)
 {
-    postMusic();
+    gPlayer->stop(true);
+
+    // TODO these should be saved when they are changed
+    // Automagically save all playlists and metadata (ratings) that have changed
+    if (gMusicData->all_music->cleanOutThreads())
+    {
+        gMusicData->all_music->save();
+    }
+
+    if (gMusicData->all_playlists->cleanOutThreads())
+    {
+        gMusicData->all_playlists->save();
+        int x = gMusicData->all_playlists->getPending();
+        SavePending(x);
+    }
+
     gPlayer->deleteLater();
+
     delete gMusicData;
 }
 
 void runMusicPlayback(void)
 {
     GetMythUI()->AddCurrentLocation("playmusic");
-    preMusic();
     startPlayback();
-    //postMusic();
     GetMythUI()->RemoveCurrentLocation();
 }
 
 void runMusicSelection(void)
 {
     GetMythUI()->AddCurrentLocation("musicplaylists");
-    preMusic();
     startDatabaseTree();
-    //postMusic();
     GetMythUI()->RemoveCurrentLocation();
 }
 
 void runRipCD(void)
 {
-    preMusic();
+    loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -628,13 +632,11 @@ void runRipCD(void)
         delete rip;
 
 //   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
-
-//     postMusic();
 }
 
 void runScan(void)
 {
-    preMusic();
+    loadMusic();
 
     if ("" != gMusicData->startdir)
     {
@@ -643,15 +645,13 @@ void runScan(void)
         RebuildMusicTree();
         delete fscan;
     }
-
-    postMusic();
 }
 
 void showMiniPlayer(void)
 {
     if (!gMusicData->all_music)
         return;
-    
+
     // only show the miniplayer if there isn't already a client attached
     if (!gPlayer->hasClient())
         gPlayer->showMiniPlayer();

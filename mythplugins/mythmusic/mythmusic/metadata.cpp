@@ -1653,7 +1653,7 @@ MusicData::MusicData(void)
 {
     all_playlists = NULL;
     all_music = NULL;
-    runPost = false;
+    initialized = false;
 }
 
 MusicData::~MusicData(void)

@@ -407,7 +407,7 @@ class MusicData
     QString             startdir;
     PlaylistContainer  *all_playlists;
     AllMusic           *all_music;
-    bool                runPost;
+    bool                initialized;
 };
 
 // This global variable contains the MusicData instance for the application
