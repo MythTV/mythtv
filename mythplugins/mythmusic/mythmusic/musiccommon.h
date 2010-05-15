@@ -124,7 +124,8 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     MythUIProgressBar     *m_trackProgress;
     MythUIText            *m_trackProgressText;
-    MythUIText            *m_trackSpeed;
+    MythUIText            *m_trackSpeedText;
+    MythUIStateType       *m_trackState;
 
     MythUIStateType       *m_muteState;
     MythUIText            *m_volumeText;

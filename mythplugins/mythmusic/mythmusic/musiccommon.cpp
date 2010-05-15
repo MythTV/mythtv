@@ -112,7 +112,8 @@ bool MusicCommon::CreateCommon(void)
 
     UIUtilW::Assign(this, m_trackProgress,     "progress", &err);
     UIUtilW::Assign(this, m_trackProgressText, "trackprogress", &err);
-    UIUtilW::Assign(this, m_trackSpeed,        "trackspeed", &err);
+    UIUtilW::Assign(this, m_trackSpeedText, "trackspeed", &err);
+    UIUtilW::Assign(this, m_trackState,        "trackstate", &err);
 
     UIUtilW::Assign(this, m_volumeText,        "volume", &err);
     UIUtilW::Assign(this, m_muteState,         "mutestate", &err);
@@ -230,6 +231,19 @@ bool MusicCommon::CreateCommon(void)
 
     if (m_movingTracksState)
         m_movingTracksState->DisplayState("off");
+
+    if (m_trackState)
+    {
+        if (!gPlayer->isPlaying()) // TODO: Add Player status check
+        {
+            if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
+                m_trackState->DisplayState("paused");
+            else
+                m_trackState->DisplayState("stopped");
+        }
+        else
+            m_trackState->DisplayState("playing");
+    }
 
     gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
                                       m_currentTrack, &m_playlistPlayedTime);
@@ -869,6 +883,8 @@ void MusicCommon::customEvent(QEvent *event)
                 m_playButton->SetLocked(true);
             if (m_pauseButton)
                 m_pauseButton->SetLocked(false);
+            if (m_trackState)
+                m_trackState->DisplayState("playing");
         }
     }
     else if (event->type() == OutputEvent::Buffering)
@@ -884,6 +900,8 @@ void MusicCommon::customEvent(QEvent *event)
             m_playButton->SetLocked(false);
         if (m_pauseButton)
             m_pauseButton->SetLocked(true);
+        if (m_trackState)
+            m_trackState->DisplayState("paused");
     }
     else if (event->type() == OutputEvent::Info)
     {
@@ -967,6 +985,8 @@ void MusicCommon::customEvent(QEvent *event)
             m_playButton->SetLocked(false);
         if (m_pauseButton)
             m_pauseButton->SetLocked(false);
+        if (m_trackState)
+            m_trackState->DisplayState("stopped");
     }
     else if (event->type() == DecoderEvent::Finished)
     {
