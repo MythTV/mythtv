@@ -169,7 +169,8 @@ bool MusicCommon::CreateCommon(void)
 
     gPlayer->addListener(this);
 
-    if (!gPlayer->isPlaying())
+    if ((this->objectName() != "music_miniplayer") // HACK
+        && !gPlayer->isPlaying())
     {
         gPlayer->loadPlaylist();
         gPlayer->restorePosition(gCoreContext->GetNumSetting("MusicBookmark"));
