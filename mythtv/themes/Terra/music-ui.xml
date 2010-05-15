@@ -5,18 +5,20 @@
         <window name="miniplayer">
             <area>20,690,800,30</area>
 
-            <statetype name="playbackstate">
+            <statetype name="trackstate">
                 <state name="playing">
                     <imagetype name="playicon">
                         <filename>music/miniplayer_playicon.png</filename>
                     </imagetype>
                 </state>
                 <state name="paused">
+                    <position>0,4</position>
                     <imagetype name="pauseicon">
                         <filename>music/miniplayer_pauseicon.png</filename>
                     </imagetype>
                 </state>
                 <state name="stopped">
+                    <position>0,4</position>
                     <imagetype name="stopicon">
                         <filename>music/miniplayer_stopicon.png</filename>
                     </imagetype>
