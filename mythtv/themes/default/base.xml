@@ -627,6 +627,66 @@
         </imagetype>
     </progressbar>
 
+    <!-- Base definition of a state used for ratings 0 to 10 -->
+    <statetype name="baseratingstate">
+        <position>0,0</position>
+        <state name="0">
+            <imagetype name="stars">
+                <filename>shared/0_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="1">
+            <imagetype name="stars">
+                <filename>shared/1_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="2">
+            <imagetype name="stars">
+                <filename>shared/2_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="3">
+            <imagetype name="stars">
+                <filename>shared/3_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="4">
+            <imagetype name="stars">
+                <filename>shared/4_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="5">
+            <imagetype name="stars">
+                <filename>shared/5_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="6">
+            <imagetype name="stars">
+                <filename>shared/6_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="7">
+            <imagetype name="stars">
+                <filename>shared/7_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="8">
+            <imagetype name="stars">
+                <filename>shared/8_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="9">
+            <imagetype name="stars">
+                <filename>shared/9_stars.png</filename>
+            </imagetype>
+        </state>
+        <state name="10">
+            <imagetype name="stars">
+                <filename>shared/10_stars.png</filename>
+            </imagetype>
+        </state>
+    </statetype>
+
     <!-- Popup Dialogue Box -->
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
