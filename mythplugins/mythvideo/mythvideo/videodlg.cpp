@@ -58,50 +58,6 @@ namespace
         return false;
     }
 
-    QString ParentalLevelToState(const ParentalLevel &level)
-    {
-        QString ret;
-        switch (level.GetLevel())
-        {
-            case ParentalLevel::plLowest :
-                ret = "Lowest";
-                break;
-            case ParentalLevel::plLow :
-                ret = "Low";
-                break;
-            case ParentalLevel::plMedium :
-                ret = "Medium";
-                break;
-            case ParentalLevel::plHigh :
-                ret = "High";
-                break;
-            default:
-                ret = "None";
-        }
-
-        return ret;
-    }
-
-    QString TrailerToState(const QString &trailerFile)
-    {
-        QString ret;
-        if (!trailerFile.isEmpty())
-            ret = "hasTrailer";
-        else
-            ret = "None";
-        return ret;
-    }
-
-    QString WatchedToState(bool watched)
-    {
-        QString ret;
-        if (watched)
-            ret = "yes";
-        else
-            ret = "no";
-        return ret;
-    }
-
     class ImageDownloadProxy : public QObject
     {
         Q_OBJECT
@@ -1134,57 +1090,12 @@ namespace
 
             tmp["fanartfile"] = fanartfile;
 
-            tmp["video_player"] = VideoPlayerCommand::PlayerFor(metadata)
-                    .GetCommandDisplayName();
-            tmp["player"] = metadata->GetPlayCommand();
-
-            tmp["filename"] = metadata->GetFilename();
-            tmp["title"] = metadata->GetTitle();
-            tmp["subtitle"] = metadata->GetSubtitle();
-            tmp["tagline"] = GetDisplayRating(metadata->GetTagline());
-            tmp["director"] = metadata->GetDirector();
-            tmp["description"] = metadata->GetPlot();
-            tmp["genres"] = GetDisplayGenres(*metadata);
-            tmp["countries"] = GetDisplayCountries(*metadata);
-            tmp["cast"] = GetDisplayCast(*metadata).join(", ");
-            tmp["rating"] = GetDisplayRating(metadata->GetRating());
-            tmp["length"] = GetDisplayLength(metadata->GetLength());
-            tmp["year"] = GetDisplayYear(metadata->GetYear());
-
-            QString formatLongDate = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
-            tmp["releasedate"] = metadata->GetReleaseDate().toString(formatLongDate);
-
-            tmp["userrating"] = GetDisplayUserRating(metadata->GetUserRating());
-            tmp["season"] = GetDisplaySeasonEpisode(metadata->GetSeason(), 1);
-            tmp["episode"] = GetDisplaySeasonEpisode(metadata->GetEpisode(), 1);
-
-            if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
-            {
-                tmp["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                                     (metadata->GetSeason(), 2))
-                                .arg(GetDisplaySeasonEpisode(metadata->GetEpisode(), 2));
-                tmp["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                                     (metadata->GetSeason(), 1))           
-                                .arg(GetDisplaySeasonEpisode(metadata->GetEpisode(), 2));
-            }
-            else
-                tmp["s##e##"] = tmp["##x##"] = QString();
-
             tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
             tmp["userratingstate"] =
                     QString::number((int)(metadata->GetUserRating()));
             tmp["watchedstate"] = WatchedToState(metadata->GetWatched());
 
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
-
-            tmp["insertdate"] = metadata->GetInsertdate()
-                                     .toString(gCoreContext->GetSetting("DateFormat"));
-            tmp["inetref"] = metadata->GetInetRef();
-            tmp["homepage"] = metadata->GetHomepage();
-            tmp["child_id"] = QString::number(metadata->GetChildID());
-            tmp["browseable"] = GetDisplayBrowse(metadata->GetBrowse());
-            tmp["watched"] = GetDisplayWatched(metadata->GetWatched());
-            tmp["category"] = metadata->GetCategory();
         }
 
         struct helper
@@ -1195,11 +1106,6 @@ namespace
             void handleImage(const QString &name)
             {
                 m_dest.handleImage(name, m_vallist[name]);
-            }
-
-            void handleText(const QString &name)
-            {
-                m_dest.handleText(name, m_vallist[name]);
             }
 
             void handleState(const QString &name)
@@ -1217,39 +1123,6 @@ namespace
         h.handleImage("screenshot");
         h.handleImage("banner");
         h.handleImage("fanart");
-
-        h.handleText("coverfile");
-        h.handleText("screenshotfile");
-        h.handleText("bannerfile");
-        h.handleText("fanartfile");
-        h.handleText("video_player");
-        h.handleText("player");
-        h.handleText("filename");
-        h.handleText("title");
-        h.handleText("subtitle");
-        h.handleText("tagline");
-        h.handleText("director");
-        h.handleText("description");
-        h.handleText("genres");
-        h.handleText("countries");
-        h.handleText("cast");
-        h.handleText("rating");
-        h.handleText("length");
-        h.handleText("season");
-        h.handleText("s##e##");
-        h.handleText("##x##");
-        h.handleText("episode");
-        h.handleText("year");
-        h.handleText("releasedate");
-        h.handleText("userrating");
-
-        h.handleText("insertdate");
-        h.handleText("inetref");
-        h.handleText("homepage");
-        h.handleText("child_id");
-        h.handleText("browseable");
-        h.handleText("watched");
-        h.handleText("category");
 
         h.handleState("trailerstate");
         h.handleState("userratingstate");
@@ -1295,6 +1168,10 @@ class ItemDetailPopup : public MythScreenType
 
         if (m_playButton || m_doneButton)
             SetFocusWidget(m_playButton ? m_playButton : m_doneButton);
+
+        MetadataMap metadataMap;
+        m_metadata->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
 
         ScreenCopyDest dest(this);
         CopyMetadataToUI(m_metadata, dest);
@@ -1857,10 +1734,17 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     Metadata *metadata = GetMetadata(item);
 
+    if (metadata)
+    {
+        MetadataMap metadataMap;
+        metadata->toMap(metadataMap);
+        item->SetTextFromMap(metadataMap);
+    }
+
     MythUIButtonListItemCopyDest dest(item);
     CopyMetadataToUI(metadata, dest);
 
-    MythGenericTree *parent = node->getParent();    
+    MythGenericTree *parent = node->getParent();
 
     if (parent && metadata && ((QString::compare(parent->getString(),
                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
@@ -1873,7 +1757,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     QString screenshot = GetScreenshot(node);
     QString banner     = GetBanner(node);
     QString fanart     = GetFanart(node);
-    
+
     if (!screenshot.isEmpty() && parent && metadata &&
         ((QString::compare(parent->getString(),
                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
@@ -1887,16 +1771,6 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
             coverimage = GetFirstImage(node, "Coverart");
         item->SetImage(coverimage);
     }
-    
-//    else if (metadata)
-//    {
-//        imgFilename = GetImageFromFolder(metadata);
-
-//        if (!imgFilename.isEmpty() && !imgFilename.endsWith("/") &&
-//           (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
-//            item->SetImage(imgFilename);
-//    }
-
 
     int nodeInt = node->getInt();
 
@@ -2894,6 +2768,19 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     Metadata *metadata = GetMetadata(item);
 
     MythGenericTree *node = GetNodePtrFromButton(item);
+
+    if (metadata)
+    {
+        MetadataMap metadataMap;
+        metadata->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
+    }
+    else
+    {
+        MetadataMap metadataMap;
+        ClearMap(metadataMap);
+        SetTextFromMap(metadataMap);
+    }
 
     ScreenCopyDest dest(this);
     CopyMetadataToUI(metadata, dest);

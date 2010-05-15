@@ -1081,6 +1081,154 @@ Metadata &Metadata::operator=(const Metadata &rhs)
     return *this;
 }
 
+void Metadata::toMap(MetadataMap &metadataMap)
+{
+    if (this == NULL)
+        return;
+
+    QString coverfile;
+    if (IsHostSet()
+        && !GetCoverFile().startsWith("/")
+        && !GetCoverFile().isEmpty()
+        && !IsDefaultCoverFile(GetCoverFile()))
+    {
+        coverfile = generate_file_url("Coverart", GetHost(),
+                GetCoverFile());
+    }
+    else
+    {
+        coverfile = GetCoverFile();
+    }
+
+    metadataMap["coverfile"] = coverfile;
+
+    QString screenshotfile;
+    if (IsHostSet() && !GetScreenshot().startsWith("/")
+        && !GetScreenshot().isEmpty())
+    {
+        screenshotfile = generate_file_url("Screenshots",
+                GetHost(), GetScreenshot());
+    }
+    else
+    {
+        screenshotfile = GetScreenshot();
+    }
+
+    metadataMap["screenshotfile"] = screenshotfile;
+
+    QString bannerfile;
+    if (IsHostSet() && !GetBanner().startsWith("/")
+        && !GetBanner().isEmpty())
+    {
+        bannerfile = generate_file_url("Banners", GetHost(),
+                GetBanner());
+    }
+    else
+    {
+        bannerfile = GetBanner();
+    }
+
+    metadataMap["bannerfile"] = bannerfile;
+
+    QString fanartfile;
+    if (IsHostSet() && !GetFanart().startsWith("/")
+        && !GetFanart().isEmpty())
+    {
+        fanartfile = generate_file_url("Fanart", GetHost(),
+                GetFanart());
+    }
+    else
+    {
+        fanartfile = GetFanart();
+    }
+
+    metadataMap["fanartfile"] = fanartfile;
+
+    metadataMap["filename"] = GetFilename();
+    metadataMap["title"] = GetTitle();
+    metadataMap["subtitle"] = GetSubtitle();
+    metadataMap["tagline"] = GetTagline();
+    metadataMap["director"] = GetDirector();
+    metadataMap["description"] = GetPlot();
+    metadataMap["genres"] = GetDisplayGenres(*this);
+    metadataMap["countries"] = GetDisplayCountries(*this);
+    metadataMap["cast"] = GetDisplayCast(*this).join(", ");
+    metadataMap["rating"] = GetDisplayRating(GetRating());
+    metadataMap["length"] = GetDisplayLength(GetLength());
+    metadataMap["year"] = GetDisplayYear(GetYear());
+
+    QString formatLongDate = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
+    metadataMap["releasedate"] = GetReleaseDate().toString(formatLongDate);
+
+    metadataMap["userrating"] = GetDisplayUserRating(GetUserRating());
+    metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
+    metadataMap["episode"] = GetDisplaySeasonEpisode(GetEpisode(), 1);
+
+    if (GetSeason() > 0 || GetEpisode() > 0)
+    {
+        metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                             (GetSeason(), 2))
+                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
+        metadataMap["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                             (GetSeason(), 1))
+                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
+    }
+    else
+        metadataMap["s##e##"] = metadataMap["##x##"] = QString();
+
+    metadataMap["trailerstate"] = TrailerToState(GetTrailer());
+    metadataMap["userratingstate"] =
+            QString::number((int)(GetUserRating()));
+    metadataMap["watchedstate"] = WatchedToState(GetWatched());
+
+    metadataMap["videolevel"] = ParentalLevelToState(GetShowLevel());
+
+    metadataMap["insertdate"] = GetInsertdate()
+                             .toString(gCoreContext->GetSetting("DateFormat"));
+    metadataMap["inetref"] = GetInetRef();
+    metadataMap["homepage"] = GetHomepage();
+    metadataMap["child_id"] = QString::number(GetChildID());
+    metadataMap["browseable"] = GetDisplayBrowse(GetBrowse());
+    metadataMap["watched"] = GetDisplayWatched(GetWatched());
+    metadataMap["category"] = GetCategory();
+}
+
+void ClearMap(MetadataMap &metadataMap)
+{
+    metadataMap["coverfile"] = "";
+    metadataMap["screenshotfile"] = "";
+    metadataMap["bannerfile"] = "";
+    metadataMap["fanartfile"] = "";
+    metadataMap["filename"] = "";
+    metadataMap["title"] = "";
+    metadataMap["subtitle"] = "";
+    metadataMap["tagline"] = "";
+    metadataMap["director"] = "";
+    metadataMap["description"] = "";
+    metadataMap["genres"] = "";
+    metadataMap["countries"] = "";
+    metadataMap["cast"] = "";
+    metadataMap["rating"] = "";
+    metadataMap["length"] = "";
+    metadataMap["year"] = "";
+    metadataMap["releasedate"] = "";
+    metadataMap["userrating"] = "";
+    metadataMap["season"] = "";
+    metadataMap["episode"] = "";
+    metadataMap["s##e##"] = "";
+    metadataMap["trailerstate"] = "";
+    metadataMap["userratingstate"] = "";
+    metadataMap["watchedstate"] = "";
+    metadataMap["videolevel"] = "";
+    metadataMap["insertdate"] = "";
+    metadataMap["inetref"] = "";
+    metadataMap["homepage"] = "";
+    metadataMap["child_id"] = "";
+    metadataMap["browseable"] = "";
+    metadataMap["watched"] = "";
+    metadataMap["category"] = "";
+}
+
 bool Metadata::HasSortKey() const
 {
     return m_imp->HasSortKey();

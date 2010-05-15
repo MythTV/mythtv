@@ -1,6 +1,8 @@
 #ifndef VIDEOUTILS_H_
 #define VIDEOUTILS_H_
 
+#include "parentalcontrols.h"
+
 template <typename T>
 inline void CheckedSet(T *uiItem, const QString &value)
 {
@@ -46,6 +48,10 @@ QStringList GetDisplayCast(const Metadata &item);
 int editDistance(const QString& s, const QString& t);
 QString nearestName(const QString& actual, const QStringList& candidates,
                     bool mythvideomode = false);
+
+QString TrailerToState(const QString &trailerFile);
+QString ParentalLevelToState(const ParentalLevel &level);
+QString WatchedToState(bool watched);
 
 // this needs to be an inline and pull in the storage group and context
 // headers since it this used in dbcheck.cpp, and it is pulled into mtd.

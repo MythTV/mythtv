@@ -297,3 +297,48 @@ QString nearestName(const QString& actual, const QStringList& candidates, bool m
     else
         return QString();
 }
+
+QString ParentalLevelToState(const ParentalLevel &level)
+{
+    QString ret;
+    switch (level.GetLevel())
+    {
+         case ParentalLevel::plLowest :
+            ret = "Lowest";
+            break;
+        case ParentalLevel::plLow :
+            ret = "Low";
+            break;
+        case ParentalLevel::plMedium :
+            ret = "Medium";
+            break;
+        case ParentalLevel::plHigh :
+            ret = "High";
+            break;
+        default:
+            ret = "None";
+    }
+
+    return ret;
+}
+
+QString TrailerToState(const QString &trailerFile)
+{
+    QString ret;
+    if (!trailerFile.isEmpty())
+        ret = "hasTrailer";
+    else
+        ret = "None";
+    return ret;
+}
+
+QString WatchedToState(bool watched)
+{
+    QString ret;
+    if (watched)
+        ret = "yes";
+    else
+        ret = "no";
+    return ret;
+}
+

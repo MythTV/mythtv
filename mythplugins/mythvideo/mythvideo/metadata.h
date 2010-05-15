@@ -17,6 +17,8 @@ const QString VIDEO_SUBTITLE_DEFAULT = "";
 
 struct SortData;
 
+typedef QHash<QString,QString> MetadataMap;
+
 class Metadata
 {
   public:
@@ -91,6 +93,8 @@ class Metadata
     Metadata(MSqlQuery &query);
     Metadata(const Metadata &rhs);
     Metadata &operator=(const Metadata &rhs);
+
+    void toMap(MetadataMap &metadataMap);
 
     // returns a string to use when sorting
     bool HasSortKey() const;
@@ -220,6 +224,8 @@ class Metadata
   private:
     class MetadataImp *m_imp;
 };
+
+void ClearMap(MetadataMap &metadataMap);
 
 bool operator==(const Metadata &a, const Metadata &b);
 bool operator!=(const Metadata &a, const Metadata &b);
