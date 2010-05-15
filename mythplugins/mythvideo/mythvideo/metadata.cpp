@@ -1216,6 +1216,7 @@ void ClearMap(MetadataMap &metadataMap)
     metadataMap["season"] = "";
     metadataMap["episode"] = "";
     metadataMap["s##e##"] = "";
+    metadataMap["##x##"] = "";
     metadataMap["trailerstate"] = "";
     metadataMap["userratingstate"] = "";
     metadataMap["watchedstate"] = "";
