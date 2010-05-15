@@ -116,7 +116,7 @@ class MetadataImp
         m_host(host), m_categoryID(categoryID), m_childID(childID),
         m_year(year), m_releasedate(releasedate), m_length(length), m_season(season),
         m_episode(episode), m_insertdate(insertdate), m_showlevel(showlevel),
-        m_browse(browse), m_watched(watched), m_id(id), 
+        m_browse(browse), m_watched(watched), m_id(id),
         m_userrating(userrating)
     {
         VideoCategory::GetCategory().get(m_categoryID, m_category);
@@ -277,7 +277,7 @@ class MetadataImp
     void SetYear(int year) { m_year = year; }
 
     QDate getReleaseDate() const { return m_releasedate; }
-    void SetReleaseDate(QDate releasedate) { m_releasedate = releasedate; } 
+    void SetReleaseDate(QDate releasedate) { m_releasedate = releasedate; }
 
     int GetLength() const { return m_length; }
     void SetLength(int length) { m_length = length; }
@@ -447,11 +447,11 @@ void MetadataImp::Reset()
     MetadataImp tmp(m_filename, Metadata::VideoFileHash(m_filename, m_host), VIDEO_TRAILER_DEFAULT,
                     VIDEO_COVERFILE_DEFAULT, VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
                     VIDEO_FANART_DEFAULT, Metadata::FilenameToMeta(m_filename, 1), QString(),
-                    Metadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT, 
-                    QDate(), VIDEO_INETREF_DEFAULT, QString(), VIDEO_DIRECTOR_DEFAULT, 
+                    Metadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT,
+                    QDate(), VIDEO_INETREF_DEFAULT, QString(), VIDEO_DIRECTOR_DEFAULT,
                     VIDEO_PLOT_DEFAULT, 0.0,
-                    VIDEO_RATING_DEFAULT, 0, 
-                    Metadata::FilenameToMeta(m_filename, 2).toInt(), 
+                    VIDEO_RATING_DEFAULT, 0,
+                    Metadata::FilenameToMeta(m_filename, 2).toInt(),
                     Metadata::FilenameToMeta(m_filename, 3).toInt(), QDate(), m_id,
                     ParentalLevel::plLowest, 0, -1, true, false, "", "",
                     Metadata::genre_list(), Metadata::country_list(),
@@ -1052,7 +1052,7 @@ Metadata::Metadata(const QString &filename, const QString &hash,
     m_imp = new MetadataImp(filename, hash, trailer, coverfile, screenshot, banner,
                             fanart, title, subtitle, tagline, year, releasedate, inetref,
                             homepage, director, plot, userrating, rating, length, season, episode,
-                            insertdate, id, showlevel, categoryID, childID, browse, watched, 
+                            insertdate, id, showlevel, categoryID, childID, browse, watched,
                             playcommand, category, genres, countries, cast, host);
 }
 
@@ -1268,7 +1268,7 @@ const QString &Metadata::GetSubtitle() const
 {
     return m_imp->getSubtitle();
 }
- 
+
 void Metadata::SetSubtitle(const QString &subtitle)
 {
     m_imp->SetSubtitle(subtitle);
@@ -1298,7 +1298,7 @@ QDate Metadata::GetReleaseDate() const
 {
     return m_imp->getReleaseDate();
 }
-             
+
 void Metadata::SetReleaseDate(QDate releasedate)
 {
     m_imp->SetReleaseDate(releasedate);

@@ -70,9 +70,9 @@ QStringList GetVideoDirsByHost(QString host)
 {
     QStringList tmp;
 
-    QStringList tmp2 = StorageGroup::getGroupDirs("Videos", host); 
-    for (QStringList::iterator p = tmp2.begin(); p != tmp2.end(); ++p) 
-        tmp.append(*p); 
+    QStringList tmp2 = StorageGroup::getGroupDirs("Videos", host);
+    for (QStringList::iterator p = tmp2.begin(); p != tmp2.end(); ++p)
+        tmp.append(*p);
 
     if (host.isEmpty())
     {
@@ -148,7 +148,7 @@ QString GetDisplaySeasonEpisode(int seasEp, int digits)
 
     if (digits == 2 && seasEpNum.size() < 2)
         seasEpNum.prepend("0");
-        
+
     return seasEpNum;
 }
 
@@ -215,7 +215,7 @@ int editDistance( const QString& s, const QString& t )
         {
             if ( s[i - 1] == t[j - 1] )
                 D( i, j ) = D( i - 1, j - 1 );
-            else 
+            else
             {
                 int x = D( i - 1, j );
                 int y = D( i - 1, j - 1 );
@@ -237,7 +237,7 @@ QString nearestName(const QString& actual, const QStringList& candidates, bool m
     int tolerance = gCoreContext->GetNumSetting("mythvideo.lookupTolerance", 10);
     QString best;
     QString bestKey;
-    QStringList possibles; 
+    QStringList possibles;
     QMap<QString,QString> inetrefTitle;
 
     if (mythvideomode)
@@ -264,10 +264,10 @@ QString nearestName(const QString& actual, const QStringList& candidates, bool m
     QStringList::ConstIterator i = possibles.begin();
     while ( i != possibles.end() )
     {
-        if ( (*i)[0] == actual[0] ) 
+        if ( (*i)[0] == actual[0] )
         {
             int delta = editDistance( actual, *i );
-            if ( delta < deltaBest ) 
+            if ( delta < deltaBest )
             {
                 deltaBest = delta;
                 numBest = 1;

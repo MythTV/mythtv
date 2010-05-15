@@ -121,7 +121,7 @@ namespace
                     SLOT(OnFinished(int, bool)));
 
             connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            
+
             m_timer.setSingleShot(true);
             m_http.setHost(m_url.host());
         }
@@ -434,7 +434,7 @@ namespace
         void Run(QString title, Metadata *item)
         {
             m_item = item;
-            int m_season, m_episode; 
+            int m_season, m_episode;
             QString cmd;
             m_season = m_item->GetSeason();
             m_episode = m_item->GetEpisode();
@@ -547,7 +547,7 @@ namespace
         void Run(QString video_uid, Metadata *item)
         {
             m_item = item;
-            m_video_uid = video_uid;            
+            m_video_uid = video_uid;
             int m_season, m_episode;
             m_season = m_item->GetSeason();
             m_episode = m_item->GetEpisode();
@@ -561,7 +561,7 @@ namespace
                                                         def_cmd);
                 cmd.append(QString(" -l %1 -D").arg(GetMythUI()->GetLanguage()));
                 QStringList args;
-                args << video_uid << QString::number(m_season) 
+                args << video_uid << QString::number(m_season)
                                   << QString::number(m_episode);
                 StartRun(cmd, args, "Video Data Query");
             }
@@ -716,7 +716,7 @@ namespace
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             const QString &title, int season, const QString host, 
+                             const QString &title, int season, const QString host,
                              QString sgroup, int episode = 0,
                              bool isScreenshot = false)
     {
@@ -811,7 +811,7 @@ namespace
                                  .arg(suffix))
                                  .arg(*ext);
                     else if (!isScreenshot)
-                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2_%3") 
+                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
@@ -877,7 +877,7 @@ namespace
         {
             connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
         }
-        
+
        ~FanartLoader()
         {
             m_fanartTimer.disconnect(this);
@@ -1215,7 +1215,7 @@ class ItemDetailPopup : public MythScreenType
         if (!MythScreenType::keyPressEvent(levent))
         {
             QStringList actions;
-            bool handled = GetMythMainWindow()->TranslateKeyPress("Video", levent, 
+            bool handled = GetMythMainWindow()->TranslateKeyPress("Video", levent,
                            actions);
 
             if (!handled && !OnKeyAction(actions))
@@ -1292,9 +1292,9 @@ class VideoDialogPrivate
                 gCoreContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
 
         m_isFileBrowser = gCoreContext->GetNumSetting("VideoDialogNoDB", 0);
-        m_groupType = gCoreContext->GetNumSetting("mythvideo.db_group_type", 0); 
+        m_groupType = gCoreContext->GetNumSetting("mythvideo.db_group_type", 0);
 
-        m_altPlayerEnabled = 
+        m_altPlayerEnabled =
                     gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer");
 
         m_artDir = gCoreContext->GetSetting("VideoArtworkDir");
@@ -1450,7 +1450,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     MythScreenType(lparent, lname), m_menuPopup(0), m_busyPopup(0),
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
-    m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0), 
+    m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0),
     m_parentalLevelState(0), m_watchedState(0)
 {
     m_d = new VideoDialogPrivate(video_list, type, browse);
@@ -1536,7 +1536,7 @@ bool VideoDialog::Create()
             break;
         case BRS_INSERTDATE:
             m_d->m_groupType = BRS_INSERTDATE;
-            break; 
+            break;
         case BRS_TVMOVIE:
             m_d->m_groupType = BRS_TVMOVIE;
             break;
@@ -1651,7 +1651,7 @@ void VideoDialog::reloadAllData(bool dbChanged)
 
 /** \fn VideoDialog::reloadData()
  *  \brief Reloads the tree after having invalidated the data.
- *  \return void.                   
+ *  \return void.
  */
 void VideoDialog::reloadData()
 {
@@ -1661,7 +1661,7 @@ void VideoDialog::reloadData()
 
 /** \fn VideoDialog::loadData()
  *  \brief load the data used to build the ButtonTree/List for MythVideo.
- *  \return void.                   
+ *  \return void.
  */
 void VideoDialog::loadData()
 {
@@ -1723,7 +1723,7 @@ void VideoDialog::loadData()
 
 /** \fn VideoDialog::UpdateItem(MythUIButtonListItem *item)
  *  \brief Update the visible representation of a MythUIButtonListItem.
- *  \return void.                   
+ *  \return void.
  */
 void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 {
@@ -1783,7 +1783,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         screenshot = GetFirstImage(node, "Screenshots");
 
     item->SetImage(screenshot, "screenshot");
-    
+
     if (banner.isEmpty() && nodeInt == kSubFolder)
         banner = GetFirstImage(node, "Banners");
 
@@ -1854,7 +1854,7 @@ void VideoDialog::fetchVideos()
 }
 
 /** \fn VideoDialog::RemoteImageCheck(QString host, QString filename)
- *  \brief Search for a given (image) filename in the Video SG. 
+ *  \brief Search for a given (image) filename in the Video SG.
  *  \return A QString of the full myth:// URL to a matching image.
  */
 QString VideoDialog::RemoteImageCheck(QString host, QString filename)
@@ -2177,7 +2177,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                             Metadata *metadata = GetMetadataPtrFromNode(subnode);
                             if (metadata)
                             {
-                                if (!metadata->GetHost().isEmpty() && 
+                                if (!metadata->GetHost().isEmpty() &&
                                     !metadata->GetCoverFile().startsWith("/"))
                                 {
                                     QString test_file = generate_file_url("Coverart",
@@ -2279,7 +2279,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
             {
                 if (subnode->childCount() > 0)
                     subDirs << subnode;
-                
+
                 Metadata *metadata = GetMetadataPtrFromNode(subnode);
                 if (metadata)
                 {
@@ -2314,7 +2314,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                         test_file = metadata->GetFanart();
 
                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
-                        test_file != VIDEO_FANART_DEFAULT && (gpnode.isEmpty() || 
+                        test_file != VIDEO_FANART_DEFAULT && (gpnode.isEmpty() ||
                         (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
                     {
                         icon_file = test_file;
@@ -2347,7 +2347,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                     else if (type == "Screenshots")
                         test_file = metadata->GetScreenshot();
 
-                    if (!test_file.endsWith("/") && !test_file.isEmpty() && 
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                        test_file != VIDEO_SCREENSHOT_DEFAULT && (gpnode.isEmpty() ||
                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
                     {
@@ -2863,7 +2863,7 @@ void VideoDialog::VideoMenu()
 }
 
 /** \fn VideoDialog::PlayMenu()
- *  \brief Pop up a MythUI "Play Menu" for MythVideo.  Appears if multiple play 
+ *  \brief Pop up a MythUI "Play Menu" for MythVideo.  Appears if multiple play
  *         options exist.
  *  \return void.
  */
@@ -2889,7 +2889,7 @@ void VideoDialog::PlayMenu()
     if (m_d->m_altPlayerEnabled)
     {
         m_menuPopup->AddButton(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
-    } 
+    }
 
     if (gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
     {
@@ -3017,7 +3017,7 @@ void VideoDialog::ShowPlayerSettings()
 void VideoDialog::ShowMetadataSettings()
 {
     MetadataSettings *ms = new MetadataSettings(m_popupStack, "metadata settings");
-    
+
     if (ms->Create())
         m_popupStack->AddScreen(ms);
     else
@@ -3065,7 +3065,7 @@ void VideoDialog::MetadataBrowseMenu()
         m_menuPopup->AddButton(tr("Date Added"),
                   SLOT(SwitchVideoInsertDateGroup()));
 
-    if (m_d->m_groupType != BRS_DIRECTOR)  
+    if (m_d->m_groupType != BRS_DIRECTOR)
         m_menuPopup->AddButton(tr("Director"),
                   SLOT(SwitchVideoDirectorGroup()));
 
@@ -3282,26 +3282,26 @@ void VideoDialog::SwitchManager()
  *  \brief Switch to Folder (filesystem) browse mode.
  *  \return void.
  */
-void VideoDialog::SwitchVideoFolderGroup() 
-{ 
+void VideoDialog::SwitchVideoFolderGroup()
+{
     SwitchLayout(m_d->m_type, BRS_FOLDER);
-} 
+}
 
 /** \fn VideoDialog::SwitchVideoGenreGroup()
  *  \brief Switch to Genre browse mode.
  *  \return void.
  */
-void VideoDialog::SwitchVideoGenreGroup() 
+void VideoDialog::SwitchVideoGenreGroup()
 {
     SwitchLayout(m_d->m_type, BRS_GENRE);
-} 
+}
 
 /** \fn VideoDialog::SwitchVideoCategoryGroup()
  *  \brief Switch to Category browse mode.
  *  \return void.
  */
-void VideoDialog::SwitchVideoCategoryGroup() 
-{ 
+void VideoDialog::SwitchVideoCategoryGroup()
+{
    SwitchLayout(m_d->m_type, BRS_CATEGORY);
 }
 
@@ -3548,7 +3548,7 @@ void VideoDialog::playFolder()
                 {
                     playing_time.start();
                     video_started = true;
-                    PlayVideo(metadata->GetFilename(), 
+                    PlayVideo(metadata->GetFilename(),
                                        m_d->m_videoList->getListCache());
                 }
             }
@@ -3651,7 +3651,7 @@ void VideoDialog::playTrailer()
 
 /** \fn VideoDialog::setParentalLevel(const ParentalLevel::Level &level)
  *  \brief Set the parental level for the library.
- *  \return void.                    
+ *  \return void.
  */
 void VideoDialog::setParentalLevel(const ParentalLevel::Level &level)
 {
@@ -3745,7 +3745,7 @@ MythUIButtonListItem *VideoDialog::GetItemByMetadata(Metadata *metadata)
         int nodeInt = child->getInt();
         if (nodeInt != kSubFolder && nodeInt != kUpFolder)
         {
-            Metadata *listmeta = 
+            Metadata *listmeta =
                         GetMetadataPtrFromNode(child);
             if (listmeta)
             {
@@ -3994,7 +3994,7 @@ void VideoDialog::ResetMetadata()
                         QStringList(m_d->m_sshotDir), screenshot_file,
                         title, season, host, "Screenshots", episode,
                         true))
-        {   
+        {
             metadata->SetScreenshot(screenshot_file);
         }
 
@@ -4042,7 +4042,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
     QString host = metadata->GetHost();
     int episode = metadata->GetEpisode();
 
-    if (metadata->GetCoverFile().isEmpty() || 
+    if (metadata->GetCoverFile().isEmpty() ||
         IsDefaultCoverFile(metadata->GetCoverFile()))
     {
         if (GetLocalVideoImage(inetref, filename,
@@ -4087,9 +4087,9 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
 
     QStringList banner_dirs;
     banner_dirs += m_d->m_banDir;
-        
+
     QString banner_file;
-        
+
     if (metadata->GetBanner().isEmpty())
     {
         if (GetLocalVideoImage(inetref, filename,
@@ -4649,7 +4649,7 @@ void VideoDialog::OnVideoSearchByTitleSubtitleDone(bool normal_exit,
         {
             metadata->SetSeason(season.toInt());
             metadata->SetEpisode(episode.toInt());
-            StartVideoSearchByTitle(VIDEO_INETREF_DEFAULT, 
+            StartVideoSearchByTitle(VIDEO_INETREF_DEFAULT,
                                 metadata->GetTitle(), metadata);
         }
     }
