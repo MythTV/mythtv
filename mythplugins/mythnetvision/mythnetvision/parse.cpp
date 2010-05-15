@@ -76,7 +76,7 @@ void ResultVideo::toMap(MetadataMap &metadataMap)
            GetSetting("DateFormat", "yyyy-MM-dd hh:mm"));
 
     if (m_time.toInt() == 0)
-        metadataMap["time"] = QString();
+        metadataMap["length"] = QString();
     else
     {
         QTime time(0,0,0,0);
@@ -91,7 +91,7 @@ void ResultVideo::toMap(MetadataMap &metadataMap)
             format = "m:ss";
         else
             format = ":ss";
-        metadataMap["time"] = fin.toString(format);
+        metadataMap["length"] = fin.toString(format);
     }
 
     if (m_rating == 0 || m_rating.isNull())
