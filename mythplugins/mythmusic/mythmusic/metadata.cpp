@@ -668,7 +668,7 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["title"] = m_title;
     metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap["genre"] = m_genre;
-    metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "N/A");
+    metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
     metadataMap["artisttitle"] = QObject::tr("%1  by  %2", 
                                              "Music track 'title by artist'")
                                              .arg(FormatTitle())
