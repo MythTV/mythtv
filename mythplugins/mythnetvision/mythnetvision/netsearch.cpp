@@ -840,17 +840,14 @@ void NetSearch::slotItemChanged()
         {
             MythUIButtonListItem *btn = m_searchResultList->GetItemCurrent();
             QString filename = btn->GetImage();
+            m_thumbImage->Reset();
+
             if (!filename.isEmpty())
             {
                 m_thumbImage->SetFilename(filename);
                 m_thumbImage->Load();
-                m_thumbImage->SetVisible(true);
             }
-            else
-                m_thumbImage->SetVisible(false);
         }
-        else if (m_thumbImage)
-            m_thumbImage->SetVisible(false);
 
         if (m_downloadable)
         {
@@ -876,14 +873,13 @@ void NetSearch::slotItemChanged()
         if (m_thumbImage)
         {
             QString filename = item->GetImage();
+            m_thumbImage->Reset();
+
             if (!filename.isEmpty())
             {
                 m_thumbImage->SetFilename(filename);
                 m_thumbImage->Load();
-                m_thumbImage->SetVisible(true);
             }
-            else
-                m_thumbImage->SetVisible(false);
         }
     }
 }

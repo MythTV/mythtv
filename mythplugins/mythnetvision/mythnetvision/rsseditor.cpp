@@ -511,15 +511,12 @@ void RSSEditor::slotItemChanged()
         {
             QString thumb = site->GetImage();
 
+            m_image->Reset();
+
             if (!thumb.isEmpty())
             {
                 m_image->SetFilename(site->GetImage());
                 m_image->Load();
-                m_image->SetVisible(true);
-            }
-            else
-            {
-                m_image->SetVisible(false);
             }
         }
         if (m_title)
