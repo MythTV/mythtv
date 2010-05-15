@@ -10,6 +10,7 @@
 #include <QRegExp>
 
 #include "parse.h"
+#include "netutils.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
@@ -18,7 +19,7 @@ using namespace std;
 
 ResultVideo::ResultVideo(const QString& title, const QString& desc,
               const QString& URL, const QString& thumbnail,
-              const QString& mediaURL, const QString& enclosure,
+              const QString& mediaURL, const QString& author,
               const QDateTime& date, const QString& time,
               const QString& rating, const off_t& filesize,
               const QString& player, const QStringList& playerargs,
@@ -33,7 +34,7 @@ ResultVideo::ResultVideo(const QString& title, const QString& desc,
     m_URL = URL;
     m_thumbnail = thumbnail;
     m_mediaURL = mediaURL;
-    m_enclosure = enclosure;
+    m_author = author;
     m_date = date;
     m_time = time;
     m_rating = rating;
@@ -57,6 +58,104 @@ ResultVideo::ResultVideo()
 
 ResultVideo::~ResultVideo()
 {
+}
+
+void ResultVideo::toMap(MetadataMap &metadataMap)
+{
+    metadataMap["title"] = m_title;
+    metadataMap["description"] = m_desc;
+    metadataMap["url"] = m_URL;
+    metadataMap["thumbnail"] = m_thumbnail;
+    metadataMap["mediaurl"] = m_mediaURL;
+    metadataMap["author"] = m_author;
+
+    if (m_date.isNull())
+        metadataMap["date"] = QString();
+    else
+        metadataMap["date"] = m_date.toString(gCoreContext->
+           GetSetting("DateFormat", "yyyy-MM-dd hh:mm"));
+
+    if (m_time.toInt() == 0)
+        metadataMap["time"] = QString();
+    else
+    {
+        QTime time(0,0,0,0);
+        int secs = m_time.toInt();
+        QTime fin = time.addSecs(secs);
+        QString format;
+        if (secs >= 3600)
+            format = "H:mm:ss";
+        else if (secs >= 600)
+            format = "mm:ss";
+        else if (secs >= 60)
+            format = "m:ss";
+        else
+            format = ":ss";
+        metadataMap["time"] = fin.toString(format);
+    }
+
+    if (m_rating == 0 || m_rating.isNull())
+        metadataMap["rating"] = QString();
+    else
+        metadataMap["rating"] = m_rating;
+
+    if (m_filesize == -1)
+        metadataMap["filesize"] = QString();
+    else if (m_filesize == 0 && !m_downloadable)
+        metadataMap["filesize"] = QObject::tr("Web Only");
+    else if (m_filesize == 0 && m_downloadable)
+        metadataMap["filesize"] = QObject::tr("Downloadable");
+    else
+        metadataMap["filesize"] = QString::number(m_filesize);
+
+    QString tmpSize;
+    tmpSize.sprintf("%0.2f ", m_filesize / 1024.0 / 1024.0);
+    tmpSize += QObject::tr("MB", "Megabytes");
+    if (m_filesize == -1)
+        metadataMap["filesize_str"] = QString();
+    else if (m_filesize == 0 && !m_downloadable)
+        metadataMap["filesize_str"] = QObject::tr("Web Only");
+    else if (m_filesize == 0 && m_downloadable)
+        metadataMap["filesize_str"] = QObject::tr("Downloadable");
+    else
+        metadataMap["filesize"] = tmpSize;
+
+    metadataMap["player"] = m_player;
+    metadataMap["playerargs"] = m_playerargs.join(", ");
+    metadataMap["downloader"] = m_download;
+    metadataMap["downloadargs"] = m_downloadargs.join(", ");
+    if (m_width == 0)
+        metadataMap["width"] = QString();
+    else
+        metadataMap["width"] = QString::number(m_width);
+    if (m_height == 0)
+        metadataMap["height"] = QString();
+    else
+        metadataMap["height"] = QString::number(m_height);
+    if (m_width == 0 || m_height == 0)
+        metadataMap["resolution"] = QString();
+    else
+        metadataMap["resolution"] = QString("%1x%2").arg(m_width).arg(m_height);
+    metadataMap["language"] = m_language;
+    metadataMap["countries"] = m_countries.join(", ");
+    if (m_season > 0 || m_episode > 0)
+    {
+        metadataMap["season"] = QString::number(m_season);
+        metadataMap["episode"] = QString::number(m_episode);
+        metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                 (m_season, 2)).arg(
+                                 GetDisplaySeasonEpisode(m_episode, 2));
+        metadataMap["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                 (m_season, 1)).arg(
+                                 GetDisplaySeasonEpisode(m_episode, 2));
+    }
+    else
+    {
+        metadataMap["season"] = QString();
+        metadataMap["episode"] = QString();
+        metadataMap["s##e##"] = QString();
+        metadataMap["##x##"] = QString();
+    }
 }
 
 namespace

@@ -14,6 +14,8 @@ using namespace std;
 #include <QMap>
 #include <QVariant>
 
+typedef QHash<QString,QString> MetadataMap;
+
 class QDomDocument;
 
    /** Describes an enclosure associated with an item.
@@ -119,12 +121,14 @@ class ResultVideo
     ResultVideo();
     ~ResultVideo();
 
+    void toMap(QHash<QString, QString> &infoMap);
+
     const QString& GetTitle() const { return m_title; }
     const QString& GetDescription() const { return m_desc; }
     const QString& GetURL() const { return m_URL; }
     const QString& GetThumbnail() const { return m_thumbnail; }
     const QString& GetMediaURL() const { return m_mediaURL; }
-    const QString& GetAuthor() const { return m_enclosure; }
+    const QString& GetAuthor() const { return m_author; }
     const QDateTime& GetDate() const { return m_date; }
     const QString& GetTime() const { return m_time; }
     const QString& GetRating() const { return m_rating; }
@@ -147,7 +151,7 @@ class ResultVideo
     QString      m_URL;
     QString      m_thumbnail;
     QString      m_mediaURL;
-    QString      m_enclosure;
+    QString      m_author;
     QDateTime    m_date;
     QString      m_time;
     QString      m_rating;

@@ -44,20 +44,11 @@ namespace
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_siteMap(NULL),               m_siteButtonList(NULL),
-      m_title(NULL),                 m_description(NULL),
-      m_url(NULL),                   m_thumbnail(NULL),
-      m_mediaurl(NULL),              m_author(NULL),
-      m_date(NULL),                  m_time(NULL),
-      m_filesize(NULL),              m_filesize_str(NULL),
-      m_rating(NULL),                m_noSites(NULL),
-      m_width(NULL),                 m_height(NULL),
-      m_resolution(NULL),            m_countries(NULL),
-      m_season(NULL),                m_episode(NULL),
-      m_s00e00(NULL),                m_00x00(NULL),
-      m_thumbImage(NULL),            m_downloadable(NULL),
-      m_busyPopup(NULL),             m_menuPopup(NULL),
-      m_popupStack(),                m_externaldownload(NULL),
-      m_type(type),                  m_lock(QMutex::Recursive)
+      m_noSites(NULL),               m_thumbImage(NULL),
+      m_downloadable(NULL),          m_busyPopup(NULL),
+      m_menuPopup(NULL),             m_popupStack(),
+      m_externaldownload(NULL),      m_type(type),
+      m_lock(QMutex::Recursive)
 {
     m_download = new DownloadManager(this);
     m_imageDownload = new ImageDownloadManager(this);
@@ -102,26 +93,7 @@ bool NetTree::Create()
     else
         UIUtilE::Assign(this, m_siteButtonList, "videos", &err);
 
-    UIUtilW::Assign(this, m_title, "title");
-    UIUtilW::Assign(this, m_description, "description");
-    UIUtilW::Assign(this, m_url, "url");
-    UIUtilW::Assign(this, m_thumbnail, "thumbnail");
-    UIUtilW::Assign(this, m_mediaurl, "mediaurl");
-    UIUtilW::Assign(this, m_author, "author");
-    UIUtilW::Assign(this, m_date, "date");
-    UIUtilW::Assign(this, m_time, "time");
-    UIUtilW::Assign(this, m_filesize, "filesize");
-    UIUtilW::Assign(this, m_filesize_str, "filesize_str");
-    UIUtilW::Assign(this, m_rating, "rating");
     UIUtilW::Assign(this, m_noSites, "nosites");
-    UIUtilW::Assign(this, m_width, "width");
-    UIUtilW::Assign(this, m_height, "height");
-    UIUtilW::Assign(this, m_resolution, "resolution");
-    UIUtilW::Assign(this, m_countries, "countries");
-    UIUtilW::Assign(this, m_season, "season");
-    UIUtilW::Assign(this, m_episode, "episode");
-    UIUtilW::Assign(this, m_s00e00, "s##e##");
-    UIUtilW::Assign(this, m_00x00, "##x##");
 
     UIUtilW::Assign(this, m_thumbImage, "preview");
 
@@ -343,55 +315,10 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     else if (video)
     {
         item->SetText(video->GetTitle());
-        item->SetText(video->GetTitle(), "title");
-        item->SetText(video->GetAuthor(), "author");
-        item->SetText(video->GetDate().toString(gCoreContext->
-                    GetSetting("DateFormat", "yyyy-MM-dd hh:mm")), "date");
 
-        QTime time(0,0,0,0);
-        int secs = video->GetTime().toInt();
-        QTime fin = time.addSecs(secs);
-        QString format;
-        if (secs >= 3600)
-            format = "H:mm:ss";
-        else if (secs >= 600)
-            format = "mm:ss";
-        else if (secs >= 60)
-            format = "m:ss";
-        else
-            format = ":ss";
-        item->SetText(fin.toString(format), "time");
-
-        item->SetText(video->GetDescription(), "description");
-        item->SetText(video->GetURL(), "url");
-        item->SetText(QString::number(video->GetWidth()), "width");
-        item->SetText(QString::number(video->GetHeight()), "height");
-        item->SetText(QString("%1x%2").arg(video->GetWidth())
-                      .arg(video->GetHeight()), "resolution");
-        item->SetText(video->GetCountries().join(","), "countries");
-        item->SetText(QString::number(video->GetSeason()), "season");
-        item->SetText(QString::number(video->GetEpisode()), "episode");
-
-        item->SetText(QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                             (video->GetSeason(), 2)).arg(
-                             GetDisplaySeasonEpisode(video->GetEpisode(), 2)),
-                             "s##e##");
-        item->SetText(QString("%1x%2").arg(GetDisplaySeasonEpisode
-                             (video->GetSeason(), 1)).arg(
-                             GetDisplaySeasonEpisode(video->GetEpisode(), 2)),
-                             "##x##");
-        off_t bytes = video->GetFilesize();
-        item->SetText(QString::number(bytes), "filesize");
-        QString tmpSize;
-
-        tmpSize.sprintf("%0.2f ", bytes / 1024.0 / 1024.0);
-        tmpSize += QObject::tr("MB", "Megabytes");
-        if (bytes == 0 && !video->GetDownloadable())
-            item->SetText(tr("Web Only"), "filesize_str");
-        else if (bytes == 0 && video->GetDownloadable())
-            item->SetText(tr("Downloadable"), "filesize_str");
-        else
-            item->SetText(tmpSize, "filesize_str");
+        MetadataMap metadataMap;
+        video->toMap(metadataMap);
+        item->SetTextFromMap(metadataMap);
 
         int pos;
         if (m_type == DLG_TREE)
@@ -399,7 +326,12 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         else
             pos = m_siteButtonList->GetItemPos(item);
 
-        m_imageDownload->addURL(video->GetTitle(), video->GetThumbnail(), pos);
+        QString dlfile = GetThumbnailFilename(video->GetThumbnail(), video->GetTitle());
+
+        if (QFile::exists(dlfile))
+            item->SetImage(dlfile);
+        else
+            m_imageDownload->addURL(video->GetTitle(), video->GetThumbnail(), pos);
     }
     else
     {
@@ -415,7 +347,12 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                 else
                     pos = m_siteButtonList->GetItemPos(item);
 
-                m_imageDownload->addURL(node->getString(), tpath, pos);
+                QString dlfile = GetThumbnailFilename(tpath,
+                                                      node->getString());
+                if (QFile::exists(dlfile))
+                    item->SetImage(dlfile);
+                else
+                    m_imageDownload->addURL(node->getString(), tpath, pos);
             }
             else if (tpath != "0")
                 item->SetImage(node->GetData().toString());
@@ -1092,88 +1029,10 @@ void NetTree::slotItemChanged()
 
     if (item)
     {
-        if (m_title)
-            m_title->SetText(item->GetTitle());
-        if (m_description)
-            m_description->SetText(item->GetDescription());
-        if (m_url)
-            m_url->SetText(item->GetURL());
-        if (m_thumbnail)
-            m_thumbnail->SetText(item->GetThumbnail());
-        if (m_mediaurl)
-            m_mediaurl->SetText(item->GetMediaURL());
-        if (m_author)
-            m_author->SetText(item->GetAuthor());
-        if (m_date)
-            m_date->SetText(item->GetDate().toString(gCoreContext->
-                    GetSetting("DateFormat", "yyyy-MM-dd hh:mm")));
-        if (m_time)
-        {
-            QTime time(0,0,0,0);
-            int secs = item->GetTime().toInt();
-            QTime fin = time.addSecs(secs);
-            QString format;
-            if (secs >= 3600)
-                format = "H:mm:ss";
-            else if (secs >= 600)
-                format = "mm:ss";
-            else if (secs >= 60)
-                format = "m:ss";
-            else
-                format = ":ss";
-            m_time->SetText(fin.toString(format));
-        }
-        if (m_rating)
-            m_rating->SetText(item->GetRating());
-        if (m_width)
-            m_width->SetText(QString::number(item->GetWidth()));
-        if (m_height)
-            m_height->SetText(QString::number(item->GetHeight()));
-        if (m_resolution)
-            m_resolution->SetText(QString("%1x%2")
-                          .arg(item->GetWidth()).arg(item->GetHeight()));
-        if (m_countries)
-            m_countries->SetText(item->GetCountries().join(","));
-        if (m_season)
-            m_season->SetText(QString::number(item->GetSeason()));
-        if (m_episode)
-            m_episode->SetText(QString::number(item->GetEpisode()));
-        if (m_s00e00)
-            m_s00e00->SetText(QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                             (item->GetSeason(), 2)).arg(
-                             GetDisplaySeasonEpisode(item->GetEpisode(), 2)));
-        if (m_00x00)
-            m_00x00->SetText(QString("%1x%2").arg(GetDisplaySeasonEpisode
-                             (item->GetSeason(), 1)).arg(
-                             GetDisplaySeasonEpisode(item->GetEpisode(), 2)));
+        MetadataMap metadataMap;
+        item->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
 
-
-        if (m_filesize || m_filesize_str)
-        {
-            off_t bytes = item->GetFilesize();
-            if (m_filesize)
-            {
-                if (bytes == 0 && !item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Web Only"));
-                else if (bytes == 0 && item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Downloadable"));
-                else
-                    m_filesize->SetText(QString::number(bytes));
-            }
-            if (m_filesize_str)
-            {
-                QString tmpSize;
-
-                tmpSize.sprintf("%0.2f ", bytes / 1024.0 / 1024.0);
-                tmpSize += QObject::tr("MB", "Megabytes");
-                if (bytes == 0 && !item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Web Only"));
-                else if (bytes == 0 && item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Downloadable"));
-                else
-                    m_filesize_str->SetText(tmpSize);
-            }
-        }
         if (!item->GetThumbnail().isEmpty() && m_thumbImage)
         {
             // Put some thumbnail handling stuff if I ever figure it out.
@@ -1227,16 +1086,15 @@ void NetTree::slotItemChanged()
     }
     else if (site)
     {
-        if (m_title)
-            m_title->SetText(site->GetTitle());
-        if (m_description)
-            m_description->SetText(site->GetDescription());
-        if (m_url)
-            m_url->SetText(site->GetURL());
-        if (m_thumbnail)
-            m_thumbnail->SetText(site->GetImage());
-        if (m_author)
-            m_author->SetText(site->GetAuthor());
+        ResultVideo *res = new ResultVideo(site->GetTitle(), site->GetDescription(),
+              site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
+              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
+              0, QStringList(), 0, 0);
+
+        MetadataMap metadataMap;
+        res->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
+
         if (!site->GetImage().isEmpty() && m_thumbImage)
         {
             m_thumbImage->SetFilename(site->GetImage());
@@ -1244,68 +1102,30 @@ void NetTree::slotItemChanged()
         }
         else if (m_thumbImage)
             m_thumbImage->Reset();
-        if (m_mediaurl)
-            m_mediaurl->SetText("");
-        if (m_date)
-            m_date->SetText("");
-        if (m_time)
-            m_time->SetText("");
-        if (m_rating)
-            m_rating->SetText("");
-        if (m_countries)
-            m_countries->SetText("");
-        if (m_season)
-            m_season->SetText("");
-        if (m_episode)
-            m_episode->SetText("");
-        if (m_s00e00)
-            m_s00e00->SetText("");
-        if (m_00x00)
-            m_00x00->SetText("");
-        if (m_filesize)
-            m_filesize->SetText("");
-        if (m_filesize_str)
-            m_filesize_str->SetText("");
+
+        if (m_downloadable)
+        {
+            m_downloadable->Reset();
+        }
     }
     else
     {
-        if (m_title)
-        {
-            if (m_type == DLG_TREE)
-                m_title->SetText(m_siteMap->GetItemCurrent()->GetText());
-            else
-                m_title->SetText(m_siteButtonList->GetItemCurrent()->GetText());
-        }
-        if (m_description)
-            m_description->SetText("");
-        if (m_url)
-            m_url->SetText("");
-        if (m_thumbnail)
-            m_thumbnail->SetText("");
-        if (m_author)
-            m_author->SetText("");
-        if (m_mediaurl)
-            m_mediaurl->SetText("");
-        if (m_date)
-            m_date->SetText("");
-        if (m_time)
-            m_time->SetText("");
-        if (m_rating)
-            m_rating->SetText("");
-        if (m_filesize)
-            m_filesize->SetText("");
-        if (m_countries)
-            m_countries->SetText("");
-        if (m_season)
-            m_season->SetText("");
-        if (m_episode)
-            m_episode->SetText("");
-        if (m_s00e00)
-            m_s00e00->SetText("");
-        if (m_00x00)
-            m_00x00->SetText("");
-        if (m_filesize_str)
-            m_filesize_str->SetText("");
+        QString title;
+
+        if (m_type == DLG_TREE)
+            title = m_siteMap->GetItemCurrent()->GetText();
+        else
+            title = m_siteButtonList->GetItemCurrent()->GetText();
+
+        ResultVideo *res = new ResultVideo(title, QString(),
+              QString(), QString(), QString(), QString(), QDateTime(),
+              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
+              0, QStringList(), 0, 0);
+
+        MetadataMap metadataMap;
+        res->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
+
         if (m_thumbImage)
         {
             QString thumb;

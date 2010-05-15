@@ -35,18 +35,7 @@ using namespace std;
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_searchResultList(NULL),      m_siteList(NULL),
-      m_search(NULL),
-      m_title(NULL),                 m_description(NULL),
-      m_url(NULL),                   m_thumbnail(NULL),
-      m_mediaurl(NULL),              m_author(NULL),
-      m_date(NULL),                  m_time(NULL),
-      m_filesize(NULL),              m_filesize_str(NULL),
-      m_rating(NULL),                m_pageText(NULL),
-      m_noSites(NULL),               m_width(NULL),
-      m_height(NULL),                m_resolution(NULL),
-      m_countries(NULL),             m_season(NULL),
-      m_episode(NULL),               m_s00e00(NULL),
-      m_00x00(NULL),                 m_thumbImage(NULL),
+      m_search(NULL),                m_thumbImage(NULL),
       m_downloadable(NULL),          m_progress(NULL),
       m_busyPopup(NULL),             m_okPopup(NULL),
       m_popupStack(),                m_netSearch(),
@@ -80,27 +69,8 @@ bool NetSearch::Create()
     m_siteList = dynamic_cast<MythUIButtonList *> (GetChild("sites"));
     m_searchResultList = dynamic_cast<MythUIButtonList *> (GetChild("results"));
 
-    m_title = dynamic_cast<MythUIText *> (GetChild("title"));
-    m_description = dynamic_cast<MythUIText *> (GetChild("description"));
-    m_url = dynamic_cast<MythUIText *> (GetChild("url"));
-    m_thumbnail = dynamic_cast<MythUIText *> (GetChild("thumbnail"));
-    m_mediaurl = dynamic_cast<MythUIText *> (GetChild("mediaurl"));
-    m_author = dynamic_cast<MythUIText *> (GetChild("author"));
-    m_date = dynamic_cast<MythUIText *> (GetChild("date"));
-    m_time = dynamic_cast<MythUIText *> (GetChild("time"));
-    m_filesize = dynamic_cast<MythUIText *> (GetChild("filesize"));
-    m_filesize_str = dynamic_cast<MythUIText *> (GetChild("filesize_str"));
-    m_rating = dynamic_cast<MythUIText *> (GetChild("rating"));
     m_pageText = dynamic_cast<MythUIText *> (GetChild("page"));
     m_noSites = dynamic_cast<MythUIText *> (GetChild("nosites"));
-    m_width = dynamic_cast<MythUIText *> (GetChild("width"));
-    m_height = dynamic_cast<MythUIText *> (GetChild("height"));
-    m_resolution = dynamic_cast<MythUIText *> (GetChild("resolution"));
-    m_countries = dynamic_cast<MythUIText *> (GetChild("countries"));
-    m_season = dynamic_cast<MythUIText *> (GetChild("season"));
-    m_episode = dynamic_cast<MythUIText *> (GetChild("episode"));
-    m_s00e00 = dynamic_cast<MythUIText *> (GetChild("s##e##"));
-    m_00x00 = dynamic_cast<MythUIText *> (GetChild("##x##"));
 
     m_thumbImage = dynamic_cast<MythUIImage *> (GetChild("preview"));
 
@@ -591,68 +561,9 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
                     m_searchResultList, title);
         if (item)
         {
-            item->SetText(title, "title");
-            item->SetText((*i)->GetDescription(), "description");
-            item->SetText((*i)->GetURL(), "url");
-            item->SetText((*i)->GetThumbnail(), "thumbnail");
-            item->SetText((*i)->GetMediaURL(), "mediaurl");
-            item->SetText((*i)->GetAuthor(), "author");
-            item->SetText((*i)->GetDate().toString(
-               gCoreContext->GetSetting("DateFormat",
-               "yyyy-MM-dd hh:mm")), "date");
-
-            QTime time(0,0,0,0);
-            int secs = (*i)->GetTime().toInt();
-            QTime fin = time.addSecs(secs);
-            QString format;
-            if (secs >= 3600)
-                format = "H:mm:ss";
-            else if (secs >= 600)
-                format = "mm:ss";
-            else if (secs >= 60)
-                format = "m:ss";
-            else
-                format = ":ss";
-            item->SetText(fin.toString(format), "time");
-
-            item->SetText((*i)->GetRating(), "rating");
-            item->SetText(QString::number((*i)->GetWidth()), "width");
-            item->SetText(QString::number((*i)->GetHeight()), "height");
-            item->SetText(QString("%1x%2").arg((*i)->GetWidth())
-                      .arg((*i)->GetHeight()), "resolution");
-            item->SetText((*i)->GetCountries().join(","), "countries");
-            item->SetText(QString::number((*i)->GetSeason()), "season");
-            item->SetText(QString::number((*i)->GetEpisode()), "episode");
-            item->SetText(QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                             ((*i)->GetSeason(), 2)).arg(
-                             GetDisplaySeasonEpisode((*i)->GetEpisode(), 2)),
-                             "s##e##");
-            item->SetText(QString("%1x%2").arg(GetDisplaySeasonEpisode
-                             ((*i)->GetSeason(), 1)).arg(
-                             GetDisplaySeasonEpisode((*i)->GetEpisode(), 2)),
-                             "##x##");
-
-            off_t bytes = (*i)->GetFilesize();
-            if (bytes > 0)
-            {
-                item->SetText(QString::number(bytes), "filesize");
-
-                QString tmpSize;
-
-                tmpSize.sprintf("%0.2f ", bytes / 1024.0 / 1024.0);
-                tmpSize += QObject::tr("MB", "Megabytes");
-                item->SetText(tmpSize, "filesize_str");
-            }
-            else if (!(*i)->GetDownloadable())
-            {
-                item->SetText(tr("Web Only"), "filesize");
-                item->SetText(tr("Web Only"), "filesize_str");
-            }
-            else
-            {
-                item->SetText(tr("Downloadable"), "filesize");
-                item->SetText(tr("Downloadable"), "filesize_str");
-            }
+            MetadataMap metadataMap;
+            (*i)->toMap(metadataMap);
+            item->SetTextFromMap(metadataMap);
 
             item->SetData(qVariantFromValue(*i));
 
@@ -921,80 +832,9 @@ void NetSearch::slotItemChanged()
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
-        if (m_title)
-            m_title->SetText(item->GetTitle());
-        if (m_description)
-            m_description->SetText(item->GetDescription());
-        if (m_url)
-            m_url->SetText(item->GetURL());
-        if (m_thumbnail)
-            m_thumbnail->SetText(item->GetThumbnail());
-        if (m_mediaurl)
-            m_mediaurl->SetText(item->GetMediaURL());
-        if (m_author)
-            m_author->SetText(item->GetAuthor());
-        if (m_date)
-            m_date->SetText(item->GetDate().toString(
-                    gCoreContext->GetSetting("DateFormat",
-                    "yyyy-MM-dd hh:mm")));
-        if (m_time)
-        {
-            QTime time(0,0,0,0);
-            int secs = item->GetTime().toInt();
-            QTime fin = time.addSecs(secs);
-            QString format;
-            if (secs >= 3600)
-                format = "H:mm:ss";
-            else if (secs >= 600)
-                format = "mm:ss";
-            else if (secs >= 60)
-                format = "m:ss";
-            else
-                format = ":ss";
-            m_time->SetText(fin.toString(format));
-        }
-        if (m_rating)
-            m_rating->SetText(item->GetRating());
-        if (m_width)
-            m_width->SetText(QString::number(item->GetWidth()));
-        if (m_height)
-            m_height->SetText(QString::number(item->GetHeight()));
-        if (m_resolution)
-            m_resolution->SetText(QString("%1x%2")
-                          .arg(item->GetWidth()).arg(item->GetHeight()));
-        if (m_countries)
-            m_countries->SetText(item->GetCountries().join(","));
-        if (m_season)
-            m_season->SetText(QString::number(item->GetSeason()));
-        if (m_episode)
-            m_episode->SetText(QString::number(item->GetEpisode()));
-
-        if (m_filesize || m_filesize_str)
-        {
-            off_t bytes = item->GetFilesize();
-            if (m_filesize)
-            {
-                if (bytes == 0 && !item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Web Only"));
-                else if (bytes == 0 && item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Downloadable"));
-                else
-                    m_filesize->SetText(QString::number(bytes));
-            }
-            if (m_filesize_str)
-            {
-                QString tmpSize;
-
-                tmpSize.sprintf("%0.2f ", bytes / 1024.0 / 1024.0);
-                tmpSize += QObject::tr("MB", "Megabytes");
-                if (bytes == 0 && !item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Web Only"));
-                else if (bytes == 0 && item->GetDownloadable())
-                    m_filesize_str->SetText(tr("Downloadable"));
-                else
-                    m_filesize_str->SetText(tmpSize);
-            }
-        }
+        MetadataMap metadataMap;
+        item->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
 
         if (!item->GetThumbnail().isEmpty() && m_thumbImage)
         {
@@ -1024,28 +864,14 @@ void NetSearch::slotItemChanged()
     {
         MythUIButtonListItem *item = m_siteList->GetItemCurrent();
 
-        if (m_title)
-            m_title->SetText(item->GetText());
-        if (m_description)
-            m_description->SetText("");
-        if (m_url)
-            m_url->SetText("");
-        if (m_thumbnail)
-            m_thumbnail->SetText("");
-        if (m_author)
-            m_author->SetText("");
-        if (m_mediaurl)
-            m_mediaurl->SetText("");
-        if (m_date)
-            m_date->SetText("");
-        if (m_time)
-            m_time->SetText("");
-        if (m_rating)
-            m_rating->SetText("");
-        if (m_filesize)
-            m_filesize->SetText("");
-        if (m_filesize_str)
-            m_filesize_str->SetText("");
+        ResultVideo *res = new ResultVideo(item->GetText(), QString(),
+              QString(), QString(), QString(), QString(), QDateTime(),
+              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
+              0, QStringList(), 0, 0);
+
+        MetadataMap metadataMap;
+        res->toMap(metadataMap);
+        SetTextFromMap(metadataMap);
 
         if (m_thumbImage)
         {

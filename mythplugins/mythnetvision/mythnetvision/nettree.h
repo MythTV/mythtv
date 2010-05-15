@@ -102,26 +102,7 @@ class NetTree : public MythScreenType
     MythGenericTree    *m_searchGeneric;
     MythGenericTree    *m_currentNode;
 
-    MythUIText         *m_title;
-    MythUIText         *m_description;
-    MythUIText         *m_url;
-    MythUIText         *m_thumbnail;
-    MythUIText         *m_mediaurl;
-    MythUIText         *m_author;
-    MythUIText         *m_date;
-    MythUIText         *m_time;
-    MythUIText         *m_filesize;
-    MythUIText         *m_filesize_str;
-    MythUIText         *m_rating;
     MythUIText         *m_noSites;
-    MythUIText         *m_width;
-    MythUIText         *m_height;
-    MythUIText         *m_resolution;
-    MythUIText         *m_countries;
-    MythUIText         *m_season;
-    MythUIText         *m_episode;
-    MythUIText         *m_s00e00;
-    MythUIText         *m_00x00;
 
     MythUIImage        *m_thumbImage;
 
