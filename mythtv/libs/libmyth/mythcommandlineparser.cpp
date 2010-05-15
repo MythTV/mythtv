@@ -541,6 +541,7 @@ bool MythCommandLineParser::Parse(
                 err = true;
                 return true;
             }
+            eventString = QString("SYSTEM_EVENT ") + eventString;
         }
         else
         {
