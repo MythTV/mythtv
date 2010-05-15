@@ -1422,74 +1422,8 @@
             <value>Rating:</value>
         </textarea>
 
-        <statetype name="rating_state">
-            <area>520,350,178,30</area>
-            <state name="0">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_0.png</filename>
-                </imagetype>
-            </state>
-            <state name="1">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_1.png</filename>
-                </imagetype>
-            </state>
-            <state name="2">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_2.png</filename>
-                </imagetype>
-            </state>
-            <state name="3">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_3.png</filename>
-                </imagetype>
-            </state>
-            <state name="4">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_4.png</filename>
-                </imagetype>
-            </state>
-            <state name="5">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_5.png</filename>
-                </imagetype>
-            </state>
-            <state name="6">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_6.png</filename>
-                </imagetype>
-            </state>
-            <state name="7">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_7.png</filename>
-                </imagetype>
-            </state>
-            <state name="8">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_8.png</filename>
-                </imagetype>
-            </state>
-            <state name="9">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_9.png</filename>
-                </imagetype>
-            </state>
-            <state name="10">
-                <imagetype name="stars">
-                    <area>0,0,178,30</area>
-                    <filename>mm_rating_10.png</filename>
-                </imagetype>
-            </state>
+        <statetype name="rating_state" from="baseratingstate">
+            <position>520,355</position>
         </statetype>
 
         <textarea name="lastplaylbl" from="titlelbl">
@@ -1518,7 +1452,7 @@
         </textarea>
 
         <textarea name="filename" from="title">
-            <area>520,510,600,90</area>
+            <area>520,505,600,90</area>
             <font>basesmall</font>
             <multiline>yes</multiline>
         </textarea>
