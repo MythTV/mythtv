@@ -721,7 +721,7 @@ void OSDListBtnType::Init(void)
     InitItem(m_itemSelInactPix, itemWidth,    m_itemHeight,
              m_itemSelBeg,      m_itemSelEnd, m_itemRegAlpha);
     InitItem(m_itemSelActPix,   itemWidth,    m_itemHeight,
-             m_itemSelBeg,      m_itemSelEnd, 255);
+             m_itemSelBeg,      m_itemSelEnd, m_itemSelAlpha);
 
     m_showDnArrow = m_itemList.size() > m_itemsVisible && m_showScrollArrows;
     m_initialized = true;
