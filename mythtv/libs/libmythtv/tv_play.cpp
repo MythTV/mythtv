@@ -202,9 +202,11 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
 
     if (tvrec)
+    {
         curProgram = new ProgramInfo(*tvrec);
 
-    curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
+        curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
+    }
 
     // Initialize TV
     if (!tv->Init())
