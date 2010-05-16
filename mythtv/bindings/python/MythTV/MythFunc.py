@@ -13,35 +13,43 @@ import re
 import socket
 from datetime import datetime
 
-def schemaUpdate(func, db=None):
+class schemaUpdate( object ):
     # decorator class for database updates
     # TODO: do locking and lock checking
     #       if interactive terminal, ask for update permission
     #       perform database backup (partial?)
-    if db is None:
-        db = DBCache()
-    log = MythLog('Schema Update')
+    def __init__(self, func):
+        self.func = func
+        self.__doc__ = self.func.__doc__
+        self.__name__ = self.func.__name__
+        self.__module__ = self.func.__module__
 
-    schemaname = func(-1)
-    while True:
-        try:
-            updates, newver = func(db.settings.NULL[schemaname])
-        except StopIteration:
-            break
+        self.schemavar = func(-1)
 
-        log(log.IMPORTANT, 'Updating %s from %s to %s' % \
-                    (schemaname, db.settings.NULL[schemaname], newver))
-        c = db.cursor()
+    def __call__(db=None):
+        if db is None:
+            db = DBCache()
+        log = MythLog('Schema Update')
 
-        try:
-            for sql, values in updates:
-                c.execute(sql, values)
-        except Exception, e:
-            log(log.IMPORTANT, 'Update of %s failed' % schemaname)
-            raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
+        while True:
+            try:
+                updates, newver = func(db.settings.NULL[schemaname])
+            except StopIteration:
+                break
 
-        c.close()
-        db.settings.NULL[schemaname] = newver
+            log(log.IMPORTANT, 'Updating %s from %s to %s' % \
+                        (schemaname, db.settings.NULL[schemaname], newver))
+            c = db.cursor()
+
+            try:
+                for sql, values in updates:
+                    c.execute(sql, values)
+            except Exception, e:
+                log(log.IMPORTANT, 'Update of %s failed' % schemaname)
+                raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
+
+            c.close()
+            db.settings.NULL[schemaname] = newver
 
 class databaseSearch( object ):
     # decorator class for database searches

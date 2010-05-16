@@ -250,6 +250,12 @@ class QuickDictData( DictData ):
             self._field_order.append(key)
         self._data[key] = value
 
+    def __delattr__(self, name):
+        if name in self._localvars:
+            del self.__dict__[name]
+        else:
+            self.__delitem__(name)
+
     def __delitem__(self, key):
         self._field_order.remove(key)
         del self._data[key]
@@ -800,28 +806,28 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     def __init__(self, connection):
         self.log = None
         MySQLdb.cursors.Cursor.__init__(self, connection)
-
-    def execute(self, query, args=None):
         if MySQLdb.__version__ >= ('1','2','2'):
-            self.connection.ping(True)
+            self.ping = self._ping
         else:
-            self.connection.ping()
-        if args:
-            self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
-        else:
-            self.log(self.log.DATABASE, ' '.join(query.split()))
+            self.ping = self._ping_pre122
+        self.ping()
+        
+    def _ping(self): self.connection.ping(True)
+    def _ping_pre122(self): self.connection.ping()
+    def log_query(self, query, args):
+        self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
+
+    def execute(self, query, args=()):
+        self.ping()
+        self.log_query(query, args)
         try:
             return MySQLdb.cursors.Cursor.execute(self, query, args)
         except Exception, e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def executemany(self, query, args):
-        if MySQLdb.__version__ >= ('1','2','2'):
-            self.connection.ping(True)
-        else:
-            self.connection.ping()
-        for arg in args:
-            self.log(self.log.DATABASE, ' '.join(query.split()), str(arg))
+        self.ping()
+        self.log_query(query, args)
         try:
             return MySQLdb.cursors.Cursor.executemany(self, query, args)
         except Exception, e:
@@ -851,10 +857,6 @@ class DBConnection( object ):
             raise MythDBError(MythError.DB_CONNECTION, dbconn)
 
     def cursor(self, log=None, type=LoggedCursor):
-        if MySQLdb.__version__ >= ('1','2','2'):
-            self.db.ping(True)
-        else:
-            self.db.ping()
         c = self.db.cursor(type)
         if log:
             c.log = log
@@ -950,7 +952,8 @@ class DBCache( object ):
     class _Settings( QuickDictData ):
         """Provides dictionary-like list of hosts"""
         class _HostSettings( QuickDictData ):
-            _localvars = QuickDictData._localvars+['_db','_host']
+            _localvars = QuickDictData._localvars+\
+                    ['_db','_host','_insert','_where']
             def __str__(self): return str(list(self))
             def __repr__(self): return str(self).encode('utf-8')
             def __iter__(self): return self._DictIterator(1)
@@ -959,22 +962,24 @@ class DBCache( object ):
                 self._db = db
                 self._host = host
                 self._log = log
-            
+                if host is 'NULL':
+                    self._insert = """INSERT INTO settings
+                                             (value, data, hostname)
+                                      VALUES (%s, %s, NULL)"""
+                    self._where = """hostname IS NULL"""
+                else:
+                    self._insert = """INSERT INTO settings
+                                             (value, data, hostname)
+                                      VALUES (%%s, %%s, '%s')""" % host
+                    self._where = """hostname='%s'""" % host
+
             def __getitem__(self, key):
                 if key not in self._data:
-                    if self._host == 'NULL':
-                        where = 'IS NULL'
-                        wheredat = (key,)
-                    else:
-                        where = 'LIKE(%s)'
-                        wheredat = (key, self._host)
-
                     c = self._db.cursor(self._log)
                     if c.execute("""SELECT data FROM settings
-                                    WHERE  value=%%s
-                                    AND    hostname %s
-                                    LIMIT 1""" % where,
-                                    wheredat) > 0:
+                                    WHERE value=%%s
+                                    AND %s LIMIT 1""" \
+                                % self._where, key):
                         self._data[key] = c.fetchone()[0]
                     else:
                         self._data[key] = None
@@ -983,40 +988,35 @@ class DBCache( object ):
                 return self._data[key]
 
             def __setitem__(self, key, value):
-                if key not in self._data:
-                    self.__getitem__(key)
                 c = self._db.cursor(self._log)
-                if self._data[key] is None:
-                    host = self._host
-                    if host is 'NULL':
-                        host = None
-                    c.execute("""INSERT INTO settings
-                                        (value, data, hostname)
-                                 VALUES (%s,%s,%s)""",
-                                 (key, value, host))
+                if self[key] is None:
+                    if value is None:
+                        return
+                    c.execute(self._insert, (key, value))
                 else:
-                    if self._host == 'NULL':
-                        where = 'IS NULL'
-                        wheredat = (value, key)
-                    else:
-                        where = 'LIKE(%s)'
-                        wheredat = (value, key, self._host)
+                    if value is None:
+                        del self[key]
                     c.execute("""UPDATE settings
-                                 SET    data=%%s
-                                 WHERE  value=%%s
-                                 AND    hostname %s""" % where, wheredat)
+                                 SET data=%%s
+                                 WHERE value=%%s
+                                 AND %s""" \
+                            % self._where, (value, key))
                 self._data[key] = value
+
+            def __delitem__(self, key):
+                if self[key] is None:
+                    return
+                c = self._db.cursor(self._log)
+                c.execute("""DELETE FROM settings
+                             WHERE value=%%s
+                             AND %s""" \
+                        % self._where, (key,))
+                QuickDictData.__delitem__(self, key)
 
             def getall(self):
                 c = self._db.cursor(self._log)
-                if self._host == 'NULL':
-                    where = 'IS NULL'
-                    wheredat = ()
-                else:
-                    where = 'LIKE(%s)'
-                    wheredat = (self._host,)
                 c.execute("""SELECT value,data FROM settings
-                             WHERE hostname %s""" % where, wheredat)
+                             WHERE %s""" % self._where)
                 for k,v in c.fetchall():
                     self._data[k] = v
                     if k not in self._field_order:
@@ -1057,16 +1057,25 @@ class DBCache( object ):
         if not self._check_dbconn(dbconn):
             # insufficient information for connection given
             # try to read from config.xml
-            config_files = [ os.path.expanduser('~/.mythtv/config.xml') ]
-            if 'MYTHCONFDIR' in os.environ:
-                config_files.append('%s/config.xml' %os.environ['MYTHCONFDIR'])
 
-            for config_file in config_files:
+            # build list of possible config paths
+            home = os.environ.get('HOME','')
+            mythconfdir = os.environ.get('MYTHCONFDIR','')
+            config_dirs = []
+            if not (((home == '') | (home == '/')) &
+                    ((mythconfdir == '') | ('$HOME' in mythconfdir))):
+                if mythconfdir:
+                    config_dirs.append(os.path.expandvars(mythconfdir))
+                if home:
+                    config_dirs.append(os.path.expanduser('~/.mythtv/'))
+
+            for confdir in config_dirs:
+                conffile = os.path.join(confdir,'config.xml')
                 dbconn.update({ 'DBHostName':None,  'DBName':None,
                                 'DBUserName':None,  'DBPassword':None,
                                 'DBPort':0})
                 try:
-                    config = etree.parse(config_file).getroot()
+                    config = etree.parse(conffile).getroot()
                     for child in config.find('UPnP').find('MythFrontend').\
                                         find('DefaultBackend').getchildren():
                         if child.tag in dbconn:
@@ -1076,7 +1085,7 @@ class DBCache( object ):
 
                 if self._check_dbconn(dbconn):
                     self.log(MythLog.IMPORTANT|MythLog.DATABASE,
-                           "Using connection settings from %s" % config_file)
+                           "Using connection settings from %s" % conffile)
                     break
             else:
                 # fall back to UPnP
@@ -1105,10 +1114,13 @@ class DBCache( object ):
   </UPnP>
 </Configuration>
 """ % tuple(settings)
-                mythdir = os.path.expanduser('~/.mythtv')
-                if not os.access(mythdir, os.F_OK):
-                    os.mkdir(mythdir,0755)
-                fp = open(mythdir+'/config.xml', 'w')
+                confdir = os.path.expanduser('~/.mythtv')
+                if mythconfdir:
+                    confdir = os.path.expandvars(mythconfdir)
+                conffile = os.path.join(confdir,'config.xml')
+                if not os.access(confdir, os.F_OK):
+                    os.mkdir(confdir,0755)
+                fp = open(conffile, 'w')
                 fp.write(config)
                 fp.close()
 
@@ -1739,7 +1751,7 @@ class XMLConnection( object ):
         return dbconn
     
 
-class MythLog( object ):
+class MythLog( LOGLEVEL ):
     """
     MythLog(module='pythonbindings', lstr=None, lbit=None, \
                     db=None, logfile=None) -> logging object
@@ -1758,50 +1770,7 @@ class MythLog( object ):
     The logging object is callable, and implements the MythLog.log() method.
     """
 
-    ALL         = int('1111111111111111111111111111', 2)
-    MOST        = int('0011111111101111111111111111', 2)
-    NONE        = int('0000000000000000000000000000', 2)
-
-    IMPORTANT   = int('0000000000000000000000000001', 2)
-    GENERAL     = int('0000000000000000000000000010', 2)
-    RECORD      = int('0000000000000000000000000100', 2)
-    PLAYBACK    = int('0000000000000000000000001000', 2)
-    CHANNEL     = int('0000000000000000000000010000', 2)
-    OSD         = int('0000000000000000000000100000', 2)
-    FILE        = int('0000000000000000000001000000', 2)
-    SCHEDULE    = int('0000000000000000000010000000', 2)
-    NETWORK     = int('0000000000000000000100000000', 2)
-    COMMFLAG    = int('0000000000000000001000000000', 2)
-    AUDIO       = int('0000000000000000010000000000', 2)
-    LIBAV       = int('0000000000000000100000000000', 2)
-    JOBQUEUE    = int('0000000000000001000000000000', 2)
-    SIPARSER    = int('0000000000000010000000000000', 2)
-    EIT         = int('0000000000000100000000000000', 2)
-    VBI         = int('0000000000001000000000000000', 2)
-    DATABASE    = int('0000000000010000000000000000', 2)
-    DSMCC       = int('0000000000100000000000000000', 2)
-    MHEG        = int('0000000001000000000000000000', 2)
-    UPNP        = int('0000000010000000000000000000', 2)
-    SOCKET      = int('0000000100000000000000000000', 2)
-    XMLTV       = int('0000001000000000000000000000', 2)
-    DVBCAM      = int('0000010000000000000000000000', 2)
-    MEDIA       = int('0000100000000000000000000000', 2)
-    IDLE        = int('0001000000000000000000000000', 2)
-    CHANNELSCAN = int('0010000000000000000000000000', 2)
-    EXTRA       = int('0100000000000000000000000000', 2)
-    TIMESTAMP   = int('1000000000000000000000000000', 2)
-
-    DBALL       = 8
-    DBDEBUG     = 7
-    DBINFO      = 6
-    DBNOTICE    = 5
-    DBWARNING   = 4
-    DBERROR     = 3
-    DBCRITICAL  = 2
-    DBALERT     = 1
-    DBEMERGENCY = 0
-
-    LOGLEVEL = IMPORTANT|GENERAL
+    LEVEL = LOGLEVEL.IMPORTANT|LOGLEVEL.GENERAL
     LOGFILE = None
 
     helptext = """Verbose debug levels.
@@ -1857,7 +1826,7 @@ class MythLog( object ):
     def __repr__(self):
         return "<%s '%s','%s' at %s>" % \
                 (str(self.__class__).split("'")[1].split(".")[-1], 
-                 self.module, bin(self.LOGLEVEL), hex(id(self)))
+                 self.module, bin(self.LEVEL), hex(id(self)))
 
     def __init__(self, module='pythonbindings', lstr=None, lbit=None, \
                     db=None, logfile=None):
@@ -1873,9 +1842,9 @@ class MythLog( object ):
     @staticmethod
     def _setlevel(lstr=None, lbit=None):
         if lstr:
-            MythLog.LOGLEVEL = MythLog._parselevel(lstr)
+            MythLog.LEVEL = MythLog._parselevel(lstr)
         elif lbit:
-            MythLog.LOGLEVEL = lbit
+            MythLog.LEVEL = lbit
 
     @staticmethod
     def _parselevel(lstr=None):
@@ -1902,7 +1871,7 @@ class MythLog( object ):
         else:
             level = []
             for l in xrange(len(bwlist)):
-                if MythLog.LOGLEVEL&2**l:
+                if MythLog.LEVEL&2**l:
                     level.append(bwlist[l])
             return ','.join(level)
 
@@ -1917,7 +1886,7 @@ class MythLog( object ):
                         ---- or ----
                 <timestamp> <module>: <message> -- <detail>
         """
-        if level&self.LOGLEVEL:
+        if level&self.LEVEL:
             if (version_info[0]>2) | (version_info[1]>5): # 2.6 or newer
                 nowstr = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
             else:
@@ -1948,7 +1917,7 @@ class MythLog( object ):
     def __call__(self, level, message, detail=None, dblevel=None):
         self.log(level, message, detail, dblevel)
 
-class MythError( Exception ):
+class MythError( Exception, ERRCODES ):
     """
     MythError('Generic Error Code') -> Exception
     MythError(error_code, additional_arguments) -> Exception
@@ -1957,22 +1926,7 @@ class MythError( Exception ):
         error code at obj.ecode.  Additional attributes may be available
         depending on the error code.
     """
-    GENERIC             = 0
-    SYSTEM              = 1
-    DB_RAW              = 50
-    DB_CONNECTION       = 51
-    DB_CREDENTIALS      = 52
-    DB_SETTING          = 53
-    DB_SCHEMAMISMATCH   = 54
-    DB_SCHEMAUPDATE     = 55
-    PROTO_CONNECTION    = 100
-    PROTO_ANNOUNCE      = 101
-    PROTO_MISMATCH      = 102
-    FE_CONNECTION       = 150
-    FE_ANNOUNCE         = 151
-    FILE_ERROR          = 200
-    FILE_FAILED_READ    = 201
-    FILE_FAILED_WRITE   = 202
+
     def __init__(self, *args):
         if args[0] == self.SYSTEM:
             self.ename = 'SYSTEM'
