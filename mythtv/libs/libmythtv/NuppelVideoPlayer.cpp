@@ -3,6 +3,8 @@
 #undef HAVE_AV_CONFIG_H
 
 // Std C headers
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
@@ -1099,7 +1101,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
 
     if ((video_disp_dim == QSize(width, height)) &&
         (video_aspect == aspect) && (video_frame_rate == fps   ) &&
-        ((keyframedistance <= 0) || (keyframedistance == keyframedist)) &&
+        ((keyframedistance <= 0) ||
+         ((uint64_t)keyframedistance == keyframedist)) &&
         !video_codec_changed)
     {
         return;
@@ -1521,7 +1524,7 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
         if (player_ctx->buffer->isDVD())
             stopFFREW = (player_ctx->buffer->DVD()->GetCurrentTime() < 2);
         else
-            stopFFREW = framesPlayed <= keyframedist;
+            stopFFREW = (int64_t)framesPlayed <= keyframedist;
     }
 
     if (stopFFREW)
@@ -3051,10 +3054,10 @@ bool NuppelVideoPlayer::Rewind(float seconds)
     if (osdHasSubtitles || !nonDisplayedAVSubtitles.empty())
        ClearSubtitles();
 
-    return rewindtime >= framesPlayed;
+    return (uint64_t)rewindtime >= framesPlayed;
 }
 
-bool NuppelVideoPlayer::JumpToFrame(long long frame)
+bool NuppelVideoPlayer::JumpToFrame(uint64_t frame)
 {
     if (!videoOutput)
         return false;
@@ -3480,7 +3483,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
             else
             {
                 player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-                player_ctx->playingInfo->SetBookmark(0);
+                player_ctx->playingInfo->SaveBookmark(0);
                 player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
             }
         }
@@ -3491,8 +3494,8 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
         QMutexLocker locker(&commBreakMapLock);
         if (player_ctx->playingInfo)
         {
-            player_ctx->playingInfo->setIgnoreBookmark(false);
-            player_ctx->playingInfo->GetCommBreakList(commBreakMap);
+            player_ctx->playingInfo->SetIgnoreBookmark(false);
+            player_ctx->playingInfo->QueryCommBreakList(commBreakMap);
         }
         if (!commBreakMap.isEmpty())
         {
@@ -4070,24 +4073,26 @@ void NuppelVideoPlayer::SetWatched(bool forceWatched)
 
     long long numFrames = totalFrames;
 
-    if (player_ctx->playingInfo->GetTranscodedStatus() != TRANSCODING_COMPLETE)
+    if (player_ctx->playingInfo->QueryTranscodeStatus() !=
+        TRANSCODING_COMPLETE)
     {
         uint endtime;
 
         // If the recording is stopped early we need to use the recording end
         // time, not the programme end time
-        if (player_ctx->playingInfo->recendts.toTime_t() <
-            player_ctx->playingInfo->endts.toTime_t())
+        if (player_ctx->playingInfo->GetRecordingEndTime().toTime_t() <
+            player_ctx->playingInfo->GetScheduledEndTime().toTime_t())
         {
-            endtime = player_ctx->playingInfo->recendts.toTime_t();
+            endtime = player_ctx->playingInfo->GetRecordingEndTime().toTime_t();
         }
         else
         {
-            endtime = player_ctx->playingInfo->endts.toTime_t();
+            endtime = player_ctx->playingInfo->GetScheduledEndTime().toTime_t();
         }
 
         numFrames = (long long)
-            ((endtime - player_ctx->playingInfo->recstartts.toTime_t()) *
+            ((endtime -
+              player_ctx->playingInfo->GetRecordingStartTime().toTime_t()) *
              video_frame_rate);
     }
 
@@ -4100,12 +4105,13 @@ void NuppelVideoPlayer::SetWatched(bool forceWatched)
 
     if (forceWatched || framesPlayed > numFrames - (offset * video_frame_rate))
     {
-        player_ctx->playingInfo->SetWatchedFlag(true);
-        VERBOSE(VB_GENERAL, QString("Marking recording as watched using offset %1 minutes").arg(offset/60));
+        player_ctx->playingInfo->SaveWatched(true);
+        VERBOSE(VB_GENERAL, QString("Marking recording as watched using "
+                                    "offset %1 minutes").arg(offset/60));
     }
     else
     {
-        player_ctx->playingInfo->SetWatchedFlag(false);
+        player_ctx->playingInfo->SaveWatched(false);
         VERBOSE(VB_GENERAL, "Marking recording as unwatched");
     }
 
@@ -4131,7 +4137,7 @@ void NuppelVideoPlayer::SetBookmark(void)
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (player_ctx->playingInfo)
         {
-            player_ctx->playingInfo->SetBookmark(framesPlayed);
+            player_ctx->playingInfo->SaveBookmark(framesPlayed);
             saved = true;
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -4161,7 +4167,7 @@ void NuppelVideoPlayer::ClearBookmark(void)
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (player_ctx->playingInfo)
         {
-            player_ctx->playingInfo->SetBookmark(0);
+            player_ctx->playingInfo->SaveBookmark(0);
             cleared = true;
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -4171,9 +4177,9 @@ void NuppelVideoPlayer::ClearBookmark(void)
         osd->SetSettingsText(QObject::tr("Bookmark Cleared"), 1);
 }
 
-long long NuppelVideoPlayer::GetBookmark(void) const
+uint64_t NuppelVideoPlayer::GetBookmark(void) const
 {
-    long long bookmark = 0;
+    uint64_t bookmark = 0;
 
     if (gCoreContext->IsDatabaseIgnored())
         bookmark = 0;
@@ -4183,7 +4189,7 @@ long long NuppelVideoPlayer::GetBookmark(void) const
     {
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (player_ctx->playingInfo)
-            bookmark = player_ctx->playingInfo->GetBookmark();
+            bookmark = player_ctx->playingInfo->QueryBookmark();
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 
@@ -4339,12 +4345,13 @@ bool NuppelVideoPlayer::DoRewind(void)
     // Save Audio Sync setting before seeking
     SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
 
-    long long number = rewindtime + 1;
-    long long desiredFrame = framesPlayed - number;
+    uint64_t number = rewindtime + 1;
+    uint64_t desiredFrame = (number > framesPlayed) ?
+        0 : framesPlayed - number;
 
     if (!editmode && hasdeletetable && IsInDelete(desiredFrame))
     {
-        QMap<long long, int>::Iterator it = deleteMap.begin();
+        frm_dir_map_t::const_iterator it = deleteMap.begin();
         while (it != deleteMap.end())
         {
             if (desiredFrame > it.key())
@@ -4493,20 +4500,19 @@ bool NuppelVideoPlayer::IsReallyNearEnd(void) const
     return near_end;
 }
 
-/** \fn NuppelVideoPlayer::IsNearEnd(long long) const
- *  \brief Returns true iff near end of recording.
+/** \brief Returns true iff near end of recording.
  *  \param margin minimum number of frames we want before being near end,
  *                defaults to 2 seconds of video.
  */
-bool NuppelVideoPlayer::IsNearEnd(long long margin) const
+bool NuppelVideoPlayer::IsNearEnd(int64_t margin) const
 {
-    long long framesRead, framesLeft = 0;
+    uint64_t framesRead, framesLeft = 0;
 
     if (!player_ctx)
         return false;
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (!player_ctx->playingInfo || player_ctx->playingInfo->isVideo ||
+    if (!player_ctx->playingInfo || player_ctx->playingInfo->IsVideo() ||
         !GetDecoder())
     {
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -4527,7 +4533,7 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
         framesLeft = margin;
         if (!editmode && hasdeletetable && IsInDelete(framesRead))
         {
-            QMap<long long, int>::const_iterator it = deleteMap.end();
+            frm_dir_map_t::const_iterator it = deleteMap.end();
             --it;
             if (it.key() == totalFrames)
             {
@@ -4538,7 +4544,7 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
         }
         else
             framesLeft = totalFrames - framesRead;
-        return (framesLeft < margin);
+        return (framesLeft < (uint64_t)margin);
     }
 
     if (!livetv && !watchingTV)
@@ -4553,11 +4559,11 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
             player_ctx->recorder->GetCachedFramesWritten() - framesRead;
 
         // if it looks like we are near end, get an updated GetFramesWritten()
-        if (framesLeft < margin)
+        if (framesLeft < (uint64_t)margin)
             framesLeft = player_ctx->recorder->GetFramesWritten() - framesRead;
     }
 
-    return (framesLeft < margin);
+    return (framesLeft < (uint64_t)margin);
 }
 
 bool NuppelVideoPlayer::DoFastForward(void)
@@ -4565,12 +4571,12 @@ bool NuppelVideoPlayer::DoFastForward(void)
     // Save Audio Sync setting before seeking
     SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
 
-    long long number = fftime - 1;
-    long long desiredFrame = framesPlayed + number;
+    int64_t number = fftime - 1;
+    uint64_t desiredFrame = framesPlayed + number;
 
     if (!editmode && hasdeletetable && IsInDelete(desiredFrame))
     {
-        QMap<long long, int>::Iterator it = deleteMap.end();
+        frm_dir_map_t::const_iterator it = deleteMap.end();
         --it;
         if ( it.key() == totalFrames)
         {
@@ -4592,7 +4598,7 @@ bool NuppelVideoPlayer::DoFastForward(void)
     return true;
 }
 
-void NuppelVideoPlayer::DoJumpToFrame(long long frame)
+void NuppelVideoPlayer::DoJumpToFrame(uint64_t frame)
 {
     bool exactstore = exactseeks;
 
@@ -4795,8 +4801,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
         return false;
     }
 
-    bool alreadyediting = false;
-    alreadyediting = player_ctx->playingInfo->IsEditing();
+    bool alreadyediting = player_ctx->playingInfo->QueryIsEditing();
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (alreadyediting)
@@ -4849,13 +4854,13 @@ bool NuppelVideoPlayer::EnableEdit(void)
         if (deleteMap.contains(totalFrames))
             deleteMap.erase(deleteMap.find(totalFrames));
 
-        QMap<long long, int>::Iterator it;
+        frm_dir_map_t::const_iterator it;
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
              AddMark(it.key(), *it);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    player_ctx->playingInfo->SetEditing(true);
+    player_ctx->playingInfo->SaveEditing(true);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     return editmode;
@@ -4868,9 +4873,9 @@ void NuppelVideoPlayer::DisableEdit(void)
     if (!player_ctx->playingInfo)
         return;
 
-    QMap<long long, int>::Iterator i = deleteMap.begin();
-    for (; i != deleteMap.end(); ++i)
-        osd->HideEditArrow(i.key(), *i);
+    frm_dir_map_t::const_iterator it = deleteMap.begin();
+    for (; it != deleteMap.end(); ++it)
+        osd->HideEditArrow(it.key(), *it);
     osd->HideSet("editmode");
 
     timedisplay = NULL;
@@ -4890,7 +4895,7 @@ void NuppelVideoPlayer::DisableEdit(void)
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
-        player_ctx->playingInfo->SetEditing(false);
+        player_ctx->playingInfo->SaveEditing(false);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
@@ -4977,7 +4982,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
         }
         else if (action == "CLEARMAP")
         {
-            QMap<long long, int>::Iterator it;
+            frm_dir_map_t::const_iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
                 osd->HideEditArrow(it.key(), *it);
 
@@ -4986,7 +4991,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
         }
         else if (action == "INVERTMAP")
         {
-            QMap<long long, int>::Iterator it;
+            frm_dir_map_t::const_iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
                 ReverseMark(it.key());
 
@@ -4998,7 +5003,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             if (hascommbreaktable)
             {
                 commBreakMapLock.lock();
-                QMap<long long, int>::Iterator it;
+                frm_dir_map_t::const_iterator it;
                 for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
                 {
                     if (!deleteMap.contains(it.key()))
@@ -5197,20 +5202,13 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     hh = mm / 60;
     mm %= 60;
 
-    char timestr[128];
-    sprintf(timestr, "%d:%02d:%02d.%02d", hh, mm, ss, frames);
-
-    char framestr[128];
-    sprintf(framestr, "%lld", framesPlayed);
-
-    QString cutmarker = " ";
-    if (IsInDelete(framesPlayed))
-        cutmarker = QObject::tr("cut");
-
     InfoMap infoMap;
-    infoMap["timedisplay"] = timestr;
-    infoMap["framedisplay"] = framestr;
-    infoMap["cutindicator"] = cutmarker;
+    infoMap["timedisplay"] =  QString("%1:%2:%3.%4")
+        .arg(hh).arg(mm,2,10,QChar('0'))
+        .arg(ss,2,10,QChar('0')).arg(frames,2,10,QChar('0'));
+    infoMap["framedisplay"] = QString::number(framesPlayed);
+    infoMap["cutindicator"] =
+        (IsInDelete(framesPlayed)) ? QObject::tr("cut") : " ";
     osd->SetText("editmode", infoMap, -1);
 }
 
@@ -5222,9 +5220,9 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
 
     if(!deleteMap.isEmpty())
     {
-        QMap<long long, int>::ConstIterator iter = deleteMap.begin();
+        frm_dir_map_t::const_iterator iter = deleteMap.begin();
 
-        while((iter != deleteMap.end()) && (iter.key() < framesPlayed))
+        while ((iter != deleteMap.end()) && (iter.key() < framesPlayed))
             ++iter;
 
         if (iter == deleteMap.end())
@@ -5232,10 +5230,10 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
             --iter;
             cut_after = !(*iter);
         }
-        else if((iter != deleteMap.begin()) && (iter.key() != framesPlayed))
+        else if ((iter != deleteMap.begin()) && (iter.key() != framesPlayed))
         {
             long long value = iter.key();
-            if((framesPlayed - (--iter).key()) > (value - framesPlayed))
+            if ((framesPlayed - (--iter).key()) > (value - framesPlayed))
             {
                 cut_after = !(*iter);
                 ++iter;
@@ -5303,7 +5301,7 @@ void NuppelVideoPlayer::HandleResponse(void)
 
     if (dialogtype == 0)
     {
-        int type = deleteMap[deleteframe];
+        MarkTypes type = deleteMap[deleteframe];
         switch (result)
         {
             case 1:
@@ -5346,35 +5344,35 @@ void NuppelVideoPlayer::UpdateEditSlider(void)
     osd->DoEditSlider(deleteMap, framesPlayed, totalFrames);
 }
 
-void NuppelVideoPlayer::AddMark(long long frames, int type)
+void NuppelVideoPlayer::AddMark(uint64_t frame, MarkTypes type)
 {
-    deleteMap[frames] = type;
-    osd->ShowEditArrow(frames, totalFrames, type);
+    deleteMap[frame] = type;
+    osd->ShowEditArrow(frame, totalFrames, type);
 }
 
-void NuppelVideoPlayer::DeleteMark(long long frames)
+void NuppelVideoPlayer::DeleteMark(uint64_t frame)
 {
-    osd->HideEditArrow(frames, deleteMap[frames]);
-    deleteMap.remove(frames);
+    osd->HideEditArrow(frame, deleteMap[frame]);
+    deleteMap.remove(frame);
 }
 
-void NuppelVideoPlayer::ReverseMark(long long frames)
+void NuppelVideoPlayer::ReverseMark(uint64_t frame)
 {
-    osd->HideEditArrow(frames, deleteMap[frames]);
+    osd->HideEditArrow(frame, deleteMap[frame]);
 
-    if (deleteMap[frames] == MARK_CUT_END)
-        deleteMap[frames] = MARK_CUT_START;
+    if (deleteMap[frame] == MARK_CUT_END)
+        deleteMap[frame] = MARK_CUT_START;
     else
-        deleteMap[frames] = MARK_CUT_END;
+        deleteMap[frame] = MARK_CUT_END;
 
-    osd->ShowEditArrow(frames, totalFrames, deleteMap[frames]);
+    osd->ShowEditArrow(frame, totalFrames, deleteMap[frame]);
 }
 
 void NuppelVideoPlayer::HandleArbSeek(bool right)
 {
     if (seekamount == -2)
     {
-        QMap<long long, int>::Iterator i = deleteMap.begin();
+        frm_dir_map_t::const_iterator i = deleteMap.begin();
         long long framenum = -1;
         if (right)
         {
@@ -5443,7 +5441,7 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe) const
     bool indelete = false;
     bool ret = false;
 
-    QMap<long long, int>::const_iterator i;
+    frm_dir_map_t::const_iterator i;
     for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
     {
         if (ret)
@@ -5501,7 +5499,7 @@ void NuppelVideoPlayer::SaveCutList(void)
     long long lastpos = -1;
     int lasttype = -1;
 
-    QMap<long long, int>::Iterator i;
+    frm_dir_map_t::const_iterator i;
 
     for (i = deleteMap.begin(); i != deleteMap.end();)
     {
@@ -5553,8 +5551,8 @@ void NuppelVideoPlayer::SaveCutList(void)
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
     {
-        player_ctx->playingInfo->SetMarkupFlag(MARK_UPDATED_CUT, true);
-        player_ctx->playingInfo->SetCutList(deleteMap);
+        player_ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
+        player_ctx->playingInfo->SaveCutList(deleteMap);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
@@ -5563,17 +5561,17 @@ void NuppelVideoPlayer::LoadCutList(void)
 {
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo && !gCoreContext->IsDatabaseIgnored())
-        player_ctx->playingInfo->GetCutList(deleteMap);
+        player_ctx->playingInfo->QueryCutList(deleteMap);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
-bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
-                                     QMap<long long, int> &breakMap)
+bool NuppelVideoPlayer::FrameIsInMap(
+    uint64_t frameNumber, const frm_dir_map_t &breakMap)
 {
     if (breakMap.isEmpty())
         return false;
 
-    QMap<long long, int>::Iterator it = breakMap.find(frameNumber);
+    frm_dir_map_t::const_iterator it = breakMap.find(frameNumber);
 
     if (it != breakMap.end())
         return true;
@@ -5645,8 +5643,8 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
                                               int &bufflen, int &vw, int &vh,
                                               float &ar)
 {
-    long long      number    = 0;
-    long long      oldnumber = 0;
+    uint64_t       number    = 0;
+    uint64_t       oldnumber = 0;
     unsigned char *data      = NULL;
     unsigned char *outputbuf = NULL;
     VideoFrame    *frame     = NULL;
@@ -5673,13 +5671,13 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Run 'mythcommflag --file %1 --rebuild' to fix.")
-                    .arg(player_ctx->playingInfo->GetRecordBasename()));
+                    .arg(player_ctx->playingInfo->GetBasename()));
             VERBOSE(VB_IMPORTANT,
                     QString("If that does not work and this is a .mpg file, "
                             "try 'mythtranscode --mpeg2 --buildindex "
                             "--allkeys -c %1 -s %2'.")
-                    .arg(player_ctx->playingInfo->chanid)
-                    .arg(player_ctx->playingInfo->recstartts
+                    .arg(player_ctx->playingInfo->GetChanID())
+                    .arg(player_ctx->playingInfo->GetRecordingStartTime()
                          .toString("yyyyMMddhhmmss")));
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -5759,14 +5757,14 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
                 commBreakMapLock.lock();
 
                 if (player_ctx->playingInfo)
-                    player_ctx->playingInfo->GetCommBreakList(commBreakMap);
+                    player_ctx->playingInfo->QueryCommBreakList(commBreakMap);
 
                 bool started_in_break_map = false;
                 while (FrameIsInMap(number, commBreakMap) ||
                        FrameIsInMap(number, deleteMap))
                 {
                     started_in_break_map = true;
-                    number += (long long) (30 * video_frame_rate);
+                    number += (uint64_t) (30 * video_frame_rate);
                     if (number >= totalFrames)
                     {
                         number = oldnumber;
@@ -5931,15 +5929,16 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     GetDecoder()->SetLowBuffers(true);
 }
 
-bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
-                                              int *did_ff, bool *is_key, bool honorCutList)
+bool NuppelVideoPlayer::TranscodeGetNextFrame(
+    frm_dir_map_t::iterator &dm_iter,
+    int &did_ff, bool &is_key, bool honorCutList)
 {
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
         player_ctx->playingInfo->UpdateInUseMark();
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    long long lastDecodedFrameNumber =
+    uint64_t lastDecodedFrameNumber =
         videoOutput->GetLastDecodedFrame()->frameNumber;
 
     if ((lastDecodedFrameNumber == 0) && honorCutList)
@@ -5956,7 +5955,8 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
             return false;
 
         if ((lastDecodedFrameNumber >= dm_iter.key()) ||
-            (lastDecodedFrameNumber == -1 && dm_iter.key() == 0))
+            (lastDecodedFrameNumber == (uint64_t)(__INT64_C(-1)) &&
+             dm_iter.key() == 0))
         {
             while(((*dm_iter) == 1) && (dm_iter != deleteMap.end()))
             {
@@ -5973,7 +5973,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 GetDecoder()->ClearStoredData();
                 ClearAfterSeek();
                 GetDecoder()->GetFrame(kDecodeAV);
-                *did_ff = 1;
+                did_ff = 1;
             }
             while(((*dm_iter) == 0) && (dm_iter != deleteMap.end()))
             {
@@ -5983,7 +5983,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
     }
     if (eof)
       return false;
-    *is_key = GetDecoder()->isLastFrameKey();
+    is_key = GetDecoder()->isLastFrameKey();
     return true;
 }
 
@@ -5992,11 +5992,11 @@ long NuppelVideoPlayer::UpdateStoredFrameNum(long curFrameNum)
     return GetDecoder()->UpdateStoredFrameNum(curFrameNum);
 }
 
-void NuppelVideoPlayer::SetCutList(QMap<long long, int> newCutList)
+void NuppelVideoPlayer::SetCutList(const frm_dir_map_t &newCutList)
 {
-    QMap<long long, int>::Iterator i;
-
     deleteMap.clear();
+
+    frm_dir_map_t::const_iterator i;
     for (i = newCutList.begin(); i != newCutList.end(); ++i)
         deleteMap[i.key()] = *i;
 }
@@ -6010,7 +6010,7 @@ bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer,
     return writevideo;
 }
 
-void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
+void NuppelVideoPlayer::SetCommBreakMap(const frm_dir_map_t &newMap)
 {
     QMutexLocker locker(&commBreakMapLock);
 
@@ -6522,7 +6522,7 @@ void NuppelVideoPlayer::GetChapterTimes(QList<long long> &times)
 
 bool NuppelVideoPlayer::DoJumpChapter(int chapter)
 {
-    long long desiredFrame = -1;
+    int64_t desiredFrame = -1;
     int total = GetNumChapters();
 
     if (chapter < 0 || chapter > total)
@@ -6551,10 +6551,10 @@ bool NuppelVideoPlayer::DoJumpChapter(int chapter)
 
     if (paused && !editmode)
         GetDecoder()->setExactSeeks(true);
-    if (desiredFrame < framesPlayed)
-        GetDecoder()->DoRewind(desiredFrame);
+    if ((uint64_t)desiredFrame < framesPlayed)
+        GetDecoder()->DoRewind((uint64_t)desiredFrame);
     else
-        GetDecoder()->DoFastForward(desiredFrame);
+        GetDecoder()->DoFastForward((uint64_t)desiredFrame);
     GetDecoder()->setExactSeeks(exactseeks);
 
     // Note: The video output will be reset by what the the decoder
@@ -6579,8 +6579,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
         QString message = "COMMFLAG_REQUEST ";
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        message += player_ctx->playingInfo->chanid + " " +
-                   player_ctx->playingInfo->recstartts.toString(Qt::ISODate);
+        message += player_ctx->playingInfo->MakeUniqueKey();
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         RemoteSendMessage(message);
 
@@ -7547,8 +7546,10 @@ long long NuppelVideoPlayer::GetDVDBookmark(void) const
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
             return 0;
         }
-        dvdbookmark = player_ctx->playingInfo->GetDVDBookmark(serialid,
-                                                        !delbookmark);
+
+        dvdbookmark = player_ctx->playingInfo->QueryDVDBookmark(
+            serialid, !delbookmark);
+
         if (!dvdbookmark.empty())
         {
             QStringList::Iterator it = dvdbookmark.begin();
@@ -7612,7 +7613,7 @@ void NuppelVideoPlayer::SetDVDBookmark(long long frames)
         fields += QString("%1").arg(audiotrack);
         fields += QString("%1").arg(subtitletrack);
         fields += QString("%1").arg(framenum);
-        player_ctx->playingInfo->SetDVDBookmark(fields);
+        player_ctx->playingInfo->SaveDVDBookmark(fields);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }

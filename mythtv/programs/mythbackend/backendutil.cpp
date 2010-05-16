@@ -22,8 +22,8 @@ QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
 {
     QString result = "";
     QMutexLocker locker(&recordingPathLock);
-    QString cacheKey = QString("%1:%2").arg(pginfo->chanid)
-                               .arg(pginfo->recstartts.toString(Qt::ISODate));
+    QString cacheKey = QString("%1:%2").arg(pginfo->GetChanID())
+        .arg(pginfo->GetRecordingStartTime(ISODate));
     if ((recordingPathCache.contains(cacheKey)) &&
         (QFile::exists(recordingPathCache[cacheKey])))
     {

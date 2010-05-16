@@ -231,13 +231,12 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
         return "";
     }
 
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(
-                              QString::number(chanid), recstartts);
+    const ProgramInfo pginfo(chanid, recstartts);
 
-    if (!pginfo)
+    if (!pginfo.GetChanID())
         return "";
 
-    QString pburl = pginfo->GetPlaybackURL(true);
+    QString pburl = pginfo.GetPlaybackURL(true);
     if (pburl.left(1) != "/")
         return "";
 
@@ -564,7 +563,7 @@ bool CommDetector2::go(void)
         cerr.flush();
     }
 
-    QMap<long long, int> lastBreakMap;
+    frm_dir_map_t lastBreakMap;
     unsigned int passno = 0;
     unsigned int npasses = frameAnalyzers.size();
     for (currentPass = frameAnalyzers.begin();
@@ -681,11 +680,11 @@ bool CommDetector2::go(void)
             if (sendBreakMapUpdates && (breakMapUpdateRequested ||
                         !(currentFrameNumber % 500)))
             {
-                QMap<long long, int> breakMap;
+                frm_dir_map_t breakMap;
 
-                getCommercialBreakList(breakMap);
+                GetCommercialBreakList(breakMap);
 
-                QMap<long long, int>::const_iterator ii, jj;
+                frm_dir_map_t::const_iterator ii, jj;
                 ii = breakMap.begin();
                 jj = lastBreakMap.begin();
                 while (ii != breakMap.end() && jj != breakMap.end())
@@ -739,7 +738,7 @@ bool CommDetector2::go(void)
     return true;
 }
 
-void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
+void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
 {
     if (!finished)
     {
@@ -783,7 +782,7 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
 
     /* Report results. */
     const float fps = nvp->GetFrameRate();
-    for (QMap<long long, int>::const_iterator iimark = marks.begin();
+    for (frm_dir_map_t::const_iterator iimark = marks.begin();
             iimark != marks.end();
             ++iimark)
     {
@@ -867,7 +866,7 @@ void PrintReportMap(
 }
 
 void CommDetector2::PrintFullMap(
-    ostream &out, const comm_break_t *comm_breaks, bool verbose) const
+    ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const
 {
     FrameAnalyzer::FrameMap logoMap, blankMap, blankBreakMap, sceneMap;
     if (logoFinder)

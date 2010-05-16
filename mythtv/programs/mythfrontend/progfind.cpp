@@ -259,7 +259,8 @@ void ProgFinder::customEvent(QEvent *event)
             {
                 ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
                 if (curPick)
-                    selectShowData(curPick->title, m_timesList->GetCurrentPos());
+                    selectShowData(curPick->GetTitle(),
+                                   m_timesList->GetCurrentPos());
             }
         }
     }
@@ -423,7 +424,7 @@ void ProgFinder::getInfo(bool toggle)
             return;
 
         // TODO: When schedule editor is non-blocking, move
-        selectShowData(curPick->title, m_timesList->GetCurrentPos());
+        selectShowData(curPick->GetTitle(), m_timesList->GetCurrentPos());
     }
 }
 
@@ -437,7 +438,7 @@ void ProgFinder::edit()
         {
             EditScheduled(curPick);
             // TODO: When schedule editor is non-blocking, move
-            selectShowData(curPick->title, m_timesList->GetCurrentPos());
+            selectShowData(curPick->GetTitle(), m_timesList->GetCurrentPos());
         }
     }
 }
@@ -493,33 +494,15 @@ void ProgFinder::updateTimesList()
         QString itemText;
         for (uint i = 0; i < m_showData.size(); ++i)
         {
-            itemText = m_showData[i]->startts.toString(m_dateFormat)
-                    + ' ' + m_showData[i]->startts.toString(m_timeFormat);
+            itemText =
+                m_showData[i]->GetScheduledStartTime().toString(m_dateFormat)
+                + ' ' +
+                m_showData[i]->GetScheduledStartTime().toString(m_timeFormat);
 
-            MythUIButtonListItem *item = new MythUIButtonListItem(m_timesList, "");
+            MythUIButtonListItem *item =
+                new MythUIButtonListItem(m_timesList, "");
 
-            QString state;
-
-            if (m_showData[i]->recstatus == rsRecording)
-                state = "running";
-            else if (m_showData[i]->recstatus == rsConflict ||
-                        m_showData[i]->recstatus == rsOffLine ||
-                        m_showData[i]->recstatus == rsAborted)
-                state = "error";
-            else if (m_showData[i]->recstatus == rsWillRecord)
-            {
-                    state = "normal";
-            }
-            else if (m_showData[i]->recstatus == rsRepeat ||
-                        m_showData[i]->recstatus == rsOtherShowing ||
-                        m_showData[i]->recstatus == rsNeverRecord ||
-                        m_showData[i]->recstatus == rsDontRecord ||
-                        (m_showData[i]->recstatus != rsDontRecord &&
-                        m_showData[i]->recstatus <= rsEarlierShowing))
-                state = "disabled";
-            else
-                state = "warning";
-
+            QString state = toUIState(m_showData[i]->GetRecordingStatus());
             item->SetText(itemText, "buttontext", state);
             item->DisplayState(state, "status");
         }

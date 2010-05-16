@@ -7,14 +7,13 @@
 
 // MythTV
 #include "mythscreentype.h"
-#include "programlist.h"
+#include "programinfo.h"
 #include "mythdialogbox.h"
 #include "playercontext.h"
 
 // mythfrontend
 #include "schedulecommon.h"
 
-class ProgramInfo;
 class TV;
 class MythUIText;
 class MythUIButtonList;

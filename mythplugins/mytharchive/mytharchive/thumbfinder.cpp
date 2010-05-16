@@ -266,7 +266,7 @@ void ThumbFinder::loadCutList()
 
     if (progInfo && m_archiveItem->hasCutlist)
     {
-        progInfo->GetCutList(m_deleteMap);
+        progInfo->QueryCutList(m_deleteMap);
         delete progInfo;
     }
 }
@@ -641,7 +641,7 @@ int ThumbFinder::checkFramePosition(int frameNumber)
         return frameNumber;
 
     int diff = 0;
-    QMap<long long, int>::Iterator it = m_deleteMap.find(frameNumber);
+    frm_dir_map_t::const_iterator it = m_deleteMap.find(frameNumber);
 
     for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
     {
@@ -695,10 +695,10 @@ bool ThumbFinder::seekForward()
     else if (inc == -2)
     {
         int pos = 0;
-        QMap<long long, int>::Iterator it;
+        frm_dir_map_t::const_iterator it;
         for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
         {
-            if (it.key() > currentFrame)
+            if (it.key() > (uint64_t)currentFrame)
             {
                 pos = it.key();
                 break;
@@ -733,11 +733,11 @@ bool ThumbFinder::seekBackward()
     else if (inc == -2)
     {
         // seek to previous cut point
-        QMap<long long, int>::Iterator it;
+        frm_dir_map_t::const_iterator it;
         int pos = 0;
         for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
         {
-            if (it.key() >= currentFrame)
+            if (it.key() >= (uint64_t)currentFrame)
                 break;
 
             pos = it.key();
@@ -911,7 +911,7 @@ void ThumbFinder::updatePositionBar(int64_t frame)
     p.setPen(Qt::NoPen);
     p.fillRect(0, 0, size.width(), size.height(), brush);
 
-    QMap<long long, int>::Iterator it;
+    frm_dir_map_t::const_iterator it;
 
     brush.setColor(Qt::red);
     double startdelta, enddelta;
@@ -953,7 +953,7 @@ int ThumbFinder::calcFinalDuration()
     {
         if (m_archiveItem->useCutlist)
         {
-            QMap<long long, int>::Iterator it;
+            frm_dir_map_t::const_iterator it;
 
             int start, end, cutLen = 0;
 

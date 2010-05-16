@@ -127,10 +127,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetNullVideo(void)                   { using_null_videoout = true; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetAutoCommercialSkip(CommSkipMode autoskip);
-    void SetCommBreakMap(QMap<long long, int> &newMap);
+    void SetCommBreakMap(const frm_dir_map_t&);
     void SetLength(int len)                   { totalLength = len; }
     void SetVideoFilters(const QString &override);
-    void SetFramesPlayed(long long played)    { framesPlayed = played; }
+    void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
     void SetEof(void)                         { eof = true; }
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
@@ -183,9 +183,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
     int     GetLength(void) const             { return totalLength; }
-    long long GetTotalFrameCount(void) const  { return totalFrames; }
-    long long GetFramesPlayed(void) const     { return framesPlayed; }
-    long long GetBookmark(void) const;
+    uint64_t  GetTotalFrameCount(void) const  { return totalFrames; }
+    uint64_t  GetFramesPlayed(void) const     { return framesPlayed; }
+    uint64_t  GetBookmark(void) const;
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
         { return (errorType & kError_Switch_Renderer); }
@@ -205,7 +205,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
     bool    IsReallyNearEnd(void) const;
-    bool    IsNearEnd(long long framesRemaining = -1) const;
+    bool    IsNearEnd(int64_t framesRemaining = -1) const;
     bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
     bool    HasAudioIn(void) const            { return !no_audio_in; }
     bool    HasAudioOut(void) const           { return !no_audio_out; }
@@ -245,7 +245,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Seek stuff
     bool FastForward(float seconds);
     bool Rewind(float seconds);
-    bool JumpToFrame(long long frame);
+    bool JumpToFrame(uint64_t frame);
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
 
@@ -259,14 +259,14 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
-    bool TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
-                               int *did_ff, bool *is_key, bool honorCutList);
+    bool TranscodeGetNextFrame(frm_dir_map_t::iterator &dm_iter,
+                               int &did_ff, bool &is_key, bool honorCutList);
     void TranscodeWriteText(
         void (*func)(void *, unsigned char *, int, int, int), void *ptr);
     bool WriteStoredData(
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
-    void SetCutList(QMap<long long, int> newCutList);
+    void SetCutList(const frm_dir_map_t&);
 
     // Edit mode stuff
     bool EnableEdit(void);
@@ -469,12 +469,13 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool DoFastForward(void);
     bool DoRewind(void);
     void DoChangeDVDTrack(void);
-    void DoJumpToFrame(long long frame);
+    void DoJumpToFrame(uint64_t frame);
 
     // Private seeking stuff
     void ClearAfterSeek(bool clearvideobuffers = true);
-    bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
-    void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
+    bool FrameIsInMap(uint64_t, const frm_dir_map_t&);
+    void JumpToNetFrame(int64_t net)
+        { JumpToFrame((int64_t)framesPlayed + net); }
     void RefreshPauseFrame(void);
 
     // Private chapter stuff
@@ -491,9 +492,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void LoadCutList(void);
     void DisableEdit(void);
 
-    void AddMark(long long frames, int type);
-    void DeleteMark(long long frames);
-    void ReverseMark(long long frames);
+    void AddMark(uint64_t frame, MarkTypes type);
+    void DeleteMark(uint64_t frame);
+    void ReverseMark(uint64_t frame);
 
     void SetDeleteIter(void);
     void SetBlankIter(void);
@@ -611,8 +612,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Playback misc.
     /// How often we have tried to wait for a video output buffer and failed
     int       videobuf_retries;
-    long long framesPlayed;
-    long long totalFrames;
+    uint64_t framesPlayed;
+    uint64_t totalFrames;
     long long totalLength;
     long long rewindtime;
     QString m_recusage;
@@ -635,7 +636,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     /// Set when SetScanType runs the first time
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
-    int keyframedist;
+    uint keyframedist;
 
     // Prebuffering (RingBuffer) control
     QWaitCondition prebuffering_wait;///< QWaitContition used by prebuffering
@@ -767,12 +768,12 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool       hasdeletetable;
     bool       hasblanktable;
     bool       hascommbreaktable;
-    QMap<long long, int> deleteMap;
-    QMap<long long, int> blankMap;
-    QMap<long long, int> commBreakMap;
-    QMap<long long, int>::Iterator deleteIter;
-    QMap<long long, int>::Iterator blankIter;
-    QMap<long long, int>::Iterator commBreakIter;
+    frm_dir_map_t deleteMap;
+    frm_dir_map_t blankMap;
+    frm_dir_map_t commBreakMap;
+    frm_dir_map_t::iterator deleteIter;
+    frm_dir_map_t::iterator blankIter;
+    frm_dir_map_t::iterator commBreakIter;
     QDateTime  lastIgnoredManualSkip;
     bool       forcePositionMapSync;
 

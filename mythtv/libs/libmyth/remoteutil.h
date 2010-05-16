@@ -46,8 +46,8 @@ MPUBLIC
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
 MPUBLIC
 void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist);
-MPUBLIC int RemoteGetRecordingList(vector<ProgramInfo *> *reclist,
-                                   QStringList &strList);
+MPUBLIC uint RemoteGetRecordingList(vector<ProgramInfo *> &reclist,
+                                    QStringList &strList);
 MPUBLIC vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
 MPUBLIC void RemoteSendMessage(const QString &message);
 MPUBLIC void RemoteSendEvent(const MythEvent &event);
@@ -56,8 +56,8 @@ MPUBLIC void RemoteGeneratePreviewPixmap(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewIfModified(
     const ProgramInfo &pginfo, const QString &cachefile);
-MPUBLIC void RemoteFillProginfo(ProgramInfo *pginfo,
-                                const QString &playbackhostname);
+MPUBLIC bool RemoteFillProgramInfo(
+    ProgramInfo &pginfo, const QString &playbackhostname);
 MPUBLIC QStringList RemoteRecordings(void);
 MPUBLIC int RemoteGetRecordingMask(void);
 MPUBLIC int RemoteGetFreeRecorderCount(void);

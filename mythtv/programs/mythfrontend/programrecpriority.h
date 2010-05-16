@@ -13,9 +13,12 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIText;
 class MythUIStateType;
+class ProgramRecPriority;
 
 class ProgramRecPriorityInfo : public RecordingInfo
 {
+    friend class ProgramRecPriority;
+
   public:
     ProgramRecPriorityInfo();
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other);

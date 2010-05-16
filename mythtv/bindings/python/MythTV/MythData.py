@@ -497,32 +497,28 @@ class Program( DictData, RECSTATUS ):
     _field_order = [ 'title',        'subtitle',     'description',
                      'category',     'chanid',       'channum',
                      'callsign',     'channame',     'filename',
-                     'fs_high',      'fs_low',       'starttime',
-                     'endtime',      'duplicate',    'shareable',
+                     'filesize',     'starttime',    'endtime',      
                      'findid',       'hostname',     'sourceid',
                      'cardid',       'inputid',      'recpriority',
                      'recstatus',    'recordid',     'rectype',
                      'dupin',        'dupmethod',    'recstartts',
-                     'recendts',     'repeat',       'programflags',
-                     'recgroup',     'commfree',     'outputfilters',
-                     'seriesid',     'programid',    'lastmodified',
-                     'stars',        'airdate',      'hasairdate',
+                     'recendts',     'programflags', 'recgroup',     
+                     'outputfilters','seriesid',     'programid',
+                     'lastmodified', 'stars',        'airdate',
                      'playgroup',    'recpriority2', 'parentid',
                      'storagegroup', 'audio_props',  'video_props',
                      'subtitle_type','year']
     _field_type = [  3,      3,      3,
                      3,      0,      3,
                      3,      3,      3,
-                     0,      0,      4,
-                     4,      0,      0,
+                     0,      4,      4,                
                      0,      3,      0,
                      0,      0,      0,
                      0,      0,      3,
                      0,      0,      4,
-                     4,      0,      3,
-                     3,      0,      3,
+                     4,      3,      3,
                      3,      3,      3,
-                     1,      3,      0,
+                     3,      1,      3,
                      3,      0,      3,
                      3,      0,      0,
                      0,      0]
@@ -548,7 +544,7 @@ class Program( DictData, RECSTATUS ):
             for key in ('title','subTitle','seriesId','programId','airdate',
                     'category','hostname','chanNum','callSign','playGroup',
                     'recGroup','rectype','programFlags','chanId','recStatus',
-                    'commFree','stars'):
+                    'commFree','stars','filesize'):
                 if key in xmldat:
                     dat[key.lower()] = xmldat[key]
             for key in ('startTime','endTime','lastModified',
@@ -556,9 +552,6 @@ class Program( DictData, RECSTATUS ):
                 if key in xmldat:
                     dat[key.lower()] = str(int(mktime(strptime(
                                         xmldat[key], '%Y-%m-%dT%H:%M:%S'))))
-            if 'fileSize' in xmldat:
-                dat['fs_high'],dat['fs_low'] = \
-                                    self.splitInt(int(xmldat['fileSize']))
 
             raw = []
             defs = (0,0,0,'',0)
@@ -571,7 +564,6 @@ class Program( DictData, RECSTATUS ):
         else:
             raise InputError("Either 'raw' or 'etree' must be provided")
         self._db = DBCache(db)
-        self.filesize = self.joinInt(self.fs_high,self.fs_low)
 
     def toString(self):
         """

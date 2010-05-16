@@ -13,7 +13,7 @@ public:
                             const QDateTime& recordingStartedAt_in,
                             const QDateTime& recordingStopsAt_in);
 
-    virtual void getCommercialBreakList(comm_break_t &comms);
+    virtual void GetCommercialBreakList(frm_dir_map_t &comms);
     virtual ~PrePostRollFlagger(){}
     bool go();
 

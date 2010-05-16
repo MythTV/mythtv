@@ -48,19 +48,6 @@ class HDHRChannel;
 class MPEGStreamData;
 class ProgramMapTable;
 
-typedef QMap<long long, long long> PosMap;
-
-/// Used to request ProgramInfo for channel browsing.
-typedef enum
-{
-    BROWSE_SAME,    ///< Fetch browse information on current channel and time
-    BROWSE_UP,      ///< Fetch information on previous channel
-    BROWSE_DOWN,    ///< Fetch information on next channel
-    BROWSE_LEFT,    ///< Fetch information on current channel in the past
-    BROWSE_RIGHT,   ///< Fetch information on current channel in the future
-    BROWSE_FAVORITE ///< Fetch information on the next favorite channel
-} BrowseDirections;
-
 class GeneralDBOptions
 {
   public:
@@ -189,8 +176,8 @@ class MPUBLIC TVRec : public SignalMonitorListener
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetMaxBitrate(void) const;
-    long long GetKeyframePosition(long long desired) const;
-    bool GetKeyframePositions(long long start, long long end, PosMap&) const;
+    int64_t GetKeyframePosition(uint64_t desired) const;
+    bool GetKeyframePositions(int64_t start, int64_t end, frm_pos_map_t&) const;
     void SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);
@@ -215,12 +202,12 @@ class MPUBLIC TVRec : public SignalMonitorListener
     bool CheckChannel(QString name) const;
     bool ShouldSwitchToAnotherCard(QString chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
-    void GetNextProgram(int direction,
+    void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
                         QString &desc,        QString &category,
                         QString &starttime,   QString &endtime,
                         QString &callsign,    QString &iconpath,
-                        QString &channelname, QString &chanid,
+                        QString &channelname, uint    &chanid,
                         QString &seriesid,    QString &programid);
     bool GetChannelInfo(uint &chanid, uint &sourceid,
                         QString &callsign, QString &channum,
@@ -230,7 +217,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
                         QString channame, QString xmltvid);
 
     /// \brief Returns the caputure card number
-    int GetCaptureCardNum(void) { return cardid; }
+    uint GetCaptureCardNum(void) { return cardid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
@@ -259,12 +246,12 @@ class MPUBLIC TVRec : public SignalMonitorListener
     void TeardownAll(void);
     void WakeEventLoop(void);
 
-    static bool GetDevices(int cardid,
+    static bool GetDevices(uint cardid,
                            GeneralDBOptions   &general_opts,
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
-    static QString GetStartChannel(int cardid, const QString &defaultinput);
+    static QString GetStartChannel(uint cardid, const QString &defaultinput);
 
     bool SetupRecorder(RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
@@ -350,7 +337,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     InputGroupMap igrp;
 
     // Configuration variables from setup routines
-    int               cardid;
+    uint              cardid;
     bool              ispip;
 
     // Configuration variables from database, based on cardid

@@ -140,7 +140,7 @@ static QMap<QString,OutputMethod> *init_output_types(void)
 
 QString get_filename(ProgramInfo *program_info)
 {
-    QString filename = program_info->pathname;
+    QString filename = program_info->GetPathname();
     if (!QFile::exists(filename))
         filename = program_info->GetPlaybackURL(true);
     return filename;
@@ -150,8 +150,8 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 {
     QString filename;
     
-    if (program_info->pathname.startsWith("myth://"))
-        filename = program_info->pathname;
+    if (program_info->IsMythStream())
+        filename = program_info->GetPathname();
     else
         filename = get_filename(program_info);
 
@@ -188,12 +188,12 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int QueueCommFlagJob(QString chanid, QString starttime)
+int QueueCommFlagJob(uint chanid, QString starttime)
 {
-    ProgramInfo *pginfo =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    const ProgramInfo pginfo(chanid, recstartts);
 
-    if (!pginfo)
+    if (!pginfo.GetChanID())
     {
         if (!quiet)
         {
@@ -205,8 +205,8 @@ int QueueCommFlagJob(QString chanid, QString starttime)
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
-    bool result = JobQueue::QueueJob(JOB_COMMFLAG, pginfo->chanid,
-                                     pginfo->recstartts);
+    bool result = JobQueue::QueueJob(
+        JOB_COMMFLAG, pginfo.GetChanID(), pginfo.GetRecordingStartTime());
 
     if (result)
     {
@@ -234,13 +234,13 @@ int QueueCommFlagJob(QString chanid, QString starttime)
 
 int CopySkipListToCutList(QString chanid, QString starttime)
 {
-    QMap<long long, int> cutlist;
-    QMap<long long, int>::Iterator it;
+    frm_dir_map_t cutlist;
+    frm_dir_map_t::const_iterator it;
 
-    ProgramInfo *pginfo =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
 
-    if (!pginfo)
+    if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
@@ -248,23 +248,23 @@ int CopySkipListToCutList(QString chanid, QString starttime)
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
-    pginfo->GetCommBreakList(cutlist);
+    pginfo.QueryCommBreakList(cutlist);
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
         if (*it == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;
         else
             cutlist[it.key()] = MARK_CUT_END;
-    pginfo->SetCutList(cutlist);
+    pginfo.SaveCutList(cutlist);
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
 int ClearSkipList(QString chanid, QString starttime)
 {
-    ProgramInfo *pginfo =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
 
-    if (!pginfo)
+    if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
@@ -272,8 +272,8 @@ int ClearSkipList(QString chanid, QString starttime)
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
-    QMap<long long, int> skiplist;
-    pginfo->SetCommBreakList(skiplist);
+    frm_dir_map_t skiplist;
+    pginfo.SaveCommBreakList(skiplist);
 
     VERBOSE(VB_IMPORTANT, "Commercial skip list cleared");
 
@@ -282,7 +282,7 @@ int ClearSkipList(QString chanid, QString starttime)
 
 int SetCutList(QString chanid, QString starttime, QString newCutList)
 {
-    QMap<long long, int> cutlist;
+    frm_dir_map_t cutlist;
 
     newCutList.replace(QRegExp(" "), "");
 
@@ -295,10 +295,10 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
         cutlist[cutpair[1].toInt()] = MARK_CUT_END;
     }
 
-    ProgramInfo *pginfo =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
 
-    if (!pginfo)
+    if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
@@ -306,7 +306,7 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
-    pginfo->SetCutList(cutlist);
+    pginfo.SaveCutList(cutlist);
 
     VERBOSE(VB_IMPORTANT, QString("Cutlist set to: %1").arg(newCutList));
 
@@ -315,14 +315,14 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
 
 int GetMarkupList(QString list, QString chanid, QString starttime)
 {
-    QMap<long long, int> cutlist;
-    QMap<long long, int>::Iterator it;
+    frm_dir_map_t cutlist;
+    frm_dir_map_t::const_iterator it;
     QString result;
 
-    ProgramInfo *pginfo =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    const ProgramInfo pginfo(chanid.toUInt(), recstartts);
 
-    if (!pginfo)
+    if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
@@ -331,9 +331,9 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
     }
 
     if (list == "cutlist")
-        pginfo->GetCutList(cutlist);
+        pginfo.QueryCutList(cutlist);
     else
-        pginfo->GetCommBreakList(cutlist);
+        pginfo.QueryCommBreakList(cutlist);
 
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
     {
@@ -360,7 +360,7 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
 }
 
 void streamOutCommercialBreakList(
-    ostream &output, const QMap<long long, int> &commercialBreakList)
+    ostream &output, const frm_dir_map_t &commercialBreakList)
 {
     if (!quiet)
         output << "----------------------------" << endl;
@@ -372,7 +372,7 @@ void streamOutCommercialBreakList(
     }
     else
     {
-        QMap<long long, int>::const_iterator it = commercialBreakList.begin();
+        frm_dir_map_t::const_iterator it = commercialBreakList.begin();
         for (; it != commercialBreakList.end(); it++)
         {
             output << "framenum: " << it.key() << "\tmarktype: " << *it
@@ -386,7 +386,7 @@ void streamOutCommercialBreakList(
 
 static void print_comm_flag_output(
     const ProgramInfo          *program_info,
-    const QMap<long long, int> &commBreakList,
+    const frm_dir_map_t        &commBreakList,
     uint64_t                    frame_count,
     const CommDetectorBase     *commDetect,
     const QString              &output_filename)
@@ -404,17 +404,17 @@ static void print_comm_flag_output(
     if (!quiet)
     {
         QString tmp = "";
-        if (!program_info->chanid.isEmpty())
+        if (program_info->GetChanID())
         {
             tmp = QString("commercialBreakListFor: %1 on %2 @ %3")
-                .arg(program_info->title)
-                .arg(program_info->chanid)
-                .arg(program_info->recstartts.toString(Qt::ISODate));
+                .arg(program_info->GetTitle())
+                .arg(program_info->GetChanID())
+                .arg(program_info->GetRecordingStartTime(ISODate));
         }
         else
         {
             tmp = QString("commercialBreakListFor: %1")
-                .arg(program_info->pathname);
+                .arg(program_info->GetPathname());
         }
 
         const QByteArray tmp2 = tmp.toLocal8Bit();
@@ -481,13 +481,12 @@ void commDetectorStatusUpdate(const QString& status)
 
 void commDetectorGotNewCommercialBreakList(void)
 {
-    QMap<long long, int> newCommercialMap;
-    commDetector->getCommercialBreakList(newCommercialMap);
+    frm_dir_map_t newCommercialMap;
+    commDetector->GetCommercialBreakList(newCommercialMap);
 
-    QMap<long long, int>::Iterator it = newCommercialMap.begin();
+    frm_dir_map_t::Iterator it = newCommercialMap.begin();
     QString message = "COMMFLAG_UPDATE ";
-    message += global_program_info->chanid + " " +
-               global_program_info->recstartts.toString(Qt::ISODate);
+    message += global_program_info->MakeUniqueKey();
 
     for (it = newCommercialMap.begin();
             it != newCommercialMap.end(); ++it)
@@ -520,7 +519,7 @@ void incomingCustomEvent(QEvent* e)
                 QString("mythcommflag: Received Event: '%1'")
                 .arg(message));
 
-        if ((watchingRecording) &&
+        if ((watchingRecording) && (tokens.size() >= 3) &&
             (tokens[0] == "DONE_RECORDING"))
         {
             int cardnum = tokens[1].toInt();
@@ -539,18 +538,18 @@ void incomingCustomEvent(QEvent* e)
             }
         }
 
-        if (tokens[0] == "COMMFLAG_REQUEST")
+        if ((tokens.size() >= 2) && (tokens[0] == "COMMFLAG_REQUEST"))
         {
-            QString chanid = tokens[1];
-            QString starttime = tokens[2];
-            QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+            uint chanid = 0;
+            QDateTime recstartts;
+            ProgramInfo::ExtractKey(tokens[1], chanid, recstartts);
 
             message = QString("mythcommflag: Received a "
                               "COMMFLAG_REQUEST event for chanid %1 @ %2.  ")
-                              .arg(chanid).arg(starttime);
+                .arg(chanid).arg(recstartts.toString());
 
-            if ((global_program_info->chanid == chanid) &&
-                (global_program_info->recstartts == startts))
+            if ((global_program_info->GetChanID()             == chanid) &&
+                (global_program_info->GetRecordingStartTime() == recstartts))
             {
                 commDetector->requestCommBreakMapUpdate();
                 message += "Requested CommDetector to generate new break list.";
@@ -567,18 +566,20 @@ int DoFlagCommercials(
     const QString &outputfilename, bool useDB)
 {
     CommDetectorFactory factory;
-    commDetector = factory.makeCommDetector(commDetectMethod, showPercentage,
-                                            fullSpeed, nvp,
-                                            program_info->chanid.toInt(),
-                                            program_info->startts,
-                                            program_info->endts,
-                                            program_info->recstartts,
-                                            program_info->recendts, useDB);
+    commDetector = factory.makeCommDetector(
+        commDetectMethod, showPercentage,
+        fullSpeed, nvp,
+        program_info->GetChanID(),
+        program_info->GetScheduledStartTime(),
+        program_info->GetScheduledEndTime(),
+        program_info->GetRecordingStartTime(),
+        program_info->GetRecordingEndTime(), useDB);
 
     if (inJobQueue && useDB)
     {
-        jobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
-                                   program_info->recstartts);
+        jobID = JobQueue::GetJobID(
+            JOB_COMMFLAG,
+            program_info->GetChanID(), program_info->GetRecordingStartTime());
 
         if (jobID != -1)
             VERBOSE(VB_COMMFLAG,
@@ -588,7 +589,7 @@ int DoFlagCommercials(
     }
 
     if (useDB)
-        program_info->SetCommFlagged(COMM_FLAG_PROCESSING);
+        program_info->SaveCommFlagged(COMM_FLAG_PROCESSING);
 
     CustomEventRelayer *cer = new CustomEventRelayer(incomingCustomEvent);
     SlotRelayer *a = new SlotRelayer(commDetectorBreathe);
@@ -605,8 +606,7 @@ int DoFlagCommercials(
     {
         VERBOSE(VB_COMMFLAG, "mythcommflag sending COMMFLAG_START notification");
         QString message = "COMMFLAG_START ";
-        message += program_info->chanid + " " +
-            program_info->recstartts.toString(Qt::ISODate);
+        message += program_info->MakeUniqueKey();
         RemoteSendMessage(message);
     }
 
@@ -615,15 +615,15 @@ int DoFlagCommercials(
 
     if (result)
     {
-        QMap<long long, int> commBreakList;
-        commDetector->getCommercialBreakList(commBreakList);
+        frm_dir_map_t commBreakList;
+        commDetector->GetCommercialBreakList(commBreakList);
         comms_found = commBreakList.size() / 2;
 
         if (!dontSubmitCommbreakListToDB)
         {
-            program_info->SetMarkupFlag(MARK_UPDATED_CUT, true);
-            program_info->SetCommBreakList(commBreakList);
-            program_info->SetCommFlagged(COMM_FLAG_DONE);
+            program_info->SaveMarkupFlag(MARK_UPDATED_CUT);
+            program_info->SaveCommBreakList(commBreakList);
+            program_info->SaveCommFlagged(COMM_FLAG_DONE);
         }
 
         print_comm_flag_output(
@@ -634,7 +634,7 @@ int DoFlagCommercials(
     else
     {
         if (!dontSubmitCommbreakListToDB && useDB)
-            program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
+            program_info->SaveCommFlagged(COMM_FLAG_NOT_FLAGGED);
     }
 
     CommDetectorBase *tmp = commDetector;
@@ -665,7 +665,7 @@ int FlagCommercials(
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT commmethod FROM channel "
                         "WHERE chanid = :CHANID;");
-        query.bindValue(":CHANID", program_info->chanid);
+        query.bindValue(":CHANID", program_info->GetChanID());
 
         if (!query.exec())
         {
@@ -680,24 +680,24 @@ int FlagCommercials(
                 VERBOSE(VB_COMMFLAG,
                         QString("Chanid %1 is marked as being Commercial Free, "
                                 "we will use the default commercial detection "
-                                "method").arg(program_info->chanid));
+                                "method").arg(program_info->GetChanID()));
             }
             else if (commDetectMethod != COMM_DETECT_UNINIT)
                 VERBOSE(VB_COMMFLAG, QString("Using method: %1 from channel %2")
-                        .arg(commDetectMethod).arg(program_info->chanid));
+                        .arg(commDetectMethod).arg(program_info->GetChanID()));
         }
     }
 
     if (commDetectMethod == COMM_DETECT_UNINIT)
         commDetectMethod = (enum SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
-    QMap<long long, int> blanks;
+    frm_dir_map_t blanks;
     recorder = NULL;
 
     if (onlyDumpDBCommercialBreakList)
     {
-        QMap<long long, int> commBreakList;
-        program_info->GetCommBreakList(commBreakList);
+        frm_dir_map_t commBreakList;
+        program_info->QueryCommBreakList(commBreakList);
 
         print_comm_flag_output(program_info, commBreakList,
                                0, NULL, outputfilename);
@@ -709,10 +709,13 @@ int FlagCommercials(
 
     if (!quiet)
     {
-        QString chanid = program_info->chanid.leftJustified(6, ' ', true);
-        QString recstartts = program_info->recstartts
-            .toString("yyyyMMddhhmmss").leftJustified(14, ' ', true);
-        QString title = program_info->title.leftJustified(41, ' ', true);
+        QString chanid =
+            QString::number(program_info->GetChanID())
+            .leftJustified(6, ' ', true);
+        QString recstartts = program_info->GetRecordingStartTime(MythDate)
+            .leftJustified(14, ' ', true);
+        QString title = program_info->GetTitle()
+            .leftJustified(41, ' ', true);
 
         QString outstr = QString("%1 %2 %3 ")
             .arg(chanid).arg(recstartts).arg(title);
@@ -721,7 +724,7 @@ int FlagCommercials(
         cerr << out.constData() << flush;
     }
 
-    if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, program_info))
+    if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, *program_info))
     {
         if (!quiet)
         {
@@ -773,7 +776,7 @@ int FlagCommercials(
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
-    if (program_info->recendts > QDateTime::currentDateTime())
+    if (program_info->GetRecordingEndTime() > QDateTime::currentDateTime())
     {
         gCoreContext->ConnectToMasterServer();
 
@@ -801,12 +804,15 @@ int FlagCommercials(
     int fakeJobID = -1;
     if (!inJobQueue && useDB)
     {
-        JobQueue::QueueJob(JOB_COMMFLAG, program_info->chanid,
-                           program_info->recstartts, "", "",
-                           gCoreContext->GetHostName(), JOB_EXTERNAL,
-                           JOB_RUNNING);
-        fakeJobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
-                                       program_info->recstartts);
+        JobQueue::QueueJob(
+            JOB_COMMFLAG,
+            program_info->GetChanID(), program_info->GetRecordingStartTime(),
+            "", "", gCoreContext->GetHostName(), JOB_EXTERNAL, JOB_RUNNING);
+
+        fakeJobID = JobQueue::GetJobID(
+            JOB_COMMFLAG,
+            program_info->GetChanID(), program_info->GetRecordingStartTime());
+
         jobID = fakeJobID;
         VERBOSE(VB_COMMFLAG,
             QString("Not in JobQueue, creating fake Job ID %1").arg(jobID));
@@ -836,13 +842,13 @@ int FlagCommercials(
 }
 
 int FlagCommercials(
-    const QString &chanid, const QString &starttime,
+    uint chanid, const QString &starttime,
     const QString &outputfilename, bool useDB)
 {
-    ProgramInfo *program_info =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    ProgramInfo pginfo(chanid, recstartts);
 
-    if (!program_info)
+    if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
@@ -850,9 +856,7 @@ int FlagCommercials(
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
-    int ret = FlagCommercials(program_info, outputfilename, useDB);
-
-    delete program_info;
+    int ret = FlagCommercials(&pginfo, outputfilename, useDB);
 
     return ret;
 }
@@ -867,7 +871,7 @@ int main(int argc, char *argv[])
     QString filename;
     QString outputfilename = QString::null;
 
-    QString chanid;
+    uint chanid;
     QString starttime;
     QString allStart = "19700101000000";
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
@@ -911,7 +915,7 @@ int main(int argc, char *argv[])
                 return COMMFLAG_EXIT_INVALID_CHANID;
             }
 
-            chanid += a.argv()[++argpos];
+            chanid = QString(a.argv()[++argpos]).toUInt();
         }
         else if (!strcmp(a.argv()[argpos],"-s") ||
                  !strcmp(a.argv()[argpos],"--starttime"))
@@ -1251,7 +1255,8 @@ int main(int argc, char *argv[])
 
     if (jobID != -1)
     {
-        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
+        if (JobQueue::GetJobInfoFromID(
+                jobID, jobType, chanid, starttime))
         {
             inJobQueue = true;
             force = true;
@@ -1273,7 +1278,7 @@ int main(int argc, char *argv[])
 
         if (query.exec() && query.next())
         {
-            chanid = query.value(0).toString();
+            chanid = query.value(0).toUInt();
             starttime = query.value(1).toDateTime().toString("yyyyMMddhhmmss");
         }
         else
@@ -1284,8 +1289,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    if ((chanid.isEmpty() && !starttime.isEmpty()) ||
-        (!chanid.isEmpty() && starttime.isEmpty()))
+    if ((!chanid && !starttime.isEmpty()) ||
+        (chanid && starttime.isEmpty()))
     {
         VERBOSE(VB_IMPORTANT, "You must specify both the Channel ID "
                 "and the Start Time.");
@@ -1293,22 +1298,22 @@ int main(int argc, char *argv[])
     }
 
     if (clearSkiplist)
-        return ClearSkipList(chanid, starttime);
+        return ClearSkipList(QString::number(chanid), starttime);
 
     if (copyToCutlist)
-        return CopySkipListToCutList(chanid, starttime);
+        return CopySkipListToCutList(QString::number(chanid), starttime);
 
     if (clearCutlist)
-        return SetCutList(chanid, starttime, "");
+        return SetCutList(QString::number(chanid), starttime, "");
 
     if (!newCutList.isEmpty())
-        return SetCutList(chanid, starttime, newCutList);
+        return SetCutList(QString::number(chanid), starttime, newCutList);
 
     if (getCutlist)
-        return GetMarkupList("cutlist", chanid, starttime);
+        return GetMarkupList("cutlist", QString::number(chanid), starttime);
 
     if (getSkipList)
-        return GetMarkupList("commflag", chanid, starttime);
+        return GetMarkupList("commflag", QString::number(chanid), starttime);
 
     if (inJobQueue)
     {
@@ -1379,21 +1384,10 @@ int main(int argc, char *argv[])
 
     if (isVideo)
     {
-        ProgramInfo *pginfo = new ProgramInfo;
-        pginfo->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
-        pginfo->recendts = QDateTime::currentDateTime().addSecs(-1);
-        pginfo->isVideo = true;
-
-        if (filename.startsWith("myth://"))
-            pginfo->pathname = filename;
-        else
-            pginfo->pathname = QFileInfo(filename).absoluteFilePath();
-
-        result = BuildVideoMarkup(pginfo, useDB);
-
-        delete pginfo;
+        ProgramInfo pginfo(filename);
+        result = BuildVideoMarkup(&pginfo, useDB);
     }
-    else if (!chanid.isEmpty() && !starttime.isEmpty())
+    else if (chanid && !starttime.isEmpty())
     {
         if (queueJobInstead)
             QueueCommFlagJob(chanid, starttime);
@@ -1409,16 +1403,16 @@ int main(int argc, char *argv[])
             return -1;
         }
 
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
-        pginfo->pathname = filename;
-        pginfo->isVideo = true;
+        ProgramInfo *pginfo = new ProgramInfo(filename);
         PMapDBReplacement *pmap = new PMapDBReplacement();
         pginfo->SetPositionMapDBReplacement(pmap);
 
         // RingBuffer doesn't like relative pathnames
-        if (filename.left(1) != "/" && !filename.startsWith("dvd://"))
-            pginfo->pathname.prepend(QDir::currentPath() + '/');
+        if (filename.left(1) != "/" && !filename.contains("://"))
+        {
+            pginfo->SetPathname(
+                QDir::currentPath() + '/' + pginfo->GetPathname());
+        }
 
         if ((filename.right(3).toLower() == "mpg") ||
             (filename.right(4).toLower() == "mpeg"))
@@ -1457,7 +1451,7 @@ int main(int argc, char *argv[])
                                           Qt::ISODate);
                 starttime = m_starttime.toString("yyyyMMddhhmmss");
 
-                chanid = query.value(0).toString();
+                chanid = query.value(0).toUInt();
 
                 if ( allRecorded )
                 {

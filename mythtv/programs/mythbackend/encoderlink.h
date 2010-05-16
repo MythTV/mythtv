@@ -13,8 +13,6 @@ class MainServer;
 class PlaybackSock;
 class LiveTVChain;
 
-typedef QMap<long long, long long> PosMap;
-
 class EncoderLink
 {
   public:
@@ -101,8 +99,8 @@ class EncoderLink
     float GetFramerate(void);
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
-    long long GetKeyframePosition(long long desired);
-    bool GetKeyframePositions(long long start, long long end, PosMap&);
+    int64_t GetKeyframePosition(uint64_t desired);
+    bool GetKeyframePositions(int64_t start, int64_t end, frm_pos_map_t&);
     void SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);
@@ -113,7 +111,7 @@ class EncoderLink
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);
-    void ChangeChannel(int channeldirection);
+    void ChangeChannel(ChannelChangeDirection channeldirection);
     void SetChannel(const QString &name);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type,
@@ -122,11 +120,11 @@ class EncoderLink
     bool CheckChannel(const QString &name);
     bool ShouldSwitchToAnotherCard(const QString &channelid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
-    void GetNextProgram(int direction,
+    void GetNextProgram(BrowseDirection direction,
                         QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
+                        QString &channelname, uint &chanid,
                         QString &seriesid, QString &programid);
     bool GetChannelInfo(uint &chanid, uint &sourceid,
                         QString &callsign, QString &channum,
@@ -156,7 +154,7 @@ class EncoderLink
 
     QDateTime endRecordingTime;
     QDateTime startRecordingTime;
-    QString chanid;
+    uint chanid;
 };
 
 #endif

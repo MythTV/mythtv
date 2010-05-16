@@ -101,12 +101,12 @@ package MythTV;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 # and should be the current MythTV protocol version.
-    our $PROTO_VERSION = 56;
+    our $PROTO_VERSION = 57;
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    our $NUMPROGRAMLINES = 47;
+    our $NUMPROGRAMLINES = 41;
 
 # Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
     our %RecStatus_Types = (

@@ -26,10 +26,10 @@ using namespace std;
 #include "langsettings.h"
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
-void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
+void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
                        ProgramInfo *pginfo);
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
-                       QMap <long long, long long> &posMap, int jobID);
+                       frm_pos_map_t &posMap, int jobID);
 void CompleteJob(int jobID, ProgramInfo *pginfo,
                  bool useCutlist, int &resultCode);
 void UpdateJobQueue(float percent_done);
@@ -78,7 +78,8 @@ void usage(char *progname)
 
 int main(int argc, char *argv[])
 {
-    QString chanid, starttime, infile, outfile;
+    uint chanid;
+    QString starttime, infile, outfile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     int jobID = -1;
@@ -88,8 +89,8 @@ int main(int argc, char *argv[])
     bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
     QMap<QString, QString> settingsOverride;
-    QMap<long long, int> deleteMap;
-    QMap<long long, long long> posMap;
+    frm_dir_map_t deleteMap;
+    frm_pos_map_t posMap;
     srand(time(NULL));
 
     QCoreApplication a(argc, argv);
@@ -126,7 +127,7 @@ int main(int argc, char *argv[])
         {
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
-                chanid = a.argv()[argpos + 1];
+                chanid = QString(a.argv()[argpos + 1]).toUInt();
                 found_chanid = 1;
                 ++argpos;
             }
@@ -251,10 +252,13 @@ int main(int argc, char *argv[])
                         .split("-", QString::SkipEmptyParts);
                     if (startend.count() == 2)
                     {
-                        cerr << "Cutting from: " << startend.first().toInt()
-                             << " to: " << startend.last().toInt() <<"\n";
-                        deleteMap[startend.first().toInt()] = 1;
-                        deleteMap[startend.last().toInt()] = 0;
+                        cerr << "Cutting from: "
+                             << startend.first().toULongLong()
+                             << " to: " << startend.last().toULongLong() <<"\n";
+                        deleteMap[startend.first().toULongLong()] =
+                            MARK_CUT_START;
+                        deleteMap[startend.last().toULongLong()] =
+                            MARK_CUT_END;
                     }
                 }
             }
@@ -277,11 +281,11 @@ int main(int argc, char *argv[])
 
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
-                long long last = 0;
+                uint64_t last = 0;
                 QStringList cutlist =  QString(a.argv()[argpos + 1])
                     .split(" ", QString::SkipEmptyParts);
                 ++argpos;
-                deleteMap[0] = 1;
+                deleteMap[0] = MARK_CUT_START;
                 for (QStringList::Iterator it = cutlist.begin();
                      it != cutlist.end(); ++it )
                 {
@@ -290,15 +294,18 @@ int main(int argc, char *argv[])
                     if (startend.count() == 2)
                     {
                         cerr << "Cutting from: " << last
-                             << " to: " << startend.first().toInt() <<"\n";
-                        deleteMap[startend.first().toInt()] = 0;
-                        deleteMap[startend.last().toInt()] = 1;
+                             << " to: "
+                             << startend.first().toULongLong() <<"\n";
+                        deleteMap[startend.first().toULongLong()] =
+                            MARK_CUT_END;
+                        deleteMap[startend.last().toULongLong()] =
+                            MARK_CUT_START;
                         last = startend.last().toInt();
                     }
                 }
                 cerr << "Cutting from: " << last
                      << " to the end\n";
-                deleteMap[999999999] = 0;
+                deleteMap[999999999] = MARK_CUT_END;
             }
             else
             {
@@ -447,7 +454,8 @@ int main(int argc, char *argv[])
 
     if (jobID != -1)
     {
-        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
+        if (JobQueue::GetJobInfoFromID(
+                jobID, jobType, chanid, startts))
         {
             starttime = startts.toString(Qt::ISODate);
             found_starttime = 1;
@@ -507,21 +515,19 @@ int main(int argc, char *argv[])
         // We want the absolute file path for the filemarkup table
         QFileInfo inf(infile);
         infile = inf.absoluteFilePath();
-
-        // Create a new, empty ProgramInfo object
-        pginfo = new ProgramInfo;
-        pginfo->isVideo = 1;
-        pginfo->pathname = infile;
+        pginfo = new ProgramInfo(infile);
     }
     else if (!found_infile)
     {
-        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+        QDateTime recstartts = myth_dt_from_string(starttime);
+        pginfo = new ProgramInfo(chanid, recstartts);
 
-        if (!pginfo)
+        if (!pginfo->GetChanID())
         {
             QString msg = QString("Couldn't find recording for chanid %1 @ %2")
                 .arg(chanid).arg(starttime);
             cerr << msg.toLocal8Bit().constData() << endl;
+            delete pginfo;
             return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
 
@@ -529,36 +535,14 @@ int main(int argc, char *argv[])
     }
     else
     {
-        QFileInfo inf(infile);
-        pginfo = ProgramInfo::GetProgramFromBasename(inf.fileName());
-        if (!pginfo)
+        pginfo = new ProgramInfo(infile);
+        if (!pginfo->GetChanID())
         {
-            QString base = inf.baseName();
-            QRegExp r(
-               "(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)");
-            int pos = r.indexIn(base);
-            if (pos > -1)
-            {
-                chanid = r.cap(1);
-                QDateTime startts(
-                   QDate(r.cap(2).toInt(), r.cap(3).toInt(), r.cap(4).toInt()),
-                   QTime(r.cap(5).toInt(), r.cap(6).toInt(), r.cap(7).toInt()));
-                pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
-
-                if (!pginfo)
-                {
-                    VERBOSE(VB_IMPORTANT,
-                        QString("Couldn't find a recording on channel %1 "
-                                "starting at %2 in the database.")
-                                .arg(chanid).arg(startts.toString()));
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("Couldn't deduce channel and start time from "
-                                "%1 ").arg(base));
-            }
+            VERBOSE(VB_IMPORTANT,
+                    QString("Couldn't find a recording for filename '%1'")
+                    .arg(infile));
+            delete pginfo;
+            pginfo = NULL;
         }
     }
 
@@ -604,7 +588,7 @@ int main(int argc, char *argv[])
         void (*update_func)(float) = NULL;
         int (*check_func)() = NULL;
         if (useCutlist && !found_infile)
-            pginfo->GetCutList(deleteMap);
+            pginfo->QueryCutList(deleteMap);
         if (jobID >= 0)
         {
            glbl_jobID = jobID;
@@ -688,14 +672,14 @@ int main(int argc, char *argv[])
     return exitcode;
 }
 
-void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
+void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
                        ProgramInfo *pginfo)
 {
     if (pginfo && mapfile.isEmpty())
     {
         pginfo->ClearPositionMap(MARK_KEYFRAME);
         pginfo->ClearPositionMap(MARK_GOP_START);
-        pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME);
+        pginfo->SavePositionMap(posMap, MARK_GOP_BYFRAME);
     }
     else if (!mapfile.isEmpty())
     {
@@ -707,16 +691,17 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                     .arg(mapfile) + ENO);
             return;
         }
-        QMap<long long, long long>::const_iterator it;
+        frm_pos_map_t::const_iterator it;
         fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
         for (it = posMap.begin(); it != posMap.end(); ++it)
-            fprintf(mapfh, "%lld %lld\n", it.key(), *it);
+            fprintf(mapfh, "%lld %lld\n",
+                    (unsigned long long)it.key(), (unsigned long long)*it);
         fclose(mapfh);
     }
 }
 
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
-                        QMap <long long, long long> &posMap, int jobID)
+                       frm_pos_map_t &posMap, int jobID)
 {
     if (jobID < 0 || JobQueue::GetJobCmd(jobID) != JOB_STOP)
     {
@@ -735,16 +720,17 @@ int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
 
 int transUnlink(QString filename, ProgramInfo *pginfo)
 {
-    if (pginfo != NULL && !pginfo->storagegroup.isEmpty() &&
-        !pginfo->hostname.isEmpty())
+    if (pginfo != NULL && !pginfo->GetStorageGroup().isEmpty() &&
+        !pginfo->GetHostname().isEmpty())
     {
         QString ip = gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                pginfo->hostname);
+                                                pginfo->GetHostname());
         QString port = gCoreContext->GetSettingOnHost("BackendServerPort",
-                                                  pginfo->hostname);
+                                                  pginfo->GetHostname());
         QString basename = filename.section('/', -1);
-        QString uri = QString("myth://%1@%2:%3/%4").arg(pginfo->storagegroup)
-                              .arg(ip).arg(port).arg(basename);
+        QString uri = QString("myth://%1@%2:%3/%4")
+            .arg(pginfo->GetStorageGroup())
+            .arg(ip).arg(port).arg(basename);
         VERBOSE(VB_IMPORTANT, QString("Requesting delete for file '%1'.")
                                       .arg(uri));
         bool ok = RemoteFile::DeleteFile(uri);
@@ -785,11 +771,11 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         if ((jobArgs == "RENAME_TO_NUV") &&
             (filename.contains(QRegExp("mpg$"))))
         {
-            QString newbase = pginfo->GetRecordBasename();
+            QString newbase = pginfo->QueryBasename();
 
             cnf.replace(QRegExp("mpg$"), "nuv");
             newbase.replace(QRegExp("mpg$"), "nuv");
-            pginfo->SetRecordBasename(newbase);
+            pginfo->SaveBasename(newbase);
         }
 
         const QString newfile = cnf;
@@ -918,8 +904,8 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.prepare("DELETE FROM recordedmarkup "
                           "WHERE chanid = :CHANID "
                           "AND starttime = :STARTTIME ");
-            query.bindValue(":CHANID", pginfo->chanid);
-            query.bindValue(":STARTTIME", pginfo->recstartts);
+            query.bindValue(":CHANID", pginfo->GetChanID());
+            query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
 
             if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
@@ -930,13 +916,13 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                           "AND starttime = :STARTTIME ;");
             query.bindValue(":CUTLIST", "0");
             query.bindValue(":BOOKMARK", "0");
-            query.bindValue(":CHANID", pginfo->chanid);
-            query.bindValue(":STARTTIME", pginfo->recstartts);
+            query.bindValue(":CHANID", pginfo->GetChanID());
+            query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
 
             if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
 
-            pginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
+            pginfo->SaveCommFlagged(COMM_FLAG_NOT_FLAGGED);
         }
         else
         {
@@ -946,8 +932,8 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                           "AND type not in ( :COMM_START, "
                           "    :COMM_END, :BOOKMARK, "
                           "    :CUTLIST_START, :CUTLIST_END) ;");
-            query.bindValue(":CHANID", pginfo->chanid);
-            query.bindValue(":STARTTIME", pginfo->recstartts);
+            query.bindValue(":CHANID", pginfo->GetChanID());
+            query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
             query.bindValue(":COMM_START", MARK_COMM_START);
             query.bindValue(":COMM_END", MARK_COMM_END);
             query.bindValue(":BOOKMARK", MARK_BOOKMARK);

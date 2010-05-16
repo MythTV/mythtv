@@ -95,7 +95,7 @@ bool CustomPriority::Create()
 
 void CustomPriority::loadData()
 {
-    QString baseTitle = m_pginfo->title;
+    QString baseTitle = m_pginfo->GetTitle();
     baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
     QString quoteTitle = baseTitle;
@@ -138,7 +138,7 @@ void CustomPriority::loadData()
 
     loadExampleRules();
 
-    if (!m_pginfo->title.isEmpty())
+    if (!m_pginfo->GetTitle().isEmpty())
     {
         m_titleEdit->SetText(baseTitle);
         m_descriptionEdit->SetText("program.title = '" + quoteTitle + "' ");

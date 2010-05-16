@@ -66,8 +66,8 @@
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    PreviewGenerator::Mode _mode)
     : programInfo(*pginfo), mode(_mode), isConnected(false),
-      createSockets(false), serverSock(NULL),      pathname(pginfo->pathname),
-      timeInSeconds(true),  captureTime(-1),       outFileName(QString::null),
+      createSockets(false), serverSock(NULL), pathname(pginfo->GetPathname()),
+      timeInSeconds(true),  captureTime(-1),  outFileName(QString::null),
       outSize(0,0)
 {
 }
@@ -87,7 +87,7 @@ void PreviewGenerator::TeardownAll(void)
     if (!isConnected)
         return;
 
-    const QString filename = programInfo.pathname + ".png";
+    const QString filename = programInfo.GetPathname() + ".png";
 
     MythTimer t;
     t.start();
@@ -204,9 +204,9 @@ bool PreviewGenerator::Run(void)
             command += QString("@%1%2")
                 .arg(captureTime).arg(timeInSeconds ? "s" : "f");
         command += " ";
-        command += QString("--chanid %1 ").arg(programInfo.chanid);
+        command += QString("--chanid %1 ").arg(programInfo.GetChanID());
         command += QString("--starttime %1 ")
-            .arg(programInfo.recstartts.toString("yyyyMMddhhmmss"));
+            .arg(programInfo.GetRecordingStartTime(MythDate));
 
         if (!outFileName.isEmpty())
             command += QString("--outfile \"%1\" ").arg(outFileName);
@@ -360,7 +360,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
             }
         }
 
-        QString filename = programInfo.pathname.section('/',-1) + ".png";
+        QString filename = programInfo.GetBasename() + ".png";
         outFileName = QString("%1/%2").arg(remotecachedirname).arg(filename);
     }
 
@@ -372,8 +372,10 @@ bool PreviewGenerator::RemotePreviewRun(void)
     ok = false;
 
     QStringList fileNames;
-    fileNames.push_back(CreateAccessibleFilename(programInfo.pathname, fn));
-    fileNames.push_back(CreateAccessibleFilename(programInfo.pathname, ""));
+    fileNames.push_back(
+        CreateAccessibleFilename(programInfo.GetPathname(), fn));
+    fileNames.push_back(
+        CreateAccessibleFilename(programInfo.GetPathname(), ""));
 
     QStringList::const_iterator it = fileNames.begin();
     for ( ; it != fileNames.end() && (!ok || data.isEmpty()); ++it)
@@ -515,17 +517,21 @@ bool PreviewGenerator::LocalPreviewRun(void)
         int startEarly = 0;
         int programDuration = 0;
         int preroll =  gCoreContext->GetNumSetting("RecordPreRoll", 0);
-        if (programInfo.startts.isValid() &&
-            programInfo.endts.isValid() &&
-            (programInfo.startts != programInfo.endts))
+        if (programInfo.GetScheduledStartTime().isValid() &&
+            programInfo.GetScheduledEndTime().isValid() &&
+            (programInfo.GetScheduledStartTime() !=
+             programInfo.GetScheduledEndTime()))
         {
-            programDuration = programInfo.startts.secsTo(programInfo.endts);
+            programDuration = programInfo.GetScheduledStartTime()
+                .secsTo(programInfo.GetScheduledEndTime());
         }
-        if (programInfo.recstartts.isValid() &&
-            programInfo.startts.isValid() &&
-            (programInfo.recstartts != programInfo.startts))
+        if (programInfo.GetRecordingStartTime().isValid() &&
+            programInfo.GetScheduledStartTime().isValid() &&
+            (programInfo.GetRecordingStartTime() !=
+             programInfo.GetScheduledStartTime()))
         {
-            startEarly = programInfo.recstartts.secsTo(programInfo.startts);
+            startEarly = programInfo.GetRecordingStartTime()
+                .secsTo(programInfo.GetScheduledStartTime());
         }
         if (programDuration > 0)
         {

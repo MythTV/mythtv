@@ -106,15 +106,13 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
 
     QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
-    QString message = pi->title;
-
-    if (!pi->subtitle.isEmpty())
-        message += QString(" - \"%1\"").arg(pi->subtitle);
-
+    QString message = pi->toString(ProgramInfo::kTitleSubtitle, " - ");
     message += "\n\n";
-    message += pi->RecStatusDesc();
+    message += toDescription(
+        pi->GetRecordingStatus(), pi->GetRecordingStartTime());
 
-    if (pi->recstatus == rsConflict || pi->recstatus == rsLaterShowing)
+    if (pi->GetRecordingStatus() == rsConflict ||
+        pi->GetRecordingStatus() == rsLaterShowing)
     {
         message += " " + QObject::tr("The following programs will be recorded "
                                      "instead:") + "\n\n";
@@ -123,18 +121,16 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
         for (; it != m_recListAfter.end(); ++it)
         {
             const ProgramInfo *pa = *it;
-            if (pa->recstartts >= pi->recendts)
+            if (pa->GetRecordingStartTime() >= pi->GetRecordingEndTime())
                 break;
-            if (pa->recendts > pi->recstartts &&
-                (pa->recstatus == rsWillRecord ||
-                 pa->recstatus == rsRecording))
+            if (pa->GetRecordingEndTime() > pi->GetRecordingStartTime() &&
+                (pa->GetRecordingStatus() == rsWillRecord ||
+                 pa->GetRecordingStatus() == rsRecording))
             {
-                message += QString("%1 - %2  %3")
-                    .arg(pa->recstartts.toString(timeFormat))
-                    .arg(pa->recendts.toString(timeFormat)).arg(pa->title);
-                if (!pa->subtitle.isEmpty())
-                    message += QString(" - \"%1\"").arg(pa->subtitle);
-                message += "\n";
+                message += QString("%1 - %2  %3\n")
+                    .arg(pa->GetRecordingStartTime().toString(timeFormat))
+                    .arg(pa->GetRecordingEndTime().toString(timeFormat))
+                    .arg(pa->toString(ProgramInfo::kTitleSubtitle, " - "));
             }
         }
     }
@@ -155,31 +151,32 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
 
 static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
 {
-    if (a->recstartts != b->recstartts)
+    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
     {
-        if (a->recstartts > b->recstartts)
+        if (a->GetRecordingStartTime() > b->GetRecordingStartTime())
             return 1;
         else
             return -1;
     }
-    if (a->recendts != b->recendts)
+    if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
     {
-        if (a->recendts > b->recendts)
+        if (a->GetRecordingEndTime() > b->GetRecordingEndTime())
             return 1;
         else
             return -1;
     }
-    if (a->chansign != b->chansign)
+    if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
     {
-        if (a->chansign < b->chansign)
+        if (a->GetChannelSchedulingID() < b->GetChannelSchedulingID())
             return 1;
         else
             return -1;
     }
-    if (a->recpriority != b->recpriority &&
-        (a->recstatus == rsWillRecord || b->recstatus == rsWillRecord))
+    if (a->GetRecordingPriority() != b->GetRecordingPriority() &&
+        (a->GetRecordingStatus() == rsWillRecord ||
+         b->GetRecordingStatus() == rsWillRecord))
     {
-        if (a->recpriority < b->recpriority)
+        if (a->GetRecordingPriority() < b->GetRecordingPriority())
             return 1;
         else
             return -1;
@@ -203,15 +200,18 @@ void ViewScheduleDiff::fillList(void)
     LoadFromScheduler(m_recListBefore, dummy);
     LoadFromScheduler(m_recListAfter,  dummy, m_altTable, m_recordid);
 
-    m_recListBefore.sort(comp_recstart_less_than);
-    m_recListAfter.sort(comp_recstart_less_than);
+    std::stable_sort(m_recListBefore.begin(), m_recListBefore.end(),
+                     comp_recstart_less_than);
+    std::stable_sort(m_recListAfter.begin(), m_recListAfter.end(),
+                     comp_recstart_less_than);
 
     QDateTime now = QDateTime::currentDateTime();
 
     ProgramList::iterator it = m_recListBefore.begin();
     while (it != m_recListBefore.end())
     {
-        if ((*it)->recendts >= now || (*it)->endts >= now)
+        if ((*it)->GetRecordingEndTime() >= now ||
+            (*it)->GetScheduledEndTime() >= now)
         {
             ++it;
         }
@@ -224,7 +224,8 @@ void ViewScheduleDiff::fillList(void)
     it = m_recListAfter.begin();
     while (it != m_recListAfter.end())
     {
-        if ((*it)->recendts >= now || (*it)->endts >= now)
+        if ((*it)->GetRecordingEndTime() >= now ||
+            (*it)->GetScheduledEndTime() >= now)
         {
             ++it;
         }
@@ -271,8 +272,9 @@ void ViewScheduleDiff::fillList(void)
             }
         }
 
-        if (s.before && s.after && (s.before->cardid == s.after->cardid) &&
-            (s.before->recstatus == s.after->recstatus))
+        if (s.before && s.after &&
+            (s.before->GetCardID() == s.after->GetCardID()) &&
+            (s.before->GetRecordingStatus() == s.after->GetRecordingStatus()))
         {
             continue;
         }
@@ -292,43 +294,25 @@ void ViewScheduleDiff::updateUIList(void)
         if (!pginfo)
             pginfo = s.before;
 
-        QString state;
+        MythUIButtonListItem *item = new MythUIButtonListItem(
+            m_conflictList, "", qVariantFromValue(pginfo));
 
-        if (pginfo->recstatus == rsRecording)
-            state = "running";
-        else if (pginfo->recstatus == rsConflict  ||
-            pginfo->recstatus == rsOffLine   ||
-            pginfo->recstatus == rsTunerBusy ||
-            pginfo->recstatus == rsFailed    ||
-            pginfo->recstatus == rsAborted)
-            state = "error";
-        else if (pginfo->recstatus == rsWillRecord)
-        {
-            state = "normal";
-        }
-        else if (pginfo->recstatus == rsRepeat ||
-            pginfo->recstatus == rsOtherShowing ||
-            pginfo->recstatus == rsNeverRecord ||
-            pginfo->recstatus == rsDontRecord ||
-            (pginfo->recstatus != rsDontRecord &&
-            pginfo->recstatus <= rsEarlierShowing))
-            state = "disabled";
-        else
-            state = "warning";
-
-        MythUIButtonListItem *item = new
-                MythUIButtonListItem(m_conflictList, "", qVariantFromValue(pginfo));
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
+
+        QString state = toUIState(pginfo->GetRecordingStatus());
+
         item->SetTextFromMap(infoMap, state);
 
         if (s.before)
-            item->SetText(s.before->RecStatusChar(), "statusbefore");
+            item->SetText(toQChar(s.before->GetRecordingStatus(),
+                                  s.before->GetCardID()), "statusbefore");
         else
             item->SetText("-", "statusbefore");
 
         if (s.after)
-            item->SetText(s.after->RecStatusChar(), "statusafter");
+            item->SetText(toQChar(s.after->GetRecordingStatus(),
+                                  s.after->GetCardID()), "statusafter");
         else
             item->SetText("-", "statusafter");
     }

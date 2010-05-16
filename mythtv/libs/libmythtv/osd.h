@@ -3,6 +3,7 @@
 
 // ANSI C
 #include <ctime>
+#include <stdint.h> // for [u]int[32,64]_t
 
 // C++
 #include <deque>
@@ -22,6 +23,7 @@ using namespace std;
 
 // MythTV Headers
 #include "themeinfo.h"
+#include "programtypes.h" // for frm_dir_map_t
 
 enum OSDFunctionalType
 {
@@ -47,6 +49,7 @@ extern const char *kOSDDialogAllowRecording;
 extern const char *kOSDDialogAlreadyEditing;
 extern const char *kOSDDialogExitOptions;
 extern const char *kOSDDialogAskDelete;
+extern const char *kOSDDialogCanNotDelete;
 extern const char *kOSDDialogIdleTimeout;
 extern const char *kOSDDialogSleepTimeout;
 extern const char *kOSDDialogChannelTimeout;
@@ -162,8 +165,8 @@ class OSD : public QObject
     void HideEditArrow(long long number, int type);
     void UpdateEditText(const QString &seek_amount, const QString &deletemarker,
                         const QString &edittime, const QString &framecnt);
-    void DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
-                      long long totalFrames);
+    void DoEditSlider(const frm_dir_map_t &deleteMap,
+                      uint64_t curFrame, uint64_t totalFrames);
 
     int getTimeType(void) { return timeType; }
 

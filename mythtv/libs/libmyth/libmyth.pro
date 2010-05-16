@@ -27,10 +27,10 @@ HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
 HEADERS += mythhttppool.h mythhttphandler.h
-HEADERS += audiopulseutil.h
-HEADERS += programinfo.h programlist.h programinfoupdater.h
-HEADERS += recordingtypes.h remoteutil.h
-HEADERS += rawsettingseditor.h
+HEADERS += audiopulseutil.h       remoteutil.h
+HEADERS += rawsettingseditor.h    autodeletedeque.h
+HEADERS += programinfo.h          programinfoupdater.h
+HEADERS += programtypes.h         recordingtypes.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h
@@ -51,10 +51,10 @@ SOURCES += volumebase.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp
-SOURCES += audiopulseutil.cpp
-SOURCES += programinfo.cpp programlist.cpp programinfoupdater.cpp
-SOURCES += recordingtypes.cpp remoteutil.cpp
+SOURCES += audiopulseutil.cpp     remoteutil.cpp
 SOURCES += rawsettingseditor.cpp
+SOURCES += programinfo.cpp        programinfoupdater.cpp
+SOURCES += programtypes.cpp       recordingtypes.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp
@@ -96,7 +96,9 @@ inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h mythdeque.h mythuifilebrowser.h
-inc.files += mythhttppool.h programinfo.h recordingtypes.h remoteutil.h
+inc.files += mythhttppool.h       remoteutil.h
+inc.files += programinfo.h        autodeletedeque.h
+inc.files += programtypes.h       recordingtypes.h
 
 # remove when everything is switched to mythui
 inc.files += virtualkeyboard_qt.h

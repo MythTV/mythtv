@@ -49,44 +49,42 @@ package MythTV::Program;
         $self->{'callsign'}        = $_[6];  # 06 chansign
         $self->{'channame'}        = $_[7];  # 07 channame
         $self->{'filename'}        = $_[8];  # 08 pathname
-        $self->{'fs_high'}         = $_[9];  # 09 filesize upper 32 bits
-        $self->{'fs_low'}          = $_[10]; # 10 filesize lower 32 bits
-        $self->{'starttime'}       = $_[11]; # 11 startts                   Scheduled starttime (unix timestamp)
-        $self->{'endtime'}         = $_[12]; # 12 endts                     Scheduled endtime (unix timestamp)
-        $self->{'duplicate'}       = $_[13]; # 13 duplicate
-        $self->{'shareable'}       = $_[14]; # 14 shareable
-        $self->{'findid'}          = $_[15]; # 15 findid
-        $self->{'hostname'}        = $_[16]; # 16 hostname
-        $self->{'sourceid'}        = $_[17]; # 17 sourceid
-        $self->{'cardid'}          = $_[18]; # 18 cardid
-        $self->{'inputid'}         = $_[19]; # 19 inputid
-        $self->{'recpriority'}     = $_[20]; # 20 recpriority
-        $self->{'recstatus'}       = $_[21]; # 21 recstatus
-        $self->{'recordid'}        = $_[22]; # 22 recordid
-        $self->{'rectype'}         = $_[23]; # 23 rectype
-        $self->{'dupin'}           = $_[24]; # 24 dupin
-        $self->{'dupmethod'}       = $_[25]; # 25 dupmethod
-        $self->{'recstartts'}      = $_[26]; # 26 recstartts                ACTUAL start time (unix timestamp)
-        $self->{'recendts'}        = $_[27]; # 27 recendts                  ACTUAL end time (unix timestamp)
-        $self->{'previouslyshown'} = $_[28]; # 28 repeat
-        $self->{'progflags'}       = $_[29]; # 29 programflags
-        $self->{'recgroup'}        = $_[30]; # 30 recgroup
-        $self->{'commfree'}        = $_[31]; # 31 chancommfree
-        $self->{'outputfilters'}   = $_[32]; # 32 chanOutputFilters
-        $self->{'seriesid'}        = $_[33]; # 33 seriesid
-        $self->{'programid'}       = $_[34]; # 34 programid
-        $self->{'lastmodified'}    = $_[35]; # 35 lastmodified
-        $self->{'stars'}           = $_[36]; # 36 stars
-        $self->{'airdate'}         = $_[37]; # 37 originalAirDate (ISO 8601 format)
-        $self->{'hasairdate'}      = $_[38]; # 38 hasAirDate
-        $self->{'playgroup'}       = $_[39]; # 39 playgroup
-        $self->{'recpriority2'}    = $_[40]; # 40 recpriority2
-        $self->{'parentid'}        = $_[41]; # 41 parentid
-        $self->{'storagegroup'}    = $_[42]; # 42 storagegroup
-        $self->{'audio_props'}     = $_[43]; # Audio properties
-        $self->{'video_props'}     = $_[44]; # Video properties
-        $self->{'subtitle_type'}   = $_[45]; # Subtitle type
-        $self->{'year'}            = $_[46]; # Production year
+        $self->{'filesize'}        = $_[9];  # 09 filesize
+
+        $self->{'starttime'}       = $_[11]; # 10 startts                   Scheduled starttime (unix timestamp)
+        $self->{'endtime'}         = $_[12]; # 11 endts                     Scheduled endtime (unix timestamp)
+        $self->{'findid'}          = $_[15]; # 12 findid
+        $self->{'hostname'}        = $_[16]; # 13 hostname
+        $self->{'sourceid'}        = $_[17]; # 14 sourceid
+        $self->{'cardid'}          = $_[18]; # 15 cardid
+        $self->{'inputid'}         = $_[19]; # 16 inputid
+        $self->{'recpriority'}     = $_[20]; # 17 recpriority
+        $self->{'recstatus'}       = $_[21]; # 18 recstatus
+        $self->{'recordid'}        = $_[22]; # 19 recordid
+
+        $self->{'rectype'}         = $_[23]; # 20 rectype
+        $self->{'dupin'}           = $_[24]; # 21 dupin
+        $self->{'dupmethod'}       = $_[25]; # 22 dupmethod
+        $self->{'recstartts'}      = $_[26]; # 23 recstartts                ACTUAL start time (unix timestamp)
+        $self->{'recendts'}        = $_[27]; # 24 recendts                  ACTUAL end time (unix timestamp)
+        $self->{'progflags'}       = $_[29]; # 25 programflags
+        $self->{'recgroup'}        = $_[30]; # 26 recgroup
+        $self->{'outputfilters'}   = $_[32]; # 27 chanOutputFilters
+        $self->{'seriesid'}        = $_[33]; # 28 seriesid
+        $self->{'programid'}       = $_[34]; # 29 programid
+
+        $self->{'lastmodified'}    = $_[35]; # 30 lastmodified
+        $self->{'stars'}           = $_[36]; # 31 stars
+        $self->{'airdate'}         = $_[37]; # 32 originalAirDate (ISO 8601 format)
+        $self->{'playgroup'}       = $_[39]; # 33 playgroup
+        $self->{'recpriority2'}    = $_[40]; # 34 recpriority2
+        $self->{'parentid'}        = $_[41]; # 35 parentid
+        $self->{'storagegroup'}    = $_[42]; # 36 storagegroup
+        $self->{'audio_props'}     = $_[43]; # 37 Audio properties
+        $self->{'video_props'}     = $_[44]; # 38 Video properties
+        $self->{'subtitle_type'}   = $_[45]; # 39 Subtitle type
+
+        $self->{'year'}            = $_[46]; # 40 Production year
 
     # Load the channel data
         if ($self->{'chanid'}) {
@@ -142,44 +140,42 @@ package MythTV::Program;
                     $self->{'callsign'}       , # 06 chansign
                     $self->{'channame'}       , # 07 channame
                     $self->{'filename'}       , # 08 pathname
-                    $self->{'fs_high'}        , # 09 filesize upper 32 bits
-                    $self->{'fs_low'}         , # 10 filesize lower 32 bits
-                    $self->{'starttime'}      , # 11 startts
-                    $self->{'endtime'}        , # 12 endts
-                    $self->{'duplicate'}      , # 13 duplicate
-                    $self->{'shareable'}      , # 14 shareable
-                    $self->{'findid'}         , # 15 findid
-                    $self->{'hostname'}       , # 16 hostname
-                    $self->{'sourceid'}       , # 17 sourceid
-                    $self->{'cardid'}         , # 18 cardid
-                    $self->{'inputid'}        , # 19 inputid
-                    $self->{'recpriority'}    , # 20 recpriority
-                    $self->{'recstatus'}      , # 21 recstatus
-                    $self->{'recordid'}       , # 22 recordid
-                    $self->{'rectype'}        , # 23 rectype
-                    $self->{'dupin'}          , # 24 dupin
-                    $self->{'dupmethod'}      , # 25 dupmethod
-                    $self->{'recstartts'}     , # 26 recstartts
-                    $self->{'recendts'}       , # 27 recendts
-                    $self->{'previouslyshown'}, # 28 repeat
-                    $self->{'progflags'}      , # 29 programflags
-                    $self->{'recgroup'}       , # 30 recgroup
-                    $self->{'commfree'}       , # 31 chancommfree
-                    $self->{'outputfilters'}  , # 32 chanOutputFilters
-                    $self->{'seriesid'}       , # 33 seriesid
-                    $self->{'programid'}      , # 34 programid
-                    $self->{'lastmodified'}   , # 35 lastmodified
-                    $self->{'stars'}          , # 36 stars
-                    $self->{'airdate'}        , # 37 originalAirDate
-                    $self->{'hasairdate'}     , # 38 hasAirDate
-                    $self->{'playgroup'}      , # 39 playgroup
-                    $self->{'recpriority2'}   , # 40 recpriority2
-                    $self->{'parentid'}       , # 41 parentid
-                    $self->{'storagegroup'}   , # 42 storagegroup
-                    $self->{'audio_props'}    , # 43 audio properties
-                    $self->{'video_props'}    , # 44 video properties
-                    $self->{'subtitle_type'}  , # 45 subtitle type
-                    $self->{'year'}           , # 46 production year
+                    $self->{'filesize'}       , # 09 filesize
+
+                    $self->{'starttime'}      , # 10 startts
+                    $self->{'endtime'}        , # 11 endts
+                    $self->{'findid'}         , # 12 findid
+                    $self->{'hostname'}       , # 13 hostname
+                    $self->{'sourceid'}       , # 14 sourceid
+                    $self->{'cardid'}         , # 15 cardid
+                    $self->{'inputid'}        , # 16 inputid
+                    $self->{'recpriority'}    , # 17 recpriority
+                    $self->{'recstatus'}      , # 18 recstatus
+                    $self->{'recordid'}       , # 19 recordid
+
+                    $self->{'rectype'}        , # 20 rectype
+                    $self->{'dupin'}          , # 21 dupin
+                    $self->{'dupmethod'}      , # 22 dupmethod
+                    $self->{'recstartts'}     , # 23 recstartts
+                    $self->{'recendts'}       , # 24 recendts
+                    $self->{'progflags'}      , # 25 programflags
+                    $self->{'recgroup'}       , # 26 recgroup
+                    $self->{'outputfilters'}  , # 27 chanOutputFilters
+                    $self->{'seriesid'}       , # 28 seriesid
+                    $self->{'programid'}      , # 29 programid
+
+                    $self->{'lastmodified'}   , # 30 lastmodified
+                    $self->{'stars'}          , # 31 stars
+                    $self->{'airdate'}        , # 32 originalAirDate
+                    $self->{'playgroup'}      , # 33 playgroup
+                    $self->{'recpriority2'}   , # 34 recpriority2
+                    $self->{'parentid'}       , # 35 parentid
+                    $self->{'storagegroup'}   , # 36 storagegroup
+                    $self->{'audio_props'}    , # 37 audio properties
+                    $self->{'video_props'}    , # 38 video properties
+                    $self->{'subtitle_type'}  , # 39 subtitle type
+
+                    $self->{'year'}           , # 40 production year
                     ''                          # trailing separator
                    );
     }

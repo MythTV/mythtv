@@ -23,7 +23,7 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
 
     vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
 
-    if (!RemoteGetRecordingList(info, strlist))
+    if (!RemoteGetRecordingList(*info, strlist))
     {
         delete info;
         return NULL;
@@ -127,7 +127,7 @@ bool RemoteCheckFile(const ProgramInfo *pginfo, bool checkSlaves)
     QString localpath = strlist[1];
     QFile checkFile(localpath);
     if (checkFile.exists())
-        pginfo->pathname = localpath;
+        pginfo->SetPathname(localpath);
 
     return true;
 }
@@ -182,40 +182,44 @@ bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts)
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
 {
     QStringList strList(QString("QUERY_GETALLSCHEDULED"));
-    RemoteGetRecordingList(&scheduledlist, strList);
+    RemoteGetRecordingList(scheduledlist, strList);
 }
 
 void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist)
 {
     QStringList strList(QString("QUERY_GETEXPIRING"));
-    RemoteGetRecordingList(&expiringlist, strList);
+    RemoteGetRecordingList(expiringlist, strList);
 }
 
-int RemoteGetRecordingList(vector<ProgramInfo *> *reclist, QStringList &strList)
+uint RemoteGetRecordingList(
+    vector<ProgramInfo *> &reclist, QStringList &strList)
 {
     if (!gCoreContext->SendReceiveStringList(strList))
         return 0;
 
     int numrecordings = strList[0].toInt();
+    if (numrecordings <= 0)
+        return 0;
 
-    if (numrecordings > 0)
+    if (numrecordings * NUMPROGRAMLINES + 1 > (int)strList.size())
     {
-        if (numrecordings * NUMPROGRAMLINES + 1 > (int)strList.size())
-        {
-            cerr << "length mismatch between programinfo\n";
-            return 0;
-        }
-
-        QStringList::const_iterator it = strList.begin() + 1;
-        for (int i = 0; i < numrecordings; i++)
-        {
-            ProgramInfo *pginfo = new ProgramInfo();
-            pginfo->FromStringList(it, strList.end());
-            reclist->push_back(pginfo);
-        }
+        VERBOSE(VB_IMPORTANT, "RemoteGetRecordingList() "
+                "list size appears to be incorrect.");
+        return 0;
     }
 
-    return numrecordings;
+    uint reclist_initial_size = (uint) reclist.size();
+    QStringList::const_iterator it = strList.begin() + 1;
+    for (int i = 0; i < numrecordings; i++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo(it, strList.end());
+        if (pginfo->GetChanID())
+            reclist.push_back(pginfo);
+        else
+            delete pginfo;
+    }
+
+    return ((uint) reclist.size()) - reclist_initial_size;
 }
 
 vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
@@ -226,7 +230,7 @@ vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
 
     vector<ProgramInfo *> *retlist = new vector<ProgramInfo *>;
 
-    RemoteGetRecordingList(retlist, strlist);
+    RemoteGetRecordingList(*retlist, strlist);
     return retlist;
 }
 
@@ -424,14 +428,23 @@ QDateTime RemoteGetPreviewIfModified(
     return retdatetime;
 }
 
-void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
+bool RemoteFillProgramInfo(ProgramInfo &pginfo, const QString &playbackhost)
 {
     QStringList strlist( "FILL_PROGRAM_INFO" );
-    strlist << playbackhostname;
-    pginfo->ToStringList(strlist);
+    strlist << playbackhost;
+    pginfo.ToStringList(strlist);
 
     if (gCoreContext->SendReceiveStringList(strlist))
-        pginfo->FromStringList(strlist, 0);
+    {
+        ProgramInfo tmp(strlist);
+        if (tmp.HasPathname() || tmp.GetChanID())
+        {
+            pginfo = tmp;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 QStringList RemoteRecordings(void)
@@ -563,15 +576,16 @@ int RemoteGetRecordingStatus(
 
     if (pginfo)
     {
-        if (curtime >= pginfo->startts.addSecs(-underrecsecs) &&
-            curtime < pginfo->endts.addSecs(overrecsecs))
+        if (curtime >= pginfo->GetScheduledStartTime().addSecs(-underrecsecs) &&
+            curtime < pginfo->GetScheduledEndTime().addSecs(overrecsecs))
         {
-            if (curtime >= pginfo->startts && curtime < pginfo->endts)
+            if (curtime >= pginfo->GetScheduledStartTime() &&
+                curtime < pginfo->GetScheduledEndTime())
                 retval = 1;
-            else if (curtime < pginfo->startts && 
+            else if (curtime < pginfo->GetScheduledStartTime() && 
                      RemoteCheckForRecording(pginfo) > 0)
                 retval = 2;
-            else if (curtime > pginfo->endts && 
+            else if (curtime > pginfo->GetScheduledEndTime() && 
                      RemoteCheckForRecording(pginfo) > 0)
                 retval = 3;
         }
@@ -591,7 +605,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
 
     vector<ProgramInfo *> *reclist = new vector<ProgramInfo *>;
     vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
-    if (!RemoteGetRecordingList(info, strlist))
+    if (!RemoteGetRecordingList(*info, strlist))
     {
         if (info)
             delete info;
@@ -600,14 +614,17 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
 
     ProgramInfo *p = NULL;
     vector<ProgramInfo *>::iterator it = info->begin();
-    // make sure whatever remotegetrecordinglist returned
+    // make sure whatever RemoteGetRecordingList() returned
     // only has rsRecording shows
     for ( ; it != info->end(); it++)
     {
         p = *it;
-        if (p->recstatus == rsRecording || (p->recstatus == rsRecorded
-                                            && p->recgroup == "LiveTV"))
+        if (p->GetRecordingStatus() == rsRecording ||
+            (p->GetRecordingStatus() == rsRecorded &&
+             p->GetRecordingGroup() == "LiveTV"))
+        {
             reclist->push_back(new ProgramInfo(*p));
+        }
     }
     
     while (!info->empty())

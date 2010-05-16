@@ -1,6 +1,9 @@
 #ifndef MANUALSCHEDULE_H_
 #define MANUALSCHEDULE_H_
 
+// ANSI C
+#include <stdint.h> // for [u]int[32,64]_t
+
 #include <QDateTime>
 #include <QStringList>
 
@@ -37,7 +40,7 @@ class ManualSchedule : public MythScreenType
     
     int m_daysahead;
 
-    QStringList m_chanids;
+    QList<uint32_t> m_chanids;
 
     MythUITextEdit *m_titleEdit;
 

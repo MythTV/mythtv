@@ -1,6 +1,8 @@
 #ifndef REMOTEENCODER_H_
 #define REMOTEENCODER_H_
 
+#include <stdint.h>
+
 #include <QString>
 #include <QMutex>
 #include <QHash>
@@ -33,7 +35,7 @@ class MPUBLIC RemoteEncoder
     long long GetFilePosition(void);
     long long GetFreeDiskSpace();
     long long GetMaxBitrate();
-    long long GetKeyframePosition(long long desired);
+    int64_t GetKeyframePosition(uint64_t desired);
     void FillPositionMap(long long start, long long end,
                          QMap<long long, long long> &positionMap);
     void StopPlaying(void);

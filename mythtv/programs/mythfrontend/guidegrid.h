@@ -3,7 +3,8 @@
 #define GUIDEGRID_H_
 
 // c++
-#include <vector> // For std::vector
+#include <vector>
+using namespace std;
 
 // qt
 #include <QString>
@@ -13,7 +14,6 @@
 // myth
 #include "mythscreentype.h"
 #include "programinfo.h"
-#include "programlist.h"
 #include "channelgroup.h"
 #include "channelutil.h"
 
@@ -188,7 +188,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     pix_chan_list_list_t m_channelInfos;
     QMap<uint,uint>      m_channelInfoIdx;
 
-    ProgramList *m_programs[MAX_DISPLAY_CHANS];
+    vector<ProgramList*> m_programs;
     ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
     ProgramList  m_recList;
 

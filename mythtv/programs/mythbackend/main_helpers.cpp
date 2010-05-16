@@ -314,7 +314,7 @@ void upnp_rebuild(int)
 
 }
 
-int preview_helper(const QString &chanid, const QString &starttime,
+int preview_helper(const QString &_chanid, const QString &starttime,
                    long long previewFrameNumber, long long previewSeconds,
                    const QSize &previewSize,
                    const QString &infile, const QString &outfile)
@@ -323,62 +323,41 @@ int preview_helper(const QString &chanid, const QString &starttime,
     if (setpriority(PRIO_PROCESS, 0, 9))
         VERBOSE(VB_GENERAL, "Setting priority failed." + ENO);
 
+    uint chanid = _chanid.toUInt();
+    QDateTime recstartts = myth_dt_from_string(starttime);
+    if (!chanid || !recstartts.isValid())
+        ProgramInfo::ExtractKeyFromPathname(infile, chanid, recstartts);
+
     ProgramInfo *pginfo = NULL;
-    if (!chanid.isEmpty() && !starttime.isEmpty())
+    if (chanid && recstartts.isValid())
     {
-        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
-        if (!pginfo)
+        pginfo = new ProgramInfo(chanid, recstartts);
+        if (!pginfo->GetChanID())
         {
             VERBOSE(VB_IMPORTANT, QString(
                         "Can not locate recording made on '%1' at '%2'")
                     .arg(chanid).arg(starttime));
+            delete pginfo;
             return GENERIC_EXIT_NOT_OK;
         }
-        pginfo->pathname = pginfo->GetPlaybackURL(false, true);
+        pginfo->SetPathname(pginfo->GetPlaybackURL(false, true));
     }
     else if (!infile.isEmpty())
     {
-        pginfo = ProgramInfo::GetProgramFromBasename(infile);
-        if (!pginfo)
+        if (!QFileInfo(infile).isReadable())
         {
-            if (!QFileInfo(infile).exists())
-            {
-                VERBOSE(VB_IMPORTANT, QString(
-                            "Can not locate recording '%1'").arg(infile));
-                return GENERIC_EXIT_NOT_OK;
-            }
-            else
-            {
-                pginfo = new ProgramInfo();
-                pginfo->isVideo = true;
-
-                QDir d(infile + "/VIDEO_TS");
-                QDir bd(infile + "/BDMV");
-                if ((infile.section('.', -1) == "iso") ||
-                    (infile.section('.', -1) == "img") ||
-                    d.exists())
-                {
-                    pginfo->pathname = QString("dvd:%1").arg(infile);
-                }
-                else if (bd.exists())
-                {
-                    pginfo->pathname = QString("bd:%1").arg(infile);
-                }
-                else
-                {
-                    pginfo->pathname = QFileInfo(infile).absoluteFilePath();
-                }
-            }
-
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Can not read this file '%1'").arg(infile));
+            return GENERIC_EXIT_NOT_OK;
         }
-        else
-        {
-            pginfo->pathname = pginfo->GetPlaybackURL(false, true);
-        }
+        pginfo = new ProgramInfo(
+            infile, ""/*plot*/, ""/*title*/, ""/*subtitle*/, ""/*director*/,
+            0/*season*/, 0/*episode*/, 120/*length_in_minutes*/,
+            1895/*year*/);
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Can not locate recording for preview");
+        VERBOSE(VB_IMPORTANT, "Can not locate recording to preview");
         return GENERIC_EXIT_NOT_OK;
     }
 

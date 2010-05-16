@@ -25,9 +25,7 @@ using namespace std;
 class EncoderLink;
 class MainServer;
 class AutoExpire;
-class RecordingList;
 
-#define USE_DEQUE_RECLIST 1
 typedef deque<RecordingInfo*> RecList;
 #define SORT_RECLIST(LIST, ORDER) \
   do { stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (0)
@@ -52,12 +50,13 @@ class Scheduler : public QObject
     void FillRecordListFromMaster(void);
 
     void UpdateRecStatus(RecordingInfo *pginfo);
-    void UpdateRecStatus(int cardid, const QString &chanid,
+    void UpdateRecStatus(uint cardid, uint chanid,
                          const QDateTime &startts, RecStatusType recstatus,
                          const QDateTime &recendts);
 
-    bool getAllPending(RecList *retList);
+    bool getAllPending(RecList *retList) const;
     void getAllPending(QStringList &strList);
+    QMap<QString,ProgramInfo*> GetRecording(void) const;
 
     void getAllScheduled(QStringList &strList);
 
@@ -72,11 +71,11 @@ class Scheduler : public QObject
     void SetMainServer(MainServer *ms);
 
     void SlaveConnected(RecordingList &slavelist);
-    void SlaveDisconnected(int cardid);
+    void SlaveDisconnected(uint cardid);
 
     void DisableScheduling(void) { schedulingEnabled = false; }
     void EnableScheduling(void) { schedulingEnabled = true; }
-    void GetNextLiveTVDir(int cardid);
+    void GetNextLiveTVDir(uint cardid);
     void ResetIdleTime(void);
 
     bool WasStartedAutomatically();
@@ -139,7 +138,14 @@ class Scheduler : public QObject
     bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
     void WakeUpSlaves(void);
 
-    int FillRecordingDir(RecordingInfo *pginfo, RecList& reclist);
+    int FillRecordingDir(const QString &title,
+                         const QString &hostname,
+                         const QString &storagegroup,
+                         const QDateTime &recstartts,
+                         const QDateTime &recendts,
+                         uint cardid,
+                         QString &recording_dir,
+                         const RecList &reclist);
     void FillDirectoryInfoCache(bool force = false);
 
     MythDeque<int> reschedQueue;

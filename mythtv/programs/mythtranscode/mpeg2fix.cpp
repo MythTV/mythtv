@@ -207,7 +207,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt)
 }
 
 MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
-                       QMap<long long, int> *deleteMap,
+                       frm_dir_map_t *deleteMap,
                        const char *fmt, int norp, int fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
@@ -1746,7 +1746,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
 void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
 {
     QStringList::iterator i;
-    QMap<long long, int> *mapPtr;
+    frm_dir_map_t *mapPtr;
     if (type == MPF_TYPE_CUTLIST)
     {
         mapPtr = &delMap;
@@ -1769,20 +1769,20 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
                     discard = 1;
             }
             else
-                mapPtr->insert(start - 1, 1);
-            mapPtr->insert(end, 0);
+                mapPtr->insert(start - 1, MARK_CUT_START);
+            mapPtr->insert(end, MARK_CUT_END);
         }
     }
     if (rangelist.count())
         use_secondary = true;
 }
 
-void MPEG2fixup::ShowRangeMap(QMap<long long, int> *mapPtr, QString msg)
+void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
 {
     if (mapPtr->count())
     {
         int64_t start = 0;
-        QMap<long long, int>::iterator it = mapPtr->begin();
+        frm_dir_map_t::iterator it = mapPtr->begin();
         for (; it != mapPtr->end(); ++it)
             if (*it == 0)
                 msg += QString("\n\t\t%1 - %2").arg(start).arg(it.key());
@@ -1859,7 +1859,7 @@ int MPEG2fixup::Start()
     int64_t expectedDTS = 0, lastPTS = 0, initPTS = 0, deltaPTS = 0;
     int64_t origvPTS = 0, origaPTS[N_AUDIO];
     int64_t cutStartPTS = 0, cutEndPTS = 0;
-    int64_t frame_count = 0;
+    uint64_t frame_count = 0;
     int new_discard_state = 0;
     int ret;
     QMap<int, int> af_dlta_cnt, cutState;
@@ -2566,7 +2566,7 @@ int main(int argc, char **argv)
 #endif
 
 int MPEG2fixup::BuildKeyframeIndex(QString &file,
-                                   QMap<long long, long long> &posMap)
+                                   frm_pos_map_t &posMap)
 {
     VERBOSE(MPF_GENERAL, "Generating Keyframe Index");
 

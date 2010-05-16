@@ -27,7 +27,9 @@ extern "C"
 #include <Q3PtrQueue>
 #include <Q3ValueList>
 
+// MythTV
 #include "transcodedefs.h"
+#include "programtypes.h"
 
 enum MPFDisplayMask {
     MPF_IMPORTANT = 0x0001,
@@ -137,14 +139,14 @@ class MPEG2fixup
 {
   public:
     MPEG2fixup(const QString &inf, const QString &outf,
-               QMap<long long, int> *deleteMap, const char *fmt, int norp,
+               frm_dir_map_t *deleteMap, const char *fmt, int norp,
                int fixPTS, int maxf, bool showprog, int otype,
                void (*update_func)(float) = NULL, int (*check_func)() = NULL);
     ~MPEG2fixup();
     int Start();
     void AddRangeList(QStringList cutlist, int type);
-    void ShowRangeMap(QMap<long long, int> *mapPtr, QString msg);
-    int BuildKeyframeIndex(QString &file, QMap<long long, long long> &posMap);
+    void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
+    int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap);
 
 
     static void dec2x33(int64_t *pts1, int64_t pts2);
@@ -232,8 +234,8 @@ class MPEG2fixup
     mpeg2dec_t *header_decoder;
     mpeg2dec_t *img_decoder;
 
-    QMap<long long, int> delMap;
-    QMap<long long, int> saveMap;
+    frm_dir_map_t delMap;
+    frm_dir_map_t saveMap;
 
     pthread_t thread;
 

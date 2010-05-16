@@ -256,23 +256,27 @@ void RecordingSelector::titleChanged(MythUIButtonListItem *item)
         return;
 
     if (m_titleText)
-        m_titleText->SetText(p->title);
+        m_titleText->SetText(p->GetTitle());
 
     if (m_datetimeText)
-        m_datetimeText->SetText(p->startts.toString("dd MMM yy (hh:mm)"));
+        m_datetimeText->SetText(p->GetScheduledStartTime()
+                                .toString("dd MMM yy (hh:mm)"));
 
     if (m_descriptionText)
+    {
         m_descriptionText->SetText(
-                (p->subtitle != "" ? p->subtitle + "\n" : "") + p->description);
+            ((!p->GetSubtitle().isEmpty()) ? p->GetSubtitle() + "\n" : "") +
+            p->GetDescription());
+    }
 
     if (m_filesizeText)
     {
-        m_filesizeText->SetText(formatSize(p->filesize / 1024));
+        m_filesizeText->SetText(formatSize(p->GetFilesize() / 1024));
     }
 
     if (m_cutlistImage)
     {
-        if (p->programflags & FL_CUTLIST)
+        if (p->HasCutlist())
             m_cutlistImage->Show();
         else
             m_cutlistImage->Hide();
@@ -281,9 +285,9 @@ void RecordingSelector::titleChanged(MythUIButtonListItem *item)
     if (m_previewImage)
     {
         // try to locate a preview image
-        if (QFile::exists(p->pathname + ".png"))
+        if (QFile::exists(p->GetPathname() + ".png"))
         {
-            m_previewImage->SetFilename(p->pathname + ".png");
+            m_previewImage->SetFilename(p->GetPathname() + ".png");
             m_previewImage->Load();
         }
         else
@@ -350,14 +354,14 @@ void RecordingSelector::OKPressed()
         p = m_selectedList.at(x);
         a = new ArchiveItem;
         a->type = "Recording";
-        a->title = p->title;
-        a->subtitle = p->subtitle;
-        a->description = p->description;
-        a->startDate = p->startts.toString("dd MMM yy");
-        a->startTime = p->startts.toString("(hh:mm)");
-        a->size = p->filesize;
+        a->title = p->GetTitle();
+        a->subtitle = p->GetSubtitle();
+        a->description = p->GetDescription();
+        a->startDate = p->GetScheduledStartTime().toString("dd MMM yy");
+        a->startTime = p->GetScheduledStartTime().toString("(hh:mm)");
+        a->size = p->GetFilesize();
         a->filename = p->GetPlaybackURL(false, true);
-        a->hasCutlist = (p->programflags & FL_CUTLIST);
+        a->hasCutlist = p->HasCutlist();
         a->useCutlist = false;
         a->duration = 0;
         a->cutDuration = 0;
@@ -395,12 +399,13 @@ void RecordingSelector::updateRecordingList(void)
         {
             p = *i;
 
-            if (p->title == m_categorySelector->GetValue() ||
+            if (p->GetTitle() == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Recordings"))
             {
-                MythUIButtonListItem* item = new MythUIButtonListItem(m_recordingButtonList,
-                        p->title + " ~ " +
-                        p->startts.toString("dd MMM yy (hh:mm)"));
+                MythUIButtonListItem* item = new MythUIButtonListItem(
+                    m_recordingButtonList,
+                    p->GetTitle() + " ~ " +
+                    p->GetScheduledStartTime().toString("dd MMM yy (hh:mm)"));
                 item->setCheckable(true);
                 if (m_selectedList.indexOf((ProgramInfo *) p) != -1)
                 {
@@ -446,15 +451,16 @@ void RecordingSelector::getRecordingList(void)
             }
 
             // ignore live tv and deleted recordings
-            if (p->recgroup == "LiveTV" || p->recgroup == "Deleted")
+            if (p->GetRecordingGroup() == "LiveTV" ||
+                p->GetRecordingGroup() == "Deleted")
             {
                 i = m_recordingList->erase(i);
                 i--;
                 continue;
             }
 
-            if (m_categories.indexOf(p->title) == -1)
-                m_categories.append(p->title);
+            if (m_categories.indexOf(p->GetTitle()) == -1)
+                m_categories.append(p->GetTitle());
         }
     }
 }

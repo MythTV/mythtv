@@ -1,4 +1,5 @@
-#include <climits> // for LONG_LONG_MAX on gcc compiler
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
 
 #include <algorithm> // for min
 #include <iostream>
@@ -64,8 +65,8 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 {
     if (pginfo)
-        VERBOSE(VB_RECORD, LOC + "SetRecording(" << pginfo
-                << QString(") title(%1)").arg(pginfo->title));
+        VERBOSE(VB_RECORD, LOC + QString("SetRecording(0x%1) title(%1)")
+                .arg((uintptr_t)pginfo,0,16).arg(pginfo->GetTitle()));
     else
         VERBOSE(VB_RECORD, LOC + "SetRecording(0x0)");
 
@@ -240,7 +241,7 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         tvrec->RingBufferChanged(ringBuffer, curRecording);
 }
 
-long long RecorderBase::GetKeyframePosition(long long desired) const
+int64_t RecorderBase::GetKeyframePosition(uint64_t desired) const
 {
     QMutexLocker locker(&positionMapLock);
     long long ret = -1;
@@ -249,7 +250,7 @@ long long RecorderBase::GetKeyframePosition(long long desired) const
         return ret;
 
     // find closest exact or previous keyframe position...
-    PosMap::const_iterator it = positionMap.lowerBound(desired);
+    frm_pos_map_t::const_iterator it = positionMap.lowerBound(desired);
     if (it == positionMap.end())
         ret = *positionMap.begin();
     else if (it.key() == desired)
@@ -261,7 +262,7 @@ long long RecorderBase::GetKeyframePosition(long long desired) const
 }
 
 bool RecorderBase::GetKeyframePositions(
-    long long start, long long end, PosMap &map) const
+    int64_t start, int64_t end, frm_pos_map_t &map) const
 {
     map.clear();
 
@@ -269,9 +270,10 @@ bool RecorderBase::GetKeyframePositions(
     if (positionMap.empty())
         return true;
 
-    PosMap::const_iterator it = positionMap.lowerBound(start);
-    end = (end < 0) ? LONG_LONG_MAX : end;
-    for (; (it != positionMap.end()) && (it.key() <= end); ++it)
+    frm_pos_map_t::const_iterator it = positionMap.lowerBound(start);
+    end = (end < 0) ? INT64_MAX : end;
+    for (; (it != positionMap.end()) &&
+             (it.key() <= (uint64_t)end); ++it)
         map[it.key()] = *it;
 
     VERBOSE(VB_IMPORTANT, LOC +
@@ -309,11 +311,11 @@ void RecorderBase::SavePositionMap(bool force)
             // copy the delta map because most times we are called it will be in
             // another thread and we don't want to lock the main recorder thread
             // which is populating the delta map
-            QMap<long long, long long> deltaCopy(positionMapDelta);
+            frm_pos_map_t deltaCopy(positionMapDelta);
             positionMapDelta.clear();
             positionMapLock.unlock();
 
-            curRecording->SetPositionMapDelta(deltaCopy, positionMapType);
+            curRecording->SavePositionMapDelta(deltaCopy, positionMapType);
         }
         else
         {
@@ -322,7 +324,7 @@ void RecorderBase::SavePositionMap(bool force)
 
         if (ringBuffer)
         {
-            curRecording->SetFilesize(ringBuffer->GetWritePosition());
+            curRecording->SaveFilesize(ringBuffer->GetWritePosition());
         }
     }
     else
@@ -353,13 +355,13 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
     }
 
     if (curRecording)
-        curRecording->SetAspectChange(mark, frame, customAspect);
+        curRecording->SaveAspect(frame, mark, customAspect);
 }
 
 void RecorderBase::ResolutionChange(uint width, uint height, long long frame)
 {
     if (curRecording)
-        curRecording->SetResolution(width, height, frame);
+        curRecording->SaveResolution(frame, width, height);
 }
 
 

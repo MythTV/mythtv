@@ -119,17 +119,19 @@ namespace
 
                 if (dce->GetId() == "bookmarkdialog")
                 {
+                    uint flags = kStartTVNoFlags;
                     if (buttonnum == 1)
-                        pgi->setIgnoreBookmark(true);
+                    {
+                        flags |= kStartTVIgnoreBookmark;
+                    }
                     else if (buttonnum != 0)
                     {
                         delete pgi;
                         return;
                     }
 
-                    TV::StartTV(pgi);
+                    TV::StartTV(pgi, flags);
 
-                    sleep(1);
                     delete pgi;
                 }
             }
@@ -465,12 +467,12 @@ void startManualSchedule(void)
 
 void startTVInGuide(void)
 {
-    TV::StartTV(NULL, true);
+    TV::StartTV(NULL, kStartTVInGuide);
 }
 
 void startTVNormal(void)
 {
-    TV::StartTV(NULL, false);
+    TV::StartTV(NULL, kStartTVNoFlags);
 }
 
 void showStatus(void)
@@ -742,59 +744,15 @@ int internal_play_media(const QString &mrl, const QString &plot,
         return res;
     }
 
-    ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->recstartts = QDateTime::currentDateTime()
-            .addSecs((0 - (lenMins + 1)) * 60 );
-    pginfo->recendts = QDateTime::currentDateTime().addSecs(-60);
-    pginfo->startts.setDate(QDate::fromString(QString("%1-01-01").arg(year),
-                                              Qt::ISODate));
-    pginfo->lenMins = lenMins;
-    pginfo->isVideo = true;
-    pginfo->pathname = mrl;
+    ProgramInfo *pginfo = new ProgramInfo(
+        mrl, plot, title, subtitle, director, season, episode,
+        lenMins, (year.toUInt()) ? year.toUInt() : 1900);
 
-    QDir d(mrl + "/VIDEO_TS");
-    if (mrl.lastIndexOf(".iso", -1, Qt::CaseInsensitive) ==
-        (int)mrl.length() - 4 ||
-        mrl.lastIndexOf(".img", -1, Qt::CaseInsensitive) ==
-        (int)mrl.length() - 4 ||
-        d.exists())
+    int64_t pos = 0;
+
+    if (pginfo->IsVideoDVD())
     {
-        pginfo->pathname = QString("dvd:%1").arg(mrl);
-    }
-
-    QDir bd(mrl + "/BDMV");
-    if (bd.exists())
-    {
-        pginfo->pathname = QString("bd:%1").arg(mrl);
-    }
-
-    if (!director.isEmpty())
-        pginfo->description = QString( "%1: %2.  " )
-                           .arg(QObject::tr("Directed By")).arg(director);
-
-    pginfo->description += plot;
-
-    if (!subtitle.isEmpty())
-        pginfo->subtitle = subtitle;
-
-    if ((season > 0) || (episode > 0))
-    {
-        QString seas, ep;
-        seas = QString::number(season);
-        ep = QString::number(episode);
-        if (ep.size() < 2)
-            ep.prepend("0");
-        QString SeasEpTitle =  QString("%1x%2").arg(seas).arg(ep);
-        pginfo->chanstr = SeasEpTitle;
-    }
-
-    pginfo->title = title;
-
-    long long pos = 0;
-
-    if (pginfo->pathname.startsWith("dvd:"))
-    {
-        RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
+        RingBuffer *tmprbuf = new RingBuffer(pginfo->GetPathname(), false);
 
         if (!tmprbuf)
         {
@@ -806,17 +764,17 @@ int internal_play_media(const QString &mrl, const QString &plot,
         if (tmprbuf->isDVD() &&
              tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
         {
-            QStringList fields = pginfo->GetDVDBookmark(serialid, false);
+            QStringList fields = pginfo->QueryDVDBookmark(serialid, false);
             if (!fields.empty())
             {
                 QStringList::Iterator it = fields.begin();
-                pos = (long long)((*++it).toLongLong() & 0xffffffffLL);
+                pos = (int64_t)((*++it).toLongLong() & 0xffffffffLL);
             }
         }
         delete tmprbuf;
     }
-    else if (pginfo->isVideo)
-        pos = pginfo->GetBookmark();
+    else if (pginfo->IsVideo())
+        pos = pginfo->QueryBookmark();
 
     if (pos > 0)
     {
@@ -831,11 +789,10 @@ int internal_play_media(const QString &mrl, const QString &plot,
     }
     else
     {
-        TV::StartTV(pginfo);
+        TV::StartTV(pginfo, kStartTVNoFlags);
 
         res = 0;
 
-        sleep(1);
         delete pginfo;
     }
 

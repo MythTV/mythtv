@@ -50,6 +50,9 @@ class MPUBLIC RecordingRule
     
     void ToMap(QHash<QString, QString> &infoMap) const;
 
+    AutoExpireType GetAutoExpire(void) const
+        { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }
+
     int m_recordID; /// Unique Recording Rule ID
     int m_parentRecID;
 

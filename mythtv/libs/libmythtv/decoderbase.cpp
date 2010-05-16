@@ -105,7 +105,7 @@ bool DecoderBase::PosMapFromDb(void)
         return false;
 
     // Overwrites current positionmap with entire contents of database
-    QMap<long long, long long> posMap;
+    frm_pos_map_t posMap;
 
     if (ringBuffer->isDVD())
     {
@@ -132,7 +132,7 @@ bool DecoderBase::PosMapFromDb(void)
     else if ((positionMapType == MARK_UNSET) ||
         (keyframedist == -1))
     {
-        m_playbackinfo->GetPositionMap(posMap, MARK_GOP_BYFRAME);
+        m_playbackinfo->QueryPositionMap(posMap, MARK_GOP_BYFRAME);
         if (!posMap.empty())
         {
             positionMapType = MARK_GOP_BYFRAME;
@@ -141,7 +141,7 @@ bool DecoderBase::PosMapFromDb(void)
         }
         else
         {
-            m_playbackinfo->GetPositionMap(posMap, MARK_GOP_START);
+            m_playbackinfo->QueryPositionMap(posMap, MARK_GOP_START);
             if (!posMap.empty())
             {
                 positionMapType = MARK_GOP_START;
@@ -154,7 +154,7 @@ bool DecoderBase::PosMapFromDb(void)
             }
             else
             {
-                m_playbackinfo->GetPositionMap(posMap, MARK_KEYFRAME);
+                m_playbackinfo->QueryPositionMap(posMap, MARK_KEYFRAME);
                 if (!posMap.empty())
                 {
                     // keyframedist should be set in the fileheader so no
@@ -166,7 +166,7 @@ bool DecoderBase::PosMapFromDb(void)
     }
     else
     {
-        m_playbackinfo->GetPositionMap(posMap, positionMapType);
+        m_playbackinfo->QueryPositionMap(posMap, positionMapType);
     }
 
     if (posMap.empty())
@@ -176,7 +176,7 @@ bool DecoderBase::PosMapFromDb(void)
     m_positionMap.clear();
     m_positionMap.reserve(posMap.size());
 
-    for (QMap<long long,long long>::const_iterator it = posMap.begin();
+    for (frm_pos_map_t::const_iterator it = posMap.begin();
          it != posMap.end(); it++)
     {
         PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
@@ -461,7 +461,7 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
         return saved;
 
     ctm.start();
-    QMap<long long, long long> posMap;
+    frm_pos_map_t posMap;
     for (uint i = 0; i < m_positionMap.size(); i++)
     {
         if ((uint64_t)m_positionMap[i].index < first)
@@ -476,7 +476,7 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
     locker.unlock();
 
     stm.start();
-    m_playbackinfo->SetPositionMapDelta(posMap, type);
+    m_playbackinfo->SavePositionMapDelta(posMap, type);
 
 #if 0
     cout<<'\n';

@@ -220,28 +220,15 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_TV;
     }
 
-    ProgramInfo *pginfo = NULL;
-
-    if (!filename.isEmpty() &&
-        ((pginfo = ProgramInfo::GetProgramFromBasename(filename)) == NULL))
+    if (filename.isEmpty())
     {
-        pginfo = new ProgramInfo();
-        pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
-        pginfo->pathname = QString::fromLocal8Bit(
-            filename.toAscii().constData());
-        pginfo->isVideo = true;
-
-        // RingBuffer doesn't like relative pathnames
-        if (filename.left(1) != "/" && !filename.startsWith("dvd:") &&
-            !filename.startsWith("myth:") && !filename.startsWith("bd:"))
-            pginfo->pathname.prepend(QDir::currentPath() + '/');
-
+        TV::StartTV(NULL, kStartTVNoFlags);
     }
-
-    TV::StartTV(pginfo, false);
-
-    if (pginfo)
-        delete pginfo;
+    else
+    {
+        ProgramInfo pginfo(filename);
+        TV::StartTV(&pginfo, kStartTVNoFlags);
+    }
     
     if (priv_thread_created)
     {

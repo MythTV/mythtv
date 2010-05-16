@@ -137,7 +137,7 @@ HEADERS += minilzo.h                RTjpegN.h
 SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
-HEADERS += recordinginfo.h          recordinglist.h
+HEADERS += recordinginfo.h
 HEADERS += RingBuffer.h             avfringbuffer.h
 HEADERS += ThreadedFileWriter.h
 HEADERS += dbcheck.h
@@ -146,6 +146,7 @@ HEADERS += jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
+HEADERS += videometadatautil.h
 HEADERS += cc608decoder.h
 HEADERS += cc708decoder.h           cc708window.h
 HEADERS += scheduledrecording.h
@@ -159,7 +160,7 @@ HEADERS += recordingrule.h          programdetail.h
 HEADERS += iso639.h
 HEADERS += mythsystemevent.h
 
-SOURCES += recordinginfo.cpp        recordinglist.cpp
+SOURCES += recordinginfo.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
 SOURCES += ThreadedFileWriter.cpp
 SOURCES += dbcheck.cpp
@@ -168,6 +169,7 @@ SOURCES += jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
+SOURCES += videometadatautil.cpp
 SOURCES += cc608decoder.cpp
 SOURCES += cc708decoder.cpp         cc708window.cpp
 SOURCES += scheduledrecording.cpp

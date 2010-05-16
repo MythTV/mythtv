@@ -186,12 +186,13 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
 
     command.replace(QString("%ARGS%"), args);
 
-    ProgramInfo pginfo;
-    bool pginfo_loaded = pginfo.LoadProgramFromRecorded(chanid, recstartts);
+    ProgramInfo pginfo(chanid, recstartts);
+    bool pginfo_loaded = pginfo.GetChanID();
     if (!pginfo_loaded)
     {
-        pginfo_loaded = ProgramInfo::kNoProgram !=
-            pginfo.LoadProgramAtDateTime(chanid, recstartts);
+        RecordingInfo::LoadStatus status;
+        pginfo = RecordingInfo(chanid, recstartts, false, 0, &status);
+        pginfo_loaded = RecordingInfo::kFoundProgram == status;
     }
 
     if (pginfo_loaded)
@@ -333,9 +334,9 @@ void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
 {
     if (pginfo)
         SendMythSystemEvent(QString("%1 CARDID %2 CHANID %3 STARTTIME %4")
-                            .arg(msg).arg(pginfo->cardid)
-                            .arg(pginfo->chanid)
-                            .arg(pginfo->recstartts.toString(Qt::ISODate)));
+                            .arg(msg).arg(pginfo->GetCardID())
+                            .arg(pginfo->GetChanID())
+                            .arg(pginfo->GetRecordingStartTime(ISODate)));
     else
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SendMythSystemRecEvent() called with "
                 "empty RecordingInfo");
@@ -353,8 +354,8 @@ void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
         SendMythSystemEvent(
             QString("%1 HOSTNAME %2 CHANID %3 STARTTIME %4")
                     .arg(msg).arg(gCoreContext->GetHostName())
-                    .arg(pginfo->chanid)
-                    .arg(pginfo->recstartts.toString(Qt::ISODate)));
+                    .arg(pginfo->GetChanID())
+                    .arg(pginfo->GetRecordingStartTime(ISODate)));
     else
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SendMythSystemPlayEvent() called with "
                 "empty ProgramInfo");

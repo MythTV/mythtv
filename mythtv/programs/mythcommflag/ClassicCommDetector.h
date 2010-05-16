@@ -43,8 +43,6 @@ class FrameInfoEntry
     QString toString(uint64_t frame, bool verbose) const;
 };
 
-typedef QMap<long long, int> comm_map_t;
-
 class ClassicCommDetector : public CommDetectorBase
 {
     Q_OBJECT
@@ -59,12 +57,13 @@ class ClassicCommDetector : public CommDetectorBase
         virtual void deleteLater(void);
 
         bool go();
-        void getCommercialBreakList(comm_map_t &comms);
+        void GetCommercialBreakList(frm_dir_map_t &comms);
         void recordingFinished(long long totalFileSize);
         void requestCommBreakMapUpdate(void);
 
         void PrintFullMap(
-            ostream &out, const comm_break_t *comm_breaks, bool verbose) const;
+            ostream &out, const frm_dir_map_t *comm_breaks,
+            bool verbose) const;
 
         void logoDetectorBreathe();
 
@@ -92,11 +91,12 @@ class ClassicCommDetector : public CommDetectorBase
         FrameBlock;
 
         void ClearAllMaps(void);
-        void GetBlankCommMap(comm_map_t &comms);
-        void GetBlankCommBreakMap(comm_map_t &comms);
-        void GetSceneChangeMap(comm_map_t &scenes,
-                               long long start_frame);
-        comm_map_t Combine2Maps(comm_map_t &a, comm_map_t &b) const;
+        void GetBlankCommMap(frm_dir_map_t &comms);
+        void GetBlankCommBreakMap(frm_dir_map_t &comms);
+        void GetSceneChangeMap(frm_dir_map_t &scenes,
+                               int64_t start_frame);
+        frm_dir_map_t Combine2Maps(
+            const frm_dir_map_t &a, const frm_dir_map_t &b) const;
         void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
                               int format, int aspect);
         void BuildAllMethodsCommList(void);
@@ -104,15 +104,16 @@ class ClassicCommDetector : public CommDetectorBase
         void BuildSceneChangeCommList(void);
         void BuildLogoCommList();
         void MergeBlankCommList(void);
-        bool FrameIsInBreakMap(long long f, const comm_map_t &breakMap) const;
-        void DumpMap(comm_map_t &map);
-        void CondenseMarkMap(comm_map_t&map, int spacing, int length);
-        void ConvertShowMapToCommMap(comm_map_t&map);
+        bool FrameIsInBreakMap(uint64_t f, const frm_dir_map_t &breakMap) const;
+        void DumpMap(frm_dir_map_t &map);
+        void CondenseMarkMap(show_map_t &map, int spacing, int length);
+        void ConvertShowMapToCommMap(
+            frm_dir_map_t &out, const show_map_t &in);
         void CleanupFrameInfo(void);
-        void GetLogoCommBreakMap(comm_map_t &map);
+        void GetLogoCommBreakMap(show_map_t &map);
 
         enum SkipTypes commDetectMethod;
-        QMap<long long,int> lastSentCommBreakMap;
+        frm_dir_map_t lastSentCommBreakMap;
         bool commBreakMapUpdateRequested;
         bool sendCommBreakMapUpdates;
 
@@ -156,13 +157,13 @@ class ClassicCommDetector : public CommDetectorBase
 
         unsigned char *framePtr;
 
-        comm_map_t blankFrameMap;
-        comm_map_t blankCommMap;
-        comm_map_t blankCommBreakMap;
-        comm_map_t sceneMap;
-        comm_map_t sceneCommBreakMap;
-        comm_map_t commBreakMap;
-        comm_map_t logoCommBreakMap;
+        frm_dir_map_t blankFrameMap;
+        frm_dir_map_t blankCommMap;
+        frm_dir_map_t blankCommBreakMap;
+        frm_dir_map_t sceneMap;
+        frm_dir_map_t sceneCommBreakMap;
+        frm_dir_map_t commBreakMap;
+        frm_dir_map_t logoCommBreakMap;
 
         bool frameIsBlank;
         bool sceneHasChanged;
@@ -183,7 +184,7 @@ protected:
         bool fullSpeed;
         bool showProgress;
         double fps;
-        long long framesProcessed;
+        uint64_t framesProcessed;
         long long preRoll;
         long long postRoll;
 

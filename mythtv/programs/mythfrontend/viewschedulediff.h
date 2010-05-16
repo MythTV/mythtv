@@ -10,7 +10,6 @@ using namespace std;
 
 // mythtv
 #include "programinfo.h"
-#include "programlist.h"
 
 class ProgramStruct
 {

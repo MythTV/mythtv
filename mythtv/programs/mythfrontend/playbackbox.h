@@ -133,8 +133,8 @@ class PlaybackBox : public ScheduleCommon
     void ItemSelected(MythUIButtonListItem *item)
         { UpdateUIListItem(item, true); }
     void selected(MythUIButtonListItem *item);
-    void playSelected(MythUIButtonListItem *item = NULL);
-    void playProgramInfo(ProgramInfo *pginfo = NULL);
+    void PlayFromBookmark(MythUIButtonListItem *item = NULL);
+    void PlayFromBeginning(MythUIButtonListItem *item = NULL);
     void deleteSelected(MythUIButtonListItem *item);
 
     void SwitchList(void);
@@ -173,7 +173,6 @@ class PlaybackBox : public ScheduleCommon
 
     void popupClosed(QString which, int reason);
 
-    void doPlayFromBeg();
     void doPlayListRandom();
 
     void askStop();
@@ -267,7 +266,15 @@ class PlaybackBox : public ScheduleCommon
 
     QString cutDown(const QString &, QFont *, int);
 
-    bool Play(const ProgramInfo &rec, bool inPlaylist);
+    void PlayX(const ProgramInfo &rec,
+               bool ignoreBookmark,
+               bool underNetworkControl);
+
+    bool Play(const ProgramInfo &rec,
+              bool inPlaylist,
+              bool ignoreBookmark,
+              bool underNetworkControl);
+
     ProgramInfo *CurrentItem(void);
 
     void togglePlayListItem(ProgramInfo *pginfo);
@@ -427,7 +434,6 @@ class PlaybackBox : public ScheduleCommon
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      m_ncLock;
     deque<QString>      m_networkControlCommands;
-    bool                m_underNetworkControl;
 
     // artwork filename cache for findArtworkFile()
     QHash <QString, QString>    m_imageFileCache;
@@ -435,7 +441,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Other
     TV                 *m_player;
-    bool                m_player_selected_new_show;
+    QStringList         m_player_selected_new_show;
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
 };

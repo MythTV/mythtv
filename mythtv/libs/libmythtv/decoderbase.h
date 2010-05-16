@@ -6,6 +6,9 @@
 #endif
 #include <stdint.h>
 
+#include <vector>
+using namespace std;
+
 #include "RingBuffer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"

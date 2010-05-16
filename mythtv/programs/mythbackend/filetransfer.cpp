@@ -15,15 +15,9 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0), writemode(false)
 {
-    QFileInfo finfo = QFileInfo(filename);
-    pginfo =
-        ProgramInfo::GetProgramFromBasename(finfo.fileName());
-
-    if (pginfo)
-    {
-        pginfo->pathname = pginfo->GetPlaybackURL();
-        pginfo->MarkAsInUse(true, kFileTransferInUseID);
-    }
+    pginfo = new ProgramInfo(filename);
+    pginfo->SetPathname(pginfo->GetPlaybackURL());
+    pginfo->MarkAsInUse(true, kFileTransferInUseID);
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
@@ -32,15 +26,9 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0), writemode(write)
 {
-    QFileInfo finfo = QFileInfo(filename);
-    pginfo =
-        ProgramInfo::GetProgramFromBasename(finfo.fileName());
-
-    if (pginfo)
-    {
-        pginfo->pathname = pginfo->GetPlaybackURL();
-        pginfo->MarkAsInUse(true, kFileTransferInUseID);
-    }
+    pginfo = new ProgramInfo(filename);
+    pginfo->SetPathname(pginfo->GetPlaybackURL());
+    pginfo->MarkAsInUse(true, kFileTransferInUseID);
 }
 
 FileTransfer::~FileTransfer()

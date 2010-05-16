@@ -13,7 +13,7 @@
  */
 LiveTVChain::LiveTVChain() :
     m_id(""), m_maxpos(0), m_lock(QMutex::Recursive),
-    m_curpos(0), m_cur_chanid(""),
+    m_curpos(0), m_cur_chanid(0),
     m_switchid(-1), m_jumppos(0)
 {
 }
@@ -50,11 +50,11 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
 {
     QMutexLocker lock(&m_lock);
 
-    QTime tmptime = pginfo->recstartts.time();
+    QTime tmptime = pginfo->GetRecordingStartTime().time();
 
     LiveTVChainEntry newent;
-    newent.chanid = pginfo->chanid;
-    newent.starttime = pginfo->recstartts;
+    newent.chanid = pginfo->GetChanID();
+    newent.starttime = pginfo->GetRecordingStartTime();
     newent.starttime.setTime(QTime(tmptime.hour(), tmptime.minute(),
                                    tmptime.second()));
     newent.discontinuity = discont;
@@ -72,9 +72,9 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
                   "VALUES(:CHANID, :START, :END, :CHAINID, :CHAINPOS, "
                   " :DISCONT, :WATCHING, :PREFIX, :CARDTYPE, :CHANNAME, "
                   " :INPUT );");
-    query.bindValue(":CHANID", pginfo->chanid);
-    query.bindValue(":START", pginfo->recstartts);
-    query.bindValue(":END", pginfo->recendts);
+    query.bindValue(":CHANID", pginfo->GetChanID());
+    query.bindValue(":START", pginfo->GetRecordingStartTime());
+    query.bindValue(":END", pginfo->GetRecordingEndTime());
     query.bindValue(":CHAINID", m_id);
     query.bindValue(":CHAINPOS", m_maxpos);
     query.bindValue(":DISCONT", discont);
@@ -103,25 +103,25 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE tvchain SET endtime = :END "
                   "WHERE chanid = :CHANID AND starttime = :START ;");
-    query.bindValue(":END", pginfo->recendts);
-    query.bindValue(":CHANID", pginfo->chanid);
-    query.bindValue(":START", pginfo->recstartts);
+    query.bindValue(":END", pginfo->GetRecordingEndTime());
+    query.bindValue(":CHANID", pginfo->GetChanID());
+    query.bindValue(":START", pginfo->GetRecordingStartTime());
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Chain: FinishedRecording", query);
     else
         VERBOSE(VB_RECORD, QString("Chain: Updated endtime for '%1_%2' to %3")
-                .arg(pginfo->chanid)
-                .arg(pginfo->recstartts.toString("yyyyMMddhhmmss"))
-                .arg(pginfo->recendts.toString("yyyyMMddhhmmss")));
+                .arg(pginfo->GetChanID())
+                .arg(pginfo->GetRecordingStartTime(MythDate))
+                .arg(pginfo->GetRecordingEndTime(MythDate)));
 
     QList<LiveTVChainEntry>::iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
     {
-        if ((*it).chanid == pginfo->chanid &&
-            (*it).starttime == pginfo->recstartts)
+        if ((*it).chanid    == pginfo->GetChanID() &&
+            (*it).starttime == pginfo->GetRecordingStartTime())
         {
-            (*it).endtime = pginfo->recendts;
+            (*it).endtime = pginfo->GetRecordingEndTime();
         }
     }
     BroadcastUpdate();
@@ -134,8 +134,8 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
     QList<LiveTVChainEntry>::iterator it, del;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
     {
-        if ((*it).chanid == pginfo->chanid &&
-            (*it).starttime == pginfo->recstartts)
+        if ((*it).chanid    == pginfo->GetChanID() &&
+            (*it).starttime == pginfo->GetRecordingStartTime())
         {
             del = it;
             ++it;
@@ -213,7 +213,7 @@ void LiveTVChain::ReloadAll(void)
         {
 
             LiveTVChainEntry entry;
-            entry.chanid = query.value(0).toString();
+            entry.chanid = query.value(0).toUInt();
             entry.starttime = query.value(1).toDateTime();
             entry.endtime = query.value(2).toDateTime();
             entry.discontinuity = query.value(3).toInt();
@@ -254,26 +254,26 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     else
     {
         VERBOSE(VB_IMPORTANT, QString("GetEntryAt(%1) failed.").arg(at));
-        entry.chanid = "0";
+        entry.chanid = 0;
         entry.starttime.setTime_t(0);
     }
 }
 
 ProgramInfo *LiveTVChain::EntryToProgram(const LiveTVChainEntry &entry)
 {
-    ProgramInfo *pginfo;
-    pginfo = ProgramInfo::GetProgramFromRecorded(entry.chanid,
-                                                 entry.starttime);
-    if (pginfo)
-        pginfo->pathname = entry.hostprefix + pginfo->pathname;
-    else
+    ProgramInfo *pginfo = new ProgramInfo(entry.chanid, entry.starttime);
+
+    if (pginfo->GetChanID())
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("EntryToProgram(%1@%2) failed to get pginfo")
-                .arg(entry.chanid).arg(entry.starttime.toString()));
+        pginfo->SetPathname(entry.hostprefix + pginfo->GetBasename());
+        return pginfo;
     }
 
-    return pginfo;
+    VERBOSE(VB_IMPORTANT,
+            QString("EntryToProgram(%1@%2) failed to get pginfo")
+            .arg(entry.chanid).arg(entry.starttime.toString()));
+    delete pginfo;
+    return NULL;
 }
 
 /** \fn LiveTVChain::GetProgramAt(int) const
@@ -291,11 +291,10 @@ ProgramInfo *LiveTVChain::GetProgramAt(int at) const
     return EntryToProgram(entry);
 }
 
-/** \fn LiveTVChain::ProgramIsAt(const QString&, const QDateTime&) const
+/** \fn LiveTVChain::ProgramIsAt(uint, const QDateTime&) const
  *  \returns program location or -1 for not found.
  */
-int LiveTVChain::ProgramIsAt(const QString &chanid,
-                             const QDateTime &starttime) const
+int LiveTVChain::ProgramIsAt(uint chanid, const QDateTime &starttime) const
 {
     QMutexLocker lock(&m_lock);
 
@@ -318,7 +317,7 @@ int LiveTVChain::ProgramIsAt(const QString &chanid,
  */
 int LiveTVChain::ProgramIsAt(const ProgramInfo &pginfo) const
 {
-    return ProgramIsAt(pginfo.chanid, pginfo.recstartts);
+    return ProgramIsAt(pginfo.GetChanID(), pginfo.GetRecordingStartTime());
 }
 
 /** \fn LiveTVChain::GetLengthAtCurPos(void)
@@ -345,8 +344,8 @@ void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
 {
     QMutexLocker lock(&m_lock);
 
-    m_cur_chanid  = pginfo.chanid;
-    m_cur_startts = pginfo.recstartts;
+    m_cur_chanid  = pginfo.GetChanID();
+    m_cur_startts = pginfo.GetRecordingStartTime();
 
     m_curpos = ProgramIsAt(pginfo);
     m_switchid = -1;

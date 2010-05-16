@@ -391,7 +391,7 @@ int Transcode::TranscodeFile(
     const QString &profileName,
     bool honorCutList, bool framecontrol,
     int jobID, QString fifodir,
-    QMap<long long, int> deleteMap)
+    const frm_dir_map_t &deleteMap)
 {
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -438,15 +438,15 @@ int Transcode::TranscodeFile(
     {
         VERBOSE(VB_GENERAL, "Honoring the cutlist while transcoding");
 
-        QMap<long long, int> delMap;
-        QMap<long long, int>::Iterator it;
+        frm_dir_map_t delMap;
+        frm_dir_map_t::const_iterator it;
         QString cutStr;
         long long lastStart = 0;
 
         if (deleteMap.size() > 0)
             delMap = deleteMap;
         else
-            m_proginfo->GetCutList(delMap);
+            m_proginfo->QueryCutList(delMap);
 
         for (it = delMap.begin(); it != delMap.end(); ++it)
         {
@@ -471,15 +471,15 @@ int Transcode::TranscodeFile(
         VERBOSE(VB_GENERAL, QString("New Length     : %1 frames")
                                     .arg((long)new_frame_count));
 
-        if ((m_proginfo->IsEditing()) ||
-            (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
+        if ((m_proginfo->QueryIsEditing()) ||
+            (JobQueue::IsJobRunning(JOB_COMMFLAG, *m_proginfo)))
         {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
             if (player_ctx)
                 delete player_ctx;
             return REENCODE_CUTLIST_CHANGE;
         }
-        m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false);
+        m_proginfo->ClearMarkupFlag(MARK_UPDATED_CUT);
         curtime = curtime.addSecs(60);
     }
 
@@ -786,7 +786,7 @@ int Transcode::TranscodeFile(
 
     bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
 
-    QMap<long long, int>::Iterator dm_iter = NULL;
+    frm_dir_map_t::iterator dm_iter;
     bool writekeyframe = true;
 
     int num_keyframes = 0;
@@ -823,7 +823,7 @@ int Transcode::TranscodeFile(
     QTime flagTime;
     flagTime.start();
 
-    while (nvp->TranscodeGetNextFrame(dm_iter, &did_ff, &is_key, honorCutList))
+    while (nvp->TranscodeGetNextFrame(dm_iter, did_ff, is_key, honorCutList))
     {
         if (first_loop)
         {
@@ -1121,7 +1121,7 @@ int Transcode::TranscodeFile(
         if (QDateTime::currentDateTime() > curtime)
         {
             if (honorCutList && m_proginfo &&
-                m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT))
+                m_proginfo->QueryMarkupFlag(MARK_UPDATED_CUT))
             {
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist updated");
 

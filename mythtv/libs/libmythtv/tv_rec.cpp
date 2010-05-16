@@ -73,7 +73,7 @@ const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 QMutex            TVRec::cardsLock;
 QMap<uint,TVRec*> TVRec::cards;
 
-static bool is_dishnet_eit(int cardid);
+static bool is_dishnet_eit(uint cardid);
 static QString load_profile(QString,void*,RecordingInfo*,RecordingProfile&);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
@@ -341,11 +341,11 @@ ProgramInfo *TVRec::GetRecording(void)
     if (curRecording && !changeState)
     {
         tmppginfo = new ProgramInfo(*curRecording);
-        tmppginfo->recstatus = rsRecording;
+        tmppginfo->SetRecordingStatus(rsRecording);
     }
     else
         tmppginfo = new ProgramInfo();
-    tmppginfo->cardid = cardid;
+    tmppginfo->SetCardID(cardid);
 
     return tmppginfo;
 }
@@ -372,9 +372,9 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     if (secsleft < 0)
     {
         VERBOSE(VB_RECORD, LOC + "Pending recording revoked on " +
-                QString("inputid %1").arg(rcinfo->inputid));
+                QString("inputid %1").arg(rcinfo->GetInputID()));
 
-        PendingMap::iterator it = pendingRecordings.find(rcinfo->cardid);
+        PendingMap::iterator it = pendingRecordings.find(rcinfo->GetCardID());
         if (it != pendingRecordings.end())
         {
             (*it).ask = false;
@@ -384,7 +384,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     }
 
     VERBOSE(VB_RECORD, LOC +
-            QString("RecordPending on inputid %1").arg(rcinfo->inputid));
+            QString("RecordPending on inputid %1").arg(rcinfo->GetInputID()));
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
@@ -393,17 +393,17 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     pending.ask             = true;
     pending.doNotAsk        = false;
 
-    pendingRecordings[rcinfo->cardid] = pending;
+    pendingRecordings[rcinfo->GetCardID()] = pending;
 
     // If this isn't a recording for this instance to make, we are done
-    if (rcinfo->cardid != cardid)
+    if (rcinfo->GetCardID() != cardid)
         return;
 
     // We also need to check our input groups
     vector<uint> cardids = CardUtil::GetConflictingCards(
-        rcinfo->inputid, cardid);
+        rcinfo->GetInputID(), cardid);
 
-    pendingRecordings[rcinfo->cardid].possibleConflicts = cardids;
+    pendingRecordings[rcinfo->GetCardID()].possibleConflicts = cardids;
 
     stateChangeLock.unlock();
     for (uint i = 0; i < cardids.size(); i++)
@@ -428,9 +428,9 @@ void TVRec::SetPseudoLiveTVRecording(ProgramInfo *pi)
 QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
 {
     bool spcat = (!overRecordCategory.isEmpty() &&
-                  pi->category == overRecordCategory);
+                  pi->GetCategory() == overRecordCategory);
     int secs = (spcat) ? overRecordSecCat : overRecordSecNrml;
-    return pi->recendts.addSecs(secs);
+    return pi->GetRecordingEndTime().addSecs(secs);
 }
 
 /** \fn TVRec::CancelNextRecording(bool)
@@ -484,7 +484,8 @@ void TVRec::CancelNextRecording(bool cancel)
  */
 RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
-    VERBOSE(VB_RECORD, LOC + QString("StartRecording(%1)").arg(rcinfo->title));
+    VERBOSE(VB_RECORD, LOC + QString("StartRecording(%1)")
+            .arg(rcinfo->toString(ProgramInfo::kTitleSubtitle)));
 
     QMutexLocker lock(&stateChangeLock);
     QString msg("");
@@ -497,23 +498,23 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     // We need to do this check early so we don't cancel an overrecord
     // that we're trying to extend.
     if (internalState != kState_WatchingLiveTV &&
-        curRecording &&
-        curRecording->title == rcinfo->title &&
-        curRecording->chanid == rcinfo->chanid &&
-        curRecording->startts == rcinfo->startts)
+        curRecording && curRecording->IsSameProgramWeakCheck(*rcinfo))
     {
-        int post_roll_seconds  = curRecording->recendts.secsTo(recordEndTime);
-        curRecording->rectype  = rcinfo->rectype;
-        curRecording->recordid = rcinfo->recordid;
-        curRecording->recendts = rcinfo->recendts;
+        int post_roll_seconds  = curRecording->GetRecordingEndTime()
+            .secsTo(recordEndTime);
+
+        curRecording->SetRecordingRuleType(rcinfo->GetRecordingRuleType());
+        curRecording->SetRecordingRuleID(rcinfo->GetRecordingRuleID());
+        curRecording->SetRecordingEndTime(rcinfo->GetRecordingEndTime());
         curRecording->UpdateRecordingEnd();
 
-        recordEndTime = curRecording->recendts.addSecs(post_roll_seconds);
+        recordEndTime = curRecording->GetRecordingEndTime()
+            .addSecs(post_roll_seconds);
 
         msg = QString("updating recording: %1 %2 %3 %4")
-            .arg(curRecording->title).arg(curRecording->chanid)
-            .arg(curRecording->recstartts.toString())
-            .arg(curRecording->recendts.toString());
+            .arg(curRecording->GetTitle()).arg(curRecording->GetChanID())
+            .arg(curRecording->GetRecordingStartTime(ISODate))
+            .arg(curRecording->GetRecordingEndTime(ISODate));
         VERBOSE(VB_RECORD, LOC + msg);
 
         ClearFlags(kFlagCancelNextRecording);
@@ -562,13 +563,13 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             if (is_busy)
             {
                 is_busy = (bool) igrp.GetSharedInputGroup(
-                    busy_input.inputid, rcinfo->inputid);
+                    busy_input.inputid, rcinfo->GetInputID());
             }
 
             if (is_busy && !sourceid)
             {
-                mplexid  = (*it).info->GetMplexID();
-                sourceid = (*it).info->sourceid;
+                mplexid  = (*it).info->QueryMplexID();
+                sourceid = (*it).info->GetSourceID();
             }
 
             if (is_busy &&
@@ -675,9 +676,9 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     else
     {
         msg = QString("Wanted to record: %1 %2 %3 %4\n\t\t\t")
-            .arg(rcinfo->title).arg(rcinfo->chanid)
-            .arg(rcinfo->recstartts.toString())
-            .arg(rcinfo->recendts.toString());
+            .arg(rcinfo->GetTitle()).arg(rcinfo->GetChanID())
+            .arg(rcinfo->GetRecordingStartTime(ISODate))
+            .arg(rcinfo->GetRecordingEndTime(ISODate));
 
         if (cancelNext)
         {
@@ -693,9 +694,9 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         if (curRecording && internalState == kState_RecordingOnly)
             msg += QString("\n\t\t\tCurrently recording: %1 %2 %3 %4")
-                .arg(curRecording->title).arg(curRecording->chanid)
-                .arg(curRecording->recstartts.toString())
-                .arg(curRecording->recendts.toString());
+                .arg(curRecording->GetTitle()).arg(curRecording->GetChanID())
+                .arg(curRecording->GetRecordingStartTime(ISODate))
+                .arg(curRecording->GetRecordingEndTime(ISODate));
 
         VERBOSE(VB_IMPORTANT, LOC + msg);
     }
@@ -706,7 +707,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     WaitForEventThreadSleep();
 
-    if ((curRecording) && (curRecording->recstatus == rsFailed) &&
+    if ((curRecording) && (curRecording->GetRecordingStatus() == rsFailed) &&
         (retval == rsRecording))
         retval = rsFailed;
 
@@ -799,10 +800,10 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
 
     curRec->StartedRecording(rbFileExt);
     VERBOSE(VB_RECORD, LOC + "StartedRecording("<<curRec<<") fn("
-            <<curRec->GetFileName()<<")");
+            <<curRec->GetPathname()<<")");
 
-    if (curRec->chancommfree != 0)
-        curRec->SetCommFlagged(COMM_FLAG_COMMFREE);
+    if (curRec->IsCommercialFree())
+        curRec->SaveCommFlagged(COMM_FLAG_COMMFREE);
 
     SendMythSystemRecEvent("REC_STARTED", curRec);
 }
@@ -819,47 +820,44 @@ void TVRec::FinishedRecording(RecordingInfo *curRec)
     if (!curRec)
         return;
 
-    ProgramInfo *pi = NULL;
+    const QString recgrp = curRec->QueryRecordingGroup();
+    curRec->SetRecordingGroup(recgrp);
 
-    QString pigrp = curRec->recgroup;
-
-    pi = ProgramInfo::GetProgramFromRecorded(curRec->chanid,
-                                             curRec->recstartts);
-    if (pi)
-    {
-        pigrp = pi->recgroup;
-        delete pi;
-    }
     VERBOSE(VB_RECORD, LOC + QString("FinishedRecording(%1) in recgroup: %2")
-                                     .arg(curRec->title).arg(pigrp));
+            .arg(curRec->GetTitle()).arg(recgrp));
 
-    if (curRec->recstatus != rsFailed)
-        curRec->recstatus = rsRecorded;
-    curRec->recendts = mythCurrentDateTime();
+    if (curRec->GetRecordingStatus() != rsFailed)
+        curRec->SetRecordingStatus(rsRecorded);
+    curRec->SetRecordingEndTime(mythCurrentDateTime());
 
     if (tvchain)
         tvchain->FinishedRecording(curRec);
 
     // Make sure really short recordings have positive run time.
-    if (curRec->recendts <= curRec->recstartts)
-        curRec->recendts = curRec->recstartts.addSecs(60);
+    if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())
+    {
+        curRec->SetRecordingEndTime(
+            curRec->GetRecordingStartTime().addSecs(60));
+    }
 
-    curRec->recendts.setTime(QTime(
-        curRec->recendts.addSecs(30).time().hour(),
-        curRec->recendts.addSecs(30).time().minute()));
+    // Round up recording end time (probably should be done in the UI only)
+    QDateTime recendts = curRec->GetRecordingEndTime();
+    recendts.setTime(QTime(recendts.addSecs(30).time().hour(),
+                           recendts.addSecs(30).time().minute()));
+    curRec->SetRecordingEndTime(recendts);
 
-    if (pigrp != "LiveTV")
+    if (recgrp != "LiveTV")
     {
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                     .arg(curRec->cardid)
-                     .arg(curRec->chanid)
-                     .arg(curRec->startts.toString(Qt::ISODate))
-                     .arg(curRec->recstatus)
-                     .arg(curRec->recendts.toString(Qt::ISODate)));
+                     .arg(curRec->GetCardID())
+                     .arg(curRec->GetChanID())
+                     .arg(curRec->GetScheduledStartTime(ISODate))
+                     .arg(curRec->GetRecordingStatus())
+                     .arg(curRec->GetRecordingEndTime(ISODate)));
         gCoreContext->dispatch(me);
     }
 
-    curRec->FinishedRecording(curRec->recstatus != rsRecorded);
+    curRec->FinishedRecording(curRec->GetRecordingStatus() != rsRecorded);
 }
 
 #define TRANSITION(ASTATE,BSTATE) \
@@ -1084,15 +1082,16 @@ void TVRec::TeardownRecorder(bool killFile)
 {
     pauseNotify = false;
     ispip = false;
-    int recWidth;
 
     if (recorder && HasFlags(kFlagRecorderRunning))
     {
         // Get the width and set the videoprops
-        recWidth = curRecording->GetWidth();
-        curRecording->SetVidpropHeight(recWidth);
+        uint avg_height = curRecording->QueryAverageHeight();
+        curRecording->SaveResolutionProperty(
+            (avg_height > 1000) ? VID_1080 :
+            ((avg_height > 700) ? VID_720 : VID_UNKNOWN));
 
-        int secsSince = curRecording->recstartts
+        int secsSince = curRecording->GetRecordingStartTime()
             .secsTo(QDateTime::currentDateTime());
         QString message = QString("DONE_RECORDING %1 %2 %3")
             .arg(cardid).arg(secsSince).arg(GetFramesWritten());
@@ -1120,7 +1119,7 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (!killFile)
         {
-            if (curRecording->pathname.left(1) == "/")
+            if (curRecording->IsLocal())
             {
                 (new PreviewGenerator(
                     curRecording, PreviewGenerator::kLocal))->Start();
@@ -1128,8 +1127,8 @@ void TVRec::TeardownRecorder(bool killFile)
 
             if (!tvchain)
             {
-                int secsSince = curRecording->recstartts.secsTo(
-                                                  QDateTime::currentDateTime());
+                int secsSince = curRecording->GetRecordingStartTime()
+                    .secsTo(QDateTime::currentDateTime());
                 if (secsSince < 120)
                 {
                     JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
@@ -1137,7 +1136,7 @@ void TVRec::TeardownRecorder(bool killFile)
                 }
 
                 if (autoRunJobs)
-                    JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+                    JobQueue::QueueRecordingJobs(*curRecording, autoRunJobs);
             }
         }
 
@@ -1287,7 +1286,7 @@ bool get_use_eit(uint cardid)
     return false;
 }
 
-static bool is_dishnet_eit(int cardid)
+static bool is_dishnet_eit(uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1307,7 +1306,7 @@ static bool is_dishnet_eit(int cardid)
     return false;
 }
 
-static int no_capturecards(int cardid)
+static int no_capturecards(uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1408,7 +1407,7 @@ void TVRec::RunTV(void)
                 // Check for recorder errors
                 if (recorder->IsErrored())
                 {
-                    curRecording->recstatus = rsFailed;
+                    curRecording->SetRecordingStatus(rsFailed);
 
                     if (GetState() == kState_WatchingLiveTV)
                     {
@@ -1436,8 +1435,8 @@ void TVRec::RunTV(void)
             {
                 if (pseudoLiveTVRecording && curRecording)
                 {
-                    int secsSince = curRecording->recstartts.secsTo(
-                                        QDateTime::currentDateTime());
+                    int secsSince = curRecording->GetRecordingStartTime()
+                        .secsTo(QDateTime::currentDateTime());
                     if (secsSince < 120)
                     {
                         JobQueue::RemoveJobsFromMask(JOB_COMMFLAG,
@@ -1447,14 +1446,16 @@ void TVRec::RunTV(void)
                     }
 
                     if (autoRunJobs)
-                        JobQueue::QueueRecordingJobs(curRecording,
-                            autoRunJobs);
+                    {
+                        JobQueue::QueueRecordingJobs(
+                            *curRecording, autoRunJobs);
+                    }
                 }
 
                 SetPseudoLiveTVRecording(NULL);
             }
             else if (!has_rec && !rec_soon && curRecording &&
-                     (now >= curRecording->endts))
+                     (now >= curRecording->GetScheduledEndTime()))
             {
                 if (!m_switchingBuffer)
                 {
@@ -1464,7 +1465,7 @@ void TVRec::RunTV(void)
 
                     QDateTime starttime; starttime.setTime_t(0);
                     if (curRecording)
-                        starttime = curRecording->recstartts;
+                        starttime = curRecording->GetRecordingStartTime();
 
                     VERBOSE(VB_RECORD, LOC
                             <<"!has_rec("<<!has_rec<<") "
@@ -1617,8 +1618,8 @@ void TVRec::HandlePendingRecordings(void)
         {
             VERBOSE(VB_RECORD, LOC + "Deleting stale pending recording " +
                     QString("%1 '%2'")
-                    .arg((*it).info->cardid)
-                    .arg((*it).info->title));
+                    .arg((*it).info->GetCardID())
+                    .arg((*it).info->GetTitle()));
 
             delete (*it).info;
             pendingRecordings.erase(it);
@@ -1630,12 +1631,13 @@ void TVRec::HandlePendingRecordings(void)
     it = pendingRecordings.begin();
     if ((1 == pendingRecordings.size()) &&
         (*it).ask &&
-        ((*it).info->cardid == cardid) &&
+        ((*it).info->GetCardID() == cardid) &&
         (GetState() == kState_WatchingLiveTV))
     {
         CheckForRecGroupChange();
         has_rec = pseudoLiveTVRecording &&
-            (pseudoLiveTVRecording->recendts > (*it).recordingStart);
+            (pseudoLiveTVRecording->GetRecordingEndTime() >
+             (*it).recordingStart);
     }
 
     for (it = pendingRecordings.begin(); it != pendingRecordings.end(); ++it)
@@ -1666,7 +1668,7 @@ void TVRec::HandlePendingRecordings(void)
     }
 }
 
-bool TVRec::GetDevices(int cardid,
+bool TVRec::GetDevices(uint cardid,
                        GeneralDBOptions   &gen_opts,
                        DVBDBOptions       &dvb_opts,
                        FireWireDBOptions  &firewire_opts)
@@ -1753,7 +1755,7 @@ bool TVRec::GetDevices(int cardid,
     return true;
 }
 
-QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
+QString TVRec::GetStartChannel(uint cardid, const QString &defaultinput)
 {
     QString startchan = QString::null;
 
@@ -2517,10 +2519,10 @@ bool TVRec::IsBusy(TunedInputInfo *busy_input, int time_buffer) const
         if (timeLeft <= time_buffer)
         {
             QString channum = QString::null, input = QString::null;
-            if ((*it).info->GetChannel(channum, input))
+            if ((*it).info->QueryTuningInfo(channum, input))
             {
                 busy_input->inputid = channel->GetInputByName(input);
-                chanid = (*it).info->chanid.toUInt();
+                chanid = (*it).info->GetChanID();
             }
         }
     }
@@ -2583,15 +2585,14 @@ long long TVRec::GetFilePosition(void)
     return -1;
 }
 
-/**
- *  \brief Returns byte position in RingBuffer
+/** \brief Returns byte position in RingBuffer
  *         of a keyframe according to recorder.
  *
- *  \sa EncoderLink::GetKeyframePosition(long long),
- *      RemoteEncoder::GetKeyframePosition(long long)
+ *  \sa EncoderLink::GetKeyframePosition(uint64_t),
+ *      RemoteEncoder::GetKeyframePosition(uint64_t)
  *  \return Byte position of keyframe if query succeeds, -1 otherwise.
  */
-long long TVRec::GetKeyframePosition(long long desired) const
+int64_t TVRec::GetKeyframePosition(uint64_t desired) const
 {
     QMutexLocker lock(&stateChangeLock);
 
@@ -2604,12 +2605,12 @@ long long TVRec::GetKeyframePosition(long long desired) const
  *  \brief Returns byte position in RingBuffer of a keyframes
  *         according to recorder.
  *
- *  \sa EncoderLink::GetKeyframePositions(long long, long long, PosMap&),
- *      RemoteEncoder::GetKeyframePositions(long long, long long, PosMap&)
+ *  \sa EncoderLink::GetKeyframePositions(int64_t, int64_t, frm_pos_map_t&),
+ *      RemoteEncoder::GetKeyframePositions(int64_t, int64_t, frm_pos_map_t&)
  *  \return Byte position of keyframe if query succeeds, -1 otherwise.
  */
 bool TVRec::GetKeyframePositions(
-    long long start, long long end, PosMap &map) const
+    int64_t start, int64_t end, frm_pos_map_t &map) const
 {
     QMutexLocker lock(&stateChangeLock);
 
@@ -2695,28 +2696,22 @@ void TVRec::CheckForRecGroupChange(void)
     if (internalState == kState_None)
         return; // already stopped
 
-    ProgramInfo *pi = NULL;
-    if (curRecording)
-    {
-        pi = ProgramInfo::GetProgramFromRecorded(
-            curRecording->chanid, curRecording->recstartts);
-    }
-    if (!pi)
+    if (!curRecording)
         return;
 
-    if (pi->recgroup != "LiveTV" && !pseudoLiveTVRecording)
+    const QString recgrp = curRecording->QueryRecordingGroup();
+    curRecording->SetRecordingGroup(recgrp);
+
+    if (recgrp != "LiveTV" && !pseudoLiveTVRecording)
     {
         // User wants this recording to continue
-        SetPseudoLiveTVRecording(pi);
-        return;
+        SetPseudoLiveTVRecording(new ProgramInfo(*curRecording));
     }
-    else if (pi->recgroup == "LiveTV" && pseudoLiveTVRecording)
+    else if (recgrp == "LiveTV" && pseudoLiveTVRecording)
     {
         // User wants to abandon scheduled recording
         SetPseudoLiveTVRecording(NULL);
     }
-
-    delete pi;
 }
 
 static uint get_input_id(uint cardid, const QString &inputname)
@@ -2756,14 +2751,13 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
 
     // Notify scheduler of the recording.
     // + set up recording so it can be resumed
-    rec->cardid    = cardid;
-    rec->inputid   = get_input_id(cardid, channel->GetCurrentInput());
+    rec->SetCardID(cardid);
+    rec->SetInputID(get_input_id(cardid, channel->GetCurrentInput()));
+    rec->SetRecordingRuleType(rec->GetRecordingRule()->m_type);
 
-    rec->rectype = rec->GetRecordingRule()->m_type;
-
-    if (rec->rectype == kNotRecording)
+    if (rec->GetRecordingRuleType() == kNotRecording)
     {
-        rec->rectype = kSingleRecord;
+        rec->SetRecordingRuleType(kSingleRecord);
         rec->GetRecordingRule()->m_type = kSingleRecord;
     }
 
@@ -2773,7 +2767,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     // + save rsInactive recstatus to so that a reschedule call
     //   doesn't start recording this on another card before we
     //   send the SCHEDULER_ADD_RECORDING message to the scheduler.
-    rec->recstatus = rsInactive;
+    rec->SetRecordingStatus(rsInactive);
     rec->AddHistory(false);
 
     // + save RecordingRule so that we get a recordid
@@ -2784,7 +2778,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     rec->ApplyRecordRecID();
 
     // + set proper recstatus (saved later)
-    rec->recstatus = rsRecording;
+    rec->SetRecordingStatus(rsRecording);
 
     // + pass proginfo to scheduler and reschedule
     QStringList prog;
@@ -2823,7 +2817,7 @@ void TVRec::SetLiveRecording(int recording)
         VERBOSE(VB_IMPORTANT, LOC + "SetLiveRecording() -- cancel");
         // cancel -- 'recording' should be 0 or -1
         SetFlags(kFlagCancelNextRecording);
-        curRecording->recgroup = "LiveTV";
+        curRecording->SetRecordingGroup("LiveTV");
         autoRunJobs = JOB_NONE;
     }
     else if (!was_rec && pseudoLiveTVRecording)
@@ -2836,8 +2830,8 @@ void TVRec::SetLiveRecording(int recording)
         // so that transcode, commfrag, etc can be run.
         recordEndTime = GetRecordEndTime(pseudoLiveTVRecording);
         NotifySchedulerOfRecording(curRecording);
-        recstat = curRecording->recstatus;
-        curRecording->recgroup = "Default";
+        recstat = curRecording->GetRecordingStatus();
+        curRecording->SetRecordingGroup("Default");
 
         RecordingProfile profile;
         load_profile(genOpt.cardtype, NULL, curRecording, profile);
@@ -2846,11 +2840,11 @@ void TVRec::SetLiveRecording(int recording)
     }
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                 .arg(curRecording->cardid)
-                 .arg(curRecording->chanid)
-                 .arg(curRecording->startts.toString(Qt::ISODate))
+                 .arg(curRecording->GetCardID())
+                 .arg(curRecording->GetChanID())
+                 .arg(curRecording->GetScheduledStartTime(ISODate))
                  .arg(recstat)
-                 .arg(curRecording->recendts.toString(Qt::ISODate)));
+                 .arg(curRecording->GetRecordingEndTime(ISODate)));
 
     gCoreContext->dispatch(me);
 }
@@ -3129,28 +3123,20 @@ void TVRec::SetChannel(QString name, uint requestType)
     VERBOSE(VB_CHANNEL, LOC + QString("SetChannel(%1) -- end").arg(name));
 }
 
-/** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- *  \brief Returns information about the program that would be seen if we changed
- *         the channel using ChangeChannel(int) with "direction".
- *  \sa EncoderLink::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
- *      RemoteEncoder::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- */
-void TVRec::GetNextProgram(int direction,
+void TVRec::GetNextProgram(BrowseDirection direction,
                            QString &title,       QString &subtitle,
                            QString &desc,        QString &category,
                            QString &starttime,   QString &endtime,
                            QString &callsign,    QString &iconpath,
-                           QString &channum,     QString &chanidStr,
+                           QString &channum,     uint    &sourceChanid,
                            QString &seriesid,    QString &programid)
 {
     QString compare     = "<=";
     QString sortorder   = "desc";
-    uint     chanid     = 0;
-    uint sourceChanid   = 0;
+    uint    chanid      = 0;
 
-    if (!chanidStr.isEmpty())
+    if (sourceChanid)
     {
-        sourceChanid = chanidStr.toUInt();
         chanid = sourceChanid;
 
         if (BROWSE_UP == direction)
@@ -3158,8 +3144,9 @@ void TVRec::GetNextProgram(int direction,
         else if (BROWSE_DOWN == direction)
             chanid = channel->GetNextChannel(chanid, CHANNEL_DIRECTION_DOWN);
         else if (BROWSE_FAVORITE == direction)
-            chanid = channel->GetNextChannel(chanid, CHANNEL_DIRECTION_FAVORITE
-);
+            chanid = channel->GetNextChannel(
+                chanid, CHANNEL_DIRECTION_FAVORITE);
+
         else if (BROWSE_LEFT == direction)
         {
             compare = "<";
@@ -3180,7 +3167,8 @@ void TVRec::GetNextProgram(int direction,
         else if (BROWSE_DOWN == direction)
             chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_DOWN);
         else if (BROWSE_FAVORITE == direction)
-            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_FAVORITE);
+            chanid = channel->GetNextChannel(channum,
+                                             CHANNEL_DIRECTION_FAVORITE);
         else if (BROWSE_LEFT == direction)
         {
             chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
@@ -3188,7 +3176,8 @@ void TVRec::GetNextProgram(int direction,
         }
         else if (BROWSE_RIGHT == direction)
         {
-                chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
+                chanid = channel->GetNextChannel(channum,
+                                                 CHANNEL_DIRECTION_SAME);
             compare = ">";
             sortorder = "asc";
         }
@@ -3213,10 +3202,8 @@ void TVRec::GetNextProgram(int direction,
     // Clear everything now in case either query fails.
     title     = subtitle  = desc      = category  = "";
     starttime = endtime   = callsign  = iconpath  = "";
-    channum   = chanidStr = seriesid  = programid = "";
-
-    // We already know the new chanid..
-    chanidStr = QString::number(chanid);
+    channum   = seriesid  = programid = "";
+    sourceChanid = 0;
 
     // Try to get the program info
     if (!query.exec() && !query.isActive())
@@ -3236,7 +3223,7 @@ void TVRec::GetNextProgram(int direction,
         channum   = query.value(8).toString();
         seriesid  = query.value(9).toString();
         programid = query.value(10).toString();
-
+        sourceChanid = chanid;
         return;
     }
 
@@ -3253,6 +3240,7 @@ void TVRec::GetNextProgram(int direction,
     }
     else if (query.next())
     {
+        sourceChanid = chanid;
         channum  = query.value(0).toString();
         callsign = query.value(1).toString();
         iconpath = query.value(2).toString();
@@ -3382,7 +3370,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
 
     if (request.program)
     {
-        request.program->GetChannel(channum, input);
+        request.program->QueryTuningInfo(channum, input);
         return channum;
     }
 
@@ -3545,7 +3533,7 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
     inputname = request.input;
 
     if (request.program)
-        request.program->GetChannel(channum, inputname);
+        request.program->QueryTuningInfo(channum, inputname);
 
     if (!channum.isEmpty() && inputname.isEmpty())
         channel->CheckChannel(channum, inputname);
@@ -3742,7 +3730,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         if (!(request.flags & kFlagLiveTV) || !(request.flags & kFlagEITScan))
         {
             if (curRecording)
-                curRecording->recstatus = rsFailed;
+                curRecording->SetRecordingStatus(rsFailed);
 
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Failed to set channel to %1. "
@@ -3909,7 +3897,7 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
     JobQueue::AddJobsToMask(rec->GetAutoRunJobs(), jobs);
 
     // disable commercial flagging on PBS, BBC, etc.
-    if (rec->chancommfree)
+    if (rec->IsCommercialFree())
         JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, jobs);
 
     // disable transcoding if the profile does not allow auto transcoding
@@ -3928,7 +3916,8 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
         // queue up real-time (i.e. on-line) commercial flagging.
         QString host = (on_host) ? gCoreContext->GetHostName() : "";
         JobQueue::QueueJob(JOB_COMMFLAG,
-                           rec->chanid, rec->recstartts, "", "",
+                           rec->GetChanID(),
+                           rec->GetRecordingStartTime(), "", "",
                            host, JOB_LIVE_REC);
 
         // don't do regular comm flagging, we won't need it.
@@ -4005,14 +3994,14 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     if (lastTuningRequest.flags & kFlagRecording)
     {
         bool write = genOpt.cardtype != "IMPORT";
-        VERBOSE(VB_IMPORTANT, LOC + QString("rec->GetFileName(): '%1'")
-                .arg(rec->GetFileName()));
-        SetRingBuffer(new RingBuffer(rec->GetFileName(), write));
+        VERBOSE(VB_IMPORTANT, LOC + QString("rec->GetPathname(): '%1'")
+                .arg(rec->GetPathname()));
+        SetRingBuffer(new RingBuffer(rec->GetPathname(), write));
         if (!ringBuffer->IsOpen() && write)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("RingBuffer '%1' not open...")
-                    .arg(rec->GetFileName()));
+                    .arg(rec->GetPathname()));
             SetRingBuffer(NULL);
             ClearFlags(kFlagPendingActions);
             goto err_ret;
@@ -4133,8 +4122,8 @@ void TVRec::TuningRestartRecorder(void)
 
         if (pseudoLiveTVRecording)
         {
-            int secsSince = curRecording->recstartts.secsTo(
-                                              QDateTime::currentDateTime());
+            int secsSince = curRecording->GetRecordingStartTime()
+                .secsTo(QDateTime::currentDateTime());
             if (secsSince < 120)
             {
                 JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
@@ -4142,7 +4131,7 @@ void TVRec::TuningRestartRecorder(void)
             }
 
             if (autoRunJobs)
-                JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+                JobQueue::QueueRecordingJobs(*curRecording, autoRunJobs);
         }
     }
 
@@ -4167,20 +4156,21 @@ void TVRec::TuningRestartRecorder(void)
     {
         ProgramInfo *rcinfo1 = pseudoLiveTVRecording;
         QString msg1 = QString("Recording: %1 %2 %3 %4")
-            .arg(rcinfo1->title).arg(rcinfo1->chanid)
-            .arg(rcinfo1->recstartts.toString())
-            .arg(rcinfo1->recendts.toString());
+            .arg(rcinfo1->GetTitle()).arg(rcinfo1->GetChanID())
+            .arg(rcinfo1->GetRecordingStartTime(ISODate))
+            .arg(rcinfo1->GetRecordingEndTime(ISODate));
         ProgramInfo *rcinfo2 = tvchain->GetProgramAt(-1);
         QString msg2 = QString("Recording: %1 %2 %3 %4")
-            .arg(rcinfo2->title).arg(rcinfo2->chanid)
-            .arg(rcinfo2->recstartts.toString())
-            .arg(rcinfo2->recendts.toString());
+            .arg(rcinfo2->GetTitle()).arg(rcinfo2->GetChanID())
+            .arg(rcinfo2->GetRecordingStartTime(ISODate))
+            .arg(rcinfo2->GetRecordingEndTime(ISODate));
         delete rcinfo2;
         VERBOSE(VB_RECORD, LOC + "Pseudo LiveTV recording starting." +
                 "\n\t\t\t" + msg1 + "\n\t\t\t" + msg2);
 
-        curRecording->SetAutoExpire(
-            curRecording->GetRecordingRule()->m_autoExpire);
+        curRecording->SaveAutoExpire(
+            curRecording->GetRecordingRule()->GetAutoExpire());
+
         curRecording->ApplyRecordRecGroupChange(
             curRecording->GetRecordingRule()->m_recGroup);
 
@@ -4351,46 +4341,47 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
         prog = new RecordingInfo(*pseudoLiveTVRecording);
     else
     {
-        prog = new RecordingInfo();
-        prog->LoadProgramAtDateTime(
+        prog = new RecordingInfo(
             chanid, mythCurrentDateTime(), true, hoursMax);
     }
 
-    prog->cardid = cardid;
+    prog->SetCardID(cardid);
 
-    if (prog->recstartts == prog->recendts)
+    if (prog->GetRecordingStartTime() == prog->GetRecordingEndTime())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
                 "\n\t\t\tProgramInfo is invalid."
                 "\n" + prog->toString());
-        prog->endts = prog->recendts = prog->recstartts.addSecs(3600);
-        prog->chanid = QString::number(chanid);
+        prog->SetScheduledEndTime(prog->GetRecordingStartTime().addSecs(3600));
+        prog->SetRecordingEndTime(prog->GetScheduledEndTime());
+
+        prog->SetChanID(chanid);
     }
 
     if (!pseudoLiveTVRecording)
-        prog->recstartts = mythCurrentDateTime();
+        prog->SetRecordingStartTime(mythCurrentDateTime());
 
-    prog->storagegroup = "LiveTV";
+    prog->SetStorageGroup("LiveTV");
 
     if (WaitForNextLiveTVDir())
     {
         QMutexLocker lock(&nextLiveTVDirLock);
-        prog->pathname = nextLiveTVDir;
+        prog->SetPathname(nextLiveTVDir);
     }
     else
     {
         StorageGroup sgroup("LiveTV", gCoreContext->GetHostName());
-        prog->pathname = sgroup.FindNextDirMostFree();
+        prog->SetPathname(sgroup.FindNextDirMostFree());
     }
 
     StartedRecording(prog);
 
-    *rb = new RingBuffer(prog->GetFileName(), true);
+    *rb = new RingBuffer(prog->GetPathname(), true);
     if (!(*rb)->IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("RingBuffer '%1' not open...")
-                .arg(prog->GetFileName()));
+                .arg(prog->GetPathname()));
 
         delete *rb;
         delete prog;
@@ -4418,7 +4409,7 @@ bool TVRec::CreateLiveTVRingBuffer(void)
 
     SetRingBuffer(rb);
 
-    pginfo->SetAutoExpire(kLiveTVAutoExpire);
+    pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
 
     bool discont = (tvchain->TotalSize() > 0);
@@ -4459,9 +4450,9 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
         FinishedRecording(oldinfo);
         if (tvchain->GetCardType(-1) != "DUMMY")
         {
-            if (oldinfo->pathname.left(1) != "/")
-                oldinfo->pathname = oldinfo->GetPlaybackURL(false,true);
-            if (oldinfo->pathname.left(1) == "/")
+            if (!oldinfo->IsLocal())
+                oldinfo->SetPathname(oldinfo->GetPlaybackURL(false,true));
+            if (oldinfo->IsLocal())
             {
                 (new PreviewGenerator(
                     oldinfo, PreviewGenerator::kLocal))->Start();
@@ -4471,7 +4462,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     }
 
     pginfo->MarkAsInUse(true, kRecorderInUseID);
-    pginfo->SetAutoExpire(kLiveTVAutoExpire);
+    pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);

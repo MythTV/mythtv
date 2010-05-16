@@ -247,8 +247,8 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_unknownTitle = gCoreContext->GetSetting("UnknownTitle", "Unknown");
     m_unknownCategory = gCoreContext->GetSetting("UnknownCategory", "Unknown");
 
-    for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
-        m_programs[y] = NULL;
+    for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
+        m_programs.push_back(NULL);
 
     for (int x = 0; x < MAX_DISPLAY_TIMES; ++x)
     {
@@ -331,6 +331,7 @@ void GuideGrid::Load(void)
         if (chanNum < 0)
             chanNum = 0;
 
+        delete m_programs[y];
         m_programs[y] = getProgramListFromProgram(chanNum);
     }
 }
@@ -366,13 +367,11 @@ GuideGrid::~GuideGrid()
 {
     gCoreContext->removeListener(this);
 
-    for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
+    while (!m_programs.empty())
     {
-        if (m_programs[y])
-        {
-            delete m_programs[y];
-            m_programs[y] = NULL;
-        }
+        if (m_programs.back())
+            delete m_programs.back();
+        m_programs.pop_back();
     }
 
     m_channelInfos.clear();
@@ -526,9 +525,13 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 // See if this show is far enough into the future that it's
                 // probable that the user wanted to schedule it to record
                 // instead of changing the channel.
-                ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-                if (pginfo && (pginfo->title != m_unknownTitle) &&
-                    ((pginfo->SecsTillStart() / 60) >= m_selectRecThreshold))
+                ProgramInfo *pginfo =
+                    m_programInfos[m_currentRow][m_currentCol];
+                int secsTillStart =
+                    (pginfo) ? QDateTime::currentDateTime().secsTo(
+                        pginfo->GetScheduledStartTime()) : 0;
+                if (pginfo && (pginfo->GetTitle() != m_unknownTitle) &&
+                    ((secsTillStart / 60) >= m_selectRecThreshold))
                 {
                     editRecSchedule();
                 }
@@ -599,14 +602,14 @@ void GuideGrid::showMenu(void)
         if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             menuPopup->AddButton(tr("Change Channel"));
         menuPopup->AddButton(tr("Record"));
-        if (pginfo && pginfo->recordid > 0)
+        if (pginfo && pginfo->GetRecordingRuleID())
             menuPopup->AddButton(tr("Edit Recording Status"));
         menuPopup->AddButton(tr("Edit Schedule"));
         menuPopup->AddButton(tr("Program Details"));
         menuPopup->AddButton(tr("Upcoming"));
         menuPopup->AddButton(tr("Custom Edit"));
 
-        if (pginfo && pginfo->recordid > 0)
+        if (pginfo && pginfo->GetRecordingRuleID())
             menuPopup->AddButton(tr("Delete Rule"));
 
         menuPopup->AddButton(tr("Reverse Channel Order"));
@@ -1049,21 +1052,16 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 {
     m_guideGrid->ResetRow(row);
 
-    ProgramList *proglist;
-
-    if (!useExistingData)
-    {
-        if (m_programs[row])
-            delete m_programs[row];
-        m_programs[row] = NULL;
-    }
+    // never divide by zero..
+    if (!m_guideGrid->getChannelCount() || !m_timeCount)
+        return;
 
     for (int x = 0; x < m_timeCount; ++x)
     {
         m_programInfos[row][x] = NULL;
     }
 
-    if (m_channelInfos.size() == 0)
+    if (m_channelInfos.empty())
         return;
 
     int chanNum = row + m_currentStartChannel;
@@ -1075,10 +1073,15 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
     if (chanNum < 0)
         chanNum = 0;
 
-    if (useExistingData)
-        proglist = m_programs[row];
-    else
-        m_programs[row] = proglist = getProgramListFromProgram(chanNum);
+    if (!useExistingData)
+    {
+        delete m_programs[row];
+        m_programs[row] = getProgramListFromProgram(chanNum);
+    }
+
+    ProgramList *proglist = m_programs[row];
+    if (!proglist)
+        return;
 
     QDateTime ts = m_currentStartTime;
 
@@ -1098,35 +1101,34 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 
     m_guideGrid->SetProgPast(progPast);
 
-    ProgramList::iterator program;
-    program = proglist->begin();
+    ProgramList::iterator program = proglist->begin();
     vector<ProgramInfo*> unknownlist;
     bool unknown = false;
     ProgramInfo *proginfo = NULL;
     for (int x = 0; x < m_timeCount; ++x)
     {
-        if (program != proglist->end() && (ts >= (*program)->endts))
+        if (program != proglist->end() &&
+            (ts >= (*program)->GetScheduledEndTime()))
         {
             ++program;
         }
 
-        if ((program == proglist->end()) || (ts < (*program)->startts))
+        if ((program == proglist->end()) ||
+            (ts < (*program)->GetScheduledStartTime()))
         {
             if (unknown)
             {
                 proginfo->spread++;
-                proginfo->endts = proginfo->endts.addSecs(5 * 60);
+                proginfo->SetScheduledEndTime(
+                    proginfo->GetScheduledEndTime().addSecs(5 * 60));
             }
             else
             {
-                proginfo = new ProgramInfo;
+                proginfo = new ProgramInfo(
+                    m_unknownTitle, m_unknownCategory, ts, ts.addSecs(5*60));
                 unknownlist.push_back(proginfo);
-                proginfo->title = m_unknownTitle;
-                proginfo->category = m_unknownCategory;
                 proginfo->startCol = x;
                 proginfo->spread = 1;
-                proginfo->startts = ts;
-                proginfo->endts = proginfo->startts.addSecs(5 * 60);
                 unknown = true;
             }
         }
@@ -1157,18 +1159,22 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 
     MythRect programRect = m_guideGrid->GetArea();
 
-    int ydifference = 0;
-    int xdifference = 0;
+    /// use doubles to avoid large gaps at end..
+    double ydifference = 0.0, xdifference = 0.0;
 
     if (m_verticalLayout)
     {
-        ydifference = programRect.width() / m_guideGrid->getChannelCount();
-        xdifference = programRect.height() / m_timeCount;
+        ydifference = programRect.width() /
+            (double) m_guideGrid->getChannelCount();
+        xdifference = programRect.height() /
+            (double) m_timeCount;
     }
     else
     {
-        ydifference = programRect.height() / m_guideGrid->getChannelCount();
-        xdifference = programRect.width() / m_timeCount;
+        ydifference = programRect.height() /
+            (double) m_guideGrid->getChannelCount();
+        xdifference = programRect.width() /
+            (double) m_timeCount;
     }
 
     int arrow = 0;
@@ -1185,12 +1191,12 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             continue;
 
         spread = 1;
-        if (pginfo->startts != lastprog)
+        if (pginfo->GetScheduledStartTime() != lastprog)
         {
             arrow = 0;
-            if (pginfo->startts < m_firstTime.addSecs(-300))
+            if (pginfo->GetScheduledStartTime() < m_firstTime.addSecs(-300))
                 arrow = arrow + 1;
-            if (pginfo->endts > m_lastTime.addSecs(2100))
+            if (pginfo->GetScheduledEndTime() > m_lastTime.addSecs(2100))
                 arrow = arrow + 2;
 
             if (pginfo->spread != -1)
@@ -1202,7 +1208,8 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
                 for (int z = x + 1; z < m_timeCount; ++z)
                 {
                     ProgramInfo *test = m_programInfos[row][z];
-                    if (test && test->startts == pginfo->startts)
+                    if (test && (test->GetScheduledStartTime() ==
+                                 pginfo->GetScheduledStartTime()))
                         spread++;
                 }
                 pginfo->spread = spread;
@@ -1221,14 +1228,24 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 
             if (m_verticalLayout)
             {
-                tempRect = QRect((int)(row * ydifference), (int)(x * xdifference),
-                            (int)(ydifference), xdifference * pginfo->spread);
+                tempRect = QRect((int)(row * ydifference),
+                                 (int)(x * xdifference),
+                                 (int)(ydifference),
+                                 (int)(xdifference * pginfo->spread));
             }
             else
             {
-                tempRect = QRect((int)(x * xdifference), (int)(row * ydifference),
-                            (int)(xdifference * pginfo->spread), ydifference);
+                tempRect = QRect((int)(x * xdifference),
+                                 (int)(row * ydifference),
+                                 (int)(xdifference * pginfo->spread),
+                                 (int)ydifference);
             }
+
+            // snap to right edge for last entry.
+            if (tempRect.right() + 2 >=  programRect.width())
+                tempRect.setRight(programRect.width());
+            if (tempRect.bottom() + 2 >=  programRect.bottom())
+                tempRect.setBottom(programRect.bottom());
 
             if (m_currentRow == (int)row && (m_currentCol >= x) &&
                 (m_currentCol < (x + spread)))
@@ -1237,7 +1254,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
                 isCurrent = false;
 
             int recFlag;
-            switch (pginfo->rectype)
+            switch (pginfo->GetRecordingRuleType())
             {
             case kSingleRecord:
                 recFlag = 1;
@@ -1270,21 +1287,23 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             }
 
             int recStat;
-            if (pginfo->recstatus == rsConflict ||
-                pginfo->recstatus == rsOffLine)
+            if (pginfo->GetRecordingStatus() == rsConflict ||
+                pginfo->GetRecordingStatus() == rsOffLine)
                 recStat = 2;
-            else if (pginfo->recstatus <= rsWillRecord)
+            else if (pginfo->GetRecordingStatus() <= rsWillRecord)
                 recStat = 1;
             else
                 recStat = 0;
 
-            m_guideGrid->SetProgramInfo(row, cnt, tempRect, pginfo->title,
-                                    pginfo->category, arrow, recFlag,
-                                    recStat, isCurrent);
+            m_guideGrid->SetProgramInfo(
+                row, cnt, tempRect, pginfo->GetTitle(),
+                pginfo->GetCategory(), arrow, recFlag,
+                recStat, isCurrent);
+
             cnt++;
         }
 
-        lastprog = pginfo->startts;
+        lastprog = pginfo->GetScheduledStartTime();
     }
 }
 
@@ -1320,14 +1339,12 @@ void GuideGrid::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            RecordingRule *record =
+                qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
-                if (buttonnum > 0)
-                {
-                    if (!record->Delete())
-                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
-                }
+                if ((buttonnum > 0) && !record->Delete())
+                    VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
                 delete record;
             }
             EmbedTVWindow();
@@ -1559,7 +1576,7 @@ void GuideGrid::updateInfo(void)
                                                 (GetChild("ratingstate"));
     if (ratingState)
     {
-        QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+        QString rating = QString::number(pginfo->GetStars(10));
         ratingState->DisplayState(rating);
     }
 }
@@ -1975,7 +1992,7 @@ void GuideGrid::quickRecord()
     if (!pginfo)
         return;
 
-    if (pginfo->title == m_unknownTitle)
+    if (pginfo->GetTitle() == m_unknownTitle)
         return;
 
     RecordingInfo ri(*pginfo);
@@ -1994,7 +2011,7 @@ void GuideGrid::editRecSchedule()
     if (!pginfo)
         return;
 
-    if (pginfo->title == m_unknownTitle)
+    if (pginfo->GetTitle() == m_unknownTitle)
         return;
 
     EditRecording(pginfo);
@@ -2007,7 +2024,7 @@ void GuideGrid::editSchedule()
     if (!pginfo)
         return;
 
-    if (pginfo->title == m_unknownTitle)
+    if (pginfo->GetTitle() == m_unknownTitle)
         return;
 
     EditScheduled(pginfo);
@@ -2024,7 +2041,7 @@ void GuideGrid::deleteRule()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
-    if (!pginfo || pginfo->recordid <= 0)
+    if (!pginfo || !pginfo->GetRecordingRuleID())
         return;
 
     RecordingRule *record = new RecordingRule();
@@ -2035,7 +2052,7 @@ void GuideGrid::deleteRule()
     }
 
     QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
-                                                .arg(pginfo->RecTypeText());
+        .arg(toString(pginfo->GetRecordingRuleType()));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -2058,7 +2075,7 @@ void GuideGrid::upcoming()
     if (!pginfo)
         return;
 
-    if (pginfo->title == m_unknownTitle)
+    if (pginfo->GetTitle() == m_unknownTitle)
         return;
 
     ShowUpcoming(pginfo);
@@ -2071,7 +2088,7 @@ void GuideGrid::details()
     if (!pginfo)
         return;
 
-    if (pginfo->title == m_unknownTitle)
+    if (pginfo->GetTitle() == m_unknownTitle)
         return;
 
     ShowDetails(pginfo);

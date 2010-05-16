@@ -1,9 +1,11 @@
 #ifndef RECORDINGTYPES_H_
 #define RECORDINGTYPES_H_
 
+#include <QString>
+
 #include "mythexp.h"
 
-enum RecordingType
+typedef enum RecordingTypes
 {
     kNotRecording = 0,
     kSingleRecord = 1,
@@ -16,11 +18,13 @@ enum RecordingType
     kDontRecord,
     kFindDailyRecord,
     kFindWeeklyRecord
-};
+} RecordingType; // note stored in uin8_t in ProgramInfo
+MPUBLIC QString toString(RecordingType);
+MPUBLIC QChar   toQChar( RecordingType);
 
 MPUBLIC int RecTypePriority(RecordingType rectype);
 
-enum RecordingDupInType
+typedef enum RecordingDupInTypes
 {
     kDupsInRecorded     = 0x01,
     kDupsInOldRecorded  = 0x02,
@@ -29,19 +33,19 @@ enum RecordingDupInType
     kDupsExRepeats      = 0x20,
     kDupsExGeneric      = 0x40,
     kDupsFirstNew       = 0x80
-};
+} RecordingDupInType; // note stored in uin8_t in ProgramInfo
 
 
-enum RecordingDupMethodType
+typedef enum RecordingDupMethodType
 {
     kDupCheckNone     = 0x01,
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,
     kDupCheckSubDesc  = 0x06,
     kDupCheckSubThenDesc = 0x08
-};
+} RecordingDupMethodType; // note stored in uin8_t in ProgramInfo
 
-enum RecSearchType
+typedef enum RecSearchTypes
 {
     kNoSearch = 0,
     kPowerSearch,
@@ -49,7 +53,7 @@ enum RecSearchType
     kKeywordSearch,
     kPeopleSearch,
     kManualSearch
-};
+} RecSearchType;
 
 #endif
 

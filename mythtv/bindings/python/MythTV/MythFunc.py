@@ -231,6 +231,7 @@ class MythBE( FileOps ):
         self.freeTuner()
 
     def _getPrograms(self, query, recstatus=None, header=0):
+        pgfieldcount = len(Program._field_order)
         programs = []
         res = self.backendCommand(query).split(BACKEND_SEP)
         for i in xrange(header):
@@ -238,8 +239,8 @@ class MythBE( FileOps ):
 
         num_progs = int(res.pop(0))
         for i in range(num_progs):
-            offs = i * PROGRAM_FIELDS
-            programs.append(Program(res[offs:offs+PROGRAM_FIELDS], db=self.db))
+            offs = i * pgfieldcount
+            programs.append(Program(res[offs:offs+pgfieldcount], db=self.db))
 
         if recstatus:
             for i in reversed(range(num_progs)):

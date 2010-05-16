@@ -215,14 +215,22 @@ int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataD
     return 0;
 }
 
-bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
+bool PlaybackSock::FillProgramInfo(ProgramInfo &pginfo,
+                                   const QString &playbackhost)
 {
     QStringList strlist( QString("FILL_PROGRAM_INFO") );
     strlist << playbackhost;
-    pginfo->ToStringList(strlist);
+    pginfo.ToStringList(strlist);
 
     if (SendReceiveStringList(strlist))
-        return pginfo->FromStringList(strlist, 0);
+    {
+        ProgramInfo tmp(strlist);
+        if (tmp.HasPathname() || tmp.GetChanID())
+        {
+            pginfo.clone(tmp, true);
+            return true;
+        }
+    }
 
     return false;
 }
@@ -307,7 +315,7 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
 
     if (SendReceiveStringList(strlist, 2))
     {
-        pginfo->pathname = strlist[1];
+        pginfo->SetPathname(strlist[1]);
         return strlist[0].toInt();
     }
 
@@ -384,30 +392,26 @@ long long PlaybackSock::GetMaxBitrate(int capturecardnum)
     return 20200000LL; // Peek bit rate for HD-PVR
 }
 
-/** \fn *PlaybackSock::GetRecording(int)
- *  \brief Returns the ProgramInfo being used by any current recording.
+/** \brief Returns the ProgramInfo being used by any current recording.
  *
  *   Caller is responsible for deleting the ProgramInfo when done with it.
- *  \param capturecardnum cardid of recorder
  */
-ProgramInfo *PlaybackSock::GetRecording(int capturecardnum)
+ProgramInfo *PlaybackSock::GetRecording(uint cardid)
 {
-    QStringList strlist( QString("QUERY_REMOTEENCODER %1")
-        .arg(capturecardnum) );
-
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "GET_CURRENT_RECORDING";
 
     if (!SendReceiveStringList(strlist))
         return NULL;
 
-    ProgramInfo *info = new ProgramInfo();
-    if (!info->FromStringList(strlist, 0))
+    ProgramInfo *pginfo = new ProgramInfo(strlist);
+    if (!pginfo->HasPathname() && !pginfo->GetChanID())
     {
-        delete info;
-        info = NULL;
+        delete pginfo;
+        pginfo = NULL;
     }
 
-    return info;
+    return pginfo;
 }
 
 bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo)

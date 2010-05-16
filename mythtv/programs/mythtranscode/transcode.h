@@ -1,6 +1,7 @@
 #include "recordingprofile.h"
 #include "fifowriter.h"
 #include "transcodedefs.h"
+#include "programtypes.h"
 
 class PlayerContext;
 class ProgramInfo;
@@ -19,7 +20,7 @@ class Transcode : public QObject
         const QString &outputname,
         const QString &profileName,
         bool honorCutList, bool framecontrol, int jobID,
-        QString fifodir, QMap<long long, int> deleteMap);
+        QString fifodir, const frm_dir_map_t &deleteMap);
     void ShowProgress(bool val) { showprogress = val; }
     void SetRecorderOptions(QString options) { recorderOptions = options; }
 

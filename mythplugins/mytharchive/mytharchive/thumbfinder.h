@@ -11,6 +11,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 }
+#include "programtypes.h"
 
 // mytharchive
 #include "archiveutil.h"
@@ -91,7 +92,7 @@ class ThumbFinder : public MythScreenType
     int64_t          m_firstIFramePTS;
     int              m_frameTime;   // in time_base units
     bool             m_updateFrame;
-    QMap<long long, int> m_deleteMap;
+    frm_dir_map_t    m_deleteMap;
     int              m_finalDuration;
     int              m_offset;
 

@@ -31,23 +31,359 @@ using namespace std;
 #include "storagegroup.h"
 #include "previewgenerator.h"
 #include "channelutil.h"
-#define LOC QString("RecordingInfo: ")
-#define LOC_ERR QString("RecordingInfo, Error: ")
 
-static bool insert_program(const RecordingInfo*,
-                           const RecordingRule*);
+#define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
+#define LOC_WARN QString("RecordingInfo(%1), Warning: ").arg(GetBasename())
+#define LOC_ERR  QString("RecordingInfo(%1), Error: ").arg(GetBasename())
 
-/** \fn RecordingInfo::clone(const ProgramInfo &other)
- *  \brief Copies important fields from other RecordingInfo.
- */
-RecordingInfo &RecordingInfo::clone(const ProgramInfo &other)
+QString RecordingInfo::unknownTitle;
+// works only for integer divisors of 60
+static const uint kUnknownProgramLength = 30;
+
+RecordingInfo::RecordingInfo(
+    const QString &_title,
+    const QString &_subtitle,
+    const QString &_description,
+    const QString &_category,
+
+    uint _chanid,
+    const QString &_chanstr,
+    const QString &_chansign,
+    const QString &_channame,
+
+    const QString &_recgroup,
+    const QString &_playgroup,
+
+    const QString &_hostname,
+    const QString &_storagegroup,
+
+    uint _year,
+
+    const QString &_seriesid,
+    const QString &_programid,
+    const QString &_catType,
+
+    int _recpriority,
+
+    const QDateTime &_startts,
+    const QDateTime &_endts,
+    const QDateTime &_recstartts,
+    const QDateTime &_recendts,
+
+    float _stars,
+    const QDate &_originalAirDate,
+
+    bool _repeat,
+
+    RecStatusType _oldrecstatus,
+    bool _reactivate,
+
+    uint _recordid,
+    uint _parentid,
+    RecordingType _rectype,
+    RecordingDupInType _dupin,
+    RecordingDupMethodType _dupmethod,
+
+    uint _sourceid,
+    uint _inputid,
+    uint _cardid,
+
+    uint _findid,
+
+    uint _subtitleType,
+    uint _videoproperties,
+    uint _audioproperties) :
+    ProgramInfo(
+        _title, _subtitle, _description, _category,
+        _chanid, _chanstr, _chansign, _channame, QString(),
+        _recgroup, _playgroup,
+        _startts, _endts, _recstartts, _recendts,
+        _seriesid, _programid),
+    oldrecstatus(rsUnknown),
+    savedrecstatus(rsUnknown),
+    record(NULL)
 {
-    delete record;
-    record = NULL;
+    hostname = _hostname;
+    storagegroup = _storagegroup;
 
-    ProgramInfo::clone(other);
+    year = _year;
 
-    return *this;
+    catType = _catType;
+
+    recpriority = _recpriority;
+
+    stars = clamp(_stars, 0.0f, 1.0f);
+    originalAirDate = _originalAirDate;
+    if (originalAirDate.isValid() && originalAirDate < QDate(1940, 1, 1))
+        originalAirDate = QDate();
+
+    programflags &= ~FL_REPEAT;
+    programflags |= _repeat ? FL_REPEAT : 0;
+    programflags &= ~FL_REACTIVATE;
+    programflags |= _reactivate ? FL_REACTIVATE : 0;
+
+    oldrecstatus = _oldrecstatus;
+
+    recstatus = (oldrecstatus == rsAborted ||
+                 oldrecstatus == rsNotListed ||
+                 _reactivate) ? rsUnknown : oldrecstatus;
+
+    recordid = _recordid;
+    parentid = _parentid;
+    rectype = _rectype;
+    dupin = _dupin;
+    dupmethod = _dupmethod;
+
+    sourceid = _sourceid;
+    inputid = _inputid;
+    cardid = _cardid;
+
+    findid = _findid;
+
+    properties = ((_subtitleType    << 11) |
+                  (_videoproperties << 6)  |
+                  _audioproperties);
+
+    if (recstartts >= recendts)
+    {
+        // start/end-offsets are invalid so ignore
+        recstartts = startts;
+        recendts   = endts;
+    }
+}
+
+RecordingInfo::RecordingInfo(
+    const QString &_title,
+    const QString &_subtitle,
+    const QString &_description,
+    const QString &_category,
+
+    uint _chanid,
+    const QString &_chanstr,
+    const QString &_chansign,
+    const QString &_channame,
+
+    const QString &_recgroup,
+    const QString &_playgroup,
+
+    const QString &_seriesid,
+    const QString &_programid,
+
+    int _recpriority,
+
+    const QDateTime &_startts,
+    const QDateTime &_endts,
+    const QDateTime &_recstartts,
+    const QDateTime &_recendts,
+
+    RecStatusType _recstatus,
+
+    uint _recordid,
+    RecordingType _rectype,
+    RecordingDupInType _dupin,
+    RecordingDupMethodType _dupmethod,
+
+    uint _findid) :
+    ProgramInfo(
+        _title, _subtitle, _description, _category,
+        _chanid, _chanstr, _chansign, _channame, QString(),
+        _recgroup, _playgroup,
+        _startts, _endts, _recstartts, _recendts,
+        _seriesid, _programid),
+    oldrecstatus(rsUnknown),
+    savedrecstatus(rsUnknown),
+    record(NULL)
+{
+    recpriority = _recpriority;
+
+    recstatus = _recstatus,
+
+    recordid = _recordid;
+    rectype = _rectype;
+    dupin = _dupin;
+    dupmethod = _dupmethod;
+
+    findid = _findid;
+}
+
+/** \brief Fills RecordingInfo for the program that air at
+ *         "dtime" on "channel".
+ *  \param chanid  %Channel ID on which to search for program.
+ *  \param dtime   Date and Time for which we desire the program.
+ *  \param genUnknown Generate a full entry for live-tv if unknown
+ *  \param clampHoursMax Clamp the maximum time to X hours from dtime.
+ *  \return LoadStatus describing what happened.
+ */
+RecordingInfo::RecordingInfo(
+    uint _chanid, const QDateTime &desiredts,
+    bool genUnknown, uint maxHours, LoadStatus *status) :
+    oldrecstatus(rsUnknown),
+    savedrecstatus(rsUnknown),
+    record(NULL)
+{
+    ProgramList schedList;
+    ProgramList progList;
+
+    MSqlBindings bindings;
+    QString querystr = "WHERE program.chanid    = :CHANID   AND "
+                       "      program.starttime < :STARTTS1 AND "
+                       "      program.endtime   > :STARTTS2 ";
+    bindings[":CHANID"] = QString::number(_chanid);
+    QString str_startts = desiredts.toString("yyyy-MM-ddThh:mm:50");
+    bindings[":STARTTS1"] = str_startts;
+    bindings[":STARTTS2"] = str_startts;
+
+    ::LoadFromScheduler(schedList);
+    LoadFromProgram(progList, querystr, bindings, schedList, false);
+
+    if (!progList.empty())
+    {
+        ProgramInfo *pginfo = progList[0];
+
+        if (maxHours > 0)
+        {
+            if (desiredts.secsTo(
+                    pginfo->GetScheduledEndTime()) > (int)maxHours * 3600)
+            {
+                pginfo->SetScheduledEndTime(desiredts.addSecs(maxHours * 3600));
+                pginfo->SetRecordingEndTime(pginfo->GetScheduledEndTime());
+            }
+        }
+
+        *this = *pginfo;
+        if (status)
+            *status = kFoundProgram;
+        return;
+    }
+
+    recstartts = startts = desiredts;
+    recendts   = endts   = desiredts;
+    lastmodified         = desiredts;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid, channum, callsign, name, "
+                  "commmethod, outputfilters "
+                  "FROM channel "
+                  "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", _chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Loading Program overlapping a datetime", query);
+        if (status)
+            *status = kNoProgram;
+        return;
+    }
+
+    if (!query.next())
+    {
+        if (status)
+            *status = kNoProgram;
+        return;
+    }
+
+    chanid               = query.value(0).toUInt();
+    chanstr              = query.value(1).toString();
+    chansign             = query.value(2).toString();
+    channame             = query.value(3).toString();
+    programflags &= ~FL_CHANCOMMFREE;
+    programflags |= (query.value(4).toInt() == COMM_DETECT_COMMFREE) ?
+        FL_CHANCOMMFREE : 0;
+    chanplaybackfilters  = query.value(5).toString();
+
+    {
+        QMutexLocker locker(&staticDataLock);
+        if (unknownTitle.isEmpty())
+            unknownTitle = gCoreContext->GetSetting("UnknownTitle");
+        title = unknownTitle;
+        title.detach();
+    }
+
+    if (!genUnknown)
+    {
+        if (status)
+            *status = kFakedZeroMinProgram;
+        return;
+    }
+
+    // Round endtime up to the next half-hour.
+    endts.setTime(QTime(endts.time().hour(),
+                        endts.time().minute() / kUnknownProgramLength
+                        * kUnknownProgramLength));
+    endts = endts.addSecs(kUnknownProgramLength * 60);
+
+    // if under a minute, bump it up to the next half hour
+    if (startts.secsTo(endts) < 60)
+        endts = endts.addSecs(kUnknownProgramLength * 60);
+
+    recendts = endts;
+
+    // Find next program starttime
+    bindings.clear();
+    QDateTime nextstart = startts;
+    querystr = "WHERE program.chanid    = :CHANID  AND "
+               "      program.starttime > :STARTTS "
+               "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
+    bindings[":CHANID"]  = QString::number(_chanid);
+    bindings[":STARTTS"] = desiredts.toString("yyyy-MM-ddThh:mm:50");
+
+    LoadFromProgram(progList, querystr, bindings, schedList, false);
+
+    if (!progList.empty())
+        nextstart = (*progList.begin())->GetScheduledStartTime();
+
+    if (nextstart > startts && nextstart < recendts)
+        recendts = endts = nextstart;
+
+    if (status)
+        *status = kFakedLiveTVProgram;
+}
+
+/// \brief Copies important fields from other RecordingInfo.
+void RecordingInfo::clone(const RecordingInfo &other,
+                          bool ignore_non_serialized_data)
+{
+    bool is_same =
+        (chanid && recstartts.isValid() && startts.isValid() &&
+         chanid     == other.GetChanID() &&
+         recstartts == other.GetRecordingStartTime() &&
+         startts    == other.GetScheduledStartTime());
+
+    ProgramInfo::clone(other, ignore_non_serialized_data);
+
+    if (!is_same)
+    {
+        delete record;
+        record = NULL;
+    }
+
+    if (!ignore_non_serialized_data)
+    {
+        oldrecstatus   = other.oldrecstatus;
+        savedrecstatus = other.savedrecstatus;
+    }
+}
+
+/// \brief Copies important fields from ProgramInfo
+void RecordingInfo::clone(const ProgramInfo &other,
+                          bool ignore_non_serialized_data)
+{
+    bool is_same =
+        (chanid && recstartts.isValid() && startts.isValid() &&
+         chanid     == other.GetChanID() &&
+         recstartts == other.GetRecordingStartTime() &&
+         startts    == other.GetScheduledStartTime());
+
+    ProgramInfo::clone(other, ignore_non_serialized_data);
+
+    if (!is_same)
+    {
+        delete record;
+        record = NULL;
+    }
+
+    oldrecstatus   = rsUnknown;
+    savedrecstatus = rsUnknown;
 }
 
 void RecordingInfo::clear(void)
@@ -56,6 +392,9 @@ void RecordingInfo::clear(void)
 
     delete record;
     record = NULL;
+
+    oldrecstatus = rsUnknown;
+    savedrecstatus = rsUnknown;
 }
 
 
@@ -66,20 +405,6 @@ RecordingInfo::~RecordingInfo()
 {
     delete record;
     record = NULL;
-}
-
-
-/** \fn RecordingInfo::ToMap(InfoMap&, bool) const
- *  \brief Converts RecordingInfo into QString QHash containing each field
- *         in RecordingInfo converted into localized strings.
- */
-void RecordingInfo::ToMap(InfoMap &progMap, bool showrerecord) const
-{
-    ProgramInfo::ToMap(progMap, showrerecord);
-
-    QString iconpath = ChannelUtil::GetIcon(chanid.toUInt());
-    if (!iconpath.isEmpty())
-        progMap["iconpath"] = iconpath;
 }
 
 /** \fn RecordingInfo::GetProgramRecordingStatus()
@@ -491,7 +816,7 @@ void RecordingInfo::StartedRecording(QString ext)
     pathname = CreateRecordBasename(ext);
 
     int count = 0;
-    while (!insert_program(this, record) && count < 50)
+    while (!InsertProgram(this, record) && count < 50)
     {
         recstartts = recstartts.addSecs(1);
         pathname = CreateRecordBasename(ext);
@@ -557,15 +882,15 @@ void RecordingInfo::StartedRecording(QString ext)
     SendAddedEvent();
 }
 
-static bool insert_program(const RecordingInfo        *pg,
-                           const RecordingRule *rule)
+bool RecordingInfo::InsertProgram(const RecordingInfo *pg,
+                                  const RecordingRule *rule)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     //query.prepare("LOCK TABLES recorded WRITE");
     if (!query.exec("LOCK TABLES recorded WRITE"))
     {
-        MythDB::DBError("insert_program -- lock", query);
+        MythDB::DBError("InsertProgram -- lock", query);
         return false;
     }
 
@@ -580,12 +905,12 @@ static bool insert_program(const RecordingInfo        *pg,
     if (!query.exec() || query.size())
     {
         if (!query.isActive())
-            MythDB::DBError("insert_program -- select", query);
+            MythDB::DBError("InsertProgram -- select", query);
         else
             VERBOSE(VB_IMPORTANT, "recording already exists...");
 
         if (!query.exec("UNLOCK TABLES"))
-            MythDB::DBError("insert_program -- unlock tables", query);
+            MythDB::DBError("InsertProgram -- unlock tables", query);
         return false;
     }
 
@@ -613,7 +938,7 @@ static bool insert_program(const RecordingInfo        *pg,
     else
         query.bindValue(":RECORDID",    pg->recordid);
 
-    if (pg->hasAirDate)
+    if (pg->originalAirDate.isValid())
         query.bindValue(":ORIGAIRDATE", pg->originalAirDate);
     else
         query.bindValue(":ORIGAIRDATE", "0000-00-00");
@@ -632,7 +957,7 @@ static bool insert_program(const RecordingInfo        *pg,
     query.bindValue(":PROGRAMID",   pg->programid);
     query.bindValue(":FINDID",      pg->findid);
     query.bindValue(":STARS",       pg->stars);
-    query.bindValue(":REPEAT",      pg->repeat);
+    query.bindValue(":REPEAT",      pg->IsRepeat());
     query.bindValue(":TRANSCODER",  rule->m_transcoder);
     query.bindValue(":PLAYGROUP",   pg->playgroup);
     query.bindValue(":RECPRIORITY", rule->m_recPriority);
@@ -646,24 +971,24 @@ static bool insert_program(const RecordingInfo        *pg,
     bool active = query.isActive();
 
     if (!query.exec("UNLOCK TABLES"))
-        MythDB::DBError("insert_program -- unlock tables", query);
+        MythDB::DBError("InsertProgram -- unlock tables", query);
 
     if (!ok && !active)
-        MythDB::DBError("insert_program -- insert", query);
+        MythDB::DBError("InsertProgram -- insert", query);
 
     else if (pg->recordid > 0)
     {
         query.prepare("UPDATE channel SET last_record = NOW() "
                       "WHERE chanid = :CHANID");
-        query.bindValue(":CHANID", pg->chanid);
+        query.bindValue(":CHANID", pg->GetChanID());
         if (!query.exec())
-            MythDB::DBError("insert_program -- channel last_record", query);
+            MythDB::DBError("InsertProgram -- channel last_record", query);
 
         query.prepare("UPDATE record SET last_record = NOW() "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", pg->recordid);
         if (!query.exec())
-            MythDB::DBError("insert_program -- record last_record", query);
+            MythDB::DBError("InsertProgram -- record last_record", query);
 
         if (pg->rectype == kOverrideRecord && pg->parentid > 0)
         {
@@ -671,7 +996,7 @@ static bool insert_program(const RecordingInfo        *pg,
                           "WHERE recordid = :PARENTID");
             query.bindValue(":PARENTID", pg->parentid);
             if (!query.exec())
-                MythDB::DBError("insert_program -- record last_record override",
+                MythDB::DBError("InsertProgram -- record last_record override",
                                 query);
         }
     }
@@ -765,12 +1090,12 @@ void RecordingInfo::ReactivateRecording(void)
  */
 void RecordingInfo::AddHistory(bool resched, bool forcedup)
 {
-    bool dup = (recstatus == rsRecorded || forcedup);
-    RecStatusType rs = (recstatus == rsCurrentRecording) ?
-        rsPreviousRecording : recstatus;
-    oldrecstatus = recstatus;
+    bool dup = (GetRecordingStatus() == rsRecorded || forcedup);
+    RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording) ?
+        rsPreviousRecording : GetRecordingStatus();
+    oldrecstatus = GetRecordingStatus();
     if (dup)
-        reactivate = false;
+        SetReactivated(false);
 
     MSqlQuery result(MSqlQuery::InitCon());
 
@@ -796,7 +1121,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup)
     result.bindValue(":RECTYPE", rectype);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
-    result.bindValue(":REACTIVATE", reactivate);
+    result.bindValue(":REACTIVATE", IsReactivated());
 
     if (!result.exec())
         MythDB::DBError("addHistory", result);
@@ -949,7 +1274,7 @@ void RecordingInfo::SubstituteMatches(QString &str)
     str.replace("%FINDID%", QString::number(findid));
     str.replace("%RECSTATUS%", QString::number(recstatus));
     str.replace("%RECTYPE%", QString::number(rectype));
-    str.replace("%REACTIVATE%", QString::number(reactivate));
+    str.replace("%REACTIVATE%", IsReactivated() ? "1" : "0");
 
     ProgramInfo::SubstituteMatches(str);
 }

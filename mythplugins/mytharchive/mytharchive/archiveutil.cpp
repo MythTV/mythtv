@@ -18,6 +18,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
+#include <util.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -182,18 +183,24 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
 
     if (bIsMythRecording)
     {
-        pinfo = ProgramInfo::GetProgramFromRecorded(chanID, startTime);
-
-        if (pinfo)
-            pinfo->pathname = pinfo->GetPlaybackURL(false, true);
+        uint chanid = chanID.toUInt();
+        QDateTime recstartts = myth_dt_from_string(startTime);
+        pinfo = new ProgramInfo(chanid, recstartts);
+        if (pinfo->GetChanID())
+        {
+            pinfo->SetPathname(pinfo->GetPlaybackURL(false, true));
+        }
+        else
+        {
+            delete pinfo;
+            pinfo = NULL;
+        }
     }
 
     if (!pinfo)
     {
         // file is not a myth recording or is no longer in the db
-        pinfo = new ProgramInfo();
-        pinfo->pathname = inFile;
-        pinfo->isVideo = true;
+        pinfo = new ProgramInfo(inFile);
         VERBOSE(VB_JOBQUEUE, "File is not a Myth recording.");
     }
     else

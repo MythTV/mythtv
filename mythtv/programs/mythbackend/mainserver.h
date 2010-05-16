@@ -72,7 +72,7 @@ class MainServer : public QObject, public MythSocketCBs
     typedef struct deletestruct
     {
         MainServer *ms;
-        QString chanid;
+        uint chanid;
         QDateTime recstartts;
         QDateTime recendts;
         QString filename;
@@ -167,7 +167,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
-    PlaybackSock *getSlaveByHostname(QString &hostname);
+    PlaybackSock *GetSlaveByHostname(const QString &hostname);
     PlaybackSock *GetPlaybackBySock(MythSocket *socket);
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);

@@ -16,6 +16,18 @@ typedef enum
     CHANNEL_DIRECTION_SAME     = 3,
 } ChannelChangeDirection;
 
+/// Used to request ProgramInfo for channel browsing.
+typedef enum BrowseDirections
+{
+    BROWSE_INVALID = -1,
+    BROWSE_SAME = 0, ///< Fetch browse information on current channel and time
+    BROWSE_UP,       ///< Fetch information on previous channel
+    BROWSE_DOWN,     ///< Fetch information on next channel
+    BROWSE_LEFT,     ///< Fetch information on current channel in the past
+    BROWSE_RIGHT,    ///< Fetch information on current channel in the future
+    BROWSE_FAVORITE  ///< Fetch information on the next favorite channel
+} BrowseDirection;
+
 /** \brief TVState is an enumeration of the states used by TV and TVRec.
  */
 typedef enum

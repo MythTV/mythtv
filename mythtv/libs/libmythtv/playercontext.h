@@ -108,6 +108,7 @@ class MPUBLIC PlayerContext
     QString  GetFilters(const QString &baseFilters) const;
     QString  GetPlayMessage(void) const;
     TVState  GetState(void) const;
+    bool     GetPlayingInfoMap(InfoMap &infoMap) const;
 
     // Boolean Gets
     bool IsPIPSupported(void) const;

@@ -7,18 +7,20 @@ using namespace std;
 #include <QObject>
 #include <QMap>
 
-enum commMapValues {
-    MARK_START = 0,
-    MARK_END,
-    MARK_PRESENT
-};
+#include "programtypes.h"
+
+typedef enum commMapValues {
+    MARK_START   = 0,
+    MARK_END     = 1,
+    MARK_PRESENT = 2,
+} CommMapValue;
+
+typedef QMap<uint64_t, CommMapValue> show_map_t;
 
 /** \class CommDetectorBase
  *  \brief Abstract base class for all CommDetectors.
  *   Please use the CommDetectFactory to make actual instances.
  */
-
-typedef QMap<long long, int> comm_break_t;
 
 class CommDetectorBase : public QObject
 {
@@ -32,13 +34,13 @@ public:
     void pause();
     void resume();
 
-    virtual void getCommercialBreakList(comm_break_t &comms) = 0;
+    virtual void GetCommercialBreakList(frm_dir_map_t &comms) = 0;
     virtual void recordingFinished(long long totalFileSize)
         { (void)totalFileSize; };
     virtual void requestCommBreakMapUpdate(void) {};
 
     virtual void PrintFullMap(
-        ostream &out, const comm_break_t *comm_breaks, bool verbose) const = 0;
+        ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const = 0;
 
 signals:
     void statusUpdate(const QString& a) ;

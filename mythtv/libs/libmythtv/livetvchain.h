@@ -13,7 +13,7 @@ class MythSocket;
 
 struct MPUBLIC LiveTVChainEntry
 {
-    QString chanid;
+    uint chanid;
     QDateTime starttime;
     QDateTime endtime;
     bool discontinuity; // if true, can't play smooth from last entry
@@ -47,7 +47,7 @@ class MPUBLIC LiveTVChain
     // const gets
     QString GetID(void)  const { return m_id; }
     int  GetCurPos(void) const { return m_curpos; }
-    int  ProgramIsAt(const QString &chanid, const QDateTime &starttime) const;
+    int  ProgramIsAt(uint chanid, const QDateTime &starttime) const;
     int  ProgramIsAt(const ProgramInfo &pginfo) const;
     int  GetLengthAtCurPos(void);
     int  TotalSize(void) const;
@@ -96,7 +96,7 @@ class MPUBLIC LiveTVChain
     QString m_cardtype;
 
     int m_curpos;
-    QString m_cur_chanid;
+    uint m_cur_chanid;
     QDateTime m_cur_startts;
 
     int m_switchid;

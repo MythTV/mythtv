@@ -83,7 +83,7 @@ bool ManualSchedule::Create(void)
             .replace("<name>", channels[i].name);
         chantext.detach();
         new MythUIButtonListItem(m_channelList, chantext);
-        m_chanids << QString::number(channels[i].chanid);
+        m_chanids.push_back(channels[i].chanid);
     }
 
     for (uint index = 0; index <= 60; index++)
@@ -200,39 +200,12 @@ void ManualSchedule::dateChanged(void)
 
 void ManualSchedule::recordClicked(void)
 {
-    ProgramInfo p;
+    QDateTime endts = m_startDateTime
+        .addSecs(max(m_durationSpin->GetIntValue() * 60, 60));
 
-    QString channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
-    p.chanid = m_chanids[m_channelList->GetCurrentPos()];
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, channum, callsign, name "
-                  "FROM channel WHERE chanid=:CHANID");
-    query.bindValue(":CHANID", p.chanid);
-
-    if (query.exec() && query.next())
-    {
-        p.chanstr = query.value(1).toString();
-        p.chansign = query.value(2).toString();
-        p.channame = query.value(3).toString();
-    }
-
-    int addsec = m_durationSpin->GetIntValue() * 60;
-
-    if (!addsec)
-        addsec = 60;
-
-    p.startts = m_startDateTime;
-    p.endts = p.startts.addSecs(addsec);
-
-    if (!m_titleEdit->GetText().isEmpty())
-        p.title = m_titleEdit->GetText();
-    else
-        p.title = p.ChannelText(channelFormat) + " - " +
-                  p.startts.toString(m_timeformat);
-
-    p.title = QString("%1 (%2)").arg(p.title).arg(tr("Manual Record"));
-    p.description = p.title; p.description.detach();
+    ProgramInfo p(m_titleEdit->GetText().trimmed(),
+                  m_chanids[m_channelList->GetCurrentPos()],
+                  m_startDateTime, endts);
 
     RecordingRule *record = new RecordingRule();
     record->LoadByProgram(&p);

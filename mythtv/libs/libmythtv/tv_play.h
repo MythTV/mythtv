@@ -31,7 +31,6 @@ using namespace std;
 #include "tv.h"
 #include "util.h"
 #include "programinfo.h"
-#include "programlist.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
 #include "volumebase.h"
@@ -139,6 +138,13 @@ typedef enum
     kNoTuners = 2,     ///< No capture cards configured
 } NoRecorderMsg;
 
+enum {
+    kStartTVNoFlags          = 0x00,
+    kStartTVInGuide          = 0x01,
+    kStartTVInPlayList       = 0x02,
+    kStartTVByNetworkCommand = 0x04,
+    kStartTVIgnoreBookmark   = 0x08,
+};
 
 class AskProgramInfo
 {
@@ -262,13 +268,13 @@ class MPUBLIC TV : public QThread
                             bool isDVD, bool isDVDStillFrame);
 
     void GetNextProgram(RemoteEncoder *enc,
-                        int direction, InfoMap &infoMap) const;
-    void GetNextProgram(int direction, InfoMap &infoMap) const;
+                        BrowseDirection direction, InfoMap &infoMap) const;
+    void GetNextProgram(BrowseDirection direction, InfoMap &infoMap) const;
 
     // static functions
     static void InitKeys(void);
-    static bool StartTV(ProgramInfo *tvrec = NULL, bool startInGuide = false,
-                        bool inPlaylist = false, bool initByNetworkCommand = false);
+    static bool StartTV(ProgramInfo *tvrec = NULL,
+                        uint flags = kStartTVNoFlags);
     static void SetFuncPtr(const char *, void *);
 
     // Used by EPG
@@ -339,7 +345,7 @@ class MPUBLIC TV : public QThread
     void ScheduleStateChange(PlayerContext*);
     void SetErrored(PlayerContext*);
     void PrepToSwitchToRecordedProgram(PlayerContext*,
-                                        ProgramInfo*);
+                                       const ProgramInfo &);
     void PrepareToExitPlayer(PlayerContext*, int line,
                              bool bookmark = true) const;
     void SetExitPlayer(bool set_it, bool wants_to) const;
@@ -521,7 +527,7 @@ class MPUBLIC TV : public QThread
 
     void BrowseStart(PlayerContext*);
     void BrowseEnd(PlayerContext*, bool change_channel);
-    void BrowseDispInfo(PlayerContext*, int direction);
+    void BrowseDispInfo(PlayerContext*, BrowseDirection direction);
     void BrowseChannel(PlayerContext*, const QString &channum);
     bool BrowseHandleAction(PlayerContext*, const QStringList &actions);
     uint BrowseAllGetChanId(const QString &chan) const;
@@ -611,7 +617,7 @@ class MPUBLIC TV : public QThread
     uint    db_udpnotify_port;
     uint    db_browse_max_forward;
     int     db_playback_exit_prompt;
-    int     db_autoexpire_default;
+    uint    db_autoexpire_default;
     bool    db_auto_set_watched;
     bool    db_end_of_rec_exit_prompt;
     bool    db_jump_prefer_osd;
@@ -778,11 +784,13 @@ class MPUBLIC TV : public QThread
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
+#ifdef PLAY_FROM_RECORDER
     /// Info requested by PlayFromRecorder
     QMutex                    recorderPlaybackInfoLock;
     QWaitCondition            recorderPlaybackInfoWaitCond;
     QMap<int,int>             recorderPlaybackInfoTimerId;
     QMap<int,ProgramInfo>     recorderPlaybackInfo;
+#endif // PLAY_FROM_RECORDER
 
     // Channel group stuff
     int channel_group_id;

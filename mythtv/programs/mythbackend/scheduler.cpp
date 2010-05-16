@@ -37,7 +37,6 @@ using namespace std;
 #include "compat.h"
 #include "storagegroup.h"
 #include "recordinginfo.h"
-#include "recordinglist.h"
 #include "scheduledrecording.h"
 #include "cardutil.h"
 #include "mythdb.h"
@@ -214,119 +213,128 @@ bool Scheduler::VerifyCards(void)
 
 static inline bool Recording(const RecordingInfo *p)
 {
-    return (p->recstatus == rsRecording || p->recstatus == rsWillRecord);
+    return (p->GetRecordingStatus() == rsRecording ||
+            p->GetRecordingStatus() == rsWillRecord);
 }
 
 static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
 {
-    if (a->startts != b->startts)
-        return a->startts < b->startts;
-    if (a->endts != b->endts)
-        return a->endts < b->endts;
+    if (a->GetScheduledStartTime() != b->GetScheduledStartTime())
+        return a->GetScheduledStartTime() < b->GetScheduledStartTime();
+    if (a->GetScheduledEndTime() != b->GetScheduledEndTime())
+        return a->GetScheduledEndTime() < b->GetScheduledEndTime();
 
     // Note: the PruneOverlaps logic depends on the following
-    if (a->title != b->title)
-        return a->title < b->title;
-    if (a->chanid != b->chanid)
-        return a->chanid < b->chanid;
-    if (a->inputid != b->inputid)
-        return a->inputid < b->inputid;
+    if (a->GetTitle() != b->GetTitle())
+        return a->GetTitle() < b->GetTitle();
+    if (a->GetChanID() != b->GetChanID())
+        return a->GetChanID() < b->GetChanID();
+    if (a->GetInputID() != b->GetInputID())
+        return a->GetInputID() < b->GetInputID();
 
     // In cases where two recording rules match the same showing, one
     // of them needs to take precedence.  Penalize any entry that
     // won't record except for those from kDontRecord rules.  This
     // will force them to yield to a rule that might record.
     // Otherwise, more specific record type beats less specific.
-    int apri = RecTypePriority(a->rectype);
-    if (a->recstatus != rsUnknown && a->recstatus != rsDontRecord)
+    int apri = RecTypePriority(a->GetRecordingRuleType());
+    if (a->GetRecordingStatus() != rsUnknown &&
+        a->GetRecordingStatus() != rsDontRecord)
+    {
         apri += 100;
-    int bpri = RecTypePriority(b->rectype);
-    if (b->recstatus != rsUnknown && b->recstatus != rsDontRecord)
+    }
+    int bpri = RecTypePriority(b->GetRecordingRuleType());
+    if (b->GetRecordingStatus() != rsUnknown &&
+        b->GetRecordingStatus() != rsDontRecord)
+    {
         bpri += 100;
+    }
     if (apri != bpri)
         return apri < bpri;
 
-    if (a->findid != b->findid)
-        return a->findid > b->findid;
-    return a->recordid < b->recordid;
+    if (a->GetFindID() != b->GetFindID())
+        return a->GetFindID() > b->GetFindID();
+    return a->GetRecordingRuleID() < b->GetRecordingRuleID();
 }
 
 static bool comp_redundant(RecordingInfo *a, RecordingInfo *b)
 {
-    if (a->startts != b->startts)
-        return a->startts < b->startts;
-    if (a->endts != b->endts)
-        return a->endts < b->endts;
+    if (a->GetScheduledStartTime() != b->GetScheduledStartTime())
+        return a->GetScheduledStartTime() < b->GetScheduledStartTime();
+    if (a->GetScheduledEndTime() != b->GetScheduledEndTime())
+        return a->GetScheduledEndTime() < b->GetScheduledEndTime();
 
     // Note: the PruneRedundants logic depends on the following
-    if (a->title != b->title)
-        return a->title < b->title;
-    if (a->recordid != b->recordid)
-        return a->recordid < b->recordid;
-    if (a->chansign != b->chansign)
-        return a->chansign < b->chansign;
-    return a->recstatus < b->recstatus;
+    if (a->GetTitle() != b->GetTitle())
+        return a->GetTitle() < b->GetTitle();
+    if (a->GetRecordingRuleID() != b->GetRecordingRuleID())
+        return a->GetRecordingRuleID() < b->GetRecordingRuleID();
+    if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
+        return a->GetChannelSchedulingID() < b->GetChannelSchedulingID();
+    return a->GetRecordingStatus() < b->GetRecordingStatus();
 }
 
 static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
 {
-    if (a->recstartts != b->recstartts)
-        return a->recstartts < b->recstartts;
-    if (a->recendts != b->recendts)
-        return a->recendts < b->recendts;
-    if (a->chansign != b->chansign)
-        return a->chansign < b->chansign;
-    return a->recstatus < b->recstatus;
+    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
+        return a->GetRecordingStartTime() < b->GetRecordingStartTime();
+    if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
+        return a->GetRecordingEndTime() < b->GetRecordingEndTime();
+    if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
+        return a->GetChannelSchedulingID() < b->GetChannelSchedulingID();
+    return a->GetRecordingStatus() < b->GetRecordingStatus();
 }
 
 static QDateTime schedTime;
 
 static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
-    int arec = (a->recstatus != rsRecording);
-    int brec = (b->recstatus != rsRecording);
+    int arec = (a->GetRecordingStatus() != rsRecording);
+    int brec = (b->GetRecordingStatus() != rsRecording);
 
     if (arec != brec)
         return arec < brec;
 
-    if (a->recpriority != b->recpriority)
-        return a->recpriority > b->recpriority;
+    if (a->GetRecordingPriority() != b->GetRecordingPriority())
+        return a->GetRecordingPriority() > b->GetRecordingPriority();
 
-    int apast = (a->recstartts < schedTime.addSecs(-30) && !a->reactivate);
-    int bpast = (b->recstartts < schedTime.addSecs(-30) && !b->reactivate);
+    int apast = (a->GetRecordingStartTime() < schedTime.addSecs(-30) &&
+                 !a->IsReactivated());
+    int bpast = (b->GetRecordingStartTime() < schedTime.addSecs(-30) &&
+                 !b->IsReactivated());
 
     if (apast != bpast)
         return apast < bpast;
 
-    int apri = RecTypePriority(a->rectype);
-    int bpri = RecTypePriority(b->rectype);
+    int apri = RecTypePriority(a->GetRecordingRuleType());
+    int bpri = RecTypePriority(b->GetRecordingRuleType());
 
     if (apri != bpri)
         return apri < bpri;
 
-    if (a->recstartts != b->recstartts)
+    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
     {
         if (apast)
-            return a->recstartts > b->recstartts;
+            return a->GetRecordingStartTime() > b->GetRecordingStartTime();
         else
-            return a->recstartts < b->recstartts;
+            return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     }
 
-    if (a->inputid != b->inputid)
-        return a->inputid < b->inputid;
+    if (a->GetInputID() != b->GetInputID())
+        return a->GetInputID() < b->GetInputID();
 
-    return a->recordid < b->recordid;
+    return a->GetRecordingRuleID() < b->GetRecordingRuleID();
 }
 
 static bool comp_timechannel(RecordingInfo *a, RecordingInfo *b)
 {
-    if (a->recstartts != b->recstartts)
-        return a->recstartts < b->recstartts;
-    if (a->chanstr == b->chanstr)
-        return a->chanid < b->chanid;
-    if (a->chanstr.toInt() > 0 && b->chanstr.toInt() > 0)
-        return a->chanstr.toInt() < b->chanstr.toInt();
-    return a->chanstr < b->chanstr;
+    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
+        return a->GetRecordingStartTime() < b->GetRecordingStartTime();
+    if (a->GetChanNum() == b->GetChanNum())
+        return a->GetChanID() < b->GetChanID();
+    if (a->GetChanNum().toInt() > 0 && b->GetChanNum().toInt() > 0)
+        return a->GetChanNum().toInt() < b->GetChanNum().toInt();
+    return a->GetChanNum() < b->GetChanNum();
 }
 
 bool Scheduler::FillRecordList(void)
@@ -465,8 +473,9 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
         RecordingInfo *first = (*i);
 
         if (onlyFutureRecordings &&
-            ((first->recendts < now && first->endts < now) ||
-             (first->recstartts < now && !Recording(first))))
+            ((first->GetRecordingEndTime() < now &&
+              first->GetScheduledEndTime() < now) ||
+             (first->GetRecordingStartTime() < now && !Recording(first))))
             continue;
 
         PrintRec(first);
@@ -483,27 +492,25 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
     if (prefix)
         cout << prefix;
 
-    QString episode = p->title;
-    if (!p->subtitle.isEmpty() && (p->subtitle != " "))
-        episode = QString("%1 - \"%2\"").arg(p->title).arg(p->subtitle);
+    QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ");
     episode = episode.leftJustified(34 - (prefix ? strlen(prefix) : 0), 
                                     ' ', true);
 
     QString outstr = QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
         .arg(episode)
-        .arg(p->chanstr.rightJustified(4, ' '))
-        .arg(p->chansign.leftJustified(7, ' ', true))
-        .arg(p->recstartts.toString("dd hh:mm"))
-        .arg(p->recendts.toString("hh:mm"))
-        .arg(p->sourceid)
-        .arg(p->cardid)
-        .arg(p->inputid);
+        .arg(p->GetChanNum().rightJustified(4, ' '))
+        .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
+        .arg(p->GetRecordingStartTime().toString("dd hh:mm"))
+        .arg(p->GetRecordingEndTime().toString("hh:mm"))
+        .arg(p->GetSourceID())
+        .arg(p->GetCardID())
+        .arg(p->GetInputID());
     outstr += QString("%1 %2 %3")
-        .arg(p->RecTypeChar())
-        .arg(p->RecStatusChar())
-        .arg(p->recpriority);
-    if (p->recpriority2)
-        outstr += QString("/%1").arg(p->recpriority2);
+        .arg(toQChar(p->GetRecordingRuleType()))
+        .arg(toQChar(p->GetRecordingStatus(), p->GetCardID()))
+        .arg(p->GetRecordingPriority());
+    if (p->GetRecordingPriority2())
+        outstr += QString("/%1").arg(p->GetRecordingPriority2());
 
     QByteArray out = outstr.toLocal8Bit();
 
@@ -520,9 +527,9 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
         RecordingInfo *p = *dreciter;
         if (p->IsSameProgramTimeslot(*pginfo))
         {
-            if (p->recstatus != pginfo->recstatus)
+            if (p->GetRecordingStatus() != pginfo->GetRecordingStatus())
             {
-                p->recstatus = pginfo->recstatus;
+                p->SetRecordingStatus(pginfo->GetRecordingStatus());
                 reclist_changed = true;
                 p->AddHistory(true);
             }
@@ -531,7 +538,7 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
     }
 }
 
-void Scheduler::UpdateRecStatus(int cardid, const QString &chanid,
+void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
                                 const QDateTime &startts,
                                 RecStatusType recstatus,
                                 const QDateTime &recendts)
@@ -542,15 +549,14 @@ void Scheduler::UpdateRecStatus(int cardid, const QString &chanid,
     for (; dreciter != reclist.end(); ++dreciter)
     {
         RecordingInfo *p = *dreciter;
-        if (p->cardid == cardid &&
-            p->chanid == chanid &&
-            p->startts == startts)
+        if (p->GetCardID() == cardid && p->GetChanID() == chanid &&
+            p->GetScheduledStartTime() == startts)
         {
-            p->recendts = recendts;
+            p->SetRecordingEndTime(recendts);
 
-            if (p->recstatus != recstatus)
+            if (p->GetRecordingStatus() != recstatus)
             {
-                p->recstatus = recstatus;
+                p->SetRecordingStatus(recstatus);
                 reclist_changed = true;
                 p->AddHistory(true);
             }
@@ -566,36 +572,37 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     if (reclist_changed)
         return false;
 
-    RecordingType oldrectype = oldp->rectype;
-    int oldrecordid = oldp->recordid;
-    QDateTime oldrecendts = oldp->recendts;
+    RecordingType oldrectype = oldp->GetRecordingRuleType();
+    int oldrecordid = oldp->GetRecordingRuleID();
+    QDateTime oldrecendts = oldp->GetRecordingEndTime();
 
-    oldp->rectype = newp->rectype;
-    oldp->recordid = newp->recordid;
-    oldp->recendts = newp->recendts;
+    oldp->SetRecordingRuleType(newp->GetRecordingRuleType());
+    oldp->SetRecordingRuleID(newp->GetRecordingRuleID());
+    oldp->SetRecordingEndTime(newp->GetRecordingEndTime());
 
     if (specsched)
     {
-        if (newp->recendts < QDateTime::currentDateTime())
+        if (newp->GetRecordingEndTime() < QDateTime::currentDateTime())
         {
-            oldp->recstatus = rsRecorded;
-            newp->recstatus = rsRecorded;
+            oldp->SetRecordingStatus(rsRecorded);
+            newp->SetRecordingStatus(rsRecorded);
             return false;
         }
         else
             return true;
     }
 
-    EncoderLink *tv = (*m_tvList)[oldp->cardid];
+    EncoderLink *tv = (*m_tvList)[oldp->GetCardID()];
     RecStatusType rs = tv->StartRecording(oldp);
     if (rs != rsRecording)
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to change end time on "
-                                      "card %1 to %2")
-                .arg(oldp->cardid).arg(oldp->recendts.toString()));
-        oldp->rectype = oldrectype;
-        oldp->recordid = oldrecordid;
-        oldp->recendts = oldrecendts;
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Failed to change end time on card %1 to %2")
+                .arg(oldp->GetCardID())
+                .arg(newp->GetRecordingEndTime(ISODate)));
+        oldp->SetRecordingRuleType(oldrectype);
+        oldp->SetRecordingRuleID(oldrecordid);
+        oldp->SetRecordingEndTime(oldrecendts);
     }
     else
     {
@@ -629,52 +636,60 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
         {
             RecordingInfo *rp = *ri;
 
-            if (sp->inputid &&
-                sp->startts == rp->startts &&
-                sp->chansign == rp->chansign &&
-                sp->title == rp->title)
+            if (sp->GetInputID() &&
+                sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
+                sp->GetChannelSchedulingID() == rp->GetChannelSchedulingID() &&
+                sp->GetTitle() == rp->GetTitle())
             {
-                if (sp->cardid == rp->cardid)
+                if (sp->GetCardID() == rp->GetCardID())
                 {
                     found = true;
-                    rp->recstatus = rsRecording;
+                    rp->SetRecordingStatus(rsRecording);
                     reclist_changed = true;
                     rp->AddHistory(false);
                     VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as "
                                                   "recording")
-                            .arg(sp->cardid).arg(sp->chansign).arg(sp->title));
+                            .arg(sp->GetCardID())
+                            .arg(sp->GetChannelSchedulingID())
+                            .arg(sp->GetTitle()));
                 }
                 else
                 {
                     VERBOSE(VB_IMPORTANT, QString("%1/%2/\"%3\" is already "
                                                   "recording on card %4")
-                            .arg(sp->cardid).arg(sp->chansign).arg(sp->title)
-                            .arg(rp->cardid));
+                            .arg(sp->GetCardID())
+                            .arg(sp->GetChannelSchedulingID())
+                            .arg(sp->GetTitle())
+                            .arg(rp->GetCardID()));
                 }
             }
-            else if (sp->cardid == rp->cardid &&
-                     rp->recstatus == rsRecording)
+            else if (sp->GetCardID() == rp->GetCardID() &&
+                     rp->GetRecordingStatus() == rsRecording)
             {
-                rp->recstatus = rsAborted;
+                rp->SetRecordingStatus(rsAborted);
                 reclist_changed = true;
                 rp->AddHistory(false);
                 VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as aborted")
-                        .arg(rp->cardid).arg(rp->chansign).arg(rp->title));
+                        .arg(rp->GetCardID())
+                        .arg(rp->GetChannelSchedulingID())
+                        .arg(rp->GetTitle()));
             }
         }
 
-        if (sp->inputid && !found)
+        if (sp->GetInputID() && !found)
         {
             reclist.push_back(new RecordingInfo(*sp));
             reclist_changed = true;
             sp->AddHistory(false);
             VERBOSE(VB_IMPORTANT, QString("adding %1/%2/\"%3\" as recording")
-                    .arg(sp->cardid).arg(sp->chansign).arg(sp->title));
+                    .arg(sp->GetCardID())
+                    .arg(sp->GetChannelSchedulingID())
+                    .arg(sp->GetTitle()));
         }
     }
 }
 
-void Scheduler::SlaveDisconnected(int cardid)
+void Scheduler::SlaveDisconnected(uint cardid)
 {
     QMutexLocker lockit(reclist_lock);
 
@@ -683,14 +698,15 @@ void Scheduler::SlaveDisconnected(int cardid)
     {
         RecordingInfo *rp = *ri;
 
-        if (rp->cardid == cardid &&
-            rp->recstatus == rsRecording)
+        if (rp->GetCardID() == cardid &&
+            rp->GetRecordingStatus() == rsRecording)
         {
-            rp->recstatus = rsAborted;
+            rp->SetRecordingStatus(rsAborted);
             reclist_changed = true;
             rp->AddHistory(false);
             VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as aborted")
-                    .arg(rp->cardid).arg(rp->chansign).arg(rp->title));
+                    .arg(rp->GetCardID()).arg(rp->GetChannelSchedulingID())
+                    .arg(rp->GetTitle()));
         }
     }
 }
@@ -704,7 +720,7 @@ void Scheduler::BuildWorkList(void)
     for (; i != reclist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        if (p->recstatus == rsRecording)
+        if (p->GetRecordingStatus() == rsRecording)
             worklist.push_back(new RecordingInfo(*p));
     }
 }
@@ -767,7 +783,7 @@ void Scheduler::PruneOverlaps(void)
     while (dreciter != worklist.end())
     {
         RecordingInfo *p = *dreciter;
-        if (lastp == NULL || lastp->recordid == p->recordid ||
+        if (!lastp || lastp->GetRecordingRuleID() == p->GetRecordingRuleID() ||
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
@@ -789,13 +805,13 @@ void Scheduler::BuildListMaps(void)
     for ( ; i != worklist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        if (p->recstatus == rsRecording ||
-            p->recstatus == rsWillRecord ||
-            p->recstatus == rsUnknown)
+        if (p->GetRecordingStatus() == rsRecording ||
+            p->GetRecordingStatus() == rsWillRecord ||
+            p->GetRecordingStatus() == rsUnknown)
         {
-            cardlistmap[p->cardid].push_back(p);
-            titlelistmap[p->title].push_back(p);
-            recordidlistmap[p->recordid].push_back(p);
+            cardlistmap[p->GetCardID()].push_back(p);
+            titlelistmap[p->GetTitle()].push_back(p);
+            recordidlistmap[p->GetRecordingRuleID()].push_back(p);
         }
     }
 }
@@ -843,20 +859,21 @@ bool Scheduler::FindNextConflict(
             continue;
 
         if (is_conflict_dbg)
-            cout << QString("\n  comparing with '%1' ").arg(q->title)
+            cout << QString("\n  comparing with '%1' ").arg(q->GetTitle())
                 .toLocal8Bit().constData();
 
-        if (p->cardid != 0 && (p->cardid != q->cardid) &&
-            !igrp.GetSharedInputGroup(p->inputid, q->inputid))
+        if (p->GetCardID() != 0 && (p->GetCardID() != q->GetCardID()) &&
+            !igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
         {
             if (is_conflict_dbg)
                 cout << "  cardid== ";
             continue;
         }
 
-        if (openEnd == 2 || (openEnd == 1 && p->chanid != q->chanid))
+        if (openEnd == 2 || (openEnd == 1 && p->GetChanID() != q->GetChanID()))
         {
-            if (p->recendts < q->recstartts || p->recstartts > q->recendts)
+            if (p->GetRecordingEndTime() < q->GetRecordingStartTime() ||
+                p->GetRecordingStartTime() > q->GetRecordingEndTime())
             {
                 if (is_conflict_dbg)
                     cout << "  no-overlap ";
@@ -865,7 +882,8 @@ bool Scheduler::FindNextConflict(
         }
         else
         {
-            if (p->recendts <= q->recstartts || p->recstartts >= q->recendts)
+            if (p->GetRecordingEndTime() <= q->GetRecordingStartTime() ||
+                p->GetRecordingStartTime() >= q->GetRecordingEndTime())
             {
                 if (is_conflict_dbg)
                     cout << "  no-overlap ";
@@ -875,20 +893,23 @@ bool Scheduler::FindNextConflict(
 
         if (is_conflict_dbg)
             cout << "\n" <<
-                (QString("  cardid's: %1, %2 ").arg(p->cardid).arg(q->cardid) +
+                (QString("  cardid's: %1, %2 ")
+                 .arg(p->GetCardID()).arg(q->GetCardID()) +
                  QString("Shared input group: %1 ")
-                 .arg(igrp.GetSharedInputGroup(p->inputid, q->inputid)) +
+                 .arg(igrp.GetSharedInputGroup(
+                          p->GetInputID(), q->GetInputID())) +
                  QString("mplexid's: %1, %2")
-                 .arg(p->GetMplexID()).arg(q->GetMplexID()))
+                 .arg(p->QueryMplexID()).arg(q->QueryMplexID()))
                 .toLocal8Bit().constData();
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
-        if (p->cardid && (p->cardid != q->cardid) &&
-            igrp.GetSharedInputGroup(p->inputid, q->inputid) &&
-            p->GetMplexID() && (p->GetMplexID() == q->GetMplexID()))
+        if (p->GetCardID() && (p->GetCardID() != q->GetCardID()) &&
+            igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
         {
-            continue;
+            uint p_mplexid = p->QueryMplexID();
+            if (p_mplexid && (p_mplexid == q->QueryMplexID()))
+                continue;
         }
 
         if (is_conflict_dbg)
@@ -916,7 +937,7 @@ const RecordingInfo *Scheduler::FindConflict(
         if (is_conflict_dbg)
         {
             cout << QString("Checking '%1' for conflicts on cardid %2")
-                .arg(p->title).arg(it.key()).toLocal8Bit().constData();
+                .arg(p->GetTitle()).arg(it.key()).toLocal8Bit().constData();
         }
 
         const RecList &cardlist = *it;
@@ -932,21 +953,21 @@ const RecordingInfo *Scheduler::FindConflict(
 
 void Scheduler::MarkOtherShowings(RecordingInfo *p)
 {
-    RecList *showinglist = &titlelistmap[p->title];
+    RecList *showinglist = &titlelistmap[p->GetTitle()];
 
     MarkShowingsList(*showinglist, p);
 
-    if (p->rectype == kFindOneRecord ||
-        p->rectype == kFindDailyRecord ||
-        p->rectype == kFindWeeklyRecord)
+    if (p->GetRecordingRuleType() == kFindOneRecord ||
+        p->GetRecordingRuleType() == kFindDailyRecord ||
+        p->GetRecordingRuleType() == kFindWeeklyRecord)
     {
-        showinglist = &recordidlistmap[p->recordid];
+        showinglist = &recordidlistmap[p->GetRecordingRuleID()];
         MarkShowingsList(*showinglist, p);
     }
 
-    if (p->rectype == kOverrideRecord && p->findid > 0)
+    if (p->GetRecordingRuleType() == kOverrideRecord && p->GetFindID())
     {
-        showinglist = &recordidlistmap[p->parentid];
+        showinglist = &recordidlistmap[p->GetParentRecordingRuleID()];
         MarkShowingsList(*showinglist, p);
     }
 }
@@ -959,21 +980,21 @@ void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
         RecordingInfo *q = *i;
         if (q == p)
             continue;
-        if (q->recstatus != rsUnknown &&
-            q->recstatus != rsWillRecord &&
-            q->recstatus != rsEarlierShowing &&
-            q->recstatus != rsLaterShowing)
+        if (q->GetRecordingStatus() != rsUnknown &&
+            q->GetRecordingStatus() != rsWillRecord &&
+            q->GetRecordingStatus() != rsEarlierShowing &&
+            q->GetRecordingStatus() != rsLaterShowing)
             continue;
         if (q->IsSameTimeslot(*p))
-            q->recstatus = rsLaterShowing;
-        else if (q->rectype != kSingleRecord &&
-                 q->rectype != kOverrideRecord &&
+            q->SetRecordingStatus(rsLaterShowing);
+        else if (q->GetRecordingRuleType() != kSingleRecord &&
+                 q->GetRecordingRuleType() != kOverrideRecord &&
                  IsSameProgram(q,p))
         {
-            if (q->recstartts < p->recstartts)
-                q->recstatus = rsLaterShowing;
+            if (q->GetRecordingStartTime() < p->GetRecordingStartTime())
+                q->SetRecordingStatus(rsLaterShowing);
             else
-                q->recstatus = rsEarlierShowing;
+                q->SetRecordingStatus(rsEarlierShowing);
         }
     }
 }
@@ -984,7 +1005,7 @@ void Scheduler::BackupRecStatus(void)
     for ( ; i != worklist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        p->savedrecstatus = p->recstatus;
+        p->savedrecstatus = p->GetRecordingStatus();
     }
 }
 
@@ -994,7 +1015,7 @@ void Scheduler::RestoreRecStatus(void)
     for ( ; i != worklist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        p->recstatus = p->savedrecstatus;
+        p->SetRecordingStatus(p->savedrecstatus);
     }
 }
 
@@ -1003,18 +1024,18 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 {
     PrintRec(p, "     >");
 
-    if (p->recstatus == rsRecording)
+    if (p->GetRecordingStatus() == rsRecording)
         return false;
 
-    RecList *showinglist = &titlelistmap[p->title];
+    RecList *showinglist = &titlelistmap[p->GetTitle()];
 
-    if (p->rectype == kFindOneRecord ||
-        p->rectype == kFindDailyRecord ||
-        p->rectype == kFindWeeklyRecord)
-        showinglist = &recordidlistmap[p->recordid];
+    if (p->GetRecordingRuleType() == kFindOneRecord ||
+        p->GetRecordingRuleType() == kFindDailyRecord ||
+        p->GetRecordingRuleType() == kFindWeeklyRecord)
+        showinglist = &recordidlistmap[p->GetRecordingRuleID()];
 
-    RecStatusType oldstatus = p->recstatus;
-    p->recstatus = rsLaterShowing;
+    RecStatusType oldstatus = p->GetRecordingStatus();
+    p->SetRecordingStatus(rsLaterShowing);
 
     bool hasLaterShowing = false;
 
@@ -1025,24 +1046,30 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
         if (q == p)
             continue;
 
-        if (samePriority && (q->recpriority != p->recpriority))
+        if (samePriority &&
+            (q->GetRecordingPriority() != p->GetRecordingPriority()))
+        {
             continue;
+        }
 
         hasLaterShowing = false;
 
-        if (q->recstatus != rsEarlierShowing &&
-            q->recstatus != rsLaterShowing &&
-            q->recstatus != rsUnknown)
+        if (q->GetRecordingStatus() != rsEarlierShowing &&
+            q->GetRecordingStatus() != rsLaterShowing &&
+            q->GetRecordingStatus() != rsUnknown)
+        {
             continue;
+        }
 
         if (!p->IsSameTimeslot(*q))
         {
             if (!IsSameProgram(p,q))
                 continue;
-            if ((p->rectype == kSingleRecord ||
-                 p->rectype == kOverrideRecord))
+            if ((p->GetRecordingRuleType() == kSingleRecord ||
+                 p->GetRecordingRuleType() == kOverrideRecord))
                 continue;
-            if (q->recstartts < schedTime && p->recstartts >= schedTime)
+            if (q->GetRecordingStartTime() < schedTime &&
+                p->GetRecordingStartTime() >= schedTime)
                 continue;
 
             hasLaterShowing |= preserveLive;
@@ -1058,7 +1085,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
         {
             failedLiveCheck |=
                 (!livetvpriority ||
-                 p->recpriority - prefinputpri > q->recpriority);
+                 p->GetRecordingPriority() - prefinputpri >
+                 q->GetRecordingPriority());
 
             // It is pointless to preempt another livetv session.
             // (the retrylist contains dummy livetv pginfo's)
@@ -1079,7 +1107,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 
         if (hasLaterShowing)
         {
-            QString id = p->schedulerid;
+            QString id = p->MakeUniqueSchedulerKey();
             hasLaterList[id] = true;
             continue;
         }
@@ -1090,8 +1118,9 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             // avoid LiveTV feature" is turned off.
             // However, there is no conflict so if this alternate showing
             // is on an equivalent virtual card, allow the move.
-            bool equiv = (p->sourceid == q->sourceid &&
-                          igrp.GetSharedInputGroup(p->inputid, q->inputid));
+            bool equiv = (p->GetSourceID() == q->GetSourceID() &&
+                          igrp.GetSharedInputGroup(
+                              p->GetInputID(), q->GetInputID()));
 
             if (!equiv)
                 continue;
@@ -1102,20 +1131,20 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             QString msg = QString(
                 "Moved \"%1\" on chanid: %2 from card: %3 to %4 "
                 "to avoid LiveTV conflict")
-                .arg(p->title).arg(p->chanid)
-                .arg(p->cardid).arg(q->cardid);
+                .arg(p->GetTitle()).arg(p->GetChanID())
+                .arg(p->GetCardID()).arg(q->GetCardID());
             QByteArray amsg = msg.toLocal8Bit();
             VERBOSE(VB_SCHEDULE, amsg.constData());
         }
 
-        q->recstatus = rsWillRecord;
+        q->SetRecordingStatus(rsWillRecord);
         MarkOtherShowings(q);
         PrintRec(p, "     -");
         PrintRec(q, "     +");
         return true;
     }
 
-    p->recstatus = oldstatus;
+    p->SetRecordingStatus(oldstatus);
     return false;
 }
 
@@ -1142,18 +1171,18 @@ void Scheduler::SchedNewRecords(void)
     while (i != worklist.end())
     {
         RecordingInfo *p = *i;
-        if (p->recstatus == rsRecording)
+        if (p->GetRecordingStatus() == rsRecording)
             MarkOtherShowings(p);
-        else if (p->recstatus == rsUnknown)
+        else if (p->GetRecordingStatus() == rsUnknown)
         {
             const RecordingInfo *conflict = FindConflict(cardlistmap, p, openEnd);
             if (!conflict)
             {
-                p->recstatus = rsWillRecord;
+                p->SetRecordingStatus(rsWillRecord);
 
-                if (p->recstartts < schedTime.addSecs(90))
+                if (p->GetRecordingStartTime() < schedTime.addSecs(90))
                 {
-                    QString id = p->schedulerid;
+                    QString id = p->MakeUniqueSchedulerKey();
                     if (!recPendingList.contains(id))
                         recPendingList[id] = false;
 
@@ -1172,9 +1201,9 @@ void Scheduler::SchedNewRecords(void)
             }
         }
 
-        int lastpri = p->recpriority;
+        int lastpri = p->GetRecordingPriority();
         ++i;
-        if (i == worklist.end() || lastpri != (*i)->recpriority)
+        if (i == worklist.end() || lastpri != (*i)->GetRecordingPriority())
         {
             MoveHigherRecords();
             retrylist.clear();
@@ -1188,13 +1217,13 @@ void Scheduler::MoveHigherRecords(bool move_this)
     for ( ; move_this && i != retrylist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        if (p->recstatus != rsUnknown)
+        if (p->GetRecordingStatus() != rsUnknown)
             continue;
 
         PrintRec(p, "  /");
 
         BackupRecStatus();
-        p->recstatus = rsWillRecord;
+        p->SetRecordingStatus(rsWillRecord);
         MarkOtherShowings(p);
 
         RecList cardlist;
@@ -1208,7 +1237,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
         RecConstIter k = cardlist.begin();
         for ( ; FindNextConflict(cardlist, p, k ); ++k)
         {
-            if (p->recpriority != (*k)->recpriority ||
+            if (p->GetRecordingPriority() != (*k)->GetRecordingPriority() ||
                 !TryAnotherShowing(*k, true))
             {
                 RestoreRecStatus();
@@ -1216,7 +1245,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
             }
         }
 
-        if (p->recstatus == rsWillRecord)
+        if (p->GetRecordingStatus() == rsWillRecord)
             PrintRec(p, "  +");
     }
 
@@ -1224,7 +1253,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
     for ( ; i != retrylist.end(); ++i)
     {
         RecordingInfo *p = *i;
-        if (p->recstatus != rsUnknown)
+        if (p->GetRecordingStatus() != rsUnknown)
             continue;
 
         PrintRec(p, "  ?");
@@ -1233,7 +1262,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
             continue;
 
         BackupRecStatus();
-        p->recstatus = rsWillRecord;
+        p->SetRecordingStatus(rsWillRecord);
         if (move_this)
             MarkOtherShowings(p);
 
@@ -1249,15 +1278,16 @@ void Scheduler::MoveHigherRecords(bool move_this)
         RecConstIter k = cardlist.begin();
         for ( ; FindNextConflict(cardlist, p, k); ++k)
         {
-            if ((p->recpriority < (*k)->recpriority && !schedMoveHigher &&
-                move_this) || !TryAnotherShowing(*k, false, !move_this))
+            if ((p->GetRecordingPriority() < (*k)->GetRecordingPriority() &&
+                 !schedMoveHigher && move_this) ||
+                !TryAnotherShowing(*k, false, !move_this))
             {
                 RestoreRecStatus();
                 break;
             }
         }
 
-        if (move_this && p->recstatus == rsWillRecord)
+        if (move_this && p->GetRecordingStatus() == rsWillRecord)
             PrintRec(p, "  +");
     }
 }
@@ -1273,9 +1303,9 @@ void Scheduler::PruneRedundants(void)
 
         // Delete anything that has already passed since we can't
         // change history, can we?
-        if (p->recstatus != rsRecording &&
-            p->endts < schedTime &&
-            p->recendts < schedTime)
+        if (p->GetRecordingStatus() != rsRecording &&
+            p->GetScheduledEndTime() < schedTime &&
+            p->GetRecordingEndTime() < schedTime)
         {
             delete p;
             *(i++) = NULL;
@@ -1283,24 +1313,26 @@ void Scheduler::PruneRedundants(void)
         }
 
         // Check for rsConflict
-        if (p->recstatus == rsUnknown)
-            p->recstatus = rsConflict;
+        if (p->GetRecordingStatus() == rsUnknown)
+            p->SetRecordingStatus(rsConflict);
 
         // Restore the old status for some select cases that won't record.
-        if (p->recstatus != rsWillRecord &&
+        if (p->GetRecordingStatus() != rsWillRecord &&
             p->oldrecstatus != rsUnknown &&
             p->oldrecstatus != rsNotListed &&
-            !p->reactivate)
-            p->recstatus = p->oldrecstatus;
+            !p->IsReactivated())
+        {
+            p->SetRecordingStatus(p->oldrecstatus);
+        }
 
         if (!Recording(p))
         {
-            p->cardid = 0;
-            p->inputid = 0;
+            p->SetCardID(0);
+            p->SetInputID(0);
         }
 
         // Check for redundant against last non-deleted
-        if (lastp == NULL || lastp->recordid != p->recordid ||
+        if (!lastp || lastp->GetRecordingRuleID() != p->GetRecordingRuleID() ||
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
@@ -1310,9 +1342,13 @@ void Scheduler::PruneRedundants(void)
         {
             // Flag lower priority showings that will recorded so we
             // can warn the user about them
-            if (lastp->recstatus == rsWillRecord &&
-                p->recpriority > lastp->recpriority - lastp->recpriority2)
-                lastp->recpriority2 = lastp->recpriority - p->recpriority;
+            if (lastp->GetRecordingStatus() == rsWillRecord &&
+                p->GetRecordingPriority() >
+                lastp->GetRecordingPriority() - lastp->GetRecordingPriority2())
+            {
+                lastp->SetRecordingPriority2(
+                    lastp->GetRecordingPriority() - p->GetRecordingPriority());
+            }
             delete p;
             *(i++) = NULL;
         }
@@ -1332,12 +1368,20 @@ void Scheduler::UpdateNextRecord(void)
     while (i != reclist.end())
     {
         RecordingInfo *p = *i;
-        if (p->recstatus == rsWillRecord && nextRecMap[p->recordid].isNull())
-            nextRecMap[p->recordid] = p->recstartts;
+        if (p->GetRecordingStatus() == rsWillRecord &&
+            nextRecMap[p->GetRecordingRuleID()].isNull())
+        {
+            nextRecMap[p->GetRecordingRuleID()] = p->GetRecordingStartTime();
+        }
 
-        if (p->rectype == kOverrideRecord && p->parentid > 0 &&
-            p->recstatus == rsWillRecord && nextRecMap[p->parentid].isNull())
-            nextRecMap[p->parentid] = p->recstartts;
+        if (p->GetRecordingRuleType() == kOverrideRecord &&
+            p->GetParentRecordingRuleID() > 0 &&
+            p->GetRecordingStatus() == rsWillRecord &&
+            nextRecMap[p->GetParentRecordingRuleID()].isNull())
+        {
+            nextRecMap[p->GetParentRecordingRuleID()] =
+                p->GetRecordingStartTime();
+        }
         ++i;
     }
 
@@ -1407,24 +1451,38 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
     }
 }
 
-bool Scheduler::getAllPending(RecList *retList)
+bool Scheduler::getAllPending(RecList *retList) const
 {
     QMutexLocker lockit(reclist_lock);
 
     bool hasconflicts = false;
 
-    RecIter i = reclist.begin();
-    for (; i != reclist.end(); ++i)
+    RecConstIter it = reclist.begin();
+    for (; it != reclist.end(); ++it)
     {
-        RecordingInfo *p = *i;
-        if (p->recstatus == rsConflict)
+        if ((*it)->GetRecordingStatus() == rsConflict)
             hasconflicts = true;
-        retList->push_back(new RecordingInfo(*p));
+        retList->push_back(new RecordingInfo(**it));
     }
 
     SORT_RECLIST(*retList, comp_timechannel);
 
     return hasconflicts;
+}
+
+QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
+{
+    QMutexLocker lockit(reclist_lock);
+
+    QMap<QString,ProgramInfo*> recMap;
+    RecConstIter it = reclist.begin();
+    for (; it != reclist.end(); ++it)
+    {
+        if (rsRecording == (*it)->GetRecordingStatus())
+            recMap[(*it)->MakeUniqueKey()] = new ProgramInfo(**it);
+    }
+
+    return recMap;
 }
 
 RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo) const
@@ -1433,12 +1491,14 @@ RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo) const
 
     for (RecConstIter it = reclist.begin(); it != reclist.end(); ++it)
     {
-        const ProgramInfo &s = **it;
-        if (pginfo.chanid == s.chanid && pginfo.recstartts == s.recstartts)
-            return (rsRecording==s.recstatus) ? rsRecording : pginfo.recstatus;
+        if (pginfo.IsSameRecording(**it))
+        {
+            return (rsRecording == (**it).GetRecordingStatus()) ?
+                rsRecording : pginfo.GetRecordingStatus();
+        }
     }
 
-    return pginfo.recstatus;
+    return pginfo.GetRecordingStatus();
 }
 
 void Scheduler::getAllPending(QStringList &strList)
@@ -1492,21 +1552,25 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
 {
     QMutexLocker lockit(reclist_lock);
 
-    VERBOSE(VB_GENERAL, LOC + "AddRecording() recid: " << pi.recordid);
+    VERBOSE(VB_GENERAL, LOC + 
+            QString("AddRecording() recid: %1")
+            .arg(pi.GetRecordingRuleID()));
 
     for (RecIter it = reclist.begin(); it != reclist.end(); ++it)
     {
         RecordingInfo *p = *it;
-        if (p->recstatus == rsRecording && p->IsSameProgramTimeslot(pi))
+        if (p->GetRecordingStatus() == rsRecording &&
+            p->IsSameProgramTimeslot(pi))
         {
             VERBOSE(VB_IMPORTANT, LOC + "Not adding recording, " +
-                    QString("'%1' is already in reclist.").arg(pi.title));
+                    QString("'%1' is already in reclist.")
+                    .arg(pi.GetTitle()));
             return;
         }
     }
 
     VERBOSE(VB_SCHEDULE, LOC +
-            QString("Adding '%1' to reclist.").arg(pi.title));
+            QString("Adding '%1' to reclist.").arg(pi.GetTitle()));
 
     RecordingInfo * new_pi = new RecordingInfo(pi);
     reclist.push_back(new_pi);
@@ -1520,7 +1584,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
     new_pi->GetRecordingRule();
 
     // Trigger reschedule..
-    ScheduledRecording::signalChange(pi.recordid);
+    ScheduledRecording::signalChange(pi.GetRecordingRuleID());
 }
 
 bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
@@ -1533,16 +1597,16 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         return true;
     }
 
-    EncoderLink *rctv = (*m_tvList)[rcinfo->cardid];
+    EncoderLink *rctv = (*m_tvList)[rcinfo->GetCardID()];
     // first check the card we will be recording on...
     if (!rctv || rctv->IsBusyRecording())
         return true;
 
     // now check other cards in the same input group as the recording.
     TunedInputInfo busy_input;
-    uint inputid = rcinfo->inputid;
+    uint inputid = rcinfo->GetInputID();
     vector<uint> cardids = CardUtil::GetConflictingCards(
-        inputid, rcinfo->cardid);
+        inputid, rcinfo->GetCardID());
     for (uint i = 0; i < cardids.size(); i++)
     {
         rctv = (*m_tvList)[cardids[i]];
@@ -1615,7 +1679,7 @@ void Scheduler::RunScheduler(void)
         bool statuschanged = false;
 
       if ((startIter != reclist.end() &&
-           curtime.secsTo((*startIter)->recstartts) < 30))
+           curtime.secsTo((*startIter)->GetRecordingStartTime()) < 30))
           sleep(1);
       else
       {
@@ -1713,13 +1777,13 @@ void Scheduler::RunScheduler(void)
                 // find the first recording that WILL be recorded
                 RecIter firstRunIter = reclist.begin();
                 for ( ; firstRunIter != reclist.end(); ++firstRunIter)
-                    if ((*firstRunIter)->recstatus == rsWillRecord)
+                    if ((*firstRunIter)->GetRecordingStatus() == rsWillRecord)
                         break;
 
                 // have we been started automatically?
                 if (WasStartedAutomatically() ||
                     ((firstRunIter != reclist.end()) &&
-                     ((curtime.secsTo((*firstRunIter)->recstartts) - prerollseconds)
+                     ((curtime.secsTo((*firstRunIter)->GetRecordingStartTime()) - prerollseconds)
                         < (idleWaitForRecordingTime * 60))))
                 {
                     VERBOSE(VB_IMPORTANT, "AUTO-Startup assumed");
@@ -1752,7 +1816,7 @@ void Scheduler::RunScheduler(void)
       }
 
         for ( ; startIter != reclist.end(); ++startIter)
-            if ((*startIter)->recstatus != (*startIter)->oldrecstatus)
+            if ((*startIter)->GetRecordingStatus() != (*startIter)->oldrecstatus)
                 break;
 
         curtime = QDateTime::currentDateTime();
@@ -1770,16 +1834,16 @@ void Scheduler::RunScheduler(void)
         for ( ; schedulingEnabled && recIter != reclist.end(); ++recIter)
         {
             nextRecording = *recIter;
-            nextrectime = nextRecording->recstartts;
+            nextrectime = nextRecording->GetRecordingStartTime();
             secsleft = curtime.secsTo(nextrectime);
 
             if ((secsleft - prerollseconds) > wakeThreshold)
                 break;
 
-            if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
+            if (m_tvList->find(nextRecording->GetCardID()) == m_tvList->end())
                 continue;
 
-            sysEventKey = QString("%1:%2").arg(nextRecording->chanid)
+            sysEventKey = QString("%1:%2").arg(nextRecording->GetChanID())
                                   .arg(nextrectime.toString(Qt::ISODate));
             int i = 0;
             bool pendingEventSent = false;
@@ -1799,14 +1863,14 @@ void Scheduler::RunScheduler(void)
                 i++;
             }
 
-            nexttv = (*m_tvList)[nextRecording->cardid];
+            nexttv = (*m_tvList)[nextRecording->GetCardID()];
 
             if (nexttv->IsAsleep() && !nexttv->IsWaking())
             {
                 VERBOSE(VB_SCHEDULE, QString("Slave Backend %1 is being "
                         "awakened to record: %2")
                         .arg(nexttv->GetHostName())
-                        .arg(nextRecording->title));
+                        .arg(nextRecording->GetTitle()));
 
                 if (!WakeUpSlave(nexttv->GetHostName()))
                 {
@@ -1858,17 +1922,17 @@ void Scheduler::RunScheduler(void)
 
             nextRecording = *recIter;
 
-            if (nextRecording->recstatus != rsWillRecord)
+            if (nextRecording->GetRecordingStatus() != rsWillRecord)
             {
-                if (nextRecording->recstatus != nextRecording->oldrecstatus &&
-                    nextRecording->recstartts <= curtime)
+                if (nextRecording->GetRecordingStatus() != nextRecording->oldrecstatus &&
+                    nextRecording->GetRecordingStartTime() <= curtime)
                     nextRecording->AddHistory(false);
                 continue;
             }
 
-            nextrectime = nextRecording->recstartts;
+            nextrectime = nextRecording->GetRecordingStartTime();
             secsleft = curtime.secsTo(nextrectime);
-            schedid = nextRecording->schedulerid;
+            schedid = nextRecording->MakeUniqueSchedulerKey();
 
             if (secsleft - prerollseconds < 60)
             {
@@ -1886,38 +1950,38 @@ void Scheduler::RunScheduler(void)
             if (secsleft - prerollseconds > 35)
                 break;
 
-            if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
+            if (m_tvList->find(nextRecording->GetCardID()) == m_tvList->end())
             {
                 msg = QString("invalid cardid (%1) for %2")
-                    .arg(nextRecording->cardid)
-                    .arg(nextRecording->title);
+                    .arg(nextRecording->GetCardID())
+                    .arg(nextRecording->GetTitle());
                 VERBOSE(VB_GENERAL, msg);
 
                 QMutexLocker lockit(reclist_lock);
-                nextRecording->recstatus = rsTunerBusy;
+                nextRecording->SetRecordingStatus(rsTunerBusy);
                 nextRecording->AddHistory(true);
                 statuschanged = true;
                 continue;
             }
 
-            nexttv = (*m_tvList)[nextRecording->cardid];
-            // cerr << "nexttv = " << nextRecording->cardid;
-            // cerr << " title: " << nextRecording->title << endl;
+            nexttv = (*m_tvList)[nextRecording->GetCardID()];
+            // cerr << "nexttv = " << nextRecording->GetCardID();
+            // cerr << " title: " << nextRecording->GetTitle() << endl;
 
             if (nexttv->IsTunerLocked())
             {
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
                               "%2 on cardid: %3, sourceid %4. Tuner "
                               "is locked by an external application.")
-                    .arg(nextRecording->title)
-                    .arg(nextRecording->chanid)
-                    .arg(nextRecording->cardid)
-                    .arg(nextRecording->sourceid);
+                    .arg(nextRecording->GetTitle())
+                    .arg(nextRecording->GetChanID())
+                    .arg(nextRecording->GetCardID())
+                    .arg(nextRecording->GetSourceID());
                 QByteArray amsg = msg.toLocal8Bit();
                 VERBOSE(VB_GENERAL, msg.constData());
 
                 QMutexLocker lockit(reclist_lock);
-                nextRecording->recstatus = rsTunerBusy;
+                nextRecording->SetRecordingStatus(rsTunerBusy);
                 nextRecording->AddHistory(true);
                 statuschanged = true;
                 continue;
@@ -1930,7 +1994,7 @@ void Scheduler::RunScheduler(void)
                 secsleft -= prerollseconds;
             }
 
-            //VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->title);
+            //VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->GetTitle());
 
             if (secsleft > 30)
                 continue;
@@ -1943,7 +2007,7 @@ void Scheduler::RunScheduler(void)
                             "has NOT come back from sleep yet.  Recording can "
                             "not begin yet for: %2")
                             .arg(nexttv->GetHostName())
-                            .arg(nextRecording->title));
+                            .arg(nextRecording->GetTitle()));
                 }
                 else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
                 {
@@ -1968,10 +2032,20 @@ void Scheduler::RunScheduler(void)
                 continue;
             }
 
-            if (nextRecording->pathname.isEmpty())
+            if (nextRecording->GetPathname().isEmpty())
             {
                 QMutexLocker lockit(reclist_lock);
-                fsID = FillRecordingDir(nextRecording, reclist);
+                QString recording_dir;
+                fsID = FillRecordingDir(
+                    nextRecording->GetTitle(),
+                    nextRecording->GetHostname(),
+                    nextRecording->GetStorageGroup(),
+                    nextRecording->GetRecordingStartTime(),
+                    nextRecording->GetRecordingEndTime(),
+                    nextRecording->GetCardID(),
+                    recording_dir,
+                    reclist);
+                nextRecording->SetPathname(recording_dir);
             }
 
             if (!recPendingList[schedid])
@@ -1984,51 +2058,48 @@ void Scheduler::RunScheduler(void)
             if (secsleft > -2)
                 continue;
 
-            nextRecording->recstartts =
-                mythCurrentDateTime().addSecs(30);
-            nextRecording->recstartts.setTime(QTime(
-                nextRecording->recstartts.time().hour(),
-                nextRecording->recstartts.time().minute()));
+            QDateTime recstartts = mythCurrentDateTime().addSecs(30);
+            recstartts.setTime(
+                QTime(recstartts.time().hour(), recstartts.time().minute()));
+            nextRecording->SetRecordingStartTime(recstartts);
 
             QMutexLocker lockit(reclist_lock);
 
-            QString subtitle = nextRecording->subtitle.isEmpty() ? "" :
-                QString(" \"%1\"").arg(nextRecording->subtitle);
-
-            details = QString("%1%2: "
-                "channel %3 on cardid %4, sourceid %5")
-                .arg(nextRecording->title)
-                .arg(subtitle)
-                .arg(nextRecording->chanid)
-                .arg(nextRecording->cardid)
-                .arg(nextRecording->sourceid);
+            details = QString("%1: channel %2 on cardid %3, sourceid %4")
+                .arg(nextRecording->toString(ProgramInfo::kTitleSubtitle))
+                .arg(nextRecording->GetChanID())
+                .arg(nextRecording->GetCardID())
+                .arg(nextRecording->GetSourceID());
 
             if (schedulingEnabled && nexttv->IsConnected())
             {
-                nextRecording->recstatus =
-                    nexttv->StartRecording(nextRecording);
+                nextRecording->SetRecordingStatus(
+                    nexttv->StartRecording(nextRecording));
 
                 nextRecording->AddHistory(false);
                 if (expirer)
                 {
                     // activate auto expirer
-                    expirer->Update(nextRecording->cardid, fsID, true);
+                    expirer->Update(nextRecording->GetCardID(), fsID, true);
                 }
             }
             else
-                nextRecording->recstatus = rsOffLine;
+                nextRecording->SetRecordingStatus(rsOffLine);
             bool doSchedAfterStart =
-                nextRecording->recstatus != rsRecording ||
-                schedAfterStartMap[nextRecording->recordid] ||
-                (nextRecording->parentid &&
-                 schedAfterStartMap[nextRecording->parentid]);
+                nextRecording->GetRecordingStatus() != rsRecording ||
+                schedAfterStartMap[nextRecording->GetRecordingRuleID()] ||
+                (nextRecording->GetParentRecordingRuleID() &&
+                 schedAfterStartMap[nextRecording->GetParentRecordingRuleID()]);
             nextRecording->AddHistory(doSchedAfterStart);
 
             statuschanged = true;
 
-            bool is_rec = (nextRecording->recstatus == rsRecording);
-            msg = is_rec ? "Started recording" : "Canceled recording (" +
-                nextRecording->RecStatusText() + ")";
+            bool is_rec = (nextRecording->GetRecordingStatus() == rsRecording);
+            msg = is_rec ?
+                QString("Started recording") :
+                QString("Canceled recording (%1)")
+                .arg(toString(nextRecording->GetRecordingStatus(),
+                              nextRecording->GetRecordingRuleType()));
 
             VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details));
             gCoreContext->LogEntry("scheduler", LP_NOTICE, msg, details);
@@ -2036,11 +2107,11 @@ void Scheduler::RunScheduler(void)
             if (is_rec)
                 UpdateNextRecord();
 
-            if (nextRecording->recstatus == rsFailed)
+            if (nextRecording->GetRecordingStatus() == rsFailed)
             {
                 MythEvent me(QString("FORCE_DELETE_RECORDING %1 %2")
-                         .arg(nextRecording->chanid)
-                         .arg(nextRecording->recstartts.toString(Qt::ISODate)));
+                         .arg(nextRecording->GetChanID())
+                         .arg(nextRecording->GetRecordingStartTime(ISODate)));
                 gCoreContext->dispatch(me);
             }
         }
@@ -2086,12 +2157,12 @@ void Scheduler::RunScheduler(void)
                     {
                         RecIter idleIter = reclist.begin();
                         for ( ; idleIter != reclist.end(); ++idleIter)
-                            if ((*idleIter)->recstatus == rsWillRecord)
+                            if ((*idleIter)->GetRecordingStatus() == rsWillRecord)
                                 break;
 
                         if (idleIter != reclist.end())
                         {
-                            if (curtime.secsTo((*idleIter)->recstartts) -
+                            if (curtime.secsTo((*idleIter)->GetRecordingStartTime()) -
                                 prerollseconds >
                                 (idleWaitForRecordingTime * 60) +
                                 idleTimeoutSecs)
@@ -2227,15 +2298,15 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
     RecIter recIter = reclist.begin();
     for ( ; recIter != reclist.end(); ++recIter)
-        if ((*recIter)->recstatus == rsWillRecord)
+        if ((*recIter)->GetRecordingStatus() == rsWillRecord)
             break;
 
     // set the wakeuptime if needed
     if (recIter != reclist.end())
     {
         RecordingInfo *nextRecording = (*recIter);
-        QDateTime restarttime = nextRecording->recstartts.addSecs((-1) *
-                                                               prerollseconds);
+        QDateTime restarttime = nextRecording->GetRecordingStartTime()
+            .addSecs((-1) * prerollseconds);
 
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
@@ -2345,28 +2416,29 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     {
         RecordingInfo *pginfo = *recIter;
 
-        if ((pginfo->recstatus != rsRecording) &&
-            (pginfo->recstatus != rsWillRecord))
+        if ((pginfo->GetRecordingStatus() != rsRecording) &&
+            (pginfo->GetRecordingStatus() != rsWillRecord))
             continue;
 
-        secsleft = curtime.secsTo(pginfo->recstartts) - prerollseconds;
+        secsleft = curtime.secsTo(
+            pginfo->GetRecordingStartTime()) - prerollseconds;
         if (secsleft > sleepThreshold)
             continue;
 
-        if (m_tvList->find(pginfo->cardid) != m_tvList->end())
+        if (m_tvList->find(pginfo->GetCardID()) != m_tvList->end())
         {
-            enc = (*m_tvList)[pginfo->cardid];
+            enc = (*m_tvList)[pginfo->GetCardID()];
             if ((!enc->IsLocal()) &&
                 (!SlavesInUse.contains(enc->GetHostName())))
             {
-                if (pginfo->recstatus == rsWillRecord)
+                if (pginfo->GetRecordingStatus() == rsWillRecord)
                     VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 will "
                             "be in use in %2 minutes").arg(enc->GetHostName())
                             .arg(secsleft / 60));
                 else
                     VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 is "
                             "in use currently recording '%1'")
-                            .arg(enc->GetHostName()).arg(pginfo->title));
+                            .arg(enc->GetHostName()).arg(pginfo->GetTitle()));
                 SlavesInUse << enc->GetHostName();
             }
         }
@@ -3225,43 +3297,49 @@ void Scheduler::AddNewRecords(void)
 );
     rmquery.replace("RECTABLE", schedTmpRecord);
 
+    pwrpri.replace("program.","p.");
+    pwrpri.replace("channel.","c.");
+    progfindid.replace("program.","p.");
+    progfindid.replace("channel.","c.");
     QString query = QString(
-"SELECT DISTINCT channel.chanid, channel.sourceid, "
-"program.starttime, program.endtime, "
-"program.title, program.subtitle, program.description, "
-"channel.channum, channel.callsign, channel.name, "
-"oldrecduplicate, program.category, "
-"RECTABLE.recpriority, "
-"RECTABLE.dupin, "
-"recduplicate, "
-"findduplicate, "
-"RECTABLE.type, RECTABLE.recordid, "
-"program.starttime - INTERVAL RECTABLE.startoffset minute AS recstartts, "
-"program.endtime + INTERVAL RECTABLE.endoffset minute AS recendts, "
-"program.previouslyshown, RECTABLE.recgroup, RECTABLE.dupmethod, "
-"channel.commmethod, capturecard.cardid, "
-"cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
-"program.seriesid, program.programid, program.category_type, "
-"program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
-"RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
-"oldrecstatus.recstatus, oldrecstatus.reactivate, "
-"program.videoprop+0, program.subtitletypes+0, program.audioprop+0, "
-"RECTABLE.storagegroup, capturecard.hostname, recordmatch.oldrecstatus, "
-"RECTABLE.avg_delay, " +  pwrpri + QString(
-"FROM recordmatch "
-" INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
-" INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
-"                        recordmatch.starttime = program.starttime AND "
-"                        recordmatch.manualid = program.manualid) "
-" INNER JOIN channel ON (channel.chanid = program.chanid) "
-" INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
-" INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
-" LEFT JOIN oldrecorded as oldrecstatus ON "
-"  ( oldrecstatus.station = channel.callsign AND "
-"    oldrecstatus.starttime = program.starttime AND "
-"    oldrecstatus.title = program.title ) "
-" ORDER BY RECTABLE.recordid DESC "
-);
+        "SELECT DISTINCT "
+        "    c.chanid,         c.sourceid,           p.starttime,       "// 0-2
+        "    p.endtime,        p.title,              p.subtitle,        "// 3-5
+        "    p.description,    c.channum,            c.callsign,        "// 6-8
+        "    c.name,           oldrecduplicate,      p.category,        "// 9-11
+        "    RECTABLE.recpriority, RECTABLE.dupin,   recduplicate,      "//12-14
+        "    findduplicate,    RECTABLE.type,        RECTABLE.recordid, "//15-17
+        "    p.starttime - INTERVAL RECTABLE.startoffset "
+        "    minute AS recstartts, "                                     //18
+        "    p.endtime + INTERVAL RECTABLE.endoffset "
+        "    minute AS recendts, "                                       //19
+        "                                            p.previouslyshown, "//20
+        "    RECTABLE.recgroup, RECTABLE.dupmethod,  c.commmethod,      "//21-23
+        "    capturecard.cardid, cardinput.cardinputid,p.seriesid,      "//24-26
+        "    p.programid,      p.category_type,      p.airdate,         "//27-29
+        "    p.stars,          p.originalairdate,    RECTABLE.inactive, "//30-32
+        "    RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup,"//33-35
+        "    oldrecstatus.recstatus, oldrecstatus.reactivate, "
+        "                                            p.videoprop+0,     "//36-38
+        "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//39-41
+        "    capturecard.hostname, recordmatch.oldrecstatus, "
+        "                                           RECTABLE.avg_delay, "//42-44
+        + pwrpri + QString(
+        "FROM recordmatch "
+        "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
+        "INNER JOIN program AS p "
+        "ON ( recordmatch.chanid    = p.chanid    AND "
+        "     recordmatch.starttime = p.starttime AND "
+        "     recordmatch.manualid  = p.manualid ) "
+        "INNER JOIN channel AS c "
+        "ON ( c.chanid = p.chanid ) "
+        "INNER JOIN cardinput ON (c.sourceid = cardinput.sourceid) "
+        "INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
+        "LEFT JOIN oldrecorded as oldrecstatus "
+        "ON ( oldrecstatus.station   = c.callsign  AND "
+        "     oldrecstatus.starttime = p.starttime AND "
+        "     oldrecstatus.title     = p.title ) "
+        "ORDER BY RECTABLE.recordid DESC ");
     query.replace("RECTABLE", schedTmpRecord);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
@@ -3288,89 +3366,73 @@ void Scheduler::AddNewRecords(void)
 
     while (result.next())
     {
-        RecordingInfo *p = new RecordingInfo;
-        p->reactivate = result.value(38).toInt();
-        p->oldrecstatus = RecStatusType(result.value(37).toInt());
-        if (p->oldrecstatus == rsAborted ||
-            p->oldrecstatus == rsNotListed ||
-            p->reactivate)
-            p->recstatus = rsUnknown;
-        else
-            p->recstatus = p->oldrecstatus;
+        RecordingInfo *p = new RecordingInfo(
+            result.value(4).toString(),//title
+            result.value(5).toString(),//subtitle
+            result.value(6).toString(),//description
+            result.value(11).toString(),//category
 
-        p->chanid = result.value(0).toString();
-        p->sourceid = result.value(1).toInt();
-        p->startts = result.value(2).toDateTime();
-        p->endts = result.value(3).toDateTime();
-        p->title = result.value(4).toString();
-        p->subtitle = result.value(5).toString();
-        p->description = result.value(6).toString();
-        p->chanstr = result.value(7).toString();
-        p->chansign = result.value(8).toString();
-        p->channame = result.value(9).toString();
-        p->category = result.value(11).toString();
-        p->recpriority = result.value(12).toInt();
-        p->dupin = RecordingDupInType(result.value(13).toInt());
-        p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
-        p->rectype = RecordingType(result.value(16).toInt());
-        p->recordid = result.value(17).toInt();
+            result.value(0).toUInt(),//chanid
+            result.value(7).toString(),//channum
+            result.value(8).toString(),//chansign
+            result.value(9).toString(),//channame
 
-        p->recstartts = result.value(18).toDateTime();
-        p->recendts = result.value(19).toDateTime();
-        p->repeat = result.value(20).toInt();
-        p->recgroup = result.value(21).toString();
-        p->storagegroup = result.value(42).toString();
-        p->playgroup = result.value(36).toString();
-        p->chancommfree = COMM_DETECT_COMMFREE == result.value(23).toInt();
-        p->hostname = result.value(43).toString();
-        p->cardid = result.value(24).toInt();
-        p->inputid = result.value(25).toInt();
-        p->shareable = result.value(26).toInt();
-        p->seriesid = result.value(27).toString();
-        p->programid = result.value(28).toString();
-        p->catType = result.value(29).toString();
-        p->year = result.value(30).toString();
-        p->stars =  result.value(31).toDouble();
+            result.value(21).toString(),//recgroup
+            result.value(35).toString(),//playgroup
 
-        if (result.value(32).isNull())
+            result.value(42).toString(),//hostname
+            result.value(41).toString(),//storagegroup
+
+            result.value(29).toUInt(),//year
+
+            result.value(26).toString(),//seriesid
+            result.value(27).toString(),//programid
+            result.value(28).toString(),//catType
+
+            result.value(12).toInt(),//recpriority
+
+            result.value(2).toDateTime(),//startts
+            result.value(3).toDateTime(),//endts
+            result.value(18).toDateTime(),//recstartts
+            result.value(19).toDateTime(),//recendts
+
+            result.value(30).toDouble(),//stars
+            (result.value(31).isNull()) ? QDate() :
+            QDate::fromString(result.value(31).toString(), Qt::ISODate),
+            //originalAirDate
+
+            result.value(20).toInt(),//repeat
+
+            RecStatusType(result.value(36).toInt()),//oldrecstatus
+            result.value(37).toInt(),//reactivate
+
+            result.value(17).toUInt(),//recordid
+            result.value(33).toUInt(),//parentid
+            RecordingType(result.value(16).toInt()),//rectype
+            RecordingDupInType(result.value(13).toInt()),//dupin
+            RecordingDupMethodType(result.value(22).toInt()),//dupmethod
+
+            result.value(1).toUInt(),//sourceid
+            result.value(25).toUInt(),//inputid
+            result.value(24).toUInt(),//cardid
+
+            result.value(34).toUInt(),//findid
+
+            result.value(39).toUInt(),//subtitleType
+            result.value(38).toUInt(),//videoproperties
+            result.value(40).toUInt());//audioproperties
+
+        if (!recTypeRecPriorityMap.contains(p->GetRecordingRuleType()))
         {
-            p->originalAirDate = QDate (0, 1, 1);
-            p->hasAirDate = false;
-        }
-        else
-        {
-            p->originalAirDate = QDate::fromString(result.value(32).toString(), Qt::ISODate);
-            p->hasAirDate = true;
-        }
-
-        bool inactive = result.value(33).toInt();
-        p->parentid = result.value(34).toInt();
-        p->findid = result.value(35).toInt();
-
-
-        p->videoproperties = result.value(39).toInt();
-        p->subtitleType = result.value(40).toInt();
-        p->audioproperties = result.value(41).toInt();
-
-        if (!recTypeRecPriorityMap.contains(p->rectype))
-            recTypeRecPriorityMap[p->rectype] =
-                p->GetRecordingTypeRecPriority(p->rectype);
-        p->recpriority += recTypeRecPriorityMap[p->rectype];
-        p->recpriority += result.value(46).toInt();
-
-        if (autopriority)
-            p->recpriority += autopriority -
-                              (result.value(45).toInt() * autostrata / 200);
-
-        if (p->recstartts >= p->recendts)
-        {
-            // start/end-offsets are invalid so ignore
-            p->recstartts = p->startts;
-            p->recendts = p->endts;
+            recTypeRecPriorityMap[p->GetRecordingRuleType()] =
+                p->GetRecordingTypeRecPriority(p->GetRecordingRuleType());
         }
 
-        p->schedulerid =
-            p->startts.toString() + "_" + p->chanid;
+        p->SetRecordingPriority(
+            p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
+            result.value(45).toInt() +
+            ((autopriority) ?
+             autopriority - (result.value(44).toInt() * autostrata / 200) : 0));
 
         // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
@@ -3383,10 +3445,10 @@ void Scheduler::AddNewRecords(void)
             RecordingInfo *r = *rec;
             if (p->IsSameTimeslot(*r))
             {
-                if (r->inputid == p->inputid &&
-                    r->recendts != p->recendts &&
-                    (r->recordid == p->recordid ||
-                     p->rectype == kOverrideRecord))
+                if (r->GetInputID() == p->GetInputID() &&
+                    r->GetRecordingEndTime() != p->GetRecordingEndTime() &&
+                    (r->GetRecordingRuleID() == p->GetRecordingRuleID() ||
+                     p->GetRecordingRuleType() == kOverrideRecord))
                     ChangeRecordingEnd(r, p);
                 delete p;
                 p = NULL;
@@ -3396,46 +3458,56 @@ void Scheduler::AddNewRecords(void)
         if (p == NULL)
             continue;
 
+        RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((threadrunning || specsched) && !cardMap.contains(p->cardid))
-            p->recstatus = rsOffLine;
+        if ((threadrunning || specsched) && !cardMap.contains(p->GetCardID()))
+            newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings
-        if (checkTooMany && tooManyMap[p->recordid] && !p->reactivate)
-            p->recstatus = rsTooManyRecordings;
-
-        // Check for rsCurrentRecording and rsPreviousRecording
-        if (p->rectype == kDontRecord)
-            p->recstatus = rsDontRecord;
-        else if (result.value(15).toInt() && !p->reactivate)
-            p->recstatus = rsPreviousRecording;
-        else if (p->rectype != kSingleRecord &&
-                 p->rectype != kOverrideRecord &&
-                 !p->reactivate &&
-                 !(p->dupmethod & kDupCheckNone))
+        if (checkTooMany && tooManyMap[p->GetRecordingRuleID()] &&
+            !p->IsReactivated())
         {
-            if ((p->dupin & kDupsNewEpi) && p->repeat)
-                p->recstatus = rsRepeat;
-
-            if ((p->dupin & kDupsInOldRecorded) && result.value(10).toInt())
-            {
-                if (result.value(44).toInt() == rsNeverRecord)
-                    p->recstatus = rsNeverRecord;
-                else
-                    p->recstatus = rsPreviousRecording;
-            }
-            if ((p->dupin & kDupsInRecorded) && result.value(14).toInt())
-                p->recstatus = rsCurrentRecording;
+            newrecstatus = rsTooManyRecordings;
         }
 
+        // Check for rsCurrentRecording and rsPreviousRecording
+        if (p->GetRecordingRuleType() == kDontRecord)
+            newrecstatus = rsDontRecord;
+        else if (result.value(15).toInt() && !p->IsReactivated())
+            newrecstatus = rsPreviousRecording;
+        else if (p->GetRecordingRuleType() != kSingleRecord &&
+                 p->GetRecordingRuleType() != kOverrideRecord &&
+                 !p->IsReactivated() &&
+                 !(p->GetDuplicateCheckMethod() & kDupCheckNone))
+        {
+            const RecordingDupInType dupin = p->GetDuplicateCheckSource();
+
+            if ((dupin & kDupsNewEpi) && p->IsRepeat())
+                newrecstatus = rsRepeat;
+
+            if ((dupin & kDupsInOldRecorded) && result.value(10).toInt())
+            {
+                if (result.value(43).toInt() == rsNeverRecord)
+                    newrecstatus = rsNeverRecord;
+                else
+                    newrecstatus = rsPreviousRecording;
+            }
+
+            if ((dupin & kDupsInRecorded) && result.value(14).toInt())
+                newrecstatus = rsCurrentRecording;
+        }
+
+        bool inactive = result.value(32).toInt();
         if (inactive)
-            p->recstatus = rsInactive;
+            newrecstatus = rsInactive;
 
         // Mark anything that has already passed as missed.  If it
         // survives PruneOverlaps, it will get deleted or have its old
         // status restored in PruneRedundants.
-        if (p->recendts < schedTime)
-            p->recstatus = rsMissed;
+        if (p->GetRecordingEndTime() < schedTime)
+            newrecstatus = rsMissed;
+
+        p->SetRecordingStatus(newrecstatus);
 
         tmpList.push_back(p);
     }
@@ -3463,27 +3535,30 @@ void Scheduler::AddNotListed(void) {
     RecList tmpList;
 
     QString query = QString(
-"SELECT RECTABLE.recordid, RECTABLE.type, RECTABLE.chanid, "
-"RECTABLE.starttime, RECTABLE.startdate, RECTABLE.endtime, RECTABLE.enddate, "
-"RECTABLE.startoffset, RECTABLE.endoffset, "
-"RECTABLE.title, RECTABLE.subtitle, RECTABLE.description, "
-"channel.channum, channel.callsign, channel.name "
-"FROM RECTABLE "
-" INNER JOIN channel ON (channel.chanid = RECTABLE.chanid) "
-" LEFT JOIN recordmatch on RECTABLE.recordid = recordmatch.recordid "
-"WHERE (type = %1 OR type = %2 OR type = %3 OR type = %4) "
-" AND recordmatch.chanid IS NULL")
+        "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
+        "       RECTABLE.description, RECTABLE.category,    " //  2,3
+        "       RECTABLE.chanid,      channel.channum,      " //  4,5
+        "       RECTABLE.station,     channel.name,         " //  6,7
+        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " //  8,9
+        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 10,11
+        "       RECTABLE.recpriority,                       " // 12
+        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 13,14
+        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 15,16
+        "       RECTABLE.recordid,    RECTABLE.type,        " // 17,18
+        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 19,20
+        "       RECTABLE.findid,                            " // 21
+        "       RECTABLE.startoffset, RECTABLE.endoffset    " // 22,23
+        "FROM RECTABLE "
+        "INNER JOIN channel ON (channel.chanid = RECTABLE.chanid) "
+        "LEFT JOIN recordmatch on RECTABLE.recordid = recordmatch.recordid "
+        "WHERE (type = %1 OR type = %2 OR type = %3 OR type = %4) AND "
+        "      recordmatch.chanid IS NULL")
         .arg(kSingleRecord)
         .arg(kTimeslotRecord)
         .arg(kWeekslotRecord)
         .arg(kOverrideRecord);
 
-    while (1)
-    {
-        int i = query.indexOf("RECTABLE");
-        if (i == -1) break;
-        query = query.replace(i, strlen("RECTABLE"), recordTable);
-    }
+    query.replace("RECTABLE", recordTable);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
@@ -3508,73 +3583,81 @@ void Scheduler::AddNotListed(void) {
 
     while (result.next())
     {
-        RecordingInfo *p = new RecordingInfo;
-        p->recstatus = rsNotListed;
-        p->recordid = result.value(0).toInt();
-        p->rectype = RecordingType(result.value(1).toInt());
-        p->chanid = result.value(2).toString();
+        RecordingType rectype = RecordingType(result.value(18).toInt());
+        QDateTime startts(result.value(13).toDate(), result.value(14).toTime());
+        QDateTime endts(  result.value(15).toDate(), result.value(16).toTime());
 
-        p->startts.setTime(result.value(3).toTime());
-        p->startts.setDate(result.value(4).toDate());
-        p->endts.setTime(result.value(5).toTime());
-        p->endts.setDate(result.value(6).toDate());
-
-        if (p->rectype == kTimeslotRecord)
+        if (rectype == kTimeslotRecord)
         {
-            int days = p->startts.daysTo(now);
+            int days = startts.daysTo(now);
 
-            p->startts = p->startts.addDays(days);
-            p->endts   = p->endts.addDays(days);
+            startts = startts.addDays(days);
+            endts   = endts.addDays(days);
 
-            if (p->endts < now)
+            if (endts < now)
             {
-                p->startts = p->startts.addDays(1);
-                p->endts   = p->endts.addDays(1);
+                startts = startts.addDays(1);
+                endts   = endts.addDays(1);
             }
         }
-        else if (p->rectype == kWeekslotRecord)
+        else if (rectype == kWeekslotRecord)
         {
-            int weeks = (p->startts.daysTo(now) + 6) / 7;
+            int weeks = (startts.daysTo(now) + 6) / 7;
 
-            p->startts = p->startts.addDays(weeks * 7);
-            p->endts   = p->endts.addDays(weeks * 7);
+            startts = startts.addDays(weeks * 7);
+            endts   = endts.addDays(weeks * 7);
 
-            if (p->endts < now)
+            if (endts < now)
             {
-                p->startts = p->startts.addDays(7);
-                p->endts   = p->endts.addDays(7);
+                startts = startts.addDays(7);
+                endts   = endts.addDays(7);
             }
         }
 
-        p->recstartts = p->startts.addSecs(result.value(7).toInt() * -60);
-        p->recendts = p->endts.addSecs(result.value(8).toInt() * 60);
+        QDateTime recstartts = startts.addSecs(result.value(22).toInt() * -60);
+        QDateTime recendts   = endts.addSecs(  result.value(23).toInt() * +60);
 
-        if (p->recstartts >= p->recendts)
+        if (recstartts >= recendts)
         {
             // start/end-offsets are invalid so ignore
-            p->recstartts = p->startts;
-            p->recendts = p->endts;
+            recstartts = startts;
+            recendts   = endts;
         }
 
         // Don't bother if the end time has already passed
-        if (p->recendts < schedTime)
-        {
-            delete p;
+        if (recendts < schedTime)
             continue;
-        }
 
-        p->title = result.value(9).toString();
+        bool sor = (kSingleRecord == rectype) || (kOverrideRecord == rectype);
 
-        if (p->rectype == kSingleRecord || p->rectype == kOverrideRecord)
-        {
-            p->subtitle = result.value(10).toString();
-            p->description = result.value(11).toString();
-        }
-        p->chanstr = result.value(12).toString();
-        p->chansign = result.value(13).toString();
-        p->channame = result.value(14).toString();
+        RecordingInfo *p = new RecordingInfo(
+            result.value(0).toString(),
+            (sor) ? result.value(1).toString() : QString(),
+            (sor) ? result.value(2).toString() : QString(),
+            QString(),
 
-        p->schedulerid = p->startts.toString() + "_" + p->chanid;
+            result.value(4).toUInt(),
+            result.value(5).toString(),
+            result.value(6).toString(),
+            result.value(7).toString(),
+
+            result.value(8).toString(),  result.value(9).toString(),
+
+            result.value(10).toString(), result.value(11).toString(),
+
+            result.value(12).toInt(),
+
+            startts,                     endts,
+            recstartts,                  recendts,
+
+            rsNotListed,
+
+            result.value(17).toUInt(),   RecordingType(result.value(18).toInt()),
+            
+            RecordingDupInType(result.value(19).toInt()),
+            RecordingDupMethodType(result.value(20).toInt()),
+
+            result.value(21).toUInt());
 
         tmpList.push_back(p);
     }
@@ -3586,25 +3669,24 @@ void Scheduler::AddNotListed(void) {
 
 void Scheduler::findAllScheduledPrograms(RecList &proglist)
 {
-    QString temptime, tempdate;
-    QString query = QString("SELECT RECTABLE.chanid, RECTABLE.starttime, "
-"RECTABLE.startdate, RECTABLE.endtime, RECTABLE.enddate, RECTABLE.title, "
-"RECTABLE.subtitle, RECTABLE.description, RECTABLE.recpriority, RECTABLE.type, "
-"channel.name, RECTABLE.recordid, RECTABLE.recgroup, RECTABLE.dupin, "
-"RECTABLE.dupmethod, channel.commmethod, channel.channum, RECTABLE.station, "
-"RECTABLE.seriesid, RECTABLE.programid, RECTABLE.category, RECTABLE.findid, "
-"RECTABLE.playgroup "
-"FROM RECTABLE "
-"LEFT JOIN channel ON channel.callsign = RECTABLE.station "
-"GROUP BY recordid "
-"ORDER BY title ASC;");
-
-    while (1)
-    {
-        int i = query.indexOf("RECTABLE");
-        if (i == -1) break;
-        query = query.replace(i, strlen("RECTABLE"), recordTable);
-    }
+    QString query = QString(
+        "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
+        "       RECTABLE.description, RECTABLE.category,    " //  2,3
+        "       RECTABLE.chanid,      channel.channum,      " //  4,5
+        "       RECTABLE.station,     channel.name,         " //  6,7
+        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " //  8,9
+        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 10,11
+        "       RECTABLE.recpriority,                       " // 12
+        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 13,14
+        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 15,16
+        "       RECTABLE.recordid,    RECTABLE.type,        " // 17,18
+        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 19,20
+        "       RECTABLE.findid                             " // 21
+        "FROM RECTABLE "
+        "LEFT JOIN channel ON channel.callsign = RECTABLE.station "
+        "GROUP BY recordid "
+        "ORDER BY title ASC");
+    query.replace("RECTABLE", recordTable);
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
@@ -3617,63 +3699,52 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 
     while (result.next())
     {
-        RecordingInfo *proginfo = new RecordingInfo;
-        proginfo->chanid = result.value(0).toString();
-        proginfo->rectype = RecordingType(result.value(9).toInt());
-        proginfo->recordid = result.value(11).toInt();
-
-        if (proginfo->rectype == kSingleRecord   ||
-            proginfo->rectype == kDontRecord     ||
-            proginfo->rectype == kOverrideRecord ||
-            proginfo->rectype == kTimeslotRecord ||
-            proginfo->rectype == kWeekslotRecord)
+        RecordingType rectype = RecordingType(result.value(18).toInt());
+        QDateTime startts;
+        QDateTime endts;
+        if (rectype == kSingleRecord   ||
+            rectype == kDontRecord     ||
+            rectype == kOverrideRecord ||
+            rectype == kTimeslotRecord ||
+            rectype == kWeekslotRecord)
         {
-            proginfo->startts = QDateTime(result.value(2).toDate(),
-                                            result.value(1).toTime());
-            proginfo->endts = QDateTime(result.value(4).toDate(),
-                                        result.value(3).toTime());
+            startts = QDateTime(result.value(13).toDate(),
+                                result.value(14).toTime());
+            endts = QDateTime(result.value(15).toDate(),
+                              result.value(16).toTime());
         }
         else
         {
             // put currentDateTime() in time fields to prevent
             // Invalid date/time warnings later
-            proginfo->startts = QDateTime::currentDateTime();
-            proginfo->startts.setTime(QTime(0,0));
-            proginfo->endts = QDateTime::currentDateTime();
-            proginfo->endts.setTime(QTime(0,0));
+            startts = mythCurrentDateTime();
+            startts.setTime(QTime(0,0));
+            endts = startts;
         }
 
-        proginfo->title = result.value(5).toString();
-        proginfo->subtitle =
-            result.value(6).toString();
-        proginfo->description =
-            result.value(7).toString();
+        proglist.push_back(new RecordingInfo(
+            result.value(0).toString(),  result.value(1).toString(),
+            result.value(2).toString(),  result.value(3).toString(),
 
-        proginfo->recpriority = result.value(8).toInt();
-        proginfo->channame =
-            result.value(10).toString();
-        proginfo->recgroup =
-            result.value(12).toString();
-        proginfo->playgroup =
-            result.value(22).toString();
-        proginfo->dupin = RecordingDupInType(result.value(13).toInt());
-        proginfo->dupmethod =
-            RecordingDupMethodType(result.value(14).toInt());
-        proginfo->chancommfree =
-            COMM_DETECT_COMMFREE == result.value(15).toInt();
-        proginfo->chanstr = result.value(16).toString();
-        proginfo->chansign =
-            result.value(17).toString();
-        proginfo->seriesid = result.value(18).toString();
-        proginfo->programid = result.value(19).toString();
-        proginfo->category =
-            result.value(20).toString();
-        proginfo->findid = result.value(21).toInt();
+            result.value(4).toUInt(),    result.value(5).toString(),
+            result.value(6).toString(),  result.value(7).toString(),
 
-        proginfo->recstartts = proginfo->startts;
-        proginfo->recendts = proginfo->endts;
+            result.value(8).toString(),  result.value(9).toString(),
 
-        proglist.push_back(proginfo);
+            result.value(10).toString(), result.value(11).toString(),
+
+            result.value(12).toInt(),
+
+            startts, endts,
+            startts, endts,
+
+            rsUnknown,
+
+            result.value(17).toUInt(),   rectype,
+            RecordingDupInType(result.value(19).toInt()),
+            RecordingDupMethodType(result.value(20).toInt()),
+
+            result.value(21).toUInt()));
     }
 }
 
@@ -3738,46 +3809,42 @@ static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
 
 /////////////////////////////////////////////////////////////////////////////
 
-void Scheduler::GetNextLiveTVDir(int cardid)
+void Scheduler::GetNextLiveTVDir(uint cardid)
 {
     QMutexLocker lockit(reclist_lock);
 
-    RecordingInfo *pginfo = new RecordingInfo;
-
-    if (!pginfo)
-        return;
-
     EncoderLink *tv = (*m_tvList)[cardid];
 
-    if (tv->IsLocal())
-        pginfo->hostname = gCoreContext->GetHostName();
-    else
-        pginfo->hostname = tv->GetHostName();
+    if (!tv)
+        return;
 
-    pginfo->storagegroup = "LiveTV";
-    pginfo->recstartts   = mythCurrentDateTime();
-    pginfo->recendts     = pginfo->recstartts.addSecs(3600);
-    pginfo->title        = "LiveTV";
-    pginfo->cardid       = cardid;
+    QDateTime cur = mythCurrentDateTime();
+    QString recording_dir;
+    int fsID = FillRecordingDir(
+        "LiveTV",
+        (tv->IsLocal()) ? gCoreContext->GetHostName() : tv->GetHostName(),
+        "LiveTV", cur, cur.addSecs(3600), cardid,
+        recording_dir, reclist);
 
-    int fsID = FillRecordingDir(pginfo, reclist);
-
-    tv->SetNextLiveTVDir(pginfo->pathname);
+    tv->SetNextLiveTVDir(recording_dir);
 
     VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
-            .arg(pginfo->pathname));
+            .arg(recording_dir));
 
-    if (expirer)
-    {
-        // update auto expirer
+    if (expirer) // update auto expirer
         expirer->Update(cardid, fsID, true);
-    }
-    delete pginfo;
 }
 
-int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
+int Scheduler::FillRecordingDir(
+    const QString &title,
+    const QString &hostname,
+    const QString &storagegroup,
+    const QDateTime &recstartts,
+    const QDateTime &recendts,
+    uint cardid,
+    QString &recording_dir,
+    const RecList &reclist)
 {
-
     VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Starting");
 
     int fsID = -1;
@@ -3787,21 +3854,22 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     QString dirKey;
     QStringList strlist;
     RecordingInfo *thispg;
-    RecIter recIter;
-    StorageGroup mysgroup(pginfo->storagegroup, pginfo->hostname);
+    StorageGroup mysgroup(storagegroup, hostname);
     QStringList dirlist = mysgroup.GetDirList();
     QStringList recsCounted;
     list<FileSystemInfo *> fsInfoList;
     list<FileSystemInfo *>::iterator fslistit;
+
+    recording_dir.clear();
 
     if (dirlist.size() == 1)
     {
         VERBOSE(VB_FILE|VB_SCHEDULE, LOC + QString("FillRecordingDir: The only "
                 "directory in the %1 Storage Group is %2, so it will be used "
                 "by default.")
-                .arg(pginfo->storagegroup)
+                .arg(storagegroup)
                 .arg(dirlist[0]));
-        pginfo->pathname = dirlist[0];
+        recording_dir = dirlist[0];
         VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
 
         return -1;
@@ -3868,32 +3936,48 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
             "FillRecordingDir: Adjusting FS Weights from inuseprograms.");
 
-    query.prepare("SELECT i.chanid, i.starttime, r.endtime, recusage, "
-                      "rechost, recdir "
-                  "FROM inuseprograms i, recorded r "
-                  "WHERE DATE_ADD(lastupdatetime, INTERVAL 16 MINUTE) > NOW() "
-                    "AND recdir <> '' "
-                    "AND i.chanid = r.chanid "
-                    "AND i.starttime = r.starttime;");
-    if (!query.exec() || !query.isActive())
+    MSqlQuery saveRecDir(MSqlQuery::InitCon());
+    saveRecDir.prepare("UPDATE inuseprograms "
+                       "SET recdir = :RECDIR "
+                       "WHERE chanid    = :CHANID AND "
+                       "      starttime = :STARTTIME");
+
+    query.prepare(
+        "SELECT i.chanid, i.starttime, r.endtime, recusage, rechost, recdir "
+        "FROM inuseprograms i, recorded r "
+        "WHERE DATE_ADD(lastupdatetime, INTERVAL 16 MINUTE) > NOW() AND "
+        "      i.chanid    = r.chanid AND "
+        "      i.starttime = r.starttime");
+
+    if (!query.exec())
+    {
         MythDB::DBError(LOC + "FillRecordingDir", query);
+    }
     else
     {
-        int recChanid;
-        QDateTime recStart;
-        QDateTime recEnd;
-        QString recUsage;
-        QString recHost;
-        QString recDir;
-
         while (query.next())
         {
-            recChanid = query.value(0).toInt();
-            recStart  = query.value(1).toDateTime();
-            recEnd    = query.value(2).toDateTime();
-            recUsage  = query.value(3).toString();
-            recHost   = query.value(4).toString();
-            recDir    = query.value(5).toString();
+            uint      recChanid = query.value(0).toUInt();
+            QDateTime recStart(   query.value(1).toDateTime());
+            QDateTime recEnd(     query.value(2).toDateTime());
+            QString   recUsage(   query.value(3).toString());
+            QString   recHost(    query.value(4).toString());
+            QString   recDir(     query.value(5).toString());
+
+            if (recDir.isEmpty())
+            {
+                ProgramInfo pginfo(recChanid, recStart);
+                recDir = pginfo.DiscoverRecordingDirectory();
+                recDir = recDir.isEmpty() ? "_UNKNOWN_" : recDir;
+
+                saveRecDir.bindValue(":RECDIR",    recDir);
+                saveRecDir.bindValue(":CHANID",    recChanid);
+                saveRecDir.bindValue(":STARTTIME", recStart);
+                if (!saveRecDir.exec())
+                    MythDB::DBError(LOC + "FillRecordingDir", saveRecDir);
+            }
+            if (recDir == "_UNKNOWN_")
+                continue;
 
             for (fslistit = fsInfoList.begin();
                  fslistit != fsInfoList.end(); ++fslistit)
@@ -3906,7 +3990,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
 
                     if (recUsage == kRecorderInUseID)
                     {
-                        if (recEnd > pginfo->recstartts.addSecs(maxOverlap))
+                        if (recEnd > recstartts.addSecs(maxOverlap))
                         {
                             weightOffset += weightPerRecording;
                             recsCounted << QString::number(recChanid) + ":" +
@@ -3956,31 +4040,32 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     VERBOSE(VB_FILE|VB_SCHEDULE, LOC +
             "FillRecordingDir: Adjusting FS Weights from scheduler.");
 
+    RecConstIter recIter;
     for (recIter = reclist.begin(); recIter != reclist.end(); ++recIter)
     {
         thispg = *recIter;
 
-        if ((pginfo->recendts < thispg->recstartts) ||
-            (pginfo->recstartts > thispg->recendts) ||
-                (thispg->recstatus != rsWillRecord) ||
-                (thispg->cardid == 0) ||
-                (recsCounted.contains(thispg->chanid + ":" +
-                    thispg->recstartts.toString(Qt::ISODate))) ||
-                (thispg->pathname.isEmpty()))
+        if ((recendts < thispg->GetRecordingStartTime()) ||
+            (recstartts > thispg->GetRecordingEndTime()) ||
+                (thispg->GetRecordingStatus() != rsWillRecord) ||
+                (thispg->GetCardID() == 0) ||
+                (recsCounted.contains(thispg->GetChanID() + ":" +
+                    thispg->GetRecordingStartTime(ISODate))) ||
+                (thispg->GetPathname().isEmpty()))
             continue;
 
         for (fslistit = fsInfoList.begin();
              fslistit != fsInfoList.end(); ++fslistit)
         {
             FileSystemInfo *fs = *fslistit;
-            if ((fs->hostname == thispg->hostname) &&
-                (fs->directory == thispg->pathname))
+            if ((fs->hostname == thispg->GetHostname()) &&
+                (fs->directory == thispg->GetPathname()))
             {
                 VERBOSE(VB_FILE|VB_SCHEDULE, QString(
                         "%1 @ %2 will record on %3:%4, FSID #%5, "
                         "weightPerRecording +%6.")
-                        .arg(thispg->chanid)
-                        .arg(thispg->recstartts.toString(Qt::ISODate))
+                        .arg(thispg->GetChanID())
+                        .arg(thispg->GetRecordingStartTime(ISODate))
                         .arg(fs->hostname).arg(fs->directory)
                         .arg(fs->fsID).arg(weightPerRecording));
 
@@ -4039,10 +4124,10 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     // recording will record at for analog broadcasts that are encoded locally.
     // maxSizeKB is 1/3 larger than required as this is what the auto expire
     // uses
-    EncoderLink *nexttv = (*m_tvList)[pginfo->cardid];
+    EncoderLink *nexttv = (*m_tvList)[cardid];
     long long maxByterate = nexttv->GetMaxBitrate() / 8;
     long long maxSizeKB = (maxByterate + maxByterate/3) *
-                          pginfo->recstartts.secsTo(pginfo->recendts) / 1024;
+        recstartts.secsTo(recendts) / 1024;
 
     bool simulateAutoExpire =
         ((gCoreContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
@@ -4088,7 +4173,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                     fslistit != fsInfoList.end(); ++fslistit)
                 {
                     // recording is not on this filesystem's host
-                    if ((*it)->hostname != (*fslistit)->hostname)
+                    if ((*it)->GetHostname() != (*fslistit)->hostname)
                         continue;
 
                     // directory is not in the Storage Group dir list
@@ -4096,10 +4181,10 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                         continue;
 
                     QString filename =
-                        (*fslistit)->directory + "/" + (*it)->pathname;
+                        (*fslistit)->directory + "/" + (*it)->GetPathname();
 
                     // recording is local
-                    if ((*it)->hostname == gCoreContext->GetHostName())
+                    if ((*it)->GetHostname() == gCoreContext->GetHostName())
                     {
                         QFile checkFile(filename);
 
@@ -4111,7 +4196,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                     }
                     else // recording is remote
                     {
-                        QString backuppath = (*it)->pathname;
+                        QString backuppath = (*it)->GetPathname();
                         ProgramInfo *programinfo = *it;
                         bool foundSlave = false;
 
@@ -4119,20 +4204,21 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                             m_tvList->begin();
                         for (; enciter != m_tvList->end(); ++enciter)
                         {
-                            if ((*enciter)->GetHostName() == programinfo->hostname)
+                            if ((*enciter)->GetHostName() ==
+                                programinfo->GetHostname())
                             {
                                 (*enciter)->CheckFile(programinfo);
                                 foundSlave = true;
                                 break;
                             }
                         }
-                        if (foundSlave && programinfo->pathname == filename)
+                        if (foundSlave && programinfo->GetPathname() == filename)
                         {
                             fs = *fslistit;
-                            programinfo->pathname = backuppath;
+                            programinfo->SetPathname(backuppath);
                             break;
                         }
-                        programinfo->pathname = backuppath;
+                        programinfo->SetPathname(backuppath);
                     }
                 }
 
@@ -4140,29 +4226,30 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                 {
                     VERBOSE(VB_IMPORTANT, QString("Unable to match '%1' "
                             "to any file system.  Ignoring it.")
-                            .arg((*it)->GetRecordBasename()));
+                            .arg((*it)->GetBasename()));
                     continue;
                 }
 
                 // add this files size to the remaining free space
-                remainingSpaceKB[fs->fsID] += (*it)->filesize / 1024;
+                remainingSpaceKB[fs->fsID] += (*it)->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
                 long long desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
 
                 if (remainingSpaceKB[fs->fsID] > (desiredSpaceKB + maxSizeKB))
                 {
-                    pginfo->pathname = fs->directory;
+                    recording_dir = fs->directory;
                     fsID = fs->fsID;
 
-                    VERBOSE(VB_FILE, QString("pass 2: '%1' will record in '%2' "
-                            "although there is only %3 MiB free and the "
-                            "AutoExpirer wants at least %4 MiB.  This "
-                            "directory has the highest priority files to be "
-                            "expired from the AutoExpire list and there are "
-                            "enough that the Expirer should be able to free "
-                            "up space for thos recording.")
-                            .arg(pginfo->title).arg(pginfo->pathname)
+                    VERBOSE(VB_FILE, QString(
+                                "pass 2: '%1' will record in '%2' "
+                                "although there is only %3 MB free and the "
+                                "AutoExpirer wants at least %4 MB.  This "
+                                "directory has the highest priority files "
+                                "to be expired from the AutoExpire list and "
+                                "there are enough that the Expirer should "
+                                "be able to free up space for this recording.")
+                            .arg(title).arg(recording_dir)
                             .arg(fs->freeSpaceKB / 1024)
                             .arg(desiredSpaceKB / 1024));
 
@@ -4183,20 +4270,21 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                 if (expirer)
                     desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
 
-                if ((fs->hostname == pginfo->hostname) &&
+                if ((fs->hostname == hostname) &&
                     (dirlist.contains(fs->directory)) &&
                     ((pass > 1) ||
                      (fs->freeSpaceKB > (desiredSpaceKB + maxSizeKB))))
                 {
-                    pginfo->pathname = fs->directory;
+                    recording_dir = fs->directory;
                     fsID = fs->fsID;
 
                     if (pass == 1)
                         VERBOSE(VB_FILE, QString("pass 1: '%1' will record in "
                                 "'%2' which has %3 MB free. This recording "
                                 "could use a max of %4 MB and the AutoExpirer "
-                                "wants to keep %5 MiB free.")
-                                .arg(pginfo->title).arg(pginfo->pathname)
+                                "wants to keep %5 MB free.")
+                                .arg(title)
+                                .arg(recording_dir)
                                 .arg(fs->freeSpaceKB / 1024)
                                 .arg(maxSizeKB / 1024)
                                 .arg(desiredSpaceKB / 1024));
@@ -4206,8 +4294,9 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                                 "the AutoExpirer wants at least %5 MB.  "
                                 "Something will have to be deleted or expired "
                                 "in order for this recording to complete "
-                                "successfully.").arg(pass).arg(pginfo->title)
-                                .arg(pginfo->pathname)
+                                "successfully.")
+                                .arg(pass).arg(title)
+                                .arg(recording_dir)
                                 .arg(fs->freeSpaceKB / 1024)
                                 .arg(desiredSpaceKB / 1024));
 
@@ -4282,12 +4371,12 @@ void Scheduler::SchedPreserveLiveTV(void)
 
         // Get the program that will be recording on this channel
         // at record start time, if this LiveTV session continues.
-        RecordingInfo *dummy = new RecordingInfo();
-        dummy->LoadProgramAtDateTime(in.chanid, livetvTime, true, 4);
+        RecordingInfo *dummy = new RecordingInfo(
+            in.chanid, livetvTime, true, 4);
 
-        dummy->cardid = enc->GetCardID();
-        dummy->inputid = in.inputid;
-        dummy->recstatus = rsUnknown;
+        dummy->SetCardID(enc->GetCardID());
+        dummy->SetInputID(in.inputid);
+        dummy->SetRecordingStatus(rsUnknown);
 
         retrylist.push_front(dummy);
     }

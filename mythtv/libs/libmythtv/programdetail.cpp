@@ -1,5 +1,4 @@
 #include "programdetail.h"
-#include "programlist.h"
 #include "programinfo.h"
 
 bool GetProgramDetailList(
@@ -18,11 +17,11 @@ bool GetProgramDetailList(
     ProgramList::const_iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
-        if (((*it)->recstatus == rsWillRecord) &&
+        if (((*it)->GetRecordingStatus() == rsWillRecord) &&
             (nextRecordingStart.isNull() ||
-             nextRecordingStart > (*it)->recstartts))
+             nextRecordingStart > (*it)->GetRecordingStartTime()))
         {
-            nextRecordingStart = (*it)->recstartts;
+            nextRecordingStart = (*it)->GetRecordingStartTime();
         }
     }
 
@@ -32,15 +31,15 @@ bool GetProgramDetailList(
     // save the details of the earliest recording(s)
     for (it = progList.begin(); it != progList.end(); ++it)
     {
-        if (((*it)->recstatus  == rsWillRecord) &&
-            ((*it)->recstartts == nextRecordingStart))
+        if (((*it)->GetRecordingStatus()    == rsWillRecord) &&
+            ((*it)->GetRecordingStartTime() == nextRecordingStart))
         {
             ProgramDetail prog;
-            prog.channame  = (*it)->channame;
-            prog.title     = (*it)->title;
-            prog.subtitle  = (*it)->subtitle;
-            prog.startTime = (*it)->recstartts;
-            prog.endTime   = (*it)->recendts;
+            prog.channame  = (*it)->GetChannelName();
+            prog.title     = (*it)->GetTitle();
+            prog.subtitle  = (*it)->GetSubtitle();
+            prog.startTime = (*it)->GetRecordingStartTime();
+            prog.endTime   = (*it)->GetRecordingEndTime();
             list->push_back(prog);
         }
     }

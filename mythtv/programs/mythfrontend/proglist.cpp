@@ -284,7 +284,7 @@ void ProgLister::ShowMenu(void)
         ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
         if (m_type != plPreviouslyRecorded)
         {
-            if (pi && pi->recordid > 0)
+            if (pi && pi->GetRecordingRuleID())
                 menuPopup->AddButton(tr("Delete Rule"));
         }
         else
@@ -653,7 +653,7 @@ void ProgLister::deleteRule()
 {
     ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
-    if (!pi || pi->recordid <= 0)
+    if (!pi || !pi->GetRecordingRuleID())
         return;
 
     RecordingRule *record = new RecordingRule();
@@ -664,7 +664,7 @@ void ProgLister::deleteRule()
     }
 
     QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
-                                                .arg(pi->RecTypeText());
+        .arg(toString(pi->GetRecordingRuleType()));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -687,7 +687,7 @@ void ProgLister::deleteOldEpisode()
     if (!pi)
         return;
 
-    QString message = tr("Delete this episode of '%1'?").arg(pi->title);
+    QString message = tr("Delete this episode of '%1'?").arg(pi->GetTitle());
 
     ShowOkPopup(message, this, SLOT(doDeleteOldEpisode(bool)), true);
 }
@@ -705,8 +705,8 @@ void ProgLister::doDeleteOldEpisode(bool ok)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM oldrecorded "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", pi->chanid);
-    query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
+    query.bindValue(":CHANID", pi->GetChanID());
+    query.bindValue(":STARTTIME", pi->GetScheduledStartTime(ISODate));
     if (!query.exec())
         MythDB::DBError("ProgLister::doDeleteOldEpisode", query);
 
@@ -721,7 +721,7 @@ void ProgLister::deleteOldTitle()
     if (!pi)
         return;
 
-    QString message = tr("Delete all episodes of '%1'?").arg(pi->title);
+    QString message = tr("Delete all episodes of '%1'?").arg(pi->GetTitle());
 
     ShowOkPopup(message, this, SLOT(doDeleteOldTitle(bool)), true);
 }
@@ -738,7 +738,7 @@ void ProgLister::doDeleteOldTitle(bool ok)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
-    query.bindValue(":TITLE", pi->title);
+    query.bindValue(":TITLE", pi->GetTitle());
     if (!query.exec())
         MythDB::DBError("ProgLister::doDeleteOldTitle -- delete", query);
 
@@ -753,25 +753,23 @@ void ProgLister::oldRecordedActions()
     if (!pi)
         return;
 
-    QString message = pi->title;
+    QString message = pi->toString(ProgramInfo::kTitleSubtitle, " - ");
 
-    if (!pi->subtitle.isEmpty())
-        message += QString(" - \"%1\"").arg(pi->subtitle);
-
-    if (!pi->description.isEmpty())
-        message += "\n\n" + pi->description;
+    if (!pi->GetDescription().isEmpty())
+        message += "\n\n" + pi->GetDescription();
 
     message += "\n\n\n" + tr("NOTE: removing items from this list will not "
                "delete any recordings.");
 
     QString title = tr("Previously Recorded");
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    MythDialogBox *menuPopup = new MythDialogBox(title, message, mainStack, "deletepopup", true);
+    MythDialogBox *menuPopup = new MythDialogBox(
+        title, message, mainStack, "deletepopup", true);
 
     if (menuPopup->Create())
     {
         menuPopup->SetReturnEvent(this, "deletemenu");
-        if (pi->duplicate)
+        if (pi->IsDuplicate())
             menuPopup->AddButton(tr("Allow this episode to re-record"));
         else
             menuPopup->AddButton(tr("Never record this episode"));
@@ -1108,16 +1106,16 @@ class plTitleSort
             if (a->sortTitle != b->sortTitle)
                     return (a->sortTitle < b->sortTitle);
 
-            if (a->recstatus == b->recstatus)
-                return a->startts < b->startts;
+            if (a->GetRecordingStatus() == b->GetRecordingStatus())
+                return a->GetScheduledStartTime() < b->GetScheduledStartTime();
 
-            if (a->recstatus == rsRecording) return true;
-            if (b->recstatus == rsRecording) return false;
+            if (a->GetRecordingStatus() == rsRecording) return true;
+            if (b->GetRecordingStatus() == rsRecording) return false;
 
-            if (a->recstatus == rsWillRecord) return true;
-            if (b->recstatus == rsWillRecord) return false;
+            if (a->GetRecordingStatus() == rsWillRecord) return true;
+            if (b->GetRecordingStatus() == rsWillRecord) return false;
 
-            return a->startts < b->startts;
+            return a->GetScheduledStartTime() < b->GetScheduledStartTime();
         }
 };
 
@@ -1132,10 +1130,10 @@ class plPrevTitleSort
             if (a->sortTitle != b->sortTitle)
                     return (a->sortTitle < b->sortTitle);
 
-            if (a->programid != b->programid)
-                return a->programid < b->programid;
+            if (a->GetProgramID() != b->GetProgramID())
+                return a->GetProgramID() < b->GetProgramID();
 
-            return a->startts < b->startts;
+            return a->GetScheduledStartTime() < b->GetScheduledStartTime();
         }
 };
 
@@ -1147,10 +1145,10 @@ class plTimeSort
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b)
         {
-            if (a->startts == b->startts)
-                return (a->chanid < b->chanid);
+            if (a->GetScheduledStartTime() == b->GetScheduledStartTime())
+                return (a->GetChanID() < b->GetChanID());
 
-            return (a->startts < b->startts);
+            return (a->GetScheduledStartTime() < b->GetScheduledStartTime());
         }
 };
 
@@ -1416,9 +1414,9 @@ void ProgLister::fillItemList(bool restorePosition, bool updateDisp)
     {
         s = m_itemList.take(0);
         if (m_type == plTitle)
-            s->sortTitle = s->subtitle;
+            s->sortTitle = s->GetSubtitle();
         else
-            s->sortTitle = s->title;
+            s->sortTitle = s->GetTitle();
 
         s->sortTitle.remove(prefixes);
         sortedList.push_back(s);
@@ -1536,52 +1534,32 @@ void ProgLister::updateButtonList(void)
 {
     m_progList->Reset();
 
-    QString state;
-    InfoMap infoMap;
-
     ProgramList::const_iterator it = m_itemList.begin();
     for (; it != m_itemList.end(); ++it)
     {
-        ProgramInfo *pginfo = new ProgramInfo;
-        pginfo->clone(*(*it)); // deep copy since we reload in the background
-
-        if (pginfo->recstatus == rsRecorded          ||
-            pginfo->recstatus == rsWillRecord)
-            state = "normal";
-        else if (pginfo->recstatus == rsRecording)
-            state = "running";
-        else if (pginfo->recstatus == rsConflict     ||
-                 pginfo->recstatus == rsOffLine      ||
-                 pginfo->recstatus == rsTunerBusy    ||
-                 pginfo->recstatus == rsFailed       ||
-                 pginfo->recstatus == rsAborted)
-            state = "error";
-        else if (m_type == plPreviouslyRecorded      ||
-                 pginfo->recstatus == rsRepeat       ||
-                 pginfo->recstatus == rsOtherShowing ||
-                 pginfo->recstatus == rsNeverRecord  ||
-                 pginfo->recstatus == rsDontRecord   ||
-                 (pginfo->recstatus != rsDontRecord &&
-                  pginfo->recstatus <= rsEarlierShowing))
-            state = "disabled";
-        else
-            state = "warning";
-
         MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_progList, "", qVariantFromValue(pginfo));
+            new MythUIButtonListItem(
+                m_progList, "", qVariantFromValue(*it));
 
-        pginfo->ToMap(infoMap);
+        InfoMap infoMap;
+        (**it).ToMap(infoMap);
+
+        QString state = toUIState((**it).GetRecordingStatus());
+        if ((state == "warning") && (plPreviouslyRecorded == m_type))
+            state = "disabled";
+
         item->SetTextFromMap(infoMap, state);
+
         if (m_type == plTitle)
         {
-            QString tempSubTitle = pginfo->subtitle;
+            QString tempSubTitle = (**it).GetSubtitle();
             if (tempSubTitle.trimmed().isEmpty())
-                tempSubTitle = pginfo->title;
+                tempSubTitle = (**it).GetTitle();
             item->SetText(tempSubTitle, "titlesubtitle", state);
         }
 
-        QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
-        item->DisplayState(rating, "ratingstate");
+        item->DisplayState(
+            QString::number((**it).GetStars(10)), "ratingstate");
 
         item->DisplayState(state, "status");
     }
@@ -1615,7 +1593,7 @@ void ProgLister::updateInfo(MythUIButtonListItem *item)
                                                     (GetChild("ratingstate"));
         if (ratingState)
         {
-            QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+            QString rating = QString::number(pginfo->GetStars(10));
             ratingState->DisplayState(rating);
         }
     }

@@ -27,7 +27,7 @@
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "mythconfig.h"
-#include "programlist.h"
+#include "programinfo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -588,17 +588,17 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     int          iChanCount = 0;
     QDomElement  channel;
-    QString      sCurChanId = "";
+    uint32_t     iCurChanId = 0;
 
     ProgramList::iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
         ProgramInfo *pInfo = *it;
-        if ( sCurChanId != pInfo->chanid )
+        if ( iCurChanId != pInfo->GetChanID() )
         {
             iChanCount++;
 
-            sCurChanId = pInfo->chanid;
+            iCurChanId = pInfo->GetChanID();
 
             // Output new Channel Node
 
@@ -951,31 +951,20 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
 void MythXML::GetRecorded( HTTPRequest *pRequest )
 {
-    bool    bDescending = pRequest->m_mapParams[ "Descending"  ].toInt();
-
-    // Get all Pending Scheduled Programs
-
-    RecList      recList;
-    ProgramList  schedList;
-
+    QMap<QString,ProgramInfo*> recMap;
     if (m_pSched)
-        m_pSched->getAllPending( &recList);
-
-    // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList
-    // (ProgramList will autodelete ProgramInfo pointers)
-    // ----------------------------------------------------------------------
-
-    for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end(); ++itRecList)
-    {
-        schedList.push_back( *itRecList );
-    }
-
-    // ----------------------------------------------------------------------
+        recMap = m_pSched->GetRecording();
+    QMap<QString,uint32_t> inUseMap = ProgramInfo::QueryInUseMap();
+    QMap<QString,bool> isJobRunning =
+        ProgramInfo::QueryJobsRunning(JOB_COMMFLAG);
 
     ProgramList progList;
-    LoadFromRecorded( progList, bDescending, false, schedList );
+    LoadFromRecorded( progList, false,
+                      inUseMap, isJobRunning, recMap );
+
+    QMap<QString,ProgramInfo*>::iterator mit = recMap.begin();
+    for (; mit != recMap.end(); mit = recMap.erase(mit))
+        delete *mit;
 
     // Build Response XML
 
@@ -1080,24 +1069,22 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     // Read Recording From Database
     // ----------------------------------------------------------------------
 
-    ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId,
-                                                              dtStart );
+    ProgramInfo pginfo(sChanId.toUInt(), dtStart);
 
-    if (!pInfo)
+    if (!pginfo.GetChanID())
     {
         VERBOSE(VB_IMPORTANT,
                 LOC + "no recording for start time " + sStartTime);
         return;
     }
 
-    if ( pInfo->hostname != gCoreContext->GetHostName())
+    if ( pginfo.GetHostname() != gCoreContext->GetHostName())
     {
         // We only handle requests for local resources
-        delete pInfo;
         return;
     }
 
-    QString sFileName     = GetPlaybackURL(pInfo);
+    QString sFileName     = GetPlaybackURL(&pginfo);
 
     // ----------------------------------------------------------------------
     // check to see if default preview image is already created.
@@ -1118,16 +1105,14 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         // ------------------------------------------------------------------
         // Must generate Preview Image, Generate Image and save.
         // ------------------------------------------------------------------
-        if (pInfo->pathname.left(1) != "/" && sFileName.left(1) == "/")
-            pInfo->pathname = sFileName;
-        if (pInfo->pathname.left(1) != "/")
-        {
-            delete pInfo;
+        if (!pginfo.IsLocal() && sFileName.left(1) == "/")
+            pginfo.SetPathname(sFileName);
+
+        if (!pginfo.IsLocal())
             return;
-        }
 
         PreviewGenerator *previewgen = new PreviewGenerator(
-            pInfo, PreviewGenerator::kLocal);
+            &pginfo, PreviewGenerator::kLocal);
         previewgen->SetPreviewTimeAsSeconds(nSecsIn);
         previewgen->SetOutputFilename(sPreviewFileName);
         bool ok = previewgen->Run();
@@ -1136,13 +1121,10 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
             pRequest->m_eResponseType   = ResponseTypeFile;
             pRequest->m_nResponseStatus = 404;
             previewgen->deleteLater();
-            delete pInfo;
             return;
         }
         previewgen->deleteLater();
     }
-
-    delete pInfo;
 
     pRequest->m_eResponseType   = ResponseTypeFile;
     pRequest->m_nResponseStatus = 200;
@@ -1278,33 +1260,28 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
         // Read Recording From Database
         // ------------------------------------------------------------------
 
-        ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId,
-                                                                  dtStart );
+        ProgramInfo pginfo(sChanId.toUInt(), dtStart);
 
-        if (pInfo==NULL)
+        if (!pginfo.GetChanID())
         {
-            VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - "
-                                       "GetProgramFromRecorded( %1, %2 ) "
-                                       "returned NULL" )
+            VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - for %1, %2 "
+                                       "failed" )
                                         .arg( sChanId )
                                         .arg( sStartTime ));
             return;
         }
 
-        if ( pInfo->hostname != gCoreContext->GetHostName())
+        if ( pginfo.GetHostname() != gCoreContext->GetHostName())
         {
             // We only handle requests for local resources
 
             VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - To access this "
                                        "recording, send request to %1." )
-                                        .arg( pInfo->hostname ));
-            delete pInfo;
+                     .arg( pginfo.GetHostname() ));
             return;
         }
 
-        pRequest->m_sFileName = GetPlaybackURL(pInfo);
-
-        delete pInfo;
+        pRequest->m_sFileName = GetPlaybackURL(&pginfo);
 
         // ------------------------------------------------------------------
         // Store File information in WorkerThread Storage
@@ -1620,32 +1597,33 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
     QDomElement program = pDoc->createElement( "Program" );
     node.appendChild( program );
 
-    program.setAttribute( "startTime"   , pInfo->startts.toString(Qt::ISODate));
-    program.setAttribute( "endTime"     , pInfo->endts.toString(Qt::ISODate));
-    program.setAttribute( "title"       , pInfo->title        );
-    program.setAttribute( "subTitle"    , pInfo->subtitle     );
-    program.setAttribute( "category"    , pInfo->category     );
-    program.setAttribute( "catType"     , pInfo->catType      );
-    program.setAttribute( "repeat"      , pInfo->repeat       );
+    program.setAttribute( "startTime"   ,
+                          pInfo->GetScheduledStartTime(ISODate));
+    program.setAttribute( "endTime"     , pInfo->GetScheduledEndTime(ISODate));
+    program.setAttribute( "title"       , pInfo->GetTitle()   );
+    program.setAttribute( "subTitle"    , pInfo->GetSubtitle());
+    program.setAttribute( "category"    , pInfo->GetCategory());
+    program.setAttribute( "catType"     , pInfo->GetCategoryType());
+    program.setAttribute( "repeat"      , pInfo->IsRepeat()   );
 
     if (bDetails)
     {
 
-        program.setAttribute( "seriesId"    , pInfo->seriesid     );
-        program.setAttribute( "programId"   , pInfo->programid    );
-        program.setAttribute( "stars"       , pInfo->stars        );
+        program.setAttribute( "seriesId"    , pInfo->GetSeriesID()     );
+        program.setAttribute( "programId"   , pInfo->GetProgramID()    );
+        program.setAttribute( "stars"       , pInfo->GetStars()        );
         program.setAttribute( "fileSize"    ,
-                              QString::number( pInfo->filesize ));
+                              QString::number( pInfo->GetFilesize() ));
         program.setAttribute( "lastModified",
-                              pInfo->lastmodified.toString(Qt::ISODate) );
-        program.setAttribute( "programFlags", pInfo->programflags );
-        program.setAttribute( "hostname"    , pInfo->hostname     );
+                              pInfo->GetLastModifiedTime(ISODate) );
+        program.setAttribute( "programFlags", pInfo->GetProgramFlags() );
+        program.setAttribute( "hostname"    , pInfo->GetHostname() );
 
-        if (pInfo->hasAirDate)
-            program.setAttribute( "airdate"  , pInfo->originalAirDate
+        if (pInfo->GetOriginalAirDate().isValid())
+            program.setAttribute( "airdate"  , pInfo->GetOriginalAirDate()
                                                .toString(Qt::ISODate) );
 
-        QDomText textNode = pDoc->createTextNode( pInfo->description );
+        QDomText textNode = pDoc->createTextNode( pInfo->GetDescription() );
         program.appendChild( textNode );
 
     }
@@ -1662,27 +1640,36 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
 
     // Build Recording Child Element
 
-    if ( pInfo->recstatus != rsUnknown )
+    if ( pInfo->GetRecordingStatus() != rsUnknown )
     {
         QDomElement recording = pDoc->createElement( "Recording" );
         program.appendChild( recording );
 
-        recording.setAttribute( "recStatus"     , pInfo->recstatus   );
-        recording.setAttribute( "recPriority"   , pInfo->recpriority );
-        recording.setAttribute( "recStartTs"    , pInfo->recstartts
-                                                  .toString(Qt::ISODate));
-        recording.setAttribute( "recEndTs"      , pInfo->recendts
-                                                  .toString(Qt::ISODate));
+        recording.setAttribute( "recStatus"     ,
+                                pInfo->GetRecordingStatus()   );
+        recording.setAttribute( "recPriority"   ,
+                                pInfo->GetRecordingPriority() );
+        recording.setAttribute( "recStartTs"    ,
+                                pInfo->GetRecordingStartTime(ISODate) );
+        recording.setAttribute( "recEndTs"      ,
+                                pInfo->GetRecordingEndTime(ISODate) );
 
         if (bDetails)
         {
-            recording.setAttribute( "recordId"      , pInfo->recordid    );
-            recording.setAttribute( "recGroup"      , pInfo->recgroup    );
-            recording.setAttribute( "playGroup"     , pInfo->playgroup   );
-            recording.setAttribute( "recType"       , pInfo->rectype     );
-            recording.setAttribute( "dupInType"     , pInfo->dupin       );
-            recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
-            recording.setAttribute( "encoderId"     , pInfo->cardid      );
+            recording.setAttribute( "recordId"      ,
+                                    pInfo->GetRecordingRuleID() );
+            recording.setAttribute( "recGroup"      ,
+                                    pInfo->GetRecordingGroup() );
+            recording.setAttribute( "playGroup"     ,
+                                    pInfo->GetPlaybackGroup() );
+            recording.setAttribute( "recType"       ,
+                                    pInfo->GetRecordingRuleType() );
+            recording.setAttribute( "dupInType"     ,
+                                    pInfo->GetDuplicateCheckSource() );
+            recording.setAttribute( "dupMethod"     ,
+                                    pInfo->GetDuplicateCheckMethod() );
+            recording.setAttribute( "encoderId"     ,
+                                    pInfo->GetCardID() );
             const RecordingInfo ri(*pInfo);
             recording.setAttribute( "recProfile"    ,
                                     ri.GetProgramRecordingProfile());
@@ -1711,18 +1698,20 @@ void MythXML::FillChannelInfo( QDomElement &channel,
                                    .arg( pInfo->chanid );
 */
 
-        channel.setAttribute( "chanId"     , pInfo->chanid      );
-        channel.setAttribute( "chanNum"    , pInfo->chanstr     );
-        channel.setAttribute( "callSign"   , pInfo->chansign    );
+        channel.setAttribute( "chanId"     , pInfo->GetChanID() );
+        channel.setAttribute( "chanNum"    , pInfo->GetChanNum());
+        channel.setAttribute( "callSign"   , pInfo->GetChannelSchedulingID());
         //channel.setAttribute( "iconURL"    , sIconURL           );
-        channel.setAttribute( "channelName", pInfo->channame    );
+        channel.setAttribute( "channelName", pInfo->GetChannelName());
 
         if (bDetails)
         {
-            channel.setAttribute( "chanFilters", pInfo->chanOutputFilters );
-            channel.setAttribute( "sourceId"   , pInfo->sourceid    );
-            channel.setAttribute( "inputId"    , pInfo->inputid     );
-            channel.setAttribute( "commFree"   , pInfo->chancommfree);
+            channel.setAttribute( "chanFilters",
+                                  pInfo->GetChannelPlaybackFilters() );
+            channel.setAttribute( "sourceId"   , pInfo->GetSourceID()    );
+            channel.setAttribute( "inputId"    , pInfo->GetInputID()     );
+            channel.setAttribute( "commFree"   ,
+                                  (pInfo->IsCommercialFree()) ? 1 : 0 );
         }
     }
 }

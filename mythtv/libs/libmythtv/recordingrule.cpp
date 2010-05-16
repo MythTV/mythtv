@@ -155,16 +155,16 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 
     m_progInfo = proginfo;
 
-    if (proginfo->recordid)
+    if (proginfo->GetRecordingRuleID())
     {
-        m_recordID = proginfo->recordid;
+        m_recordID = proginfo->GetRecordingRuleID();
         Load();
     }
 
     if (m_searchType == kNoSearch || m_searchType == kManualSearch)
     {
         AssignProgramInfo();
-        if (!proginfo->recordid)
+        if (!proginfo->GetRecordingRuleID())
             m_playGroup = PlayGroup::GetInitialName(proginfo);
     }
 
@@ -551,34 +551,37 @@ void RecordingRule::AssignProgramInfo()
     if (!m_progInfo)
         return;
 
-    m_title = m_progInfo->title;
-    m_subtitle = m_progInfo->subtitle;
-    m_description = m_progInfo->description;
-    m_channelid = m_progInfo->chanid.toInt();
-    m_station = m_progInfo->chansign;
-    m_startdate = m_progInfo->startts.date();
-    m_starttime = m_progInfo->startts.time();
-    m_enddate = m_progInfo->endts.date();
-    m_endtime = m_progInfo->endts.time();
-    m_seriesid = m_progInfo->seriesid;
-    m_programid = m_progInfo->programid;
+    m_title       = m_progInfo->GetTitle();
+    m_subtitle    = m_progInfo->GetSubtitle();
+    m_description = m_progInfo->GetDescription();
+    m_channelid   = m_progInfo->GetChanID();
+    m_station     = m_progInfo->GetChannelSchedulingID();
+    m_startdate   = m_progInfo->GetScheduledStartTime().date();
+    m_starttime   = m_progInfo->GetScheduledStartTime().time();
+    m_enddate     = m_progInfo->GetScheduledEndTime().date();
+    m_endtime     = m_progInfo->GetScheduledEndTime().time();
+    m_seriesid    = m_progInfo->GetSeriesID();
+    m_programid   = m_progInfo->GetProgramID();
     if (m_findday < 0)
     {
-        m_findday = (m_progInfo->startts.date().dayOfWeek() + 1) % 7;
-        m_findtime = m_progInfo->startts.time();
+        m_findday =
+            (m_progInfo->GetScheduledStartTime().date().dayOfWeek() + 1) % 7;
+        m_findtime = m_progInfo->GetScheduledStartTime().time();
 
         QDate epoch(1970, 1, 1);
-        m_findid = epoch.daysTo(m_progInfo->startts.date()) + 719528;
+        m_findid = epoch.daysTo(
+            m_progInfo->GetScheduledStartTime().date()) + 719528;
     }
     else
     {
         if (m_findid > 0)
-            m_findid = m_progInfo->findid;
+            m_findid = m_progInfo->GetFindID();
         else
         {
             QDate epoch(1970, 1, 1);
-            m_findid = epoch.daysTo(m_progInfo->startts.date()) + 719528;
+            m_findid = epoch.daysTo(
+                m_progInfo->GetScheduledStartTime().date()) + 719528;
         }
     }
-    m_category = m_progInfo->category;
+    m_category = m_progInfo->GetCategory();
 }

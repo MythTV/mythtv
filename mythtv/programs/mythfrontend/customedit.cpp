@@ -99,7 +99,7 @@ bool CustomEdit::Create()
 
 void CustomEdit::loadData(void)
 {
-    QString baseTitle = m_pginfo->title;
+    QString baseTitle = m_pginfo->GetTitle();
     baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
     CustomRuleInfo rule;
@@ -130,7 +130,7 @@ void CustomEdit::loadData(void)
                                          qVariantFromValue(rule));
 
             if (trimTitle == baseTitle ||
-                result.value(0).toInt() == m_pginfo->recordid)
+                result.value(0).toUInt() == m_pginfo->GetRecordingRuleID())
                 m_ruleList->SetItemCurrent(item);
         }
     }
@@ -139,7 +139,7 @@ void CustomEdit::loadData(void)
 
     loadClauses();
 
-    if (m_ruleList->GetCurrentPos() == 0 && !m_pginfo->title.isEmpty())
+    if (m_ruleList->GetCurrentPos() == 0 && !m_pginfo->GetTitle().isEmpty())
     {
         m_titleEdit->SetText(baseTitle);
         QString quoteTitle = baseTitle;
@@ -151,7 +151,7 @@ void CustomEdit::loadData(void)
 
 void CustomEdit::loadClauses()
 {
-    QString baseTitle = m_pginfo->title;
+    QString baseTitle = m_pginfo->GetTitle();
     baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
     QString quoteTitle = baseTitle;
@@ -160,26 +160,26 @@ void CustomEdit::loadClauses()
     CustomRuleInfo rule;
   
     rule.title = tr("Match an exact title");
-    if (!m_pginfo->title.isEmpty())
+    if (!m_pginfo->GetTitle().isEmpty())
         rule.description = QString("program.title = '%1' ").arg(quoteTitle);
     else 
         rule.description = "program.title = 'Nova' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                               qVariantFromValue(rule));
 
-    if (!m_pginfo->seriesid.isEmpty()) 
+    if (!m_pginfo->GetSeriesID().isEmpty()) 
     {
         rule.title = tr("Match this series");
         rule.subtitle.clear();
         rule.description = QString("program.seriesid = '%1' ")
-                                   .arg(m_pginfo->seriesid);
+            .arg(m_pginfo->GetSeriesID());
         new MythUIButtonListItem(m_clauseList, rule.title,
                                  qVariantFromValue(rule));
     }
 
     rule.title = tr("Match words in the title");
     rule.subtitle.clear();
-    if (!m_pginfo->title.isEmpty())
+    if (!m_pginfo->GetTitle().isEmpty())
         rule.description = QString("program.title LIKE '\%%1\%' ")
                                    .arg(quoteTitle);
     else
@@ -189,9 +189,9 @@ void CustomEdit::loadClauses()
 
     rule.title = tr("Match words in the subtitle");
     rule.subtitle.clear();
-    if (!m_pginfo->subtitle.isEmpty())
+    if (!m_pginfo->GetSubtitle().isEmpty())
     {
-        QString subt = m_pginfo->subtitle;
+        QString subt = m_pginfo->GetSubtitle();
         subt.replace("\'","\'\'");
         rule.description = QString("program.subtitle LIKE '\%%1\%' ")
                                    .arg(subt);
@@ -201,22 +201,21 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    if (!m_pginfo->programid.isEmpty())
+    if (!m_pginfo->GetProgramID().isEmpty())
     {
         rule.title = tr("Match this episode");
         rule.subtitle.clear();
         rule.description = QString("program.programid = '%1' ")
-                                   .arg(m_pginfo->programid); 
+            .arg(m_pginfo->GetProgramID()); 
     }
-    else if (!m_pginfo->subtitle.isEmpty())
+    else if (!m_pginfo->GetSubtitle().isEmpty())
     {
         rule.title = tr("Match this episode");
         rule.subtitle.clear();
         rule.description = QString("program.subtitle = '%1' \n"
-                             "AND program.description = '%2' ")
-                             .arg(m_pginfo->subtitle.replace("\'","\'\'"))
-                             .arg(m_pginfo->description.replace("\'","\'\'"));
-
+                                   "AND program.description = '%2' ")
+            .arg(m_pginfo->GetSubtitle().replace("\'","\'\'"))
+            .arg(m_pginfo->GetDescription().replace("\'","\'\'"));
     }
     else
     {
@@ -263,7 +262,7 @@ void CustomEdit::loadClauses()
     rule.title = tr("Anytime on a specific day of the week");
     rule.subtitle.clear();
     rule.description = QString("DAYNAME(program.starttime) = '%1' ")
-                               .arg(m_pginfo->startts.toString("dddd"));
+        .arg(m_pginfo->GetScheduledStartTime().toString("dddd"));
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
@@ -295,9 +294,9 @@ void CustomEdit::loadClauses()
 
     rule.title = tr("Only on a specific station");
     rule.subtitle.clear();
-    if (!m_pginfo->chansign.isEmpty())
+    if (!m_pginfo->GetChannelSchedulingID().isEmpty())
         rule.description = QString("channel.callsign = '%1' ")
-                                   .arg(m_pginfo->chansign);
+            .arg(m_pginfo->GetChannelSchedulingID());
     else
         rule.description = "channel.callsign = 'ESPN' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
@@ -360,9 +359,9 @@ void CustomEdit::loadClauses()
     
     rule.title = tr("Limit by category");
     rule.subtitle.clear();
-    if (!m_pginfo->category.isEmpty())
+    if (!m_pginfo->GetCategory().isEmpty())
         rule.description = QString("program.category = '%1' ")
-                                   .arg(m_pginfo->category);
+            .arg(m_pginfo->GetCategory());
     else
         rule.description = "program.category = 'Reality' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
@@ -372,9 +371,9 @@ void CustomEdit::loadClauses()
     rule.subtitle = "LEFT JOIN programgenres ON "
                     "program.chanid = programgenres.chanid AND "
                     "program.starttime = programgenres.starttime ";
-    if (!m_pginfo->category.isEmpty())
+    if (!m_pginfo->GetCategory().isEmpty())
         rule.description = QString("programgenres.genre = '%1' ")
-                                   .arg(m_pginfo->category);
+            .arg(m_pginfo->GetCategory());
     else
         rule.description = "programgenres.genre = 'Reality' ";
     new MythUIButtonListItem(m_clauseList, rule.title,

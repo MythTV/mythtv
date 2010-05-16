@@ -243,9 +243,9 @@ void ViewScheduled::LoadList(bool useExistingData)
                                                     (currentItem->GetData());
         if (currentpginfo)
         {
-            callsign = currentpginfo->chansign;
-            startts = currentpginfo->startts;
-            recstartts = currentpginfo->recstartts;
+            callsign   = currentpginfo->GetChannelSchedulingID();
+            startts    = currentpginfo->GetScheduledStartTime();
+            recstartts = currentpginfo->GetRecordingStartTime();
         }
     }
 
@@ -268,26 +268,28 @@ void ViewScheduled::LoadList(bool useExistingData)
     m_recgroupList[m_defaultGroup].setAutoDelete(false);
     while (pit != m_recList.end())
     {
-
         ProgramInfo *pginfo = *pit;
-        if ((pginfo->recendts >= now || pginfo->endts >= now) &&
-            (m_showAll || pginfo->recstatus <= rsWillRecord ||
-             pginfo->recstatus == rsDontRecord ||
-             (pginfo->recstatus == rsTooManyRecordings &&
-              ++toomanycounts[pginfo->recordid] <= 1) ||
-             (pginfo->recstatus > rsTooManyRecordings &&
-              pginfo->recstatus != rsRepeat &&
-              pginfo->recstatus != rsNeverRecord)))
+        const RecStatusType recstatus = pginfo->GetRecordingStatus();
+        if ((pginfo->GetRecordingEndTime() >= now ||
+             pginfo->GetScheduledEndTime() >= now) &&
+            (m_showAll ||
+             recstatus <= rsWillRecord ||
+             recstatus == rsDontRecord ||
+             (recstatus == rsTooManyRecordings &&
+              ++toomanycounts[pginfo->GetRecordingRuleID()] <= 1) ||
+             (recstatus > rsTooManyRecordings &&
+              recstatus != rsRepeat &&
+              recstatus != rsNeverRecord)))
         {
-            m_cardref[pginfo->cardid]++;
-            if (pginfo->cardid > m_maxcard)
-                m_maxcard = pginfo->cardid;
+            m_cardref[pginfo->GetCardID()]++;
+            if (pginfo->GetCardID() > m_maxcard)
+                m_maxcard = pginfo->GetCardID();
 
-            m_inputref[pginfo->inputid]++;
-            if (pginfo->inputid > m_maxinput)
-                m_maxinput = pginfo->inputid;
+            m_inputref[pginfo->GetInputID()]++;
+            if (pginfo->GetInputID() > m_maxinput)
+                m_maxinput = pginfo->GetInputID();
 
-            QDate date = (pginfo->recstartts).date();
+            QDate date = (pginfo->GetRecordingStartTime()).date();
             m_recgroupList[date].push_back(pginfo);
             m_recgroupList[date].setAutoDelete(false);
 
@@ -338,13 +340,13 @@ void ViewScheduled::LoadList(bool useExistingData)
         for (i = listPos; i >= 0; --i)
         {
             ProgramInfo *pginfo = plist[i];
-            if (callsign == pginfo->chansign &&
-                startts == pginfo->startts)
+            if (callsign == pginfo->GetChannelSchedulingID() &&
+                startts  == pginfo->GetScheduledStartTime())
             {
                 listPos = i;
                 break;
             }
-            else if (recstartts <= pginfo->recstartts)
+            else if (recstartts <= pginfo->GetRecordingStartTime())
                 listPos = i;
         }
         m_schedulesList->SetItemCurrent(listPos);
@@ -400,31 +402,33 @@ void ViewScheduled::FillList()
 
         QString state;
 
-        if (pginfo->recstatus == rsRecording)
+        const RecStatusType recstatus = pginfo->GetRecordingStatus();
+        if (recstatus == rsRecording)
             state = "running";
-        else if (pginfo->recstatus == rsConflict  ||
-                 pginfo->recstatus == rsOffLine   ||
-                 pginfo->recstatus == rsTunerBusy ||
-                 pginfo->recstatus == rsFailed    ||
-                 pginfo->recstatus == rsAborted)
+        else if (recstatus == rsConflict  ||
+                 recstatus == rsOffLine   ||
+                 recstatus == rsTunerBusy ||
+                 recstatus == rsFailed    ||
+                 recstatus == rsAborted)
             state = "error";
-        else if (pginfo->recstatus == rsWillRecord)
+        else if (recstatus == rsWillRecord)
         {
             if ((m_curcard == 0 && m_curinput == 0) ||
-                pginfo->cardid == m_curcard || pginfo->inputid == m_curinput)
+                pginfo->GetCardID() == m_curcard ||
+                pginfo->GetInputID() == m_curinput)
             {
-                if (pginfo->recpriority2 < 0)
+                if (pginfo->GetRecordingPriority2() < 0)
                     state = "warning";
                 else
                     state = "normal";
             }
         }
-        else if (pginfo->recstatus == rsRepeat ||
-                    pginfo->recstatus == rsOtherShowing ||
-                    pginfo->recstatus == rsNeverRecord ||
-                    pginfo->recstatus == rsDontRecord ||
-                    (pginfo->recstatus != rsDontRecord &&
-                    pginfo->recstatus <= rsEarlierShowing))
+        else if (recstatus == rsRepeat ||
+                 recstatus == rsOtherShowing ||
+                 recstatus == rsNeverRecord ||
+                 recstatus == rsDontRecord ||
+                 (recstatus != rsDontRecord &&
+                  recstatus <= rsEarlierShowing))
             state = "disabled";
         else
             state = "warning";
@@ -437,7 +441,7 @@ void ViewScheduled::FillList()
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
-        QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+        QString rating = QString::number(pginfo->GetStars(10));
         item->DisplayState(rating, "ratingstate");
         item->DisplayState(state, "status");
 
@@ -450,13 +454,13 @@ void ViewScheduled::FillList()
         if (m_conflictBool)
         {
             // Find first conflict and store in m_conflictDate field
-            ProgramList::iterator it = plist.begin();
+            ProgramList::const_iterator it = plist.begin();
             for (; it != plist.end(); ++it)
             {
-                ProgramInfo *p = *it;
-                if (p->recstatus == rsConflict)
+                ProgramInfo &p = **it;
+                if (p.GetRecordingStatus() == rsConflict)
                 {
-                    m_conflictDate = p->recstartts.date();
+                    m_conflictDate = p.GetRecordingStartTime().date();
                     break;
                 }
             }
@@ -504,7 +508,7 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
                                                     (GetChild("ratingstate"));
         if (ratingState)
         {
-            QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+            QString rating = QString::number(pginfo->GetStars(10));
             ratingState->DisplayState(rating);
         }
     }
@@ -554,7 +558,7 @@ void ViewScheduled::deleteRule()
     }
 
     QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
-                                                .arg(pginfo->RecTypeText());
+        .arg(toString(pginfo->GetRecordingRuleType()));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

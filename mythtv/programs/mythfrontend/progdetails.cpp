@@ -16,14 +16,11 @@
 
 #define LASTPAGE 2
 
-ProgDetails::ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo)
-           : MythScreenType (parent, "progdetails")
+ProgDetails::ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo) :
+    MythScreenType (parent, "progdetails"),
+    m_progInfo(*progInfo), m_browser(NULL),
+    m_currentPage(0)
 {
-    m_progInfo = *progInfo;
-    m_browser = NULL;
-
-    m_currentPage = 0;
-    m_page[0] = m_page[1] = QString();
 }
 
 bool ProgDetails::Create(void)
@@ -217,16 +214,16 @@ void ProgDetails::loadPage(void)
     bool recorded = false;
 
     RecordingRule* record = NULL;
-    if (m_progInfo.recordid)
+    if (m_progInfo.GetRecordingRuleID())
     {
         record = new RecordingRule();
         record->LoadByProgram(&m_progInfo);
     }
 
-    if (m_progInfo.filesize > 0)
+    if (m_progInfo.GetFilesize())
         recorded = true;
 
-    if (m_progInfo.endts != m_progInfo.startts)
+    if (m_progInfo.GetScheduledEndTime() != m_progInfo.GetScheduledStartTime())
     {
         QString ptable = "program";
         if (recorded)
@@ -239,8 +236,8 @@ void ProgDetails::loadPage(void)
                       " FROM %1 WHERE chanid = :CHANID AND"
                       " starttime = :STARTTIME ;").arg(ptable));
 
-        query.bindValue(":CHANID", m_progInfo.chanid);
-        query.bindValue(":STARTTIME", m_progInfo.startts);
+        query.bindValue(":CHANID",    m_progInfo.GetChanID());
+        query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
 
         if (query.exec() && query.next())
         {
@@ -261,12 +258,14 @@ void ProgDetails::loadPage(void)
         else if (!query.isActive())
             MythDB::DBError("ProgDetails", query);
 
-        rating = getRatings(recorded, m_progInfo.chanid.toUInt(), m_progInfo.startts);
+        rating = getRatings(
+            recorded, m_progInfo.GetChanID(),
+            m_progInfo.GetScheduledStartTime());
     }
 
-    if (category_type.isEmpty() && !m_progInfo.programid.isEmpty())
+    if (category_type.isEmpty() && !m_progInfo.GetProgramID().isEmpty())
     {
-        QString prefix = m_progInfo.programid.left(2);
+        QString prefix = m_progInfo.GetProgramID().left(2);
 
         if (prefix == "MV")
            category_type = "movie";
@@ -278,14 +277,12 @@ void ProgDetails::loadPage(void)
            category_type = "tvshow";
     }
 
-    QString s = m_progInfo.title;
-    if (!m_progInfo.subtitle.isEmpty())
-        s += " - \"" + m_progInfo.subtitle + "\"";
-    addItem("TITLE", tr("Title"), s);
+    addItem("TITLE", tr("Title"),
+            m_progInfo.toString(ProgramInfo::kTitleSubtitle, " - "));
 
     addItem("TITLE_PRONOUNCE", tr("Title Pronounce"), title_pronounce);
 
-    s = m_progInfo.description;
+    QString s = m_progInfo.GetDescription();
 
     QString attr;
 
@@ -340,7 +337,7 @@ void ProgDetails::loadPage(void)
 
     if (generic && category_type == "series")
         attr += tr("Unidentified Episode") + ", ";
-    else if (m_progInfo.repeat)
+    else if (m_progInfo.IsRepeat())
         attr += tr("Repeat") + ", ";
 
     if (!attr.isEmpty())
@@ -352,16 +349,16 @@ void ProgDetails::loadPage(void)
     addItem("DESCRIPTION", tr("Description"), s);
 
     s.clear();
-    if (!m_progInfo.category.isEmpty())
+    if (!m_progInfo.GetCategory().isEmpty())
     {
-        s = m_progInfo.category;
+        s = m_progInfo.GetCategory();
 
         query.prepare("SELECT genre FROM programgenres "
                       "WHERE chanid = :CHANID AND starttime = :STARTTIME "
                       "AND relevance > 0 ORDER BY relevance;");
 
-        query.bindValue(":CHANID", m_progInfo.chanid);
-        query.bindValue(":STARTTIME", m_progInfo.startts);
+        query.bindValue(":CHANID",    m_progInfo.GetChanID());
+        query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
 
         if (query.exec())
         {
@@ -375,8 +372,8 @@ void ProgDetails::loadPage(void)
     if (!category_type.isEmpty())
     {
         s = category_type;
-        if (!m_progInfo.seriesid.isEmpty())
-            s += "  (" + m_progInfo.seriesid + ")";
+        if (!m_progInfo.GetSeriesID().isEmpty())
+            s += "  (" + m_progInfo.GetSeriesID() + ")";
         if (!showtype.isEmpty())
             s += "  " + showtype;
     }
@@ -385,19 +382,20 @@ void ProgDetails::loadPage(void)
     addItem("EPISODE", tr("Episode Number"), epinum);
 
     s.clear();
-    if (m_progInfo.hasAirDate && category_type != "movie")
+    if (m_progInfo.GetOriginalAirDate().isValid() &&
+        category_type != "movie")
     {
-        s = m_progInfo.originalAirDate.toString(fullDateFormat);
+        s = m_progInfo.GetOriginalAirDate().toString(fullDateFormat);
     }
     addItem("ORIGINAL_AIRDATE", tr("Original Airdate"), s);
 
-    addItem("PROGRAMID", tr("Program ID"), m_progInfo.programid);
+    addItem("PROGRAMID", tr("Program ID"), m_progInfo.GetProgramID());
 
     QString actors, director, producer, execProducer;
     QString writer, guestStar, host, adapter;
     QString presenter, commentator, guest;
 
-    if (m_progInfo.endts != m_progInfo.startts)
+    if (m_progInfo.GetScheduledEndTime() != m_progInfo.GetScheduledStartTime())
     {
         if (recorded)
             query.prepare("SELECT role,people.name FROM recordedcredits"
@@ -412,8 +410,8 @@ void ProgDetails::loadPage(void)
                           " WHERE credits.chanid = :CHANID"
                           " AND credits.starttime = :STARTTIME"
                           " ORDER BY role;");
-        query.bindValue(":CHANID", m_progInfo.chanid);
-        query.bindValue(":STARTTIME", m_progInfo.startts);
+        query.bindValue(":CHANID",    m_progInfo.GetChanID());
+        query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
 
         if (query.exec() && query.size() > 0)
         {
@@ -511,15 +509,14 @@ void ProgDetails::loadPage(void)
     // Begin MythTV information not found in the listings info
 //    msg += "<br>";
     QDateTime statusDate;
-    if (m_progInfo.recstatus == rsWillRecord)
-        statusDate = m_progInfo.startts;
+    if (m_progInfo.GetRecordingStatus() == rsWillRecord)
+        statusDate = m_progInfo.GetScheduledStartTime();
 
-    ProgramInfo *p = new ProgramInfo;
-    p->rectype = kSingleRecord; // must be != kNotRecording
-    p->recstatus = m_progInfo.recstatus;
+    RecordingType rectype = kSingleRecord; // avoid kNotRecording
+    RecStatusType recstatus = m_progInfo.GetRecordingStatus();
 
-    if (p->recstatus == rsPreviousRecording ||
-        p->recstatus == rsNeverRecord || p->recstatus == rsUnknown)
+    if (recstatus == rsPreviousRecording || recstatus == rsNeverRecord ||
+        recstatus == rsUnknown)
     {
         query.prepare("SELECT recstatus, starttime "
                       "FROM oldrecorded WHERE duplicate > 0 AND "
@@ -528,41 +525,49 @@ void ProgDetails::loadPage(void)
                       "  subtitle <> '' AND subtitle = :SUBTITLE AND "
                       "  description <> '' AND description = :DECRIPTION));");
 
-        query.bindValue(":PROGRAMID", m_progInfo.programid);
-        query.bindValue(":TITLE", m_progInfo.title);
-        query.bindValue(":SUBTITLE", m_progInfo.subtitle);
-        query.bindValue(":DECRIPTION", m_progInfo.description);
+        query.bindValue(":PROGRAMID",  m_progInfo.GetProgramID());
+        query.bindValue(":TITLE",      m_progInfo.GetTitle());
+        query.bindValue(":SUBTITLE",   m_progInfo.GetSubtitle());
+        query.bindValue(":DECRIPTION", m_progInfo.GetDescription());
 
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("showDetails", query);
-
-        if (query.next())
+        if (!query.exec())
         {
-            if (p->recstatus == rsUnknown)
-                p->recstatus = RecStatusType(query.value(0).toInt());
-            if (p->recstatus == rsPreviousRecording ||
-                p->recstatus == rsNeverRecord || p->recstatus == rsRecorded)
-                statusDate = QDateTime::fromString(query.value(1).toString(),
-                                                  Qt::ISODate);
+            MythDB::DBError("showDetails", query);
+        }
+        else if (query.next())
+        {
+            if (recstatus == rsUnknown)
+                recstatus = RecStatusType(query.value(0).toInt());
+
+            if (recstatus == rsPreviousRecording ||
+                recstatus == rsNeverRecord ||
+                recstatus == rsRecorded)
+            {
+                statusDate = query.value(1).toDateTime();
+            }
         }
     }
-    if (p->recstatus == rsUnknown)
+
+    if (recstatus == rsUnknown)
     {
         if (recorded)
         {
-            p->recstatus = rsRecorded;
-            statusDate = m_progInfo.startts;
+            recstatus = rsRecorded;
+            statusDate = m_progInfo.GetScheduledStartTime();
         }
         else
         {
-            p->rectype = m_progInfo.rectype; // re-enable "Not Recording" status text.
+            // re-enable "Not Recording" status text
+            rectype = m_progInfo.GetRecordingRuleType();
         }
     }
-    s = p->RecStatusText();
+
+    s = toString(recstatus, rectype);
+
     if (statusDate.isValid())
         s += " " + statusDate.toString(fullDateFormat);
+
     addItem("MYTHTV_STATUS", QString("MythTV " + tr("Status")), s);
-    delete p;
 
     QString recordingRule;
     QString lastRecorded;
@@ -572,17 +577,17 @@ void ProgDetails::loadPage(void)
     QString watchListStatus;
     QString searchPhrase;
 
-    if (m_progInfo.recordid)
+    if (m_progInfo.GetRecordingRuleID())
     {
-        recordingRule = QString("%1, ").arg(m_progInfo.recordid);
-        if (m_progInfo.rectype != kNotRecording)
-            recordingRule += m_progInfo.RecTypeText();
+        recordingRule = QString("%1, ").arg(m_progInfo.GetRecordingRuleID());
+        if (m_progInfo.GetRecordingRuleType() != kNotRecording)
+            recordingRule += toString(m_progInfo.GetRecordingRuleType());
         if (!(record->m_title.isEmpty()))
             recordingRule += QString(" \"%2\"").arg(record->m_title);
 
         query.prepare("SELECT last_record, next_record, avg_delay "
                       "FROM record WHERE recordid = :RECORDID");
-        query.bindValue(":RECORDID", m_progInfo.recordid);
+        query.bindValue(":RECORDID", m_progInfo.GetRecordingRuleID());
 
         if (query.exec() && query.next())
         {
@@ -596,33 +601,35 @@ void ProgDetails::loadPage(void)
         }
         if (recorded)
         {
-            if (m_progInfo.recpriority2 > 0)
-                watchListScore = QString("%1").arg(m_progInfo.recpriority2);
+            if (m_progInfo.GetRecordingPriority2() > 0)
+                watchListScore =
+                    QString::number(m_progInfo.GetRecordingPriority2());
 
-            if (m_progInfo.recpriority2 < 0)
+            if (m_progInfo.GetRecordingPriority2() < 0)
             {
-                switch(m_progInfo.recpriority2)
+                switch (m_progInfo.GetRecordingPriority2())
                 {
-                case wlExpireOff:
-                    watchListStatus = tr("Auto-expire off");
-                    break;
-                case wlWatched:
-                    watchListStatus = tr("Marked as 'watched'");
-                    break;
-                case wlEarlier:
-                    watchListStatus = tr("Not the earliest episode");
-                    break;
-                case wlDeleted:
-                    watchListStatus = tr("Recently deleted episode");
-                    break;
+                    case wlExpireOff:
+                        watchListStatus = tr("Auto-expire off");
+                        break;
+                    case wlWatched:
+                        watchListStatus = tr("Marked as 'watched'");
+                        break;
+                    case wlEarlier:
+                        watchListStatus = tr("Not the earliest episode");
+                        break;
+                    case wlDeleted:
+                        watchListStatus = tr("Recently deleted episode");
+                        break;
                 }
             }
         }
         if (record->m_searchType != kManualSearch &&
-            record->m_description != m_progInfo.description)
-            searchPhrase = record->m_description.replace("<", "&lt;")
-                                                .replace(">", "&gt;")
-                                                .replace("\n", " ");
+            record->m_description != m_progInfo.GetDescription())
+        {
+            searchPhrase = record->m_description
+                .replace("<", "&lt;").replace(">", "&gt;").replace("\n", " ");
+        }
     }
     addItem("RECORDING_RULE", tr("Recording Rule"), recordingRule);
     addItem("LAST_RECORDED", tr("Last Recorded"), lastRecorded);
@@ -633,11 +640,12 @@ void ProgDetails::loadPage(void)
     addItem("SEARCH_PHRASE", tr("Search Phrase"), searchPhrase);
 
     s.clear();
-    if (m_progInfo.findid > 0)
+    if (m_progInfo.GetFindID())
     {
         QDate fdate(1970, 1, 1);
-        fdate = fdate.addDays(m_progInfo.findid - 719528);
-        s = QString("%1 (%2)").arg(m_progInfo.findid).arg(fdate.toString(fullDateFormat));
+        fdate = fdate.addDays((int)m_progInfo.GetFindID() - 719528);
+        s = QString("%1 (%2)").arg(m_progInfo.GetFindID())
+            .arg(fdate.toString(fullDateFormat));
     }
     addItem("FINDID", tr("Find ID"), s);
 
@@ -651,26 +659,27 @@ void ProgDetails::loadPage(void)
 
     if (recorded)
     {
-        recordingHost = m_progInfo.hostname;
-        recordedFilename = m_progInfo.GetRecordBasename();
-        recordedFileSize.sprintf("%0.2f ", m_progInfo.filesize / 1024.0 / 1024.0 / 1024.0);
+        recordingHost = m_progInfo.GetHostname();
+        recordedFilename = m_progInfo.GetBasename();
+        recordedFileSize = QString("%1 ")
+            .arg((double)(m_progInfo.GetFilesize()>>30),0,'f',2);
         recordedFileSize += tr("GB", "GigaBytes");
 
         query.prepare("SELECT profile FROM recorded"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME;");
-        query.bindValue(":CHANID", m_progInfo.chanid);
-        query.bindValue(":STARTTIME", m_progInfo.recstartts);
+        query.bindValue(":CHANID",    m_progInfo.GetChanID());
+        query.bindValue(":STARTTIME", m_progInfo.GetRecordingStartTime());
 
         if (query.exec() && query.next())
         {
             recordingProfile = m_progInfo.i18n(query.value(0).toString());
         }
-        recordingGroup = m_progInfo.i18n(m_progInfo.recgroup);
-        storageGroup =  m_progInfo.i18n(m_progInfo.storagegroup);
-        playbackGroup =  m_progInfo.i18n(m_progInfo.playgroup);
+        recordingGroup = m_progInfo.i18n(m_progInfo.GetRecordingGroup());
+        storageGroup   = m_progInfo.i18n(m_progInfo.GetStorageGroup());
+        playbackGroup  = m_progInfo.i18n(m_progInfo.GetPlaybackGroup());
     }
-    else if (m_progInfo.recordid)
+    else if (m_progInfo.GetRecordingRuleID())
     {
         recordingProfile =  record->m_recProfile;
     }

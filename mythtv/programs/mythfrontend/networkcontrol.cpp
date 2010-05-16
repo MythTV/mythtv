@@ -1252,7 +1252,7 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
 QString NetworkControl::saveScreenshot(NetworkCommand *nc)
 {
     QString result;
-    long long frameNumber = 150;
+    int64_t frameNumber = 150;
 
     QString location = GetMythUI()->GetCurrentLocation();
 
@@ -1271,14 +1271,18 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
     while (timer.elapsed() < 2000  && !gotAnswer)
         usleep(10000);
 
-    ProgramInfo *pginfo = NULL;
     if (gotAnswer)
     {
         int width = -1;
         int height = -1;
         QStringList results = answer.simplified().split(" ");
-        pginfo = ProgramInfo::GetProgramFromRecorded(results[5], results[6]);
-        if (!pginfo)
+        if (results.size() < 8)
+            return "ERROR: Invalid network control command";
+
+        uint chanid = results[5].toUInt();
+        QDateTime recstartts = myth_dt_from_string(results[6]);
+        ProgramInfo pginfo(chanid, recstartts);
+        if (!pginfo.GetChanID())
             return "ERROR: Unable to find program info for current program";
 
         QString outFile = QDir::homePath() + "/.mythtv/screenshot.png";
@@ -1293,16 +1297,14 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
             height = size[1].toInt();
         }
 
-        frameNumber = results[7].toInt();
+        frameNumber = results[7].toLongLong();
 
-        PreviewGenerator *previewgen = new PreviewGenerator(pginfo);
+        PreviewGenerator *previewgen = new PreviewGenerator(&pginfo);
         previewgen->SetPreviewTimeAsFrameNumber(frameNumber);
         previewgen->SetOutputFilename(outFile);
         previewgen->SetOutputSize(QSize(width, height));
         bool ok = previewgen->Run();
         previewgen->deleteLater();
-
-        delete pginfo;
 
         QString str = "ERROR: Unable to generate screenshot, check logs";
         if (ok)

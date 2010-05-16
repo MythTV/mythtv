@@ -348,15 +348,13 @@ bool RemoteGetRecordingStatus(
             strlist << "GET_RECORDING";
             gCoreContext->SendReceiveStringList(strlist);
 
-            ProgramInfo progInfo;
-            QStringList::const_iterator it = strlist.constBegin();
-            progInfo.FromStringList(it, strlist.constEnd());
+            ProgramInfo progInfo(strlist);
 
-            title       = progInfo.title;
-            subtitle    = progInfo.subtitle;
-            channelName = progInfo.channame;
-            dtStart     = progInfo.startts;
-            dtEnd       = progInfo.endts;
+            title       = progInfo.GetTitle();
+            subtitle    = progInfo.GetSubtitle();
+            channelName = progInfo.GetChannelName();
+            dtStart     = progInfo.GetScheduledStartTime();
+            dtEnd       = progInfo.GetScheduledEndTime();
         }
         else if (!list_inactive)
             continue;

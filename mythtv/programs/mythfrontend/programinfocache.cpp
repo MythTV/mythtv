@@ -119,7 +119,7 @@ void ProgramInfoCache::Refresh(void)
         vector<ProgramInfo*>::iterator it = m_next_cache->begin();
         for (; it != m_next_cache->end(); ++it)
         {
-            PICKey k((*it)->chanid.toUInt(), (*it)->recstartts);
+            PICKey k((*it)->GetChanID(), (*it)->GetRecordingStartTime());
             m_cache[k] = *it;
         }
         delete m_next_cache;
@@ -135,7 +135,7 @@ void ProgramInfoCache::Refresh(void)
         nit = it;
         nit++;
 
-        if (it->second->availableStatus == asDeleted)
+        if (it->second->GetAvailableStatus() == asDeleted)
         {
             delete it->second;
             m_cache.erase(it);
@@ -152,14 +152,10 @@ bool ProgramInfoCache::Update(const ProgramInfo &pginfo)
     QMutexLocker locker(&m_lock);
 
     Cache::iterator it = m_cache.find(
-        PICKey(pginfo.chanid.toUInt(),pginfo.recstartts));
+        PICKey(pginfo.GetChanID(),pginfo.GetRecordingStartTime()));
 
     if (it != m_cache.end())
-    {
-        QString pathname = it->second->pathname;
-        *(it->second) = pginfo;
-        it->second->pathname = pathname;
-    }
+        it->second->clone(pginfo, true);
 
     return it != m_cache.end();
 }
@@ -177,9 +173,9 @@ bool ProgramInfoCache::UpdateFileSize(
 
     if (it != m_cache.end())
     {
-        it->second->filesize = filesize;
+        it->second->SetFilesize(filesize);
         if (filesize)
-            it->second->availableStatus = asAvailable;
+            it->second->SetAvailableStatus(asAvailable, "PIC::UpdateFileSize");
     }
 
     return it != m_cache.end();
@@ -197,7 +193,7 @@ QString ProgramInfoCache::GetRecGroup(
 
     QString recgroup;
     if (it != m_cache.end())
-        recgroup = it->second->recgroup;
+        recgroup = it->second->GetRecordingGroup();
 
     return recgroup;
 }
@@ -210,7 +206,7 @@ void ProgramInfoCache::Add(const ProgramInfo &pginfo)
     if (Update(pginfo))
         return;
 
-    PICKey key(pginfo.chanid.toUInt(),pginfo.recstartts);
+    PICKey key(pginfo.GetChanID(),pginfo.GetRecordingStartTime());
     m_cache[key] = new ProgramInfo(pginfo);
 }
 
@@ -224,7 +220,7 @@ bool ProgramInfoCache::Remove(uint chanid, const QDateTime &recstartts)
     Cache::iterator it = m_cache.find(PICKey(chanid,recstartts));
 
     if (it != m_cache.end())
-        it->second->availableStatus = asDeleted;
+        it->second->SetAvailableStatus(asDeleted, "PIC::Remove");
 
     return it != m_cache.end();
 }

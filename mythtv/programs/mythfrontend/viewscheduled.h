@@ -3,15 +3,13 @@
 
 // QT
 #include <QDateTime>
+#include <QString>
+#include <QMap>
 
-// libmythtv
-#include "programlist.h"
-
-// libmythui
-#include "mythscreentype.h"
-
-// mythfrontend
+// MythTV
 #include "schedulecommon.h"
+#include "mythscreentype.h"
+#include "programinfo.h"
 
 class TV;
 class Timer;
@@ -91,12 +89,12 @@ class ViewScheduled : public ScheduleCommon
     QDate m_defaultGroup;
 
     QMap<int, int> m_cardref;
-    int m_maxcard;
-    int m_curcard;
+    uint m_maxcard;
+    uint m_curcard;
 
     QMap<int, int> m_inputref;
-    int m_maxinput;
-    int m_curinput;
+    uint m_maxinput;
+    uint m_curinput;
 
     TV *m_player;
 };

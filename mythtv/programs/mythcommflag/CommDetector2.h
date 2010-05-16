@@ -43,11 +43,11 @@ class CommDetector2 : public CommDetectorBase
         int chanid, const QDateTime& startts, const QDateTime& endts,
         const QDateTime& recstartts, const QDateTime& recendts, bool useDB);
     virtual bool go(void);
-    virtual void getCommercialBreakList(QMap<long long, int> &comms);
+    virtual void GetCommercialBreakList(frm_dir_map_t &comms);
     virtual void recordingFinished(long long totalFileSize);
     virtual void requestCommBreakMapUpdate(void);
     virtual void PrintFullMap(
-        ostream &out, const comm_break_t *comm_breaks, bool verbose) const;
+        ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const;
 
   private:
     virtual ~CommDetector2() {}

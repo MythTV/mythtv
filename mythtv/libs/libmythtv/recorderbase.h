@@ -2,6 +2,8 @@
 #ifndef RECORDERBASE_H_
 #define RECORDERBASE_H_
 
+#include <stdint.h>
+
 #include <QWaitCondition>
 #include <QString>
 #include <QMutex>
@@ -11,13 +13,12 @@
 
 #include "mythexp.h"
 #include "mythtimer.h"
+#include "programtypes.h" // for MarkTypes, frm_pos_map_t
 
 class TVRec;
 class RingBuffer;
 class ProgramInfo;
 class RecordingProfile;
-
-typedef QMap<long long, long long> PosMap;
 
 /** \class RecorderBase
  *  \brief This is the abstract base class for supporting
@@ -179,9 +180,9 @@ class MPUBLIC RecorderBase
      *  \return Closest prior keyframe, or -1 if there is no prior
      *          known keyframe.
      */
-    virtual long long GetKeyframePosition(long long desired) const;
-    virtual bool GetKeyframePositions(
-        long long start, long long end, PosMap&) const;
+    int64_t GetKeyframePosition(uint64_t desired) const;
+    bool GetKeyframePositions(
+        int64_t start, int64_t end, frm_pos_map_t&) const;
 
     /** \brief Pause tells StartRecording() to pause, it should not block.
      *
@@ -242,7 +243,7 @@ class MPUBLIC RecorderBase
 
     /** \brief Set seektable type
      */
-    void SetPositionMapType(int type) { positionMapType = type; }
+    void SetPositionMapType(MarkTypes type) { positionMapType = type; }
 
     /** \brief Note a change in aspect ratio in the recordedmark table
      */
@@ -285,10 +286,10 @@ class MPUBLIC RecorderBase
     ProgramInfo   *nextRecording;
 
     // Seektable  support
-    int            positionMapType;
+    MarkTypes      positionMapType;
     mutable QMutex positionMapLock;
-    PosMap         positionMap;
-    PosMap         positionMapDelta;
+    frm_pos_map_t  positionMap;
+    frm_pos_map_t  positionMapDelta;
     MythTimer      positionMapTimer;
 };
 

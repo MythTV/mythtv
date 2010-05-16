@@ -178,9 +178,9 @@ QString PlayGroup::GetInitialName(const ProgramInfo *pi)
                   "      name = :CATEGORY OR "
                   "      (titlematch <> '' AND "
                   "       :TITLE2 REGEXP titlematch) ");
-    query.bindValue(":TITLE1", pi->title);
-    query.bindValue(":TITLE2", pi->title);
-    query.bindValue(":CATEGORY", pi->category);
+    query.bindValue(":TITLE1", pi->GetTitle());
+    query.bindValue(":TITLE2", pi->GetTitle());
+    query.bindValue(":CATEGORY", pi->GetCategory());
 
     if (!query.exec())
         MythDB::DBError("GetInitialName", query);

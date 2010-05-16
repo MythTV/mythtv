@@ -151,12 +151,9 @@ ProgramInfo *RemoteEncoder::GetRecording(void)
 
     if (SendReceiveStringList(strlist))
     {
-        ProgramInfo *proginfo = new ProgramInfo();
-        QStringList::const_iterator it = strlist.begin();
-
-        if (proginfo->FromStringList(it, strlist.end()))
+        ProgramInfo *proginfo = new ProgramInfo(strlist);
+        if (proginfo->GetChanID())
             return proginfo;
-
         delete proginfo;
     }
 
@@ -259,14 +256,14 @@ long long RemoteEncoder::GetMaxBitrate(void)
     return 20200000LL; // Peek bit rate for HD-PVR
 }
 
-/** \fn RemoteEncoder::GetKeyframePosition(long long)
+/** \fn RemoteEncoder::GetKeyframePosition(uint64_t)
  *  \brief Returns byte position in RingBuffer of a keyframe.
  *
- *  \sa TVRec::GetKeyframePosition(long long),
- *      EncoderLink::GetKeyframePosition(long long)
+ *  \sa TVRec::GetKeyframePosition(uint64_t),
+ *      EncoderLink::GetKeyframePosition(uint64_t)
  *  \return Byte position of keyframe if query succeeds, -1 otherwise.
  */
-long long RemoteEncoder::GetKeyframePosition(long long desired)
+int64_t RemoteEncoder::GetKeyframePosition(uint64_t desired)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "GET_KEYFRAME_POS";

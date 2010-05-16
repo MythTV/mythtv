@@ -52,6 +52,7 @@ const char *kOSDDialogAllowRecording = "allowrecordingbox";
 const char *kOSDDialogAlreadyEditing = "alreadybeingedited";
 const char *kOSDDialogExitOptions    = "exitplayoptions";
 const char *kOSDDialogAskDelete      = "askdeleterecording";
+const char *kOSDDialogCanNotDelete   = "cannotdeleterecording";
 const char *kOSDDialogIdleTimeout    = "idletimeout";
 const char *kOSDDialogSleepTimeout   = "sleeptimeout";
 const char *kOSDDialogChannelTimeout = "channel_timed_out";
@@ -2747,8 +2748,8 @@ void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker
     }
 }
 
-void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
-                       long long totalFrames)
+void OSD::DoEditSlider(const frm_dir_map_t &deleteMap,
+                       uint64_t curFrame, uint64_t totalFrames)
 {
     QMutexLocker locker(&osdlock);
 
@@ -2767,7 +2768,7 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
             int endpos = 0;
             bool first = true;
 
-            QMap<long long, int>::Iterator i = deleteMap.begin();
+            frm_dir_map_t::const_iterator i = deleteMap.begin();
             for (; i != deleteMap.end(); ++i)
             {
                 long long frame = i.key();

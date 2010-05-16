@@ -64,7 +64,7 @@ class PlaybackSock
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);
     int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
-    bool FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
+    bool FillProgramInfo(ProgramInfo &pginfo, const QString &playbackhost);
     QStringList GetSGFileList(QString &host, QString &groupname,
                               QString &directory, bool fileNamesOnly);
     QStringList GetSGFileQuery(QString &host, QString &groupname,
@@ -84,7 +84,7 @@ class PlaybackSock
                 int        time_buffer = 5);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);
-    ProgramInfo *GetRecording(int capturecardnum);
+    ProgramInfo *GetRecording(uint cardid);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
     RecStatusType StartRecording(int capturecardnum,
                                  const ProgramInfo *pginfo);

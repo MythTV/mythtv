@@ -60,6 +60,28 @@ QDateTime mythCurrentDateTime()
     return rettime;
 }
 
+QDateTime myth_dt_from_string(const QString &dtstr)
+{
+    if (dtstr.isEmpty())
+        return QDateTime();
+
+    if (!dtstr.contains("-") && dtstr.length() == 14)
+    {
+        // must be in YYYYMMDDhhmmss format, convert to ISODate
+        QString isodate =
+            QString("%1-%2-%3T%4:%5:%6")
+            .arg(dtstr.mid( 0,4), 4, QLatin1Char('0'))
+            .arg(dtstr.mid( 4,2), 2, QLatin1Char('0'))
+            .arg(dtstr.mid( 6,2), 2, QLatin1Char('0'))
+            .arg(dtstr.mid( 8,2), 2, QLatin1Char('0'))
+            .arg(dtstr.mid(10,2), 2, QLatin1Char('0'))
+            .arg(dtstr.mid(12,2), 2, QLatin1Char('0'));
+        return QDateTime::fromString(isodate, Qt::ISODate);
+    }
+
+    return QDateTime::fromString(dtstr, Qt::ISODate);
+}
+
 int calc_utc_offset(void)
 {
     QDateTime loc = QDateTime::currentDateTime();

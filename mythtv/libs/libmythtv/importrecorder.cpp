@@ -81,13 +81,13 @@ void ImportRecorder::StartRecording(void)
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- " +
             QString("attempting to open '%1'")
-            .arg(curRecording->GetFileName()));
+            .arg(curRecording->GetPathname()));
 
     // retry opening the file until StopRecording() is called.
     while (!Open() && _request_recording && !_error)
         usleep(20000);
 
-    curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+    curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
 
     // build seek table
     if (_import_fd && _request_recording && !_error)
@@ -107,7 +107,7 @@ void ImportRecorder::StartRecording(void)
         delete ctx;
     }
 
-    curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+    curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
 
     // cleanup...
     Close();
@@ -137,7 +137,7 @@ bool ImportRecorder::Open(void)
     if (!curRecording)
         return false;
 
-    QString fn = curRecording->GetFileName();
+    QString fn = curRecording->GetPathname();
     QFileInfo f(fn);
     if (!f.exists())
     {

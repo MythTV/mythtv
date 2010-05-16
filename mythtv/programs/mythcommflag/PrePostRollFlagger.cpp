@@ -381,7 +381,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 }
 
 
-void PrePostRollFlagger::getCommercialBreakList(comm_map_t &marks)
+void PrePostRollFlagger::GetCommercialBreakList(frm_dir_map_t &marks)
 {
     VERBOSE(VB_COMMFLAG, "PrePostRollFlagger::GetCommBreakMap()");
     marks.clear();

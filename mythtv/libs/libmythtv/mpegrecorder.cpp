@@ -1042,7 +1042,7 @@ void MpegRecorder::StartRecording(void)
 
     if (driver == "hdpvr")
     {
-        if (curRecording->recgroup == "LiveTV")
+        if (curRecording->GetRecordingGroup() == "LiveTV")
         {
             // Don't bother checking resolution, always use best bitrate
             int maxbitrate = std::max(high_mpeg4peakbitrate,
@@ -1529,7 +1529,7 @@ bool MpegRecorder::StartEncoding(int fd)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
 
-    if (driver == "hdpvr" && curRecording->recgroup != "LiveTV")
+    if (driver == "hdpvr" && curRecording->GetRecordingGroup() != "LiveTV")
         HandleResolutionChanges();
 
     VERBOSE(VB_RECORD, LOC + "StartEncoding");

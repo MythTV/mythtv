@@ -7,8 +7,6 @@
 // MythTV headers
 #include "mythscreentype.h"
 #include "programinfo.h"
-#include "programlist.h"
-
 #include "mythwidgets.h"
 
 // mythfrontend

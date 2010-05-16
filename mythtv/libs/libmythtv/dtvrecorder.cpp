@@ -126,7 +126,7 @@ void DTVRecorder::FinishRecording(void)
     if (curRecording)
     {
         if (ringBuffer)
-            curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
 //     positionMapLock.lock();
@@ -419,7 +419,7 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     {
         ringBuffer->WriterFlush();
         if (curRecording)
-            curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
     }
 
     // Then we set the next info

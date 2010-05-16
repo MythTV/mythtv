@@ -2029,17 +2029,17 @@ long long getCutFrames(const QString &filename)
     if (!progInfo)
         return 0;
 
-    if (progInfo->isVideo)
+    if (progInfo->IsVideo())
     {
         delete progInfo;
         return 0;
     }
 
-    QMap<long long, int> cutlist;
-    QMap<long long, int>::Iterator it;
-    long long frames = 0;
+    frm_dir_map_t cutlist;
+    frm_dir_map_t::iterator it;
+    uint64_t frames = 0;
 
-    progInfo->GetCutList(cutlist);
+    progInfo->QueryCutList(cutlist);
 
     if (cutlist.size() == 0)
     {
@@ -2049,7 +2049,7 @@ long long getCutFrames(const QString &filename)
 
     for (it = cutlist.begin(); it != cutlist.end();)
     {
-        long long start = 0, end = 0;
+        uint64_t start = 0, end = 0;
 
         if (it.value() == MARK_CUT_START)
         {
@@ -2077,20 +2077,20 @@ long long getFrameCount(const QString &filename, float fps)
         basename = filename.mid(pos + 1);
 
     int keyframedist = -1;
-    QMap<long long, long long> posMap;
+    frm_pos_map_t posMap;
 
     ProgramInfo *progInfo = getProgramInfoForFile(basename);
     if (!progInfo)
         return 0;
 
-    progInfo->GetPositionMap(posMap, MARK_GOP_BYFRAME);
+    progInfo->QueryPositionMap(posMap, MARK_GOP_BYFRAME);
     if (!posMap.empty())
     {
         keyframedist = 1;
     }
     else
     {
-        progInfo->GetPositionMap(posMap, MARK_GOP_START);
+        progInfo->QueryPositionMap(posMap, MARK_GOP_START);
         if (!posMap.empty())
         {
             keyframedist = 15;
@@ -2099,7 +2099,7 @@ long long getFrameCount(const QString &filename, float fps)
         }
         else
         {
-            progInfo->GetPositionMap(posMap, MARK_KEYFRAME);
+            progInfo->QueryPositionMap(posMap, MARK_KEYFRAME);
             if (!posMap.empty())
             {
                 // keyframedist should be set in the fileheader so no
@@ -2112,9 +2112,9 @@ long long getFrameCount(const QString &filename, float fps)
     if (posMap.empty())
         return 0; // no position map in recording
 
-    QMap<long long, long long>::const_iterator it = posMap.end();
+    frm_pos_map_t::const_iterator it = posMap.end();
     it--;
-    long long totframes = it.key() * keyframedist;
+    uint64_t totframes = it.key() * keyframedist;
     return totframes;
 }
 

@@ -2734,7 +2734,7 @@ static HostCheckBox *UseFixedWindowSize()
 }
 }
 
-static HostComboBox *MythDateFormat()
+static HostComboBox *MythDateFormatCB()
 {
     HostComboBox *gc = new HostComboBox("DateFormat");
     gc->setLabel(QObject::tr("Date format"));
@@ -4655,7 +4655,7 @@ AppearanceSettings::AppearanceSettings()
     dates->addChild(MythLanguage());
     dates->addChild(ISO639PreferredLanguage(0));
     dates->addChild(ISO639PreferredLanguage(1));
-    dates->addChild(MythDateFormat());
+    dates->addChild(MythDateFormatCB());
     dates->addChild(MythShortDateFormat());
     dates->addChild(MythTimeFormat());
     addChild(dates);

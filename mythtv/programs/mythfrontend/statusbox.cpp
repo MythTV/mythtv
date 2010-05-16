@@ -19,18 +19,12 @@ using namespace std;
 #include "jobqueue.h"
 #include "cardutil.h"
 #include "recordinginfo.h"
-#include "programlist.h"
 
 #include "mythuihelper.h"
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
-
-#define REC_CAN_BE_DELETED(rec) \
-    ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
-     ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
-      ((rec)->recgroup != "LiveTV")))
 
 struct LogLine {
     QString line;
@@ -351,12 +345,12 @@ void StatusBox::clicked(MythUIButtonListItem *item)
             menuPopup->SetReturnEvent(this, "AutoExpireManage");
 
             menuPopup->AddButton(tr("Delete Now"), qVariantFromValue(rec));
-            if ((rec)->recgroup == "LiveTV")
+            if ((rec)->GetRecordingGroup() == "LiveTV")
             {
                 menuPopup->AddButton(tr("Move to Default group"),
                                                        qVariantFromValue(rec));
             }
-            else if ((rec)->recgroup == "Deleted")
+            else if ((rec)->GetRecordingGroup() == "Deleted")
                 menuPopup->AddButton(tr("Undelete"), qVariantFromValue(rec));
             else
                 menuPopup->AddButton(tr("Disable AutoExpire"),
@@ -445,23 +439,23 @@ void StatusBox::customEvent(QEvent *event)
             if (!rec)
                 return;
 
-            if ((buttonnum == 0) && REC_CAN_BE_DELETED(rec))
+            if ((buttonnum == 0) && rec->QueryIsDeleteCandidate())
             {
                 RemoteDeleteRecording(
-                    rec->chanid.toUInt(), rec->recstartts, false);
+                    rec->GetChanID(), rec->GetRecordingStartTime(), false);
             }
             else if (buttonnum == 1)
             {
-                if ((rec)->recgroup == "Deleted")
+                if ((rec)->GetRecordingGroup() == "Deleted")
                 {
                     RemoteUndeleteRecording(
-                        rec->chanid.toUInt(), rec->recstartts);
+                        rec->GetChanID(), rec->GetRecordingStartTime());
                 }
                 else
                 {
-                    rec->SetAutoExpire(0);
+                    rec->SaveAutoExpire(kDisableAutoExpire);
 
-                    if ((rec)->recgroup == "LiveTV")
+                    if ((rec)->GetRecordingGroup() == "LiveTV")
                     {
                         RecordingInfo ri(*rec);
                         ri.ApplyRecordRecGroupChange("Default");
@@ -643,18 +637,23 @@ void StatusBox::doScheduleStatus()
     for (; it != schedList.end(); ++it)
     {
         const ProgramInfo *s = *it;
-        if (statusMatch[s->recstatus] < 1)
-            statusText[s->recstatus] = s->RecStatusText();
+        const RecStatusType recstatus = s->GetRecordingStatus();
 
-        ++statusMatch[s->recstatus];
-
-        if (s->recstatus == rsWillRecord || s->recstatus == rsRecording)
+        if (statusMatch[recstatus] < 1)
         {
-            ++sourceMatch[s->sourceid];
-            ++inputMatch[s->inputid];
-            if (s->recpriority2 < 0)
+            statusText[recstatus] = toString(
+                recstatus, s->GetRecordingRuleType());
+        }
+
+        ++statusMatch[recstatus];
+
+        if (recstatus == rsWillRecord || recstatus == rsRecording)
+        {
+            ++sourceMatch[s->GetSourceID()];
+            ++inputMatch[s->GetInputID()];
+            if (s->GetRecordingPriority2() < 0)
                 ++lowerpriority;
-            if (s->videoproperties & VID_HDTV)
+            if (s->GetVideoProperties() & VID_HDTV)
                 ++hdflag;
         }
     }
@@ -784,14 +783,14 @@ void StatusBox::doTunerStatus()
             strlist = QStringList( QString("QUERY_RECORDER %1").arg(cardid));
             strlist << "GET_RECORDING";
             gCoreContext->SendReceiveStringList(strlist);
-            ProgramInfo *proginfo = new ProgramInfo;
-            proginfo->FromStringList(strlist, 0);
-
-            status += ' ' + proginfo->title;
-            status += "\n";
-            status += proginfo->subtitle;
-            longtuner = tun.arg(cardid).arg(devlabel).arg(status);
-            delete proginfo;
+            ProgramInfo pginfo(strlist);
+            if (pginfo.GetChanID())
+            {
+                status += ' ' + pginfo.GetTitle();
+                status += "\n";
+                status += pginfo.GetSubtitle();
+                longtuner = tun.arg(cardid).arg(devlabel).arg(status);
+            }
         }
 
         AddLogLine(shorttuner, longtuner, fontstate);
@@ -874,24 +873,21 @@ void StatusBox::doJobQueueStatus()
 
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            QString chanid = (*it).chanid;
-            QDateTime starttime = (*it).starttime;
-            ProgramInfo *pginfo;
+            ProgramInfo pginfo((*it).chanid, (*it).recstartts);
 
-            pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
-
-            if (!pginfo)
+            if (!pginfo.GetChanID())
                 continue;
 
             detail = QString("%1\n%2 %3 @ %4\n%5 %6     %7 %8")
-                    .arg(pginfo->title)
-                    .arg(pginfo->channame)
-                    .arg(pginfo->chanstr)
-                    .arg(starttime.toString(m_timeDateFormat))
-                    .arg(tr("Job:"))
-                    .arg(JobQueue::JobText((*it).type))
-                    .arg(tr("Status: "))
-                    .arg(JobQueue::StatusText((*it).status));
+                .arg(pginfo.GetTitle())
+                .arg(pginfo.GetChannelName())
+                .arg(pginfo.GetChanNum())
+                .arg(pginfo.GetRecordingStartTime()
+                     .toString(m_timeDateFormat))
+                .arg(tr("Job:"))
+                .arg(JobQueue::JobText((*it).type))
+                .arg(tr("Status: "))
+                .arg(JobQueue::StatusText((*it).status));
 
             if ((*it).status != JOB_QUEUED)
                 detail += " (" + (*it).hostname + ')';
@@ -902,8 +898,9 @@ void StatusBox::doJobQueueStatus()
             else
                 detail += '\n' + (*it).comment;
 
-            line = QString("%1 @ %2").arg(pginfo->title)
-                                     .arg(starttime.toString(m_timeDateFormat));
+            line = QString("%1 @ %2").arg(pginfo.GetTitle())
+                .arg(pginfo.GetRecordingStartTime()
+                     .toString(m_timeDateFormat));
 
             QString font;
             if ((*it).status == JOB_ERRORED)
@@ -912,7 +909,6 @@ void StatusBox::doJobQueueStatus()
                 font = "warning";
 
             AddLogLine(line, detail, font, QString("%1").arg((*it).id));
-            delete pginfo;
         }
     }
     else
@@ -1298,15 +1294,15 @@ void StatusBox::doAutoExpireList()
     {
         pginfo = *it;
 
-        totalSize += pginfo->filesize;
-        if (pginfo->recgroup == "LiveTV")
+        totalSize += pginfo->GetFilesize();
+        if (pginfo->GetRecordingGroup() == "LiveTV")
         {
-            liveTVSize += pginfo->filesize;
+            liveTVSize += pginfo->GetFilesize();
             liveTVCount++;
         }
-        else if (pginfo->recgroup == "Deleted")
+        else if (pginfo->GetRecordingGroup() == "Deleted")
         {
-            deletedGroupSize += pginfo->filesize;
+            deletedGroupSize += pginfo->GetFilesize();
             deletedGroupCount++;
         }
     }
@@ -1326,25 +1322,24 @@ void StatusBox::doAutoExpireList()
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
         pginfo = *it;
-        contentLine = pginfo->recstartts.toString(m_dateFormat) + " - ";
+        contentLine = pginfo->GetRecordingStartTime()
+            .toString(m_dateFormat) + " - ";
 
-        contentLine += "(" + ProgramInfo::i18n(pginfo->recgroup) + ") ";
+        contentLine += "(" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ") ";
 
-        contentLine += pginfo->title +
-                       " (" + sm_str(pginfo->filesize / 1024) + ")";
+        contentLine += pginfo->GetTitle() +
+            " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
         detailInfo = staticInfo;
-        detailInfo += pginfo->recstartts.toString(m_timeDateFormat) + " - " +
-                      pginfo->recendts.toString(m_timeDateFormat);
+        detailInfo +=
+            pginfo->GetRecordingStartTime().toString(m_timeDateFormat) + " - " +
+            pginfo->GetRecordingEndTime().toString(m_timeDateFormat);
 
-        detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")";
+        detailInfo += " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
-        detailInfo += " (" + ProgramInfo::i18n(pginfo->recgroup) + ")";
+        detailInfo += " (" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ")";
 
-        detailInfo += "\n" + pginfo->title;
-
-        if (!pginfo->subtitle.isEmpty())
-            detailInfo += " - " + pginfo->subtitle + "";
+        detailInfo += "\n" + pginfo->toString(ProgramInfo::kTitleSubtitle, " - ");
 
         AddLogLine(contentLine, detailInfo);
     }

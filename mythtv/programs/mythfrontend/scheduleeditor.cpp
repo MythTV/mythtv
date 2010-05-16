@@ -66,7 +66,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             m_previewButton(NULL), m_player(player)
 {
     m_recordingRule = new RecordingRule();
-    m_recordingRule->m_recordID = m_recInfo->recordid;
+    m_recordingRule->m_recordID = m_recInfo->GetRecordingRuleID();
 }
 
 ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
@@ -381,7 +381,7 @@ void ScheduleEditor::showPrevious(void)
 {
     QString title;
     if (m_recInfo)
-        title = m_recInfo->title;
+        title = m_recInfo->GetTitle();
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, m_recordingRule->m_recordID,
                                     title);

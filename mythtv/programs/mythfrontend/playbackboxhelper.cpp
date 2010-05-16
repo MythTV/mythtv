@@ -41,6 +41,7 @@ bool PBHEventHandler::event(QEvent *e)
         const int timer_id = te->timerId();
         if (timer_id == m_freeSpaceTimerId)
             UpdateFreeSpaceEvent();
+        return true;
     }
     else if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
     {
@@ -52,8 +53,8 @@ bool PBHEventHandler::event(QEvent *e)
         }
         else if (me->Message() == "STOP_RECORDING")
         {
-            ProgramInfo pginfo;
-            if (pginfo.FromStringList(me->ExtraDataList(), 0))
+            ProgramInfo pginfo(me->ExtraDataList());
+            if (pginfo.GetChanID())
                 RemoteStopRecording(&pginfo);
             return true;
         }
@@ -89,6 +90,8 @@ bool PBHEventHandler::event(QEvent *e)
                 MythEvent *e = new MythEvent("DELETE_FAILURES", failures);
                 QCoreApplication::postEvent(m_pbh.m_listener, e);
             }
+
+            return true;
         }
         else if (me->Message() == "UNDELETE_RECORDINGS")
         {
@@ -120,19 +123,20 @@ bool PBHEventHandler::event(QEvent *e)
                 MythEvent *e = new MythEvent("UNDELETE_FAILURES", failures);
                 QCoreApplication::postEvent(m_pbh.m_listener, e);
             }
+
+            return true;
         }
         else if (me->Message() == "GET_PREVIEW")
         {
-            ProgramInfo evinfo;
-            if (evinfo.FromStringList(me->ExtraDataList(), 0) &&
-                evinfo.IsFileReadable())
+            ProgramInfo evinfo(me->ExtraDataList());
+            if (evinfo.HasPathname() && evinfo.IsFileReadable())
             {
                 // Note: IsFileReadable() implicitly calls GetPlaybackURL()
                 // when necessary, so we might as well update the pathname
                 // in the PBB cache to avoid calling this again...
                 QStringList list;
                 list.push_back(evinfo.MakeUniqueKey());
-                list.push_back(evinfo.pathname);            
+                list.push_back(evinfo.GetPathname());
                 MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
                 QCoreApplication::postEvent(m_pbh.m_listener, e0);
 
@@ -146,22 +150,24 @@ bool PBHEventHandler::event(QEvent *e)
                     QCoreApplication::postEvent(m_pbh.m_listener, e);
                 }
             }
+
+            return true;
         }
         else if (me->Message() == "CHECK_AVAILABILITY")
         {
-            CheckAvailabilityType cat = kCheckForCache;
+            if (me->ExtraDataCount() < 5 + NUMPROGRAMLINES)
+                return true;
+
+            QStringList slist = me->ExtraDataList();
+            CheckAvailabilityType cat = (CheckAvailabilityType)
+                slist[0].toUInt();
             QTime tm;
-            if (me->ExtraDataCount() >= 5)
-            {
-                cat = (CheckAvailabilityType) me->ExtraData(0).toUInt();
-                tm.setHMS(
-                    me->ExtraData(1).toUInt(),
-                    me->ExtraData(2).toUInt(),
-                    me->ExtraData(3).toUInt(),
-                    me->ExtraData(4).toUInt());
-            }
-            ProgramInfo evinfo;
-            if (!evinfo.FromStringList(me->ExtraDataList(), 5))
+            tm.setHMS(slist[1].toUInt(), slist[2].toUInt(),
+                      slist[3].toUInt(), slist[4].toUInt());
+
+            QStringList::const_iterator it = slist.begin() + 5;
+            ProgramInfo evinfo(it, slist.end());
+            if (!evinfo.HasPathname() && !evinfo.GetChanID())
                 return true;
 
             AvailableStatusType availableStatus = asAvailable;
@@ -172,22 +178,23 @@ bool PBHEventHandler::event(QEvent *e)
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         QString("CHECK_AVAILABILITY '%1' "
                                 "file not found")
-                        .arg(evinfo.pathname));
+                        .arg(evinfo.GetPathname()));
                 availableStatus = asFileNotFound;
             }
-            else if (0 == evinfo.filesize)
+            else if (!evinfo.GetFilesize())
             {
-                evinfo.filesize = evinfo.GetFilesize();
-                if (0 == evinfo.filesize)
+                evinfo.SetFilesize(evinfo.QueryFilesize());
+                if (!evinfo.GetFilesize())
                 {
-                    availableStatus = (evinfo.recstatus == rsRecording) ?
+                    availableStatus =
+                        (evinfo.GetRecordingStatus() == rsRecording) ?
                         asNotYetAvailable : asZeroByte;
                 }
             }
 
             QStringList list;
             list.push_back(evinfo.MakeUniqueKey());
-            list.push_back(evinfo.pathname);            
+            list.push_back(evinfo.GetPathname());
             MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
             QCoreApplication::postEvent(m_pbh.m_listener, e0);
 
@@ -195,13 +202,15 @@ bool PBHEventHandler::event(QEvent *e)
             list.push_back(evinfo.MakeUniqueKey());
             list.push_back(QString::number((int)cat));
             list.push_back(QString::number((int)availableStatus));
-            list.push_back(QString::number(evinfo.filesize));
+            list.push_back(QString::number(evinfo.GetFilesize()));
             list.push_back(QString::number(tm.hour()));
             list.push_back(QString::number(tm.minute()));
             list.push_back(QString::number(tm.second()));
             list.push_back(QString::number(tm.msec()));
             MythEvent *e = new MythEvent("AVAILABILITY", list);
             QCoreApplication::postEvent(m_pbh.m_listener, e);
+
+            return true;
         }
     }
 
@@ -355,10 +364,10 @@ void PlaybackBoxHelper::GetPreviewImage(const ProgramInfo &pginfo)
 
 QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
 {
-    if (pginfo.availableStatus == asPendingDelete)
+    if (pginfo.GetAvailableStatus() == asPendingDelete)
         return QString();
 
-    QString filename = pginfo.pathname + ".png";
+    QString filename = pginfo.GetPathname() + ".png";
 
     // If someone is asking for this preview it must be on screen
     // and hence higher priority than anything else we may have
@@ -371,9 +380,9 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
     bool locally_accessible = false;
     bool bookmark_updated = false;
 
-    QDateTime bookmark_ts = pginfo.GetBookmarkTimeStamp();
+    QDateTime bookmark_ts = pginfo.QueryBookmarkTimeStamp();
     QDateTime cmp_ts = bookmark_ts.isValid() ?
-        bookmark_ts : pginfo.lastmodified;
+        bookmark_ts : pginfo.GetLastModifiedTime();
 
     if (streaming)
     {
@@ -420,7 +429,7 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
                     "pginfo.lastmodified: %3")
                 .arg(previewLastModified.toString(Qt::ISODate))
                 .arg(bookmark_ts.toString(Qt::ISODate))
-                .arg(pginfo.lastmodified.toString(Qt::ISODate)));
+                .arg(pginfo.GetLastModifiedTime(ISODate)));
     }
 
     bool preview_exists = previewLastModified.isValid();
@@ -428,8 +437,8 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
     if (0)
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Title: %1:%2\n\t\t\t")
-                .arg(pginfo.title).arg(pginfo.subtitle) +
+                QString("Title: %1\n\t\t\t")
+                .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)) +
                 QString("File  '%1' \n\t\t\tCache '%2'")
                 .arg(filename).arg(ret_file) +
                 QString("\n\t\t\tPreview Exists: %1, "
@@ -622,11 +631,11 @@ void PlaybackBoxHelper::previewReady(const ProgramInfo *pginfo)
     if (!pginfo)
         return;
     
-    QString xfn = pginfo->pathname + ".png";
+    QString xfn = pginfo->GetPathname() + ".png";
     QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
 
     VERBOSE(VB_PLAYBACK, LOC + QString("Preview for '%1' ready")
-            .arg(pginfo->pathname));
+            .arg(pginfo->GetPathname()));
 
     m_previewGeneratorLock.lock();
     PreviewMap::iterator it = m_previewGenerator.find(fn);

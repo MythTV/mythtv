@@ -2898,7 +2898,7 @@ void NuppelVideoRecorder::SetNextRecording(const ProgramInfo *progInf,
     SavePositionMap(true);
     ringBuffer->WriterFlush();
     if (curRecording)
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+        curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
 
     // Then we set the next info
     QMutexLocker locker(&nextRingBufferLock);
@@ -2938,7 +2938,7 @@ void NuppelVideoRecorder::FinishRecording(void)
 
     if (curRecording)
     {
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+        curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
     positionMapLock.lock();

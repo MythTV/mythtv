@@ -14,6 +14,7 @@
 #include "videoouttypes.h"
 #include "storagegroup.h"
 #include "mythcorecontext.h"
+#include "videometadatautil.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")
@@ -100,21 +101,20 @@ void PlayerContext::SetInitialTVState(bool islivetv)
     {
         int overrecordseconds = gCoreContext->GetNumSetting("RecordOverTime");
         QDateTime curtime = QDateTime::currentDateTime();
-        QDateTime recendts = playingInfo->recendts.addSecs(overrecordseconds);
+        QDateTime recendts = playingInfo->GetRecordingEndTime()
+            .addSecs(overrecordseconds);
 
-        if (curtime < recendts && !playingInfo->isVideo)
-            newState = kState_WatchingRecording;
-        else if (playingInfo->isVideo)
+        if (playingInfo->IsRecording())
         {
-            if (playingInfo->pathname.startsWith("dvd:"))
-                newState = kState_WatchingDVD;
-            else
-                newState = kState_WatchingVideo;
+            newState = (curtime < recendts) ?
+                kState_WatchingRecording : kState_WatchingPreRecorded;
         }
+        else if (playingInfo->IsVideoDVD())
+            newState = kState_WatchingDVD;
         else
-            newState = kState_WatchingPreRecorded;
+            newState = kState_WatchingVideo;
 
-        newPlaygroup = playingInfo->playgroup;
+        newPlaygroup = playingInfo->GetPlaybackGroup();
     }
     UnlockPlayingInfo(__FILE__, __LINE__);
 
@@ -748,6 +748,27 @@ TVState PlayerContext::GetState(void) const
     return playingState;
 }
 
+bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
+{
+    bool loaded = false;
+    LockPlayingInfo(__FILE__, __LINE__);
+    if (playingInfo)
+    {
+        playingInfo->ToMap(infoMap);
+        infoMap["iconpath"] = ChannelUtil::GetIcon(playingInfo->GetChanID());
+        if (playingInfo->IsVideoFile() &&
+            playingInfo->GetPathname() != playingInfo->GetBasename())
+        {
+            infoMap["coverartpath"] = VideoMetaDataUtil::GetCoverArtPath(
+                playingInfo->GetPathname());
+        }
+        infoMap.detach();
+        loaded = true;
+    }
+    UnlockPlayingInfo(__FILE__, __LINE__);
+    return loaded;
+}
+
 bool PlayerContext::IsSameProgram(const ProgramInfo &p) const
 {
     bool ret = false;
@@ -769,7 +790,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
     LockPlayingInfo(__FILE__, __LINE__);
     if (playingInfo) // Recordings have this info already.
     {
-        chanFilters = playingInfo->chanOutputFilters;
+        chanFilters = playingInfo->GetChannelPlaybackFilters();
         chanFilters.detach();
     }
     UnlockPlayingInfo(__FILE__, __LINE__);
@@ -911,7 +932,7 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
         playingInfo = new ProgramInfo(*info);
         if (!ignoreDB)
             playingInfo->MarkAsInUse(true, recUsage);
-        playingLen  = playingInfo->CalculateLength();
+        playingLen = playingInfo->GetSecondsInRecording();
     }
 }
 
@@ -934,9 +955,9 @@ void PlayerContext::SetPseudoLiveTV(
     {
         new_rec = new ProgramInfo(*pi);
         QString msg = QString("Wants to record: %1 %2 %3 %4")
-            .arg(new_rec->title).arg(new_rec->chanstr)
-            .arg(new_rec->recstartts.toString())
-            .arg(new_rec->recendts.toString());
+            .arg(new_rec->GetTitle()).arg(new_rec->GetChanNum())
+            .arg(new_rec->GetRecordingStartTime(ISODate))
+            .arg(new_rec->GetRecordingEndTime(ISODate));
         VERBOSE(VB_PLAYBACK, LOC + msg);
     }
 
@@ -946,9 +967,9 @@ void PlayerContext::SetPseudoLiveTV(
     if (old_rec)
     {
         QString msg = QString("Done recording: %1 %2 %3 %4")
-            .arg(old_rec->title).arg(old_rec->chanstr)
-            .arg(old_rec->recstartts.toString())
-            .arg(old_rec->recendts.toString());
+            .arg(old_rec->GetTitle()).arg(old_rec->GetChanNum())
+            .arg(old_rec->GetRecordingStartTime(ISODate))
+            .arg(old_rec->GetRecordingEndTime(ISODate));
         VERBOSE(VB_PLAYBACK, LOC + msg);
         delete old_rec;
     }

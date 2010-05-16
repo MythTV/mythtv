@@ -70,7 +70,7 @@ void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
     if (!pginfo)
         return;
 
-    ShowUpcoming(pginfo->title);
+    ShowUpcoming(pginfo->GetTitle());
 }
 
 /**
@@ -84,9 +84,9 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
     
     RecordingInfo ri(*pginfo);
 
-    if (ri.recordid == 0)
+    if (!ri.GetRecordingRuleID())
         EditScheduled(&ri);
-    else if (ri.recstatus <= rsWillRecord)
+    else if (ri.GetRecordingStatus() <= rsWillRecord)
         ShowRecordingDialog(ri);
     else
         ShowNotRecordingDialog(ri);
@@ -138,7 +138,7 @@ void ScheduleCommon::EditCustom(ProgramInfo *pginfo)
 */
 void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
 {
-    if (!recinfo || recinfo->recordid <= 0)
+    if (!recinfo || !recinfo->GetRecordingRuleID())
         return;
 
     RecordingRule *recrule = new RecordingRule();
@@ -169,13 +169,11 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
 */
 void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 {
-    QString message = recinfo.title;
-    
-    if (!recinfo.subtitle.isEmpty())
-        message += QString(" - \"%1\"").arg(recinfo.subtitle);
+    QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
     
     message += "\n\n";
-    message += recinfo.RecStatusDesc();
+    message += toDescription(
+        recinfo.GetRecordingStatus(), recinfo.GetRecordingStartTime());
     
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(message, popupStack,
@@ -187,9 +185,10 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 
         QDateTime now = QDateTime::currentDateTime();
         
-        if (recinfo.recstartts < now && recinfo.recendts > now)
+        if (recinfo.GetRecordingStartTime() < now &&
+            recinfo.GetRecordingEndTime() > now)
         {
-            if (recinfo.recstatus != rsRecording)
+            if (recinfo.GetRecordingStatus() != rsRecording)
                 menuPopup->AddButton(tr("Reactivate"),
                                      qVariantFromValue(recinfo));
             else
@@ -197,41 +196,47 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                                      qVariantFromValue(recinfo));
         }
 
-        if (recinfo.recendts > now)
+        if (recinfo.GetRecordingEndTime() > now)
         {
-            if (recinfo.rectype != kSingleRecord &&
-                recinfo.rectype != kOverrideRecord)
+            if (recinfo.GetRecordingRuleType() != kSingleRecord &&
+                recinfo.GetRecordingRuleType() != kOverrideRecord)
             {
-                if (recinfo.recstartts > now)
+                if (recinfo.GetRecordingStartTime() > now)
                 {
                     menuPopup->AddButton(tr("Don't record"),
                                          qVariantFromValue(recinfo));
                 }
-                if (recinfo.recstatus != rsRecording &&
-                    recinfo.rectype != kFindOneRecord &&
-                    !((recinfo.findid == 0 || !IsFindApplicable(recinfo)) &&
-                      recinfo.catType == "series" &&
-                      recinfo.programid.contains(QRegExp("0000$"))) &&
-                    ((!(recinfo.dupmethod & kDupCheckNone) &&
-                      !recinfo.programid.isEmpty() &&
-                      (recinfo.findid != 0 || !IsFindApplicable(recinfo))) ||
-                     ((recinfo.dupmethod & kDupCheckSub) &&
-                      !recinfo.subtitle.isEmpty()) ||
-                     ((recinfo.dupmethod & kDupCheckDesc) &&
-                      !recinfo.description.isEmpty()) ||
-                     ((recinfo.dupmethod & kDupCheckSubThenDesc) &&
-                      (!recinfo.subtitle.isEmpty() ||
-                       !recinfo.description.isEmpty())) ))
+
+                const RecordingDupMethodType dupmethod =
+                    recinfo.GetDuplicateCheckMethod();
+
+                if (recinfo.GetRecordingStatus() != rsRecording &&
+                    recinfo.GetRecordingRuleType() != kFindOneRecord &&
+                    !((recinfo.GetFindID() == 0 ||
+                       !IsFindApplicable(recinfo)) &&
+                      recinfo.GetCategoryType() == "series" &&
+                      recinfo.GetProgramID().contains(QRegExp("0000$"))) &&
+                    ((!(dupmethod & kDupCheckNone) &&
+                      !recinfo.GetProgramID().isEmpty() &&
+                      (recinfo.GetFindID() != 0 ||
+                       !IsFindApplicable(recinfo))) ||
+                     ((dupmethod & kDupCheckSub) &&
+                      !recinfo.GetSubtitle().isEmpty()) ||
+                     ((dupmethod & kDupCheckDesc) &&
+                      !recinfo.GetDescription().isEmpty()) ||
+                     ((dupmethod & kDupCheckSubThenDesc) &&
+                      (!recinfo.GetSubtitle().isEmpty() ||
+                       !recinfo.GetDescription().isEmpty())) ))
                     {
                         menuPopup->AddButton(tr("Never record"),
                                              qVariantFromValue(recinfo));
                     }
             }
             
-            if (recinfo.rectype != kOverrideRecord &&
-                recinfo.rectype != kDontRecord)
+            if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
+                recinfo.GetRecordingRuleType() != kDontRecord)
             {
-                if (recinfo.recstatus == rsRecording)
+                if (recinfo.GetRecordingStatus() == rsRecording)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -241,8 +246,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                     menuPopup->AddButton(tr("Edit Options"),
                                          qVariantFromValue(recinfo));
                     
-                    if (recinfo.rectype != kSingleRecord &&
-                        recinfo.rectype != kFindOneRecord)
+                    if (recinfo.GetRecordingRuleType() != kSingleRecord &&
+                        recinfo.GetRecordingRuleType() != kFindOneRecord)
                     {
                         menuPopup->AddButton(tr("Add Override"),
                                              qVariantFromValue(recinfo));
@@ -250,10 +255,10 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 }
             }
             
-            if (recinfo.rectype == kOverrideRecord ||
-                recinfo.rectype == kDontRecord)
+            if (recinfo.GetRecordingRuleType() == kOverrideRecord ||
+                recinfo.GetRecordingRuleType() == kDontRecord)
             {
-                if (recinfo.recstatus == rsRecording)
+                if (recinfo.GetRecordingStatus() == rsRecording)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -282,15 +287,14 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
 {
     QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
-    QString message = recinfo.title;
-
-    if (!recinfo.subtitle.isEmpty())
-        message += QString(" - \"%1\"").arg(recinfo.subtitle);
+    QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
 
     message += "\n\n";
-    message += recinfo.RecStatusDesc();
+    message += toDescription(
+        recinfo.GetRecordingStatus(), recinfo.GetRecordingStartTime());
 
-    if (recinfo.recstatus == rsConflict || recinfo.recstatus == rsLaterShowing)
+    if (recinfo.GetRecordingStatus() == rsConflict ||
+        recinfo.GetRecordingStatus() == rsLaterShowing)
     {
         vector<ProgramInfo *> *confList = RemoteGetConflictList(&recinfo);
 
@@ -298,16 +302,14 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
             message += tr(" The following programs will be recorded "
             "instead:\n");
 
-        for (int maxi = 0; confList->begin() != confList->end() &&
-            maxi < 4; maxi++)
+        uint maxi = 0;
+        for (; confList->begin() != confList->end() && maxi < 4; maxi++)
         {
             ProgramInfo *p = *confList->begin();
-            message += QString("%1 - %2  %3")
-            .arg(p->recstartts.toString(timeFormat))
-            .arg(p->recendts.toString(timeFormat)).arg(p->title);
-            if (!p->subtitle.isEmpty())
-                message += QString(" - \"%1\"").arg(p->subtitle);
-            message += "\n";
+            message += QString("%1 - %2  %3\n")
+                .arg(p->GetRecordingStartTime().toString(timeFormat))
+                .arg(p->GetRecordingEndTime().toString(timeFormat))
+                .arg(p->toString(ProgramInfo::kTitleSubtitle, " - "));
             delete p;
             confList->erase(confList->begin());
         }
@@ -330,86 +332,93 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
 
         QDateTime now = QDateTime::currentDateTime();
 
-        if ((recinfo.recstartts < now) && (recinfo.recendts > now) &&
-            (recinfo.recstatus != rsDontRecord) &&
-            (recinfo.recstatus != rsNotListed))
+        if ((recinfo.GetRecordingStartTime() < now) &&
+            (recinfo.GetRecordingEndTime() > now) &&
+            (recinfo.GetRecordingStatus() != rsDontRecord) &&
+            (recinfo.GetRecordingStatus() != rsNotListed))
         {
             menuPopup->AddButton(tr("Reactivate"),
                                  qVariantFromValue(recinfo));
         }
 
-        if (recinfo.recendts > now)
+        if (recinfo.GetRecordingEndTime() > now)
         {
-            if ((recinfo.rectype != kSingleRecord &&
-                recinfo.rectype != kOverrideRecord) &&
-                (recinfo.recstatus == rsDontRecord ||
-                recinfo.recstatus == rsPreviousRecording ||
-                recinfo.recstatus == rsCurrentRecording ||
-                recinfo.recstatus == rsEarlierShowing ||
-                recinfo.recstatus == rsOtherShowing ||
-                recinfo.recstatus == rsNeverRecord ||
-                recinfo.recstatus == rsRepeat ||
-                recinfo.recstatus == rsInactive ||
-                recinfo.recstatus == rsLaterShowing))
+            if ((recinfo.GetRecordingRuleType() != kSingleRecord &&
+                recinfo.GetRecordingRuleType() != kOverrideRecord) &&
+                (recinfo.GetRecordingStatus() == rsDontRecord ||
+                recinfo.GetRecordingStatus() == rsPreviousRecording ||
+                recinfo.GetRecordingStatus() == rsCurrentRecording ||
+                recinfo.GetRecordingStatus() == rsEarlierShowing ||
+                recinfo.GetRecordingStatus() == rsOtherShowing ||
+                recinfo.GetRecordingStatus() == rsNeverRecord ||
+                recinfo.GetRecordingStatus() == rsRepeat ||
+                recinfo.GetRecordingStatus() == rsInactive ||
+                recinfo.GetRecordingStatus() == rsLaterShowing))
             {
                 menuPopup->AddButton(tr("Record anyway"),
                                     qVariantFromValue(recinfo));
-                if (recinfo.recstatus == rsPreviousRecording ||
-                    recinfo.recstatus == rsNeverRecord)
+                if (recinfo.GetRecordingStatus() == rsPreviousRecording ||
+                    recinfo.GetRecordingStatus() == rsNeverRecord)
                 {
                     menuPopup->AddButton(tr("Forget Previous"),
                                         qVariantFromValue(recinfo));
                 }
             }
 
-            if (recinfo.rectype != kOverrideRecord &&
-                recinfo.rectype != kDontRecord)
+            if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
+                recinfo.GetRecordingRuleType() != kDontRecord)
             {
-                if (recinfo.rectype != kSingleRecord &&
-                    recinfo.recstatus != rsPreviousRecording &&
-                    recinfo.recstatus != rsCurrentRecording &&
-                    recinfo.recstatus != rsNeverRecord &&
-                    recinfo.recstatus != rsNotListed)
+                if (recinfo.GetRecordingRuleType() != kSingleRecord &&
+                    recinfo.GetRecordingStatus() != rsPreviousRecording &&
+                    recinfo.GetRecordingStatus() != rsCurrentRecording &&
+                    recinfo.GetRecordingStatus() != rsNeverRecord &&
+                    recinfo.GetRecordingStatus() != rsNotListed)
                 {
-                    if (recinfo.recstartts > now)
+                    if (recinfo.GetRecordingStartTime() > now)
                     {
                         menuPopup->AddButton(tr("Don't record"),
                                             qVariantFromValue(recinfo));
                     }
-                    if (recinfo.rectype != kFindOneRecord &&
-                        !((recinfo.findid == 0 || !IsFindApplicable(recinfo)) &&
-                          recinfo.catType == "series" &&
-                          recinfo.programid.contains(QRegExp("0000$"))) &&
-                        ((!(recinfo.dupmethod & kDupCheckNone) &&
-                          !recinfo.programid.isEmpty() &&
-                          (recinfo.findid != 0 || !IsFindApplicable(recinfo))) ||
-                         ((recinfo.dupmethod & kDupCheckSub) &&
-                          !recinfo.subtitle.isEmpty()) ||
-                         ((recinfo.dupmethod & kDupCheckDesc) &&
-                          !recinfo.description.isEmpty()) ||
-                         ((recinfo.dupmethod & kDupCheckSubThenDesc) &&
-                          (!recinfo.subtitle.isEmpty() ||
-                           !recinfo.description.isEmpty())) ))
+
+                    const RecordingDupMethodType dupmethod =
+                        recinfo.GetDuplicateCheckMethod();
+
+                    if (recinfo.GetRecordingRuleType() != kFindOneRecord &&
+                        !((recinfo.GetFindID() == 0 ||
+                           !IsFindApplicable(recinfo)) &&
+                          recinfo.GetCategoryType() == "series" &&
+                          recinfo.GetProgramID().contains(QRegExp("0000$"))) &&
+                        ((!(dupmethod & kDupCheckNone) &&
+                          !recinfo.GetProgramID().isEmpty() &&
+                          (recinfo.GetFindID() != 0 ||
+                           !IsFindApplicable(recinfo))) ||
+                         ((dupmethod & kDupCheckSub) &&
+                          !recinfo.GetSubtitle().isEmpty()) ||
+                         ((dupmethod & kDupCheckDesc) &&
+                          !recinfo.GetDescription().isEmpty()) ||
+                         ((dupmethod & kDupCheckSubThenDesc) &&
+                          (!recinfo.GetSubtitle().isEmpty() ||
+                           !recinfo.GetDescription().isEmpty())) ))
                         {
                             menuPopup->AddButton(tr("Never record"),
-                                                qVariantFromValue(recinfo));
+                                                 qVariantFromValue(recinfo));
                         }
                 }
 
                 menuPopup->AddButton(tr("Edit Options"),
                                      qVariantFromValue(recinfo));
 
-                if (recinfo.rectype != kSingleRecord &&
-                    recinfo.rectype != kFindOneRecord &&
-                    recinfo.recstatus != rsNotListed)
+                if (recinfo.GetRecordingRuleType() != kSingleRecord &&
+                    recinfo.GetRecordingRuleType() != kFindOneRecord &&
+                    recinfo.GetRecordingStatus() != rsNotListed)
                 {
                     menuPopup->AddButton(tr("Add Override"),
                                         qVariantFromValue(recinfo));
                 }
             }
 
-            if (recinfo.rectype == kOverrideRecord ||
-                recinfo.rectype == kDontRecord)
+            if (recinfo.GetRecordingRuleType() == kOverrideRecord ||
+                recinfo.GetRecordingRuleType() == kDontRecord)
             {
                 menuPopup->AddButton(tr("Edit Override"),
                                     qVariantFromValue(recinfo));
@@ -446,7 +455,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Record anyway"))
             {
                 recInfo.ApplyRecordStateChange(kOverrideRecord);
-                if (recInfo.recstartts < QDateTime::currentDateTime())
+                if (recInfo.GetRecordingStartTime() < QDateTime::currentDateTime())
                     recInfo.ReactivateRecording();
             }
             else if (resulttext == tr("Forget Previous"))
@@ -455,9 +464,9 @@ void ScheduleCommon::customEvent(QEvent *event)
                 recInfo.ApplyRecordStateChange(kDontRecord);
             else if (resulttext == tr("Never record"))
             {
-                recInfo.recstatus = rsNeverRecord;
-                recInfo.startts = QDateTime::currentDateTime();
-                recInfo.endts = recInfo.recstartts;
+                recInfo.SetRecordingStatus(rsNeverRecord);
+                recInfo.SetScheduledStartTime(QDateTime::currentDateTime());
+                recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }
             else if (resulttext == tr("Clear Override"))
@@ -484,31 +493,27 @@ void ScheduleCommon::customEvent(QEvent *event)
                 recInfo.ReactivateRecording();
             else if (resulttext == tr("Stop recording"))
             {
-                ProgramInfo *p = recInfo.GetProgramFromRecorded(
-                                                        recInfo.chanid,
-                                                        recInfo.recstartts);
-                if (p)
-                {
-                    RemoteStopRecording(p);
-                    delete p;
-                }
+                ProgramInfo pginfo(
+                    recInfo.GetChanID(), recInfo.GetRecordingStartTime());
+                if (pginfo.GetChanID())
+                    RemoteStopRecording(&pginfo);
             }
             else if (resulttext == tr("Don't record"))
                 recInfo.ApplyRecordStateChange(kDontRecord);
             else if (resulttext == tr("Never record"))
             {
-                recInfo.recstatus = rsNeverRecord;
-                recInfo.startts = QDateTime::currentDateTime();
-                recInfo.endts = recInfo.recstartts;
+                recInfo.SetRecordingStatus(rsNeverRecord);
+                recInfo.SetScheduledStartTime(QDateTime::currentDateTime());
+                recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }
             else if (resulttext == tr("Clear Override"))
                 recInfo.ApplyRecordStateChange(kNotRecording);
             else if (resulttext == tr("Modify Recording Options"))
             {
-                if (recInfo.rectype == kSingleRecord ||
-                    recInfo.rectype == kOverrideRecord ||
-                    recInfo.rectype == kFindOneRecord)
+                if (recInfo.GetRecordingRuleType() == kSingleRecord ||
+                    recInfo.GetRecordingRuleType() == kOverrideRecord ||
+                    recInfo.GetRecordingRuleType() == kFindOneRecord)
                     EditScheduled(&recInfo);
                 else
                     MakeOverride(&recInfo, true);
@@ -532,6 +537,6 @@ void ScheduleCommon::customEvent(QEvent *event)
 */
 bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo) const
 {
-    return recInfo.rectype == kFindDailyRecord ||
-           recInfo.rectype == kFindWeeklyRecord;
+    return recInfo.GetRecordingRuleType() == kFindDailyRecord ||
+           recInfo.GetRecordingRuleType() == kFindWeeklyRecord;
 }

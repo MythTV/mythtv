@@ -4,12 +4,16 @@
 #include <pthread.h>
 
 #include <QWaitCondition>
+#include <QDateTime>
 #include <QObject>
 #include <QEvent>
 #include <QMutex>
 #include <QMap>
 
-#include "programinfo.h"
+#include "mythexp.h"
+
+class ProgramInfo;
+class RecordingInfo;
 
 using namespace std;
 
@@ -79,8 +83,8 @@ enum JobTypes {
 
 typedef struct jobqueueentry {
     int id;
-    QString chanid;
-    QDateTime starttime;
+    uint chanid;
+    QDateTime recstartts;
     QDateTime schedruntime;
     QString startts;
     QDateTime inserttime;
@@ -111,27 +115,28 @@ class MPUBLIC JobQueue : public QObject
     ~JobQueue(void);
     void customEvent(QEvent *e);
 
-    static bool QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes = JOB_NONE);
-    static bool QueueJob(int jobType, QString chanid,
-                         QDateTime starttime, QString args = "",
+    static bool QueueRecordingJobs(
+        const RecordingInfo&, int jobTypes = JOB_NONE);
+    static bool QueueJob(int jobType, uint chanid,
+                         const QDateTime &recstartts, QString args = "",
                          QString comment = "", QString host = "",
                          int flags = 0, int status = JOB_QUEUED,
                          QDateTime schedruntime = QDateTime());
 
-    static bool QueueJobs(int jobTypes, QString chanid,
-                         QDateTime starttime, QString args = "",
+    static bool QueueJobs(int jobTypes, uint chanid,
+                         const QDateTime &recstartts, QString args = "",
                          QString comment = "", QString host = "");
 
-    static int GetJobID(int jobType, QString chanid,
-                        QDateTime starttime);
+    static int GetJobID(int jobType, uint chanid,
+                        const QDateTime &recstartts);
     static bool GetJobInfoFromID(int jobID, int &jobType,
-                                 QString &chanid, QDateTime &starttime);
+                                 uint &chanid, QDateTime &recstartts);
     static bool GetJobInfoFromID(int jobID, int &jobType,
-                                 QString &chanid, QString &starttime);
+                                 uint &chanid, QString &recstartts);
 
     static bool ChangeJobCmds(int jobID, int newCmds);
-    static bool ChangeJobCmds(int jobType, QString chanid,
-                              QDateTime starttime, int newCmds);
+    static bool ChangeJobCmds(int jobType, uint chanid,
+                              const QDateTime &recstartts, int newCmds);
     static bool ChangeJobFlags(int jobID, int newFlags);
     static bool ChangeJobStatus(int jobID, int newStatus,
                                 QString comment = "");
@@ -140,13 +145,14 @@ class MPUBLIC JobQueue : public QObject
                                  QString comment = "");
     static bool ChangeJobArgs(int jobID,
                               QString args = "");
-    static bool IsJobQueuedOrRunning(int jobType, QString chanid,
-                                     QDateTime starttime);
-    int GetRunningJobID(const QString &chanid, const QDateTime &starttime);
-    static bool IsJobRunning(int jobType, QString chanid,
-                             QDateTime starttime);
-    static bool IsJobRunning(int jobType, const ProgramInfo *pginfo);
-    static bool IsJobQueued(int jobType, QString chanid, QDateTime starttime);
+    static bool IsJobQueuedOrRunning(int jobType, uint chanid,
+                                     const QDateTime &recstartts);
+    int GetRunningJobID(uint chanid, const QDateTime &recstartts);
+    static bool IsJobRunning(int jobType, uint chanid,
+                             const QDateTime &recstartts);
+    static bool IsJobRunning(int jobType, const ProgramInfo &pginfo);
+    static bool IsJobQueued(int jobType,
+                            uint chanid, const QDateTime &recstartts);
     static bool PauseJob(int jobID);
     static bool ResumeJob(int jobID);
     static bool RestartJob(int jobID);
@@ -156,12 +162,12 @@ class MPUBLIC JobQueue : public QObject
     static enum JobCmds GetJobCmd(int jobID);
     static enum JobFlags GetJobFlags(int jobID);
     static enum JobStatus GetJobStatus(int jobID);
-    static enum JobStatus GetJobStatus(int jobType, QString chanid,
-                        QDateTime starttime);
+    static enum JobStatus GetJobStatus(int jobType, uint chanid,
+                                       const QDateTime &recstartts);
     static QString GetJobArgs(int jobID);
     static int UserJobTypeToIndex(int JobType);
 
-    static bool DeleteAllJobs(QString chanid, QDateTime starttime);
+    static bool DeleteAllJobs(uint chanid, const QDateTime &recstartts);
 
     static void ClearJobMask(int &mask) { mask = JOB_NONE; }
     static bool JobIsInMask(int job, int mask) { return (bool)(job & mask); }

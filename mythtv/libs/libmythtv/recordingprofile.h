@@ -110,7 +110,7 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
                                int group);                           
 
     // constants
-    static const int TranscoderAutodetect = 0;  ///< sentinel value
+    static const uint TranscoderAutodetect = 0; ///< sentinel value
     static const int TranscoderGroup = 6;       ///< hard-coded DB value
 
   private slots:

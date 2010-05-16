@@ -393,7 +393,11 @@ void AutoExpire::ExpireRecordings(void)
                   "WHERE recusage = 'truncatingdelete' "
                    "AND lastupdatetime > DATE_ADD(NOW(), INTERVAL -2 MINUTE);");
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec())
+    {
+        MythDB::DBError(LOC + "ExpireRecordings", query);
+    }
+    else
     {
         while (query.next())
         {
@@ -492,11 +496,11 @@ void AutoExpire::ExpireRecordings(void)
                 ProgramInfo *p = *it;
                 it++;
 
-                VERBOSE(VB_FILE, QString("        Checking %1 @ %2 => %3")
-                        .arg(p->chanid).arg(p->recstartts.toString(Qt::ISODate))
-                        .arg(p->title));
+                VERBOSE(VB_FILE, QString("        Checking %1 => %2")
+                        .arg(p->toString(ProgramInfo::kRecordingKey))
+                        .arg(p->GetTitle()));
 
-                if (p->pathname.left(1) != "/")
+                if (!p->IsLocal())
                 {
                     bool foundFile = false;
                     QMap<int, EncoderLink *>::Iterator eit =
@@ -506,8 +510,8 @@ void AutoExpire::ExpireRecordings(void)
                         EncoderLink *el = *eit;
                         eit++;
 
-                        if ((p->hostname == el->GetHostName()) ||
-                            ((p->hostname == myHostName) &&
+                        if ((p->GetHostname() == el->GetHostName()) ||
+                            ((p->GetHostname() == myHostName) &&
                              (el->IsLocal())))
                         {
                             if (el->IsConnected())
@@ -517,41 +521,40 @@ void AutoExpire::ExpireRecordings(void)
                         }
                     }
 
-                    if (!foundFile && (p->hostname != myHostName))
+                    if (!foundFile && (p->GetHostname() != myHostName))
                     {
                         // Wasn't found so check locally
                         QString file = GetPlaybackURL(p);
 
                         if (file.left(1) == "/")
                         {
-                            p->pathname = file;
-                            p->hostname = myHostName;
+                            p->SetPathname(file);
+                            p->SetHostname(myHostName);
                             foundFile = true;
                         }
                     }
 
                     if (!foundFile)
                     {
-                        VERBOSE(VB_FILE, QString("        ERROR: Can't find "
-                                "file for %1 @ %2").arg(p->chanid)
-                                .arg(p->recstartts.toString(Qt::ISODate)));
+                        VERBOSE(VB_FILE, LOC_ERR + QString(
+                                    "        ERROR: Can't find file for %1")
+                                .arg(p->toString(ProgramInfo::kRecordingKey)));
                         continue;
                     }
                 }
 
-                QFileInfo vidFile(p->pathname);
-                if (dirList.contains(p->hostname + ':' + vidFile.path()))
+                QFileInfo vidFile(p->GetPathname());
+                if (dirList.contains(p->GetHostname() + ':' + vidFile.path()))
                 {
-                    fsit->freeSpaceKB += (p->filesize / 1024);
+                    fsit->freeSpaceKB += (p->GetFilesize() / 1024);
                     deleteList.push_back(p);
 
                     VERBOSE(VB_FILE, QString("        FOUND file expirable. "
-                            "%1 @ %2 is located at %3 which is on fsID #%4. "
+                            "%1 is located at %2 which is on fsID #%3. "
                             "Adding to deleteList.  After deleting we should "
-                            "have %5 MB free on this filesystem.")
-                            .arg(p->chanid)
-                            .arg(p->recstartts.toString(Qt::ISODate))
-                            .arg(p->pathname).arg(fsit->fsID)
+                            "have %4 MB free on this filesystem.")
+                            .arg(p->toString(ProgramInfo::kRecordingKey))
+                            .arg(p->GetPathname()).arg(fsit->fsID)
                             .arg(fsit->freeSpaceKB / 1024));
                 }
             }
@@ -581,13 +584,10 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
     pginfolist_t::iterator it = deleteList.begin();
     while (it != deleteList.end())
     {
-        QString titlestr = (*it)->title;
-        if (!(*it)->subtitle.isEmpty())
-            titlestr += " \"" + (*it)->subtitle + "\"";
-        msg = QString("Expiring %1 MBytes for %2 @ %3 => %4")
-            .arg((int)((*it)->filesize >> 20))
-            .arg((*it)->chanid).arg((*it)->startts.toString())
-            .arg(titlestr);
+        msg = QString("Expiring %1 MB for %2 => %3")
+            .arg(((*it)->GetFilesize() >> 20))
+            .arg((*it)->toString(ProgramInfo::kRecordingKey))
+            .arg((*it)->toString(ProgramInfo::kTitleSubtitle));
 
         if (VERBOSE_LEVEL_CHECK(VB_IMPORTANT))
             VERBOSE(VB_IMPORTANT, msg);
@@ -598,8 +598,8 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
                            "Expiring Program", msg);
 
         // send auto expire message to backend's event thread.
-        MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->chanid)
-                     .arg((*it)->recstartts.toString(Qt::ISODate)));
+        MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->GetChanID())
+                     .arg((*it)->GetRecordingStartTime(ISODate)));
         gCoreContext->dispatch(me);
 
         deleted_set.insert((*it)->MakeUniqueKey());
@@ -698,7 +698,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     long long spaceFreed =
                         query.value(5).toLongLong() >> 20;
                     QString msg =
-                        QString("Expiring %1 MBytes for %2 @ %3 => %4.  Too "
+                        QString("Expiring %1 MBytes for %2 at %3 => %4.  Too "
                                 "many episodes, we only want to keep %5.")
                             .arg(spaceFreed)
                             .arg(chanid).arg(startts.toString())
@@ -783,21 +783,19 @@ void AutoExpire::PrintExpireList(QString expHost)
     {
         ProgramInfo *first = (*i);
 
-        if (expHost != "ALL" && first->hostname != expHost)
+        if (expHost != "ALL" && first->GetHostname() != expHost)
             continue;
 
-        QString title = first->title;
-
-        if (first->subtitle.length())
-            title += ": \"" + first->subtitle + "\"";
-
+        QString title = first->toString(ProgramInfo::kTitleSubtitle);
         title = title.leftJustified(39, ' ', true);
+
         QString outstr = QString("%1 %2 MB %3 [%4]")
             .arg(title)
-            .arg(QString::number(first->filesize >> 20)
+            .arg(QString::number(first->GetFilesize() >> 20)
                  .rightJustified(5, ' ', true))
-            .arg(first->startts.toString().leftJustified(24, ' ', true))
-            .arg(QString::number(first->recpriority)
+            .arg(first->GetRecordingStartTime(ISODate)
+                 .leftJustified(24, ' ', true))
+            .arg(QString::number(first->GetRecordingPriority())
                  .rightJustified(3, ' ', true));
         QByteArray out = outstr.toLocal8Bit();
 
@@ -947,17 +945,11 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString(
-               "SELECT recorded.chanid, starttime,   endtime,     "
-               "       title,           subtitle,    description, "
-               "       hostname,        channum,     name,        "
-               "       callsign,        seriesid,    programid,   "
-               "       recorded.recpriority,         progstart,   "
-               "       progend,         filesize,    recgroup,    "
-               "       storagegroup,    basename "
-               "FROM recorded "
-               "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-               "WHERE %1 AND deletepending = 0 "
-               "ORDER BY autoexpire DESC, %2").arg(where).arg(orderby);
+        "SELECT recorded.chanid, starttime "
+        "FROM recorded "
+        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+        "WHERE %1 AND deletepending = 0 "
+        "ORDER BY autoexpire DESC, %2").arg(where).arg(orderby);
 
     query.prepare(querystr);
 
@@ -971,57 +963,37 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 
         if (IsInDontExpireSet(chanid, recstartts))
         {
-            VERBOSE(VB_FILE, LOC + QString("    Skipping "
-                             "%1 @ %2 because it is in Don't Expire List")
-                             .arg(chanid).arg(recstartts.toString()));
-            continue;
+            VERBOSE(VB_FILE, LOC + QString(
+                        "    Skipping %1 at %2 "
+                        "because it is in Don't Expire List")
+                    .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
         }
         else if (IsInExpireList(expireList, chanid, recstartts))
         {
-            VERBOSE(VB_FILE, LOC + QString("    Skipping "
-                             "%1 @ %2 because it is already in Expire List")
-                             .arg(chanid) .arg(recstartts.toString()));
-            continue;
-        }
-
-        ProgramInfo *proginfo = new ProgramInfo;
-
-        proginfo->chanid = QString::number(chanid);
-        proginfo->startts = query.value(13).toDateTime();
-        proginfo->endts = query.value(14).toDateTime();
-        proginfo->recstartts = recstartts;
-        proginfo->recendts = query.value(2).toDateTime();
-        proginfo->title = query.value(3).toString();
-        proginfo->subtitle = query.value(4).toString();
-        proginfo->description = query.value(5).toString();
-        proginfo->hostname = query.value(6).toString();
-
-        if (!query.value(7).toString().isEmpty())
-        {
-            proginfo->chanstr = query.value(7).toString();
-            proginfo->channame = query.value(8).toString();
-            proginfo->chansign = query.value(9).toString();
+            VERBOSE(VB_FILE, LOC + QString(
+                        "    Skipping %1 at %2 "
+                        "because it is already in Expire List")
+                    .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
         }
         else
         {
-            proginfo->chanstr = "#" + proginfo->chanid;
-            proginfo->channame = "#" + proginfo->chanid;
-            proginfo->chansign = "#" + proginfo->chanid;
+            ProgramInfo *pginfo = new ProgramInfo(chanid, recstartts);
+            if (pginfo->GetChanID())
+            {
+                VERBOSE(VB_FILE, LOC +
+                        QString("    Adding   %1 at %2")
+                        .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+                expireList.push_back(pginfo);
+            }
+            else
+            {
+                VERBOSE(VB_FILE, LOC + QString(
+                            "    Skipping %1 at %2 "
+                            "because it could not be loaded from the DB")
+                        .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+                delete pginfo;
+            }
         }
-
-        proginfo->seriesid = query.value(10).toString();
-        proginfo->programid = query.value(11).toString();
-        proginfo->recpriority = query.value(12).toInt();
-        proginfo->filesize = query.value(15).toULongLong();
-        proginfo->recgroup = query.value(16).toString();
-        proginfo->storagegroup = query.value(17).toString();
-        proginfo->pathname = query.value(18).toString();
-
-        VERBOSE(VB_FILE, LOC + QString("    Adding   "
-                                       "%1 @ %2")
-                                       .arg(proginfo->chanid)
-                                       .arg(proginfo->recstartts.toString()));
-        expireList.push_back(proginfo);
     }
 }
 
@@ -1126,7 +1098,7 @@ void AutoExpire::UpdateDontExpireSet(void)
             QString key = QString("%1_%2")
                 .arg(chanid).arg(recstartts.toString(Qt::ISODate));
             dont_expire_set.insert(key);
-            VERBOSE(VB_FILE, QString("    %1 @ %2 in use by %3 on %4")
+            VERBOSE(VB_FILE, QString("    %1 at %2 in use by %3 on %4")
                     .arg(chanid)
                     .arg(recstartts.toString(Qt::ISODate))
                     .arg(query.value(3).toString())
@@ -1152,8 +1124,8 @@ bool AutoExpire::IsInExpireList(
 
     for (it = expireList.begin(); it != expireList.end(); ++it)
     {
-        if (((*it)->chanid.toUInt() == chanid) &&
-            ((*it)->recstartts == recstartts))
+        if (((*it)->GetChanID()             == chanid) &&
+            ((*it)->GetRecordingStartTime() == recstartts))
         {
             return true;
         }

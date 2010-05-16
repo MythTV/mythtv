@@ -41,7 +41,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
                          QString lhostname)
     : m_capturecardnum(capturecardnum), sock(lsock), hostname(lhostname),
       freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false),
-      sleepStatus(sStatus_Undefined), chanid("")
+      sleepStatus(sStatus_Undefined), chanid(0)
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
@@ -60,7 +60,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     : m_capturecardnum(capturecardnum), sock(NULL),
       freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false),
-      sleepStatus(sStatus_Undefined), chanid("")
+      sleepStatus(sStatus_Undefined), chanid(0)
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
@@ -209,12 +209,8 @@ uint EncoderLink::GetFlags(void) const
  */
 bool EncoderLink::IsRecording(const ProgramInfo *rec)
 {
-    bool retval = false;
-
-    if (rec->chanid == chanid && rec->recstartts == startRecordingTime)
-        retval = true;
-
-    return retval;
+    return (rec->GetChanID() == chanid &&
+            rec->GetRecordingStartTime() == startRecordingTime);
 }
 
 /** \fn EncoderLink::MatchesRecording(const ProgramInfo *rec)
@@ -240,12 +236,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
 
         if (tvrec)
         {
-            if (tvrec->chanid == rec->chanid &&
-                tvrec->recstartts == rec->recstartts)
-            {
-                retval = true;
-            }
-
+            retval = tvrec->IsSameRecording(*rec);
             delete tvrec;
         }
     }
@@ -285,23 +276,20 @@ bool EncoderLink::WouldConflict(const ProgramInfo *rec)
     if (!IsConnected())
         return true;
 
-    if (rec->recstartts < endRecordingTime)
+    if (rec->GetRecordingStartTime() < endRecordingTime)
         return true;
 
     return false;
 }
 
+/// Checks if program is stored locally
 bool EncoderLink::CheckFile(ProgramInfo *pginfo)
 {
     if (sock)
         return sock->CheckFile(pginfo);
-    else
-    {
-        pginfo->pathname = GetPlaybackURL(pginfo);
-        if (pginfo->pathname.left(1) == "/")
-            return true;
-    }
-    return false;
+
+    pginfo->SetPathname(GetPlaybackURL(pginfo));
+    return pginfo->IsLocal();
 }
 
 /**
@@ -391,9 +379,9 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
 {
     RecStatusType retval = rsAborted;
 
-    endRecordingTime = rec->recendts;
-    startRecordingTime = rec->recstartts;
-    chanid = rec->chanid;
+    endRecordingTime = rec->GetRecordingEndTime();
+    startRecordingTime = rec->GetRecordingStartTime();
+    chanid = rec->GetChanID();
 
     if (local)
         retval = tv->StartRecording(rec);
@@ -409,7 +397,7 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
     {
         endRecordingTime = QDateTime::currentDateTime().addDays(-2);
         startRecordingTime = endRecordingTime;
-        chanid = "";
+        chanid = 0;
     }
 
     return retval;
@@ -442,7 +430,7 @@ void EncoderLink::StopRecording(bool killFile)
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
-    chanid = "";
+    chanid = 0;
 
     if (local)
     {
@@ -530,14 +518,13 @@ long long EncoderLink::GetFilePosition(void)
     return -1;
 }
 
-/** \fn EncoderLink::GetKeyframePosition(long long)
- *  \brief Returns byte position in RingBuffer of a keyframe.
+/** \brief Returns byte position in RingBuffer of a keyframe.
  *         <b>This only works on local recorders.</b>
- *  \sa TVRec::GetKeyframePosition(long long),
- *      RemoteEncoder::GetKeyframePosition(long long)
+ *  \sa TVRec::GetKeyframePosition(uint64_t),
+ *      RemoteEncoder::GetKeyframePosition(uint64_t)
  *  \return Byte position of keyframe if query succeeds, -1 otherwise.
  */
-long long EncoderLink::GetKeyframePosition(long long desired)
+int64_t EncoderLink::GetKeyframePosition(uint64_t desired)
 {
     if (local)
         return tv->GetKeyframePosition(desired);
@@ -547,7 +534,7 @@ long long EncoderLink::GetKeyframePosition(long long desired)
 }
 
 bool EncoderLink::GetKeyframePositions(
-    long long start, long long end, PosMap &map)
+    int64_t start, int64_t end, frm_pos_map_t &map)
 {
     if (!local)
     {
@@ -735,17 +722,16 @@ void EncoderLink::ToggleChannelFavorite(QString changroup)
         VERBOSE(VB_IMPORTANT, "Should be local only query: ToggleChannelFavorite");
 }
 
-/** \fn EncoderLink::ChangeChannel(int)
- *  \brief Changes to the next or previous channel.
+/** \brief Changes to the next or previous channel.
  *         <b>This only works on local recorders.</b>
  *
  *   You must call PauseRecorder() before calling this.
  *  \param channeldirection channel change direction \sa BrowseDirections.
  */
-void EncoderLink::ChangeChannel(int channeldirection)
+void EncoderLink::ChangeChannel(ChannelChangeDirection channeldirection)
 {
     if (local)
-        tv->ChangeChannel((ChannelChangeDirection)channeldirection);
+        tv->ChangeChannel(channeldirection);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeChannel");
 }
@@ -870,24 +856,26 @@ bool EncoderLink::CheckChannelPrefix(
     return false;
 }
 
-/** \fn EncoderLink::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- *  \brief Returns information about the program that would be seen if we changed
- *         the channel using ChangeChannel(int) with "direction".
+/** \brief Returns information about the program that would be
+ *         seen if we changed the channel using ChangeChannel(int)
+ *         with "direction".
  *         <b>This only works on local recorders.</b>
  */
-void EncoderLink::GetNextProgram(int direction,
+void EncoderLink::GetNextProgram(BrowseDirection direction,
                                  QString &title,       QString &subtitle,
                                  QString &desc,        QString &category,
                                  QString &starttime,   QString &endtime,
                                  QString &callsign,    QString &iconpath,
-                                 QString &channelname, QString &chanid,
+                                 QString &channelname, uint    &_chanid,
                                  QString &seriesid,    QString &programid)
 {
     if (local)
+    {
         tv->GetNextProgram(direction,
                            title, subtitle, desc, category, starttime,
-                           endtime, callsign, iconpath, channelname, chanid,
-                           seriesid, programid);
+                           endtime, callsign, iconpath, channelname,
+                           _chanid, seriesid, programid);
+    }
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: GetNextProgram");
 }

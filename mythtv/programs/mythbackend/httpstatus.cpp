@@ -239,8 +239,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     RecConstIter itProg = recordingList.begin();
     for (; (itProg != recordingList.end()) && iNumRecordings < iNum; ++itProg)
     {
-        if (((*itProg)->recstatus  <= rsWillRecord) &&
-            ((*itProg)->recstartts >= QDateTime::currentDateTime()))
+        if (((*itProg)->GetRecordingStatus() <= rsWillRecord) &&
+            ((*itProg)->GetRecordingStartTime() >=
+             QDateTime::currentDateTime()))
         {
             iNumRecordings++;
             MythXML::FillProgramInfo(pDoc, scheduled, *itProg);
@@ -268,50 +269,41 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
 
-    if (jobs.size())
+    for (it = jobs.begin(); it != jobs.end(); ++it)
     {
-        for (it = jobs.begin(); it != jobs.end(); ++it)
-        {
-            ProgramInfo *pInfo;
+        ProgramInfo pginfo((*it).chanid, (*it).recstartts);
+        if (!pginfo.GetChanID())
+            continue;
 
-            pInfo = ProgramInfo::GetProgramFromRecorded((*it).chanid,
-                                                        (*it).starttime);
+        QDomElement job = pDoc->createElement("Job");
+        jobqueue.appendChild(job);
 
-            if (!pInfo)
-                continue;
+        job.setAttribute("id"        , (*it).id         );
+        job.setAttribute("chanId"    , (*it).chanid     );
+        job.setAttribute("startTime" ,
+                         (*it).recstartts.toString(Qt::ISODate));
+        job.setAttribute("startTs"   , (*it).startts    );
+        job.setAttribute("insertTime",
+                         (*it).inserttime.toString(Qt::ISODate));
+        job.setAttribute("type"      , (*it).type       );
+        job.setAttribute("cmds"      , (*it).cmds       );
+        job.setAttribute("flags"     , (*it).flags      );
+        job.setAttribute("status"    , (*it).status     );
+        job.setAttribute("statusTime",
+                         (*it).statustime.toString(Qt::ISODate));
+        job.setAttribute("schedTime" ,
+                         (*it).schedruntime.toString(Qt::ISODate));
+        job.setAttribute("args"      , (*it).args       );
 
-            QDomElement job = pDoc->createElement("Job");
-            jobqueue.appendChild(job);
+        if ((*it).hostname.isEmpty())
+            job.setAttribute("hostname", QObject::tr("master"));
+        else
+            job.setAttribute("hostname",(*it).hostname);
 
-            job.setAttribute("id"        , (*it).id         );
-            job.setAttribute("chanId"    , (*it).chanid     );
-            job.setAttribute("startTime" ,
-                             (*it).starttime.toString(Qt::ISODate));
-            job.setAttribute("startTs"   , (*it).startts    );
-            job.setAttribute("insertTime",
-                             (*it).inserttime.toString(Qt::ISODate));
-            job.setAttribute("type"      , (*it).type       );
-            job.setAttribute("cmds"      , (*it).cmds       );
-            job.setAttribute("flags"     , (*it).flags      );
-            job.setAttribute("status"    , (*it).status     );
-            job.setAttribute("statusTime",
-                             (*it).statustime.toString(Qt::ISODate));
-            job.setAttribute("schedTime" ,
-                             (*it).schedruntime.toString(Qt::ISODate));
-            job.setAttribute("args"      , (*it).args       );
+        QDomText textNode = pDoc->createTextNode((*it).comment);
+        job.appendChild(textNode);
 
-            if ((*it).hostname.isEmpty())
-                job.setAttribute("hostname", QObject::tr("master"));
-            else
-                job.setAttribute("hostname",(*it).hostname);
-
-            QDomText textNode = pDoc->createTextNode((*it).comment);
-            job.appendChild(textNode);
-
-            MythXML::FillProgramInfo(pDoc, job, pInfo);
-
-            delete pInfo;
-        }
+        MythXML::FillProgramInfo(pDoc, job, &pginfo);
     }
 
     jobqueue.setAttribute( "count", jobs.size() );
