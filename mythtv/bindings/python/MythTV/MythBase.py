@@ -1013,6 +1013,11 @@ class DBCache( object ):
                         % self._where, (key,))
                 QuickDictData.__delitem__(self, key)
 
+            def get(self, value, default=None):
+                res = self[value]
+                if res is None: res = default
+                return res
+
             def getall(self):
                 c = self._db.cursor(self._log)
                 c.execute("""SELECT value,data FROM settings
@@ -1446,7 +1451,7 @@ class BEConnection( object ):
             in the receive buffer.
         """
 
-        def alrm():
+        def alrm(signum, frame):
             raise MythBEError('Socket Timeout Reached')
 
         # return if not connected
