@@ -1119,9 +1119,9 @@ Set the "Host name" field to point to your Master backend's IP address.
 </list>
 
 <sect>MySQL.<label id="mysql">
-<p>You will also want to comment out "log-bin" in your <tt>my.cnf</tt>
-configuration file.  This option will quickly fill your "/var" disk
-partition with many gigabytes of data, unless you are doing database
+<p>You will also want to comment out any "log-bin" or "log_bin" lines in your
+<tt>my.cnf</tt> configuration file.  This option will quickly fill your "/var"
+disk partition with many gigabytes of data, unless you are doing database
 replication and deleting these files regularly.
 
 <sect1>Distribution-specific information
