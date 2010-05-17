@@ -5955,7 +5955,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(
             return false;
 
         if ((lastDecodedFrameNumber >= dm_iter.key()) ||
-            (lastDecodedFrameNumber == (uint64_t)(__INT64_C(-1)) &&
+            (lastDecodedFrameNumber == (uint64_t)(INT64_C(-1)) &&
              dm_iter.key() == 0))
         {
             while(((*dm_iter) == 1) && (dm_iter != deleteMap.end()))
