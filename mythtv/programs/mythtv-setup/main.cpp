@@ -576,10 +576,6 @@ int main(int argc, char *argv[])
         return BACKEND_EXIT_OK;
     }
 
-    // If "System Exit key" is set to "No exit key", override for setup
-    if (0 == gCoreContext->GetNumSetting("AllowQuitShutdown", 4))
-        gCoreContext->OverrideSettingForSession("AllowQuitShutdown", "4");
-
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));

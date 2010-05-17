@@ -183,8 +183,12 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
 {
     int keynum = e->key();
 
-    if (keynum != Qt::Key_Escape &&
-        (keynum <  Qt::Key_Shift || keynum > Qt::Key_ScrollLock))
+    if ((keynum != Qt::Key_Shift  ) && (keynum !=Qt::Key_Control   ) &&
+        (keynum != Qt::Key_Meta   ) && (keynum !=Qt::Key_Alt       ) &&
+        (keynum != Qt::Key_Super_L) && (keynum !=Qt::Key_Super_R   ) &&
+        (keynum != Qt::Key_Hyper_L) && (keynum !=Qt::Key_Hyper_R   ) &&
+        (keynum != Qt::Key_AltGr  ) && (keynum !=Qt::Key_CapsLock  ) &&
+        (keynum != Qt::Key_NumLock) && (keynum !=Qt::Key_ScrollLock ))
     {
         Qt::KeyboardModifiers modifiers;
         // if modifiers have been pressed, rebuild keynum
@@ -483,6 +487,9 @@ MythMainWindow::MythMainWindow(const bool useDB)
         "Go back to previous page"),        "R,Backspace");
     RegisterKey("Browser", "HISTORYFORWARD",  QT_TRANSLATE_NOOP("MythControls",
         "Go forward to previous page"),     "F");
+
+    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
+        "System Exit"),                     "Esc");
 
     d->gestureTimer = new QTimer(this);
     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));

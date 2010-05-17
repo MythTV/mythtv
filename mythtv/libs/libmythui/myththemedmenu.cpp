@@ -91,7 +91,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
                                bool allowreorder, MythThemedMenuState *state)
     : MythThemedMenuState(parent, name),
       m_state(state), m_allocedstate(false), m_foundtheme(false),
-      m_exitModifier(0), m_ignorekeys(false), m_wantpop(false)
+      m_ignorekeys(false), m_wantpop(false)
 {
     m_menuPopup = NULL;
 
@@ -113,8 +113,6 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
  */
 void MythThemedMenu::Init(const QString &menufile)
 {
-    ReloadExitKey();
-
     if (!m_state->m_loaded)
     {
         if (m_state->Create())
@@ -180,28 +178,9 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
         m_descriptionText->SetText(button.description);
 }
 
-/** \brief Looks at "AllowQuitShutdown" setting in DB, in order to
- *         determine what to show to user on exit from the frontend.
- */
-void MythThemedMenu::ReloadExitKey(void)
-{
-    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown", 4);
-
-    if (allowsd == 1)
-        m_exitModifier = Qt::ControlModifier;
-    else if (allowsd == 2)
-        m_exitModifier = Qt::MetaModifier;
-    else if (allowsd == 3)
-        m_exitModifier = Qt::AltModifier;
-    else if (allowsd == 4)
-        m_exitModifier = 0;
-    else
-        m_exitModifier = -1;
-}
-
 /** \brief keyboard/LIRC event handler.
  *
- *  This translates key presses through the "menu" context into MythTV
+ *  This translates key presses through the "Main Menu" context into MythTV
  *  actions and then handles them as appropriate.
  */
 bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
@@ -221,11 +200,8 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     bool handled = false;
 
-    handled = GetMythMainWindow()->TranslateKeyPress("menu", event, actions);
-
-    bool fullexit = false;
-    if (event->modifiers() == m_exitModifier)
-        fullexit = true;
+    handled = GetMythMainWindow()->TranslateKeyPress("Main Menu", event,
+                                                     actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -237,7 +213,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
             MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
             buttonAction(item);
         }
-        else if (action == "LEFT" || action == "ESCAPE")
+        else if (action == "LEFT" || action == "ESCAPE" || action == "EXIT" )
         {
             bool    callbacks  = m_state->m_callback;
             bool    lastScreen = (GetMythMainWindow()->GetMainStack()
@@ -263,7 +239,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     QCoreApplication::exit();
                 }
             }
-            else if (m_exitModifier >= 0 && fullexit && lastScreen)
+            else if ((action == "EXIT" || QObject::tr("MythTV Setup") ==
+                      GetMythMainWindow()->windowTitle()) &&
+                     lastScreen)
             {
                 if (callbacks)
                     m_state->m_callback(m_state->m_callbackdata, selExit);
@@ -303,7 +281,6 @@ void MythThemedMenu::ShowMenu()
     if (m_menuPopup)
         return;
 
-    int allowsd =  GetMythDB()->GetNumSetting("AllowQuitShutdown");
     int override_menu = GetMythDB()->GetNumSetting("OverrideExitMenu");
     QString label = tr("System Menu");
     MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();
@@ -314,18 +291,6 @@ void MythThemedMenu::ShowMenu()
 
     switch (override_menu)
     {
-        case 0:
-            if ( (allowsd != 0) && (allowsd != 4)  )
-            {
-                m_menuPopup->SetReturnEvent(this,"popmenu_exit");
-                m_menuPopup->AddButton(tr("Shutdown"));
-                m_menuPopup->AddButton(tr("Reboot"));
-            }
-            else
-            {
-                m_menuPopup->SetReturnEvent(this,"popmenu_noexit");
-            }
-            break;
         case 2:
         case 4:
             // shutdown
@@ -344,6 +309,7 @@ void MythThemedMenu::ShowMenu()
             m_menuPopup->AddButton(tr("Shutdown"));
             m_menuPopup->AddButton(tr("Reboot"));
             break;
+        case 0:
         default:
             m_menuPopup->SetReturnEvent(this,"popmenu_noexit");
             break;

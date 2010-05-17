@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1255";
+const QString currentDatabaseVersion = "1256";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5187,6 +5187,30 @@ NULL
 };
         if (!performActualUpdate(updates, "1255", dbver))
             return false;
+    }
+
+    if (dbver == "1255")
+    {
+        const char *updates[] = {
+"INSERT INTO keybindings (SELECT 'Main Menu', 'EXIT', 'System Exit', "
+    "(CASE data WHEN '1' THEN 'Ctrl+Esc' WHEN '2' THEN 'Meta+Esc' "
+    "WHEN '3' THEN 'Alt+Esc' WHEN '4' THEN 'Esc' ELSE '' END), hostname "
+    "FROM settings WHERE value = 'AllowQuitShutdown' LIMIT 1) "
+    "ON DUPLICATE KEY UPDATE keylist = VALUES(keylist);",
+NULL
+};
+        if (!performActualUpdate(updates, "1256", dbver))
+            return false;
+
+        // Reload the binding in case mythtv-setup did the upgrade and the
+        // user's previous setting for this host wasn't Esc
+        if (gCoreContext->HasGUI())
+        {
+            MythMainWindow *mainwin = GetMythMainWindow();
+            mainwin->ClearKey("Main Menu", "EXIT");
+            QString keys = mainwin->GetKey("Main Menu", "EXIT");
+            mainwin->BindKey("Main Menu", "EXIT", keys);
+        }
     }
 
     return true;

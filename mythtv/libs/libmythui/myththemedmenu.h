@@ -78,7 +78,6 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
 
     QString getSelection(void);
 
-    void ReloadExitKey(void);
     virtual void aboutToShow(void);
 
     void ShowMenu();
@@ -116,8 +115,6 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
 
     QString m_selection;
     bool m_foundtheme;
-
-    int m_exitModifier;
 
     bool m_ignorekeys;
 

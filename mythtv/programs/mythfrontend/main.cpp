@@ -591,7 +591,6 @@ void TVMenuCallback(void *data, QString &selection)
     {
         MainGeneralSettings mainsettings;
         mainsettings.exec();
-        menu->ReloadExitKey();
         QStringList strlist( QString("REFRESH_BACKEND") );
         gCoreContext->SendReceiveStringList(strlist);
     }

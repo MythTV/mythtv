@@ -2220,27 +2220,11 @@ static HostCheckBox *UseVirtualKeyboard()
     return gc;
 }
 
-static HostComboBox *AllowQuitShutdown()
-{
-    HostComboBox *gc = new HostComboBox("AllowQuitShutdown");
-    gc->setLabel(QObject::tr("System Exit key"));
-    gc->addSelection(QObject::tr("ESC"), "4");
-    gc->addSelection(QObject::tr("No exit key"), "0");
-    gc->addSelection(QObject::tr("Control-ESC"), "1");
-    gc->addSelection(QObject::tr("Meta-ESC"), "2");
-    gc->addSelection(QObject::tr("Alt-ESC"), "3");
-    gc->setHelpText(QObject::tr("MythTV is designed to run continuously. If "
-                    "you wish, you may use the ESC key or the ESC key + a "
-                    "modifier to exit MythTV. Do not choose a key combination "
-                    "that will be intercepted by your window manager."));
-    return gc;
-}
-
 static HostComboBox *OverrideExitMenu()
 {
     HostComboBox *gc = new HostComboBox("OverrideExitMenu");
     gc->setLabel(QObject::tr("Customize exit menu options"));
-    gc->addSelection(QObject::tr("Autodetect"), "0");
+    gc->addSelection(QObject::tr("Default"), "0");
     gc->addSelection(QObject::tr("Show quit"), "1");
     gc->addSelection(QObject::tr("Show quit and shutdown"), "2");
     gc->addSelection(QObject::tr("Show quit, reboot and shutdown"), "3");
@@ -4244,7 +4228,6 @@ MainGeneralSettings::MainGeneralSettings()
     exit->setLabel(QObject::tr("Program Exit"));
     HorizontalConfigurationGroup *ehor0 =
         new HorizontalConfigurationGroup(false, false, true, true);
-    ehor0->addChild(AllowQuitShutdown());
     ehor0->addChild(NoPromptOnExit());
     VerticalConfigurationGroup *shutdownSettings =
         new VerticalConfigurationGroup(true, true, false, false);
