@@ -5,12 +5,14 @@ using namespace std;
 #include <QStringList>
 #include <QDateTime>
 #include <QFileInfo>
+#include <QDir>
 
 #include "playbackboxhelper.h"
 #include "previewgenerator.h"
-#include "tvremoteutil.h"
-#include "programinfo.h"
 #include "mythcorecontext.h"
+#include "tvremoteutil.h"
+#include "storagegroup.h"
+#include "programinfo.h"
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
@@ -19,16 +21,66 @@ using namespace std;
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")
 #define LOC_ERR  QString("PlaybackBoxHelper Error: ")
 
+QString toString(ArtworkType t)
+{
+    switch (t)
+    {
+        case kArtworkFan:    return "fanart";
+        case kArtworkBanner: return "banner";
+        case kArtworkCover:  return "coverart";
+    }
+    return QString();
+}
+
+QString toLocalDir(ArtworkType t)
+{
+    static QMutex m;
+    static bool initrun = false;
+    QString kFanDir, kBannerDir, kCoverDir;
+
+    QMutexLocker locker(&m);
+    if (!initrun)
+    {
+        kFanDir    = gCoreContext->GetSetting("mythvideo.fanartDir");
+        kBannerDir = gCoreContext->GetSetting("mythvideo.bannerDir");
+        kCoverDir  = gCoreContext->GetSetting("VideoArtworkDir");
+        initrun = true;
+    }
+
+    switch (t)
+    {
+        case kArtworkFan:    return kFanDir;
+        case kArtworkBanner: return kBannerDir;
+        case kArtworkCover:  return kCoverDir;
+    }
+    return QString();
+}
+
+QString toSG(ArtworkType t)
+{
+    switch (t)
+    {
+        case kArtworkFan:    return "Fanart";
+        case kArtworkBanner: return "Banners";
+        case kArtworkCover:  return "Coverart";
+    }
+    return QString();
+}
+
 class PBHEventHandler : public QObject
 {
   public:
     PBHEventHandler(PlaybackBoxHelper &pbh) :
-        m_pbh(pbh), m_freeSpaceTimerId(0) { }
+        m_pbh(pbh), m_freeSpaceTimerId(0)
+    {
+        StorageGroup::ClearGroupToUseCache();
+    }
     virtual bool event(QEvent*); // QObject
     void UpdateFreeSpaceEvent(void);
     PlaybackBoxHelper &m_pbh;
     int m_freeSpaceTimerId;
     static const uint kUpdateFreeSpaceInterval;
+    QMap<QString, QStringList> m_fileListCache;
 };
 
 const uint PBHEventHandler::kUpdateFreeSpaceInterval = 15000; // 15 seconds
@@ -212,6 +264,139 @@ bool PBHEventHandler::event(QEvent *e)
 
             return true;
         }
+        else if (me->Message() == "LOCATE_ARTWORK")
+        {
+            QString           seriesid  = me->ExtraData(0);
+            QString           title     = me->ExtraData(1);
+            const ArtworkType type      = (ArtworkType)me->ExtraData(2).toInt();
+            const QString     host      = me->ExtraData(3);
+            const QString     sgroup    = toSG(type);
+            const QString     localDir  = toLocalDir(type);
+            const QString     cacheKey = QString("%1:%2:%3")
+                .arg((int)type).arg(seriesid).arg(title);
+
+            seriesid = (seriesid == "_GROUP_") ? QString() : seriesid;
+
+            // Attempts to match image file in specified directory.
+            // Falls back like this:
+            //
+            //     Pushing Daisies 5.png
+            //     PushingDaisies5.png
+            //     PushingDaisiesSeason5.png
+            //     Pushing Daisies Season 5 Episode 1.png
+            //     PuShinG DaisIES s05e01.png
+            //     etc. (you get it)
+            //
+            // Or any permutation thereof including -,_, or . instead of space
+            // Then, match by seriesid (for future PBB grabber):
+            //
+            //     EP0012345.png
+            //
+            // Then, as a final fallback, match just title
+            //
+            //     Pushing Daisies.png (or Pushing_Daisies.png, etc.)
+            //
+            // All this allows for grabber to grab an image with format:
+            //
+            //     Title SeasonNumber.ext or Title SeasonNum # Epnum #.ext
+            //     or SeriesID.ext or Title.ext (without caring about cases,
+            //     spaces, dashes, periods, or underscores)
+
+            QDir dir(localDir);
+            dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
+
+            QStringList entries = dir.entryList();
+            QString grpHost = sgroup + ":" + host;
+
+            if (!m_fileListCache.contains(grpHost))
+            {
+                QStringList sgEntries;
+                RemoteGetFileList(host, "", &sgEntries, sgroup, true);
+                m_fileListCache[grpHost] = sgEntries;
+            }
+
+            title.replace(' ', "(?:\\s|-|_|\\.)?");
+            QString regs[] = {
+                QString("%1" // title
+                        "(?:\\s|-|_|\\.)?" // optional separator
+                        "(?:" // begin optional Season portion
+                        "S(?:eason)?" // optional "S" or "Season"
+                        "(?:\\s|-|_|\\.)?" // optional separator
+                        "[0-9]{1,3}" // number
+                        ")?" // end optional Season portion
+                        "(?:" // begin optional Episode portion
+                        "(?:\\s|-|_|\\.)?" // optional separator
+                        "(?:x?" // optional "x"
+                        "(?:\\s|-|_|\\.)?" // optional separator
+                        "(?:E(?:pisode)?)?" // optional "E" or "Episode"
+                        "(?:\\s|-|_|\\.)?)?" // optional separator
+                        "[0-9]{1,3}" // number portion of
+                                     // optional Episode portion
+                        ")?" // end optional Episode portion
+                        "(?:_%2)?" // optional Suffix portion
+                        "\\.(?:png|gif|jpg)" // file extension
+                    ).arg(title).arg(toString(type)),
+                QString("%1_%2\\.(?:png|jpg|gif)")
+                .arg(seriesid).arg(toString(type)),
+                QString("%1\\.(?:png|jpg|gif)").arg(seriesid),
+            };
+
+            QString foundFile;
+            for (uint i = 0; i < sizeof(regs) / sizeof(QString); i++)
+            {
+                QRegExp re(regs[i], Qt::CaseInsensitive);
+
+                for (QStringList::const_iterator it = entries.begin();
+                     it != entries.end(); ++it)
+                {
+                    if (re.exactMatch(*it))
+                    {
+                        foundFile = *it;
+                        break;
+                    }
+                }
+
+                for (QStringList::const_iterator it =
+                         m_fileListCache[grpHost].begin();
+                     it != m_fileListCache[grpHost].end(); ++it)
+                {
+                    if (!re.exactMatch(*it))
+                        continue;
+
+                    foundFile = QString("myth://%1@%2:%3/%4")
+                        .arg(StorageGroup::GetGroupToUse(host, sgroup))
+                        .arg(gCoreContext->GetSettingOnHost(
+                                 "BackendServerIP", host))
+                        .arg(gCoreContext->GetSettingOnHost(
+                                 "BackendServerPort", host))
+                        .arg(*it);
+                    break;
+                }
+            }
+
+            if (!foundFile.isEmpty())
+            {
+                if (localDir.endsWith("/"))
+                    localDir.left(localDir.length()-1);
+                if (!foundFile.startsWith("myth://"))
+                    foundFile = QString("%1/%2").arg(localDir).arg(foundFile);
+            }
+
+            {
+                QMutexLocker locker(&m_pbh.m_lock);
+                m_pbh.m_artworkFilenameCache[cacheKey] = foundFile;
+            }
+
+            if (!foundFile.isEmpty())
+            {
+                QStringList list = me->ExtraDataList();
+                list.push_back(foundFile);
+                MythEvent *e = new MythEvent("FOUND_ARTWORK", list);
+                QCoreApplication::postEvent(m_pbh.m_listener, e);
+            }
+
+            return true;
+        }
     }
 
     return QObject::event(e);
@@ -352,6 +537,33 @@ void PlaybackBoxHelper::CheckAvailability(
     pginfo.ToStringList(list);
     MythEvent *e = new MythEvent("CHECK_AVAILABILITY", list);
     QCoreApplication::postEvent(m_eventHandler, e);        
+}
+
+QString PlaybackBoxHelper::LocateArtwork(
+    const QString &seriesid, const QString &title,
+    ArtworkType type, const QString &host,
+    const ProgramInfo *pginfo)
+{
+    QString cacheKey = QString("%1:%2:%3")
+        .arg((int)type).arg(seriesid).arg(title);
+
+    QMutexLocker locker(&m_lock);
+
+    QHash<QString,QString>::const_iterator it =
+        m_artworkFilenameCache.find(cacheKey);
+
+    if (it != m_artworkFilenameCache.end())
+        return *it;
+
+    QStringList list(seriesid);
+    list.push_back(title);
+    list.push_back(QString::number((int)type));
+    list.push_back(host);
+    list.push_back((pginfo)?pginfo->MakeUniqueKey():"");
+    MythEvent *e = new MythEvent("LOCATE_ARTWORK", list);
+    QCoreApplication::postEvent(m_eventHandler, e);
+
+    return QString();
 }
 
 void PlaybackBoxHelper::GetPreviewImage(const ProgramInfo &pginfo)

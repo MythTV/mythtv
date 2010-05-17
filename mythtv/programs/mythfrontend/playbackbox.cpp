@@ -6,7 +6,6 @@
 #include <QWaitCondition>
 #include <QDateTime>
 #include <QTimer>
-#include <QDir>
 #include <QMap>
 
 // libmythdb
@@ -170,6 +169,11 @@ static bool comp_recordDate_rev_less_than(
     return comp_recordDate_rev(a, b) < 0;
 }
 
+static const ArtworkType s_artType[] =
+    { kArtworkFan,        kArtworkBanner,        kArtworkCover, };
+static const uint s_artDelay[] =
+    { kArtworkFanTimeout, kArtworkBannerTimeout, kArtworkCoverTimeout,};
+
 static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
         PlaybackBox::ViewMask toggle)
 {
@@ -179,13 +183,14 @@ static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
     return (PlaybackBox::ViewMask)(mask | toggle);
 }
 
-static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
-        PlaybackBox::ViewTitleSort titleSort, int recpriority)
+static QString construct_sort_title(
+    QString title, PlaybackBox::ViewMask viewmask,
+    PlaybackBox::ViewTitleSort titleSort, int recpriority,
+    const QRegExp &prefixes)
 {
     if (title.isEmpty())
         return title;
 
-    QRegExp prefixes( QObject::tr("^(The |A |An )") );
     QString sTitle = title;
 
     sTitle.remove(prefixes);
@@ -325,9 +330,10 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
                             TV *player, bool showTV)
     : ScheduleCommon(parent, name),
+      m_prefixes(QObject::tr("^(The |A |An )")),
+      m_titleChaff(" \\(.*\\)$"),
       // Artwork Variables
-      m_fanartTimer(new QTimer(this)),    m_bannerTimer(new QTimer(this)),
-      m_coverartTimer(new QTimer(this)),
+      m_artHostOverride(),
       // Settings
       m_type(ltype),
       m_formatShortDate("M/d"),           m_formatLongDate("ddd MMMM d"),
@@ -357,6 +363,13 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_player(NULL),
       m_helper(this)
 {
+    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    {
+        m_artImage[i] = NULL;
+        m_artTimer[i] = new QTimer(this);
+        m_artTimer[i]->setSingleShot(true);
+    }
+
     m_formatShortDate    = gCoreContext->GetSetting("ShortDateFormat", "M/d");
     m_formatLongDate     = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
     m_formatTime         = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
@@ -401,6 +414,9 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
         gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
 
+    if (gCoreContext->GetNumSetting("MasterBackendOverride", 0))
+        m_artHostOverride = gCoreContext->GetMasterHostName();
+
     if (player)
     {
         m_player = player;
@@ -408,8 +424,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
         if (!tmp.isEmpty())
             m_recGroup = tmp;
     }
-
-    StorageGroup::ClearGroupToUseCache();
 
     // recording group stuff
     m_recGroupIdx = -1;
@@ -433,22 +447,11 @@ PlaybackBox::~PlaybackBox(void)
 {
     gCoreContext->removeListener(this);
 
-    if (m_fanartTimer)
+    for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
-        m_fanartTimer->disconnect(this);
-        m_fanartTimer = NULL;
-    }
-
-    if (m_bannerTimer)
-    {
-        m_bannerTimer->disconnect(this);
-        m_bannerTimer = NULL;
-    }
-
-    if (m_coverartTimer)
-    {
-        m_coverartTimer->disconnect(this);
-        m_coverartTimer = NULL;
+        m_artTimer[i]->disconnect(this);
+        m_artTimer[i] = NULL;
+        m_artImage[i] = NULL;
     }
 
     if (m_player)
@@ -475,9 +478,9 @@ bool PlaybackBox::Create()
     m_noRecordingsText = dynamic_cast<MythUIText *> (GetChild("norecordings"));
 
     m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
-    m_fanart = dynamic_cast<MythUIImage *>(GetChild("fanart"));
-    m_banner = dynamic_cast<MythUIImage *>(GetChild("banner"));
-    m_coverart = dynamic_cast<MythUIImage *>(GetChild("coverart"));
+    m_artImage[kArtworkFan] = dynamic_cast<MythUIImage*>(GetChild("fanart"));
+    m_artImage[kArtworkBanner] = dynamic_cast<MythUIImage*>(GetChild("banner"));
+    m_artImage[kArtworkCover]= dynamic_cast<MythUIImage*>(GetChild("coverart"));
 
     if (!m_recordingList || !m_groupList)
     {
@@ -499,9 +502,9 @@ bool PlaybackBox::Create()
             SLOT(PlayFromBookmark(MythUIButtonListItem*)));
 
     // connect up timers...
-    connect(m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
-    connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
-    connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
+    connect(m_artTimer[kArtworkFan],   SIGNAL(timeout()), SLOT(fanartLoad()));
+    connect(m_artTimer[kArtworkBanner],SIGNAL(timeout()), SLOT(bannerLoad()));
+    connect(m_artTimer[kArtworkCover], SIGNAL(timeout()), SLOT(coverartLoad()));
 
     BuildFocusList();
     m_programInfoCache.ScheduleLoad();
@@ -602,31 +605,32 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         infoMap["show"]  = grouplabel;
     }
 
-    if (m_fanart)
+    if (m_artImage[kArtworkFan])
     {
-        if (groupname.isEmpty() || countInGroup == 0)
+        if (!groupname.isEmpty() && !m_progLists[groupname].empty())
         {
-            m_fanart->Reset();
+            ProgramInfo *pginfo = *m_progLists[groupname].begin();
+            QString arthost((!m_artHostOverride.isEmpty()) ?
+                            m_artHostOverride : pginfo->GetHostname());
+
+            QString artworkSeriesID = "_GROUP_";
+            QString fn = m_helper.LocateArtwork(
+                artworkSeriesID, groupname, kArtworkFan, arthost, NULL);
+
+            if (fn.isEmpty())
+            {
+                m_artTimer[kArtworkFan]->stop();
+                m_artImage[kArtworkFan]->Reset();
+            }
+            else if (m_artImage[kArtworkFan]->GetFilename() != fn)
+            {
+                m_artImage[kArtworkFan]->SetFilename(fn);
+                m_artTimer[kArtworkFan]->start(kArtworkFanTimeout);
+            }
         }
         else
         {
-            static int itemsPast = 0;
-            QString artworkHost;
-            if (gCoreContext->GetNumSetting("MasterBackendOverride", 0))
-                artworkHost = gCoreContext->GetMasterHostName();
-            else
-                artworkHost = 
-                    (*(m_progLists[groupname].begin()))->GetHostname();
-
-            QString artworkTitle = groupname;
-            QString artworkSeriesID;
-            QString artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
-                                                  "fanart", artworkHost);
-            if (loadArtwork(artworkFile, m_fanart, m_fanartTimer, 300,
-                            itemsPast > 2))
-                itemsPast++;
-            else
-                itemsPast = 0;
+            m_artImage[kArtworkFan]->Reset();
         }
     }
 
@@ -682,11 +686,11 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     if (m_previewImage)
         m_previewImage->Reset();
 
-    if (m_banner)
-        m_banner->Reset();
+    if (m_artImage[kArtworkBanner])
+        m_artImage[kArtworkBanner]->Reset();
 
-    if (m_coverart)
-        m_coverart->Reset();
+    if (m_artImage[kArtworkCover])
+        m_artImage[kArtworkCover]->Reset();
 
     updateIcons();
 }
@@ -817,43 +821,32 @@ void PlaybackBox::UpdateUIListItem(
             m_previewImage->Load();
         }
 
-        if (m_fanart || m_banner || m_coverart)
+        // Handle artwork
+        QString arthost;
+        for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
         {
-            QString artworkHost;
-            QString artworkDir;
-            QString artworkFile;
-            QString artworkTitle    = pginfo->GetTitle();
-            QString artworkSeriesID = pginfo->GetSeriesID();
-
-            if (gCoreContext->GetNumSetting("MasterBackendOverride", 0))
-                artworkHost = gCoreContext->GetMasterHostName();
-            else
-                artworkHost = pginfo->GetHostname();
-
-            if (m_fanart)
+            if (!m_artImage[i])
+                continue;
+  
+            if (arthost.isEmpty())
             {
-                static int itemsPast = 0;
-                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
-                                              "fanart", artworkHost);
-                if (loadArtwork(artworkFile, m_fanart, m_fanartTimer, 300,
-                                itemsPast > 2))
-                    itemsPast++;
-                else
-                    itemsPast = 0;
+                arthost = (!m_artHostOverride.isEmpty()) ?
+                    m_artHostOverride : pginfo->GetHostname();
             }
+  
+            QString fn = m_helper.LocateArtwork(
+                pginfo->GetSeriesID(), pginfo->GetTitle(),
+                s_artType[i], arthost, pginfo);
 
-            if (m_banner)
+            if (fn.isEmpty())
             {
-                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
-                                              "banner", artworkHost);
-                loadArtwork(artworkFile, m_banner, m_bannerTimer, 50);
+                m_artTimer[i]->stop();
+                m_artImage[i]->Reset();
             }
-
-            if (m_coverart)
+            else if (m_artImage[i]->GetFilename() != fn)
             {
-                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
-                                              "coverart", artworkHost);
-                loadArtwork(artworkFile, m_coverart, m_coverartTimer, 50);
+                m_artImage[i]->SetFilename(fn);
+                m_artTimer[i]->start(s_artDelay[i]);
             }
         }
 
@@ -1446,7 +1439,7 @@ bool PlaybackBox::UpdateUILists(void)
                 while (query.next())
                 {
                     QString tmpTitle = query.value(1).toString();
-                    tmpTitle.remove(QRegExp(" \\(.*\\)$"));
+                    tmpTitle.remove(m_titleChaff);
                     searchRule[query.value(0).toInt()] = tmpTitle;
                 }
             }
@@ -1510,8 +1503,9 @@ bool PlaybackBox::UpdateUILists(void)
                     ((p->GetRecordingGroup() != "LiveTV") ||
                      (m_recGroup == "LiveTV")))
                 {
-                    sTitle = sortTitle(p->GetTitle(), m_viewMask, titleSort,
-                            p->GetRecordingPriority());
+                    sTitle = construct_sort_title(
+                        p->GetTitle(), m_viewMask, titleSort,
+                        p->GetRecordingPriority(), m_prefixes);
                     sTitle = sTitle.toLower();
 
                     if (!sortedList.contains(sTitle))
@@ -2308,193 +2302,17 @@ void PlaybackBox::RemoveProgram(
 
 void PlaybackBox::fanartLoad(void)
 {
-    m_fanart->Load();
+    m_artImage[kArtworkFan]->Load();
 }
 
 void PlaybackBox::bannerLoad(void)
 {
-    m_banner->Load();
+    m_artImage[kArtworkBanner]->Load();
 }
 
 void PlaybackBox::coverartLoad(void)
 {
-    m_coverart->Load();
-}
-
-bool PlaybackBox::loadArtwork(QString artworkFile, MythUIImage *image, QTimer *timer,
-                              int delay, bool resetImage)
-{
-    bool wasActive = timer->isActive();
-
-    if (artworkFile.isEmpty())
-    {
-        if (wasActive)
-            timer->stop();
-
-        image->Reset();
-
-        return true;
-    }
-    else
-    {
-        if (artworkFile != image->GetFilename())
-        {
-            if (wasActive)
-                timer->stop();
-
-            if (resetImage)
-                image->Reset();
-
-            image->SetFilename(artworkFile);
-
-            timer->setSingleShot(true);
-            timer->start(delay);
-
-            return wasActive;
-        }
-    }
-
-    return false;
-}
-
-QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
-                                     QString imagetype, QString host)
-{
-    QString cacheKey = QString("%1:%2:%3").arg(imagetype).arg(seriesID)
-                               .arg(titleIn);
-
-    if (m_imageFileCache.contains(cacheKey))
-        return m_imageFileCache[cacheKey];
-
-    QString foundFile;
-    QString sgroup;
-    QString localDir;
-
-    if (imagetype == "fanart")
-    {
-        sgroup = "Fanart";
-        localDir = gCoreContext->GetSetting("mythvideo.fanartDir");
-    }
-    else if (imagetype == "banner")
-    {
-        sgroup = "Banners";
-        localDir = gCoreContext->GetSetting("mythvideo.bannerDir");
-    }
-    else if (imagetype == "coverart")
-    {
-        sgroup = "Coverart";
-        localDir = gCoreContext->GetSetting("VideoArtworkDir");
-    }
-
-    // Attempts to match image file in specified directory.
-    // Falls back like this:
-    //
-    //     Pushing Daisies 5.png
-    //     PushingDaisies5.png
-    //     PushingDaisiesSeason5.png
-    //     Pushing Daisies Season 5 Episode 1.png
-    //     PuShinG DaisIES s05e01.png
-    //     etc. (you get it)
-    //
-    // Or any permutation thereof including -,_, or . instead of space
-    // Then, match by seriesid (for future PBB grabber):
-    //
-    //     EP0012345.png
-    //
-    // Then, as a final fallback, match just title
-    //
-    //     Pushing Daisies.png (or Pushing_Daisies.png, etc.)
-    //
-    // All this allows for grabber to grab an image with format:
-    //
-    //     Title SeasonNumber.ext or Title SeasonNum # Epnum #.ext
-    //     or SeriesID.ext or Title.ext (without caring about cases,
-    //     spaces, dashes, periods, or underscores)
-
-    QDir dir(localDir);
-    dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
-
-    QStringList entries = dir.entryList();
-    QString grpHost = sgroup + ":" + host;
-
-    if (!m_fileListCache.contains(grpHost))
-    {
-        // TODO do this in another thread
-        QStringList sgEntries;
-        RemoteGetFileList(host, "", &sgEntries, sgroup, true);
-        m_fileListCache[grpHost] = sgEntries;
-    }
-
-    int regIndex = 0;
-    titleIn.replace(' ', "(?:\\s|-|_|\\.)?");
-    QString regs[] = {
-        QString("%1" // title
-            "(?:\\s|-|_|\\.)?" // optional separator
-            "(?:" // begin optional Season portion
-            "S(?:eason)?" // optional "S" or "Season"
-            "(?:\\s|-|_|\\.)?" // optional separator
-            "[0-9]{1,3}" // number
-            ")?" // end optional Season portion
-            "(?:" // begin optional Episode portion
-            "(?:\\s|-|_|\\.)?" // optional separator
-            "(?:x?" // optional "x"
-            "(?:\\s|-|_|\\.)?" // optional separator
-            "(?:E(?:pisode)?)?" // optional "E" or "Episode"
-            "(?:\\s|-|_|\\.)?)?" // optional separator
-            "[0-9]{1,3}" // number portion of optional Episode portion
-            ")?" // end optional Episode portion
-            "(?:_%2)?" // optional Suffix portion
-            "\\.(?:png|gif|jpg)" // file extension
-            ).arg(titleIn).arg(imagetype),
-        QString("%1_%2\\.(?:png|jpg|gif)").arg(seriesID).arg(imagetype),
-        QString("%1\\.(?:png|jpg|gif)").arg(seriesID),
-        "" };  // This blank entry must exist, do not remove.
-
-    QString reg = regs[regIndex];
-    while ((!reg.isEmpty()) && (foundFile.isEmpty()))
-    {
-        QRegExp re(reg, Qt::CaseInsensitive);
-        for (QStringList::const_iterator it = entries.begin();
-            it != entries.end(); ++it)
-        {
-            if (re.exactMatch(*it))
-            {
-                foundFile = *it;
-                break;
-            }
-        }
-        for (QStringList::const_iterator it = m_fileListCache[grpHost].begin();
-            it != m_fileListCache[grpHost].end(); ++it)
-        {
-            if (re.exactMatch(*it))
-            {
-                // TODO FIXME get rid of GetSettingOnHost calls
-                // TODO FIXME get rid of string concatenation
-                foundFile =
-                    QString("myth://%1@")
-                    .arg(StorageGroup::GetGroupToUse(host, sgroup)) +
-                    gCoreContext->GetSettingOnHost("BackendServerIP", host) +
-                    QString(":") +
-                    gCoreContext->GetSettingOnHost("BackendServerPort", host) +
-                    QString("/") +
-                    *it;
-                break;
-            }
-        }
-        reg = regs[++regIndex];
-    }
-
-    if (!foundFile.isEmpty())
-    {
-        if (foundFile.startsWith("myth://"))
-            m_imageFileCache[cacheKey] = foundFile;
-        else
-            m_imageFileCache[cacheKey] = QString("%1/%2").arg(localDir)
-                                               .arg(foundFile);
-        return m_imageFileCache[cacheKey];
-    }
-    else
-        return QString();
+    m_artImage[kArtworkCover]->Load();
 }
 
 void PlaybackBox::ShowDeletePopup(DeletePopupType type)
@@ -4081,6 +3899,36 @@ void PlaybackBox::customEvent(QEvent *event)
             ProgramInfo *info = m_programInfoCache.GetProgramInfo(piKey);
             if (info)
                 info->SetPathname(me->ExtraData(1));
+        }
+        else if ((message == "FOUND_ARTWORK") && (me->ExtraDataCount() >= 6))
+        {
+            QString     seriesid  = me->ExtraData(0);
+            QString     groupname = me->ExtraData(1);
+            ArtworkType type      = (ArtworkType) me->ExtraData(2).toInt();
+            QString     pikey     = me->ExtraData(4);
+            QString     fn        = me->ExtraData(5);
+
+            if (seriesid != "_GROUP_" && !pikey.isEmpty())
+            {
+                ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(pikey);
+                if (pginfo &&
+                    m_recordingList->GetItemByData(qVariantFromValue(pginfo)) ==
+                    m_recordingList->GetItemCurrent() &&
+                    m_artImage[(uint)type]->GetFilename() != fn)
+                {
+                    m_artImage[(uint)type]->SetFilename(fn);
+                    m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
+                }
+            }
+            else if (seriesid == "_GROUP_" && !groupname.isEmpty() &&
+                     (m_currentGroup == groupname) &&
+                     m_artImage[type] &&
+                     m_groupList->GetItemCurrent() &&
+                     m_artImage[(uint)type]->GetFilename() != fn)
+            {
+                m_artImage[(uint)type]->SetFilename(fn);
+                m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
+            }
         }
     }
     else

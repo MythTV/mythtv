@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QThread>
 #include <QMutex>
+#include <QHash>
 #include <QMap>
 
 class PreviewGenerator;
@@ -42,6 +43,16 @@ typedef enum CheckAvailabilityType {
     kCheckForPlaylistAction,
 } CheckAvailabilityType;
 
+typedef enum ArtworkTypes
+{
+    kArtworkFan    = 0,
+    kArtworkBanner = 1,
+    kArtworkCover  = 2,
+} ArtworkType;
+QString toString(ArtworkType t);
+QString toLocalDir(ArtworkType t);
+QString toSG(ArtworkType t);
+
 class PlaybackBoxHelper : public QThread
 {
     friend class PBHEventHandler;
@@ -61,6 +72,10 @@ class PlaybackBoxHelper : public QThread
     void CheckAvailability(const ProgramInfo&,
                            CheckAvailabilityType cat = kCheckForCache);
     void GetPreviewImage(const ProgramInfo&);
+
+    QString LocateArtwork(const QString &seriesid, const QString &title,
+                          ArtworkType, const QString &host,
+                          const ProgramInfo *pginfo);
 
     virtual void run(void);      // QThread
 
@@ -100,6 +115,9 @@ class PlaybackBoxHelper : public QThread
     QStringList         m_previewGeneratorQueue;
     uint                m_previewGeneratorRunning;
     uint                m_previewGeneratorMaxThreads;
+
+    // Artwork Variables //////////////////////////////////////////////////////
+    QHash<QString, QString>    m_artworkFilenameCache;
 };
 
 #endif // _FREE_SPACE_H_

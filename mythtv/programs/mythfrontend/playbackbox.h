@@ -46,6 +46,12 @@ class MythDialogBox;
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
 
+enum {
+    kArtworkFanTimeout    = 0,//300,
+    kArtworkBannerTimeout = 0,//50,
+    kArtworkCoverTimeout  = 0,//50,
+};
+
 class PlaybackBox : public ScheduleCommon
 {
     Q_OBJECT
@@ -298,11 +304,6 @@ class PlaybackBox : public ScheduleCommon
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);
 
-    bool loadArtwork(QString artworkFile, MythUIImage *image, QTimer *timer,
-                     int delay = 500, bool resetImage = false);
-    QString findArtworkFile(QString &seriesID, QString &titleIn,
-                            QString imagetype, QString host);
-
     bool IsUsageUIVisible(void) const;
 
     void updateIcons(const ProgramInfo *pginfo = NULL);
@@ -332,6 +333,9 @@ class PlaybackBox : public ScheduleCommon
     QString CreateProgramInfoString(const ProgramInfo &program) const;
 
   private:
+    QRegExp m_prefixes;   ///< prefixes to be ignored when sorting
+    QRegExp m_titleChaff; ///< stuff to remove for search rules
+
     MythUIButtonList *m_recgroupList;
     MythUIButtonList *m_groupList;
     MythUIButtonList *m_recordingList;
@@ -339,12 +343,10 @@ class PlaybackBox : public ScheduleCommon
     MythUIText *m_noRecordingsText;
 
     MythUIImage *m_previewImage;
-    MythUIImage *m_fanart;
-    MythUIImage *m_banner;
-    MythUIImage *m_coverart;
-    QTimer      *m_fanartTimer;
-    QTimer      *m_bannerTimer;
-    QTimer      *m_coverartTimer;
+
+    QString      m_artHostOverride;
+    MythUIImage *m_artImage[3];
+    QTimer      *m_artTimer[3];
 
     InfoMap m_currentMap;
 
@@ -434,10 +436,6 @@ class PlaybackBox : public ScheduleCommon
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      m_ncLock;
     deque<QString>      m_networkControlCommands;
-
-    // artwork filename cache for findArtworkFile()
-    QHash <QString, QString>    m_imageFileCache;
-    QMap <QString, QStringList> m_fileListCache;
 
     // Other
     TV                 *m_player;
