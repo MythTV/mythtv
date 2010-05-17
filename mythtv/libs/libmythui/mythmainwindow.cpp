@@ -29,7 +29,7 @@ using namespace std;
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
-#ifdef Q_WS_MACX
+#ifdef Q_WS_MACX_OLDQT
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
@@ -885,14 +885,7 @@ void MythMainWindow::Init(void)
         flags |= Qt::FramelessWindowHint;
     }
 
-    // Workarounds for Qt/Mac bugs
-#ifdef Q_WS_MACX
-    if (d->does_fill_screen)
-    {
-        flags = Qt::SplashScreen;
-    }
-#endif
-
+    // Workaround Qt/Windows playback bug?
 #ifdef WIN32
     flags |= Qt::MSWindowsOwnDC;
 #endif
@@ -999,7 +992,7 @@ void MythMainWindow::ReinitDone(void)
 void MythMainWindow::Show(void)
 {
     show();
-#ifdef Q_WS_MACX
+#ifdef Q_WS_MACX_OLDQT
     if (d->does_fill_screen)
         HideMenuBar();
     else
