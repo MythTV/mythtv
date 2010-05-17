@@ -118,7 +118,8 @@ NAV_TITLE_LIST* nav_get_title_list(char *root, uint32_t flags)
     if (dir == NULL) {
         DEBUG(DBG_NAV, "Failed to open dir: %s\n", path);
         X_FREE(path);
-        return NULL;;
+        X_FREE(title_list);
+        return NULL;
     }
     X_FREE(path);
 
@@ -207,7 +208,7 @@ char* nav_find_main_title(char *root)
     if (dir == NULL) {
         fprintf(stderr, "Failed to open dir: %s\n", path);
         X_FREE(path);
-        return NULL;;
+        return NULL;
     }
     X_FREE(path);
 
