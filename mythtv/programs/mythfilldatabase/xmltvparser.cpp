@@ -535,12 +535,27 @@ ProgInfo *XMLTVParser::parseProgram(
 
         if (!episode.isEmpty() && !season.isEmpty())
         {
-            programid.append(episode);
-            programid.append(season);
-            if (pginfo->partnumber && pginfo->parttotal)
+            /* Append unpadded episode and season number to the seriesid (to
+               maintain consistency with historical encoding), but limit the
+               season number representation to a single base-36 character to
+               ensure unique programid generation. */
+            int season_int = season.toInt();
+            if (season_int > 35)
             {
-                programid += QString::number(pginfo->partnumber);
-                programid += QString::number(pginfo->parttotal);
+                // Can not represent season as a single base-36 character, so
+                // remove the programid and fall back to normal dup matching.
+                if (kCategoryMovie != pginfo->categoryType)
+                    programid.clear();
+            }
+            else
+            {
+                programid.append(episode);
+                programid.append(QString::number(season_int, 36));
+                if (pginfo->partnumber && pginfo->parttotal)
+                {
+                    programid += QString::number(pginfo->partnumber);
+                    programid += QString::number(pginfo->parttotal);
+                }
             }
         }
         else
