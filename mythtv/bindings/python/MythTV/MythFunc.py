@@ -820,7 +820,7 @@ class MythDB( MythDBBase ):
 
     def getGuideData(self, chanid, date):
         return self.searchGuide(chanid=chanid, 
-                                custom=('DATE(starttime)=%s',date))
+                                custom=(('DATE(starttime)=%s',date),))
 
     def getSetting(self, value, hostname=None):
         if not hostname:
