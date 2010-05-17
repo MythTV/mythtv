@@ -219,8 +219,6 @@ bool MythDB::SuppressDBMessages(void) const
     return d->suppressDBMessages;
 }
 
-typedef QHash<QString,QString> SettingsMap;
-
 void MythDB::SaveSetting(const QString &key, int newValue)
 {
     (void) SaveSettingOnHost(key,
