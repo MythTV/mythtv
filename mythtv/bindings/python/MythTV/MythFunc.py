@@ -26,30 +26,30 @@ class schemaUpdate( object ):
 
         self.schemavar = func(-1)
 
-    def __call__(db=None):
+    def __call__(self, db=None):
         if db is None:
             db = DBCache()
         log = MythLog('Schema Update')
 
         while True:
             try:
-                updates, newver = func(db.settings.NULL[schemaname])
+                updates, newver = self.func(db.settings.NULL[self.schemavar])
             except StopIteration:
                 break
 
             log(log.IMPORTANT, 'Updating %s from %s to %s' % \
-                        (schemaname, db.settings.NULL[schemaname], newver))
+                        (schemaname, db.settings.NULL[self.schemavar], newver))
             c = db.cursor()
 
             try:
                 for sql, values in updates:
                     c.execute(sql, values)
             except Exception, e:
-                log(log.IMPORTANT, 'Update of %s failed' % schemaname)
+                log(log.IMPORTANT, 'Update of %s failed' % self.schemavar)
                 raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
 
             c.close()
-            db.settings.NULL[schemaname] = newver
+            db.settings.NULL[self.schemavar] = newver
 
 class databaseSearch( object ):
     # decorator class for database searches
