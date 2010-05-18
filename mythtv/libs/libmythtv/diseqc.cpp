@@ -675,6 +675,8 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
     // make sure the bus is powered
     SetVoltage(SEC_VOLTAGE_18);
     usleep(DISEQC_POWER_ON_WAIT);
+    // some DiSEqC devices need more time. see #8465
+    usleep(DISEQC_POWER_ON_WAIT);
 
     // issue a global reset command
     VERBOSE(VB_CHANNEL, LOC + "Resetting DiSEqC Bus");
