@@ -21,12 +21,12 @@ SOURCES += hdhomerun_debug.c     hdhomerun_device.c       hdhomerun_device_selec
 SOURCES += hdhomerun_discover.c  hdhomerun_pkt.c          hdhomerun_video.c
 
 unix {
-    HEADERS += hdhomerun_os_posix.h  hdhomerun_sock_posix.h
+    HEADERS += hdhomerun_os_posix.h
     SOURCES += hdhomerun_os_posix.c hdhomerun_sock_posix.c
 }
 
 mingw {
-    HEADERS += hdhomerun_os_windows.h hdhomerun_sock_windows.h
+    HEADERS += hdhomerun_os_windows.h
     SOURCES += hdhomerun_os_windows.c hdhomerun_sock_windows.c
     LIBS += -lws2_32 -liphlpapi -lpthread
 }
