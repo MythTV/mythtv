@@ -1243,7 +1243,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(audioproperties);   // 37
     INT_FROM_LIST(videoproperties);   // 38
     INT_FROM_LIST(subtitleType);      // 39
-    properties = (subtitleType<<11) | (videoproperties<<6) | subtitleType;
+    properties = (subtitleType<<11) | (videoproperties<<6) | audioproperties;
 
     INT_FROM_LIST(year);              // 40
 
