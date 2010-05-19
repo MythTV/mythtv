@@ -179,7 +179,9 @@ bool PreviewGenerator::RunReal(void)
 bool PreviewGenerator::Run(void)
 {
     bool ok = false;
-    bool local_ok = IsLocal() && (mode & kLocal);
+    QString command = GetInstallPrefix() + "/bin/mythbackend";
+    bool local_ok = (IsLocal() && (mode & kLocal) &&
+                     QFileInfo(command).isExecutable());
     if (!local_ok)
     {
         if (mode & kRemote)
@@ -189,15 +191,14 @@ bool PreviewGenerator::Run(void)
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Run() file not local: '%1'")
+                    QString("Run() can not generate preview locally for: '%1'")
                     .arg(pathname));
         }
     }
     else
     {
         // This is where we fork and run mythbackend to actually make preview
-        QString command = GetInstallPrefix() +
-                                    "/bin/mythbackend --generate-preview ";
+        command += " --generate-preview ";
         command += QString("%1x%2")
             .arg(outSize.width()).arg(outSize.height());
         if (captureTime >= 0)
