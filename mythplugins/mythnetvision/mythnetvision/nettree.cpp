@@ -794,10 +794,19 @@ void NetTree::showWebVideo()
     {
         QString cmd = item->GetPlayer();
         QStringList args = item->GetPlayerArguments();
-        args.replaceInStrings("%DIR%", QString(GetConfDir() + "/MythNetvision"));
-        args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
-        args.replaceInStrings("%URL%", item->GetURL());
-        args.replaceInStrings("%TITLE%", item->GetTitle());
+        if (!args.size())
+        {
+            args += item->GetMediaURL();
+            if (!args.size())
+                args += item->GetURL();
+        }
+        else
+        {
+            args.replaceInStrings("%DIR%", QString(GetConfDir() + "/MythNetvision"));
+            args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
+            args.replaceInStrings("%URL%", item->GetURL());
+            args.replaceInStrings("%TITLE%", item->GetTitle());
+        }
         QString playerCommand = cmd + " " + args.join(" ");
 
         myth_system(playerCommand);
