@@ -1,7 +1,7 @@
 /*
  * hdhomerun_channelscan.c
  *
- * Copyright © 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2007-2010 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -99,7 +99,7 @@ static int channelscan_find_lock(struct hdhomerun_channelscan_t *scan, uint32_t 
 			return 1;
 		}
 
-		msleep(250);
+		msleep_approx(250);
 	}
 }
 
@@ -303,7 +303,7 @@ int channelscan_detect(struct hdhomerun_channelscan_t *scan, struct hdhomerun_ch
 			break;
 		}
 
-		msleep(250);
+		msleep_approx(250);
 	}
 
 	/* Lock => skip overlapping channels. */

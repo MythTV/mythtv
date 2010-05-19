@@ -1,7 +1,7 @@
 /*
  * hdhomerun_config.c
  *
- * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -202,11 +202,30 @@ static int cmd_set(const char *item, const char *value)
 	return cmd_set_internal(item, value);
 }
 
-static bool_t sigabort = FALSE;
-
-static void signal_abort(int arg)
+static volatile sig_atomic_t sigabort_flag = FALSE;
+static volatile sig_atomic_t siginfo_flag = FALSE;
+ 
+static void sigabort_handler(int arg)
 {
-	sigabort = TRUE;
+	sigabort_flag = TRUE;
+}
+
+static void siginfo_handler(int arg)
+{
+	siginfo_flag = TRUE;
+}
+
+static void register_signal_handlers(sig_t sigpipe_handler, sig_t sigint_handler, sig_t siginfo_handler)
+{
+#if defined(SIGPIPE)
+	signal(SIGPIPE, sigpipe_handler);
+#endif
+#if defined(SIGINT)
+	signal(SIGINT, sigint_handler);
+#endif
+#if defined(SIGINFO)
+	signal(SIGINFO, siginfo_handler);
+#endif
 }
 
 static void cmd_scan_printf(FILE *fp, const char *fmt, ...)
@@ -274,11 +293,10 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		}
 	}
 
-	signal(SIGINT, signal_abort);
-	signal(SIGPIPE, signal_abort);
+	register_signal_handlers(sigabort_handler, sigabort_handler, siginfo_handler);
 
 	int ret = 0;
-	while (!sigabort) {
+	while (!sigabort_flag) {
 		struct hdhomerun_channelscan_result_t result;
 		ret = hdhomerun_device_channelscan_advance(hd, &result);
 		if (ret <= 0) {
@@ -286,7 +304,7 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		}
 
 		cmd_scan_printf(fp, "SCANNING: %lu (%s)\n",
-			result.frequency, result.channel_str
+			(unsigned long)result.frequency, result.channel_str
 		);
 
 		ret = hdhomerun_device_channelscan_detect(hd, &result);
@@ -321,6 +339,20 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 	return ret;
 }
 
+static void cmd_save_print_stats(void)
+{
+	struct hdhomerun_video_stats_t stats;
+	hdhomerun_device_get_video_stats(hd, &stats);
+
+	fprintf(stderr, "%u packets received, %u overflow errors, %u network errors, %u transport errors, %u sequence errors\n",
+		(unsigned int)stats.packet_count, 
+		(unsigned int)stats.overflow_error_count,
+		(unsigned int)stats.network_error_count, 
+		(unsigned int)stats.transport_error_count, 
+		(unsigned int)stats.sequence_error_count
+	);
+}
+
 static int cmd_save(const char *tuner_str, const char *filename)
 {
 	if (hdhomerun_device_set_tuner_from_str(hd, tuner_str) <= 0) {
@@ -350,21 +382,26 @@ static int cmd_save(const char *tuner_str, const char *filename)
 		return ret;
 	}
 
-	signal(SIGINT, signal_abort);
-	signal(SIGPIPE, signal_abort);
+	register_signal_handlers(sigabort_handler, sigabort_handler, siginfo_handler);
 
 	struct hdhomerun_video_stats_t stats_old, stats_cur;
 	hdhomerun_device_get_video_stats(hd, &stats_old);
 
 	uint64_t next_progress = getcurrenttime() + 1000;
 
-	while (!sigabort) {
+	while (!sigabort_flag) {
 		uint64_t loop_start_time = getcurrenttime();
+
+		if (siginfo_flag) {
+			fprintf(stderr, "\n");
+			cmd_save_print_stats();
+			siginfo_flag = FALSE;
+		}
 
 		size_t actual_size;
 		uint8_t *ptr = hdhomerun_device_stream_recv(hd, VIDEO_DATA_BUFFER_SIZE_1S, &actual_size);
 		if (!ptr) {
-			msleep(64);
+			msleep_approx(64);
 			continue;
 		}
 
@@ -381,6 +418,12 @@ static int cmd_save(const char *tuner_str, const char *filename)
 				next_progress = loop_start_time + 1000;
 			}
 
+			/* Windows - indicate activity to suppress auto sleep mode. */
+			#if defined(__WINDOWS__)
+			SetThreadExecutionState(ES_SYSTEM_REQUIRED);
+			#endif
+
+			/* Video stats. */
 			hdhomerun_device_get_video_stats(hd, &stats_cur);
 
 			if (stats_cur.overflow_error_count > stats_old.overflow_error_count) {
@@ -404,7 +447,7 @@ static int cmd_save(const char *tuner_str, const char *filename)
 			continue;
 		}
 
-		msleep(delay);
+		msleep_approx(delay);
 	}
 
 	if (fp) {
@@ -412,16 +455,10 @@ static int cmd_save(const char *tuner_str, const char *filename)
 	}
 
 	hdhomerun_device_stream_stop(hd);
-	hdhomerun_device_get_video_stats(hd, &stats_cur);
 
 	fprintf(stderr, "\n");
 	fprintf(stderr, "-- Video statistics --\n");
-	fprintf(stderr, "%u packets received, %u overflow errors, %u network errors, %u transport errors, %u sequence errors\n",
-		(unsigned int)stats_cur.packet_count, 
-		(unsigned int)stats_cur.overflow_error_count,
-		(unsigned int)stats_cur.network_error_count, 
-		(unsigned int)stats_cur.transport_error_count, 
-		(unsigned int)stats_cur.sequence_error_count);
+	cmd_save_print_stats();
 
 	return 0;
 }
@@ -440,10 +477,10 @@ static int cmd_upgrade(const char *filename)
 		fclose(fp);
 		return -1;
 	}
-	sleep(2);
+	msleep_minimum(2000);
 
 	printf("upgrading firmware...\n");
-	sleep(8);
+	msleep_minimum(8000);
 
 	printf("rebooting...\n");
 	int count = 0;
@@ -460,7 +497,7 @@ static int cmd_upgrade(const char *filename)
 			return -1;
 		}
 
-		sleep(1);
+		msleep_minimum(1000);
 	}
 
 	printf("upgrade complete - now running firmware %s\n", version_str);

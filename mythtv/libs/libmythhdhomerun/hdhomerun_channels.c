@@ -1,7 +1,7 @@
 /*
  * hdhomerun_channels.c
  *
- * Copyright © 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -55,7 +55,6 @@ struct hdhomerun_channelmap_range_t {
 };
 
 struct hdhomerun_channelmap_record_t {
-	const char *channelmap_prefix;
 	const char *channelmap;
 	const struct hdhomerun_channelmap_range_t *range_list;
 	const char *channelmap_scan_group;
@@ -140,30 +139,45 @@ static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_us_i
 };
 
 static const struct hdhomerun_channelmap_record_t hdhomerun_channelmap_table[] = {
-	{"au", "au-bcast", hdhomerun_channelmap_range_au_bcast, "au-bcast",               "AU"},
-	{"au", "au-cable", hdhomerun_channelmap_range_au_cable, "au-cable",               "AU"},
-	{"eu", "eu-bcast", hdhomerun_channelmap_range_eu_bcast, "eu-bcast",               "EU"},
-	{"eu", "eu-cable", hdhomerun_channelmap_range_eu_cable, "eu-cable",               "EU"},
-	{"tw", "tw-bcast", hdhomerun_channelmap_range_us_bcast, "tw-bcast",               "TW"},
-	{"tw", "tw-cable", hdhomerun_channelmap_range_us_cable, "tw-cable",               "TW"},
-	{"us", "us-bcast", hdhomerun_channelmap_range_us_bcast, "us-bcast",               "CA US"},
-	{"us", "us-cable", hdhomerun_channelmap_range_us_cable, "us-cable us-hrc us-irc", "CA US"},
-	{"us", "us-hrc",   hdhomerun_channelmap_range_us_hrc  , "us-cable us-hrc us-irc", "CA US"},
-	{"us", "us-irc",   hdhomerun_channelmap_range_us_irc,   "us-cable us-hrc us-irc", "CA US"},
-	{NULL, NULL,       NULL,                                NULL,                     NULL}
+	{"au-bcast", hdhomerun_channelmap_range_au_bcast, "au-bcast",               "AU"},
+	{"au-cable", hdhomerun_channelmap_range_au_cable, "au-cable",               "AU"},
+	{"eu-bcast", hdhomerun_channelmap_range_eu_bcast, "eu-bcast",               "EU PA"},
+	{"eu-cable", hdhomerun_channelmap_range_eu_cable, "eu-cable",               "EU"},
+	{"tw-bcast", hdhomerun_channelmap_range_us_bcast, "tw-bcast",               "TW"},
+	{"tw-cable", hdhomerun_channelmap_range_us_cable, "tw-cable",               "TW"},
+
+	{"us-bcast", hdhomerun_channelmap_range_us_bcast, "us-bcast",               "CA US"},
+	{"us-cable", hdhomerun_channelmap_range_us_cable, "us-cable us-hrc us-irc", "CA PA US"},
+	{"us-hrc",   hdhomerun_channelmap_range_us_hrc  , "us-cable us-hrc us-irc", "CA PA US"},
+	{"us-irc",   hdhomerun_channelmap_range_us_irc,   "us-cable us-hrc us-irc", "CA PA US"},
+
+	{NULL,       NULL,                                NULL,                     NULL}
 };
 
-const char *hdhomerun_channelmap_convert_countrycode_to_channelmap_prefix(const char *countrycode)
+const char *hdhomerun_channelmap_get_channelmap_from_country_source(const char *countrycode, const char *source)
 {
+	bool_t country_found = FALSE;
+
 	const struct hdhomerun_channelmap_record_t *record = hdhomerun_channelmap_table;
 	while (record->channelmap) {
-		if (strstr(record->countrycodes, countrycode)) {
-			return record->channelmap_prefix;
+		if (!strstr(record->countrycodes, countrycode)) {
+			record++;
+			continue;
 		}
+
+		if (strstr(record->channelmap, source)) {
+			return record->channelmap;
+		}
+
+		country_found = TRUE;
 		record++;
 	}
 
-	return "eu";
+	if (!country_found) {
+		return hdhomerun_channelmap_get_channelmap_from_country_source("EU", source);
+	}
+
+	return NULL;
 }
 
 const char *hdhomerun_channelmap_get_channelmap_scan_group(const char *channelmap)

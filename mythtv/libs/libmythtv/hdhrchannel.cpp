@@ -181,10 +181,14 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "dtv_multiplex data is required for tuning");
+            if (!_stream_handler->TuneVChannel(channum))
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "dtv_multiplex data is required for tuning");
+                return false;
+            }
 
-            return false;
+            SetSIStandard(si_std);
         }
     }
     else if (!ChangeExternalChannel(freqid))
@@ -200,10 +204,6 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     // Set this as the future start channel for this source
     QString tmpX = m_curchannelname; tmpX.detach();
     m_inputs[m_currentInputID]->startChanNum = tmpX;
-
-    // Turn on the program filtering if tuning to MPEG stream
-    if (mpeg_prog_num && (GetTuningMode() == "mpeg"))
-        _stream_handler->TuneProgram(mpeg_prog_num);
 
     return true;
 }

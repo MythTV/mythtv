@@ -483,6 +483,15 @@ bool HDHRStreamHandler::UpdateFiltersFromStreamData(void)
 
 bool HDHRStreamHandler::UpdateFilters(void)
 {
+    if (_tune_mode == hdhrTuneModeFrequency)
+        _tune_mode = hdhrTuneModeFrequencyPid;
+
+    if (_tune_mode != hdhrTuneModeFrequencyPid)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "UpdateFilters called in wrong tune mode");
+        return false;
+    }
+
 #ifdef DEBUG_PID_FILTERS
     VERBOSE(VB_RECORD, LOC + "UpdateFilters()");
 #endif // DEBUG_PID_FILTERS
@@ -492,10 +501,6 @@ bool HDHRStreamHandler::UpdateFilters(void)
 
     vector<uint> range_min;
     vector<uint> range_max;
-
-// FIXME
-//    if (_ignore_filters)
- //       return true;
 
     for (uint i = 0; i < _pid_info.size(); i++)
     {
@@ -731,8 +736,9 @@ bool HDHRStreamHandler::IsConnected(void) const
 
 bool HDHRStreamHandler::TuneChannel(const QString &chn)
 {
-    QString current = TunerGet("channel");
+    _tune_mode = hdhrTuneModeFrequency;
 
+    QString current = TunerGet("channel");
     if (current == chn)
     {
         VERBOSE(VB_RECORD, QString(LOC + "Not Re-Tuning channel %1").arg(chn));
@@ -746,7 +752,25 @@ bool HDHRStreamHandler::TuneChannel(const QString &chn)
 
 bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
 {
+    if (_tune_mode == hdhrTuneModeFrequency)
+        _tune_mode = hdhrTuneModeFrequencyProgram;
+
+    if (_tune_mode != hdhrTuneModeFrequencyProgram)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneProgram called in wrong tune mode");
+        return false;
+    }
+
     VERBOSE(VB_RECORD, QString(LOC + "Tuning program %1").arg(mpeg_prog_num));
     return !TunerSet(
         "program", QString::number(mpeg_prog_num), false).isEmpty();
+}
+
+bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
+{
+    _tune_mode = hdhrTuneModeVChannel;
+
+    VERBOSE(VB_RECORD, QString(LOC + "Tuning vchannel %1").arg(vchn));
+    return !TunerSet(
+        "vchannel", vchn).isEmpty();
 }

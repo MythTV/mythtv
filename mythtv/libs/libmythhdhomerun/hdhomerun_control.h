@@ -1,7 +1,7 @@
 /*
  * hdhomerun_control.h
  *
- * Copyright © 2006 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2006 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public

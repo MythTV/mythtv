@@ -1,9 +1,7 @@
-#ifndef __HDHOMERUN_INCLUDES__
-#define __HDHOMERUN_INCLUDES__
 /*
  * hdhomerun.h
  *
- * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2006-2010 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -35,6 +33,7 @@
 #include "hdhomerun_os.h"
 #include "hdhomerun_types.h"
 #include "hdhomerun_pkt.h"
+#include "hdhomerun_sock.h"
 #include "hdhomerun_debug.h"
 #include "hdhomerun_discover.h"
 #include "hdhomerun_control.h"
@@ -43,5 +42,3 @@
 #include "hdhomerun_channelscan.h"
 #include "hdhomerun_device.h"
 #include "hdhomerun_device_selector.h"
-
-#endif /* __HDHOMERUN_INCLUDES__ */

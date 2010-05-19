@@ -1,7 +1,7 @@
 /*
  * hdhomerun_os_windows.h
  *
- * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2006-2010 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -31,12 +31,10 @@
  */
 
 #define _WINSOCKAPI_
-// MinGW lacks wspiapi, so remove dependency by setting minimum WINVER to WinXP
-#define WINVER 0x0501
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-//#include <wspiapi.h>
+#include <wspiapi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -55,7 +53,6 @@
 #endif
 
 typedef int bool_t;
-/* Use MinGW includes instead
 typedef signed __int8 int8_t;
 typedef signed __int16 int16_t;
 typedef signed __int32 int32_t;
@@ -64,19 +61,11 @@ typedef unsigned __int8 uint8_t;
 typedef unsigned __int16 uint16_t;
 typedef unsigned __int32 uint32_t;
 typedef unsigned __int64 uint64_t;
+typedef void (*sig_t)(int);
 typedef HANDLE pthread_t;
 typedef HANDLE pthread_mutex_t;
-*/
-#include <stdint.h>
-#include <pthread.h>
 
-// Avoid #define conflicts by limiting scope to non-c++
-#ifndef __cplusplus
-#define socklen_t int
-#define close closesocket
-#define sock_getlasterror WSAGetLastError()
-#define sock_getlasterror_socktimeout (WSAGetLastError() == WSAETIMEDOUT)
-//#define va_copy(x, y) x = y
+#define va_copy(x, y) x = y
 #define atoll _atoi64
 #define strdup _strdup
 #define strcasecmp _stricmp
@@ -84,101 +73,29 @@ typedef HANDLE pthread_mutex_t;
 #define fseeko _fseeki64
 #define ftello _ftelli64
 #define THREAD_FUNC_PREFIX DWORD WINAPI
-#define SIGPIPE SIGABRT
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-static inline uint64_t getcurrenttime(void)
-{
-	struct timeb tb;
-	ftime(&tb);
-	return ((uint64_t)tb.time * 1000) + tb.millitm;
-}
+extern LIBTYPE uint64_t getcurrenttime(void);
+extern LIBTYPE void msleep_approx(uint64_t ms);
+extern LIBTYPE void msleep_minimum(uint64_t ms);
 
-static inline int msleep(unsigned int ms)
-{
-	uint64_t stop_time = getcurrenttime() + ms;
-
-	while (1) {
-		uint64_t current_time = getcurrenttime();
-		if (current_time >= stop_time) {
-			return 0;
-		}
-
-		uint64_t delay_ms = stop_time - current_time;
-		Sleep((DWORD)delay_ms);
-	}
-}
-
-// Avoid a define conflict
-/*static inline int sleep(unsigned int sec)
-{
-	msleep(sec * 1000);
-	return 0;
-}
-*/
-
-static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)
-{
-	int t = (int)timeout;
-	return setsockopt(s, level, optname, (char *)&t, sizeof(t));
-}
-
-/* MythTV uses pthreads lib instead
-static inline int pthread_create(pthread_t *tid, void *attr, LPTHREAD_START_ROUTINE start, void *arg)
-{
-	*tid = CreateThread(NULL, 0, start, arg, 0, NULL);
-	if (!*tid) {
-		return (int)GetLastError();
-	}
-	return 0;
-}
-
-static inline int pthread_join(pthread_t tid, void **value_ptr)
-{
-	while (1) {
-		DWORD ExitCode = 0;
-		if (!GetExitCodeThread(tid, &ExitCode)) {
-			return (int)GetLastError();
-		}
-		if (ExitCode != STILL_ACTIVE) {
-			return 0;
-		}
-	}
-}
-
-static inline void pthread_mutex_init(pthread_mutex_t *mutex, void *attr)
-{
-	*mutex = CreateMutex(NULL, FALSE, NULL);
-}
-
-static inline void pthread_mutex_lock(pthread_mutex_t *mutex)
-{
-	WaitForSingleObject(*mutex, INFINITE);
-}
-
-static inline void pthread_mutex_unlock(pthread_mutex_t *mutex)
-{
-	ReleaseMutex(*mutex);
-}
-*/
+extern LIBTYPE int pthread_create(pthread_t *tid, void *attr, LPTHREAD_START_ROUTINE start, void *arg);
+extern LIBTYPE int pthread_join(pthread_t tid, void **value_ptr);
+extern LIBTYPE void pthread_mutex_init(pthread_mutex_t *mutex, void *attr);
+extern LIBTYPE void pthread_mutex_lock(pthread_mutex_t *mutex);
+extern LIBTYPE void pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 /*
  * The console output format should be set to UTF-8, however in XP and Vista this breaks batch file processing.
  * Attempting to restore on exit fails to restore if the program is terminated by the user.
  * Solution - set the output format each printf.
  */
-static inline void console_vprintf(const char *fmt, va_list ap)
-{
-	UINT cp = GetConsoleOutputCP();
-	SetConsoleOutputCP(CP_UTF8);
-	vprintf(fmt, ap);
-	SetConsoleOutputCP(cp);
-}
+extern LIBTYPE void console_vprintf(const char *fmt, va_list ap);
+extern LIBTYPE void console_printf(const char *fmt, ...);
 
-static inline void console_printf(const char *fmt, ...)
-{
-	va_list ap;
-	va_start(ap, fmt);
-	console_vprintf(fmt, ap);
-	va_end(ap);
+#ifdef __cplusplus
 }
+#endif

@@ -1,7 +1,7 @@
 /*
  * hdhomerun_video.h
  *
- * Copyright © 2006 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2006 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -71,6 +71,12 @@ extern LIBTYPE void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 extern LIBTYPE uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
 
 /*
+ * Join/leave multicast group.
+ */
+extern LIBTYPE int hdhomerun_video_join_multicast_group(struct hdhomerun_video_sock_t *vs, uint32_t multicast_ip, uint32_t local_ip);
+extern LIBTYPE int hdhomerun_video_leave_multicast_group(struct hdhomerun_video_sock_t *vs);
+
+/*
  * Read data from buffer.
  *
  * size_t max_size: The maximum amount of data to be returned.
@@ -99,6 +105,11 @@ extern LIBTYPE void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs);
  */
 extern LIBTYPE void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs);
 extern LIBTYPE void hdhomerun_video_get_stats(struct hdhomerun_video_sock_t *vs, struct hdhomerun_video_stats_t *stats);
+
+/*
+ * Internal use only.
+ */
+extern LIBTYPE hdhomerun_sock_t hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs);
 
 #ifdef __cplusplus
 }

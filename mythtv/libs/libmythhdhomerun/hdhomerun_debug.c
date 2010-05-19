@@ -1,7 +1,7 @@
 /*
  * hdhomerun_debug.c
  *
- * Copyright © 2006 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2006-2010 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -44,8 +44,12 @@
 #define HDHOMERUN_DEBUG_HOST "debug.silicondust.com"
 #endif
 #if !defined(HDHOMERUN_DEBUG_PORT)
-#define HDHOMERUN_DEBUG_PORT "8002"
+#define HDHOMERUN_DEBUG_PORT 8002
 #endif
+
+#define HDHOMERUN_DEBUG_CONNECT_RETRY_TIME 30000
+#define HDHOMERUN_DEBUG_CONNECT_TIMEOUT 10000
+#define HDHOMERUN_DEBUG_SEND_TIMEOUT 10000
 
 struct hdhomerun_debug_message_t
 {
@@ -73,7 +77,7 @@ struct hdhomerun_debug_t
 
 	char *file_name;
 	FILE *file_fp;
-	int sock;
+	hdhomerun_sock_t sock;
 };
 
 static THREAD_FUNC_PREFIX hdhomerun_debug_thread_execute(void *arg);
@@ -85,7 +89,7 @@ struct hdhomerun_debug_t *hdhomerun_debug_create(void)
 		return NULL;
 	}
 
-	dbg->sock = -1;
+	dbg->sock = HDHOMERUN_SOCK_INVALID;
 
 	pthread_mutex_init(&dbg->print_lock, NULL);
 	pthread_mutex_init(&dbg->queue_lock, NULL);
@@ -117,8 +121,8 @@ void hdhomerun_debug_destroy(struct hdhomerun_debug_t *dbg)
 	if (dbg->file_fp) {
 		fclose(dbg->file_fp);
 	}
-	if (dbg->sock != -1) {
-		close(dbg->sock);
+	if (dbg->sock != HDHOMERUN_SOCK_INVALID) {
+		hdhomerun_sock_destroy(dbg->sock);
 	}
 
 	free(dbg);
@@ -132,9 +136,9 @@ static void hdhomerun_debug_close_internal(struct hdhomerun_debug_t *dbg)
 		dbg->file_fp = NULL;
 	}
 
-	if (dbg->sock != -1) {
-		close(dbg->sock);
-		dbg->sock = -1;
+	if (dbg->sock != HDHOMERUN_SOCK_INVALID) {
+		hdhomerun_sock_destroy(dbg->sock);
+		dbg->sock = HDHOMERUN_SOCK_INVALID;
 	}
 }
 
@@ -251,7 +255,7 @@ void hdhomerun_debug_flush(struct hdhomerun_debug_t *dbg, uint64_t timeout)
 			return;
 		}
 
-		msleep(10);
+		msleep_approx(10);
 	}
 }
 
@@ -372,54 +376,40 @@ static bool_t hdhomerun_debug_output_message_file(struct hdhomerun_debug_t *dbg,
 }
 
 /* Send lock held by caller */
-#if defined(__CYGWIN__)
 static bool_t hdhomerun_debug_output_message_sock(struct hdhomerun_debug_t *dbg, struct hdhomerun_debug_message_t *message)
 {
-	return TRUE;
-}
-#else
-static bool_t hdhomerun_debug_output_message_sock(struct hdhomerun_debug_t *dbg, struct hdhomerun_debug_message_t *message)
-{
-	if (dbg->sock == -1) {
+	if (dbg->sock == HDHOMERUN_SOCK_INVALID) {
 		uint64_t current_time = getcurrenttime();
 		if (current_time < dbg->connect_delay) {
 			return FALSE;
 		}
-		dbg->connect_delay = current_time + 30*1000;
+		dbg->connect_delay = current_time + HDHOMERUN_DEBUG_CONNECT_RETRY_TIME;
 
-		dbg->sock = (int)socket(AF_INET, SOCK_STREAM, 0);
-		if (dbg->sock == -1) {
+		dbg->sock = hdhomerun_sock_create_tcp();
+		if (dbg->sock == HDHOMERUN_SOCK_INVALID) {
 			return FALSE;
 		}
 
-		struct addrinfo hints;
-		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = AF_INET;
-		hints.ai_socktype = SOCK_STREAM;
-		hints.ai_protocol = IPPROTO_TCP;
-
-		struct addrinfo *sock_info;
-		if (getaddrinfo(HDHOMERUN_DEBUG_HOST, HDHOMERUN_DEBUG_PORT, &hints, &sock_info) != 0) {
+		uint32_t remote_addr = hdhomerun_sock_getaddrinfo_addr(dbg->sock, HDHOMERUN_DEBUG_HOST);
+		if (remote_addr == 0) {
 			hdhomerun_debug_close_internal(dbg);
 			return FALSE;
 		}
-		if (connect(dbg->sock, sock_info->ai_addr, (int)sock_info->ai_addrlen) != 0) {
-			freeaddrinfo(sock_info);
+
+		if (!hdhomerun_sock_connect(dbg->sock, remote_addr, HDHOMERUN_DEBUG_PORT, HDHOMERUN_DEBUG_CONNECT_TIMEOUT)) {
 			hdhomerun_debug_close_internal(dbg);
 			return FALSE;
 		}
-		freeaddrinfo(sock_info);
 	}
 
 	size_t length = strlen(message->buffer);
-	if (send(dbg->sock, (char *)message->buffer, (int)length, 0) != length) {
+	if (!hdhomerun_sock_send(dbg->sock, message->buffer, length, HDHOMERUN_DEBUG_SEND_TIMEOUT)) {
 		hdhomerun_debug_close_internal(dbg);
 		return FALSE;
 	}
 
 	return TRUE;
 }
-#endif
 
 static bool_t hdhomerun_debug_output_message(struct hdhomerun_debug_t *dbg, struct hdhomerun_debug_message_t *message)
 {
@@ -466,7 +456,7 @@ static THREAD_FUNC_PREFIX hdhomerun_debug_thread_execute(void *arg)
 		pthread_mutex_unlock(&dbg->queue_lock);
 
 		if (!message) {
-			msleep(250);
+			msleep_approx(250);
 			continue;
 		}
 
@@ -476,7 +466,7 @@ static THREAD_FUNC_PREFIX hdhomerun_debug_thread_execute(void *arg)
 		}
 
 		if (!hdhomerun_debug_output_message(dbg, message)) {
-			msleep(250);
+			msleep_approx(250);
 			continue;
 		}
 

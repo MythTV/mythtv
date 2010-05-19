@@ -1,7 +1,7 @@
 /*
  * hdhomerun_types.h
  *
- * Copyright © 2008-2009 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2008-2009 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public

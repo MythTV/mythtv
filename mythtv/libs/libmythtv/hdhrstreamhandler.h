@@ -27,6 +27,14 @@ class DeviceReadBuffer;
 struct hdhomerun_device_t { int dummy; };
 #endif
 
+enum HDHRTuneMode {
+    hdhrTuneModeNone = 0,
+    hdhrTuneModeFrequency,
+    hdhrTuneModeFrequencyPid,
+    hdhrTuneModeFrequencyProgram,
+    hdhrTuneModeVChannel
+};
+
 typedef QMap<uint,int> FilterMap;
 
 //#define RETUNE_TIMEOUT 5000
@@ -50,6 +58,7 @@ class HDHRStreamHandler : public ReaderPausedCB
     // Commands
     bool TuneChannel(const QString &chanid);
     bool TuneProgram(uint mpeg_prog_num);
+    bool TuneVChannel(const QString &vchn);
     bool EnterPowerSavingMode(void);
 
 
@@ -91,9 +100,10 @@ class HDHRStreamHandler : public ReaderPausedCB
 
   private:
     hdhomerun_device_t *_hdhomerun_device;
-    uint                _tuner;
-    QString             _devicename;
+    uint                 _tuner;
+    QString              _devicename;
     vector<DTVTunerType> _tuner_types;
+    HDHRTuneMode         _tune_mode; // debug self check
 
     mutable QMutex    _start_stop_lock;
     bool              _running;

@@ -43,11 +43,17 @@ extern LIBTYPE struct hdhomerun_device_selector_t *hdhomerun_device_selector_cre
 extern LIBTYPE void hdhomerun_device_selector_destroy(struct hdhomerun_device_selector_t *hds, bool_t destroy_devices);
 
 /*
- * Populate device selector with devices from given source.
+ * Get the number of devices in the list.
  */
-extern LIBTYPE void hdhomerun_device_selector_load_from_file(struct hdhomerun_device_selector_t *hds, char *filename);
+extern LIBTYPE int hdhomerun_device_selector_get_device_count(struct hdhomerun_device_selector_t *hds);
+
+/*
+ * Populate device selector with devices from given source.
+ * Returns the number of devices populated.
+ */
+extern LIBTYPE int hdhomerun_device_selector_load_from_file(struct hdhomerun_device_selector_t *hds, char *filename);
 #if defined(__WINDOWS__)
-extern LIBTYPE void hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device_selector_t *hds, wchar_t *wsource);
+extern LIBTYPE int hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device_selector_t *hds, wchar_t *wsource);
 #endif
 
 /*

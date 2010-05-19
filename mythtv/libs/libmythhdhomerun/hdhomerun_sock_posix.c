@@ -1,0 +1,414 @@
+/*
+ * hdhomerun_sock_posix.c
+ *
+ * Copyright © 2010 Silicondust USA Inc. <www.silicondust.com>.
+ *
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
+ */
+
+/*
+ * Implementation notes:
+ *
+ * API specifies timeout for each operation (or zero for non-blocking).
+ *
+ * It is not possible to rely on the OS socket timeout as this will fail to
+ * detect the command-response situation where data is sent successfully and
+ * the other end chooses not to send a response (other than the TCP ack).
+ *
+ * The select() cannot be used with high socket numbers (typically max 1024)
+ * so the code works as follows:
+ * - Use non-blocking sockets to allow operation without select.
+ * - Use select where safe (low socket numbers).
+ * - Poll with short sleep when select cannot be used safely.
+ */
+
+#include "hdhomerun.h"
+
+hdhomerun_sock_t hdhomerun_sock_create_udp(void)
+{
+	/* Create socket. */
+	hdhomerun_sock_t sock = (hdhomerun_sock_t)socket(AF_INET, SOCK_DGRAM, 0);
+	if (sock == -1) {
+		return HDHOMERUN_SOCK_INVALID;
+	}
+
+	/* Set non-blocking */
+	if (fcntl(sock, F_SETFL, O_NONBLOCK) != 0) {
+		close(sock);
+		return HDHOMERUN_SOCK_INVALID;
+	}
+
+	/* Allow broadcast. */
+	int sock_opt = 1;
+	setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&sock_opt, sizeof(sock_opt));
+
+	/* Success. */
+	return sock;
+}
+
+hdhomerun_sock_t hdhomerun_sock_create_tcp(void)
+{
+	/* Create socket. */
+	hdhomerun_sock_t sock = (hdhomerun_sock_t)socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == -1) {
+		return HDHOMERUN_SOCK_INVALID;
+	}
+
+	/* Set non-blocking */
+	if (fcntl(sock, F_SETFL, O_NONBLOCK) != 0) {
+		close(sock);
+		return HDHOMERUN_SOCK_INVALID;
+	}
+
+	/* Success. */
+	return sock;
+}
+
+void hdhomerun_sock_destroy(hdhomerun_sock_t sock)
+{
+	close(sock);
+}
+
+int hdhomerun_sock_getlasterror(void)
+{
+	return errno;
+}
+
+uint32_t hdhomerun_sock_getsockname_addr(hdhomerun_sock_t sock)
+{
+	struct sockaddr_in sock_addr;
+	socklen_t sockaddr_size = sizeof(sock_addr);
+
+	if (getsockname(sock, (struct sockaddr *)&sock_addr, &sockaddr_size) != 0) {
+		return 0;
+	}
+
+	return ntohl(sock_addr.sin_addr.s_addr);
+}
+
+uint16_t hdhomerun_sock_getsockname_port(hdhomerun_sock_t sock)
+{
+	struct sockaddr_in sock_addr;
+	socklen_t sockaddr_size = sizeof(sock_addr);
+
+	if (getsockname(sock, (struct sockaddr *)&sock_addr, &sockaddr_size) != 0) {
+		return 0;
+	}
+
+	return ntohs(sock_addr.sin_port);
+}
+
+uint32_t hdhomerun_sock_getpeername_addr(hdhomerun_sock_t sock)
+{
+	struct sockaddr_in sock_addr;
+	socklen_t sockaddr_size = sizeof(sock_addr);
+
+	if (getpeername(sock, (struct sockaddr *)&sock_addr, &sockaddr_size) != 0) {
+		return 0;
+	}
+
+	return ntohl(sock_addr.sin_addr.s_addr);
+}
+
+#if defined(__CYGWIN__)
+uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name)
+{
+	return 0;
+}
+#else
+uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name)
+{
+	struct addrinfo hints;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	struct addrinfo *sock_info;
+	if (getaddrinfo(name, "", &hints, &sock_info) != 0) {
+		return 0;
+	}
+
+	struct sockaddr_in *sock_addr = (struct sockaddr_in *)sock_info->ai_addr;
+	uint32_t addr = ntohl(sock_addr->sin_addr.s_addr);
+
+	freeaddrinfo(sock_info);
+	return addr;
+}
+#endif
+
+bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port)
+{
+	struct sockaddr_in sock_addr;
+	memset(&sock_addr, 0, sizeof(sock_addr));
+	sock_addr.sin_family = AF_INET;
+	sock_addr.sin_addr.s_addr = htonl(local_addr);
+	sock_addr.sin_port = htons(local_port);
+
+	if (bind(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+static bool_t hdhomerun_sock_wait_for_read_event(hdhomerun_sock_t sock, uint64_t stop_time)
+{
+	uint64_t current_time = getcurrenttime();
+	if (current_time >= stop_time) {
+		return FALSE;
+	}
+
+	if (sock < FD_SETSIZE) {
+		uint64_t timeout = stop_time - current_time;
+		struct timeval t;
+		t.tv_sec = timeout / 1000;
+		t.tv_usec = (timeout % 1000) * 1000;
+
+		fd_set readfds;
+		FD_ZERO(&readfds);
+		FD_SET(sock, &readfds);
+
+		fd_set errorfds;
+		FD_ZERO(&errorfds);
+		FD_SET(sock, &errorfds);
+
+		if (select(sock + 1, &readfds, NULL, &errorfds, &t) <= 0) {
+			return FALSE;
+		}
+		if (!FD_ISSET(sock, &readfds)) {
+			return FALSE;
+		}
+	} else {
+		uint64_t delay = stop_time - current_time;
+		if (delay > 5) {
+			delay = 5;
+		}
+
+		msleep_approx(delay);
+	}
+
+	return TRUE;
+}
+
+static bool_t hdhomerun_sock_wait_for_write_event(hdhomerun_sock_t sock, uint64_t stop_time)
+{
+	uint64_t current_time = getcurrenttime();
+	if (current_time >= stop_time) {
+		return FALSE;
+	}
+
+	if (sock < FD_SETSIZE) {
+		uint64_t timeout = stop_time - current_time;
+		struct timeval t;
+		t.tv_sec = timeout / 1000;
+		t.tv_usec = (timeout % 1000) * 1000;
+
+		fd_set writefds;
+		FD_ZERO(&writefds);
+		FD_SET(sock, &writefds);
+
+		fd_set errorfds;
+		FD_ZERO(&errorfds);
+		FD_SET(sock, &errorfds);
+
+		if (select(sock + 1, NULL, &writefds, &errorfds, &t) <= 0) {
+			return FALSE;
+		}
+		if (!FD_ISSET(sock, &writefds)) {
+			return FALSE;
+		}
+	} else {
+		uint64_t delay = stop_time - current_time;
+		if (delay > 5) {
+			delay = 5;
+		}
+
+		msleep_approx(delay);
+	}
+
+	return TRUE;
+}
+
+bool_t hdhomerun_sock_connect(hdhomerun_sock_t sock, uint32_t remote_addr, uint16_t remote_port, uint64_t timeout)
+{
+	struct sockaddr_in sock_addr;
+	memset(&sock_addr, 0, sizeof(sock_addr));
+	sock_addr.sin_family = AF_INET;
+	sock_addr.sin_addr.s_addr = htonl(remote_addr);
+	sock_addr.sin_port = htons(remote_port);
+
+	if (connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) == 0) {
+		return TRUE;
+	}
+
+	uint64_t stop_time = getcurrenttime() + timeout;
+
+	/*
+	 * getpeername() is used to detect if connect succeeded. Bug - cygwin
+	 * will return getpeername success even if the connect process hasn't
+	 * completed. This first call to select is used to work around the
+	 * problem (at least for low numbered sockets where select is used).
+	 */
+	if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
+		return FALSE;
+	}
+
+	while (1) {
+		struct sockaddr_in sock_addr;
+		socklen_t sockaddr_size = sizeof(sock_addr);
+		if (getpeername(sock, (struct sockaddr *)&sock_addr, &sockaddr_size) == 0) {
+			return TRUE;
+		}
+
+		if (errno != ENOTCONN) {
+			return FALSE;
+		}
+
+		if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
+			return FALSE;
+		}
+	}
+}
+
+bool_t hdhomerun_sock_send(hdhomerun_sock_t sock, const void *data, size_t length, uint64_t timeout)
+{
+	uint64_t stop_time = getcurrenttime() + timeout;
+	const uint8_t *ptr = (const uint8_t *)data;
+
+	while (1) {
+		int ret = send(sock, ptr, length, 0);
+		if (ret >= (int)length) {
+			return TRUE;
+		}
+
+		if (ret > 0) {
+			ptr += ret;
+			length -= ret;
+		}
+
+		if (errno == EINPROGRESS) {
+			errno = EWOULDBLOCK;
+		}
+		if (errno != EWOULDBLOCK) {
+			return FALSE;
+		}
+
+		if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
+			return FALSE;
+		}
+	}
+}
+
+bool_t hdhomerun_sock_sendto(hdhomerun_sock_t sock, uint32_t remote_addr, uint16_t remote_port, const void *data, size_t length, uint64_t timeout)
+{
+	uint64_t stop_time = getcurrenttime() + timeout;
+	const uint8_t *ptr = (const uint8_t *)data;
+
+	while (1) {
+		struct sockaddr_in sock_addr;
+		memset(&sock_addr, 0, sizeof(sock_addr));
+		sock_addr.sin_family = AF_INET;
+		sock_addr.sin_addr.s_addr = htonl(remote_addr);
+		sock_addr.sin_port = htons(remote_port);
+
+		int ret = sendto(sock, ptr, length, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
+		if (ret >= (int)length) {
+			return TRUE;
+		}
+
+		if (ret > 0) {
+			ptr += ret;
+			length -= ret;
+		}
+
+		if (errno == EINPROGRESS) {
+			errno = EWOULDBLOCK;
+		}
+		if (errno != EWOULDBLOCK) {
+			return FALSE;
+		}
+
+		if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
+			return FALSE;
+		}
+	}
+}
+
+bool_t hdhomerun_sock_recv(hdhomerun_sock_t sock, void *data, size_t *length, uint64_t timeout)
+{
+	uint64_t stop_time = getcurrenttime() + timeout;
+
+	while (1) {
+		int ret = recv(sock, data, *length, 0);
+		if (ret > 0) {
+			*length = ret;
+			return TRUE;
+		}
+
+		if (errno == EINPROGRESS) {
+			errno = EWOULDBLOCK;
+		}
+		if (errno != EWOULDBLOCK) {
+			return FALSE;
+		}
+
+		if (!hdhomerun_sock_wait_for_read_event(sock, stop_time)) {
+			return FALSE;
+		}
+	}
+}
+
+bool_t hdhomerun_sock_recvfrom(hdhomerun_sock_t sock, uint32_t *remote_addr, uint16_t *remote_port, void *data, size_t *length, uint64_t timeout)
+{
+	uint64_t stop_time = getcurrenttime() + timeout;
+
+	while (1) {
+		struct sockaddr_in sock_addr;
+		memset(&sock_addr, 0, sizeof(sock_addr));
+		socklen_t sockaddr_size = sizeof(sock_addr);
+
+		int ret = recvfrom(sock, data, *length, 0, (struct sockaddr *)&sock_addr, &sockaddr_size);
+		if (ret > 0) {
+			*remote_addr = ntohl(sock_addr.sin_addr.s_addr);
+			*remote_port = ntohs(sock_addr.sin_port);
+			*length = ret;
+			return TRUE;
+		}
+
+		if (errno == EINPROGRESS) {
+			errno = EWOULDBLOCK;
+		}
+		if (errno != EWOULDBLOCK) {
+			return FALSE;
+		}
+
+		if (!hdhomerun_sock_wait_for_read_event(sock, stop_time)) {
+			return FALSE;
+		}
+	}
+}

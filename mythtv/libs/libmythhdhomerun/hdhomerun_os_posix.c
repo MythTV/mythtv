@@ -1,5 +1,5 @@
 /*
- * hdhomerun_os_posix.h
+ * hdhomerun_os_posix.c
  *
  * Copyright © 2006-2010 Silicondust USA Inc. <www.silicondust.com>.
  *
@@ -30,41 +30,60 @@
  * conditions defined in the GNU Lesser General Public License.
  */
 
-#define _FILE_OFFSET_BITS 64
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/timeb.h>
-#include <sys/wait.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <pthread.h>
+#include "hdhomerun_os.h"
 
-typedef int bool_t;
-typedef void (*sig_t)(int);
+uint64_t getcurrenttime(void)
+{
+	static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+	static uint64_t result = 0;
+	static uint64_t previous_time = 0;
 
-#define LIBTYPE
-#define console_vprintf vprintf
-#define console_printf printf
-#define THREAD_FUNC_PREFIX void *
+	pthread_mutex_lock(&lock);
 
-#ifdef __cplusplus
-extern "C" {
+#if defined(CLOCK_MONOTONIC)
+	struct timespec tp;
+	clock_gettime(CLOCK_MONOTONIC, &tp);
+	uint64_t current_time = ((uint64_t)tp.tv_sec * 1000) + (tp.tv_nsec / 1000000);
+#else
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	uint64_t current_time = ((uint64_t)t.tv_sec * 1000) + (t.tv_usec / 1000);
 #endif
 
-extern LIBTYPE uint64_t getcurrenttime(void);
-extern LIBTYPE void msleep_approx(uint64_t ms);
-extern LIBTYPE void msleep_minimum(uint64_t ms);
+	if (current_time > previous_time) {
+		result += current_time - previous_time;
+	}
 
-#ifdef __cplusplus
+	previous_time = current_time;
+
+	pthread_mutex_unlock(&lock);
+	return result;
 }
-#endif
+
+void msleep_approx(uint64_t ms)
+{
+	unsigned int delay_s = ms / 1000;
+	if (delay_s > 0) {
+		sleep(delay_s);
+		ms -= delay_s * 1000;
+	}
+
+	unsigned int delay_us = ms * 1000;
+	if (delay_us > 0) {
+		usleep(delay_us);
+	}
+}
+
+void msleep_minimum(uint64_t ms)
+{
+	uint64_t stop_time = getcurrenttime() + ms;
+
+	while (1) {
+		uint64_t current_time = getcurrenttime();
+		if (current_time >= stop_time) {
+			return;
+		}
+
+		msleep_approx(stop_time - current_time);
+	}
+}

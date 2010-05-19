@@ -1,7 +1,7 @@
 /*
  * hdhomerun_channels.h
  *
- * Copyright © 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright Â© 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ extern "C" {
 struct hdhomerun_channel_entry_t;
 struct hdhomerun_channel_list_t;
 
-extern LIBTYPE const char *hdhomerun_channelmap_convert_countrycode_to_channelmap_prefix(const char *countrycode);
+extern LIBTYPE const char *hdhomerun_channelmap_get_channelmap_from_country_source(const char *countrycode, const char *source);
 extern LIBTYPE const char *hdhomerun_channelmap_get_channelmap_scan_group(const char *channelmap);
 
 extern LIBTYPE uint8_t hdhomerun_channel_entry_channel_number(struct hdhomerun_channel_entry_t *entry);
