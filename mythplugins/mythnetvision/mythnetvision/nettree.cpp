@@ -790,41 +790,56 @@ void NetTree::showWebVideo()
     if (!item)
         return;
 
-    QString url = item->GetURL();
-
-    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Web URL = %1").arg(url));
-
-    if (url.isEmpty())
-        return;
-
-    QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
-    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
-
-    if (browser.isEmpty())
+    if (!item->GetPlayer().isEmpty())
     {
-        ShowOkPopup(tr("No browser command set! MythNetTree needs MythBrowser "
-                       "installed to display the video."));
-        return;
-    }
+        QString cmd = item->GetPlayer();
+        QStringList args = item->GetPlayerArguments();
+        args.replaceInStrings("%DIR%", QString(GetConfDir() + "/MythNetvision"));
+        args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
+        args.replaceInStrings("%URL%", item->GetURL());
+        args.replaceInStrings("%TITLE%", item->GetTitle());
+        QString playerCommand = cmd + " " + args.join(" ");
 
-    if (browser.toLower() == "internal")
-    {
-        GetMythMainWindow()->HandleMedia("WebBrowser", url);
-        return;
+        myth_system(playerCommand);
     }
     else
     {
-        QString cmd = browser;
-        cmd.replace("%ZOOM%", zoom);
-        cmd.replace("%URL%", url);
-        cmd.replace('\'', "%27");
-        cmd.replace("&","\\&");
-        cmd.replace(";","\\;");
+        QString url = item->GetURL();
 
-        GetMythMainWindow()->AllowInput(false);
-        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        GetMythMainWindow()->AllowInput(true);
-        return;
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Web URL = %1").arg(url));
+
+        if (url.isEmpty())
+            return;
+
+        QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
+        QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
+
+        if (browser.isEmpty())
+        {
+            ShowOkPopup(tr("No browser command set! MythNetTree needs MythBrowser "
+                           "installed to display the video."));
+            return;
+        }
+
+        if (browser.toLower() == "internal")
+        {
+            GetMythMainWindow()->HandleMedia("WebBrowser", url);
+            return;
+        }
+        else
+        {
+            QString cmd = browser;
+            cmd.replace("%ZOOM%", zoom);
+            cmd.replace("%URL%", url);
+            cmd.replace('\'', "%27");
+            cmd.replace("&","\\&");
+            cmd.replace(";","\\;");
+
+            GetMythMainWindow()->AllowInput(false);
+            myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+            GetMythMainWindow()->AllowInput(true);
+            return;
+        }
     }
 }
 
@@ -924,66 +939,43 @@ void NetTree::doDownloadAndPlay()
     if (!item)
         return;
 
-    if (!item->GetPlayer().isEmpty())
+    if (m_download->isRunning())
     {
-        m_externaldownload = new QProcess();
-        QString cmd = item->GetPlayer();
-        QStringList args = item->GetPlayerArguments();
-        args.replaceInStrings("%DIR%", QString(GetConfDir() + "/MythNetvision"));
-        args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
-        args.replaceInStrings("%URL%", item->GetURL());
-        args.replaceInStrings("%TITLE%", item->GetTitle());
+        QString message = tr("Download already running.  Try again "
+                             "when the download is finished.");
 
-        m_externaldownload->setReadChannel(QProcess::StandardOutput);
+        MythConfirmationDialog *okPopup =
+            new MythConfirmationDialog(m_popupStack, message, false);
 
-//        connect(externalplay, SIGNAL(finished(int, QProcess::ExitStatus)),
-//                  SLOT(slotProcessSearchExit(int, QProcess::ExitStatus)));
-
-        m_externaldownload->start(cmd, args);
-//        QByteArray result = externalplay.readAll();
-//        QString resultString(result);
-    }
-    else
-    {
-        if (m_download->isRunning())
-        {
-            QString message = tr("Download already running.  Try again "
-                                 "when the download is finished.");
-
-            MythConfirmationDialog *okPopup =
-                new MythConfirmationDialog(m_popupStack, message, false);
-
-            if (okPopup->Create())
-                m_popupStack->AddScreen(okPopup);
-            else
-                delete okPopup;
-
-            return;
-        }
-
-        QString filename = getDownloadFilename(item);
-
-        VERBOSE(VB_GENERAL, QString("Downloading %1").arg(filename));
-
-        // Does the file already exist?
-        bool exists;
-        if (filename.startsWith("myth://"))
-            exists = RemoteFile::Exists(filename);
+        if (okPopup->Create())
+            m_popupStack->AddScreen(okPopup);
         else
-            exists = QFile::exists(filename);
+            delete okPopup;
 
-        if (exists)
-        {
-            doPlayVideo();
-
-            return;
-        }
-
-        // Initialize the download
-        m_download->addDL(item);
-         if (!m_download->isRunning())
-            m_download->start();
+        return;
     }
+
+    QString filename = getDownloadFilename(item);
+
+    VERBOSE(VB_GENERAL, QString("Downloading %1").arg(filename));
+
+    // Does the file already exist?
+    bool exists;
+    if (filename.startsWith("myth://"))
+        exists = RemoteFile::Exists(filename);
+    else
+        exists = QFile::exists(filename);
+
+    if (exists)
+    {
+        doPlayVideo();
+        return;
+    }
+
+    // Initialize the download
+    m_download->addDL(item);
+    if (!m_download->isRunning())
+        m_download->start();
 }
 
 QString NetTree::getDownloadFilename(ResultVideo *item)
