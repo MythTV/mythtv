@@ -501,6 +501,7 @@ static int cmd_upgrade(const char *filename)
 	}
 
 	printf("upgrade complete - now running firmware %s\n", version_str);
+	fclose(fp);
 	return 0;
 }
 
