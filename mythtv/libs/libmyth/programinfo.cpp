@@ -299,7 +299,7 @@ ProgramInfo::ProgramInfo(
     chanplaybackfilters(_chanplaybackfilters),
 
     recgroup(_recgroup),
-    playgroup(_recgroup),
+    playgroup(_playgroup),
 
     pathname(_pathname),
 
@@ -639,7 +639,7 @@ ProgramInfo::ProgramInfo(
     chanplaybackfilters(_chanplaybackfilters),
 
     recgroup(_recgroup),
-    playgroup(_recgroup),
+    playgroup(_playgroup),
 
     pathname(),
 
