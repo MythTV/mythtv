@@ -116,15 +116,11 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
         VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawImage called with no painter");
         return;
     }
-    
-    (void)alpha;
 
     MythQtImage *qim = reinterpret_cast<MythQtImage *>(im);
 
     if (qim->NeedsRegen())
-    {
        qim->RegeneratePixmap();
-    }
 
     painter->setOpacity(static_cast<float>(alpha) / 255.0);
     painter->drawPixmap(r.topLeft(), *(qim->GetPixmap()), src);
