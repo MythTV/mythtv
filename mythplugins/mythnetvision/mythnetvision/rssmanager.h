@@ -12,24 +12,18 @@ using namespace std;
 #include <QDateTime>
 #include <QByteArray>
 #include <QVariant>
+#include <QNetworkReply>
 
 #include "parse.h"
 
 #include <mythhttppool.h>
 
 class RSSSite;
-class RSSSite : public QObject, public MythHttpListener
+class RSSSite : public QObject
 {
     Q_OBJECT
 
   public:
-
-    enum State {
-        Retrieving = 0,
-        RetrieveFailed,
-        WriteFailed,
-        Success
-    };
 
     class List : public vector<RSSSite*>
     {
@@ -65,8 +59,6 @@ class RSSSite : public QObject, public MythHttpListener
     const bool& GetDownload() const { return m_download; }
     const QDateTime& GetUpdated() const { return m_updated; }
 
-    virtual void deleteLater();
-
     unsigned int timeSinceLastUpdate(void) const; // in minutes
 
     void insertRSSArticle(ResultVideo *item);
@@ -78,17 +70,10 @@ class RSSSite : public QObject, public MythHttpListener
     void stop(void);
     void process(void);
 
-    bool     successful(void) const;
-    QString  errorMsg(void) const;
-
-    virtual void Update(QHttp::Error      error,
-                        const QString    &error_str,
-                        const QUrl       &url,
-                        uint              http_status_id,
-                        const QString    &http_status_str,
-                        const QByteArray &data);
-
   private:
+
+    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
+                     const QUrl& oldRedirectUrl) const;
 
     QString    m_title;
     QString    m_image;
@@ -102,13 +87,16 @@ class RSSSite : public QObject, public MythHttpListener
     mutable    QMutex m_lock;
     QString    m_destDir;
     QByteArray m_data;
-    State      m_state;
-    QString    m_errorString;
-    QString    m_updateErrorString;
     QString    m_imageURL;
     bool       m_podcast;
 
     ResultVideo::resultList m_articleList;
+
+    QNetworkReply          *m_reply;
+    QNetworkAccessManager  *m_manager;
+
+  private slots:
+    void slotCheckRedirect(QNetworkReply* reply);
 
   signals:
 
@@ -143,6 +131,7 @@ class RSSManager : public QObject
     QTimer                        *m_timer;
     RSSSite::rssList               m_sites;
     uint                           m_updateFreq;
+    RSSSite::rssList               m_inprogress;
 };
 
 #endif

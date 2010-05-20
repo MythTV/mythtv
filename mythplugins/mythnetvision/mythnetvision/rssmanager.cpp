@@ -77,7 +77,7 @@ void RSSManager::slotRefreshRSS()
     for (; i != m_sites.end(); ++i)
     {
             (*i)->retrieve();
-//            processAndInsertRSS(*i);
+            m_inprogress.append(*i);
     }
 }
 
@@ -86,7 +86,7 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
     if (!site)
         return;
 
-    site->process();
+//    site->retrieve();
 
     clearRSSArticles(site->GetTitle());
 
@@ -96,9 +96,11 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
     {
         // Insert in the DB here.
         insertArticleInDB(site->GetTitle(), *it);
+        m_inprogress.removeOne(site);
     }
 
-    emit finished();
+    if (!m_inprogress.count())
+        emit finished();
 }
 
 void RSSManager::slotRSSRetrieved(RSSSite *site)
@@ -117,9 +119,8 @@ RSSSite::RSSSite(const QString& title,
                   const QDateTime& updated) :
     QObject(),
     m_lock(QMutex::Recursive),
-    m_state(RSSSite::Success),
-    m_errorString(QString::null),
-    m_updateErrorString(QString::null)
+    m_reply(NULL),
+    m_manager(NULL)
 {
     m_title = title;
     m_image = image;
@@ -133,16 +134,6 @@ RSSSite::RSSSite(const QString& title,
 
 RSSSite::~RSSSite()
 {
-    QMutexLocker locker(&m_lock);
-    MythHttpPool::GetSingleton()->RemoveListener(this);
-}
-
-void RSSSite::deleteLater()
-{
-    QMutexLocker locker(&m_lock);
-    MythHttpPool::GetSingleton()->RemoveListener(this);
-    m_articleList.clear();
-    QObject::deleteLater();
 }
 
 void RSSSite::insertRSSArticle(ResultVideo *item)
@@ -160,32 +151,45 @@ void RSSSite::clearRSSArticles(void)
 void RSSSite::retrieve(void)
 {
     QMutexLocker locker(&m_lock);
-    stop();
-    m_state = RSSSite::Retrieving;
     m_data.resize(0);
-    m_errorString = QString::null;
-    m_updateErrorString = QString::null;
     m_articleList.clear();
     m_urlReq = QUrl(m_url);
-    MythHttpPool::GetSingleton()->AddUrlRequest(m_urlReq, this);
+    m_manager = new QNetworkAccessManager();
+
+    m_reply = m_manager->get(QNetworkRequest(m_urlReq));
+
+    connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
+                       SLOT(slotCheckRedirect(QNetworkReply*)));
 }
 
-void RSSSite::stop(void)
+QUrl RSSSite::redirectUrl(const QUrl& possibleRedirectUrl,
+                               const QUrl& oldRedirectUrl) const
 {
-    QMutexLocker locker(&m_lock);
-    MythHttpPool::GetSingleton()->RemoveUrlRequest(m_urlReq, this);
+    QUrl redirectUrl;
+    if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)
+        redirectUrl = possibleRedirectUrl;
+    return redirectUrl;
 }
 
-bool RSSSite::successful(void) const
+void RSSSite::slotCheckRedirect(QNetworkReply* reply)
 {
-    QMutexLocker locker(&m_lock);
-    return (m_state == RSSSite::Success);
-}
+    QVariant possibleRedirectUrl =
+         reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
-QString RSSSite::errorMsg(void) const
-{
-    QMutexLocker locker(&m_lock);
-    return m_errorString;
+    QUrl urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
+                                       urlRedirectedTo);
+
+    if(!urlRedirectedTo.isEmpty())
+    {
+        m_manager->get(QNetworkRequest(urlRedirectedTo));
+    }
+    else
+    {
+        m_data = m_reply->readAll();
+        process();
+    }
+
+    reply->deleteLater();
 }
 
 ResultVideo::resultList RSSSite::GetVideoList(void) const
@@ -203,86 +207,21 @@ unsigned int RSSSite::timeSinceLastUpdate(void) const
     return min;
 }
 
-void RSSSite::Update(QHttp::Error      error,
-                      const QString    &error_str,
-                      const QUrl       &url,
-                      uint              http_status_id,
-                      const QString    &http_status_str,
-                      const QByteArray &data)
-{
-    QMutexLocker locker(&m_lock);
-
-    if (url != m_urlReq)
-    {
-        return;
-    }
-
-    if (QHttp::NoError != error)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HTTP Connection Error" +
-                QString("\n\t\t\tExplanation: %1: %2")
-                .arg(error).arg(error_str));
-
-        m_state = RSSSite::RetrieveFailed;
-        m_updateErrorString = QString("%1: %2").arg(error).arg(error_str);
-        emit finished(this);
-        return;
-    }
-
-    if (200 != http_status_id)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HTTP Protocol Error" +
-                QString("\n\t\t\tExplanation: %1: %2")
-                .arg(http_status_id).arg(http_status_str));
-
-        m_state = RSSSite::RetrieveFailed;
-        m_updateErrorString =
-            QString("%1: %2").arg(http_status_id).arg(http_status_str);
-        emit finished(this);
-        return;
-    }
-
-    m_updateErrorString = QString::null;
-    m_data = data;
-
-    if (m_title.isEmpty())
-    {
-        m_state = RSSSite::WriteFailed;
-    }
-    else
-    {
-        m_updated = QDateTime::currentDateTime();
-        m_state = RSSSite::Success;
-    }
-    emit finished(this);
-}
-
 void RSSSite::process(void)
 {
     QMutexLocker locker(&m_lock);
 
     m_articleList.clear();
 
-    m_errorString = "";
-    if (RetrieveFailed == m_state)
-        m_errorString = tr("Retrieve Failed. ")+"\n";
+    if (!m_data.size())
+        return;
 
     QDomDocument domDoc;
 
     if (!domDoc.setContent(m_data, true))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set content from xmlfile");
-        m_errorString += tr("Failed to read downloaded file.");
-        if (!m_updateErrorString.isEmpty())
-            m_errorString += "\n" + m_updateErrorString;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set content from downloaded XML");
         return;
-    }
-
-    if (RetrieveFailed == m_state)
-    {
-        m_errorString += tr("Showing Cached News.");
-        if (!m_updateErrorString.isEmpty())
-            m_errorString += "\n" + m_updateErrorString;
     }
 
     //Check the type of the feed
@@ -313,12 +252,11 @@ void RSSSite::process(void)
                (*i)->GetSeason(),
                (*i)->GetEpisode()));
         }
-        return;
+        emit finished(this);
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "XML-file is not valid RSS-feed");
-        m_errorString += tr("XML-file is not valid RSS-feed");
-        return;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Data is not valid RSS-feed");
+        emit finished(this);
     }
 }
