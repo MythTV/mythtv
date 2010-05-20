@@ -206,6 +206,8 @@ void GrabberDownloadThread::run()
         }
         delete script;
     }
-    QCoreApplication::postEvent(m_parent, new GrabberUpdateEvent());
+    emit finished();
+    if (m_parent)
+        QCoreApplication::postEvent(m_parent, new GrabberUpdateEvent());
 }
 
