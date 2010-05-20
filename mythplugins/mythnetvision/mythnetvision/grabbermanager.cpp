@@ -121,6 +121,7 @@ GrabberManager::GrabberManager() :     m_lock(QMutex::Recursive)
                        "mythNetvision.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
     m_runningCount = 0;
+    m_refreshAll = false;
     connect( m_timer, SIGNAL(timeout()),
                       this, SLOT(timeout()));
 }
@@ -143,6 +144,8 @@ void GrabberManager::stopTimer()
 void GrabberManager::doUpdate()
 {
     GrabberDownloadThread *gdt = new GrabberDownloadThread(this);
+    if (m_refreshAll)
+       gdt->refreshAll();
     gdt->start(QThread::LowPriority);
 
     m_timer->start(m_updateFreq);
@@ -152,6 +155,11 @@ void GrabberManager::timeout()
 {
     QMutexLocker locker(&m_lock);
     doUpdate();
+}
+
+void GrabberManager::refreshAll()
+{
+    m_refreshAll = true;
 }
 
 GrabberDownloadThread::GrabberDownloadThread(QObject *parent)

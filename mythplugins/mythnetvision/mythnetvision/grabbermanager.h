@@ -66,6 +66,7 @@ class GrabberManager : public QObject
     void startTimer();
     void stopTimer();
     void doUpdate();
+    void refreshAll();
 
   signals:
     void finished(void);
@@ -80,6 +81,7 @@ class GrabberManager : public QObject
     GrabberScript::scriptList      m_scripts;
     uint                           m_updateFreq;
     uint                           m_runningCount;
+    bool                           m_refreshAll;
 };
 
 const int kGrabberUpdateEventType = QEvent::User + 5000;
