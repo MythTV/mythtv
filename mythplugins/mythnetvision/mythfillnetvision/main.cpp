@@ -22,14 +22,18 @@ using namespace std;
 #include "mythconfig.h"
 
 #include "../mythnetvision/grabbermanager.h"
+#include "../mythnetvision/rssmanager.h"
 
 GrabberDownloadThread *gdt = 0;
+RSSManager *rssMan = 0;
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     int argpos = 1;
     bool refreshall = false;
+    bool refreshrss = true;
+    bool refreshtree = true;
 
     myth_nice(19);
 
@@ -43,12 +47,30 @@ int main(int argc, char *argv[])
             cout << "###\n";
             refreshall = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--refresh-rss"))
+        {
+            cout << "###\n";
+            cout << "### Refreshing RSS Only.\n";
+            cout << "###\n";
+            refreshtree = false;
+        }
+        else if (!strcmp(a.argv()[argpos], "--refresh-tree"))
+        {
+            cout << "###\n";
+            cout << "### Refreshing Trees Only.\n";
+            cout << "###\n";
+            refreshrss = false;
+        }
         else if (!strcmp(a.argv()[argpos], "-h") ||
                  !strcmp(a.argv()[argpos], "--help"))
         {
             cout << "usage:\n";
             cout << "--refresh-all\n";
-            cout << "   Refresh all tree views, regardless of whether they need it.\n";
+            cout << "   Refresh all tree views and RSS feeds, regardless of whether they need it.\n";
+            cout << "--refresh-rss\n";
+            cout << "   Refresh RSS feeds only.\n";
+            cout << "--refresh-tree\n";
+            cout << "   Refresh Tree views only.\n";
             cout << "\n";
             cout << "Run with no options to only update trees which need update.\n";
             return FILLDB_EXIT_INVALID_CMDLINE;
@@ -74,22 +96,37 @@ int main(int argc, char *argv[])
     LanguageSettings::load("mythfrontend");
 
     gCoreContext->LogEntry("mythfillnetvision", LP_INFO,
-                       "Listings Download Started", "");
+                       "Online Source Listing Download Started", "");
 
-    QEventLoop loop;
+    if (refreshtree)
+    {
+        QEventLoop treeloop;
 
-    gdt = new GrabberDownloadThread(NULL);
-    if (refreshall)
-        gdt->refreshAll();
-    gdt->start();
+        gdt = new GrabberDownloadThread(NULL);
+        if (refreshall)
+            gdt->refreshAll();
+        gdt->start();
 
-    QObject::connect(gdt, SIGNAL(finished(void)), &loop, SLOT(quit()));
+        QObject::connect(gdt, SIGNAL(finished(void)), &treeloop, SLOT(quit()));
+        treeloop.exec();
+    }
 
-    loop.exec();
+    if (refreshrss)
+    {
+        QEventLoop rssloop;
 
+        rssMan = new RSSManager();
+        rssMan->doUpdate();
+
+        QObject::connect(rssMan, SIGNAL(finished(void)), &rssloop, SLOT(quit()));
+        rssloop.exec();
+    }
+
+    delete gdt;
+    delete rssMan;
     delete gContext;
 
-    VERBOSE(VB_IMPORTANT, "mythfillnetvision run complete.");
+    VERBOSE(VB_IMPORTANT, "MythFillNetvision run complete.");
 
     return FILLDB_EXIT_OK;
 }
