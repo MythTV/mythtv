@@ -175,7 +175,7 @@ class FileTransfer( MythBEConn ):
         if not self.open:
             return
         self.control.backendCommand('QUERY_FILETRANSFER '\
-                    +BACKEND_SEP.join([str(self.sockno), 'JOIN']))
+                    +BACKEND_SEP.join([str(self.sockno), 'DONE']))
         self.socket.shutdown(1)
         self.socket.close()
         self.open = False
