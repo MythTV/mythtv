@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythnetvision theme i18n
+SUBDIRS = mythnetvision mythfillnetvision theme i18n
