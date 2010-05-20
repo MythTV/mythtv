@@ -482,6 +482,16 @@ enable_deep_weak(){
     enable_weak $*
 }
 
+disable_bindings_python(){
+    echo "WARNING: disabling Python bindings; missing $1"
+    disable bindings_python
+}
+
+disable_bindings_perl(){
+    echo "WARNING: disabling Perl bindings; missing $1"
+    disable bindings_perl
+}
+
 enabled(){
     test "${1#!}" = "$1" && op== || op=!=
     eval test "x\$${1#!}" $op "xyes"
@@ -3937,26 +3947,30 @@ if enabled gprof; then
 fi
 
 # Check for python dependencies
-enabled bindings_python && check_py_lib MySQLdb || disable bindings_python
-enabled bindings_python && check_py_lib lxml    || disable bindings_python
+if enabled bindings_python; then
+    check_py_lib MySQLdb || disable_bindings_python "MySQLdb"
+    check_py_lib lxml    || disable_bindings_python "lxml"
+fi
 
 # Check for perl dependencies
 # Modules distributed in Perl core
-enabled bindings_perl && check_pl_lib "ExtUtils::MakeMaker" ||
-    disable bindings_perl
-enabled bindings_perl && check_pl_lib Config || disable bindings_perl
-enabled bindings_perl && check_pl_lib Exporter || disable bindings_perl
-enabled bindings_perl && check_pl_lib Fcntl || disable bindings_perl
-enabled bindings_perl && check_pl_lib "File::Copy" || disable bindings_perl
-enabled bindings_perl && check_pl_lib "Sys::Hostname" || disable bindings_perl
+if enabled bindings_perl; then
+    check_pl_lib "ExtUtils::MakeMaker" || 
+        disable_bindings_perl "ExtUtils::MakeMaker"
+    check_pl_lib Config           || disable_bindings_perl Config
+    check_pl_lib Exporter         || disable_bindings_perl Exporter
+    check_pl_lib Fcntl            || disable_bindings_perl Fcntl
+    check_pl_lib "File::Copy"     || disable_bindings_perl "File::Copy"
+    check_pl_lib "Sys::Hostname"  || disable_bindings_perl "Sys::Hostname"
 # Modules not distributed in Perl core
-enabled bindings_perl && check_pl_lib DBI || disable bindings_perl
-enabled bindings_perl && check_pl_lib "HTTP::Request" || disable bindings_perl
-enabled bindings_perl && check_pl_lib "LWP::UserAgent" || disable bindings_perl
-enabled bindings_perl && check_pl_lib "Net::UPnP::QueryResponse" ||
-    disable bindings_perl
-enabled bindings_perl && check_pl_lib "Net::UPnP::ControlPoint" ||
-    disable bindings_perl
+    check_pl_lib DBI              || disable_bindings_perl DBI
+    check_pl_lib "HTTP::Request"  || disable_bindings_perl "HTTP::Request"
+    check_pl_lib "LWP::UserAgent" || disable_bindings_perl "LWP::UserAgent"
+    check_pl_lib "Net::UPnP::QueryResponse" || 
+        disable_bindings_perl "Net::UPnP::QueryResponse"
+    check_pl_lib "Net::UPnP::ControlPoint"  || 
+        disable_bindings_perl "Net::UPnP::ControlPoint"
+fi
 
 # Find out if the .align argument is a power of two or not.
 check_asm asmalign_pot '".align 3"'
