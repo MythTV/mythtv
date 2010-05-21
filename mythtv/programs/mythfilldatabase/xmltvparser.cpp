@@ -367,28 +367,33 @@ ProgInfo *XMLTVParser::parseProgram(
                 QString date = getFirstText(info);
                 pginfo->airdate = date.left(4).toUInt();
             }
-            else if (info.tagName() == "star-rating")
+            else if (info.tagName() == "star-rating" && pginfo->stars.isEmpty())
             {
                 QDomNodeList values = info.elementsByTagName("value");
                 QDomElement item;
                 QString stars, num, den;
-                float avg = 0.0;
-                // not sure why the XML suggests multiple ratings,
-                // but the following will average them anyway.
-                for (unsigned int i = 0; i < values.length(); ++i)
+                float rating = 0.0;
+
+                // Use the first rating to appear in the xml, this should be
+                // the most important one.
+                //
+                // Averaging is not a good idea here, any subsequent ratings
+                // are likely to represent that days recommended programmes
+                // which on a bad night could given to an average programme.
+                // In the case of uk_rt it's not unknown for a recommendation
+                // to be given to programmes which are 'so bad, you have to
+                // watch!'
+                item = values.item(0).toElement();
+                if (!item.isNull())
                 {
-                    item = values.item(i).toElement();
-                    if (item.isNull())
-                        continue;
                     stars = getFirstText(item);
                     num = stars.section('/', 0, 0);
                     den = stars.section('/', 1, 1);
-                    if (0.0 >= den.toFloat())
-                        continue;
-                    avg *= i/(i+1);
-                    avg += (num.toFloat()/den.toFloat()) / (i+1);
+                    if (0.0 < den.toFloat())
+                        rating = num.toFloat()/den.toFloat();
                 }
-                pginfo->stars.setNum(avg);
+                
+                pginfo->stars.setNum(rating);
             }
             else if (info.tagName() == "rating")
             {
