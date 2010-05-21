@@ -161,10 +161,7 @@ bool MythUIShape::ParseElement(
             {
                 QDomElement childElem = child.toElement();
                 if (childElem.tagName() == "gradient")
-                {
-                    QLinearGradient gradient = parseGradient(childElem);
-                    m_fillBrush = QBrush(gradient);
-                }
+                    m_fillBrush = parseGradient(childElem);
             }
         }
         else
@@ -199,82 +196,6 @@ bool MythUIShape::ParseElement(
     }
 
     return true;
-}
-
-QLinearGradient MythUIShape::parseGradient(const QDomElement &element)
-{
-    QLinearGradient gradient;
-    QString gradientStart = element.attribute("start", "");
-    QString gradientEnd = element.attribute("end", "");
-    int gradientAlpha = element.attribute("alpha", "100").toInt();
-    QString direction = element.attribute("direction", "vertical");
-
-    float x1, y1, x2, y2 = 0.0;
-    if (direction == "vertical")
-    {
-        x1 = 0.5;
-        x2 = 0.5;
-        y1 = 0.0;
-        y2 = 1.0;
-    }
-    else if (direction == "diagonal")
-    {
-        x1 = 0.0;
-        x2 = 1.0;
-        y1 = 0.0;
-        y2 = 1.0;
-    }
-    else
-    {
-        x1 = 0.0;
-        x2 = 1.0;
-        y1 = 0.5;
-        y2 = 0.5;
-    }
-
-    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    gradient.setStart(x1, y1);
-    gradient.setFinalStop(x2, y2);
-
-    QGradientStops stops;
-    
-    if (!gradientStart.isEmpty())
-    {
-        QColor startColor = QColor(gradientStart);
-        startColor.setAlpha(gradientAlpha);
-        QGradientStop stop(0.0, startColor);
-        stops.append(stop);
-    }
-    
-    if (!gradientEnd.isEmpty())
-    {
-        QColor endColor = QColor(gradientEnd);
-        endColor.setAlpha(gradientAlpha);
-        QGradientStop stop(1.0, endColor);
-        stops.append(stop);
-    }
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-        child = child.nextSibling())
-    {
-        QDomElement childElem = child.toElement();
-        if (childElem.tagName() == "stop")
-        {
-            float position = childElem.attribute("position", "0").toFloat();
-            QString color = childElem.attribute("color", "");
-            int alpha = childElem.attribute("alpha", "-1").toInt();
-            if (alpha < 0)
-                alpha = gradientAlpha;
-            QColor stopColor = QColor(color);
-            stopColor.setAlpha(alpha);
-            QGradientStop stop((position / 100), stopColor);
-            stops.append(stop);
-        }
-    }
-
-    gradient.setStops(stops);
-
-    return gradient;
 }
 
 void MythUIShape::CopyFrom(MythUIType *base)

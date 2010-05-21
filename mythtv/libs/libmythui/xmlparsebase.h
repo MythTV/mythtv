@@ -8,6 +8,7 @@
 class MythUIType;
 class MythScreenType;
 class QDomElement;
+class QBrush;
 
 void VERBOSE_XML(
     unsigned int verbose_type,
@@ -27,6 +28,7 @@ class MPUBLIC XMLParseBase
     static MythRect parseRect(QDomElement &element, bool normalize = true);
     static int parseAlignment(const QString &text);
     static int parseAlignment(QDomElement &element);
+    static QBrush parseGradient(const QDomElement &element);
 
     static MythUIType *GetGlobalObjectStore(void);
     static void ClearGlobalObjectStore(void);
