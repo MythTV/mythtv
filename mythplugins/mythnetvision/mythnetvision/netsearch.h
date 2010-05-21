@@ -16,7 +16,6 @@
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythdialogbox.h>
 
-#include "search.h"
 #include "grabbermanager.h"
 #include "rssmanager.h"
 #include "downloadmanager.h"

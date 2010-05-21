@@ -17,8 +17,6 @@
 #include <libmythui/mythdialogbox.h>
 
 #include "grabbermanager.h"
-//#include "netvision.h"
-#include "search.h"
 #include "rssmanager.h"
 #include "downloadmanager.h"
 #include "imagedownloadmanager.h"

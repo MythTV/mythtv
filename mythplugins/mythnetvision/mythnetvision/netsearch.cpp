@@ -19,7 +19,7 @@
 #include <storagegroup.h>
 #include <remotefile.h>
 
-#include "search.h"
+#include "grabbermanager.h"
 #include "netsearch.h"
 #include "netutils.h"
 #include "parse.h"

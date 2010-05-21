@@ -77,10 +77,10 @@ INSTALLS += installdiricons installtopicicons installfilmicons installmusicicons
 
 # Input
 HEADERS += dbcheck.h grabbermanager.h rssmanager.h treedbutil.h netutils.h rssdbutil.h rsseditor.h
-HEADERS += search.h netsearch.h parse.h imagedownloadmanager.h downloadmanager.h treeeditor.h nettree.h
+HEADERS += netsearch.h parse.h imagedownloadmanager.h downloadmanager.h treeeditor.h nettree.h
 HEADERS += searcheditor.h
 
-SOURCES += dbcheck.cpp grabbermanager.cpp rssmanager.cpp parse.cpp treedbutil.cpp netutils.cpp search.cpp
+SOURCES += dbcheck.cpp grabbermanager.cpp rssmanager.cpp parse.cpp treedbutil.cpp netutils.cpp
 SOURCES += rssdbutil.cpp rsseditor.cpp netsearch.cpp searcheditor.cpp
 SOURCES += downloadmanager.cpp imagedownloadmanager.cpp treeeditor.cpp nettree.cpp main.cpp
 
