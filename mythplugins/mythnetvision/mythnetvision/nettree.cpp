@@ -13,12 +13,10 @@
 #include <mythprogressdialog.h>
 
 // mythnetvision
-#include "treedbutil.h"
 #include "treeeditor.h"
 #include "parse.h"
 #include "nettree.h"
 #include "netutils.h"
-#include "rssdbutil.h"
 #include "rsseditor.h"
 #include "rssmanager.h"
 #include "grabbermanager.h"

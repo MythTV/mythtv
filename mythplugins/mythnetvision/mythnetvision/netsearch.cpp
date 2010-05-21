@@ -23,8 +23,6 @@
 #include "netsearch.h"
 #include "netutils.h"
 #include "parse.h"
-#include "rssdbutil.h"
-#include "treedbutil.h"
 #include "rsseditor.h"
 #include "searcheditor.h"
 

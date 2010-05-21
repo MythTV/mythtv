@@ -9,7 +9,7 @@
 #include <mythverbose.h>
 
 #include "rssmanager.h"
-#include "rssdbutil.h"
+#include "netutils.h"
 #include "parse.h"
 
 using namespace std;

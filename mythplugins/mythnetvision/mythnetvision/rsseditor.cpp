@@ -20,7 +20,7 @@
 
 // RSS headers
 #include "rsseditor.h"
-#include "rssdbutil.h"
+#include "netutils.h"
 #include "parse.h"
 
 #define LOC      QString("RSSEditor: ")

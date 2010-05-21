@@ -14,14 +14,12 @@ INSTALLS = target
 INCLUDEPATH += ../mythnetvision
 
 HEADERS += ../mythnetvision/grabbermanager.h ../mythnetvision/parse.h
-HEADERS += ../mythnetvision/rssmanager.h ../mythnetvision/rssdbutil.h
-HEADERS += ../mythnetvision/treedbutil.h ../mythnetvision/netutils.h
+HEADERS += ../mythnetvision/rssmanager.h ../mythnetvision/netutils.h
 
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-SOURCES += ../mythnetvision/treedbutil.cpp ../mythnetvision/netutils.cpp
-SOURCES += ../mythnetvision/rssdbutil.cpp ../mythnetvision/rssmanager.cpp
+SOURCES += ../mythnetvision/netutils.cpp ../mythnetvision/rssmanager.cpp
 SOURCES += ../mythnetvision/grabbermanager.cpp ../mythnetvision/parse.cpp main.cpp
 
 include ( ../../libs-targetfix.pro )
