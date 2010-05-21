@@ -12,8 +12,8 @@
 #include <mythmainwindow.h>
 
 // MythNetVision headers
-#include "grabbermanager.h"
-#include "rssmanager.h"
+#include "netgrabbermanager.h"
+#include "mythrssmanager.h"
 #include "netsearch.h"
 #include "nettree.h"
 #include "treeeditor.h"

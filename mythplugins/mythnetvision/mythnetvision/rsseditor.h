@@ -12,7 +12,7 @@
 // MythTV headers
 #include <mythscreentype.h>
 
-#include "rssmanager.h"
+#include "mythrssmanager.h"
 
 class MythUITextEdit;
 class MythUIButton;

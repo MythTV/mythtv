@@ -9,7 +9,7 @@
 #include <QFileInfo>
 #include <QRegExp>
 
-#include "parse.h"
+#include "rssparse.h"
 #include "netutils.h"
 
 #include <mythtv/mythcontext.h>

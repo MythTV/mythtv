@@ -12,7 +12,7 @@
 // MythTV headers
 #include <mythscreentype.h>
 
-#include "grabbermanager.h"
+#include "netgrabbermanager.h"
 
 class MythUIButtonList;
 

@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 
-#include "parse.h"
+#include "rssparse.h"
 
 class QObject;
 

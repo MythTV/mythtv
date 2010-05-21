@@ -21,8 +21,8 @@ using namespace std;
 
 #include "mythconfig.h"
 
-#include "../mythnetvision/grabbermanager.h"
-#include "../mythnetvision/rssmanager.h"
+#include "../mythnetvision/netgrabbermanager.h"
+#include "../mythnetvision/mythrssmanager.h"
 
 GrabberDownloadThread *gdt = 0;
 RSSManager *rssMan = 0;

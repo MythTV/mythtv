@@ -20,8 +20,9 @@
 
 // Tree headers
 #include "treeeditor.h"
-#include "treedbutil.h"
-#include "grabbermanager.h"
+#include "netutils.h"
+
+//#include "netgrabbermanager.h"
 
 #define LOC      QString("TreeEditor: ")
 #define LOC_WARN QString("TreeEditor, Warning: ")

@@ -19,10 +19,10 @@
 #include <storagegroup.h>
 #include <remotefile.h>
 
-#include "grabbermanager.h"
+#include "netgrabbermanager.h"
 #include "netsearch.h"
 #include "netutils.h"
-#include "parse.h"
+#include "rssparse.h"
 #include "rsseditor.h"
 #include "searcheditor.h"
 

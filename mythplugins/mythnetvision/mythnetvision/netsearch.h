@@ -16,8 +16,8 @@
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythdialogbox.h>
 
-#include "grabbermanager.h"
-#include "rssmanager.h"
+#include "netgrabbermanager.h"
+#include "mythrssmanager.h"
 #include "downloadmanager.h"
 #include "imagedownloadmanager.h"
 

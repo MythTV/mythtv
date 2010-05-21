@@ -9,8 +9,8 @@
 #include <mythcontext.h>
 #include <mythverbose.h>
 
-#include "grabbermanager.h"
-#include "treedbutil.h"
+#include "netgrabbermanager.h"
+#include "netutils.h"
 
 using namespace std;
 

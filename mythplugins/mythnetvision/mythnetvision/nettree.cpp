@@ -14,12 +14,12 @@
 
 // mythnetvision
 #include "treeeditor.h"
-#include "parse.h"
+#include "rssparse.h"
 #include "nettree.h"
 #include "netutils.h"
 #include "rsseditor.h"
-#include "rssmanager.h"
-#include "grabbermanager.h"
+#include "mythrssmanager.h"
+#include "netgrabbermanager.h"
 
 class ResultVideo;
 class GrabberScript;

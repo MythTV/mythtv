@@ -76,11 +76,11 @@ INSTALLS += installtmdblibs installvimeolibs installvimeooauth installyoutubelib
 INSTALLS += installdiricons installtopicicons installfilmicons installmusicicons
 
 # Input
-HEADERS += dbcheck.h grabbermanager.h rssmanager.h netutils.h rsseditor.h
-HEADERS += netsearch.h parse.h imagedownloadmanager.h downloadmanager.h treeeditor.h nettree.h
+HEADERS += dbcheck.h netgrabbermanager.h mythrssmanager.h netutils.h rsseditor.h
+HEADERS += netsearch.h rssparse.h imagedownloadmanager.h downloadmanager.h treeeditor.h nettree.h
 HEADERS += searcheditor.h
 
-SOURCES += dbcheck.cpp grabbermanager.cpp rssmanager.cpp parse.cpp
+SOURCES += dbcheck.cpp netgrabbermanager.cpp mythrssmanager.cpp rssparse.cpp
 SOURCES += netutils.cpp rsseditor.cpp netsearch.cpp searcheditor.cpp
 SOURCES += downloadmanager.cpp imagedownloadmanager.cpp treeeditor.cpp nettree.cpp main.cpp
 

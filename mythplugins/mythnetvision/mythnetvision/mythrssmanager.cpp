@@ -8,9 +8,9 @@
 #include <mythcontext.h>
 #include <mythverbose.h>
 
-#include "rssmanager.h"
+#include "mythrssmanager.h"
 #include "netutils.h"
-#include "parse.h"
+#include "rssparse.h"
 
 using namespace std;
 

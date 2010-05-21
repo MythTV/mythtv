@@ -1,5 +1,5 @@
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef RSSPARSE_H
+#define RSSPARSE_H
 
 #include <vector>
 using namespace std;

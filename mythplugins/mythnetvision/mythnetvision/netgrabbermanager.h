@@ -1,5 +1,5 @@
-#ifndef GRABBERMANAGER_H
-#define GRABBERMANAGER_H
+#ifndef NETGRABBERMANAGER_H
+#define NETGRABBERMANAGER_H
 
 #include <QObject>
 #include <QEvent>
@@ -10,7 +10,7 @@
 #include <QTimer>
 #include <QProcess>
 
-#include "parse.h"
+#include "rssparse.h"
 
 class GrabberScript : public QThread
 {

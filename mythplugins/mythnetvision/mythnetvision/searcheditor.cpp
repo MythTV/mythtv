@@ -16,8 +16,8 @@
 
 // Search headers
 #include "searcheditor.h"
-#include "treedbutil.h"
-#include "grabbermanager.h"
+#include "netutils.h"
+#include "netgrabbermanager.h"
 
 #define LOC      QString("SearchEditor: ")
 #define LOC_WARN QString("SearchEditor, Warning: ")

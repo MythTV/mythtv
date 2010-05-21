@@ -4,9 +4,9 @@
 #include <QString>
 #include <QDateTime>
 
-#include "parse.h"
-#include "grabbermanager.h"
-#include "rssmanager.h"
+#include "rssparse.h"
+#include "netgrabbermanager.h"
+#include "mythrssmanager.h"
 
 // Generic Data Formatting
 QString GetDisplaySeasonEpisode(int seasEp, int digits);

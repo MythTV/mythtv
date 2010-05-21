@@ -1,5 +1,5 @@
-#ifndef RSSMANAGER_H
-#define RSSMANAGER_H
+#ifndef MYTHRSSMANAGER_H
+#define MYTHRSSMANAGER_H
 
 #include <vector>
 using namespace std;
@@ -14,7 +14,7 @@ using namespace std;
 #include <QVariant>
 #include <QNetworkReply>
 
-#include "parse.h"
+#include "rssparse.h"
 
 #include <mythhttppool.h>
 

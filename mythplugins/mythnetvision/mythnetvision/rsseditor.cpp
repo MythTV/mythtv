@@ -21,7 +21,7 @@
 // RSS headers
 #include "rsseditor.h"
 #include "netutils.h"
-#include "parse.h"
+#include "rssparse.h"
 
 #define LOC      QString("RSSEditor: ")
 #define LOC_WARN QString("RSSEditor, Warning: ")
