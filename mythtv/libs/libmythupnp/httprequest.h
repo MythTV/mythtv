@@ -187,6 +187,7 @@ class UPNP_PUBLIC HTTPRequest
 
         void            FormatActionResponse( const NameValues &pArgs );
         void            FormatFileResponse  ( const QString &sFileName );
+        void            FormatRawResponse   ( const QString &sXML );
 
         long            SendResponse    ( void );
         long            SendResponseFile( QString sFileName );

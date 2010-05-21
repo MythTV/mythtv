@@ -635,6 +635,17 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void HTTPRequest::FormatRawResponse(const QString &sXML)
+{
+    m_eResponseType   = ResponseTypeXML;
+    m_nResponseStatus = 200;
+
+    m_response << sXML;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void HTTPRequest::FormatFileResponse( const QString &sFileName )
 {
     m_sFileName = sFileName;
