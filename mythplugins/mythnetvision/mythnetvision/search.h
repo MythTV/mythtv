@@ -26,29 +26,29 @@ class Search : public QObject
     Search();
     ~Search();
 
-    void reset(void);
+    void resetSearch(void);
     void executeSearch(const QString &script, const QString &query,
                        uint pagenum = 1);
     void process(void);
 
-    uint numResults();
-    uint numReturned();
-    uint numIndex();
+    uint numResults() { return m_numResults; };
+    uint numReturned() { return m_numReturned; };
+    uint numIndex() { return m_numIndex; };
 
-    ResultVideo::resultList GetVideoList();
+    ResultVideo::resultList GetVideoList() { return m_videoList; };
 
   private:
 
-    QProcess       *m_searchProcess;
+    QProcess               *m_searchProcess;
 
-    QByteArray     m_data;
-    QDomDocument   m_document;
-    QTimer         *m_timer;
+    QByteArray              m_data;
+    QDomDocument            m_document;
+    QTimer                 *m_searchtimer;
     ResultVideo::resultList m_videoList;
 
-    uint parseNumResults(QDomDocument domDoc);
-    uint parseNumReturned(QDomDocument domDoc);
-    uint parseNumIndex(QDomDocument domDoc);
+    uint                    m_numResults;
+    uint                    m_numReturned;
+    uint                    m_numIndex;
 
   signals:
 

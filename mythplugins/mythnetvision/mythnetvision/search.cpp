@@ -9,8 +9,8 @@
 #include "parse.h"
 #include "search.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdirs.h>
 
 using namespace std;
 
@@ -22,23 +22,23 @@ Search::Search()
     : m_searchProcess(NULL)
 {
     m_videoList.clear();
-    m_timer = new QTimer();
+    m_searchtimer = new QTimer();
 
-    m_timer->setSingleShot(true);
+    m_searchtimer->setSingleShot(true);
 }
 
 Search::~Search()
 {
-    reset();
+    resetSearch();
 
     delete m_searchProcess;
     m_searchProcess = NULL;
 
-    if (m_timer)
+    if (m_searchtimer)
     {
-        m_timer->disconnect();
-        m_timer->deleteLater();
-        m_timer = NULL;
+        m_searchtimer->disconnect();
+        m_searchtimer->deleteLater();
+        m_searchtimer = NULL;
     }
 }
 
@@ -49,13 +49,13 @@ Search::~Search()
 
 void Search::executeSearch(const QString &script, const QString &query, uint pagenum)
 {
-    reset();
+    resetSearch();
 
     m_searchProcess = new QProcess();
 
     connect(m_searchProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
                   SLOT(slotProcessSearchExit(int, QProcess::ExitStatus)));
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(slotSearchTimeout()));
+    connect(m_searchtimer, SIGNAL(timeout()), this, SLOT(slotSearchTimeout()));
 
     QString cmd = script;
 
@@ -73,115 +73,72 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     VERBOSE(VB_GENERAL|VB_EXTRA, QString("MythNetVision Query: %1 %2")
                                         .arg(cmd).arg(args.join(" ")));
 
-    m_timer->start(40 * 1000);
+    m_searchtimer->start(40 * 1000);
     m_searchProcess->start(cmd, args);
 }
 
-void Search::reset()
+void Search::resetSearch()
 {
     qDeleteAll(m_videoList);
     m_videoList.clear();
-}
-
-uint Search::numResults()
-{
-    return parseNumResults(m_document);
-}
-
-uint Search::numReturned()
-{
-    return parseNumReturned(m_document);
-}
-
-uint Search::numIndex()
-{
-    return parseNumIndex(m_document);
 }
 
 void Search::process()
 {
     Parse parse;
     m_videoList = parse.parseRSS(m_document);
-}
 
-uint Search::parseNumResults(QDomDocument domDoc)
-{
-    QDomNodeList entries = domDoc.elementsByTagName("channel");
+    QDomNodeList entries = m_document.elementsByTagName("channel");
 
     if (entries.count() == 0)
-        return 0;
+    {
+        m_numResults = 0;
+        m_numReturned = 0;
+        m_numIndex = 0;
+        return;
+    }
 
     QDomNode itemNode = entries.item(0);
 
     QDomNode Node = itemNode.namedItem(QString("numresults"));
     if (!Node.isNull())
     {
-        return Node.toElement().text().toUInt();
+        m_numResults = Node.toElement().text().toUInt();
     }
     else
     {
-        QDomNodeList count = domDoc.elementsByTagName("item");
+        QDomNodeList count = m_document.elementsByTagName("item");
 
         if (count.count() == 0)
-            return 0;
+            m_numResults = 0;
         else
-            return count.count();
+            m_numResults = count.count();
     }
-}
 
-uint Search::parseNumReturned(QDomDocument domDoc)
-{
-    QDomNodeList entries = domDoc.elementsByTagName("channel");
-
-    if (entries.count() == 0)
-        return 0;
-
-    QDomNode itemNode = entries.item(0);
-
-    QDomNode Node = itemNode.namedItem(QString("returned"));
+    Node = itemNode.namedItem(QString("returned"));
     if (!Node.isNull())
     {
-        return Node.toElement().text().toUInt();
+        m_numReturned = Node.toElement().text().toUInt();
     }
     else
     {
-        QDomNodeList entries = domDoc.elementsByTagName("item");
+        QDomNodeList entries = m_document.elementsByTagName("item");
 
         if (entries.count() == 0)
-            return 0;
+            m_numReturned = 0;
         else
-            return entries.count();
+            m_numReturned = entries.count();
     }
-}
 
-uint Search::parseNumIndex(QDomDocument domDoc)
-{
-    QDomNodeList entries = domDoc.elementsByTagName("channel");
-
-    if (entries.count() == 0)
-        return 0;
-
-    QDomNode itemNode = entries.item(0);
-
-    QDomNode Node = itemNode.namedItem(QString("startindex"));
+    Node = itemNode.namedItem(QString("startindex"));
     if (!Node.isNull())
     {
-        return Node.toElement().text().toUInt();
+        m_numIndex = Node.toElement().text().toUInt();
     }
     else
-        return 0;
+        m_numIndex = 0;
+
 }
-
-//========================================================================================
-//          Manage video list
-//========================================================================================
-
-
-ResultVideo::resultList Search::GetVideoList()
-{
-    return m_videoList;
-}
-
 
 //========================================================================================
 //          Slots
@@ -190,8 +147,8 @@ ResultVideo::resultList Search::GetVideoList()
 
 void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus)
 {
-    if (m_timer)
-        m_timer->stop();
+    if (m_searchtimer)
+        m_searchtimer->stop();
 
     if ((exitstatus != QProcess::NormalExit) ||
         (exitcode != 0))
