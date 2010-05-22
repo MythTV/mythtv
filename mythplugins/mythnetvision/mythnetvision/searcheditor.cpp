@@ -187,7 +187,7 @@ void SearchEditor::fillGrabberButtonList()
             item->SetData(qVariantFromValue(*i));
             QString img = (*i)->GetImage();
             QString thumb;
-            if (!img.startsWith("/"))
+            if (!img.startsWith("/") && !img.isEmpty())
                 thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
                             .arg((*i)->GetImage());
             else
