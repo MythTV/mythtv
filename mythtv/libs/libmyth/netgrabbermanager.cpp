@@ -40,8 +40,7 @@ void GrabberScript::run()
 {
     QMutexLocker locker(&m_lock);
 
-    QString commandline = QString("%1internetcontent/%2").arg(GetShareDir())
-                              .arg(m_commandline);
+    QString commandline = m_commandline;
     m_getTree.setReadChannel(QProcess::StandardOutput);
 
     if (QFile(commandline).exists())

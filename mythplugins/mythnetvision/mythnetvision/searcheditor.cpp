@@ -185,7 +185,14 @@ void SearchEditor::fillGrabberButtonList()
         {
             item->SetText((*i)->GetTitle(), "title");
             item->SetData(qVariantFromValue(*i));
-            item->SetImage((*i)->GetImage());
+            QString img = (*i)->GetImage();
+            QString thumb;
+            if (!img.startsWith("/"))
+                thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                            .arg((*i)->GetImage());
+            else
+                thumb = img;
+            item->SetImage(thumb);
             item->setCheckable(true);
             item->setChecked(MythUIButtonListItem::NotChecked);
             QFileInfo fi((*i)->GetCommandline());

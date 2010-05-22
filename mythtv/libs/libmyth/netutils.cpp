@@ -95,10 +95,9 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline)
     }
 
     QString title = query.value(0).toString();
-    QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
-                        .arg(query.value(1).toString());
-    QFileInfo cmd(query.value(2).toString());
-    QString command = cmd.fileName();
+    QString image = query.value(1).toString();
+    QString command = QString("%1/internetcontent/%2").arg(GetShareDir())
+                        .arg(query.value(2).toString());
 
     GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
                                      command);
@@ -120,9 +119,9 @@ GrabberScript* findSearchGrabberByCommand(const QString& commandline)
     }
 
     QString title = query.value(0).toString();
-    QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
-                        .arg(query.value(1).toString());
-    QString command = query.value(2).toString();
+    QString image = query.value(1).toString();
+    QString command = QString("%1/internetcontent/%2").arg(GetShareDir())
+                        .arg(query.value(2).toString());
 
     GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
                                      command);
@@ -145,9 +144,9 @@ GrabberScript::scriptList findAllDBTreeGrabbers(void)
     while (query.next())
     {
         QString title = query.value(0).toString();
-        QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg(query.value(1).toString());
-        QString commandline = query.value(2).toString();
+        QString image = query.value(1).toString();
+        QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
+                            .arg(query.value(2).toString());
 
         GrabberScript *script = new GrabberScript(title, image, 0, 1,
                                          commandline);
@@ -173,9 +172,9 @@ GrabberScript::scriptList findAllDBSearchGrabbers(void)
     while (query.next())
     {
         QString title = query.value(0).toString();
-        QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg(query.value(1).toString());
-        QString commandline = query.value(2).toString();
+        QString image = query.value(1).toString();
+        QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
+                        .arg(query.value(2).toString());
 
         GrabberScript *script = new GrabberScript(title, image, 0, 1,
                                          commandline);

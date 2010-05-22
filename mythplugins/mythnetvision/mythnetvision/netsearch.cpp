@@ -293,8 +293,7 @@ GrabberScript::scriptList NetSearch::fillGrabberList()
         bool search = false;
         bool tree = false;
 
-        QString commandline = QString("%1internetcontent/%2")
-                                      .arg(GetShareDir()).arg(*i);
+        QString commandline = (*i);
         scriptCheck.setReadChannel(QProcess::StandardOutput);
         scriptCheck.start(commandline, QStringList() << "-v");
         scriptCheck.waitForFinished();
@@ -374,7 +373,9 @@ void NetSearch::fillGrabberButtonList()
         {
         item->SetText((*i)->GetTitle(), "title");
         item->SetData((*i)->GetCommandline());
-        item->SetImage((*i)->GetImage());
+        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                            .arg((*i)->GetImage());
+        item->SetImage(thumb);
         }
         else
             delete item;
@@ -418,8 +419,7 @@ void NetSearch::doSearch()
     m_pagenum = 1;
     m_maxpage = 1;
 
-    QString cmd = QString("%1internetcontent/%2").arg(GetShareDir())
-                      .arg(m_siteList->GetDataValue().toString());
+    QString cmd = m_siteList->GetDataValue().toString();
     QString grabber = m_siteList->GetItemCurrent()->GetText();
     QString query = m_search->GetText();
 

@@ -682,7 +682,9 @@ void NetTree::fillTree()
 
         MythGenericTree *ret = new MythGenericTree(
                    (*i)->GetTitle(), kSubFolder, false);
-        ret->SetData(qVariantFromValue((*i)->GetImage()));
+        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                            .arg((*i)->GetImage());
+        ret->SetData(qVariantFromValue(thumb));
 
         // Add an upfolder
         if (m_type != DLG_TREE)
