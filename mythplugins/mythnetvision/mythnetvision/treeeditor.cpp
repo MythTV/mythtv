@@ -106,7 +106,7 @@ GrabberScript::scriptList TreeEditor::fillGrabberList()
     QMutexLocker locker(&m_lock);
 
     GrabberScript::scriptList tmp;
-    QDir ScriptPath = QString("%1/mythnetvision/scripts/").arg(GetShareDir());
+    QDir ScriptPath = QString("%1/internetcontent/").arg(GetShareDir());
     QStringList Scripts = ScriptPath.entryList(QDir::Files | QDir::Executable);
 
     for (QStringList::const_iterator i = Scripts.begin();
@@ -117,7 +117,7 @@ GrabberScript::scriptList TreeEditor::fillGrabberList()
         bool search = false;
         bool tree = false;
 
-        QString commandline = QString("%1mythnetvision/scripts/%2")
+        QString commandline = QString("%1internetcontent/%2")
                                       .arg(GetShareDir()).arg(*i);
         scriptCheck.setReadChannel(QProcess::StandardOutput);
         scriptCheck.start(commandline, QStringList() << "-v");
