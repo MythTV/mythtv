@@ -418,7 +418,8 @@ void NetSearch::doSearch()
     m_pagenum = 1;
     m_maxpage = 1;
 
-    QString cmd = m_siteList->GetDataValue().toString();
+    QString cmd = QString("%1internetcontent/%2").arg(GetShareDir())
+                      .arg(m_siteList->GetDataValue().toString());
     QString grabber = m_siteList->GetItemCurrent()->GetText();
     QString query = m_search->GetText();
 
