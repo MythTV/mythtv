@@ -11,15 +11,15 @@
 #include <remoteutil.h>
 #include <remotefile.h>
 #include <mythprogressdialog.h>
+#include <rssparse.h>
+#include <netutils.h>
+#include <mythrssmanager.h>
+#include <netgrabbermanager.h>
 
 // mythnetvision
 #include "treeeditor.h"
-#include "rssparse.h"
 #include "nettree.h"
-#include "netutils.h"
 #include "rsseditor.h"
-#include "mythrssmanager.h"
-#include "netgrabbermanager.h"
 
 class ResultItem;
 class GrabberScript;

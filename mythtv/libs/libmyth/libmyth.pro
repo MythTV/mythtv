@@ -31,6 +31,8 @@ HEADERS += audiopulseutil.h       remoteutil.h
 HEADERS += rawsettingseditor.h    autodeletedeque.h
 HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
+HEADERS += mythrssmanager.h       netgrabbermanager.h
+HEADERS += rssparse.h             netutils.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h
@@ -55,6 +57,8 @@ SOURCES += audiopulseutil.cpp     remoteutil.cpp
 SOURCES += rawsettingseditor.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
 SOURCES += programtypes.cpp       recordingtypes.cpp
+SOURCES += mythrssmanager.cpp     netgrabbermanager.cpp
+SOURCES += rssparse.cpp           netutils.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp
@@ -99,6 +103,8 @@ inc.files += mythterminal.h mythdeque.h mythuifilebrowser.h
 inc.files += mythhttppool.h       remoteutil.h
 inc.files += programinfo.h        autodeletedeque.h
 inc.files += programtypes.h       recordingtypes.h
+inc.files += mythrssmanager.h     netgrabbermanager.h
+inc.files += rssparse.h           netutils.h
 
 # remove when everything is switched to mythui
 inc.files += virtualkeyboard_qt.h

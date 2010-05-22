@@ -1,23 +1,23 @@
 #ifndef NETTREE_H
 #define NETTREE_H
 
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/oldsettings.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
+#include <uitypes.h>
+#include <xmlparse.h>
+#include <oldsettings.h>
+#include <mythwidgets.h>
+#include <mythdialogs.h>
 
 // libmythui
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuibuttontree.h>
-#include <libmythui/mythgenerictree.h>
-#include <libmythui/mythuiprogressbar.h>
-#include <libmythui/mythuistatetype.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuibuttontree.h>
+#include <mythgenerictree.h>
+#include <mythuiprogressbar.h>
+#include <mythuistatetype.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
+#include <netgrabbermanager.h>
+#include <mythrssmanager.h>
 
-#include "netgrabbermanager.h"
-#include "mythrssmanager.h"
 #include "downloadmanager.h"
 #include "imagedownloadmanager.h"
 

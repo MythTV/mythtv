@@ -10,19 +10,17 @@ using namespace std;
 #include <QEventLoop>
 
 // libmyth headers
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdb.h"
-#include "mythverbose.h"
-#include "mythversion.h"
-#include "remoteutil.h"
-#include "util.h"
-#include "langsettings.h"
-
-#include "mythconfig.h"
-
-#include "../mythnetvision/netgrabbermanager.h"
-#include "../mythnetvision/mythrssmanager.h"
+#include <exitcodes.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythverbose.h>
+#include <mythversion.h>
+#include <remoteutil.h>
+#include <util.h>
+#include <langsettings.h>
+#include <mythconfig.h>
+#include <netgrabbermanager.h>
+#include <mythrssmanager.h>
 
 GrabberDownloadThread *gdt = 0;
 RSSManager *rssMan = 0;

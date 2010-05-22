@@ -10,10 +10,10 @@
 #include <mythpluginapi.h>
 #include <mythversion.h>
 #include <mythmainwindow.h>
+#include <netgrabbermanager.h>
+#include <mythrssmanager.h>
 
 // MythNetVision headers
-#include "netgrabbermanager.h"
-#include "mythrssmanager.h"
 #include "netsearch.h"
 #include "nettree.h"
 #include "treeeditor.h"

@@ -6,8 +6,7 @@
 
 // MythTV headers
 #include <mythscreentype.h>
-
-#include "netgrabbermanager.h"
+#include <netgrabbermanager.h>
 
 class MythUIButtonList;
 

@@ -14,15 +14,11 @@
 #include <util.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
-
-// Myth
 #include <mythdirs.h>
+#include <netutils.h>
 
 // Tree headers
 #include "treeeditor.h"
-#include "netutils.h"
-
-//#include "netgrabbermanager.h"
 
 #define LOC      QString("TreeEditor: ")
 #define LOC_WARN QString("TreeEditor, Warning: ")

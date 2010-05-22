@@ -18,11 +18,11 @@
 #include <mythprogressdialog.h>
 #include <storagegroup.h>
 #include <remotefile.h>
+#include <netgrabbermanager.h>
+#include <netutils.h>
+#include <rssparse.h>
 
-#include "netgrabbermanager.h"
 #include "netsearch.h"
-#include "netutils.h"
-#include "rssparse.h"
 #include "rsseditor.h"
 #include "searcheditor.h"
 

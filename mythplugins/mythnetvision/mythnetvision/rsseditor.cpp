@@ -13,15 +13,13 @@
 #include <util.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
-
-// Myth
 #include <httpcomms.h>
 #include <mythdirs.h>
+#include <netutils.h>
+#include <rssparse.h>
 
 // RSS headers
 #include "rsseditor.h"
-#include "netutils.h"
-#include "rssparse.h"
 
 #define LOC      QString("RSSEditor: ")
 #define LOC_WARN QString("RSSEditor, Warning: ")

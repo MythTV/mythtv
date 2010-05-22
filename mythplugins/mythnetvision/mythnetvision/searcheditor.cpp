@@ -10,14 +10,12 @@
 #include <mythdialogbox.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
-
-// Myth
 #include <mythdirs.h>
+#include <netutils.h>
+#include <netgrabbermanager.h>
 
 // Search headers
 #include "searcheditor.h"
-#include "netutils.h"
-#include "netgrabbermanager.h"
 
 #define LOC      QString("SearchEditor: ")
 #define LOC_WARN QString("SearchEditor, Warning: ")
