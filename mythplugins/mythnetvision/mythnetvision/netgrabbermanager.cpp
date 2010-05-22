@@ -345,7 +345,7 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
     }
     else
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR "Internet Search Successfully Completed");
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Successfully Completed");
 
         m_data = m_searchProcess->readAllStandardOutput();
         m_document.setContent(m_data, true);
@@ -358,7 +358,7 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
 
 void Search::slotSearchTimeout()
 {
-    VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR "Internet Search Timeout");
+    VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Timeout");
 
     if (m_searchProcess)
     {
