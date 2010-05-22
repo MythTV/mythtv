@@ -793,7 +793,7 @@ void showUsage()
     cout << "                                  1 - do check recording status (default)\n";
     cout << "                          0 - Idle\n";
     cout << "                          1 - Transcoding\n";
-    cout << "                          2 - Commercial Flagging\n";
+    cout << "                          2 - Commercial Detection\n";
     cout << "                          4 - Grabbing EPG data\n";
     cout << "                          8 - Recording - only valid if flag is 1\n";
     cout << "                         16 - Locked\n";

@@ -594,23 +594,23 @@ static GlobalCheckBox *JobsRunOnRecordHost()
 static GlobalCheckBox *AutoTranscodeBeforeAutoCommflag()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("AutoTranscodeBeforeAutoCommflag");
-    gc->setLabel(QObject::tr("Run Transcode Jobs before Auto-Commercial Flagging"));
+    gc->setLabel(QObject::tr("Run Transcode Jobs before Auto-Commercial Detection"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, if both auto-transcode and "
-                                "auto commercial flagging are turned ON for a "
+                                "auto commercial detection are turned ON for a "
                                 "recording, transcoding will run first, "
-                                "otherwise, commercial flagging runs first."));
+                                "otherwise, commercial detection runs first."));
     return gc;
 };
 
 static GlobalCheckBox *AutoCommflagWhileRecording()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("AutoCommflagWhileRecording");
-    gc->setLabel(QObject::tr("Start Auto-Commercial Flagging jobs when the "
+    gc->setLabel(QObject::tr("Start Auto-Commercial Detection jobs when the "
                              "recording starts"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set and Auto Commercial Flagging is ON for "
-                                "a recording, the flagging job will be started "
+    gc->setHelpText(QObject::tr("If set and Auto Commercial Detection is ON for "
+                                "a recording, the detection job will be started "
                                 "as soon as the recording starts.  NOT "
                                 "recommended on underpowered systems."));
     return gc;
@@ -669,7 +669,7 @@ static GlobalLineEdit *JobQueueTranscodeCommand()
 static GlobalLineEdit *JobQueueCommFlagCommand()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("JobQueueCommFlagCommand");
-    gc->setLabel(QObject::tr("Commercial Flagger command"));
+    gc->setLabel(QObject::tr("Commercial detection command"));
     gc->setValue("mythcommflag");
     gc->setHelpText(QObject::tr("The program used to detect commercials in a "
                     "recording.  The default is 'mythcommflag' "

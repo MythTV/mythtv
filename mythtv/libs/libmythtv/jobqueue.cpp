@@ -1708,7 +1708,7 @@ QString JobQueue::GetJobDescription(int jobType)
     if (jobType == JOB_TRANSCODE)
         return "Transcode";
     else if (jobType == JOB_COMMFLAG)
-        return "Commercial Flagging";
+        return "Commercial Detection";
     else if (!(jobType & JOB_USERJOB))
         return "Unknown Job";
 
@@ -2087,7 +2087,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
     if (!MSqlQuery::testDBConnection())
     {
-        QString msg = QString("Commercial Flagging failed.  Could not open "
+        QString msg = QString("Commercial Detection failed.  Could not open "
                               "new database connection for %1. "
                               "Program can not be flagged.")
                               .arg(details.constData());
@@ -2095,14 +2095,14 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
         ChangeJobStatus(jobID, JOB_ERRORED,
                         "Could not open new database connection for "
-                        "commercial flagger.");
+                        "commercial detector.");
 
         delete program_info;
         return;
     }
 
-    QString msg = tr("Commercial Flagging Starting");
-    VERBOSE(VB_GENERAL, LOC + "Commercial Flagging Starting for " + detailstr);
+    QString msg = tr("Commercial Detection Starting");
+    VERBOSE(VB_GENERAL, LOC + "Commercial Detection Starting for " + detailstr);
     gCoreContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
 
     int breaksFound = 0;
@@ -2176,7 +2176,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         }
     }
 
-    msg = tr("Commercial Flagging %1", "Job ID")
+    msg = tr("Commercial Detection %1", "Job ID")
         .arg(StatusText(GetJobStatus(jobID)));
 
     if (!comment.isEmpty())

@@ -251,7 +251,7 @@ class CommMethod : public ComboBoxSetting, public ChannelDBStorage
     CommMethod(const ChannelID &id) :
        ComboBoxSetting(this), ChannelDBStorage(this, id, "commmethod")
     {
-        setLabel(QObject::tr("Commercial Flagging Method"));
+        setLabel(QObject::tr("Commercial Detection Method"));
         setHelpText(QObject::tr("Changes the method of "
                "commercial detection used for recordings on this channel or "
                "skips detection by marking the channel as Commercial Free."));

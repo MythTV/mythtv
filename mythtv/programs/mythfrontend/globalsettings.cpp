@@ -466,7 +466,7 @@ static HostCheckBox *ExactSeeking()
 static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
-    bc->setLabel(QObject::tr("Commercial Flagging Method"));
+    bc->setLabel(QObject::tr("Commercial Detection Method"));
     bc->setHelpText(QObject::tr(
                         "This determines the method used by MythTV to "
                         "detect when commercials start and end."));
@@ -486,7 +486,7 @@ static HostComboBox *AutoCommercialSkip()
     gc->addSelection(QObject::tr("Notify, but do not skip"), "2");
     gc->addSelection(QObject::tr("Automatically Skip"), "1");
     gc->setHelpText(QObject::tr("Automatically skip commercial breaks that "
-                    "have been flagged during Automatic Commercial Flagging "
+                    "have been flagged during Automatic Commercial Detection "
                     "or by the mythcommflag program, or just notify that a "
                     "commercial has been detected."));
     return gc;
@@ -495,10 +495,10 @@ static HostComboBox *AutoCommercialSkip()
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
-    bc->setLabel(QObject::tr("Run commercial flagger"));
+    bc->setLabel(QObject::tr("Run commercial detection"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
-                    "Commercial Flagging setting when a new scheduled "
+                    "Commercial Detection setting when a new scheduled "
                     "recording is created."));
     return bc;
 }

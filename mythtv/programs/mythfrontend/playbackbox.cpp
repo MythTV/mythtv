@@ -2587,10 +2587,10 @@ void PlaybackBox::showPlaylistJobPopup(void)
         m_popupMenu->AddButton(tr("Stop Transcoding"),
                          SLOT(stopPlaylistTranscoding()));
     if (!isFlagging)
-        m_popupMenu->AddButton(tr("Begin Commercial Flagging"),
+        m_popupMenu->AddButton(tr("Begin Commercial Detection"),
                          SLOT(doPlaylistBeginFlagging()));
     else
-        m_popupMenu->AddButton(tr("Stop Commercial Flagging"),
+        m_popupMenu->AddButton(tr("Stop Commercial Detection"),
                          SLOT(stopPlaylistFlagging()));
 
     command = gCoreContext->GetSetting("UserJob1", "");
@@ -2777,7 +2777,7 @@ void PlaybackBox::showJobPopup()
     {
         // stop                         start
         tr("Stop Transcoding"),         tr("Begin Transcoding"),
-        tr("Stop Commercial Flagging"), tr("Begin Commercial Flagging"),
+        tr("Stop Commercial Detection"), tr("Begin Commercial Detection"),
         "1",                            "1",
         "2",                            "2",
         "3",                            "3",

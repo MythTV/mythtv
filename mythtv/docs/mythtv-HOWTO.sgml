@@ -3446,9 +3446,9 @@ limit is reached; either stop recording that series, or to delete the
 oldest episodes in favor of the new ones.
 
 <sect1>Post Recording Processing
-<sect2>Commercial Flagging
-<p>Select whether or not to automatically flag commercials for these
-recordings. Commercial Flagging parameters can be set in
+<sect2>Commercial Detection
+<p>Select whether or not to automatically detect commercials for these
+recordings. Commercial Detection parameters can be set in
 Setup->TV Settings->General.
 
 <sect2>Transcoding

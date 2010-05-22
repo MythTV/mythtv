@@ -2441,7 +2441,7 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
             else if (recusage == kTruncatingDeleteInUseID)
                 usageStr = QObject::tr("Delete");
             else if (recusage == kFlaggerInUseID)
-                usageStr = QObject::tr("Commercial Flagging");
+                usageStr = QObject::tr("Commercial Detection");
             else if (recusage == kTranscoderInUseID)
                 usageStr = QObject::tr("Transcoding");
 

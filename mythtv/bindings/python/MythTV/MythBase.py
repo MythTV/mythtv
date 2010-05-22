@@ -1792,7 +1792,7 @@ class MythLog( LOGLEVEL ):
  "  file         "  -  File and AutoExpire related messages 
  "  schedule     "  -  Scheduling related messages 
  "  network      "  -  Network protocol related messages 
- "  commflag     "  -  Commercial Flagging related messages 
+ "  commflag     "  -  Commercial detection related messages
  "  audio        "  -  Audio related messages 
  "  libav        "  -  Enables libav debugging 
  "  jobqueue     "  -  JobQueue related messages 
