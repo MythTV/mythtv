@@ -19,9 +19,9 @@
 #include <cstdio>
 #include <cerrno>
 #include <cmath>
+#include <cstdlib> // for abs(int)
 #include <unistd.h>
 #include <fcntl.h>
-#include <limits.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -674,12 +674,6 @@ bool BusyWaitVideoSync::TryInit(void)
     return true;
 }
 
-static int int_abs(int val)
-{
-    int xval = val < 0 ? -val : val;
-    return xval < 0 ? INT_MAX : xval;
-}
-
 void BusyWaitVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
@@ -705,7 +699,7 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
             m_delay = CalcDelay();
             cnt++;
         }
-        m_fudge = int_abs(m_delay / 2);
+        m_fudge = abs(m_delay / 2);
         if (cnt > 1)
             m_cheat -= 200;
     }
