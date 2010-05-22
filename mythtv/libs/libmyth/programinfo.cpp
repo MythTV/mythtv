@@ -1383,6 +1383,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["lentime"] = min_str;
     if (hours > 0 && minutes > 0)
     {
+        min_str = QObject::tr("%n minute(s)","",minutes);
         progMap["lentime"] = QString("%1 %2")
             .arg(QObject::tr("%n hour(s)","", hours))
             .arg(min_str);
