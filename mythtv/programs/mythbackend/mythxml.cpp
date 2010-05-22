@@ -1465,13 +1465,15 @@ void MythXML::GetInternetSearch( HTTPRequest *pRequest )
 
     search->process();
 
-    QString ret(search->GetData());
+    QDomDocument ret;
+    ret.setContent(search->GetData());
+
     delete search;
 
-    if (ret.isEmpty())
+    if (ret.isNull())
         return;
 
-    pRequest->FormatRawResponse( ret );
+    pRequest->FormatRawResponse( ret.toString() );
 }
 
 /////////////////////////////////////////////////////////////////////////////
