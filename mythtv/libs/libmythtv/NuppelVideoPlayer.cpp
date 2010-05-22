@@ -1449,13 +1449,38 @@ void NuppelVideoPlayer::AddTextData(unsigned char *buffer, int len,
     if (len > text_size)
         len = text_size;
 
+    int num_validcaptions = tbuffer_numvalid();
+    text_buflock.lock();
+    int prev_rtxt = (rtxt - 1 + MAXTBUFFER) % MAXTBUFFER;
+    /* Check whether the reader appears to be waiting on a caption
+       whose timestamp is too large.  We can guess this is the case
+       if we are adding a timestamp that is smaller than timestamp
+       being waited on but larger than the timestamp before that.
+       Note that even if the text buffer is full, the entry at index
+       rtxt-1 should still be valid.
+    */
+    if (num_validcaptions > 0 &&
+        txtbuffers[rtxt].timecode > timecode &&
+        timecode > txtbuffers[prev_rtxt].timecode)
+    {
+        /* If so, reset the timestamp that the reader is waiting on
+           to a value reasonably close to the previously read
+           timestamp.  This will probably cause one or more captions
+           to appear rapidly, but at least the captions won't
+           appear to be stuck.
+        */
+        VERBOSE(VB_VBI,
+                QString("Writing caption timecode %1 but waiting on %2")
+                .arg(timecode).arg(txtbuffers[rtxt].timecode));
+        txtbuffers[rtxt].timecode = txtbuffers[prev_rtxt].timecode + 500;
+    }
+
     txtbuffers[wtxt].timecode = timecode;
     txtbuffers[wtxt].type = type;
     txtbuffers[wtxt].len = len;
     memset(txtbuffers[wtxt].buffer, 0, text_size);
     memcpy(txtbuffers[wtxt].buffer, buffer, len);
 
-    text_buflock.lock();
     wtxt = (wtxt+1) % MAXTBUFFER;
     text_buflock.unlock();
 }
