@@ -391,9 +391,9 @@ void ProgDetails::loadPage(void)
 
     addItem("PROGRAMID", tr("Program ID"), m_progInfo.GetProgramID());
 
-    QString actors, director, producer, execProducer;
-    QString writer, guestStar, host, adapter;
-    QString presenter, commentator, guest;
+    QString actors, directors, producers, execProducers;
+    QString writers, guestStars, hosts, adapters;
+    QString presenters, commentators, guests;
 
     if (m_progInfo.GetScheduledEndTime() != m_progInfo.GetScheduledStartTime())
     {
@@ -415,8 +415,8 @@ void ProgDetails::loadPage(void)
 
         if (query.exec() && query.size() > 0)
         {
-            QString rstr, plist;
-            QString role, pname;
+            QStringList plist;
+            QString rstr, role, pname;
 
             while(query.next())
             {
@@ -439,72 +439,72 @@ void ProgDetails::loadPage(void)
                 pname = QString::fromUtf8(query.value(1)
                                           .toByteArray().constData());
 
-                if (rstr == role)
-                    plist += ", " + pname;
-                else
+                if (rstr != role)
                 {
                     if (rstr == "actor")
-                        actors = plist;
+                        actors = plist.join(", ");
                     else if (rstr == "director")
-                        director = plist;
+                        directors = plist.join(", ");
                     else if (rstr == "producer")
-                        producer = plist;
+                        producers = plist.join(", ");
                     else if (rstr == "executive_producer")
-                        execProducer = plist;
+                        execProducers = plist.join(", ");
                     else if (rstr == "writer")
-                        writer = plist;
+                        writers = plist.join(", ");
                     else if (rstr == "guest_star")
-                        guestStar = plist;
+                        guestStars = plist.join(", ");
                     else if (rstr == "host")
-                        host = plist;
+                        hosts = plist.join(", ");
                     else if (rstr == "adapter")
-                        adapter = plist;
+                        adapters = plist.join(", ");
                     else if (rstr == "presenter")
-                        presenter = plist;
+                        presenters = plist.join(", ");
                     else if (rstr == "commentator")
-                        commentator = plist;
+                        commentators = plist.join(", ");
                     else if (rstr == "guest")
-                        guest =  plist;
+                        guests =  plist.join(", ");
 
                     rstr = role;
-                    plist = pname;
+                    plist.clear();
                 }
+                
+                plist.append(pname);
             }
             if (rstr == "actor")
-                actors = plist;
+                actors = plist.join(", ");
             else if (rstr == "director")
-                director = plist;
+                directors = plist.join(", ");
             else if (rstr == "producer")
-                producer = plist;
+                producers = plist.join(", ");
             else if (rstr == "executive_producer")
-                execProducer = plist;
+                execProducers = plist.join(", ");
             else if (rstr == "writer")
-                writer = plist;
+                writers = plist.join(", ");
             else if (rstr == "guest_star")
-                guestStar = plist;
+                guestStars = plist.join(", ");
             else if (rstr == "host")
-                host = plist;
+                hosts = plist.join(", ");
             else if (rstr == "adapter")
-                adapter = plist;
+                adapters = plist.join(", ");
             else if (rstr == "presenter")
-                presenter = plist;
+                presenters = plist.join(", ");
             else if (rstr == "commentator")
-                commentator = plist;
+                commentators = plist.join(", ");
             else if (rstr == "guest")
-                guest =  plist;
+                guests =  plist.join(", ");
         }
     }
     addItem("ACTORS", tr("Actors"), actors);
-    addItem("DIRECTOR", tr("Director"), director);
-    addItem("PRODUCER", tr("Producer"), producer);
-    addItem("EXECUTIVE_PRODUCER", tr("Executive Producer"), execProducer);
-    addItem("WRITER", tr("Writer"), writer);
-    addItem("GUEST_STAR", tr("Guest Star"), guestStar);
-    addItem("HOST", tr("Host"), host);
-    addItem("ADAPTER", tr("Adapter"), adapter);
-    addItem("PRESENTER", tr("Presenter"), presenter);
-    addItem("COMMENTATOR", tr("Commentator"), commentator);
-    addItem("GUEST", tr("Guest"), guest);
+    addItem("DIRECTOR", tr("Director"), directors);
+    addItem("PRODUCER", tr("Producer"), producers);
+    addItem("EXECUTIVE_PRODUCER", tr("Executive Producer"), execProducers);
+    addItem("WRITER", tr("Writer"), writers);
+    addItem("GUEST_STAR", tr("Guest Star"), guestStars);
+    addItem("HOST", tr("Host"), hosts);
+    addItem("ADAPTER", tr("Adapter"), adapters);
+    addItem("PRESENTER", tr("Presenter"), presenters);
+    addItem("COMMENTATOR", tr("Commentator"), commentators);
+    addItem("GUEST", tr("Guest"), guests);
 
     // Begin MythTV information not found in the listings info
 //    msg += "<br>";
