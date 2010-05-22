@@ -188,7 +188,8 @@ void SearchEditor::fillGrabberButtonList()
             item->SetImage((*i)->GetImage());
             item->setCheckable(true);
             item->setChecked(MythUIButtonListItem::NotChecked);
-            if (findSearchGrabberInDB((*i)->GetCommandline()))
+            QFileInfo fi((*i)->GetCommandline());
+            if (findSearchGrabberInDB(fi.fileName()))
                 item->setChecked(MythUIButtonListItem::FullChecked);
         }
         else

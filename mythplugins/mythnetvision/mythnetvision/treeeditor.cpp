@@ -199,7 +199,8 @@ void TreeEditor::fillGrabberButtonList()
         item->SetImage((*i)->GetImage());
         item->setCheckable(true);
         item->setChecked(MythUIButtonListItem::NotChecked);
-        if (findTreeGrabberInDB((*i)->GetCommandline()))
+        QFileInfo fi((*i)->GetCommandline());
+        if (findTreeGrabberInDB(fi.fileName()))
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
         else
