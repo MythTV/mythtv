@@ -393,7 +393,9 @@ MythImage *MythVDPAUPainter::GetImageFromString(const QString &msg,
         }
     }
 
-    tmp.setPen(font.color());
+    QPen pen;
+    pen.setBrush(font.GetBrush());
+    tmp.setPen(pen);
     tmp.drawText(drawOffset.x(), drawOffset.y(), r.width(), r.height(),
                  flags, msg);
 

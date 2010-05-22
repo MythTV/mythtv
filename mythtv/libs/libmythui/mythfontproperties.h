@@ -3,6 +3,7 @@
 
 #include <QFont>
 #include <QColor>
+#include <QBrush>
 #include <QPoint>
 #include <QMap>
 
@@ -19,7 +20,8 @@ class MPUBLIC MythFontProperties: public XMLParseBase
     void SetOutline(bool on, const QColor &color, int size, int alpha);
 
     QFont face(void) const { return m_face; }
-    QColor color(void) const { return m_color; }
+    QColor color(void) const { return m_brush.color(); }
+    QBrush GetBrush(void) const { return m_brush; }
 
     bool hasShadow(void) const { return m_hasShadow; }
     void GetShadow(QPoint &offset, QColor &color, int &alpha) const;
@@ -43,7 +45,7 @@ class MPUBLIC MythFontProperties: public XMLParseBase
     void CalcHash(void);
 
     QFont   m_face;
-    QColor  m_color;
+    QBrush  m_brush;
 
     bool    m_hasShadow;
     QPoint  m_shadowOffset;

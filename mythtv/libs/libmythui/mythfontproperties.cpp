@@ -18,7 +18,7 @@
 #define LOC_ERR  QString("MythFontProperties, Error: ")
 
 MythFontProperties::MythFontProperties() :
-    m_color(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
+    m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
     m_hasOutline(false), m_outlineAlpha(255), m_bFreeze(false)
 {
     CalcHash();
@@ -32,7 +32,7 @@ void MythFontProperties::SetFace(const QFont &face)
 
 void MythFontProperties::SetColor(const QColor &color)
 {
-    m_color = color;
+    m_brush.setColor(color);
     CalcHash();
 }
 
@@ -81,7 +81,9 @@ void MythFontProperties::CalcHash(void)
         return;
 
     m_hash = QString("%1%2%3%4").arg(m_face.toString())
-                 .arg(m_color.name()).arg(m_hasShadow).arg(m_hasOutline);
+                                .arg(m_brush.color().name())
+                                .arg(m_hasShadow)
+                                .arg(m_hasOutline);
 
     if (m_hasShadow)
         m_hash += QString("%1%2%3%4").arg(m_shadowOffset.x())
@@ -238,7 +240,11 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             }
             else if (info.tagName() == "color")
             {
-                newFont->m_color = QColor(getFirstText(info));
+                newFont->m_brush = QBrush(QColor(getFirstText(info)));
+            }
+            else if (info.tagName() == "gradient")
+            {
+                newFont->m_brush = parseGradient(info);
             }
             else if (info.tagName() == "shadowcolor")
             {
@@ -448,7 +454,7 @@ bool FontMap::AddFont(const QString &text, MythFontProperties *font)
         fontProp oldf;
 
         oldf.face = font->m_face;
-        oldf.color = font->m_color;
+        oldf.color = font->m_brush.color();
         if (font->m_hasShadow)
         {
             oldf.dropColor = font->m_shadowColor;

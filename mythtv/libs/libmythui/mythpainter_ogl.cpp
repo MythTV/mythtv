@@ -457,7 +457,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         }
     }
 
-    tmp.setPen(font.color());
+    tmp.setPen(QPen(font.GetBrush(), 0));
     tmp.drawText(drawOffset.x(), drawOffset.y(), r.width(), r.height(),
                  flags, msg);
 
