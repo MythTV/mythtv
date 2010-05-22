@@ -117,7 +117,7 @@ class ResultItem
               const QString& download, const QStringList& downloadargs,
               const uint& width, const uint& height, const QString& language,
               const bool& downloadable, const QStringList& countries,
-              const uint& season, const uint& episode);
+              const uint& season, const uint& episode, const bool& customhtml);
     ResultItem();
     ~ResultItem();
 
@@ -144,6 +144,7 @@ class ResultItem
     const QStringList& GetCountries() const { return m_countries; }
     const uint& GetSeason() const { return m_season; }
     const uint& GetEpisode() const { return m_episode; }
+    const bool& GetCustomHTML() const { return m_customhtml; }
 
   private:
     QString      m_title;
@@ -167,6 +168,7 @@ class ResultItem
     QStringList  m_countries;
     uint         m_season;
     uint         m_episode;
+    bool         m_customhtml;
 };
 Q_DECLARE_METATYPE(ResultItem*)
 

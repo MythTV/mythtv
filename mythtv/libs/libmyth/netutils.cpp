@@ -380,11 +380,11 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
                   " title, description, url, thumbnail, mediaURL, author, "
                   "date, time, rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, downloadable, countries, "
-                  "season, episode) "
+                  "season, episode, customhtml) "
             "VALUES( :FEEDTITLE, :PATH, :PATHTHUMB, :TITLE, :DESCRIPTION, :URL, "
             ":THUMBNAIL, :MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, :FILESIZE, "
             ":PLAYER, :PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
-            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :SEASON, :EPISODE);");
+            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :SEASON, :EPISODE, :HTML);");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":PATH", path);
     query.bindValue(":PATHTHUMB", paththumb);
@@ -414,6 +414,7 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":COUNTRIES", item->GetCountries().join(" "));
     query.bindValue(":SEASON", item->GetSeason());
     query.bindValue(":EPISODE", item->GetEpisode());
+    query.bindValue(":HTML", item->GetCustomHTML());
 
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: inserting article in DB", query);
@@ -433,7 +434,7 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
                   "downloadable, countries, season, episode, "
-                  "path, paththumb FROM netvisiontreeitems "
+                  "path, paththumb, customhtml FROM netvisiontreeitems "
                   "WHERE feedtitle = :FEEDTITLE ORDER BY title DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
     if (!query.exec() || !query.isActive()) {
@@ -467,13 +468,14 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
 
         QString     path = query.value(21).toString();
         QString     paththumb = query.value(22).toString();
+        bool        customhtml = query.value(23).toBool();
 
         QPair<QString,QString> pair(path,paththumb);
         ret.insert(pair, new ResultItem(title, desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
                    width, height, language, downloadable, countries,
-                   season, episode));
+                   season, episode, customhtml));
     }
 
     return ret;
@@ -740,7 +742,7 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle)
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
                    width, height, language, downloadable, countries,
-                   season, episode));
+                   season, episode, false));
     }
 
     return ret;

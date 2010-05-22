@@ -247,7 +247,7 @@ void RSSSite::process(void)
                (*i)->GetDownloadable(),
                (*i)->GetCountries(),
                (*i)->GetSeason(),
-               (*i)->GetEpisode()));
+               (*i)->GetEpisode(), false));
         }
         emit finished(this);
     }

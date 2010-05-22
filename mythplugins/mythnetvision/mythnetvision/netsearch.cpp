@@ -869,7 +869,7 @@ void NetSearch::slotItemChanged()
         ResultItem *res = new ResultItem(item->GetText(), QString(),
               QString(), QString(), QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0);
+              0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
         res->toMap(metadataMap);

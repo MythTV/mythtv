@@ -11,9 +11,8 @@
 
 #include "rssparse.h"
 #include "netutils.h"
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
+#include "mythcontext.h"
+#include "mythdirs.h"
 
 using namespace std;
 
@@ -27,7 +26,7 @@ ResultItem::ResultItem(const QString& title, const QString& desc,
               const uint& width, const uint& height,
               const QString& language, const bool& downloadable,
               const QStringList& countries, const uint& season,
-              const uint& episode)
+              const uint& episode, const bool& customhtml)
 {
     m_title = title;
     m_desc = desc;
@@ -50,6 +49,7 @@ ResultItem::ResultItem(const QString& title, const QString& desc,
     m_countries = countries;
     m_season = season;
     m_episode = episode;
+    m_customhtml = customhtml;
 }
 
 ResultItem::ResultItem()
@@ -732,6 +732,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     QDateTime date;
     QStringList playerargs, downloadargs, countries;
     bool downloadable = true;
+    bool customhtml = false;
 
     // Get the title of the article/video
     title = item.firstChildElement("title").text();
@@ -854,6 +855,16 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
         episode = ep.at(0).toElement().text().toUInt();
     }
 
+    // Does this grabber return custom HTML?
+    QDomNodeList html = item.elementsByTagNameNS(MythRSS, "customhtml");
+    if (html.size())
+    {
+        QString htmlstring = html.at(0).toElement().text();
+        if (htmlstring.toLower().contains("true") || htmlstring == "1" ||
+            htmlstring.toLower().contains("yes"))
+            customhtml = true;
+    }
+
     QList<MRSSEntry> enclosures = GetMediaRSS(item);
 
     if (enclosures.size())
@@ -905,7 +916,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
               rating, filesize, player, playerargs,
               download, downloadargs, width, height,
               language, downloadable, countries, season,
-              episode));
+              episode, customhtml));
 }
 
 QString Parse::GetLink(const QDomElement& parent) const

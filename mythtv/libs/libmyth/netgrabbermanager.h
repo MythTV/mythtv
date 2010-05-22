@@ -132,6 +132,8 @@ class Search : public QObject
                        uint pagenum = 1);
     void process(void);
 
+    QByteArray GetData() { return m_data; };
+
     uint numResults() { return m_numResults; };
     uint numReturned() { return m_numReturned; };
     uint numIndex() { return m_numIndex; };

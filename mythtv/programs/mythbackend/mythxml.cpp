@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QRegExp>
 #include <QBuffer>
+#include <QEventLoop>
 
 #include "mythxml.h"
 #include "backendutil.h"
@@ -23,11 +24,16 @@
 #include "util.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
+#include "mythdirs.h"
 
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "mythconfig.h"
 #include "programinfo.h"
+
+#include "rssparse.h"
+#include "netutils.h"
+#include "netgrabbermanager.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -93,26 +99,27 @@ MythXML::~MythXML()
 
 MythXMLMethod MythXML::GetMethod( const QString &sURI )
 {
-    if (sURI == "GetServDesc"          ) return MXML_GetServiceDescription;
+    if (sURI == "GetServDesc"           ) return MXML_GetServiceDescription;
 
-    if (sURI == "GetProgramGuide"      ) return MXML_GetProgramGuide;
-    if (sURI == "GetProgramDetails"    ) return MXML_GetProgramDetails;
+    if (sURI == "GetProgramGuide"       ) return MXML_GetProgramGuide;
+    if (sURI == "GetProgramDetails"     ) return MXML_GetProgramDetails;
 
-    if (sURI == "GetHosts"             ) return MXML_GetHosts;
-    if (sURI == "GetKeys"              ) return MXML_GetKeys;
-    if (sURI == "GetSetting"           ) return MXML_GetSetting;
-    if (sURI == "PutSetting"           ) return MXML_PutSetting;
+    if (sURI == "GetHosts"              ) return MXML_GetHosts;
+    if (sURI == "GetKeys"               ) return MXML_GetKeys;
+    if (sURI == "GetSetting"            ) return MXML_GetSetting;
+    if (sURI == "PutSetting"            ) return MXML_PutSetting;
 
-    if (sURI == "GetChannelIcon"       ) return MXML_GetChannelIcon;
-    if (sURI == "GetAlbumArt"          ) return MXML_GetAlbumArt;
-    if (sURI == "GetRecorded"          ) return MXML_GetRecorded;
-    if (sURI == "GetExpiring"          ) return MXML_GetExpiring;
-    if (sURI == "GetPreviewImage"      ) return MXML_GetPreviewImage;
-    if (sURI == "GetRecording"         ) return MXML_GetRecording;
-    if (sURI == "GetVideo"             ) return MXML_GetVideo;
-    if (sURI == "GetMusic"             ) return MXML_GetMusic;
-    if (sURI == "GetConnectionInfo"    ) return MXML_GetConnectionInfo;
-    if (sURI == "GetVideoArt"          ) return MXML_GetVideoArt;
+    if (sURI == "GetChannelIcon"        ) return MXML_GetChannelIcon;
+    if (sURI == "GetAlbumArt"           ) return MXML_GetAlbumArt;
+    if (sURI == "GetRecorded"           ) return MXML_GetRecorded;
+    if (sURI == "GetExpiring"           ) return MXML_GetExpiring;
+    if (sURI == "GetPreviewImage"       ) return MXML_GetPreviewImage;
+    if (sURI == "GetRecording"          ) return MXML_GetRecording;
+    if (sURI == "GetVideo"              ) return MXML_GetVideo;
+    if (sURI == "GetMusic"              ) return MXML_GetMusic;
+    if (sURI == "GetConnectionInfo"     ) return MXML_GetConnectionInfo;
+    if (sURI == "GetVideoArt"           ) return MXML_GetVideoArt;
+    if (sURI == "GetInternetSearch"     ) return MXML_GetInternetSearch;
 
     return MXML_Unknown;
 }
@@ -136,6 +143,11 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
             {
                 pRequest->m_sBaseUrl = m_sControlUrl;
                 pRequest->m_sMethod = "GetVideoArt";
+            }
+            else if (pRequest->m_sBaseUrl == "/Myth/GetInternetSearch")
+            {
+                pRequest->m_sBaseUrl = m_sControlUrl;
+                pRequest->m_sMethod = "GetInternetSearch";
             }
 
             if (pRequest->m_sBaseUrl != m_sControlUrl)
@@ -192,6 +204,10 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
                     return true;
                 case MXML_GetVideo             :
                     GetVideo       ( pThread, pRequest );
+                    return true;
+
+                case MXML_GetInternetSearch :
+                    GetInternetSearch( pRequest );
                     return true;
 
                 case MXML_GetConnectionInfo    :
@@ -1405,6 +1421,57 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
         pRequest->m_eResponseType   = ResponseTypeFile;
         pRequest->m_nResponseStatus = 200;
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void MythXML::GetInternetSearch( HTTPRequest *pRequest )
+{
+    pRequest->m_eResponseType   = ResponseTypeHTML;
+
+    QString grabber =  pRequest->m_mapParams[ "Grabber" ];
+    QString query   =  pRequest->m_mapParams[ "Query" ];
+    QString page    =  pRequest->m_mapParams[ "Page" ];
+
+    if (grabber.isEmpty() || query.isEmpty() || page.isEmpty())
+        return;
+
+    uint pagenum = page.toUInt();
+    QString command = QString("%1internetcontent/%2").arg(GetShareDir())
+                        .arg(grabber);
+
+    if (!QFile::exists(command))
+    {
+        pRequest->FormatRawResponse( QString("<HTML>Grabber %1 does "
+                  "not exist!</HTML>").arg(command) );
+        return;
+    }
+
+    VERBOSE(VB_GENERAL, QString("MythXML::GetInternetSearch Executing "
+            "Command: %1 -S -p %2 %3").arg(command).arg(pagenum).arg(query));
+
+    Search *search = new Search();
+    QEventLoop loop;
+
+    QObject::connect(search, SIGNAL(finishedSearch(Search *)),
+                     &loop, SLOT(quit(void)));
+    QObject::connect(search, SIGNAL(searchTimedOut(Search *)),
+                     &loop, SLOT(quit(void)));
+
+    search->executeSearch(command, query, pagenum);
+    loop.exec();
+
+    search->process();
+
+    QString ret(search->GetData());
+    delete search;
+
+    if (ret.isEmpty())
+        return;
+
+    pRequest->FormatRawResponse( ret );
 }
 
 /////////////////////////////////////////////////////////////////////////////

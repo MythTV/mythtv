@@ -52,7 +52,8 @@ typedef enum
 
     MXML_GetConnectionInfo      = 15,
     MXML_GetAlbumArt            = 16,
-    MXML_GetVideoArt            = 17
+    MXML_GetVideoArt            = 17,
+    MXML_GetInternetSearch      = 18
 
 } MythXMLMethod;
 
@@ -117,6 +118,7 @@ class MythXML : public Eventing
         void    GetVideo       ( HttpWorkerThread *pThread,
                                  HTTPRequest      *pRequest );
 
+        void    GetInternetSearch( HTTPRequest *pRequest );
 
         void    GetDeviceDesc  ( HTTPRequest *pRequest );
         void    GetFile        ( HTTPRequest *pRequest, QString sFileName );
