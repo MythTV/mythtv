@@ -28,7 +28,7 @@ DownloadManager::~DownloadManager()
     wait();
 }
 
-void DownloadManager::addDL(ResultVideo *video)
+void DownloadManager::addDL(ResultItem *video)
 {
     // Add a file to the list of videos
     m_mutex.lock();
@@ -115,7 +115,7 @@ bool DownloadManager::moreWork()
     return result;
 }
 
-QString DownloadManager::getDownloadFilename(ResultVideo *item)
+QString DownloadManager::getDownloadFilename(ResultItem *item)
 {
     QByteArray urlarr(item->GetMediaURL().toLatin1());
     quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());

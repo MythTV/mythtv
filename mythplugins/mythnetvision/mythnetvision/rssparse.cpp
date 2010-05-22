@@ -17,7 +17,7 @@
 
 using namespace std;
 
-ResultVideo::ResultVideo(const QString& title, const QString& desc,
+ResultItem::ResultItem(const QString& title, const QString& desc,
               const QString& URL, const QString& thumbnail,
               const QString& mediaURL, const QString& author,
               const QDateTime& date, const QString& time,
@@ -52,15 +52,15 @@ ResultVideo::ResultVideo(const QString& title, const QString& desc,
     m_episode = episode;
 }
 
-ResultVideo::ResultVideo()
+ResultItem::ResultItem()
 {
 }
 
-ResultVideo::~ResultVideo()
+ResultItem::~ResultItem()
 {
 }
 
-void ResultVideo::toMap(MetadataMap &metadataMap)
+void ResultItem::toMap(MetadataMap &metadataMap)
 {
     metadataMap["title"] = m_title;
     metadataMap["description"] = m_desc;
@@ -700,9 +700,9 @@ Parse::~Parse()
 {
 }
 
-ResultVideo::resultList Parse::parseRSS(QDomDocument domDoc)
+ResultItem::resultList Parse::parseRSS(QDomDocument domDoc)
 {
-    ResultVideo::resultList vList;
+    ResultItem::resultList vList;
 
     QString document = domDoc.toString();
     VERBOSE(VB_GENERAL|VB_EXTRA, QString("Will Be Parsing: %1").arg(document));
@@ -723,7 +723,7 @@ ResultVideo::resultList Parse::parseRSS(QDomDocument domDoc)
     return vList;
 }
 
-ResultVideo* Parse::ParseItem(const QDomElement& item) const
+ResultItem* Parse::ParseItem(const QDomElement& item) const
 {
     QString title, description, url, author, duration, rating,
             thumbnail, mediaURL, player, language, download;
@@ -900,7 +900,7 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
     if (mediaURL.isNull() || mediaURL == url)
         downloadable = false;
 
-    return(new ResultVideo(title, description, url, thumbnail,
+    return(new ResultItem(title, description, url, thumbnail,
               mediaURL, author, date, duration,
               rating, filesize, player, playerargs,
               download, downloadargs, width, height,

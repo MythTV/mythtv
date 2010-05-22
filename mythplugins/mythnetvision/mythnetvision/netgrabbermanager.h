@@ -136,7 +136,7 @@ class Search : public QObject
     uint numReturned() { return m_numReturned; };
     uint numIndex() { return m_numIndex; };
 
-    ResultVideo::resultList GetVideoList() { return m_videoList; };
+    ResultItem::resultList GetVideoList() { return m_videoList; };
 
   private:
 
@@ -145,7 +145,7 @@ class Search : public QObject
     QByteArray              m_data;
     QDomDocument            m_document;
     QTimer                 *m_searchtimer;
-    ResultVideo::resultList m_videoList;
+    ResultItem::resultList m_videoList;
 
     uint                    m_numResults;
     uint                    m_numReturned;

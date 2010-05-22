@@ -55,8 +55,8 @@ class NetTree : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void populateResultList(ResultVideo::resultList list);
-    QString getDownloadFilename(ResultVideo *item);
+    void populateResultList(ResultItem::resultList list);
+    QString getDownloadFilename(ResultItem *item);
 
   public slots:
 
@@ -78,7 +78,7 @@ class NetTree : public MythScreenType
     void buildGenericTree(MythGenericTree *dst,
                           QStringList paths,
                           QString dirthumb,
-                          QList<ResultVideo*> videos);
+                          QList<ResultItem*> videos);
 
     void cleanCacheDir(void);
 
@@ -86,12 +86,12 @@ class NetTree : public MythScreenType
                     MythGenericTree *where_to_add,
                     QString name, QString thumbnail);
     int AddFileNode(MythGenericTree *where_to_add,
-                    ResultVideo *video);
+                    ResultItem *video);
 
     void switchView(void);
 
     // Only to keep track of what to delete
-    QList<ResultVideo*> m_videos;
+    QList<ResultItem*> m_videos;
 
     MythUIButtonTree   *m_siteMap;
     MythUIButtonList   *m_siteButtonList;

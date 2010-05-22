@@ -370,7 +370,7 @@ bool isTreeInUse(const QString &feedtitle)
 }
 
 bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
-                       const QString &paththumb, ResultVideo *item)
+                       const QString &paththumb, ResultItem *item)
 {
     if (!item || feedtitle.isEmpty() || path.isEmpty())
         return false;
@@ -423,9 +423,9 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     return (query.numRowsAffected() > 0);
 }
 
-QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &feedtitle)
+QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &feedtitle)
 {
-    QMultiMap<QPair<QString,QString>, ResultVideo*> ret;
+    QMultiMap<QPair<QString,QString>, ResultItem*> ret;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title, description, url, "
@@ -469,7 +469,7 @@ QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &f
         QString     paththumb = query.value(22).toString();
 
         QPair<QString,QString> pair(path,paththumb);
-        ret.insert(pair, new ResultVideo(title, desc, URL, thumbnail,
+        ret.insert(pair, new ResultItem(title, desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
                    width, height, language, downloadable, countries,
@@ -642,7 +642,7 @@ bool clearRSSArticles(const QString &feedtitle)
     return (query.numRowsAffected() > 0);
 }
 
-bool insertArticleInDB(const QString &feedtitle, ResultVideo *item)
+bool insertArticleInDB(const QString &feedtitle, ResultItem *item)
 {
     if (!item || feedtitle.isEmpty())
         return false;
@@ -693,9 +693,9 @@ bool insertArticleInDB(const QString &feedtitle, ResultVideo *item)
     return (query.numRowsAffected() > 0);
 }
 
-ResultVideo::resultList getRSSArticles(const QString &feedtitle)
+ResultItem::resultList getRSSArticles(const QString &feedtitle)
 {
-    ResultVideo::resultList ret;
+    ResultItem::resultList ret;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title, description, url, "
@@ -736,7 +736,7 @@ ResultVideo::resultList getRSSArticles(const QString &feedtitle)
         uint        season = query.value(19).toUInt();
         uint        episode = query.value(20).toUInt();
 
-        ret.append(new ResultVideo(title, desc, URL, thumbnail,
+        ret.append(new ResultItem(title, desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
                    width, height, language, downloadable, countries,

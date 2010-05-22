@@ -34,10 +34,10 @@ class DownloadManager : public QThread
     DownloadManager(QObject *parent);
     ~DownloadManager();
 
-    void addDL(ResultVideo *video);
+    void addDL(ResultItem *video);
     void cancel();
 
-    QString getDownloadFilename(ResultVideo *item);
+    QString getDownloadFilename(ResultItem *item);
 
   protected:
 

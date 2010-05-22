@@ -38,8 +38,8 @@ class NetSearch : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void populateResultList(ResultVideo::resultList list);
-    QString getDownloadFilename(ResultVideo *item);
+    void populateResultList(ResultItem::resultList list);
+    QString getDownloadFilename(ResultItem *item);
 
   public slots:
 
@@ -85,7 +85,7 @@ class NetSearch : public MythScreenType
 
     GrabberScript::scriptList m_grabberList;
     RSSSite::rssList    m_rssList;
-    QMap<MythUIButtonListItem*,ResultVideo> m_rssitems;
+    QMap<MythUIButtonListItem*,ResultItem> m_rssitems;
     DialogType          m_dialogType;
 
     mutable QMutex      m_lock;

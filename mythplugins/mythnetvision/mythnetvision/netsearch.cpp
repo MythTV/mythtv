@@ -228,8 +228,8 @@ void NetSearch::showMenu(void)
 
         if (m_searchResultList->GetCount() > 0)
         {
-            ResultVideo *item =
-                  qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
+            ResultItem *item =
+                  qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
             QString filename;
             bool exists;
@@ -513,7 +513,7 @@ void NetSearch::searchFinished(Search *item)
                         .arg(QString::number(m_pagenum))
                         .arg(QString::number(m_maxpage)));
 
-    ResultVideo::resultList list = item->GetVideoList();
+    ResultItem::resultList list = item->GetVideoList();
     populateResultList(list);
 }
 
@@ -546,11 +546,11 @@ void NetSearch::searchTimeout(Search *)
     }
 }
 
-void NetSearch::populateResultList(ResultVideo::resultList list)
+void NetSearch::populateResultList(ResultItem::resultList list)
 {
     QMutexLocker locker(&m_lock);
 
-    for (ResultVideo::resultList::iterator i = list.begin();
+    for (ResultItem::resultList::iterator i = list.begin();
             i != list.end(); ++i)
     {
         QString title = (*i)->GetTitle();
@@ -612,8 +612,8 @@ void NetSearch::showWebVideo()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item =
-        qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
+    ResultItem *item =
+        qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
     if (!item)
         return;
@@ -684,8 +684,8 @@ void NetSearch::doPlayVideo()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item =
-          qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
+    ResultItem *item =
+          qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
     if (!item)
         return;
@@ -719,8 +719,8 @@ void NetSearch::doDeleteVideo(bool remove)
     if (!remove)
         return;
 
-    ResultVideo *item =
-          qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
+    ResultItem *item =
+          qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
     if (!item)
         return;
@@ -768,8 +768,8 @@ void NetSearch::doDownloadAndPlay()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item =
-          qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
+    ResultItem *item =
+          qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
     if (!item)
         return;
@@ -832,8 +832,8 @@ void NetSearch::slotItemChanged()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item =
-              qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
+    ResultItem *item =
+              qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
@@ -866,7 +866,7 @@ void NetSearch::slotItemChanged()
     {
         MythUIButtonListItem *item = m_siteList->GetItemCurrent();
 
-        ResultVideo *res = new ResultVideo(item->GetText(), QString(),
+        ResultItem *res = new ResultItem(item->GetText(), QString(),
               QString(), QString(), QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0);
@@ -912,7 +912,7 @@ void NetSearch::slotDownloadFinished()
        m_progress->SetVisible(false);
 }
 
-QString NetSearch::getDownloadFilename(ResultVideo *item)
+QString NetSearch::getDownloadFilename(ResultItem *item)
 {
     QByteArray urlarr(item->GetMediaURL().toLatin1());
     quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());

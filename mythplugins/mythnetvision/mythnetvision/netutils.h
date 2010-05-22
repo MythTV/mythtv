@@ -27,8 +27,8 @@ QDateTime lastUpdate(GrabberScript* script);
 bool clearTreeItems(const QString &feedtitle);
 bool isTreeInUse(const QString &feedtitle);
 bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
-                       const QString &paththumb, ResultVideo *item);
-QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &feedtitle);
+                       const QString &paththumb, ResultItem *item);
+QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &feedtitle);
 
 bool insertTreeInDB(GrabberScript *script);
 bool insertTreeInDB(const QString &name, const QString &thumbnail,
@@ -58,7 +58,7 @@ bool removeFromDB(const QString &url);
 
 void markUpdated(RSSSite *site);
 bool clearRSSArticles(const QString &feedtitle);
-bool insertArticleInDB(const QString &feedtitle, ResultVideo *item);
-ResultVideo::resultList getRSSArticles(const QString &feedtitle);
+bool insertArticleInDB(const QString &feedtitle, ResultItem *item);
+ResultItem::resultList getRSSArticles(const QString &feedtitle);
 
 #endif // NETUTILS_H_

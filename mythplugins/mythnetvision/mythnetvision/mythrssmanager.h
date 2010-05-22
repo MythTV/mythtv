@@ -61,10 +61,10 @@ class RSSSite : public QObject
 
     unsigned int timeSinceLastUpdate(void) const; // in minutes
 
-    void insertRSSArticle(ResultVideo *item);
+    void insertRSSArticle(ResultItem *item);
     void clearRSSArticles(void);
 
-    ResultVideo::resultList GetVideoList(void) const;
+    ResultItem::resultList GetVideoList(void) const;
 
     void retrieve(void);
     void stop(void);
@@ -90,7 +90,7 @@ class RSSSite : public QObject
     QString    m_imageURL;
     bool       m_podcast;
 
-    ResultVideo::resultList m_articleList;
+    ResultItem::resultList m_articleList;
 
     QNetworkReply          *m_reply;
     QNetworkAccessManager  *m_manager;

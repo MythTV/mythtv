@@ -21,7 +21,7 @@
 #include "mythrssmanager.h"
 #include "netgrabbermanager.h"
 
-class ResultVideo;
+class ResultItem;
 class GrabberScript;
 
 const QString NetTree::RSSNode = tr("RSS Feeds");
@@ -285,7 +285,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         return;
 
     RSSSite *site = qVariantValue<RSSSite *>(node->GetData());
-    ResultVideo *video = qVariantValue<ResultVideo *>(node->GetData());
+    ResultItem *video = qVariantValue<ResultItem *>(node->GetData());
 
     int nodeInt = node->getInt();
 
@@ -481,15 +481,15 @@ void NetTree::showMenu(void)
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
                                                     "mythnettreemenupopup");
 
-    ResultVideo *item = NULL;
+    ResultItem *item = NULL;
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
 
         if (node)
-            item = qVariantValue<ResultVideo *>(node->GetData());
+            item = qVariantValue<ResultItem *>(node->GetData());
     }
 
     if (menuPopup->Create())
@@ -641,7 +641,7 @@ void NetTree::fillTree()
     RSSSite::rssList::iterator i = m_rssList.begin();
     for (; i != m_rssList.end(); ++i)
     {
-        ResultVideo::resultList items =
+        ResultItem::resultList items =
                    getRSSArticles((*i)->GetTitle());
         MythGenericTree *ret = new MythGenericTree(
                    (*i)->GetTitle(), kSubFolder, false);
@@ -654,7 +654,7 @@ void NetTree::fillTree()
             ret->addNode(QString(tr("Back")), kUpFolder, true, false);
         }
 
-        ResultVideo::resultList::iterator it = items.begin();
+        ResultItem::resultList::iterator it = items.begin();
         for (; it != items.end(); ++it)
         {
             AddFileNode(ret, *it);
@@ -675,7 +675,7 @@ void NetTree::fillTree()
             i != m_grabberList.end(); ++i)
     {
 
-        QMultiMap<QPair<QString,QString>, ResultVideo*> treePathsNodes =
+        QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
                            getTreeArticles((*i)->GetTitle());
 
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
@@ -695,7 +695,7 @@ void NetTree::fillTree()
         {
             QStringList curPaths = (*i).first.split("/");
             QString dirthumb = (*i).second;
-            QList<ResultVideo*> videos = treePathsNodes.values(*i);
+            QList<ResultItem*> videos = treePathsNodes.values(*i);
             buildGenericTree(ret, curPaths, dirthumb, videos);
         }
         m_siteGeneric->addNode(ret);
@@ -703,7 +703,7 @@ void NetTree::fillTree()
 }
 
 void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
-                               QString dirthumb, QList<ResultVideo*> videos)
+                               QString dirthumb, QList<ResultItem*> videos)
 {
     MythGenericTree *folder = NULL;
 
@@ -739,7 +739,7 @@ void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
     else
     {
         // File Handling
-        for (QList<ResultVideo*>::iterator it = videos.begin();
+        for (QList<ResultItem*>::iterator it = videos.begin();
                 it != videos.end(); ++it)
             AddFileNode(folder, *it);
     }
@@ -756,7 +756,7 @@ MythGenericTree *NetTree::AddDirNode(MythGenericTree *where_to_add,
     return sub_node;
 }
 
-int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultVideo *video)
+int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
 {
     QString title = video->GetTitle();
     title.replace("&amp;", "&");
@@ -771,10 +771,10 @@ void NetTree::showWebVideo()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item;
+    ResultItem *item;
 
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
@@ -782,7 +782,7 @@ void NetTree::showWebVideo()
         if (!node)
             return;
 
-        item = qVariantValue<ResultVideo *>(node->GetData());
+        item = qVariantValue<ResultItem *>(node->GetData());
     }
 
     if (!item)
@@ -854,9 +854,9 @@ void NetTree::doPlayVideo()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item;
+    ResultItem *item;
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
@@ -864,7 +864,7 @@ void NetTree::doPlayVideo()
         if (!node)
             return;
 
-        item = qVariantValue<ResultVideo *>(node->GetData());
+        item = qVariantValue<ResultItem *>(node->GetData());
     }
 
     if (!item)
@@ -899,9 +899,9 @@ void NetTree::doDeleteVideo(bool remove)
     if (!remove)
         return;
 
-    ResultVideo *item;
+    ResultItem *item;
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
@@ -909,7 +909,7 @@ void NetTree::doDeleteVideo(bool remove)
         if (!node)
             return;
 
-        item = qVariantValue<ResultVideo *>(node->GetData());
+        item = qVariantValue<ResultItem *>(node->GetData());
     }
 
     if (!item)
@@ -930,9 +930,9 @@ void NetTree::doDownloadAndPlay()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item;
+    ResultItem *item;
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
@@ -940,7 +940,7 @@ void NetTree::doDownloadAndPlay()
         if (!node)
             return;
 
-        item = qVariantValue<ResultVideo *>(node->GetData());
+        item = qVariantValue<ResultItem *>(node->GetData());
     }
 
     if (!item)
@@ -985,7 +985,7 @@ void NetTree::doDownloadAndPlay()
         m_download->start();
 }
 
-QString NetTree::getDownloadFilename(ResultVideo *item)
+QString NetTree::getDownloadFilename(ResultItem *item)
 {
     QByteArray urlarr(item->GetMediaURL().toLatin1());
     quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
@@ -1007,12 +1007,12 @@ void NetTree::slotItemChanged()
 {
     QMutexLocker locker(&m_lock);
 
-    ResultVideo *item;
+    ResultItem *item;
     RSSSite *site;
 
     if (m_type == DLG_TREE)
     {
-        item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
+        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
         site = qVariantValue<RSSSite *>(m_siteMap->GetCurrentNode()->GetData());
     }
     else
@@ -1022,7 +1022,7 @@ void NetTree::slotItemChanged()
         if (!node)
             return;
 
-        item = qVariantValue<ResultVideo *>(node->GetData());
+        item = qVariantValue<ResultItem *>(node->GetData());
         site = qVariantValue<RSSSite *>(node->GetData());
     }
 
@@ -1085,7 +1085,7 @@ void NetTree::slotItemChanged()
     }
     else if (site)
     {
-        ResultVideo *res = new ResultVideo(site->GetTitle(), site->GetDescription(),
+        ResultItem *res = new ResultItem(site->GetTitle(), site->GetDescription(),
               site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0);
@@ -1116,7 +1116,7 @@ void NetTree::slotItemChanged()
         else
             title = m_siteButtonList->GetItemCurrent()->GetText();
 
-        ResultVideo *res = new ResultVideo(title, QString(),
+        ResultItem *res = new ResultItem(title, QString(),
               QString(), QString(), QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0);

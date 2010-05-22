@@ -90,8 +90,8 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
 
     clearRSSArticles(site->GetTitle());
 
-    ResultVideo::resultList rss = site->GetVideoList();
-    ResultVideo::resultList::iterator it = rss.begin();
+    ResultItem::resultList rss = site->GetVideoList();
+    ResultItem::resultList::iterator it = rss.begin();
     for (; it != rss.end(); ++it)
     {
         // Insert in the DB here.
@@ -136,7 +136,7 @@ RSSSite::~RSSSite()
 {
 }
 
-void RSSSite::insertRSSArticle(ResultVideo *item)
+void RSSSite::insertRSSArticle(ResultItem *item)
 {
     QMutexLocker locker(&m_lock);
     m_articleList.append(item);
@@ -192,7 +192,7 @@ void RSSSite::slotCheckRedirect(QNetworkReply* reply)
     reply->deleteLater();
 }
 
-ResultVideo::resultList RSSSite::GetVideoList(void) const
+ResultItem::resultList RSSSite::GetVideoList(void) const
 {
     QMutexLocker locker(&m_lock);
     return m_articleList;
@@ -228,14 +228,14 @@ void RSSSite::process(void)
     QString rootName = domDoc.documentElement().nodeName();
     if (rootName == "rss" || rootName == "rdf:RDF")
     {
-        ResultVideo::resultList items;
+        ResultItem::resultList items;
         Parse parser;
         items = parser.parseRSS(domDoc);
 
-        for (ResultVideo::resultList::iterator i = items.begin();
+        for (ResultItem::resultList::iterator i = items.begin();
                 i != items.end(); ++i)
         {
-            insertRSSArticle(new ResultVideo((*i)->GetTitle(),
+            insertRSSArticle(new ResultItem((*i)->GetTitle(),
                (*i)->GetDescription(), (*i)->GetURL(),
                (*i)->GetThumbnail(), (*i)->GetMediaURL(),
                (*i)->GetAuthor(), (*i)->GetDate(),

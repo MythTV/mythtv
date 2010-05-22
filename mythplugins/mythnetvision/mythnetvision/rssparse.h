@@ -100,15 +100,15 @@ class QDomDocument;
        QList<MRSSScene> Scenes;
    };
 
-class ResultVideo
+class ResultItem
 {
 
   public:
 
-    typedef QList<ResultVideo *> resultList;
-    typedef vector<ResultVideo> List;
+    typedef QList<ResultItem *> resultList;
+    typedef vector<ResultItem> List;
 
-    ResultVideo(const QString& title, const QString& desc,
+    ResultItem(const QString& title, const QString& desc,
               const QString& URL, const QString& thumbnail,
               const QString& mediaURL, const QString& author,
               const QDateTime& date, const QString& time,
@@ -118,8 +118,8 @@ class ResultVideo
               const uint& width, const uint& height, const QString& language,
               const bool& downloadable, const QStringList& countries,
               const uint& season, const uint& episode);
-    ResultVideo();
-    ~ResultVideo();
+    ResultItem();
+    ~ResultItem();
 
     void toMap(QHash<QString, QString> &infoMap);
 
@@ -168,7 +168,7 @@ class ResultVideo
     uint         m_season;
     uint         m_episode;
 };
-Q_DECLARE_METATYPE(ResultVideo*)
+Q_DECLARE_METATYPE(ResultItem*)
 
 class Parse : public QObject
 {
@@ -179,8 +179,8 @@ class Parse : public QObject
     Parse();
     virtual ~Parse();
 
-    ResultVideo::resultList parseRSS(QDomDocument domDoc);
-    ResultVideo* ParseItem(const QDomElement& item) const;
+    ResultItem::resultList parseRSS(QDomDocument domDoc);
+    ResultItem* ParseItem(const QDomElement& item) const;
 
     QString GetLink(const QDomElement&) const;
     QString GetAuthor(const QDomElement&) const;
