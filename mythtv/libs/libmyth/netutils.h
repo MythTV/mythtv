@@ -9,56 +9,56 @@
 #include "mythrssmanager.h"
 
 // Generic Data Formatting
-QString GetDisplaySeasonEpisode(int seasEp, int digits);
-QString GetThumbnailFilename(QString url, QString title);
+MPUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits);
+MPUBLIC QString GetThumbnailFilename(QString url, QString title);
 
 // Tree DB Utils
 
-bool findTreeGrabberInDB(const QString &commandline);
-GrabberScript* findTreeGrabberByCommand(const QString &url);
-GrabberScript::scriptList findAllDBTreeGrabbers(void);
-bool findSearchGrabberInDB(const QString &commandline);
-GrabberScript* findSearchGrabberByCommand(const QString &url);
-GrabberScript::scriptList findAllDBSearchGrabbers(void);
-bool markTreeUpdated(GrabberScript *script, QDateTime curTime);
-bool needsUpdate(GrabberScript *script, uint updateFreq);
-QDateTime lastUpdate(GrabberScript* script);
+MPUBLIC bool findTreeGrabberInDB(const QString &commandline);
+MPUBLIC GrabberScript* findTreeGrabberByCommand(const QString &url);
+MPUBLIC GrabberScript::scriptList findAllDBTreeGrabbers(void);
+MPUBLIC bool findSearchGrabberInDB(const QString &commandline);
+MPUBLIC GrabberScript* findSearchGrabberByCommand(const QString &url);
+MPUBLIC GrabberScript::scriptList findAllDBSearchGrabbers(void);
+MPUBLIC bool markTreeUpdated(GrabberScript *script, QDateTime curTime);
+MPUBLIC bool needsUpdate(GrabberScript *script, uint updateFreq);
+MPUBLIC QDateTime lastUpdate(GrabberScript* script);
 
-bool clearTreeItems(const QString &feedtitle);
-bool isTreeInUse(const QString &feedtitle);
-bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
+MPUBLIC bool clearTreeItems(const QString &feedtitle);
+MPUBLIC bool isTreeInUse(const QString &feedtitle);
+MPUBLIC bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
                        const QString &paththumb, ResultItem *item);
-QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &feedtitle);
+MPUBLIC QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &feedtitle);
 
-bool insertTreeInDB(GrabberScript *script);
-bool insertTreeInDB(const QString &name, const QString &thumbnail,
+MPUBLIC bool insertTreeInDB(GrabberScript *script);
+MPUBLIC bool insertTreeInDB(const QString &name, const QString &thumbnail,
                 const QString &commandline);
-bool insertSearchInDB(GrabberScript *script);
-bool insertSearchInDB(const QString &name, const QString &thumbnail,
+MPUBLIC bool insertSearchInDB(GrabberScript *script);
+MPUBLIC bool insertSearchInDB(const QString &name, const QString &thumbnail,
                 const QString &commandline);
 
-bool removeTreeFromDB(GrabberScript *script);
-bool removeTreeFromDB(const QString &commandline);
-bool removeSearchFromDB(GrabberScript *script);
-bool removeSearchFromDB(const QString &commandline);
+MPUBLIC bool removeTreeFromDB(GrabberScript *script);
+MPUBLIC bool removeTreeFromDB(const QString &commandline);
+MPUBLIC bool removeSearchFromDB(GrabberScript *script);
+MPUBLIC bool removeSearchFromDB(const QString &commandline);
 
 // RSS DB Utils
 
-bool findInDB(const QString &url);
-RSSSite* findByURL(const QString &url);
-RSSSite::rssList findAllDBRSS();
-bool insertInDB(RSSSite *site);
-bool insertInDB(const QString &name, const QString &thumbnail,
+MPUBLIC bool findInDB(const QString &url);
+MPUBLIC RSSSite* findByURL(const QString &url);
+MPUBLIC RSSSite::rssList findAllDBRSS();
+MPUBLIC bool insertInDB(RSSSite *site);
+MPUBLIC bool insertInDB(const QString &name, const QString &thumbnail,
                 const QString &description, const QString &url,
                 const QString &author, const bool &download,
                 const QDateTime &updated);
 
-bool removeFromDB(RSSSite *site);
-bool removeFromDB(const QString &url);
+MPUBLIC bool removeFromDB(RSSSite *site);
+MPUBLIC bool removeFromDB(const QString &url);
 
-void markUpdated(RSSSite *site);
-bool clearRSSArticles(const QString &feedtitle);
-bool insertArticleInDB(const QString &feedtitle, ResultItem *item);
-ResultItem::resultList getRSSArticles(const QString &feedtitle);
+MPUBLIC void markUpdated(RSSSite *site);
+MPUBLIC bool clearRSSArticles(const QString &feedtitle);
+MPUBLIC bool insertArticleInDB(const QString &feedtitle, ResultItem *item);
+MPUBLIC ResultItem::resultList getRSSArticles(const QString &feedtitle);
 
 #endif // NETUTILS_H_

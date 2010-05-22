@@ -19,7 +19,7 @@ using namespace std;
 #include <mythhttppool.h>
 
 class RSSSite;
-class RSSSite : public QObject
+class MPUBLIC RSSSite : public QObject
 {
     Q_OBJECT
 
@@ -104,7 +104,7 @@ class RSSSite : public QObject
 };
 Q_DECLARE_METATYPE(RSSSite*)
 
-class RSSManager : public QObject
+class MPUBLIC RSSManager : public QObject
 {
     Q_OBJECT
 

@@ -14,6 +14,8 @@ using namespace std;
 #include <QMap>
 #include <QVariant>
 
+#include "mythexp.h"
+
 typedef QHash<QString,QString> MetadataMap;
 
 class QDomDocument;
@@ -100,7 +102,7 @@ class QDomDocument;
        QList<MRSSScene> Scenes;
    };
 
-class ResultItem
+class MPUBLIC ResultItem
 {
 
   public:
@@ -172,7 +174,7 @@ class ResultItem
 };
 Q_DECLARE_METATYPE(ResultItem*)
 
-class Parse : public QObject
+class MPUBLIC Parse : public QObject
 {
     Q_OBJECT
     friend class MRSSParser;

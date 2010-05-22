@@ -11,8 +11,9 @@
 #include <QProcess>
 
 #include "rssparse.h"
+#include "mythexp.h"
 
-class GrabberScript : public QThread
+class MPUBLIC GrabberScript : public QThread
 {
 
     Q_OBJECT
@@ -56,7 +57,7 @@ class GrabberScript : public QThread
 };
 Q_DECLARE_METATYPE(GrabberScript *);
 
-class GrabberManager : public QObject
+class MPUBLIC GrabberManager : public QObject
 {
     Q_OBJECT
 
@@ -86,7 +87,7 @@ class GrabberManager : public QObject
 
 const int kGrabberUpdateEventType = QEvent::User + 5000;
 
-class GrabberUpdateEvent : public QEvent
+class MPUBLIC GrabberUpdateEvent : public QEvent
 {
   public:
     GrabberUpdateEvent(void)
@@ -94,7 +95,7 @@ class GrabberUpdateEvent : public QEvent
     ~GrabberUpdateEvent() {}
 };
 
-class GrabberDownloadThread : public QThread
+class MPUBLIC GrabberDownloadThread : public QThread
 {
   public:
 
@@ -117,7 +118,7 @@ class GrabberDownloadThread : public QThread
 
 };
 
-class Search : public QObject
+class MPUBLIC Search : public QObject
 {
     friend class MRSSParser;
     Q_OBJECT
