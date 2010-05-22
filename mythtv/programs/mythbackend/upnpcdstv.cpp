@@ -10,6 +10,7 @@
 
 // POSIX headers
 #include <limits.h>
+#include <stdint.h>
 
 // MythTV headers
 #include "upnpcdstv.h"
@@ -252,7 +253,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     QString        sCategory    = query.value( 6).toString();
     QString        sHostName    = query.value( 7).toString();
     QString        sRecGroup    = query.value( 8).toString();
-    size_t         nFileSize    = query.value( 9).toULongLong();
+    uint64_t       nFileSize    = query.value( 9).toULongLong();
     QString        sBaseName    = query.value(10).toString();
 
     QDateTime      dtProgStart  = query.value(11).toDateTime();
