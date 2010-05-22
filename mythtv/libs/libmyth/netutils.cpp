@@ -1,4 +1,5 @@
 #include <QDir>
+#include <QFileInfo>
 
 #include <mythdirs.h>
 #include <mythdb.h>
@@ -50,7 +51,8 @@ bool findTreeGrabberInDB(const QString& commandline)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT * FROM netvisiontreegrabbers WHERE "
                   "commandline = :COMMAND AND host = :HOST;");
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo fi(commandline);
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive())
     {
@@ -66,7 +68,8 @@ bool findSearchGrabberInDB(const QString& commandline)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT * FROM netvisionsearchgrabbers WHERE "
                   "commandline = :COMMAND AND host = :HOST;");
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo fi(commandline);
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) 
     {
@@ -84,7 +87,8 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline)
                   "FROM netvisiontreegrabbers "
                   "WHERE commandline = :COMMAND AND "
                   "host = :HOST;");
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo fi(commandline);
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
@@ -93,7 +97,8 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline)
     QString title = query.value(0).toString();
     QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
                         .arg(query.value(1).toString());
-    QString command = query.value(2).toString();
+    QFileInfo cmd(query.value(2).toString());
+    QString command = cmd.fileName();
 
     GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
                                      command);
@@ -107,7 +112,8 @@ GrabberScript* findSearchGrabberByCommand(const QString& commandline)
                   "FROM netvisionsearchgrabbers "
                   "WHERE commandline = :COMMAND AND "
                   "host = :HOST;");
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo fi(commandline);
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Search find in db", query);
@@ -210,7 +216,8 @@ bool insertTreeInDB(const QString &name, const QString &thumbnail,
             "VALUES( :NAME, :THUMBNAIL, :COMMAND, :UPDATED, :HOST);");
     query.bindValue(":NAME", name);
     query.bindValue(":THUMBNAIL", thumbbase);
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo cmd(commandline);
+    query.bindValue(":COMMAND", cmd.fileName());
     query.bindValue(":UPDATED", QDateTime());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
@@ -236,7 +243,8 @@ bool insertSearchInDB(const QString &name, const QString &thumbnail,
             "VALUES( :NAME, :THUMBNAIL, :COMMAND, :HOST);");
     query.bindValue(":NAME", name);
     query.bindValue(":THUMBNAIL", thumbbase);
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo cmd(commandline);
+    query.bindValue(":COMMAND", cmd.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: inserting in DB", query);
@@ -265,7 +273,8 @@ bool removeTreeFromDB(const QString &commandline)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM netvisiontreegrabbers WHERE commandline = :COMMAND "
                   "AND host = :HOST ;");
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo fi(commandline);
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: delete from db", query);
@@ -280,7 +289,8 @@ bool removeSearchFromDB(const QString &commandline)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM netvisionsearchgrabbers WHERE commandline = :COMMAND "
                   "AND host = :HOST ;");
-    query.bindValue(":COMMAND", commandline);
+    QFileInfo fi(commandline);
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: delete from db", query);
@@ -297,7 +307,8 @@ bool markTreeUpdated(GrabberScript* script, QDateTime curTime)
                   "WHERE commandline = :COMMAND "
                   "AND host = :HOST ;");
     query.bindValue(":UPDATED", curTime);
-    query.bindValue(":COMMAND", script->GetCommandline());
+    QFileInfo fi(script->GetCommandline());
+    query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: update db time", query);
