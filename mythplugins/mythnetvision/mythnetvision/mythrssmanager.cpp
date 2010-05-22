@@ -23,7 +23,7 @@ using namespace std;
 RSSManager::RSSManager()
 {
     m_updateFreq = (gCoreContext->GetNumSetting(
-                       "mythNetvision.updateFreq", 6) * 3600 * 1000);
+                       "rss.updateFreq", 6) * 3600 * 1000);
 
     m_timer = new QTimer();
 
@@ -53,7 +53,7 @@ void RSSManager::doUpdate()
     for (RSSSite::rssList::iterator i = m_sites.begin();
             i != m_sites.end(); ++i)
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("MythNetvision: Updating RSS Feed %1")
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Updating RSS Feed %1")
                                       .arg((*i)->GetTitle()));
 
         connect(*i, SIGNAL(finished(RSSSite*)),
@@ -85,8 +85,6 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
 {
     if (!site)
         return;
-
-//    site->retrieve();
 
     clearRSSArticles(site->GetTitle());
 
@@ -126,7 +124,6 @@ RSSSite::RSSSite(const QString& title,
     m_image = image;
     m_description = description;
     m_url = url;
-    m_destDir = GetConfDir()+"/MythNetvision";
     m_author = author;
     m_download = download;
     m_updated = updated;

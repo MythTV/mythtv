@@ -85,7 +85,6 @@ class RSSSite : public QObject
     QDateTime  m_updated;
 
     mutable    QMutex m_lock;
-    QString    m_destDir;
     QByteArray m_data;
     QString    m_imageURL;
     bool       m_podcast;

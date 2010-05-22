@@ -12,6 +12,10 @@
 #include "netgrabbermanager.h"
 #include "netutils.h"
 
+#define LOC      QString("NetContent: ")
+#define LOC_WARN QString("NetContent, Warning: ")
+#define LOC_ERR  QString("NetContent, Error: ")
+
 using namespace std;
 
 // ---------------------------------------------------
@@ -47,14 +51,14 @@ void GrabberScript::run()
 
         if (QProcess::NormalExit != m_getTree.exitStatus())
         {
-            VERBOSE(VB_IMPORTANT, QString("Script %1 crashed while grabbing tree.")
-                              .arg(m_title));
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Internet Content Script "
+                           "%1 crashed while grabbing tree.").arg(m_title));
             emit finished();
             return;
         }
 
-        VERBOSE(VB_IMPORTANT, QString("MythNetvision: Script %1 completed download.")
-                                  .arg(m_title));
+        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Script %1 "
+                           "completed download.").arg(m_title));
 
         QByteArray result = m_getTree.readAll();
 
@@ -118,7 +122,7 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
 GrabberManager::GrabberManager() :     m_lock(QMutex::Recursive)
 {
     m_updateFreq = (gCoreContext->GetNumSetting(
-                       "mythNetvision.updateFreq", 24) * 3600 * 1000);
+                       "netsite.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
     m_runningCount = 0;
     m_refreshAll = false;
@@ -193,14 +197,14 @@ void GrabberDownloadThread::run()
 {
     m_scripts = findAllDBTreeGrabbers();
     uint updateFreq = gCoreContext->GetNumSetting(
-               "mythNetvision.updateFreq", 24);
+               "netsite.updateFreq", 24);
 
     while (m_scripts.count())
     {
         GrabberScript *script = m_scripts.takeFirst();
         if (script && (needsUpdate(script, updateFreq) || m_refreshAll))
         {
-            VERBOSE(VB_IMPORTANT, QString("MythNetvision: Script %1 Updating...")
+            VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Script %1 Updating...")
                                   .arg(script->GetTitle()));
             script->run();
         }
@@ -259,7 +263,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     args.append("-S");
     args.append(query);
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, QString("MythNetVision Query: %1 %2")
+    VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Internet Search Query: %1 %2")
                                         .arg(cmd).arg(args.join(" ")));
 
     m_searchtimer->start(40 * 1000);
@@ -341,7 +345,7 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
     }
     else
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA, "MythNetVision: Script Execution Successfully Completed");
+        VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR "Internet Search Successfully Completed");
 
         m_data = m_searchProcess->readAllStandardOutput();
         m_document.setContent(m_data, true);
@@ -354,7 +358,7 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
 
 void Search::slotSearchTimeout()
 {
-    VERBOSE(VB_GENERAL|VB_EXTRA, "MythNetVision: Search Timeout");
+    VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR "Internet Search Timeout");
 
     if (m_searchProcess)
     {
