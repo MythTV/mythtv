@@ -1088,7 +1088,7 @@ void NetTree::slotItemChanged()
         ResultItem *res = new ResultItem(site->GetTitle(), site->GetDescription(),
               site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0);
+              0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
         res->toMap(metadataMap);
@@ -1119,7 +1119,7 @@ void NetTree::slotItemChanged()
         ResultItem *res = new ResultItem(title, QString(),
               QString(), QString(), QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0);
+              0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
         res->toMap(metadataMap);
