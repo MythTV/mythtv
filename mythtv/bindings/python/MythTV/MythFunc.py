@@ -392,13 +392,16 @@ class MythBE( FileOps ):
         'filenames' is a dictionary, where the values are the file sizes.
         """
         def walk(self, host, sg, root, path):
-            dn, fn, fs = self.getSGList(host, sg, root+path+'/')
-            res = [list(dn), dict(zip(fn, fs))]
+            res = self.getSGList(host, sg, root+path+'/')
+            if res < 0:
+                return {}
+            dlist = list(res[0])
+            res = [dlist, dict(zip(res[1],res[2]))]
             if path == '':
                 res = {'/':res}
             else:
                 res = {path:res}
-            for d in dn:
+            for d in dlist:
                 res.update(walk(self, host, sg, root, path+'/'+d))
             return res
 
@@ -996,7 +999,7 @@ class MythVideo( MythDBBase ):
                         tpath = sgfold[0][1:]+'/'+sgfile
 
                     # filter by extension
-                    if tpath.rsplit('.',1)[1].lower() not in extensions:
+                    if tpath.rsplit('.',1)[-1].lower() not in extensions:
                         #print 'skipping: '+tpath
                         continue
 
