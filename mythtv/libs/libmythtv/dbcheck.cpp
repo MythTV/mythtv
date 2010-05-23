@@ -279,10 +279,7 @@ For digital television, the 'mplexid' field contains the
 parameters. The 'serviceid' field contains the MPEG program number when
 describing a DVB service. The 'useonairguide' field is used by DVB to
 determine whether to use the on-air-guide data from this channel to
-update the listings. Using the on-air-guide is currently experimental
-and must be selected when you compile %MythTV. Finally, the 'atscsrcid'
-field currently contains both the major and minor atsc channels, encoded
-in the form (atsc_major_chan * 256 | atsc_minor_chan).
+update the listings.
 
 \section program_table Program Entry Table (program)
 'category_type' holds one of these exact four strings:
