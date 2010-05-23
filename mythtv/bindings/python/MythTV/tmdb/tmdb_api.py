@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.9"
+__version__="v0.2.0"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -33,6 +33,8 @@ __version__="v0.1.9"
 # 0.1.8 Fixed the error message reporting when the machines Internet connection or DNS is not working
 # 0.1.9 Fixed an abort with the People data logic due to empty data (e.g. biography) being passed by TMDB
 #       Included in this change are a number of other potential empty data checks.
+# 0.2.0 Support multi-languages. TMDB supports multi-languages with a fall back to English when the
+#       data is not in the specified language
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -264,10 +266,7 @@ class MovieDb(object):
 
         language (2 character language abbreviation):
             The language of the returned data. Is also the language search
-            uses. Default is "en" (English). For full list, run..
-
-            >>> MovieDb().config['valid_languages'] #doctest: +ELLIPSIS
-            ['da', 'fi', 'nl', ...]
+            uses. Default is "en" (English).
 
         search_all_languages (True/False):
             By default, TMDB will only search in the language specified using
@@ -301,25 +300,14 @@ class MovieDb(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        # The supported languages have not been published or enabled at this time.
-        # List of language from ???????
-        # Hard-coded here as it is realtively static, and saves another HTTP request, as
-        # recommended on ?????
-        #self.config['valid_languages'] = [
-        #    "da", "fi", "nl", "de", "it", "es", "fr","pl", "hu","el","tr",
-        #    "ru","he","ja","pt","zh","cs","sl", "hr","ko","en","sv","no"
-        #]
-
-        # ONLY ENGISH is supported at this time
-        self.config['language'] = "en"
-        #if language is None:
-        #    self.config['language'] = "en"
-        #elif language not in self.config['valid_languages']:
-        #    raise ValueError("Invalid language %s, options are: %s" % (
-        #        language, self.config['valid_languages']
-        #    ))
-        #else:
-        #    self.config['language'] = language
+        # The supported languages are any two chracters from
+        # http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+        # The default is English including returned data if the movie exists but not in the
+        # specified language.
+        if language is None:
+            self.config['language'] = "en"
+        else:
+            self.config['language'] = language
 
         # The following url_ configs are based of the
         # http://api.themoviedb.org/2.1/
