@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1256";
+const QString currentDatabaseVersion = "1257";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5208,6 +5208,16 @@ NULL
             QString keys = mainwin->GetKey("Main Menu", "EXIT");
             mainwin->BindKey("Main Menu", "EXIT", keys);
         }
+    }
+
+    if (dbver == "1256")
+    {
+        const char *updates[] = {
+"ALTER TABLE record DROP COLUMN tsdefault;",
+NULL
+};
+        if (!performActualUpdate(updates, "1257", dbver))
+            return false;
     }
 
     return true;
