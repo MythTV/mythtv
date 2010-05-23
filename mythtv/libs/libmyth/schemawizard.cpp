@@ -261,6 +261,11 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         return MYTH_SCHEMA_USE_EXISTING;
 #endif
 
+    // Only back up the database if it's old/about to be upgraded
+    // (not if it's too new)
+    // or if a user is doing something they probably shouldn't ("expert mode")
+    if ((upgradeAllowed && (versionsBehind > 0)) || m_expertMode)
+        BackupDB();
 
     connections = CountClients() > 1;
     gui         = GetMythUI()->IsScreenSetup() && GetMythMainWindow();
@@ -312,6 +317,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         {
             VERBOSE(VB_IMPORTANT, warnOldDBMS);
             return MYTH_SCHEMA_EXIT;
+        }
+
+        if (versionsBehind < 0)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Error: MythTV database has newer "
+                    "%1 schema (%2) than expected (%3).")
+                    .arg(name).arg(DBver).arg(m_newSchemaVer));
+            return MYTH_SCHEMA_ERROR;
         }
 
         if (upgradeIfNoUI && validDBMS)
