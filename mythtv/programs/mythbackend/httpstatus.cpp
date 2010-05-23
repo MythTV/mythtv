@@ -31,13 +31,17 @@
 #include "compat.h"
 #include "mythconfig.h"
 #include "autoexpire.h"
+#include "tv.h"
+#include "encoderlink.h"
+#include "scheduler.h"
 #include "mainserver.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster )
+HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched,
+                        AutoExpire *expirer, bool bIsMaster )
           : HttpServerExtension( "HttpStatus" , QString())
 {
     m_pEncoders = tvList;
@@ -76,7 +80,8 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */, HTTPRequest *pRequest )
+bool HttpStatus::ProcessRequest( HttpWorkerThread * /* pThread */,
+                                 HTTPRequest *pRequest )
 {
     try
     {

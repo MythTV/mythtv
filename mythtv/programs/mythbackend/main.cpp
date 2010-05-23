@@ -38,7 +38,6 @@ using namespace std;
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "mainserver.h"
-#include "encoderlink.h"
 #include "remoteutil.h"
 #include "housekeeper.h"
 
@@ -56,8 +55,6 @@ using namespace std;
 #include "mythcommandlineparser.h"
 #include "mythsystemevent.h"
 
-#include "mediaserver.h"
-#include "httpstatus.h"
 #include "backendcontext.h"
 #include "main_helpers.h"
 

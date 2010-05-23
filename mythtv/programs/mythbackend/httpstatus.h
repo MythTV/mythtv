@@ -67,13 +67,15 @@ class HttpStatus : public HttpServerExtension
         int     PrintMiscellaneousInfo ( QTextStream &os, QDomElement info );
 
     public:
-                 HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster );
+                 HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched,
+                             AutoExpire *expirer, bool bIsMaster );
         virtual ~HttpStatus();
 
         void     SetMainServer(MainServer *mainServer)
-		             { m_pMainServer = mainServer; }
+                    { m_pMainServer = mainServer; }
 
-        bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        bool     ProcessRequest( HttpWorkerThread *pThread,
+                                 HTTPRequest *pRequest );
 };
 
 #endif

@@ -16,13 +16,13 @@
 #include <QDateTime>
 
 #include "upnp.h"
-#include "mainserver.h"
 #include "eventing.h"
 
 #include "autoexpire.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
 #include "recordinginfo.h"
+#include "scheduler.h"
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire              *expirer;

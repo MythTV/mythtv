@@ -11,7 +11,6 @@
 #ifndef UPnpCDSVIDEO_H_
 #define UPnpCDSVIDEO_H_
 
-#include "mainserver.h"
 #include "upnpcds.h"
 
 typedef QMap<int, QString> IntMap;

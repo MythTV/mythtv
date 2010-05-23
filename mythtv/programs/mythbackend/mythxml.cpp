@@ -16,6 +16,7 @@
 #include <QRegExp>
 #include <QBuffer>
 #include <QEventLoop>
+#include <QImage>
 
 #include "mythxml.h"
 #include "backendutil.h"
@@ -30,6 +31,7 @@
 #include "backendutil.h"
 #include "mythconfig.h"
 #include "programinfo.h"
+#include "channelutil.h"
 
 #include "rssparse.h"
 #include "netutils.h"
