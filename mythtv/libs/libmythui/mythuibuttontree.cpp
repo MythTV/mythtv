@@ -556,7 +556,7 @@ bool MythUIButtonTree::ParseElement(
 }
 
 /*!
- * \copydoc MythUIType::CreatCopy()
+ * \copydoc MythUIType::CreateCopy()
  */
 void MythUIButtonTree::CreateCopy(MythUIType *parent)
 {

@@ -34,6 +34,9 @@ MythUIClock::~MythUIClock()
     m_Font = NULL;
 }
 
+/**
+ *  \copydoc MythUIType::Pulse()
+ */
 void MythUIClock::Pulse(void)
 {
     m_Time = QDateTime::currentDateTime();
@@ -63,6 +66,9 @@ void MythUIClock::Pulse(void)
     MythUIText::Pulse();
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythUIClock::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
@@ -87,6 +93,9 @@ bool MythUIClock::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIClock::CopyFrom(MythUIType *base)
 {
     MythUIClock *clock = dynamic_cast<MythUIClock *>(base);
@@ -110,6 +119,9 @@ void MythUIClock::CopyFrom(MythUIType *base)
     MythUIText::CopyFrom(base);
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIClock::CreateCopy(MythUIType *parent)
 {
     MythUIClock *clock = new MythUIClock(parent, objectName());

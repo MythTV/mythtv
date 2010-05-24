@@ -178,11 +178,17 @@ void MythUIType::DeleteChild(MythUIType *child)
     }
 }
 
+/**
+ *  \brief Return a list of all child widgets
+ */
 QList<MythUIType *> *MythUIType::GetAllChildren(void)
 {
     return &m_ChildrenList;
 }
 
+/**
+ *  \brief Delete all child widgets
+ */
 void MythUIType::DeleteAllChildren(void)
 {
     QList<MythUIType*>::iterator it;
@@ -295,16 +301,27 @@ void MythUIType::SetChildNeedsRedraw(MythUIType *child)
         m_Parent->SetChildNeedsRedraw(this);
 }
 
+/**
+ *  \brief Return if this widget can accept input focus
+ */
 bool MythUIType::CanTakeFocus(void) const
 {
     return m_CanHaveFocus;
 }
 
+/**
+ *  \brief Set whether this widget can take focus
+ */
 void MythUIType::SetCanTakeFocus(bool set)
 {
     m_CanHaveFocus = set;
 }
 
+/**
+ *  \brief Handle one frame of a movement animation.
+ *
+ * This changes the position of the widget within it's parent's area
+ */
 void MythUIType::HandleMovementPulse(void)
 {
     if (!GetMythPainter()->SupportsAnimation())
@@ -347,6 +364,11 @@ void MythUIType::HandleMovementPulse(void)
     m_Area.moveTopLeft(curXY);
 }
 
+/**
+ *  \brief Handle one frame of an alpha (transparency) change animation.
+ *
+ * This changes the alpha value of the widget
+ */
 void MythUIType::HandleAlphaPulse(void)
 {
     if (!GetMythPainter()->SupportsAlpha() ||
@@ -380,6 +402,12 @@ void MythUIType::HandleAlphaPulse(void)
     SetRedraw();
 }
 
+/**
+ *  \brief Pulse is called 70 times a second to trigger a single frame of an
+ *         animation
+ *
+ * This changes the alpha value of the widget
+ */
 void MythUIType::Pulse(void)
 {
     if (!m_Visible)
@@ -466,7 +494,9 @@ void MythUIType::SetSize(const QSize &size)
     SetRedraw();
 }
 
-/*
+/**
+ * \brief Set the minimum size of this widget, for widgets which can be rescaled
+ *
  * Use MythPoint to represent size, so percentages can be used
  */
 void MythUIType::SetMinSize(const MythPoint &minsize)
@@ -553,7 +583,7 @@ void MythUIType::SetMinArea(const QSize &size)
     if (m_MinSize.x() < 1)
         return;
 
-    /*
+    /**
      * The MinArea will have the same origin as the normal Area,
      * but can have a smaller size.
      */
@@ -588,7 +618,7 @@ void MythUIType::ExpandArea(const MythRect &rect)
     SetRedraw();
 }
 
-/*
+/**
  * If the object has a minimum area defined, return it, other wise
  * return the default area.
  */
@@ -659,16 +689,27 @@ int MythUIType::GetAlpha(void) const
     return m_Alpha;
 }
 
+/** \brief Key event handler
+ *
+ *  \param event Keypress event
+ */
 bool MythUIType::keyPressEvent(QKeyEvent *)
 {
     return false;
 }
+
 
 void MythUIType::customEvent(QEvent *)
 {
     return;
 }
 
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
+ *         QCoreApplication event loop. Should not be used directly.
+ *
+ *  \param uitype The mythuitype receiving the event
+ *  \param event Mouse event
+ */
 bool MythUIType::gestureEvent(MythGestureEvent *ge)
 {
     return false;
@@ -759,6 +800,9 @@ int MythUIType::NormY(const int y)
     return GetMythMainWindow()->NormY(y);
 }
 
+/**
+ *  \brief Copy this widgets state from another.
+ */
 void MythUIType::CopyFrom(MythUIType *base)
 {
     m_Visible = base->m_Visible;
@@ -792,15 +836,24 @@ void MythUIType::CopyFrom(MythUIType *base)
     }
 }
 
+/**
+ *  \brief Copy the state of this widget to the one given, it must be of the
+ *         same type.
+ */
 void MythUIType::CreateCopy(MythUIType *)
 {
     // Calling CreateCopy on base type is not valid
 }
 
-//FIXME add alpha/movement/etc.
+/**
+ *  \brief Parse the xml definition of this widget setting the state of the
+ *         object accordingly
+ */
 bool MythUIType::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
+    //FIXME add movement etc.
+    
     if (element.tagName() == "position")
         SetPosition(parsePoint(element));
     else if (element.tagName() == "area")
@@ -845,6 +898,13 @@ bool MythUIType::ParseElement(
     return true;
 }
 
+/**
+ *  \brief Perform any post-xml parsing initialisation tasks
+ *
+ *  This is called after the widget has been created and it's state established
+ *  by ParseElement() or CopyFrom(). A derived class should use this to perform
+ *  any initialisation tasks which should occur after this point.
+ */
 void MythUIType::Finalize(void)
 {
 }

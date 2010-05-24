@@ -172,6 +172,9 @@ MythUIType *MythUIStateType::GetState(StateType state)
     return NULL;
 }
 
+/*!
+ * \copydoc MythUIType::Clear()
+ */
 void MythUIStateType::Clear()
 {
     if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
@@ -196,6 +199,9 @@ void MythUIStateType::Clear()
     SetRedraw();
 }
 
+/*!
+ * \copydoc MythUIType::Reset()
+ */
 void MythUIStateType::Reset()
 {
     if (!DisplayState("default"))

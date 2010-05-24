@@ -38,6 +38,9 @@ MythUIShape::~MythUIShape()
     }
 }
 
+/**
+ *  \copydoc MythUIType::Reset()
+ */
 void MythUIShape::Reset()
 {
     if (m_image)
@@ -70,6 +73,9 @@ void MythUIShape::SetLinePen(QPen pen)
     m_linePen = pen;
 }
 
+/**
+ *  \copydoc MythUIType::DrawSelf()
+ */
 void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
@@ -78,7 +84,7 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     if (!m_image || m_image->isNull())
     {
-            if (m_type == "box")
+        if (m_type == "box")
             DrawRect(area, m_fillBrush, m_linePen);
         else if (m_type == "roundbox")
             DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen);
@@ -163,6 +169,9 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     m_image->Assign(image);
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythUIShape::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
@@ -229,6 +238,9 @@ bool MythUIShape::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIShape::CopyFrom(MythUIType *base)
 {
     MythUIShape *shape = dynamic_cast<MythUIShape *>(base);
@@ -251,6 +263,9 @@ void MythUIShape::CopyFrom(MythUIType *base)
     MythUIType::CopyFrom(base);
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIShape::CreateCopy(MythUIType *parent)
 {
     MythUIShape *shape = new MythUIShape(parent, objectName());

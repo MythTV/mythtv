@@ -178,12 +178,18 @@ bool MythUICheckBox::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUICheckBox::CreateCopy(MythUIType *parent)
 {
     MythUICheckBox *checkbox = new MythUICheckBox(parent, objectName());
     checkbox->CopyFrom(this);
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUICheckBox::CopyFrom(MythUIType *base)
 {
     MythUICheckBox *button = dynamic_cast<MythUICheckBox *>(base);
@@ -199,6 +205,9 @@ void MythUICheckBox::CopyFrom(MythUIType *base)
     SetInitialStates();
 }
 
+/**
+ *  \copydoc MythUIType::Finalize()
+ */
 void MythUICheckBox::Finalize()
 {
     SetInitialStates();

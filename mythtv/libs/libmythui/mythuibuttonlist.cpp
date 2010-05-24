@@ -117,6 +117,9 @@ void MythUIButtonList::SetActive(bool active)
         Update();
 }
 
+/*!
+ * \copydoc MythUIType::Reset()
+ */
 void MythUIButtonList::Reset()
 {
     m_ButtonToItem.clear();
@@ -2078,6 +2081,9 @@ uint MythUIButtonList::ItemHeight(void)
     return m_itemHeight;
 }
 
+/**
+ *  \copydoc MythUIType::keyPressEvent()
+ */
 bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
 {
     QStringList actions;
@@ -2164,11 +2170,8 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, receives mouse gesture events from the
- *         QCoreApplication event loop. Should not be used directly.
- *
- *  \param uitype The mythuitype receiving the event
- *  \param event Mouse event
+/**
+ *  \copydoc MythUIType::gestureEvent()
  */
 bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 {
@@ -2263,6 +2266,9 @@ void MythUIButtonList::CalculateVisibleItems(void)
     m_itemsVisible = m_columns * m_rows;
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythUIButtonList::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
@@ -2342,18 +2348,27 @@ bool MythUIButtonList::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::DrawSelf()
+ */
 void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
 {
     if (m_needsUpdate)
         SetPositionArrowStates();
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIButtonList::CreateCopy(MythUIType *parent)
 {
     MythUIButtonList *lb = new MythUIButtonList(parent, objectName());
     lb->CopyFrom(this);
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIButtonList::CopyFrom(MythUIType *base)
 {
     MythUIButtonList *lb = dynamic_cast<MythUIButtonList *>(base);
@@ -2393,8 +2408,8 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     {
         MythUIType *deltype;
         QString name = QString("buttonlist button %1").arg(i);
-        if ((deltype = GetChild(name)))
-            delete deltype;
+        deltype = GetChild(name);
+        delete deltype;
     }
 
     m_ButtonList.clear();
@@ -2402,6 +2417,9 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     m_initialized = false;
 }
 
+/**
+ *  \copydoc MythUIType::Finalize()
+ */
 void MythUIButtonList::Finalize(void)
 {
     MythUIType::Finalize();

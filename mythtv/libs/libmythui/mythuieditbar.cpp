@@ -262,6 +262,9 @@ void MythUIEditBar::ClearImages(void)
         DeleteChild(m_images.takeFirst());
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIEditBar::CopyFrom(MythUIType *base)
 {
     MythUIEditBar *editbar = dynamic_cast<MythUIEditBar *>(base);
@@ -277,6 +280,9 @@ void MythUIEditBar::CopyFrom(MythUIType *base)
     MythUIType::CopyFrom(base);
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIEditBar::CreateCopy(MythUIType *parent)
 {
     MythUIEditBar *editbar = new MythUIEditBar(parent, objectName());

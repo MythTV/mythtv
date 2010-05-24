@@ -15,6 +15,17 @@ MythUISpinBox::~MythUISpinBox()
 {
 }
 
+/**
+ * \brief Set the lower and upper bounds of the spinbox, the interval and page
+ *        amount
+ *
+ * \param low  The lowest value
+ * \param high The highest value
+ * \param step The interval between displayed values e.g. sequence 0,5,10,15
+ *             would have have step value of 5
+ * \param pageMultiple The number of list items to move by when PAGEUP and
+ *             PAGEDOWN input actions are used
+ */
 void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
 {
     if ((high == low) || step == 0)
@@ -62,6 +73,9 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
     SetPositionArrowStates();
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythUISpinBox::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)    
 {
@@ -85,6 +99,9 @@ bool MythUISpinBox::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIButtonList::MoveDown()
+ */
 bool MythUISpinBox::MoveDown(MovementUnit unit, uint amount)
 {
     bool handled = false;
@@ -96,6 +113,9 @@ bool MythUISpinBox::MoveDown(MovementUnit unit, uint amount)
     return handled;
 }
 
+/**
+ *  \copydoc MythUIButtonList::MoveUp()
+ */
 bool MythUISpinBox::MoveUp(MovementUnit unit, uint amount)
 {
     bool handled = false;
@@ -107,12 +127,18 @@ bool MythUISpinBox::MoveUp(MovementUnit unit, uint amount)
     return handled;
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUISpinBox::CreateCopy(MythUIType *parent)
 {
     MythUISpinBox *spinbox = new MythUISpinBox(parent, objectName());
     spinbox->CopyFrom(this);
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUISpinBox::CopyFrom(MythUIType *base)
 {
     MythUISpinBox *spinbox = dynamic_cast<MythUISpinBox *>(base);

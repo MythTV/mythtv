@@ -46,6 +46,9 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
     page()->setForwardUnsupportedContent(true);
 }
 
+/**
+ *  \copydoc MythUIType::keyPressEvent()
+ */
 void MythWebView::keyPressEvent(QKeyEvent *event)
 {
     // if the QWebView widget has focus then all keypresses from a regular keyboard 
@@ -205,6 +208,9 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
     SetCanTakeFocus(true);
 }
 
+/**
+ *  \copydoc MythUIType::Finalize()
+ */
 void MythUIWebBrowser::Finalize(void)
 {
     Init();
@@ -603,6 +609,9 @@ void MythUIWebBrowser::UpdateBuffer(void)
     }
 }
 
+/**
+ *  \copydoc MythUIType::Pulse()
+ */
 void MythUIWebBrowser::Pulse(void)
 {
     if (m_updateInterval && m_lastUpdateTime.elapsed() > m_updateInterval)
@@ -614,6 +623,9 @@ void MythUIWebBrowser::Pulse(void)
     MythUIType::Pulse();
 }
 
+/**
+ *  \copydoc MythUIType::DrawSelf()
+ */
 void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                        int alphaMod, QRect clipRegion)
 {
@@ -626,9 +638,8 @@ void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     p->DrawImage(area.x(), area.y(), m_image, alphaMod);
 }
 
-/** \brief Key event handler
- *
- *  \param event Keypress event
+/**
+ *  \copydoc MythUIType::keyPressEvent()
  */
 bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 {
@@ -841,6 +852,9 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
     }
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythUIWebBrowser::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
@@ -876,6 +890,9 @@ bool MythUIWebBrowser::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIWebBrowser::CopyFrom(MythUIType *base)
 {
     MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *>(base);
@@ -896,6 +913,9 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
     Init();
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIWebBrowser::CreateCopy(MythUIType *parent)
 {
     MythUIWebBrowser *browser = new MythUIWebBrowser(parent, objectName());

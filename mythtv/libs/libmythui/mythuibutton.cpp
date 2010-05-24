@@ -55,6 +55,9 @@ void MythUIButton::SetInitialStates()
         m_Message = m_Text->GetDefaultText();
 }
 
+/*!
+ * \copydoc MythUIType::Reset()
+ */
 void MythUIButton::Reset()
 {
     MythUIType::Reset();
@@ -116,6 +119,9 @@ void MythUIButton::SetState(QString state)
     }
 }
 
+/**
+ *  \copydoc MythUIType::keyPressEvent()
+ */
 bool MythUIButton::keyPressEvent(QKeyEvent *e)
 {
     QStringList actions;
@@ -144,11 +150,8 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, receives mouse gesture events from the
- *         QCoreApplication event loop. Should not be used directly.
- *
- *  \param uitype The mythuitype receiving the event
- *  \param event Mouse event
+/**
+ *  \copydoc MythUIType::gestureEvent()
  */
 bool MythUIButton::gestureEvent(MythGestureEvent *event)
 {
@@ -245,6 +248,9 @@ QString MythUIButton::GetDefaultText() const
     return m_Text->GetDefaultText();
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythUIButton::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
@@ -261,12 +267,18 @@ bool MythUIButton::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIButton::CreateCopy(MythUIType *parent)
 {
     MythUIButton *button = new MythUIButton(parent, objectName());
     button->CopyFrom(this);
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIButton::CopyFrom(MythUIType *base)
 {
     MythUIButton *button = dynamic_cast<MythUIButton *>(base);
@@ -286,6 +298,9 @@ void MythUIButton::CopyFrom(MythUIType *base)
     SetInitialStates();
 }
 
+/**
+ *  \copydoc MythUIType::Finalize()
+ */
 void MythUIButton::Finalize()
 {
     SetInitialStates();

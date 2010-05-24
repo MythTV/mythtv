@@ -438,6 +438,9 @@ bool MythScreenType::gestureEvent(MythGestureEvent *event)
     return handled;
 }
 
+/**
+ *  \copydoc MythUIType::ParseElement()
+ */
 bool MythScreenType::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
@@ -473,6 +476,9 @@ bool MythScreenType::ParseElement(
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythScreenType::CopyFrom(MythUIType *base)
 {
     MythScreenType *st = dynamic_cast<MythScreenType *>(base);
@@ -490,6 +496,12 @@ void MythScreenType::CopyFrom(MythUIType *base)
     BuildFocusList();
 };
 
+/**
+ * \copydoc MythUIType::CreateCopy()
+ *
+ * Do not use.
+ * 
+ */
 void MythScreenType::CreateCopy(MythUIType *)
 {
     VERBOSE(VB_IMPORTANT, "CreateCopy called on screentype - bad.");
