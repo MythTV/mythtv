@@ -1816,7 +1816,7 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
     if (title != other.title)
         return false;
-    if (startts == other.startts && endts == other.endts &&
+    if (startts == other.startts && 
         (chanid == other.chanid ||
          (!chansign.isEmpty() && chansign == other.chansign)))
         return true;
