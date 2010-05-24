@@ -510,7 +510,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
     programInfo.MarkAsInUse(true, kPreviewGeneratorInUseID);
 
     float aspect = 0;
-    int   len, width, height, sz;
+    int   width, height, sz;
     long long captime = captureTime;
     if (captime < 0)
     {
@@ -543,7 +543,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
         captime += preroll;
     }
 
-    len = width = height = sz = 0;
+    width = height = sz = 0;
     unsigned char *data = (unsigned char*)
         GetScreenGrab(programInfo, pathname,
                       captime, timeInSeconds,
@@ -556,8 +556,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
 
     bool ok = SavePreview(outname, data, width, height, aspect, dw, dh);
 
-    if (data)
-        delete[] data;
+    delete[] data;
 
     programInfo.MarkAsInUse(false, kPreviewGeneratorInUseID);
 
