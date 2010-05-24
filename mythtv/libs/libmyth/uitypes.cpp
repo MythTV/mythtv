@@ -218,8 +218,8 @@ UIType::~UIType()
 void UIType::Draw(QPainter *dr, int drawlayer, int context)
 {
     dr->end();
-    drawlayer = 0;
-    context = 0;
+    (void)drawlayer;
+    (void)context;
 }
 
 void UIType::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
