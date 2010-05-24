@@ -3763,12 +3763,13 @@ enabled freetype2 ||
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
+# Qt dependency checks
+qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
+qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
+
 if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
     enable qtwebkit
 else
-    # For environments that don't have pkg-config, we do a compile test.
-    qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
-
     check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
 #if QT_VERSION < 0x040400
@@ -3780,9 +3781,11 @@ fi
 enabled qtwebkit || die "Error! QtWebkit headers not found"
 
 # Check if Qt was built with DBus support:
-qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
-check_cxx ${qt_inc} ${qt_inc}/QtDBus <<EOF && enable qtdbus
+check_ld_cxx ${qt_inc} ${qt_inc}/QtDBus ${qt_libs} -lQtDBus <<EOF && enable qtdbus
 #include <QtDBus>
+int main(void){
+    return (long) QDBusConnection::disconnectFromBus;
+}
 EOF
 
 if enabled firewire; then
