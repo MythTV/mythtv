@@ -1,0 +1,117 @@
+<mythuitheme>
+    <window name="MythPopupBox">
+        <fontdef name="basesmall" face="Droid Sans">
+            <pixelsize>22</pixelsize>
+            <color>#EEEEEE</color>
+            <bold>yes</bold>
+        </fontdef>
+        <fontdef name="basesmall_normal_inactive" from="basesmall">
+            <color>#666666</color>
+        </fontdef>
+        <area>-1,-1,500,500</area>
+        <imagetype name="backimg">
+            <area>0,0,500,500</area>
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="messagearea">
+            <font>basesmall</font>
+            <area>12,14,470,210</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+        </textarea>
+
+        <buttonlist name="list">
+            <area>12,224,470,250</area>
+            <drawfrombottom>yes</drawfrombottom>
+            <showarrow>no</showarrow>
+            <wrapstyle>selection</wrapstyle>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,30</area>
+                    <imagetype name="buttonbackground">
+                        <gradient start="#505050" end="#000000" alpha="200" />
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>0,0,100%,30</area>
+                        <align>allcenter</align>
+                        <font>basesmall</font>
+                        <cutdown>yes</cutdown>
+                    </textarea>
+                    <statetype name="buttoncheck">
+                        <area>91%,4,20,20</area>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <area>0,0,20,20</area>
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <area>0,0,20,20</area>
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <area>0,0,20,20</area>
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <imagetype name="buttonarrow">
+                        <area>94%,6,16,16</area>
+                        <filename>lb-arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selectedactive" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                    </imagetype>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmall_normal_inactive</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>10,96%</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <area>0,0,27,18</area>
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <area>0,0,27,18</area>
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>40,96%</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <area>0,0,27,18</area>
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <area>0,0,27,18</area>
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
+</mythuitheme>
+

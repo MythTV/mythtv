@@ -1,0 +1,498 @@
+<mythuitheme>
+    <window name="osd_message">
+        <fontdef name="medium" face="DejaVu Sans">
+            <pixelsize>22</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <area>250,42,300,58</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="message_text">
+            <font>medium</font>
+            <area>12,17,275,25</area>
+            <align>hcenter, vcenter</align>
+        </textarea>
+    </window>
+
+    <window name="osd_input">
+        <fontdef name="medium" face="DejaVu Sans">
+            <pixelsize>22</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <area>69,42,106,58</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="osd_number_entry">
+            <font>medium</font>
+            <area>12,17,81,25</area>
+            <align>hcenter, vcenter</align>
+        </textarea>
+    </window>
+
+    <window name="osd_status">
+        <fontdef name="small" face="DejaVu Sans">
+            <pixelsize>18</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <area>62,483,675,75</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title">
+            <font>small</font>
+            <area>6,8,375,25</area>
+            <align>left, top</align>
+        </textarea>
+        <textarea name="description">
+            <font>small</font>
+            <area>6,42,662,25</area>
+            <align>hcenter, bottom</align>
+            <template>%DESCRIPTION% %VALUE%%UNITS%</template>
+        </textarea>
+        <clock name="clock">
+            <area>481,8,187,25</area>
+            <font>small</font>
+            <format>%TIME%</format>
+            <align>right,top</align>
+        </clock>
+        <progressbar name="position">
+            <area>6,35,662,6</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+        	    <area>0,0,100%,100%</area>
+                <filename>progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+        	    <area>0,0,100%,100%</area>
+                <filename>progressbar_fill.png</filename>
+            </imagetype>
+        </progressbar>
+    </window>
+
+    <window name="program_info">
+        <fontdef name="small" face="DejaVu Sans">
+            <pixelsize>18</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <fontdef name="smaller" from="small">
+            <pixelsize>15</pixelsize>
+        </fontdef>
+        <fontdef name="medium" from="small">
+            <pixelsize>22</pixelsize>
+        </fontdef>
+        <area>62,301,675,249</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title">
+            <font>medium</font>
+            <area>6,8,375,25</area>
+            <align>left, top</align>
+        </textarea>
+        <textarea name="starttime">
+            <font>smaller</font>
+            <area>6,42,437,25</area>
+            <align>left, top</align>
+            <template>%STARTTIME%-%ENDTIME% : %LENMINS%</template>
+        </textarea>
+        <clock name="clock">
+            <area>481,8,187,25</area>
+            <font>small</font>
+            <format>%TIME%</format>
+            <align>right,top</align>
+        </clock>
+        <textarea name="channum">
+            <font>small</font>
+            <area>12,83,94,25</area>
+            <align>hcenter, vcenter</align>
+        </textarea>
+        <imagetype name="iconpath">
+            <area>19,117,81,83</area>
+        </imagetype>
+        <textarea name="callsign">
+            <font>smaller</font>
+            <area>12,208,94,25</area>
+            <align>hcenter, vcenter</align>
+        </textarea>
+        <textarea name="description">
+            <font>small</font>
+            <area>125,83,537,150</area>
+            <align>left, top</align>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+        </textarea>
+    </window>
+
+    <window name="browse_info">
+        <fontdef name="small" face="DejaVu Sans">
+            <pixelsize>18</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <fontdef name="smaller" from="small">
+            <pixelsize>15</pixelsize>
+        </fontdef>
+        <fontdef name="medium" from="small">
+            <pixelsize>22</pixelsize>
+        </fontdef>
+        <area>62,301,675,249</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title">
+            <font>medium</font>
+            <area>6,8,375,25</area>
+            <align>left, top</align>
+        </textarea>
+        <textarea name="starttime">
+            <font>smaller</font>
+            <area>6,42,437,25</area>
+            <align>left, top</align>
+            <template>%STARTTIME%-%ENDTIME% : %LENMINS%</template>
+        </textarea>
+        <clock name="clock">
+            <area>481,8,187,25</area>
+            <font>small</font>
+            <format>%TIME%</format>
+            <align>right,top</align>
+        </clock>
+        <textarea name="channum">
+            <font>small</font>
+            <area>12,83,94,25</area>
+            <align>hcenter, vcenter</align>
+        </textarea>
+        <imagetype name="iconpath">
+            <area>19,117,81,83</area>
+        </imagetype>
+        <textarea name="callsign">
+            <font>smaller</font>
+            <area>12,208,94,25</area>
+            <align>hcenter, vcenter</align>
+        </textarea>
+        <textarea name="description">
+            <font>small</font>
+            <area>125,83,537,150</area>
+            <align>left, top</align>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+        </textarea>
+    </window>
+
+    <window name="ChannelEditor">
+        <fontdef name="small" face="DejaVu Sans">
+            <pixelsize>18</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <fontdef name="smaller" from="small">
+            <pixelsize>15</pixelsize>
+        </fontdef>
+        <area>244,92,312,416</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title">
+            <font>small</font>
+            <area>6,8,300,25</area>
+            <align>left, top</align>
+        </textarea>
+        <textarea name="message">
+            <font>small</font>
+            <area>9,12,294,125</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="callsign_label">
+            <font>small</font>
+            <area>6,150,81,42</area>
+            <align>allcenter</align>
+            <value>Callsign</value>
+        </textarea>
+        <textedit name="callsign">
+            <area>94,150,212,42</area>
+            <statetype name="background">
+                <state name="active">
+                    <shape name="textbackground">
+                        <fill color="#BBBBBB" alpha="255" />
+                    </shape>
+                </state>
+                <state name="selected" from="active">
+                    <shape name="textbackground">
+                        <fill color="#BBBBBB" alpha="200" />
+                    </shape>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <font>small</font>
+                <align>left, vcenter</align>
+            </textarea>
+        </textedit>
+
+        <textarea name="channum_label" from="callsign_label">
+            <area>6,208,81,42</area>
+            <value>Channel #</value>
+        </textarea>
+        <textedit name="channum" from="callsign">
+            <area>94,208,212,42</area>
+        </textedit>
+
+        <textarea name="channame_label" from="callsign_label">
+            <area>6,267,81,42</area>
+            <value>Channel Name</value>
+        </textarea>
+        <textedit name="channame" from="callsign">
+            <area>94,267,212,42</area>
+        </textedit>
+
+        <textarea name="xmltv_label" from="callsign_label">
+            <area>6,325,81,42</area>
+            <value>XMLTV ID</value>
+        </textarea>
+        <textedit name="XMLTV" from="callsign">
+            <area>94,325,212,42</area>
+        </textedit>
+
+        <button name="probe">
+            <position>45,367</position>
+            <value>Probe</value>
+            <statetype name="buttonstate">
+                <state name="active">
+	            <shape name="buttonbackground">
+	                <type>roundbox</type>
+	                <area>0,0,94,33</area>
+	    	    <fill color="#666666" alpha="50" />
+	    	    <cornerradius>20</cornerradius>
+	            </shape>
+                    <textarea name="text">
+                        <area>4,4,87,25</area>
+                        <align>allcenter</align>
+                        <font>small</font>
+                        <font state="selected">small</font>
+                        <font state="disabled">small</font>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+	            <shape name="buttonbackground">
+                    <fill color="#ffffff" alpha="50" />
+                </shape>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active" />
+            </statetype>
+        </button>
+        <button name="ok" from="probe">
+            <position>305,367</position>
+            <value>Ok</value>
+        </button>
+    </window>
+
+    <window name="osd_program_editor">
+        <fontdef name="small" face="DejaVu Sans">
+            <pixelsize>18</pixelsize>
+            <color>#FFFFFF</color>
+            <shadowoffset>1,1</shadowoffset>
+            <shadowcolor>#000000</shadowcolor>
+        </fontdef>
+        <area>62,483,675,75</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title">
+            <area>6,8,375,25</area>
+            <align>left,top</align>
+            <font>small</font>
+        </textarea>
+        <textarea name="seekamount" from="title">
+            <area>481,8,187,25</area>
+            <align>right,top</align>
+        </textarea>
+        <textarea name="timedisplay" from="title">
+            <area>6,42,662,25</area>
+            <align>hcenter, bottom</align>
+        </textarea>
+        <textarea name="cutindicator" from="title">
+            <area>6,42,187,25</area>
+            <align>left, bottom</align>
+        </textarea>
+        <textarea name="framedisplay" from="title">
+            <area>481,42,187,25</area>
+            <align>right, bottom</align>
+        </textarea>
+        <editbar name="editbar">
+            <area>6,25,662,25</area>
+            <shape name="position">
+                <area>0,0,5,100%</area>
+                <fill color="#FFFFFF" alpha="255" />
+            </shape>
+            <shape name="keep">
+                <area>0,9,100%,7</area>
+                <fill color="#00FF00" alpha="255" />
+                <type>roundbox</type>
+                <cornerradius>6</cornerradius>
+            </shape>
+            <shape name="cut">
+                <area>0,9,100%,7</area>
+                <fill color="#FF0000" alpha="255" />
+                <type>roundbox</type>
+                <cornerradius>6</cornerradius>
+            </shape>
+            <shape name="cuttoright">
+                <area>0,4,3,17</area>
+                <fill color="#FF0000" alpha="255" />
+            </shape>
+            <shape name="cuttoleft">
+                <area>0,4,3,17</area>
+                <fill color="#FF0000" alpha="255" />
+            </shape>
+            <shape name="keeptoright">
+                <area>0,4,3,17</area>
+                <fill color="#00FF00" alpha="255" />
+            </shape>
+            <shape name="keeptoleft">
+                <area>0,4,3,17</area>
+                <fill color="#00FF00" alpha="255" />
+            </shape>
+        </editbar>
+    </window>
+
+    <window name="MythPopupBox">
+        <fontdef name="basesmall" face="DejaVu Sans">
+            <size>15</size>
+            <color>#FFFFFF</color>
+        </fontdef>
+        <fontdef name="basesmallgrey" from="basesmall">
+            <color>#bcbcbc</color>
+        </fontdef>
+        <area>-1,-1,312,416</area>
+        <shape name="basebackground">
+            <area>0,0,312,416</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="200" />
+            <line color="#222222" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="messagearea">
+            <area>9,12,294,175</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+        </textarea>
+
+        <buttonlist name="list">
+            <area>11,187,294,208</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <drawfrombottom>yes</drawfrombottom>
+            <showarrow>yes</showarrow>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,25</area>
+        	        <shape name="buttonbackground">
+        	            <type>roundbox</type>
+        	            <area>0,0,99%,25</area>
+            		    <fill color="#666666" alpha="50" />
+            		    <cornerradius>15</cornerradius>
+        	        </shape>
+                    <textarea name="buttontext">
+                        <font>basesmallgrey</font>
+                        <cutdown>yes</cutdown>
+                        <align>allcenter</align>
+                        <area>0,0,100%,25</area>
+                    </textarea>
+                    <imagetype name="buttonarrow">
+                        <area>94%,6,10,13</area>
+                        <filename>lb-arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selectedactive" from="active">
+    	            <shape name="buttonbackground">
+    	                <type>roundbox</type>
+    	                <area>0,0,99%,25</area>
+    	                <fill color="#ffffff" alpha="50" />
+    	                <cornerradius>15</cornerradius>
+        	        </shape>
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="active">
+        	        <shape name="buttonbackground">
+        	            <type>roundbox</type>
+                	    <area>0,0,99%,25</area>
+        	            <fill color="#ffffff" alpha="50" />
+        	            <cornerradius>15</cornerradius>
+        	        </shape>
+                    <textarea name="buttontext">
+                        <font>basesmallgrey</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>6,96%</position>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <area>0,0,19,25</area>
+                        <filename>uparrow_alt.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>25,96%</position>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <area>0,0,19,25</area>
+                        <filename>downarrow_alt.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+    </window>
+</mythuitheme>

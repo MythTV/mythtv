@@ -1,0 +1,67 @@
+<mythuitheme>
+    <window name="MythPopupBox">
+
+        <fontdef name="osdsmall" face="Arial">
+            <pixelsize>19</pixelsize>
+            <color>#DDDDDD</color>
+        </fontdef>
+        <fontdef name="osdmedium" from="osdsmall">
+            <pixelsize>22</pixelsize>
+        </fontdef>
+        <fontdef name="osdmediumbrown" from="osdmedium">
+            <color>#484537</color>
+        </fontdef>
+
+        <area>0,42,412,642</area>
+
+        <imagetype name="backimg">
+            <area>0,78,412,515</area>
+            <filename>popups/menu_background.png</filename>
+        </imagetype>
+
+        <textarea name="messagearea">
+            <area>12,93,378,125</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <font>osdsmall</font>
+        </textarea>
+
+        <buttonlist name="list">
+            <area>15,238,378,350</area>
+            <buttonarea>0,0,378,350</buttonarea>
+            <spacing>3</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,367,53</area>
+                <state name="active">
+                    <area>0,0,367,53</area>
+                    <imagetype name="buttonbackground">
+                        <area>0,0,367,53</area>
+                        <filename>popups/menu_button.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>18,0,324,50</area>
+                        <align>allcenter</align>
+                        <font>osdmedium</font>
+                    </textarea>
+                    <imagetype name="buttonarrow">
+                        <area>346,16,10,19</area>
+                        <filename>popups/submenu_arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selectedinactive" from="active">
+                </state>
+                <state name="selectedactive" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <area>5,16,10,19</area>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>osdmediumbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
+</mythuitheme>
+
