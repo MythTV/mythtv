@@ -13,7 +13,7 @@ class MythRender
 {
   public:
     MythRender() : m_master(kMasterUI), m_size(QSize()), m_errored(false) { }
-   ~MythRender() { }
+    virtual  ~MythRender() { }
 
     void  SetMaster(RenderMaster master) { m_master = master; }
     bool  IsErrored(void) const          { return m_errored;  }
