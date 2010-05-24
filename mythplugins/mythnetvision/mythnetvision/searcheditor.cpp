@@ -103,7 +103,8 @@ GrabberScript::scriptList SearchEditor::fillGrabberList()
             i != Scripts.end(); ++i)
     {
         QProcess scriptCheck;
-        QString title, image;
+        QString title, image, description, author, type;
+        double version;
         bool search = false;
         bool tree = false;
 
@@ -113,63 +114,29 @@ GrabberScript::scriptList SearchEditor::fillGrabberList()
         scriptCheck.start(commandline, QStringList() << "-v");
         scriptCheck.waitForFinished();
         QByteArray result = scriptCheck.readAll();
-        QString resultString(result);
 
-        if (resultString.isEmpty())
-            resultString = *i;
+        QDomDocument versioninfo;
+        versioninfo.setContent(result);
+        QDomElement item = versioninfo.documentElement();
 
-        QString capabilities = QString();
-        QStringList specs = resultString.split("|");
-        if (specs.size() > 1)
-            capabilities = specs.takeAt(1);
-
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Capability of script %1: %2")
-                              .arg(*i).arg(capabilities.trimmed()));
-
-        title = specs.takeAt(0);
-
-        if (capabilities.trimmed().contains("S"))
+        title = item.firstChildElement("name").text();
+        author = item.firstChildElement("author").text();
+        image = item.firstChildElement("thumbnail").text();
+        type = item.firstChildElement("type").text();
+        description = item.firstChildElement("description").text();
+        version = item.firstChildElement("version").text().toDouble();
+        QString treestring = item.firstChildElement("tree").text();
+        if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
+            treestring.toLower() == "yes" || treestring == "1"))
+            tree = true;
+        QString searchstring = item.firstChildElement("search").text();
+        if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
+            searchstring.toLower() == "yes" || searchstring == "1"))
             search = true;
 
-        if (capabilities.trimmed().contains("T"))
-            tree = true;
-
-        QFileInfo fi(*i);
-        QString basename = fi.completeBaseName();
-        QList<QByteArray> image_types = QImageReader::supportedImageFormats();
-
-        typedef std::set<QString> image_type_list;
-        image_type_list image_exts;
-
-        for (QList<QByteArray>::const_iterator it = image_types.begin();
-                it != image_types.end(); ++it)
-        {
-            image_exts.insert(QString(*it).toLower());
-        }
-
-        QStringList sfn;
-
-        QString icondir = QString("%1/mythnetvision/icons/").arg(GetShareDir());
-        QString dbIconDir = gCoreContext->GetSetting("mythnetvision.iconDir",
-                                                     icondir);
-
-        for (image_type_list::const_iterator ext = image_exts.begin();
-                ext != image_exts.end(); ++ext)
-        {
-            sfn += QString(dbIconDir + basename + "." + *ext);
-        }
-
-        for (QStringList::const_iterator im = sfn.begin();
-                        im != sfn.end(); ++im)
-        {
-            if (QFile::exists(*im))
-            {
-                image = *im;
-                break;
-            }
-        }
-        if (search)
-            tmp.append(new GrabberScript(title, image, search, tree, commandline));
+        if (search && type.toLower() == "video")
+            tmp.append(new GrabberScript(title, image, VIDEO, author,
+                       search, tree, description, commandline, version));
     }
     return tmp;
 }
@@ -196,7 +163,7 @@ void SearchEditor::fillGrabberButtonList()
             item->setCheckable(true);
             item->setChecked(MythUIButtonListItem::NotChecked);
             QFileInfo fi((*i)->GetCommandline());
-            if (findSearchGrabberInDB(fi.fileName()))
+            if (findSearchGrabberInDB(fi.fileName(), VIDEO))
                 item->setChecked(MythUIButtonListItem::FullChecked);
         }
         else
@@ -218,7 +185,7 @@ void SearchEditor::toggleItem(MythUIButtonListItem *item)
 
     if (!checked)
     {
-        if (insertSearchInDB(script))
+        if (insertSearchInDB(script, VIDEO))
         {
             m_changed = true;
             item->setChecked(MythUIButtonListItem::FullChecked);

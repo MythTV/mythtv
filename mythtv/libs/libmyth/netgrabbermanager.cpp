@@ -21,15 +21,21 @@ using namespace std;
 // ---------------------------------------------------
 
 GrabberScript::GrabberScript(const QString& title, const QString& image,
+              const ArticleType &type, const QString& author,
               const bool& search, const bool& tree,
-              const QString& commandline) :
+              const QString& description, const QString& commandline,
+              const double& version) :
         m_lock(QMutex::Recursive)
 {
     m_title = title;
     m_image = image;
+    m_type = type;
+    m_author = author;
     m_search = search;
     m_tree = tree;
+    m_description = description;
     m_commandline = commandline;
+    m_version = version;
 }
 
 GrabberScript::~GrabberScript()
@@ -51,14 +57,14 @@ void GrabberScript::run()
 
         if (QProcess::NormalExit != m_getTree.exitStatus())
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Internet Content Script "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Internet Content Source "
                            "%1 crashed while grabbing tree.").arg(m_title));
             emit finished();
             return;
         }
 
-        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Script %1 "
-                           "completed download.").arg(m_title));
+        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
+                           "completed download, beginning processing...").arg(m_title));
 
         QByteArray result = m_getTree.readAll();
 
@@ -70,10 +76,12 @@ void GrabberScript::run()
 
         while (!channel.isNull())
         {
-            parseDBTree(m_title, QString(), QString(), channel);
+            parseDBTree(m_title, QString(), QString(), channel, GetType());
             channel = channel.nextSiblingElement("channel");
         }
         markTreeUpdated(this, QDateTime::currentDateTime());
+        VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 "
+                           "completed processing, marking as updated.").arg(m_title));
         emit finished();
     }
     else
@@ -81,19 +89,26 @@ void GrabberScript::run()
 }
 
 void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
-                                const QString &pathThumb, QDomElement& domElem)
+                                const QString &pathThumb, QDomElement& domElem,
+                                const ArticleType &type)
 {
     QMutexLocker locker(&m_lock);
 
     Parse parse;
+    ResultItem::resultList articles;
 
     // File Handling
     QDomElement fileitem = domElem.firstChildElement("item");
     while (!fileitem.isNull())
-    {
-        insertTreeArticleInDB(feedtitle, path,
-                       pathThumb, parse.ParseItem(fileitem));
+    {   // Fill the article list...
+        articles.append(parse.ParseItem(fileitem));
         fileitem = fileitem.nextSiblingElement("item");
+    }
+
+    while (!articles.isEmpty())
+    {   // Insert the articles in the DB...
+        insertTreeArticleInDB(feedtitle, path,
+                       pathThumb, articles.takeFirst(), type);
     }
 
     // Directory Handling
@@ -114,7 +129,8 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
         parseDBTree(feedtitle,
                     pathToUse,
                     dirthumb,
-                    subfolder);
+                    subfolder,
+                    type);
         diritem = diritem.nextSiblingElement("directory");
     }
 }
@@ -204,7 +220,7 @@ void GrabberDownloadThread::run()
         GrabberScript *script = m_scripts.takeFirst();
         if (script && (needsUpdate(script, updateFreq) || m_refreshAll))
         {
-            VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Script %1 Updating...")
+            VERBOSE(VB_IMPORTANT, LOC + QString("Internet Content Source %1 Updating...")
                                   .arg(script->GetTitle()));
             script->run();
         }

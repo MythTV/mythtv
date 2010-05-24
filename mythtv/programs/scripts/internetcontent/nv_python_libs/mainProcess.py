@@ -21,13 +21,15 @@
 #-------------------------------------
 __title__ ="Netvision Common Query Processing";
 __author__="R.D.Vaughan"
-__version__="v0.2.1"
+__version__="v0.2.3"
 # 0.1.0 Initial development
 # 0.1.1 Refining the code like the additional of a grabber specifing the maximum number of items to return
 # 0.1.2 Added the Tree view option
 # 0.1.3 Updated deocumentation
 # 0.2.0 Public release
 # 0.2.1 Added the ability to have a mashup name independant of the mashup title
+# 0.2.2 Added support of the -H option
+# 0.2.3 Added support of the XML version information
 
 import sys, os
 from optparse import OptionParser
@@ -62,6 +64,30 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+
+try:
+    from StringIO import StringIO
+    from lxml import etree
+except Exception, e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.exit(1)
+
+# Check that the lxml library is current enough
+# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
+# Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
+version = ''
+for digit in etree.LIBXML_VERSION:
+    version+=str(digit)+'.'
+version = version[:-1]
+if version < '2.7.2':
+    sys.stderr.write(u'''
+! Error - The installed version of the "lxml" python library "libxml" version is too old.
+          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
+''' % version)
+    sys.exit(1)
+
 
 class siteQueries():
     '''Methods that quering video Web sites for metadata and outputs the results to stdout any errors are output
@@ -226,7 +252,7 @@ xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""
     # end searchForVideos()
 
     def displayTreeView(self):
-        '''Ceate a Tree View specific to a target site and output the results a XML to stdout. Nested
+        '''Create a Tree View specific to a target site and output the results a XML to stdout. Nested
         directories are permissable.
         '''
         self.firstVideo = True
@@ -258,6 +284,19 @@ xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""
         sys.stdout.write(self.treeViewXML['end_rss'])
     # end displayTreeView()
 
+    def displayHTML(self, videocode):
+        '''Request a custom Web page from the grabber and display on stdout
+        '''
+        self.firstVideo = True
+        self.config['target'].page_limit = self.page_limit
+        self.config['target'].grabber_title = self.grabber_title
+        self.config['target'].mashup_title = self.mashup_title
+        self.config['target'].HTMLvideocode = videocode
+
+        sys.stdout.write(self.config['target'].displayCustomHTML())
+        return
+    # end displayHTML()
+
 # end Class siteQueries()
 
 class mainProcess:
@@ -274,7 +313,6 @@ class mainProcess:
     def main(self):
         """Gets video details a search term
         """
-        index = self.grabber_title.find(u'|')
         parser = OptionParser()
 
         parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
@@ -288,23 +326,22 @@ class mainProcess:
         parser.add_option(  "-p", "--pagenumber", metavar="PAGE NUMBER", default=1, dest="pagenumber",
                             help=u"Display specific page of the search results. Default is page 1.\nPage number is ignored with the Tree View option (-T).")
         functionality = u''
-        if self.grabber_title[index:].find('S') != -1:
+        if self.grabberInfo['search']:
             parser.add_option(  "-S", "--search", action="store_true", default=False, dest="search",
                                 help=u"Search for videos")
             functionality+='S'
-            search = True
-        else:
-            search = False
 
-        if self.grabber_title[index:].find('T') != -1:
+        if self.grabberInfo['tree']:
             parser.add_option(  "-T", "--treeview", action="store_true", default=False, dest="treeview",
                                 help=u"Display a Tree View of a sites videos")
             functionality+='T'
-            treeview = True
-        else:
-            treeview = False
 
-        parser.usage=u"./%%prog -hduvl%s [parameters] <search text>\nVersion: %s Author: %s\n\nFor details on the MythTV Netvision plugin see the wiki page at:\nhttp://www.mythtv.org/wiki/MythNetvision" % (functionality, self.grabber_version, self.grabber_author)
+        if self.grabberInfo['html']:
+            parser.add_option(  "-H", "--customhtml", action="store_true", default=False,
+                                dest="customhtml", help=u"Return a custom HTML Web page")
+            functionality+='H'
+
+        parser.usage=u"./%%prog -hduvl%s [parameters] <search text>\nVersion: %s Author: %s\n\nFor details on the MythTV Netvision plugin see the wiki page at:\nhttp://www.mythtv.org/wiki/MythNetvision" % (functionality, self.grabberInfo['version'], self.grabberInfo['author'])
 
         opts, args = parser.parse_args()
 
@@ -318,25 +355,45 @@ class mainProcess:
 
         # Process version command line requests
         if opts.version:
-            sys.stdout.write("%s\n" % (
-            self.grabber_title))
+            version = etree.XML(u'<grabber></grabber>')
+            etree.SubElement(version, "name").text = self.grabberInfo['title']
+            etree.SubElement(version, "author").text = self.grabberInfo['author']
+            etree.SubElement(version, "thumbnail").text = self.grabberInfo['thumbnail']
+            for t in self.grabberInfo['type']:
+                etree.SubElement(version, "type").text = t
+            etree.SubElement(version, "description").text = self.grabberInfo['desc']
+            etree.SubElement(version, "version").text = self.grabberInfo['version']
+            if self.grabberInfo['search']:
+                etree.SubElement(version, "search").text = 'true'
+            if self.grabberInfo['tree']:
+                etree.SubElement(version, "tree").text = 'true'
+            sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True))
             sys.exit(0)
 
         # Process usage command line requests
         if opts.usage:
-            sys.stdout.write(self.grabber_usage_examples)
+            sys.stdout.write(self.grabberInfo['usage'])
             sys.exit(0)
 
-        if search:
+        if self.grabberInfo['search']:
             if opts.search and not len(args) == 1:
                 sys.stderr.write("! Error: There must be one value for the search option. Your options are (%s)\n" % (args))
                 sys.exit(1)
             if opts.search and args[0] == u'':
                 sys.stderr.write("! Error: There must be a non-empty search argument, yours is empty.\n")
                 sys.exit(1)
-            if not opts.search and not opts.treeview:
-                sys.stderr.write("! Error: You have not selected a valid option.\n")
+
+        if self.grabberInfo['html']:
+            if opts.customhtml and not len(args) == 1:
+                sys.stderr.write("! Error: There must be one value for the search option. Your options are (%s)\n" % (args))
                 sys.exit(1)
+            if opts.customhtml and args[0] == u'':
+                sys.stderr.write("! Error: There must be a non-empty Videocode argument, yours is empty.\n")
+                sys.exit(1)
+
+        if not self.grabberInfo['search'] and not self.grabberInfo['tree'] and not self.grabberInfo['html']:
+            sys.stderr.write("! Error: You have not selected a valid option.\n")
+            sys.exit(1)
 
         try:
             x = int(opts.pagenumber)
@@ -354,46 +411,46 @@ class mainProcess:
                     search_all_languages = False,)
 
         # Set the maximum number of items to display per Mythtvnetvision search page
-        if not 'search_max_page_items' in dir(self):
+        if not 'SmaxPage' in self.grabberInfo.keys():
             Queries.page_limit = 20   # Default items per page
         else:
-            Queries.page_limit = self.search_max_page_items
+            Queries.page_limit = self.grabberInfo['SmaxPage']
 
         # Set the maximum number of items to display per Mythtvnetvision tree view page
-        if not 'tree_max_page_items' in dir(self):
+        if not 'TmaxPage' in self.grabberInfo.keys():
             Queries.page_limit = 20   # Default items per page
         else:
-            Queries.page_limit = self.tree_max_page_items
+            Queries.page_limit = self.grabberInfo['TmaxPage']
 
         # Set the grabber title
-        if not 'grabber_title' in dir(self):
-            Queries.grabber_title = u''
-        else:
-            index = self.grabber_title.find(u'|')
-            if not index == -1:
-                Queries.grabber_title = self.grabber_title[:index]
-            else:
-                Queries.grabber_title = self.grabber_title
+        Queries.grabber_title = self.grabberInfo['title']
 
         # Set the mashup title
-        if not 'mashup_title' in dir(self):
+        if not 'mashup_title' in self.grabberInfo.keys():
             Queries.mashup_title = Queries.grabber_title
         else:
-            if search:
+            if self.grabberInfo['search']:
                 if opts.search:
-                    Queries.mashup_title = self.mashup_title + "search"
-            if treeview:
+                    Queries.mashup_title = self.grabberInfo['mashup_title'] + "search"
+            if self.grabberInfo['tree']:
                 if opts.treeview:
-                    Queries.mashup_title = self.mashup_title + "treeview"
+                    Queries.mashup_title = self.grabberInfo['mashup_title'] + "treeview"
+            if self.grabberInfo['html']:
+                if opts.customhtml:
+                    Queries.mashup_title = self.grabberInfo['mashup_title'] + "customhtml"
 
         # Process requested option
-        if search:
+        if self.grabberInfo['search']:
             if opts.search:                 # Video search -S
                 Queries.searchForVideos(args[0], opts.pagenumber)
 
-        if treeview:
+        if self.grabberInfo['tree']:
             if opts.treeview:               # Video treeview -T
                 Queries.displayTreeView()
+
+        if self.grabberInfo['html']:
+            if opts.customhtml:               # Video treeview -H
+                Queries.displayHTML(args[0])
 
         sys.exit(0)
     # end main()

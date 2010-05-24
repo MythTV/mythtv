@@ -53,7 +53,7 @@ void RSSManager::doUpdate()
     for (RSSSite::rssList::iterator i = m_sites.begin();
             i != m_sites.end(); ++i)
     {
-        VERBOSE(VB_GENERAL|VB_EXTRA, LOC + QString("Updating RSS Feed %1")
+        VERBOSE(VB_GENERAL, LOC + QString("Updating RSS Feed %1")
                                       .arg((*i)->GetTitle()));
 
         connect(*i, SIGNAL(finished(RSSSite*)),
@@ -86,14 +86,14 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
     if (!site)
         return;
 
-    clearRSSArticles(site->GetTitle());
+    clearRSSArticles(site->GetTitle(), site->GetType());
 
     ResultItem::resultList rss = site->GetVideoList();
     ResultItem::resultList::iterator it = rss.begin();
     for (; it != rss.end(); ++it)
     {
         // Insert in the DB here.
-        insertArticleInDB(site->GetTitle(), *it);
+        insertRSSArticleInDB(site->GetTitle(), *it, site->GetType());
         m_inprogress.removeOne(site);
     }
 
@@ -110,6 +110,7 @@ void RSSManager::slotRSSRetrieved(RSSSite *site)
 
 RSSSite::RSSSite(const QString& title,
                   const QString& image,
+                  const ArticleType& type,
                   const QString& description,
                   const QString& url,
                   const QString& author,
@@ -122,6 +123,7 @@ RSSSite::RSSSite(const QString& title,
 {
     m_title = title;
     m_image = image;
+    m_type = type;
     m_description = description;
     m_url = url;
     m_author = author;
@@ -233,7 +235,7 @@ void RSSSite::process(void)
                 i != items.end(); ++i)
         {
             insertRSSArticle(new ResultItem((*i)->GetTitle(),
-               (*i)->GetDescription(), (*i)->GetURL(),
+               QString(), (*i)->GetDescription(), (*i)->GetURL(),
                (*i)->GetThumbnail(), (*i)->GetMediaURL(),
                (*i)->GetAuthor(), (*i)->GetDate(),
                (*i)->GetTime(), (*i)->GetRating(),

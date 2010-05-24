@@ -114,7 +114,7 @@ bool NetSearch::Create()
 
 void NetSearch::Load()
 {
-    m_grabberList = findAllDBSearchGrabbers();
+    m_grabberList = findAllDBSearchGrabbers(VIDEO);
     if (m_grabberList.isEmpty())
         m_grabberList = fillGrabberList();
 }
@@ -289,7 +289,8 @@ GrabberScript::scriptList NetSearch::fillGrabberList()
             i != Scripts.end(); ++i)
     {
         QProcess scriptCheck;
-        QString title, image;
+        QString title, author, image, description, type;
+        double version;
         bool search = false;
         bool tree = false;
 
@@ -298,62 +299,29 @@ GrabberScript::scriptList NetSearch::fillGrabberList()
         scriptCheck.start(commandline, QStringList() << "-v");
         scriptCheck.waitForFinished();
         QByteArray result = scriptCheck.readAll();
-        QString resultString(result);
 
-        if (resultString.isEmpty())
-            resultString = *i;
+        QDomDocument versioninfo;
+        versioninfo.setContent(result);
+        QDomElement item = versioninfo.documentElement();
 
-        QString capabilities = QString();
-        QStringList specs = resultString.split("|");
-        if (specs.size() > 1)
-            capabilities = specs.takeAt(1);
-
-        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Capability of script %1: %2")
-                              .arg(*i).arg(capabilities.trimmed()));
-
-        title = specs.takeAt(0);
-
-        if (capabilities.trimmed().contains("S"))
+        title = item.firstChildElement("name").text();
+        author = item.firstChildElement("author").text();
+        image = item.firstChildElement("thumbnail").text();
+        type = item.firstChildElement("type").text();
+        description = item.firstChildElement("description").text();
+        version = item.firstChildElement("version").text().toDouble();
+        QString treestring = item.firstChildElement("tree").text();
+        if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
+            treestring.toLower() == "yes" || treestring == "1"))
+            tree = true;
+        QString searchstring = item.firstChildElement("search").text();
+        if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
+            searchstring.toLower() == "yes" || searchstring == "1"))
             search = true;
 
-        if (capabilities.trimmed().contains("T"))
-            tree = true;
-
-        QFileInfo fi(*i);
-        QString basename = fi.completeBaseName();
-        QList<QByteArray> image_types = QImageReader::supportedImageFormats();
-
-        typedef std::set<QString> image_type_list;
-        image_type_list image_exts;
-
-        for (QList<QByteArray>::const_iterator it = image_types.begin();
-                it != image_types.end(); ++it)
-        {
-            image_exts.insert(QString(*it).toLower());
-        }
-
-        QStringList sfn;
-
-        QString icondir = QString("%1/mythnetvision/icons/").arg(GetShareDir());
-        QString dbIconDir = gCoreContext->GetSetting("mythnetvision.iconDir", icondir);
-
-        for (image_type_list::const_iterator ext = image_exts.begin();
-                ext != image_exts.end(); ++ext)
-        {
-            sfn += QString(dbIconDir + basename + "." + *ext);
-        }
-
-        for (QStringList::const_iterator im = sfn.begin();
-                        im != sfn.end(); ++im)
-        {
-            if (QFile::exists(*im))
-            {
-                image = *im;
-                break;
-            }
-        }
-        if (search)
-            tmp.append(new GrabberScript(title, image, search, tree, commandline));
+        if (search && type.toLower() == "video")
+            tmp.append(new GrabberScript(title, image, VIDEO, author,
+                       search, tree, description, commandline, version));
     }
     return tmp;
 }
@@ -758,7 +726,7 @@ void NetSearch::runSearchEditor()
 
 void NetSearch::doListRefresh()
 {
-    m_grabberList = findAllDBSearchGrabbers();
+    m_grabberList = findAllDBSearchGrabbers(VIDEO);
     if (m_grabberList.isEmpty())
         m_grabberList = fillGrabberList();
 
@@ -867,7 +835,7 @@ void NetSearch::slotItemChanged()
     {
         MythUIButtonListItem *item = m_siteList->GetItemCurrent();
 
-        ResultItem *res = new ResultItem(item->GetText(), QString(),
+        ResultItem *res = new ResultItem(item->GetText(), QString(), QString(),
               QString(), QString(), QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);

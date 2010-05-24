@@ -27,21 +27,22 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="TMDB Trailers|S";
+__title__ ="TMDB Trailers";
 __author__="R.D.Vaughan"
-__version__="v0.2.0"
+__version__="0.21"
 # 0.1.0 Initial development
 # 0.1.1 Refining grabber. Added maximum items per page and usage examples.
 # 0.1.2 Added the support function code "|S" to the title.
 # 0.1.3 Changed publish date to the standard RSS format.
 # 0.1.4 Documentation updates
 # 0.2.0 Public release
+# 0.21 Change to support xml version information display
 
 
 __usage_examples__ = '''
 > ./tmdb_nv.py -h
 Usage: ./tmdb_nv.py -hduvlS [parameters] <search text>
-Version: v0.2.0 Author: R.D.Vaughan
+Version: v0.21 Author: R.D.Vaughan
 
 For details on the MythTV Netvision plugin see the wiki page at:
 http://www.mythtv.org/wiki/MythNetvision
@@ -164,9 +165,17 @@ if __name__ == '__main__':
     # themoviedb.org api key given by Travis Bell for Mythtv
     apikey = "c27cb71cff5bd76e1a7a009380562c62"
     main = process.mainProcess(target, apikey, )
-    main.grabber_title = __title__
-    main.grabber_author = __author__
-    main.grabber_version = __version__
-    main.grabber_usage_examples = __usage_examples__
-    main.grabber_max_page_items = __max_page_items__
+    main.grabberInfo = {}
+    main.grabberInfo['title'] = __title__
+    main.grabberInfo['author'] = __author__
+    main.grabberInfo['thumbnail'] = 'tmdb_nv.png'
+    main.grabberInfo['type'] = ['video']
+    main.grabberInfo['desc'] = u"themoviedb.org is an open 'wiki-style' movie database."
+    main.grabberInfo['version'] = __version__
+    main.grabberInfo['search'] = True
+    main.grabberInfo['tree'] = False
+    main.grabberInfo['html'] = False
+    main.grabberInfo['usage'] = __usage_examples__
+    main.grabberInfo['SmaxPage'] = __max_page_items__
+    main.grabberInfo['TmaxPage'] = __max_page_items__
     main.main()

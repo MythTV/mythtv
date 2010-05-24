@@ -107,7 +107,7 @@ bool RSSEditPopup::Create(void)
 
     if (m_editing)
     {
-        m_site = findByURL(m_urlText);
+        m_site = findByURL(m_urlText, VIDEO_PODCAST);
 
         m_urlEdit->SetText(m_urlText);
         m_titleEdit->SetText(m_site->GetTitle());
@@ -161,10 +161,10 @@ void RSSEditPopup::parseAndSave(void)
         else
             download = false;
 
-        removeFromDB(m_urlText);
+        removeFromDB(m_urlText, VIDEO_PODCAST);
 
-        if (insertInDB(new RSSSite(title, filename, desc, link,
-                author, download, QDateTime::currentDateTime())))
+        if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST,
+                desc, link, author, download, QDateTime::currentDateTime())))
             emit saving();
         Close();
     }
@@ -308,7 +308,7 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
             if (!exists)
                 HttpComms::getHttpFile(filename, thumbnailURL, 20000, 1, 2);
         }
-        if (insertInDB(new RSSSite(title, filename, description, link,
+        if (insertInDB(new RSSSite(title, filename, VIDEO_PODCAST, description, link,
                 author, download, QDateTime::currentDateTime())))
             emit saving();
     }

@@ -25,14 +25,15 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="YouTube|ST";
-__author__="R.D.Vaughan"
-__version__="v0.2.1"
+__title__ ="YouTube";
+__author__="R.D. Vaughan"
+__version__="0.22"
 # 0.1.0 Initial development
 # 0.1.1 Added the Tree view option
 # 0.1.2 Documentation review
 # 0.2.0 Public release
 # 0.2.1 Completed abort exception display message improvements
+# 0.22  Change to support xml version information display
 
 __usage_examples__ ='''
 (Option Help)
@@ -231,10 +232,17 @@ if __name__ == '__main__':
     # No api key is required
     apikey = ""
     main = process.mainProcess(target, apikey, )
-    main.grabber_title = __title__
-    main.grabber_author = __author__
-    main.grabber_version = __version__
-    main.grabber_usage_examples = __usage_examples__
-    main.search_max_page_items = __search_max_page_items__
-    main.tree_max_page_items = __tree_max_page_items__
+    main.grabberInfo = {}
+    main.grabberInfo['title'] = __title__
+    main.grabberInfo['author'] = __author__
+    main.grabberInfo['thumbnail'] = 'youtube.png'
+    main.grabberInfo['type'] = ['video']
+    main.grabberInfo['desc'] = u"Share your videos with friends, family, and the world."
+    main.grabberInfo['version'] = __version__
+    main.grabberInfo['search'] = True
+    main.grabberInfo['tree'] = True
+    main.grabberInfo['html'] = False
+    main.grabberInfo['usage'] = __usage_examples__
+    main.grabberInfo['SmaxPage'] = __search_max_page_items__
+    main.grabberInfo['TmaxPage'] = __tree_max_page_items__
     main.main()

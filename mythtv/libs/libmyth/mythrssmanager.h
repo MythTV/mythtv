@@ -41,6 +41,7 @@ class MPUBLIC RSSSite : public QObject
 
     RSSSite(const QString& title,
                   const QString& image,
+                  const ArticleType& type,
                   const QString& description,
                   const QString& url,
                   const QString& author,
@@ -53,6 +54,7 @@ class MPUBLIC RSSSite : public QObject
 
     const QString& GetTitle() const { return m_title; }
     const QString& GetImage() const { return m_image; }
+    const ArticleType& GetType() const { return m_type; }
     const QString& GetDescription() const { return m_description; }
     const QString& GetURL() const { return m_url; }
     const QString& GetAuthor() const { return m_author; }
@@ -75,14 +77,15 @@ class MPUBLIC RSSSite : public QObject
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
                      const QUrl& oldRedirectUrl) const;
 
-    QString    m_title;
-    QString    m_image;
-    QString    m_description;
-    QString    m_url;
-    QUrl       m_urlReq;
-    QString    m_author;
-    bool       m_download;
-    QDateTime  m_updated;
+    QString     m_title;
+    QString     m_image;
+    ArticleType m_type;
+    QString     m_description;
+    QString     m_url;
+    QUrl        m_urlReq;
+    QString     m_author;
+    bool        m_download;
+    QDateTime   m_updated;
 
     mutable    QMutex m_lock;
     QByteArray m_data;

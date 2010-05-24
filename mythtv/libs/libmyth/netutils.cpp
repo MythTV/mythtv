@@ -46,14 +46,17 @@ QString GetThumbnailFilename(QString url, QString title)
     return sFilename;
 }
 
-bool findTreeGrabberInDB(const QString& commandline)
+bool findTreeGrabberInDB(const QString& commandline,
+                         ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT * FROM netvisiontreegrabbers WHERE "
-                  "commandline = :COMMAND AND host = :HOST;");
+    query.prepare("SELECT * FROM internetcontent WHERE "
+                  "commandline = :COMMAND AND host = :HOST "
+                  "AND type = :TYPE AND tree = 1;");
     QFileInfo fi(commandline);
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Tree find in db", query);
@@ -63,14 +66,17 @@ bool findTreeGrabberInDB(const QString& commandline)
     return query.size() > 0;
 }
 
-bool findSearchGrabberInDB(const QString& commandline)
+bool findSearchGrabberInDB(const QString& commandline,
+                           ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT * FROM netvisionsearchgrabbers WHERE "
-                  "commandline = :COMMAND AND host = :HOST;");
+    query.prepare("SELECT * FROM internetcontent WHERE "
+                  "commandline = :COMMAND AND host = :HOST "
+                  "AND type = :TYPE AND search = 1;");
     QFileInfo fi(commandline);
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) 
     {
         MythDB::DBError("Search find in db", query);
@@ -80,61 +86,77 @@ bool findSearchGrabberInDB(const QString& commandline)
     return query.size() > 0;
 }
 
-GrabberScript* findTreeGrabberByCommand(const QString& commandline)
+GrabberScript* findTreeGrabberByCommand(const QString& commandline,
+                                        ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name,thumbnail,commandline "
-                  "FROM netvisiontreegrabbers "
+    query.prepare("SELECT name,thumbnail,author,description,commandline,"
+                  "version,search,tree FROM internetcontent "
                   "WHERE commandline = :COMMAND AND "
-                  "host = :HOST;");
+                  "host = :HOST AND type = :TYPE "
+                  "AND tree = 1;");
     QFileInfo fi(commandline);
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
     }
 
     QString title = query.value(0).toString();
     QString image = query.value(1).toString();
+    QString author = query.value(2).toString();
+    QString desc = query.value(3).toString();
     QString command = QString("%1/internetcontent/%2").arg(GetShareDir())
-                        .arg(query.value(2).toString());
+                        .arg(query.value(4).toString());
+    double ver = query.value(5).toDouble();
+    bool search = query.value(6).toBool();
+    bool tree = query.value(7).toBool();
 
-    GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
-                                     command);
+    GrabberScript *tmp = new GrabberScript(title, image, type, author, search,
+                                     tree, desc, command, ver);
     return tmp;
 }
 
-GrabberScript* findSearchGrabberByCommand(const QString& commandline)
+GrabberScript* findSearchGrabberByCommand(const QString& commandline,
+                                          ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name,thumbnail,commandline "
-                  "FROM netvisionsearchgrabbers "
+    query.prepare("SELECT name,thumbnail,author,description,commandline,"
+                  "version,search,tree FROM internetcontent "
                   "WHERE commandline = :COMMAND AND "
-                  "host = :HOST;");
+                  "type = :TYPE AND host = :HOST AND "
+                  "search = 1;");
     QFileInfo fi(commandline);
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Search find in db", query);
     }
 
     QString title = query.value(0).toString();
     QString image = query.value(1).toString();
+    QString author = query.value(2).toString();
+    QString desc = query.value(3).toString();
     QString command = QString("%1/internetcontent/%2").arg(GetShareDir())
-                        .arg(query.value(2).toString());
+                        .arg(query.value(4).toString());
+    double ver = query.value(5).toDouble();
+    bool search = query.value(6).toBool();
+    bool tree = query.value(7).toBool();
 
-    GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
-                                     command);
+    GrabberScript *tmp = new GrabberScript(title, image, type, author, search,
+                                     tree, desc, command, ver);
     return tmp;
 }
 
-GrabberScript::scriptList findAllDBTreeGrabbers(void)
+GrabberScript::scriptList findAllDBTreeGrabbers()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name,thumbnail,commandline "
-                  "FROM netvisiontreegrabbers "
-                  "WHERE host = :HOST ORDER BY name;");
-    query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.prepare("SELECT name,thumbnail,type,"
+                  "author,description,commandline,"
+                  "version,search,tree FROM internetcontent "
+                  "where tree = 1 ORDER BY name;");
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
     }
@@ -145,24 +167,67 @@ GrabberScript::scriptList findAllDBTreeGrabbers(void)
     {
         QString title = query.value(0).toString();
         QString image = query.value(1).toString();
+        ArticleType type = (ArticleType)query.value(2).toInt();
+        QString author = query.value(3).toString();
+        QString desc = query.value(4).toString();
         QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
-                            .arg(query.value(2).toString());
+                            .arg(query.value(5).toString());
+        double ver = query.value(6).toDouble();
+        bool search = query.value(7).toBool();
+        bool tree = query.value(8).toBool();
 
-        GrabberScript *script = new GrabberScript(title, image, 0, 1,
-                                         commandline);
+        GrabberScript *script = new GrabberScript(title, image, type, author, search,
+                                     tree, desc, commandline, ver);
         tmp.append(script);
     }
 
     return tmp;
 }
 
-GrabberScript::scriptList findAllDBSearchGrabbers(void)
+GrabberScript::scriptList findAllDBTreeGrabbersByHost(ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name,thumbnail,commandline "
-                  "FROM netvisionsearchgrabbers "
-                  "WHERE host = :HOST ORDER BY name;");
+    query.prepare("SELECT name,thumbnail,author,description,commandline,"
+                  "version,search,tree FROM internetcontent "
+                  "WHERE host = :HOST AND type = :TYPE "
+                  "AND tree = 1 ORDER BY name;");
     query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":TYPE", type);
+    if (!query.exec() || !query.isActive()) {
+        MythDB::DBError("Tree find in db", query);
+    }
+
+    GrabberScript::scriptList tmp;
+
+    while (query.next())
+    {
+        QString title = query.value(0).toString();
+        QString image = query.value(1).toString();
+        QString author = query.value(2).toString();
+        QString desc = query.value(3).toString();
+        QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
+                            .arg(query.value(4).toString());
+        double ver = query.value(5).toDouble();
+        bool search = query.value(6).toBool();
+        bool tree = query.value(7).toBool();
+
+        GrabberScript *script = new GrabberScript(title, image, type, author, search,
+                                     tree, desc, commandline, ver);
+        tmp.append(script);
+    }
+
+    return tmp;
+}
+
+GrabberScript::scriptList findAllDBSearchGrabbers(ArticleType type)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name,thumbnail,author,description,commandline,"
+                  "version,search,tree FROM internetcontent "
+                  "WHERE host = :HOST AND type = :TYPE "
+                  "AND search = 1 ORDER BY name;");
+    query.bindValue(":HOST", gCoreContext->GetHostName());
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Search find in db", query);
     }
@@ -173,80 +238,77 @@ GrabberScript::scriptList findAllDBSearchGrabbers(void)
     {
         QString title = query.value(0).toString();
         QString image = query.value(1).toString();
+        QString author = query.value(2).toString();
+        QString desc = query.value(3).toString();
         QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
-                        .arg(query.value(2).toString());
+                            .arg(query.value(4).toString());
+        double ver = query.value(5).toDouble();
+        bool search = query.value(6).toBool();
+        bool tree = query.value(7).toBool();
 
-        GrabberScript *script = new GrabberScript(title, image, 0, 1,
-                                         commandline);
+        GrabberScript *script = new GrabberScript(title, image, type, author, search,
+                                     tree, desc, commandline, ver);
         tmp.append(script);
     }
 
     return tmp;
 }
 
-bool insertTreeInDB(GrabberScript* script)
+bool insertSearchInDB(GrabberScript* script, ArticleType type)
 {
-    if (!script) return false;
+    if (!script)
+        return false;
 
-    return insertTreeInDB(script->GetTitle(), script->GetImage(),
-                      script->GetCommandline());
+    return insertGrabberInDB(script->GetTitle(), script->GetImage(),
+                      type, script->GetAuthor(), script->GetDescription(),
+                      script->GetCommandline(), script->GetVersion(),
+                      true, false, false);
 }
 
-bool insertSearchInDB(GrabberScript* script)
+bool insertTreeInDB(GrabberScript* script, ArticleType type)
 {
-    if (!script) return false;
+    if (!script)
+        return false;
 
-    return insertSearchInDB(script->GetTitle(), script->GetImage(),
-                      script->GetCommandline());
+    return insertGrabberInDB(script->GetTitle(), script->GetImage(),
+                      type, script->GetAuthor(), script->GetDescription(),
+                      script->GetCommandline(), script->GetVersion(),
+                      false, true, false);
 }
 
-bool insertTreeInDB(const QString &name, const QString &thumbnail,
-                const QString &commandline)
+bool insertGrabberInDB(const QString &name, const QString &thumbnail,
+                ArticleType type, const QString &author,
+                const QString &description, const QString &commandline,
+                const double &version, bool search, bool tree,
+                bool podcast)
 {
-    if (findTreeGrabberInDB(commandline))
+    if (findTreeGrabberInDB(commandline, type))
         return false;
 
     QFileInfo fi(thumbnail);
     QString thumbbase = fi.fileName();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO netvisiontreegrabbers (name,thumbnail,commandline,"
-                  "updated,host) "
-            "VALUES( :NAME, :THUMBNAIL, :COMMAND, :UPDATED, :HOST);");
-    query.bindValue(":NAME", name);
-    query.bindValue(":THUMBNAIL", thumbbase);
-    QFileInfo cmd(commandline);
-    query.bindValue(":COMMAND", cmd.fileName());
-    query.bindValue(":UPDATED", QDateTime());
-    query.bindValue(":HOST", gCoreContext->GetHostName());
-    if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: inserting in DB", query);
-        return false;
-    }
-
-    return (query.numRowsAffected() > 0);
-}
-
-bool insertSearchInDB(const QString &name, const QString &thumbnail,
-                const QString &commandline)
-{
-    if (findSearchGrabberInDB(commandline))
-        return false;
-
-    QFileInfo fi(thumbnail);
-    QString thumbbase = fi.fileName();  
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO netvisionsearchgrabbers (name,thumbnail,commandline,"
+    query.prepare("INSERT INTO internetcontent (name,thumbnail,type,author,"
+                  "description,commandline,version,updated,search,tree,podcast,"
                   "host) "
-            "VALUES( :NAME, :THUMBNAIL, :COMMAND, :HOST);");
+            "VALUES( :NAME, :THUMBNAIL, :TYPE, :AUTHOR, :DESCRIPTION, :COMMAND, "
+            ":VERSION, :UPDATED, :SEARCH, :TREE, :PODCAST, :HOST);");
     query.bindValue(":NAME", name);
     query.bindValue(":THUMBNAIL", thumbbase);
+    query.bindValue(":TYPE", type);
+    query.bindValue(":AUTHOR", author);
+    query.bindValue(":DESCRIPTION", description);
     QFileInfo cmd(commandline);
     query.bindValue(":COMMAND", cmd.fileName());
+    query.bindValue(":VERSION", version);
+    query.bindValue(":UPDATED", QDateTime());
+    query.bindValue(":SEARCH", search);
+    query.bindValue(":TREE", tree);
+    query.bindValue(":PODCAST", podcast);
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: inserting in DB", query);
+        MythDB::DBError("netcontent: inserting in DB", query);
         return false;
     }
 
@@ -257,42 +319,30 @@ bool removeTreeFromDB(GrabberScript* script)
 {
     if (!script) return false;
 
-    return removeTreeFromDB(script->GetCommandline());
+    return removeGrabberFromDB(script->GetCommandline(), false);
 }
 
 bool removeSearchFromDB(GrabberScript* script)
 {
     if (!script) return false;
 
-    return removeSearchFromDB(script->GetCommandline());
+    return removeGrabberFromDB(script->GetCommandline(), true);
 }
 
-bool removeTreeFromDB(const QString &commandline)
+bool removeGrabberFromDB(const QString &commandline, const bool &search)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM netvisiontreegrabbers WHERE commandline = :COMMAND "
-                  "AND host = :HOST ;");
+    if (search)
+        query.prepare("DELETE FROM internetcontent WHERE commandline = :COMMAND "
+                  "AND host = :HOST AND search = 1;");
+    else
+        query.prepare("DELETE FROM internetcontent WHERE commandline = :COMMAND "
+                  "AND host = :HOST AND search = 0;");
     QFileInfo fi(commandline);
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: delete from db", query);
-        return false;
-    }
-
-    return (query.numRowsAffected() > 0);
-}
-
-bool removeSearchFromDB(const QString &commandline)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM netvisionsearchgrabbers WHERE commandline = :COMMAND "
-                  "AND host = :HOST ;");
-    QFileInfo fi(commandline);
-    query.bindValue(":COMMAND", fi.fileName());
-    query.bindValue(":HOST", gCoreContext->GetHostName());
-    if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: delete from db", query);
+        MythDB::DBError("netcontent: delete from db", query);
         return false;
     }
 
@@ -302,15 +352,13 @@ bool removeSearchFromDB(const QString &commandline)
 bool markTreeUpdated(GrabberScript* script, QDateTime curTime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE netvisiontreegrabbers SET updated = :UPDATED "
-                  "WHERE commandline = :COMMAND "
-                  "AND host = :HOST ;");
+    query.prepare("UPDATE internetcontent SET updated = :UPDATED "
+                  "WHERE commandline = :COMMAND AND tree = 1;");
     query.bindValue(":UPDATED", curTime);
     QFileInfo fi(script->GetCommandline());
     query.bindValue(":COMMAND", fi.fileName());
-    query.bindValue(":HOST", gCoreContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: update db time", query);
+        MythDB::DBError("netcontent: update db time", query);
         return false;
     }
 
@@ -329,12 +377,13 @@ QDateTime lastUpdate(GrabberScript* script)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT updated "
-                  "FROM netvisiontreegrabbers "
-                  "WHERE name = :NAME ORDER "
+                  "FROM internetcontent "
+                  "WHERE commandline = :COMMAND ORDER "
                   "BY updated DESC LIMIT 1;");
-    query.bindValue(":NAME", script->GetTitle());
+    QFileInfo fi(script->GetCommandline());
+    query.bindValue(":COMMAND", fi.fileName());
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("Tree find in db", query);
+        MythDB::DBError("Tree last update in db", query);
     }
 
     query.next();
@@ -343,36 +392,37 @@ QDateTime lastUpdate(GrabberScript* script)
     return updated;
 }
 
-bool clearTreeItems(const QString &feedtitle)
+bool clearTreeItems(const QString &feedcommand)
 {
-    if (feedtitle.isEmpty())
+    if (feedcommand.isEmpty())
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM netvisiontreeitems "
-        "WHERE feedtitle = :FEEDTITLE;");
-    query.bindValue(":FEEDTITLE", feedtitle);
+    query.prepare("DELETE FROM internetcontentarticles "
+        "WHERE feedtitle = :FEEDTITLE AND podcast = 0;");
+    query.bindValue(":FEEDTITLE", feedcommand);
 
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: clearing DB", query);
+        MythDB::DBError("netcontent: clearing DB", query);
         return false;
     }
 
     return (query.numRowsAffected() > 0);
 }
 
-bool isTreeInUse(const QString &feedtitle)
+bool isTreeInUse(const QString &feedcommand)
 {
-    if (feedtitle.isEmpty())
+    if (feedcommand.isEmpty())
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT * FROM netvisiontreegrabbers "
-        "WHERE name = :FEEDTITLE;");
-    query.bindValue(":FEEDTITLE", feedtitle);
+    query.prepare("SELECT * FROM internetcontent "
+        "WHERE commandline = :COMMAND;");
+    QFileInfo fi(feedcommand);
+    query.bindValue(":COMMAND", fi.fileName());
 
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("Netvision:  isTreeInUse", query);
+        MythDB::DBError("netcontent:  isTreeInUse", query);
         return false;
     }
 
@@ -380,27 +430,31 @@ bool isTreeInUse(const QString &feedtitle)
 }
 
 bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
-                       const QString &paththumb, ResultItem *item)
+                       const QString &paththumb, ResultItem *item,
+                       ArticleType type)
 {
     if (!item || feedtitle.isEmpty() || path.isEmpty())
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO netvisiontreeitems (feedtitle, path, paththumb, "
-                  " title, description, url, thumbnail, mediaURL, author, "
+    query.prepare("INSERT INTO internetcontentarticles (feedtitle, path, paththumb, "
+                  " title, subtitle, description, url, type, thumbnail, mediaURL, author, "
                   "date, time, rating, filesize, player, playerargs, download, "
-                  "downloadargs, width, height, language, downloadable, countries, "
-                  "season, episode, customhtml) "
-            "VALUES( :FEEDTITLE, :PATH, :PATHTHUMB, :TITLE, :DESCRIPTION, :URL, "
-            ":THUMBNAIL, :MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, :FILESIZE, "
-            ":PLAYER, :PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
-            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :SEASON, :EPISODE, :HTML);");
+                  "downloadargs, width, height, language, podcast, downloadable, "
+                  "customhtml, countries, season, episode) "
+            "VALUES( :FEEDTITLE, :PATH, :PATHTHUMB, :TITLE, :SUBTITLE, :DESCRIPTION, "
+            ":URL, :TYPE, :THUMBNAIL, :MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, "
+            ":FILESIZE, :PLAYER, :PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
+            ":LANGUAGE, :PODCAST, :DOWNLOADABLE, :CUSTOMHTML, :COUNTRIES, :SEASON, "
+            ":EPISODE);");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":PATH", path);
     query.bindValue(":PATHTHUMB", paththumb);
     query.bindValue(":TITLE", item->GetTitle());
+    query.bindValue(":SUBTITLE", item->GetSubtitle());
     query.bindValue(":DESCRIPTION", item->GetDescription());
     query.bindValue(":URL", item->GetURL());
+    query.bindValue(":TYPE", type);
     query.bindValue(":THUMBNAIL", item->GetThumbnail());
     query.bindValue(":MEDIAURL", item->GetMediaURL());
     query.bindValue(":AUTHOR", item->GetAuthor());
@@ -420,33 +474,37 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":WIDTH", item->GetWidth());
     query.bindValue(":HEIGHT", item->GetHeight());
     query.bindValue(":LANGUAGE", item->GetLanguage());
+    query.bindValue(":PODCAST", false);
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
+    query.bindValue(":CUSTOMHTML", item->GetCustomHTML());
     query.bindValue(":COUNTRIES", item->GetCountries().join(" "));
     query.bindValue(":SEASON", item->GetSeason());
     query.bindValue(":EPISODE", item->GetEpisode());
-    query.bindValue(":HTML", item->GetCustomHTML());
 
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: inserting article in DB", query);
+        MythDB::DBError("netcontent: inserting article in DB", query);
         return false;
     }
 
     return (query.numRowsAffected() > 0);
 }
 
-QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &feedtitle)
+QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &feedtitle,
+                                                               ArticleType type)
 {
     QMultiMap<QPair<QString,QString>, ResultItem*> ret;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT title, description, url, "
-                  "thumbnail, mediaURL, author, date, time, "
+    query.prepare("SELECT title, subtitle, description, url, "
+                  "type, thumbnail, mediaURL, author, date, time, "
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
-                  "downloadable, countries, season, episode, "
-                  "path, paththumb, customhtml FROM netvisiontreeitems "
-                  "WHERE feedtitle = :FEEDTITLE ORDER BY title DESC;");
+                  "downloadable, customhtml, countries, season, episode, "
+                  "path, paththumb FROM internetcontentarticles "
+                  "WHERE feedtitle = :FEEDTITLE AND podcast = 0 "
+                  "AND type = :TYPE ORDER BY title DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
         return ret;
@@ -455,34 +513,36 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
     while (query.next())
     {
         QString     title = query.value(0).toString();
-        QString     desc = query.value(1).toString();
-        QString     URL = query.value(2).toString();
-        QString     thumbnail = query.value(3).toString();
-        QString     mediaURL = query.value(4).toString();
-        QString     author = query.value(5).toString();
-        QDateTime   date = query.value(6).toDateTime();
-        QString     time = query.value(7).toString();
-        QString     rating = query.value(8).toString();
-        off_t       filesize = query.value(9).toULongLong();
-        QString     player = query.value(10).toString();
-        QStringList playerargs = query.value(11).toString().split(" ");
-        QString     download = query.value(12).toString();
-        QStringList downloadargs = query.value(13).toString().split(" ");
-        uint        width = query.value(14).toUInt();
-        uint        height = query.value(15).toUInt();
-        QString     language = query.value(16).toString();
-        bool        downloadable = query.value(17).toBool();
-        QStringList countries = query.value(18).toString().split(" ");
-        uint        season = query.value(19).toUInt();
-        uint        episode = query.value(20).toUInt();
+        QString     subtitle = query.value(1).toString();
+        QString     desc = query.value(2).toString();
+        QString     URL = query.value(3).toString();
+        QString     type = query.value(4).toString();
+        QString     thumbnail = query.value(5).toString();
+        QString     mediaURL = query.value(6).toString();
+        QString     author = query.value(7).toString();
+        QDateTime   date = query.value(8).toDateTime();
+        QString     time = query.value(9).toString();
+        QString     rating = query.value(10).toString();
+        off_t       filesize = query.value(11).toULongLong();
+        QString     player = query.value(12).toString();
+        QStringList playerargs = query.value(13).toString().split(" ");
+        QString     download = query.value(14).toString();
+        QStringList downloadargs = query.value(15).toString().split(" ");
+        uint        width = query.value(16).toUInt();
+        uint        height = query.value(17).toUInt();
+        QString     language = query.value(18).toString();
+        bool        downloadable = query.value(19).toBool();
+        bool        customhtml = query.value(20).toBool();
+        QStringList countries = query.value(21).toString().split(" ");
+        uint        season = query.value(22).toUInt();
+        uint        episode = query.value(23).toUInt();
 
-        QString     path = query.value(21).toString();
-        QString     paththumb = query.value(22).toString();
-        bool        customhtml = query.value(23).toBool();
+        QString     path = query.value(24).toString();
+        QString     paththumb = query.value(25).toString();
 
         QPair<QString,QString> pair(path,paththumb);
-        ret.insert(pair, new ResultItem(title, desc, URL, thumbnail,
-                   mediaURL, author, date, time, rating, filesize,
+        ret.insert(pair, new ResultItem(title, subtitle, desc, URL,
+                   thumbnail, mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
                    width, height, language, downloadable, countries,
                    season, episode, customhtml));
@@ -491,11 +551,13 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
     return ret;
 }
 
-bool findInDB(const QString& url)
+bool findInDB(const QString& url, ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT url FROM netvisionsites WHERE url = :URL ;");
+    query.prepare("SELECT commandline FROM internetcontent WHERE commandline = :URL AND "
+                  "type = :TYPE AND podcast = 1;");
     query.bindValue(":URL", url);
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("RSS find in db", query);
         return false;
@@ -504,16 +566,18 @@ bool findInDB(const QString& url)
     return query.size() > 0;
 }
 
-RSSSite* findByURL(const QString& url)
+RSSSite* findByURL(const QString& url, ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name,thumbnail,description,url,"
-                  "author,download,updated FROM netvisionsites "
-                  "WHERE url = :URL ;");
+    query.prepare("SELECT name,thumbnail,author,description,"
+                  "commandline,download,updated FROM internetcontent "
+                  "WHERE commandline = :URL AND type = :TYPE "
+                  "AND podcast = 1;");
     query.bindValue(":URL", url);
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("RSS find in db", query);
-        RSSSite *tmp = new RSSSite(QString(), QString(), QString(),
+        RSSSite *tmp = new RSSSite(QString(), QString(), (ArticleType)0, QString(),
                        QString(), QString(), false,
                        QDateTime());
         return tmp;
@@ -523,26 +587,28 @@ RSSSite* findByURL(const QString& url)
 
     QString title = query.value(0).toString();
     QString image  = query.value(1).toString();
-    QString description = query.value(2).toString();
-    QString outurl = query.value(3).toString();
-    QString author = query.value(4).toString();
+    QString author = query.value(2).toString();
+    QString description = query.value(3).toString();
+    QString outurl = query.value(4).toString();
     bool download = query.value(5).toInt();
     QDateTime updated; query.value(6).toDate();
 
-    RSSSite *tmp = new RSSSite(title, image, description, outurl,
+    RSSSite *tmp = new RSSSite(title, image, type, description, outurl,
                        author, download, updated);
     return tmp;
 }
 
-RSSSite::rssList findAllDBRSS()
+RSSSite::rssList findAllDBRSSByType(ArticleType type)
 {
     RSSSite::rssList tmp;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT name, thumbnail, description, url, author, download, updated "
-        "FROM netvisionsites "
-        "ORDER BY name");
+        "SELECT name, thumbnail, description, commandline, author, "
+        "download, updated FROM internetcontent WHERE podcast = 1 "
+        "AND type = :TYPE ORDER BY name");
+
+    query.bindValue(":TYPE", type);
 
     if (!query.exec())
     {
@@ -558,7 +624,39 @@ RSSSite::rssList findAllDBRSS()
         QString author = query.value(4).toString();
         bool download = query.value(5).toInt();
         QDateTime updated; query.value(6).toDate();
-        tmp.append(new RSSSite(title, image, description, url,
+        tmp.append(new RSSSite(title, image, type, description, url,
+                       author, download, updated));
+    }
+
+    return tmp;
+}
+
+RSSSite::rssList findAllDBRSS()
+{
+    RSSSite::rssList tmp;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT name, thumbnail, type, description, commandline, author, "
+        "download, updated FROM internetcontent WHERE podcast = 1 "
+        "ORDER BY name");
+
+    if (!query.exec())
+    {
+        return tmp;
+    }
+
+    while (query.next())
+    {
+        QString title = query.value(0).toString();
+        QString image  = query.value(1).toString();
+        ArticleType type  = (ArticleType)query.value(2).toInt();
+        QString description = query.value(3).toString();
+        QString url = query.value(4).toString();
+        QString author = query.value(5).toString();
+        bool download = query.value(6).toInt();
+        QDateTime updated; query.value(7).toDate();
+        tmp.append(new RSSSite(title, image, type, description, url,
                        author, download, updated));
     }
 
@@ -572,22 +670,22 @@ bool insertInDB(RSSSite* site)
     return insertInDB(site->GetTitle(), site->GetImage(),
                       site->GetDescription(), site->GetURL(),
                       site->GetAuthor(), site->GetDownload(),
-                      site->GetUpdated());
+                      site->GetUpdated(), site->GetType());
 }
 
 bool insertInDB(const QString &name, const QString &thumbnail,
                 const QString &description, const QString &url,
                 const QString &author, const bool &download,
-                const QDateTime &updated)
+                const QDateTime &updated, ArticleType type)
 {
-    if (findInDB(name))
+    if (findInDB(name, type))
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO netvisionsites (name,thumbnail,description,"
-                  "url,author,download,updated) "
+    query.prepare("INSERT INTO internetcontent (name,thumbnail,description,"
+                  "commandline,author,download,updated,podcast, type) "
             "VALUES( :NAME, :THUMBNAIL, :DESCRIPTION, :URL, :AUTHOR, :DOWNLOAD, "
-            ":UPDATED);");
+            ":UPDATED, :PODCAST, :TYPE);");
     query.bindValue(":NAME", name);
     query.bindValue(":THUMBNAIL", thumbnail);
     query.bindValue(":DESCRIPTION", description);
@@ -595,8 +693,10 @@ bool insertInDB(const QString &name, const QString &thumbnail,
     query.bindValue(":AUTHOR", author);
     query.bindValue(":DOWNLOAD", download);
     query.bindValue(":UPDATED", updated);
+    query.bindValue(":PODCAST", true);
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: inserting in DB", query);
+        MythDB::DBError("netcontent: inserting in DB", query);
         return false;
     }
 
@@ -607,16 +707,18 @@ bool removeFromDB(RSSSite* site)
 {
     if (!site) return false;
 
-    return removeFromDB(site->GetURL());
+    return removeFromDB(site->GetURL(), site->GetType());
 }
 
-bool removeFromDB(const QString &url)
+bool removeFromDB(const QString &url, ArticleType type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM netvisionsites WHERE url = :URL ;");
+    query.prepare("DELETE FROM internetcontent WHERE commandline = :URL "
+                  "AND type = :TYPE;");
     query.bindValue(":URL", url);
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: delete from db", query);
+        MythDB::DBError("netcontent: delete from db", query);
         return false;
     }
 
@@ -628,51 +730,56 @@ void markUpdated(RSSSite *site)
     QDateTime now = QDateTime::currentDateTime();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE netvisionsites SET updated = :UPDATED "
-                  "WHERE name = :NAME ;");
+    query.prepare("UPDATE internetcontent SET updated = :UPDATED "
+                  "WHERE commandline = :URL AND type = :TYPE;");
     query.bindValue(":UPDATED", now);
-    query.bindValue(":NAME", site->GetTitle());
+    query.bindValue(":URL", site->GetURL());
+    query.bindValue(":TYPE", site->GetType());
     if (!query.exec() || !query.isActive())
-        MythDB::DBError("netvision update time", query);
+        MythDB::DBError("netcontent update time", query);
 }
 
-bool clearRSSArticles(const QString &feedtitle)
+bool clearRSSArticles(const QString &feedtitle, ArticleType type)
 {
     if (feedtitle.isEmpty())
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM netvisionrssitems "
-        "WHERE feedtitle = :FEEDTITLE;");
+    query.prepare("DELETE FROM internetcontentarticles "
+        "WHERE feedtitle = :FEEDTITLE AND podcast = 1 "
+        "AND type = :TYPE ;");
     query.bindValue(":FEEDTITLE", feedtitle);
+    query.bindValue(":TYPE", type);
 
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: clearing DB", query);
+        MythDB::DBError("netcontent: clearing DB", query);
         return false;
     }
 
     return (query.numRowsAffected() > 0);
 }
 
-bool insertArticleInDB(const QString &feedtitle, ResultItem *item)
+bool insertRSSArticleInDB(const QString &feedtitle, ResultItem *item,
+                          ArticleType type)
 {
     if (!item || feedtitle.isEmpty())
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO netvisionrssitems (feedtitle, title, "
-                  "description, url, thumbnail, mediaURL, author, date, time, "
+    query.prepare("INSERT INTO internetcontentarticles (feedtitle, title, "
+                  "description, url, type, thumbnail, mediaURL, author, date, time, "
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, downloadable, countries, "
-                  "season, episode) "
-            "VALUES( :FEEDTITLE, :TITLE, :DESCRIPTION, :URL, :THUMBNAIL, "
+                  "podcast) "
+            "VALUES( :FEEDTITLE, :TITLE, :DESCRIPTION, :URL, :TYPE, :THUMBNAIL, "
             ":MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, :FILESIZE, :PLAYER, "
             ":PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
-            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :SEASON, :EPISODE);");
+            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :PODCAST);");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":TITLE", item->GetTitle());
     query.bindValue(":DESCRIPTION", item->GetDescription());
     query.bindValue(":URL", item->GetURL());
+    query.bindValue(":TYPE", type);
     query.bindValue(":THUMBNAIL", item->GetThumbnail());
     query.bindValue(":MEDIAURL", item->GetMediaURL());
     query.bindValue(":AUTHOR", item->GetAuthor());
@@ -694,18 +801,18 @@ bool insertArticleInDB(const QString &feedtitle, ResultItem *item)
     query.bindValue(":LANGUAGE", item->GetLanguage());
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
     query.bindValue(":COUNTRIES", item->GetCountries());
-    query.bindValue(":SEASON", item->GetSeason());
-    query.bindValue(":EPISODE", item->GetEpisode());
+    query.bindValue(":PODCAST", true);
 
     if (!query.exec() || !query.isActive()) {
-        MythDB::DBError("netvision: inserting article in DB", query);
+        MythDB::DBError("netcontent: inserting article in DB", query);
         return false;
     }
 
     return (query.numRowsAffected() > 0);
 }
 
-ResultItem::resultList getRSSArticles(const QString &feedtitle)
+ResultItem::resultList getRSSArticles(const QString &feedtitle,
+                                      ArticleType type)
 {
     ResultItem::resultList ret;
 
@@ -715,10 +822,11 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle)
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
                   "downloadable, countries, season, episode "
-                  "FROM netvisionrssitems "
-                  "WHERE feedtitle = :FEEDTITLE ORDER BY "
-                  "date DESC;");
+                  "FROM internetcontentarticles "
+                  "WHERE feedtitle = :FEEDTITLE AND podcast = 1 "
+                  "AND type = :TYPE ORDER BY date DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
+    query.bindValue(":TYPE", type);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("RSS find in db", query);
         return ret;
@@ -748,7 +856,7 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle)
         uint        season = query.value(19).toUInt();
         uint        episode = query.value(20).toUInt();
 
-        ret.append(new ResultItem(title, desc, URL, thumbnail,
+        ret.append(new ResultItem(title, QString(), desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
                    width, height, language, downloadable, countries,

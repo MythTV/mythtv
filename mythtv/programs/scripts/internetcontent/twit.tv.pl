@@ -454,8 +454,17 @@ NODURATION:
 getopts('vtTp:S:');
 
 if ($opt_v) {
-	print "$site|TS\n";
-	exit 0;
+        print "<grabber>\n";
+        print "  <name>Twit.tv</name>\n";
+        print "  <author>Auric</author>\n";
+        print "  <thumbnail>twit.tv.png</thumbnail>\n";
+        print "  <type>video</type>\n";
+        print "  <description>This Week in Tech is netcasts you love from people you trust.</description>\n";
+        print "  <version>1.00</version>\n";
+        print "  <search>true</search>\n";
+        print "  <tree>true</tree>\n";
+        print "</grabber>\n";
+        exit 0;
 }
 
 my $type; my $page = 1; my $search = "";

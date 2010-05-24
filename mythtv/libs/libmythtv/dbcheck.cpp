@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1257";
+const QString currentDatabaseVersion = "1258";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5202,6 +5202,58 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1257", dbver))
+            return false;
+    }
+
+    if (dbver == "1257")
+    {
+        const char *updates[] = {
+"CREATE TABLE internetcontent "
+"( name VARCHAR(255) NOT NULL,"
+"  thumbnail VARCHAR(255),"
+"  type SMALLINT(3) NOT NULL,"
+"  author VARCHAR(128) NOT NULL,"
+"  description TEXT NOT NULL,"
+"  commandline TEXT NOT NULL,"
+"  version DOUBLE NOT NULL,"
+"  updated TIMESTAMP NOT NULL,"
+"  search BOOL NOT NULL,"
+"  tree BOOL NOT NULL,"
+"  podcast BOOL NOT NULL,"
+"  download BOOL NOT NULL,"
+"  host  VARCHAR(128));",
+"CREATE TABLE internetcontentarticles "
+"( feedtitle VARCHAR(255) NOT NULL,"
+"  path TEXT NOT NULL,"
+"  paththumb TEXT NOT NULL,"
+"  title VARCHAR(255) NOT NULL,"
+"  subtitle VARCHAR(255) NOT NULL,"
+"  season SMALLINT(5) NOT NULL DEFAULT '0',"
+"  episode SMALLINT(5) NOT NULL DEFAULT '0',"
+"  description TEXT NOT NULL,"
+"  url TEXT NOT NULL,"
+"  type SMALLINT(3) NOT NULL,"
+"  thumbnail TEXT NOT NULL,"
+"  mediaURL TEXT NOT NULL,"
+"  author VARCHAR(255) NOT NULL,"
+"  date TIMESTAMP NOT NULL,"
+"  time INT NOT NULL,"
+"  rating VARCHAR(255) NOT NULL,"
+"  filesize BIGINT NOT NULL,"
+"  player VARCHAR(255) NOT NULL,"
+"  playerargs TEXT NOT NULL,"
+"  download VARCHAR(255) NOT NULL,"
+"  downloadargs TEXT NOT NULL,"
+"  width SMALLINT NOT NULL,"
+"  height SMALLINT NOT NULL,"
+"  language VARCHAR(128) NOT NULL,"
+"  podcast BOOL NOT NULL,"
+"  downloadable BOOL NOT NULL,"
+"  customhtml BOOL NOT NULL,"
+"  countries VARCHAR(255) NOT NULL);",
+NULL
+};
+        if (!performActualUpdate(updates, "1258", dbver))
             return false;
     }
 

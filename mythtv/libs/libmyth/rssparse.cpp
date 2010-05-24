@@ -16,19 +16,21 @@
 
 using namespace std;
 
-ResultItem::ResultItem(const QString& title, const QString& desc,
-              const QString& URL, const QString& thumbnail,
-              const QString& mediaURL, const QString& author,
-              const QDateTime& date, const QString& time,
-              const QString& rating, const off_t& filesize,
-              const QString& player, const QStringList& playerargs,
-              const QString& download, const QStringList& downloadargs,
-              const uint& width, const uint& height,
-              const QString& language, const bool& downloadable,
-              const QStringList& countries, const uint& season,
-              const uint& episode, const bool& customhtml)
+ResultItem::ResultItem(const QString& title, const QString& subtitle,
+              const QString& desc, const QString& URL,
+              const QString& thumbnail, const QString& mediaURL,
+              const QString& author, const QDateTime& date,
+              const QString& time, const QString& rating,
+              const off_t& filesize, const QString& player,
+              const QStringList& playerargs, const QString& download,
+              const QStringList& downloadargs, const uint& width,
+              const uint& height, const QString& language,
+              const bool& downloadable, const QStringList& countries,
+              const uint& season, const uint& episode,
+              const bool& customhtml)
 {
     m_title = title;
+    m_subtitle = subtitle;
     m_desc = desc;
     m_URL = URL;
     m_thumbnail = thumbnail;
@@ -63,6 +65,7 @@ ResultItem::~ResultItem()
 void ResultItem::toMap(MetadataMap &metadataMap)
 {
     metadataMap["title"] = m_title;
+    metadataMap["subtitle"] = m_subtitle;
     metadataMap["description"] = m_desc;
     metadataMap["url"] = m_URL;
     metadataMap["thumbnail"] = m_thumbnail;
@@ -725,7 +728,7 @@ ResultItem::resultList Parse::parseRSS(QDomDocument domDoc)
 
 ResultItem* Parse::ParseItem(const QDomElement& item) const
 {
-    QString title, description, url, author, duration, rating,
+    QString title, subtitle, description, url, author, duration, rating,
             thumbnail, mediaURL, player, language, download;
     off_t filesize = 0;
     uint width = 0, height = 0, season = 0, episode = 0;
@@ -739,6 +742,13 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     title = UnescapeHTML(title);
     if (title.isEmpty())
         title = "";
+
+    // Get the subtitle of this item.
+    QDomNodeList subt = item.elementsByTagNameNS(MythRSS, "subtitle");
+    if (subt.size())
+    {
+        subtitle = subt.at(0).toElement().text();
+    }
 
     // Parse the description of the article/video
     QDomElement descriptiontemp = item.firstChildElement("description");
@@ -911,8 +921,8 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     if (mediaURL.isNull() || mediaURL == url)
         downloadable = false;
 
-    return(new ResultItem(title, description, url, thumbnail,
-              mediaURL, author, date, duration,
+    return(new ResultItem(title, subtitle, description,
+              url, thumbnail, mediaURL, author, date, duration,
               rating, filesize, player, playerargs,
               download, downloadargs, width, height,
               language, downloadable, countries, season,

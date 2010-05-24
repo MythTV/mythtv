@@ -22,16 +22,24 @@ class MPUBLIC GrabberScript : public QThread
 
     GrabberScript(const QString& title,
                   const QString& image,
+                  const ArticleType& type,
+                  const QString& author,
                   const bool& search,
                   const bool& tree,
-                  const QString& commandline);
+                  const QString& description,
+                  const QString& commandline,
+                  const double& version);
     ~GrabberScript();
 
     const QString& GetTitle() const { return m_title; }
     const QString& GetImage() const { return m_image; }
+    const ArticleType& GetType() const { return m_type; }
+    const QString& GetAuthor() const { return m_author; }
     const bool& GetSearch() const { return m_search; }
     const bool& GetTree() const { return m_tree; }
+    const QString& GetDescription() const { return m_description; }
     const QString& GetCommandline() const { return m_commandline; }
+    const double& GetVersion() const { return m_version; }
 
     virtual void run(void);
 
@@ -44,16 +52,20 @@ class MPUBLIC GrabberScript : public QThread
   private:
 
     void parseDBTree(const QString &feedtitle, const QString &path,
-                     const QString &pathThumb, QDomElement& domElem);
+                     const QString &pathThumb, QDomElement& domElem,
+                     const ArticleType &type);
     mutable QMutex m_lock;
 
-    QString   m_title;
-    QString   m_image;
-    bool      m_rss;
-    bool      m_search;
-    bool      m_tree;
-    QString   m_commandline;
-    QProcess  m_getTree;
+    QString     m_title;
+    QString     m_image;
+    ArticleType m_type;
+    QString     m_author;
+    bool        m_search;
+    bool        m_tree;
+    QString     m_description;
+    QString     m_commandline;
+    double      m_version;
+    QProcess    m_getTree;
 };
 Q_DECLARE_METATYPE(GrabberScript *);
 

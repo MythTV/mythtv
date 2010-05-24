@@ -22,11 +22,12 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="Search all tree views|S";
+__title__ ="Search all tree views";
 __mashup_title__ = "mnvsearch"
-__author__="R.D.Vaughan"
-__version__="v0.1.0"
+__author__="R.D. Vaughan"
+__version__="0.11"
 # 0.1.0 Initial development
+# 0.11  Change to support xml version information display
 
 __usage_examples__ ='''
 (Option Help)
@@ -55,7 +56,15 @@ Options:
   -S, --search          Search for videos
 
 > ./mnvsearch.py -v
-Search all tree views|S
+<grabber>
+  <name>Search all tree views</name>
+  <author>R.D.Vaughan</author>
+  <thumbnail>mnvsearch.png</thumbnail>
+  <type>video</type>
+  <description>MythNetvision treeview data base search</description>
+  <version>v0.11</version>
+  <search>true</search>
+</grabber>
 
 > ./mnvsearch.py -S "Doctor Who"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -198,11 +207,18 @@ if __name__ == '__main__':
     # Make sure the target functions have an instance of the common routines
     target.common = common
     main = process.mainProcess(target, apikey, )
-    main.grabber_title = __title__
-    main.mashup_title = __mashup_title__
-    main.grabber_author = __author__
-    main.grabber_version = __version__
-    main.grabber_usage_examples = __usage_examples__
-    main.search_max_page_items = __search_max_page_items__
-    main.tree_max_page_items = __tree_max_page_items__
+    main.grabberInfo = {}
+    main.grabberInfo['title'] = __title__
+    main.grabberInfo['mashup_title'] = __mashup_title__
+    main.grabberInfo['author'] = __author__
+    main.grabberInfo['thumbnail'] = 'mnvsearch.png'
+    main.grabberInfo['type'] = ['video', ]
+    main.grabberInfo['desc'] = u"MythTV Online Content database search."
+    main.grabberInfo['version'] = __version__
+    main.grabberInfo['search'] = True
+    main.grabberInfo['tree'] = False
+    main.grabberInfo['html'] = False
+    main.grabberInfo['usage'] = __usage_examples__
+    main.grabberInfo['SmaxPage'] = __search_max_page_items__
+    main.grabberInfo['TmaxPage'] = __tree_max_page_items__
     main.main()

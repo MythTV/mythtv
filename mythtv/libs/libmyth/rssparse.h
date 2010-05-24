@@ -18,89 +18,94 @@ using namespace std;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class QDomDocument;
+typedef enum ArticleTypes {
+    VIDEO = 0,
+    VIDEO_PODCAST = 1,
+    AUDIO = 2,
+    AUDIO_PODCAST = 3
+} ArticleType;
 
-   /** Describes an enclosure associated with an item.
-    */
-   struct Enclosure
-   {
-       QString URL;
-       QString Type;
-       qint64 Length;
-       QString Lang;
-   };
+/** Describes an enclosure associated with an item.
+ */
+struct Enclosure
+{
+    QString URL;
+    QString Type;
+    qint64 Length;
+    QString Lang;
+};
 
-   struct MRSSThumbnail
-   {
-       QString URL;
-       int Width;
-       int Height;
-       QString Time;
-   };
+struct MRSSThumbnail
+{
+    QString URL;
+    int Width;
+    int Height;
+    QString Time;
+};
 
-   struct MRSSCredit
-   {
-       QString Role;
-       QString Who;
-   };
+struct MRSSCredit
+{
+    QString Role;
+    QString Who;
+};
 
-   struct MRSSComment
-   {
-       QString Type;
-       QString Comment;
-   };
+struct MRSSComment
+{
+    QString Type;
+    QString Comment;
+};
 
-   struct MRSSPeerLink
-   {
-       QString Type;
-       QString Link;
-   };
+struct MRSSPeerLink
+{
+    QString Type;
+    QString Link;
+};
 
-   struct MRSSScene
-   {
-       QString Title;
-       QString Description;
-       QString StartTime;
-       QString EndTime;
-   };
+struct MRSSScene
+{
+    QString Title;
+    QString Description;
+    QString StartTime;
+    QString EndTime;
+};
 
-   struct MRSSEntry
-   {
-       QString URL;
-       qint64 Size;
-       QString Type;
-       QString Medium;
-       bool IsDefault;
-       QString Expression;
-       int Bitrate;
-       double Framerate;
-       double SamplingRate;
-       int Channels;
-       int Duration;
-       int Width;
-       int Height;
-       QString Lang;
-       int Group;
-       QString Rating;
-       QString RatingScheme;
-       QString Title;
-       QString Description;
-       QString Keywords;
-       QString CopyrightURL;
-       QString CopyrightText;
-       int RatingAverage;
-       int RatingCount;
-       int RatingMin;
-       int RatingMax;
-       int Views;
-       int Favs;
-       QString Tags;
-       QList<MRSSThumbnail> Thumbnails;
-       QList<MRSSCredit> Credits;
-       QList<MRSSComment> Comments;
-       QList<MRSSPeerLink> PeerLinks;
-       QList<MRSSScene> Scenes;
-   };
+struct MRSSEntry
+{
+    QString URL;
+    qint64 Size;
+    QString Type;
+    QString Medium;
+    bool IsDefault;
+    QString Expression;
+    int Bitrate;
+    double Framerate;
+    double SamplingRate;
+    int Channels;
+    int Duration;
+    int Width;
+    int Height;
+    QString Lang;
+    int Group;
+    QString Rating;
+    QString RatingScheme;
+    QString Title;
+    QString Description;
+    QString Keywords;
+    QString CopyrightURL;
+    QString CopyrightText;
+    int RatingAverage;
+    int RatingCount;
+    int RatingMin;
+    int RatingMax;
+    int Views;
+    int Favs;
+    QString Tags;
+    QList<MRSSThumbnail> Thumbnails;
+    QList<MRSSCredit> Credits;
+    QList<MRSSComment> Comments;
+    QList<MRSSPeerLink> PeerLinks;
+    QList<MRSSScene> Scenes;
+};
 
 class MPUBLIC ResultItem
 {
@@ -110,10 +115,10 @@ class MPUBLIC ResultItem
     typedef QList<ResultItem *> resultList;
     typedef vector<ResultItem> List;
 
-    ResultItem(const QString& title, const QString& desc,
-              const QString& URL, const QString& thumbnail,
-              const QString& mediaURL, const QString& author,
-              const QDateTime& date, const QString& time,
+    ResultItem(const QString& title, const QString& subtitle,
+              const QString& desc, const QString& URL,
+              const QString& thumbnail, const QString& mediaURL,
+              const QString& author, const QDateTime& date, const QString& time,
               const QString& rating, const off_t& filesize,
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,
@@ -126,6 +131,7 @@ class MPUBLIC ResultItem
     void toMap(QHash<QString, QString> &infoMap);
 
     const QString& GetTitle() const { return m_title; }
+    const QString& GetSubtitle() const { return m_subtitle; }
     const QString& GetDescription() const { return m_desc; }
     const QString& GetURL() const { return m_URL; }
     const QString& GetThumbnail() const { return m_thumbnail; }
@@ -150,6 +156,7 @@ class MPUBLIC ResultItem
 
   private:
     QString      m_title;
+    QString      m_subtitle;
     QString      m_desc;
     QString      m_URL;
     QString      m_thumbnail;

@@ -642,7 +642,7 @@ void NetTree::fillTree()
     for (; i != m_rssList.end(); ++i)
     {
         ResultItem::resultList items =
-                   getRSSArticles((*i)->GetTitle());
+                   getRSSArticles((*i)->GetTitle(), VIDEO_PODCAST);
         MythGenericTree *ret = new MythGenericTree(
                    (*i)->GetTitle(), kSubFolder, false);
         ret->SetData(qVariantFromValue(*i));
@@ -676,7 +676,7 @@ void NetTree::fillTree()
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
-                           getTreeArticles((*i)->GetTitle());
+                           getTreeArticles((*i)->GetTitle(), VIDEO);
 
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
 
@@ -1087,7 +1087,7 @@ void NetTree::slotItemChanged()
     }
     else if (site)
     {
-        ResultItem *res = new ResultItem(site->GetTitle(), site->GetDescription(),
+        ResultItem *res = new ResultItem(site->GetTitle(), QString(), site->GetDescription(),
               site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
@@ -1118,7 +1118,7 @@ void NetTree::slotItemChanged()
         else
             title = m_siteButtonList->GetItemCurrent()->GetText();
 
-        ResultItem *res = new ResultItem(title, QString(),
+        ResultItem *res = new ResultItem(title, QString(), QString(),
               QString(), QString(), QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);

@@ -22,11 +22,12 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="Hulu|ST";
+__title__ ="Hulu";
 __mashup_title__ = "hulu"
-__author__="R.D.Vaughan"
-__version__="v0.1.0"
+__author__="R.D. Vaughan"
+__version__="0.11"
 # 0.1.0 Initial development
+# 0.11  Change to support xml version information display
 
 __usage_examples__ ='''
 (Option Help)
@@ -56,7 +57,16 @@ Options:
   -T, --treeview        Display a Tree View of a sites videos
 
 > ./hulu.py -v
-Hulu|ST
+<grabber>
+  <name>Hulu</name>
+  <author>R.D.Vaughan</author>
+  <thumbnail>hulu.png</thumbnail>
+  <type>video</type>
+  <description>Hulu.com is a free online video service that offers hit TV shows including Family Guy, 30 Rock, and the Daily Show with Jon Stewart, etc.</description>
+  <version>v0.11</version>
+  <search>true</search>
+  <tree>true</tree>
+</grabber>
 
 > ./hulu.py -S "Burn Notice"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -259,11 +269,18 @@ if __name__ == '__main__':
     # Make sure the target functions have an instance of the common routines
     target.common = common
     main = process.mainProcess(target, apikey, )
-    main.grabber_title = __title__
-    main.mashup_title = __mashup_title__
-    main.grabber_author = __author__
-    main.grabber_version = __version__
-    main.grabber_usage_examples = __usage_examples__
-    main.search_max_page_items = __search_max_page_items__
-    main.tree_max_page_items = __tree_max_page_items__
+    main.grabberInfo = {}
+    main.grabberInfo['title'] = __title__
+    main.grabberInfo['mashup_title'] = __mashup_title__
+    main.grabberInfo['author'] = __author__
+    main.grabberInfo['thumbnail'] = 'hulu.png'
+    main.grabberInfo['type'] = ['video', ]
+    main.grabberInfo['desc'] = u"Hulu.com is a free online video service that offers hit TV shows including Family Guy, 30 Rock, and the Daily Show with Jon Stewart."
+    main.grabberInfo['version'] = __version__
+    main.grabberInfo['search'] = True
+    main.grabberInfo['tree'] = True
+    main.grabberInfo['html'] = False
+    main.grabberInfo['usage'] = __usage_examples__
+    main.grabberInfo['SmaxPage'] = __search_max_page_items__
+    main.grabberInfo['TmaxPage'] = __tree_max_page_items__
     main.main()

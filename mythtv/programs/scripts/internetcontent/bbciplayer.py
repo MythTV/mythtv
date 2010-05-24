@@ -22,13 +22,14 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="BBC iPlayer|ST";
+__title__ ="BBC iPlayer";
 __mashup_title__ = "bbcipplayer"
-__author__="R.D.Vaughan"
-__version__="v0.1.2"
+__author__="R.D. Vaughan"
+__version__="0.13"
 # 0.1.0 Initial development
 # 0.1.1 Added treeview support
 # 0.1.2 Convert to detect and use either local or remote processing
+# 0.13  Change to support xml version information display
 
 __usage_examples__ ='''
 (Option Help)
@@ -58,7 +59,16 @@ Options:
   -T, --treeview        Display a Tree View of a sites videos
 
 > ./bbciplayer.py -v
-BBC iPlayer|ST
+<grabber>
+  <name>BBC iPlayer</name>
+  <author>R.D. Vaughan</author>
+  <thumbnail>bbciplayer.jpg</thumbnail>
+  <type>video</type>
+  <description>BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week.</description>
+  <version>v0.13</version>
+  <search>true</search>
+  <tree>true</tree>
+</grabber>
 
 > ./bbciplayer.py -S "Doctor Who"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -261,11 +271,18 @@ if __name__ == '__main__':
     # Make sure the target functions have an instance of the common routines
     target.common = common
     main = process.mainProcess(target, apikey, )
-    main.grabber_title = __title__
-    main.mashup_title = __mashup_title__
-    main.grabber_author = __author__
-    main.grabber_version = __version__
-    main.grabber_usage_examples = __usage_examples__
-    main.search_max_page_items = __search_max_page_items__
-    main.tree_max_page_items = __tree_max_page_items__
+    main.grabberInfo = {}
+    main.grabberInfo['title'] = __title__
+    main.grabberInfo['mashup_title'] = __mashup_title__
+    main.grabberInfo['author'] = __author__
+    main.grabberInfo['thumbnail'] = 'bbciplayer.jpg'
+    main.grabberInfo['type'] = ['video', ]
+    main.grabberInfo['desc'] = u"BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week."
+    main.grabberInfo['version'] = __version__
+    main.grabberInfo['search'] = True
+    main.grabberInfo['tree'] = True
+    main.grabberInfo['html'] = False
+    main.grabberInfo['usage'] = __usage_examples__
+    main.grabberInfo['SmaxPage'] = __search_max_page_items__
+    main.grabberInfo['TmaxPage'] = __tree_max_page_items__
     main.main()
