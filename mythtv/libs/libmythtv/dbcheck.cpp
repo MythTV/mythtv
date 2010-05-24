@@ -5193,16 +5193,6 @@ NULL
 };
         if (!performActualUpdate(updates, "1256", dbver))
             return false;
-
-        // Reload the binding in case mythtv-setup did the upgrade and the
-        // user's previous setting for this host wasn't Esc
-        if (gCoreContext->HasGUI())
-        {
-            MythMainWindow *mainwin = GetMythMainWindow();
-            mainwin->ClearKey("Main Menu", "EXIT");
-            QString keys = mainwin->GetKey("Main Menu", "EXIT");
-            mainwin->BindKey("Main Menu", "EXIT", keys);
-        }
     }
 
     if (dbver == "1256")

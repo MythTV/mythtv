@@ -1403,6 +1403,10 @@ int main(int argc, char **argv)
 
     WriteDefaults();
 
+    // Refresh Global/Main Menu keys after DB update in case there was no DB
+    // when they were written originally
+    mainWindow->ResetKeys();
+
     InitJumpPoints();
 
     internal_media_init();

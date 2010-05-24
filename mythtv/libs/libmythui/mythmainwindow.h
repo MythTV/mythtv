@@ -48,7 +48,9 @@ class MPUBLIC MythMainWindow : public QWidget
                            QStringList &actions, bool allowJumps = true) 
                            __attribute__ ((warn_unused_result));
 
+    void ResetKeys(void);
     void ClearKey(const QString &context, const QString &action);
+    void ClearKeyContext(const QString &context);
     void BindKey(const QString &context, const QString &action,
                  const QString &key);
     void RegisterKey(const QString &context, const QString &action,
@@ -123,6 +125,8 @@ class MPUBLIC MythMainWindow : public QWidget
   protected:
     MythMainWindow(const bool useDB = true);
     virtual ~MythMainWindow();
+
+    void InitKeys(void);
 
     bool eventFilter(QObject *o, QEvent *e);
     void customEvent(QEvent *ce);

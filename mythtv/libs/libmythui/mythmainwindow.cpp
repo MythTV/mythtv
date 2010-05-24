@@ -386,134 +386,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
         d->appleRemote->start();
 #endif
 
-    RegisterKey("Global", "UP", QT_TRANSLATE_NOOP("MythControls",
-        "Up Arrow"),               "Up");
-    RegisterKey("Global", "DOWN", QT_TRANSLATE_NOOP("MythControls",
-        "Down Arrow"),           "Down");
-    RegisterKey("Global", "LEFT", QT_TRANSLATE_NOOP("MythControls",
-        "Left Arrow"),           "Left");
-    RegisterKey("Global", "RIGHT", QT_TRANSLATE_NOOP("MythControls",
-        "Right Arrow"),         "Right");
-    RegisterKey("Global", "NEXT", QT_TRANSLATE_NOOP("MythControls",
-        "Move to next widget"),   "Tab");
-    RegisterKey("Global", "PREVIOUS", QT_TRANSLATE_NOOP("MythControls",
-        "Move to preview widget"), "Backtab");
-    RegisterKey("Global", "SELECT", QT_TRANSLATE_NOOP("MythControls",
-        "Select"), "Return,Enter,Space");
-    RegisterKey("Global", "BACKSPACE", QT_TRANSLATE_NOOP("MythControls",
-        "Backspace"),       "Backspace");
-    RegisterKey("Global", "ESCAPE", QT_TRANSLATE_NOOP("MythControls",
-        "Escape"),                "Esc");
-    RegisterKey("Global", "MENU", QT_TRANSLATE_NOOP("MythControls",
-        "Pop-up menu"),             "M");
-    RegisterKey("Global", "INFO", QT_TRANSLATE_NOOP("MythControls",
-        "More information"),        "I");
-    RegisterKey("Global", "DELETE", QT_TRANSLATE_NOOP("MythControls",
-        "Delete"),                  "D");
-    RegisterKey("Global", "EDIT", QT_TRANSLATE_NOOP("MythControls",
-        "Edit"),                    "E");
-
-    RegisterKey("Global", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
-        "Page Up"),              "PgUp");
-    RegisterKey("Global", "PAGEDOWN", QT_TRANSLATE_NOOP("MythControls",
-        "Page Down"),          "PgDown");
-    RegisterKey("Global", "PAGETOP", QT_TRANSLATE_NOOP("MythControls",
-        "Page to top of list"),      "");
-    RegisterKey("Global", "PAGEMIDDLE", QT_TRANSLATE_NOOP("MythControls",
-        "Page to middle of list"),   "");
-    RegisterKey("Global", "PAGEBOTTOM", QT_TRANSLATE_NOOP("MythControls",
-        "Page to bottom of list"),   "");
-
-    RegisterKey("Global", "PREVVIEW", QT_TRANSLATE_NOOP("MythControls",
-        "Previous View"),        "Home");
-    RegisterKey("Global", "NEXTVIEW", QT_TRANSLATE_NOOP("MythControls",
-        "Next View"),             "End");
-
-    RegisterKey("Global", "HELP", QT_TRANSLATE_NOOP("MythControls",
-        "Help"),                   "F1");
-    RegisterKey("Global", "EJECT", QT_TRANSLATE_NOOP("MythControls"
-        ,"Eject Removable Media"),   "");
-
-    RegisterKey("Global", "CUT", QT_TRANSLATE_NOOP("MythControls",
-        "Cut text from textedit"), "Ctrl+X");
-    RegisterKey("Global", "COPY", QT_TRANSLATE_NOOP("MythControls"
-        ,"Copy text from textedit"), "Ctrl+C");
-    RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
-        "Paste text into textedit"), "Ctrl+V");
-
-    RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
-    RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
-    RegisterKey("Global", "2", QT_TRANSLATE_NOOP("MythControls","2"), "2");
-    RegisterKey("Global", "3", QT_TRANSLATE_NOOP("MythControls","3"), "3");
-    RegisterKey("Global", "4", QT_TRANSLATE_NOOP("MythControls","4"), "4");
-    RegisterKey("Global", "5", QT_TRANSLATE_NOOP("MythControls","5"), "5");
-    RegisterKey("Global", "6", QT_TRANSLATE_NOOP("MythControls","6"), "6");
-    RegisterKey("Global", "7", QT_TRANSLATE_NOOP("MythControls","7"), "7");
-    RegisterKey("Global", "8", QT_TRANSLATE_NOOP("MythControls","8"), "8");
-    RegisterKey("Global", "9", QT_TRANSLATE_NOOP("MythControls","9"), "9");
-
-    RegisterKey("Global", "SYSEVENT01", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #1"), "");
-    RegisterKey("Global", "SYSEVENT02", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #2"), "");
-    RegisterKey("Global", "SYSEVENT03", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #3"), "");
-    RegisterKey("Global", "SYSEVENT04", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #4"), "");
-    RegisterKey("Global", "SYSEVENT05", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #5"), "");
-    RegisterKey("Global", "SYSEVENT06", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #6"), "");
-    RegisterKey("Global", "SYSEVENT07", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #7"), "");
-    RegisterKey("Global", "SYSEVENT08", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #8"), "");
-    RegisterKey("Global", "SYSEVENT09", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #9"), "");
-    RegisterKey("Global", "SYSEVENT10", QT_TRANSLATE_NOOP("MythControls",
-        "Trigger System Key Event #10"), "");
-
-    // these are for the html viewer widget (MythUIWebBrowser)
-    RegisterKey("Browser", "ZOOMIN",          QT_TRANSLATE_NOOP("MythControls",
-        "Zoom in on browser window"),           ".,>");
-    RegisterKey("Browser", "ZOOMOUT",         QT_TRANSLATE_NOOP("MythControls",
-        "Zoom out on browser window"),          ",,<");
-    RegisterKey("Browser", "TOGGLEINPUT",     QT_TRANSLATE_NOOP("MythControls",
-        "Toggle where keyboard input goes to"),  "F1");
-
-    RegisterKey("Browser", "MOUSEUP",         QT_TRANSLATE_NOOP("MythControls",
-        "Move mouse pointer up"),                 "2");
-    RegisterKey("Browser", "MOUSEDOWN",       QT_TRANSLATE_NOOP("MythControls",
-        "Move mouse pointer down"),               "8");
-    RegisterKey("Browser", "MOUSELEFT",       QT_TRANSLATE_NOOP("MythControls",
-        "Move mouse pointer left"),               "4");
-    RegisterKey("Browser", "MOUSERIGHT",      QT_TRANSLATE_NOOP("MythControls",
-        "Move mouse pointer right"),              "6");
-    RegisterKey("Browser", "MOUSELEFTBUTTON", QT_TRANSLATE_NOOP("MythControls",
-        "Mouse Left button click"),               "5");
-
-    RegisterKey("Browser", "PAGEDOWN",        QT_TRANSLATE_NOOP("MythControls",
-        "Scroll down half a page"),               "9");
-    RegisterKey("Browser", "PAGEUP",          QT_TRANSLATE_NOOP("MythControls",
-        "Scroll up half a page"),                 "3");
-    RegisterKey("Browser", "PAGELEFT",        QT_TRANSLATE_NOOP("MythControls",
-        "Scroll left half a page"),               "7");
-    RegisterKey("Browser", "PAGERIGHT",       QT_TRANSLATE_NOOP("MythControls",
-        "Scroll right half a page"),              "1");
-
-    RegisterKey("Browser", "NEXTLINK",        QT_TRANSLATE_NOOP("MythControls",
-        "Move selection to next link"),           "Z");
-    RegisterKey("Browser", "PREVIOUSLINK",    QT_TRANSLATE_NOOP("MythControls",
-        "Move selection to previous link"),       "Q");
-    RegisterKey("Browser", "FOLLOWLINK",      QT_TRANSLATE_NOOP("MythControls",
-        "Follow selected link"),            "Return,Space,Enter");
-    RegisterKey("Browser", "HISTORYBACK",     QT_TRANSLATE_NOOP("MythControls",
-        "Go back to previous page"),        "R,Backspace");
-    RegisterKey("Browser", "HISTORYFORWARD",  QT_TRANSLATE_NOOP("MythControls",
-        "Go forward to previous page"),     "F");
-
-    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
-        "System Exit"),                     "Esc");
+    InitKeys();
 
     d->gestureTimer = new QTimer(this);
     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
@@ -1009,6 +882,146 @@ void MythMainWindow::Init(void)
     d->paintwin->show();
 }
 
+void MythMainWindow::InitKeys()
+{
+    RegisterKey("Global", "UP", QT_TRANSLATE_NOOP("MythControls",
+        "Up Arrow"),               "Up");
+    RegisterKey("Global", "DOWN", QT_TRANSLATE_NOOP("MythControls",
+        "Down Arrow"),           "Down");
+    RegisterKey("Global", "LEFT", QT_TRANSLATE_NOOP("MythControls",
+        "Left Arrow"),           "Left");
+    RegisterKey("Global", "RIGHT", QT_TRANSLATE_NOOP("MythControls",
+        "Right Arrow"),         "Right");
+    RegisterKey("Global", "NEXT", QT_TRANSLATE_NOOP("MythControls",
+        "Move to next widget"),   "Tab");
+    RegisterKey("Global", "PREVIOUS", QT_TRANSLATE_NOOP("MythControls",
+        "Move to preview widget"), "Backtab");
+    RegisterKey("Global", "SELECT", QT_TRANSLATE_NOOP("MythControls",
+        "Select"), "Return,Enter,Space");
+    RegisterKey("Global", "BACKSPACE", QT_TRANSLATE_NOOP("MythControls",
+        "Backspace"),       "Backspace");
+    RegisterKey("Global", "ESCAPE", QT_TRANSLATE_NOOP("MythControls",
+        "Escape"),                "Esc");
+    RegisterKey("Global", "MENU", QT_TRANSLATE_NOOP("MythControls",
+        "Pop-up menu"),             "M");
+    RegisterKey("Global", "INFO", QT_TRANSLATE_NOOP("MythControls",
+        "More information"),        "I");
+    RegisterKey("Global", "DELETE", QT_TRANSLATE_NOOP("MythControls",
+        "Delete"),                  "D");
+    RegisterKey("Global", "EDIT", QT_TRANSLATE_NOOP("MythControls",
+        "Edit"),                    "E");
+
+    RegisterKey("Global", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
+        "Page Up"),              "PgUp");
+    RegisterKey("Global", "PAGEDOWN", QT_TRANSLATE_NOOP("MythControls",
+        "Page Down"),          "PgDown");
+    RegisterKey("Global", "PAGETOP", QT_TRANSLATE_NOOP("MythControls",
+        "Page to top of list"),      "");
+    RegisterKey("Global", "PAGEMIDDLE", QT_TRANSLATE_NOOP("MythControls",
+        "Page to middle of list"),   "");
+    RegisterKey("Global", "PAGEBOTTOM", QT_TRANSLATE_NOOP("MythControls",
+        "Page to bottom of list"),   "");
+
+    RegisterKey("Global", "PREVVIEW", QT_TRANSLATE_NOOP("MythControls",
+        "Previous View"),        "Home");
+    RegisterKey("Global", "NEXTVIEW", QT_TRANSLATE_NOOP("MythControls",
+        "Next View"),             "End");
+
+    RegisterKey("Global", "HELP", QT_TRANSLATE_NOOP("MythControls",
+        "Help"),                   "F1");
+    RegisterKey("Global", "EJECT", QT_TRANSLATE_NOOP("MythControls"
+        ,"Eject Removable Media"),   "");
+
+    RegisterKey("Global", "CUT", QT_TRANSLATE_NOOP("MythControls",
+        "Cut text from textedit"), "Ctrl+X");
+    RegisterKey("Global", "COPY", QT_TRANSLATE_NOOP("MythControls"
+        ,"Copy text from textedit"), "Ctrl+C");
+    RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
+        "Paste text into textedit"), "Ctrl+V");
+
+    RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
+    RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
+    RegisterKey("Global", "2", QT_TRANSLATE_NOOP("MythControls","2"), "2");
+    RegisterKey("Global", "3", QT_TRANSLATE_NOOP("MythControls","3"), "3");
+    RegisterKey("Global", "4", QT_TRANSLATE_NOOP("MythControls","4"), "4");
+    RegisterKey("Global", "5", QT_TRANSLATE_NOOP("MythControls","5"), "5");
+    RegisterKey("Global", "6", QT_TRANSLATE_NOOP("MythControls","6"), "6");
+    RegisterKey("Global", "7", QT_TRANSLATE_NOOP("MythControls","7"), "7");
+    RegisterKey("Global", "8", QT_TRANSLATE_NOOP("MythControls","8"), "8");
+    RegisterKey("Global", "9", QT_TRANSLATE_NOOP("MythControls","9"), "9");
+
+    RegisterKey("Global", "SYSEVENT01", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #1"), "");
+    RegisterKey("Global", "SYSEVENT02", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #2"), "");
+    RegisterKey("Global", "SYSEVENT03", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #3"), "");
+    RegisterKey("Global", "SYSEVENT04", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #4"), "");
+    RegisterKey("Global", "SYSEVENT05", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #5"), "");
+    RegisterKey("Global", "SYSEVENT06", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #6"), "");
+    RegisterKey("Global", "SYSEVENT07", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #7"), "");
+    RegisterKey("Global", "SYSEVENT08", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #8"), "");
+    RegisterKey("Global", "SYSEVENT09", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #9"), "");
+    RegisterKey("Global", "SYSEVENT10", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #10"), "");
+
+    // these are for the html viewer widget (MythUIWebBrowser)
+    RegisterKey("Browser", "ZOOMIN",          QT_TRANSLATE_NOOP("MythControls",
+        "Zoom in on browser window"),           ".,>");
+    RegisterKey("Browser", "ZOOMOUT",         QT_TRANSLATE_NOOP("MythControls",
+        "Zoom out on browser window"),          ",,<");
+    RegisterKey("Browser", "TOGGLEINPUT",     QT_TRANSLATE_NOOP("MythControls",
+        "Toggle where keyboard input goes to"),  "F1");
+
+    RegisterKey("Browser", "MOUSEUP",         QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer up"),                 "2");
+    RegisterKey("Browser", "MOUSEDOWN",       QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer down"),               "8");
+    RegisterKey("Browser", "MOUSELEFT",       QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer left"),               "4");
+    RegisterKey("Browser", "MOUSERIGHT",      QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer right"),              "6");
+    RegisterKey("Browser", "MOUSELEFTBUTTON", QT_TRANSLATE_NOOP("MythControls",
+        "Mouse Left button click"),               "5");
+
+    RegisterKey("Browser", "PAGEDOWN",        QT_TRANSLATE_NOOP("MythControls",
+        "Scroll down half a page"),               "9");
+    RegisterKey("Browser", "PAGEUP",          QT_TRANSLATE_NOOP("MythControls",
+        "Scroll up half a page"),                 "3");
+    RegisterKey("Browser", "PAGELEFT",        QT_TRANSLATE_NOOP("MythControls",
+        "Scroll left half a page"),               "7");
+    RegisterKey("Browser", "PAGERIGHT",       QT_TRANSLATE_NOOP("MythControls",
+        "Scroll right half a page"),              "1");
+
+    RegisterKey("Browser", "NEXTLINK",        QT_TRANSLATE_NOOP("MythControls",
+        "Move selection to next link"),           "Z");
+    RegisterKey("Browser", "PREVIOUSLINK",    QT_TRANSLATE_NOOP("MythControls",
+        "Move selection to previous link"),       "Q");
+    RegisterKey("Browser", "FOLLOWLINK",      QT_TRANSLATE_NOOP("MythControls",
+        "Follow selected link"),            "Return,Space,Enter");
+    RegisterKey("Browser", "HISTORYBACK",     QT_TRANSLATE_NOOP("MythControls",
+        "Go back to previous page"),        "R,Backspace");
+    RegisterKey("Browser", "HISTORYFORWARD",  QT_TRANSLATE_NOOP("MythControls",
+        "Go forward to previous page"),     "F");
+
+    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
+        "System Exit"),                     "Esc");
+}
+
+void MythMainWindow::ResetKeys()
+{
+    ClearKeyContext("Global");
+    ClearKeyContext("Browser");
+    ClearKeyContext("Main Menu");
+    InitKeys();
+}
+
 void MythMainWindow::ReinitDone(void)
 {
     if (d->oldpainter)
@@ -1276,6 +1289,13 @@ void MythMainWindow::ClearKey(const QString &context, const QString &action)
         if (list.isEmpty())
             it.remove();
     }
+}
+
+void MythMainWindow::ClearKeyContext(const QString &context)
+{
+    KeyContext *keycontext = d->keyContexts.value(context);
+    if (keycontext != NULL)
+        keycontext->actionMap.clear();
 }
 
 void MythMainWindow::BindKey(const QString &context, const QString &action,

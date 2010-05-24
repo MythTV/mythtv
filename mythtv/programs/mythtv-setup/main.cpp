@@ -593,6 +593,10 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
+    // Refresh Global/Main Menu keys after DB update in case there was no DB
+    // when they were written originally
+    mainWindow->ResetKeys();
+
     if (!startPrompt)
         startPrompt = new StartPrompter();
     startPrompt->handleStart();

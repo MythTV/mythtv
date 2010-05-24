@@ -803,6 +803,16 @@ void TV::InitKeys(void)
 */
 }
 
+void TV::ResetKeys(void)
+{
+    MythMainWindow *mainWindow = GetMythMainWindow();
+    mainWindow->ClearKeyContext("TV Frontend");
+    mainWindow->ClearKeyContext("TV Playback");
+    mainWindow->ClearKeyContext("TV Editing");
+    mainWindow->ClearKeyContext("Teletext Menu");
+    InitKeys();
+}
+
 /** \fn TV::TV(void)
  *  \brief Performs instance initialiation not requiring access to database.
  *  \sa Init(void)
