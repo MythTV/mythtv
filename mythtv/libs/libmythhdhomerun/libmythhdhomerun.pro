@@ -5,6 +5,7 @@ INCLUDEPATH += ../libmythtv
 TEMPLATE = lib
 TARGET = mythhdhomerun-$$LIBVERSION
 CONFIG += thread dll
+CONFIG -= qt
 target.path = $${LIBDIR}
 INSTALLS = target
 

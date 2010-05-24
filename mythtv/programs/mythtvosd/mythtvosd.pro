@@ -1,4 +1,5 @@
 include ( ../../settings.pro )
+include ( ../programs-libs.pro )
 
 QT += network
 

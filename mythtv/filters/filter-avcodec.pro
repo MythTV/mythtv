@@ -1,8 +1,5 @@
 # A few filters use routines from libavcodec. Include this in their .pro file
 
-# This eliminates a linker warning
-CONFIG += qt
-
 INCLUDEPATH += ../../libs/libavcodec ../../libs/libavutil ../../libs ../..
 DEPENDPATH  += ../../libs/libavcodec ../../libs/libavutil
 

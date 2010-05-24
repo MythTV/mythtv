@@ -22,5 +22,6 @@ HEADERS += Programs.h Root.h Stream.h Text.h Variables.h Visible.h BaseActions.h
 HEADERS += DynamicLineArt.h TokenGroup.h Link.h Logging.h freemheg.h
 
 LIBS += $$EXTRA_LIBS
+LIBS += $$LATE_LIBS
 
 include ( ../libs-targetfix.pro )
