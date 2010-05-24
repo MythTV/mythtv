@@ -430,7 +430,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 #endif
 
     // squelch a warning
-    rgb_stride = y_stride = uv_stride;
+    (void) rgb_stride; (void) y_stride; (void) uv_stride;
 
     d = image;
     y1_ptr = py;
