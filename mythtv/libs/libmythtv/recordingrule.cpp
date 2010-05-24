@@ -18,6 +18,7 @@ RecordingRule::RecordingRule()
     m_startdate(QDate::currentDate()),
     m_endtime(QTime::currentTime()),
     m_enddate(QDate::currentDate()),
+    m_channelid(0),
     m_findday(-1),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
     m_findid(QDate(1970, 1, 1).daysTo(QDate::currentDate()) + 719528),

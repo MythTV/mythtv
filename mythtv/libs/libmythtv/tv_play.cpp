@@ -6797,7 +6797,7 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     // Look for channel in line-up
     QString needed_spacer;
     uint    pref_cardid;
-    bool    is_not_complete;
+    bool    is_not_complete = true;
 
     bool valid_prefix = false;
     if (ctx->recorder)

@@ -16,6 +16,7 @@ DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
     detectLetterboxSwitchFrame = -1;
     detectLetterboxPossibleHalfFrame = -1;
     detectLetterboxPossibleFullFrame = -1;
+    detectLetterboxConsecutiveCounter = 0;
     detectLetterboxDetectedMode = nvp->GetAdjustFill();
     detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
     nupple_video_player = nvp;

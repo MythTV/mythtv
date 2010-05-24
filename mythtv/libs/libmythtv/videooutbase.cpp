@@ -310,7 +310,7 @@ VideoOutput::VideoOutput() :
     db_letterbox_colour(kLetterBoxColour_Black),
     db_deint_filtername(QString::null),
     db_use_picture_controls(false),
-    db_vdisp_profile(NULL),
+    db_vdisp_profile(NULL),             video_prate(0.0),
 
     // Picture-in-Picture stuff
     pip_desired_display_size(160,128),  pip_display_size(0,0),

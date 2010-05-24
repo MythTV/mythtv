@@ -343,6 +343,9 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 struct seektable_entry ste;
                 int offset = 0;
 
+                ste.file_offset = 0;
+                ste.keyframe_number = 0;
+
                 m_positionMapLock.lock();
 
                 m_positionMap.clear();

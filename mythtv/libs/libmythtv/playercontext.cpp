@@ -36,8 +36,8 @@ static void *SpawnDecode(void *param)
 PlayerContext::PlayerContext(const QString &inUseID) :
     recUsage(inUseID), nvp(NULL), nvpUnsafe(false), recorder(NULL),
     tvchain(NULL), buffer(NULL), playingInfo(NULL),
-    nohardwaredecoders(false),
-    decoding(false), last_cardid(-1), last_framerate(30.0f),
+    playingLen(0), nohardwaredecoders(false),
+    decoding(false), decode(pthread_t()), last_cardid(-1), last_framerate(30.0f),
     // Fast forward state
     ff_rew_state(0), ff_rew_index(0), ff_rew_speed(0),
     // Other state
@@ -53,7 +53,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     stateLock(QMutex::Recursive),
     // pip
     pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL),
-    useNullVideo(false),
+    pipLocation(0), useNullVideo(false),
     // embedding
     embedWinID(0), embedBounds(0,0,0,0)
 {

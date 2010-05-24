@@ -49,6 +49,9 @@ HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
       _input_pat(NULL),         _input_pmt(NULL),
       _has_no_av(false)
 {
+    memset(_stream_id, 0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0, sizeof(_continuity_counter));
 }
 
 HDHRRecorder::~HDHRRecorder()

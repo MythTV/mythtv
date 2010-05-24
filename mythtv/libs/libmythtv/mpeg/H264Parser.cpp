@@ -12,6 +12,7 @@ extern "C" {
 }
 
 #include <cmath>
+#include <strings.h>
 
 static const float eps = 1E-5;
 
@@ -93,6 +94,7 @@ H264Parser::H264Parser(void)
 {
     Reset();
     I_is_keyframe = true;
+    memset(&gb, 0, sizeof(gb));
 }
 
 void H264Parser::Reset(void)

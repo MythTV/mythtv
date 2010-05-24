@@ -131,6 +131,7 @@ TVRec::TVRec(int capturecardnum)
       m_switchingBuffer(false),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
+      overrecordseconds(0),
       // Pseudo LiveTV recording
       pseudoLiveTVRecording(NULL),
       nextLiveTVDir(""),            nextLiveTVDirLock(),

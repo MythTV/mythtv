@@ -147,6 +147,8 @@ OpenGLContext::OpenGLContext(QMutex *lock) :
     m_lock(lock),       m_lock_level(0),
     m_colour_control(false)
 {
+    for (int i = 0; i < kPictureAttribute_MAX; i++)
+        pictureAttribs[i] = 0.0f;
 }
 
 OpenGLContext::~OpenGLContext()

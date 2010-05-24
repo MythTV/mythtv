@@ -109,7 +109,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       no_hardware_decoders(false),
       // Window stuff
       parentWidget(NULL), embedid(0),
-      embx(-1), emby(-1), embw(-1), embh(-1),
+      wantToResize(false), embx(-1), emby(-1), embw(-1), embh(-1),
       // State
       eof(false),
       m_double_framerate(false),    m_double_process(false),

@@ -171,7 +171,7 @@ bool get_glx_version(MythXDisplay *disp, uint &major, uint &minor)
     static QMutex get_glx_version_lock;
     QMutexLocker locker(&get_glx_version_lock);
 
-    int ret, errbase, eventbase, gl_major, gl_minor;
+    int ret = 0, errbase, eventbase, gl_major = 0, gl_minor = 0;
 
     if (has_run)
     {

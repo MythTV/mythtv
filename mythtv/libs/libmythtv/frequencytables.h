@@ -48,7 +48,8 @@ class FrequencyTable
         : name_format(_name_format),       name_offset(_name_offset),
           frequencyStart(_frequencyStart), frequencyEnd(_frequencyEnd),
           frequencyStep(_frequencyStep),   modulation(_modulation),
-          offset1(0),                      offset2(0) { }
+          offset1(0),                      offset2(0),
+          symbol_rate(0) { }
 
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
@@ -73,7 +74,8 @@ class FrequencyTable
           inversion(_inversion),           bandwidth(_bandwidth),
           coderate_hp(_coderate_hp),       coderate_lp(_coderate_lp),
           constellation(_constellation),   trans_mode(_trans_mode),
-          guard_interval(_guard_interval), hierarchy(_hierarchy) { ; }
+          guard_interval(_guard_interval), hierarchy(_hierarchy),
+          symbol_rate(0) { }
 
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,

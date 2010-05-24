@@ -29,6 +29,8 @@
 AudioInputALSA::AudioInputALSA(const QString &device):
     AudioInput(device),
     pcm_handle(NULL),
+    period_size(0),
+    periods(0),
     myth_block_bytes(0)
 {
     alsa_device = device.right(device.size()-5).toAscii();

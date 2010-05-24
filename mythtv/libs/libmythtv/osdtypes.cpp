@@ -80,6 +80,7 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
 
 OSDSet::OSDSet(const OSDSet &other)
 {
+    m_listener = other.m_listener;
     m_screenwidth = other.m_screenwidth;
     m_screenheight = other.m_screenheight;
     m_frameint = other.m_frameint;

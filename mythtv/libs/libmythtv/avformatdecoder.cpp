@@ -507,6 +507,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       dvdTitleChanged(false), mpeg_seq_end_seen(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
+    bzero(&readcontext, sizeof(readcontext));
     // using preallocated AVFormatContext for our own ByteIOContext
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *

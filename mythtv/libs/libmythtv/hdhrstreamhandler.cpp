@@ -109,8 +109,10 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &devicename) :
 
     _start_stop_lock(QMutex::Recursive),
     _running(false),
+    _reader_thread(),
 
     _pid_lock(QMutex::Recursive),
+    _open_pid_filters(0),
     _listener_lock(QMutex::Recursive),
     _hdhr_lock(QMutex::Recursive)
 {
