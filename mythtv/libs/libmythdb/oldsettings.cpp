@@ -35,8 +35,7 @@ Settings::Settings(QString strSettingsFile)
 
 Settings::~Settings()
 {
-    if (m_pSettings != NULL)
-        delete m_pSettings;
+    delete m_pSettings;
 }
 
 // Setting retrieval functions

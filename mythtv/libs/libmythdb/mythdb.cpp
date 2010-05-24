@@ -35,8 +35,7 @@ MythDB *MythDB::getMythDB(void)
 void MythDB::destroyMythDB(void)
 {
     dbLock.lock();
-    if (mythdb)
-        delete mythdb;
+    delete mythdb;
     mythdb = NULL;
     dbLock.unlock();
 }
