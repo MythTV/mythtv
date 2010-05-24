@@ -39,6 +39,7 @@ MythImage::MythImage(MythPainter *parent)
     m_gradDirection = FillTopToBottom;
 
     m_isReflected = false;
+    m_isYUV = false;
 
     m_imageId = 0;
 
@@ -356,3 +357,38 @@ MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
     ret->m_gradDirection = direction;
     return ret;
 }
+
+#define SCALEBITS 8
+#define ONE_HALF (1 << (SCALEBITS - 1))
+#define FIX(x)   ((int) ((x) * (1L<<SCALEBITS) /*+ 0.5*/))
+
+void MythImage::ConvertToYUV(void)
+{
+    if (m_isYUV)
+        return;
+
+    m_isYUV = true;
+
+    int r, r1, g, g1, b, b1, a;
+    for (int i = 0; i < height(); i ++)
+    {
+        QRgb *data = (QRgb*)scanLine(i);
+        for (int j = 0; j < width(); j++)
+        {
+            r = qRed(data[j]);
+            g = qGreen(data[j]);
+            b = qBlue(data[j]);
+            a = qAlpha(data[j]);
+
+            r1 = (FIX(0.299) * r + FIX(0.587) * g +
+                  FIX(0.114) * b + ONE_HALF) >> SCALEBITS;
+            g1 = ((- FIX(0.169) * r - FIX(0.331) * g +
+                  FIX(0.499) * b + ONE_HALF) >> SCALEBITS) + 128;
+            b1 = ((FIX(0.499) * r - FIX(0.418) * g -
+                  FIX(0.0813) * b + ONE_HALF) >> SCALEBITS) + 128;
+
+            data[j] = qRgba(r1, g1, b1, a);
+        }
+    }
+}
+

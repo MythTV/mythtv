@@ -322,7 +322,8 @@ void MythScreenType::Init(void)
 void MythScreenType::Close(void)
 {
     CloseBusyPopup();
-    GetScreenStack()->PopScreen(this);
+    if (GetScreenStack())
+        GetScreenStack()->PopScreen(this);
 }
 
 void MythScreenType::ShowMenu(void)
@@ -335,6 +336,7 @@ void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
     QList<MythUIType *> *children = GetAllChildren();
 
     MythUIText *textType;
+
     QMutableListIterator<MythUIType *> i(*children);
     while (i.hasNext())
     {

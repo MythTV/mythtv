@@ -17,6 +17,7 @@ class MythVDPAUPainter : public MythPainter
    ~MythVDPAUPainter();
 
     void SetTarget(uint target) { m_target = target; }
+    void SetFlip(bool flip)     { m_flip   = flip;   }
 
     virtual QString GetName(void)        { return QString("VDPAU"); }
     virtual bool SupportsAnimation(void) { return true;             }
@@ -58,6 +59,7 @@ class MythVDPAUPainter : public MythPainter
     MythRenderVDPAU            *m_render;
     bool                        m_created_render;
     uint                        m_target;
+    bool                        m_flip;
 
     QMap<MythImage *, uint32_t> m_ImageBitmapMap;
     std::list<MythImage *>      m_ImageExpireList;

@@ -19,6 +19,10 @@ class MPUBLIC MythUIShape : public MythUIType
     ~MythUIShape();
 
     void Reset(void);
+    void SetCropRect(int x, int y, int width, int height);
+    void SetCropRect(const MythRect &rect);
+    void SetFillBrush(QBrush fill);
+    void SetLinePen(QPen pen);
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
@@ -39,6 +43,10 @@ class MPUBLIC MythUIShape : public MythUIType
     QBrush         m_fillBrush;
     QPen           m_linePen;
     int            m_cornerRadius;
+    MythRect       m_cropRect;
+
+    friend class MythUIProgressBar;
+    friend class MythUIEditBar;
 };
 
 #endif

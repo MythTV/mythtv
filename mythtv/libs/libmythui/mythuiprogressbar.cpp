@@ -82,16 +82,15 @@ void MythUIProgressBar::SetTotal(int value)
 
 void MythUIProgressBar::CalculatePosition(void)
 {
-    MythUIImage *progressImage = dynamic_cast<MythUIImage *>
-                                         (GetChild("progressimage"));
+    MythUIType *progressType = GetChild("progressimage");
 
-    if (!progressImage)
+    if (!progressType)
     {
         VERBOSE(VB_IMPORTANT, "Progress image doesn't exist");
         return;
     }
 
-    progressImage->SetVisible(false);
+    progressType->SetVisible(false);
 
     int total = m_total-m_start;
     int current = m_current-m_start;
@@ -101,9 +100,9 @@ void MythUIProgressBar::CalculatePosition(void)
         return;
 
     percentage = (float)current / (float)total;
-    progressImage->SetVisible(true);
+    progressType->SetVisible(true);
 
-    QRect fillArea = progressImage->GetArea();
+    QRect fillArea = progressType->GetArea();
 
     int height = fillArea.height();
     int width = fillArea.width();
@@ -141,13 +140,20 @@ void MythUIProgressBar::CalculatePosition(void)
         break;
     }
 
-    if (width <= 0)
-        width = 1;
+    MythUIImage *progressImage = dynamic_cast<MythUIImage *>(progressType);
+    MythUIShape *progressShape = dynamic_cast<MythUIShape *>(progressType);
 
-    if (height <= 0)
-        height = 1;
+     if (width <= 0)
+         width = 1;
 
-    progressImage->SetCropRect(x,y,width,height);
+     if (height <= 0)
+         height = 1;
+
+    if (progressImage)
+        progressImage->SetCropRect(x,y,width,height);
+    else if (progressShape)
+        progressShape->SetCropRect(x,y,width,height);
+
     SetRedraw();
 }
 

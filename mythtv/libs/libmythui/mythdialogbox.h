@@ -63,19 +63,23 @@ class MPUBLIC MythDialogBox : public MythScreenType
   public:
     MythDialogBox(const QString &text,
                   MythScreenStack *parent, const char *name,
-                  bool fullscreen = false);
+                  bool fullscreen = false, bool osd = false);
     MythDialogBox(const QString &title, const QString &text,
                   MythScreenStack *parent, const char *name,
-                  bool fullscreen = false);
+                  bool fullscreen = false, bool osd = false);
 
     virtual bool Create(void);
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
+    void SetBackAction(const QString &text, QVariant data);
+    void SetExitAction(const QString &text, QVariant data);
+    void SetText(const QString &text);
 
     void AddButton(const QString &title, QVariant data = 0,
                    bool newMenu = false, bool setCurrent = false);
     void AddButton(const QString &title, const char *slot,
                    bool newMenu = false, bool setCurrent = false);
+    void ResetButtons(void);
 
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual bool gestureEvent(MythGestureEvent *event);
@@ -98,8 +102,14 @@ class MPUBLIC MythDialogBox : public MythScreenType
     bool m_useSlots;
 
     bool    m_fullscreen;
+    bool    m_osdDialog;
     QString m_title;
     QString m_text;
+
+    QString  m_backtext;
+    QVariant m_backdata;
+    QString  m_exittext;
+    QVariant m_exitdata;
 };
 
 /**

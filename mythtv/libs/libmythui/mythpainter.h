@@ -30,6 +30,8 @@ class MPUBLIC MythPainter
     virtual void End() { m_Parent = NULL; }
 
     virtual void SetClipRect(const QRect &clipRect);
+    virtual void SetClipRegion(const QRegion &clipRegion);
+    virtual void Clear(QPaintDevice *device, const QRegion &region);
 
     QPaintDevice *GetParent(void) { return m_Parent; }
 

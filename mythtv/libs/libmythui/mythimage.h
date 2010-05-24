@@ -31,6 +31,9 @@ class MPUBLIC MythImage : public QImage
     bool IsGradient() const { return m_isGradient; }
     bool IsReflected() const { return m_isReflected; }
 
+    void SetToYUV(void) { m_isYUV = true; }
+    void ConvertToYUV(void);
+
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
 
@@ -84,6 +87,7 @@ class MPUBLIC MythImage : public QImage
     FillDirection m_gradDirection;
 
     bool m_isReflected;
+    bool m_isYUV;
 
     unsigned int m_imageId;
 

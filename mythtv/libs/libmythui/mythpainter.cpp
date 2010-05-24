@@ -16,6 +16,14 @@ void MythPainter::SetClipRect(const QRect &)
 {
 }
 
+void MythPainter::SetClipRegion(const QRegion &)
+{
+}
+
+void MythPainter::Clear(QPaintDevice *device, const QRegion &region)
+{
+}
+
 void MythPainter::DrawImage(int x, int y, MythImage *im, int alpha)
 {
     if (!im)

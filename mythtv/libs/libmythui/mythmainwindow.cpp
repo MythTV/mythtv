@@ -69,8 +69,11 @@ using namespace std;
 #include "mythpainter_vdpau.h"
 #endif
 
-#define GESTURE_TIMEOUT 1000
+#ifdef USING_MINGW
+#include "mythpainter_d3d9.h"
+#endif
 
+#define GESTURE_TIMEOUT 1000
 
 class KeyContext
 {
@@ -159,6 +162,10 @@ class MythMainWindowPrivate
     MythScreenStack *mainStack;
 
     MythPainter *painter;
+
+#ifdef USE_OPENGL_PAINTER
+    MythRenderOpenGL *render;
+#endif
 
     bool AllowInput;
 
@@ -264,9 +271,10 @@ MythPainter *GetMythPainter(void)
 
 #ifdef USE_OPENGL_PAINTER
 MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
-                                         MythMainWindowPrivate *priv)
-                   : QGLWidget(win),
-                     parent(win), d(priv)
+                                         MythMainWindowPrivate *priv,
+                                         MythRenderOpenGL *rend)
+                   : QGLWidget(rend, win),
+                     parent(win), d(priv), render(rend)
 {
     setAutoBufferSwap(false);
 }
@@ -288,6 +296,22 @@ MythPainterWindowVDPAU::MythPainterWindowVDPAU(MythMainWindow *win,
 }
 
 void MythPainterWindowVDPAU::paintEvent(QPaintEvent *pe)
+{
+    d->repaintRegion = d->repaintRegion.unite(pe->region());
+    parent->drawScreen();
+}
+#endif
+
+#ifdef USING_MINGW
+MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
+                                             MythMainWindowPrivate *priv)
+                   : QGLWidget(win),
+                     parent(win), d(priv)
+{
+    setAutoBufferSwap(false);
+}
+
+void MythPainterWindowD3D9::paintEvent(QPaintEvent *pe)
 {
     d->repaintRegion = d->repaintRegion.unite(pe->region());
     parent->drawScreen();
@@ -938,7 +962,10 @@ void MythMainWindow::Init(void)
     {
         VERBOSE(VB_GENERAL, "Using the OpenGL painter");
         d->painter = new MythOpenGLPainter();
-        d->paintwin = new MythPainterWindowGL(this, d);
+        QGLFormat fmt;
+        fmt.setDepth(false);
+        d->render  = new MythRenderOpenGL(fmt);
+        d->paintwin = new MythPainterWindowGL(this, d, d->render);
         QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);
         if (qgl && !qgl->isValid())
         {
@@ -958,6 +985,14 @@ void MythMainWindow::Init(void)
         VERBOSE(VB_GENERAL, "Using the VDPAU painter");
         d->painter = new MythVDPAUPainter();
         d->paintwin = new MythPainterWindowVDPAU(this, d);
+    }
+#endif
+#ifdef USING_MINGW
+    if (painter == "d3d9")
+    {
+        VERBOSE(VB_GENERAL, "Using the D3D9 painter");
+        d->painter = new MythD3D9Painter();
+        d->paintwin = new MythPainterWindowD3D9(this, d);
     }
 #endif
 
@@ -1998,9 +2033,20 @@ int MythMainWindow::NormY(const int y)
     return (int)(y * d->hmult);
 }
 
+void MythMainWindow::SetScalingFactors(float wmult, float hmult)
+{
+    d->wmult = wmult;
+    d->hmult = hmult;
+}
+
 QRect MythMainWindow::GetUIScreenRect(void)
 {
     return d->uiScreenRect;
+}
+
+void MythMainWindow::SetUIScreenRect(QRect &rect)
+{
+    d->uiScreenRect = rect;
 }
 
 void MythMainWindow::StartLIRC(void)

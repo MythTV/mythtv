@@ -49,6 +49,7 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     QString GetDBValue(void) const { return GetText(); }
 
     void SetFontState(const QString&);
+    void SetJustification(int just);
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
@@ -66,7 +67,6 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     void CycleColor(QColor startColor, QColor endColor, int numSteps);
     void StopCycling();
 
-    void SetJustification(int just);
     int GetJustification(void);
     void SetCutDown(bool cut);
     bool GetCutDown(void) const { return m_Cutdown; }

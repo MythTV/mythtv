@@ -24,6 +24,7 @@ class MythMainWindowPrivate;
 class MythPainterWindowGL;
 class MythPainterWindowQt;
 class MythPainterWindowVDPAU;
+class MythPainterWindowD3D9;
 
 class MPUBLIC MythMainWindow : public QWidget
 {
@@ -31,6 +32,7 @@ class MPUBLIC MythMainWindow : public QWidget
     friend class MythPainterWindowGL;
     friend class MythPainterWindowQt;
     friend class MythPainterWindowVDPAU;
+    friend class MythPainterWindowD3D9;
 
   public:
     void Init(void);
@@ -90,6 +92,7 @@ class MPUBLIC MythMainWindow : public QWidget
     void AllowInput(bool allow);
 
     QRect GetUIScreenRect();
+    void  SetUIScreenRect(QRect &rect);
 
     int NormalizeFontSize(int pointSize);
     MythRect NormRect(const MythRect &rect);
@@ -98,6 +101,7 @@ class MPUBLIC MythMainWindow : public QWidget
     int NormX(const int x);
     int NormY(const int y);
     int fonTweak;
+    void SetScalingFactors(float wmult, float hmult);
 
     void StartLIRC(void);
 

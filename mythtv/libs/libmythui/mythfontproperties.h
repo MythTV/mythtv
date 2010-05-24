@@ -14,6 +14,8 @@ class MPUBLIC MythFontProperties: public XMLParseBase
   public:
     MythFontProperties();
 
+    QFont* GetFace(void) { return &m_face; }
+
     void SetFace(const QFont &face);
     void SetColor(const QColor &color);
     void SetShadow(bool on, const QPoint &offset, const QColor &color, int alpha);

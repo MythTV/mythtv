@@ -15,7 +15,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h mythrect.h
-HEADERS += myththemebase.h
+HEADERS += myththemebase.h  mythpainter_qimage.h mythpainter_yuva.h
 HEADERS += mythpainter_qt.h mythmainwindow_internal.h mythuihelper.h
 HEADERS += mythscreenstack.h mythgesture.h mythuitype.h mythscreentype.h
 HEADERS += mythuiimage.h mythuitext.h mythuistatetype.h  xmlparsebase.h
@@ -27,13 +27,13 @@ HEADERS += screensaver.h screensaver-null.h x11colors.h
 HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
-HEADERS += mythrender_base.h mythfontmanager.h
+HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
-SOURCES += myththemebase.cpp
+SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
 SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp 
-SOURCES +=  mythuiimage.cpp mythuitext.cpp
+SOURCES += mythuiimage.cpp mythuitext.cpp
 SOURCES += mythuistatetype.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
@@ -43,7 +43,7 @@ SOURCES += screensaver.cpp screensaver-null.cpp x11colors.cpp
 SOURCES += themeinfo.cpp mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
-SOURCES += mythfontmanager.cpp
+SOURCES += mythfontmanager.cpp mythuieditbar.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -58,6 +58,7 @@ inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
+inc.files += mythuieditbar.h
 
 INSTALLS += inc
 
@@ -120,10 +121,16 @@ using_xrandr {
 
 cygwin:DEFINES += _WIN32
 
+mingw {
+    DEFINES += USING_MINGW
+    HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
+    SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
+}
+
 using_opengl {
     DEFINES += USE_OPENGL_PAINTER
-    SOURCES += mythpainter_ogl.cpp
-    HEADERS += mythpainter_ogl.h
+    SOURCES += mythpainter_ogl.cpp mythrender_opengl.cpp
+    HEADERS += mythpainter_ogl.h   mythrender_opengl.h mythrender_opengl_defs.h
     inc.files += mythpainter_ogl.h
     QT += opengl
 

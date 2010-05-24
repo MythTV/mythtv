@@ -26,6 +26,7 @@ MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
     m_fillBrush = QBrush(Qt::NoBrush);
     m_linePen = QPen(Qt::NoPen);
     m_cornerRadius = 10;
+    m_cropRect = MythRect(0,0,0,0);
 }
 
 MythUIShape::~MythUIShape()
@@ -48,6 +49,27 @@ void MythUIShape::Reset()
     MythUIType::Reset();
 }
 
+void MythUIShape::SetCropRect(int x, int y, int width, int height)
+{
+    SetCropRect(MythRect(x, y, width, height));
+}
+
+void MythUIShape::SetCropRect(const MythRect &rect)
+{
+    m_cropRect = rect;
+    SetRedraw();
+}
+
+void MythUIShape::SetFillBrush(QBrush fill)
+{
+    m_fillBrush = fill;
+}
+
+void MythUIShape::SetLinePen(QPen pen)
+{
+    m_linePen = pen;
+}
+
 void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
@@ -63,7 +85,16 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     }
 
     if (m_image)
-        p->DrawImage(area.x(), area.y(), m_image, alphaMod);
+    {
+        QRect dest = QRect(area.x(), area.y(), m_image->width(), m_image->height());
+        QRect srcRect;
+        m_cropRect.CalculateArea(m_Area);
+        if (!m_cropRect.isEmpty())
+            srcRect = m_cropRect.toQRect();
+        else
+            srcRect = m_image->rect();
+        p->DrawImage(dest, m_image, srcRect, alphaMod);
+    }
 }
 
 void MythUIShape::DrawRect(const QRect &area,const QBrush &fillBrush,
@@ -215,6 +246,7 @@ void MythUIShape::CopyFrom(MythUIType *base)
     m_fillBrush = shape->m_fillBrush;
     m_linePen = shape->m_linePen;
     m_cornerRadius = shape->m_cornerRadius;
+    m_cropRect = shape->m_cropRect;
 
     MythUIType::CopyFrom(base);
 }

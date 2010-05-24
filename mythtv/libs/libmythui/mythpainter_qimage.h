@@ -1,31 +1,31 @@
-#ifndef MYTHPAINTER_OPENGL_H_
-#define MYTHPAINTER_OPENGL_H_
+#ifndef MYTHPAINTER_QIMAGE_H_
+#define MYTHPAINTER_QIMAGE_H_
 
 #include <QMap>
-#include <QMutex>
-#include <QGLWidget>
-
-#include <list>
 
 #include "mythpainter.h"
 #include "mythimage.h"
-#include "mythrender_opengl.h"
+#include "compat.h"
 
-class MythOpenGLPainter : public MythPainter
+class QPainter;
+
+class MythQImagePainter : public MythPainter
 {
   public:
-    MythOpenGLPainter(MythRenderOpenGL *render =  NULL, QGLWidget *parent = NULL);
-   ~MythOpenGLPainter();
+    MythQImagePainter();
+   ~MythQImagePainter();
 
-    void SetTarget(int new_target)       { target = new_target;      }
-
-    virtual QString GetName(void)        { return QString("OpenGL"); }
-    virtual bool SupportsAnimation(void) { return true;              }
+    virtual QString GetName(void)        { return QString("QImage"); }
+    virtual bool SupportsAnimation(void) { return false;             }
     virtual bool SupportsAlpha(void)     { return true;              }
-    virtual bool SupportsClipping(void)  { return false;             }
+    virtual bool SupportsClipping(void)  { return true;              }
 
     virtual void Begin(QPaintDevice *parent);
     virtual void End();
+
+    virtual void SetClipRect(const QRect &clipRect);
+    virtual void SetClipRegion(const QRegion &region);
+    virtual void Clear(QPaintDevice *device, const QRegion &region);
 
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha);
@@ -43,8 +43,8 @@ class MythOpenGLPainter : public MythPainter
     virtual void DeleteFormatImage(MythImage *im);
 
   protected:
+    void       CheckPaintMode(const QRect &area);
     void       ExpireImages(uint max = 0);
-    int        GetTextureFromCache(MythImage *im);
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font);
     MythImage *GetImageFromRect(const QSize &size, int radius,
@@ -52,17 +52,14 @@ class MythOpenGLPainter : public MythPainter
                                 bool drawLine, int lineWidth,
                                 const QColor &lineColor);
 
+    QPainter *painter;
+    QRegion   clipRegion;
+    QRegion   paintedRegion;
+    bool      copy;
 
-    QGLWidget        *realParent;
-    MythRenderOpenGL *realRender;
-    int               target;
-
-    QMap<MythImage *, unsigned int> m_ImageIntMap;
-    std::list<MythImage *>          m_ImageExpireList;
-    QMap<QString, MythImage *>      m_StringToImageMap;
-    std::list<QString>              m_StringExpireList;
-    std::list<long long>            m_textureDeleteList;
-    QMutex                          m_textureDeleteLock;
+    QMap<QString, MythImage *> m_StringToImageMap;
+    std::list<QString>         m_StringExpireList;
 };
 
 #endif
+

@@ -24,7 +24,7 @@ QEvent::Type DialogCompletionEvent::kEventType =
 
 MythDialogBox::MythDialogBox(const QString &text,
                              MythScreenStack *parent, const char *name,
-                             bool fullscreen)
+                             bool fullscreen, bool osd)
          : MythScreenType(parent, name, false)
 {
     m_id = "";
@@ -36,12 +36,18 @@ MythDialogBox::MythDialogBox(const QString &text,
     m_buttonList = NULL;
 
     m_fullscreen = fullscreen;
+    m_osdDialog  = osd;
     m_useSlots = false;
+
+    m_backtext = "";
+    m_backdata = 0;
+    m_exittext = "";
+    m_exitdata = 0;
 }
 
 MythDialogBox::MythDialogBox(const QString &title, const QString &text,
                              MythScreenStack *parent, const char *name,
-                             bool fullscreen)
+                             bool fullscreen, bool osd)
          : MythScreenType(parent, name, false)
 {
     m_id = "";
@@ -53,14 +59,25 @@ MythDialogBox::MythDialogBox(const QString &title, const QString &text,
     m_buttonList = NULL;
 
     m_fullscreen = fullscreen;
+    m_osdDialog  = osd;
     m_useSlots = false;
+
+    m_backtext = "";
+    m_backdata = 0;
+    m_exittext = "";
+    m_exitdata = 0;
 }
 
 bool MythDialogBox::Create(void)
 {
     QString windowName = (m_fullscreen ? "MythDialogBox" : "MythPopupBox");
 
-    if (!CopyWindowFromBase(windowName, this))
+    if (m_osdDialog)
+    {
+        if (!XMLParseBase::LoadWindowFromXML("osd.xml", windowName, this))
+            return false;
+    }
+    else if (!CopyWindowFromBase(windowName, this))
         return false;
 
     bool err = false;
@@ -100,7 +117,8 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     }
 
     SendEvent(m_buttonList->GetItemPos(item), item->GetText(), item->GetData());
-    m_ScreenStack->PopScreen(false);
+    if (m_ScreenStack)
+        m_ScreenStack->PopScreen(false);
 }
 
 void MythDialogBox::SetReturnEvent(QObject *retobject,
@@ -108,6 +126,24 @@ void MythDialogBox::SetReturnEvent(QObject *retobject,
 {
     m_retObject = retobject;
     m_id = resultid;
+}
+
+void MythDialogBox::SetBackAction(const QString &text, QVariant data)
+{
+    m_backtext = text;
+    m_backdata = data;
+}
+
+void MythDialogBox::SetExitAction(const QString &text, QVariant data)
+{
+    m_exittext = text;
+    m_exitdata = data;
+}
+
+void MythDialogBox::SetText(const QString &text)
+{
+    if (m_textarea)
+        m_textarea->SetText(text);
 }
 
 void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
@@ -136,6 +172,12 @@ void MythDialogBox::AddButton(const QString &title, const char *slot,
         m_buttonList->SetItemCurrent(button);
 }
 
+void MythDialogBox::ResetButtons(void)
+{
+    if (m_buttonList)
+        m_buttonList->Reset();
+}
+
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))
@@ -150,10 +192,17 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE" || action == "LEFT")
+        if (action == "ESCAPE" )
         {
-            SendEvent(-1);
-            Close();
+            SendEvent(-1, m_exittext, m_exitdata);
+            if (m_exitdata == 0 && m_exittext.isEmpty())
+                Close();
+        }
+        else if (action == "LEFT")
+        {
+            SendEvent(-1, m_backtext, m_backdata);
+            if (m_backdata == 0 && m_backtext.isEmpty())
+                Close();
         }
         else if (action == "MENU")
         {

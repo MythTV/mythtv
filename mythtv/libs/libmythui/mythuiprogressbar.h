@@ -3,6 +3,7 @@
 
 #include "mythuitype.h"
 #include "mythuiimage.h"
+#include "mythuishape.h"
 
 class MythFontProperties;
 
@@ -25,6 +26,7 @@ class MPUBLIC MythUIProgressBar : public MythUIType
     void SetStart(int);
     void SetUsed(int);
     void SetTotal(int);
+    int  GetUsed(void) { return m_current; }
 
   protected:
     virtual bool ParseElement(

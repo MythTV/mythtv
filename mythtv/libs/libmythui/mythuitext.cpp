@@ -55,13 +55,13 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
              incR(0.0),      incG(0.0),      incB(0.0)
 {
     m_MultiLine = false;
-    SetArea(displayRect);
-    m_FontStates.insert("default", font);
-    *m_Font = m_FontStates["default"];
-
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
     m_textCase = CaseNormal;
+
+    SetArea(displayRect);
+    m_FontStates.insert("default", font);
+    *m_Font = m_FontStates["default"];
 }
 
 MythUIText::~MythUIText()
