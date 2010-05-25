@@ -47,7 +47,10 @@ AudioOutputOSS::~AudioOutputOSS()
 AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
-    audiofd = open(main_device.toAscii(), O_WRONLY | O_NONBLOCK);
+
+    QByteArray device = main_device.toAscii();
+    audiofd = open(device.constData(), O_WRONLY | O_NONBLOCK);
+
     AudioFormat fmt;
     int rate, formats;
 
@@ -98,7 +101,7 @@ bool AudioOutputOSS::OpenDevice()
     MythTimer timer;
     timer.start();
 
-    VBGENERAL(QString("Opening OSS audio device '%1'.").arg(main_device));
+    VBAUDIO(QString("Opening OSS audio device '%1'.").arg(main_device));
 
     while (timer.elapsed() < 2000 && audiofd == -1)
     {
@@ -124,6 +127,8 @@ bool AudioOutputOSS::OpenDevice()
         return false;
     }
 
+    fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK);
+
     bool err = false;
     int  format;
 
@@ -133,6 +138,8 @@ bool AudioOutputOSS::OpenDevice()
         case FORMAT_S16: format = AFMT_S16_NE;  break;
         default:
             Error(QString("Unknown sample format: %1").arg(output_format));
+            close(audiofd);
+            audiofd = -1;
             return false;
     }
 
@@ -233,10 +240,8 @@ void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
 
     if (lw < 0)
     {
-        OERROR(QString("Error writing to audio device (%1), unable to continue")
+        OERROR(QString("Error writing to audio device (%1)")
                .arg(main_device));
-        close(audiofd);
-        audiofd = -1;
         return;
     }
 }
@@ -273,7 +278,7 @@ void AudioOutputOSS::VolumeInit()
 
     if (mixerfd < 0)
     {
-        VBERROR(QString("Unable to open mixer: '%1'").arg(device));
+        VBAUDIO(QString("Unable to open mixer: '%1'").arg(device));
         return;
     }
 
@@ -284,13 +289,13 @@ void AudioOutputOSS::VolumeInit()
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)
-            VBERROR(QString("Error Setting initial Master Volume") + ENO);
+            VBAUDIO(QString("Error Setting initial Master Volume") + ENO);
 
         volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
         if (ret < 0)
-            VBERROR(QString("Error setting initial PCM Volume") + ENO);
+            VBAUDIO(QString("Error setting initial PCM Volume") + ENO);
     }
 }
 
@@ -312,8 +317,9 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
         return 100;
 
     int ret = ioctl(mixerfd, MIXER_READ(control), &tmpVol);
-    if (ret < 0) {
-        VBERROR(QString("Error reading volume for channel %1").arg(channel));
+    if (ret < 0)
+    {
+        VBAUDIO(QString("Error reading volume for channel %1").arg(channel));
         return 0;
     }
 
@@ -322,16 +328,17 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
     else if (channel == 1)
         volume = (tmpVol >> 8) & 0xff; // right
     else
-        VBERROR("Invalid channel. Only stereo volume supported");
+        VBAUDIO("Invalid channel. Only stereo volume supported");
 
     return volume;
 }
 
 void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
 {
-    if (channel > 1) {
+    if (channel > 1)
+    {
         // Don't support more than two channels!
-        VBERROR(QString("Error setting channel %1. Only 2 ch volume supported")
+        VBAUDIO(QString("Error setting channel %1. Only 2 ch volume supported")
                 .arg(channel));
         return;
     }
@@ -351,7 +358,7 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
 
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &tmpVol);
         if (ret < 0)
-            VBERROR(QString("Error setting volume on channel %1").arg(channel));
+            VBAUDIO(QString("Error setting volume on channel %1").arg(channel));
     }
 }
 
