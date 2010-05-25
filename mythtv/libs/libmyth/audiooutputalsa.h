@@ -58,7 +58,7 @@ class AudioOutputALSA : public AudioOutputBase
     // Volume control
     virtual int GetVolumeChannel(int channel) const; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
-    static QMap<QString, QString> *GetALSADevices(const char *type);
+    MPUBLIC static QMap<QString, QString> *GetALSADevices(const char *type);
 
   protected:
     // You need to implement the following functions
