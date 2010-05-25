@@ -282,9 +282,6 @@ bool insertGrabberInDB(const QString &name, const QString &thumbnail,
                 const double &version, bool search, bool tree,
                 bool podcast)
 {
-    if (findTreeGrabberInDB(commandline, type))
-        return false;
-
     QFileInfo fi(thumbnail);
     QString thumbbase = fi.fileName();
 

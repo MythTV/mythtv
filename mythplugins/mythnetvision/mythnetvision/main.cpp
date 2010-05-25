@@ -17,7 +17,6 @@
 #include "netsearch.h"
 #include "nettree.h"
 #include "treeeditor.h"
-#include "dbcheck.h"
 
 using namespace std;
 
@@ -46,30 +45,7 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gCoreContext->ActivateSettingsCache(false);
-    if (!UpgradeNetvisionDatabaseSchema())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade netvision database to new schema, exiting.");
-        return -1;
-    }
-    gCoreContext->ActivateSettingsCache(false);
-
     setupKeys();
-
-    if (gCoreContext->GetNumSetting("mythnetvision.backgroundFetch", 0))
-    {
-        grabMan = new GrabberManager();
-        grabMan->startTimer();
-        grabMan->doUpdate();
-    }
-
-    if (gCoreContext->GetNumSetting("mythnetvision.rssBackgroundFetch", 0))
-    {
-//        rssMan = new RSSManager();
-//        rssMan->startTimer();
-//        rssMan->doUpdate();
-    }
 
     return 0;
 }
