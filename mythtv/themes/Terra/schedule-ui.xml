@@ -500,7 +500,7 @@
 
         <shape name="finalcolumn" from="prioritycolumn">
             <position>1180,111</position>
-        </shape>        
+        </shape>
 
         <buttonlist name="programs">
             <area>0,111,1280,310</area>
@@ -1369,7 +1369,7 @@
                 <area>0,0,0,0</area>
             </shape>
         </shape>
-        
+
         <textarea name="overviewlabel" from="basetextarea">
             <area>700,77,490,40</area>
             <font>baselarge</font>
@@ -1438,47 +1438,47 @@
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>64,160</position>
+            <position>40,160</position>
             <helptext>Select the recording rule</helptext>
         </buttonlist>
 
         <button name="schedoptions" from="basewidebutton">
-            <position>137,230</position>
+            <position>157,230</position>
             <value>Schedule Options</value>
             <helptext></helptext>
         </button>
 
         <button name="storeoptions" from="basewidebutton">
-            <position>137,295</position>
+            <position>157,295</position>
             <value>Storage Options</value>
             <helptext></helptext>
         </button>
 
         <button name="postprocessing" from="basewidebutton">
-            <position>137,360</position>
+            <position>157,360</position>
             <value>Post Processing</value>
             <helptext></helptext>
         </button>
 
         <button name="schedinfo" from="basewidebutton">
-            <position>137,425</position>
+            <position>157,425</position>
             <value>Schedule Info</value>
             <helptext></helptext>
         </button>
 
         <button name="preview" from="basewidebutton">
-            <position>137,490</position>
+            <position>157,490</position>
             <value>Preview</value>
             <helptext></helptext>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>40,595</position>
+            <position>60,595</position>
             <value>Cancel</value>
         </button>
 
         <button name="save" from="basebutton">
-            <position>377,595</position>
+            <position>397,595</position>
             <value>Save</value>
         </button>
     </window>
@@ -1492,7 +1492,7 @@
         <textarea name="heading" from="baseheading">
             <value>Schedule Options</value>
         </textarea>
-        
+
         <shape name="overviewbackground" from="basetextbackground">
             <area>680,70,567,214</area>
             <shape name="hline">
@@ -1547,9 +1547,9 @@
         <textarea name="rectypestatus" from="basetextarea">
             <area>700,646,420,30</area>
         </textarea>
-        
+
         <spinbox name="priority" from="basewidespinbox">
-            <position>64,160</position>
+            <position>40,160</position>
             <template type="negative">Reduce priority by %n</template>
             <template type="zero">Normal recording priority</template>
             <template type="positive">Raise priority by %n</template>
@@ -1557,12 +1557,12 @@
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
-            <position>64,220</position>
+            <position>40,220</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <position>64,280</position>
+            <position>40,280</position>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
             <template type="positive">Start recording %n minute(s) early</template>
@@ -1570,7 +1570,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <position>64,340</position>
+            <position>40,340</position>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
@@ -1578,12 +1578,12 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>64,400</position>
+            <position>40,400</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
-            <position>64,460</position>
+            <position>40,460</position>
             <helptext></helptext>
         </buttonlist>
 
@@ -1597,7 +1597,7 @@
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,595</position>
+            <position>60,595</position>
             <value>Back</value>
         </button>
     </window>
@@ -1668,34 +1668,34 @@
         </textarea>
 
         <buttonlist name="recprofile" from="basewideselector">
-            <position>64,160</position>
+            <position>40,160</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="recgroup" from="basewideselector">
-            <position>64,220</position>
+            <position>40,220</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="storagegroup" from="basewideselector">
-            <position>64,280</position>
+            <position>40,280</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="playgroup" from="basewideselector">
-            <position>64,340</position>
+            <position>40,340</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="maxepisodes" from="basewidespinbox">
-            <position>64,400</position>
+            <position>40,400</position>
             <template type="zero">No episode limit</template>
             <template type="positive">Keep at most %n episode(s)</template>
             <helptext></helptext>
         </spinbox>
 
         <buttonlist name="maxnewest" from="basewideselector">
-            <position>64,460</position>
+            <position>40,460</position>
             <helptext></helptext>
         </buttonlist>
 
@@ -1709,7 +1709,7 @@
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,595</position>
+            <position>60,595</position>
             <value>Back</value>
         </button>
     </window>
@@ -1798,7 +1798,7 @@
         </textarea>
 
         <buttonlist name="transcodeprofile" from="basewideselector">
-            <position>64,280</position>
+            <position>40,280</position>
             <helptext></helptext>
         </buttonlist>
 
@@ -1835,7 +1835,7 @@
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,595</position>
+            <position>60,595</position>
             <value>Back</value>
         </button>
     </window>
