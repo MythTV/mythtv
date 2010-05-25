@@ -59,8 +59,11 @@ package MythTV::Recording;
         $self->{'cutlist_frames'}  = 0;
 
     # Calculate the filesize
-        $self->{'filesize'} = ($self->{'fs_high'} + ($self->{'fs_low'} < 0)) * 4294967296
-                              + $self->{'fs_low'};
+    # This should be deprecated (left here in early 0.24 beta in case I'm mistaken)
+        #unless ($self->{'filesize'}) {
+        #    $self->{'filesize'} = ($self->{'fs_high'} + ($self->{'fs_low'} < 0)) * 4294967296
+        #                          + $self->{'fs_low'};
+        #}
     # Pull the last known frame from the database, to help guestimate the
     # total frame count.
         $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT MAX(mark)
