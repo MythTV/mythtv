@@ -501,10 +501,17 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         // Why only if using extradata?
         audio_bits_per_sample = extradata.audio_bits_per_sample;
 #endif
-        GetNVP()->SetAudioParams(extradata.audio_bits_per_sample,
-                                 extradata.audio_channels,
-                                 CODEC_ID_NONE,
-                                 extradata.audio_sample_rate,
+        AudioFormat format = FORMAT_NONE;
+        switch (extradata.audio_bits_per_sample)
+        {
+            case 8:  format = FORMAT_U8;
+            case 16: format = FORMAT_S16;
+            case 24: format = FORMAT_S24;
+            case 32: format = FORMAT_S32;
+        }
+
+        GetNVP()->SetAudioParams(format, extradata.audio_channels,
+                                 CODEC_ID_NONE, extradata.audio_sample_rate,
                                  false /* AC3/DTS pass through */);
         GetNVP()->ReinitAudio();
         foundit = 1;

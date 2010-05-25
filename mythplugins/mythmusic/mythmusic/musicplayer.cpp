@@ -205,17 +205,15 @@ void MusicPlayer::stop(bool stopAll)
     if (m_output)
     {
         if (m_output->IsPaused())
-        {
             pause();
-        }
         m_output->Reset();
     }
+
+    m_isPlaying = false;
 
     if (m_input)
         delete m_input;
     m_input = NULL;
-
-    m_isPlaying = false;
 
     if (stopAll && m_decoder)
     {
@@ -284,8 +282,6 @@ void MusicPlayer::play(void)
 
         if (m_currentFile.contains("cda") == 1)
             dynamic_cast<CdDecoder*>(m_decoder)->setDevice(m_CDdevice);
-
-        m_decoder->setBlockSize(2 * 1024);
 
         m_decoder->addListener(this);
         // add any listeners to the decoder
@@ -377,11 +373,11 @@ void MusicPlayer::openOutputDevice(void)
     pdevice = gCoreContext->GetSetting("PassThruOutputDevice");
 
     // TODO: Error checking that device is opened correctly!
-    m_output = AudioOutput::OpenAudio(adevice, pdevice, 16, 2, 0, 44100,
-                                      AUDIOOUTPUT_MUSIC, true, false,
-                                      gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
+    m_output = AudioOutput::OpenAudio(
+                   adevice, pdevice, FORMAT_S16, 2, 0, 44100,
+                   AUDIOOUTPUT_MUSIC, true, false,
+                   gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
     m_output->setBufferSize(256 * 1024);
-    m_output->SetBlocking(false);
 
     m_output->addListener(this);
 
@@ -406,12 +402,11 @@ void MusicPlayer::next(void)
     if (!m_currentNode)
         return;
 
-    GenericTree *node
-        = m_currentNode->nextSibling(1, ((int) m_shuffleMode) + 1);
+    GenericTree *node =
+        m_currentNode->nextSibling(1, ((int) m_shuffleMode) + 1);
+
     if (node)
-    {
         m_currentNode = node;
-    }
     else
     {
         if (m_repeatMode == REPEAT_ALL)
@@ -782,15 +777,10 @@ void MusicPlayer::seek(int pos)
 {
     if (m_output)
     {
-        m_output->Reset();
-        m_output->SetTimecode(pos*1000);
-
         if (m_decoder && m_decoder->isRunning())
-        {
-            m_decoder->lock();
             m_decoder->seek(pos);
-            m_decoder->unlock();
-        }
+
+        m_output->SetTimecode(pos*1000);
     }
 }
 

@@ -5,6 +5,8 @@
 
 #include "decoder.h"
 
+#include <audiooutputsettings.h>
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -28,40 +30,31 @@ class avfDecoder : public Decoder
   private:
     void run();
 
-    void flush(bool = FALSE);
+    void writeBlock();
     void deinit();
 
     bool inited, user_stop;
     int stat;
     char *output_buf;
-    ulong output_bytes, output_at;
+    ulong output_at;
 
-    unsigned int bks;
-    bool done, finish;
-    long len, freq, bitrate;
+    unsigned int bks, bksFrames, decodeBytes;
+    bool finish;
+    long freq, bitrate;
+    AudioFormat m_sampleFmt;
     int m_channels;
-    unsigned long output_size;
     double totalTime, seekTime;
 
     QString devicename;
 
-    long int start;
-    long int end;
-
-    AVOutputFormat *m_outputFormat; // Encoding format (PCM)
-    AVInputFormat *m_inputFormat; // Decoding format
+    AVInputFormat *m_inputFormat;
     AVFormatParameters m_params;
-    AVFormatContext *m_outputContext, *m_inputContext;
+    AVFormatContext *m_inputContext;
     AVStream *m_decStream;
     AVCodec *m_codec; // Codec
-    AVCodecContext *m_audioEnc, *m_audioDec;
-    AVPacket m_pkt1;
-    AVPacket *m_pkt;
+    AVCodecContext *m_audioDec;
 
     int errcode;
-
-    unsigned char *ptr;
-    int dec_len, data_size;
     int16_t *m_samples;
 };
 

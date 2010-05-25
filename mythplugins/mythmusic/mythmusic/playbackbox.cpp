@@ -1208,8 +1208,11 @@ void PlaybackBoxMusic::toggleMute()
 
 void PlaybackBoxMusic::toggleUpmix()
 {
-    if (gPlayer->getOutput())
-        gPlayer->getOutput()->ToggleUpmix();
+    if (!gPlayer->getOutput())
+        return;
+
+    gPlayer->getOutput()->ToggleUpmix();
+    gPlayer->getOutput()->SetTimecode(currentTime * 1000);
 }
     
 
@@ -1316,18 +1319,18 @@ void PlaybackBoxMusic::play()
     if (gPlayer->isPlaying())
         gPlayer->stop();
 
+    else if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
+    {
+        pause();
+        return;
+    }
+
     if (curMeta)
         playfile = curMeta->Filename();
     else
     {
         // Perhaps we can descend to something playable?
         wipeTrackInfo();
-        return;
-    }
-
-    if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
-    {
-        gPlayer->pause();
         return;
     }
 
@@ -1348,6 +1351,8 @@ void PlaybackBoxMusic::play()
             seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
             gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
         }
+        else if (gPlayer->getOutput())
+            gPlayer->getOutput()->SetTimecode(0);
     }
 
     bannerEnable(curMeta, show_album_art);
@@ -1545,12 +1550,8 @@ void PlaybackBoxMusic::seek(int pos)
 {
     if (gPlayer->getOutput())
     {
-        gPlayer->getOutput()->Reset();
-        gPlayer->getOutput()->SetTimecode(pos*1000);
-
         if (gPlayer->getDecoder() && gPlayer->getDecoder()->isRunning())
         {
-            gPlayer->getDecoder()->lock();
             gPlayer->getDecoder()->seek(pos);
 
             if (mainvisual)
@@ -1560,8 +1561,9 @@ void PlaybackBoxMusic::seek(int pos)
                 mainvisual->mutex()->unlock();
             }
 
-            gPlayer->getDecoder()->unlock();
         }
+        
+        gPlayer->getOutput()->SetTimecode(pos*1000);
 
         if (!gPlayer->isPlaying())
         {

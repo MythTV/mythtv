@@ -46,13 +46,12 @@ class CdDecoder : public Decoder
   private:
     void run();
 
-    void flush(bool = FALSE);
+    void writeBlock(void);
     void deinit();
 
     bool inited, user_stop;
 
-
-    QString            devicename;
+    QString devicename;
 
 #if CONFIG_DARWIN
     void lookupCDDB(const QString &hexID, uint tracks);
@@ -68,13 +67,12 @@ class CdDecoder : public Decoder
 
     int stat;
     char *output_buf;
-    ulong output_bytes, output_at;
+    ulong output_at;
 
-    unsigned int bks;
-    bool done, finish;
-    long len, freq, bitrate;
+    unsigned int bks, bksFrames, decodeBytes;
+    bool finish;
+    long freq, bitrate;
     int chan;
-    unsigned long output_size;
     double totalTime, seekTime;
 
     int settracknum;
@@ -85,9 +83,7 @@ class CdDecoder : public Decoder
     cdrom_paranoia *paranoia;
 #endif
 
-    long int start;
-    long int end;
-    long int curpos;
+    long int start, end, curpos;
 };
 
 #endif

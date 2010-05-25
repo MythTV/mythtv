@@ -32,15 +32,13 @@ class AudioOutputPulseAudio : public AudioOutputBase
 
     int GetVolumeChannel(int channel) const;
     void SetVolumeChannel(int channel, int volume);
-    void Pause(bool paused);
-    void Reset(void);
     void Drain(void);
 
   protected:
+    AudioOutputSettings* GetOutputSettings(void);
     bool OpenDevice(void);
     void CloseDevice(void);
     void WriteAudio(unsigned char *aubuf, int size);
-    int GetSpaceOnSoundcard(void) const;
     int GetBufferedOnSoundcard(void) const;
 
   private:
@@ -53,18 +51,21 @@ class AudioOutputPulseAudio : public AudioOutputBase
     static void ContextStateCallback(pa_context *c, void *arg);
     static void StreamStateCallback(pa_stream *s, void *arg);
     static void OpCompletionCallback(pa_context *c, int ok, void *arg);
+    static void WriteCallback(pa_stream *s, size_t size, void *arg);
     static void BufferFlowCallback(pa_stream *s, void *tag);
     static void ServerInfoCallback(pa_context *context,
                                    const pa_server_info *inf, void *arg);
+    static void SinkInfoCallback(pa_context *c, const pa_sink_info *info,
+                                 int eol, void *arg);
 
     pa_context             *pcontext;
     pa_stream              *pstream;
     pa_threaded_mainloop   *mainloop;
-    size_t                  sample_rate;
     pa_sample_spec          sample_spec;
     pa_channel_map          channel_map;
     pa_cvolume              volume_control;
     pa_buffer_attr          buffer_settings;
+    AudioOutputSettings    *output_settings;
 };
 #endif
 

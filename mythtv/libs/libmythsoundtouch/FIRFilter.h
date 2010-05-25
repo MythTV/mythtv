@@ -98,6 +98,24 @@ public:
 
 // Optional subclasses that implement CPU-specific optimizations:
 
+#ifdef ALLOW_SSE2
+    /// Class that implements SSE optimized functions exclusive for floating point samples type.
+    class FIRFilterSSE2 : public FIRFilter
+    {
+    protected:
+        float *filterCoeffsUnalign;
+        float *filterCoeffsAlign;
+
+        virtual uint evaluateFilterStereo(float *dest, const float *src, uint numSamples) const;
+    public:
+        FIRFilterSSE2();
+        ~FIRFilterSSE2();
+
+        virtual void setCoefficients(const float *coeffs, uint newLength, uint uResultDivFactor);
+    };
+
+#endif // ALLOW_SSE2
+
 #ifdef ALLOW_MMX
 
     /// Class that implements MMX optimized functions exclusive for 16bit integer samples type.
@@ -116,43 +134,5 @@ public:
     };
 
 #endif // ALLOW_MMX
-
-
-#ifdef ALLOW_3DNOW
-
-    /// Class that implements 3DNow! optimized functions exclusive for floating point samples type.
-    class FIRFilter3DNow : public FIRFilter
-    {
-    protected:
-        float *filterCoeffsUnalign;
-        float *filterCoeffsAlign;
-
-        virtual uint evaluateFilterStereo(float *dest, const float *src, uint numSamples) const;
-    public:
-        FIRFilter3DNow();
-        ~FIRFilter3DNow();
-        virtual void setCoefficients(const float *coeffs, uint newLength, uint uResultDivFactor);
-    };
-
-#endif  // ALLOW_3DNOW
-
-
-#ifdef ALLOW_SSE_FLOAT
-    /// Class that implements SSE optimized functions exclusive for floating point samples type.
-    class FIRFilterSSE : public FIRFilter
-    {
-    protected:
-        float *filterCoeffsUnalign;
-        float *filterCoeffsAlign;
-
-        virtual uint evaluateFilterStereo(float *dest, const float *src, uint numSamples) const;
-    public:
-        FIRFilterSSE();
-        ~FIRFilterSSE();
-
-        virtual void setCoefficients(const float *coeffs, uint newLength, uint uResultDivFactor);
-    };
-
-#endif // ALLOW_SSE_FLOAT
 
 #endif  // FIRFilter_H

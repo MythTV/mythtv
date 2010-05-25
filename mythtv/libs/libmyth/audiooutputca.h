@@ -18,8 +18,9 @@ public:
     AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
+    AudioOutputSettings* GetOutputSettings(void);
+
     virtual int GetAudiotime(void);
-    void        SetAudiotime(void);
 
     // callback for delivering audio to output device
     bool RenderAudio(unsigned char *aubuf, int size,
@@ -44,7 +45,6 @@ protected:
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetSpaceOnSoundcard(void) const;
     virtual int  GetBufferedOnSoundcard(void) const;
     
     virtual bool StartOutputThread(void) { return true; }

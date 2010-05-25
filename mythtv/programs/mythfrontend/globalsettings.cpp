@@ -47,12 +47,12 @@ AudioOutputDevice::AudioOutputDevice() : HostComboBox("AudioOutputDevice", true)
     setLabel(QObject::tr("Audio output device"));
 
 #ifdef USING_ALSA
-    QMap<QString, QString> alsadevs = GetALSADevices("pcm");
+    QMap<QString, QString> *alsadevs = AudioOutputALSA::GetALSADevices("pcm");
 
-    if (!alsadevs.empty())
+    if (!alsadevs->empty())
     {
-        for (QMap<QString, QString>::const_iterator i = alsadevs.begin();
-             i != alsadevs.end(); ++i)
+        for (QMap<QString, QString>::const_iterator i = alsadevs->begin();
+             i != alsadevs->end(); ++i)
         {
             QString key = i.key();
             QString value = i.value();
@@ -61,6 +61,7 @@ AudioOutputDevice::AudioOutputDevice() : HostComboBox("AudioOutputDevice", true)
             addSelection(devname, devname);
         }
     }
+    delete alsadevs;
 #endif
 #ifdef USING_PULSEOUTPUT
     addSelection("PulseAudio:default", "PulseAudio:default");
@@ -109,9 +110,10 @@ static HostComboBox *MaxAudioChannels()
     gc->setLabel(QObject::tr("Speakers configuration"));
     gc->addSelection(QObject::tr("Stereo"), "2", true); // default
     gc->addSelection(QObject::tr("5.1"), "6");
+    gc->addSelection(QObject::tr("7.1"), "8");
     gc->setHelpText(
             QObject::tr(
-                "Set your audio configuration: Stereo or Surround."));
+                "Set your audio configuration: Stereo, 5.1 or 7.1 Surround."));
     return gc;
 }
 
@@ -130,9 +132,9 @@ static HostComboBox *AudioUpmixType()
 {
     HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
     gc->setLabel(QObject::tr("Upmix"));
-    gc->addSelection(QObject::tr("Fastest"), "0", true); // default
+    gc->addSelection(QObject::tr("Fastest"), "0");
     gc->addSelection(QObject::tr("Good"), "1");
-    gc->addSelection(QObject::tr("Best"), "2");
+    gc->addSelection(QObject::tr("Best"), "2", true);  // default
     gc->setHelpText(
             QObject::tr(
                 "Set the audio surround upconversion quality. "
@@ -173,6 +175,15 @@ static HostComboBox *SRCQuality()
     return gc;
 }
 
+static HostCheckBox *PassThroughOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("PassThruDeviceOverride");
+    gc->setLabel(QObject::tr("Separate digital output device"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Use a distinct digital output device from default."));
+    return gc;
+}
+
 static HostComboBox *PassThroughOutputDevice()
 {
     HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
@@ -190,8 +201,8 @@ static HostComboBox *PassThroughOutputDevice()
     gc->addSelection("PulseAudio:default", "PulseAudio:default");
 #endif
 
-    gc->setHelpText(QObject::tr("Audio output device to use for digital audio. Default is the same as Audio output "
-                    "device. This value is currently only used with ALSA "
+    gc->setHelpText(QObject::tr("Audio output device to use for digital audio."
+                    " This value is currently only used with ALSA "
                     "and DirectX sound output."));
     return gc;
 }
@@ -312,15 +323,14 @@ static HostCheckBox *DTSPassThrough()
     return gc;
 }
 
-static HostCheckBox *AggressiveBuffer()
+static HostCheckBox *MPCM()
 {
-    HostCheckBox *gc = new HostCheckBox("AggressiveSoundcardBuffer");
-    gc->setLabel(QObject::tr("Aggressive Sound card Buffering"));
+    HostCheckBox *gc = new HostCheckBox("MultiChannelPCM");
+    gc->setLabel(QObject::tr("PCM/Analog"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
-                                "a smaller sound card buffer than is really present. "
-                                "Should be unchecked in most cases. "
-                                "Enable only if you have playback issues."));
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder supports multi-channel PCM "
+                                "or are using analog output. If unchecked with digital output, "
+                                "Dolby Digital support is required for multi-channel audio"));
     return gc;
 }
 
@@ -3403,6 +3413,7 @@ class AudioSystemSurroundGroup : public TriggeredConfigurationGroup
         setTrigger(checkbox);
 
         addTarget("6", group);
+        addTarget("8", group);
         addTarget("2", new VerticalConfigurationGroup(false, true));
     }
 };
@@ -3443,6 +3454,7 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
 
     vcg->addChild(new AudioOutputDevice());
 
+
     Setting *numchannels = MaxAudioChannels();
     vcg->addChild(numchannels);
 
@@ -3451,16 +3463,16 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
 
     group1->addChild(AudioUpmix());
     group1->addChild(AudioUpmixType());
-    group1->addChild(PassThroughOutputDevice());
 
     ConfigurationGroup *settings1 =
-        new HorizontalConfigurationGroup();
+    new HorizontalConfigurationGroup();
     settings1->setLabel(QObject::tr("Audio Processing Capabilities"));
+    settings1->addChild(MPCM());
     settings1->addChild(AC3PassThrough());
     settings1->addChild(DTSPassThrough());
-
+    
     group1->addChild(settings1);
-
+    
         // Show surround/upmixer config only if 5.1 Audio is selected
     AudioSystemSurroundGroup *sub1 =
         new AudioSystemSurroundGroup(numchannels, group1);
@@ -3476,18 +3488,25 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
         new AudioSystemAdvancedGroup(advancedsettings, group2);
     vcg->addChild(sub2);
 
-    ConfigurationGroup *settings2 =
-            new HorizontalConfigurationGroup(false, false, false, false);
+    ConfigurationGroup *settings3 =
+    new HorizontalConfigurationGroup(false, false, false, false);
 
-    Setting *srcqualityoverride = SRCQualityOverride();
-
+    Setting *passthroughoverride = PassThroughOverride();
     AudioSystemAdvancedSettings *sub3 =
-        new AudioSystemAdvancedSettings(srcqualityoverride, SRCQuality());
-    settings2->addChild(srcqualityoverride);
-    settings2->addChild(sub3);
+    new AudioSystemAdvancedSettings(passthroughoverride, PassThroughOutputDevice());
+    settings3->addChild(passthroughoverride);
+    settings3->addChild(sub3);
 
-    group2->addChild(settings2);
-    group2->addChild(AggressiveBuffer());
+    ConfigurationGroup *settings4 =
+            new HorizontalConfigurationGroup(false, false, false, false);
+    Setting *srcqualityoverride = SRCQualityOverride();
+    AudioSystemAdvancedSettings *sub4 =
+        new AudioSystemAdvancedSettings(srcqualityoverride, SRCQuality());
+    settings4->addChild(srcqualityoverride);
+    settings4->addChild(sub4);
+
+    group2->addChild(settings3);
+    group2->addChild(settings4);
 
     return vcg;
 

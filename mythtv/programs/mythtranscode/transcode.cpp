@@ -36,10 +36,10 @@ using namespace std;
 class AudioReencodeBuffer : public AudioOutput
 {
  public:
-    AudioReencodeBuffer(int audio_bits, int audio_channels)
+    AudioReencodeBuffer(AudioFormat audio_format, int audio_channels)
     {
         Reset();
-        const AudioSettings settings(audio_bits, audio_channels, 0, 0, false);
+        const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
         Reconfigure(settings);
         bufsize = 512000;
         audiobuffer = new unsigned char[bufsize];
@@ -59,9 +59,11 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Reconfigure(const AudioSettings &settings)
     {
         ClearError();
-        bits = settings.bits;
+        bytes_per_sample = channels *
+                           AudioOutputSettings::SampleSize(settings.format);
+
         channels = settings.channels;
-        bytes_per_sample = bits * channels / 8;
+
         if ((uint)settings.channels > 2)
             Error(QString("Invalid channel count %1").arg(channels));
     }
@@ -80,7 +82,7 @@ class AudioReencodeBuffer : public AudioOutput
     }
 
     // timecode is in milliseconds.
-    virtual bool AddSamples(char *buffer, int samples, long long timecode)
+    virtual bool AddSamples(void *buffer, int samples, long long timecode)
     {
         int freebuf = bufsize - audiobuffer_len;
 
@@ -109,42 +111,6 @@ class AudioReencodeBuffer : public AudioOutput
         return true;
     }
 
-    virtual bool AddSamples(char *buffers[], int samples, long long timecode)
-    {
-        int audio_bytes = bits / 8;
-        int freebuf = bufsize - audiobuffer_len;
-
-        if (samples * bytes_per_sample > freebuf)
-        {
-            bufsize += samples * bytes_per_sample - freebuf;
-            unsigned char *tmpbuf = new unsigned char[bufsize];
-            memcpy(tmpbuf, audiobuffer, audiobuffer_len);
-            delete [] audiobuffer;
-            audiobuffer = tmpbuf;
-        }
-
-        ab_len[ab_count] = samples * bytes_per_sample;
-        ab_offset[ab_count] = audiobuffer_len;
-
-        for (int itemp = 0; itemp < samples*audio_bytes; itemp+=audio_bytes)
-        {
-            for(int chan = 0; chan < channels; chan++)
-            {
-                audiobuffer[audiobuffer_len++] = buffers[chan][itemp];
-                if (bits == 16)
-                    audiobuffer[audiobuffer_len++] = buffers[chan][itemp+1];
-            }
-        }
-
-        // last_audiotime is at the end of the sample
-        last_audiotime = timecode + samples * 1000 / eff_audiorate;
-
-        ab_time[ab_count] = last_audiotime;
-        ab_count++;
-
-        return true;
-    }
-
     virtual void SetTimecode(long long timecode)
     {
         last_audiotime = timecode;
@@ -157,10 +123,13 @@ class AudioReencodeBuffer : public AudioOutput
     {
         (void)paused;
     }
+    virtual void PauseUntilBuffered(void)
+    {
+        // Do nothing
+    }
     virtual void Drain(void)
     {
         // Do nothing
-        return;
     }
 
     virtual int GetAudiotime(void)
@@ -419,7 +388,7 @@ int Transcode::TranscodeFile(
         statustime = statustime.addSecs(5);
     }
 
-    AudioOutput *audioOutput = new AudioReencodeBuffer(0, 0);
+    AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
     nvp->SetAudioOutput(audioOutput);
     nvp->SetTranscoding(true);

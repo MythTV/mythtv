@@ -209,7 +209,7 @@ public:
     /// the input of the object. Notice that sample rate _has_to_ be set before
     /// calling this function, otherwise throws a runtime_error exception.
     virtual void putSamples(
-            const SAMPLETYPE *samples,  ///< Pointer to sample buffer.
+            const SAMPLETYPE *samples,              ///< Pointer to sample buffer.
             uint numSamples                         ///< Number of samples in buffer. Notice
                                                     ///< that in case of stereo-sound a single sample
                                                     ///< contains data for both channels.

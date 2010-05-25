@@ -309,8 +309,7 @@ class MPUBLIC TV : public QThread
     virtual void run(void);
     void TVEventThreadChecks(void);
 
-    void SetMuteTimer(PlayerContext*, int timeout);
-    bool MuteChannelChange(PlayerContext *ctx);
+    void PauseAudioUntilBuffered(PlayerContext *ctx);
 
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;
@@ -829,7 +828,6 @@ class MPUBLIC TV : public QThread
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
     TimerContextMap      tvchainUpdateTimerId;
-    TimerContextMap      unmuteTimerId;
 
     /// Condition to signal that the Event thread is up and running
     QWaitCondition mainLoopCond;
@@ -850,8 +848,6 @@ class MPUBLIC TV : public QThread
 
     ///< Timeout for entry modes in msec
     static const uint kInputModeTimeout;
-    /// Channel changing mute timeout in msec
-    static const uint kMuteTimeout;
     /// Timeout for updating LCD info in msec
     static const uint kLCDTimeout;
     /// Timeout for browse mode exit in msec

@@ -4,28 +4,30 @@
 #include <QString>
 
 #include "audiosettings.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h"
 #include "volumebase.h"
 #include "output.h"
 
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
  public:
+    static void AudioSetup(int &max_channels, bool &allow_ac3_passthru,
+                           bool &allow_dts_passthru, bool &allow_multipcm,
+                           bool &upmix_default);
+
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(
-        const QString &audiodevice,
-        const QString &passthrudevice,
-        int audio_bits, int audio_channels, 
-        int audio_codec, int audio_samplerate,
-        AudioOutputSource source,
-        bool set_initial_vol, bool audio_passthru,
+        const QString &audiodevice, const QString &passthrudevice,
+        AudioFormat format, int channels, int codec, int samplerate,
+        AudioOutputSource source, bool set_initial_vol, bool passthru,
         int upmixer_startup = 0);
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
-        lastError(QString::null), lastWarn(QString::null) {}
+        lastError(QString::null), lastWarn(QString::null),
+        pulsewassuspended(false)  {};
 
-    virtual ~AudioOutput() { };
+    virtual ~AudioOutput();
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
@@ -33,22 +35,19 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0f; }
 
-    // do AddSamples calls block?
-    virtual void SetBlocking(bool blocking) = 0;
-    
+    virtual bool CanPassthrough(void) const { return false; }
+
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate) = 0;
 
     virtual void Reset(void) = 0;
 
-    // timecode is in milliseconds.
-    // Return true if all samples were written, false if none.
-    virtual bool AddSamples(char *buffer, int samples, long long timecode) = 0;
-    virtual bool AddSamples(char *buffers[], int samples, long long timecode) = 0;
+    virtual bool AddSamples(void *buffer, int samples, long long timecode) = 0;
 
     virtual void SetTimecode(long long timecode) = 0;
     virtual bool IsPaused(void) const = 0;
     virtual void Pause(bool paused) = 0;
+    virtual void PauseUntilBuffered(void) = 0;
  
     // Wait for all data to finish playing
     virtual void Drain(void) = 0;
@@ -67,10 +66,12 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         { fill = total = 0; }
 
     //  Only really used by the AudioOutputNULL object
-    
     virtual void bufferOutputData(bool y) = 0;
     virtual int readOutputData(unsigned char *read_buffer, int max_length) = 0;
+
     virtual bool ToggleUpmix(void) = 0;
+
+    bool PulseStatus(void) { return pulsewassuspended; };
 
   protected:
     void Error(const QString &msg);
@@ -81,6 +82,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
   protected:
     QString lastError;
     QString lastWarn;
+    bool pulsewassuspended;
 };
 
 #endif

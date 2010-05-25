@@ -783,9 +783,6 @@ void MusicCommon::seek(int pos)
 {
     if (gPlayer->getOutput())
     {
-        gPlayer->getOutput()->Reset();
-        gPlayer->getOutput()->SetTimecode(pos*1000);
-
         if (gPlayer->getDecoder() && gPlayer->getDecoder()->isRunning())
         {
             gPlayer->getDecoder()->lock();
@@ -800,6 +797,8 @@ void MusicCommon::seek(int pos)
 
             gPlayer->getDecoder()->unlock();
         }
+
+        gPlayer->getOutput()->SetTimecode(pos*1000);
 
         if (!gPlayer->isPlaying())
         {

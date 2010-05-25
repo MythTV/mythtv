@@ -234,9 +234,22 @@ public:
             );
 };
 
-
-
 // Implementation-specific class declarations:
+
+#ifdef ALLOW_SSE2
+    /// Class that implements SSE optimized routines for float samples type.
+    class TDStretchSSE2 : public TDStretch
+    {
+    protected:
+#ifdef MULTICHANNEL
+        double calcCrossCorrMulti(const float *mixingPos, const float *compare) const;
+        virtual void overlapMulti(float *output, const float *input) const;
+#endif
+        double calcCrossCorrStereo(const float *mixingPos, const float *compare) const;
+        virtual void overlapStereo(float *output, const float *input) const;
+    };
+
+#endif /// ALLOW_SSE2
 
 #ifdef ALLOW_MMX
     /// Class that implements MMX optimized routines for 16bit integer samples type.
@@ -253,35 +266,6 @@ public:
         virtual void clearCrossCorrState();
     };
 #endif /// ALLOW_MMX
-
-
-#ifdef ALLOW_3DNOW
-    /// Class that implements 3DNow! optimized routines for floating point samples type.
-    class TDStretch3DNow : public TDStretch
-    {
-    protected:
-#ifdef MULTICHANNEL
-        //double calcCrossCorrMulti(const float *mixingPos, const float *compare) const;
-#endif
-        double calcCrossCorrStereo(const float *mixingPos, const float *compare) const;
-    };
-#endif /// ALLOW_3DNOW
-
-
-#ifdef ALLOW_SSE2
-    /// Class that implements SSE optimized routines for 16bit integer samples type.
-    class TDStretchSSE2 : public TDStretch
-    {
-    protected:
-#ifdef MULTICHANNEL
-        long calcCrossCorrMulti(const short *mixingPos, const short *compare) const;
-        virtual void overlapMulti(short *output, const short *input) const;
-#endif
-        long calcCrossCorrStereo(const short *mixingPos, const short *compare) const;
-        virtual void overlapStereo(short *output, const short *input) const;
-    };
-
-#endif /// ALLOW_SSE2
 
 }
 #endif  /// TDStretch_H

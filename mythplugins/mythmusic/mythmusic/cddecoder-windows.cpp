@@ -53,9 +53,8 @@ void CdDecoder::run()
 {
 }
 
-void CdDecoder::flush(bool final)
+void CdDecoder::writeBlock()
 {
-    (void)final;
 }
 
 void CdDecoder::deinit()

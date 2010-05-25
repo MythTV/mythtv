@@ -24,9 +24,9 @@ AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     AudioOutputBase(settings),
     pcm_output_buffer_mutex(QMutex::NonRecursive),
     current_buffer_size(0),
-    locked_audio_channels(settings.channels),
-    locked_audio_bits(settings.bits),
-    locked_audio_samplerate(settings.samplerate)
+    locked_channels(settings.channels),
+    locked_format(settings.format),
+    locked_samplerate(settings.samplerate)
 {
     bzero(pcm_output_buffer, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
 
@@ -45,9 +45,9 @@ bool AudioOutputNULL::OpenDevice()
     fragment_size = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
     soundcard_buffer_size = NULLAUDIO_OUTPUT_BUFFER_SIZE;
     
-    audio_bits = locked_audio_bits;
-    audio_channels = locked_audio_channels;
-    audio_samplerate = locked_audio_samplerate;
+    format = locked_format;
+    channels = locked_channels;
+    samplerate = locked_samplerate;
     
     return true;
 }
@@ -111,18 +111,5 @@ int AudioOutputNULL::GetBufferedOnSoundcard(void) const
     }
 
     return 0;
-}
-
-
-int AudioOutputNULL::GetSpaceOnSoundcard(void) const
-{
-    if (buffer_output_data_for_use)
-    {
-        return NULLAUDIO_OUTPUT_BUFFER_SIZE - current_buffer_size;
-    }
-    else
-    {
-        return NULLAUDIO_OUTPUT_BUFFER_SIZE;
-    }
 }
 

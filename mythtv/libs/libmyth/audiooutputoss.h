@@ -21,16 +21,15 @@ class AudioOutputOSS : public AudioOutputBase
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetSpaceOnSoundcard(void) const;
     virtual int  GetBufferedOnSoundcard(void) const;
-    vector<int> GetSupportedRates(void);
+    AudioOutputSettings* GetOutputSettings(void);
 
   private:
     void VolumeInit(void);
     void VolumeCleanup(void);
-    
+
     void SetFragSize(void);
-    
+
     int audiofd;
     mutable int numbadioctls;
 

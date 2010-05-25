@@ -106,8 +106,7 @@ void VolumeBase::UpdateVolume(void)
         return;
     }
     
-    // TODO: Avoid assumption that there are 2 channels!
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < channels; i++)
     {
         SetVolumeChannel(i, new_volume);
     }
@@ -133,3 +132,7 @@ void VolumeBase::SyncVolume(void)
         volume = GetVolumeChannel(0);
 }
 
+void VolumeBase::SetChannels(int new_channels)
+{
+    channels = new_channels;
+}

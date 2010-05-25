@@ -232,34 +232,14 @@ FIRFilter * FIRFilter::newInstance()
     uExtensions = detectCPUextensions();
 
     // Check if MMX/SSE/3DNow! instruction set extensions supported by CPU
-
-#ifdef ALLOW_MMX
-    // MMX routines available only with integer sample types
-    if (uExtensions & MM_MMX)
-    {
-        return ::new FIRFilterMMX;
-    }
-    else
-#endif // ALLOW_MMX
-
-#ifdef ALLOW_SSE_FLOAT
-    if (uExtensions & MM_SSE)
+#ifdef ALLOW_SSE2
+    if (uExtensions & MM_SSE2)
     {
         // SSE support
-        return ::new FIRFilterSSE;
+        return ::new FIRFilterSSE2;
     }
     else
-#endif // ALLOW_SSE_FLOAT
-
-#ifdef ALLOW_3DNOW
-    if (uExtensions & MM_3DNOW)
-    {
-        // 3DNow! support
-        return ::new FIRFilter3DNow;
-    }
-    else
-#endif // ALLOW_3DNOW
-
+#endif // ALLOW_SSE2
     {
         // ISA optimizations not supported, use plain C version
         return ::new FIRFilter;

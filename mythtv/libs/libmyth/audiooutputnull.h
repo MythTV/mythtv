@@ -39,7 +39,6 @@ class AudioOutputNULL : public AudioOutputBase
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetSpaceOnSoundcard(void) const;
     virtual int  GetBufferedOnSoundcard(void) const;
 
   private:
@@ -47,9 +46,9 @@ class AudioOutputNULL : public AudioOutputBase
     unsigned char pcm_output_buffer[NULLAUDIO_OUTPUT_BUFFER_SIZE];
     int           current_buffer_size;
 
-    int           locked_audio_channels;
-    int           locked_audio_bits;
-    int           locked_audio_samplerate;
+    int           locked_channels;
+    AudioFormat   locked_format;
+    int           locked_samplerate;
 };
 
 #endif

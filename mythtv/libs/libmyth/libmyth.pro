@@ -12,7 +12,8 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += audiooutput.h audiooutputbase.h audiooutputnull.h
-HEADERS += audiooutputdigitalencoder.h audiosettings.cpp
+HEADERS += audiooutpututil.h audiooutputdownmix.h
+HEADERS += audiooutputdigitalencoder.h audiosettings.h audiooutputsettings.h
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += generictree.h langsettings.h
 HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
@@ -38,7 +39,8 @@ HEADERS += rssparse.h             netutils.h
 HEADERS += virtualkeyboard_qt.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
-SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp
+SOURCES += audiooutpututil.cpp audiooutputdownmix.cpp
+SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp audiooutputsettings.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
 SOURCES += generictree.cpp langsettings.cpp
 SOURCES += managedlist.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
@@ -93,7 +95,7 @@ inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
-inc.files += audiooutput.h audiosettings.h util.h
+inc.files += audiooutput.h audiosettings.h audiooutputsettings.h util.h
 inc.files += inetcomms.h mythmedia.h mythcdrom.h mythwizard.h schemawizard.h dbutil.h
 inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
@@ -198,8 +200,8 @@ using_alsa {
 
 using_jack {
     DEFINES += USE_JACK
-    HEADERS += bio2jack.h audiooutputjack.h
-    SOURCES += bio2jack.c audiooutputjack.cpp
+    HEADERS += audiooutputjack.h
+    SOURCES += audiooutputjack.cpp
     LIBS += $$JACK_LIBS
 }
 

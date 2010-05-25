@@ -34,11 +34,11 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     m_lengthInSecs(0.0)
 #endif
     stat(0),         output_buf(NULL),
-    output_bytes(0), output_at(0),
-    bks(0),          done(false),
-    finish(false),   len(0),
+    output_at(0),    bks(0),
+    bksFrames(0),    decodeBytes(0),
+    finish(false),
     freq(0),         bitrate(0),
-    chan(0),         output_size(0),
+    chan(0),
     totalTime(0.0),  seekTime(-1.0),
     settracknum(-1), tracknum(0),
 #if defined(__linux__) || defined(__FreeBSD__)
@@ -54,10 +54,6 @@ CdDecoder::~CdDecoder(void)
 {
     if (inited)
         deinit();
-
-    if (output_buf)
-        delete [] output_buf;
-    output_buf = 0;
 }
 
 void CdDecoder::stop()
@@ -65,62 +61,36 @@ void CdDecoder::stop()
     user_stop = TRUE;
 }
 
-void CdDecoder::flush(bool final)
+void CdDecoder::writeBlock()
 {
-    ulong min = final ? 0 : bks;
-
-    while ((! done && ! finish) && output_bytes > min)
+    while (seekTime <= 0)
     {
-
-        if (user_stop || finish)
+        if(output()->AddSamples(output_buf, bksFrames, -1))
         {
-            inited = FALSE;
-            done = TRUE;
+            output_at -= bks;
+            memmove(output_buf, output_buf + bks, output_at);
+            break;
         }
         else
-        {
-            ulong sz = output_bytes < bks ? output_bytes : bks;
-
-            int samples = (sz*8)/(chan*16);
-            // Never buffer more than 5000ms of audio since this slows down
-            // actions such as seeking or track changes made after decoding is
-            // complete but audio remains in the buffer
-            bool ok = (output()->GetAudioBufferedTime() <= 5000);
-            if (ok) ok = output()->AddSamples(output_buf, samples, -1);
-            if (ok)
-            {
-                output_bytes -= sz;
-                memmove(output_buf, output_buf + sz, output_bytes);
-                output_at = output_bytes;
-            }
-            else
-            {
-                unlock();
-                usleep(5000);
-                lock();
-                done = user_stop;
-            }
-        }
+            usleep(output()->GetAudioBufferedTime()<<9);
     }
 }
 
+
 bool CdDecoder::initialize()
 {
-    bks = blockSize();
-
-    inited = user_stop = done = finish = FALSE;
-    len = freq = bitrate = 0;
+    inited = user_stop = finish = FALSE;
+    freq = bitrate = 0;
     stat = chan = 0;
     seekTime = -1.0;
+
+    if (output())
+        output()->PauseUntilBuffered();
+
     totalTime = 0.0;
 
     filename = ((QFile *)input())->fileName();
     tracknum = filename.section('.', 0, 0).toUInt();
-
-    if (!output_buf)
-        output_buf = new char[globalBufferSize];
-    output_at = 0;
-    output_bytes = 0;
 
     QByteArray devname = devicename.toAscii();
     device = cdda_identify(devname.constData(), 0, NULL);
@@ -144,7 +114,7 @@ bool CdDecoder::initialize()
     }
 
     paranoia = paranoia_init(device);
-    paranoia_modeset(paranoia, PARANOIA_MODE_OVERLAP);
+    paranoia_modeset(paranoia, PARANOIA_MODE_DISABLE);
     paranoia_seek(paranoia, start, SEEK_SET);
 
     curpos = start;
@@ -156,12 +126,20 @@ bool CdDecoder::initialize()
 
     if (output())
     {
-        const AudioSettings settings(
-            16 /*bits*/, chan, CODEC_ID_PCM_S16LE, freq,
-            false /* AC3/DTS passthru */);
+        const AudioSettings settings(FORMAT_S16, chan, CODEC_ID_PCM_S16LE, freq,
+                                     false /* AC3/DTS passthru */);
         output()->Reconfigure(settings);
         output()->SetSourceBitrate(44100 * 2 * 16);
     }
+
+    // 20ms worth
+    bks = (freq * chan * 2) / 50;
+    bksFrames = freq / 50;
+    // decode 8 bks worth of samples each time we need more
+    decodeBytes = bks << 3;
+
+    output_buf = (char *)av_malloc(decodeBytes + CD_FRAMESIZE_RAW * 2);
+    output_at = 0;
 
     setCDSpeed(2);
     inited = TRUE;
@@ -171,6 +149,8 @@ bool CdDecoder::initialize()
 void CdDecoder::seek(double pos)
 {
     seekTime = pos;
+    if (output())
+        output()->PauseUntilBuffered();
 }
 
 void CdDecoder::deinit()
@@ -181,11 +161,15 @@ void CdDecoder::deinit()
     if (device)
         cdda_close(device);
 
+    if (output_buf)
+        av_free(output_buf);
+    output_buf = NULL;
+
     device = NULL;
     paranoia = NULL;
 
-    inited = user_stop = done = finish = FALSE;
-    len = freq = bitrate = 0;
+    inited = user_stop = finish = FALSE;
+    freq = bitrate = 0;
     stat = chan = 0;
     setInput(0);
     setOutput(0);
@@ -198,75 +182,90 @@ static void paranoia_cb(long inpos, int function)
 
 void CdDecoder::run()
 {
-    lock();
-
-    if (! inited) {
-        unlock();
-
+    if (!inited)
         return;
-    }
 
     stat = DecoderEvent::Decoding;
-
-    unlock();
-
     {
         DecoderEvent e((DecoderEvent::Type) stat);
         dispatch(e);
     }
 
     int16_t *cdbuffer;
+    uint fill, total;
+    // account for possible frame expansion in aobase (upmix, float conv)
+    uint thresh = bks * 6;
 
-    while (! done && ! finish) {
-        lock();
-        // decode
-
-        if (seekTime >= 0.0) {
+    while (!finish && !user_stop)
+    {
+        if (seekTime >= 0.0)
+        {
             curpos = (int)(((seekTime * 44100) / CD_FRAMESAMPLES) + start);
             paranoia_seek(paranoia, curpos, SEEK_SET);
-
+            output_at = 0;
             seekTime = -1.0;
         }
 
-        curpos++;
-        if (curpos <= end)
+        if (output_at < bks)
         {
-            cdbuffer = paranoia_read(paranoia, paranoia_cb);
+            while (output_at < decodeBytes &&
+                   !finish && !user_stop && seekTime <= 0.0)
+            {
+                curpos++;
 
-            memcpy((char *)(output_buf + output_at), (char *)cdbuffer,
-                   CD_FRAMESIZE_RAW);
-            output_at += CD_FRAMESIZE_RAW;
-            output_bytes += CD_FRAMESIZE_RAW;
+                if (curpos <= end)
+                {
+                    cdbuffer = paranoia_read(paranoia, paranoia_cb);
 
-            if (output())
-                flush();
-        }
-        else
-        {
-            flush(TRUE);
+                    memcpy((char *)(output_buf + output_at), (char *)cdbuffer,
+                           CD_FRAMESIZE_RAW);
 
-            if (output()) {
-                output()->Drain();
-            }
-
-            done = TRUE;
-            if (! user_stop) {
-                finish = TRUE;
+                    output_at += CD_FRAMESIZE_RAW;
+                }
+                else
+                    finish = TRUE;
             }
         }
 
-        unlock();
+        if (!output())
+            continue;
+
+        // Wait until we need to decode or supply more samples
+        while (!finish && !user_stop && seekTime <= 0.0)
+        {
+            output()->GetBufferStatus(fill, total);
+            // Make sure we have decoded samples ready and that the
+            // audiobuffer is reasonably populated
+            if (fill < thresh << 6)
+                break;
+            else
+                // Wait for half of the buffer to drain
+                usleep(output()->GetAudioBufferedTime()<<9);
+        }
+
+        // write a block if there's sufficient space for it
+        if (!user_stop && output_at >= bks && fill <= total - thresh)
+            writeBlock();
+
     }
 
-    lock();
+    if (user_stop)
+        inited = FALSE;
+
+    else if (output())
+    {
+        // Drain our buffer
+        while (output_at >= bks)
+            writeBlock();
+
+        // Drain ao buffer
+        output()->Drain();
+    }
 
     if (finish)
         stat = DecoderEvent::Finished;
     else if (user_stop)
         stat = DecoderEvent::Stopped;
-
-    unlock();
-
     {
         DecoderEvent e((DecoderEvent::Type) stat);
         dispatch(e);

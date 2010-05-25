@@ -38,9 +38,9 @@ typedef FFTSample FFTComplexArray[2];
 
 typedef std::complex<float> cfloat;
 
-const float PI = 3.141592654;
-const float epsilon = 0.000001;
-const float center_level = 0.5*sqrt(0.5);
+static const float PI = 3.141592654;
+static const float epsilon = 0.000001;
+static const float center_level = 0.5*sqrt(0.5);
 
 // private implementation of the surround decoder
 class decoder_impl {

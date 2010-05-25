@@ -87,8 +87,6 @@ class Decoder : public QThread, public MythObservable
 
     QWaitCondition *cond() { return &cnd; }
 
-    void setBlockSize(unsigned int sz) { blksize = sz; }
-    unsigned int blockSize()  const { return blksize; }
     QString getFilename(void) const { return filename; }
 
     virtual Metadata *readMetadata(void);
@@ -124,7 +122,6 @@ class Decoder : public QThread, public MythObservable
     QMutex mtx;
     QWaitCondition cnd;
 
-    int blksize;
 };
 
 class DecoderFactory

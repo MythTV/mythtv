@@ -29,7 +29,10 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "audiooutputca.h"
 #include "config.h"
-#include "SoundTouch.h" 
+#include "SoundTouch.h"
+
+#define CHANNELS_MIN 1
+#define CHANNELS_MAX 8
 
 /** \class CoreAudioData
  *  \brief This holds Core Audio member variables and low-level audio IO methods
@@ -47,7 +50,7 @@ public:
 
     pid_t GetHogPID();
     bool  SetHogPID(pid_t pid);
-    bool  SetHogMode(); 
+    bool  SetHogMode();
     void  ReleaseHogMode()   { SetHogPID(-1); }
 
     bool SetUnMixable();
@@ -55,6 +58,8 @@ public:
     bool FindAC3Stream();
     void ResetAudioDevices();
     void ResetStream(AudioStreamID s);
+    int *RatesList(AudioDeviceID d);
+    bool *ChannelsList(AudioDeviceID d, bool passthru);
 
     // Helpers for iterating. Returns a malloc'd array
     AudioStreamID               *StreamsList(AudioDeviceID d);
@@ -99,11 +104,11 @@ static OSStatus RenderCallbackAnalog(void                       *inRefCon,
                                      UInt32                     inNumberFrames,
                                      AudioBufferList            *ioData);
 static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
-                                    const AudioTimeStamp *inNow, 
+                                    const AudioTimeStamp *inNow,
                                     const void           *inInputData,
-                                    const AudioTimeStamp *inInputTime, 
+                                    const AudioTimeStamp *inInputTime,
                                     AudioBufferList      *outOutputData,
-                                    const AudioTimeStamp *inOutputTime, 
+                                    const AudioTimeStamp *inOutputTime,
                                     void                 *threadGlobals);
 
 
@@ -167,23 +172,36 @@ bool CoreAudioData::OpenAnalog()
         return false;
     }
 
-    // base class does this after OpenDevice, but we need it now
-    mCA->audio_bytes_per_sample = mCA->audio_channels * mCA->audio_bits / 8;
+    int formatFlags;
+    switch (mCA->output_format)
+    {
+        case FORMAT_S16:
+            formatFlags = kLinearPCMFormatFlagIsSignedInteger;
+            break;
+        case FORMAT_FLT:
+            formatFlags = kLinearPCMFormatFlagIsFloat;
+            break;
+        default:
+            formatFlags = kLinearPCMFormatFlagIsSignedInteger;
+            break;
+    }
 
     // Set up the audio output unit
     AudioStreamBasicDescription conv_in_desc;
     bzero(&conv_in_desc, sizeof(AudioStreamBasicDescription));
-    conv_in_desc.mSampleRate       = mCA->audio_samplerate;
+    conv_in_desc.mSampleRate       = mCA->samplerate;
     conv_in_desc.mFormatID         = kAudioFormatLinearPCM;
-    conv_in_desc.mFormatFlags      = kLinearPCMFormatFlagIsSignedInteger;
+    conv_in_desc.mFormatFlags      = formatFlags;
 #ifdef WORDS_BIGENDIAN
     conv_in_desc.mFormatFlags     |= kLinearPCMFormatFlagIsBigEndian;
 #endif
-    conv_in_desc.mBytesPerPacket   = mCA->audio_bytes_per_sample;
+    conv_in_desc.mBytesPerPacket   = mCA->output_bytes_per_frame;
+    // This seems inefficient, does it hurt if we increase this?
     conv_in_desc.mFramesPerPacket  = 1;
-    conv_in_desc.mBytesPerFrame    = mCA->audio_bytes_per_sample;
-    conv_in_desc.mChannelsPerFrame = mCA->audio_channels;
-    conv_in_desc.mBitsPerChannel   = mCA->audio_bits;
+    conv_in_desc.mBytesPerFrame    = mCA->output_bytes_per_frame;
+    conv_in_desc.mChannelsPerFrame = mCA->channels;
+    conv_in_desc.mBitsPerChannel   =
+        AudioOutputSettings::FormatToBits(mCA->output_format);
 
     err = AudioUnitSetProperty(mOutputUnit,
                                kAudioUnitProperty_StreamFormat,
@@ -214,12 +232,54 @@ bool CoreAudioData::OpenAnalog()
     return true;
 }
 
+AudioOutputSettings* AudioOutputCA::GetOutputSettings()
+{
+    AudioOutputSettings *settings = new AudioOutputSettings();
+
+    // Seek hardware sample rate available
+    int rate;
+    int *rates = d->RatesList(d->mDeviceID);
+    int *p_rates = rates;
+
+    while (*p_rates > 0 && (rate = settings->GetNextRate()))
+    {
+        if (*p_rates == rate)
+        {
+            settings->AddSupportedRate(*p_rates);
+            p_rates++;
+        }
+    }
+    free(rates);
+
+    // Supported format: 16 bits audio or float
+    settings->AddSupportedFormat(FORMAT_S16);
+    settings->AddSupportedFormat(FORMAT_FLT);
+
+    bool *channels = d->ChannelsList(d->mDeviceID, passthru);
+    if (channels == NULL)
+    {
+        // Error retrieving list of supported channels, assume stereo only
+        settings->AddSupportedChannels(2);
+    }
+    else
+    {
+        for (int i = CHANNELS_MIN; i <= CHANNELS_MAX; i++)
+            if (channels[i])
+            {
+                Debug(QString("Support %1 channels").arg(i));
+                settings->AddSupportedChannels(i);
+            }
+        free(channels);
+    }
+
+    return settings;
+}
+
 bool AudioOutputCA::OpenDevice()
 {
     bool deviceOpened = false;
 
-
-    if (audio_passthru)
+    if (passthru)
     {
         if (!d->FindAC3Stream())
         {
@@ -275,7 +335,7 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
 {
     if (pauseaudio || killaudio)
     {
-        audio_actually_paused = true;
+        actually_paused = true;
         return false;
     }
 
@@ -297,9 +357,8 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
     UInt64 nanos = AudioConvertHostTimeToNanos(
                         timestamp - AudioGetCurrentHostTime());
     bufferedBytes = (int)((nanos / 1000000000.0) *    // secs
-                          (effdsp / 100.0) *          // samples/sec
-                          audio_bytes_per_sample);    // bytes/sample
-    SetAudiotime();
+                          (effdsp / 100.0) *          // frames/sec
+                          output_bytes_per_frame);    // bytes/frame
 
     return (written_size > 0);
 }
@@ -309,11 +368,6 @@ void AudioOutputCA::WriteAudio(unsigned char *aubuf, int size)
     (void)aubuf;
     (void)size;
     return;     // unneeded and unused in CA
-}
-
-int AudioOutputCA::GetSpaceOnSoundcard(void) const
-{
-    return 0;   // unneeded and unused in CA
 }
 
 int AudioOutputCA::GetBufferedOnSoundcard(void) const
@@ -326,53 +380,16 @@ int AudioOutputCA::GetBufferedOnSoundcard(void) const
  */
 int AudioOutputCA::GetAudiotime(void)
 {
-    int ret;
+    int audbuf_timecode = GetBaseAudBufTimeCode();
 
-    if (GetBaseAudioTime() == 0)
+    if (!audbuf_timecode)
         return 0;
 
-    UInt64 hostNanos = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
-    ret = (hostNanos / 1000000) - CA_audiotime_updated;
-	
-    ret += GetBaseAudioTime();
+    int totalbuffer = audioready() + GetBufferedOnSoundcard();
 
-    return ret;
-}
+    return audbuf_timecode - (int)(totalbuffer * 100000.0 /
+                                  (output_bytes_per_frame * effdspstretched));
 
-/** Reimplement base's SetAudiotime()
- *  without gettimeofday() or Qt mutexes.
- */
-void AudioOutputCA::SetAudiotime(void)
-{
-    if (GetBaseAudBufTimeCode() == 0)
-        return;
-
-    int soundcard_buffer = 0;
-    int totalbuffer;
-
-
-    soundcard_buffer = GetBufferedOnSoundcard();
-    totalbuffer = audiolen(false) + soundcard_buffer;
- 
-    if (GetSoundStretch())
-        totalbuffer += (int)((GetSoundStretch()->numUnprocessedSamples() *
-                              audio_bytes_per_sample) / audio_stretchfactor);
- 
-    SetBaseAudioTime(GetBaseAudBufTimeCode() - (int)(totalbuffer * 100000.0 /
-                                   (audio_bytes_per_sample * effdspstretched)));
- 
-    // We also store here the host time stamp of when the update occurred.
-    // That way when asked later for the audio time we can use
-    // the sum of the output time code info calculated here,
-    // and the delta since when it was calculated and when we asked.
-
-    // Note that since we're using a single 32bit variable here
-    // there is no need to use a lock or similar, since the 32 bit
-    // accesses are atomic. Also we use AudioHost time here
-    // so that we're all referring to the same clock.
-
-    UInt64 hostNanos = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
-    CA_audiotime_updated = hostNanos / 1000000;
 }
 
 /* This callback provides converted audio data to the default output device. */
@@ -408,7 +425,7 @@ int AudioOutputCA::GetVolumeChannel(int channel) const
     if (!AudioUnitGetParameter(d->mOutputUnit,
                                kHALOutputParam_Volume,
                                kAudioUnitScope_Global, 0, &volume))
-        return (int)lroundf(volume * 100.0);
+        return (int)lroundf(volume * 100.0f);
 
     return 0;    // error case
 }
@@ -418,16 +435,16 @@ void AudioOutputCA::SetVolumeChannel(int channel, int volume)
     // FIXME: this only sets global volume
     (void)channel;
      AudioUnitSetParameter(d->mOutputUnit, kHALOutputParam_Volume,
-                           kAudioUnitScope_Global, 0, (volume * 0.01), 0);
+                           kAudioUnitScope_Global, 0, (volume * 0.01f), 0);
 }
 
 // IOProc style callback for SPDIF audio output
 static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
-                                    const AudioTimeStamp *inNow, 
+                                    const AudioTimeStamp *inNow,
                                     const void           *inInputData,
-                                    const AudioTimeStamp *inInputTime, 
+                                    const AudioTimeStamp *inInputTime,
                                     AudioBufferList      *outOutputData,
-                                    const AudioTimeStamp *inOutputTime, 
+                                    const AudioTimeStamp *inOutputTime,
                                     void                 *inRefCon)
 {
     CoreAudioData    *d = (CoreAudioData *)inRefCon;
@@ -620,7 +637,7 @@ AudioStreamID *CoreAudioData::StreamsList(AudioDeviceID d)
 
     return list;
 }
- 
+
 AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
 {
     OSStatus                     err;
@@ -631,7 +648,7 @@ AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
 
     // This is deprecated for kAudioStreamPropertyAvailablePhysicalFormats,
     // but compiling on 10.3 requires the older constant
-    p = kAudioStreamPropertyPhysicalFormats,
+    p = kAudioStreamPropertyPhysicalFormats;
 
     // Retrieve all the stream formats supported by this output stream
     err = AudioStreamGetPropertyInfo(s, 0, p, &listSize, NULL);
@@ -665,12 +682,162 @@ AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
     return list;
 }
 
+static UInt32   sNumberCommonSampleRates = 15;
+static Float64  sCommonSampleRates[] = {
+    8000.0,   11025.0,  12000.0,
+    16000.0,  22050.0,  24000.0,
+    32000.0,  44100.0,  48000.0,
+    64000.0,  88200.0,  96000.0,
+    128000.0, 176400.0, 192000.0 };
+
+static bool		IsRateCommon(Float64 inRate)
+{
+	bool theAnswer = false;
+	for(UInt32 i = 0; !theAnswer && (i < sNumberCommonSampleRates); i++)
+	{
+		theAnswer = inRate == sCommonSampleRates[i];
+	}
+	return theAnswer;
+}
+
+int *CoreAudioData::RatesList(AudioDeviceID d)
+{
+    OSStatus                    err;
+    AudioValueRange             *list;
+    int                         *finallist;
+    UInt32                      listSize;
+    UInt32                      nbitems = 0;
+
+    // retrieve size of rate list
+    err = AudioDeviceGetPropertyInfo(d, 0, 0,
+                                     kAudioDevicePropertyAvailableNominalSampleRates,
+                                     &listSize, NULL);
+    if (err != noErr)
+    {
+        Warn(QString("RatesList() couldn't get data rate list size: %1").arg(err));
+        return NULL;
+    }
+
+    list      = (AudioValueRange *)malloc(listSize);
+    if (list == NULL)
+    {
+        Error("RatesList() - out of memory?");
+        return NULL;
+    }
+
+	err = AudioDeviceGetProperty(d, 0, 0,
+                                 kAudioDevicePropertyAvailableNominalSampleRates,
+                                 &listSize, list);
+    if (err != noErr)
+    {
+        Warn(QString("RatesList() couldn't get list: %1").arg(err));
+        free(list);
+        return NULL;
+    }
+
+    finallist = (int *)malloc(((listSize / sizeof(AudioValueRange)) + 1)
+                              * sizeof(int));
+    if (finallist == NULL)
+    {
+        Error("RatesList() - out of memory?");
+        return NULL;
+    }
+
+    // iterate through the ranges and add the minimum, maximum, and common rates in between
+    UInt32 theFirstIndex = 0, theLastIndex = 0;
+    for(UInt32 i = 0; i < listSize / sizeof(AudioValueRange); i++)
+    {
+        theFirstIndex = theLastIndex;
+        // find the index of the first common rate greater than or equal to the minimum
+        while((theFirstIndex < sNumberCommonSampleRates) &&  (sCommonSampleRates[theFirstIndex] < list[i].mMinimum))
+            theFirstIndex++;
+
+        if (theFirstIndex >= sNumberCommonSampleRates)
+            break;
+
+        theLastIndex = theFirstIndex;
+        // find the index of the first common rate greater than or equal to the maximum
+        while((theLastIndex < sNumberCommonSampleRates) && (sCommonSampleRates[theLastIndex] < list[i].mMaximum))
+        {
+            finallist[nbitems++] = sCommonSampleRates[theLastIndex];
+            theLastIndex++;
+        }
+        if (IsRateCommon(list[i].mMinimum))
+            finallist[nbitems++] = list[i].mMinimum;
+        else if (IsRateCommon(list[i].mMaximum))
+            finallist[nbitems++] = list[i].mMaximum;
+    }
+    free(list);
+
+    // Add a terminating ID
+    finallist[nbitems] = -1;
+
+    return finallist;
+}
+
+bool *CoreAudioData::ChannelsList(AudioDeviceID d, bool passthru)
+{
+    AudioStreamID               *streams;
+    AudioStreamBasicDescription *formats;
+    bool                        founddigital = false;
+    bool                        *list;
+
+    if ((list = (bool *)malloc((CHANNELS_MAX+1) * sizeof(bool))) == NULL)
+        return NULL;
+
+    bzero(list, (CHANNELS_MAX+1) * sizeof(bool));
+
+    streams = StreamsList(mDeviceID);
+    if (!streams)
+    {
+        free(list);
+        return NULL;
+    }
+
+    if (passthru)
+    {
+        for (int i = 0; streams[i] != kAudioHardwareBadStreamError; i++)
+        {
+            formats = FormatsList(streams[i]);
+            if (!formats)
+                continue;
+
+            // Find a stream with a cac3 stream
+            for (int j = 0; formats[j].mFormatID != 0; j++)
+            {
+                if (formats[j].mFormatID == 'IAC3' ||
+                    formats[j].mFormatID == kAudioFormat60958AC3)
+                {
+                    list[formats[j].mChannelsPerFrame] = true;
+                    founddigital = true;
+                }
+            }
+            free(formats);
+        }        
+    }
+
+    if (!founddigital)
+    {
+        for (int i = 0; streams[i] != kAudioHardwareBadStreamError; i++)
+        {
+            formats = FormatsList(streams[i]);
+            if (!formats)
+                continue;
+            for (int j = 0; formats[j].mFormatID != 0; j++)
+                if (formats[j].mChannelsPerFrame <= CHANNELS_MAX)
+                    list[formats[j].mChannelsPerFrame] = true;
+            free(formats);
+        }
+    }
+    return list;
+}
+
 bool CoreAudioData::OpenSPDIF()
 {
     OSStatus       err;
     AudioStreamID  *streams;
     UInt32         paramSize = 0;
- 
+
     // Hog the device
     if (!SetHogMode())
         return false;
@@ -730,7 +897,7 @@ bool CoreAudioData::OpenSPDIF()
                 if (err != noErr)
                 {
                     Warn(QString("OpenSPDIF - could not retrieve the original streamformat: %1").arg(err));
-                    continue; 
+                    continue;
                 }
                 mRevertFormat = true;
             }
@@ -740,7 +907,7 @@ bool CoreAudioData::OpenSPDIF()
                 if (formats[j].mFormatID == 'IAC3' ||
                     formats[j].mFormatID == kAudioFormat60958AC3)
                 {
-                    if (formats[j].mSampleRate == mCA->audio_samplerate)
+                    if (formats[j].mSampleRate == mCA->samplerate)
                     {
                         requestedFmt = j;
                         break;
@@ -788,12 +955,12 @@ bool CoreAudioData::OpenSPDIF()
     }
 
     // Start device
-    err = AudioDeviceStart(mDeviceID, (AudioDeviceIOProc)RenderCallbackSPDIF); 
+    err = AudioDeviceStart(mDeviceID, (AudioDeviceIOProc)RenderCallbackSPDIF);
     if (err != noErr)
     {
         Warn(QString("OpenSPDIF - AudioDeviceStart failed: %1").arg(err));
 
-        err = AudioDeviceRemoveIOProc(mDeviceID, 
+        err = AudioDeviceRemoveIOProc(mDeviceID,
                                       (AudioDeviceIOProc)RenderCallbackSPDIF);
         if (err != noErr)
             Warn(QString("OpenSPDIF - AudioDeviceRemoveIOProc failed: %1")
@@ -811,7 +978,7 @@ void CoreAudioData::CloseSPDIF()
     UInt32    paramSize;
 
     // Stop device
-    err = AudioDeviceStop(mDeviceID, (AudioDeviceIOProc)RenderCallbackSPDIF); 
+    err = AudioDeviceStop(mDeviceID, (AudioDeviceIOProc)RenderCallbackSPDIF);
     if (err != noErr)
         Debug(QString("CloseSPDIF - AudioDeviceStop failed: %1").arg(err));
 
@@ -863,7 +1030,7 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
 
     OSStatus err = AudioStreamSetProperty(s, 0, 0,
                                           kAudioStreamPropertyPhysicalFormat,
-                                          sizeof(format), &format); 
+                                          sizeof(format), &format);
     if (err != noErr)
     {
         Error(QString("AudioStreamChangeFormat couldn't set stream format: %1")

@@ -21,6 +21,7 @@ extern "C" {
 
 // MythTV headers
 #include "audiooutputdigitalencoder.h"
+#include "audiooutpututil.h"
 #include "compat.h"
 #include "mythverbose.h"
 
@@ -30,12 +31,13 @@ extern "C" {
 #define MAX_AC3_FRAME_SIZE 6144
 
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
-    audio_bytes_per_sample(0),
+    bytes_per_sample(0),
     av_context(NULL),
-    outbuflen(0),
-    inbuflen(0),
+    outlen(0),
+    inlen(0),
     one_frame_bytes(0)
 {
+    in = (char *)(((long)&inbuf + 15) & ~15);
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
@@ -77,14 +79,14 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    av_context = avcodec_alloc_context();
-    av_context->bit_rate = bitrate;
+    av_context              = avcodec_alloc_context();
+    av_context->bit_rate    = bitrate;
     av_context->sample_rate = samplerate;
-    av_context->channels = channels;
+    av_context->channels    = channels;
 
     // open it */
     ret = avcodec_open(av_context, codec);
-    if (ret < 0) 
+    if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Could not open codec, invalid bitrate or samplerate");
@@ -93,13 +95,12 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    size_t bytes_per_frame = av_context->channels * sizeof(short);
-    audio_bytes_per_sample = bytes_per_frame;
-    one_frame_bytes = bytes_per_frame * av_context->frame_size;
+    bytes_per_sample = av_context->channels * sizeof(short);
+    one_frame_bytes  = bytes_per_sample * av_context->frame_size;
 
     VERBOSE(VB_AUDIO, QString("DigitalEncoder::Init fs=%1, bpf=%2 ofb=%3")
             .arg(av_context->frame_size)
-            .arg(bytes_per_frame)
+            .arg(bytes_per_sample)
             .arg(one_frame_bytes));
 
     return true;
@@ -212,7 +213,7 @@ typedef struct {
     // 1 - 48k
     // 2 - 44.1k
     // 3 - 32k
-    unsigned sample_frequency:2;    
+    unsigned sample_frequency:2;
     // byte 1
     // 0
     // 1 - 2 ch
@@ -242,7 +243,7 @@ typedef struct {
 } AESHeader;
 
 static int encode_frame(
-        bool dts, 
+        bool dts,
         unsigned char *data,
         size_t enc_len)
 {
@@ -289,12 +290,7 @@ static int encode_frame(
 
     enc_len = std::min((uint)enc_len, block_len - 8);
 
-    //uint32_t x = *(uint32_t*)payload;
-    // in place swab
     swab((const char *)payload, (char *)payload, enc_len);
-    //VERBOSE(VB_AUDIO+VB_TIMESTAMP, 
-    //        QString("DigitalEncoder::Encode swab test %1 %2")
-    //        .arg(x,0,16).arg(*(uint32_t*)payload,0,16));
 
     // the following values come from libmpcodecs/ad_hwac3.c in mplayer.
     // they form a valid IEC958 AC3 header.
@@ -343,38 +339,53 @@ static int encode_frame(
     return enc_len;
 }
 
-size_t AudioOutputDigitalEncoder::Encode(void *buf, int len)
+size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, bool isFloat)
 {
     size_t outsize = 0;
 
-    int fs = FrameSize();
-    memcpy(inbuf+inbuflen, buf, len);
-    inbuflen += len;
-    int frames = inbuflen / fs;
+    if (isFloat)
+        inlen += AudioOutputUtil::fromFloat(FORMAT_S16, in + inlen, buf, len);
+    else
+    {
+        memcpy(in + inlen, buf, len);
+        inlen += len;
+    }
 
-    while (frames--) 
+    int frames = inlen / one_frame_bytes;
+    int i = 0;
+
+    while (i < frames)
     {
         // put data in the correct spot for encode frame
-        outsize = avcodec_encode_audio(
-            av_context, ((uchar*)outbuf) + outbuflen + 8, OUTBUFSIZE - 8, (short int *)inbuf);
+        outsize = avcodec_encode_audio(av_context,
+                                       ((uchar*)out) + outlen + 8,
+                                       OUTBUFSIZE - outlen - 8,
+                                       (short *)(in + i * one_frame_bytes));
+        if (outsize < 0)
+        {
+            VERBOSE(VB_AUDIO, LOC_ERR + "AC-3 encode error");
+            return outlen;
+        }
 
         encode_frame(
             /*av_context->codec_id==CODEC_ID_DTS*/ false,
-            (unsigned char*)outbuf + outbuflen, outsize
+            (uchar*)out + outlen, outsize
         );
 
-        outbuflen += MAX_AC3_FRAME_SIZE;
-        inbuflen -= fs;
-        memmove(inbuf, inbuf+fs, inbuflen);
+
+        outlen += MAX_AC3_FRAME_SIZE;
+        inlen -= one_frame_bytes;
+        i++;
     }
 
-    return outbuflen;
+    memmove(in, in + i * one_frame_bytes, inlen);
+    return outlen;
 }
 
 void AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
 {
-    int len = (maxlen < outbuflen ? maxlen : outbuflen);
-    memcpy(ptr, outbuf, len);
-    outbuflen -= len;
-    memmove(outbuf, outbuf+len, outbuflen);
+    int len = std::min(maxlen, outlen);
+    memcpy(ptr, out, len);
+    outlen -= len;
+    memmove(out, out + len, outlen);
 }

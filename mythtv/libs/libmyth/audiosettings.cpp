@@ -11,7 +11,7 @@
 AudioSettings::AudioSettings() :
     main_device(QString::null),
     passthru_device(QString::null),
-    bits(-1),
+    format(FORMAT_NONE),
     channels(-1),
     codec(0),
     samplerate(-1),
@@ -25,7 +25,7 @@ AudioSettings::AudioSettings() :
 AudioSettings::AudioSettings(const AudioSettings &other) :
     main_device(other.main_device),
     passthru_device(other.passthru_device),
-    bits(other.bits),
+    format(other.format),
     channels(other.channels),
     codec(other.codec),
     samplerate(other.samplerate),
@@ -37,44 +37,44 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
 }
 
 AudioSettings::AudioSettings(
-    const QString &audio_main_device,
-    const QString &audio_passthru_device,
-    int audio_bits,
-    int audio_channels,
-    int audio_codec,
-    int audio_samplerate,
-    AudioOutputSource audio_source,
-    bool audio_set_initial_vol,
-    bool audio_use_passthru,
-    int upmixer_startup) :
-    main_device(audio_main_device),
-    passthru_device(audio_passthru_device),
-    bits(audio_bits),
-    channels(audio_channels),
-    codec(audio_codec),
-    samplerate(audio_samplerate),
-    set_initial_vol(audio_set_initial_vol),
-    use_passthru(audio_use_passthru),
-    source(audio_source),
+    const QString     &main_device,
+    const QString     &passthru_device,
+    AudioFormat       format,
+    int               channels,
+    int               codec,
+    int               samplerate,
+    AudioOutputSource source,
+    bool              set_initial_vol,
+    bool              use_passthru,
+    int               upmixer_startup) :
+    main_device(main_device),
+    passthru_device(passthru_device),
+    format(format),
+    channels(channels),
+    codec(codec),
+    samplerate(samplerate),
+    set_initial_vol(set_initial_vol),
+    use_passthru(use_passthru),
+    source(source),
     upmixer(upmixer_startup)
 {
 }
 
 AudioSettings::AudioSettings(
-    int   audio_bits, 
-    int   audio_channels, 
-    int   audio_codec,
-    int   audio_samplerate,
-    bool  audio_use_passthru,
-    int   upmixer_startup) :
+    AudioFormat format,
+    int         channels,
+    int         codec,
+    int         samplerate,
+    bool        use_passthru,
+    int         upmixer_startup) :
     main_device(QString::null),
     passthru_device(QString::null),
-    bits(audio_bits),
-    channels(audio_channels),
-    codec(audio_codec),
-    samplerate(audio_samplerate),
+    format(format),
+    channels(channels),
+    codec(codec),
+    samplerate(samplerate),
     set_initial_vol(false),
-    use_passthru(audio_use_passthru),
+    use_passthru(use_passthru),
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(upmixer_startup)
 {

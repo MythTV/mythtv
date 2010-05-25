@@ -85,7 +85,6 @@ const uint TV::kMaxPBPCount                  = 2;
 
 
 const uint TV::kInputModeTimeout             = 5000;
-const uint TV::kMuteTimeout                  = 800;
 const uint TV::kLCDTimeout                   = 1000;
 const uint TV::kBrowseTimeout                = 30000;
 const uint TV::kKeyRepeatTimeout             = 300;
@@ -2885,36 +2884,6 @@ void TV::timerEvent(QTimerEvent *te)
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         BrowseEnd(actx, false);
         ReturnPlayerLock(actx);
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
-    // Check unmute..
-    ctx = NULL;
-    {
-        QMutexLocker locker(&timerIdLock);
-        TimerContextMap::iterator it = unmuteTimerId.find(timer_id);
-        if (it != unmuteTimerId.end())
-        {
-            KillTimer(timer_id);
-            ctx = *it;
-            unmuteTimerId.erase(it);
-        }
-    }
-
-    if (ctx)
-    {
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        if (find_player_index(ctx) >= 0)
-        {
-            ctx->LockDeleteNVP(__FILE__, __LINE__);
-            if (ctx->nvp && ctx->nvp->IsMuted())
-                ctx->nvp->SetMuted(false);
-            ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-        }
-        ReturnPlayerLock(mctx);
         handled = true;
     }
 
@@ -5891,8 +5860,6 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
 
     VERBOSE(VB_PLAYBACK, LOC + "DoNVPSeek() -- begin");
 
-    bool muted = false;
-
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (!ctx->nvp)
     {
@@ -5901,7 +5868,7 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
     }
 
     if (ctx == GetPlayer(ctx, 0))
-        muted = MuteChannelChange(ctx);
+        PauseAudioUntilBuffered(ctx);
 
     bool res = false;
 
@@ -5922,9 +5889,6 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
         res = ctx->nvp->Rewind(-time);
     }
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    if (muted)
-        SetMuteTimer(ctx, kMuteTimeout);
 
     VERBOSE(VB_PLAYBACK, LOC + "DoNVPSeek() -- end");
 
@@ -6292,7 +6256,7 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     StopFFRew(ctx);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
-    bool muted = MuteChannelChange(ctx);
+    PauseAudioUntilBuffered(ctx);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     struct StatusPosInfo posInfo;
@@ -6313,9 +6277,6 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     if (ctx->nvp)
         ctx->nvp->JumpChapter(chapter);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    if (muted)
-        SetMuteTimer(ctx, kMuteTimeout);
 }
 
 void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
@@ -6327,7 +6288,7 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
         return;
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
-    bool muted = MuteChannelChange(ctx);
+    PauseAudioUntilBuffered(ctx);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     struct StatusPosInfo posInfo;
@@ -6348,9 +6309,6 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
     if (ctx->nvp)
         ctx->nvp->SkipCommercials(direction);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    if (muted)
-        SetMuteTimer(ctx, kMuteTimeout);
 }
 
 void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
@@ -6925,8 +6883,6 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
 
 void TV::ChangeChannel(PlayerContext *ctx, int direction)
 {
-    bool muted = false;
-
     if ((browse_changrp || (direction == CHANNEL_DIRECTION_FAVORITE)) &&
         (channel_group_id > -1))
     {
@@ -6957,8 +6913,6 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
     QString oldinputname = ctx->recorder->GetInput();
 
-    muted = MuteChannelChange(ctx);
-
     if (ctx->paused)
     {
         OSD *osd = GetOSDLock(ctx);
@@ -6973,6 +6927,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
     if (ctx->prevChan.empty())
         ctx->PushPreviousChannel();
 
+    PauseAudioUntilBuffered(ctx);
     PauseLiveTV(ctx);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
@@ -6986,8 +6941,8 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
     ctx->recorder->ChangeChannel(direction);
     ClearInputQueues(ctx, false);
 
-    if (muted)
-        SetMuteTimer(ctx, kMuteTimeout * 2);
+    if (ctx->nvp)
+        ctx->nvp->ResetAudio();
 
     UnpauseLiveTV(ctx);
 
@@ -7005,7 +6960,6 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
     QString channum = chan;
     QStringList reclist;
-    bool muted = false;
 
     QString oldinputname = ctx->recorder->GetInput();
 
@@ -7075,8 +7029,6 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (getit || !ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
-    muted = MuteChannelChange(ctx);
-
     OSD *osd = GetOSDLock(ctx);
     if (osd && ctx->paused)
     {
@@ -7090,6 +7042,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (ctx->prevChan.empty())
         ctx->PushPreviousChannel();
 
+    PauseAudioUntilBuffered(ctx);
     PauseLiveTV(ctx);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
@@ -7102,8 +7055,8 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
     ctx->recorder->SetChannel(channum);
 
-    if (muted)
-        SetMuteTimer(ctx, kMuteTimeout * 2);
+    if (ctx->nvp)
+        ctx->nvp->ResetAudio();
 
     UnpauseLiveTV(ctx);
 
@@ -8572,28 +8525,15 @@ void TV::ToggleAdjustFill(PlayerContext *ctx, AdjustFillMode adjustfillMode)
     ReturnOSDLock(ctx, osd);
 }
 
-void TV::SetMuteTimer(PlayerContext *ctx, int timeout)
-{
-    // message to set the timer will be posted to the main UI thread
-    // where it will be caught in eventFilter and processed as CustomEvent
-    // this will properly set the mute timer
-    // otherwise it never fires on Win32
-    QString message = QString("UNMUTE %1 %2").arg((long long)ctx).arg(timeout);
-    qApp->postEvent(GetMythMainWindow(), new MythEvent(message));
-}
-
-bool TV::MuteChannelChange(PlayerContext *ctx)
+void TV::PauseAudioUntilBuffered(PlayerContext *ctx)
 {
     if (!ctx)
-        return false;
+        return;
 
-    bool muted = false;
     ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp && !ctx->nvp->IsMuted())
-        muted = ctx->nvp->SetMuted(true);
+    if (ctx->nvp)
+        ctx->nvp->PauseAudioUntilBuffered();
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    return muted;
 }
 
 void TV::customEvent(QEvent *e)
@@ -8867,25 +8807,6 @@ void TV::customEvent(QEvent *e)
                 if (!networkControlTimerId)
                     networkControlTimerId = StartTimer(1, __LINE__);
             }
-        }
-    }
-
-    if (message.left(6) == "UNMUTE")
-    {
-        if (tokens.size() >= 3)
-        {
-            long long target = tokens[1].toLongLong();
-            PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-            for (uint i = 0; i < player.size(); i++)
-            {
-                PlayerContext *ctx = GetPlayer(mctx, i);
-                if (((long long)ctx) == target)
-                {
-                    QMutexLocker locker(&timerIdLock);
-                    unmuteTimerId[StartTimer(tokens[2].toUInt(), __LINE__)] = ctx;
-                }
-            }
-            ReturnPlayerLock(mctx);
         }
     }
 

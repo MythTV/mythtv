@@ -1,223 +1,298 @@
-// SSE2 version of the expensive routines for 16 bit integer samples
+// SSE2 versions of the expensive routines for float samples
 
 #include "STTypes.h"
 #include "TDStretch.h"
+#include "FIRFilter.h"
 #include "inttypes.h"
 
 using namespace soundtouch;
 
-static uint64_t ones = 0x0001ffff0001ffffULL;
-static uint64_t sadd = 0x000001ff000001ffULL;
-
-long TDStretchSSE2::calcCrossCorrMulti(const short *mPos, const short *cPos) const
+double TDStretchSSE2::calcCrossCorrMulti(const float *mPos, const float *cPos) const
 {
-    long corr = 0;
-    // Need 16-byte align for int out[4], but gcc bug #16660 prevents use of
-    //  attribute(aligned()), so align it ourselves. Fixed in gcc >4.4 r138335
-    int i, x[8]; 
-    int *out=(int *)(((uintptr_t)&x+15) & ~(uintptr_t)0xf);
-    int count = (overlapLength * channels) - channels;
-    long loops = count >> 5;
-    long remainder = count - (loops<<5);
-    const short *mp = mPos;
-    const short *cp = cPos;
-
-    mp += channels;
-    cp += channels;
+    double corr = 0;
+    int count = overlapLength * channels;
+    int loops = count >> 4;
+    int i = loops << 4;
+    const float *mp = mPos;
+    const float *cp = cPos;
 
     __asm__ volatile (
-        "xorps      %%xmm5, %%xmm5      \n\t"
-        "movd       %4, %%xmm7          \n\t"
-        "1:                             \n\t"
-        "movupd     (%1), %%xmm0        \n\t"
-        "movupd     (%2), %%xmm1        \n\t"
-        "movupd     16(%1), %%xmm2      \n\t"
-        "pmaddwd    %%xmm0, %%xmm1      \n\t"
-        "movupd     32(%1), %%xmm4      \n\t"
-        "movupd     48(%1), %%xmm6      \n\t"
-        "psrad      %%xmm7, %%xmm1      \n\t"
-        "movupd     16(%2), %%xmm3      \n\t"
-        "paddd      %%xmm1, %%xmm5      \n\t"
-        "movupd     32(%2), %%xmm0      \n\t"
-        "pmaddwd    %%xmm2, %%xmm3      \n\t"
-        "movupd     48(%2), %%xmm1      \n\t"
-        "pmaddwd    %%xmm4, %%xmm0      \n\t"
-        "psrad      %%xmm7, %%xmm3      \n\t"
-        "pmaddwd    %%xmm6, %%xmm1      \n\t"
-        "psrad      %%xmm7, %%xmm0      \n\t"
-        "paddd      %%xmm3, %%xmm5      \n\t"
-        "psrad      %%xmm7, %%xmm1      \n\t"
-        "paddd      %%xmm0, %%xmm5      \n\t"
-        "add        $64, %1             \n\t"
-        "paddd      %%xmm1, %%xmm5      \n\t"
-        "add        $64, %2             \n\t"
-        "sub        $1, %%ecx           \n\t"
-        "jnz        1b                  \n\t"
-        "movdqa     %%xmm5, %0          \n\t"
-        :"=m"(out[0]),"+r"(mp), "+r"(cp)
-        :"c"(loops), "m"(overlapDividerBits)
-    );
-
-    corr = out[0] + out[1] + out[2] + out[3];
-
-    for (i = 0; i < remainder; i++)
-        corr += (mPos[i] * cPos[i]) >> overlapDividerBits;
-
-    return corr;
-}
-
-long TDStretchSSE2::calcCrossCorrStereo(const short *mPos, const short *cPos) const
-{
-    long corr = 0;
-    // Need 16-byte align for int out[4], but gcc bug #16660 prevents use of
-    //  attribute(aligned()), so align it ourselves. Fixed in gcc >4.4 r138335
-    int i, x[8]; 
-    int *out=(int *)(((uintptr_t)&x+15) & ~(uintptr_t)0xf);
-    int count = (overlapLength<<1) - 2;
-    long loops = count >> 5;
-    long remainder = count - (loops<<5);
-    const short *mp = mPos;
-    const short *cp = cPos;
-
-    mp += 2;
-    cp += 2;
-
-    __asm__ volatile (
-        "xorps      %%xmm5, %%xmm5      \n\t"
-        "movd       %4, %%xmm7          \n\t"
-        "1:                             \n\t"
-        "movupd     (%1), %%xmm0        \n\t"
-        "movupd     (%2), %%xmm1        \n\t"
-        "movupd     16(%1), %%xmm2      \n\t"
-        "pmaddwd    %%xmm0, %%xmm1      \n\t"
-        "movupd     32(%1), %%xmm4      \n\t"
-        "movupd     48(%1), %%xmm6      \n\t"
-        "psrad      %%xmm7, %%xmm1      \n\t"
-        "movupd     16(%2), %%xmm3      \n\t"
-        "paddd      %%xmm1, %%xmm5      \n\t"
-        "movupd     32(%2), %%xmm0      \n\t"
-        "pmaddwd    %%xmm2, %%xmm3      \n\t"
-        "movupd     48(%2), %%xmm1      \n\t"
-        "pmaddwd    %%xmm4, %%xmm0      \n\t"
-        "psrad      %%xmm7, %%xmm3      \n\t"
-        "pmaddwd    %%xmm6, %%xmm1      \n\t"
-        "psrad      %%xmm7, %%xmm0      \n\t"
-        "paddd      %%xmm3, %%xmm5      \n\t"
-        "psrad      %%xmm7, %%xmm1      \n\t"
-        "paddd      %%xmm0, %%xmm5      \n\t"
-        "add        $64, %1             \n\t"
-        "paddd      %%xmm1, %%xmm5      \n\t"
-        "add        $64, %2             \n\t"
-        "sub        $1, %%ecx           \n\t"
-        "jnz        1b                  \n\t"
-        "movdqa     %%xmm5, %0          \n\t"
-        :"=m"(out[0]),"+r"(mp),"+r"(cp)
-        :"c"(loops), "m"(overlapDividerBits)
-    );
-
-    corr = out[0] + out[1] + out[2] + out[3];
-
-    for (i = 0; i < remainder; i += 2)
-        corr += (mPos[i] * cPos[i] +
-                 mPos[i+1] * cPos[i+1]) >> overlapDividerBits;
-
-    return corr;
-}
-
-void TDStretchSSE2::overlapMulti(short *output, const short *input) const
-{
-
-    short *o = output;
-    const short *i = input;
-    const short *m = pMidBuffer;
-    long ch = (long)channels;
-
-    __asm__ volatile (
-        "movd       %%ecx, %%xmm0       \n\t"
-        "shl        %6                  \n\t"
-        "punpckldq  %%xmm0, %%xmm0      \n\t"
-        "movq       %2, %%xmm2          \n\t"
-        "punpckldq  %%xmm0, %%xmm0      \n\t"
-        "movq       %1, %%xmm1          \n\t"
-        "punpckldq  %%xmm2, %%xmm2      \n\t"
         "xorpd      %%xmm7, %%xmm7      \n\t"
-        "punpckldq  %%xmm1, %%xmm1      \n\t"
         "1:                             \n\t"
-        "movdqu     (%3), %%xmm3        \n\t"
-        "movdqu     (%4), %%xmm4        \n\t"
-        "movdqa     %%xmm4, %%xmm5      \n\t"
-        "punpcklwd  %%xmm3, %%xmm4      \n\t"
-        "add        %6, %3              \n\t"
-        "punpckhwd  %%xmm3, %%xmm5      \n\t"
-        "pmaddwd    %%xmm0, %%xmm4      \n\t"
-        "movdqa     %%xmm7, %%xmm3      \n\t"
-        "pcmpgtd    %%xmm4, %%xmm3      \n\t"
-        "pand       %%xmm1, %%xmm3      \n\t"
-        "add        %6, %4              \n\t"
-        "paddd      %%xmm3, %%xmm4      \n\t"
-        "pmaddwd    %%xmm0, %%xmm5      \n\t"
-        "movdqa     %%xmm7, %%xmm3      \n\t"
-        "pcmpgtd    %%xmm5, %%xmm3      \n\t"
-        "pand       %%xmm1, %%xmm3      \n\t"
-        "psrad      $9, %%xmm4          \n\t"
-        "paddd      %%xmm3, %%xmm5      \n\t"
-        "psrad      $9, %%xmm5          \n\t"
-        "packssdw   %%xmm5, %%xmm4      \n\t"
-        "paddw      %%xmm2, %%xmm0      \n\t"
-        "movdqu     %%xmm4, (%5)        \n\t"
-        "add        %6, %5              \n\t"
-        "sub        $1, %%ecx           \n\t"
+        "movups       (%1), %%xmm0      \n\t"
+        "movups     16(%1), %%xmm1      \n\t"
+        "mulps      (%2),   %%xmm0      \n\t"
+        "movups     32(%1), %%xmm2      \n\t"
+        "addps      %%xmm0, %%xmm7      \n\t"
+        "mulps      16(%2), %%xmm1      \n\t"
+        "movups     48(%1), %%xmm3      \n\t"
+        "mulps      32(%2), %%xmm2      \n\t"
+        "addps      %%xmm1, %%xmm7      \n\t"
+        "mulps      48(%2), %%xmm3      \n\t"
+        "addps      %%xmm2, %%xmm7      \n\t"
+        "add        $64,    %1          \n\t"
+        "add        $64,    %2          \n\t"
+        "addps      %%xmm3, %%xmm7      \n\t"
+        "sub        $1,     %%ecx       \n\t"
         "jnz        1b                  \n\t"
-        ::"c"(overlapLength),"m"(sadd),"m"(ones),"r"(i),"r"(m),"r"(o),"r"(ch)
-        :"memory"
+        "haddps     %%xmm7, %%xmm7      \n\t"
+        "cvtps2pd   %%xmm7, %%xmm7      \n\t"
+        "haddpd     %%xmm7, %%xmm7      \n\t"
+        "movsd      %%xmm7, %0          \n\t"
+        :"=m"(corr),"+r"(mp), "+r"(cp)
+        :"c"(loops)
+    );
+
+    for (; i < count; i++)
+        corr += *mp++ * *cp++;
+
+    return corr;
+}
+
+double TDStretchSSE2::calcCrossCorrStereo(const float *mPos, const float *cPos) const
+{
+    double corr = 0;
+    int count = overlapLength <<1;
+    int loops = count >> 4;
+    int i = loops << 4;
+    const float *mp = mPos;
+    const float *cp = cPos;
+
+    __asm__ volatile (
+        "xorpd      %%xmm7, %%xmm7      \n\t"
+        "1:                             \n\t"
+        "movups       (%1), %%xmm0      \n\t"
+        "movups     16(%1), %%xmm1      \n\t"
+        "mulps      (%2),   %%xmm0      \n\t"
+        "movups     32(%1), %%xmm2      \n\t"
+        "addps      %%xmm0, %%xmm7      \n\t"
+        "mulps      16(%2), %%xmm1      \n\t"
+        "movups     48(%1), %%xmm3      \n\t"
+        "mulps      32(%2), %%xmm2      \n\t"
+        "addps      %%xmm1, %%xmm7      \n\t"
+        "mulps      48(%2), %%xmm3      \n\t"
+        "addps      %%xmm2, %%xmm7      \n\t"
+        "add        $64,    %1          \n\t"
+        "add        $64,    %2          \n\t"
+        "addps      %%xmm3, %%xmm7      \n\t"
+        "sub        $1,     %%ecx       \n\t"
+        "jnz        1b                  \n\t"
+        "haddps     %%xmm7, %%xmm7      \n\t"
+        "cvtps2pd   %%xmm7, %%xmm7      \n\t"
+        "haddpd     %%xmm7, %%xmm7      \n\t"
+        "movsd      %%xmm7, %0          \n\t"
+        :"=m"(corr),"+r"(mp), "+r"(cp)
+        :"c"(loops)
+    );
+
+    for (; i < count; i += 2)
+        corr += (mp[i] * cp[i] + mp[i + 1] * cp[i + 1]);
+
+    return corr;
+}
+
+void TDStretchSSE2::overlapMulti(float *output, const float *input) const
+{
+
+    float *o = output;
+    const float *i = input;
+    const float *m = pMidBuffer;
+
+    if (channels > 4)
+        __asm__ volatile (
+            "cvtsi2ss   %%ecx,  %%xmm7      \n\t"
+            "shl        $2,     %4          \n\t"
+            "punpckldq  %%xmm7, %%xmm7      \n\t"
+            "xorpd      %%xmm6, %%xmm6      \n\t"
+            "punpckldq  %%xmm7, %%xmm7      \n\t"
+            "rcpps      %%xmm7, %%xmm1      \n\t"
+            "mulps      %%xmm1, %%xmm7      \n\t"
+            "1:                             \n\t"
+            "movups     (%1),   %%xmm2      \n\t"
+            "movups     16(%1), %%xmm4      \n\t"
+            "mulps      %%xmm6, %%xmm2      \n\t"
+            "movups     (%2),   %%xmm3      \n\t"
+            "movups     16(%2), %%xmm5      \n\t"
+            "mulps      %%xmm7, %%xmm3      \n\t"
+            "add        %4,     %1          \n\t"
+            "mulps      %%xmm6, %%xmm4      \n\t"
+            "addps      %%xmm2, %%xmm3      \n\t"
+            "mulps      %%xmm7, %%xmm5      \n\t"
+            "movups     %%xmm3, (%3)        \n\t"
+            "addps      %%xmm4, %%xmm5      \n\t"
+            "add        %4,     %2          \n\t"
+            "movups     %%xmm5, 16(%3)      \n\t"
+            "addps      %%xmm1, %%xmm6      \n\t"
+            "add        %4,     %3          \n\t"
+            "subps      %%xmm1, %%xmm7      \n\t"
+            "sub        $1,     %%ecx       \n\t"
+            "jnz        1b                  \n\t"
+            :
+            :"c"(overlapLength),"r"(i),"r"(m),"r"(o),"r"((long)channels)
+        );
+    else
+        __asm__ volatile (
+            "cvtsi2ss   %%ecx, %%xmm7      \n\t"
+            "shl        $2, %4              \n\t"
+            "shr        %%ecx               \n\t"
+            "punpckldq  %%xmm7, %%xmm7      \n\t"
+            "xorpd      %%xmm6, %%xmm6      \n\t"
+            "punpckldq  %%xmm7, %%xmm7      \n\t"
+            "rcpps      %%xmm7, %%xmm1      \n\t"
+            "mulps      %%xmm1, %%xmm7      \n\t"
+            "1:                             \n\t"
+            "movups     (%1),   %%xmm2      \n\t"
+            "movups     16(%1), %%xmm4      \n\t"
+            "mulps      %%xmm6, %%xmm2      \n\t"
+            "movups     (%2),   %%xmm3      \n\t"
+            "movups     16(%2), %%xmm5      \n\t"
+            "mulps      %%xmm7, %%xmm3      \n\t"
+            "addps      %%xmm1, %%xmm6      \n\t"
+            "add        %4,     %1          \n\t"
+            "addps      %%xmm2, %%xmm3      \n\t"
+            "add        %4,     %2          \n\t"
+            "subps      %%xmm1, %%xmm7      \n\t"
+            "movups     %%xmm3, (%3)        \n\t"
+            "add        %4,     %3          \n\t"
+            "mulps      %%xmm6, %%xmm4      \n\t"
+            "add        %4,     %1          \n\t"
+            "mulps      %%xmm7, %%xmm5      \n\t"
+            "addps      %%xmm1, %%xmm6      \n\t"
+            "add        %4,     %2          \n\t"
+            "addps      %%xmm4, %%xmm5      \n\t"
+            "subps      %%xmm1, %%xmm7      \n\t"
+            "movups     %%xmm5, (%3)        \n\t"
+            "add        %4,     %3          \n\t"
+            "sub        $1,     %%ecx       \n\t"
+            "jnz        1b                  \n\t"
+            :
+            :"c"(overlapLength),"r"(i),"r"(m),"r"(o),"r"((long)channels)
+        );
+}
+
+void TDStretchSSE2::overlapStereo(float *output, const float *input) const
+{
+    float *o = output;
+    const float *i = input;
+    const float *m = pMidBuffer;
+
+    __asm__ volatile (
+        "cvtsi2ss   %%ecx, %%xmm7       \n\t"
+        "shr        %%ecx               \n\t"
+        "xorpd      %%xmm6, %%xmm6      \n\t"
+        "punpckldq  %%xmm7, %%xmm7      \n\t"
+        "rcpps      %%xmm7, %%xmm1      \n\t"
+        "mulps      %%xmm1, %%xmm7      \n\t"
+        "1:                             \n\t"
+        "movups     (%1),  %%xmm2       \n\t"
+        "movups     8(%1), %%xmm4       \n\t"
+        "mulps      %%xmm6, %%xmm2      \n\t"
+        "movups     (%2),  %%xmm3       \n\t"
+        "movups     8(%2), %%xmm5       \n\t"
+        "mulps      %%xmm7, %%xmm3      \n\t"
+        "addps      %%xmm1, %%xmm6      \n\t"
+        "addps      %%xmm2, %%xmm3      \n\t"
+        "subps      %%xmm1, %%xmm7      \n\t"
+        "movlps     %%xmm3, (%3)        \n\t"
+        "add        $8,    %3           \n\t"
+        "mulps      %%xmm6, %%xmm4      \n\t"
+        "add        $16,   %1           \n\t"
+        "mulps      %%xmm7, %%xmm5      \n\t"
+        "addps      %%xmm1, %%xmm6      \n\t"
+        "add        $16,   %2           \n\t"
+        "addps      %%xmm4, %%xmm5      \n\t"
+        "subps      %%xmm1, %%xmm7      \n\t"
+        "movlps     %%xmm5, (%3)        \n\t"
+        "add        $8,    %3           \n\t"
+        "sub        $1,    %%ecx        \n\t"
+        "jnz        1b                  \n\t"
+        :
+        :"c"(overlapLength),"r"(i),"r"(m),"r"(o)
     );
 }
 
-void TDStretchSSE2::overlapStereo(short *output, const short *input) const
+FIRFilterSSE2::FIRFilterSSE2() : FIRFilter()
 {
-    short *o = output;
-    const short *i = input;
-    const short *m = pMidBuffer;
+    filterCoeffsAlign = NULL;
+    filterCoeffsUnalign = NULL;
+}
 
-    __asm__ volatile (
-        "movd       %%ecx, %%mm0        \n\t"
-        "pxor       %%mm7, %%mm7        \n\t"
-        "punpckldq  %%mm0, %%mm0        \n\t"
-        "shr        %%ecx               \n\t"
-        "movq       %%mm0, %%mm6        \n\t"
-        "movq       %2, %%mm2           \n\t"
-        "paddw      %%mm2, %%mm6        \n\t"
-        "movq       %1, %%mm1           \n\t"
-        "paddw      %%mm2, %%mm2        \n\t" 
-        "1:                             \n\t"
-        "movq       (%4), %%mm4         \n\t"
-        "movq       (%3), %%mm3         \n\t"
-        "movq       %%mm4, %%mm5        \n\t"
-        "punpcklwd  %%mm3, %%mm4        \n\t"
-        "add        $8, %3              \n\t"
-        "pmaddwd    %%mm0, %%mm4        \n\t"
-        "punpckhwd  %%mm3, %%mm5        \n\t"
-        "movq       %%mm7, %%mm3        \n\t"
-        "pcmpgtd    %%mm4, %%mm3        \n\t"
-        "pand       %%mm1, %%mm3        \n\t"
-        "pmaddwd    %%mm6, %%mm5        \n\t"
-        "paddd      %%mm3, %%mm4        \n\t"
-        "movq       %%mm7, %%mm3        \n\t"
-        "psrad      $9, %%mm4           \n\t"
-        "pcmpgtd    %%mm5, %%mm3        \n\t"
-        "pand       %%mm1, %%mm3        \n\t"
-        "paddd      %%mm3, %%mm5        \n\t"
-        "add        $8, %4              \n\t"
-        "psrad      $9, %%mm5           \n\t"
-        "paddw      %%mm2, %%mm0        \n\t"
-        "packssdw   %%mm5, %%mm4        \n\t"
-        "paddw      %%mm2, %%mm6        \n\t"
-        "movq       %%mm4, (%5)         \n\t"
-        "add        $8, %5              \n\t"
-        "sub        $1, %%ecx           \n\t"
-        "jnz        1b                  \n\t"
-        "emms                           \n\t"
-        ::"c"(overlapLength),"m"(sadd),"m"(ones),"r"(i),"r"(m),"r"(o)
-        :"memory"
-    );
+FIRFilterSSE2::~FIRFilterSSE2()
+{
+    delete[] filterCoeffsUnalign;
+    filterCoeffsAlign = NULL;
+    filterCoeffsUnalign = NULL;
+}
+
+
+void FIRFilterSSE2::setCoefficients(const float *coeffs, uint newLen, uint uRDF)
+{
+    uint i;
+    FIRFilter::setCoefficients(coeffs, newLen, uRDF);
+
+    // Ensure that filter coeffs array is aligned to 16-byte boundary
+    delete[] filterCoeffsUnalign;
+    filterCoeffsUnalign = new float[2 * newLen + 16];
+    filterCoeffsAlign = (float *)(((ulong)filterCoeffsUnalign + 15) & -16);
+
+    float fdiv = (float)resultDivider;
+
+    for (i = 0; i < newLen; i++)
+    {
+        filterCoeffsAlign[2 * i + 0] =
+        filterCoeffsAlign[2 * i + 1] = coeffs[i + 0] / fdiv;
+    }
+}
+
+uint FIRFilterSSE2::evaluateFilterStereo(float *dest, const float *src, const uint numSamples) const
+{
+    uint count = (numSamples - length) & -2;
+
+    for (int i = 0; i < count; i += 2)
+    {
+        __asm__ volatile(
+            "xorpd      %%xmm6, %%xmm6          \n\t"
+            "xorpd      %%xmm7, %%xmm7          \n\t"
+            "1:                                 \n\t"
+            "movups     (%1),   %%xmm1          \n\t"
+            "movups     8(%1),  %%xmm2          \n\t"
+            "mulps      (%2),   %%xmm1          \n\t"
+            "movups     16(%1), %%xmm3          \n\t"
+            "mulps      (%2),   %%xmm2          \n\t"
+            "addps      %%xmm1, %%xmm6          \n\t"
+            "movups     24(%1), %%xmm4          \n\t"
+            "addps      %%xmm2, %%xmm7          \n\t"
+            "mulps      16(%2), %%xmm3          \n\t"
+            "movups     32(%1), %%xmm1          \n\t"
+            "mulps      16(%2), %%xmm4          \n\t"
+            "addps      %%xmm3, %%xmm6          \n\t"
+            "movups     40(%1), %%xmm2          \n\t"
+            "addps      %%xmm4, %%xmm7          \n\t"
+            "mulps      32(%2), %%xmm1          \n\t"
+            "movups     48(%1), %%xmm3          \n\t"
+            "mulps      32(%2), %%xmm2          \n\t"
+            "addps      %%xmm1, %%xmm6          \n\t"
+            "movups     56(%1), %%xmm4          \n\t"
+            "addps      %%xmm2, %%xmm7          \n\t"
+            "mulps      48(%2), %%xmm3          \n\t"
+            "add        $64,    %1              \n\t"
+            "mulps      48(%2), %%xmm4          \n\t"
+            "addps      %%xmm3, %%xmm6          \n\t"
+            "add        $64,    %2              \n\t"
+            "addps      %%xmm4, %%xmm7          \n\t"
+            "sub        $1,     %%ecx           \n\t"
+            "jnz        1b                      \n\t"
+            "movhlps    %%xmm6, %%xmm0          \n\t"
+            "movlhps    %%xmm7, %%xmm0          \n\t"
+            "shufps     $0xe4,  %%xmm7, %%xmm6  \n\t"
+            "addps      %%xmm0, %%xmm6          \n\t"
+            "movups     %%xmm6, (%0)            \n\t"
+            :
+            :"r"(dest),"r"(src),"r"(filterCoeffsAlign),"c"(length>>3)
+        );
+        src  += 4;
+        dest += 4;
+    }
+
+    return count;
 }

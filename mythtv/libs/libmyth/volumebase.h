@@ -13,7 +13,7 @@ typedef enum {
 class MPUBLIC VolumeBase
 {
   public:
-    VolumeBase();    
+    VolumeBase();
     virtual ~VolumeBase() {};
 
     void SWVolume(bool set);
@@ -37,15 +37,16 @@ class MPUBLIC VolumeBase
 
     void UpdateVolume(void);
     void SyncVolume(void);
-
+    void SetChannels(int new_channels);
     bool internal_vol;
 
  private:
-    
+
     int volume;
     MuteState current_mute_state;
     bool swvol;
     bool swvol_setting;
+    int channels;
 
 };
 

@@ -16,8 +16,14 @@ using namespace std;
 
 // MythTV headers
 #include "audiooutput.h"
+#include "audiooutputsettings.h"
 #include "samplerate.h"
 #include "mythverbose.h"
+
+#define VBAUDIO(str)   VERBOSE(VB_AUDIO, LOC + str)
+#define VBAUDIOTS(str) VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + str)
+#define VBGENERAL(str) VERBOSE(VB_GENERAL, LOC + str)
+#define VBERROR(str)   VERBOSE(VB_IMPORTANT, LOC_ERR + str)
 
 namespace soundtouch {
 class SoundTouch;
@@ -35,14 +41,14 @@ class AudioOutputBase : public AudioOutput, public QThread
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings);
 
-    // do AddSamples calls block?
-    virtual void SetBlocking(bool blocking);
-
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate);
 
+    // timestretch
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const;
+
+    virtual bool CanPassthrough(void) const;
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
@@ -51,12 +57,12 @@ class AudioOutputBase : public AudioOutput, public QThread
     int GetSWVolume(void);
 
     // timecode is in milliseconds.
-    virtual bool AddSamples(char *buffer, int samples, long long timecode);
-    virtual bool AddSamples(char *buffers[], int samples, long long timecode);
+    virtual bool AddSamples(void *buffer, int frames, long long timecode);
 
     virtual void SetTimecode(long long timecode);
-    virtual bool IsPaused(void) const { return audio_actually_paused; }
+    virtual bool IsPaused(void) const { return actually_paused; }
     virtual void Pause(bool paused);
+    void PauseUntilBuffered(void);
 
     // Wait for all data to finish playing
     virtual void Drain(void);
@@ -72,13 +78,11 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void GetBufferStatus(uint &fill, uint &total);
 
     //  Only really used by the AudioOutputNULL object
-
     virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
     virtual int readOutputData(unsigned char *read_buffer, int max_length);
 
-    static const uint kAudioSourceInputSize  = 16384;
-    static const uint kAudioSourceOutputSize = (16384*6);
-    static const uint kAudioTempBufSize      = (16384*6);
+    static const uint kAudioSRCInputSize  = 16384<<1;
+    static const uint kAudioSRCOutputSize = 16384<<3;
     /// Audio Buffer Size -- should be divisible by 12,10,8,6,4,2..
     static const uint kAudioRingBufferSize   = 1536000;
 
@@ -86,11 +90,11 @@ class AudioOutputBase : public AudioOutput, public QThread
     // You need to implement the following functions
     virtual bool OpenDevice(void) = 0;
     virtual void CloseDevice(void) = 0;
-    virtual void WriteAudio(unsigned char *aubuf, int size) = 0;
-    virtual int  GetSpaceOnSoundcard(void) const = 0;
+    virtual void WriteAudio(uchar *aubuf, int size) = 0;
     virtual int  GetBufferedOnSoundcard(void) const = 0;
-    virtual vector<int> GetSupportedRates(void) 
-        { vector<int> rates; return rates; }
+    // Default implementation only supports 2ch s16le at 48kHz
+    virtual AudioOutputSettings* GetOutputSettings(void)
+        { return new AudioOutputSettings; }
     /// You need to call this from any implementation in the dtor.
     void KillAudio(void);
 
@@ -98,138 +102,116 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
-    int GetAudioData(unsigned char *buffer, int buf_size, bool fill_buffer);
-
-    void _AddSamples(void *buffer, bool interleaved, int samples, long long timecode);
+    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer);
 
     void OutputAudioLoop(void);
 
     virtual void run();
-    //static void *kickoffOutputAudioLoop(void *player);
 
-    void SetAudiotime(void);
-    int WaitForFreeSpace(int len);
+    int CheckFreeSpace(int &frames);
 
-    int audiolen(bool use_lock); // number of valid bytes in audio buffer
-    int audiofree(bool use_lock); // number of free bytes in audio buffer
-
-    void UpdateVolume(void);
+    inline int audiolen(); // number of valid bytes in audio buffer
+    int audiofree();       // number of free bytes in audio buffer
+    int audioready();      // number of bytes ready to be written
 
     void SetStretchFactorLocked(float factor);
 
-    int GetBaseAudioTime()                    const { return audiotime;       }
-    int GetBaseAudBufTimeCode()               const { return audbuf_timecode; }
-    soundtouch::SoundTouch *GetSoundStretch() const { return pSoundStretch;   }
-    void SetBaseAudioTime(const int inAudioTime) { audiotime = inAudioTime; }
+    // For audiooutputca
+    int GetBaseAudBufTimeCode() const { return audbuf_timecode; }
 
   protected:
-    int effdsp; // from the recorded stream
-    int effdspstretched; // from the recorded stream
 
     // Basic details about the audio stream
-    int audio_channels;
-    int audio_codec;
-    int audio_bytes_per_sample;
-    int audio_bits;
-    int audio_samplerate;
-    mutable int audio_buffer_unused; ///< set on error conditions
+    int channels;
+    int codec;
+    int bytes_per_frame;
+    int output_bytes_per_frame;
+    AudioFormat format;
+    AudioFormat output_format;
+    int samplerate;
+    int effdsp; // from the recorded stream (NuppelVideo)
     int fragment_size;
     long soundcard_buffer_size;
-    QString audio_main_device;
-    QString audio_passthru_device;
 
-    bool audio_passthru;
-    bool audio_enc;
-    bool audio_reenc;
+    QString main_device, passthru_device;
 
-    float audio_stretchfactor;
+    bool passthru, enc, reenc;
+
+    float stretchfactor;
     AudioOutputSource source;
 
     bool killaudio;
 
-    bool pauseaudio, audio_actually_paused, was_paused;
+    bool pauseaudio, actually_paused, was_paused, unpause_when_ready;
     bool set_initial_vol;
     bool buffer_output_data_for_use; //  used by AudioOutputNULL
 
-    int configured_audio_channels;
-    int orig_config_channels;
+    int configured_channels;
+    int max_channels;
     int src_quality;
+    bool allow_multipcm;
 
  private:
-    // software volume
-    template <class AudioDataType>
-    void _AdjustVolume(AudioDataType *buffer, int len, bool music);
-    void AdjustVolume(void *buffer, int len, bool music);
-
-    // resampler
+    int CopyWithUpmix(char *buffer, int frames, int &org_waud);
+    AudioOutputSettings *output_settings;
     bool need_resampler;
     SRC_STATE *src_ctx;
-
-    // timestretch
     soundtouch::SoundTouch    *pSoundStretch;
     AudioOutputDigitalEncoder *encoder;
     FreeSurround              *upmixer;
 
-    void *MonoToStereo(void *s1, void *s2, int samples);
-    template <class AudioDataType>
-        void *_MonoToStereo(AudioDataType *s1, AudioDataType *s2, int samples);
-
-    int source_audio_channels;
-    int source_audio_samplerate;
-    int source_audio_bytes_per_sample;
+    int source_channels;
+    int source_samplerate;
+    int source_bytes_per_frame;
     bool needs_upmix;
+    bool needs_downmix;
     int surround_mode;
     bool allow_ac3_passthru;
-    float old_audio_stretchfactor;
+    float old_stretchfactor;
     int volume;
+    QString volumeControl;
 
-    bool blocking; // do AddSamples calls block?
+    bool pulsewassuspended;
 
-    int lastaudiolen;
-    long long samples_buffered;
+    bool processing;
+
+    long long frames_buffered;
 
     bool audio_thread_exists;
 
-    /** adjustments to audiotimecode, waud, and raud can only be made
-        while holding this lock */
+    /* Writes to the audiobuffer, reconfigures and audiobuffer resets can only
+       take place while holding this lock */
     QMutex audio_buflock;
-
-    /** condition is signaled when the buffer gets more free space.
-        Must be holding audio_buflock to use. */
-    QWaitCondition audio_bufsig;
 
     /** must hold avsync_lock to read or write 'audiotime' and
         'audiotime_updated' */
     QMutex avsync_lock;
 
-    /// timecode of audio leaving the soundcard (same units as timecodes)
+    // timecode of audio leaving the soundcard (same units as timecodes)
     long long audiotime;
-    struct timeval audiotime_updated; // ... which was last updated at this time
 
     /* Audio circular buffer */
     int raud, waud;     /* read and write positions */
-    /// timecode of audio most recently placed into buffer
+    // timecode of audio most recently placed into buffer
     long long audbuf_timecode;
-
-    int numlowbuffer;
 
     QMutex killAudioLock;
 
     long current_seconds;
     long source_bitrate;
 
+    float *src_in;
+
     // All actual buffers
     SRC_DATA src_data;
     uint memory_corruption_test0;
-    float src_in[kAudioSourceInputSize];
+    float src_in_buf[kAudioSRCInputSize + 16];
     uint memory_corruption_test1;
-    float src_out[kAudioSourceOutputSize];
+    float src_out[kAudioSRCOutputSize];
     uint memory_corruption_test2;
-    short tmp_buff[kAudioTempBufSize];
-    uint memory_corruption_test3;
     /** main audio buffer */
-    unsigned char audiobuffer[kAudioRingBufferSize];
-    uint memory_corruption_test4;
+    uchar audiobuffer[kAudioRingBufferSize];
+    uint memory_corruption_test3;
 };
 
 #endif

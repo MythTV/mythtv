@@ -34,23 +34,19 @@ public:
     FreeSurround(uint srate, bool moviemode, SurroundMode mode);
     ~FreeSurround();
 
-    // put samples in buffer, returns number of samples used
-    uint putSamples(short* samples, uint numSamples, uint numChannels, int step);
-    uint putSamples(char* samples, uint numSamples, uint numChannels, int step);
-    // get a number of samples
-    uint receiveSamples(short *output, 
-                        uint maxSamples
-                        );
+    // put frames in buffer, returns number of frames used
+    uint putFrames(void* buffer, uint numFrames, uint numChannels);
+    // get a number of frames
+    uint receiveFrames(void *buffer, uint maxFrames);
     // flush unprocessed samples
     void flush();
-    //void setSampleRate(uint srate);
-    uint numUnprocessedSamples();
-    uint numSamples();
+    uint numUnprocessedFrames();
+    uint numFrames();
 
     long long getLatency();
-    uint sampleLatency();
+    uint frameLatency();
 
-    uint samplesPerBlock();
+    uint framesPerBlock();
 
 protected:
     void process_block();
@@ -60,35 +56,33 @@ protected:
 
 private:
 
-	// the changeable parameters
+    // the changeable parameters
     struct fsurround_params {
-        int32_t center_width;	    // presence of the center channel
-        int32_t dimension;		    // dimension
-        float coeff_a,coeff_b;  // surround mixing coefficients
-        int32_t phasemode;			// phase shifting mode
-        int32_t steering;			// steering mode (0=simple, 1=linear)
-        int32_t front_sep, rear_sep;// front/rear stereo separation
-        float gain;                 ///< total gain
-
+        int32_t center_width;           // presence of the center channel
+        int32_t dimension;              // dimension
+        float coeff_a,coeff_b;          // surround mixing coefficients
+        int32_t phasemode;              // phase shifting mode
+        int32_t steering;               // steering mode (0=simple, 1=linear)
+        int32_t front_sep, rear_sep;    // front/rear stereo separation
+        float gain;                     // total gain
         // (default) constructor
         fsurround_params(int32_t center_width=100, int32_t dimension=0);
     } params;
 
-	// additional settings
-	uint srate;
+    // additional settings
+    uint srate;
 
-	// info about the current setup
-	bool open_;					// whether a stream is currently open
-	bool initialized_;			// whether the thing is intialized	
-	//struct buffers *bufs;				// our buffers
-	struct int16buffers *int16bufs;		// our buffers
-	class fsurround_decoder *decoder;	// the surround decoder
-    int in_count;               // amount in lt,rt
-    int out_count;              // amount in output bufs
-    bool processed;             // whether processing is enabled or not for latency calc
-    int processed_size;         // amount processed
-    SurroundMode surround_mode; // 1 of 3 surround modes supported
-
+    // info about the current setup
+    bool open_;                         // whether a stream is currently open
+    bool initialized_;                  // whether the thing is intialized	
+    struct buffers *bufs;               // our buffers
+    struct int16buffers *int16bufs;     // our buffers
+    class fsurround_decoder *decoder;   // the surround decoder
+    int in_count;                       // amount in lt,rt
+    int out_count;                      // amount in output bufs
+    bool processed;             // whether processing is enabled for latency calc
+    int processed_size;                 // amount processed
+    SurroundMode surround_mode;         // 1 of 3 surround modes supported
 };
 
 #endif

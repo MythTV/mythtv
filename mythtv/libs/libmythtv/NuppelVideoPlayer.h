@@ -5,6 +5,7 @@
 
 #include "playercontext.h"
 #include "volumebase.h"
+#include "audiooutputsettings.h"
 #include "RingBuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
@@ -110,7 +111,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
     void SetAudioOutput(AudioOutput *ao)      { audioOutput = ao; }
     void SetAudioInfo(const QString &main, const QString &passthru, uint rate);
-    void SetAudioParams(int bits, int channels, int codec, int samplerate, bool passthru);
+    void SetAudioParams(AudioFormat format, int channels, int codec, int samplerate, bool passthru);
     void SetEffDsp(int dsprate);
     uint AdjustVolume(int change);
     bool SetMuted(bool mute);
@@ -241,6 +242,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
     bool IsPaused(bool *is_pause_still_possible = NULL);
+    bool IsAudioPaused() { return audio_paused; }
+    void PauseAudioUntilBuffered(void);
+    void ResetAudio(void);
 
     // Seek stuff
     bool FastForward(float seconds);
@@ -298,8 +302,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Add data
     void AddAudioData(char *buffer, int len, long long timecode);
-    void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
-                      long long timecode);
     void AddTextData(unsigned char *buffer, int len,
                      long long timecode, char type);
     void AddAVSubtitle(const AVSubtitle& subtitle);
@@ -710,16 +712,16 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Audio stuff
     AudioOutput *audioOutput;
-    QString  audio_main_device;
-    QString  audio_passthru_device;
-    int      audio_channels;
-    int      audio_codec;
-    int      audio_bits;
-    int      audio_samplerate;
-    float    audio_stretchfactor;
-    bool     audio_passthru;
-    QMutex   audio_lock;
-    bool     audio_muted_on_creation;
+    QString      audio_main_device;
+    QString      audio_passthru_device;
+    int          audio_channels;
+    int          audio_codec;
+    AudioFormat  audio_format;
+    int          audio_samplerate;
+    float        audio_stretchfactor;
+    bool         audio_passthru;
+    QMutex       audio_lock;
+    bool         audio_muted_on_creation;
 
     // Picture-in-Picture
     mutable QMutex pip_players_lock;

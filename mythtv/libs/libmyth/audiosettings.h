@@ -11,6 +11,7 @@
 #include <QString>
 
 #include "mythexp.h"
+#include "audiooutputsettings.h"
 
 typedef enum {
     AUDIOOUTPUT_UNKNOWN,
@@ -25,23 +26,23 @@ class MPUBLIC AudioSettings
     AudioSettings();
     AudioSettings(const AudioSettings &other);
     AudioSettings(
-        const QString    &audio_main_device,
-        const QString    &audio_passthru_device,
-        int               audio_bits,
-        int               audio_channels,
-        int               audio_codec,
-        int               audio_samplerate,
-        AudioOutputSource audio_source,
-        bool              audio_set_initial_vol,
-        bool              audio_use_passthru,
+        const QString    &main_device,
+        const QString    &passthru_device,
+        AudioFormat       format,
+        int               channels,
+        int               codec,
+        int               samplerate,
+        AudioOutputSource source,
+        bool              set_initial_vol,
+        bool              use_passthru,
         int               upmixer_startup = 0);
 
-    AudioSettings(int   audio_bits, 
-                  int   audio_channels, 
-                  int   audio_codec,
-                  int   audio_samplerate,
-                  bool  audio_use_passthru,
-                  int   upmixer_startup = 0);
+    AudioSettings(AudioFormat format,
+                  int         channels,
+                  int         codec,
+                  int         samplerate,
+                  bool        use_passthru,
+                  int         upmixer_startup = 0);
 
     void FixPassThrough(void);
     void TrimDeviceType(void);
@@ -50,18 +51,18 @@ class MPUBLIC AudioSettings
     QString GetPassthruDevice(void) const;
 
   private:
-    QString main_device;
-    QString passthru_device;
+    QString           main_device;
+    QString           passthru_device;
 
   public:
-    int     bits;
-    int     channels;
-    int     codec;
-    int     samplerate;
-    bool    set_initial_vol;
-    bool    use_passthru;
+    AudioFormat       format;
+    int               channels;
+    int               codec;
+    int               samplerate;
+    bool              set_initial_vol;
+    bool              use_passthru;
     AudioOutputSource source;
-    int     upmixer;
+    int               upmixer;
 };
 
 #endif // _AUDIO_SETTINGS_H_

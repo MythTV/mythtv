@@ -25,7 +25,7 @@ QEvent::Type DecoderEvent::Error =
     (QEvent::Type) QEvent::registerEventType();
 
 Decoder::Decoder(DecoderFactory *d, QIODevice *i, AudioOutput *o)
-       : fctry(d), in(i), out(o), blksize(0)
+       : fctry(d), in(i), out(o)
 {
 }
 
@@ -34,7 +34,6 @@ Decoder::~Decoder()
     fctry = 0;
     in = 0;
     out = 0;
-    blksize = 0;
 }
 
 void Decoder::setInput(QIODevice *i)

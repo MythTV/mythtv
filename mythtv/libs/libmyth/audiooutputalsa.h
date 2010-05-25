@@ -58,29 +58,26 @@ class AudioOutputALSA : public AudioOutputBase
     // Volume control
     virtual int GetVolumeChannel(int channel) const; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
+    static QMap<QString, QString> *GetALSADevices(const char *type);
 
-    
   protected:
     // You need to implement the following functions
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetSpaceOnSoundcard(void) const;
+    virtual void WriteAudio(uchar *aubuf, int size);
     virtual int  GetBufferedOnSoundcard(void) const;
-    vector<int> GetSupportedRates(void);
+    AudioOutputSettings* GetOutputSettings(void);
 
   private:
-    void SetIECStatus(bool audio);
-    inline int SetParameters(snd_pcm_t *handle,
-                             snd_pcm_format_t format, unsigned int channels,
-                             unsigned int rate, unsigned int buffer_time,
-                             unsigned int period_time);
-
-    void ReorderSmpteToAlsa6ch(void *buf, int frames);
-    template <class AudioDataType>
-        void _ReorderSmpteToAlsa6ch(AudioDataType *buf, int frames);
+    int GetPCMInfo(int &card, int &device, int &subdevice);
+    int SetIECStatus(bool audio);
+    bool SetPreallocBufferSize(int size);
+    bool IncPreallocBufferSize(int buffer_time);
+    inline int SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
+                             uint channels, uint rate, uint buffer_time,
+                             uint period_time);
     // Volume related
-    void SetCurrentVolume(QString control, int channel, int volume);
+    void SetCurrentVolume(QString control, uint channel, uint volume);
     void OpenMixer(bool setstartingvolume);
     void CloseMixer(void);
     void SetupMixer(void);
@@ -89,14 +86,13 @@ class AudioOutputALSA : public AudioOutputBase
   private:
     snd_pcm_t   *pcm_handle;
     int          numbadioctls;
+    int          pbufsize;
+    int          m_card, m_device, m_subdevice;
     QMutex       killAudioLock;
     snd_mixer_t *mixer_handle;
     QString      mixer_control; // e.g. "PCM"
-    snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*, 
+    snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*,
                                         snd_pcm_uframes_t);
 };
-
-MPUBLIC QMap<QString, QString> GetALSADevices(const char *type);
-
 #endif
 

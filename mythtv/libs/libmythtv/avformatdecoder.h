@@ -7,6 +7,7 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
+#include "audiooutputsettings.h"
 #include "vbilut.h"
 #include "H264Parser.h"
 #include "videodisplayprofile.h"
@@ -37,36 +38,33 @@ class AudioInfo
 {
   public:
     AudioInfo() :
-        codec_id(CODEC_ID_NONE), sample_size(-2),   sample_rate(-1),
-        channels(-1), do_passthru(false)
+        codec_id(CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
+        sample_rate(-1), channels(-1), do_passthru(false)
     {;}
 
-    AudioInfo(CodecID id, int sr, int ch, bool passthru) :
-        codec_id(id), sample_size(ch*2),   sample_rate(sr),
-        channels(ch), do_passthru(passthru)
-    {;}
+    AudioInfo(CodecID id, AudioFormat fmt, int sr, int ch, bool passthru) :
+        codec_id(id), format(fmt),
+        sample_size(ch * AudioOutputSettings::SampleSize(fmt)),
+        sample_rate(sr), channels(ch), do_passthru(passthru)
+    {
+    }
 
     CodecID codec_id;
+    AudioFormat format;
     int sample_size, sample_rate, channels;
     bool do_passthru;
 
-    /// \brief Bits per sample.
-    int bps(void) const
-    {
-        uint chan = (channels) ? channels : 2;
-        return (8 * sample_size) / chan;
-    }
     bool operator==(const AudioInfo &o) const
     {
         return (codec_id==o.codec_id        && channels==o.channels       &&
                 sample_size==o.sample_size  && sample_rate==o.sample_rate &&
-                do_passthru==o.do_passthru);
+                format==o.format            && do_passthru==o.do_passthru);
     }
     QString toString() const
     {
-        return QString("id(%1) %2Hz %3ch %4bps%5")
-            .arg(codec_id_string(codec_id),4).arg(sample_rate,5)
-            .arg(channels,2).arg(bps(),3)
+        return QString("id(%1) %2Hz %3ch %4bps %5")
+            .arg(codec_id_string(codec_id),4).arg(sample_rate,6)
+            .arg(channels,2).arg(AudioOutputSettings::FormatToBits(format),2)
             .arg((do_passthru) ? "pt":"",3);
     }
 };
@@ -208,6 +206,7 @@ class AvFormatDecoder : public DecoderBase
 
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
+    static inline bool DecoderWillDownmix(const AVCodecContext *ctx);
     bool DoPassThrough(const AVCodecContext *ctx);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);
@@ -299,10 +298,6 @@ class AvFormatDecoder : public DecoderBase
 
     // Audio
     short int        *audioSamples;
-    short int        *audioSamplesResampled;
-    AVAudioConvert   *reformat_ctx;
-    enum SampleFormat audio_src_fmt;
-
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
     bool              internal_vol;

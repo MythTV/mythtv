@@ -171,7 +171,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       audio_main_device(QString::null),
       audio_passthru_device(QString::null),
       audio_channels(2),            audio_codec(0),
-      audio_bits(-1),               audio_samplerate(44100),
+      audio_format(FORMAT_NONE),    audio_samplerate(44100),
       audio_stretchfactor(1.0f),    audio_lock(QMutex::Recursive),
       audio_muted_on_creation(muted),
       // Picture-in-Picture stuff
@@ -540,6 +540,25 @@ bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible)
             IsVideoActuallyPaused());
 }
 
+void NuppelVideoPlayer::PauseAudioUntilBuffered()
+{
+    audio_lock.lock();
+    if (audioOutput)
+    {
+        audio_paused = true;
+        audioOutput->PauseUntilBuffered();
+    }
+    audio_lock.unlock();
+}
+
+void NuppelVideoPlayer::ResetAudio()
+{
+    audio_lock.lock();
+    if (audioOutput)
+        audioOutput->Reset();
+    audio_lock.unlock();
+}
+
 void NuppelVideoPlayer::PauseVideo(bool wait)
 {
     QMutexLocker locker(&pauseUnpauseLock);
@@ -842,11 +861,12 @@ QString NuppelVideoPlayer::ReinitAudio(void)
     QMutexLocker lock(&audio_lock);
     QString errMsg = QString::null;
 
-    if ((audio_bits <= 0) || (audio_channels <= 0) || (audio_samplerate <= 0))
+    if (audio_format == FORMAT_NONE || audio_channels <= 0 ||
+        audio_samplerate <= 0)
     {
         VERBOSE(VB_IMPORTANT, LOC +
                 QString("Disabling Audio, params(%1,%2,%3)")
-                .arg(audio_bits).arg(audio_channels).arg(audio_samplerate));
+                .arg(audio_format).arg(audio_channels).arg(audio_samplerate));
 
         no_audio_in = no_audio_out = true;
         if (audioOutput)
@@ -864,7 +884,7 @@ QString NuppelVideoPlayer::ReinitAudio(void)
         bool setVolume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audio_main_device,
                                              audio_passthru_device,
-                                             audio_bits, audio_channels,
+                                             audio_format, audio_channels,
                                              audio_codec, audio_samplerate,
                                              AUDIOOUTPUT_VIDEO,
                                              setVolume, audio_passthru);
@@ -898,7 +918,7 @@ QString NuppelVideoPlayer::ReinitAudio(void)
 
     if (audioOutput)
     {
-        const AudioSettings settings(audio_bits, audio_channels, audio_codec,
+        const AudioSettings settings(audio_format, audio_channels, audio_codec,
                                      audio_samplerate, audio_passthru);
         audioOutput->Reconfigure(settings);
         if (audio_passthru)
@@ -1254,7 +1274,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         return -1;
     }
 
-    if (audio_bits == -1)
+    if (audio_format == FORMAT_NONE)
         no_audio_in = no_audio_out = true;
 
     if (ret > 0)
@@ -3816,10 +3836,10 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     return !IsErrored();
 }
 
-void NuppelVideoPlayer::SetAudioParams(int bps, int channels, int codec,
-                                       int samplerate, bool passthru)
+void NuppelVideoPlayer::SetAudioParams(AudioFormat format, int channels,
+                                       int codec, int samplerate, bool passthru)
 {
-    audio_bits = bps;
+    audio_format = format;
     audio_channels = channels;
     audio_codec = codec;
     audio_samplerate = samplerate;
@@ -4029,7 +4049,9 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
     if (!player_ctx->buffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
-    int samplesize = (audio_channels * audio_bits) / 8; // bytes per sample
+    int samplesize = audio_channels *
+                     AudioOutputSettings::SampleSize(audio_format);
+
     if ((samplesize <= 0) || !audioOutput)
         return;
 
@@ -4043,32 +4065,6 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 
     if (!audioOutput->AddSamples(buffer, samples, timecode))
         VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p1: "
-                "Audio buffer overflow, audio data lost!");
-    return;
-}
-
-/** \fn NuppelVideoPlayer::AddAudioData(short int*,short int*,int,long long)
- *  \brief Sends audio to AudioOuput::AddSamples(char *buffers[],int,long long)
- *
- *   This uses point sampling filter to resample audio if we are
- *   using video as the timebase rather than the audio as the
- *   timebase. This causes ringing artifacts, but hopefully not
- *   too much of it.
- */
-void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
-                                     int samples, long long timecode)
-{
-    char *buffers[2];
-
-    WrapTimecode(timecode, TC_AUDIO);
-
-    if (!audioOutput)
-        return;
-
-    buffers[0] = (char*) lbuffer;
-    buffers[1] = (char*) rbuffer;
-    if (!audioOutput->AddSamples(buffers, samples, timecode))
-        VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p2: "
                 "Audio buffer overflow, audio data lost!");
     return;
 }
@@ -4703,10 +4699,7 @@ void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
     }
 
     SetPrebuffering(true);
-    audio_lock.lock();
-    if (audioOutput)
-        audioOutput->Reset();
-    audio_lock.unlock();
+    ResetAudio();
 
     if (osd)
     {

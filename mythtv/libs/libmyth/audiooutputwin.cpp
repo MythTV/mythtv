@@ -8,41 +8,42 @@ using namespace std;
 #include <windows.h>
 #include <mmsystem.h>
 
+#define LOC QString("AOWin: ")
+#define LOC_ERR QString("AOWin, error: ")
+
 #ifndef WAVE_FORMAT_IEEE_FLOAT
-#   define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
 #endif
 
 #ifndef WAVE_FORMAT_DOLBY_AC3_SPDIF
-#   define WAVE_FORMAT_DOLBY_AC3_SPDIF 0x0092
+#define WAVE_FORMAT_DOLBY_AC3_SPDIF 0x0092
 #endif
 
 #ifndef WAVE_FORMAT_EXTENSIBLE
-#define  WAVE_FORMAT_EXTENSIBLE   0xFFFE
+#define WAVE_FORMAT_EXTENSIBLE 0xFFFE
 #endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_
 typedef struct {
     WAVEFORMATEX    Format;
     union {
-        WORD wValidBitsPerSample;       /* bits of precision  */
-        WORD wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
-        WORD wReserved;                 /* If neither applies, set to zero. */
+        WORD wValidBitsPerSample;       // bits of precision
+        WORD wSamplesPerBlock;          // valid if wBitsPerSample==0
+        WORD wReserved;                 // If neither applies, set to zero
     } Samples;
-    DWORD           dwChannelMask;      /* which channels are */
-                                        /* present in stream  */
+    DWORD           dwChannelMask;      // which channels are present in stream
     GUID            SubFormat;
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif
 
-DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000,
-            0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80,
-            0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
-            0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+const uint AudioOutputWin::kPacketCnt = 4;
 
-// even number, 42 ~= 1.008 sec @ 48000 with 1152 samples per packet
-const uint AudioOutputWin::kPacketCnt = 16;
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT,
+            0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM,
+            0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
+            0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
 class AudioOutputWinPrivate
 {
@@ -79,9 +80,8 @@ class AudioOutputWinPrivate
         }
     }
 
-    static void CALLBACK waveOutProc(
-        HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1,
-        DWORD dwParam2);
+    static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
+                                     DWORD dwParam1, DWORD dwParam2);
 
   public:
     HWAVEOUT  m_hWaveOut;
@@ -89,17 +89,18 @@ class AudioOutputWinPrivate
     HANDLE    m_hEvent;
 };
 
-void CALLBACK AudioOutputWinPrivate::waveOutProc(
-    HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
+                                                 DWORD dwInstance,
+                                                 DWORD dwParam1, DWORD dwParam2)
 {
-    if (uMsg == WOM_DONE)
+    if (uMsg != WOM_DONE)
+        return;
+
+    InterlockedDecrement(&((AudioOutputWin*)dwInstance)->m_nPkts);
+    if (((AudioOutputWin*)dwInstance)->m_nPkts <
+        (int)AudioOutputWin::kPacketCnt)
     {
-        InterlockedDecrement(&((AudioOutputWin*)dwInstance)->m_nPkts);
-        if (((AudioOutputWin*)dwInstance)->m_nPkts <
-            (int)AudioOutputWin::kPacketCnt)
-        {
-            SetEvent(((AudioOutputWin*)dwInstance)->m_priv->m_hEvent);
-        }
+        SetEvent(((AudioOutputWin*)dwInstance)->m_priv->m_hEvent);
     }
 }
 
@@ -112,7 +113,6 @@ AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
     m_UseSPDIF(settings.use_passthru)
 {
     Reconfigure(settings);
-
     m_OutPkts = (unsigned char**) calloc(kPacketCnt, sizeof(unsigned char*));
 }
 
@@ -129,74 +129,93 @@ AudioOutputWin::~AudioOutputWin()
     if (m_OutPkts)
     {
         for (uint i = 0; i < kPacketCnt; i++)
-        {
             if (m_OutPkts[i])
                 free(m_OutPkts[i]);
-        }
+
         free(m_OutPkts);
         m_OutPkts = NULL;
     }
 }
 
-vector<int> AudioOutputWin::GetSupportedRates(void)
+AudioOutputSettings* AudioOutputWin::GetOutputSettings(void)
 {
-    // We use WAVE_MAPPER to find a compatible device,
-    // so just return a set of standard rates
-    const int srates[] = { 11025, 22050, 44100, 48000 };
-    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
-    if (audio_passthru || audio_enc)
-    {
-        rates.clear();
-        rates.push_back(48000);
-    }
-    return rates;
+    AudioOutputSettings *settings = new AudioOutputSettings();
+
+    // We use WAVE_MAPPER to find a compatible device, so just claim support
+    // for all of the standard rates
+    while (DWORD rate = (DWORD)settings->GetNextRate())
+        settings->AddSupportedRate(rate);
+
+    // Support all standard formats
+    settings->AddSupportedFormat(FORMAT_U8);
+    settings->AddSupportedFormat(FORMAT_S16);
+    settings->AddSupportedFormat(FORMAT_S24);
+    settings->AddSupportedFormat(FORMAT_S32);
+    settings->AddSupportedFormat(FORMAT_FLT);
+
+    // Guess that we can do up to 5.1
+    for (uint i = 2; i < 7; i++)
+        settings->AddSupportedChannels(i);
+
+    return settings;
 }
 
 bool AudioOutputWin::OpenDevice(void)
 {
     CloseDevice();
-    // Set everything up
-    SetBlocking(true);
-    fragment_size = (AUDIOOUTPUT_TELEPHONY == source) ? 320 : 6144;
+    // fragments are 50ms worth of samples
+    fragment_size = 50 * output_bytes_per_frame * samplerate / 1000;
+    // DirectSound buffer holds 4 fragments = 200ms worth of samples
     soundcard_buffer_size = kPacketCnt * fragment_size;
-    m_UseSPDIF = audio_passthru || audio_enc;
+
+    VBAUDIO(QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
+            .arg(kPacketCnt).arg(fragment_size).arg(soundcard_buffer_size));
+
+    m_UseSPDIF = passthru || enc;
 
     WAVEFORMATEXTENSIBLE wf;
-    wf.Format.wFormatTag =
-        (m_UseSPDIF) ? WAVE_FORMAT_DOLBY_AC3_SPDIF : WAVE_FORMAT_PCM;
-    wf.Format.nChannels = audio_channels;
-    wf.Format.nSamplesPerSec = audio_samplerate;
-    wf.Format.nBlockAlign = audio_bytes_per_sample;
-    wf.Format.nAvgBytesPerSec = 
-        wf.Format.nSamplesPerSec * wf.Format.nBlockAlign;
-    wf.Format.wBitsPerSample = audio_bits;
-    wf.Samples.wValidBitsPerSample = wf.Format.wBitsPerSample;
-    wf.SubFormat = 
-        (m_UseSPDIF) ? _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF : _KSDATAFORMAT_SUBTYPE_PCM;
+    wf.Format.nChannels            = channels;
+    wf.Format.nSamplesPerSec       = samplerate;
+    wf.Format.nBlockAlign          = output_bytes_per_frame;
+    wf.Format.nAvgBytesPerSec      = samplerate * output_bytes_per_frame;
+    wf.Format.wBitsPerSample       = (output_bytes_per_frame << 3) / channels;
+    wf.Samples.wValidBitsPerSample =
+        AudioOutputSettings::FormatToBits(output_format);
 
-    VERBOSE(VB_AUDIO, QString("New format: %1bits, %2ch, %3Hz")
-                .arg(audio_bits).arg(audio_channels).arg(audio_samplerate));
+    if (m_UseSPDIF)
+    {
+        wf.Format.wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
+        wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
+    }
+    else if (output_format == FORMAT_FLT)
+    {
+        wf.Format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+        wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
+    }
+    else
+    {
+        wf.Format.wFormatTag = WAVE_FORMAT_PCM;
+        wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_PCM;
+    }
+
+    VBAUDIO(QString("New format: %1bits %2ch %3Hz %4")
+            .arg(wf.Samples.wValidBitsPerSample).arg(channels)
+            .arg(samplerate).arg(m_UseSPDIF ? "data" : "PCM"));
 
     /* Only use the new WAVE_FORMAT_EXTENSIBLE format for multichannel audio */
-    if (audio_channels <= 2)
-    {
+    if (channels <= 2)
         wf.Format.cbSize = 0;
-    }
     else
     {
         wf.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
         wf.dwChannelMask = 0x003F; // 0x003F = 5.1 channels
-        wf.Format.cbSize =
-            sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+        wf.Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
     }
 
-    MMRESULT mmr = waveOutOpen(
-        &m_priv->m_hWaveOut,
-        WAVE_MAPPER,
-        (WAVEFORMATEX *)&wf,
-        (DWORD) AudioOutputWinPrivate::waveOutProc,
-        (DWORD) this,
-        CALLBACK_FUNCTION);
+    MMRESULT mmr = waveOutOpen(&m_priv->m_hWaveOut, WAVE_MAPPER,
+                               (WAVEFORMATEX *)&wf,
+                               (DWORD)AudioOutputWinPrivate::waveOutProc,
+                               (DWORD)this, CALLBACK_FUNCTION);
 
     if (mmr == WAVERR_BADFORMAT)
     {
@@ -215,12 +234,12 @@ void AudioOutputWin::CloseDevice(void)
 
 void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
 {
-    if (size == 0)
+    if (!size)
         return;
 
-    if (InterlockedIncrement(&m_nPkts) > kPacketCnt)
+    if (InterlockedIncrement(&m_nPkts) > (int)kPacketCnt)
     {
-        while (m_nPkts > kPacketCnt)
+        while (m_nPkts > (int)kPacketCnt)
             WaitForSingleObject(m_priv->m_hEvent, INFINITE);
     }
 
@@ -231,8 +250,8 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
     if (wh->dwFlags & WHDR_PREPARED)
         waveOutUnprepareHeader(m_priv->m_hWaveOut, wh, sizeof(WAVEHDR));
 
-    m_OutPkts[m_CurrentPkt] = (unsigned char*)
-        realloc(m_OutPkts[m_CurrentPkt], size);
+    m_OutPkts[m_CurrentPkt] =
+        (unsigned char*)realloc(m_OutPkts[m_CurrentPkt], size);
 
     memcpy(m_OutPkts[m_CurrentPkt], buffer, size);
 
@@ -240,23 +259,14 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
     wh->lpData = (LPSTR)m_OutPkts[m_CurrentPkt];
     wh->dwBufferLength = size;
 
-    if (MMSYSERR_NOERROR != waveOutPrepareHeader(
-            m_priv->m_hWaveOut, wh, sizeof(WAVEHDR)))
-    {
-        VERBOSE(VB_IMPORTANT, "WriteAudio: failed to prepare header");
-    }
-    else if (MMSYSERR_NOERROR != waveOutWrite(
-                 m_priv->m_hWaveOut, wh, sizeof(WAVEHDR)))
-    {
-        VERBOSE(VB_IMPORTANT, "WriteAudio: failed to write packet");
-    }
+    if (MMSYSERR_NOERROR != waveOutPrepareHeader(m_priv->m_hWaveOut, wh,
+                                                 sizeof(WAVEHDR)))
+        VBERROR("WriteAudio: failed to prepare header");
+    else if (MMSYSERR_NOERROR != waveOutWrite(m_priv->m_hWaveOut, wh,
+                                              sizeof(WAVEHDR)))
+        VBERROR("WriteAudio: failed to write packet");
 
     m_CurrentPkt++;
-}
-
-int AudioOutputWin::GetSpaceOnSoundcard(void) const
-{
-    return soundcard_buffer_size - GetBufferedOnSoundcard();
 }
 
 int AudioOutputWin::GetBufferedOnSoundcard(void) const
@@ -276,7 +286,7 @@ int AudioOutputWin::GetVolumeChannel(int channel) const
     }
 
     VERBOSE(VB_AUDIO, "GetVolume(" << channel << ") "
-            << Volume << "(" << dwVolume << ")");
+                      << Volume << "(" << dwVolume << ")");
 
     return Volume;
 }
@@ -284,11 +294,7 @@ int AudioOutputWin::GetVolumeChannel(int channel) const
 void AudioOutputWin::SetVolumeChannel(int channel, int volume)
 {
     if (channel > 1)
-    {
-        Error(QString("Error setting channel: %1. "
-                      "Only stereo volume supported").arg(channel));
-        return;
-    }
+        VBERROR("Windows volume only supports stereo!");
 
     DWORD dwVolume = 0xffffffff;
     if (MMSYSERR_NOERROR == waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, &dwVolume))
@@ -304,7 +310,8 @@ void AudioOutputWin::SetVolumeChannel(int channel, int volume)
         dwVolume |= (dwVolume << 16);
     }
 
-    VERBOSE(VB_AUDIO, QString("SetVolume(%1) %2(%3)")
+    VBAUDIO(QString("SetVolume(%1) %2(%3)")
             .arg(channel).arg(volume).arg(dwVolume));
+
     waveOutSetVolume((HWAVEOUT)WAVE_MAPPER, dwVolume);
 }

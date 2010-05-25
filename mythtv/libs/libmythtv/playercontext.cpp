@@ -448,10 +448,14 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
 
     if (nohardwaredecoders)
         _nvp->DisableHardwareDecoders();
+    
+    QString passthru_device = gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
+                              gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
+                                  gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
     _nvp->SetPlayerInfo(tv, widget, exact_seeking, this);
     _nvp->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"),
-                       gCoreContext->GetSetting("PassThruOutputDevice"),
+                       passthru_device,
                        gCoreContext->GetNumSetting("AudioSampleRate", 44100));
     _nvp->SetAudioStretchFactor(ts_normal);
     _nvp->SetLength(playingLen);

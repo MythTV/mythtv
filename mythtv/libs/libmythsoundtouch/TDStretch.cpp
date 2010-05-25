@@ -811,24 +811,6 @@ TDStretch * TDStretch::newInstance()
     }
     else
 #endif // ALLOW_SSE2
-
-#ifdef ALLOW_MMX
-    // MMX routines available only with integer sample types
-    if (uExtensions & MM_MMX)
-    {
-        return ::new TDStretchMMX;
-    }
-    else
-#endif // ALLOW_MMX
-
-#ifdef ALLOW_3DNOW
-    if (uExtensions & MM_3DNOW)
-    {
-        // 3DNow! support
-        return ::new TDStretch3DNow;
-    }
-    else
-#endif // ALLOW_3DNOW
     {
         // ISA optimizations not supported, use plain C version
         return ::new TDStretch;
@@ -1019,7 +1001,6 @@ long TDStretch::calcCrossCorrMulti(const short *mixingPos, const short *compare)
 
 #ifdef FLOAT_SAMPLES
 
-
 // Slopes the amplitude of the 'midBuffer' samples so that cross correlation
 // is faster to calculate
 void TDStretch::precalcCorrReferenceStereo()
@@ -1036,6 +1017,28 @@ void TDStretch::precalcCorrReferenceStereo()
     }
 }
 
+#ifdef MULTICHANNEL
+// Slopes the amplitude of the 'midBuffer' samples so that cross correlation
+// is faster to calculate
+void TDStretch::precalcCorrReference()
+{
+    int i,j;
+    float temp, temp2;
+    float *src = pMidBuffer;
+    float *dest = pRefMidBuffer;
+
+    for (i = 0 ; i < (int)overlapLength ; i++) 
+    {
+        temp = (float)i * (float)(overlapLength - i);
+
+        for(j = 0; j < channels; j++)
+        {
+            temp2 = (float)(*src++ * temp);
+            *dest++ = temp2;
+        }
+    }
+}
+#endif
 
 // Slopes the amplitude of the 'midBuffer' samples so that cross correlation
 // is faster to calculate
@@ -1050,7 +1053,6 @@ void TDStretch::precalcCorrReferenceMono()
         pRefMidBuffer[i] = (float)(pMidBuffer[i] * temp);
     }
 }
-
 
 // SSE-optimized version of the function overlapStereo
 void TDStretch::overlapStereo(float *output, const float *input) const
@@ -1073,6 +1075,27 @@ void TDStretch::overlapStereo(float *output, const float *input) const
     }
 }
 
+#ifdef MULTICHANNEL
+// Overlaps samples in 'midBuffer' with the samples in 'input'. 
+void TDStretch::overlapMulti(float *output, const float *input) const
+{
+    int i,j;
+    float temp;
+    const float *ip = input;
+    float *op = output;
+    const float *md = pMidBuffer;
+    float fScale = 1.0f / (float)overlapLength;
+    float fi;
+
+    for (i = 0; i < (int)overlapLength ; i ++) 
+    {
+        temp = (float)(overlapLength - i) * fScale;
+        fi = (float)i * fScale;
+        for(j = 0; j < channels; j++)
+            *op++ = (*ip++ * fi + *md++ * temp);
+    }
+}
+#endif
 
 /// Calculates overlap period length in samples.
 void TDStretch::calculateOverlapLength(uint overlapMs)
@@ -1119,5 +1142,21 @@ double TDStretch::calcCrossCorrStereo(const float *mixingPos, const float *compa
 
     return corr;
 }
+
+#ifdef MULTICHANNEL
+double TDStretch::calcCrossCorrMulti(const float *mixingPos, const float *compare) const
+{
+    double corr;
+    uint i;
+
+    corr = 0;
+    for (i = channels; i < channels * overlapLength; i++) 
+    {
+        corr += mixingPos[i] * compare[i];
+    }
+
+    return corr;
+}
+#endif
 
 #endif // FLOAT_SAMPLES

@@ -32,8 +32,6 @@ SOURCES += cpu_detect_x86_gcc.cpp
 
 contains(ARCH_X86, yes) {
         DEFINES += ALLOW_SSE2
-
-        SOURCES += mmx_gcc.cpp
         SOURCES += sse_gcc.cpp 
 }
 

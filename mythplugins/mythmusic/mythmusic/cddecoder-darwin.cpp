@@ -340,11 +340,6 @@ void CdDecoder::run()
 {
 }
 
-void CdDecoder::flush(bool final)
-{
-    (void)final;
-}
-
 void CdDecoder::deinit()
 {
     // Free any stored Metadata

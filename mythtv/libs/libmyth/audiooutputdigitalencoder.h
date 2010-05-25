@@ -16,20 +16,21 @@ class AudioOutputDigitalEncoder
 
     bool   Init(CodecID codec_id, int bitrate, int samplerate, int channels);
     void   Dispose(void);
-    size_t Encode(void *buf, int len);
+    size_t Encode(void *buf, int len, bool isFloat);
     void   GetFrames(void *ptr, int maxlen);
     size_t FrameSize(void)  const { return one_frame_bytes; }
-    int    Buffered(void) const { return inbuflen; }
+    int    Buffered(void) const { return inlen; }
 
   public:
-    size_t audio_bytes_per_sample;
+    size_t bytes_per_sample;
 
   private:
     AVCodecContext *av_context;
-    char            outbuf[OUTBUFSIZE];
-    char            inbuf[INBUFSIZE];
-    int             outbuflen;
-    int             inbuflen;
+    char            out[OUTBUFSIZE];
+    char            inbuf[INBUFSIZE+16];
+    char            *in;
+    int             outlen;
+    int             inlen;
     size_t          one_frame_bytes;
 };
 

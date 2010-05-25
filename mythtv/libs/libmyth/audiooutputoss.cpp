@@ -20,9 +20,11 @@
 
 using namespace std;
 
-#define LOC      QString("AudioOuputOSS: ")
-#define LOC_WARN QString("AudioOuputOSS, Warning: ")
-#define LOC_ERR  QString("AudioOuputOSS, Error: ")
+#define LOC      QString("AOOSS: ")
+#define LOC_WARN QString("AOOSS, Warning: ")
+#define LOC_ERR  QString("AOOSS, Error: ")
+
+#define OERROR(str) Error(str + QString(": %1").arg(strerror(errno)))
 
 #include "mythcorecontext.h"
 #include "audiooutputoss.h"
@@ -42,34 +44,51 @@ AudioOutputOSS::~AudioOutputOSS()
     KillAudio();
 }
 
-vector<int> AudioOutputOSS::GetSupportedRates()
+AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
 {
-    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
-    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
-    audiofd = open(audio_main_device.toAscii(), O_WRONLY | O_NONBLOCK);
+    AudioOutputSettings *settings = new AudioOutputSettings();
+    audiofd = open(main_device.toAscii(), O_WRONLY | O_NONBLOCK);
+    AudioFormat fmt;
+    int rate, formats;
 
     if (audiofd < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
-                " error was: %2").arg(audio_main_device).arg(strerror(errno)));
-        rates.clear();
-        return rates;
+        OERROR(QString("Error opening audio device (%1)").arg(main_device));
+        return settings;
     }
 
-    vector<int>::iterator it = rates.begin();
+    while ((rate = settings->GetNextRate()))
+        if(ioctl(audiofd, SNDCTL_DSP_SPEED, &rate) >= 0)
+            settings->AddSupportedRate(rate);
 
-    while (it != rates.end())
+    if(ioctl(audiofd, SNDCTL_DSP_GETFMTS, &formats) < 0)
+        OERROR("Error retrieving formats");
+    else
     {
-        if(ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
-            it = rates.erase(it);
-        else
-            it++;
+        int ofmt;
+        
+        while ((fmt = settings->GetNextFormat()))
+        {
+            switch (fmt)
+            {
+                case FORMAT_U8:  ofmt = AFMT_U8;       break;
+                case FORMAT_S16: ofmt = AFMT_S16_NE;   break;
+                default: continue;
+            }
+
+            if (formats & ofmt)
+                settings->AddSupportedFormat(fmt);
+        }
     }
+
+    for (uint i = 2; i < 9; i++)
+        if (ioctl(audiofd, SNDCTL_DSP_CHANNELS, &i) >= 0)
+            settings->AddSupportedChannels(i);
 
     close(audiofd);
     audiofd = -1;
 
-    return rates;
+    return settings;
 }
 
 bool AudioOutputOSS::OpenDevice()
@@ -79,25 +98,21 @@ bool AudioOutputOSS::OpenDevice()
     MythTimer timer;
     timer.start();
 
-    VERBOSE(VB_GENERAL, QString("Opening OSS audio device '%1'.")
-            .arg(audio_main_device));
-    
+    VBGENERAL(QString("Opening OSS audio device '%1'.").arg(main_device));
+
     while (timer.elapsed() < 2000 && audiofd == -1)
     {
-        QByteArray main_device = audio_main_device.toAscii();
-        audiofd = open(main_device.constData(), O_WRONLY | O_NONBLOCK);
+        QByteArray device = main_device.toAscii();
+        audiofd = open(device.constData(), O_WRONLY | O_NONBLOCK);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
         {
             if (errno == EBUSY)
             {
-                Error(QString("WARNING: something is currently"
-                              " using: %1.").arg(audio_main_device));
+                Error(QString("WARNING: something is currently using: %1.")
+                      .arg(main_device));
                 return false;
             }
-
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Error opening audio device (%1)")
-                    .arg(audio_main_device) + ENO);
+            OERROR(QString("Error opening audio device (%1)").arg(main_device));
         }
         if (audiofd < 0)
             usleep(50);
@@ -105,36 +120,24 @@ bool AudioOutputOSS::OpenDevice()
 
     if (audiofd == -1)
     {
-        Error(QString("Error opening audio device (%1), the error was: %2")
-              .arg(audio_main_device).arg(strerror(errno)));
+        OERROR(QString("Error opening audio device (%1)").arg(main_device));
         return false;
     }
-
-    fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK);
-
-    SetFragSize();
 
     bool err = false;
     int  format;
 
-    switch (audio_bits)
+    switch (output_format)
     {
-        case 8:
-            format = AFMT_S8;
-            break;
-        case 16:
-#ifdef WORDS_BIGENDIAN
-            format = AFMT_S16_BE;
-#else
-            format = AFMT_S16_LE;
-#endif
-            break;
-        default: Error(QString("AudioOutputOSS() - Illegal bitsize of %1")
-                       .arg(audio_bits));
+        case FORMAT_U8:  format = AFMT_U8;      break;
+        case FORMAT_S16: format = AFMT_S16_NE;  break;
+        default:
+            Error(QString("Unknown sample format: %1").arg(output_format));
+            return false;
     }
 
 #if defined(AFMT_AC3) && defined(SNDCTL_DSP_GETFMTS)
-    if (audio_passthru)
+    if (passthru)
     {
         int format_support;
         if (!ioctl(audiofd, SNDCTL_DSP_GETFMTS, &format_support) &&
@@ -145,29 +148,30 @@ bool AudioOutputOSS::OpenDevice()
     }
 #endif
 
-    if (audio_channels > 2)
+    if (channels > 2)
     {
-        if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
-            ioctl(audiofd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
-            ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0 ||
+        if (ioctl(audiofd, SNDCTL_DSP_CHANNELS, &channels) < 0 ||
+            ioctl(audiofd, SNDCTL_DSP_SPEED, &samplerate) < 0  ||
             ioctl(audiofd, SNDCTL_DSP_SETFMT, &format) < 0)
             err = true;
     }
     else
     {
-        int stereo = audio_channels - 1;
-        if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
-            ioctl(audiofd, SNDCTL_DSP_STEREO, &stereo) < 0 ||
-            ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0 ||
+        int stereo = channels - 1;
+        if (ioctl(audiofd, SNDCTL_DSP_STEREO, &stereo) < 0     ||
+            ioctl(audiofd, SNDCTL_DSP_SPEED, &samplerate) < 0  ||
             ioctl(audiofd, SNDCTL_DSP_SETFMT, &format) < 0)
             err = true;
     }
 
     if (err)
     {
-        Error(QString("Unable to set audio device (%1) to %2 kHz / %3 bits"
-                      " / %4 channels").arg(audio_main_device).arg(audio_samplerate)
-                      .arg(audio_bits).arg(audio_channels));
+        OERROR(QString("Unable to set audio device (%1) to %2 kHz, %3 bits"
+                       ", %4 channels")
+               .arg(main_device).arg(samplerate)
+               .arg(AudioOutputSettings::FormatToBits(output_format))
+               .arg(channels));
+
         close(audiofd);
         audiofd = -1;
         return false;
@@ -177,22 +181,19 @@ bool AudioOutputOSS::OpenDevice()
     ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
     fragment_size = info.fragsize;
 
-    audio_buffer_unused = info.bytes - (fragment_size * 4);
     soundcard_buffer_size = info.bytes;
 
     int caps;
-    
+
     if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) == 0)
     {
         if (!(caps & DSP_CAP_REALTIME))
-        {
-            VERBOSE(VB_IMPORTANT, "The audio device cannot report buffer state"
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "The audio device cannot report buffer state"
                     " accurately! audio/video sync will be bad, continuing...");
-        }
-    } else {
-        VERBOSE(VB_IMPORTANT, QString("Unable to get audio card capabilities,"
-                " the error was: %1").arg(strerror(errno)));
     }
+    else
+        OERROR("Unable to get audio card capabilities");
 
     // Setup volume control
     if (internal_vol)
@@ -202,57 +203,23 @@ bool AudioOutputOSS::OpenDevice()
     return true;
 }
 
-/**
- * Set the fragsize to something slightly smaller than the number of bytes of
- * audio for one frame of video.
- */
-void AudioOutputOSS::SetFragSize()
-{
-    // I think video_frame_rate isn't necessary. Someone clearly thought it was
-    // useful but I don't see why. Let's just hardcode 30 for now...
-    // if there's a problem, it can be added back.
-    const int video_frame_rate = 30;
-    const int bits_per_byte = 8;
-
-    // get rough measurement of audio bytes per frame of video
-    int fbytes = (audio_bits * audio_channels * audio_samplerate) / 
-                        (bits_per_byte * video_frame_rate);
-
-    // find the next smaller number that's a power of 2 
-    // there's probably a better way to do this
-    int count = 0;
-    while ( fbytes >> 1 )
-    {
-        fbytes >>= 1;
-        count++;
-    }
-
-    if (count > 4)
-    {
-        // High order word is the max number of fragments
-        int frag = 0x7fff0000 + count;
-        ioctl(audiofd, SNDCTL_DSP_SETFRAGMENT, &frag);
-        // ignore failure, since we check the actual fragsize before use
-    }
-}
-
 void AudioOutputOSS::CloseDevice()
 {
     if (audiofd != -1)
         close(audiofd);
 
     audiofd = -1;
-    
+
     VolumeCleanup();
 }
 
 
-void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
+void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
 {
     if (audiofd < 0)
         return;
 
-    unsigned char *tmpbuf;
+    uchar *tmpbuf;
     int written = 0, lw = 0;
 
     tmpbuf = aubuf;
@@ -266,9 +233,8 @@ void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
 
     if (lw < 0)
     {
-        Error(QString("Error writing to audio device (%1), unable to"
-              " continue. The error was: %2").arg(audio_main_device)
-              .arg(strerror(errno)));
+        OERROR(QString("Error writing to audio device (%1), unable to continue")
+               .arg(main_device));
         close(audiofd);
         audiofd = -1;
         return;
@@ -286,31 +252,6 @@ int AudioOutputOSS::GetBufferedOnSoundcard(void) const
     return soundcard_buffer;
 }
 
-int AudioOutputOSS::GetSpaceOnSoundcard(void) const
-{
-    audio_buf_info info;
-    int space = 0;
-
-    ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-    space = info.bytes - audio_buffer_unused;
-
-    if (space < 0)
-    {
-        numbadioctls++;
-        if (numbadioctls > 2 || space < -5000)
-        {
-            VERBOSE(VB_IMPORTANT, "Your soundcard is not reporting free space"
-                    " correctly. Falling back to old method...");
-            audio_buffer_unused = 0;
-            space = info.bytes;
-        }
-    }
-    else
-        numbadioctls = 0;
-
-    return space;
-}
-
 void AudioOutputOSS::VolumeInit()
 {
     mixerfd = -1;
@@ -326,18 +267,13 @@ void AudioOutputOSS::VolumeInit()
     QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
 
     if (controlLabel == "Master")
-    {
         control = SOUND_MIXER_VOLUME;
-    }
     else
-    {
         control = SOUND_MIXER_PCM;
-    }
 
     if (mixerfd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Unable to open mixer: '%1'").arg(device));
+        VBERROR(QString("Unable to open mixer: '%1'").arg(device));
         return;
     }
 
@@ -348,19 +284,13 @@ void AudioOutputOSS::VolumeInit()
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Error Setting initial Master Volume") + ENO);
-        }
+            VBERROR(QString("Error Setting initial Master Volume") + ENO);
 
         volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
         if (ret < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Error setting initial PCM Volume") + ENO);
-        }
+            VBERROR(QString("Error setting initial PCM Volume") + ENO);
     }
 }
 
@@ -383,19 +313,16 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
 
     int ret = ioctl(mixerfd, MIXER_READ(control), &tmpVol);
     if (ret < 0) {
-        VERBOSE(VB_IMPORTANT, QString("Error reading volume for channel %1")
-                          .arg(channel));
-        perror("Reading PCM volume: ");
+        VBERROR(QString("Error reading volume for channel %1").arg(channel));
         return 0;
     }
 
-    if (channel == 0) {
+    if (channel == 0)
         volume = tmpVol & 0xff; // left
-    } else if (channel == 1) {
+    else if (channel == 1)
         volume = (tmpVol >> 8) & 0xff; // right
-    } else {
-        VERBOSE(VB_IMPORTANT, QString("Invalid channel. Only stereo volume supported"));
-    }
+    else
+        VBERROR("Invalid channel. Only stereo volume supported");
 
     return volume;
 }
@@ -404,8 +331,8 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
 {
     if (channel > 1) {
         // Don't support more than two channels!
-    VERBOSE(VB_IMPORTANT, QString("Error setting channel: %1.  Only stereo volume supported")
-                                .arg(channel));
+        VBERROR(QString("Error setting channel %1. Only 2 ch volume supported")
+                .arg(channel));
         return;
     }
 
@@ -417,17 +344,14 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
     if (mixerfd >= 0)
     {
         int tmpVol = 0;
-        if (channel == 0) 
+        if (channel == 0)
             tmpVol = (GetVolumeChannel(1) << 8) + volume;
         else
             tmpVol = (volume << 8) + GetVolumeChannel(0);
 
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &tmpVol);
-        if (ret < 0) 
-        {
-            VERBOSE(VB_IMPORTANT, QString("Error setting volume on channel: %1").arg(channel));
-            perror("Setting volume: ");
-        }
+        if (ret < 0)
+            VBERROR(QString("Error setting volume on channel %1").arg(channel));
     }
 }
 

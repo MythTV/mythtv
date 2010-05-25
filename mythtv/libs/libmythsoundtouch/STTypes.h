@@ -81,8 +81,8 @@ namespace soundtouch
     ///   However, if you still prefer to select the sample format here 
     ///   also in GNU environment, then please #undef the INTEGER_SAMPLE
     ///   and FLOAT_SAMPLE defines first as in comments above.
-    #define INTEGER_SAMPLES     1    //< 16bit integer samples
-    //#define FLOAT_SAMPLES       1    //< 32bit float samples
+    //#define INTEGER_SAMPLES     1    //< 16bit integer samples
+    #define FLOAT_SAMPLES       1    //< 32bit float samples
  
  #endif
 
@@ -127,7 +127,7 @@ namespace soundtouch
         typedef double LONG_SAMPLETYPE;
 
         #ifdef ALLOW_OPTIMIZATIONS
-                // Allow 3DNow! and SSE optimizations
+            // Allow 3DNow! and SSE optimizations
             #if WIN32
                 #define ALLOW_3DNOW     1
             #endif

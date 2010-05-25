@@ -47,28 +47,22 @@ using namespace std;
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                        AudioOutput *o) :
     Decoder(d, i, o),
-    inited(false),   user_stop(false),
-    stat(0),         output_buf(NULL),
-    output_bytes(0), output_at(0),
-    bks(0),          done(false),
-    finish(false),   len(0),
-    freq(0),         bitrate(0),
-    m_channels(0),   output_size(0),
-    totalTime(0.0),  seekTime(-1.0),
-    devicename(""),  start(0),
-    end(0),          m_outputFormat(0),
-    m_inputFormat(NULL),
-    m_outputContext(NULL),  m_inputContext(NULL),
-    m_decStream(NULL),      m_codec(NULL),
-    m_audioEnc(NULL),       m_audioDec(NULL),
-    m_pkt(&m_pkt1),         errcode(0),
-    ptr(NULL),              dec_len(0),
-    data_size(0),           m_samples(NULL)
+    inited(false),              user_stop(false),
+    stat(0),                    output_buf(NULL),
+    output_at(0),               bks(0),
+    bksFrames(0),               decodeBytes(0),
+    finish(false),
+    freq(0),                    bitrate(0),
+    m_sampleFmt(FORMAT_NONE),   m_channels(0),
+    totalTime(0.0),             seekTime(-1.0),
+    devicename(""),
+    m_inputFormat(NULL),        m_inputContext(NULL),
+    m_decStream(NULL),          m_codec(NULL),
+    m_audioDec(NULL),           errcode(0),
+    m_samples(NULL)
 {
     setFilename(file);
-
     memset(&m_params, 0, sizeof(AVFormatParameters));
-
 }
 
 avfDecoder::~avfDecoder(void)
@@ -77,12 +71,6 @@ avfDecoder::~avfDecoder(void)
         deinit();
 
     av_freep((void *)&m_samples);
-
-    if (output_buf)
-    {
-        delete [] output_buf;
-        output_buf = NULL;
-    }
 }
 
 void avfDecoder::stop()
@@ -90,70 +78,46 @@ void avfDecoder::stop()
     user_stop = TRUE;
 }
 
-void avfDecoder::flush(bool final)
+void avfDecoder::writeBlock()
 {
-    ulong min = final ? 0 : bks;
-
-    while ((!done && !finish && seekTime <= 0) && output_bytes > min)
+    while (!user_stop && seekTime <= 0)
     {
-        if (user_stop || finish)
+        if(output()->AddSamples(output_buf, bksFrames, -1))
         {
-            inited = FALSE;
-            done = TRUE;
+            output_at -= bks;
+            memmove(output_buf, output_buf + bks, output_at);
+            break;
         }
         else
-        {
-            ulong sz = output_bytes < bks ? output_bytes : bks;
-
-            int samples = (sz*8)/(m_channels*16);
-            // Never buffer more than 5000ms of audio since this slows down
-            // actions such as seeking or track changes made after decoding is
-            // complete but audio remains in the buffer
-            bool ok = (output()->GetAudioBufferedTime() <= 5000);
-            if (ok) ok = output()->AddSamples(output_buf, samples, -1);
-            if (ok)
-            {
-                output_bytes -= sz;
-                memmove(output_buf, output_buf + sz, output_bytes);
-                output_at = output_bytes;
-            } else {
-                unlock();
-                usleep(5000);
-                lock();
-                done = user_stop;
-            }
-        }
+            usleep(output()->GetAudioBufferedTime()<<9);
     }
 }
 
 bool avfDecoder::initialize()
 {
-    bks = blockSize();
-
-    inited = user_stop = done = finish = FALSE;
-    len = freq = bitrate = 0;
+    inited = user_stop = finish = FALSE;
+    freq = bitrate = 0;
     stat = m_channels = 0;
+    m_sampleFmt = FORMAT_NONE;
     seekTime = -1.0;
     totalTime = 0.0;
+
+    if (output())
+        output()->PauseUntilBuffered();
 
     filename = ((QFile *)input())->fileName();
 
     if (!m_samples)
     {
-        m_samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE / 2 *
-                                          sizeof(*m_samples));
+        m_samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                          sizeof(int32_t));
         if (!m_samples)
         {
             VERBOSE(VB_GENERAL, "Could not allocate output buffer in "
-                    "avfDecoder::initialize");
+                                "avfDecoder::initialize");
             return false;
         }
     }
-
-    if (!output_buf)
-        output_buf = new char[globalBufferSize];
-    output_at = 0;
-    output_bytes = 0;
 
     // open device
     // register av codecs
@@ -187,37 +151,6 @@ bool avfDecoder::initialize()
 
     // Store the input format of the context
     m_inputFormat = m_inputContext->iformat;
-
-    // Determine the output format
-    // Given we are outputing to a sound card, this will always
-    // be a PCM format
-
-#ifdef WORDS_BIGENDIAN
-    m_outputFormat = guess_format("s16be", NULL, NULL);
-#else
-    m_outputFormat = guess_format("s16le", NULL, NULL);
-#endif
-
-    if (!m_outputFormat)
-    {
-        VERBOSE(VB_IMPORTANT, "avfDecoder.o - failed to get output format");
-        deinit();
-        return FALSE;
-    }
-
-    // Populate the output context
-    // Create the output stream and attach to output context
-    // Set various parameters to match the input format
-    m_outputContext = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
-    m_outputContext->oformat = m_outputFormat;
-
-    m_decStream = av_new_stream(m_outputContext,0);
-    m_decStream->codec->codec_type = CODEC_TYPE_AUDIO;
-    m_decStream->codec->codec_id = m_outputContext->oformat->audio_codec;
-    m_decStream->codec->sample_rate = m_audioDec->sample_rate;
-    m_decStream->codec->channels = m_audioDec->channels;
-    m_decStream->codec->bit_rate = m_audioDec->bit_rate;
-    av_set_parameters(m_outputContext, NULL);
 
     // Prepare the decoding codec
     // The format is different than the codec
@@ -255,12 +188,58 @@ bool avfDecoder::initialize()
 
     if (output())
     {
-        const AudioSettings settings(
-            16 /*bits*/, m_audioDec->channels, m_audioDec->codec_id, 
-            m_audioDec->sample_rate, false /* AC3/DTS pass through */);
+        switch (m_audioDec->sample_fmt)
+        {
+            case SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
+            case SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
+            case SAMPLE_FMT_FLT:    m_sampleFmt = FORMAT_FLT;   break;
+            case SAMPLE_FMT_DBL:    m_sampleFmt = FORMAT_NONE;  break;
+            case SAMPLE_FMT_S32:
+                switch (m_audioDec->bits_per_raw_sample)
+                {
+                    case  0:    m_sampleFmt = FORMAT_S32;   break;
+                    case 24:    m_sampleFmt = FORMAT_S24;   break;
+                    case 32:    m_sampleFmt = FORMAT_S32;   break;
+                    default:    m_sampleFmt = FORMAT_NONE;
+                }
+                break;
+            default:                m_sampleFmt = FORMAT_NONE;
+        }
+
+        if (m_sampleFmt == FORMAT_NONE)
+        {
+            int bps =
+                av_get_bits_per_sample_format(m_audioDec->sample_fmt);
+            if (m_audioDec->sample_fmt == SAMPLE_FMT_S32 &&
+                m_audioDec->bits_per_raw_sample)
+            {
+                bps = m_audioDec->bits_per_raw_sample;
+            }
+            VERBOSE(VB_IMPORTANT, QString("Error: Unsupported sample format "
+                                          "with %1 bits").arg(bps));
+            return false;
+        }
+
+        const AudioSettings settings(m_sampleFmt, m_audioDec->channels,
+                                     m_audioDec->codec_id,
+                                     m_audioDec->sample_rate, false);
+
         output()->Reconfigure(settings);
         output()->SetSourceBitrate(m_audioDec->bit_rate);
     }
+
+    // 20ms worth
+    bks = (freq * m_channels *
+           AudioOutputSettings::SampleSize(m_sampleFmt)) / 50;
+
+    bksFrames = freq / 50;
+
+    // decode 8 bks worth of samples each time we need more
+    decodeBytes = bks << 3;
+
+    output_buf = (char *)av_malloc(decodeBytes +
+                                   AVCODEC_MAX_AUDIO_FRAME_SIZE * 2);
+    output_at = 0;
 
     inited = TRUE;
     return TRUE;
@@ -273,9 +252,10 @@ void avfDecoder::seek(double pos)
 
 void avfDecoder::deinit()
 {
-    inited = user_stop = done = finish = FALSE;
-    len = freq = bitrate = 0;
+    inited = user_stop = finish = FALSE;
+    freq = bitrate = 0;
     stat = m_channels = 0;
+    m_sampleFmt = FORMAT_NONE;
     setInput(0);
     setOutput(0);
 
@@ -286,149 +266,136 @@ void avfDecoder::deinit()
         m_inputContext = NULL;
     }
 
-    if (m_outputContext)
-    {
-        av_free(m_outputContext);
-        m_outputContext = NULL;
-    }
+    if (output_buf)
+        av_free(output_buf);
+    output_buf = NULL;
 
     m_decStream = NULL;
     m_codec = NULL;
-    m_audioEnc = m_audioDec = NULL;
+    m_audioDec = NULL;
     m_inputFormat = NULL;
-    m_outputFormat = NULL;
 }
 
 void avfDecoder::run()
 {
-    int mem_len;
+    AVPacket pkt;
     char *s;
-
-    lock();
+    int data_size, dec_len;
+    long len;
+    const uint8_t *ptr;
+    uint fill, total;
+    // account for possible frame expansion in aobase (upmix, float conv)
+    uint thresh = bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
 
     if (!inited)
-    {
-        unlock();
         return;
-    }
 
     stat = DecoderEvent::Decoding;
-
-    unlock();
-
     {
         DecoderEvent e((DecoderEvent::Type) stat);
         dispatch(e);
     }
 
     av_read_play(m_inputContext);
-    while (!done && !finish && !user_stop)
-    {
-        lock();
 
+    while (!finish && !user_stop)
+    {
         // Look to see if user has requested a seek
         if (seekTime >= 0.0)
         {
             VERBOSE(VB_GENERAL, QString("avfdecoder.o: seek time %1")
-                .arg(seekTime));
-            if (av_seek_frame(m_inputContext, -1, (int64_t)(seekTime * AV_TIME_BASE), 0)
-                              < 0)
-            {
+                                .arg(seekTime));
+
+            if (av_seek_frame(m_inputContext, -1,
+                              (int64_t)(seekTime * AV_TIME_BASE), 0) < 0)
                 VERBOSE(VB_IMPORTANT, "Error seeking");
-            }
 
             seekTime = -1.0;
         }
 
-        // Read a packet from the input context
-        // if (av_read_packet(m_inputContext, m_pkt) < 0)
-        if (av_read_frame(m_inputContext, m_pkt) < 0)
+        // Do we need to decode more samples?
+        if (output_at < bks)
         {
-            VERBOSE(VB_IMPORTANT, "Read frame failed");
-            VERBOSE(VB_FILE, ("... for file '" + filename) + "'");
-            unlock();
-            finish = TRUE;
-            break;
-        }
-
-        // Get the pointer to the data and its length
-        ptr = m_pkt->data;
-        len = m_pkt->size;
-        unlock();
-
-        while (len > 0 && !done && !finish && !user_stop && seekTime <= 0.0)
-        {
-            lock();
-            // Decode the stream to the output codec
-            // m_samples is the output buffer
-            // data_size is the size in bytes of the frame
-            // ptr is the input buffer
-            // len is the size of the input buffer
-            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-            dec_len = avcodec_decode_audio2(m_audioDec, m_samples, &data_size,
-                                            ptr, len);
-            if (dec_len < 0)
+            while (output_at < decodeBytes &&
+                   !finish && !user_stop && seekTime <= 0.0)
             {
-                unlock();
-                break;
-            }
-
-            s = (char *)m_samples;
-            unlock();
-
-            while (data_size > 0 && !done && !finish && !user_stop &&
-                   seekTime <= 0.0)
-             {
-                lock();
-                // Store and check the size
-                // It is possible the returned data is larger than
-                // the output buffer.  If so, flush the buffer and
-                // limit the data written to the buffer size
-                mem_len = data_size;
-                if ((output_at + data_size) > globalBufferSize)
+                // Read a packet from the input context
+                if (av_read_frame(m_inputContext, &pkt) < 0)
                 {
-                    // if (output()) { flush(); }
-                    mem_len = globalBufferSize - output_at;
+                    VERBOSE(VB_IMPORTANT, "Read frame failed");
+                    VERBOSE(VB_FILE, ("... for file '" + filename) + "'");
+                    finish = TRUE;
+                    break;
                 }
 
-                // Copy the data to the output buffer
-                memcpy((char *)(output_buf + output_at), s, mem_len);
+                ptr = pkt.data;
+                len = pkt.size;
 
-                // Increment the output pointer and count
-                output_at += mem_len;
-                output_bytes += mem_len;
+                while (len > 0 && !finish && !user_stop && seekTime <= 0.0)
+                {
+                    // Decode the stream to the output codec
+                    // m_samples is the output buffer
+                    // data_size is the size in bytes of the frame
+                    // ptr is the input buffer
+                    // len is the size of the input buffer
+                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                    dec_len = avcodec_decode_audio2(m_audioDec, m_samples,
+                                                    &data_size, ptr, len);
+                    if (dec_len < 0)
+                        break;
 
-                // Move the input buffer pointer and mark off
-                // what we sent to the output buffer
-                data_size -= mem_len;
-                s += mem_len;
+                    s = (char *)m_samples;
+                    // Copy the data to the output buffer
+                    memcpy((char *)(output_buf + output_at), s, data_size);
 
-                if (output())
-                    flush();
+                    // Increment the output pointer and count
+                    output_at += data_size;
+                    len -= dec_len;
+                    ptr += dec_len;
+                }
 
-                unlock();
+                av_free_packet(&pkt);
             }
-
-            lock();
-            flush();
-            ptr += dec_len;
-            len -= dec_len;
-            unlock();
         }
-        av_free_packet(m_pkt);
+
+        if (!output())
+            continue;
+
+        // Wait until we need to decode or supply more samples
+        while (!finish && !user_stop && seekTime <= 0.0)
+        {
+            output()->GetBufferStatus(fill, total);
+            // Make sure we have decoded samples ready and that the
+            // audiobuffer is reasonably populated
+            if (fill < thresh<<3)
+                break;
+            else
+                // Wait for half of the buffer to drain
+                usleep(output()->GetAudioBufferedTime()<<9);
+        }
+
+        // write a block if there's sufficient space for it
+        if (!user_stop && output_at >= bks && fill <= total - thresh)
+            writeBlock();
     }
 
-    flush(TRUE);
+    if (user_stop)
+        inited = FALSE;
 
-    if (output() && !user_stop)
+    else if (output())
+    {
+        // Drain our buffer
+        while (output_at >= bks)
+            writeBlock();
+
+        // Drain ao buffer
         output()->Drain();
+    }
 
     if (finish)
         stat = DecoderEvent::Finished;
     else if (user_stop)
         stat = DecoderEvent::Stopped;
-
-    // unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);
