@@ -16,7 +16,11 @@ using namespace std;
 #include <audiooutput.h>
 #include <mythcontext.h>
 #include <mythmediamonitor.h>
+
+extern "C" {
 #include <libavcodec/avcodec.h>
+}
+
 
 // MythMusic
 #include "cddecoder.h"
