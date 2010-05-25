@@ -16,7 +16,7 @@ using namespace std;
 
 #include "rssparse.h"
 
-#include <mythhttppool.h>
+#include "mythhttppool.h"
 
 class RSSSite;
 class MPUBLIC RSSSite : public QObject

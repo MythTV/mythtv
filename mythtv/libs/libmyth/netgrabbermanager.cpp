@@ -5,9 +5,9 @@
 #include <QFile>
 #include <QDir>
 
-#include <mythdirs.h>
-#include <mythcontext.h>
-#include <mythverbose.h>
+#include "mythdirs.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"

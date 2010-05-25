@@ -1,9 +1,9 @@
 #include <QDir>
 #include <QFileInfo>
 
-#include <mythdirs.h>
-#include <mythdb.h>
-#include <mythcontext.h>
+#include "mythdirs.h"
+#include "mythdb.h"
+#include "mythcontext.h"
 
 #include "netutils.h"
 
