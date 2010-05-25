@@ -122,6 +122,7 @@ MythXMLMethod MythXML::GetMethod( const QString &sURI )
     if (sURI == "GetConnectionInfo"     ) return MXML_GetConnectionInfo;
     if (sURI == "GetVideoArt"           ) return MXML_GetVideoArt;
     if (sURI == "GetInternetSearch"     ) return MXML_GetInternetSearch;
+    if (sURI == "GetInternetSources"    ) return MXML_GetInternetSources;
 
     return MXML_Unknown;
 }
@@ -150,6 +151,11 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
             {
                 pRequest->m_sBaseUrl = m_sControlUrl;
                 pRequest->m_sMethod = "GetInternetSearch";
+            }
+            else if (pRequest->m_sBaseUrl == "/Myth/GetInternetSources")
+            {
+                pRequest->m_sBaseUrl = m_sControlUrl;
+                pRequest->m_sMethod = "GetInternetSources";
             }
 
             if (pRequest->m_sBaseUrl != m_sControlUrl)
@@ -210,6 +216,9 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
                 case MXML_GetInternetSearch :
                     GetInternetSearch( pRequest );
+                    return true;
+                case MXML_GetInternetSources :
+                    GetInternetSources( pRequest );
                     return true;
 
                 case MXML_GetConnectionInfo    :
@@ -1476,6 +1485,35 @@ void MythXML::GetInternetSearch( HTTPRequest *pRequest )
         return;
 
     pRequest->FormatRawResponse( ret.toString() );
+}
+
+void MythXML::GetInternetSources( HTTPRequest *pRequest )
+{
+    pRequest->m_eResponseType   = ResponseTypeHTML;
+
+    QString ret;
+    QString GrabberDir = QString("%1/internetcontent/").arg(GetShareDir());
+    QDir GrabberPath(GrabberDir);
+    QStringList Grabbers = GrabberPath.entryList(QDir::Files | QDir::Executable);
+
+    for (QStringList::const_iterator i = Grabbers.begin();
+            i != Grabbers.end(); ++i)
+    {
+        QProcess scriptCheck;
+        QString commandline = GrabberDir + (*i);
+        scriptCheck.setReadChannel(QProcess::StandardOutput);
+        scriptCheck.start(commandline, QStringList() << "-v");
+        scriptCheck.waitForFinished();
+        QString result = scriptCheck.readAll();
+        if (!result.isEmpty() && result.toLower().startsWith("<grabber>"))
+            ret += result;
+    }
+
+    NameValues list;
+
+    list.push_back( NameValue( "InternetContent", ret ));
+
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
