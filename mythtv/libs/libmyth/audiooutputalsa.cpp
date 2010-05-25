@@ -671,7 +671,7 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     snd_mixer_elem_t *elem = snd_mixer_find_selem(mixer_handle, sid);
     if (!elem)
     {
-        VBAUDIO(QString("Mixer unable to find control %1 (ch %2)")
+        VBERROR(QString("Mixer unable to find control %1 (ch %2)")
                 .arg(mixer_control).arg(channel));
         return -1;
     }
@@ -709,7 +709,7 @@ void AudioOutputALSA::SetCurrentVolume(QString control, uint channel,
     snd_mixer_elem_t *elem = snd_mixer_find_selem(mixer_handle, sid);
     if (!elem)
     {
-        VBAUDIO(QString("Mixer unable to find control %1 (ch %2)")
+        VBERROR(QString("Mixer unable to find control %1 (ch %2)")
                 .arg(control).arg(channel));
         return;
     }

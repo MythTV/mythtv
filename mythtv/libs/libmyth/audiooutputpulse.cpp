@@ -91,7 +91,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
     {
         if (fmt == FORMAT_S24
 // define from PA 0.9.15 only
-#ifndef PA_MAJOR 0
+#ifndef PA_MAJOR
             || fmt == FORMAT_S24LSB
 #endif
             )
@@ -124,7 +124,7 @@ bool AudioOutputPulseAudio::OpenDevice()
         case FORMAT_U8:     sample_spec.format = PA_SAMPLE_U8;         break;
         case FORMAT_S16:    sample_spec.format = PA_SAMPLE_S16NE;      break;
 // define from PA 0.9.15 only
-#ifdef PA_MAJOR 0
+#ifdef PA_MAJOR
         case FORMAT_S24LSB: sample_spec.format = PA_SAMPLE_S24_32NE;   break;
 #endif
         case FORMAT_S32:    sample_spec.format = PA_SAMPLE_S32NE;      break;

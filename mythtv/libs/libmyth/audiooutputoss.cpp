@@ -278,7 +278,7 @@ void AudioOutputOSS::VolumeInit()
 
     if (mixerfd < 0)
     {
-        VBAUDIO(QString("Unable to open mixer: '%1'").arg(device));
+        VBERROR(QString("Unable to open mixer: '%1'").arg(device));
         return;
     }
 
@@ -289,13 +289,13 @@ void AudioOutputOSS::VolumeInit()
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)
-            VBAUDIO(QString("Error Setting initial Master Volume") + ENO);
+            VBERROR(QString("Error Setting initial Master Volume") + ENO);
 
         volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
         if (ret < 0)
-            VBAUDIO(QString("Error setting initial PCM Volume") + ENO);
+            VBERROR(QString("Error setting initial PCM Volume") + ENO);
     }
 }
 
@@ -319,7 +319,7 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
     int ret = ioctl(mixerfd, MIXER_READ(control), &tmpVol);
     if (ret < 0)
     {
-        VBAUDIO(QString("Error reading volume for channel %1").arg(channel));
+        VBERROR(QString("Error reading volume for channel %1").arg(channel));
         return 0;
     }
 
@@ -328,7 +328,7 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
     else if (channel == 1)
         volume = (tmpVol >> 8) & 0xff; // right
     else
-        VBAUDIO("Invalid channel. Only stereo volume supported");
+        VBERROR("Invalid channel. Only stereo volume supported");
 
     return volume;
 }
@@ -338,7 +338,7 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
     if (channel > 1)
     {
         // Don't support more than two channels!
-        VBAUDIO(QString("Error setting channel %1. Only 2 ch volume supported")
+        VBERROR(QString("Error setting channel %1. Only 2 ch volume supported")
                 .arg(channel));
         return;
     }
@@ -358,7 +358,7 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
 
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &tmpVol);
         if (ret < 0)
-            VBAUDIO(QString("Error setting volume on channel %1").arg(channel));
+            VBERROR(QString("Error setting volume on channel %1").arg(channel));
     }
 }
 
