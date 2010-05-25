@@ -68,7 +68,7 @@ package MythTV::Program;
         $self->{'recstartts'}      = $_[23]; # 23 recstartts                ACTUAL start time (unix timestamp)
         $self->{'recendts'}        = $_[24]; # 24 recendts                  ACTUAL end time (unix timestamp)
         $self->{'progflags'}       = $_[25]; # 25 programflags
-        $self->{'recgroup'}        = $_[30]; # 26 recgroup
+        $self->{'recgroup'}        = $_[26]; # 26 recgroup
         $self->{'outputfilters'}   = $_[27]; # 27 chanOutputFilters
         $self->{'seriesid'}        = $_[28]; # 28 seriesid
         $self->{'programid'}       = $_[29]; # 29 programid
