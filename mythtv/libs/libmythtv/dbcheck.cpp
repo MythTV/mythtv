@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1258";
+const QString currentDatabaseVersion = "1259";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5255,6 +5255,90 @@ NULL
 };
         if (!performActualUpdate(updates, "1258", dbver))
             return false;
+    }
+
+    if (dbver == "1258")
+    {
+        MSqlQuery select(MSqlQuery::InitCon());
+        select.prepare("SELECT hostname, data FROM settings "
+                       " WHERE value = 'IndividualMuteControl'");
+
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve IndividualMuteControl values.",
+                            select);
+        }
+        else
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (select.next())
+            {
+                QString hostname = select.value(0).toString();
+                QString individual_mute = select.value(1).toString();
+
+                if ("1" == individual_mute)
+                {
+                    update.prepare("DELETE FROM keybindings "
+                                   " WHERE action = 'CYCLEAUDIOCHAN' AND "
+                                   "       hostname = :HOSTNAME AND "
+                                   "       context IN ('TV Frontend', "
+                                   "                   'TV Playback')");
+
+                    update.bindValue(":HOSTNAME", hostname);
+
+                    if (!update.exec())
+                    {
+                         MythDB::DBError("Unable to update keybindings",
+                                         update);
+                         continue;
+                    }
+
+                    update.prepare("UPDATE keybindings "
+                                   "   SET action = 'CYCLEAUDIOCHAN', "
+                                   "       description = 'Cycle audio channels'"
+                                   " WHERE action = 'MUTE' AND "
+                                   "       hostname = :HOSTNAME AND "
+                                   "       context IN ('TV Frontend', "
+                                   "                   'TV Playback')");
+
+                    update.bindValue(":HOSTNAME", hostname);
+
+                    if (!update.exec())
+                    {
+                         MythDB::DBError("Unable to update keybindings",
+                                         update);
+                         continue;
+                    }
+
+                    update.prepare("REPLACE INTO keybindings "
+                                   " VALUES (:CONTEXT, 'MUTE', 'Mute', "
+                                   "         '', :HOSTNAME)");
+
+                    update.bindValue(":CONTEXT", "TV Playback");
+                    update.bindValue(":HOSTNAME", hostname);
+                    if (!update.exec())
+                    {
+                         MythDB::DBError("Unable to update keybindings",
+                                         update);
+                         continue;
+                    }
+                    update.bindValue(":CONTEXT", "TV Frontend");
+                    update.bindValue(":HOSTNAME", hostname);
+                    if (!update.exec())
+                    {
+                         MythDB::DBError("Unable to update keybindings",
+                                         update);
+                         continue;
+                    }
+
+                }
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1259"))
+            return false;
+
+        dbver = "1259";
     }
 
     return true;

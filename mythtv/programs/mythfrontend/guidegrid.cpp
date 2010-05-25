@@ -568,6 +568,8 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             volumeUpdate(true);
         else if (action == "VOLUMEDOWN")
             volumeUpdate(false);
+        else if (action == "CYCLEAUDIOCHAN")
+            toggleMute(true);
         else if (action == "MUTE")
             toggleMute();
         else if (action == "TOGGLEEPGORDER")
@@ -2119,12 +2121,12 @@ void GuideGrid::volumeUpdate(bool up)
     }
 }
 
-void GuideGrid::toggleMute(void)
+void GuideGrid::toggleMute(const bool muteIndividualChannels)
 {
     if (m_player)
     {
         PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-        m_player->ToggleMute(ctx);
+        m_player->ToggleMute(ctx, muteIndividualChannels);
         m_player->ReturnPlayerLock(ctx);
     }
 }

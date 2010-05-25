@@ -289,20 +289,6 @@ static HostSlider *PCMVolume()
     return gs;
 }
 
-static HostCheckBox *IndividualMuteControl()
-{
-    HostCheckBox *gc = new HostCheckBox("IndividualMuteControl");
-    gc->setLabel(QObject::tr("Independent Muting of Left and Right Audio "
-                 "Channels"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable muting of just the left or right "
-                    "channel.  Useful if your broadcaster puts the "
-                    "original language on one channel, and a dubbed "
-                    "version of the program on the other one.  This "
-                    "modifies the behavior of the Mute key."));
-    return gc;
-}
-
 static HostCheckBox *AC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("AC3PassThru");
@@ -3531,7 +3517,6 @@ class AudioMixerSettingsGroup : public TriggeredConfigurationGroup
         settings->addChild(MixerControl());
         settings->addChild(MixerVolume());
         settings->addChild(PCMVolume());
-        settings->addChild(IndividualMuteControl());
 
         ConfigurationGroup *dummy =
             new VerticalConfigurationGroup(false, true, false, false);

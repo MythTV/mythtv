@@ -280,7 +280,7 @@ class MPUBLIC TV : public QThread
 
     // Used by EPG
     void ChangeVolume(PlayerContext*, bool up);
-    void ToggleMute(PlayerContext*);
+    void ToggleMute(PlayerContext*, const bool muteIndividualChannels = false);
 
     void SetNextProgPIPState(PIPState state) { jumpToProgramPIPState = state; }
 
@@ -632,7 +632,6 @@ class MPUBLIC TV : public QThread
     DBChanList db_browse_all_channels;
 
     bool    smartChannelChange;
-    bool    MuteIndividualChannels;
     bool    arrowAccel;
     int     osd_general_timeout;
     int     osd_prog_info_timeout;

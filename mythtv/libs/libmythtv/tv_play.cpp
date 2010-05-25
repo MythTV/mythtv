@@ -509,6 +509,8 @@ void TV::InitKeys(void)
             "Volume up"), "],},F11,Volume Up");
     REG_KEY("TV Frontend", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
             "|,\\,F9,Volume Mute");
+    REG_KEY("TV Frontend", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
+            "Cycle audio channels"), "");
     REG_KEY("TV Frontend", "RANKINC", QT_TRANSLATE_NOOP("MythControls",
             "Increase program or channel rank"), "Right");
     REG_KEY("TV Frontend", "RANKDEC", QT_TRANSLATE_NOOP("MythControls",
@@ -582,6 +584,8 @@ void TV::InitKeys(void)
             "Volume up"), "],},F11,Volume Up");
     REG_KEY("TV Playback", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
             "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", "CYCLEAUDIOCHAN", QT_TRANSLATE_NOOP("MythControls",
+            "Cycle audio channels"), "");
     REG_KEY("TV Playback", "TOGGLEUPMIX", QT_TRANSLATE_NOOP("MythControls",
             "Toggle audio upmixer"), "Ctrl+U");
     REG_KEY("TV Playback", "TOGGLEPIPMODE", QT_TRANSLATE_NOOP("MythControls",
@@ -832,7 +836,7 @@ TV::TV(void)
       db_browse_all_tuners(false),
 
       smartChannelChange(false),
-      MuteIndividualChannels(false), arrowAccel(false),
+      arrowAccel(false),
       osd_general_timeout(2), osd_prog_info_timeout(3),
       tryUnflaggedSkip(false),
       smartForward(false),
@@ -931,7 +935,6 @@ TV::TV(void)
     kv["ShortDateFormat"]          = "M/d";
     kv["SmartChannelChange"]       = "0";
 
-    kv["IndividualMuteControl"]    = "0";
     kv["UseArrowAccels"]           = "1";
     kv["OSDGeneralTimeout"]        = "2";
     kv["OSDProgramInfoTimeout"]    = "3";
@@ -977,7 +980,6 @@ TV::TV(void)
     db_time_format         = kv["TimeFormat"];
     db_short_date_format   = kv["ShortDateFormat"];
     smartChannelChange     = kv["SmartChannelChange"].toInt();
-    MuteIndividualChannels = kv["IndividualMuteControl"].toInt();
     arrowAccel             = kv["UseArrowAccels"].toInt();
     osd_general_timeout    = kv["OSDGeneralTimeout"].toInt();
     osd_prog_info_timeout  = kv["OSDProgramInfoTimeout"].toInt();
@@ -3756,6 +3758,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
           has_action("STRETCHINC",      actions) ||
           has_action("STRETCHDEC",      actions) ||
           has_action("MUTE",            actions) ||
+          has_action("CYCLEAUDIOCHAN",  actions) ||
           has_action("TOGGLEASPECT",    actions) ||
           has_action("TOGGLEPIPMODE",   actions) ||
           has_action("TOGGLEPIPSTATE",  actions) ||
@@ -3811,11 +3814,12 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
     else
     {
         // only pass-through actions listed below
-        handled = !(has_action("STRETCHINC", actions) ||
-                    has_action("STRETCHDEC", actions) ||
-                    has_action("MUTE",       actions) ||
-                    has_action("PAUSE",      actions) ||
-                    has_action("CLEAROSD",   actions));
+        handled = !(has_action("STRETCHINC",     actions) ||
+                    has_action("STRETCHDEC",     actions) ||
+                    has_action("MUTE",           actions) ||
+                    has_action("CYCLEAUDIOCHAN", actions) ||
+                    has_action("PAUSE",          actions) ||
+                    has_action("CLEAROSD",       actions));
     }
     actx->UnlockDeleteNVP(__FILE__, __LINE__);
 
@@ -4433,6 +4437,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         ChangeVolume(ctx, false);
     else if (has_action("VOLUMEUP", actions))
         ChangeVolume(ctx, true);
+    else if (has_action("CYCLEAUDIOCHAN", actions))
+        ToggleMute(ctx, true);
     else if (has_action("MUTE", actions))
         ToggleMute(ctx);
     else if (has_action("STRETCHINC", actions))
@@ -8330,7 +8336,7 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
     ReturnOSDLock(ctx, osd);
 }
 
-void TV::ToggleMute(PlayerContext *ctx)
+void TV::ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels)
 {
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (!ctx->nvp || !ctx->nvp->HasAudioOut())
@@ -8341,7 +8347,7 @@ void TV::ToggleMute(PlayerContext *ctx)
 
     MuteState mute_status;
 
-    if (!MuteIndividualChannels)
+    if (!muteIndividualChannels)
     {
         ctx->nvp->SetMuted(!ctx->nvp->IsMuted());
         mute_status = (ctx->nvp->IsMuted()) ? kMuteAll : kMuteOff;
