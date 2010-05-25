@@ -139,26 +139,25 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
         {
             for (int i = 0; i < EXIF_IFD_COUNT; i++)
             {
-                    ExifEntry *entry = exif_content_get_entry (data->ifd[i],
+                ExifEntry *entry = exif_content_get_entry (data->ifd[i],
                                                         EXIF_TAG_ORIENTATION);
-                    if (entry)
+                ExifByteOrder byteorder = exif_data_get_byte_order (data);
+
+                if (entry)
+                {
+                    ExifShort v_short = exif_get_short (entry->data, byteorder);
+                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Exif entry=%1").arg(v_short));
+                    /* See http://sylvana.net/jpegcrop/exif_orientation.html*/
+                    if (v_short == 8)
                     {
-#if NEW_LIB_EXIF
-                        exif_entry_get_value(entry, exifvalue, 1023);
-                        QString value = exifvalue;
-#else
-                        QString value = exif_entry_get_value(entry);
-#endif
-                        if (value == "left - bottom")
-                        {
-                          rotateAngle = -90;
-                        }
-                        else if (value == "right - top")
-                        {
-                          rotateAngle = 90;
-                        }
-                        break;
+                        rotateAngle = -90;
                     }
+                    else if (v_short == 6)
+                    {
+                        rotateAngle = 90;
+                    }
+                    break;
+                }
             }
             exif_data_free(data);
         }
