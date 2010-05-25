@@ -33,14 +33,14 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include <mythcorecontext.h>
-#include <mythmainwindow.h>
+#include "mythcorecontext.h"
+#include "mythmainwindow.h"
 
 // MythUI headers
-#include <mythuitext.h>
-#include <mythuibutton.h>
-#include <mythuibuttonlist.h>
-#include <mythdialogbox.h>
+#include "mythuitext.h"
+#include "mythuibutton.h"
+#include "mythuibuttonlist.h"
+#include "mythdialogbox.h"
 
 // MythControls headers
 #include "keygrabber.h"

@@ -7,10 +7,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef USING_ALSA
-#include <audiooutputalsa.h>
-#endif
-
 // Qt headers
 #include <QCoreApplication>
 #include <QEvent>
@@ -21,6 +17,10 @@
 #include <QDir>
 #include <QImage>
 #include <QTextCodec>
+
+#ifdef USING_ALSA
+#include "audiooutputalsa.h"
+#endif
 
 // MythTV headers
 #include "mythconfig.h"

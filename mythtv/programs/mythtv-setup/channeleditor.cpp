@@ -1,16 +1,15 @@
 
 #include "channeleditor.h"
 
-#include "settings.h"
-#include "mythverbose.h"
-#include "mythdb.h"
-
 #include <QSqlDatabase>
 #include <QCoreApplication>
 
-#include <mythwizard.h>
+#include "mythwizard.h"
+
 
 // MythUI
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "mythuitext.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
@@ -19,6 +18,7 @@
 #include "mythdialogbox.h"
 #include "mythprogressdialog.h"
 
+#include "settings.h"
 #include "channelsettings.h"
 #include "transporteditor.h"
 #include "sourceutil.h"

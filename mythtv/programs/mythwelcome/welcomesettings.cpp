@@ -1,8 +1,7 @@
-#include <mythcorecontext.h>
-
 #include <unistd.h>
 
 #include "welcomesettings.h"
+#include "mythcorecontext.h"
 #include "mythdirs.h"
 
 ///////////////////////////////////////////////////////////////////

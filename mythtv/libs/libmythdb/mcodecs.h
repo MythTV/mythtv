@@ -36,7 +36,7 @@
 
 #define QBase64 QCodecs
 
-#include <mythexp.h>
+#include "mythexp.h"
 
 class QByteArray;
 class QIODevice;

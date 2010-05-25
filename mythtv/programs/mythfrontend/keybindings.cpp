@@ -27,8 +27,8 @@
  */
 
 // MythTV headers
-#include <mythdb.h>
-#include <mythmainwindow.h>
+#include "mythdb.h"
+#include "mythmainwindow.h"
 
 // MythControls headers
 #include "keybindings.h"
