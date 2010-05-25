@@ -38,10 +38,11 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     pbufsize(-1),
     m_card(-1),
     m_device(-1),
-    m_subdevice(-1),
-    mixer_handle(NULL),
-    mixer_control(QString::null)
+    m_subdevice(-1)
 {
+    m_mixer.handle = NULL;
+    m_mixer.elem = NULL;
+
     // Set everything up
     Reconfigure(settings);
 }
@@ -396,8 +397,11 @@ bool AudioOutputALSA::OpenDevice()
         return OpenDevice();
     }
 
-    if (internal_vol)
-        OpenMixer(set_initial_vol);
+    if (internal_vol && !OpenMixer())
+    {
+        CloseDevice();
+        return false;
+    }
 
     // Device opened successfully
     return true;
@@ -405,7 +409,9 @@ bool AudioOutputALSA::OpenDevice()
 
 void AudioOutputALSA::CloseDevice()
 {
-    CloseMixer();
+    if (m_mixer.handle)
+        snd_mixer_close(m_mixer.handle);
+    m_mixer.handle = NULL;
     if (pcm_handle)
     {
         snd_pcm_close(pcm_handle);
@@ -654,201 +660,163 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     return 0;
 }
 
-
 int AudioOutputALSA::GetVolumeChannel(int channel) const
 {
-    long actual_volume;
+    int retvol = 0;
 
-    if (mixer_handle == NULL)
-        return -1;
-
-    QByteArray mix_ctl = mixer_control.toAscii();
-    snd_mixer_selem_id_t *sid;
-    snd_mixer_selem_id_alloca(&sid);
-    snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, mix_ctl.constData());
-
-    snd_mixer_elem_t *elem = snd_mixer_find_selem(mixer_handle, sid);
-    if (!elem)
-    {
-        VBERROR(QString("Mixer unable to find control %1 (ch %2)")
-                .arg(mixer_control).arg(channel));
-        return -1;
-    }
+    if (!m_mixer.elem)
+        return retvol;
 
     snd_mixer_selem_channel_id_t chan = (snd_mixer_selem_channel_id_t) channel;
-    if (!snd_mixer_selem_has_playback_channel(elem, chan))
-        return -1;
+    if (!snd_mixer_selem_has_playback_channel(m_mixer.elem, chan))
+        return retvol;
 
-    ALSAVolumeInfo vinfo = GetVolumeRange(elem);
-
-    snd_mixer_selem_get_playback_volume(elem,
-                                        (snd_mixer_selem_channel_id_t)channel,
-                                        &actual_volume);
-
-    return vinfo.ToMythRange(actual_volume);
+    long mixervol;
+    int chk;
+    if ((chk = snd_mixer_selem_get_playback_volume(m_mixer.elem,
+                                                   chan,
+                                                   &mixervol)) < 0)
+    {
+        VBERROR(QString("failed to get channel %1 volume, mixer %2/%3: %4")
+                .arg(channel).arg(m_mixer.device)
+                .arg(m_mixer.control)
+                .arg(snd_strerror(chk)));
+    }
+    else
+    {
+        retvol = (m_mixer.volrange != 0L) ? (mixervol - m_mixer.volmin) *
+                                            100.0f / m_mixer.volrange + 0.5f
+                                            : 0;
+        retvol = max(retvol, 0);
+        retvol = min(retvol, 100);
+        VBAUDIO(QString("get volume channel %1: %2")
+                .arg(channel).arg(retvol));
+    }
+    return retvol;
 }
 
 void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
 {
-    SetCurrentVolume(mixer_control, channel, volume);
-}
-
-void AudioOutputALSA::SetCurrentVolume(QString control, uint channel,
-                                       uint volume)
-{
-    if (!mixer_handle)
-        return; // no mixer, nothing to do
-
-    QByteArray ctl = control.toAscii();
-    snd_mixer_selem_id_t *sid;
-    snd_mixer_selem_id_alloca(&sid);
-    snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, ctl.constData());
-
-    snd_mixer_elem_t *elem = snd_mixer_find_selem(mixer_handle, sid);
-    if (!elem)
-    {
-        VBERROR(QString("Mixer unable to find control %1 (ch %2)")
-                .arg(control).arg(channel));
+    if (!(internal_vol && m_mixer.elem))
         return;
-    }
+
+    long mixervol = volume * m_mixer.volrange / 100.0f - m_mixer.volmin + 0.5f;
+    mixervol = max(mixervol, m_mixer.volmin);
+    mixervol = min(mixervol, m_mixer.volmax);
 
     snd_mixer_selem_channel_id_t chan = (snd_mixer_selem_channel_id_t) channel;
-    if (!snd_mixer_selem_has_playback_channel(elem, chan))
-        return;
-
-    VBAUDIO(QString("Setting %1 volume to %2").arg(control).arg(volume));
-
-    ALSAVolumeInfo vinfo = GetVolumeRange(elem);
-
-    long set_vol = vinfo.ToALSARange(volume);
-
-    int err = snd_mixer_selem_set_playback_volume(elem, chan, set_vol);
-    if (err < 0)
-        AERROR(QString("mixer set channel %1").arg(channel));
+    if (snd_mixer_selem_set_playback_volume(m_mixer.elem, chan, mixervol) < 0)
+        VBERROR(QString("failed to set channel %1 volume").arg(channel));
     else
-        VBAUDIO(QString("channel %1 vol set to %2").arg(channel).arg(set_vol));
+        VBAUDIO(QString("channel %1 volume set %2 => %3")
+                .arg(channel).arg(volume).arg(mixervol));
+}
 
-    if (snd_mixer_selem_has_playback_switch(elem))
+bool AudioOutputALSA::OpenMixer(void)
+{
+    if (!pcm_handle)
     {
-        int unmute = (0 != set_vol);
-        if (snd_mixer_selem_has_playback_switch_joined(elem))
-        {
-            // Only mute if all the channels should be muted.
-            for (int i = 0; i < channels; i++)
-            {
-                if (GetVolumeChannel(i) > 0)
-                    unmute = 1;
-            }
-        }
+        VBERROR("mixer setup without a pcm");
+        return false;
+    }
+    m_mixer.device = gCoreContext->GetSetting("MixerDevice", "default");
+    m_mixer.device = m_mixer.device.remove(QString("ALSA:"));
+    if (m_mixer.device.toLower() == "software")
+        return true;
 
-        if ((err = snd_mixer_selem_set_playback_switch(elem, chan, unmute)) < 0)
-            AERROR(QString("mixer set playback switch %1").arg(channel));
+    m_mixer.control = gCoreContext->GetSetting("MixerControl", "PCM");
+
+    QString mixer_device_tag = QString("mixer device %1").arg(m_mixer.device);
+
+    int chk;
+    if ((chk = snd_mixer_open(&m_mixer.handle, 0)) < 0)
+    {
+        VBERROR(QString("failed to open mixer device %1: %2")
+                .arg(mixer_device_tag).arg(snd_strerror(chk)));
+        return false;
+    }
+
+    QByteArray dev_ba = m_mixer.device.toAscii();
+    struct snd_mixer_selem_regopt regopts =
+        {1, SND_MIXER_SABSTRACT_NONE, dev_ba.constData(), NULL, NULL};
+
+    if ((chk = snd_mixer_selem_register(m_mixer.handle, &regopts, NULL)) < 0)
+    {
+        snd_mixer_close(m_mixer.handle);
+        m_mixer.handle = NULL;
+        VBERROR(QString("failed to register %1: %2")
+                .arg(mixer_device_tag).arg(snd_strerror(chk)));
+        return false;
+    }
+
+    if ((chk = snd_mixer_load(m_mixer.handle)) < 0)
+    {
+        snd_mixer_close(m_mixer.handle);
+        m_mixer.handle = NULL;
+        VBERROR(QString("failed to load %1: %2")
+                .arg(mixer_device_tag).arg(snd_strerror(chk)));
+        return false;
+    }
+
+    m_mixer.elem = NULL;
+    uint elcount = snd_mixer_get_count(m_mixer.handle);
+    snd_mixer_elem_t* elx = snd_mixer_first_elem(m_mixer.handle);
+
+    for (uint ctr = 0; elx != NULL && ctr < elcount; ctr++)
+    {
+        QString tmp = QString(snd_mixer_selem_get_name(elx));
+        if (m_mixer.control == tmp &&
+            !snd_mixer_selem_is_enumerated(elx) &&
+            snd_mixer_selem_has_playback_volume(elx) &&
+            snd_mixer_selem_is_active(elx))
+        {
+            m_mixer.elem = elx;
+            VBAUDIO(QString("found playback control %1 on %2")
+                    .arg(m_mixer.control)
+                    .arg(mixer_device_tag));
+            break;
+        }
+        elx = snd_mixer_elem_next(elx);
+    }
+    if (!m_mixer.elem)
+    {
+        snd_mixer_close(m_mixer.handle);
+        m_mixer.handle = NULL;
+        VBERROR(QString("no playback control %1 found on %2")
+                .arg(m_mixer.control).arg(mixer_device_tag));
+        return false;
+    }
+    if ((snd_mixer_selem_get_playback_volume_range(m_mixer.elem,
+                                                   &m_mixer.volmin,
+                                                   &m_mixer.volmax) < 0))
+    {
+        snd_mixer_close(m_mixer.handle);
+        m_mixer.handle = NULL;
+        VBERROR(QString("failed to get volume range on %1/%2")
+                .arg(mixer_device_tag).arg(m_mixer.control));
+        return false;
+    }
+
+    m_mixer.volrange = m_mixer.volmax - m_mixer.volmin;
+    VBAUDIO(QString("mixer volume range on %1/%2 - min %3, max %4, range %5")
+            .arg(mixer_device_tag).arg(m_mixer.control)
+            .arg(m_mixer.volmin).arg(m_mixer.volmax).arg(m_mixer.volrange));
+    VBAUDIO(QString("%1/%2 set up successfully")
+            .arg(mixer_device_tag)
+            .arg(m_mixer.control));
+
+    if (set_initial_vol)
+    {
+        int initial_vol;
+        if (m_mixer.control == "PCM")
+            initial_vol = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         else
-            VBAUDIO(QString("channel %1 playback switch set to %2")
-                    .arg(channel).arg(unmute));
-    }
-}
-
-void AudioOutputALSA::OpenMixer(bool setstartingvolume)
-{
-    int volume;
-
-    mixer_control = gCoreContext->GetSetting("MixerControl", "PCM");
-
-    SetupMixer();
-
-    if (!mixer_handle || !setstartingvolume)
-        return;
-
-    volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
-    SetCurrentVolume("Master", 0, volume);
-    SetCurrentVolume("Master", 1, volume);
-
-    volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
-    SetCurrentVolume("PCM", 0, volume);
-    SetCurrentVolume("PCM", 1, volume);
-}
-
-void AudioOutputALSA::CloseMixer(void)
-{
-    if (mixer_handle != NULL)
-        snd_mixer_close(mixer_handle);
-    mixer_handle = NULL;
-}
-
-void AudioOutputALSA::SetupMixer(void)
-{
-    int err;
-
-    QString alsadevice = gCoreContext->GetSetting("MixerDevice", "default");
-    QString device = alsadevice.remove(QString("ALSA:"));
-
-    if (mixer_handle != NULL)
-        CloseMixer();
-
-    if (alsadevice.toLower() == "software")
-        return;
-
-    VBAUDIO(QString("Opening mixer %1").arg(device));
-
-    if ((err = snd_mixer_open(&mixer_handle, 0)) < 0)
-    {
-        AERROR("Mixer device open error");
-        mixer_handle = NULL;
-        return;
+            initial_vol = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
+        for (int ch = 0; ch < channels; ++ch)
+            SetVolumeChannel(ch, initial_vol);
     }
 
-    QByteArray dev_ba = device.toAscii();
-    if ((err = snd_mixer_attach(mixer_handle, dev_ba.constData())) < 0)
-    {
-        AERROR(QString("Mixer attach error. "
-                       "Check Mixer Name in Setup: '%1'.\n\t\tError")
-               .arg(device));
-        CloseMixer();
-        return;
-    }
-
-    if ((err = snd_mixer_selem_register(mixer_handle, NULL, NULL)) < 0)
-    {
-        AERROR("Mixer register error");
-        CloseMixer();
-        return;
-    }
-
-    if ((err = snd_mixer_load(mixer_handle)) < 0)
-    {
-        AERROR("Mixer load error");
-        CloseMixer();
-        return;
-    }
-}
-
-ALSAVolumeInfo AudioOutputALSA::GetVolumeRange(snd_mixer_elem_t *elem) const
-{
-    long volume_min, volume_max;
-    int err;
-
-    if ((err = snd_mixer_selem_get_playback_volume_range(elem, &volume_min,
-                                                         &volume_max)) < 0)
-    {
-        static bool first_time = true;
-        if (first_time)
-        {
-            VBERROR(QString("Unable to get mixer volume range: %1")
-                  .arg(snd_strerror(err)));
-            first_time = false;
-        }
-    }
-
-    ALSAVolumeInfo vinfo(volume_min, volume_max);
-
-    VBAUDIO(QString("Volume range is %1 to %2, mult=%3")
-            .arg(vinfo.volume_min).arg(vinfo.volume_max)
-            .arg(vinfo.range_multiplier));
-
-    return vinfo;
+    return true;
 }
 
 QMap<QString, QString> *AudioOutputALSA::GetALSADevices(const char *type)
