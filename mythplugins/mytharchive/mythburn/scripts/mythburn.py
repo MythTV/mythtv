@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20100502-1"
+VERSION="0.1.20100526-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -804,8 +804,8 @@ def getDefaultParametersFromMythTVDB():
     write( "Obtaining MythTV settings from MySQL database for hostname " + configHostname)
 
     #TVFormat is not dependant upon the hostname.
-    sqlstatement="""select value, data from settings where value in('DBSchemaVer') 
-                    or (hostname='""" + configHostname + """' and value in(
+    sqlstatement="""SELECT value, data FROM settings WHERE value IN('DBSchemaVer') 
+                    OR (hostname=%s AND value IN(
                         'VideoStartupDir',
                         'GalleryDir',
                         'MusicLocation',
@@ -838,7 +838,7 @@ def getDefaultParametersFromMythTVDB():
                         'ISO639Language0',
                         'ISO639Language1',
                         'JobQueueCPU'
-                        )) order by value"""
+                        )) ORDER BY value"""
 
     #write( sqlstatement)
 
@@ -847,7 +847,7 @@ def getDefaultParametersFromMythTVDB():
     # create a cursor
     cursor = db.cursor()
     # execute SQL statement
-    cursor.execute(sqlstatement)
+    cursor.execute(sqlstatement, configHostname)
     # get the resultset as a tuple
     result = cursor.fetchall()
 
@@ -871,13 +871,12 @@ def saveSetting(name, data):
     db = getDatabaseConnection()
     cursor = db.cursor()
 
-    query =  "DELETE from settings "
-    query += "WHERE value = '" + name + "' AND hostname = '" + configHostname + "'"
-    cursor.execute(query)
+    cursor.execute("""DELETE FROM settings
+                      WHERE value=%s
+                      AND hostname=%s""", (name, configHostname))
 
-    query =  "INSERT INTO settings (value, data, hostname) "
-    query += "VALUES ('" + name + "', '" + data + "', '" + configHostname + "')"
-    cursor.execute(query)
+    cursor.execute("""INSERT INTO settings (value, data, hostname)
+                      VALUES(%s, %s, %s)""", (name, data, configHostname))
 
     db.close()
     del db
@@ -894,7 +893,7 @@ def clearArchiveItems():
     db = getDatabaseConnection()
     cursor = db.cursor()
 
-    cursor.execute("DELETE from archiveitems;")
+    cursor.execute("DELETE FROM archiveitems")
 
     db.close()
     del db
@@ -1404,12 +1403,12 @@ def getFileInformation(file, folder):
         # if this a myth recording we still need to find the chanid, starttime and hascutlist
         if file.attributes["type"].value=="recording":
             basename = os.path.basename(file.attributes["filename"].value)
-            sqlstatement  = """SELECT starttime, chanid FROM recorded 
-                               WHERE basename = '%s'""" % basename.replace("'", "\\'")
 
             db = getDatabaseConnection()
             cursor = db.cursor()
-            cursor.execute(sqlstatement)
+            cursor.execute("""SELECT starttime, chanid FROM recorded
+                              WHERE basename=%s""", basename)
+
             result = cursor.fetchall()
             numrows = int(cursor.rowcount)
 
@@ -1433,12 +1432,13 @@ def getFileInformation(file, folder):
                 chanid = record[1]
 
                 # find the cutlist if available
-                sqlstatement  = """SELECT mark, type FROM recordedmarkup 
-                                WHERE chanid = '%s' AND starttime = '%s' 
-                                AND type IN (0,1) ORDER BY mark""" % (chanid, starttime)
                 cursor = db.cursor()
-                # execute SQL statement
-                cursor.execute(sqlstatement)
+                cursor.execute("""SELECT mark, type FROM recordedmarkup
+                                  WHERE chanid=%s
+                                  AND starttime=%s
+                                  AND type IN(0,1)
+                                  ORDER BY mark""", (chanid, starttime))
+
                 if cursor.rowcount > 0:
                     node = infoDOM.createElement("hascutlist")
                     node.appendChild(infoDOM.createTextNode("yes"))
@@ -1450,12 +1450,12 @@ def getFileInformation(file, folder):
 
                 # find the cut list end marks if available to use as chapter marks
                 if file.attributes["usecutlist"].value == "0" and addCutlistChapters == True:
-                    sqlstatement  = """SELECT mark, type FROM recordedmarkup 
-                                    WHERE chanid = '%s' AND starttime = '%s' 
-                                    AND type = 0 ORDER BY mark""" % (chanid, starttime)
                     cursor = db.cursor()
-                    # execute SQL statement
-                    cursor.execute(sqlstatement)
+                    cursor.execute("""SELECT mark, type FROM recordedmarkup
+                                      WHERE chanid=%s
+                                      AND starttime=%s
+                                      AND type=0
+                                      ORDER BY mark""", (chanid, starttime))    
                     # get the resultset as a tuple
                     result = cursor.fetchall()
                     if cursor.rowcount > 0:
@@ -1475,16 +1475,16 @@ def getFileInformation(file, folder):
 
     elif file.attributes["type"].value=="recording":
         basename = os.path.basename(file.attributes["filename"].value)
-        sqlstatement  = """SELECT progstart, stars, cutlist, category, description, subtitle, 
-                           title, starttime, chanid
-                           FROM recorded WHERE basename = '%s'""" % basename.replace("'", "\\'")
-
         # connect
         db = getDatabaseConnection()
         # create a cursor
         cursor = db.cursor()
         # execute SQL statement
-        cursor.execute(sqlstatement)
+        cursor.execute("""SELECT progstart, stars, cutlist, category,
+                                 description, subtitle, title, starttime,
+                                 chanid
+                          FROM recorded
+                          WHERE basename=%s""", basename)
         # get the resultset as a tuple
         result = cursor.fetchall()
         # get the number of rows in the resultset
@@ -1552,12 +1552,14 @@ def getFileInformation(file, folder):
             chanid = record[8]
 
             # find the cutlist if available
-            sqlstatement  = """SELECT mark, type FROM recordedmarkup 
-                               WHERE chanid = '%s' AND starttime = '%s' 
-                               AND type IN (0,1) ORDER BY mark""" % (chanid, starttime)
             cursor = db.cursor()
             # execute SQL statement
-            cursor.execute(sqlstatement)
+            cursor.execute("""SELECT mark, type FROM recordedmarkup
+                              WHERE chanid=%s
+                              AND starttime=%s
+                              AND type IN(0,1)
+                              ORDER BY mark""", (chanid, starttime))
+
             if cursor.rowcount > 0:
                 node = infoDOM.createElement("hascutlist")
                 node.appendChild(infoDOM.createTextNode("yes"))
@@ -1569,12 +1571,13 @@ def getFileInformation(file, folder):
 
             if file.attributes["usecutlist"].value == "0" and addCutlistChapters == True:
                 # find the cut list end marks if available
-                sqlstatement  = """SELECT mark, type FROM recordedmarkup 
-                                    WHERE chanid = '%s' AND starttime = '%s' 
-                                    AND type = 0 ORDER BY mark""" % (chanid, starttime)
                 cursor = db.cursor()
                 # execute SQL statement
-                cursor.execute(sqlstatement)
+                cursor.execute("""SELECT mark, type FROM recordedmarkup
+                                  WHERE chanid=%s
+                                  AND starttime=%s
+                                  AND type=0
+                                  ORDER BY mark""", (chanid, starttime))
                 # get the resultset as a tuple
                 result = cursor.fetchall()
                 if cursor.rowcount > 0:
@@ -1593,17 +1596,15 @@ def getFileInformation(file, folder):
         del cursor
 
     elif file.attributes["type"].value=="video":
-        filename = os.path.join(videopath, file.attributes["filename"].value.replace("'", "\\'"))
-        sqlstatement="""select title, director, plot, rating, inetref, year, 
-                        userrating, length, coverfile from videometadata 
-                        where filename='%s'""" % filename
-
         # connect
         db = getDatabaseConnection()
         # create a cursor
         cursor = db.cursor()
         # execute SQL statement
-        cursor.execute(sqlstatement)
+        cursor.execute("""SELECT title, director, plot, rating, inetref, year,
+                                 userrating, length, coverfile
+                          FROM videometadata
+                          WHERE filename LIKE %s""", '%'+file.attributes["filename"].value)
         # get the resultset as a tuple
         result = cursor.fetchall()
         # get the number of rows in the resultset
