@@ -87,9 +87,6 @@ bool TreeEditor::Create(void)
 
     loadData();
 
-    QString icondir = QString("%1/mythnetvision/icons/").arg(GetShareDir());
-    gCoreContext->SaveSetting("mythnetvision.iconDir", icondir);
-
     return true;
 }
 

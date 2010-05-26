@@ -357,7 +357,12 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                     m_imageDownload->addURL(node->getString(), tpath, pos);
             }
             else if (tpath != "0")
-                item->SetImage(node->GetData().toString());
+            {
+                QString filename = node->GetData().toString();
+                if (filename.contains("%SHAREDIR%"))
+                    filename.replace("%SHAREDIR%", GetShareDir());
+                item->SetImage(filename);
+            }
         }
     }
 }
@@ -1144,6 +1149,7 @@ void NetTree::slotItemChanged()
                 if (node)
                     thumb = node->GetData().toString();
             }
+
             if (!thumb.startsWith("http://"))
             {
                 bool exists = QFile::exists(thumb);
