@@ -24,7 +24,6 @@ using namespace std;
 #include "langsettings.h"
 #include "mythxdisplay.h"
 #include "mythevent.h"
-#include "themeinfo.h"
 #include "dbutil.h"
 #include "DisplayRes.h"
 
