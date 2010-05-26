@@ -3,10 +3,14 @@
 
 // Qt headers
 #include <QString>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 // MythTV headers
 #include <mythscreentype.h>
 #include <netgrabbermanager.h>
+#include <mythscreentype.h>
+#include <mythprogressdialog.h>
 
 class MythUIButtonList;
 
@@ -27,19 +31,27 @@ class SearchEditor : public MythScreenType
 
   private:
     void loadData(void);
-    GrabberScript::scriptList fillGrabberList();
     void fillGrabberButtonList();
+    void parsedData();
 
     GrabberScript::scriptList m_grabberList;
     MythUIButtonList *m_grabbers;
+    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack;
 
-    bool m_changed;
+    QNetworkAccessManager *m_manager;
+    QNetworkReply         *m_reply;
+    bool                   m_changed;
+
+  protected:
+    void createBusyDialog(QString title);
 
   signals:
     void itemsChanged(void);
 
   public slots:
     void toggleItem(MythUIButtonListItem *item);
+    void slotLoadedData(void);
 };
 
 #endif /* SEARCHEDITOR_H */

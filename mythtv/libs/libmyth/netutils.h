@@ -10,7 +10,6 @@
 
 // Generic Data Formatting
 MPUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits);
-MPUBLIC QString GetThumbnailFilename(QString url, QString title);
 
 // Tree DB Utils
 

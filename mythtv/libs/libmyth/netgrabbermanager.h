@@ -146,6 +146,7 @@ class MPUBLIC Search : public QObject
     void process(void);
 
     QByteArray GetData() { return m_data; };
+    void SetData(QByteArray data);
 
     uint numResults() { return m_numResults; };
     uint numReturned() { return m_numReturned; };

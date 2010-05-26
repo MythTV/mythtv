@@ -28,8 +28,8 @@
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
 __title__ ="TMDB Trailers";
-__author__="R.D.Vaughan"
-__version__="0.21"
+__author__="R.D. Vaughan"
+__version__="0.22"
 # 0.1.0 Initial development
 # 0.1.1 Refining grabber. Added maximum items per page and usage examples.
 # 0.1.2 Added the support function code "|S" to the title.
@@ -37,6 +37,7 @@ __version__="0.21"
 # 0.1.4 Documentation updates
 # 0.2.0 Public release
 # 0.21 Change to support xml version information display
+# 0.22  Added the "command" tag to the xml version information display
 
 
 __usage_examples__ = '''
@@ -167,6 +168,7 @@ if __name__ == '__main__':
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
+    main.grabberInfo['command'] = u'tmdb_nv.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'tmdb_nv.png'
     main.grabberInfo['type'] = ['video']

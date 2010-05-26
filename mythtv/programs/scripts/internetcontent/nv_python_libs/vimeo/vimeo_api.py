@@ -36,7 +36,7 @@ metadata and video/image URLs from vimeo. These routines are based on the v2 api
 for this api are published at http://vimeo.com/api/docs/advanced-api
 '''
 
-__version__="v0.2.4"
+__version__="v0.2.5"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view processing
 # 0.1.2 Documentation review
@@ -49,6 +49,7 @@ __version__="v0.2.4"
 #       Fixed an exception message error when vimeo returns poorly formed XML.
 #       For example search term "flute" returns bad XML while "Flute music" returns proper XML
 # 0.2.4 Fixed an exception message output code error
+# 0.2.5 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 
 """
 Python module to interact with Vimeo through its API (version 2)
@@ -617,33 +618,6 @@ sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
-# Find out if the MythTV python bindings can be accessed and instances can created
-try:
-	'''If the MythTV python interface is found, required to access Netvision icon directory settings
-	'''
-	from MythTV import MythDB, MythLog
-	mythdb = None
-	try:
-		'''Create an instance of each: MythDB
-		'''
-		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-		mythdb = MythDB()
-	except MythError, e:
-		sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
-		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
-		if not os.path.isfile(filename):
-			sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
-		else:
-			sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
-	except Exception, e:
-		sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
-except Exception, e:
-	sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
-	mythdb = None
-
-from socket import gethostname, gethostbyname
-
-
 class Videos(object):
     """Main interface to http://vimeo.com/
     This is done to support a common naming framework for all python Netvision plugins no matter their site
@@ -784,14 +758,7 @@ class Videos(object):
 
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.treeview = False
-        self.channel_icon = u'http://vimeo.com/assets/images/vimeo_logo/vimeo_logo.png'
-
-        if mythdb:
-            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
-            if self.icon_dir:
-                self.icon_dir = self.icon_dir.replace(u'//', u'/')
-                self.setTreeViewIcon(dir_icon='vimeo')
-                self.channel_icon = self.tree_dir_icon
+        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/vimeo.jpg'
     # end __init__()
 
 ###########################################################################################################
@@ -879,18 +846,12 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.icon_dir:
-                return self.tree_dir_icon
             if not self.feed_icons.has_key(self.tree_key):
                 return self.tree_dir_icon
             if not self.feed_icons[self.tree_key].has_key(self.feed):
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
-        for ext in self.config[u'image_extentions']:
-            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
-            if os.path.isfile(icon):
-                self.tree_dir_icon = icon
-                break
+        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 

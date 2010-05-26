@@ -19,7 +19,7 @@ metadata, video and image URLs from MTV. These routines are based on the api. Sp
 for this api are published at http://developer.mtvnservices.com/docs
 '''
 
-__version__="v0.2.3"
+__version__="v0.2.4"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree View Processing
 # 0.1.2 Modified Reee view code and structure to be standandized across all grabbers
@@ -32,6 +32,7 @@ __version__="v0.2.3"
 # 0.2.2 Complete abort error message display improvements
 #       Removed the import and use of the feedparser library
 # 0.2.3 Fixed an exception message output code error in two places
+# 0.2.4 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 
 import os, struct, sys, re, time
 from datetime import datetime, timedelta
@@ -72,33 +73,6 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
-
-
-# Find out if the MythTV python bindings can be accessed and instances can created
-try:
-	'''If the MythTV python interface is found, required to access Netvision icon directory settings
-	'''
-	from MythTV import MythDB, MythLog
-	mythdb = None
-	try:
-		'''Create an instance of each: MythDB
-		'''
-		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-		mythdb = MythDB()
-	except MythError, e:
-		sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
-		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
-		if not os.path.isfile(filename):
-			sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
-		else:
-			sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
-	except Exception, e:
-		sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
-except Exception, e:
-	sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
-	mythdb = None
-
-from socket import gethostname, gethostbyname
 
 
 class XmlHandler:
@@ -267,14 +241,7 @@ class Videos(object):
 
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.treeview = False
-        self.channel_icon = u'http://nail.cc/brain/wp-content/uploads/2009/02/mtv_logo.jpg'
-
-        if mythdb:
-            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
-            if self.icon_dir:
-                self.icon_dir = self.icon_dir.replace(u'//', u'/')
-                self.setTreeViewIcon(dir_icon='mtv')
-                self.channel_icon = self.tree_dir_icon
+        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/mtv.png'
     # end __init__()
 
 ###########################################################################################################
@@ -362,18 +329,12 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.icon_dir:
-                return self.tree_dir_icon
             if not self.feed_icons.has_key(self.tree_key):
                 return self.tree_dir_icon
             if not self.feed_icons[self.tree_key].has_key(self.feed):
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
-        for ext in self.config[u'image_extentions']:
-            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
-            if os.path.isfile(icon):
-                self.tree_dir_icon = icon
-                break
+        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 

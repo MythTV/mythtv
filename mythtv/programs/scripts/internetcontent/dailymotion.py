@@ -27,12 +27,13 @@
 #-------------------------------------
 __title__ ="Dailymotion";
 __author__="R.D. Vaughan"
-__version__="0.22"
+__version__="0.23"
 # 0.1.0 Initial development
 # 0.1.1 Update documentation
 # 0.2.0 Public release
 # 0.2.1 Improved the diplayed messages when exception occur
 # 0.22  Change to support xml version information display
+# 0.23  Added the "command" tag to the xml version information display
 
 
 __usage_examples__ ='''
@@ -235,6 +236,7 @@ if __name__ == '__main__':
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
+    main.grabberInfo['command'] = u'dailymotion.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'dailymotion.png'
     main.grabberInfo['type'] = ['video']

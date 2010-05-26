@@ -20,7 +20,7 @@ meta data, video and image URLs from blip.tv. These routines are based on the v2
 for this api are published at  http://blip.tv/about/api/
 '''
 
-__version__="v0.2.3"
+__version__="v0.2.5"
 # 0.1.0 Initial development
 # 0.1.1 Changed to use bliptv's rss data rather than JSON as JSON ad a number of error
 # 0.1.2 Changes Search to parse XML and added Tree view
@@ -33,6 +33,9 @@ __version__="v0.2.3"
 # 0.2.2 Completed exception message improvements
 #       Removed the unused import of the feedparser library
 # 0.2.3 Fixed an exception message output code error in two places
+# 0.2.4 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.2.5 Changed link URL to full screen when a "blip:embedUrl" exists for an item
+#       Removed a subdirectory level as the "Featured" RSS feed has been discontinued
 
 import os, struct, sys, re, time
 import urllib, urllib2
@@ -72,32 +75,6 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
-
-# Find out if the MythTV python bindings can be accessed and instances can created
-try:
-	'''If the MythTV python interface is found, required to access Netvision icon directory settings
-	'''
-	from MythTV import MythDB, MythLog
-	mythdb = None
-	try:
-		'''Create an instance of each: MythDB
-		'''
-		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-		mythdb = MythDB()
-	except MythError, e:
-		sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
-		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
-		if not os.path.isfile(filename):
-			sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
-		else:
-			sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
-	except Exception, e:
-		sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
-except Exception, e:
-	sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
-	mythdb = None
-
-from socket import gethostname, gethostbyname
 
 
 class XmlHandler:
@@ -232,7 +209,8 @@ class Videos(object):
         self.tree_order = ['P_R_R_F']
 
         self.tree_org = {
-            'P_R_R_F': [['Popular/Recent/Features/Random ...', ['popular', 'recent', 'random', 'featured',]],
+#            'P_R_R_F': [['Popular/Recent/Features/Random ...', ['popular', 'recent', 'random', 'featured',]],
+            'P_R_R_F': [['', ['popular', 'recent', 'random', 'featured',]],
                 ],
             # categories are dynamically filled in from a list retrieved from the blip.tv site
             'categories': [
@@ -252,14 +230,14 @@ class Videos(object):
             }
 
         self.feed_names = {
-            'P_R_R_F': {'featured': 'Featured Videos', 'popular': 'Most Comments', 'recent': 'Most Recent', 'random': 'Random selection',
+            'P_R_R_F': {'popular': 'Most Comments', 'recent': 'Most Recent', 'random': 'Random selection',
             },
             'categories': {'featured': 'Featured Videos', 'popular': 'Most Comments', 'recent': 'Most Recent', 'random': 'Random selection',
             },
             }
 
         self.feed_icons = {
-            'P_R_R_F': {'featured': 'directories/topics/featured', 'popular': 'directories/topics/most_comments', 'recent': 'directories/topics/most_recent', 'random': 'directories/topics/random',
+            'P_R_R_F': {'popular': 'directories/topics/most_comments', 'recent': 'directories/topics/most_recent', 'random': 'directories/topics/random',
             },
             'categories': {'featured': 'directories/topics/featured', 'popular': 'directories/topics/most_comments', 'recent': 'directories/topics/most_recent', 'random': 'directories/topics/random',
             },
@@ -268,13 +246,7 @@ class Videos(object):
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.categories = False
         self.treeview = False
-        self.channel_icon = u'http://a.blip.tv/skin/mercury/images/logo.gif'
-
-        if mythdb:
-            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
-            if self.icon_dir:
-                self.setTreeViewIcon(dir_icon='bliptv')
-                self.channel_icon = self.tree_dir_icon
+        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/bliptv.png'
     # end __init__()
 
 
@@ -421,18 +393,12 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.icon_dir:
-                return self.tree_dir_icon
             if not self.feed_icons.has_key(self.tree_key):
                 return self.tree_dir_icon
             if not self.feed_icons[self.tree_key].has_key(self.feed):
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
-        for ext in self.config[u'image_extentions']:
-            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
-            if os.path.isfile(icon):
-                self.tree_dir_icon = icon
-                break
+        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 
@@ -478,6 +444,7 @@ class Videos(object):
                 continue
             item = {}
             item['language'] = language
+            embedURL = u''
             for elem in elements:
                 if elem.tag == 'title':
                     if elem.text:
@@ -498,6 +465,10 @@ class Videos(object):
                 if elem.tag.endswith('link'):
                     if elem.text:
                         item['link'] = self.ampReplace(elem.text.strip())
+                    continue
+                if elem.tag.endswith('embedUrl'):
+                    if elem.text:
+                        embedURL = self.ampReplace(elem.text.strip())
                     continue
                 if elem.tag.endswith('thumbnail'):
                     if elem.get('url'):
@@ -524,8 +495,10 @@ class Videos(object):
                     if elem.text:
                         item['blip_rating'] = self.massageDescription(elem.text.strip())
                     continue
-            if not item.has_key('video') and not item.has_key('link'):
+            if not item.has_key('video') and not item.has_key('link') and not embedURL:
                 continue
+            if embedURL:
+                item['link'] = embedURL
             if item.has_key('link') and not item.has_key('video'):
                 continue
             if item.has_key('video') and not item.has_key('link'):
@@ -767,6 +740,7 @@ class Videos(object):
 
             item = {}
             item['language'] = language
+            embedURL = u''
             for elem in elements:
                 if elem.tag == 'title':
                     if elem.text:
@@ -787,6 +761,10 @@ class Videos(object):
                 if elem.tag == 'link':
                     if elem.text:
                         item['link'] = self.ampReplace(elem.text.strip())
+                    continue
+                if elem.tag.endswith('embedUrl'):
+                    if elem.text:
+                        embedURL = self.ampReplace(elem.text.strip())
                     continue
                 if elem.tag.endswith('thumbnail'):
                     if elem.get('url'):
@@ -824,6 +802,8 @@ class Videos(object):
                     continue
             if not item.has_key('video') and not item.has_key('link'):
                 continue
+            if embedURL:
+                item['link'] = embedURL
             if item.has_key('link') and not item.has_key('video'):
                 continue
             if item.has_key('video') and not item.has_key('link'):

@@ -20,9 +20,10 @@ provided by Hulu (http://www.hulu.com/). The specific Hulu RSS feeds that are pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/hulu.xml"
 '''
 
-__version__="v0.1.1"
+__version__="v0.1.2"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
+# 0.1.2 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 from string import capitalize
@@ -61,31 +62,6 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
-
-
-# Find out if the MythTV python bindings can be accessed and instances can created
-try:
-    '''If the MythTV python interface is found, required to access Netvision icon directory settings
-    '''
-    from MythTV import MythDB, MythLog
-    mythdb = None
-    try:
-        '''Create an instance of each: MythDB
-        '''
-        MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-        mythdb = MythDB()
-    except MythError, e:
-        sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
-        filename = os.path.expanduser("~")+'/.mythtv/config.xml'
-        if not os.path.isfile(filename):
-            sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
-        else:
-            sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
-    except Exception, e:
-        sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
-except Exception, e:
-    sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
-    mythdb = None
 
 
 try:
@@ -199,16 +175,9 @@ class Videos(object):
             re.compile(u'''(?P<seriesname>[^_]+)\\_(?P<seasno>[0-9]+)\\_(?P<epno>[0-9]+).*$''', re.UNICODE),
             ]
 
-        self.channel_icon = u'http://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Hulu_logo.svg/300px-Hulu_logo.svg.png'
+        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/hulu.png'
 
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
-
-        if mythdb:
-            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
-            if self.icon_dir:
-                self.icon_dir = self.icon_dir.replace(u'//', u'/')
-                self.setTreeViewIcon(dir_icon='hulu')
-                self.channel_icon = self.tree_dir_icon
     # end __init__()
 
 ###########################################################################################################
@@ -216,28 +185,6 @@ class Videos(object):
 # Start - Utility functions
 #
 ###########################################################################################################
-
-    def setTreeViewIcon(self, dir_icon=None):
-        '''Check if there is a specific generic tree view icon. If not default to the channel icon.
-        return self.tree_dir_icon
-        '''
-        self.tree_dir_icon = self.channel_icon
-        if not dir_icon:
-            if not self.icon_dir:
-                return self.tree_dir_icon
-            if not self.feed_icons.has_key(self.tree_key):
-                return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
-                return self.tree_dir_icon
-            dir_icon = self.feed_icons[self.tree_key][self.feed]
-        for ext in self.config[u'image_extentions']:
-            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
-            if os.path.isfile(icon):
-                self.tree_dir_icon = icon
-                break
-        return self.tree_dir_icon
-    # end setTreeViewIcon()
-
 
     def getHuluConfig(self):
         ''' Read the MNV Hulu grabber "hulu_config.xml" configuration file

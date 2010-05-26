@@ -20,6 +20,7 @@
 #include "treeeditor.h"
 #include "nettree.h"
 #include "rsseditor.h"
+#include "netcommon.h"
 
 class ResultItem;
 class GrabberScript;
@@ -138,7 +139,7 @@ void NetTree::Load()
 {
     QMutexLocker locker(&m_lock);
 
-    m_grabberList = findAllDBTreeGrabbers();
+    m_grabberList = findAllDBTreeGrabbersByHost(VIDEO);
     m_rssList = findAllDBRSS();
 
     fillTree();
@@ -270,6 +271,9 @@ void NetTree::loadData(void)
         m_noSites->SetVisible(true);
     else if (m_noSites)
         m_noSites->SetVisible(false);
+
+    if (m_siteGeneric->childCount() == 0)
+        runTreeEditor();
 }
 
 void NetTree::UpdateItem(MythUIButtonListItem *item)

@@ -372,6 +372,12 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
     emit finishedSearch(this);
 }
 
+void Search::SetData(QByteArray data)
+{
+    m_data = data;
+    m_document.setContent(m_data, true);
+
+}
 void Search::slotSearchTimeout()
 {
     VERBOSE(VB_GENERAL|VB_EXTRA, LOC_ERR + "Internet Search Timeout");

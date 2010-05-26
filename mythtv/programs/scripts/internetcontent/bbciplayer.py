@@ -25,11 +25,12 @@
 __title__ ="BBC iPlayer";
 __mashup_title__ = "bbcipplayer"
 __author__="R.D. Vaughan"
-__version__="0.13"
+__version__="0.14"
 # 0.1.0 Initial development
 # 0.1.1 Added treeview support
 # 0.1.2 Convert to detect and use either local or remote processing
 # 0.13  Change to support xml version information display
+# 0.14  Added the "command" tag to the xml version information display
 
 __usage_examples__ ='''
 (Option Help)
@@ -274,6 +275,7 @@ if __name__ == '__main__':
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
     main.grabberInfo['mashup_title'] = __mashup_title__
+    main.grabberInfo['command'] = u'bbciplayer.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'bbciplayer.jpg'
     main.grabberInfo['type'] = ['video', ]

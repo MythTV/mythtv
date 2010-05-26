@@ -12,6 +12,8 @@
 // MythTV headers
 #include <mythscreentype.h>
 #include <netgrabbermanager.h>
+#include <mythscreentype.h>
+#include <mythprogressdialog.h>
 
 class MythUIButtonList;
 
@@ -32,19 +34,27 @@ class TreeEditor : public MythScreenType
 
   private:
     void loadData(void);
-    GrabberScript::scriptList fillGrabberList();
     void fillGrabberButtonList();
     mutable QMutex  m_lock;
+    void parsedData();
 
     GrabberScript::scriptList m_grabberList;
     MythUIButtonList *m_grabbers;
+    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack;
 
+    QNetworkAccessManager *m_manager;
+    QNetworkReply         *m_reply;
     bool m_changed;
+
+  protected:
+    void createBusyDialog(QString title);
 
   signals:
     void itemsChanged(void);
 
   public slots:
+    void slotLoadedData(void);
     void toggleItem(MythUIButtonListItem *item);
 };
 

@@ -70,11 +70,12 @@ class NetSearch : public MythScreenType
     MythDialogBox      *m_menuPopup;
     MythScreenStack    *m_popupStack;
 
-    Search             *m_netSearch;
-    DownloadManager    *m_download;
+    QNetworkAccessManager *m_netSearch;
+    QNetworkReply         *m_reply;
+    DownloadManager       *m_download;
     ImageDownloadManager  *m_imageDownload;
-    QFile              *m_file;
-    QProcess           *m_externaldownload;
+    QFile                 *m_file;
+    QProcess              *m_externaldownload;
 
     QString             m_currentSearch;
     int                 m_currentGrabber;
@@ -84,6 +85,7 @@ class NetSearch : public MythScreenType
     uint                m_maxpage;
     bool                m_playing;
     uint                m_redirects;
+    QString             m_mythXML;
 
     GrabberScript::scriptList m_grabberList;
     RSSSite::rssList    m_rssList;
@@ -105,10 +107,9 @@ class NetSearch : public MythScreenType
     void doListRefresh();
 
     void doSearch(void);
-    void searchFinished(Search *item);
+    void searchFinished(void);
     void searchTimeout(Search *item);
     void loadData(void);
-    GrabberScript::scriptList fillGrabberList(void);
     void fillGrabberButtonList(void);
     void slotItemChanged(void);
     void slotDoProgress(qint64 bytesReceived,

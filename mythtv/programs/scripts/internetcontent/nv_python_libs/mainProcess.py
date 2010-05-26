@@ -21,7 +21,7 @@
 #-------------------------------------
 __title__ ="Netvision Common Query Processing";
 __author__="R.D.Vaughan"
-__version__="v0.2.3"
+__version__="v0.2.4"
 # 0.1.0 Initial development
 # 0.1.1 Refining the code like the additional of a grabber specifing the maximum number of items to return
 # 0.1.2 Added the Tree view option
@@ -30,6 +30,7 @@ __version__="v0.2.3"
 # 0.2.1 Added the ability to have a mashup name independant of the mashup title
 # 0.2.2 Added support of the -H option
 # 0.2.3 Added support of the XML version information
+# 0.2.4 Added the "command" tag to the XML version information
 
 import sys, os
 from optparse import OptionParser
@@ -359,6 +360,7 @@ class mainProcess:
             etree.SubElement(version, "name").text = self.grabberInfo['title']
             etree.SubElement(version, "author").text = self.grabberInfo['author']
             etree.SubElement(version, "thumbnail").text = self.grabberInfo['thumbnail']
+            etree.SubElement(version, "command").text = self.grabberInfo['command']
             for t in self.grabberInfo['type']:
                 etree.SubElement(version, "type").text = t
             etree.SubElement(version, "description").text = self.grabberInfo['desc']

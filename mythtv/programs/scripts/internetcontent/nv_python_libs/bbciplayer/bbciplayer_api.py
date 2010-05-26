@@ -20,9 +20,13 @@ provided by BBC (http://www.bbc.co.uk). The specific BBC iPlayer RSS feeds that 
 "~/.mythtv/MythNetvision/userGrabberPrefs/bbciplayer.xml"
 '''
 
-__version__="v0.1.1"
+__version__="v0.1.2"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
+# 0.1.2 Fixed incorrect URL creation for RSS feed Web pages
+#       Restricted custom HTML web pages to Video media only. Audio will only play from its Web page.
+#       Add the "customhtml" tag to search and treeviews
+#       Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 
 import os, struct, sys, re, time, datetime, shutil, urllib, re
 import logging
@@ -60,31 +64,6 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
-
-
-# Find out if the MythTV python bindings can be accessed and instances can created
-try:
-    '''If the MythTV python interface is found, required to access Netvision icon directory settings
-    '''
-    from MythTV import MythDB, MythLog
-    mythdb = None
-    try:
-        '''Create an instance of each: MythDB
-        '''
-        MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-        mythdb = MythDB()
-    except MythError, e:
-        sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
-        filename = os.path.expanduser("~")+'/.mythtv/config.xml'
-        if not os.path.isfile(filename):
-            sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
-        else:
-            sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
-    except Exception, e:
-        sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
-except Exception, e:
-    sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
-    mythdb = None
 
 
 try:
@@ -211,16 +190,9 @@ class Videos(object):
             re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             ]
 
-        self.channel_icon = u'http://upload.wikimedia.org/wikipedia/en/thumb/0/05/BBC_iPlayer_logo.svg/500px-BBC_iPlayer_logo.svg.png'
+        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/bbciplayer.jpg'
 
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
-
-        if mythdb:
-            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
-            if self.icon_dir:
-                self.icon_dir = self.icon_dir.replace(u'//', u'/')
-                self.setTreeViewIcon(dir_icon='bbciplayer')
-                self.channel_icon = self.tree_dir_icon
     # end __init__()
 
 ###########################################################################################################
@@ -228,28 +200,6 @@ class Videos(object):
 # Start - Utility functions
 #
 ###########################################################################################################
-
-    def setTreeViewIcon(self, dir_icon=None):
-        '''Check if there is a specific generic tree view icon. If not default to the channel icon.
-        return self.tree_dir_icon
-        '''
-        self.tree_dir_icon = self.channel_icon
-        if not dir_icon:
-            if not self.icon_dir:
-                return self.tree_dir_icon
-            if not self.feed_icons.has_key(self.tree_key):
-                return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
-                return self.tree_dir_icon
-            dir_icon = self.feed_icons[self.tree_key][self.feed]
-        for ext in self.config[u'image_extentions']:
-            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
-            if os.path.isfile(icon):
-                self.tree_dir_icon = icon
-                break
-        return self.tree_dir_icon
-    # end setTreeViewIcon()
-
 
     def getBBCConfig(self):
         ''' Read the MNV BBC iPlayer grabber "bbc_config.xml" configuration file
@@ -416,10 +366,14 @@ class Videos(object):
             elif urlType == 'bbcweb':
                 link = u'http://www.bbc.co.uk'+ link
             else:
-                link = link.replace(u'/iplayer/episode/', u'')
-                index = link.find(u'/')
-                link = link[:index]
-                link = u'file://%s/nv_python_libs/configs/HTML/bbciplayer.html?videocode=%s' % (baseProcessingDir, link)
+                if tmpLink[0].attrib['class'].find('cta-video') != -1:
+                    link = link.replace(u'/iplayer/episode/', u'')
+                    index = link.find(u'/')
+                    link = link[:index]
+                    link = u'file://%s/nv_python_libs/configs/HTML/bbciplayer.html?videocode=%s' % (baseProcessingDir, link)
+                    etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
+                else: # Audio media will not play in the embedded HTML page
+                    link = u'http://www.bbc.co.uk'+ link
 
             title = self.common.massageText(titleFilter(result)[0].attrib['title'].strip())
             description = self.common.massageText(etree.tostring(descFilter(result)[0], method="text", encoding=unicode).strip())
@@ -635,6 +589,7 @@ class Videos(object):
             feedFilter = etree.XPath('//url[text()=$url]')
             itemFilter = etree.XPath('.//atm:entry', namespaces=self.common.namespaces)
             titleFilter = etree.XPath('.//atm:title', namespaces=self.common.namespaces)
+            mediaFilter = etree.XPath('.//atm:category[@term="TV"]', namespaces=self.common.namespaces)
             linkFilter = etree.XPath('.//atm:link', namespaces=self.common.namespaces)
             descFilter1 = etree.XPath('.//atm:content', namespaces=self.common.namespaces)
             descFilter2 = etree.XPath('.//p')
@@ -694,14 +649,18 @@ class Videos(object):
                     if len(tmpLink):   # Make sure that this result actually has a video
                         link = tmpLink[0].attrib['href']
                         if urlType == 'bigscreen':
-                            link = u'http://www.bbc.co.uk/iplayer/bigscreen%s' % link.replace(u'/iplayer',u'')
+                            link = link.replace(u'/iplayer/', u'/iplayer/bigscreen/')
                         elif urlType == 'bbcweb':
-                            link = u'http://www.bbc.co.uk'+ link
+                            pass    # Link does not need adjustments
                         else:
-                            link = link.replace(u'http://www.bbc.co.uk/iplayer/episode/', u'')
-                            index = link.find(u'/')
-                            link = link[:index]
-                            link = u'file://%s/nv_python_libs/configs/HTML/bbciplayer.html?videocode=%s' % (baseProcessingDir, link)
+                            if len(mediaFilter(itemData)):
+                                link = link.replace(u'http://www.bbc.co.uk/iplayer/episode/', u'')
+                                index = link.find(u'/')
+                                link = link[:index]
+                                link = u'file://%s/nv_python_libs/configs/HTML/bbciplayer.html?videocode=%s' % (baseProcessingDir, link)
+                                etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
+                            else:
+                                pass # Radio media cannot be played within the embedded weg page
                     else:
                         continue
                     link = self.common.ampReplace(link)

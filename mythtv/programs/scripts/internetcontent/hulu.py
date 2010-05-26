@@ -25,9 +25,10 @@
 __title__ ="Hulu";
 __mashup_title__ = "hulu"
 __author__="R.D. Vaughan"
-__version__="0.11"
+__version__="0.12"
 # 0.1.0 Initial development
 # 0.11  Change to support xml version information display
+# 0.12  Added the "command" tag to the xml version information display
 
 __usage_examples__ ='''
 (Option Help)
@@ -271,6 +272,7 @@ if __name__ == '__main__':
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
+    main.grabberInfo['command'] = u'hulu.py'
     main.grabberInfo['mashup_title'] = __mashup_title__
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'hulu.png'

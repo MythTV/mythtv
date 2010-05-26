@@ -18,9 +18,11 @@ This python script is intended to perform a data base search of MythNetvision da
 videos based on a command line search term.
 '''
 
-__version__="v0.1.1"
+__version__="0.1.2"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
+# 0.1.2 Changed the SQL query to the new "internetcontentarticles" table format and new fields
+#       Added "%SHAREDIR%" to icon directory path
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 import logging
@@ -186,51 +188,8 @@ class Videos(object):
         # Channel details and search results
         self.channel = {'channel_title': u'Search all tree views', 'channel_link': u'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': u"MythNetvision treeview data base search", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
 
-        self.channel_icon = u''
-
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
-
-        if mythdb:
-            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
-            if self.icon_dir:
-                self.icon_dir = self.icon_dir.replace(u'//', u'/')
-                self.setTreeViewIcon(dir_icon='mnvsearch')
-                self.channel_icon = self.tree_dir_icon
+        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/mnvsearch.png'
     # end __init__()
-
-###########################################################################################################
-#
-# Start - Utility functions
-#
-###########################################################################################################
-
-    def setTreeViewIcon(self, dir_icon=None):
-        '''Check if there is a specific generic tree view icon. If not default to the channel icon.
-        return self.tree_dir_icon
-        '''
-        self.tree_dir_icon = self.channel_icon
-        if not dir_icon:
-            if not self.icon_dir:
-                return self.tree_dir_icon
-            if not self.feed_icons.has_key(self.tree_key):
-                return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
-                return self.tree_dir_icon
-            dir_icon = self.feed_icons[self.tree_key][self.feed]
-        for ext in self.config[u'image_extentions']:
-            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
-            if os.path.isfile(icon):
-                self.tree_dir_icon = icon
-                break
-        return self.tree_dir_icon
-    # end setTreeViewIcon()
-
-
-###########################################################################################################
-#
-# End of Utility functions
-#
-###########################################################################################################
 
 
     def searchTitle(self, title, pagenumber, pagelen):
@@ -276,6 +235,8 @@ class Videos(object):
             mnvsearchItem.find('link').text = result['url']
             if result['title']:
                 mnvsearchItem.find('title').text = result['title']
+            if result['subtitle']:
+                etree.SubElement(mnvsearchItem, "subtitle").text = result['subtitle']
             if result['description']:
                 mnvsearchItem.find('description').text = result['description']
             if result['author']:
@@ -303,6 +264,8 @@ class Videos(object):
                     etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = unicode(result['season'])
                 if result['episode']:
                     etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = unicode(result['episode'])
+            if result['customhtml'] == 1:
+                etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
             if result['countries']:
                 countries = result['countries'].split(u' ')
                 for country in countries:
@@ -383,8 +346,8 @@ class Videos(object):
         by a ";" character.
         return a list of items found in the search or an empty dictionary if none were found
         '''
-        sqlStatement = u'(SELECT title, description, season, episode, url, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, countries FROM `netvisiontreeitems` WHERE %s) UNION DISTINCT (SELECT title, description, season, episode, url, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, countries FROM `netvisionrssitems` WHERE %s) ORDER BY title ASC LIMIT %s , %s'
-        searchTerm = u"`title` LIKE '%SEARCHTERM%' OR `description` LIKE '%SEARCHTERM%'"
+        sqlStatement = u'(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE %s) ORDER BY title ASC LIMIT %s , %s'
+        searchTerm = u"`title` LIKE '%%SEARCHTERM%%' OR `description` LIKE '%%SEARCHTERM%%'"
 
         # Create the query variables search terms and the from/to paging values
         searchList = searchTerms.split(u';')
@@ -406,7 +369,7 @@ class Videos(object):
             fromResults = (int(pagenumber)-1)*int(pagelen)
             pageLimit = pagelen+1
 
-        query = sqlStatement % (dbSearchStatements, dbSearchStatements, fromResults, pageLimit,)
+        query = sqlStatement % (dbSearchStatements, fromResults, pageLimit,)
         if self.config['debug_enabled']:
             print "FromRow(%s) pageLimit(%s)" % (fromResults, pageLimit)
             print "query:"
@@ -418,8 +381,8 @@ class Videos(object):
         c = mythdb.cursor()
         host = gethostname()
         c.execute(query)
-        for title, description, season, episode, url, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, countries in c.fetchall():
-            items.append({'title': title, 'description': description, 'season': season, 'episode': episode, 'url': url, 'thumbnail': thumbnail, 'mediaURL': mediaURL, 'author': author, 'date': date, 'rating': rating, 'filesize': filesize, 'player': player, 'playerargs': playerargs, 'download': download, 'downloadargs': downloadargs, 'time': time, 'width': width, 'height': height, 'language': language, 'countries': countries})
+        for title, description, subtitle, season, episode, url, media_type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries in c.fetchall():
+            items.append({'title': title, 'description': description, 'subtitle': subtitle, 'season': season, 'episode': episode, 'url': url, 'media_type': media_type, 'thumbnail': thumbnail, 'mediaURL': mediaURL, 'author': author, 'date': date, 'rating': rating, 'filesize': filesize, 'player': player, 'playerargs': playerargs, 'download': download, 'downloadargs': downloadargs, 'time': time, 'width': width, 'height': height, 'language': language, 'customhtml': customhtml, 'countries': countries})
         c.close()
 
         return items

@@ -1461,7 +1461,7 @@ void MythXML::GetInternetSearch( HTTPRequest *pRequest )
     }
 
     VERBOSE(VB_GENERAL, QString("MythXML::GetInternetSearch Executing "
-            "Command: %1 -S -p %2 %3").arg(command).arg(pagenum).arg(query));
+            "Command: %1 -p %2 -S '%3'").arg(command).arg(pagenum).arg(query));
 
     Search *search = new Search();
     QEventLoop loop;

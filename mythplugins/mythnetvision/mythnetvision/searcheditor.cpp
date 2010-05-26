@@ -16,6 +16,7 @@
 
 // Search headers
 #include "searcheditor.h"
+#include "netcommon.h"
 
 #define LOC      QString("SearchEditor: ")
 #define LOC_WARN QString("SearchEditor, Warning: ")
@@ -29,14 +30,26 @@ SearchEditor::SearchEditor(MythScreenStack *parent,
                           const QString name) :
     MythScreenType(parent, name),
     m_grabbers(NULL),
+    m_busyPopup(NULL),
+    m_popupStack(),
+    m_manager(NULL),
+    m_reply(NULL),
     m_changed(false)
 {
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
 SearchEditor::~SearchEditor()
 {
     qDeleteAll(m_grabberList);
     m_grabberList.clear();
+
+    if (m_manager)
+    {
+        m_manager->disconnect();
+        m_manager->deleteLater();
+        m_manager = NULL;
+    }
 
     if (m_changed)
         emit itemsChanged();
@@ -74,8 +87,90 @@ bool SearchEditor::Create(void)
 
 void SearchEditor::loadData()
 {
-    m_grabberList = fillGrabberList();
+    QString msg = tr("Querying Backend for Internet Content Sources...");
+    createBusyDialog(msg);
+
+    m_manager = new QNetworkAccessManager();
+
+    connect(m_manager, SIGNAL(finished(QNetworkReply*)),
+                       SLOT(slotLoadedData(void)));
+
+    QUrl url(GetMythXMLURL() + "GetInternetSources");
+    m_reply = m_manager->get(QNetworkRequest(url));
+}
+
+void SearchEditor::slotLoadedData()
+{
+    QDomDocument doc;
+    doc.setContent(m_reply->readAll());
+    QDomElement root = doc.documentElement();
+    QDomElement content = root.firstChildElement("InternetContent");
+    QDomElement grabber = content.firstChildElement("grabber");
+
+    while (!grabber.isNull())
+    {
+        QString title, author, image, description, type, commandline;
+        double version;
+        bool search = false;
+        bool tree = false;
+
+        title = grabber.firstChildElement("name").text();
+        commandline = grabber.firstChildElement("command").text();
+        author = grabber.firstChildElement("author").text();
+        image = grabber.firstChildElement("thumbnail").text();
+        type = grabber.firstChildElement("type").text();
+        description = grabber.firstChildElement("description").text();
+        version = grabber.firstChildElement("version").text().toDouble();
+        QString treestring = grabber.firstChildElement("tree").text();
+        if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
+            treestring.toLower() == "yes" || treestring == "1"))
+            tree = true;
+        QString searchstring = grabber.firstChildElement("search").text();
+        if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
+            searchstring.toLower() == "yes" || searchstring == "1"))
+            search = true;
+
+        if (type.toLower() == "video" && search)
+        {
+            VERBOSE(VB_GENERAL, QString("Found Search Source %1...").arg(title));
+            m_grabberList.append(new GrabberScript(title, image, VIDEO, author,
+                       search, tree, description, commandline, version));
+        }
+
+        grabber = grabber.nextSiblingElement("grabber");
+    }
+
+    parsedData();
+}
+
+void SearchEditor::parsedData()
+{
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
+    }
+
     fillGrabberButtonList();
+}
+
+void SearchEditor::createBusyDialog(QString title)
+{
+    if (m_busyPopup)
+        return;
+
+    QString message = title;
+
+    m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
+            "mythvideobusydialog");
+
+    if (m_busyPopup->Create())
+        m_popupStack->AddScreen(m_busyPopup);
+    else
+    {
+        delete m_busyPopup;
+        m_busyPopup = NULL;
+    }
 }
 
 bool SearchEditor::keyPressEvent(QKeyEvent *event)
@@ -91,54 +186,6 @@ bool SearchEditor::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
-}
-
-GrabberScript::scriptList SearchEditor::fillGrabberList()
-{
-    GrabberScript::scriptList tmp;
-    QDir ScriptPath = QString("%1/internetcontent/").arg(GetShareDir());
-    QStringList Scripts = ScriptPath.entryList(QDir::Files | QDir::Executable);
-
-    for (QStringList::const_iterator i = Scripts.begin();
-            i != Scripts.end(); ++i)
-    {
-        QProcess scriptCheck;
-        QString title, image, description, author, type;
-        double version;
-        bool search = false;
-        bool tree = false;
-
-        QString commandline = QString("%1internetcontent/%2")
-                                      .arg(GetShareDir()).arg(*i);
-        scriptCheck.setReadChannel(QProcess::StandardOutput);
-        scriptCheck.start(commandline, QStringList() << "-v");
-        scriptCheck.waitForFinished();
-        QByteArray result = scriptCheck.readAll();
-
-        QDomDocument versioninfo;
-        versioninfo.setContent(result);
-        QDomElement item = versioninfo.documentElement();
-
-        title = item.firstChildElement("name").text();
-        author = item.firstChildElement("author").text();
-        image = item.firstChildElement("thumbnail").text();
-        type = item.firstChildElement("type").text();
-        description = item.firstChildElement("description").text();
-        version = item.firstChildElement("version").text().toDouble();
-        QString treestring = item.firstChildElement("tree").text();
-        if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
-            treestring.toLower() == "yes" || treestring == "1"))
-            tree = true;
-        QString searchstring = item.firstChildElement("search").text();
-        if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
-            searchstring.toLower() == "yes" || searchstring == "1"))
-            search = true;
-
-        if (search && type.toLower() == "video")
-            tmp.append(new GrabberScript(title, image, VIDEO, author,
-                       search, tree, description, commandline, version));
-    }
-    return tmp;
 }
 
 void SearchEditor::fillGrabberButtonList()

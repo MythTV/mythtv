@@ -458,6 +458,7 @@ if ($opt_v) {
         print "  <name>Twit.tv</name>\n";
         print "  <author>Auric</author>\n";
         print "  <thumbnail>twit.tv.png</thumbnail>\n";
+        print "  <command>twit.tv.pl</command>\n";
         print "  <type>video</type>\n";
         print "  <description>This Week in Tech is netcasts you love from people you trust.</description>\n";
         print "  <version>1.00</version>\n";

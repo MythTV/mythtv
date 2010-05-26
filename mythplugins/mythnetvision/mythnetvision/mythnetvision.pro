@@ -26,10 +26,10 @@ INSTALLS += installfiles installicons
 INSTALLS += installdiricons installtopicicons installfilmicons installmusicicons
 
 # Input
-HEADERS += rsseditor.h searcheditor.h
+HEADERS += rsseditor.h searcheditor.h netcommon.h
 HEADERS += netsearch.h imagedownloadmanager.h downloadmanager.h treeeditor.h nettree.h
 
-SOURCES += rsseditor.cpp netsearch.cpp searcheditor.cpp
+SOURCES += rsseditor.cpp netsearch.cpp searcheditor.cpp netcommon.cpp
 SOURCES += downloadmanager.cpp imagedownloadmanager.cpp treeeditor.cpp nettree.cpp main.cpp
 
 include ( ../../libs-targetfix.pro )

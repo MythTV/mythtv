@@ -23,6 +23,7 @@
 #include <rssparse.h>
 
 #include "netsearch.h"
+#include "netcommon.h"
 #include "rsseditor.h"
 #include "searcheditor.h"
 
@@ -36,13 +37,14 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_search(NULL),                m_thumbImage(NULL),
       m_downloadable(NULL),          m_progress(NULL),
       m_busyPopup(NULL),             m_okPopup(NULL),
-      m_popupStack(),                m_netSearch(),
-      m_currentSearch(NULL),         m_currentGrabber(0),
-      m_currentCmd(NULL),            m_currentDownload(NULL),
-      m_pagenum(0),                  m_lock(QMutex::Recursive)
+      m_popupStack(),                m_netSearch(NULL),
+      m_reply(NULL),                 m_currentSearch(NULL),
+      m_currentGrabber(0),           m_currentCmd(NULL),
+      m_currentDownload(NULL),       m_pagenum(0),
+      m_lock(QMutex::Recursive)
 {
+    m_mythXML = GetMythXMLURL();
     m_playing = false;
-    m_netSearch = new Search();
     m_download = new DownloadManager(this);
     m_imageDownload = new ImageDownloadManager(this);
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -96,10 +98,8 @@ bool NetSearch::Create()
                        SLOT(slotItemChanged()));
     connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem *)),
                        SLOT(doSearch(void)));
-    connect(m_netSearch, SIGNAL(finishedSearch(Search *)),
-                       SLOT(searchFinished(Search *)));
-    connect(m_netSearch, SIGNAL(searchTimedOut(Search *)),
-                       SLOT(searchTimeout(Search *)));
+//    connect(m_netSearch, SIGNAL(searchTimedOut(Search *)),
+//                       SLOT(searchTimeout(Search *)));
     connect(m_searchResultList, SIGNAL(itemClicked(MythUIButtonListItem *)),
                        SLOT(showWebVideo(void)));
     connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
@@ -115,8 +115,6 @@ bool NetSearch::Create()
 void NetSearch::Load()
 {
     m_grabberList = findAllDBSearchGrabbers(VIDEO);
-    if (m_grabberList.isEmpty())
-        m_grabberList = fillGrabberList();
 }
 
 void NetSearch::Init()
@@ -135,7 +133,8 @@ NetSearch::~NetSearch()
 
     if (m_netSearch)
     {
-        delete m_netSearch;
+        m_netSearch->disconnect();
+        m_netSearch->deleteLater();
         m_netSearch = NULL;
     }
 
@@ -162,6 +161,9 @@ void NetSearch::loadData(void)
         m_noSites->SetVisible(true);
     else if (m_noSites)
         m_noSites->SetVisible(false);
+
+    if (m_grabberList.isEmpty())
+        runSearchEditor();
 }
 
 bool NetSearch::keyPressEvent(QKeyEvent *event)
@@ -277,55 +279,6 @@ void NetSearch::showMenu(void)
     }
 }
 
-GrabberScript::scriptList NetSearch::fillGrabberList()
-{
-    QMutexLocker locker(&m_lock);
-
-    GrabberScript::scriptList tmp;
-    QDir ScriptPath = QString("%1/internetcontent/").arg(GetShareDir());
-    QStringList Scripts = ScriptPath.entryList(QDir::Files | QDir::Executable);
-
-    for (QStringList::const_iterator i = Scripts.begin();
-            i != Scripts.end(); ++i)
-    {
-        QProcess scriptCheck;
-        QString title, author, image, description, type;
-        double version;
-        bool search = false;
-        bool tree = false;
-
-        QString commandline = (*i);
-        scriptCheck.setReadChannel(QProcess::StandardOutput);
-        scriptCheck.start(commandline, QStringList() << "-v");
-        scriptCheck.waitForFinished();
-        QByteArray result = scriptCheck.readAll();
-
-        QDomDocument versioninfo;
-        versioninfo.setContent(result);
-        QDomElement item = versioninfo.documentElement();
-
-        title = item.firstChildElement("name").text();
-        author = item.firstChildElement("author").text();
-        image = item.firstChildElement("thumbnail").text();
-        type = item.firstChildElement("type").text();
-        description = item.firstChildElement("description").text();
-        version = item.firstChildElement("version").text().toDouble();
-        QString treestring = item.firstChildElement("tree").text();
-        if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
-            treestring.toLower() == "yes" || treestring == "1"))
-            tree = true;
-        QString searchstring = item.firstChildElement("search").text();
-        if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
-            searchstring.toLower() == "yes" || searchstring == "1"))
-            search = true;
-
-        if (search && type.toLower() == "video")
-            tmp.append(new GrabberScript(title, image, VIDEO, author,
-                       search, tree, description, commandline, version));
-    }
-    return tmp;
-}
-
 void NetSearch::fillGrabberButtonList()
 {
     QMutexLocker locker(&m_lock);
@@ -394,7 +347,8 @@ void NetSearch::doSearch()
     if (query.isEmpty())
         return;
 
-    m_currentCmd = cmd;
+    QFileInfo fi(cmd);
+    m_currentCmd = fi.fileName();
     m_currentGrabber = m_siteList->GetCurrentPos();
     m_currentSearch = query;
 
@@ -402,7 +356,15 @@ void NetSearch::doSearch()
                     .arg(grabber).arg(query);
     createBusyDialog(title);
 
-    m_netSearch->executeSearch(cmd, query);
+    m_netSearch = new QNetworkAccessManager(this);
+    connect(m_netSearch, SIGNAL(finished(QNetworkReply*)),
+                       SLOT(searchFinished(void)));
+
+    QUrl init = GetMythXMLSearch(m_mythXML, m_currentSearch,
+                                m_currentCmd, m_pagenum);
+    QUrl req(init.toEncoded(), QUrl::TolerantMode);
+    VERBOSE(VB_GENERAL, QString("Using Search URL %1").arg(req.toString()));
+    m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
 void NetSearch::getLastResults()
@@ -418,10 +380,9 @@ void NetSearch::getLastResults()
                     .arg(m_currentSearch);
     createBusyDialog(title);
 
-    QString cmd = m_currentCmd;
-    QString query = m_currentSearch;
-
-    m_netSearch->executeSearch(cmd, query, m_pagenum);
+    QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
+                                m_currentCmd, m_pagenum);
+    m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
 void NetSearch::getMoreResults()
@@ -437,13 +398,12 @@ void NetSearch::getMoreResults()
                     .arg(m_currentSearch);
     createBusyDialog(title);
 
-    QString cmd = m_currentCmd;
-    QString query = m_currentSearch;
-
-    m_netSearch->executeSearch(cmd, query, m_pagenum);
+    QUrl req = GetMythXMLSearch(m_mythXML, m_currentSearch,
+                                m_currentCmd, m_pagenum);
+    m_reply = m_netSearch->get(QNetworkRequest(req));
 }
 
-void NetSearch::searchFinished(Search *item)
+void NetSearch::searchFinished(void)
 {
     QMutexLocker locker(&m_lock);
 
@@ -452,6 +412,10 @@ void NetSearch::searchFinished(Search *item)
         m_busyPopup->Close();
         m_busyPopup = NULL;
     }
+
+    Search *item = new Search();
+    QByteArray data = m_reply->readAll();
+    item->SetData(data);
 
     item->process();
 
@@ -728,7 +692,7 @@ void NetSearch::doListRefresh()
 {
     m_grabberList = findAllDBSearchGrabbers(VIDEO);
     if (m_grabberList.isEmpty())
-        m_grabberList = fillGrabberList();
+        runSearchEditor();
 
     loadData();
 }
