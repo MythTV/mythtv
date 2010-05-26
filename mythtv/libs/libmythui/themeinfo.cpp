@@ -173,7 +173,7 @@ bool ThemeInfo::parseThemeInfo()
     return true;
 }
 
-bool ThemeInfo::IsWide()
+bool ThemeInfo::IsWide() const
 {
 
     if (m_aspect == "16:9" || m_aspect == "16:10")

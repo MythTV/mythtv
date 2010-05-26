@@ -439,8 +439,8 @@ void MythUIHelper::LoadQtConfig(void)
     if (themeinfo)
     {
         d->m_isWide = themeinfo->IsWide();
-        d->m_baseWidth = themeinfo->BaseRes()->width();
-        d->m_baseHeight = themeinfo->BaseRes()->height();
+        d->m_baseWidth = themeinfo->GetBaseRes()->width();
+        d->m_baseHeight = themeinfo->GetBaseRes()->height();
         VERBOSE(VB_GUI, LOC + QString("Using theme base resolution of %1x%2")
                 .arg(d->m_baseWidth).arg(d->m_baseHeight));
         delete themeinfo;
@@ -1590,7 +1590,7 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
 
     if (fullPath)
     {
-        // get main stack top screen 
+        // get main stack top screen
         MythScreenStack *stack = GetMythMainWindow()->GetMainStack();
         result = stack->GetLocation(true);
 
@@ -1611,7 +1611,7 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
     }
     else
     {
-        // get main stack top screen 
+        // get main stack top screen
         MythScreenStack *stack = GetMythMainWindow()->GetMainStack();
         result = stack->GetLocation(false);
 

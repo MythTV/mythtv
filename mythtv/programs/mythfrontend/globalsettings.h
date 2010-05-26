@@ -7,7 +7,6 @@
 #include "settings.h"
 #include "mythcontext.h"
 #include "videodisplayprofile.h"
-#include "themeinfo.h"
 
 class QFileInfo;
 

@@ -22,16 +22,16 @@ class MPUBLIC ThemeInfo
     ThemeInfo(QString theme);
     ~ThemeInfo();
 
-    bool IsWide();
-    QString Aspect() const { return m_aspect; }
-    QSize   *BaseRes() { return &m_baseres; }
-    QString Name() const { return m_name; }
-    QString Description() const { return m_description; }
-    QString Errata() const { return m_errata; }
-    QString PreviewPath() const { return m_previewpath; }
-    int Type() const { return m_type; }
-    int MajorVersion() const { return m_majorver; }
-    int MinorVersion() const { return m_minorver; }
+    bool IsWide() const;
+    QString GetAspect() const { return m_aspect; }
+    QSize   *GetBaseRes() { return &m_baseres; }
+    QString GetName() const { return m_name; }
+    QString GetDescription() const { return m_description; }
+    QString GetErrata() const { return m_errata; }
+    QString GetPreviewPath() const { return m_previewpath; }
+    int GetType() const { return m_type; }
+    int GetMajorVersion() const { return m_majorver; }
+    int GetMinorVersion() const { return m_minorver; }
 
   private:
     bool parseThemeInfo();

@@ -2872,16 +2872,16 @@ ThemeSelector::ThemeSelector(QString label):
         if (!themeinfo)
             continue;
 
-        name = themeinfo->Name();
-        preview = QFileInfo(themeinfo->PreviewPath());
+        name = themeinfo->GetName();
+        preview = QFileInfo(themeinfo->GetPreviewPath());
 
-        if (name.isEmpty() || !(themeinfo->Type() & themetype))
+        if (name.isEmpty() || !(themeinfo->GetType() & themetype))
         {
             delete themeinfo;
             continue;
         }
 
-        if ((themeinfo->Type() & THEME_UI) & themeinfo->IsWide())
+        if ((themeinfo->GetType() & THEME_UI) & themeinfo->IsWide())
             name += QString(" (%1)").arg(QObject::tr("Widescreen"));
 
         if (!preview.exists())
@@ -3456,9 +3456,9 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
     settings1->addChild(MPCM());
     settings1->addChild(AC3PassThrough());
     settings1->addChild(DTSPassThrough());
-    
+
     group1->addChild(settings1);
-    
+
         // Show surround/upmixer config only if 5.1 Audio is selected
     AudioSystemSurroundGroup *sub1 =
         new AudioSystemSurroundGroup(numchannels, group1);

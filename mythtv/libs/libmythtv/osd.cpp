@@ -84,15 +84,16 @@ OSD::OSD() :
     removeHTML(QRegExp("</?.+>"))
 {
     VERBOSE(VB_GENERAL, QString("OSD Theme Dimensions W: %1 H: %2")
-            .arg(m_themeinfo->BaseRes()->width()).arg(m_themeinfo->BaseRes()->height()));
+            .arg(m_themeinfo->GetBaseRes()->width())
+            .arg(m_themeinfo->GetBaseRes()->height()));
 
     for (uint i = 0; i < (sizeof(cc708fontnames) / sizeof(QString)); i++)
         cc708fontnames[i] = QString("");
 
-    if (m_themeinfo->BaseRes()->height())
+    if (m_themeinfo->GetBaseRes()->height())
     {
-        m_themeaspect  = (float)m_themeinfo->BaseRes()->width();
-        m_themeaspect /= (float)m_themeinfo->BaseRes()->height();
+        m_themeaspect  = (float)m_themeinfo->GetBaseRes()->width();
+        m_themeaspect /= (float)m_themeinfo->GetBaseRes()->height();
     }
 }
 
@@ -164,8 +165,8 @@ void OSD::Init(const QRect &osd_bounds, int   frameRate,
     fscale = fontScaling;
     osdBounds = osd_bounds;
     frameint = frameRate;
-    hmult = vis_bounds.height() / (float)m_themeinfo->BaseRes()->height();
-    wmult = vis_bounds.width() / (float)m_themeinfo->BaseRes()->width();
+    hmult = vis_bounds.height() / (float)m_themeinfo->GetBaseRes()->height();
+    wmult = vis_bounds.width() / (float)m_themeinfo->GetBaseRes()->width();
     xoffset = vis_bounds.left();
     yoffset = vis_bounds.top();
     displaywidth = vis_bounds.width();
@@ -237,7 +238,7 @@ bool OSD::InitCC608(void)
     if (!ccfont)
     {
         QString name = "cc_font";
-        int fontsize = m_themeinfo->BaseRes()->height() / 27;
+        int fontsize = m_themeinfo->GetBaseRes()->height() / 27;
 
         ccfont = LoadFont(gCoreContext->GetSetting("OSDCCFont"), fontsize);
 
@@ -295,7 +296,7 @@ bool OSD::InitCC708(void)
     // Create fonts...
     TTFFont* ccfonts[48];
     uint z = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100) *
-                    m_themeinfo->BaseRes()->height();
+                    m_themeinfo->GetBaseRes()->height();
     uint fontsizes[3] = { z / 3600, z / 2900, z / 2200 };
     for (uint i = 0; i < 48; i++)
     {
@@ -349,7 +350,7 @@ bool OSD::InitTeletext(void)
     container->SetAllowFade(false);
     container->SetWantsUpdates(true);
     AddSet(container, name);
-    QSize *size = m_themeinfo->BaseRes();
+    QSize *size = m_themeinfo->GetBaseRes();
     int safe_x = (int)(((float)size->width() * 0.05f) + 0.5f);
     int safe_y = (int)(((float)size->height() * 0.05f) + 0.5f);
     QRect area = QRect(safe_x, safe_y, size->width() - (2 * safe_x),
@@ -608,12 +609,13 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
     yoffset       = visibleBounds.top();
     displaywidth  = visibleBounds.width();
     displayheight = visibleBounds.height();
-    wmult         = displaywidth  / (float)m_themeinfo->BaseRes()->width();
-    hmult         = displayheight / (float)m_themeinfo->BaseRes()->height();
+    wmult         = displaywidth  / (float)m_themeinfo->GetBaseRes()->width();
+    hmult         = displayheight / (float)m_themeinfo->GetBaseRes()->height();
     needPillarBox = visibleAspect > 1.51f;
     frameint      = (frameRate <= 0) ? frameRate : frameint;
 
-    float themeaspect = (float)m_themeinfo->BaseRes()->width() / (float)m_themeinfo->BaseRes()->height();
+    float themeaspect = (float)m_themeinfo->GetBaseRes()->width() /
+                        (float)m_themeinfo->GetBaseRes()->height();
 
     wscale = visibleAspect / themeaspect;
     fscale = fontScaling;
@@ -1686,8 +1688,8 @@ bool OSD::LoadTheme(void)
     // HACK begin -- needed to address ticket #989
     xoffset = 0;
     yoffset = 0;
-    displaywidth  = m_themeinfo->BaseRes()->width();
-    displayheight = m_themeinfo->BaseRes()->height();
+    displaywidth  = m_themeinfo->GetBaseRes()->width();
+    displayheight = m_themeinfo->GetBaseRes()->height();
     hmult = 1.0f;
     wmult = 1.0f;
     // HACK end
