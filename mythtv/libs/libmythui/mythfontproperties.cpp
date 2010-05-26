@@ -136,7 +136,6 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     bool showWarnings)
 {
     // Crappy, but cached.  Move to GlobalFontMap?
-    QString fontSizeType = GetMythDB()->GetSetting("ThemeFontSizeType", "default");
 
     bool fromBase = false;
     MythFontProperties *newFont = new MythFontProperties();
@@ -145,7 +144,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     if (element.tagName() == "font")
         VERBOSE(VB_GENERAL, LOC_WARN + "Use of 'font' is deprecated in favour "
                                        "of 'fontdef'");
-    
+
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
@@ -303,9 +302,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                 {
                     if (*it == "underline")
                         newFont->m_face.setUnderline(true);
-                    else if (*it == "overline")  
+                    else if (*it == "overline")
                         newFont->m_face.setOverline(true);
-                    else if (*it == "strikeout")  
+                    else if (*it == "strikeout")
                         newFont->m_face.setStrikeOut(true);
                 }
             }
@@ -342,7 +341,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                 QString stretch = getFirstText(info).toLower();
 
                 if (stretch == "ultracondensed" ||
-                    stretch == "1")    
+                    stretch == "1")
                     newFont->m_face.setStretch(QFont::UltraCondensed);
                 else if (stretch == "extracondensed" ||
                          stretch == "2")
