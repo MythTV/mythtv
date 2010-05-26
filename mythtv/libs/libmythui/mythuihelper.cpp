@@ -695,7 +695,8 @@ QString MythUIHelper::GetThemeCacheDir(void)
 {
     QString cachedirname = GetConfDir() + "/themecache/";
 
-    QString tmpcachedir = cachedirname + GetMythDB()->GetSetting("Theme") +
+    QString tmpcachedir = cachedirname +
+                          GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) +
                           "." + QString::number(d->m_screenwidth) +
                           "." + QString::number(d->m_screenheight);
 
