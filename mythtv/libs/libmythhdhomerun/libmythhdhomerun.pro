@@ -32,4 +32,6 @@ mingw {
     LIBS += -lws2_32 -liphlpapi -lpthread
 }
 
+LIBS += $$EXTRALIBS 
+
 include ( ../libs-targetfix.pro )
