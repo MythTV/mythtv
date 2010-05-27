@@ -493,7 +493,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
         cout << prefix;
 
     QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ");
-    episode = episode.leftJustified(34 - (prefix ? strlen(prefix) : 0), 
+    episode = episode.leftJustified(34 - (prefix ? strlen(prefix) : 0),
                                     ' ', true);
 
     QString outstr = QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
@@ -1552,7 +1552,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
 {
     QMutexLocker lockit(reclist_lock);
 
-    VERBOSE(VB_GENERAL, LOC + 
+    VERBOSE(VB_GENERAL, LOC +
             QString("AddRecording() recid: %1")
             .arg(pi.GetRecordingRuleID()));
 
@@ -3653,7 +3653,7 @@ void Scheduler::AddNotListed(void) {
             rsNotListed,
 
             result.value(17).toUInt(),   RecordingType(result.value(18).toInt()),
-            
+
             RecordingDupInType(result.value(19).toInt()),
             RecordingDupMethodType(result.value(20).toInt()),
 
@@ -4049,8 +4049,8 @@ int Scheduler::FillRecordingDir(
             (recstartts > thispg->GetRecordingEndTime()) ||
                 (thispg->GetRecordingStatus() != rsWillRecord) ||
                 (thispg->GetCardID() == 0) ||
-                (recsCounted.contains(thispg->GetChanID() + ":" +
-                    thispg->GetRecordingStartTime(ISODate))) ||
+                (recsCounted.contains(QString("%1:%2").arg(thispg->GetChanID())
+                    .arg(thispg->GetRecordingStartTime(ISODate)))) ||
                 (thispg->GetPathname().isEmpty()))
             continue;
 
