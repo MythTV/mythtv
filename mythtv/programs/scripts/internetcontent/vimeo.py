@@ -130,7 +130,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
         <numresults>18</numresults>
         <returned>1</returned>
         <startindex>0</startindex>
-            <directory name="Newest Channels/Most ..." thumbnail="/usr/local/share/mythtv/mythnetvision/icons/vimeo.jpg">
+            <directory name="Newest Channels/Most ..." thumbnail="/usr/local/share/mythtv/mythnetvision/icons/vimeo.png">
             <directory name="Most Recent Channels" thumbnail="/usr/local/share/mythtv/mythnetvision/icons/directories/topics/most_recent.png">
                 <item>
                     <title>PSA 1: Family Meal is a Healthy Meal</title>
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     main.grabberInfo['title'] = __title__
     main.grabberInfo['command'] = u'vimeo.py'
     main.grabberInfo['author'] = __author__
-    main.grabberInfo['thumbnail'] = 'vimeo.jpg'
+    main.grabberInfo['thumbnail'] = 'vimeo.png'
     main.grabberInfo['type'] = ['video']
     main.grabberInfo['desc'] = u"Vimeo is a respectful community of creative people who are passionate about sharing the videos they make."
     main.grabberInfo['version'] = __version__

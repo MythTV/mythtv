@@ -63,7 +63,7 @@ Options:
 <grabber>
   <name>BBC iPlayer</name>
   <author>R.D. Vaughan</author>
-  <thumbnail>bbciplayer.jpg</thumbnail>
+  <thumbnail>bbciplayer.png</thumbnail>
   <type>video</type>
   <description>BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week.</description>
   <version>v0.13</version>
@@ -133,8 +133,8 @@ Options:
     <numresults>1</numresults>
     <returned>1</returned>
     <startindex>1</startindex>
-    <directory name="BBC iPlayer" thumbnail="/usr/local/share/mythtv/mythnetvision/icons/bbciplayer.jpg">
-      <directory name="BBC iPlayer - TV Highlights" thumbnail="/usr/local/share/mythtv/mythnetvision/icons/bbciplayer.jpg">
+    <directory name="BBC iPlayer" thumbnail="/usr/local/share/mythtv/mythnetvision/icons/bbciplayer.png">
+      <directory name="BBC iPlayer - TV Highlights" thumbnail="/usr/local/share/mythtv/mythnetvision/icons/bbciplayer.png">
         <item>
           <title>Great Ormond Street: Pushing the Boundaries</title>
           <author>BBC</author>
@@ -277,7 +277,7 @@ if __name__ == '__main__':
     main.grabberInfo['mashup_title'] = __mashup_title__
     main.grabberInfo['command'] = u'bbciplayer.py'
     main.grabberInfo['author'] = __author__
-    main.grabberInfo['thumbnail'] = 'bbciplayer.jpg'
+    main.grabberInfo['thumbnail'] = 'bbciplayer.png'
     main.grabberInfo['type'] = ['video', ]
     main.grabberInfo['desc'] = u"BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week."
     main.grabberInfo['version'] = __version__
