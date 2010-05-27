@@ -388,8 +388,8 @@ int AudioOutputCA::GetAudiotime(void)
     int totalbuffer = audioready() + GetBufferedOnSoundcard();
 
     return audbuf_timecode - (int)(totalbuffer * 100000.0 /
-                                  (output_bytes_per_frame * effdspstretched));
-
+                                  (output_bytes_per_frame *
+                                   effdsp * stretchfactor));
 }
 
 /* This callback provides converted audio data to the default output device. */
