@@ -171,8 +171,6 @@ class AudioOutputBase : public AudioOutput, public QThread
     int volume;
     QString volumeControl;
 
-    bool pulsewassuspended;
-
     bool processing;
 
     long long frames_buffered;

@@ -27,9 +27,6 @@ using namespace std;
 #ifdef USING_PULSEOUTPUT
 #include "audiooutputpulse.h"
 #endif
-#ifdef USING_PULSE
-#include "audiopulseutil.h"
-#endif
 
 AudioOutput *AudioOutput::OpenAudio(
     const QString &main_device, const QString &passthru_device,
@@ -37,41 +34,17 @@ AudioOutput *AudioOutput::OpenAudio(
     AudioOutputSource source, bool set_initial_vol, bool passthru,
     int upmixer_startup)
 {
-    AudioOutput *ret = NULL;
-#ifdef USING_PULSE
-    bool pulsestatus = false;
-#endif
-
     AudioSettings settings(
         main_device, passthru_device, format, channels, codec, samplerate,
         source, set_initial_vol, passthru, upmixer_startup);
 
     settings.FixPassThrough();
 
-    if (main_device.startsWith("PulseAudio:"))
-    {
-#ifdef USING_PULSEOUTPUT
-        return new AudioOutputPulseAudio(settings);
-#else
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to PulseAudio "
-                "but PulseAudio support is not compiled in!");
-        return NULL;
-#endif
-    }
-
-#ifdef USING_PULSE
-    if (!main_device.startsWith("ALSA:pulse") &&
-        pulseaudio_handle_startup() > 0)
-    {
-        pulsestatus = true;
-    }
-#endif
-
     if (main_device.startsWith("ALSA:"))
     {
 #ifdef USE_ALSA
         settings.TrimDeviceType();
-        ret = new AudioOutputALSA(settings);
+        return new AudioOutputALSA(settings);
 #else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to an ALSA device "
                               "but ALSA support is not compiled in!");
@@ -80,13 +53,13 @@ AudioOutput *AudioOutput::OpenAudio(
     }
     else if (main_device.startsWith("NULL"))
     {
-        ret = new AudioOutputNULL(settings);
+        return new AudioOutputNULL(settings);
     }
     else if (main_device.startsWith("JACK:"))
     {
 #ifdef USE_JACK
         settings.TrimDeviceType();
-        ret = new AudioOutputJACK(settings);
+        return new AudioOutputJACK(settings);
 #else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to a JACK device "
                               "but JACK support is not compiled in!");
@@ -106,40 +79,36 @@ AudioOutput *AudioOutput::OpenAudio(
     else if (main_device.startsWith("Windows:"))
     {
 #ifdef USING_MINGW
-        ret = new AudioOutputWin(settings);
+        return new AudioOutputWin(settings);
 #else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to a Windows device "
                               "but Windows support is not compiled in!");
         return NULL;
 #endif
     }
+    else if (main_device.startsWith("PulseAudio:"))
+    {
+#ifdef USING_PULSEOUTPUT
+        return new AudioOutputPulseAudio(settings);
+#else
+        VERBOSE(VB_IMPORTANT, "Audio output device is set to PulseAudio "
+                              "but PulseAudio support is not compiled in!");
+        return NULL;
+#endif
+    }
 #if defined(USING_OSS)
     else
-        ret = new AudioOutputOSS(settings);
+        return new AudioOutputOSS(settings);
 #elif CONFIG_DARWIN
     else
-        ret = new AudioOutputCA(settings);
+        return new AudioOutputCA(settings);
 #endif
-    
-    if (!ret)
-    {
-        VERBOSE(VB_IMPORTANT, "No useable audio output driver found.");
-        VERBOSE(VB_IMPORTANT, "Don't disable OSS support unless you're "
-                              "not running on Linux.");        
-        return NULL;
-    }
-#ifdef USING_PULSE
-    ret->pulsewassuspended = pulsestatus;
-#endif
-    return ret;
-}
 
-AudioOutput::~AudioOutput()
-{
-#ifdef USING_PULSE
-    if (pulsewassuspended)
-        pulseaudio_handle_teardown();
-#endif
+    VERBOSE(VB_IMPORTANT, "No useable audio output driver found.");
+    VERBOSE(VB_IMPORTANT, "Don't disable OSS support unless you're "
+                          "not running on Linux.");
+
+    return NULL;
 }
 
 void AudioOutput::SetStretchFactor(float /*factor*/)

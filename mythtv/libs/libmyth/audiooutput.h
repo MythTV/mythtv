@@ -24,10 +24,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
-        lastError(QString::null), lastWarn(QString::null),
-        pulsewassuspended(false)  {};
+        lastError(QString::null), lastWarn(QString::null) {}
 
-    virtual ~AudioOutput();
+    virtual ~AudioOutput() { };
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
@@ -71,8 +70,6 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual bool ToggleUpmix(void) = 0;
 
-    bool PulseStatus(void) { return pulsewassuspended; };
-
   protected:
     void Error(const QString &msg);
     void Warn(const QString &msg);
@@ -82,7 +79,6 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
   protected:
     QString lastError;
     QString lastWarn;
-    bool pulsewassuspended;
 };
 
 #endif
