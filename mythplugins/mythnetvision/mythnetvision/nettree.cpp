@@ -299,6 +299,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         item->DisplayState("subfolder", "nodetype");
         item->SetText(node->getString(), "title");
         item->SetText(node->getString());
+        item->SetImage(node->GetData().toString());
     }
     else if (nodeInt == kUpFolder)
     {
@@ -1045,8 +1046,6 @@ void NetTree::slotItemChanged()
 
         if (!item->GetThumbnail().isEmpty() && m_thumbImage)
         {
-            // Put some thumbnail handling stuff if I ever figure it out.
-
             QString fileprefix = GetConfDir();
 
             QDir dir(fileprefix);
@@ -1127,8 +1126,22 @@ void NetTree::slotItemChanged()
         else
             title = m_siteButtonList->GetItemCurrent()->GetText();
 
+        QString thumb;
+        if (m_type == DLG_TREE)
+            thumb = m_siteMap->GetCurrentNode()->
+                        GetData().toString();
+        else
+        {
+            MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
+
+            if (node)
+                thumb = node->GetData().toString();
+        }
+
+        VERBOSE(VB_GENERAL, QString("Node %1 is neither an item nor a site, and had thumbnail = %2").arg(title).arg(thumb));
+
         ResultItem *res = new ResultItem(title, QString(), QString(),
-              QString(), QString(), QString(), QString(), QDateTime(),
+              QString(), thumb, QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
@@ -1138,20 +1151,11 @@ void NetTree::slotItemChanged()
 
         if (m_thumbImage)
         {
-            QString thumb;
-            if (m_type == DLG_TREE)
-                thumb = m_siteMap->GetCurrentNode()->
-                            GetData().toString();
-            else
-            {
-                MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
-
-                if (node)
-                    thumb = node->GetData().toString();
-            }
-
             if (!thumb.startsWith("http://"))
             {
+                if (thumb.contains("%SHAREDIR%"))
+                    thumb.replace("%SHAREDIR%", GetShareDir());
+
                 bool exists = QFile::exists(thumb);
 
                 if (exists)
