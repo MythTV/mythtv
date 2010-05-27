@@ -1138,8 +1138,6 @@ void NetTree::slotItemChanged()
                 thumb = node->GetData().toString();
         }
 
-        VERBOSE(VB_GENERAL, QString("Node %1 is neither an item nor a site, and had thumbnail = %2").arg(title).arg(thumb));
-
         ResultItem *res = new ResultItem(title, QString(), QString(),
               QString(), thumb, QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
