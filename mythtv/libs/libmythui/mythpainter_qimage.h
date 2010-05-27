@@ -1,8 +1,13 @@
 #ifndef MYTHPAINTER_QIMAGE_H_
 #define MYTHPAINTER_QIMAGE_H_
 
+// C++ includes
+#include <list>
+
+// Qt includes
 #include <QMap>
 
+// MythTV includes
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "compat.h"
@@ -34,10 +39,12 @@ class MythQImagePainter : public MythPainter
                           const QRect &boundRect);
     virtual void DrawRect(const QRect &area,
                           bool drawFill, const QColor &fillColor, 
-                          bool drawLine, int lineWidth, const QColor &lineColor);
+                          bool drawLine, int lineWidth,
+                          const QColor &lineColor);
     virtual void DrawRoundRect(const QRect &area, int radius, 
                                bool drawFill, const QColor &fillColor, 
-                               bool drawLine, int lineWidth, const QColor &lineColor);
+                               bool drawLine, int lineWidth,
+                               const QColor &lineColor);
 
     virtual MythImage *GetFormatImage();
     virtual void DeleteFormatImage(MythImage *im);
