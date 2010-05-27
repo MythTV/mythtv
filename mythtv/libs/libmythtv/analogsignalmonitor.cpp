@@ -5,7 +5,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#include "videodev_myth.h"
+#include <linux/videodev.h>
+
 #include "mythverbose.h"
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"

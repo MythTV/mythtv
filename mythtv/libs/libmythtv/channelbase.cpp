@@ -16,7 +16,6 @@
 using namespace std;
 
 // MythTV headers
-#include "videodev_myth.h"
 #include "channelbase.h"
 #include "frequencies.h"
 #include "tv_rec.h"

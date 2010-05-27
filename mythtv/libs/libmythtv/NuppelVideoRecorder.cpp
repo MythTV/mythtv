@@ -39,16 +39,25 @@ extern "C" {
 #endif
 
 extern "C" {
-#include "vbitext/vbi.h"
 #include "libswscale/swscale.h"
 }
 
-#include "videodev_myth.h"
+#ifdef USING_V4L
+#include <linux/videodev.h>
+#include <linux/videodev2.h>
+
 #include "go7007_myth.h"
 
 #ifndef MJPIOC_S_PARAMS
 #include "videodev_mjpeg.h"
 #endif
+
+extern "C" {
+#include "vbitext/vbi.h"
+}
+#else  // USING_V4l
+#define VT_WIDTH 0
+#endif // USING_V4l
 
 #define KEYFRAMEDIST   30
 
@@ -756,6 +765,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
  */
 bool NuppelVideoRecorder::MJPEGInit(void)
 {
+#ifdef USING_V4L
     bool we_opened_fd = false;
     int init_fd = fd;
     if (init_fd < 0)
@@ -797,6 +807,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
             hmjpg_maxw = 640;
         return true;
     }
+#endif // USING_V4L
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "MJPEG not supported by device");
     return false;
@@ -944,6 +955,7 @@ bool NuppelVideoRecorder::Open(void)
 
 void NuppelVideoRecorder::ProbeV4L2(void)
 {
+#ifdef USING_V4L
     usingv4l2 = true;
 
     struct v4l2_capability vcap;
@@ -973,6 +985,7 @@ void NuppelVideoRecorder::ProbeV4L2(void)
     QString driver = (char *)vcap.driver;
     if (driver == "go7007")
         go7007 = true;
+#endif // USING_V4L
 }
 
 void NuppelVideoRecorder::StartRecording(void)
@@ -1055,6 +1068,7 @@ void NuppelVideoRecorder::StartRecording(void)
         DoV4L();
 }
 
+#ifdef USING_V4L
 void NuppelVideoRecorder::DoV4L(void)
 {
     struct video_capability vc;
@@ -1776,6 +1790,13 @@ void NuppelVideoRecorder::DoMJPEG(void)
     close(fd);
 }
 
+#else  // USING_V4L
+void NuppelVideoRecorder::DoV4L(void)         {}
+bool NuppelVideoRecorder::SetFormatV4L2(void) { return false; }
+void NuppelVideoRecorder::DoV4L2(void)        {}
+void NuppelVideoRecorder::DoMJPEG(void)       {}
+#endif // USING_V4L
+
 int NuppelVideoRecorder::SpawnChildren(void)
 {
     int result;
@@ -2373,6 +2394,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         audio_device->Close();
 }
 
+#ifdef USING_V4L
 struct VBIData
 {
     NuppelVideoRecorder *nvr;
@@ -2546,6 +2568,9 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
         act_text_buffer = 0;
     textbuffer[act]->freeToEncode = 1;
 }
+#else  // USING_V4L
+void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata) {}
+#endif // USING_V4L
 
 void NuppelVideoRecorder::FormatCC(struct cc *cc)
 {
@@ -2582,6 +2607,7 @@ void NuppelVideoRecorder::AddTextData(unsigned char *buf, int len,
     textbuffer[act]->freeToEncode = 1;
 }
 
+#ifdef USING_V4L
 static void vbi_event(struct VBIData *data, struct vt_event *ev)
 {
     switch (ev->type)
@@ -2771,6 +2797,9 @@ void NuppelVideoRecorder::doVbiThread(void)
     //VERBOSE(VB_RECORD, LOC + "vbi end");
 }
 
+#else  // USING_V4L
+void NuppelVideoRecorder::doVbiThread(void) { }
+#endif // USING_V4L
 
 void NuppelVideoRecorder::doWriteThread(void)
 {

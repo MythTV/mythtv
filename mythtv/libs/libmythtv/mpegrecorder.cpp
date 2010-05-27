@@ -21,6 +21,8 @@ using namespace std;
 #include <sys/time.h>
 #include <sys/poll.h>
 
+#include <linux/videodev2.h>
+
 #include "mythconfig.h"
 
 // avlib headers
@@ -35,7 +37,6 @@ extern "C" {
 #include "programinfo.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
-#include "videodev_myth.h"
 #include "util.h"
 #include "cardutil.h"
 

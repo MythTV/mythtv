@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "videodev_myth.h"
+#include <linux/videodev.h>
+#include <linux/videodev2.h>
 
 // vbitext headers
 #include "vt.h"

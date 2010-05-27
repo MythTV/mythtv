@@ -16,8 +16,10 @@
 #include <iostream>
 using namespace std;
 
+#include <linux/videodev.h>
+#include <linux/videodev2.h>
+
 // MythTV headers
-#include "videodev_myth.h"
 #include "v4lchannel.h"
 #include "frequencies.h"
 #include "tv_rec.h"
@@ -237,8 +239,6 @@ static QString mode_to_format(int mode, int v4l_version)
     {
         if (mode == VIDEO_MODE_NTSC)
             return "NTSC";
-        else if (mode == VIDEO_MODE_ATSC)
-            return "ATSC";
         else if (mode == VIDEO_MODE_PAL)
             return "PAL";
         else if (mode == VIDEO_MODE_SECAM)

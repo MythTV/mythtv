@@ -111,7 +111,7 @@ cygwin:DEFINES += _WIN32
 using_valgrind:DEFINES += USING_VALGRIND
 
 # old libvbitext (Caption decoder)
-!win32 {
+using_v4l {
     HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h
     HEADERS += vbitext/vbi.h vbitext/vt.h
     SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
