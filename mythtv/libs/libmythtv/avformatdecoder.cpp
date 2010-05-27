@@ -4654,7 +4654,6 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
     switch (ctx->codec_id)
     {
         case CODEC_ID_AC3:
-        case CODEC_ID_DTS:
         case CODEC_ID_TRUEHD:
         case CODEC_ID_EAC3:
             return true;
