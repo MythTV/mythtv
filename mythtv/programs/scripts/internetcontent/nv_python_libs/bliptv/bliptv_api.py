@@ -398,6 +398,8 @@ class Videos(object):
             if not self.feed_icons[self.tree_key].has_key(self.feed):
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
+            if not dir_icon:
+                return self.tree_dir_icon
         self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
