@@ -65,6 +65,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdirs.h"
 #include "mythosdmenueditor.h"
+#include "audiopulseutil.h"
 #include "mythdb.h"
 #include "backendconnectionmanager.h"
 
@@ -1239,6 +1240,10 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
+    int pa_ret = pulseaudio_handle_startup();
+    if (pa_ret != GENERIC_EXIT_OK)
+        return pa_ret;
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||
@@ -1485,6 +1490,10 @@ int main(int argc, char **argv)
     delete networkControl;
 
     DestroyMythMainWindow();
+
+    pa_ret = pulseaudio_handle_teardown();
+    if (GENERIC_EXIT_OK != pa_ret)
+        return pa_ret;
 
     return ret;
 
