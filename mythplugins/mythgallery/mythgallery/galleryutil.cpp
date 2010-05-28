@@ -51,19 +51,12 @@ QStringList GalleryUtil::GetImageFilter(void)
 {
     QStringList filt;
     filt.push_back("*.jpg");
-    filt.push_back("*.JPG");
     filt.push_back("*.jpeg");
-    filt.push_back("*.JPEG");
     filt.push_back("*.png");
-    filt.push_back("*.PNG");
     filt.push_back("*.tif");
-    filt.push_back("*.TIF");
     filt.push_back("*.tiff");
-    filt.push_back("*.TIFF");
     filt.push_back("*.bmp");
-    filt.push_back("*.BMP");
     filt.push_back("*.gif");
-    filt.push_back("*.GIF");
     return filt;
 }
 
@@ -71,15 +64,11 @@ QStringList GalleryUtil::GetMovieFilter(void)
 {
     QStringList filt;
     filt.push_back("*.avi");
-    filt.push_back("*.AVI");
     filt.push_back("*.mpg");
-    filt.push_back("*.MPG");
+    filt.push_back("*.mp4");
     filt.push_back("*.mpeg");
-    filt.push_back("*.MPEG");
     filt.push_back("*.mov");
-    filt.push_back("*.MOV");
     filt.push_back("*.wmv");
-    filt.push_back("*.WMV");
     return filt;
 }
 
@@ -100,7 +89,7 @@ bool GalleryUtil::IsImage(const QString &filePath)
     QStringList::const_iterator it = filt.begin();
     for (; it != filt.end(); ++it)
     {
-        if ((*it).contains(fi.suffix()))
+        if ((*it).toLower().contains(fi.suffix()))
             return true;
     }
 
@@ -117,7 +106,7 @@ bool GalleryUtil::IsMovie(const QString &filePath)
     QStringList::const_iterator it = filt.begin();
     for (; it != filt.end(); ++it)
     {
-        if ((*it).contains(fi.suffix()))
+        if ((*it).toLower().contains(fi.suffix()))
             return true;
     }
 
