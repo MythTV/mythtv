@@ -25,10 +25,11 @@
 __title__ ="Hulu";
 __mashup_title__ = "hulu"
 __author__="R.D. Vaughan"
-__version__="0.12"
+__version__="0.13"
 # 0.1.0 Initial development
 # 0.11  Change to support xml version information display
 # 0.12  Added the "command" tag to the xml version information display
+# 0.13  Converted to new common_api.py library
 
 __usage_examples__ ='''
 (Option Help)
@@ -201,52 +202,40 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 # Used for debugging
-#import nv_python_libs.common.mashups_api
-
+#import nv_python_libs.common.common_api
 try:
     '''Import the common python class
     '''
-    import nv_python_libs.common.mashups_api as mashups_api
+    import nv_python_libs.common.common_api as common_api
 except Exception, e:
     sys.stderr.write('''
-The subdirectory "nv_python_libs/common" containing the modules mashups_api.py and
-mashups_exceptions.py (v0.1.3 or greater),
+The subdirectory "nv_python_libs/common" containing the modules common_api.py and
+common_exceptions.py (v0.1.3 or greater),
 They should have been included with the distribution of MythNetvision
 Error(%s)
 ''' % e)
     sys.exit(1)
-
-if mashups_api.__version__ < '0.1.3':
-    sys.stderr.write("\n! Error: Your current installed mashups_api.py version is (%s)\nYou must at least have version (0.1.3) or higher.\n" % target.__version__)
+if common_api.__version__ < '0.1.3':
+    sys.stderr.write("\n! Error: Your current installed common_api.py version is (%s)\nYou must at least have version (0.1.3) or higher.\n" % target.__version__)
     sys.exit(1)
 
-# Check if this grabber is processed remotely on a CGI Web server or on a local Frontend
-common = mashups_api.Common()
+# Used for debugging
+#import nv_python_libs.hulu.hulu_api as target
 try:
-  common.getFEConfig()
+    '''Import the python hulu support classes
+    '''
+    import nv_python_libs.hulu.hulu_api as target
 except Exception, e:
-  sys.stderr.write(u'%s\n' % e)
-  pass
-if common.local:
-  # Used for debugging
-  #import nv_python_libs.hulu.hulu_api as target
-  try:
-      '''Import the python hulu support classes
-      '''
-      import nv_python_libs.hulu.hulu_api as target
-  except Exception, e:
-      sys.stderr.write('''
-  The subdirectory "nv_python_libs/hulu" containing the modules hulu_api and
-  hulu_exceptions.py (v0.1.0 or greater),
-  They should have been included with the distribution of hulu.py.
-  Error(%s)
-  ''' % e)
-      sys.exit(1)
-  if target.__version__ < '0.1.0':
-      sys.stderr.write("\n! Error: Your current installed hulu_api.py version is (%s)\nYou must at least have version (0.1.0) or higher.\n" % target.__version__)
-      sys.exit(1)
-else:
-  target = mashups_api    # This grabber is to be run on a CGI enabled Web server
+    sys.stderr.write('''
+The subdirectory "nv_python_libs/hulu" containing the modules hulu_api and
+hulu_exceptions.py (v0.1.0 or greater),
+They should have been included with the distribution of hulu.py.
+Error(%s)
+''' % e)
+    sys.exit(1)
+if target.__version__ < '0.1.0':
+    sys.stderr.write("\n! Error: Your current installed hulu_api.py version is (%s)\nYou must at least have version (0.1.0) or higher.\n" % target.__version__)
+    sys.exit(1)
 
 # Verify that the main process modules are installed and accessable
 try:
@@ -268,7 +257,7 @@ if __name__ == '__main__':
     # Set the base processing directory that the grabber is installed
     target.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ ))
     # Make sure the target functions have an instance of the common routines
-    target.common = common
+    target.common = common_api.Common()
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__

@@ -1,0 +1,4 @@
+<Configuration>
+    <!-- The relative file path and filename that contains the user specific preferences for this mashup -->
+    <userPreferenceFile>~/.mythtv/MythNetvision/userGrabberPrefs</userPreferenceFile>
+</Configuration>

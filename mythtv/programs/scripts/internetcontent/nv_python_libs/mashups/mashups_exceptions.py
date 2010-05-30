@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: mashups_exceptions - Custom exceptions used or raised by Mashups_api
+# Name: mashups_exceptions - Custom exceptions used or raised by mashups_api
 # Python Script
 # Author:  R.D. Vaughan
-# Purpose:  Custom exceptions used or raised by Mashups_api
+# Purpose:  Custom exceptions used or raised by mashups_api
 #
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="mashups_exceptions - Custom exceptions used or raised by mashups";
+__title__ ="mashups_exceptions - Custom exceptions used or raised by mashups_api";
 __author__="R.D. Vaughan"
-__version__="v0.1.1"
+__version__="v0.1.0"
 # 0.1.0 Initial development
-# 0.1.1 Changes due to abanding the EMML Engine/Tomcat server and the addition of the common function class
 
-__all__ = ["MashupsUrlError", "MashupsHttpError", "MashupsRssError", "MashupsVideoNotFound", "MashupsInvalidSearchType", "MashupsXmlError", "MashupsVideoDetailError", "MashupsCategoryNotFound", ]
+__all__ = ["MashupsUrlError", "MashupsHttpError", "MashupsRssError", "MashupsVideoNotFound", "MashupsConfigFileError", "MashupsUrlDownloadError"]
 
 class MashupsBaseError(Exception):
     pass
@@ -40,12 +39,12 @@ class MashupsVideoNotFound(MashupsBaseError):
         return None
     # end __repr__
 
-class MashupsInvalidSearchType(MashupsBaseError):
+class MashupsConfigFileError(MashupsBaseError):
     def __repr__(self):
         return None
     # end __repr__
 
-class MashupsXmlError(MashupsBaseError):
+class MashupsUrlDownloadError(MashupsBaseError):
     def __repr__(self):
         return None
     # end __repr__

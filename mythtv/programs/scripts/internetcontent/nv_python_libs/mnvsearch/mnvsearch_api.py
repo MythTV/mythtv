@@ -18,11 +18,12 @@ This python script is intended to perform a data base search of MythNetvision da
 videos based on a command line search term.
 '''
 
-__version__="0.1.2"
+__version__="0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
 # 0.1.2 Changed the SQL query to the new "internetcontentarticles" table format and new fields
 #       Added "%SHAREDIR%" to icon directory path
+# 0.1.3 Video duration value was being erroneously multiplied by 60.
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 import logging
@@ -252,7 +253,7 @@ class Videos(object):
             if result['filesize']:
                 itemContent(mnvsearchItem)[0].attrib['length'] = unicode(result['filesize'])
             if result['time']:
-                itemContent(mnvsearchItem)[0].attrib['duration'] = unicode(result['time']*60)
+                itemContent(mnvsearchItem)[0].attrib['duration'] = unicode(result['time'])
             if result['width']:
                 itemContent(mnvsearchItem)[0].attrib['width'] = unicode(result['width'])
             if result['height']:

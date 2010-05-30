@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: mashups_api.py - Common class libraries for all MythNetvision Mashup processing
+# Name: common_api.py - Common class libraries for all MythNetvision Mashup processing
 # Python Script
 # Author:   R.D. Vaughan
 # Purpose:  This python script contains a number of common functions used for processing MythNetvision
-#           Mashups.
+#           Grabbers.
 #
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="mashups_common - Common class libraries for all MythNetvision Mashup processing"
+__title__ ="common_api - Common class libraries for all MythNetvision Mashup processing"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions for the processing of
-MythNetvision Mashups scripts that run as a Web application and global functions used by many
+MythNetvision Grabber scripts that run as a Web application and global functions used by many
 MNV grabbers.
 '''
 
-__version__="v0.1.4"
+__version__="v0.1.6"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -31,14 +31,19 @@ __version__="v0.1.4"
 #       Added a class of global functions that could be used by all grabbers
 # 0.1.4 Changed the rating item element to default to be empty rather than "0.0"
 #       Changed the default logger to stderr
+# 0.1.5 Added functions and data structures for common "Mashups" grabbers
+#       Changed the api name from "mashups_api" to "common_api"
+#       Added XSLT stylsheets as an alternate process option in the threaded URL download functions
+# 0.1.6 Removed all logic associated with Web CGI calls as the MNV plugin is now on the backend
+#       Made the pubDate fucntion more adaptable to various input date strings
 
-import os, struct, sys, re, time, subprocess
+import os, struct, sys, re, datetime, time, subprocess, string
 import urllib
 import logging
 import telnetlib
 from threading import Thread
 
-from mashups_exceptions import (MashupsUrlError, MashupsHttpError, MashupsRssError, MashupsVideoNotFound, MashupsXmlError, )
+from common_exceptions import (WebCgiUrlError, WebCgiHttpError, WebCgiRssError, WebCgiVideoNotFound, WebCgiXmlError, )
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -104,191 +109,6 @@ if version < '2.7.2':
     sys.exit(1)
 
 
-class Videos(object):
-    """Main interface to the MNV Grabbers that run as a Web server application
-    This is done to support common functions when interfacing the MNV CGI Web server interface.
-    Supporting both search and tree view methods.
-    """
-    def __init__(self,
-                apikey,
-                mythtv = True,
-                interactive = False,
-                select_first = False,
-                debug = False,
-                custom_ui = None,
-                language = None,
-                search_all_languages = False,
-                ):
-        """apikey (str/unicode):
-            Specify the target site API key. Applications need their own key in some cases
-
-        mythtv (True/False):
-            When True, the returned meta data is being returned has the key and values
-            massaged to match MythTV
-            When False, the returned meta data  is being returned matches what target site returned
-
-        interactive (True/False): (This option is not supported by all target site apis)
-            When True, uses built-in console UI is used to select the correct show.
-            When False, the first search result is used.
-
-        select_first (True/False): (This option is not supported currently implemented in any grabbers)
-            Automatically selects the first series search result (rather
-            than showing the user a list of more than one series).
-            Is overridden by interactive = False, or specifying a custom_ui
-
-        debug (True/False):
-             shows verbose debugging information
-
-        custom_ui (xx_ui.BaseUI subclass): (This option is not supported currently implemented in any grabbers)
-            A callable subclass of interactive class (overrides interactive option)
-
-        language (2 character language abbreviation): (This option is not supported by all target site apis)
-            The language of the returned data. Is also the language search
-            uses. Default is "en" (English). For full list, run..
-
-        search_all_languages (True/False): (This option is not supported by all target site apis)
-            By default, a Netvision grabber will only search in the language specified using
-            the language option. When this is True, it will search for the
-            show in any language
-
-        """
-        self.config = {}
-
-        self.config['debug_enabled'] = debug # show debugging messages
-        self.common = common
-        self.common.debug = debug    # Set the common function debug level
-
-        self.log_name = "WebCGI_Mashups"
-        self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
-        self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
-
-        self.config['search_all_languages'] = search_all_languages
-
-        # Defaulting to ENGISH most mashups do not support specifying a language
-        self.config['language'] = "en"
-
-        self.error_messages = {'MashupsUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'MashupsHttpError': u"! Error: An HTTP communicating error with MNV CGI Web application was raised (%s)\n", 'MashupsRssError': u"! Error: Invalid RSS meta data\nwas received from MNV CGI Web application error (%s). Skipping item.\n", 'MashupsVideoNotFound': u"! Error: Video search with MNV CGI Web application did not return any results (%s)\n", }
-
-        # The following url_ configs are based for the Web CGI interface. Example:
-        # http://192.168.0.100:80/cgi-bin
-        self.config['base_url'] = u"http://%s:%s/%s/"
-        if self.config['debug_enabled']:
-            self.config['search'] = self.config['base_url']+u"%s?searchterms=%s&page=%s&debug=true&hostname=%s&port=%s"
-            self.config['treeview'] = self.config['base_url']+u"%s?debug=true&hostname=%s&port=%s"
-        else:
-            self.config['search'] = self.config['base_url']+u"%s?searchterms=%s&page=%s&hostname=%s&port=%s"
-            self.config['treeview'] = self.config['base_url']+u"%s?hostname=%s&port=%s"
-    # end __init__()
-
-
-    def searchMashup(self, mashupName, searchTerm, pagenumber, pagelen):
-        '''Key word video search using the EMML mashup server for a specific search emml file
-        When there are items returned display the results to stdout
-        When no items are returned display nothing but post an appropriate message to stderr
-        '''
-        url = self.config['search'] % (slef.common.ip_hostname, slef.common.port, urllib.quote_plus(mashupName.lower().encode("utf-8")), urllib.quote_plus(searchTerm.encode("utf-8")), pagenumber, slef.common.ip_hostname, slef.common.port, )
-
-        if self.config['debug_enabled']:
-            print "Search URL:"
-            print url
-            print
-
-        try:
-            tree = etree.parse(url, etree.XMLParser(remove_blank_text=True))
-        except Exception, errormsg:
-            raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (url, errormsg))
-
-        if tree is None:
-            raise MashupsVideoNotFound(u"Nothing returned for Video search value (%s)" % searchTerm)
-
-        if tree.xpath('not(boolean(//item))'):
-            raise MashupsVideoNotFound(u"No Video matches found for search value (%s)" % searchTerm)
-
-        # Display the results
-        sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
-
-        return
-        # end searchMashup()
-
-
-    def searchForVideos(self, searchTerm, pagenumber):
-        '''Execute a search Mashup. This code allows search mashups to be just stub scripts
-        return nothing just display results or error messages
-        '''
-        # Read the "~/.mythtv/mnvMashupsConfig.xml file"
-        try:
-            self.common.getFEConfig()
-        except Exception, e:
-            sys.stderr.write('''
-%s\n''' % e)
-            sys.exit(1)
-
-        # Get and display all enabled search Mashups results
-        try:
-            self.searchMashup(self.mashup_title, searchTerm, pagenumber, self.page_limit)
-        except Exception, e:
-            sys.stderr.write('''
-%s\n''' % e)
-            sys.exit(1)
-
-        sys.exit(0)
-    # end searchForVideos()
-
-
-    def treeviewMashup(self, mashupName):
-        '''Call the CGI Web server using the treeview mashup name and display the results if any
-        return nothing
-        When no items are returned display nothing but post an appropriate message to stderr
-        '''
-        url = self.config['treeview'] % (slef.common.ip_hostname, slef.common.port, urllib.quote_plus(mashupName.lower().encode("utf-8")), slef.common.ip_hostname, slef.common.port, )
-
-        if self.config['debug_enabled']:
-            print "Treeview URL:"
-            print url
-            print
-
-        try:
-            tree = etree.parse(url, etree.XMLParser(remove_blank_text=True))
-        except Exception, errormsg:
-            raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (url, errormsg))
-
-        if tree is None:
-            raise MashupsVideoNotFound(u"Nothing returned from treeview mashup (%s)" % mashupName)
-
-        if tree.xpath('not(boolean(//directory))'):
-            raise MashupsVideoNotFound(u"No Videos from treeview mashup (%s)" % mashupName)
-
-        # Display the treeview results
-        sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
-        return
-        # end treeviewMashup()
-
-
-    def displayTreeView(self):
-        '''Execute all enabled treeview mashups aggrigated into a single multi-channel MNV RSS treeview
-        return nothing
-        '''
-        # Read the "~/.mythtv/mnvMashupsConfig.xml file"
-        try:
-            slef.common.getFEConfig()
-        except Exception, e:
-            sys.stderr.write('''
-%s\n''' % e)
-            sys.exit(1)
-
-        # Get and display a treeview Mashup
-        try:
-            self.treeviewMashup(self.mashup_title, shutdown=self.shutdownOnExit)
-        except Exception, e:
-            sys.stderr.write('''
-%s\n''' % e)
-            sys.exit(1)
-
-        sys.exit(0)
-    # end displayTreeView()
-# end Mashups() class
-
-
 ###########################################################################################################
 #
 # Start - Utility functions
@@ -303,12 +123,14 @@ class Common(object):
         ):
         self.logger = logger
         self.debug = debug
+        self.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ )).replace(u'/nv_python_libs/common', u'')
         self.namespaces = {
             'xsi': u"http://www.w3.org/2001/XMLSchema-instance",
             'media': u"http://search.yahoo.com/mrss/",
             'xhtml': u"http://www.w3.org/1999/xhtml",
             'atm': u"http://www.w3.org/2005/Atom",
             'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
+            'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
             }
         self.parsers = {
             'xml': etree.XMLParser(remove_blank_text=True),
@@ -342,6 +164,39 @@ class Common(object):
     <rating></rating>
 </item>
 '''
+        # Season and Episode detection regex patterns
+        self.s_e_Patterns = [
+            # "Series 7 - Episode 4" or "Series 7 - Episode 4" or "Series 7: On Holiday: Episode 10"
+            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Series 5 - 1
+            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+)\\ \\-\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Series 1 - Warriors of Kudlak - Part 2
+            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Part\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Series 3: Programme 3
+            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+)\\:\\ Programme\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Series 3:
+            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            # Episode 1
+            re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            # Title: "s18 | e87"
+            re.compile(u'''^.+?[Ss](?P<seasno>[0-9]+).*.+?[Ee](?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Description: "season 1, episode 5"
+            re.compile(u'''^.+?season\ (?P<seasno>[0-9]+).*.+?episode\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Thumbnail: "http://media.thewb.com/thewb/images/thumbs/firefly/01/firefly_01_07.jpg"
+            re.compile(u'''(?P<seriesname>[^_]+)\\_(?P<seasno>[0-9]+)\\_(?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Guid: "http://traffic.libsyn.com/divefilm/episode54hd.m4v"
+            re.compile(u'''^.+?episode(?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Season 3, Episode 8
+            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # "Episode 1" anywhere in text
+            re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            # "Episode 1" at the start of the text
+            re.compile(u'''Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            # "--0027--" when the episode is in the URL link
+            re.compile(u'''^.+?--(?P<seasno>[0-9]+)--.*$''', re.UNICODE),
+            ]
+        self.nv_python_libs_path = u'nv_python_libs'
+        self.apiSuffix = u'_api'
     # end __init__()
 
     def massageText(self, text):
@@ -421,8 +276,8 @@ class Common(object):
     # end ampReplace()
 
     def callCommandLine(self, command, stderr=False):
-        '''Perform the requested command line and return an array of stdout strings and stderr strings if
-        stderr=True
+        '''Perform the requested command line and return an array of stdout strings and
+        stderr strings if stderr=True
         return array of stdout string array or stdout and stderr string arrays
         '''
         stderrarray = []
@@ -530,60 +385,31 @@ class Common(object):
     # end detectUserLocationByIP()
 
 
-    def checkForCGIServer(self, tn_host, tn_port):
-        '''Using Telnet check if the CGI Web server is running
-        The code was copied from: http://www.velocityreviews.com/forums/t327444-telnet-instead-ping.html
-        return True if the server is responding
-        return Fale if the server is NOT responding
-        '''
+    def displayCustomHTML(self):
+        """Common name for a custom HTML display. Used to interface with MythTV plugin NetVision
+        """
+        embedFlashVarFilter = etree.XPath('//embed', namespaces=self.common.namespaces)
+        variables = self.HTMLvideocode.split(u'?')
+
+        url = u'%s/nv_python_libs/configs/HTML/%s' % (baseProcessingDir, variables[0])
         try:
-            tn = telnetlib.Telnet(tn_host,tn_port)
-            tn.close()
-            return True
-        except:
-            False
-    # end checkForCGIServer()
+            customHTML = etree.parse(url)
+        except Exception, e:
+            raise Exception(u"! Error: The Custom HTML file (%s) cause the exception error (%s)\n" % (url, errormsg))
 
+        # There may be one or more argumants to replace in the HTML code
+        # Example:
+        # "bbciplayer.html?AttribName1/FirstReplace=bc623bc?SecondReplace/AttribName2=wonderland/..."
+        for arg in variables[1:]:
+            (attrib, key_value) = arg.split(u'/')
+            (key, value) = key_value.split(u'=')
+            embedFlashVarFilter(customHTML)[0].attrib[attrib] = embedFlashVarFilter(customHTML)[0].attrib[attrib].replace(key, value)
 
-    def getFEConfig(self):
-        '''Load and extract data from the FE's Mashups configuration file. Initialize all the appropriate
-        variables from the config file or use set defaults if the file does not exist.
-        This configuration file may not exist.
-        return nothing
-        '''
-        # Iniitalize variables to their defaults
-        self.local = True
-        self.ip_hostname = u'localhost'
-        self.port = u'80'
+        sys.stdout.write(etree.tostring(customHTML, encoding='UTF-8', pretty_print=True))
 
-        url = u"file://%s/%s" % (os.path.expanduser(u"~"), u".mythtv/MythNetvision/userGrabberPrefs/mnvMashupsConfig.xml")
-        if self.debug:
-            print url
-            print
+        sys.exit(0)
+    # end displayCustomHTML()
 
-        try:
-            tree = etree.parse(url)
-        except Exception, errormsg:
-            self.local = True
-            return
-
-        if tree is None:
-            raise MashupsVideoNotFound(u"No Mashups configuration file found (%s)" % url)
-
-        if tree.find('local') is not None:
-            if tree.find('local').text != 'true':
-                self.local = False
-            else:
-                return
-
-        if tree.find('ip_hostname') is not None:
-            self.ip_hostname = tree.find('ip_hostname').text
-
-        if tree.find('port') is not None:
-            self.ip_hostname = tree.find('port').text
-
-        return
-    # end getFEConfig()
 
     def mnvChannelElement(self, channelDetails):
         ''' Create a MNV Channel element populated with channel details
@@ -603,9 +429,28 @@ class Common(object):
         return mnvChannel
     # end mnvChannelElement()
 
+    # Verify the a URL actually exists
+    def checkURL(self, url):
+        '''Verify that a URL actually exists. Be careful as redirects can lead to false positives. Use
+        the info details to be sure.
+        return True when it exists and info
+        return False when it does not exist and info
+        '''
+        urlOpened = urllib.urlopen(url)
+        code = urlOpened.getcode()
+        actualURL = urlOpened.geturl()
+        info = urlOpened.info()
+        urlOpened.close()
+        if code != 200:
+            return [False, info]
+        if url != actualURL:
+            return [False, info]
+        return [True, info]
+    # end checkURL()
+
 
     def getUrlData(self, inputUrls, pageFilter=None):
-        ''' Fetch url data and extract the desired results using a dynamic filter.
+        ''' Fetch url data and extract the desired results using a dynamic filter or XSLT stylesheet.
         The URLs are requested in parallel using threading
         return the extracted data organised into directories
         '''
@@ -619,11 +464,20 @@ class Common(object):
         for element in inputUrls.xpath('.//url'):
             key = element.find('name').text
             urlDictionary[key] = {}
+            urlDictionary[key]['type'] = 'raw'
             urlDictionary[key]['href'] = element.find('href').text
             urlFilter = element.findall('filter')
+            if len(urlFilter):
+                urlDictionary[key]['type'] = 'xpath'
             for index in range(len(urlFilter)):
                 urlFilter[index] = urlFilter[index].text
             urlDictionary[key]['filter'] = urlFilter
+            urlXSLT = element.findall('xslt')
+            if len(urlXSLT):
+                urlDictionary[key]['type'] = 'xslt'
+            for index in range(len(urlXSLT)):
+                urlXSLT[index] = etree.XSLT(etree.parse(u'%s/nv_python_libs/configs/XSLT/%s.xsl' % (self.baseProcessingDir, urlXSLT[index].text)))
+            urlDictionary[key]['xslt'] = urlXSLT
             urlDictionary[key]['pageFilter'] = pageFilter
             urlDictionary[key]['parser'] = self.parsers[element.find('parserType').text].copy()
             urlDictionary[key]['namespaces'] = self.namespaces
@@ -664,10 +518,19 @@ class Common(object):
             results = etree.SubElement(root, "results")
             etree.SubElement(results, "name").text = key
             etree.SubElement(results, "url").text = urlDictionary[key]['href']
+            etree.SubElement(results, "type").text = urlDictionary[key]['type']
             etree.SubElement(results, "pageInfo").text = getURL.urlDictionary[key]['morePages']
             result = etree.SubElement(results, "result")
-            for index in range(len(getURL.urlDictionary[key]['result'])):
-                for element in getURL.urlDictionary[key]['result'][index]:
+            if len(getURL.urlDictionary[key]['filter']):
+                for index in range(len(getURL.urlDictionary[key]['result'])):
+                    for element in getURL.urlDictionary[key]['result'][index]:
+                        result.append(element)
+            elif len(getURL.urlDictionary[key]['xslt']):
+                for index in range(len(getURL.urlDictionary[key]['result'])):
+                    for element in getURL.urlDictionary[key]['result'][index].getroot():
+                        result.append(element)
+            else:
+                for element in getURL.urlDictionary[key]['result'][0].xpath('/*'):
                     result.append(element)
 
         if self.debug:
@@ -677,6 +540,261 @@ class Common(object):
 
         return root
     # end getShows()
+
+    ##############################################################################
+    # Start - Utility functions specifically used to modify MNV item data
+    ##############################################################################
+    def buildFunctionDict(self):
+        ''' Create a dictionary of functions that manipulate items data. These functions are imported
+        from other MNV grabbers. These functions are meant to be used by the MNV WebCgi type of grabber
+        which aggregates data from a number of different sources (e.g. RSS feeds and HTML Web pages)
+        including sources from other grabbers.
+        Using a dictionary facilitates mixing XSLT functions with pure python functions to use the best
+        capabilities of both technologies when translating source information into MNV compliant item
+        data.
+        return nothing
+        '''
+        # Add the common XPath extention functions
+        self.functionDict = {
+            'pubDate': self.pubDate,
+            'getSeasonEpisode': self.getSeasonEpisode,
+            'convertDuration': self.convertDuration,
+            'getHtmlData': self.getHtmlData,
+            'linkWebPage': self.linkWebPage,
+            'baseDir': self.baseDir,
+            'stringLower': self.stringLower,
+            'stringUpper': self.stringUpper,
+            'stringReplace': self.stringReplace,
+            'stringEscape': self.stringEscape,
+            'removePunc': self.removePunc,
+            'htmlToString': self.htmlToString,
+            }
+        # Get the specific source functions
+        self.addDynamicFunctions('xsltfunctions')
+        return
+    # end buildFunctionDict()
+
+    def addDynamicFunctions(self, dirPath):
+        ''' Dynamically add functions to the function dictionary from a specified directory
+        return nothing
+        '''
+        fullPath = u'%s/nv_python_libs/%s' % (self.baseProcessingDir, dirPath)
+        sys.path.append(fullPath)
+        # Make a list of all functions that need to be included
+        fileList = []
+        for fPath in os.listdir(fullPath):
+            filepath, filename = os.path.split( fPath )
+            filename, ext = os.path.splitext( filename )
+            if filename == u'__init__':
+                continue
+            if ext != '.py':
+                continue
+            fileList.append(filename)
+
+        # Do not stop when there is an abort on a library just send an error message to stderr
+        for fileName in fileList:
+            filename = {'filename': fileName, }
+            try:
+                exec('''
+import %(filename)s
+%(filename)s.common = self
+for xpathClass in %(filename)s.__xpathClassList__:
+    exec(u'xpathClass = %(filename)s.%%s()' %% xpathClass)
+    for func in xpathClass.functList:
+        exec("self.functionDict['%%s'] = %%s" %% (func, u'xpathClass.%%s' %% func))
+for xsltExtension in %(filename)s.__xsltExtentionList__:
+    exec("self.functionDict['%%s'] = %%s" %% (xsltExtension, u'%(filename)s.%%s' %% xsltExtension))''' % filename )
+            except Exception, errmsg:
+                sys.stderr.write(u'! Error: Dynamic import of (%s) XPath and XSLT extention functions\nmessage(%s)\n' % (fileName, errmsg))
+
+        return
+    # end addDynamicFunctions()
+
+    def pubDate(self, context, *inputArgs):
+        '''Convert a date/time string in a specified format into a pubDate. The default is the
+        MNV item format
+        return the formatted pubDate string
+        return on error return the original date string
+        '''
+        args = []
+        for arg in inputArgs:
+            args.append(arg)
+        if args[0] == u'':
+            return datetime.datetime.now().strftime(self.pubDateFormat)
+        index = args[0].find('+')
+        if index == -1:
+            index = args[0].find('-')
+        if index != -1:
+            args[0] = args[0][:index].strip()
+        args[0] = args[0].replace(',', u'').replace('.', u'')
+        try:
+            if len(args) > 1:
+                args[1] = args[1].replace(',', u'').replace('.', u'')
+                if args[1].find('GMT') != -1:
+                    args[1] = args[1][:args[1].find('GMT')].strip()
+                    args[0] = args[0][:args[0].rfind(' ')].strip()
+                try:
+                    pubdate = time.strptime(args[0], args[1])
+                except ValueError:
+                    if args[1] == '%a %d %b %Y %H:%M:%S':
+                        pubdate = time.strptime(args[0], '%a %d %B %Y %H:%M:%S')
+                    elif args[1] == '%a %d %B %Y %H:%M:%S':
+                        pubdate = time.strptime(args[0], '%a %d %b %Y %H:%M:%S')
+                if len(args) > 2:
+                    return time.strftime(args[2], pubdate)
+                else:
+                    return time.strftime(self.pubDateFormat, pubdate)
+            else:
+                return datetime.datetime.now().strftime(self.pubDateFormat)
+        except Exception, err:
+            sys.stderr.write(u'! Error: pubDate variables(%s) error(%s)\n' % (args, err))
+        return args[0]
+    # end pubDate()
+
+    def getSeasonEpisode(self, context, text):
+        ''' Check is there is any season or episode number information in an item's text
+        return a string of season and/or episode numbers e.g. "2_21"
+        return a string with "None_None" values
+        '''
+        s_e = [None, None]
+        for regexPattern in self.s_e_Patterns:
+            match = regexPattern.match(text)
+            if not match:
+                continue
+            season_episode = match.groups()
+            if len(season_episode) > 1:
+                s_e[0] = season_episode[0]
+                s_e[1] = season_episode[1]
+            else:
+                s_e[1] = season_episode[0]
+            return u'%s_%s' % (s_e[0], s_e[1])
+        return u'%s_%s' % (s_e[0], s_e[1])
+    # end getSeasonEpisode()
+
+    def convertDuration(self, context, duration):
+        ''' Take a duration and convert it to seconds
+        return a string of seconds
+        '''
+        min_sec = duration.split(':')
+        seconds = 0
+        for count in range(len(min_sec)):
+            if count != len(min_sec)-1:
+                seconds+=int(min_sec[count])*(60*(len(min_sec)-count-1))
+            else:
+                seconds+=int(min_sec[count])
+        return u'%s' % seconds
+    # end convertDuration()
+
+    def getHtmlData(self, context, *args):
+        ''' Take a HTML string and convert it to an HTML element. Then apply a filter and return
+        that value.
+        return filter value as a string
+        return an empty sting if the filter failed to find any values.
+        '''
+        xpathFilter = None
+        if len(args) > 1:
+            xpathFilter = args[0]
+            htmldata = args[1]
+        else:
+            htmldata = args[0]
+        htmlElement = etree.HTML(htmldata)
+        if not xpathFilter:
+            return htmlElement
+        filteredData = htmlElement.xpath(xpathFilter)
+        if len(filteredData):
+            if xpathFilter.find('@') != -1:
+                return filteredData[0]
+            else:
+                return filteredData[0].text
+        return u''
+    # end getHtmlData()
+
+    def linkWebPage(self, context, sourceLink):
+        ''' Check if there is a special local HTML page for the link. If not then return a generic
+        download only local HTML url.
+        return a file://.... link to a local HTML web page
+        '''
+        # Currently there are no link specific Web pages
+        linksWebPage = {
+            # Tribute.ca
+            'tributeca': u'tributeca.html?videocode=',
+            'cinemarv': u'cinemarv.html?videocode=',
+            }
+        if sourceLink in linksWebPage.keys():
+            return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, linksWebPage[sourceLink])
+        return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, 'nodownloads.html')
+    # end linkWebPage()
+
+    def baseDir(self, context, dummy):
+        ''' Return the base directory string
+        return the base directory
+        '''
+        return self.baseProcessingDir
+    # end baseDir()
+
+    def stringLower(self, context, data):
+        '''
+        return a lower case string
+        '''
+        return data.lower()
+    # end stringLower()
+
+    def stringUpper(self, context, data):
+        '''
+        return a upper case string
+        '''
+        return data.upper()
+    # end stringUpper()
+
+    def stringReplace(self, context, *inputArgs):
+        ''' Replace substring values in a string
+        return the resulting string from a replace operation
+        '''
+        args = []
+        for arg in inputArgs:
+            args.append(arg)
+        if not len(args) or len(args) == 1:
+            return data
+        if len(args) == 2:
+            args[0] = args[0].replace(args[1], "")
+        else:
+            args[0] = args[0].replace(args[1], args[2])
+        return args[0]
+    # end stringReplace()
+
+    def stringEscape(self, context, *args):
+        ''' Replace substring values in a string
+        return the resulting string from a replace operation
+        '''
+        if not len(args):
+            return u""
+        if len(args) == 1:
+            return urllib.quote_plus(args[0].encode("utf-8"))
+        else :
+            return urllib.quote_plus(args[0].encode("utf-8"), args[1])
+    # end stringEscape()
+
+    def removePunc(self, context, data):
+        ''' Remove all punctuation for a string
+        return the resulting string
+        '''
+        if not len(data):
+            return u""
+        return re.sub('[%s]' % re.escape(string.punctuation), '', data)
+    # end removePunc()
+
+    def htmlToString(self, context, html):
+        ''' Remove HTML tags and LFs from a string
+        return the string without HTML tags or LFs
+        '''
+        if not len(html):
+            return u""
+        return self.massageText(html).strip().replace(u'\n', u' ').replace(u'', u"&apos;").replace(u'', u"&apos;")
+    # end removePunc()
+
+    ##############################################################################
+    # End  - Utility functions specifically used to modify MNV item data
+    ##############################################################################
 # end Common() class
 
 class getURL(Thread):
@@ -701,7 +819,7 @@ class getURL(Thread):
             return
 
         if self.debug:
-            print "Raw unfiltered URL imput:"
+            print "Raw unfiltered URL input:"
             sys.stdout.write(etree.tostring(self.urlDictionary[self.urlKey]['tree'], encoding='UTF-8', pretty_print=True))
             print
 
@@ -714,6 +832,26 @@ class getURL(Thread):
                     sys.stderr.write("No filter results for Name(%s)\n" % self.urlKey)
                     sys.stderr.write("No filter results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
                     sys.stderr.write("! Error:(%s)\n" % e)
+                    if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
+                        return
+                    else:
+                        continue
+                self.urlDictionary[self.urlKey]['result'].append(self.urlDictionary[self.urlKey]['tmp'])
+        elif len(self.urlDictionary[self.urlKey]['xslt']):
+            for index in range(len(self.urlDictionary[self.urlKey]['xslt'])):
+                # Process the results through a XSLT stylesheet out the desired data
+                try:
+                   self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'])
+                except Exception, e:
+                    sys.stderr.write("! Error:(%s)\n" % e)
+                    if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
+                        return
+                    else:
+                        continue
+                # Was any data found?
+                if self.urlDictionary[self.urlKey]['tmp'].getroot() == None:
+                    sys.stderr.write("No Xslt results for Name(%s)\n" % self.urlKey)
+                    sys.stderr.write("No Xslt results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:
