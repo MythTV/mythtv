@@ -329,11 +329,17 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         else
             pos = m_siteButtonList->GetItemPos(item);
 
-        QString dlfile = GetThumbnailFilename(video->GetThumbnail(), video->GetTitle());
+
+        QString dlfile = video->GetThumbnail();
+        if (dlfile.contains("%SHAREDIR%"))
+            dlfile.replace("%SHAREDIR%", GetShareDir());
+        else
+            dlfile = GetThumbnailFilename(video->GetThumbnail(),
+                                          video->GetTitle());
 
         if (QFile::exists(dlfile))
             item->SetImage(dlfile);
-        else
+        else if (dlfile.startsWith("http"))
             m_imageDownload->addURL(video->GetTitle(), video->GetThumbnail(), pos);
     }
     else
@@ -1046,41 +1052,50 @@ void NetTree::slotItemChanged()
 
         if (!item->GetThumbnail().isEmpty() && m_thumbImage)
         {
-            QString fileprefix = GetConfDir();
-
-            QDir dir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            fileprefix += "/MythNetvision";
-
-            dir = QDir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            fileprefix += "/thumbcache";
-
-            dir = QDir(fileprefix);
-            if (!dir.exists())
-               dir.mkdir(fileprefix);
-
-            QString url = item->GetThumbnail();
-            QString title = item->GetTitle();
-            QString sFilename = QString("%1/%2_%3")
-                .arg(fileprefix)
-                .arg(qChecksum(url.toLocal8Bit().constData(),
-                               url.toLocal8Bit().size()))
-                .arg(qChecksum(title.toLocal8Bit().constData(),
-                               title.toLocal8Bit().size()));
-
-            // Hello, I am code that causes hangs.
-            bool exists = QFile::exists(sFilename);
-            if (exists)
+            m_thumbImage->Reset();
+            QString dlfile = item->GetThumbnail();
+            if (dlfile.contains("%SHAREDIR%"))
             {
-                m_thumbImage->SetFilename(sFilename);
+                dlfile.replace("%SHAREDIR%", GetShareDir());
+                m_thumbImage->SetFilename(dlfile);
                 m_thumbImage->Load();
             }
+            else
+            {
+                QString fileprefix = GetConfDir();
 
+                QDir dir(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
+
+                fileprefix += "/MythNetvision";
+
+                dir = QDir(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
+
+                fileprefix += "/thumbcache";
+
+                dir = QDir(fileprefix);
+                if (!dir.exists())
+                   dir.mkdir(fileprefix);
+
+                QString url = item->GetThumbnail();
+                QString title = item->GetTitle();
+                QString sFilename = QString("%1/%2_%3")
+                    .arg(fileprefix)
+                    .arg(qChecksum(url.toLocal8Bit().constData(),
+                                   url.toLocal8Bit().size()))
+                    .arg(qChecksum(title.toLocal8Bit().constData(),
+                                   title.toLocal8Bit().size()));
+
+                bool exists = QFile::exists(sFilename);
+                if (exists)
+                {
+                    m_thumbImage->SetFilename(sFilename);
+                    m_thumbImage->Load();
+                }
+            }
         }
         else if (m_thumbImage)
             m_thumbImage->Reset();

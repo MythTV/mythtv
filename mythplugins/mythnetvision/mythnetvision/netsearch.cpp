@@ -500,39 +500,49 @@ void NetSearch::populateResultList(ResultItem::resultList list)
 
             if (!(*i)->GetThumbnail().isEmpty())
             {
-                QString fileprefix = GetConfDir();
+                QString dlfile = (*i)->GetThumbnail();
 
-                QDir dir(fileprefix);
-                if (!dir.exists())
+                if (dlfile.contains("%SHAREDIR%"))
+                {
+                    dlfile.replace("%SHAREDIR%", GetShareDir());
+                    item->SetImage(dlfile);
+                }
+                else
+                {
+                    QString fileprefix = GetConfDir();
+
+                    QDir dir(fileprefix);
+                    if (!dir.exists())
+                            dir.mkdir(fileprefix);
+
+                    fileprefix += "/MythNetvision";
+
+                    dir = QDir(fileprefix);
+                    if (!dir.exists())
                         dir.mkdir(fileprefix);
 
-                fileprefix += "/MythNetvision";
+                    fileprefix += "/thumbcache";
 
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
+                    dir = QDir(fileprefix);
+                    if (!dir.exists())
+                        dir.mkdir(fileprefix);
 
-                fileprefix += "/thumbcache";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                QString title = (*i)->GetTitle();
-                QString url = (*i)->GetThumbnail();
-                QUrl qurl(url);
-                QString ext = QFileInfo(qurl.path()).suffix();
-                QString sFilename = QString("%1/%2_%3.%4")
-                    .arg(fileprefix)
-                    .arg(qChecksum(url.toLocal8Bit().constData(),
-                               url.toLocal8Bit().size()))
-                    .arg(qChecksum(title.toLocal8Bit().constData(),
-                               title.toLocal8Bit().size()))
-                    .arg(ext);
-                uint pos = m_searchResultList->GetItemPos(item);
-                m_imageDownload->addURL((*i)->GetTitle(),
-                                        (*i)->GetThumbnail(),
-                                        pos);
+                    QString title = (*i)->GetTitle();
+                    QString url = (*i)->GetThumbnail();
+                    QUrl qurl(url);
+                    QString ext = QFileInfo(qurl.path()).suffix();
+                    QString sFilename = QString("%1/%2_%3.%4")
+                        .arg(fileprefix)
+                        .arg(qChecksum(url.toLocal8Bit().constData(),
+                                   url.toLocal8Bit().size()))
+                        .arg(qChecksum(title.toLocal8Bit().constData(),
+                                   title.toLocal8Bit().size()))
+                        .arg(ext);
+                    uint pos = m_searchResultList->GetItemPos(item);
+                    m_imageDownload->addURL((*i)->GetTitle(),
+                                            (*i)->GetThumbnail(),
+                                            pos);
+                }
             }
         }
         else
