@@ -124,15 +124,11 @@ int AudioOutputALSA::SetIECStatus(bool audio)
                        SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS);
     CHECKERR(QString("snd_pcm_open(\"%1\")").arg(pdevice));
 
-    if ((err = GetPCMInfo(card, device, subdevice)) < 0)
-    {
-        snd_pcm_close(pcm_handle);
-        pcm_handle = NULL;
-        return err;
-    }
-
+    err = GetPCMInfo(card, device, subdevice);
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
+    if (err < 0)
+        return err;
 
     // Now open the ctl
     QByteArray ctln = QString("hw:CARD=%1").arg(card).toAscii();
@@ -402,10 +398,7 @@ bool AudioOutputALSA::OpenDevice()
     }
 
     if (internal_vol && !OpenMixer())
-    {
-        CloseDevice();
-        return false;
-    }
+        VBERROR("Unable to open audio mixer. Volume control disabled");
 
     // Device opened successfully
     return true;
