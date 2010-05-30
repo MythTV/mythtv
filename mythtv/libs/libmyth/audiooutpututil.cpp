@@ -55,7 +55,7 @@ static int toFloat8(float *out, uchar *in, int len)
     float f = 1.0f / ((1<<7) - 1);
 
 #if ARCH_X86
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -123,7 +123,7 @@ static int fromFloat8(uchar *out, float *in, int len)
     float f = (1<<7) - 1;
 
 #if ARCH_X86
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -154,7 +154,7 @@ static int fromFloat8(uchar *out, float *in, int len)
             "add        $64,    %1          \n\t"
             "packsswb   %%xmm3, %%xmm1      \n\t"
             "paddb      %%xmm0, %%xmm1      \n\t"
-            "movdqa     %%xmm1, (%0)        \n\t"
+            "movdqu     %%xmm1, (%0)        \n\t"
             "add        $16,    %0          \n\t"
             "sub        $1, %%ecx           \n\t"
             "jnz        1b                  \n\t"
@@ -174,50 +174,47 @@ static int toFloat16(float *out, short *in, int len)
     float f = 1.0f / ((1<<15) - 1);
 
 #if ARCH_X86
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
 
-        if (sse_check())
-        {
-            __asm__ volatile (
-                "movd       %3, %%xmm7          \n\t"
-                "punpckldq  %%xmm7, %%xmm7      \n\t"
-                "punpckldq  %%xmm7, %%xmm7      \n\t"
-                "1:                             \n\t"
-                "xorpd      %%xmm2, %%xmm2      \n\t"
-                "movdqa     (%1),   %%xmm1      \n\t"
-                "xorpd      %%xmm3, %%xmm3      \n\t"
-                "punpcklwd  %%xmm1, %%xmm2      \n\t"
-                "movdqa     16(%1), %%xmm4      \n\t"
-                "punpckhwd  %%xmm1, %%xmm3      \n\t"
-                "psrad      $16,    %%xmm2      \n\t"
-                "punpcklwd  %%xmm4, %%xmm5      \n\t"
-                "psrad      $16,    %%xmm3      \n\t"
-                "cvtdq2ps   %%xmm2, %%xmm2      \n\t"
-                "punpckhwd  %%xmm4, %%xmm6      \n\t"
-                "psrad      $16,    %%xmm5      \n\t"
-                "mulps      %%xmm7, %%xmm2      \n\t"
-                "cvtdq2ps   %%xmm3, %%xmm3      \n\t"
-                "psrad      $16,    %%xmm6      \n\t"
-                "mulps      %%xmm7, %%xmm3      \n\t"
-                "cvtdq2ps   %%xmm5, %%xmm5      \n\t"
-                "movaps     %%xmm2, (%0)        \n\t"
-                "cvtdq2ps   %%xmm6, %%xmm6      \n\t"
-                "mulps      %%xmm7, %%xmm5      \n\t"
-                "movaps     %%xmm3, 16(%0)      \n\t"
-                "mulps      %%xmm7, %%xmm6      \n\t"
-                "movaps     %%xmm5, 32(%0)      \n\t"
-                "add        $32, %1             \n\t"
-                "movaps     %%xmm6, 48(%0)      \n\t"
-                "add        $64, %0             \n\t"
-                "sub        $1, %%ecx           \n\t"
-                "jnz        1b                  \n\t"
-                :"+r"(out),"+r"(in)
-                :"c"(loops), "r"(f)
-            );
-        }
+        __asm__ volatile (
+            "movd       %3, %%xmm7          \n\t"
+            "punpckldq  %%xmm7, %%xmm7      \n\t"
+            "punpckldq  %%xmm7, %%xmm7      \n\t"
+            "1:                             \n\t"
+            "xorpd      %%xmm2, %%xmm2      \n\t"
+            "movdqa     (%1),   %%xmm1      \n\t"
+            "xorpd      %%xmm3, %%xmm3      \n\t"
+            "punpcklwd  %%xmm1, %%xmm2      \n\t"
+            "movdqa     16(%1), %%xmm4      \n\t"
+            "punpckhwd  %%xmm1, %%xmm3      \n\t"
+            "psrad      $16,    %%xmm2      \n\t"
+            "punpcklwd  %%xmm4, %%xmm5      \n\t"
+            "psrad      $16,    %%xmm3      \n\t"
+            "cvtdq2ps   %%xmm2, %%xmm2      \n\t"
+            "punpckhwd  %%xmm4, %%xmm6      \n\t"
+            "psrad      $16,    %%xmm5      \n\t"
+            "mulps      %%xmm7, %%xmm2      \n\t"
+            "cvtdq2ps   %%xmm3, %%xmm3      \n\t"
+            "psrad      $16,    %%xmm6      \n\t"
+            "mulps      %%xmm7, %%xmm3      \n\t"
+            "cvtdq2ps   %%xmm5, %%xmm5      \n\t"
+            "movaps     %%xmm2, (%0)        \n\t"
+            "cvtdq2ps   %%xmm6, %%xmm6      \n\t"
+            "mulps      %%xmm7, %%xmm5      \n\t"
+            "movaps     %%xmm3, 16(%0)      \n\t"
+            "mulps      %%xmm7, %%xmm6      \n\t"
+            "movaps     %%xmm5, 32(%0)      \n\t"
+            "add        $32, %1             \n\t"
+            "movaps     %%xmm6, 48(%0)      \n\t"
+            "add        $64, %0             \n\t"
+            "sub        $1, %%ecx           \n\t"
+            "jnz        1b                  \n\t"
+            :"+r"(out),"+r"(in)
+            :"c"(loops), "r"(f)
+        );
     }
 #endif //ARCH_x86
     for (; i < len; i++)
@@ -231,8 +228,7 @@ static int fromFloat16(short *out, float *in, int len)
     float f = (1<<15) - 1;
 
 #if ARCH_X86
-
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -257,8 +253,8 @@ static int fromFloat16(short *out, float *in, int len)
             "packssdw   %%xmm2, %%xmm1      \n\t"
             "packssdw   %%xmm4, %%xmm3      \n\t"
             "add        $64,    %1          \n\t"
-            "movdqa     %%xmm1, (%0)        \n\t"
-            "movdqa     %%xmm3, 16(%0)      \n\t"
+            "movdqu     %%xmm1, (%0)        \n\t"
+            "movdqu     %%xmm3, 16(%0)      \n\t"
             "add        $32,    %0          \n\t"
             "sub        $1, %%ecx           \n\t"
             "jnz        1b                  \n\t"
@@ -279,8 +275,11 @@ static int toFloat32(AudioFormat format, float *out, int *in, int len)
     float f = 1.0f / ((uint)(1<<(bits-1)) - 128);
     int shift = 32 - bits;
 
+    if (format == FORMAT_S24LSB)
+        shift = 0;
+
 #if ARCH_X86
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -336,10 +335,10 @@ static int fromFloat32(AudioFormat format, int *out, float *in, int len)
         shift = 0;
 
 #if ARCH_X86
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
-        int loops = len >> 4;
         float o = 1, mo = -1;
+        int loops = len >> 4;
         i = loops << 4;
 
         __asm__ volatile (
@@ -367,22 +366,22 @@ static int fromFloat32(AudioFormat format, int *out, float *in, int len)
             "pslld      %%xmm0, %%xmm1      \n\t"
             "minps      %%xmm5, %%xmm3      \n\t"
             "mulps      %%xmm7, %%xmm2      \n\t"
-            "movdqa     %%xmm1, (%0)        \n\t"
+            "movdqu     %%xmm1, (%0)        \n\t"
             "cvtps2dq   %%xmm2, %%xmm2      \n\t"
             "maxps      %%xmm6, %%xmm3      \n\t"
             "minps      %%xmm5, %%xmm4      \n\t"
             "pslld      %%xmm0, %%xmm2      \n\t"
             "mulps      %%xmm7, %%xmm3      \n\t"
             "maxps      %%xmm6, %%xmm4      \n\t"
-            "movdqa     %%xmm2, 16(%0)      \n\t"
+            "movdqu     %%xmm2, 16(%0)      \n\t"
             "cvtps2dq   %%xmm3, %%xmm3      \n\t"
             "mulps      %%xmm7, %%xmm4      \n\t"
             "pslld      %%xmm0, %%xmm3      \n\t"
             "cvtps2dq   %%xmm4, %%xmm4      \n\t"
-            "movdqa     %%xmm3, 32(%0)      \n\t"
+            "movdqu     %%xmm3, 32(%0)      \n\t"
             "pslld      %%xmm0, %%xmm4      \n\t"
             "add        $64,    %1          \n\t"
-            "movdqa     %%xmm4, 48(%0)      \n\t"
+            "movdqu     %%xmm4, 48(%0)      \n\t"
             "add        $64,    %0          \n\t"
             "sub        $1, %%ecx           \n\t"
             "jnz        1b                  \n\t"
@@ -401,7 +400,7 @@ static int fromFloatFLT(float *out, float *in, int len)
     int i = 0;
 
 #if ARCH_X86
-    if (sse_check())
+    if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
         float o = 1, mo = -1;
@@ -423,15 +422,15 @@ static int fromFloatFLT(float *out, float *in, int len)
             "minps      %%xmm6, %%xmm2      \n\t"
             "movups     48(%1), %%xmm4      \n\t"
             "maxps      %%xmm7, %%xmm2      \n\t"
-            "movaps     %%xmm1, (%0)        \n\t"
+            "movups     %%xmm1, (%0)        \n\t"
             "minps      %%xmm6, %%xmm3      \n\t"
-            "movaps     %%xmm2, 16(%0)      \n\t"
+            "movups     %%xmm2, 16(%0)      \n\t"
             "maxps      %%xmm7, %%xmm3      \n\t"
             "minps      %%xmm6, %%xmm4      \n\t"
-            "movaps     %%xmm3, 32(%0)      \n\t"
+            "movups     %%xmm3, 32(%0)      \n\t"
             "maxps      %%xmm7, %%xmm4      \n\t"
             "add        $64,    %1          \n\t"
-            "movaps     %%xmm4, 48(%0)      \n\t"
+            "movups     %%xmm4, 48(%0)      \n\t"
             "add        $64,    %0          \n\t"
             "sub        $1, %%ecx           \n\t"
             "jnz        1b                  \n\t"
