@@ -49,10 +49,10 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
 
 AudioOutputALSA::~AudioOutputALSA()
 {
-    KillAudio();
-    SetIECStatus(IECSTATUS_AUDIO);
     if (pbufsize > 0)
         SetPreallocBufferSize(pbufsize);
+    KillAudio();
+    SetIECStatus(IECSTATUS_AUDIO);
 }
 
 int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
@@ -125,7 +125,11 @@ int AudioOutputALSA::SetIECStatus(bool audio)
     CHECKERR(QString("snd_pcm_open(\"%1\")").arg(pdevice));
 
     if ((err = GetPCMInfo(card, device, subdevice)) < 0)
-       return err;
+    {
+        snd_pcm_close(pcm_handle);
+        pcm_handle = NULL;
+        return err;
+    }
 
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
