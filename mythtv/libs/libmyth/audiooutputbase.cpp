@@ -563,6 +563,8 @@ void AudioOutputBase::Pause(bool paused)
     if (unpause_when_ready)
         return;
     VBAUDIO(QString("Pause %0").arg(paused));
+    if (pauseaudio != paused)
+        was_paused = pauseaudio;
     pauseaudio = paused;
     actually_paused = false;
 }
