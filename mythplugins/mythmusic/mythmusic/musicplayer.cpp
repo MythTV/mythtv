@@ -370,13 +370,18 @@ void MusicPlayer::openOutputDevice(void)
     else
         adevice = gCoreContext->GetSetting("MusicAudioDevice");
 
-    pdevice = gCoreContext->GetSetting("PassThruOutputDevice");
+    pdevice = gCoreContext->GetNumSetting("AdvancedAudioSettings",
+                                          false) &&
+                gCoreContext->GetNumSetting("PassThruDeviceOverride",
+                                            false) ?
+              gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
     // TODO: Error checking that device is opened correctly!
     m_output = AudioOutput::OpenAudio(
                    adevice, pdevice, FORMAT_S16, 2, 0, 44100,
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
+
     m_output->setBufferSize(256 * 1024);
 
     m_output->addListener(this);
