@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.2.0"
+__version__="v0.2.1"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -35,9 +35,11 @@ __version__="v0.2.0"
 #       Included in this change are a number of other potential empty data checks.
 # 0.2.0 Support multi-languages. TMDB supports multi-languages with a fall back to English when the
 #       data is not in the specified language
+# 0.2.1 Add support for XML display. http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 
 import os, struct, sys, time
 import urllib, urllib2
+from copy import deepcopy
 import logging
 
 from tmdb_ui import BaseUI, ConsoleUI
@@ -71,6 +73,29 @@ class OutStreamEncoder(object):
         return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+
+try:
+    from StringIO import StringIO
+    from lxml import etree as eTree
+except Exception, e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.exit(1)
+
+# Check that the lxml library is current enough
+# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
+# Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
+version = ''
+for digit in eTree.LIBXML_VERSION:
+    version+=str(digit)+'.'
+version = version[:-1]
+if version < '2.7.2':
+    sys.stderr.write(u'''
+! Error - The installed version of the "lxml" python library "libxml" version is too old.
+          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
+''' % version)
+    sys.exit(1)
 
 
 try:
@@ -330,6 +355,15 @@ class MovieDb(object):
         self.config[u'mythtv_translation'] = {u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres', u'director':  u'director', u'id': u'inetref', u'name': u'title', u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart', u'production_countries': u'countries', u'released': u'releasedate', u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb', u'certification': u'movierating', }
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
         self.thumbnails = False
+        self.xml = False
+        self.pubDateFormat = u'%a, %d %b %Y %H:%M:%S GMT'
+        self.xmlParser = eTree.HTMLParser(remove_blank_text=True)
+        self.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ ))
+        self.supportedJobList = ["actor", "author", "producer", "executive producer", "director", "cinematographer", "composer", "editor", "casting", ]
+        self.tagTranslations = {
+            'poster': 'coverart',
+            'backdrop': 'fanart',
+            }
     # end __init__()
 
 
@@ -553,6 +587,10 @@ class MovieDb(object):
         if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
             sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
 
+        # Display a XML query if it was requested
+        if self.xml:
+            self.queryXML(url)
+
         etree = XmlHandler(url).getEt()
         if etree is None:
             raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % org_title)
@@ -597,6 +635,10 @@ class MovieDb(object):
         if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
             sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
 
+        # Display a XML video details if it was requested
+        if self.xml:
+            self.videoXML(url)
+
         etree = XmlHandler(url).getEt()
 
         if etree is None:
@@ -618,6 +660,10 @@ class MovieDb(object):
         url = URL % (id_url)
         if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
             sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
+        # Display a XML video details if it was requested
+        if self.xml:
+            self.videoXML(url)
 
         etree = XmlHandler(url).getEt()
 
@@ -643,6 +689,10 @@ class MovieDb(object):
         url = URL % (id_url)
         if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
             sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
+        # Display a XML video details if it was requested
+        if self.xml:
+            self.videoXML(url)
 
         etree = XmlHandler(url).getEt()
 
@@ -848,6 +898,166 @@ class MovieDb(object):
                     person[elem.tag] = self.textUtf8(elem.text.strip()).replace(u'\n',u' ')
         return person
     # end personInfo()
+
+    def lastUpdated(self, context, *inputArgs):
+        '''Convert a date/time string in a specified format into a lastupdated. The default is the
+        Universal Metadata Format item format
+        return the formatted lastupdated string
+        return on error return the original date string
+        '''
+        args = []
+        for arg in inputArgs:
+            args.append(arg)
+        if args[0] == u'':
+            return datetime.datetime.now().strftime(self.pubDateFormat)
+        index = args[0].find('+')
+        if index != -1:
+            args[0] = args[0][:index].strip()
+        args[0] = args[0].replace(',', u'').replace('.', u'')
+        try:
+            if len(args) > 1:
+                args[1] = args[1].replace(',', u'').replace('.', u'')
+                if args[1].find('GMT') != -1:
+                    args[1] = args[1][:args[1].find('GMT')].strip()
+                    args[0] = args[0][:args[0].rfind(' ')].strip()
+                try:
+                    pubdate = time.strptime(args[0], args[1])
+                except ValueError:
+                    if args[1] == '%a %d %b %Y %H:%M:%S':
+                        pubdate = time.strptime(args[0], '%a %d %B %Y %H:%M:%S')
+                    elif args[1] == '%a %d %B %Y %H:%M:%S':
+                        pubdate = time.strptime(args[0], '%a %d %b %Y %H:%M:%S')
+                if len(args) > 2:
+                    return time.strftime(args[2], pubdate)
+                else:
+                    return time.strftime(self.pubDateFormat, pubdate)
+            else:
+                return datetime.datetime.now().strftime(self.pubDateFormat)
+        except Exception, err:
+            sys.stderr.write(u'! Error: lastupdated variables(%s) error(%s)\n' % (args, err))
+        return args[0]
+    # end lastUpdated()
+
+    def supportedJobs(self, context, *inputArgs):
+        '''Validate that the job category is supported by the
+        Universal Metadata Format item format
+        return True is supported
+        return False if not supported
+        '''
+        for job in inputArgs[0]:
+            if job.lower() in self.supportedJobList:
+                return True
+        return False
+    # end supportedJobs()
+
+    def verifyName(self, context, *inputArgs):
+        '''Verify a tag name is supported in the Universal Metadata Format. Handles one or more names.
+        When there is a tuple list of names only one in the list needs to be a supported tag.
+        return True when the tag is supported
+        return False when the tag is not supported
+        '''
+        for tag in inputArgs[0]:
+            if tag.lower() in self.tagTranslations.keys():
+                return True
+        return False
+    # end verifyName()
+
+    def translateName(self, context, *inputArgs):
+        '''Translate a tag name into the Universal Metadata Format item equivalent
+        return the translated tag equivalent
+        return False if the tag has no translation value
+        '''
+        name = inputArgs[0]
+        name = name.lower()
+        if name in self.tagTranslations.keys():
+            return self.tagTranslations[name]
+        return False
+    # end translateName()
+
+    def makeImageElements(self, context, *inputArgs):
+        '''Take list of image elements and create Universal Metadata Format item image elements
+        return a list of processed image elements
+        '''
+        imageList = []
+        currentImageID = None
+        imageElement = None
+        for tmdbImage in inputArgs[0]:
+            if not tmdbImage.attrib['size'] in ['original', 'cover', 'thumb']:
+                continue
+            if currentImageID != None and currentImageID != tmdbImage.attrib['id']:
+                imageList.append(deepcopy(imageElement))
+                imageElement = None
+            if imageElement == None:
+                imageElement = eTree.XML(u'<image></image>')
+                imageElement.attrib['type'] = self.translateName('dummy', ((tmdbImage.attrib['type'])))
+                currentImageID = tmdbImage.attrib['id']
+            if tmdbImage.attrib['size'] == 'original':
+                imageElement.attrib['url'] = tmdbImage.attrib['url']
+                continue
+            if tmdbImage.attrib['size'] == 'cover' and imageElement.attrib['type'] == 'coverart':
+                imageElement.attrib['thumb'] = tmdbImage.attrib['url']
+                continue
+            if tmdbImage.attrib['size'] == 'thumb' and imageElement.attrib['type'] == 'fanart':
+                imageElement.attrib['thumb'] = tmdbImage.attrib['url']
+                continue
+
+        # Add any last image elements
+        if imageElement != None:
+            imageList.append(deepcopy(imageElement))
+        return imageList
+    # end makeImageElements()
+
+    def queryXML(self, url):
+        """Display a Movie query in XML format:
+        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+        Returns nothing
+        """
+        try:
+            queryResult = eTree.parse(url, parser=self.xmlParser)
+        except Exception, errmsg:
+            sys.stderr.write(u"! Error: Invalid XML was received from themoviedb.org (%s)\n" % errmsg)
+            sys.exit(1)
+
+        queryXslt = eTree.XSLT(eTree.parse(u'%s/XSLT/tmdbQuery.xsl' % self.baseProcessingDir))
+        tmdbXpath = eTree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+        tmdbXpath.prefix = 'tmdbXpath'
+        tmdbXpath['lastUpdated'] = self.lastUpdated
+
+        items = queryXslt(queryResult)
+
+        if items.getroot() != None:
+            if len(items.xpath('//item')):
+                sys.stdout.write(unicode(items))
+        sys.exit(0)
+    # end queryXML()
+
+    def videoXML(self, url):
+        """Display a Movie details in XML format:
+        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+        Returns nothing
+        """
+        try:
+            videoResult = eTree.parse(url, parser=self.xmlParser)
+        except Exception, errmsg:
+            sys.stderr.write(u"! Error: Invalid XML was received from themoviedb.org (%s)\n" % errmsg)
+            sys.exit(1)
+
+        videoXslt = eTree.XSLT(eTree.parse(u'%s/XSLT/tmdbVideo.xsl' % self.baseProcessingDir))
+        tmdbXpath = eTree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+        tmdbXpath.prefix = 'tmdbXpath'
+        tmdbXpath['lastUpdated'] = self.lastUpdated
+        tmdbXpath['supportedJobs'] = self.supportedJobs
+        tmdbXpath['verifyName'] = self.verifyName
+        tmdbXpath['translateName'] = self.translateName
+        tmdbXpath['makeImageElements'] = self.makeImageElements
+
+        items = videoXslt(videoResult)
+
+        if items.getroot() != None:
+            if len(items.xpath('//item')):
+                sys.stdout.write(unicode(items))
+        sys.exit(0)
+    # end videoXML()
 
 # end MovieDb class
 

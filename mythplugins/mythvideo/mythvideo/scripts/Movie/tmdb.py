@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="TheMovieDB Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.8"
+__version__="v0.1.9"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -47,6 +47,7 @@ __version__="v0.1.8"
 #       This was causing issues for MythVideo.
 # 0.1.7 Change over to the installed TMDB api library
 # 0.1.8 Improved displayed messages on an exception abort
+# 0.1.9 Added support for XML output
 
 
 __usage_examples__='''
@@ -494,7 +495,7 @@ def main():
     # themoviedb.org api key given by Travis Bell for Mythtv
     apikey = "c27cb71cff5bd76e1a7a009380562c62"
 
-    parser = OptionParser(usage=u"%prog usage: tmdb -hdruviomMPFBDS [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using tmdb with Mythvideo see the tmdb wiki page at:\nhttp://www.mythtv.org/wiki/tmdb.py")
+    parser = OptionParser(usage=u"%prog usage: tmdb -hdruviomMPFBDSX [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using tmdb with Mythvideo see the tmdb wiki page at:\nhttp://www.mythtv.org/wiki/tmdb.py")
 
     parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
                         help=u"Show debugging info")
@@ -518,10 +519,12 @@ def main():
                         help=u"Get matching People list")
     parser.add_option(  "-I", "--peopleinfo", action="store_true", default=False, dest="peopleinfo",
                         help=u"Get A Person's metadata including graphic URLs")
+    parser.add_option(  "-X", "--xml", action="store_true", default=False, dest="xml",
+                        help=u"Display output in XML format")
 
     opts, args = parser.parse_args()
 
-    # Make alls command line arguments unicode utf8
+    # Make all command line arguments unicode utf8
     for index in range(len(args)):
         args[index] = unicode(args[index], 'utf8')
 
@@ -556,6 +559,11 @@ def main():
                 custom_ui = None,
                 language = opts.language,
                 search_all_languages = False,)
+
+    # Display in XML format
+    # See: http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+    if opts.xml:
+        Queries.config['moviedb'].xml = True
 
     # Process requested option
     if opts.movielist:                  # Movie Search -M
