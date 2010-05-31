@@ -587,12 +587,12 @@ void mythplugin_destroy(void)
 
     // TODO these should be saved when they are changed
     // Automagically save all playlists and metadata (ratings) that have changed
-    if (gMusicData->all_music->cleanOutThreads())
+    if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
     {
         gMusicData->all_music->save();
     }
 
-    if (gMusicData->all_playlists->cleanOutThreads())
+    if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
         int x = gMusicData->all_playlists->getPending();
