@@ -40,11 +40,11 @@ class CustomEdit : public MythScreenType
 
     ProgramInfo *m_pginfo;
 
-    int prevItem;
-    int maxex;
+    int m_prevItem;
+    int m_maxex;
 
-    QString seSuffix;
-    QString exSuffix;
+    QString m_seSuffix;
+    QString m_exSuffix;
 
     MythUIButtonList *m_ruleList;
     MythUIButtonList *m_clauseList;

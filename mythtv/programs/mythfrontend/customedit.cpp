@@ -31,10 +31,10 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
     else
         m_pginfo = new ProgramInfo();
 
-    prevItem = 0;
-    maxex = 0;
-    seSuffix = QString(" (%1)").arg(tr("stored search"));
-    exSuffix = QString(" (%1)").arg(tr("stored example"));
+    m_prevItem = 0;
+    m_maxex = 0;
+    m_seSuffix = QString(" (%1)").arg(tr("stored search"));
+    m_exSuffix = QString(" (%1)").arg(tr("stored example"));
 
     gCoreContext->addListener(this);
 }
@@ -56,8 +56,8 @@ bool CustomEdit::Create()
     UIUtilE::Assign(this, m_clauseList,  "clauses", &err);
 
     UIUtilE::Assign(this, m_titleEdit,       "title", &err);
-    UIUtilE::Assign(this, m_subtitleEdit,    "subtitle", &err); 
-    UIUtilE::Assign(this, m_descriptionEdit, "description", &err); 
+    UIUtilE::Assign(this, m_subtitleEdit,    "subtitle", &err);
+    UIUtilE::Assign(this, m_descriptionEdit, "description", &err);
     UIUtilE::Assign(this, m_clauseText,      "clausetext", &err);
     UIUtilE::Assign(this, m_testButton,      "test", &err);
     UIUtilE::Assign(this, m_recordButton,    "record", &err);
@@ -158,16 +158,16 @@ void CustomEdit::loadClauses()
     quoteTitle.replace("\'","\'\'");
 
     CustomRuleInfo rule;
-  
+
     rule.title = tr("Match an exact title");
     if (!m_pginfo->GetTitle().isEmpty())
         rule.description = QString("program.title = '%1' ").arg(quoteTitle);
-    else 
+    else
         rule.description = "program.title = 'Nova' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                               qVariantFromValue(rule));
 
-    if (!m_pginfo->GetSeriesID().isEmpty()) 
+    if (!m_pginfo->GetSeriesID().isEmpty())
     {
         rule.title = tr("Match this series");
         rule.subtitle.clear();
@@ -206,7 +206,7 @@ void CustomEdit::loadClauses()
         rule.title = tr("Match this episode");
         rule.subtitle.clear();
         rule.description = QString("program.programid = '%1' ")
-            .arg(m_pginfo->GetProgramID()); 
+            .arg(m_pginfo->GetProgramID());
     }
     else if (!m_pginfo->GetSubtitle().isEmpty())
     {
@@ -319,11 +319,11 @@ void CustomEdit::loadClauses()
     rule.description = "channel.sourceid = 2 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
-  
+
     rule.title = tr("Only channels marked as commercial free");
     rule.subtitle.clear();
     rule.description = QString("channel.commmethod = %1 ")
-                               .arg(COMM_DETECT_COMMFREE); 
+                               .arg(COMM_DETECT_COMMFREE);
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
@@ -350,13 +350,13 @@ void CustomEdit::loadClauses()
     rule.description = "FIND_IN_SET('SIGNED', program.subtitletypes) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
-    
+
     rule.title = tr("Only shows with in-vision subtitles");
     rule.subtitle.clear();
     rule.description = "FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
-    
+
     rule.title = tr("Limit by category");
     rule.subtitle.clear();
     if (!m_pginfo->GetCategory().isEmpty())
@@ -429,7 +429,7 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 */
 
-    rule.title = tr("Multiple sports teams (complete example)"); 
+    rule.title = tr("Multiple sports teams (complete example)");
     rule.subtitle.clear();
     rule.description = "program.title = 'NBA Basketball' \n"
                  "AND program.subtitle REGEXP '(Miami|Cavaliers|Lakers)' \n"
@@ -471,7 +471,7 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    maxex = m_clauseList->GetCount();
+    m_maxex = m_clauseList->GetCount();
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT rulename,fromclause,whereclause,search "
@@ -484,9 +484,9 @@ void CustomEdit::loadClauses()
             QString str = result.value(0).toString();
 
             if (result.value(3).toInt() > 0)
-                str += seSuffix;
+                str += m_seSuffix;
             else
-                str += exSuffix;
+                str += m_exSuffix;
 
             rule.title = str;
             rule.subtitle = result.value(1).toString();
@@ -501,7 +501,7 @@ void CustomEdit::ruleChanged(MythUIButtonListItem *item)
 {
     int curItem = m_ruleList->GetCurrentPos();
 
-    if (curItem == prevItem)
+    if (curItem == m_prevItem)
         return;
 
     if (!item)
@@ -515,7 +515,7 @@ void CustomEdit::ruleChanged(MythUIButtonListItem *item)
 
     textChanged();
 
-    prevItem = curItem;
+    m_prevItem = curItem;
 }
 
 void CustomEdit::textChanged(void)
@@ -525,7 +525,7 @@ void CustomEdit::textChanged(void)
 
     m_testButton->SetEnabled(hasdesc);
     m_recordButton->SetEnabled(hastitle && hasdesc);
-    m_storeButton->SetEnabled(m_clauseList->GetCurrentPos() >= maxex ||
+    m_storeButton->SetEnabled(m_clauseList->GetCurrentPos() >= m_maxex ||
                               (hastitle && hasdesc));
 }
 
@@ -545,7 +545,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     bool hastitle = !m_titleEdit->GetText().isEmpty();
     bool hasdesc = !m_descriptionEdit->GetText().isEmpty();
 
-    m_storeButton->SetEnabled(m_clauseList->GetCurrentPos() >= maxex ||
+    m_storeButton->SetEnabled(m_clauseList->GetCurrentPos() >= m_maxex ||
                               (hastitle && hasdesc));
 }
 
@@ -577,7 +577,7 @@ void CustomEdit::testClicked(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plSQLSearch,
-                                    m_descriptionEdit->GetText(), 
+                                    m_descriptionEdit->GetText(),
                                     m_subtitleEdit->GetText());
     if (pl->Create())
     {
@@ -596,7 +596,7 @@ void CustomEdit::recordClicked(void)
 
     MythUIButtonListItem* item = m_ruleList->GetItemCurrent();
     CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
-     
+
     int cur_recid = rule.recordid.toInt();
     if (cur_recid > 0)
     {
@@ -630,7 +630,7 @@ void CustomEdit::scheduleCreated(int ruleID)
 
 void CustomEdit::storeClicked(void)
 {
-    bool nameExists = false;
+    bool exampleExists = false;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT rulename,whereclause FROM customexample "
@@ -638,7 +638,7 @@ void CustomEdit::storeClicked(void)
     query.bindValue(":RULE", m_titleEdit->GetText());
 
     if (query.exec() && query.next())
-        nameExists = true;
+        exampleExists = true;
 
     QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
                                        .arg(m_titleEdit->GetText());
@@ -655,26 +655,27 @@ void CustomEdit::storeClicked(void)
     storediag->SetReturnEvent(this, "storeruledialog");
     if (storediag->Create())
     {
-        QString action = tr("Store");
-        if (nameExists)
-            action = tr("Replace");
-
-        QString str = QString("%1 \"%2\"").arg(action)
-                                          .arg(m_titleEdit->GetText());
-
         if (!m_titleEdit->GetText().isEmpty())
         {
-            QString str2;
-            str2 = QString("%1 %2").arg(str).arg(tr("as a search"));
-            storediag->AddButton(str2);
+            QString str;
+            // Keep strings whole for translation!
+            if (exampleExists)
+                str = tr("Replace as a search");
+            else
+                str = tr("Store as a search");
+            storediag->AddButton(str);
 
-            str2 = QString("%1 %2").arg(str).arg(tr("as an example"));
-            storediag->AddButton(str2);
+            if (exampleExists)
+                str = tr("Replace as an example");
+            else
+                str = tr("Store as an example");
+            storediag->AddButton(str);
         }
-        if (m_clauseList->GetCurrentPos() >= maxex)
+
+        if (m_clauseList->GetCurrentPos() >= m_maxex)
         {
             MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
-            str = QString("%1 \"%2\"").arg(tr("Delete"))
+            QString str = QString("%1 \"%2\"").arg(tr("Delete"))
                                       .arg(item->GetText());
             storediag->AddButton(str);
         }
@@ -694,7 +695,7 @@ bool CustomEdit::checkSyntax(void)
     QString from = m_subtitleEdit->GetText();
     if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
     {
-        msg = tr("Power Search rules no longer reqiure a leading \"AND\".");
+        msg = tr("Power Search rules no longer require a leading \"AND\".");
     }
     else if (desc.contains(';'))
     {
@@ -759,9 +760,9 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
     query.bindValue(":SEARCH", is_search);
 
     if (is_search)
-        rule.title += seSuffix;
+        rule.title += m_seSuffix;
     else
-        rule.title += exSuffix;
+        rule.title += m_exSuffix;
 
     if (!query.exec())
         MythDB::DBError("Store custom example", query);
@@ -775,11 +776,11 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
         /* Modify the existing entry.  We know one exists from the database
            search but do not know its position in the clause list.  It may
            or may not be the current item. */
-        for (int i = maxex; i < m_clauseList->GetCount(); i++)
+        for (int i = m_maxex; i < m_clauseList->GetCount(); i++)
         {
             MythUIButtonListItem* item = m_clauseList->GetItemAt(i);
-            QString removedStr = item->GetText().remove(seSuffix)
-                                                .remove(exSuffix);
+            QString removedStr = item->GetText().remove(m_seSuffix)
+                                                .remove(m_exSuffix);
             if (m_titleEdit->GetText() == removedStr)
             {
                 item->SetData(qVariantFromValue(rule));
@@ -799,9 +800,9 @@ void CustomEdit::deleteRule(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM customexample "
                   "WHERE rulename = :RULE;");
-    query.bindValue(":RULE", item->GetText().remove(seSuffix)
-                                            .remove(exSuffix));
-    
+    query.bindValue(":RULE", item->GetText().remove(m_seSuffix)
+                                            .remove(m_exSuffix));
+
     if (!query.exec())
         MythDB::DBError("Delete custom example", query);
     else
