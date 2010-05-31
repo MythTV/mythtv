@@ -26,7 +26,12 @@
         <xsl:for-each select="//movie">
             <item>
                 <language><xsl:value-of select="normalize-space(language)"/></language>
-                <title><xsl:value-of select="normalize-space(name)"/></title>
+                <xsl:for-each select="tmdbXpath:titleElement(string(name))">
+                    <title><xsl:value-of select="normalize-space(./@title)"/></title>
+                    <xsl:if test="./@subtitle">
+                        <subtitle><xsl:value-of select="normalize-space(./@subtitle)"/></subtitle>
+                    </xsl:if>
+                </xsl:for-each>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
                 <imdb><xsl:value-of select="normalize-space(substring-after(string(imdb_id), 'tt'))"/></imdb>
                 <userrating><xsl:value-of select="normalize-space(rating)"/></userrating>

@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -36,6 +36,7 @@ __version__="v0.2.1"
 # 0.2.0 Support multi-languages. TMDB supports multi-languages with a fall back to English when the
 #       data is not in the specified language
 # 0.2.1 Add support for XML display. http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+# 0.2.2 Fixed a bug with XSLT title and subtitle.
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -364,6 +365,10 @@ class MovieDb(object):
             'poster': 'coverart',
             'backdrop': 'fanart',
             }
+        self.separatorTitleSubtitle = [
+            ':',
+            ' - ',
+            ]
     # end __init__()
 
 
@@ -974,6 +979,22 @@ class MovieDb(object):
         return False
     # end translateName()
 
+    def titleElement(self, context, *inputArgs):
+        '''Check the title to see if it should be split into a title and subtitle
+        return a list containing an element with attributes for title and subtitle
+        '''
+        name = inputArgs[0]
+        titleElement = eTree.XML(u'<title></title>')
+        titleElement.attrib['title'] = name
+        for separator in self.separatorTitleSubtitle:
+            index = name.find(separator)
+            if index == -1:
+                continue
+            titleElement.attrib['title'] = name[:index].strip()
+            titleElement.attrib['subtitle'] = name[index+len(separator):].strip()
+        return [titleElement]
+    # end titleElement()
+
     def makeImageElements(self, context, *inputArgs):
         '''Take list of image elements and create Universal Metadata Format item image elements
         return a list of processed image elements
@@ -1007,6 +1028,21 @@ class MovieDb(object):
         return imageList
     # end makeImageElements()
 
+    def buildFuncDict(self):
+        """ Build a dictionary of the XPath extention function for the XSLT stylesheets
+        Returns nothing
+        """
+        self.FuncDict = {
+            'lastUpdated': self.lastUpdated,
+            'supportedJobs': self.supportedJobs,
+            'verifyName': self.verifyName,
+            'translateName': self.translateName,
+            'makeImageElements': self.makeImageElements,
+            'titleElement': self.titleElement,
+            }
+        return
+    # end buildFuncDict()
+
     def queryXML(self, url):
         """Display a Movie query in XML format:
         http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
@@ -1021,7 +1057,9 @@ class MovieDb(object):
         queryXslt = eTree.XSLT(eTree.parse(u'%s/XSLT/tmdbQuery.xsl' % self.baseProcessingDir))
         tmdbXpath = eTree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         tmdbXpath.prefix = 'tmdbXpath'
-        tmdbXpath['lastUpdated'] = self.lastUpdated
+        self.buildFuncDict()
+        for key in self.FuncDict.keys():
+            tmdbXpath[key] = self.FuncDict[key]
 
         items = queryXslt(queryResult)
 
@@ -1045,12 +1083,9 @@ class MovieDb(object):
         videoXslt = eTree.XSLT(eTree.parse(u'%s/XSLT/tmdbVideo.xsl' % self.baseProcessingDir))
         tmdbXpath = eTree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         tmdbXpath.prefix = 'tmdbXpath'
-        tmdbXpath['lastUpdated'] = self.lastUpdated
-        tmdbXpath['supportedJobs'] = self.supportedJobs
-        tmdbXpath['verifyName'] = self.verifyName
-        tmdbXpath['translateName'] = self.translateName
-        tmdbXpath['makeImageElements'] = self.makeImageElements
-
+        self.buildFuncDict()
+        for key in self.FuncDict.keys():
+            tmdbXpath[key] = self.FuncDict[key]
         items = videoXslt(videoResult)
 
         if items.getroot() != None:

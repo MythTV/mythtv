@@ -25,10 +25,12 @@
     <xsl:template name="movieVideoData">
         <xsl:for-each select="//movie">
             <item>
-                <title><xsl:value-of select="normalize-space(substring-before(string(name), ':'))"/></title>
-                <xsl:if test="substring-after(string(name), ':') != ''">
-                    <subtitle><xsl:value-of select="normalize-space(substring-after(string(name), ':'))"/></subtitle>
-                </xsl:if>
+                <xsl:for-each select="tmdbXpath:titleElement(string(name))">
+                    <title><xsl:value-of select="normalize-space(./@title)"/></title>
+                    <xsl:if test="./@subtitle">
+                        <subtitle><xsl:value-of select="normalize-space(./@subtitle)"/></subtitle>
+                    </xsl:if>
+                </xsl:for-each>
                 <xsl:if test="string(tagline) != ''">
                     <tagline><xsl:value-of select="normalize-space(tagline)"/></tagline>
                 </xsl:if>
