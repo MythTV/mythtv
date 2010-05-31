@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.2.2"
+__version__="v0.2.3"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -37,6 +37,7 @@ __version__="v0.2.2"
 #       data is not in the specified language
 # 0.2.1 Add support for XML display. http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 # 0.2.2 Fixed a bug with XSLT title and subtitle.
+# 0.2.3 Added encoding XML declaration "<?xml version='1.0' encoding='UTF-8'?>" to output
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -1065,7 +1066,7 @@ class MovieDb(object):
 
         if items.getroot() != None:
             if len(items.xpath('//item')):
-                sys.stdout.write(unicode(items))
+                sys.stdout.write(eTree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
         sys.exit(0)
     # end queryXML()
 
@@ -1090,7 +1091,7 @@ class MovieDb(object):
 
         if items.getroot() != None:
             if len(items.xpath('//item')):
-                sys.stdout.write(unicode(items))
+                sys.stdout.write(eTree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
         sys.exit(0)
     # end videoXML()
 
