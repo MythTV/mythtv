@@ -102,7 +102,6 @@ browser
 flix
 gallery
 game
-movies
 music
 netvision
 news
@@ -185,10 +184,7 @@ MythWeather related options:
 MythZoneMinder related options:
   --enable-mythzoneminder  build the mythzoneminder plugin [$zoneminder]
 
-MythMovies related options:
-  --enable-mythmovies      build the mythmovies plugin [$movies]
-
-MythNetvision related options: 
+MythNetvision related options:
   --enable-mythnetvision      build the mythnetvision plugin (BETA) [$netvision]
 
 EOF
@@ -623,13 +619,6 @@ if test "$zoneminder" = "yes" ; then
   echo "SUBDIRS += mythzoneminder" >> ./config.pro
 else
   echo "        MythZoneMinder plugin will not be built"
-fi
-
-if test "$movies" = "yes" ; then
-  echo "        MythMovies     plugin will be built"
-  echo "SUBDIRS += mythmovies" >> ./config.pro
-else
-  echo "        MythMovies     plugin will not be built"
 fi
 
 if test "$netvision" = "yes" ; then
