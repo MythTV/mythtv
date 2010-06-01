@@ -601,8 +601,27 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     CHECKERR(QString("Channels count %1 not available").arg(channels));
 
     /* set the stream rate */
-    err = snd_pcm_hw_params_set_rate(handle, params, rate, 0);
-    CHECKERR(QString("Samplerate %1 Hz not available").arg(rate));
+    if (src_quality == -1)
+    {
+        err = snd_pcm_hw_params_set_rate_resample(handle, params, 1);
+        CHECKERR(QString("Resampling setup failed").arg(rate));
+
+        uint rrate = rate;
+        err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0);
+        CHECKERR(QString("Rate %1Hz not available for playback: %s").arg(rate));
+
+        if (rrate != rate)
+        {
+            VBERROR(QString("Rate doesn't match (requested %1Hz, got %2Hz)")
+                    .arg(rate).arg(err));
+            return err;
+        }
+    }
+    else
+    {
+        err = snd_pcm_hw_params_set_rate(handle, params, rate, 0);
+        CHECKERR(QString("Samplerate %1 Hz not available").arg(rate));
+    }
 
     /* set the buffer time */
     err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
