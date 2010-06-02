@@ -36,6 +36,29 @@ from tvdb_ui import BaseUI, ConsoleUI
 from tvdb_exceptions import (tvdb_error, tvdb_userabort, tvdb_shownotfound,
     tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_attributenotfound)
 
+try:
+    from StringIO import StringIO
+    from lxml import etree as eTree
+except Exception, e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.exit(1)
+
+# Check that the lxml library is current enough
+# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
+# Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
+version = ''
+for digit in eTree.LIBXML_VERSION:
+    version+=str(digit)+'.'
+version = version[:-1]
+if version < '2.7.2':
+    sys.stderr.write(u'''
+! Error - The installed version of the "lxml" python library "libxml" version is too old.
+          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
+''' % version)
+    sys.exit(1)
+
+
 class ShowContainer(dict):
     """Simple dict that holds a series of Show instances
     """
@@ -384,6 +407,14 @@ class Tvdb:
         self.config['url_seriesBanner'] = "%(base_url)s/api/%(apikey)s/series/%%s/banners.xml" % self.config
         self.config['url_artworkPrefix'] = "%(base_url)s/banners/%%s" % self.config
 
+        # Initialize XML display value to off
+        self.xml = False
+        self.searchTree = None
+        self.seriesInfoTree = None
+        self.epInfoTree = None
+        self.actorsInfoTree = None
+        self.imagesInfoTree = None
+        self.baseXsltDir = u'%s/XSLT/' % os.path.dirname( os.path.realpath( __file__ ))
     #end __init__
 
     def _initLogger(self):
@@ -432,10 +463,14 @@ class Tvdb:
         """
         src = self._loadUrl(url)
         try:
+            if self.xml:
+                self.tmpTree = eTree.XML(src)
             return ElementTree.fromstring(src)
         except SyntaxError:
             src = self._loadUrl(url, recache=True)
             try:
+                if self.xml:
+                    self.tmpTree = eTree.XML(src)
                 return ElementTree.fromstring(src)
             except SyntaxError, exceptionmsg:
                 errormsg = "There was an error with the XML retrieved from thetvdb.com:\n%s" % (
@@ -504,6 +539,8 @@ class Tvdb:
         series = urllib.quote(series.encode("utf-8"))
         self.log.debug("Searching for show %s" % series)
         seriesEt = self._getetsrc(self.config['url_getSeries'] % (series))
+        if self.xml:
+            self.searchTree = self.tmpTree
         allSeries = []
         for series in seriesEt:
             sn = series.find('SeriesName')
@@ -554,6 +591,8 @@ class Tvdb:
         """
         self.log.debug('Getting season banners for %s' % (sid))
         bannersEt = self._getetsrc( self.config['url_seriesBanner'] % (sid) )
+        if self.xml:
+            self.imagesInfoTree = self.tmpTree
         banners = {}
         for cur_banner in bannersEt.findall('Banner'):
             bid = cur_banner.find('id').text
@@ -593,70 +632,72 @@ class Tvdb:
     # Alternate tvdb_api's method for retrieving graphics URLs but returned as a list that preserves
     # the user rating order highest rated to lowest rated
     def ttvdb_parseBanners(self, sid):
-	    """Parses banners XML, from
-	    http://www.thetvdb.com/api/[APIKEY]/series/[SERIES ID]/banners.xml
+        """Parses banners XML, from
+        http://www.thetvdb.com/api/[APIKEY]/series/[SERIES ID]/banners.xml
 
-	    Banners are retrieved using t['show name]['_banners'], for example:
+        Banners are retrieved using t['show name]['_banners'], for example:
 
-	    >>> t = Tvdb(banners = True)
-	    >>> t['scrubs']['_banners'].keys()
-	    ['fanart', 'poster', 'series', 'season']
-	    >>> t['scrubs']['_banners']['poster']['680x1000']['35308']['_bannerpath']
-	    'http://www.thetvdb.com/banners/posters/76156-2.jpg'
-	    >>>
+        >>> t = Tvdb(banners = True)
+        >>> t['scrubs']['_banners'].keys()
+        ['fanart', 'poster', 'series', 'season']
+        >>> t['scrubs']['_banners']['poster']['680x1000']['35308']['_bannerpath']
+        'http://www.thetvdb.com/banners/posters/76156-2.jpg'
+        >>>
 
-	    Any key starting with an underscore has been processed (not the raw
-	    data from the XML)
+        Any key starting with an underscore has been processed (not the raw
+        data from the XML)
 
-	    This interface will be improved in future versions.
-	    Changed in this interface is that a list or URLs is created to preserve the user rating order from
-	    top rated to lowest rated.
-	    """
+        This interface will be improved in future versions.
+        Changed in this interface is that a list or URLs is created to preserve the user rating order from
+        top rated to lowest rated.
+        """
 
-	    self.log.debug('Getting season banners for %s' % (sid))
-	    bannersEt = self._getetsrc( self.config['url_seriesBanner'] % (sid) )
-	    banners = {}
-	    bid_order = {'fanart': [], 'poster': [], 'series': [], 'season': []}
-	    for cur_banner in bannersEt.findall('Banner'):
-		    bid = cur_banner.find('id').text
-		    btype = cur_banner.find('BannerType')
-		    btype2 = cur_banner.find('BannerType2')
-		    if btype is None or btype2 is None:
-			    continue
-		    btype, btype2 = btype.text, btype2.text
-		    if not btype in banners:
-			    banners[btype] = {}
-		    if not btype2 in banners[btype]:
-			    banners[btype][btype2] = {}
-		    if not bid in banners[btype][btype2]:
-			    banners[btype][btype2][bid] = {}
-			    if btype in bid_order.keys():
-				    if btype2 != u'blank':
-					    bid_order[btype].append([bid, btype2])
+        self.log.debug('Getting season banners for %s' % (sid))
+        bannersEt = self._getetsrc( self.config['url_seriesBanner'] % (sid) )
+        if self.xml:
+            self.imagesInfoTree = self.tmpTree
+        banners = {}
+        bid_order = {'fanart': [], 'poster': [], 'series': [], 'season': []}
+        for cur_banner in bannersEt.findall('Banner'):
+            bid = cur_banner.find('id').text
+            btype = cur_banner.find('BannerType')
+            btype2 = cur_banner.find('BannerType2')
+            if btype is None or btype2 is None:
+                continue
+            btype, btype2 = btype.text, btype2.text
+            if not btype in banners:
+                banners[btype] = {}
+            if not btype2 in banners[btype]:
+                banners[btype][btype2] = {}
+            if not bid in banners[btype][btype2]:
+                banners[btype][btype2][bid] = {}
+                if btype in bid_order.keys():
+                    if btype2 != u'blank':
+                        bid_order[btype].append([bid, btype2])
 
-		    self.log.debug("Banner: %s", bid)
-		    for cur_element in cur_banner.getchildren():
-			    tag = cur_element.tag.lower()
-			    value = cur_element.text
-			    if tag is None or value is None:
-				    continue
-			    tag, value = tag.lower(), value.lower()
-			    self.log.debug("Banner info: %s = %s" % (tag, value))
-			    banners[btype][btype2][bid][tag] = value
+            self.log.debug("Banner: %s", bid)
+            for cur_element in cur_banner.getchildren():
+                tag = cur_element.tag.lower()
+                value = cur_element.text
+                if tag is None or value is None:
+                    continue
+                tag, value = tag.lower(), value.lower()
+                self.log.debug("Banner info: %s = %s" % (tag, value))
+                banners[btype][btype2][bid][tag] = value
 
-		    for k, v in banners[btype][btype2][bid].items():
-			    if k.endswith("path"):
-				    new_key = "_%s" % (k)
-				    self.log.debug("Transforming %s to %s" % (k, new_key))
-				    new_url = self.config['url_artworkPrefix'] % (v)
-				    self.log.debug("New banner URL: %s" % (new_url))
-				    banners[btype][btype2][bid][new_key] = new_url
+            for k, v in banners[btype][btype2][bid].items():
+                if k.endswith("path"):
+                    new_key = "_%s" % (k)
+                    self.log.debug("Transforming %s to %s" % (k, new_key))
+                    new_url = self.config['url_artworkPrefix'] % (v)
+                    self.log.debug("New banner URL: %s" % (new_url))
+                    banners[btype][btype2][bid][new_key] = new_url
 
-	    graphics_in_order = {'fanart': [], 'poster': [], 'series': [], 'season': []}
-	    for key in bid_order.keys():
-		    for bid in bid_order[key]:
-			    graphics_in_order[key].append(banners[key][bid[1]][bid[0]])
-	    return graphics_in_order
+        graphics_in_order = {'fanart': [], 'poster': [], 'series': [], 'season': []}
+        for key in bid_order.keys():
+            for bid in bid_order[key]:
+                graphics_in_order[key].append(banners[key][bid[1]][bid[0]])
+        return graphics_in_order
     # end ttvdb_parseBanners()
 
 
@@ -686,7 +727,8 @@ class Tvdb:
         """
         self.log.debug("Getting actors for %s" % (sid))
         actorsEt = self._getetsrc(self.config['url_actorsInfo'] % (sid))
-
+        if self.xml:
+            self.actorsInfoTree = self.tmpTree
         cur_actors = Actors()
         for curActorItem in actorsEt.findall("Actor"):
             curActor = Actor()
@@ -707,10 +749,11 @@ class Tvdb:
         XML file into the shows dict in layout:
         shows[series_id][season_number][episode_number]
         """
-
         # Parse show information
         self.log.debug('Getting all series data for %s' % (sid))
         seriesInfoEt = self._getetsrc(self.config['url_seriesInfo'] % (sid))
+        if self.xml:
+            self.seriesInfoTree = self.tmpTree
         for curInfo in seriesInfoEt.findall("Series")[0]:
             tag = curInfo.tag.lower()
             value = curInfo.text
@@ -736,7 +779,8 @@ class Tvdb:
         # Parse episode data
         self.log.debug('Getting all episodes of %s' % (sid))
         epsEt = self._getetsrc( self.config['url_epInfo'] % (sid) )
-
+        if self.xml:
+            self.epInfoTree = self.tmpTree
         for cur_ep in epsEt.findall("Episode"):
             seas_no = int(cur_ep.find('SeasonNumber').text)
             ep_no = int(cur_ep.find('EpisodeNumber').text)

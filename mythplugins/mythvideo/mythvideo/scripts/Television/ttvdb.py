@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="TheTVDB.com Query";
 __author__="R.D.Vaughan"
-__version__="v1.0.9"
+__version__="v1.1.0"
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -128,6 +128,8 @@ __version__="v1.0.9"
 #               line option "-c" can still override the default location and name.
 # Version 1.0.8 Removed any stderr messages for non-critical events. They cause dual pop-ups in MythVideo.
 # Version 1.0.9 Removed another stderr messages when a non-supported language code is passed.
+# Version 1.1.0 Added support for XML output. See:
+#               http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -167,6 +169,8 @@ Options:
   -B, --backdrop        Get Series banner/backdrop URL(s)
   -S, --screenshot      Get a Season's Episode screen shot
   -D, --data            Get Series episode data
+  -X, --xml             Display output in XML format as secified by:
+                        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
   -N, --numbers         Get Season and Episode numbers
     NOTE: There are no identifiers for URLs output if ONLY one type has been selected (e.g -B versus -BF)
 
@@ -300,6 +304,7 @@ Banner:http://www.thetvdb.com/banners/graphical/80159-g2.jpg,http://www.thetvdb.
 # System modules
 import sys, os, re, locale, ConfigParser
 from optparse import OptionParser
+from copy import deepcopy
 
 # Verify that tvdb_api.py, tvdb_ui.py and tvdb_exceptions.py are available
 try:
@@ -320,6 +325,29 @@ They should have been installed along with the MythTV python bindings.
 Error:(%s)
 ''' %  e
     sys.exit(1)
+
+try:
+    from StringIO import StringIO
+    from lxml import etree as etree
+except Exception, e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.exit(1)
+
+# Check that the lxml library is current enough
+# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
+# Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
+version = ''
+for digit in etree.LIBXML_VERSION:
+    version+=str(digit)+'.'
+version = version[:-1]
+if version < '2.7.2':
+    sys.stderr.write(u'''
+! Error - The installed version of the "lxml" python library "libxml" version is too old.
+          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
+''' % version)
+    sys.exit(1)
+
 
 # Global variables
 http_find="http://www.thetvdb.com"
@@ -733,6 +761,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 
 # Get Series Season and Episode numbers
 def Getseries_episode_numbers(t, opts, series_season_ep):
+    global xmlFlag
     series_name=''
     ep_name=''
     if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
@@ -751,8 +780,14 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
                 if len(episode['episodename']) > (len(ep_name)+1):
                     if episode['episodename'][len(ep_name):len(ep_name)+2] != ' (':
                         continue # Skip episodes the are not part of a set of (1), (2) ... etc
+                    if xmlFlag:
+                        displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
+                        sys.exit(0)
                     print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
                 else: # Exact match
+                    if xmlFlag:
+                        displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
+                        sys.exit(0)
                     print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
 # end Getseries_episode_numbers
 
@@ -839,8 +874,90 @@ def initialize_override_dictionary(useroptions):
     return
 # END initialize_override_dictionary
 
+def initializeXslt(language):
+    ''' Initalize all data and functions for XSLT stylesheet processing
+    return nothing
+    '''
+    global xslt, tvdbXpath
+    try:
+        import MythTV.ttvdb.tvdbXslt as tvdbXslt
+    except Exception, errmsg:
+        sys.stderr.write('! Error: Importing tvdbXslt error(%s)\n' % errmsg)
+        sys.exit(1)
+
+    xslt = tvdbXslt.xpathFunctions()
+    xslt.language = language
+    xslt.buildFuncDict()
+    tvdbXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+    tvdbXpath.prefix = 'tvdbXpath'
+    for key in xslt.FuncDict.keys():
+        tvdbXpath[key] = xslt.FuncDict[key]
+    return
+# end initializeXslt()
+
+def displaySearchXML(tvdb_api):
+    '''Using a XSLT style sheet translate TVDB search results into the MythTV Universal Query format
+    return nothing
+    '''
+    global xslt, tvdbXpath
+
+    # Remove duplicates when a non-English language code is specified
+    if xslt.language != 'en':
+        compareFilter = etree.XPath('//id[text()=$Id]')
+        idLangFilter = etree.XPath('//id[text()=$Id]/../language[text()="en"]/..')
+        tmpTree = deepcopy(tvdb_api.searchTree)
+        for seriesId in tmpTree.xpath('//Series/id/text()'):
+            if len(compareFilter(tvdb_api.searchTree, Id=seriesId)) > 1:
+                tmpList = idLangFilter(tvdb_api.searchTree, Id=seriesId)
+                if len(tmpList):
+                    tvdb_api.searchTree.remove(tmpList[0])
+
+    tvdbQueryXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbQuery.xsl')))
+    items = tvdbQueryXslt(tvdb_api.searchTree)
+    if items.getroot() != None:
+        if len(items.xpath('//item')):
+            sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
+    sys.exit(0)
+# end displaySearchXML()
+
+def displaySeriesXML(tvdb_api, series_season_ep):
+    '''Using a XSLT style sheet translate TVDB Series data results into the
+    MythTV Universal Query format
+    return nothing
+    '''
+    global xslt, tvdbXpath
+    allDataElement = etree.XML(u'<allData></allData>')
+    requestDetails = etree.XML(u'<requestDetails></requestDetails>')
+    requestDetails.attrib['lang'] = xslt.language
+    requestDetails.attrib['series'] = series_season_ep[0]
+    requestDetails.attrib['season'] = series_season_ep[1]
+    requestDetails.attrib['episode'] = series_season_ep[2]
+    allDataElement.append(requestDetails)
+
+    # Combine the various XML inputs into a single XML element and send to the XSLT stylesheet
+    if tvdb_api.epInfoTree != None:
+        allDataElement.append(tvdb_api.epInfoTree)
+    else:
+        sys.exit(0)
+    if tvdb_api.actorsInfoTree != None:
+        allDataElement.append(tvdb_api.actorsInfoTree)
+    else:
+        allDataElement.append(etree.XML(u'<Actors></Actors>'))
+    if tvdb_api.imagesInfoTree != None:
+        allDataElement.append(tvdb_api.imagesInfoTree)
+    else:
+        allDataElement.append(etree.XML(u'<Banners></Banners>'))
+
+    tvdbQueryXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbVideo.xsl')))
+    items = tvdbQueryXslt(allDataElement)
+    if items.getroot() != None:
+        if len(items.xpath('//item')):
+            sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
+    sys.exit(0)
+# end displaySeriesXML()
+
 def main():
-    parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBDS [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
+    parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBDSX [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
 
     parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
                         help=u"Show debugging info")
@@ -876,6 +993,8 @@ def main():
                         help=u"Get Series episode data")
     parser.add_option(  "-N", "--numbers", action="store_true", default=False, dest="numbers",
                         help=u"Get Season and Episode numbers")
+    parser.add_option(  "-X", "--xml", action="store_true", default=False, dest="xml",
+                        help=u"Display data in XML format for the 'N', 'M' and 'D' options")
 
     opts, series_season_ep = parser.parse_args()
 
@@ -958,13 +1077,22 @@ def main():
     if not opts.language in valid_languages:
         opts.language = 'en'    # Set the default to English when an invalid language was specified
 
+    if opts.xml:
+        initializeXslt(opts.language)
+
     # Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
     if opts.list ==True:
         t = tvdb_api.Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        if opts.xml:
+            t.xml = True
     elif opts.interactive == True:
         t = tvdb_api.Tvdb(banners=True, debug=opts.debug, interactive=True,  select_first=False, cache=cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        if opts.xml:
+            t.xml = True
     else:
         t = tvdb_api.Tvdb(banners=True, debug = opts.debug, cache = cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        if opts.xml:
+            t.xml = True
 
     # Determine if there is a SID or a series name to search with
     global SID
@@ -1019,6 +1147,9 @@ def main():
         except Exception, e:
             sys.stderr.write("! Error: %s\n" % (e))
             sys.exit(1) # Most likely a communications error
+        if opts.xml:
+            displaySearchXML(t)
+            sys.exit(0)
         match_list = []
         for series_name_sid in allSeries: # list search results
             key_value = u"%s:%s" % (series_name_sid['sid'], series_name_sid['name'])
@@ -1075,6 +1206,11 @@ def main():
         sys.exit (True)
 
     if opts.numbers == True: # Fetch and output season and episode numbers
+        global xmlFlag
+        if opts.xml:
+            xmlFlag = True
+        else:
+            xmlFlag = False
         Getseries_episode_numbers(t, opts, series_season_ep)
         sys.exit(0) # The Numbers option (-N) is the only option honoured when used
 
@@ -1083,8 +1219,14 @@ def main():
             if len(series_season_ep) != 3:
                 print u"Season and Episode numbers required."
             else:
+                if opts.xml:
+                    displaySeriesXML(t, series_season_ep)
+                    sys.exit(0)
                 Getseries_episode_data(t, opts, series_season_ep, language=opts.language)
         else:
+            if opts.xml and len(series_season_ep) == 3:
+                displaySeriesXML(t, series_season_ep)
+                sys.exit(0)
             Getseries_episode_data(t, opts, series_season_ep, language=opts.language)
 
     # Fetch the requested graphics URL(s)

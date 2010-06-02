@@ -12,7 +12,7 @@ setup(
         version='0.23.0',
         description='MythTV Python bindings.',
         packages=['MythTV', 'MythTV/tmdb', 'MythTV/ttvdb', 'MythTV/wikiscripts'],
-        data_files=[('MythTV/tmdb/XSLT', glob.glob('MythTV/tmdb/XSLT/*'))],
+        data_files=[('MythTV/tmdb/XSLT', glob.glob('MythTV/tmdb/XSLT/*')), ('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
         url=['http://www.mythtv.org/'],
         scripts=['scripts/mythpython', 'scripts/mythwikiscripts'],
         )
