@@ -504,10 +504,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         AudioFormat format = FORMAT_NONE;
         switch (extradata.audio_bits_per_sample)
         {
-            case 8:  format = FORMAT_U8;
-            case 16: format = FORMAT_S16;
-            case 24: format = FORMAT_S24;
-            case 32: format = FORMAT_S32;
+            case 8:  format = FORMAT_U8;  break;
+            case 16: format = FORMAT_S16; break;
+            case 24: format = FORMAT_S24; break;
+            case 32: format = FORMAT_S32; break;
         }
 
         GetNVP()->SetAudioParams(format, extradata.audio_channels,
