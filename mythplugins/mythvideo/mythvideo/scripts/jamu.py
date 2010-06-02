@@ -1167,15 +1167,15 @@ class Configuration(object):
         # regex strings to parse folder names for TV series title, season and episode numbers
         self.config['fullname_parse_season_episode_translation'] = {u'slash': u'\\', u'season': u'Season', u'episode': u'Episode'}
         self.config['fullname_parse_regex'] = [
-            # Title/Season 1/01 Subtitle
-            u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
-                   u'''(?P<seasno>[0-9]+)/(?P<epno>[0-9]+).+$''',
             # Title/Season 1/s01e01 Subtitle
             u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
                    u'''(?P<seasno>[0-9]+)/[Ss][0-9]+[Ee](?P<epno>[0-9]+).+$''',
             # Title/Season 1/1x01 Subtitle
             u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
                    u'''(?P<seasno>[0-9]+)/(?:(?P=seasno))[Xx](?P<epno>[0-9]+).+$''',
+            # Title/Season 1/01 Subtitle
+            u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+                   u'''(?P<seasno>[0-9]+)/(?P<epno>[0-9]+).+$''',
             # Title/Season 1/Title s01e01 Subtitle
             u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
                    u'''(?P<seasno>[0-9]+)/(?:(?P=seriesname))%(slash)s [Ss][0-9]+'''+
