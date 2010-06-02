@@ -16,6 +16,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
+#include "mythlocale.h"
 
 #include "mythversion.h"
 
@@ -73,6 +74,8 @@ class MythCoreContextPrivate : public QObject
 
     QThread *m_UIThread;
 
+    MythLocale *m_locale;
+
     QMutex                 m_privMutex;
     queue<MythPrivRequest> m_privRequests;
     QWaitCondition         m_privQueued;
@@ -93,7 +96,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_WOLInProgress(false),
       m_backend(false),
       m_database(GetMythDB()),
-      m_UIThread(QThread::currentThread())
+      m_UIThread(QThread::currentThread()),
+      m_locale(new MythLocale())
 {
 }
 
@@ -110,6 +114,8 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
         m_eventSock->DownRef();
         m_eventSock = NULL;
     }
+
+    delete m_locale;
 
     if (m_database)
         DestroyMythDB();
@@ -184,7 +190,7 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
                                          const QString &announcement,
                                          uint timeout_in_ms,
                                          bool &proto_mismatch)
-{   
+{
     proto_mismatch = false;
 
 #ifndef IGNORE_PROTO_VER_MISMATCH
@@ -222,7 +228,7 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
 // Assumes that either m_sockLock is held, or the app is still single
 // threaded (i.e. during startup).
 bool MythCoreContext::ConnectToMasterServer(bool blockingClient)
-{   
+{
     if (IsMasterBackend())
     {
         // Should never get here unless there is a bug in the code somewhere.
@@ -244,13 +250,13 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient)
         d->m_serverSock = ConnectCommandSocket(
             server, port, ann, &proto_mismatch);
     }
-    
+
     if (!d->m_serverSock)
-        return false; 
+        return false;
 
     if (!d->m_eventSock)
         d->m_eventSock = ConnectEventSocket(server, port);
-    
+
     if (!d->m_eventSock)
     {
         d->m_serverSock->DownRef();
@@ -258,10 +264,10 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient)
 
         QCoreApplication::postEvent(
             d->m_GUIcontext, new MythEvent("CONNECTION_FAILURE"));
-    
+
         return false;
     }
-    
+
     return true;
 }
 
@@ -729,7 +735,7 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
 
     if (!strlist.isEmpty())
         query_type = strlist[0];
-    
+
     QMutexLocker locker(&d->m_sockLock);
     if (!d->m_serverSock)
     {
@@ -805,11 +811,11 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
                 VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
                                         "with an error, but no error message.")
                                         .arg(query_type));
-                
+
             ok = false;
         }
     }
-    
+
     return ok;
 }
 
@@ -1082,6 +1088,21 @@ QObject *MythCoreContext::GetGUIObject(void)
 MythDB *MythCoreContext::GetDB(void)
 {
     return d->m_database;
+}
+
+void MythCoreContext::SaveLocaleDefaults(void)
+{
+    if (!d->m_locale->GetLocaleCode().isEmpty())
+    {
+        VERBOSE(VB_GENERAL, QString("Current locale %1")
+                                        .arg(d->m_locale->GetLocaleCode()));
+
+        d->m_locale->SaveLocaleDefaults();
+        return;
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("No locale defined! We weren't able to "
+                                    "set locale defaults."));
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

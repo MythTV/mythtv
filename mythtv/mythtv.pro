@@ -11,7 +11,7 @@ CONFIG += ordered
 include ( settings.pro )
 
 # Directories
-SUBDIRS += libs filters programs themes i18n
+SUBDIRS += libs filters programs themes i18n locales
 
 using_bindings_* {
     SUBDIRS += bindings

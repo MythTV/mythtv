@@ -16,14 +16,14 @@ HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
 HEADERS += lcddevice.h mythstorage.h remotefile.h decodeencode.h
-HEADERS += mythcorecontext.h mythsystem.h
+HEADERS += mythcorecontext.h mythsystem.h mythlocale.h
 
-SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp 
+SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
 SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
 SOURCES += mythdirs.cpp mythsignalingtimer.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp decodeencode.cpp
-SOURCES += mythcorecontext.cpp mythsystem.cpp
+SOURCES += mythcorecontext.cpp mythsystem.cpp mythlocale.cpp
 
 win32:SOURCES += msocketdevice_win.cpp
 unix {
@@ -58,7 +58,7 @@ use_hidesyms {
 
 mingw:LIBS += -lpthread -lws2_32
 
-QT += sql network
+QT += xml sql network
 
 include ( ../libs-targetfix.pro )
 

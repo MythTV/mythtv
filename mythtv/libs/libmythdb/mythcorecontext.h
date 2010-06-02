@@ -29,7 +29,7 @@ enum LogPriorities
 
 /** \class MythPrivRequest
  *  \brief Container for requests that require privledge escalation.
- *  
+ *
  *   Currently this is used for just one thing, increasing the
  *   priority of the video output thread to a real-time priority.
  *   These requests are made by calling gCoreContext->addPrivRequest().
@@ -159,6 +159,8 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
+
+    void SaveLocaleDefaults(void);
 
   private:
     MythCoreContextPrivate *d;

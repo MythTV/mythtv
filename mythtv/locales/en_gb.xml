@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythlocale>
+  <!-- Global Settings -->
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">PAL</setting>
+    <setting name="VbiFormat" global="true">PAL Teletext</setting>
+    <setting name="FreqTable" global="true">europe-west</setting>
+
+    <!-- Scheduling -->
+    <setting name="prefDupMethod" global="true">8</setting> <!-- Subtitle then description works best with UK guide data -->
+
+    <!-- Advert Detection -->
+
+
+  <!-- Per-host Settings -->
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language">EN_GB</setting>
+    <setting name="ISO639Language0">eng</setting>
+    <setting name="ISO639Language1">eng</setting>
+
+    <!-- Date/Time format -->
+
+
+    <!-- Playback -->
+    <setting name="EnableMHEG">1</setting> <!-- Red button, interactive services -->
+
+  <!-- Plugins -->
+    <!-- MythArchive -->
+    <setting name="MythArchiveVideoFormat">PAL</setting>
+</mythlocale>
