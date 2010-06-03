@@ -21,8 +21,9 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
+# 0.1.1 Converted categories, genre, ... etc text characters to be XML compliant
 
 
 # Specify the class names that have XPath extention functions
@@ -154,7 +155,7 @@ class xpathFunctions(object):
                 continue
             value = value.replace(u'\n', u' ').strip()
             if value != u'':
-                elementList.append(etree.XML(u'<listItem>%s</listItem>' % value))
+                elementList.append(etree.XML(u'<listItem>%s</listItem>' % self.massageText(value)))
         return elementList
     # end stringToList()
 
