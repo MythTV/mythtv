@@ -817,11 +817,14 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     def log_query(self, query, args):
         self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
 
-    def execute(self, query, args=()):
+    def execute(self, query, args=None):
         self.ping()
         self.log_query(query, args)
         try:
-            return MySQLdb.cursors.Cursor.execute(self, query, args)
+            if args:
+                return MySQLdb.cursors.Cursor.execute(self, query, args)
+            else:
+                return MySQLdb.cursors.Cursor.execute(self, query)
         except Exception, e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
@@ -855,6 +858,7 @@ class DBConnection( object ):
                                         charset='utf8')
         except:
             raise MythDBError(MythError.DB_CONNECTION, dbconn)
+        self.db.autocommit(True)
 
     def cursor(self, log=None, type=LoggedCursor):
         c = self.db.cursor(type)
