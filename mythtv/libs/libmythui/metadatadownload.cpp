@@ -97,7 +97,9 @@ void MetadataDownload::run()
             // these decisions on our own.  Pass to title match.
             if (list.at(0)->GetAutomatic() && list.count() > 1)
             {
-                findBestMatch(list, lookup->GetTitle());
+                if (!findBestMatch(list, lookup->GetTitle()));
+                    QCoreApplication::postEvent(m_parent,
+                        new MetadataLookupFailure(MetadataLookupList() << lookup));
                 continue;
             }
 
@@ -126,7 +128,7 @@ MetadataLookup* MetadataDownload::moreWork()
     return result;
 }
 
-void MetadataDownload::findBestMatch(MetadataLookupList list,
+bool MetadataDownload::findBestMatch(MetadataLookupList list,
                                            QString originaltitle)
 {
     QStringList titles;
@@ -147,7 +149,7 @@ void MetadataDownload::findBestMatch(MetadataLookupList list,
         VERBOSE(VB_GENERAL, QString("No adequate match or multiple "
                     "matches found for %1.  Update manually.")
                     .arg(originaltitle));
-        return;
+        return false;
     }
 
     VERBOSE(VB_GENERAL, QString("Best Title Match For %1: %2")
@@ -162,9 +164,11 @@ void MetadataDownload::findBestMatch(MetadataLookupList list,
             MetadataLookup *newlookup = (*i);
             newlookup->SetStep(GETDATA);
             prependLookup(newlookup);
-            return;
+            return true;
         }
     }
+
+    return false;
 }
 
 MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
