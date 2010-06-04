@@ -138,12 +138,16 @@ static void guess_palette(uint32_t *rgba_palette,
     if (nb_opaque_colors == 0)
         return;
 
-    j = nb_opaque_colors;
+    j = nb_opaque_colors - 1;
     memset(color_used, 0, 16);
     for(i = 0; i < 4; i++) {
         if (alpha[i] != 0) {
             if (!color_used[colormap[i]])  {
-                level = (0xff * j) / nb_opaque_colors;
+                if (nb_opaque_colors == 1) {
+                    level = 0xff;
+                } else {
+                    level = (0xff * j) / (nb_opaque_colors - 1);
+                }
                 r = (((subtitle_color >> 16) & 0xff) * level) >> 8;
                 g = (((subtitle_color >> 8) & 0xff) * level) >> 8;
                 b = (((subtitle_color >> 0) & 0xff) * level) >> 8;
@@ -327,7 +331,7 @@ static int decode_dvd_subtitles(AVSubtitle *sub_header,
                 } else {
                     sub_header->rects[0]->nb_colors = 4;
                     guess_palette((uint32_t*)sub_header->rects[0]->pict.data[1],
-                                  colormap, alpha, 0xffff00);
+                                  colormap, alpha, 0xffffff);
                 }
                 sub_header->rects[0]->x = x1;
                 sub_header->rects[0]->y = y1;
