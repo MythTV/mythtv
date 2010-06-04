@@ -30,7 +30,7 @@
             <buttonarea>0,0,100%,97%</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,100%,90</area>
+                    <area>0,0,100%,85</area>
                     <shape name="buttonbackground">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
@@ -38,11 +38,11 @@
                         </fill>
                     </shape>
                     <imagetype name="buttonimage">
-                        <area>5,5,150,80</area>
+                        <area>5,2,150,80</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <textarea name="resolution">
-                        <area>160,0,175,90</area>
+                        <area>160,0,175,85</area>
                         <font>basesmall</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -964,7 +964,7 @@
     <window name="edit_metadata">
 
         <textarea name="title" from="basetextarea">
-            <area>10,30,760,50</area>
+            <area>260,30,760,50</area>
             <value>Edit Video Information</value>
             <align>hcenter,vcenter</align>
             <font>baselarge</font>
@@ -973,129 +973,134 @@
         <!-- Labels  -->
 
         <textarea name="title_text" from="basetextarea">
-            <area>50,80,250,40</area>
+            <area>250,80,250,40</area>
             <value>Title:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="subtitle_text" from="basetextarea">
-            <area>50,138,250,40</area>
+            <area>250,138,250,40</area>
             <value>Subtitle:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="season_text" from="basetextarea">
-            <area>50,185,250,40</area>
+            <area>250,185,250,40</area>
             <value>Season:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="episode_text" from="basetextarea">
-            <area>370,185,150,40</area>
+            <area>570,185,150,40</area>
             <value>Episode:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="category_text" from="title_text">
-            <area>420,232,150,40</area>
+            <area>620,232,150,40</area>
             <align>right</align>
             <value>Category:</value>
         </textarea>
 
         <textarea name="level_text" from="title_text">
-            <area>20,232,200,40</area>
+            <area>220,232,200,40</area>
             <align>right</align>
             <value>Parental Control:</value>
         </textarea>
 
         <textarea name="child_text" from="title_text">
-            <area>20,277,200,40</area>
+            <area>220,277,200,40</area>
             <align>right</align>
             <value>File to Always Play Next:</value>
         </textarea>
 
         <textarea name="browse_text" from="title_text">
-            <area>470,277,280,40</area>
+            <area>670,277,280,40</area>
             <align>left</align>
             <value>Include while Browsing:</value>
         </textarea>
 
         <textarea name="watched_text" from="title_text">
-            <area>470,317,280,40</area>
+            <area>670,317,280,40</area>
             <align>left</align>
             <value>Item has been watched:</value>
         </textarea>
 
         <textarea name="coverart_text_label" from="title_text">
-            <position>50,358</position>
-            <value>Cover Art:</value>
+            <position>250,358</position>
+            <value>Coverart:</value>
         </textarea>
 
         <textarea name="screenshot_text_label" from="title_text">
-            <position>50,387</position>
+            <position>250,397</position>
             <value>Screenshot:</value>
         </textarea>
 
         <textarea name="banner_text_label" from="title_text">
-            <position>50,416</position>
+            <position>250,436</position>
             <value>Banner:</value>
         </textarea>
 
         <textarea name="fanart_text_label" from="title_text">
-            <position>50,445</position>
+            <position>250,475</position>
             <value>Fanart:</value>
         </textarea>
 
         <textarea name="trailer_text_label" from="title_text">
-            <position>50,477</position>
+            <position>250,517</position>
             <value>Trailer:</value>
         </textarea>
 
         <textarea name="player_text" from="title_text">
-            <position>50,517</position>
+            <area>150,597,350,40</area>
             <value>Unique Player Command:</value>
         </textarea>
 
         <!-- Widgets -->
 
         <textedit name="title_edit" from="basetextedit">
-            <position>310,70</position>
+            <position>510,70</position>
         </textedit>
 
         <textedit name="subtitle_edit" from="basetextedit">
-            <position>310,126</position>
+            <position>510,126</position>
         </textedit>
 
         <spinbox name="season" from="basespinbox">
-            <position>310,181</position>
+            <position>510,181</position>
         </spinbox>
 
         <spinbox name="episode" from="basespinbox">
-            <position>530,181</position>
+            <position>730,181</position>
         </spinbox>
 
         <buttonlist name="level_select" from="baseselector">
-            <position>230,225</position>
+            <position>430,225</position>
         </buttonlist>
 
         <buttonlist name="category_select" from="baseselector">
-            <position>580,225</position>
+            <position>780,225</position>
         </buttonlist>
 
         <buttonlist name="child_select" from="baseselector">
-            <position>230,270</position>
+            <position>430,270</position>
         </buttonlist>
 
         <checkbox name="browse_check" from="basecheckbox">
-            <position>745,275</position>
+            <position>945,275</position>
         </checkbox>
 
         <checkbox name="watched_check" from="basecheckbox">
-            <position>745,315</position>
+            <position>945,315</position>
         </checkbox>
 
+        <button name="net_coverart_button" from="basewidebutton">
+            <position>70,348</position>
+            <value>Find Online...</value>
+        </button>
+
         <button name="coverart_button">
-            <area>310,353,32,32</area>
+            <area>510,353,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1117,12 +1122,17 @@
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>350,358,250,40</area>
+            <area>550,358,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+        <button name="net_screenshot_button" from="basewidebutton">
+            <position>70,387</position>
+            <value>Find Online...</value>
+        </button>
+
         <button name="screenshot_button">
-            <area>310,382,32,32</area>
+            <area>510,392,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1144,12 +1154,17 @@
         </button>
 
         <textarea name="screenshot_text" from="basetextarea">
-            <area>350,387,250,40</area>
+            <area>550,397,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+        <button name="net_banner_button" from="basewidebutton">
+            <position>70,426</position>
+            <value>Find Online...</value>
+        </button>
+
         <button name="banner_button">
-            <area>310,411,32,32</area>
+            <area>510,431,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1171,12 +1186,17 @@
         </button>
 
         <textarea name="banner_text" from="basetextarea">
-            <area>350,416,250,40</area>
+            <area>550,436,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+        <button name="net_fanart_button" from="basewidebutton">
+            <position>70,467</position>
+            <value>Find Online...</value>
+        </button>
+
         <button name="fanart_button">
-            <area>310,442,32,32</area>
+            <area>510,472,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1198,12 +1218,12 @@
         </button>
 
         <textarea name="fanart_text" from="basetextarea">
-            <area>350,445,250,40</area>
+            <area>550,477,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="trailer_button">
-            <area>310,472,32,32</area>
+            <area>510,512,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1225,17 +1245,16 @@
         </button>
 
         <textarea name="trailer_text" from="basetextarea">
-            <area>350,477,250,40</area>
+            <area>550,517,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
-
         <textedit name="player_edit" from="basetextedit">
-            <position>310,507</position>
+            <position>510,587</position>
         </textedit>
 
         <button name="done_button" from="basebutton">
-            <position>310,567</position>
+            <position>510,647</position>
             <value>Done</value>
         </button>
 

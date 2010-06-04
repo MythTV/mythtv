@@ -30,7 +30,7 @@
             <buttonarea>0,0,100%,97%</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,100%,90</area>
+                    <area>0,0,100%,85</area>
                     <shape name="buttonbackground">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
@@ -38,11 +38,11 @@
                         </fill>
                     </shape>
                     <imagetype name="buttonimage">
-                        <area>5,5,150,80</area>
+                        <area>5,2,150,80</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <textarea name="resolution">
-                        <area>160,0,175,90</area>
+                        <area>160,0,175,80</area>
                         <font>basesmall</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -1030,39 +1030,19 @@
         </textarea>
 
         <textarea name="browse_text" from="title_text">
-            <area>500,265,200,40</area>
-            <align>left</align>
-            <value>Include while Browsing:</value>
+            <area>480,265,200,40</area>
+            <align>right</align>
+            <value>Visible:</value>
         </textarea>
 
         <textarea name="watched_text" from="title_text">
-            <area>498,304,200,40</area>
-            <align>left</align>
-            <value>Item has been watched:</value>
-        </textarea>
-
-        <textarea name="coverart_text_label" from="title_text">
-            <position>50,328</position>
-            <value>Cover Art:</value>
-        </textarea>
-
-        <textarea name="screenshot_text_label" from="title_text">
-            <position>50,357</position>
-            <value>Screenshot:</value>
-        </textarea>
-
-        <textarea name="banner_text_label" from="title_text">
-            <position>50,386</position>
-            <value>Banner:</value>
-        </textarea>
-
-        <textarea name="fanart_text_label" from="title_text">
-            <position>50,415</position>
-            <value>Fanart:</value>
+            <area>480,304,200,40</area>
+            <align>right</align>
+            <value>Watched:</value>
         </textarea>
 
         <textarea name="trailer_text_label" from="title_text">
-            <position>50,447</position>
+            <position>450,434</position>
             <value>Trailer:</value>
         </textarea>
 
@@ -1109,48 +1089,68 @@
             <position>680,302</position>
         </checkbox>
 
+        <button name="net_coverart_button" from="basebutton">
+            <position>160,305</position>
+            <value>Coverart</value>
+        </button>
+
         <button name="coverart_button" from="basesearchbutton">
-            <position>310,323</position>
+            <position>310,310</position>
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>350,328,250,40</area>
+            <area>350,314,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+        <button name="net_screenshot_button" from="basebutton">
+            <position>160,345</position>
+            <value>Screenshots</value>
+        </button>
+
         <button name="screenshot_button" from="basesearchbutton">
-            <position>310,352</position>
+            <position>310,350</position>
         </button>
 
         <textarea name="screenshot_text" from="basetextarea">
-            <area>350,357,250,40</area>
+            <area>350,354,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+        <button name="net_banner_button" from="basebutton">
+            <position>160,385</position>
+            <value>Banners</value>
+        </button>
+
         <button name="banner_button" from="basesearchbutton">
-            <position>310,381</position>
+            <position>310,390</position>
         </button>
 
         <textarea name="banner_text" from="basetextarea">
-            <area>350,386,250,40</area>
+            <area>350,394,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+        <button name="net_fanart_button" from="basebutton">
+            <position>160,425</position>
+            <value>Fanart</value>
+        </button>
+
         <button name="fanart_button" from="basesearchbutton">
-            <position>310,412</position>
+            <position>310,430</position>
         </button>
 
         <textarea name="fanart_text" from="basetextarea">
-            <area>350,415,250,40</area>
+            <area>350,434,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="trailer_button" from="basesearchbutton">
-            <position>310,442</position>
+            <position>710,430</position>
         </button>
 
         <textarea name="trailer_text" from="basetextarea">
-            <area>350,447,250,40</area>
+            <area>350,447,0,0</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
