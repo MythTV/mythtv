@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.2.3"
+__version__="v0.2.4"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -38,6 +38,7 @@ __version__="v0.2.3"
 # 0.2.1 Add support for XML display. http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 # 0.2.2 Fixed a bug with XSLT title and subtitle.
 # 0.2.3 Added encoding XML declaration "<?xml version='1.0' encoding='UTF-8'?>" to output
+# 0.2.4 Added width and height attributes to images
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -1015,6 +1016,8 @@ class MovieDb(object):
                 currentImageID = tmdbImage.attrib['id']
             if tmdbImage.attrib['size'] == 'original':
                 imageElement.attrib['url'] = tmdbImage.attrib['url']
+                imageElement.attrib['width'] = tmdbImage.attrib['width']
+                imageElement.attrib['height'] = tmdbImage.attrib['height']
                 continue
             if tmdbImage.attrib['size'] == 'cover' and imageElement.attrib['type'] == 'coverart':
                 imageElement.attrib['thumb'] = tmdbImage.attrib['url']

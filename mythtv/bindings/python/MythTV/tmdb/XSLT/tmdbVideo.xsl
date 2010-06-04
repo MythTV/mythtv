@@ -143,6 +143,12 @@
                                 <xsl:if test="./@url != ''">
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(./@url)"/></xsl:attribute>
                                 </xsl:if>
+                                <xsl:if test="./@width != ''">
+                                    <xsl:attribute name="width"><xsl:value-of select="normalize-space(./@width)"/></xsl:attribute>
+                                </xsl:if>
+                                <xsl:if test="./@height != ''">
+                                    <xsl:attribute name="height"><xsl:value-of select="normalize-space(./@height)"/></xsl:attribute>
+                                </xsl:if>
                             </image>
                         </xsl:for-each>
                     </images>

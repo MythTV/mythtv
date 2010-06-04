@@ -58,6 +58,12 @@
                                 <xsl:attribute name="type">coverart</xsl:attribute>
                                 <xsl:if test=".//image[@type='poster' and @size='original']">
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(.//image[@type='poster' and @size='original']/@url)"/></xsl:attribute>
+                                    <xsl:if test=".//image[@type='poster' and @size='original']/@width != ''">
+                                        <xsl:attribute name="width"><xsl:value-of select="normalize-space(.//image[@type='poster' and @size='original']/@width)"/></xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:if test=".//image[@type='poster' and @size='original']/@height != ''">
+                                        <xsl:attribute name="height"><xsl:value-of select="normalize-space(.//image[@type='poster' and @size='original']/@height)"/></xsl:attribute>
+                                    </xsl:if>
                                 </xsl:if>
                                 <xsl:if test=".//image[@type='poster' and @size='cover']">
                                     <xsl:attribute name="thumb"><xsl:value-of select="normalize-space(.//image[@type='poster' and @size='cover']/@url)"/></xsl:attribute>
@@ -72,6 +78,12 @@
                                 <xsl:attribute name="type">fanart</xsl:attribute>
                                 <xsl:if test=".//image[@type='backdrop' and @size='original']">
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(.//image[@type='backdrop' and @size='original']/@url)"/></xsl:attribute>
+                                    <xsl:if test=".//image[@type='backdrop' and @size='original']/@width != ''">
+                                        <xsl:attribute name="width"><xsl:value-of select="normalize-space(.//image[@type='backdrop' and @size='original']/@width)"/></xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:if test=".//image[@type='backdrop' and @size='original']/@height != ''">
+                                        <xsl:attribute name="height"><xsl:value-of select="normalize-space(.//image[@type='backdrop' and @size='original']/@height)"/></xsl:attribute>
+                                    </xsl:if>
                                 </xsl:if>
                                 <xsl:if test=".//image[@type='backdrop' and @size='thumb']">
                                     <xsl:attribute name="thumb"><xsl:value-of select="normalize-space(.//image[@type='backdrop' and @size='thumb']/@url)"/></xsl:attribute>
