@@ -647,19 +647,19 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 
 void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
 {
-    //Loops through d->imageCache
-    QMap<QString, MythImage*>::iterator it;
+    QList<QString>::iterator it;
 
     QString partialKey = fname;
     partialKey.replace('/', '-');
 
     d->m_cacheLock->lock();
-    for (it = d->imageCache.begin(); it != d->imageCache.end(); ++it)
-    {
-        if (it.key().contains(partialKey))
-            RemoveFromCacheByURL(it.key());
-    }
+    QList<QString> imageCacheKeys = d->imageCache.keys();
     d->m_cacheLock->unlock();
+    for (it = imageCacheKeys.begin(); it != imageCacheKeys.end(); ++it)
+    {
+        if ((*it).contains(partialKey))
+            RemoveFromCacheByURL(*it);
+    }
 
     // Loop through files to cache any that were not caught by
     // RemoveFromCacheByURL
@@ -673,7 +673,10 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
             VERBOSE(VB_GUI|VB_FILE, LOC +
                     QString("RemoveFromCacheByFile removed :%1: "
                             "from cache").arg(fileInfo.fileName()));
-            QFile::remove(fileInfo.fileName());
+            if (!dir.remove(fileInfo.fileName()))
+                VERBOSE(VB_IMPORTANT, QString("Failed to delete %1 from the "
+                                              "theme cache")
+                                              .arg(fileInfo.fileName()));
         }
      }
 }
@@ -874,7 +877,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     }
 
     bool parsed;
-    int tmp_w, tmp_h, tmp_x, tmp_y;
+    int tmp_w, tmp_h;
 
     tmp_w = geo[1].toInt(&parsed);
     if (!parsed)
@@ -908,6 +911,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
     if (longForm)
     {
+        int tmp_x, tmp_y;
         tmp_x = geo[3].toInt(&parsed);
         if (!parsed)
         {
