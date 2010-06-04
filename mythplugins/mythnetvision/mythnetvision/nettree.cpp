@@ -329,7 +329,6 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         else
             pos = m_siteButtonList->GetItemPos(item);
 
-
         QString dlfile = video->GetThumbnail();
         if (dlfile.contains("%SHAREDIR%"))
             dlfile.replace("%SHAREDIR%", GetShareDir());
