@@ -19,9 +19,9 @@
              -->
             <url>
                 <name>The WB.com Search</name>
-                <href>http://www.thewb.com/search/all/episodes/</href>
-                <filter>//div[@class='all_episode_search_result']</filter>
-                <pageFilter>//p[@class="pagination" and a="next »"]</pageFilter>
+                <href>http://www.thewb.com/search/site/</href>
+                <filter>//div[@style='position:relative;']</filter>
+<!--                <pageFilter>//p[@class="pagination" and a="next »"]</pageFilter>-->
                 <parserType>html</parserType>
             </url>
         </urls>
@@ -38,9 +38,9 @@
                 "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
          -->
         <url>
-            <name>Show Episodes</name>
-            <href>http://www.thewb.com/shows/</href>
-            <filter>//p[@class='footershows']//a</filter>
+            <name>Show Full Episodes</name>
+            <href>http://www.thewb.com/shows/full-episodes/</href>
+            <filter>//div[@id="show-directory"]//li/a</filter>
             <parserType>html</parserType>
         </url>
     </treeviewUrls>

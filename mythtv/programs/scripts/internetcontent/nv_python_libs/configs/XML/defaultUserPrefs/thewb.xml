@@ -12,20 +12,6 @@
     <updateDuration>5</updateDuration>
 
     <!--
-        The WB Treeview video RSS feeds.
-        "globalmax" (optional) Is a way to limit the number of items processed per RSS feed for all
-                    treeview URLs. A value of zero (0) means there are no limitations.
-        "enabled" If you want to remove a RSS feed then change the "enabled" attribute to "false". Do not
-                  delete the element.
-        "max" (optional)  Is a way to limit the number of items processed for an individual RSS feed.
-              This value will override any "globalmax" setting. A value of zero (0) means
-              there are no limitations and would be the same if the attribute was no included at all.
-    -->
-    <treeviewURLS globalmax="0">
-        <url enabled="true">http://www.thewb.com/shows/feed/new/</url>
-    </treeviewURLS>
-
-    <!--
         The WB Treeview video TV series Episodes
         "enabled" If you want to remove a TV series then change the "enabled" attribute to "false".
                   Do not delete the element as during the next automatic update the show will just

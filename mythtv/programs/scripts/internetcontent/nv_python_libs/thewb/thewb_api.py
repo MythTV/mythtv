@@ -19,10 +19,11 @@ meta data, video and image URLs from thewb. These routines process RSS feeds pro
 a user XML preference file usually found at "~/.mythtv/MythNetvision/userGrabberPrefs/thewb.xml"
 '''
 
-__version__="v0.1.2"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
 # 0.1.2 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.1.3 Fixes to accomodate changes to TheWB web site.
 
 import os, struct, sys, re, time, datetime, urllib
 import logging
@@ -180,6 +181,23 @@ class Videos(object):
         # Channel details and search results
         self.channel = {'channel_title': u'The WB', 'channel_link': u'http://www.thewb.com/', 'channel_description': u"Watch full episodes of your favorite shows on The WB.com, like Friends, The O.C., Veronica Mars, Pushing Daisies, Smallville, Buffy The Vampire Slayer, One Tree Hill and Gilmore Girls.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
 
+
+        # Season and Episode detection regex patterns
+        self.s_e_Patterns = [
+            # Season 3: Ep. 13 (01:04:30)
+            re.compile(u'''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<hours>[0-9]+)\\:(?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            # Season 3: Ep. 13 (04:30)
+            re.compile(u'''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            # Season 3: Ep. 13
+            re.compile(u'''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Ep. 13 (01:04:30)
+            re.compile(u'''Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<hours>[0-9]+)\\:(?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            # Ep. 13 (04:30)
+            re.compile(u'''Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            # Ep. 13
+            re.compile(u'''Ep.\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            ]
+
         self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/thewb.png'
     # end __init__()
 
@@ -188,6 +206,20 @@ class Videos(object):
 # Start - Utility functions
 #
 ###########################################################################################################
+
+    def getSeasonEpisode(self, title):
+        ''' Check is there is any season or episode number information in an item's title
+        return array of season and/or episode numbers plus any duration in minutes and seconds
+        return array with None values
+        '''
+        s_e = []
+        for index in range(len(self.s_e_Patterns)):
+            match = self.s_e_Patterns[index].match(title)
+            if not match:
+                continue
+            return match.groups()
+        return s_e
+    # end getSeasonEpisode()
 
     def getTheWBConfig(self):
         ''' Read the MNV The WB grabber "thewb_config.xml" configuration file
@@ -284,7 +316,7 @@ class Videos(object):
             tmpDirectory = etree.SubElement(root, u'showDirectories')
             tmpDirectory.attrib['name'] = directory.find('name').text
             for show in directory.xpath('.//a'):
-                showName = show.attrib['title']
+                showName = show.text
                 # Skip any DVD references as they are not on-line videos
                 if showName.lower().find('dvd') != -1 or show.attrib['href'].lower().find('dvd') != -1:
                     continue
@@ -303,8 +335,6 @@ class Videos(object):
         # this new thewb.xml
         if not create:
             userTheWB.find('updateDuration').text = self.userPrefs.find('updateDuration').text
-            if self.userPrefs.find('treeviewURLS').get('globalmax'):
-                userTheWB.find('treeviewURLS').attrib['globalmax'] = self.userPrefs.find('treeviewURLS').attrib['globalmax']
             if self.userPrefs.find('showDirectories').get('globalmax'):
                 root.find('showDirectories').attrib['globalmax'] = self.userPrefs.find('showDirectories').attrib['globalmax']
             for rss in self.userPrefs.xpath("//url[@enabled='false']"):
@@ -350,9 +380,9 @@ class Videos(object):
         orgURL = self.thewb_config.find('searchURLS').xpath(".//href")[0].text
 
         try:
-            searchVar = u'%s/%s' % (urllib.quote(title.encode("utf-8")).replace(u' ', u'+'), pagenumber)
+            searchVar = u'?q=%s' % (urllib.quote(title.encode("utf-8")).replace(u' ', u'+'))
         except UnicodeDecodeError:
-            searchVar = u'%s/%s' % (urllib.quote(title).replace(u' ', u'+'), pagenumber)
+            searchVar = u'?q=%s' % (urllib.quote(title).replace(u' ', u'+'))
         url = self.thewb_config.find('searchURLS').xpath(".//href")[0].text+searchVar
 
         if self.config['debug_enabled']:
@@ -363,7 +393,7 @@ class Videos(object):
 
         # Perform a search
         try:
-            resultTree = self.common.getUrlData(self.thewb_config.find('searchURLS'), pageFilter=self.thewb_config.find('searchURLS').xpath(".//pageFilter")[0].text)
+            resultTree = self.common.getUrlData(self.thewb_config.find('searchURLS'), pageFilter=None)
         except Exception, errormsg:
             self.thewb_config.find('searchURLS').xpath(".//href")[0].text = orgURL
             raise TheWBUrlDownloadError(self.error_messages['TheWBUrlDownloadError'] % (errormsg))
@@ -394,22 +424,25 @@ class Videos(object):
         pubDate = datetime.datetime.now().strftime(self.common.pubDateFormat)
 
         # Translate the search results into MNV RSS item format
-        thumbNailFilter = etree.XPath('.//div[@class="episodethumb"]/img')
-        descFilter = etree.XPath('.//div[@class="episodecontent"]/p')
-        linkFilter = etree.XPath('.//div[@class="episodecontent"]/p//a[@href!="javascript:;"]')
+        thumbNailFilter = etree.XPath('.//div[@class="overlay_thumb_area"]//img')
+        textFilter = etree.XPath('.//div[@class="overlay-bg-middle"]/p')
+        titleFilter = etree.XPath('.//div[@class="overlay_thumb_area"]//a[@title!=""]/@title')
+        descFilter = etree.XPath('.//div[@class="overlay-bg-middle"]/p[@class="overlay_extra overlay_spacer_top"]/text()')
+        linkFilter = etree.XPath('.//div[@class="overlay_thumb_area"]//a[@title!=""]/@href')
         itemThumbNail = etree.XPath('.//media:thumbnail', namespaces=self.common.namespaces)
         itemDwnLink = etree.XPath('.//media:content', namespaces=self.common.namespaces)
         itemDict = {}
         for result in searchResults:
-            if len(linkFilter(result)):   # Make sure that this result actually has a video
+            if linkFilter(result) != None:   # Make sure that this result actually has a video
                 thewbItem = etree.XML(self.common.mnvItem)
                 # These videos are only viewable in the US so add a country indicator
                 etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = u'us'
                 # Extract and massage data
                 thumbNail = self.common.ampReplace(thumbNailFilter(result)[0].attrib['src'])
-                title = linkFilter(result)[0].text
-                link = self.common.ampReplace(u'http://www.thewb.com'+linkFilter(result)[0].attrib['href'])
-                descriptionElement = descFilter(result)[0]
+                title = titleFilter(result)[0].strip()
+                link = u'file://%s/nv_python_libs/configs/HTML/thewb.html?videocode=%s' % (baseProcessingDir, result.attrib['id'].replace(u'video_', u''))
+                etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
+                descriptionElement = textFilter(result)[0]
                 description = u''
                 tmptitle = None
                 seasonNum = None
@@ -419,46 +452,30 @@ class Videos(object):
                         eText = unicode(e.tail, 'UTF-8').strip()
                     except:
                         continue
-                    if not eText.startswith(u'Season ') and not eText.startswith(u'EP '):
-                        description=eText
-                        continue
-                    else:
-                        infoList = eText.split(u',')
-                        if not len(infoList):
+                    if eText.startswith(u'Season ') or eText.startswith(u'EP'):
+                        sed = self.getSeasonEpisode(eText)
+                        if not len(sed):
                             continue
-                        s_e = infoList[0].replace(u'Season',u'').replace(u'EP',u'').strip().split(u' ')
-                        if len(s_e) == 1 and can_int(s_e[0].strip()):
-                            infoList[0] = u'Ep(%02d)' % int(s_e[0].strip())
-                            episodeNum = s_e[0].strip()
-                        elif len(s_e) == 3 and can_int(s_e[0].strip()) and can_int(s_e[2].strip()):
-                            infoList[0] = u'S%02dE%02d' % (int(s_e[0].strip()), int(s_e[2].strip()))
-                            seasonNum = s_e[0].strip()
-                            episodeNum = s_e[2].strip()
-                        title = title.replace(u'-', u'–')
-                        index = title.find(u'–')
+                        infoList =  u'S%02dE%02d' % (int(sed[0]), int(sed[1]))
+                        seasonNum = u'%d' % int(sed[0])
+                        episodeNum = u'%d' % int(sed[1])
+                        if len(sed) == 5:
+                            videoSeconds = int(sed[2])*3600+int(sed[3])*60+int(sed[4])
+                            itemDwnLink(thewbItem)[0].attrib['duration'] = unicode(videoSeconds)
+                        elif len(sed) == 4:
+                            videoSeconds = int(sed[2])*60+int(sed[3])
+                            itemDwnLink(thewbItem)[0].attrib['duration'] = unicode(videoSeconds)
+
+                        index = title.find(u':')
                         if index != -1:
-                            tmptitle = u'%s: %s %s' % (title[:index].strip(), infoList[0].strip(), title[index:].strip())
+                            tmptitle = u'%s: %s %s' % (title[:index].strip(), infoList, title[index+1:].strip())
                         else:
-                            tmptitle = u'%s %s' % (title, infoList[0].strip())
-                        if not len(infoList) > 1:
-                            continue
-                        videoSeconds = False
-                        videoDuration = infoList[1].strip().replace(u'(', u'').replace(u')', u'').split(u':')
-                        try:
-                            if len(videoDuration) == 1:
-                                videoSeconds = int(videoDuration[0])
-                            elif len(videoDuration) == 2:
-                                videoSeconds = int(videoDuration[0])*60+int(videoDuration[1])
-                            elif len(videoDuration) == 3:
-                                videoSeconds = int(videoDuration[0])*3600+int(videoDuration[1])*60+int(videoDuration[2])
-                            if videoSeconds:
-                                itemDwnLink(thewbItem)[0].attrib['duration'] = unicode(videoSeconds)
-                        except:
-                            pass
+                            tmptitle = u'%s: %s' % (title.strip(), infoList)
                 if tmptitle:
                     title = tmptitle
                 title = self.common.massageText(title.strip())
-                description = self.common.massageText(description.strip())
+                description = self.common.massageText(descFilter(result)[0].strip())
+
                 # Insert data into a new item element
                 thewbItem.find('title').text = title
                 thewbItem.find('author').text = "The WB.com"
@@ -629,19 +646,12 @@ class Videos(object):
                 print "Show(%s) name(%s) item count(%s)" % (key, showItems[key][2], len(showItems[key][0]))
             print
 
-        # Create a structure of feeds that can be concurrently downloaded
+        # Create a structure of feeds that concurrently have videos
         rssData = etree.XML(u'<xml></xml>')
         rssFeedsUrl = u'http://www.thewb.com/shows/feed/'
-        for feedType in [u'treeviewURLS', u'showDirectories', ]:
-            if self.userPrefs.find(feedType) == None:
-                continue
-            if not len(self.userPrefs.find(feedType).xpath('./url')):
-                continue
-            for rssFeed in self.userPrefs.xpath("//%s/url[@enabled='true']" % feedType):
-                if feedType == u'showDirectories':
-                    link = rssFeedsUrl+rssFeed.text
-                else:
-                    link = rssFeed.text
+        for feedType in self.userPrefs.findall('showDirectories'):
+            for rssFeed in self.userPrefs.xpath("//showDirectories/url[@enabled='true']"):
+                link = rssFeedsUrl+rssFeed.text
                 urlName = rssFeed.attrib.get('name')
                 if urlName:
                      uniqueName = u'%s;%s' % (urlName, link)
@@ -764,7 +774,9 @@ class Videos(object):
             # These videos are only viewable in the US so add a country indicator
             etree.SubElement(newItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = u'us'
             # Extract and massage data
-            link = self.common.ampReplace(self.linkFilter(thewbItem)[0].text)
+            tmpLink = self.linkFilter(thewbItem)[0].text.strip()
+            link = self.common.ampReplace(u'file://%s/nv_python_libs/configs/HTML/thewb.html?videocode=%s' % (baseProcessingDir, tmpLink[tmpLink.rfind(u'/')+1:]))
+            etree.SubElement(newItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
             # Convert the pubDate '2010-05-02T11:23:25-07:00' to a MNV pubdate format
             pubdate = self.pubdateFilter(thewbItem)
             if len(pubdate):
@@ -783,41 +795,45 @@ class Videos(object):
                 if eText == '\n\t':
                     continue
                 eText = eText.strip().encode('UTF-8')
-                if description == None:
+                if not description:
                     description = eText
                     continue
-                if eText.startswith(u'Season: ') or eText.startswith(u'EP: '):
-                    s_e = eText.replace(u'Season:',u'').replace(u', Episode:',u'').replace(u'EP:',u'').strip().split(u' ')
-                    if len(s_e) == 1 and can_int(s_e[0].strip()):
-                        eText = u'Ep(%02d)' % int(s_e[0].strip())
-                        episodeNum = s_e[0].strip()
-                    elif len(s_e) == 2 and can_int(s_e[0].strip()) and can_int(s_e[1].strip()):
-                        eText = u'S%02dE%02d' % (int(s_e[0].strip()), int(s_e[1].strip()))
-                        seasonNum = s_e[0].strip()
-                        episodeNum = s_e[1].strip()
-                    title = title.replace(u'-', u'–')
-                    index = title.find(u'–')
-                    if index != -1:
-                        tmptitle = u'%s: %s %s' % (title[:index].strip(), eText.strip(), title[index:].strip())
-                    else:
-                        tmptitle = u'%s %s' % (title, eText.strip())
-                    continue
-                elif eText.startswith(u'Running Time: '):
-                    videoDuration = eText.replace(u'Running Time: ', u'').strip().split(u':')
-                    if not len(videoDuration):
+                try:
+                    if eText.startswith(u'Season: ') or eText.startswith(u'EP: '):
+                        s_e = eText.replace(u'Season:',u'').replace(u', Episode:',u'').replace(u'EP:',u'').strip().split(u' ')
+                        if len(s_e) == 1 and can_int(s_e[0].strip()):
+                            eText = u'Ep(%02d)' % int(s_e[0].strip())
+                            episodeNum = s_e[0].strip()
+                        elif len(s_e) == 2 and can_int(s_e[0].strip()) and can_int(s_e[1].strip()):
+                            eText = u'S%02dE%02d' % (int(s_e[0].strip()), int(s_e[1].strip()))
+                            seasonNum = s_e[0].strip()
+                            episodeNum = s_e[1].strip()
+                        title = title.replace(u'-', u'–')
+                        index = title.find(u'–')
+                        if index != -1:
+                            tmptitle = u'%s: %s %s' % (title[:index].strip(), eText.strip(), title[index:].strip())
+                        else:
+                            tmptitle = u'%s %s' % (title, eText.strip())
                         continue
-                    videoSeconds = False
-                    try:
-                        if len(videoDuration) == 1:
-                            videoSeconds = int(videoDuration[0])
-                        elif len(videoDuration) == 2:
-                            videoSeconds = int(videoDuration[0])*60+int(videoDuration[1])
-                        elif len(videoDuration) == 3:
-                            videoSeconds = int(videoDuration[0])*3600+int(videoDuration[1])*60+int(videoDuration[2])
-                        if videoSeconds:
-                            self.itemDwnLink(newItem)[0].attrib['duration'] = unicode(videoSeconds)
-                    except:
-                        pass
+                    elif eText.startswith(u'Running Time: '):
+                        videoDuration = eText.replace(u'Running Time: ', u'').strip().split(u':')
+                        if not len(videoDuration):
+                            continue
+                        videoSeconds = False
+                        try:
+                            if len(videoDuration) == 1:
+                                videoSeconds = int(videoDuration[0])
+                            elif len(videoDuration) == 2:
+                                videoSeconds = int(videoDuration[0])*60+int(videoDuration[1])
+                            elif len(videoDuration) == 3:
+                                videoSeconds = int(videoDuration[0])*3600+int(videoDuration[1])*60+int(videoDuration[2])
+                            if videoSeconds:
+                                self.itemDwnLink(newItem)[0].attrib['duration'] = unicode(videoSeconds)
+                        except:
+                            pass
+                except UnicodeDecodeError:
+                    continue
+
             if tmptitle:
                 title = tmptitle
             title = self.common.massageText(title.strip())

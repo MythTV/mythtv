@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+  <!-- Author: R.D. Vaughan       Apr 28th, 2010
+       Purpose: Implement full screen browser video display for the TheWB.com
+  Example:
+  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/thewb.html?videocode=d4f287a292
+  -->
+    <script type="text/javascript">
+      function gup( name )
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        }
+
+      var videocode = gup( 'videocode' );
+      var embedded = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="100%" height="100%" id="digitalsmithsplayer">\
+      <param name="movie" value="http://www.thewb.com/player/wbphasethree/wbvideoplayer.swf" /> \
+      <param name="quality" value="high" />\
+	<param name="wmode" value="opaque" />\
+	<param name="allowfullscreen" value="true" />\
+	<param name="allowscriptaccess" value="always" />\
+	<param name="flashvars"\ value="config=wbvideoplayer.xml&amp;fwSiteSectionId=10148&amp;mediaKey=VIDEOCODE&amp;audienceScienceSegs=A10862_10003|A10862_10006" />\
+	<!--[if !IE]>-->\
+	<object type="application/x-shockwave-flash" data="http://www.thewb.com/player/wbphasethree/wbvideoplayer.swf" width="100%" height="100%">\
+		<param name="quality" value="high" />\
+		<param name="wmode" value="opaque" />\
+		<param name="allowfullscreen" value="true" />\
+		<param name="allowscriptaccess" value="always" />\
+		<param name="flashvars"\ value="config=wbvideoplayer.xml&amp;fwSiteSectionId=10148&amp;mediaKey=VIDEOCODE&amp;audienceScienceSegs=A10862_10003|A10862_10006" />\
+	<!--<![endif]-->\
+		<a href="http://www.adobe.com/go/getflashplayer">\
+		<img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" />\
+		</a>\
+	<!--[if !IE]>-->\
+	</object>\
+	<!--<![endif]-->\
+</object>';
+      document.write('<title>TheWB Full Screen</title>');
+      document.write(embedded.replace(/VIDEOCODE/g, videocode));
+
+    </script>
+  </head>
+</html>
