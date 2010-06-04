@@ -2,6 +2,9 @@
 #define EDITMETADATA_H_
 
 #include <mythscreentype.h>
+#include <metadatacommon.h>
+#include <metadatadownload.h>
+#include <metadataimagedownload.h>
 
 class Metadata;
 class MetadataListManager;
@@ -28,6 +31,9 @@ class EditMetadataDialog : public MythScreenType
     void customEvent(QEvent *levent);
 
     void fillWidgets();
+
+  protected:
+    void createBusyDialog(QString title);
 
   signals:
     void Finished();
@@ -65,8 +71,17 @@ class EditMetadataDialog : public MythScreenType
     void SetFanart(QString file);
     void SetScreenshot(QString file);
     void SetTrailer(QString file);
+    void FindNetArt(ArtworkType type);
+    void FindNetCoverArt();
+    void FindNetBanner();
+    void FindNetFanart();
+    void FindNetScreenshot();
+    void OnSearchListSelection(ArtworkInfo info,
+                               ArtworkType type);
 
   private:
+    void OnArtworkSearchDone(MetadataLookup *lookup);
+    void handleDownloadedImages(MetadataLookup *lookup);
 
     Metadata            *m_workingMetadata;
     Metadata            *m_origMetadata;
@@ -105,6 +120,10 @@ class EditMetadataDialog : public MythScreenType
     MythUIText          *m_fanartText;
     MythUIButton        *m_trailerButton;
     MythUIText          *m_trailerText;
+    MythUIButton        *m_netCoverartButton;
+    MythUIButton        *m_netFanartButton;
+    MythUIButton        *m_netBannerButton;
+    MythUIButton        *m_netScreenshotButton;
     MythUIImage         *m_coverart;
     MythUIImage         *m_screenshot;
     MythUIImage         *m_banner;
@@ -119,6 +138,11 @@ class EditMetadataDialog : public MythScreenType
     int cachedChildSelection;
 
     const MetadataListManager &m_metaCache;
+    MetadataDownload          *m_query;
+    MetadataImageDownload     *m_imageDownload;
+
+    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack;
 };
 
 #endif

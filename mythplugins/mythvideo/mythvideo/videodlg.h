@@ -5,6 +5,9 @@
 #include <QStringList>
 
 #include <mythscreentype.h>
+#include <metadatadownload.h>
+#include <metadataimagedownload.h>
+#include <metadatacommon.h>
 
 #include "parentalcontrols.h"
 #include "quicksp.h"
@@ -90,10 +93,10 @@ class VideoDialog : public MythScreenType
     void SwitchVideoTVMovieGroup();
 
     void EditMetadata();
-    void VideoSearch();
-    void TitleSubtitleSearch();
+    void VideoSearch(MythGenericTree *node = NULL,
+                     bool automode = false);
+    void VideoAutoSearch(MythGenericTree *node = NULL);
     void ManualVideoUID();
-    void ManualVideoTitle();
     void ResetMetadata();
     void ToggleBrowseable();
     void ToggleWatched();
@@ -126,10 +129,9 @@ class VideoDialog : public MythScreenType
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
-    void OnVideoSearchListSelection(QString video_uid);
+    void OnVideoSearchListSelection(MetadataLookup *lookup);
 
     void OnManualVideoUID(QString video_uid);
-    void OnManualVideoTitle(QString title);
 
     void doVideoScan();
 
@@ -156,6 +158,8 @@ class VideoDialog : public MythScreenType
     QString GetBanner(MythGenericTree *node);
     QString GetFanart(MythGenericTree *node);
 
+    void handleDownloadedImages(MetadataLookup *lookup);
+
     Metadata *GetMetadata(MythUIButtonListItem *item);
 
     void handleDirSelect(MythGenericTree *node);
@@ -168,56 +172,14 @@ class VideoDialog : public MythScreenType
 
     void SwitchLayout(DialogType type, BrowseType browse);
 
-// Start asynchronous functions.
-
-// These are the start points, separated for sanity.
-    // StartVideoPosterSet() start wait background
-    //   OnPosterURL()
-    //     OnPosterCopyFinished()
-    //       OnVideoPosterSetDone()
-    //       OnPosterCopyFinished()
-    // OnVideoPosterSetDone() stop wait background
-    void StartVideoImageSet(Metadata *metadata, QStringList coverart = QStringList(),
+    void StartVideoImageSet(MythGenericTree *node, QStringList coverart = QStringList(),
                             QStringList fanart = QStringList(), QStringList banner = QStringList(),
                             QStringList screenshot = QStringList());
 
-    // StartVideoSearchByUID() start wait background
-    //   OnVideoSearchByUIDDone() stop wait background
-    //     StartVideoPosterSet()
-    void StartVideoSearchByUID(QString video_uid, Metadata *metadata);
-
-    // StartVideoSearchByTitle()
-    //   OnVideoSearchByTitleDone()
-    void StartVideoSearchByTitle(QString video_uid, QString title,
-            Metadata *metadata);
-    void StartVideoSearchByTitleSubtitle(QString title,
-            QString subtitle, Metadata *metadata);
-
   private slots:
-    // called during StartVideoPosterSet
-    void OnImageURL(QString uri, Metadata *metadata, QString type);
-    void OnImageCopyFinished(ImageDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata, const QString &imagePath);
 
-    // called during StartVideoSearchByTitle
-    void OnVideoSearchByTitleDone(bool normal_exit,
-                                  const QStringList &results,
-                                  Metadata *metadata);
-    void OnVideoSearchByTitleSubtitleDone(bool normal_exit,
-                                  QStringList result,
-                                  Metadata *metadata);
-
-// and now the end points
-
-    // StartVideoPosterSet end
     void OnVideoImageSetDone(Metadata *metadata);
-
-    // StartVideoSearchByUID end
-    void OnVideoSearchByUIDDone(bool normal_exit,
-                                QStringList output,
-                                Metadata *metadata, QString video_uid);
-
-// End asynchronous functions.
+    void OnVideoSearchDone(MetadataLookup *lookup);
 
   private:
     MythDialogBox    *m_menuPopup;
@@ -243,6 +205,9 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_videoLevelState;
     MythUIStateType  *m_userRatingState;
     MythUIStateType  *m_watchedState;
+
+    MetadataDownload *m_query;
+    MetadataImageDownload *m_imageDownload;
 
     class VideoDialogPrivate *m_d;
 };

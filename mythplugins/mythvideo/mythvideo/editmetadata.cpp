@@ -15,6 +15,8 @@
 #include <mythuicheckbox.h>
 #include <mythuispinbox.h>
 #include <mythuifilebrowser.h>
+#include <mythuihelper.h>
+#include <mythprogressdialog.h>
 #include <remoteutil.h>
 
 #include "globals.h"
@@ -35,13 +37,18 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
     m_screenshotButton(0), m_screenshotText(0), m_bannerButton(0),
     m_bannerText(0), m_fanartButton(0), m_fanartText(0),
     m_trailerButton(0), m_trailerText(0),
-    m_coverart(0), m_screenshot(0),
+    m_netCoverartButton(0), m_netFanartButton(0), m_netBannerButton(0),
+    m_netScreenshotButton(0), m_coverart(0), m_screenshot(0),
     m_banner(0), m_fanart(0),
     m_doneButton(0),
     cachedChildSelection(0),
-    m_metaCache(cache)
+    m_metaCache(cache), m_busyPopup(0)
 {
+    m_query = new MetadataDownload(this);
+    m_imageDownload = new MetadataImageDownload(this);
     m_workingMetadata = new Metadata(*m_origMetadata);
+
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
 EditMetadataDialog::~EditMetadataDialog()
@@ -87,6 +94,11 @@ bool EditMetadataDialog::Create()
         VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
         return false;
     }
+
+    UIUtilW::Assign(this, m_netBannerButton, "net_banner_button");
+    UIUtilW::Assign(this, m_netFanartButton, "net_fanart_button");
+    UIUtilW::Assign(this, m_netScreenshotButton, "net_screenshot_button");
+    UIUtilW::Assign(this, m_netCoverartButton, "net_coverart_button");
 
     UIUtilW::Assign(this, m_taglineEdit, "tagline_edit");
     UIUtilW::Assign(this, m_ratingEdit, "rating_edit");
@@ -150,10 +162,23 @@ bool EditMetadataDialog::Create()
         connect(m_lengthSpin, SIGNAL(LosingFocus()), SLOT(SetLength()));
 
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
+
+    // Find Artwork locally
     connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
     connect(m_bannerButton, SIGNAL(Clicked()), SLOT(FindBanner()));
     connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
     connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
+
+    // Find Artwork on the Internet
+    if (m_netCoverartButton)
+        connect(m_netCoverartButton, SIGNAL(Clicked()), SLOT(FindNetCoverArt()));
+    if (m_netBannerButton)
+        connect(m_netBannerButton, SIGNAL(Clicked()), SLOT(FindNetBanner()));
+    if (m_netFanartButton)
+        connect(m_netFanartButton, SIGNAL(Clicked()), SLOT(FindNetFanart()));
+    if (m_netScreenshotButton)
+        connect(m_netScreenshotButton, SIGNAL(Clicked()), SLOT(FindNetScreenshot()));
+
     connect(m_trailerButton, SIGNAL(Clicked()), SLOT(FindTrailer()));
 
     connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(ToggleBrowse()));
@@ -258,6 +283,174 @@ namespace
     const QString CEID_SCREENSHOTFILE = "screenshotfile";
     const QString CEID_TRAILERFILE = "trailerfile";
     const QString CEID_NEWCATEGORY = "newcategory";
+
+    class ImageSearchResultsDialog : public MythScreenType
+    {
+        Q_OBJECT
+
+      public:
+        ImageSearchResultsDialog(MythScreenStack *lparent,
+                const ArtworkList list, const ArtworkType type) :
+            MythScreenType(lparent, "videosearchresultspopup"),
+            m_list(list), m_type(type), m_resultsList(0)
+        {
+            m_imageDownload = new MetadataImageDownload(this);
+        }
+
+        ~ImageSearchResultsDialog()
+        {
+            cleanCacheDir();
+
+            if (m_imageDownload)
+            {
+                delete m_imageDownload;
+                m_imageDownload = NULL;
+            }
+        }
+
+        bool Create()
+        {
+            if (!LoadWindowFromXML("video-ui.xml", "artworksel", this))
+                return false;
+
+            bool err = false;
+            UIUtilE::Assign(this, m_resultsList, "results", &err);
+            if (err)
+            {
+                VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
+                return false;
+            }
+
+            for (ArtworkList::const_iterator i = m_list.begin();
+                    i != m_list.end(); ++i)
+            {
+                    ArtworkInfo info = (*i);
+                    MythUIButtonListItem *button =
+                        new MythUIButtonListItem(m_resultsList,
+                        QString());
+                    button->SetText(info.label, "label");
+                    button->SetText(info.thumbnail, "thumbnail");
+                    button->SetText(info.url, "url");
+                    QString width = QString::number(info.width);
+                    QString height = QString::number(info.height);
+                    button->SetText(width, "width");
+                    button->SetText(height, "height");
+                    if (info.width > 0 && info.height > 0)
+                        button->SetText(QString("%1x%2").arg(width).arg(height),
+                            "resolution");
+
+                    QString artfile = info.thumbnail;
+
+                    if (artfile.isEmpty())
+                        artfile = info.url;
+
+                    QString dlfile = getDownloadFilename(info.label,
+                        artfile);
+
+                    if (!artfile.isEmpty())
+                    {
+                        int pos = m_resultsList->GetItemPos(button);
+
+                        if (QFile::exists(dlfile))
+                            button->SetImage(dlfile);
+                        else
+                            m_imageDownload->addThumb(info.label,
+                                             artfile,
+                                             qVariantFromValue<uint>(pos));
+                    }
+
+                    button->SetData(qVariantFromValue<ArtworkInfo>(*i));
+                }
+
+            connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+                    SLOT(sendResult(MythUIButtonListItem *)));
+
+            BuildFocusList();
+
+            return true;
+        }
+
+        void cleanCacheDir()
+        {
+            QString cache = QString("%1/thumbcache")
+                       .arg(GetConfDir());
+            QDir cacheDir(cache);
+            QStringList thumbs = cacheDir.entryList(QDir::Files);
+
+            for (QStringList::const_iterator i = thumbs.end() - 1;
+                    i != thumbs.begin() - 1; --i)
+            {
+                QString filename = QString("%1/%2").arg(cache).arg(*i);
+                QFileInfo fi(filename);
+                QDateTime lastmod = fi.lastModified();
+                if (lastmod.addDays(2) < QDateTime::currentDateTime())
+                {
+                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
+                          .arg(filename));
+                    QFile::remove(filename);
+                }
+            }
+        }
+
+        void customEvent(QEvent *event)
+        {
+            if (event->type() == ThumbnailDLEvent::kEventType)
+            {
+                ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
+
+                ThumbnailData *data = tde->thumb;
+
+                QString file = data->url;
+                uint pos = qVariantValue<uint>(data->data);
+
+                if (file.isEmpty())
+                    return;
+
+                if (!((uint)m_resultsList->GetCount() >= pos))
+                    return;
+
+                MythUIButtonListItem *item =
+                          m_resultsList->GetItemAt(pos);
+
+                if (item)
+                {
+                    item->SetImage(file);
+                }
+                delete data;
+            }
+        }
+
+     signals:
+        void haveResult(ArtworkInfo, ArtworkType);
+
+      private:
+        ArtworkList            m_list;
+        ArtworkType            m_type;
+        MythUIButtonList      *m_resultsList;
+        MetadataImageDownload *m_imageDownload;
+
+      private slots:
+        void sendResult(MythUIButtonListItem* item)
+        {
+            emit haveResult(qVariantValue<ArtworkInfo>(item->GetData()),
+                            m_type);
+            Close();
+        }
+    };
+}
+
+void EditMetadataDialog::createBusyDialog(QString title)
+{
+    if (m_busyPopup)
+        return;
+
+    QString message = title;
+
+    m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
+            "mythvideobusydialog");
+
+    if (m_busyPopup->Create())
+        m_popupStack->AddScreen(m_busyPopup);
 }
 
 void EditMetadataDialog::fillWidgets()
@@ -633,10 +826,136 @@ void EditMetadataDialog::FindCoverArt()
                 *this, CEID_COVERARTFILE);
 }
 
+void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return;
+
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
+    }
+
+    ArtworkType type = qVariantValue<ArtworkType>(lookup->GetData());
+    ArtworkList list = lookup->GetArtwork(type);
+
+    if (list.count() == 0)
+        return;
+
+    MythScreenStack *m_popupStack =
+                     GetMythMainWindow()->GetStack("popup stack");
+
+    ImageSearchResultsDialog *resultsdialog =
+          new ImageSearchResultsDialog(m_popupStack, list, type);
+
+    connect(resultsdialog, SIGNAL(haveResult(ArtworkInfo, ArtworkType)),
+            SLOT(OnSearchListSelection(ArtworkInfo, ArtworkType)));
+
+    if (resultsdialog->Create())
+        m_popupStack->AddScreen(resultsdialog);
+}
+
+void EditMetadataDialog::OnSearchListSelection(ArtworkInfo info, ArtworkType type)
+{
+    QString msg = tr("Downloading selected artwork...");
+    createBusyDialog(msg);
+
+    MetadataLookup *lookup = new MetadataLookup();
+    lookup->SetType(VID);
+    lookup->SetHost(m_workingMetadata->GetHost());
+    lookup->SetAutomatic(true);
+    lookup->SetData(qVariantFromValue<ArtworkType>(type));
+
+    ArtworkMap downloads;
+    downloads.insert(type, info);
+    lookup->SetDownloads(downloads);
+    lookup->SetAllowOverwrites(true);
+    lookup->SetTitle(m_workingMetadata->GetTitle());
+    lookup->SetSubtitle(m_workingMetadata->GetSubtitle());
+    lookup->SetSeason(m_workingMetadata->GetSeason());
+    lookup->SetEpisode(m_workingMetadata->GetEpisode());
+    lookup->SetInetref(m_workingMetadata->GetInetRef());
+
+    m_imageDownload->addDownloads(lookup);
+}
+
+void EditMetadataDialog::handleDownloadedImages(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return;
+
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
+    }
+
+    ArtworkType type = qVariantValue<ArtworkType>(lookup->GetData());
+    ArtworkMap map = lookup->GetDownloads();
+
+    if (map.count() >= 1)
+    {
+        ArtworkInfo info = map.value(type);
+        QString filename = info.url;
+
+        if (type == COVERART)
+            SetCoverArt(filename);
+        else if (type == FANART)
+            SetFanart(filename);
+        else if (type == BANNER)
+            SetBanner(filename);
+        else if (type == SCREENSHOT)
+            SetScreenshot(filename);
+    }
+}
+
+void EditMetadataDialog::FindNetArt(ArtworkType type)
+{
+    QString msg = tr("Searching for available artwork...");
+    createBusyDialog(msg);
+
+    MetadataLookup *lookup = new MetadataLookup();
+    lookup->SetStep(SEARCH);
+    lookup->SetType(VID);
+    lookup->SetAutomatic(true);
+    lookup->SetData(qVariantFromValue<ArtworkType>(type));
+
+    lookup->SetTitle(m_workingMetadata->GetTitle());
+    lookup->SetSubtitle(m_workingMetadata->GetSubtitle());
+    lookup->SetSeason(m_workingMetadata->GetSeason());
+    lookup->SetEpisode(m_workingMetadata->GetEpisode());
+    lookup->SetInetref(m_workingMetadata->GetInetRef());
+
+    m_query->addLookup(lookup);
+}
+
+void EditMetadataDialog::FindNetCoverArt()
+{
+    FindNetArt(COVERART);
+}
+
+void EditMetadataDialog::FindNetFanart()
+{
+    FindNetArt(FANART);
+}
+
+void EditMetadataDialog::FindNetBanner()
+{
+    FindNetArt(BANNER);
+}
+
+void EditMetadataDialog::FindNetScreenshot()
+{
+    FindNetArt(SCREENSHOT);
+}
+
 void EditMetadataDialog::SetCoverArt(QString file)
 {
     if (file.isEmpty())
         return;
+
+    QString origfile = file;
 
     if (file.startsWith("myth://"))
     {
@@ -650,7 +969,14 @@ void EditMetadataDialog::SetCoverArt(QString file)
     }
     else
         m_workingMetadata->SetCoverFile(file);
+
     CheckedSet(m_coverartText, file);
+
+    if (m_coverart)
+    {
+        m_coverart->SetFilename(origfile);
+        m_coverart->Load();
+    }
 }
 
 void EditMetadataDialog::FindBanner()
@@ -674,6 +1000,8 @@ void EditMetadataDialog::SetBanner(QString file)
     if (file.isEmpty())
         return;
 
+    QString origfile = file;
+
     if (file.startsWith("myth://"))
     {
         QUrl url(file);
@@ -686,7 +1014,14 @@ void EditMetadataDialog::SetBanner(QString file)
     }
     else
         m_workingMetadata->SetBanner(file);
+
     CheckedSet(m_bannerText, file);
+
+    if (m_banner)
+    {
+        m_banner->SetFilename(origfile);
+        m_banner->Load();
+    }
 }
 
 void EditMetadataDialog::FindFanart()
@@ -710,6 +1045,8 @@ void EditMetadataDialog::SetFanart(QString file)
     if (file.isEmpty())
         return;
 
+    QString origfile = file;
+
     if (file.startsWith("myth://"))
     {
         QUrl url(file);
@@ -722,7 +1059,14 @@ void EditMetadataDialog::SetFanart(QString file)
     }
     else
         m_workingMetadata->SetFanart(file);
+
     CheckedSet(m_fanartText, file);
+
+    if (m_fanart)
+    {
+        m_fanart->SetFilename(origfile);
+        m_fanart->Load();
+    }
 }
 
 void EditMetadataDialog::FindScreenshot()
@@ -746,6 +1090,8 @@ void EditMetadataDialog::SetScreenshot(QString file)
     if (file.isEmpty())
         return;
 
+    QString origfile = file;
+
     if (file.startsWith("myth://"))
     {
         QUrl url(file);
@@ -758,7 +1104,14 @@ void EditMetadataDialog::SetScreenshot(QString file)
     }
     else
         m_workingMetadata->SetScreenshot(file);
+
     CheckedSet(m_screenshotText, file);
+
+    if (m_screenshot)
+    {
+        m_screenshot->SetFilename(origfile);
+        m_screenshot->Load();
+    }
 }
 
 void EditMetadataDialog::FindTrailer()
@@ -818,4 +1171,61 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         else if (resultid == CEID_NEWCATEGORY)
             AddCategory(dce->GetResultText());
     }
+    else if (levent->type() == MetadataLookupEvent::kEventType)
+    {
+        MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
+
+        MetadataLookupList lul = lue->lookupList;
+
+        if (lul.isEmpty())
+            return;
+
+        // There should really only be one result here.
+        // If not, USER ERROR!
+        if (lul.count() == 1)
+        {
+            OnArtworkSearchDone(lul.takeFirst());
+        }
+        else
+        {
+            if (m_busyPopup)
+            {
+                m_busyPopup->Close();
+                m_busyPopup = NULL;
+            }
+        }
+    }
+    else if (levent->type() == MetadataLookupFailure::kEventType)
+    {
+        MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
+
+        MetadataLookupList lul = luf->lookupList;
+
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
+        if (lul.size())
+        {
+            MetadataLookup *lookup = lul.takeFirst();
+            VERBOSE(VB_GENERAL,
+                QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
+                    .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
+        }
+    }
+    else if (levent->type() == ImageDLEvent::kEventType)
+    {
+        ImageDLEvent *ide = (ImageDLEvent *)levent;
+
+        MetadataLookup *lookup = ide->item;
+
+        if (!lookup)
+            return;
+
+        handleDownloadedImages(lookup);
+    }
 }
+
+#include "editmetadata.moc"
