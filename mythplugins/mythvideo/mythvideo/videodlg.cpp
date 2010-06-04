@@ -3488,7 +3488,7 @@ void VideoDialog::VideoSearch(MythGenericTree *node,
     if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
         msg += tr(" %1x%2").arg(metadata->GetSeason())
                .arg(metadata->GetEpisode());
-    createBusyDialog(msg);
+//    createBusyDialog(msg);
 }
 
 void VideoDialog::VideoAutoSearch(MythGenericTree *node)
