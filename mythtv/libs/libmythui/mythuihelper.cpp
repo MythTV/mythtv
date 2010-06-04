@@ -671,7 +671,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
         if (fileInfo.fileName().contains(partialKey))
         {
             VERBOSE(VB_GUI|VB_FILE, LOC +
-                    QString("RemoveFromCacheByFile removed :%1: "
+                    QString("RemoveFromCacheByFile removed: %1: "
                             "from cache").arg(fileInfo.fileName()));
             if (!dir.remove(fileInfo.fileName()))
                 VERBOSE(VB_IMPORTANT, QString("Failed to delete %1 from the "

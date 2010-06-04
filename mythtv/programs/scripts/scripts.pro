@@ -12,7 +12,7 @@ installscripts.path = $${PREFIX}/share/mythtv
 installscripts.files = database/*
 
 installinternetscripts.path = $${PREFIX}/share/mythtv
-installinternetscripts.files = internetcontent
+installinternetscripts.files = internetcontent metadata
 
 INSTALLS += installscripts installinternetscripts
 
