@@ -97,7 +97,7 @@ void MetadataDownload::run()
             // these decisions on our own.  Pass to title match.
             if (list.at(0)->GetAutomatic() && list.count() > 1)
             {
-                if (!findBestMatch(list, lookup->GetTitle()));
+                if (!findBestMatch(list, lookup->GetTitle()))
                     QCoreApplication::postEvent(m_parent,
                         new MetadataLookupFailure(MetadataLookupList() << lookup));
                 continue;
