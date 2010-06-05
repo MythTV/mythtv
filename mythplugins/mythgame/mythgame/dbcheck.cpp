@@ -10,7 +10,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1016";
+const QString currentDatabaseVersion = "1017";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -407,6 +407,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1016", dbver))
+            return false;
+    }
+
+    if (dbver == "1016")
+    {
+        const QString updates[] = {
+
+"ALTER TABLE gamemetadata ADD inetref TEXT AFTER crc_value;",
+""
+};
+
+        if (!performActualUpdate(updates, "1017", dbver))
             return false;
     }
 
