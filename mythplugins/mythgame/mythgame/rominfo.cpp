@@ -20,7 +20,7 @@ void RomInfo::UpdateDatabase()
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT gamename,genre,year,country,plot,publisher, "
-                  "favorite,screenshot,fanart,boxart "
+                  "favorite,screenshot,fanart,boxart,inetref "
                   "FROM gamemetadata "
                   "WHERE gametype = :GAMETYPE "
                   "AND romname = :ROMNAME");
@@ -47,12 +47,14 @@ void RomInfo::UpdateDatabase()
     QString t_screenshot = query.value(7).toString();
     QString t_fanart = query.value(8).toString();
     QString t_boxart = query.value(9).toString();
+    QString t_inetref = query.value(10).toString();
 
     if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
         (t_year      != Year())      || (t_country   != Country()) ||
-        (t_plot      != Plot())      || (t_publisher != Publisher()) || 
-        (t_favourite != Favorite())  || (t_screenshot != Screenshot()) || 
-        (t_fanart    != Fanart())    || (t_boxart    != Boxart()))
+        (t_plot      != Plot())      || (t_publisher != Publisher()) ||
+        (t_favourite != Favorite())  || (t_screenshot != Screenshot()) ||
+        (t_fanart    != Fanart())    || (t_boxart    != Boxart()) ||
+        (t_inetref   != Inetref()))
     {
         query.prepare("UPDATE gamemetadata "
                       "SET version = 'CUSTOM', "
@@ -66,6 +68,7 @@ void RomInfo::UpdateDatabase()
                       "    screenshot = :SCREENSHOT,"
                       "    fanart = :FANART,"
                       "    boxart = :BOXART "
+                      "    inetref = :INETREF "
                       "WHERE gametype = :GAMETYPE AND "
                       "      romname  = :ROMNAME");
         query.bindValue(":GAMENAME", Gamename());
@@ -78,6 +81,7 @@ void RomInfo::UpdateDatabase()
         query.bindValue(":SCREENSHOT", Screenshot());
         query.bindValue(":FANART", Fanart());
         query.bindValue(":BOXART", Boxart());
+        query.bindValue(":INETREF", Inetref());
         query.bindValue(":GAMETYPE", GameType());
         query.bindValue(":ROMNAME", Romname());
 
@@ -176,6 +180,8 @@ void RomInfo::setField(QString field, QString data)
         publisher = data;
     else if (field == "crc_value")
         crc_value = data;
+    else if (field == "inetref")
+        inetref = data;
     else if (field == "diskcount")
         diskcount = data.toInt();
     else if (field == "gametype")
@@ -237,7 +243,7 @@ void RomInfo::fillData()
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
                        "rompath,country,crc_value,diskcount,gametype,plot,publisher,"
-                       "version,screenshot,fanart,boxart FROM gamemetadata "
+                       "version,screenshot,fanart,boxart,inetref FROM gamemetadata "
                        "WHERE gamename = :GAMENAME "
                        + systemtype + " ORDER BY diskcount DESC";
 
@@ -264,6 +270,7 @@ void RomInfo::fillData()
         setScreenshot(query.value(14).toString());
         setFanart(query.value(15).toString());
         setBoxart(query.value(16).toString());
+        setInetref(query.value(17).toString());
     }
 
     setRomCount(romInDB(romname,gametype));

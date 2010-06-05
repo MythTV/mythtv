@@ -15,7 +15,7 @@ class RomInfo
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,
             QString lallsystems = "", QString lplot = "", QString lpublisher = "", 
             QString lversion = "", QString lscreenshot = "", QString lfanart = "", 
-            QString lboxart = "")
+            QString lboxart = "", QString linetref = "")
             {
                 romname = lromname;
                 system = lsystem;
@@ -36,6 +36,7 @@ class RomInfo
                 plot = lplot;
                 publisher = lpublisher;
                 version = lversion;
+                inetref = linetref;
             }
 
     RomInfo(const RomInfo &lhs)
@@ -59,6 +60,7 @@ class RomInfo
                 plot = lhs.plot;
                 publisher = lhs.publisher;
                 version = lhs.version;
+                inetref = lhs.inetref;
             }
 
     ~RomInfo() {}
@@ -119,6 +121,9 @@ class RomInfo
     QString Year() const { return year; }
     void setYear(const QString &lyear) { year = lyear; }
 
+    QString Inetref() const { return inetref; }
+    void setInetref(const QString &linetref) { inetref = linetref; }
+
     int Favorite() const { return favorite; }
     void setFavorite(bool updateDatabase = false);
 
@@ -148,6 +153,7 @@ class RomInfo
     QString screenshot;
     QString fanart;
     QString boxart;
+    QString inetref;
 };
 
 bool operator==(const RomInfo& a, const RomInfo& b);
