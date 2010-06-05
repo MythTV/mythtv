@@ -106,7 +106,8 @@ class MetadataImp
              const genre_list &genres,
              const country_list &countries,
              const cast_list &cast,
-             const QString &host = "") :
+             const QString &host = "",
+             bool processed = false) :
         m_title(title), m_subtitle(subtitle), m_tagline(tagline),
         m_inetref(inetref), m_homepage(homepage), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
@@ -117,7 +118,7 @@ class MetadataImp
         m_year(year), m_releasedate(releasedate), m_length(length), m_season(season),
         m_episode(episode), m_insertdate(insertdate), m_showlevel(showlevel),
         m_browse(browse), m_watched(watched), m_id(id),
-        m_userrating(userrating)
+        m_userrating(userrating), m_processed(processed)
     {
         VideoCategory::GetCategory().get(m_categoryID, m_category);
     }
@@ -171,6 +172,7 @@ class MetadataImp
             m_id = rhs.m_id;
             m_userrating = rhs.m_userrating;
             m_host = rhs.m_host;
+            m_processed = rhs.m_processed;
 
             // No DB vars
             m_sort_key = rhs.m_sort_key;
@@ -309,6 +311,9 @@ class MetadataImp
     float GetUserRating() const { return m_userrating; }
     void SetUserRating(float userRating) { m_userrating = userRating; }
 
+    bool GetProcessed() const { return m_processed; }
+    void SetProcessed(bool processed) { m_processed = processed; }
+
     ////////////////////////////////
 
     void SaveToDatabase();
@@ -368,6 +373,7 @@ class MetadataImp
     bool m_watched;
     unsigned int m_id;  // videometadata.intid
     float m_userrating;
+    bool m_processed;
 
     // not in DB
     Metadata::SortKey m_sort_key;
@@ -455,7 +461,7 @@ void MetadataImp::Reset()
                     Metadata::FilenameToMeta(m_filename, 3).toInt(), QDate(), m_id,
                     ParentalLevel::plLowest, 0, -1, true, false, "", "",
                     Metadata::genre_list(), Metadata::country_list(),
-                    Metadata::cast_list(), m_host);
+                    Metadata::cast_list(), m_host, false);
     tmp.m_prefix = m_prefix;
 
     *this = tmp;
@@ -560,6 +566,7 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_episode = query.value(27).toInt();
     m_host = query.value(28).toString();
     m_insertdate = query.value(29).toDate();
+    m_processed = query.value(30).toBool();
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -619,11 +626,11 @@ void MetadataImp::saveToDatabase()
         query.prepare("INSERT INTO videometadata (title,subtitle, tagline,director,plot,"
                       "rating,year,userrating,length,season,episode,filename,hash,"
                       "showlevel,coverfile,inetref,homepage,browse,watched,trailer,"
-                      "screenshot,banner,fanart,host) VALUES (:TITLE, :SUBTITLE, "
+                      "screenshot,banner,fanart,host,processed) VALUES (:TITLE, :SUBTITLE, "
                       ":TAGLINE, :DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, "
                       ":LENGTH, :SEASON, :EPISODE, :FILENAME, :HASH, :SHOWLEVEL, "
                       ":COVERFILE, :INETREF, :HOMEPAGE, :BROWSE, :WATCHED, "
-                      ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST)");
+                      ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST, :PROCESSED)");
     }
     else
     {
@@ -636,7 +643,8 @@ void MetadataImp::saveToDatabase()
                       "screenshot = :SCREENSHOT, banner = :BANNER, fanart = :FANART, "
                       "inetref = :INETREF, homepage = :HOMEPAGE, browse = :BROWSE, "
                       "watched = :WATCHED, host = :HOST, playcommand = :PLAYCOMMAND, "
-                      "childid = :CHILDID, category = :CATEGORY WHERE intid = :INTID");
+                      "childid = :CHILDID, category = :CATEGORY, processed = :PROCESSED "
+                      " WHERE intid = :INTID");
 
         query.bindValue(":PLAYCOMMAND", m_playcommand);
         query.bindValue(":CHILDID", m_childID);
@@ -669,6 +677,7 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":BROWSE", m_browse);
     query.bindValue(":WATCHED", m_watched);
     query.bindValue(":HOST", m_host);
+    query.bindValue(":PROCESSED", m_processed);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1047,13 +1056,13 @@ Metadata::Metadata(const QString &filename, const QString &hash,
              const genre_list &genres,
              const country_list &countries,
              const cast_list &cast,
-             const QString &host)
+             const QString &host, bool processed)
 {
     m_imp = new MetadataImp(filename, hash, trailer, coverfile, screenshot, banner,
                             fanart, title, subtitle, tagline, year, releasedate, inetref,
                             homepage, director, plot, userrating, rating, length, season, episode,
                             insertdate, id, showlevel, categoryID, childID, browse, watched,
-                            playcommand, category, genres, countries, cast, host);
+                            playcommand, category, genres, countries, cast, host, processed);
 }
 
 Metadata::~Metadata()
@@ -1190,6 +1199,7 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["child_id"] = QString::number(GetChildID());
     metadataMap["browseable"] = GetDisplayBrowse(GetBrowse());
     metadataMap["watched"] = GetDisplayWatched(GetWatched());
+    metadataMap["processed"] = GetDisplayProcessed(GetProcessed());
     metadataMap["category"] = GetCategory();
 }
 
@@ -1228,6 +1238,7 @@ void ClearMap(MetadataMap &metadataMap)
     metadataMap["browseable"] = "";
     metadataMap["watched"] = "";
     metadataMap["category"] = "";
+    metadataMap["processed"] = "";
 }
 
 bool Metadata::HasSortKey() const
@@ -1443,6 +1454,16 @@ bool Metadata::GetWatched() const
 void Metadata::SetWatched(bool watched)
 {
     m_imp->SetWatched(watched);
+}
+
+bool Metadata::GetProcessed() const
+{
+    return m_imp->GetProcessed();
+}
+
+void Metadata::SetProcessed(bool processed)
+{
+    m_imp->SetProcessed(processed);
 }
 
 const QString &Metadata::GetPlayCommand() const

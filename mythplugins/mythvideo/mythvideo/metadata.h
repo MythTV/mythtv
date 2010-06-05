@@ -88,7 +88,8 @@ class Metadata
              const genre_list &genres = genre_list(),
              const country_list &countries = country_list(),
              const cast_list &cast = cast_list(),
-             const QString &host = "");
+             const QString &host = "",
+             bool processed = false);
     ~Metadata();
     Metadata(MSqlQuery &query);
     Metadata(const Metadata &rhs);
@@ -160,6 +161,9 @@ class Metadata
 
     bool GetWatched() const;
     void SetWatched(bool watched);
+
+    bool GetProcessed() const;
+    void SetProcessed(bool processed);
 
     const QString &GetPlayCommand() const;
     void SetPlayCommand(const QString &playCommand);

@@ -2415,7 +2415,7 @@ void VideoDialog::VideoMenu()
         else
             m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
         m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
-        m_menuPopup->AddButton(tr("Metadata Options"), SLOT(ManageMenu()), true);
+        m_menuPopup->AddButton(tr("Change Video Details"), SLOT(ManageMenu()), true);
         m_menuPopup->AddButton(tr("Video Options"), SLOT(VideoOptionMenu()), true);
         m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
     }
@@ -2483,7 +2483,7 @@ void VideoDialog::DisplayMenu()
     m_menuPopup->SetReturnEvent(this, "display");
 
     m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
-    m_menuPopup->AddButton(tr("Download All Metadata"), SLOT(VideoAutoSearch()));
+    m_menuPopup->AddButton(tr("Retrieve All Details"), SLOT(VideoAutoSearch()));
     m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
 
     m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
@@ -2723,13 +2723,31 @@ void VideoDialog::ManageMenu()
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
 
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+
     m_menuPopup->SetReturnEvent(this, "manage");
 
-    m_menuPopup->AddButton(tr("Edit Metadata"), SLOT(EditMetadata()));
-    m_menuPopup->AddButton(tr("Download Metadata For This Item"), SLOT(VideoSearch()));
+    m_menuPopup->AddButton(tr("Edit Details"), SLOT(EditMetadata()));
+    m_menuPopup->AddButton(tr("Retrieve Details"), SLOT(VideoSearch()));
     m_menuPopup->AddButton(tr("Manually Enter Video #"),
             SLOT(ManualVideoUID()));
-    m_menuPopup->AddButton(tr("Reset Metadata"), SLOT(ResetMetadata()));
+    if (metadata->GetProcessed())
+        m_menuPopup->AddButton(tr("Allow Updates"), SLOT(ToggleProcess()));
+    else
+        m_menuPopup->AddButton(tr("Disable Updates"), SLOT(ToggleProcess()));
+    m_menuPopup->AddButton(tr("Reset Details"), SLOT(ResetMetadata()));
+}
+
+void VideoDialog::ToggleProcess()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (metadata)
+    {
+        metadata->SetProcessed(!metadata->GetProcessed());
+        metadata->UpdateDatabase();
+
+        refreshData();
+    }
 }
 
 /** \fn VideoDialog::ToggleBrowseMode()
@@ -3315,6 +3333,19 @@ void VideoDialog::customEvent(QEvent *levent)
         if (lul.size())
         {
             MetadataLookup *lookup = lul.takeFirst();
+            MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+            if (node)
+            {
+                Metadata *metadata = GetMetadataPtrFromNode(node);
+                if (metadata)
+                {
+                    metadata->SetProcessed(true);
+                    metadata->UpdateDatabase();
+                    MythUIButtonListItem *item = GetItemByMetadata(metadata);
+                    if (item)
+                        UpdateItem(item);
+                }
+            }
             VERBOSE(VB_GENERAL,
                 QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
                     .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));
@@ -3398,7 +3429,9 @@ void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
          m_busyPopup = NULL;
      }
 
+    metadata->SetProcessed(true);
     metadata->UpdateDatabase();
+
     MythUIButtonListItem *item = GetItemByMetadata(metadata);
     if (item != NULL)
         UpdateItem(item);
@@ -3514,8 +3547,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
             if (!metadata)
                 continue;
 
-            if (metadata->GetInetRef().isEmpty() ||
-                metadata->GetInetRef() == VIDEO_INETREF_DEFAULT)
+            if (!metadata->GetProcessed())
                 VideoSearch((*p), true);
         }
     }
@@ -4014,6 +4046,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     }
 
     metadata->SetCountries(video_countries);
+    metadata->SetProcessed(true);
 
     metadata->UpdateDatabase();
 

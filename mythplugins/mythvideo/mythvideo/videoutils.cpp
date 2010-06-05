@@ -162,6 +162,11 @@ QString GetDisplayWatched(bool watched)
     return watched ? QObject::tr("Yes") : QObject::tr("No");
 }
 
+QString GetDisplayProcessed(bool processed)
+{
+    return processed ? QObject::tr("Details Downloaded") : QObject::tr("Waiting for Detail Download");
+}
+
 QString GetDisplayYear(int year)
 {
     return year == VIDEO_YEAR_DEFAULT ? "?" : QString::number(year);

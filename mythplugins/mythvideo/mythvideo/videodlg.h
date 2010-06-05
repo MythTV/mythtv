@@ -100,6 +100,7 @@ class VideoDialog : public MythScreenType
     void ResetMetadata();
     void ToggleBrowseable();
     void ToggleWatched();
+    void ToggleProcess();
     void RemoveVideo();
     void OnRemoveVideo(bool);
 
