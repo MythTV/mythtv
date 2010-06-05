@@ -3160,7 +3160,7 @@ bool NuppelVideoPlayer::IsReallyNearEnd(void) const
  *  \param margin minimum number of frames we want before being near end,
  *                defaults to 2 seconds of video.
  */
-bool NuppelVideoPlayer::IsNearEnd(long long margin)
+bool NuppelVideoPlayer::IsNearEnd(int64_t margin)
 {
     uint64_t framesRead, framesLeft = 0;
 
