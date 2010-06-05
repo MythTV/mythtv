@@ -22,7 +22,7 @@ class VideoOutputDirectfb: public VideoOutput
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan);
-    void PrepareFrame(VideoFrame *buffer, FrameScanType);
+    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void Show(FrameScanType);
 
     void MoveResize(void);

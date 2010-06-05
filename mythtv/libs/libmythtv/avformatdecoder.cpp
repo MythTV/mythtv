@@ -24,6 +24,7 @@ using namespace std;
 #include "dvbdescriptors.h"
 #include "cc608decoder.h"
 #include "cc708decoder.h"
+#include "subtitlereader.h"
 #include "interactivetv.h"
 #include "DVDRingBuffer.h"
 #include "videodisplayprofile.h"
@@ -487,9 +488,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       no_hardware_decoders(no_hardware_decode),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
-      ccd608(new CC608Decoder(parent)),
-      ccd708(new CC708Decoder(parent)),
-      ttd(new TeletextDecoder()),
+      ccd608(new CC608Decoder(parent->GetCC608Reader())),
+      ccd708(new CC708Decoder(parent->GetCC708Reader())),
+      ttd(new TeletextDecoder()),   subReader(parent->GetSubReader()),
       // Interactive TV
       itv(NULL),
       selectedVideoIndex(-1),
@@ -524,7 +525,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                             allow_dts_passthru, ignore, ignore);
     max_channels = mchannels;
 
-        // TODO: improve this when we open the card earlier in future
+    // TODO: improve this when we open the card earlier in future
     QString stmp = gCoreContext->GetSetting("AudioOutputDevice");
     if (stmp.startsWith("JACK:"))
         allow_dts_passthru = allow_ac3_passthru = false;
@@ -2347,10 +2348,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     // We have to do this here to avoid the NVP getting stuck
     // waiting on audio.
-    if (GetNVP()->HasAudioIn() && tracks[kTrackTypeAudio].empty())
+    if (m_audio->HasAudioIn() && tracks[kTrackTypeAudio].empty())
     {
-        GetNVP()->SetAudioParams(FORMAT_NONE, -1, CODEC_ID_NONE, -1, false);
-        GetNVP()->ReinitAudio();
+        m_audio->SetAudioParams(FORMAT_NONE, -1, CODEC_ID_NONE, -1, false);
+        m_audio->ReinitAudio();
         if (ringBuffer && ringBuffer->isDVD())
             audioIn = AudioInfo();
     }
@@ -2484,7 +2485,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
  */
 void AvFormatDecoder::RemoveAudioStreams()
 {
-    if (!GetNVP() || !GetNVP()->HasAudioIn())
+    if (!m_audio->HasAudioIn())
         return;
 
     QMutexLocker locker(avcodeclock);
@@ -3475,7 +3476,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     {
         subtitle.start_display_time += pts;
         subtitle.end_display_time += pts;
-        GetNVP()->AddAVSubtitle(subtitle);
+        if (subReader)
+            subReader->AddAVSubtitle(subtitle);
 
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
                 QString("subtl timecode %1 %2 %3 %4")
@@ -3508,12 +3510,7 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
         // Have to return regularly to ensure that the OSD is updated.
         // This applies both to MHEG and also channel browsing.
         if (!(decodetype & kDecodeVideo))
-        {
             allowedquit |= (itv && itv->ImageHasChanged());
-            OSD *osd = NULL;
-            if (!allowedquit && GetNVP() && (osd = GetNVP()->GetOSD()))
-                allowedquit |=  osd->HasChanged();
-        }
         break;
     }
 #endif // USING_MHEG:
@@ -3930,7 +3927,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     avcodeclock->unlock();
 
     uint ofill = 0, ototal = 0, othresh = 0, total_decoded_audio = 0;
-    if (GetNVP()->GetAudioBufferStatus(ofill, ototal))
+    if (m_audio->GetBufferStatus(ofill, ototal))
     {
         othresh =  ((ototal>>1) + (ototal>>2));
         allowedquit = (!(decodetype & kDecodeAudio)) && (ofill > othresh);
@@ -3948,7 +3945,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         bool reselectAudioTrack = false;
 
         /// HACK HACK HACK -- begin See #3731
-        if (!GetNVP()->HasAudioIn())
+        if (!m_audio->HasAudioIn())
         {
             VERBOSE(VB_AUDIO, LOC + "Audio is disabled - trying to restart it");
             reselectAudioTrack = true;
@@ -4113,20 +4110,20 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
-        GetNVP()->AddAudioData((char *)audioSamples, data_size, temppts);
+        m_audio->AddAudioData((char *)audioSamples, data_size, temppts);
 
         total_decoded_audio += data_size;
 
         allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
         // Audio can expand by a factor of 6 in audiooutputbase's audiobuffer
         allowedquit |= !(decodetype & kDecodeVideo) &&
-                       ofill + total_decoded_audio * 6 > othresh;
+                       ((ofill + total_decoded_audio * 6) > othresh);
 
         // top off audio buffers initially in audio only mode
         if (!allowedquit && !(decodetype & kDecodeVideo))
         {
             uint fill, total;
-            if (GetNVP()->GetAudioBufferStatus(fill, total))
+            if (m_audio->GetBufferStatus(fill, total))
             {
                 total /= 6; // Possible expansion in aobase (upmix, float conv)
                 allowedquit = fill == 0 || fill > total>>1           ||
@@ -4177,7 +4174,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     }
 
     uint ofill = 0, ototal = 0, othresh = 0;
-    if (GetNVP()->GetAudioBufferStatus(ofill, ototal))
+    if (m_audio->GetBufferStatus(ofill, ototal))
     {
         othresh =  ((ototal>>1) + (ototal>>2));
         allowedquit = (!(decodetype & kDecodeAudio)) && (ofill > othresh);
@@ -4769,13 +4766,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
             .arg(old_in.toString()).arg(audioOut.toString()));
 
     if (audioOut.sample_rate > 0)
-        GetNVP()->SetEffDsp(audioOut.sample_rate * 100);
-
-    GetNVP()->SetAudioParams(audioOut.format, ctx->request_channels,
-                             audioOut.codec_id, audioOut.sample_rate,
-                             audioOut.do_passthru);
-
-    GetNVP()->ReinitAudio();
+        m_audio->SetEffDsp(audioOut.sample_rate * 100);
+    m_audio->SetAudioParams(audioOut.format, ctx->request_channels,
+                            audioOut.codec_id, audioOut.sample_rate,
+                            audioOut.do_passthru);
+    m_audio->ReinitAudio();
 
     if (LCD *lcd = LCD::Get())
     {

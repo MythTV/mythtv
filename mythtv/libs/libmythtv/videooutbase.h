@@ -23,9 +23,11 @@ extern "C" {
 #include "videodisplayprofile.h"
 using namespace std;
 
+class MythPainter;
+class MythYUVAPainter;
+class MythImage;
 class NuppelVideoPlayer;
 class OSD;
-class OSDSurface;
 class FilterChain;
 class FilterManager;
 class OpenGLContextGLX;
@@ -69,7 +71,8 @@ class VideoOutput
     virtual bool IsExtraProcessingRequired(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 
-    virtual void PrepareFrame(VideoFrame *buffer, FrameScanType) = 0;
+    virtual void PrepareFrame(VideoFrame *buffer, FrameScanType,
+                              OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
 
     virtual void WindowResized(const QSize &new_size) {}
@@ -241,10 +244,12 @@ class VideoOutput
     virtual void SetPIPState(PIPState setting);
 
     virtual QString GetOSDRenderer(void) const;
+    virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)osd_painter; }
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space
     QRect   GetImageRect(const QRect &rect);
+    QRect   GetSafeRect(void);
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
@@ -256,7 +261,7 @@ class VideoOutput
                          NuppelVideoPlayer *pipplayer,
                          PIPLocation        loc);
 
-    virtual int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
+    virtual bool DisplayOSD(VideoFrame *frame, OSD *osd);
 
     virtual void SetPictureAttributeDBValue(
         PictureAttribute attributeType, int newValue);
@@ -328,6 +333,10 @@ class VideoOutput
     // Display information
     QSize monitor_sz;
     QSize monitor_dim;
+
+    // OSD painter and surface
+    MythYUVAPainter *osd_painter;
+    MythImage       *osd_image;
 };
 
 #endif

@@ -13,15 +13,8 @@ using namespace std;
 #include <QMutex>
 #include <QChar>
 
+#include "cc608reader.h"
 #include "format.h"
-
-class CC608Reader
-{
-  public:
-    virtual ~CC608Reader() { }
-    virtual void AddTextData(unsigned char *buf, int len,
-                             long long timecode, char type) = 0;
-};
 
 enum
 {

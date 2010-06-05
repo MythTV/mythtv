@@ -3,6 +3,9 @@
 
 #include <sys/time.h>
 
+#include <QObject>
+#include <QTimer>
+
 #include "playercontext.h"
 #include "volumebase.h"
 #include "audiooutputsettings.h"
@@ -11,13 +14,18 @@
 #include "jitterometer.h"
 #include "videooutbase.h"
 #include "teletextdecoder.h"
-#include "textsubtitleparser.h"
+#include "subtitlereader.h"
 #include "tv_play.h"
 #include "yuv2rgb.h"
+#include "cc608reader.h"
 #include "cc608decoder.h"
+#include "cc708reader.h"
 #include "cc708decoder.h"
 #include "cc708window.h"
 #include "decoderbase.h"
+#include "deletemap.h"
+#include "commbreakmap.h"
+#include "audioplayer.h"
 
 #include "mythexp.h"
 
@@ -26,37 +34,25 @@ extern "C" {
 }
 using namespace std;
 
-#define MAXTBUFFER 60
-
 #ifndef LONG_LONG_MIN
 #define LONG_LONG_MIN LLONG_MIN
 #endif
 
 class VideoOutput;
-class OSDSet;
 class RemoteEncoder;
 class MythSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
-class AudioOutput;
 class FilterManager;
 class FilterChain;
 class VideoSync;
 class LiveTVChain;
 class TV;
-struct AVSubtitle;
 struct SwsContext;
 class InteractiveTV;
 class NSAutoreleasePool;
 class DetectLetterbox;
-
-struct TextContainer
-{
-    int timecode;
-    int len;
-    unsigned char *buffer;
-    char type;
-};
+class NuppelVideoPlayer;
 
 typedef  void (*StatusCallback)(int, void*);
 
@@ -79,15 +75,48 @@ enum
     kDisplayAVSubtitle          = 0x04,
     kDisplayCC608               = 0x08,
     kDisplayCC708               = 0x10,
-    kDisplayNUVCaptions         = kDisplayNUVTeletextCaptions | kDisplayCC608,
     kDisplayTextSubtitle        = 0x20,
-    kDisplayAllCaptions         = 0x3f,
-    kDisplayTeletextMenu        = 0x40,
+    kDisplayDVDButton           = 0x40,
+    kDisplayAllCaptions         = 0x7f,
+    kDisplayTeletextMenu        = 0x80,
 };
 
-class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
+class PlayerTimer : public QObject
+{
+    Q_OBJECT
+  public:
+    PlayerTimer(NuppelVideoPlayer *nvp);
+   ~PlayerTimer(void);
+
+  public slots:
+    void loop(void);
+
+  private:
+    NuppelVideoPlayer *m_nvp;
+    QTimer            *m_timer;
+};
+
+class DecoderThread : public QThread
+{
+    Q_OBJECT
+
+  public:
+    DecoderThread(NuppelVideoPlayer *nvp) : QThread(NULL), m_nvp(nvp) { }
+
+  protected:
+    virtual void run(void);
+
+  private:
+    NuppelVideoPlayer *m_nvp;
+};
+
+class MPUBLIC NuppelVideoPlayer
 {
     friend class PlayerContext;
+    friend class PlayerTimer;
+    friend class CC708Reader;
+    friend class CC608Reader;
+    friend class DecoderThread;
 
   public:
     NuppelVideoPlayer(bool muted = false);
@@ -95,8 +124,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Initialization
     bool InitVideo(void);
-    int  OpenFile(bool skipDsp = false, uint retries = 4,
-                  bool allow_libmpeg2 = true);
+    virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
     void OpenDummy(void);
 
     // Windowing stuff
@@ -107,31 +135,21 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void WindowResized(const QSize &new_size);
 
     // Audio Sets
-    void SetNoAudio(void)                     { no_audio_out = true; }
-    void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
-    void SetAudioOutput(AudioOutput *ao)      { audioOutput = ao; }
-    void SetAudioInfo(const QString &main, const QString &passthru, uint rate);
-    void SetAudioParams(AudioFormat format, int channels, int codec, int samplerate, bool passthru);
-    void SetEffDsp(int dsprate);
-    uint AdjustVolume(int change);
-    bool SetMuted(bool mute);
-    MuteState SetMuteState(MuteState);
-    MuteState IncrMuteState(void);
-    void SetAudioCodec(void *ac);
+    uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
+    bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
+    MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
+    MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
 
     // Sets
     void SetPlayerInfo(TV             *tv,
                        QWidget        *widget,
                        bool           frame_exact_seek,
                        PlayerContext *ctx);
-    void SetAsPIP(void)                       { SetNoAudio(); SetNullVideo(); }
     void SetNullVideo(void)                   { using_null_videoout = true; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
-    void SetAutoCommercialSkip(CommSkipMode autoskip);
-    void SetCommBreakMap(const frm_dir_map_t&);
     void SetLength(int len)                   { totalLength = len; }
-    void SetVideoFilters(const QString &override);
     void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
+    void SetVideoFilters(const QString &override);
     void SetEof(void)                         { eof = true; }
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
@@ -142,14 +160,14 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
-    void SetBookmark(void);
+    virtual void SetBookmark(void);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
                         float a = 1.33333, FrameScanType scan = kScan_Ignore, 
                         bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
     void Zoom(ZoomDirection direction);
-    void ClearBookmark(void);
+    virtual void ClearBookmark(bool message = true);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
 
     void NextScanType(void)
@@ -157,15 +175,11 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetScanType(FrameScanType);
     FrameScanType GetScanType(void) const { return m_scan; }
     bool IsScanTypeLocked(void) const { return m_scan_locked; }
-
-    void SetOSDFontName(const QString osdfonts[22], const QString &prefix);
-    void SetOSDThemeName(const QString themename);
     void SetVideoResize(const QRect &videoRect);
 
     // Toggle Sets
     void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
     void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
-    bool ToggleUpmix(void);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }
@@ -173,20 +187,21 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
 
-    uint    GetVolume(void);
+    bool    IsAudioNeeded(void) { return !using_null_videoout && player_ctx->IsAudioNeeded(); }
+    uint    GetVolume(void) { return audio.GetVolume(); }
     int     GetSecondsBehind(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
-    MuteState          GetMuteState(void);
-    CommSkipMode       GetAutoCommercialSkip(void) const;
+    MuteState          GetMuteState(void) { return audio.GetMuteState(); }
 
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
-    float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
+    AudioPlayer* GetAudio(void)               { return &audio; }
+    float   GetAudioStretchFactor(void)       { return audio.GetStretchFactor(); }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
     int     GetLength(void) const             { return totalLength; }
-    uint64_t  GetTotalFrameCount(void) const  { return totalFrames; }
-    uint64_t  GetFramesPlayed(void) const     { return framesPlayed; }
-    uint64_t  GetBookmark(void) const;
+    uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
+    uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
+    virtual  uint64_t GetBookmark(void) const;
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
         { return (errorType & kError_Switch_Renderer); }
@@ -194,7 +209,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
         { return (errorType & kError_Decode); }
     QString   GetEncodingType(void) const;
     QString   GetXDS(const QString &key) const;
-    bool      GetAudioBufferStatus(uint &fill, uint &total) const;
     PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
@@ -204,120 +218,122 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
-    bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
     bool    IsReallyNearEnd(void) const;
-    bool    IsNearEnd(int64_t framesRemaining = -1) const;
-    bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
-    bool    HasAudioIn(void) const            { return !no_audio_in; }
-    bool    HasAudioOut(void) const           { return !no_audio_out; }
+    bool    IsNearEnd(int64_t framesRemaining = -1);
+    bool    HasAudioOut(void) const           { return audio.HasAudioOut(); }
     bool    IsPIPActive(void) const           { return pip_active; }
     bool    IsPIPVisible(void) const          { return pip_visible; }
-    bool    IsMuted(void)              { return GetMuteState() == kMuteAll; }
+    bool    IsMuted(void)                     { return audio.IsMuted(); }
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
 
     // Complicated gets
-    long long CalcMaxFFTime(long long ff, bool setjump = true) const;
+    virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
-    void      calcSliderPos(struct StatusPosInfo &posInfo,
-                            bool paddedFields = false);
+    virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
 
     /// Non-const gets
     OSD         *GetOSD(void)                 { return osd; }
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
-    char        *GetScreenGrabAtFrame(long long frameNum, bool absolute,
-                                      int &buflen, int &vw, int &vh, float &ar);
+    virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
+                                       int &buflen, int &vw, int &vh, float &ar);
+    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
+                                   bool absolute);
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
 
     // Start/Reset/Stop playing
-    bool StartPlaying(bool openfile = true);
-    void ResetPlaying(void);
-    void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
+    virtual bool StartPlaying(void);
+    virtual void ResetPlaying(bool resetframes = true);
+    virtual void EndPlaying(void) { }
+    virtual void StopPlaying(void);
 
     // Pause stuff
-    void PauseDecoder(void);
-    void Pause(bool waitvideo = true);
+    bool PauseDecoder(void);
+    void UnpauseDecoder(void);
+    void Pause(void);
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
-    bool IsPaused(bool *is_pause_still_possible = NULL);
-    bool IsAudioPaused() { return audio_paused; }
-    void PauseAudioUntilBuffered(void);
-    void ResetAudio(void);
 
     // Seek stuff
-    bool FastForward(float seconds);
-    bool Rewind(float seconds);
-    bool JumpToFrame(uint64_t frame);
-    bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
-                          void* cbData = NULL);
+    virtual bool FastForward(float seconds);
+    virtual bool Rewind(float seconds);
+    virtual bool JumpToFrame(uint64_t frame);
 
     // Chapter stuff
     void JumpChapter(int chapter);
 
     // Commercial stuff
-    void SkipCommercials(int direction);
-    int FlagCommercials(bool showPercentage, bool fullSpeed,
-                        bool inJobQueue);
+    void SetAutoCommercialSkip(CommSkipMode autoskip)
+        { commBreakMap.SetAutoCommercialSkip(autoskip, framesPlayed); }
+    void SkipCommercials(int direction)
+        { commBreakMap.SkipCommercials(direction); }
+    void SetCommBreakMap(frm_dir_map_t &newMap);
+    CommSkipMode GetAutoCommercialSkip(void)
+        { return commBreakMap.GetAutoCommercialSkip(); }
 
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
     bool TranscodeGetNextFrame(frm_dir_map_t::iterator &dm_iter,
                                int &did_ff, bool &is_key, bool honorCutList);
-    void TranscodeWriteText(
-        void (*func)(void *, unsigned char *, int, int, int), void *ptr);
     bool WriteStoredData(
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
-    void SetCutList(const frm_dir_map_t&);
+    void SetCutList(const frm_dir_map_t &newCutList);
 
     // Edit mode stuff
     bool EnableEdit(void);
-    bool DoKeypress(QKeyEvent *e);
-    bool GetEditMode(void) const { return editmode; }
+    bool HandleProgrameEditorActions(QStringList &actions, long long frame = -1);
+    bool GetEditMode(void) { return deleteMap.IsEditing(); }
+    bool IsNearDeletePoint(int &direction, bool &cutAfter,
+                           uint64_t &nearestMark);
+    void DisableEdit(void);
 
     // Decoder stuff..
     VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);
-    void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode);
+    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode,
+                                       bool wrap = true);
     void ReleaseNextVideoFrame(void)
         { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
     void ReleaseCurrentFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+    /// Returns the stream decoder currently in use.
+    DecoderBase *GetDecoder(void) { return decoder; }
 
     // Preview Image stuff
-    const QImage &GetARGBFrame(QSize &size);
-    const unsigned char *GetScaledFrame(QSize &size);
-    void ShutdownYUVResize(void);
     void SaveScreenshot(void);
 
     // Reinit
     void    ReinitOSD(void);
     void    ReinitVideo(void);
-    QString ReinitAudio(void);
 
     // Add data
-    void AddAudioData(char *buffer, int len, long long timecode);
-    void AddTextData(unsigned char *buffer, int len,
-                     long long timecode, char type);
-    void AddAVSubtitle(const AVSubtitle& subtitle);
+    virtual bool PrepareAudioSample(long long &timecode);
+
+    // OSD conveniences
+    void SetOSDMessage(const QString &msg);
+    void SetOSDStatus(const QString &title, bool fade = true);
 
     // Closed caption and teletext stuff
     uint GetCaptionMode(void) const { return textDisplayMode; }
-    void ResetCaptions(uint mode_override = 0);
-    void DisableCaptions(uint mode, bool osd_msg=true);
-    void EnableCaptions(uint mode, bool osd_msg=true);
+    void ResetCaptions(void);
+    virtual void DisableCaptions(uint mode, bool osd_msg=true);
+    virtual void EnableCaptions(uint mode, bool osd_msg=true);
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint mode);
     void SetCaptionsEnabled(bool, bool osd_msg=true);
-    bool LoadExternalSubtitles(const QString &videoFile);
+    CC708Reader* GetCC708Reader(void)  { return &cc708; }
+    CC608Reader* GetCC608Reader(void)  { return &cc608; }
+    SubtitleReader* GetSubReader(void) { return &subReader; }
+    bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
 
     // Teletext Menu and non-NUV teletext decoder
-    void EnableTeletext(void);
+    void EnableTeletext(int page = 0x100);
     void DisableTeletext(void);
     void ResetTeletext(void);
     bool HandleTeletextAction(const QString &action);
@@ -325,55 +341,13 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Teletext NUV Captions
     void SetTeletextPage(uint page);
 
-    // ATSC/NTSC EIA-608 captions and PAL Teletext NUV captions
-    void FlushTxtBuffers(void) { rtxt = wtxt; }
-
-    // ATSC EIA-708 Captions
-    CC708Window &GetCCWin(uint service_num, uint window_id)
-        { return CC708services[service_num].windows[window_id]; }
-    CC708Window &GetCCWin(uint svc_num)
-        { return GetCCWin(svc_num, CC708services[svc_num].current_window); }
-
-    void SetCurrentWindow(uint service_num, int window_id);
-    void DefineWindow(uint service_num,     int window_id,
-                      int priority,         int visible,
-                      int anchor_point,     int relative_pos,
-                      int anchor_vertical,  int anchor_horizontal,
-                      int row_count,        int column_count,
-                      int row_lock,         int column_lock,
-                      int pen_style,        int window_style);
-    void DeleteWindows( uint service_num,   int window_map);
-    void DisplayWindows(uint service_num,   int window_map);
-    void HideWindows(   uint service_num,   int window_map);
-    void ClearWindows(  uint service_num,   int window_map);
-    void ToggleWindows( uint service_num,   int window_map);
-    void SetWindowAttributes(uint service_num,
-                             int fill_color,     int fill_opacity,
-                             int border_color,   int border_type,
-                             int scroll_dir,     int print_dir,
-                             int effect_dir,
-                             int display_effect, int effect_speed,
-                             int justify,        int word_wrap);
-    void SetPenAttributes(uint service_num, int pen_size,
-                          int offset,       int text_tag,  int font_tag,
-                          int edge_type,    int underline, int italics);
-    void SetPenColor(uint service_num,
-                     int fg_color, int fg_opacity,
-                     int bg_color, int bg_opacity,
-                     int edge_color);
-    void SetPenLocation(uint service_num, int row, int column);
-
-    void Delay(uint service_num, int tenths_of_seconds);
-    void DelayCancel(uint service_num);
-    void Reset(uint service_num);
-    void TextWrite(uint service_num, short* unicode_string, short len);
-
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    QStringList GetTracks(uint type) const;
-    int SetTrack(uint type, int trackNo);
-    int GetTrack(uint type) const;
+    QStringList GetTracks(uint type);
+    virtual int SetTrack(uint type, int trackNo);
+    int GetTrack(uint type);
     int ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
+    int  NextCaptionTrack(int mode);
     void TracksChanged(uint trackType);
 
     // MHEG/MHI stream selection
@@ -404,14 +378,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void GetChapterTimes(QList<long long> &times);
 
     // DVD public stuff
-    void ChangeDVDTrack(bool ffw);
-    void ActivateDVDButton(void);
-    bool GoToDVDMenu(QString str);
-    void GoToDVDProgram(bool direction);
-    void HideDVDButton(bool hide) 
-    {
-        hidedvdbutton = hide;
-    }
+    virtual void ChangeDVDTrack(bool ffw)       { (void) ffw;       }
+    virtual bool GoToDVDMenu(QString str)       { return false;     }
+    virtual void GoToDVDProgram(bool direction) { (void) direction; }
 
     // Playback (output) zoom automation
     DetectLetterbox *detect_letter_box;
@@ -421,170 +390,133 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
                        QMap<long long, long long> &posMap);
 
   protected:
-    void DisplayPauseFrame(void);
-    void DisplayNormalFrame(void);
-    void OutputVideoLoop(void);
+    virtual void DisplayPauseFrame(void);
+    virtual void DisplayNormalFrame(bool allow_pause = true);
+    virtual void PreProcessNormalFrame(void);
+    virtual void VideoStart(void);
+    virtual bool VideoLoop(void);
+    virtual void VideoEnd(void);
+    virtual void DecoderStart(void);
+    virtual void DecoderLoop(void);
+    virtual void DecoderEnd(void);
+    virtual void AudioEnd(void);
+    virtual void EventStart(void);
+    virtual void EventLoop(void);
 
-    static void *kickoffOutputVideoLoop(void *player);
-
-  private:
+  protected:
     // Private initialization stuff
     void InitFilters(void);
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height);
-    void AutoDeint(VideoFrame*);
+    virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
 
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
-    void SetPrebuffering(bool prebuffer);
     void SetPlaying(bool is_playing);
     void SetErrored(const QString &reason) const;
 
     // Private Gets
     int  GetStatusbarPos(void) const;
-    bool IsInDelete(long long testframe) const;
 
     // Private pausing stuff
-    void PauseVideo(bool wait = true);
-    void UnpauseVideo(bool wait = false);
-    void SetVideoActuallyPaused(bool val);
-    bool IsVideoActuallyPaused(void) const;
+    void PauseVideo(void);
+    void UnpauseVideo(void);
+    void PauseBuffer(void);
+    void UnpauseBuffer(void);
 
     // Private decoder stuff
     void  SetDecoder(DecoderBase *dec);
-    /// Returns the stream decoder currently in use.
-    DecoderBase *GetDecoder(void) { return decoder; }
     /// Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder(void) const { return decoder; }
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
 
-    bool PrebufferEnoughFrames(void);
+    virtual bool PrebufferEnoughFrames(bool pause_audio = true,
+                                       int  min_buffers = 0);
     void CheckPrebuffering(void);
-    bool GetFrameNormal(DecodeType);
-    bool GetFrameFFREW(void);
-    bool GetFrame(DecodeType, bool unsafe = false);
+    virtual bool DecoderGetFrameFFREW(void);
+    virtual bool DecoderGetFrameREW(void);
+    bool         DecoderGetFrame(DecodeType, bool unsafe = false);
 
     // These actually execute commands requested by public members
-    void DoPause(void);
-    void DoPlay(void);
-    bool DoFastForward(void);
-    bool DoRewind(void);
-    void DoChangeDVDTrack(void);
+    virtual void ChangeSpeed(void);
+    bool DoFastForward(uint64_t frames, bool override_seeks = false,
+                       bool seeks_wanted = false);
+    bool DoRewind(uint64_t frames, bool override_seeks = false,
+                  bool seeks_wanted = false);
     void DoJumpToFrame(uint64_t frame);
 
     // Private seeking stuff
+    void WaitForSeek(uint64_t frame, bool override_seeks = false,
+                     bool seeks_wanted = false);
     void ClearAfterSeek(bool clearvideobuffers = true);
-    bool FrameIsInMap(uint64_t, const frm_dir_map_t&);
-    void JumpToNetFrame(int64_t net)
-        { JumpToFrame((int64_t)framesPlayed + net); }
-    void RefreshPauseFrame(void);
 
     // Private chapter stuff
     bool DoJumpChapter(int chapter);
 
-    // Private commercial skipping
-    void SkipCommercialsByBlanks(void);
-    bool DoSkipCommercials(int direction);
-    void AutoCommercialSkip(void);
-    void MergeShortCommercials(void);
-
     // Private edit stuff
-    void SaveCutList(void);
-    void LoadCutList(void);
-    void DisableEdit(void);
-
-    void AddMark(uint64_t frame, MarkTypes type);
-    void DeleteMark(uint64_t frame);
-    void ReverseMark(uint64_t frame);
-
-    void SetDeleteIter(void);
-    void SetBlankIter(void);
-    void SetCommBreakIter(void);
-
     void HandleArbSeek(bool right);
-    void HandleSelect(bool allowSelectNear = false);
-    void HandleResponse(void);
-
-    void UpdateTimeDisplay(void);
-    void UpdateSeekAmount(bool up);
-    void UpdateEditSlider(void);
 
     // Private A/V Sync Stuff
-    float WarpFactor(void);
     void  WrapTimecode(long long &timecode, TCTypes tc_type);
     void  InitAVSync(void);
-    void  AVSync(void);
+    virtual void AVSync(bool limit_delay = false);
     void  FallbackDeint(void);
     void  CheckExtraAudioDecode(void);
-
-    // Private closed caption and teletext stuff
-    int   tbuffer_numvalid(void); // number of valid slots in the text buffer
-    int   tbuffer_numfree(void); // number of free slots in the text buffer
-    void  ShowText(void);
-    void  ResetCC(void);
-    void  UpdateCC(unsigned char *inpos);
-
-    // Private subtitle stuff
-    void  DisplayAVSubtitles(void);
-    void  DisplayTextSubtitles(void);
-    void  ClearSubtitles(void);
-    void  ExpireSubtitles(void);
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
 
-    // Private DVD stuff
-    void DisplayDVDButton(void);
-    long long GetDVDBookmark(void) const;
-    void SetDVDBookmark(long long frames);
+    void calcSliderPosPriv(osdInfo &info, bool paddedFields,
+                           int playbackLen, float secsplayed, bool islive);
 
-    // Private PIP stuff
-    void HandlePIPPlayerLists(uint max_pip_players);
-
-  private:
+  protected:
     DecoderBase   *decoder;
     QMutex         decoder_change_lock;
     VideoOutput   *videoOutput;
     PlayerContext *player_ctx;
+    DecoderThread *decoderThread;
+    QThread       *playerThread;
+    PlayerTimer   *playerTimer;
     bool           no_hardware_decoders;
 
     // Window stuff
     QWidget *parentWidget;
     WId embedid;
-    bool wantToResize;
     int embx, emby, embw, embh;
 
     // State
-    QWaitCondition decoderThreadPaused;
-    QWaitCondition videoThreadPaused;
-    QWaitCondition videoThreadUnpaused;
+    QWaitCondition decoderThreadPause;
+    QWaitCondition decoderThreadUnpause;
+    mutable QMutex decoderPauseLock;
+    mutable QMutex decoderSeekLock;
+    bool           decoderPaused;
+    bool           pauseDecoder;
+    bool           unpauseDecoder;
+    bool           killdecoder;
+    uint64_t       decoderSeek;
+    bool           decodeOneFrame;
+    bool           needNewPauseFrame;
+    mutable QMutex bufferPauseLock;
+    mutable QMutex videoPauseLock;
+    mutable QMutex pauseLock;
+    bool           bufferPaused;
+    bool           videoPaused;
+    bool           allpaused;
+    bool           playing;
+
     mutable QWaitCondition playingWaitCond;
     mutable QMutex vidExitLock;
-    mutable QMutex pauseUnpauseLock;
-    mutable QMutex internalPauseLock;
     mutable QMutex playingLock;
     bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_double_process;///< Output filter must processed at double rate
     bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
     bool     m_deint_possible;
-    bool     paused;
-    bool     pausevideo;
-    bool     actuallypaused;
-    bool     video_actually_paused;
-    bool     playing;
-    bool     decoder_thread_alive;
-    bool     killplayer;
-    bool     killvideo;
     bool     livetv;
     bool     watchingrecording;
-    bool     editmode;
-    bool     resetvideo;
     bool     using_null_videoout;
-    bool     no_audio_in;
-    bool     no_audio_out;
     bool     transcoding;
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;
@@ -602,11 +534,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     /// If fftime>0, number of frames to seek forward.
     /// If fftime<0, number of frames to seek backward.
     long long fftime;
-    /// 1..9 == keyframe..10 minutes. 0 == cut point
-    int       seekamountpos;
-    /// Seekable frame increment when not using exact seeks.
-    /// Usually equal to keyframedist.
-    int      seekamount;
     /// Iff true we ignore seek amount and try to seek to an
     /// exact frame ignoring key frame restrictions.
     bool     exactseeks;
@@ -614,11 +541,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Playback misc.
     /// How often we have tried to wait for a video output buffer and failed
     int       videobuf_retries;
-    uint64_t framesPlayed;
-    uint64_t totalFrames;
+    uint64_t  framesPlayed;
+    uint64_t  totalFrames;
     long long totalLength;
     long long rewindtime;
-    QString m_recusage;
 
     // -- end state stuff -- 
 
@@ -638,19 +564,11 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     /// Set when SetScanType runs the first time
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
-    uint keyframedist;
-
-    // Prebuffering (RingBuffer) control
-    QWaitCondition prebuffering_wait;///< QWaitContition used by prebuffering
-    QMutex     prebuffering_lock;///< Mutex used to control access to prebuf
-    bool       prebuffering;    ///< Iff true, don't play until done prebuf
-    /// Number of times prebuf wait attempted, since last reset
-    int        prebuffer_tries;
-    /// Number of times prebuf wait attempted
-    int        prebuffer_tries_total;
-
+    uint     keyframedist;
+    // Buffering
+    bool     buffering;
+    QTime    buffering_start;
     // General Caption/Teletext/Subtitle support
-    bool     db_prefer708;
     uint     textDisplayMode;
     uint     prevTextDisplayMode;
 
@@ -658,45 +576,17 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
     uint     vbimode;         ///< VBI decoder to use
     int      ttPageNum;       ///< VBI page to display when in PAL vbimode
-    int      ccmode;          ///< VBI text to display when in NTSC vbimode
-
-    int      wtxt;            ///< Write position for VBI text
-    int      rtxt;            ///< Read position for VBI text
-    QMutex   text_buflock;    ///< Lock for rtxt and wtxt VBI text positions
-    int      text_size;       ///< Maximum size of a text buffer
-    struct TextContainer txtbuffers[MAXTBUFFER+1]; ///< VBI text buffers
-
-    QString  ccline;
-    int      cccol;
-    int      ccrow;
 
     // Support for captions, teletext, etc. decoded by libav
-    QMutex    subtitleLock;
+    SubtitleReader subReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      textDesired;
-    bool      osdHasSubtitles;
-    long long osdSubtitlesExpireAt;
 
-    /// Subtitles loaded from the video stream by libavcodec.
-    /// This should contain only undisplayed subtitles, old
-    /// ones are deleted after displayed.
-    MythDeque<AVSubtitle> nonDisplayedAVSubtitles;
-
-    /// Subtitles loaded from an external subtitle file.
-    /// This contains all subtitles in textual format. No
-    /// subtitles are deleted after displaying (so they can
-    /// be displayed again after seeking). The list is ordered
-    /// by the subtitle display start time.
-    TextSubtitles textSubtitles;
-
-    CC708Service CC708services[64];
-    int        CC708DelayedDeletes[64];
-    QString    osdfontname;
-    QString    osdccfontname;
-    QString    osd708fontnames[20];
-    QString    osdprefix;
-    QString    osdtheme;
+    // CC608/708
+    bool db_prefer708;
+    CC608Reader cc608;
+    CC708Reader cc708;
 
     // Support for MHEG/MHI
     bool       itvVisible;
@@ -705,46 +595,15 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     QMutex     itvLock;
 
     // OSD stuff
-    OSD      *osd;
-    OSDSet   *timedisplay;
-    QString   dialogname;
-    int       dialogtype;
+    OSD  *osd;
 
     // Audio stuff
-    AudioOutput *audioOutput;
-    QString      audio_main_device;
-    QString      audio_passthru_device;
-    int          audio_channels;
-    int          audio_codec;
-    AudioFormat  audio_format;
-    int          audio_samplerate;
-    float        audio_stretchfactor;
-    bool         audio_passthru;
-    QMutex       audio_lock;
-    bool         audio_muted_on_creation;
+    AudioPlayer audio;
 
     // Picture-in-Picture
-    mutable QMutex pip_players_lock;
-    QWaitCondition pip_players_wait;
     PIPMap         pip_players;
-    PIPMap         pip_players_add;
-    PIPMap         pip_players_rm;
     volatile bool  pip_active;
     volatile bool  pip_visible;
-
-    // Preview window support
-    unsigned char      *argb_buf;
-    QSize               argb_size;
-    QImage              argb_scaled_img;
-    yuv2rgb_fun         yuv2argb_conv;
-    bool                yuv_need_copy;
-    QSize               yuv_desired_size;
-    struct SwsContext  *yuv_scaler;
-    unsigned char      *yuv_frame_scaled;
-    QSize               yuv_scaler_in_size;
-    QSize               yuv_scaler_out_size;
-    QMutex              yuv_lock;
-    QWaitCondition      yuv_wait;
 
     // Filters
     QMutex   videofiltersLock;
@@ -756,28 +615,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     FilterManager *FiltMan;
 
     // Commercial filtering
-    mutable QMutex commBreakMapLock;
-    int        skipcommercials;
-    CommSkipMode autocommercialskip;
-    int        commrewindamount;
-    int        commnotifyamount;
-    int        lastCommSkipDirection;
-    time_t     lastCommSkipTime;
-    long long  lastCommSkipStart;
-    time_t     lastSkipTime;
-
-    long long  deleteframe;
-    bool       hasdeletetable;
-    bool       hasblanktable;
-    bool       hascommbreaktable;
-    frm_dir_map_t deleteMap;
-    frm_dir_map_t blankMap;
-    frm_dir_map_t commBreakMap;
-    frm_dir_map_t::iterator deleteIter;
-    frm_dir_map_t::iterator blankIter;
-    frm_dir_map_t::iterator commBreakIter;
-    QDateTime  lastIgnoredManualSkip;
+    CommBreakMap   commBreakMap;
     bool       forcePositionMapSync;
+    // Manual editing
+    DeleteMap  deleteMap;
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
@@ -794,42 +635,24 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Audio and video synchronization stuff
     VideoSync *videosync;
-    int        delay;
-    int        vsynctol;
     int        avsync_delay;
     int        avsync_adjustment;
     int        avsync_avg;
-    int        avsync_oldavg;
     int        refreshrate;
     bool       lastsync;
-    bool       m_playing_slower;
     bool       decode_extra_audio;
-    float      m_stored_audio_stretchfactor;
-    bool       audio_paused;
     int        repeat_delay;
-
-    // Audio warping stuff
-    float      warpfactor;
-    float      warpfactor_avg;
  
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
     int        prevrp;        ///< repeat_pict of last frame
-    int        tc_avcheck_framecounter;
     long long  tc_wrap[TCTYPESMAX];
     long long  tc_lastval[TCTYPESMAX];
-    long long  tc_diff_estimate;
     long long  savedAudioTimecodeOffset;
 
     // LiveTV
     TV *m_tv;
     bool isDummy;
-
-    // DVD
-    /// \brief true if dvd button is hidden
-    bool hidedvdbutton;
-    int need_change_dvd_track;
-    bool dvd_stillframe_showing;
 
     // Debugging variables
     Jitterometer *output_jmeter;

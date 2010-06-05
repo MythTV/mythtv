@@ -9,23 +9,32 @@
 
 // MythTV headers
 #include "osd.h"
-#include "osdsurface.h"
 #include "osdchromakey.h"
 
 #include "mythverbose.h"
 #include "videoout_xv.h"
 #include "mythxdisplay.h"
 
+#ifdef MMX
+extern "C" {
+#include "x86/mmx.h"
+}
+#endif
+
 #define LOC QString("OSDChroma: ")
 #define LOC_ERR QString("OSDChroma Error: ")
 
-void ChromaKeyOSD::AllocImage(int i)
+ChromaKeyOSD::~ChromaKeyOSD(void)
 {
+    TearDown();
+}
+
+bool ChromaKeyOSD::CreateShmImage(QSize area)
+{
+    if (!videoOutput || area.isEmpty())
+        return false;
+
     uint size = 0;
-
-    const QRect display_visible_rect =
-        videoOutput->windows[0].GetDisplayVisibleRect();
-
     MythXDisplay *disp = videoOutput->disp;
     MythXLocker lock(disp);
     Display *d         = disp->GetDisplay();
@@ -34,120 +43,201 @@ void ChromaKeyOSD::AllocImage(int i)
     XImage *shm_img =
         XShmCreateImage(d, DefaultVisual(d,screen_num),
                         disp->GetDepth(), ZPixmap, 0,
-                        &shm_infos[i],
-                        display_visible_rect.width(),
-                        display_visible_rect.height());
+                        &shm_infos, area.width(),area.height());
     if (shm_img)
         size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
 
-    shm_infos[i].shmid   = 0;
-    shm_infos[i].shmaddr = NULL;
+    shm_infos.shmid   = 0;
+    shm_infos.shmaddr = NULL;
     if (shm_img)
     {
-        shm_infos[i].shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
-        if (shm_infos[i].shmid >= 0)
+        shm_infos.shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
+        if (shm_infos.shmid >= 0)
         {
-            shm_infos[i].shmaddr = (char*) shmat(shm_infos[i].shmid, 0, 0);
+            shm_infos.shmaddr = (char*) shmat(shm_infos.shmid, 0, 0);
 
-            shm_img->data = shm_infos[i].shmaddr;
-            shm_infos[i].readOnly = False;
+            shm_img->data = shm_infos.shmaddr;
+            shm_infos.readOnly = False;
 
-            XShmAttach(d, &shm_infos[i]);
+            XShmAttach(d, &shm_infos);
             disp->Sync(); // needed for FreeBSD?
 
             // Mark for delete immediately.
             // It won't actually be removed until after we detach it.
-            shmctl(shm_infos[i].shmid, IPC_RMID, 0);
+            shmctl(shm_infos.shmid, IPC_RMID, 0);
+            img = shm_img;
+            return true;
         }
     }
-
-    img[i] = shm_img;
-    bzero((vf+i), sizeof(VideoFrame));
-    vf[i].buf = (unsigned char*) shm_infos[i].shmaddr;
-    vf[i].codec  = FMT_ARGB32;
-    vf[i].height = display_visible_rect.height();
-    vf[i].width  = display_visible_rect.width();
-    vf[i].bpp    = 32;
+    return false;
 }
 
-void ChromaKeyOSD::FreeImage(int i)
+void ChromaKeyOSD::DestroyShmImage(void)
 {
-    if (!img[i])
+    if (!img || !videoOutput)
         return;
 
     MythXDisplay *disp = videoOutput->disp;
     disp->Lock();
-    XShmDetach(disp->GetDisplay(), &(shm_infos[i]));
-    XFree(img[i]);
-    img[i] = NULL;
+    XShmDetach(disp->GetDisplay(), &shm_infos);
+    XFree(img);
+    img = NULL;
     disp->Unlock();
 
-    if (shm_infos[i].shmaddr)
-        shmdt(shm_infos[i].shmaddr);
-    if (shm_infos[i].shmid > 0)
-        shmctl(shm_infos[0].shmid, IPC_RMID, 0);
+    if (shm_infos.shmaddr)
+        shmdt(shm_infos.shmaddr);
+    if (shm_infos.shmid > 0)
+        shmctl(shm_infos.shmid, IPC_RMID, 0);
 
-    bzero((shm_infos+i), sizeof(XShmSegmentInfo));
-    bzero((vf+i),        sizeof(VideoFrame));
+    bzero(&shm_infos, sizeof(XShmSegmentInfo));
 }
 
-void ChromaKeyOSD::Reinit(int i)
+bool ChromaKeyOSD::Init(QSize new_size)
 {
-    // Make sure the buffer is the right size...
-    QSize new_res(vf[i].width, vf[i].height);
-    const QRect display_visible_rect =
-        videoOutput->windows[0].GetDisplayVisibleRect();
-    const QRect display_video_rect =
-        videoOutput->windows[0].GetDisplayVideoRect();
+    if (current_size == new_size)
+        return true;
 
-    if (new_res != display_visible_rect.size())
+    TearDown();
+
+    bool success = CreateShmImage(new_size);
+    image = new QImage(new_size, QImage::Format_ARGB32_Premultiplied);
+    painter = new MythQImagePainter();
+
+    if (success && image && painter)
     {
-        FreeImage(i);
-        AllocImage(i);
+        current_size = new_size;
+        image->fill(0);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Created ChromaOSD size %1x%2")
+                                   .arg(current_size.width())
+                                   .arg(current_size.height()));
+        return true;
     }
 
-    uint key = videoOutput->xv_colorkey;
-    uint bpl = img[i]->bytes_per_line;
+    VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to create ChromaOSD."));
+    return false;
+}
 
-    // create chroma key line
-    char *cln = (char*)av_malloc(bpl + 128);
-    bzero(cln, bpl);
-    int j  = max(display_video_rect.left() -
-                 display_visible_rect.left(), 0);
-    int ej = min(display_video_rect.left() +
-                 display_video_rect.width(), vf[i].width);
-    for (; j < ej; ++j)
-        ((uint*)cln)[j] = key;
+void ChromaKeyOSD::TearDown(void)
+{
+    DestroyShmImage();
 
-    // boboff assumes the smallest interlaced resolution is 480 lines - 5%
-    int boboff = (int) round(
-        ((double)display_video_rect.height()) / 456 - 0.00001);
-    boboff = (videoOutput->m_deinterlacing &&
-              videoOutput->m_deintfiltername == "bobdeint") ? boboff : 0;
+    if (image)
+    {
+        delete image;
+        image = NULL;
+    }
 
-    // calculate beginning and end of chromakey
-    int cstart = min(max(display_video_rect.top() + boboff, 0),
-                     vf[i].height - 1);
-    int cend   = min(max(display_video_rect.top() +
-                         display_video_rect.height(), 0),
-                     vf[i].height);
+    if (painter)
+    {
+        delete painter;
+        painter = NULL;
+    }
+}
 
-    // Paint with borders and chromakey
-    char *buf = shm_infos[i].shmaddr;
-    int ldispy = min(max(display_visible_rect.top(), 0),
-                     vf[i].height - 1);
+#define MASK     0xFE000000
+#define MMX_MASK 0xFE000000FE000000LL
 
-    VERBOSE(VB_PLAYBACK, LOC + "cstart: "<<cstart<<"  cend: "<<cend);
-    VERBOSE(VB_PLAYBACK, LOC + "ldispy: "<<ldispy<<" height: "<<vf[i].height);
+void ChromaKeyOSD::BlendOrCopy(uint32_t colour, const QRect &rect)
+{
+    int width  = rect.width();
+    int height = rect.height();
+    if (!width || !height)
+        return;
 
-    if (cstart > ldispy)
-        bzero(buf + (ldispy * bpl), (cstart - ldispy) * bpl);
-    for (j = cstart; j < cend; ++j)
-        memcpy(buf + (j*bpl), cln, bpl);
-    if (cend < vf[i].height)
-        bzero(buf + (cend * bpl), (vf[i].height - cend) * bpl);
+    uint src_stride = image->bytesPerLine();
+    uint dst_stride = img->bytes_per_line;
+    unsigned char *src = image->bits() +
+                         (rect.top() * src_stride) + (rect.left() << 2);
+    unsigned char *dst = (unsigned char*)shm_infos.shmaddr +
+                         (rect.top() * dst_stride) + (rect.left() << 2);
 
-    av_free(cln);
+    if (colour == 0x0)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            memcpy(dst, src, width << 2);
+            src += src_stride;
+            dst += dst_stride;
+        }
+        return;
+    }
+
+    src_stride = src_stride >> 2;
+    dst_stride = dst_stride >> 2;
+
+#ifdef MMX
+    bool odd_start      = rect.left() & 0x1;
+    bool odd_end        = (rect.left() + rect.width()) & 0x1;
+    static mmx_t mask   = {MMX_MASK};
+    static mmx_t zero   = {0x0000000000000000LL};
+    uint32_t *src_start = (uint32_t*)src;
+    uint32_t *dst_start = (uint32_t*)dst;
+    uint32_t *src_end   = NULL;
+    uint32_t *dst_end   = NULL;
+
+    if (odd_end)
+    {
+        width--;
+        src_end = src_start + width;
+        dst_end = dst_start + width;
+    }
+
+    if (odd_start)
+    {
+        src += 4; dst += 4;
+        width--;
+    }
+
+    uint64_t *source = (uint64_t*)src;
+    uint64_t *dest   = (uint64_t*)dst;
+#else
+    uint32_t *source = (uint32_t*)src;
+    uint32_t *dest   = (uint32_t*)dst;
+#endif
+
+    for (int i = 0; i < height; i++)
+    {
+#ifdef MMX
+        if (odd_start)
+        {
+            dst_start[0] = (src_start[0] & MASK) ? src_start[0] : colour;
+            src_start   += src_stride;
+            dst_start   += dst_stride;
+        }
+
+        if (odd_end)
+        {
+            dst_end[0] = (src_end[0] & MASK) ? src_end[0] : colour;
+            src_end   += src_stride;
+            dst_end   += dst_stride;
+        }
+
+        punpckldq_m2r (colour, mm0);
+        punpckhdq_r2r (mm0, mm0);
+        for (int j = 0; j < (width >> 1); j++)
+        {
+            movq_m2r    (source[j], mm1);
+            pand_m2r    (mask,      mm1);
+            pcmpeqd_m2r (zero,      mm1);
+            movq_r2r    (mm1,       mm2);
+            pand_r2r    (mm0,       mm1);
+            pandn_m2r   (source[j], mm2);
+            por_r2r     (mm1,       mm2);
+            movq_r2m    (mm2,       dest[j]);
+        }
+        source += src_stride >> 1;
+        dest   += dst_stride >> 1;
+#else
+        for (uint j = 0; j < width; j++)
+            dest[j] = (source[j] & MASK) ? source[j] : colour;
+        source += src_stride;
+        dest   += dst_stride;
+#endif
+    }
+
+#ifdef MMX
+    emms();
+#endif
 }
 
 /** \fn ChromaKeyOSD::ProcessOSD(OSD*)
@@ -156,31 +246,55 @@ void ChromaKeyOSD::Reinit(int i)
  */
 bool ChromaKeyOSD::ProcessOSD(OSD *osd)
 {
-    OSDSurface *osdsurf = NULL;
-    if (osd)
-        osdsurf = osd->Display();
-
-    int next = (current+1) & 0x1;
-    if (!osdsurf && current >= 0)
-    {
-        Reset();
-        return true;
-    }
-    else if (!osdsurf || (revision == osdsurf->GetRevision()))
+    if (!osd || !videoOutput)
         return false;
 
-    // first create a blank frame with the chroma key
-    Reinit(next);
+    QRect osd_rect = videoOutput->GetTotalOSDBounds();
+    if (!Init(osd_rect.size()))
+        return false;
 
-    // then blend the OSD onto it
-    unsigned char *buf = (unsigned char*) shm_infos[next].shmaddr;
-    osdsurf->BlendToARGB(buf, img[next]->bytes_per_line, vf[next].height,
-                         false/*blend_to_black*/, 16);
+    bool was_visible = visible;
+    QRect video_rect = videoOutput->windows[0].GetDisplayVideoRect();
+    QRegion dirty    = QRegion();
+    QRegion vis_area = osd->Draw(painter, image, current_size, dirty);
+    visible = !vis_area.isEmpty();
 
-    // then set it as the current OSD image
-    revision = osdsurf->GetRevision();
-    current  = next;
+    if (dirty.isEmpty() && (video_rect == current_rect))
+        return (visible || was_visible);
 
-    return true;
+    if (video_rect != current_rect)
+        dirty = osd_rect;
+
+    current_rect       = video_rect;
+    uint32_t letterbox = (uint32_t)videoOutput->XJ_letterbox_colour;
+    uint32_t colorkey  = (uint32_t)videoOutput->xv_colorkey;
+
+    int boboff = (int) round(
+        ((double)current_size.height()) / 456 - 0.00001);
+    boboff = (videoOutput->m_deinterlacing &&
+              videoOutput->m_deintfiltername == "bobdeint") ? boboff : 0;
+
+    video_rect.adjust(0, boboff, 0, -boboff);
+    video_rect = video_rect.intersected(osd_rect);
+
+    QRect top   = QRect(0, 0, osd_rect.width(), video_rect.top());
+    QRect left  = QRect(0, video_rect.top(), video_rect.left(), video_rect.height());
+    QRect right = QRect(video_rect.left() + video_rect.width(), video_rect.top(),
+                        osd_rect.width() - video_rect.width() - video_rect.left(),
+                        video_rect.height());
+    QRect bot   = QRect(0, video_rect.top() + video_rect.height(), osd_rect.width(),
+                        osd_rect.height() - video_rect.top() - video_rect.height());
+
+    QVector<QRect> update = dirty.rects();
+    for (int i = 0; i < update.size(); i++)
+    {
+        BlendOrCopy(letterbox, update[i].intersected(top));
+        BlendOrCopy(letterbox, update[i].intersected(left));
+        BlendOrCopy(colorkey,  update[i].intersected(video_rect));
+        BlendOrCopy(letterbox, update[i].intersected(right));
+        BlendOrCopy(letterbox, update[i].intersected(bot));
+    }
+
+    return (visible || was_visible);
 }
 

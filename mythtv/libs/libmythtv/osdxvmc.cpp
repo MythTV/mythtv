@@ -27,7 +27,7 @@ XvMCOSD::XvMCOSD(MythXDisplay *display, int port, int surface_type_id,
     XJ_height(0),                    xv_port(port),
     osd_palette(NULL),               osd_xv_image(NULL),
     osd_subpict_mode(NO_SUBPICTURE), osd_subpict_clear_color(0),
-    osd_subpict_alloc(false),        revision(-1)
+    osd_subpict_alloc(false)
 {
     bzero(&osd_subpict,      sizeof(osd_subpict));
     bzero(&XJ_osd_shm_info,  sizeof(XJ_osd_shm_info));
@@ -59,7 +59,7 @@ XvMCOSD::XvMCOSD() :
     XJ_height(0),                    xv_port(-1),
     osd_palette(NULL),               osd_xv_image(NULL),
     osd_subpict_mode(NO_SUBPICTURE), osd_subpict_clear_color(0),
-    osd_subpict_alloc(false),        revision(-1)
+    osd_subpict_alloc(false)
 {
     bzero(&osd_subpict,      sizeof(osd_subpict));
     bzero(&XJ_osd_shm_info,  sizeof(XJ_osd_shm_info));

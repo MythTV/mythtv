@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include "mythverbose.h"
+#include "cc708reader.h"
 #include "cc708decoder.h"
 
 #define LOC QString("CC708: ")
@@ -35,30 +36,6 @@ const char* cc_types[4] =
 
 static void parse_cc_packet(CC708Reader *cb_cbs, CaptionPacket *pkt,
                             time_t last_seen[64]);
-
-CC708Reader::CC708Reader()
-{
-    for (uint i=0; i<64; i++)
-    {
-        buf_alloc[i] = 512;
-        buf[i]       = (unsigned char*) malloc(buf_alloc[i]);
-        buf_size[i]  = 0;
-        delayed[i]   = 0;
-
-        temp_str_alloc[i] = 512;
-        temp_str_size[i]  = 0;
-        temp_str[i]       = (short*) malloc(temp_str_alloc[i] * sizeof(short));
-    }
-}
-
-CC708Reader::~CC708Reader()
-{
-    for (uint i=0; i<64; i++)
-    {
-        free(buf[i]);
-        free(temp_str[i]);
-    }
-}
 
 void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
 {

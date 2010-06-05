@@ -147,8 +147,9 @@ HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
 HEADERS += videometadatautil.h
-HEADERS += cc608decoder.h
-HEADERS += cc708decoder.h           cc708window.h
+HEADERS += cc608decoder.h           cc608reader.h
+HEADERS += cc708decoder.h           cc708reader.h
+HEADERS += cc708window.h            subtitlereader.h
 HEADERS += scheduledrecording.h
 HEADERS += signalmonitorvalue.h     signalmonitorlistener.h
 HEADERS += livetvchain.h            playgroup.h
@@ -170,8 +171,9 @@ SOURCES += filtermanager.cpp        recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
 SOURCES += videometadatautil.cpp
-SOURCES += cc608decoder.cpp
-SOURCES += cc708decoder.cpp         cc708window.cpp
+SOURCES += cc608decoder.cpp         cc608reader.cpp
+SOURCES += cc708decoder.cpp         cc708reader.cpp
+SOURCES += cc708window.cpp          subtitlereader.cpp
 SOURCES += scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += livetvchain.cpp          playgroup.cpp
@@ -245,11 +247,17 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h                NuppelVideoPlayer.h
-    HEADERS += DVDRingBuffer.h          BDRingBuffer.h
-    HEADERS += playercontext.h          tv_play_win.h
+    HEADERS += mythdvdplayer.h          audioplayer.h
+    HEADERS += DVDRingBuffer.h          playercontext.h
+    HEADERS += tv_play_win.h            deletemap.h
+    HEADERS += mythcommflagplayer.h     commbreakmap.h
+    HEADERS += BDRingBuffer.h
     SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
-    SOURCES += DVDRingBuffer.cpp        BDRingBuffer.cpp
-    SOURCES += playercontext.cpp        tv_play_win.cpp
+    SOURCES += mythdvdplayer.cpp        audioplayer.cpp
+    SOURCES += DVDRingBuffer.cpp        playercontext.cpp
+    SOURCES += tv_play_win.cpp          deletemap.cpp
+    SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
+    SOURCES += BDRingBuffer.cpp
 
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h
@@ -263,27 +271,25 @@ using_frontend {
 
     # On screen display (video output overlay)
     using_fribidi:DEFINES += USING_FRIBIDI
-    HEADERS += osd.h                    osdtypes.h
-    HEADERS += osdsurface.h             osdlistbtntype.h
-    HEADERS += osdimagecache.h          osdtypeteletext.h
-    HEADERS += udpnotify.h                  tvosdmenuentry.h
-    SOURCES += osd.cpp                  osdtypes.cpp
-    SOURCES += osdsurface.cpp           osdlistbtntype.cpp
-    SOURCES += osdimagecache.cpp        osdtypeteletext.cpp
-    SOURCES += udpnotify.cpp              tvosdmenuentry.cpp
+    HEADERS += osd.h                    teletextscreen.h
+    HEADERS += udpnotify.h              tvosdmenuentry.h
+    HEADERS += subtitlescreen.h         interactivescreen.h
+    SOURCES += osd.cpp                  teletextscreen.cpp
+    SOURCES += udpnotify.cpp            tvosdmenuentry.cpp
+    SOURCES += subtitlescreen.cpp       interactivescreen.cpp
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h
     HEADERS += videobuffers.h           vsync.h
     HEADERS += jitterometer.h           yuv2rgb.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
-    HEADERS += videoouttypes.h
+    HEADERS += videoouttypes.h          util-osd.h
     HEADERS += videooutwindow.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
-    SOURCES += videooutwindow.cpp
+    SOURCES += videooutwindow.cpp       util-osd.cpp
 
     macx:HEADERS +=               videoout_dvdv.h
     macx:HEADERS +=               videoout_quartz.h
@@ -324,8 +330,11 @@ using_frontend {
     using_opengl {
         CONFIG += opengl
         DEFINES += USING_OPENGL
-        HEADERS += util-opengl.h        openglcontext.h
-        SOURCES += util-opengl.cpp      openglcontext.cpp
+        HEADERS += util-opengl.h
+        SOURCES += util-opengl.cpp
+        HEADERS += mythrender_opengl.h
+        SOURCES += mythrender_opengl.cpp
+        QT += opengl
     }
     using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 
@@ -336,8 +345,6 @@ using_frontend {
     using_glx_proc_addr_arb:DEFINES += USING_GLX_PROC_ADDR_ARB
 
     # Misc. frontend
-    HEADERS += ttfont.h
-    SOURCES += ttfont.cpp
     HEADERS += DetectLetterbox.h
     SOURCES += DetectLetterbox.cpp
 

@@ -30,7 +30,7 @@
 #include <QFileInfo>
 
 // MythTV
-#include "NuppelVideoPlayer.h"
+#include "mythcommflagplayer.h"
 #include "importrecorder.h"
 #include "mythdirs.h"
 #include "tv_rec.h"
@@ -92,17 +92,17 @@ void ImportRecorder::StartRecording(void)
     // build seek table
     if (_import_fd && _request_recording && !_error)
     {
-        NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
+        MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
         RingBuffer *rb = new RingBuffer(
             ringBuffer->GetFilename(), false, true, 6);
 
         PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
         ctx->SetPlayingInfo(curRecording);
         ctx->SetRingBuffer(rb);
-        ctx->SetNVP(nvp);
-        nvp->SetPlayerInfo(NULL, NULL, true, ctx);
+        ctx->SetNVP(cfp);
+        cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
-        nvp->RebuildSeekTable(false);
+        cfp->RebuildSeekTable(false);
 
         delete ctx;
     }

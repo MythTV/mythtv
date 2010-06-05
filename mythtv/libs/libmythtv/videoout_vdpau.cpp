@@ -4,8 +4,10 @@
 #include "videoout_vdpau.h"
 #include "videodisplayprofile.h"
 #include "osd.h"
-#include "osdsurface.h"
 #include "mythxdisplay.h"
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
+#include "mythpainter_vdpau.h"
 
 #define LOC      QString("VidOutVDPAU: ")
 #define LOC_ERR  QString("VidOutVDPAU Error: ")
@@ -55,11 +57,7 @@ VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
     m_checked_output_surfaces(false),
     m_decoder(0),            m_pix_fmt(-1),    m_frame_delay(0),
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
-    m_pip_ready(false),
-    m_osd_layer(0),          m_osd_surface(0), m_osd_output_surface(0),
-    m_osd_alpha_surface(0),  m_osd_mixer(0),   m_osd_ready(false),
-    m_osd_avail(false),      m_osd_size(QSize()),
-    m_using_piccontrols(false),
+    m_pip_ready(false),      m_osd_painter(NULL), m_using_piccontrols(false),
     m_skip_chroma(false),    m_denoise(0.0f),
     m_sharpen(0.0f),         m_studio(false),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
@@ -129,7 +127,17 @@ bool VideoOutputVDPAU::InitRender(void)
 
     if (m_render && m_render->Create(size, m_win))
     {
-        InitOSD(GetTotalOSDBounds().size());
+        m_render->SetMaster(kMasterVideo);
+        m_osd_painter = new MythVDPAUPainter(m_render);
+        if (m_osd_painter)
+        {
+            m_osd_painter->SetFlip(false);
+            VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU osd (%1x%2)")
+                .arg(size.width()).arg(size.height()));
+        }
+        else
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to create VDPAU osd."));
         return true;
     }
 
@@ -142,10 +150,11 @@ void VideoOutputVDPAU::DeleteRender(void)
 {
     QMutexLocker locker(&m_lock);
 
+    if (m_osd_painter)
+        delete m_osd_painter;
+
     if (m_render)
     {
-        DeinitOSD();
-
         if (m_decoder)
             m_render->DestroyDecoder(m_decoder);
 
@@ -153,6 +162,7 @@ void VideoOutputVDPAU::DeleteRender(void)
     }
 
     m_checked_output_surfaces = false;
+    m_osd_painter = NULL;
     m_decoder = 0;
     m_render = NULL;
     m_pix_fmt = -1;
@@ -369,16 +379,15 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (!m_checked_surface_ownership && codec_is_std(m_codec_id))
         ClaimVideoSurfaces();
 
-    m_osd_ready = false;
-    if (m_osd_avail)
-        DisplayOSD(frame, osd);
-
+    m_pip_ready = false;
     ShowPIPs(frame, pipPlayers);
 }
 
-void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
+void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
+                                    OSD *osd)
 {
     QMutexLocker locker(&m_lock);
+    (void)osd;
     CHECK_ERROR("PrepareFrame")
 
     if (!m_render)
@@ -476,12 +485,15 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
     if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
                               deint ? &m_reference_frames : NULL,
                               scan == kScan_Interlaced,
-                              windows[0].GetVideoRect(), size,
+                              windows[0].GetVideoRect(),
+                              QRect(QPoint(0,0), size),
                               vsz_enabled ? vsz_desired_display_rect :
                                             windows[0].GetDisplayVideoRect(),
-                              m_pip_ready ? m_pip_layer : 0,
-                              m_osd_ready ? m_osd_layer : 0))
+                              m_pip_ready ? m_pip_layer : 0, 0))
         VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Prepare frame failed."));
+
+    if (osd && m_osd_painter)
+        osd->DrawDirect(m_osd_painter, GetTotalOSDBounds().size(), true);
 
     if (!frame)
     {
@@ -1104,8 +1116,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, NuppelVideoPlayer *pipplayer,
                                        m_pips[pipplayer].videoSurface,
                                        m_pip_surface, NULL, false,
                                        QRect(QPoint(0,0), pipVideoDim),
-                                       windows[0].GetDisplayVisibleRect().size(),
-                                       rect);
+                                       rect, rect);
             ok &= m_render->DrawBitmap(0, m_pip_surface, NULL, &rect,
                                        255, 0, 0, 0, true);
 
@@ -1248,93 +1259,4 @@ void VideoOutputVDPAU::ParseOptions(void)
                     QString("Requesting high quality scaling."));
         }
     }
-}
-
-int VideoOutputVDPAU::DisplayOSD(VideoFrame *frame, OSD *osd,
-                                 int stride, int revision)
-{
-    if (!osd || !m_render || !m_osd_avail)
-        return -1;
-
-    OSDSurface *surface = osd->Display();
-    if (!surface)
-        return -1;
-
-    bool changed = (-1 == revision) ?
-        surface->Changed() : (surface->GetRevision()!=revision);
-    if (changed)
-    {
-        QRect osd_rect(QPoint(0,0), m_osd_size);
-        uint32_t pitches[3] = {m_osd_size.width(),
-                               m_osd_size.width()>>1,
-                               m_osd_size.width()>>1};
-        void *offsets[3], *alpha[1];
-        offsets[0] = surface->y;
-        offsets[1] = surface->v;
-        offsets[2] = surface->u;
-        alpha[0] = surface->alpha;
-        uint32_t alpha_pitch[1] = { m_osd_size.width() };
-
-        m_render->UploadYUVFrame(m_osd_surface, offsets, pitches);
-        m_render->MixAndRend(m_osd_mixer,
-                             VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
-                             m_osd_surface, m_osd_output_surface, NULL, false,
-                             osd_rect, m_osd_size, osd_rect, 0, 0);
-
-        m_render->UploadBitmap(m_osd_alpha_surface, alpha, alpha_pitch);
-        m_render->DrawBitmap(m_osd_alpha_surface, m_osd_output_surface, NULL,
-                             NULL, 255, 255, 255, 255, true);
-    }
-
-    m_osd_ready = true;
-    return changed;
-}
-
-void VideoOutputVDPAU::InitOSD(QSize size)
-{
-    if (!m_render)
-        return;
-
-    m_osd_output_surface = m_render->CreateOutputSurface(size);
-    m_osd_layer          = m_render->CreateLayer(m_osd_output_surface);
-    m_osd_surface        = m_render->CreateVideoSurface(size);
-    m_osd_alpha_surface  = m_render->CreateBitmapSurface(size, VDP_RGBA_FORMAT_A8);
-    m_osd_mixer          = m_render->CreateVideoMixer(size, 0, kVDPFeatNone);
-
-    if (m_osd_output_surface && m_osd_layer && m_osd_surface &&
-        m_osd_alpha_surface && m_osd_mixer)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU osd (%1x%2)")
-            .arg(size.width()).arg(size.height()));
-        m_osd_size  = size;
-        m_osd_avail = true;
-        m_osd_ready = false;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("Failed to create VDPAU osd."));
-    }
-}
-
-void VideoOutputVDPAU::DeinitOSD(void)
-{
-    if (m_render)
-    {
-        m_render->DestroyOutputSurface(m_osd_output_surface);
-        m_render->DestroyLayer(m_osd_layer);
-        m_render->DestroyVideoSurface(m_osd_surface);
-        m_render->DestroyBitmapSurface(m_osd_alpha_surface);
-        m_render->DestroyVideoMixer(m_osd_mixer);
-    }
-
-    m_osd_output_surface = 0;
-    m_osd_layer          = 0;
-    m_osd_surface        = 0;
-    m_osd_alpha_surface  = 0;
-    m_osd_mixer          = 0;
-
-    m_osd_size  = QSize();
-    m_osd_avail = false;
-    m_osd_ready = false;
 }

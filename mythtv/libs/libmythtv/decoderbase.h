@@ -19,6 +19,7 @@ using namespace std;
 class RingBuffer;
 class TeletextViewer;
 class NuppelVideoPlayer;
+class AudioPlayer;
 
 const int kDecoderProbeBufferSize = 128 * 1024;
 
@@ -181,6 +182,7 @@ class DecoderBase
     inline  int  DecrementTrack(uint type);
     inline  int  ChangeTrack(uint type, int dir);
     virtual bool InsertTrack(uint type, const StreamInfo&);
+    inline int   NextTrack(uint type);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
     virtual void SetTeletextDecoderViewer(TeletextViewer*) {;}
@@ -215,7 +217,7 @@ class DecoderBase
 
     NuppelVideoPlayer *m_parent;
     ProgramInfo *m_playbackinfo;
-
+    AudioPlayer *m_audio;
     RingBuffer *ringBuffer;
 
     int current_width;
@@ -307,4 +309,12 @@ inline void DecoderBase::ResetTracks(void)
         currentTrack[i] = -1;
 }
 
+inline int DecoderBase::NextTrack(uint type)
+{
+    int next_track = -1;
+    int size = tracks[type].size();
+    if (size)
+        next_track = (max(0, currentTrack[type]) + 1) % size;
+    return next_track;
+}
 #endif

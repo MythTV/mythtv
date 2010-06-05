@@ -31,9 +31,6 @@ class XvMCOSD
         return &tmpframe;
     }
 
-    void SetRevision(int rev) { revision = rev; }
-
-    int GetRevision() const { return revision; }
     bool NeedFrame() const;
     bool IsValid() const;
 
@@ -55,7 +52,6 @@ class XvMCOSD
     bool                 osd_subpict_alloc;
 
     VideoFrame           tmpframe;
-    int                  revision;
 };
 
 #endif // __OSD_XVMC_H__

@@ -690,8 +690,10 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     return true;
 }
 
-void VideoOutputDirectfb::PrepareFrame(VideoFrame *frame, FrameScanType)
+void VideoOutputDirectfb::PrepareFrame(VideoFrame *frame, FrameScanType,
+                                       OSD *osd)
 {
+    (void)osd;
     QMutexLocker locker(&data->bufferLock);
     DFBResult fberr = DFB_OK;
 

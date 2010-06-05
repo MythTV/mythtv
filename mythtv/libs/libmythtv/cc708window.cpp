@@ -91,6 +91,13 @@ const uint k708AttrFontCasual                = 5;
 const uint k708AttrFontCursive               = 6;
 const uint k708AttrFontSmallCaps             = 7;
 
+extern const uint k708AttrEdgeNone            = 0;
+extern const uint k708AttrEdgeRaised          = 1;
+extern const uint k708AttrEdgeDepressed       = 2;
+extern const uint k708AttrEdgeUniform         = 3;
+extern const uint k708AttrEdgeLeftDropShadow  = 4;
+extern const uint k708AttrEdgeRightDropShadow = 5;
+
 const uint k708AttrColorBlack         = 0;
 const uint k708AttrColorWhite         = 63;
 
@@ -118,7 +125,7 @@ CC708Window::CC708Window()
 
       true_row_count(0),        true_column_count(0),
       text(NULL),               exists(false),
-      lock(QMutex::Recursive)
+      changed(true),            lock(QMutex::Recursive)
 {
 }
 
@@ -170,7 +177,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         for (uint i = old_row * old_col; i < num; i++)
         {
             new_text[i].attr = pen.attr;
-            //if (forceWhiteOnBlackText)
+            if (forceWhiteOnBlackText)
             {
                 new_text[i].attr.fg_opacity = k708AttrOpacityTransparent;
                 new_text[i].attr.bg_opacity = k708AttrOpacityTransparent;
@@ -195,7 +202,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         for (uint i = 0; i < num; i++)
         {
             text[i].attr = pen.attr;
-            //if (forceWhiteOnBlackText)
+            if (forceWhiteOnBlackText)
             {
                 text[i].attr.fg_opacity = k708AttrOpacityTransparent;
                 text[i].attr.bg_opacity = k708AttrOpacityTransparent;
@@ -203,7 +210,8 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         }
     }
 
-    exists = true;
+    exists  = true;
+    changed = true;
 }
 
 
@@ -233,12 +241,13 @@ void CC708Window::Clear(void)
     {
         text[i].character = QChar(' ');
         text[i].attr = pen.attr;
-        //if (forceWhiteOnBlackText)
+        if (forceWhiteOnBlackText)
         {
             text[i].attr.fg_opacity = k708AttrOpacityTransparent;
             text[i].attr.bg_opacity = k708AttrOpacityTransparent;
         }
     }
+    changed = true;
 }
 
 CC708Character &CC708Window::GetCCChar(void) const
@@ -532,7 +541,7 @@ void CC708Pen::SetPenStyle(uint style)
 CC708Character::CC708Character(const CC708Window &win)
 {
     attr = win.pen.attr;
-    //if (CC708Window::forceWhiteOnBlackText)
+    if (CC708Window::forceWhiteOnBlackText)
     {
         attr.fg_opacity = k708AttrOpacityTransparent;
         attr.bg_opacity = k708AttrOpacityTransparent;

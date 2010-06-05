@@ -24,6 +24,7 @@ extern "C" {
 class TeletextDecoder;
 class CC608Decoder;
 class CC708Decoder;
+class SubtitleReader;
 class InteractiveTV;
 class ProgramInfo;
 class MythSqlDatabase;
@@ -272,6 +273,7 @@ class AvFormatDecoder : public DecoderBase
     CC608Decoder     *ccd608;
     CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
+    SubtitleReader   *subReader;
     int               cc608_parity_table[256];
     /// Lookup table for whether a stream was seen in the PMT
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while

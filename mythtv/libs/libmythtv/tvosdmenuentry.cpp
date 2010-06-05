@@ -198,6 +198,8 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "INPUTSWITCHING",     1, -1, -1, -1, "Change TV Input"));
     curMenuEntries.append(new TVOSDMenuEntry(
+        "SOURCESWITCHING",    1, -1, -1, -1, "Change TV Source"));
+    curMenuEntries.append(new TVOSDMenuEntry(
         "EDITCHANNEL",        1, -1, -1, -1, "Edit Channel"));
     curMenuEntries.append(new TVOSDMenuEntry(
         "EDITRECORDING",     -1,  1, -1, -1, "Edit Recording"));
@@ -222,7 +224,11 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "SUBTITLETRACKS",     1,  1,  1,  1, "Subtitle Tracks"));
     curMenuEntries.append(new TVOSDMenuEntry(
-        "CCTRACKS",           1,  1,  1,  1, "Closed Caption Tracks"));
+        "TEXTTRACKS",         1,  1,  1,  1, "Text Subtitles"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "CCTRACKS",           1,  1,  1,  1, "VBI Caption Tracks"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "ATSCTRACKS",         1,  1,  1,  1, "ATSC Caption Tracks"));
     curMenuEntries.append(new TVOSDMenuEntry(
         "VIDEOASPECT",        1,  1,  1,  1, "Video Aspect"));
     curMenuEntries.append(new TVOSDMenuEntry(

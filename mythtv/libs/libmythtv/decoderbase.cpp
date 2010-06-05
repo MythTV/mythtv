@@ -22,8 +22,7 @@ using namespace std;
 
 DecoderBase::DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo)
     : m_parent(parent), m_playbackinfo(new ProgramInfo(pginfo)),
-
-      ringBuffer(NULL),
+      m_audio(m_parent->GetAudio()), ringBuffer(NULL),
 
       current_width(640), current_height(480),
       current_aspect(1.33333), fps(29.97),

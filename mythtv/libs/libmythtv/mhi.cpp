@@ -5,6 +5,10 @@
 #include <QVector>
 
 #include "mhi.h"
+#include "interactivescreen.h"
+#include "mythpainter.h"
+#include "mythimage.h"
+#include "mythuiimage.h"
 #include "osd.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
@@ -455,21 +459,37 @@ void MHIContext::SetInputRegister(int num)
 
 
 // Called by the video player to redraw the image.
-void MHIContext::UpdateOSD(OSDSet *osdSet)
+void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
+                           MythPainter *osdPainter)
 {
+    if (!osdWindow || !osdPainter)
+        return;
+
     QMutexLocker locker(&m_display_lock);
     m_updated = false;
-    osdSet->Clear();
+    osdWindow->DeleteAllChildren();
     // Copy all the display items into the display.
     list<MHIImageData*>::iterator it = m_display.begin();
-    for (; it != m_display.end(); ++it)
+    for (int count = 0; it != m_display.end(); ++it, count++)
     {
         MHIImageData *data = *it;
-        OSDTypeImage* image = new OSDTypeImage();
-        image->SetPosition(QPoint(data->m_x, data->m_y), 1.0, 1.0);
-        image->Load(data->m_image);
-        osdSet->AddType(image);
+        MythImage* image = osdPainter->GetFormatImage();
+        if (!image)
+            continue;
+
+        image->Assign(data->m_image);
+        MythUIImage *uiimage = new MythUIImage(osdWindow, QString("itv%1")
+                                               .arg(count));
+        if (uiimage)
+        {
+            uiimage->SetImage(image);
+            uiimage->SetArea(MythRect(data->m_x, data->m_y,
+                             data->m_image.width(), data->m_image.height()));
+        }
     }
+    osdWindow->OptimiseDisplayedArea();
+    // N.B. bypasses OSD class hence no expiry set
+    osdWindow->SetVisible(true);
 }
 
 void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
@@ -498,50 +518,7 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
     int dispx = x + m_displayRect.left();
     int dispy = y + m_displayRect.top();
 
-    // It seems that OSDTypeImage::Load doesn't deal well with images
-    // located on odd pixel boundaries and the resulting display contains
-    // transparent lines.  To avoid this we create a new image if either
-    // the x or y offset would be odd and set the extra pixels to transparent.
-    QImage img = image;
-    int xboundary = dispx & 1;
-    int yboundary = dispx & 1;
-
-    if (xboundary || yboundary)
-    {
-        int width = img.width(), height = img.height();
-        if (xboundary)
-        {
-            width++;
-            dispx--;
-        }
-        if (yboundary)
-        {
-            height++;
-            dispy--;
-        }
-        img = QImage(width, height, QImage::Format_ARGB32);
-        QRgb qTransparent = qRgba(0,0,0,0);
-        if (xboundary)
-        {
-            for (int i = 0; i < height; i++)
-                img.setPixel(0, i, qTransparent);
-        }
-
-        if (yboundary)
-        {
-            for (int j = 0; j < width; j++)
-                img.setPixel(j, 0, qTransparent);
-        }
-
-        for (int i = 0; i < height-yboundary; i++)
-        {
-            for (int j = 0; j < width-xboundary; j++)
-            {
-                img.setPixel(j+xboundary, i+yboundary, image.pixel(j,i));
-            }
-        }
-    }
-    data->m_image = img;
+    data->m_image = image;
     data->m_x = dispx;
     data->m_y = dispy;
     QMutexLocker locker(&m_display_lock);

@@ -55,6 +55,7 @@ class TvPlayWindow;
 class TV;
 class OSDListTreeItemEnteredEvent;
 class OSDListTreeItemSelectedEvent;
+struct osdInfo;
 
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
@@ -120,13 +121,6 @@ enum scheduleEditTypes {
     kViewSchedule,
     kPlaybackBox
 };
-
-typedef enum
-{
-    kAskAllowCancel,
-    kAskAllowOneRec,
-    kAskAllowMultiRec,
-} AskAllowType;
 
 /**
  * Type of message displayed in ShowNoRecorderDialog()
@@ -223,8 +217,6 @@ class MPUBLIC TV : public QThread
                               NoRecorderMsg msgType = kNoRecorders);
     void FinishRecording(int player_idx); ///< Finishes player's recording
     void AskAllowRecording(PlayerContext*, const QStringList&, int, bool, bool);
-    void PromptStopWatchingRecording(PlayerContext*);
-    void PromptDeleteRecording(PlayerContext*, QString title);
     bool PromptRecGroupPassword(PlayerContext*);
 
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
@@ -301,8 +293,7 @@ class MPUBLIC TV : public QThread
     void ClearUDPNotifyEvents(void);
 
   protected:
-    void TreeMenuEntered(OSDListTreeItemEnteredEvent *e);
-    void TreeMenuSelected(OSDListTreeItemSelectedEvent *e);
+    void OSDDialogEvent(int result, QString text, QString action);
 
     void DoEditSchedule(int editType = kScheduleProgramGuide);
 
@@ -453,22 +444,6 @@ class MPUBLIC TV : public QThread
     int  GetCurrentChapter(const PlayerContext*) const;
     void DoJumpChapter(PlayerContext*, int direction);
     void DoSkipCommercials(PlayerContext*, int direction);
-    void StartProgramEditMode(PlayerContext*);
-
-    // Channel editing support
-    void StartChannelEditMode(PlayerContext*);
-    void ChannelEditKey(const PlayerContext*, const QKeyEvent*);
-    void ChannelEditAutoFill(const PlayerContext*, InfoMap&) const;
-    void ChannelEditAutoFill(const PlayerContext*, InfoMap&,
-                             const QMap<QString,bool>&) const;
-    void ChannelEditXDSFill(const PlayerContext*, InfoMap&) const;
-    void ChannelEditDDFill(InfoMap&, const QMap<QString,bool>&, bool) const;
-    QString GetDataDirect(QString key,   QString value,
-                          QString field, bool    allow_partial = false) const;
-    bool LoadDDMap(uint sourceid);
-    void RunLoadDDMap(uint sourceid);
-    static void *load_dd_map_thunk(void*);
-    static void *load_dd_map_post_thunk(void*);
 
     void DoQueueTranscode(PlayerContext*,QString profile);
 
@@ -480,21 +455,22 @@ class MPUBLIC TV : public QThread
     bool ManualZoomHandleAction(PlayerContext *actx,
                                 const QStringList &actions);
 
-    void DoDisplayJumpMenu(void);
-
     bool ClearOSD(const PlayerContext*);
     void ToggleOSD(const PlayerContext*, bool includeStatusOSD);
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
+    void UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
+                         QString value, int type, QString units,
+                         int position = 0, int prev = 0, int next = 0);
+    void UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
+                         int type, bool set_expiry = true);
+
     void UpdateOSDSeekMessage(const PlayerContext*,
                               const QString &mesg, int disptime);
     void UpdateOSDInput(const PlayerContext*,
                         QString inputname = QString::null);
-    void UpdateOSDTextEntry(const PlayerContext*, const QString &message);
     void UpdateOSDSignal(const PlayerContext*, const QStringList &strlist);
     void UpdateOSDTimeoutMessage(PlayerContext*);
     void UpdateOSDAskAllowDialog(PlayerContext*);
-    void HandleOSDAskAllowResponse(PlayerContext*, int dialog_result);
-    bool OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions);
 
     void EditSchedule(const PlayerContext*,
                       int editType = kScheduleProgramGuide);
@@ -542,21 +518,98 @@ class MPUBLIC TV : public QThread
     bool PictureAttributeHandleAction(PlayerContext*,
                                       const QStringList &actions);
 
-    void ShowOSDTreeMenu(const PlayerContext*);
+    // Channel editing support
+    void StartChannelEditMode(PlayerContext*);
+    bool HandleOSDChannelEdit(PlayerContext*, QString action);
+    void ChannelEditAutoFill(const PlayerContext*, InfoMap&) const;
+    void ChannelEditAutoFill(const PlayerContext*, InfoMap&,
+                             const QMap<QString,bool>&) const;
+    void ChannelEditXDSFill(const PlayerContext*, InfoMap&) const;
+    void ChannelEditDDFill(InfoMap&, const QMap<QString,bool>&, bool) const;
+    QString GetDataDirect(QString key,   QString value,
+                          QString field, bool    allow_partial = false) const;
+    bool LoadDDMap(uint sourceid);
+    void RunLoadDDMap(uint sourceid);
+    static void *load_dd_map_thunk(void*);
+    static void *load_dd_map_post_thunk(void*);
 
-    void FillOSDTreeMenu(       const PlayerContext*, OSDGenericTree*, QString category) const;
-    void FillMenuPlaying(       const PlayerContext*, OSDGenericTree*, QString category) const;
-    void FillMenuAVChapter(     const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuPxP(           const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuInputSwitching(const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuVideoAspect(   const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuVideoScan(     const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuAdjustFill(    const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuAdjustPicture( const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuTimeStretch(   const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuSleepMode(     const PlayerContext*, OSDGenericTree*) const;
-    bool FillMenuTracks(        const PlayerContext*, OSDGenericTree*, uint type) const;
-    void FillMenuChanGroups(    const PlayerContext *ctx, OSDGenericTree *treeMenu) const;
+    // General dialog handling
+    bool DialogIsVisible(PlayerContext *ctx, const QString &dialog);
+    void HandleOSDInfo(PlayerContext *ctx, QString action);
+
+    // AskAllow dialog handling
+    void ShowOSDAskAllow(PlayerContext *ctx);
+    void HandleOSDAskAllow(PlayerContext *ctx, QString action);
+
+    // Program editing support
+    void ShowOSDCutpoint(PlayerContext *ctx, bool allowSelectNear);
+    bool HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame);
+    void StartProgramEditMode(PlayerContext*);
+
+    // Already editing dialog
+    void ShowOSDAlreadyEditing(PlayerContext *ctx);
+    void HandleOSDAlreadyEditing(PlayerContext *ctx, QString action);
+
+    // Sleep dialog handling
+    void ShowOSDSleep(void);
+    void HandleOSDSleep(PlayerContext *ctx, QString action);
+    void SleepDialogTimeout(void);
+
+    // Idle dialog handling
+    void ShowOSDIdle(void);
+    void HandleOSDIdle(PlayerContext *ctx, QString action);
+    void IdleDialogTimeout(void);
+
+    // Exit/delete dialog handling
+    void ShowOSDStopWatchingRecording(PlayerContext *ctx);
+    void ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
+                                      bool force = false);
+    bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
+
+    // Menu dialog
+    void ShowOSDJumpRec(PlayerContext* ctx, const QString category = "",
+                        int level = 0, const QString selected = "");
+    void ShowOSDMenu(const PlayerContext*, const QString category = "",
+                     int level = 0, const QString selected = "");
+
+    QString FillOSDMenu(const PlayerContext*, OSD *osd, QString category,
+                        const QString selected, int level);
+    QString FillOSDMenuTranscode(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuCommskip(   const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuExpire(     const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuSchedule(   const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuAVChapter(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuPxP(        const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuSwitchInput(const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuSwitchSrc(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuJumpRec(    const PlayerContext*, OSD *osd,
+                                   bool select, int level);
+    QString FillOSDMenuVidAspect(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuVideoScan(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuAdjustFill( const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuAdjustPic(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuTimeStretch(const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuSleepMode(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuTracks(     const PlayerContext*, OSD *osd,
+                                   bool select, int level, uint type) const;
+    QString FillOSDMenuChanGroups( const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuTextSubs(   const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
 
     void UpdateLCD(void);
     bool HandleLCDTimerEvent(void);
@@ -573,14 +626,6 @@ class MPUBLIC TV : public QThread
     bool DVDMenuHandleAction(PlayerContext*,
                              const QStringList &actions,
                              bool isDVD, bool isDVDStill);
-
-    // Sleep dialog handling
-    void SleepDialogCreate(void);
-    void SleepDialogTimeout(void);
-
-    // Idle dialog handling
-    void IdleDialogCreate(void);
-    void IdleDialogTimeout(void);
 
     // Program jumping stuff
     void SetLastProgram(const ProgramInfo *rcinfo);
@@ -600,9 +645,6 @@ class MPUBLIC TV : public QThread
     void RestoreScreenSaver(const PlayerContext*);
 
     void InitUDPNotifyEvent(void);
-
-    /// true if dialog is either videoplayexit, playexit or askdelete dialog
-    bool IsVideoExitDialog(const QString &dialog_name);
 
     // for temp debugging only..
     int find_player_index(const PlayerContext*) const;
@@ -669,7 +711,6 @@ class MPUBLIC TV : public QThread
     PictureAttribute  adjustingPictureAttribute;
 
     // Ask Allow state
-    AskAllowType                 askAllowType;
     QMap<QString,AskProgramInfo> askAllowPrograms;
     QMutex                       askAllowLock;
 
@@ -752,7 +793,6 @@ class MPUBLIC TV : public QThread
     RemoteEncoder *switchToRec;
 
     // OSD info
-    OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
     QMap<OSD*,const PlayerContext*> osd_lctx;
     TVOSDMenuEntryList *osdMenuEntries;
 

@@ -66,7 +66,7 @@ class VideoOutputXv : public VideoOutput
                       const PIPMap &pipPlayers,
                       FrameScanType scan);
 
-    void PrepareFrame(VideoFrame*, FrameScanType);
+    void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd);
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
     void Show(FrameScanType);
 
@@ -130,6 +130,7 @@ class VideoOutputXv : public VideoOutput
                                            const QSize &video_dim);
 
     VOSType VideoOutputSubType() const { return video_output_subtype; }
+    virtual MythPainter* GetOSDPainter(void);
 
   private:
     virtual bool hasFullScreenOSD(void) const { return chroma_osd; }

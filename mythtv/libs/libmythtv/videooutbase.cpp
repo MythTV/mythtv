@@ -4,7 +4,6 @@
 #include <QDesktopWidget>
 
 #include "osd.h"
-#include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
@@ -14,6 +13,8 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythxdisplay.h"
+#include "mythpainter_yuva.h"
+#include "util-osd.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
@@ -337,7 +338,10 @@ VideoOutput::VideoOutput() :
     display_res(NULL),
 
     // Physical display
-    monitor_sz(640,480),                monitor_dim(400,300)
+    monitor_sz(640,480),                monitor_dim(400,300),
+
+    // OSD
+    osd_painter(NULL),                  osd_image(NULL)
 
 {
     bzero(&pip_tmp_image, sizeof(pip_tmp_image));
@@ -374,6 +378,11 @@ VideoOutput::VideoOutput() :
  */
 VideoOutput::~VideoOutput()
 {
+    if (osd_image)
+        delete osd_image;
+    if (osd_painter)
+        delete osd_painter;
+
     ShutdownPipResize();
 
     ShutdownVideoResize();
@@ -1150,15 +1159,20 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
     // if resize == existing frame, no need to carry on
     abort |= !resize.left() && !resize.top() && (resize.size() == frameDim);
 
-    if (abort || !vsz_tmp_buf)
+    if (abort)
     {
-        vsz_enabled = false;
         ShutdownVideoResize();
-        vsz_desired_display_rect.setRect(0,0,0,0);
+        vsz_desired_display_rect = QRect();
         return;
     }
 
     DoVideoResize(frameDim, resize.size());
+    if (!vsz_tmp_buf)
+    {
+        ShutdownVideoResize();
+        vsz_desired_display_rect = QRect();
+        return;
+    }
 
     if (vsz_tmp_buf && vsz_scale_context)
     {
@@ -1246,9 +1260,8 @@ void VideoOutput::SetVideoResize(const QRect &videoRect)
          videoRect.width()  < 1 || videoRect.height() < 1 ||
          videoRect.left()   < 0 || videoRect.top()    < 0)
     {
-        vsz_enabled = false;
         ShutdownVideoResize();
-        vsz_desired_display_rect.setRect(0,0,0,0);
+        vsz_desired_display_rect = QRect();
     }
     else
     {
@@ -1273,66 +1286,93 @@ void VideoOutput::SetVideoScalingAllowed(bool change)
  *  If the destination format is either IA44 or AI44 the osd is
  *  converted to greyscale.
  *
- * \return 1 if changed, -1 on error and 0 otherwise
+ * \return true if visible, false otherwise
  */
-int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
-                            int revision)
+bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 {
-    if (!osd)
-        return -1;
+    if (!osd || !frame)
+        return false;
 
     if (vsz_enabled)
         ResizeVideo(frame);
 
+    if (!osd_painter)
+    {
+        osd_painter = new MythYUVAPainter();
+        if (!osd_painter)
+            return false;
+    }
+
+    QSize osd_size = GetTotalOSDBounds().size();
+    if (osd_image && (osd_image->size() != osd_size))
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("OSD size changed."));
+        delete osd_image;
+        osd_image = NULL;
+    }
+
+    if (!osd_image)
+    {
+        osd_image = new MythImage(osd_painter);
+        if (osd_image)
+        {
+            QImage blank = QImage(osd_size, QImage::Format_ARGB32_Premultiplied);
+            osd_image->Assign(blank);
+            osd_image->ConvertToYUV();
+            osd_painter->Clear(osd_image, QRegion(QRect(QPoint(0,0), osd_size)));
+            VERBOSE(VB_IMPORTANT, LOC + QString("Created YV12 OSD."));
+        }
+        else
+            return false;
+    }
+
+    osd_painter->SetFontStretch(osd->GetFontStretch());
+    QRegion dirty   = QRegion();
+    QRegion visible = osd->Draw(osd_painter, osd_image, osd_size, dirty,
+                                frame->codec == FMT_YV12 ? ALIGN_X_MMX : 0,
+                                frame->codec == FMT_YV12 ? ALIGN_C : 0);
+    bool changed    = !dirty.isEmpty();
+    bool show       = !visible.isEmpty();
+
+    if (!show)
+        return show;
+
+    if (!changed && frame->codec != FMT_YV12)
+        return show;
+
     QSize video_dim = windows[0].GetVideoDim();
 
-    OSDSurface *surface = osd->Display();
-    if (!surface)
-        return -1;
-
-    bool changed = (-1 == revision) ?
-        surface->Changed() : (surface->GetRevision()!=revision);
-
-    switch (frame->codec)
+    QVector<QRect> vis = visible.rects();
+    for (int i = 0; i < vis.size(); i++)
     {
-        case FMT_YV12: // works for YUV & YVU 420 formats due to offsets
+        int left   = min(vis[i].left(), osd_image->width());
+        int top    = min(vis[i].top(), osd_image->height());
+        int right  = min(left + vis[i].width(), osd_image->width());
+        int bottom = min(top + vis[i].height(), osd_image->height());
+
+        if (FMT_YV12 == frame->codec)
         {
-            surface->BlendToYV12(frame->buf + frame->offsets[0],
-                                 frame->buf + frame->offsets[1],
-                                 frame->buf + frame->offsets[2],
-                                 frame->pitches[0],
-                                 frame->pitches[1],
-                                 frame->pitches[2]);
-            break;
+            yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
         }
-        case FMT_AI44:
+        else if (FMT_AI44 == frame->codec)
         {
-            if (stride < 0)
-                stride = video_dim.width(); // 8 bits per pixel
-            if (changed)
-                surface->DitherToAI44(frame->buf, stride, video_dim.height());
-            break;
+            bzero(frame->buf, video_dim.width() * video_dim.height());
+            yuv888_to_i44(frame->buf, osd_image, video_dim,
+                          left, top, right, bottom, true);
         }
-        case FMT_IA44:
+        else if (FMT_IA44 == frame->codec)
         {
-            if (stride < 0)
-                    stride = video_dim.width(); // 8 bits per pixel
-            if (changed)
-                surface->DitherToIA44(frame->buf, stride, video_dim.height());
-            break;
+            bzero(frame->buf, video_dim.width() * video_dim.height());
+            yuv888_to_i44(frame->buf, osd_image, video_dim,
+                          left, top, right, bottom, false);
         }
-        case FMT_ARGB32:
+        else
         {
-            if (stride < 0)
-                stride = video_dim.width()*4; // 32 bits per pixel
-            if (changed)
-                surface->BlendToARGB(frame->buf, stride, video_dim.height());
-            break;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Display OSD: Frame format not supported."));
         }
-        default:
-            break;
     }
-    return (changed) ? 1 : 0;
+    return show;
 }
 
 /**
@@ -1451,6 +1491,30 @@ QRect VideoOutput::GetImageRect(const QRect &rect)
 
     result.translate(-visible_osd.left(), -visible_osd.top());
     return result;
+}
+
+/**
+ * \brief Returns a QRect describing an area of the screen on which it is
+ *        'safe' to render the On Screen Display. For 'fullscreen' OSDs this
+ *        will still translate to a subset of the video frame area to ensure
+ *        consistency of presentation for subtitling etc.
+ */
+QRect VideoOutput::GetSafeRect(void)
+{
+    static const float safeMargin = 0.05f;
+    QRect result;
+    if (hasFullScreenOSD())
+    {
+        result = windows[0].GetDisplayVideoRect();
+    }
+    else
+    {
+        result = QRect(QPoint(0, 0), windows[0].GetVideoDispDim());
+    }
+    int safex = (int)((float)result.width()  * safeMargin);
+    int safey = (int)((float)result.height() * safeMargin);
+    return QRect(result.left() + safex, result.top() + safey,
+                 result.width() - (2 * safex), result.height() - (2 * safey));
 }
 
 void VideoOutput::SetPIPState(PIPState setting)

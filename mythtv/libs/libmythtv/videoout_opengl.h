@@ -4,7 +4,7 @@
 // MythTV headers
 #include "videooutbase.h"
 #include "openglvideo.h"
-#include "openglcontext.h"
+#include "mythpainter_ogl.h"
 
 class VideoOutputOpenGL : public VideoOutput
 {
@@ -17,7 +17,7 @@ class VideoOutputOpenGL : public VideoOutput
               int winx, int winy, int winw, int winh, WId embedid = 0);
     void TearDown(void);
 
-    void PrepareFrame(VideoFrame *buffer, FrameScanType);
+    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
@@ -39,17 +39,17 @@ class VideoOutputOpenGL : public VideoOutput
     void StopEmbedding(void);
     bool SetDeinterlacingEnabled(bool);
     bool SetupDeinterlace(bool i, const QString& ovrf="");
-    int  DisplayOSD(VideoFrame *frame, OSD *osd,
-                    int stride = -1, int revision = -1);
     void ShowPIP(VideoFrame        *frame,
                  NuppelVideoPlayer *pipplayer,
                  PIPLocation        loc);
     void MoveResizeWindow(QRect new_rect);
 
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
-    virtual bool IsPIPSupported(void) const { return true; }
-    virtual bool hasFullScreenOSD(void) const { return gl_osd; }
+    virtual bool IsPIPSupported(void) const   { return true; }
+    virtual bool hasFullScreenOSD(void) const { return true; }
+    virtual bool IsSyncLocked(void) const     { return true; }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
+    virtual MythPainter *GetOSDPainter(void)  { return (MythPainter*)gl_painter; }
 
   private:
     bool CreateBuffers(void);
@@ -57,18 +57,17 @@ class VideoOutputOpenGL : public VideoOutput
     bool SetupOpenGL(void);
     void InitOSD(void);
 
-    QMutex         gl_context_lock;
-    OpenGLContext *gl_context;
-    OpenGLVideo   *gl_videochain;
-    OpenGLVideo   *gl_osdchain;
+    QMutex            gl_context_lock;
+    MythRenderOpenGL *gl_context;
+    OpenGLVideo      *gl_videochain;
     QMap<NuppelVideoPlayer*,OpenGLVideo*> gl_pipchains;
     QMap<NuppelVideoPlayer*,bool>         gl_pip_ready;
-    OpenGLVideo   *gl_pipchain_active;
-    bool           gl_osd;
-    bool           gl_osd_ready;
-    WId            gl_parent_win;
-    WId            gl_embed_win;
-    VideoFrame     av_pause_frame;
+    OpenGLVideo      *gl_pipchain_active;
+    WId               gl_parent_win;
+    WId               gl_embed_win;
+    VideoFrame        av_pause_frame;
+
+    MythOpenGLPainter *gl_painter;
 };
 
 #endif

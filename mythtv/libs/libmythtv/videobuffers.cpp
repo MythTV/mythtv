@@ -228,7 +228,7 @@ void VideoBuffers::SetPrebuffering(bool normal)
     QMutexLocker locker(&global_lock);
     needprebufferframes = (normal) ?
         needprebufferframes_normal : needprebufferframes_small;
-};
+}
 
 VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
     bool with_lock, bool allow_unsafe, BufferType enqueue_to)
@@ -246,7 +246,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
 
     while (frame && used.contains(frame))
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_PLAYBACK,
                 QString("GetNextFreeFrame() served a busy frame %1. "
                         "Dropping. %2")
                 .arg(DebugString(frame, true)).arg(GetStatus()));

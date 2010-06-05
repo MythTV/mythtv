@@ -44,8 +44,7 @@
 #endif
 
 #ifdef USING_OPENGL_VSYNC
-#include "util-opengl.h"
-#include "openglcontext.h"
+#include "mythrender_opengl.h"
 #endif // USING_OPENGL_VSYNC
 
 #ifdef __linux__
@@ -384,7 +383,7 @@ OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
                                  bool interlaced) :
     VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-    m_context(NULL), m_context_lock(QMutex::Recursive)
+    m_context(NULL), m_device(NULL)
 {
     VERBOSE(VB_IMPORTANT, "OpenGLVideoSync()");
 }
@@ -395,6 +394,8 @@ OpenGLVideoSync::~OpenGLVideoSync()
 #ifdef USING_OPENGL_VSYNC
     if (m_context)
         delete m_context;
+    if (m_device)
+        delete m_device;
 #endif
 }
 
@@ -405,22 +406,13 @@ OpenGLVideoSync::~OpenGLVideoSync()
 bool OpenGLVideoSync::TryInit(void)
 {
 #ifdef USING_OPENGL_VSYNC
-    QRect window_rect = QRect(0,0,1,1);
-
-    VideoOutput *vo =  dynamic_cast<VideoOutput*>(m_video_output);
-    if (vo)
+    m_device = new QPixmap(16,16);
+    QGLFormat fmt;
+    fmt.setDepth(false);
+    m_context = new MythRenderOpenGL(fmt, m_device);
+    if (m_context && m_context->create())
     {
-        // center the window to ensure we sync to the correct display
-        QRect master = vo->windows[0].GetDisplayVisibleRect();
-        window_rect.moveTopLeft(
-            QPoint(master.width() >> 1, master.height() >> 1));
-    }
-
-    QMutexLocker locker(&m_context_lock);
-    m_context = OpenGLContext::Create(&m_context_lock);
-    if (m_context && m_context->Create(0, window_rect, false))
-    {
-        if (m_context->GetFeatures() & kGLGLXVSync)
+        if (m_context->HasGLXWaitVideoSyncSGI())
             return true;
 
         VERBOSE(VB_IMPORTANT, "OpenGLVideoSync: GLX_SGI_video_sync extension "
@@ -434,63 +426,16 @@ bool OpenGLVideoSync::TryInit(void)
     return false;
 }
 
-/** \fn checkGLSyncError(const QString&, int)
- *  \brief Prints an error messages for SGI_video_sync extension calls.
- *
- *  \return true if all is ok, false if there is an error
- */
-bool checkGLSyncError(const QString& hdr, int err)
-{
-    (void) hdr;
-    (void) err;
-#ifdef USING_OPENGL_VSYNC
-    QString errStr("");
-    switch (err)
-    {
-        case False:
-            break;
-        case GLX_BAD_CONTEXT:
-            errStr = "Bad Context";
-            break;
-        case GLX_BAD_VALUE:
-            errStr = "Bad Value";
-            break;
-        default:
-            errStr = QString("Unknown Error 0x%1").arg(err,0,16);
-            break;
-    }
-    if (errStr != "")
-    {
-        VERBOSE(VB_IMPORTANT, hdr+" reported error: "+errStr);
-        return false;
-    }
-    return true;
-#else
-    return false;
-#endif /* USING_OPENGL_VSYNC */
-}
-
 void OpenGLVideoSync::Start(void)
 {
 #ifdef USING_OPENGL_VSYNC
     if (!m_context)
         return;
 
-    int err;
-
-    bool embedding = false;
-    VideoOutput *vo = dynamic_cast<VideoOutput*>(m_video_output);
-    if (vo && vo->IsEmbedding())
-        embedding = true;
-
-    if (!embedding)
+    if (!(m_video_output && m_video_output->IsEmbedding()))
     {
-        OpenGLContextLocker ctx_lock(m_context);
-        unsigned int count;
-        err = gMythGLXGetVideoSyncSGI(&count);
-        checkGLSyncError("OpenGLVideoSync::Start(): Frame Number Query", err);
-        err = gMythGLXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
-        checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
+        unsigned int count = m_context->GetVideoSyncCount();
+        m_context->WaitForVideoSync(2, (count+1)%2, &count);
     }
     // Initialize next trigger
     VideoSync::Start();
@@ -504,8 +449,7 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
 
-    VideoOutput *vo = dynamic_cast<VideoOutput*>(m_video_output);
-    if (vo && vo->IsEmbedding())
+    if (m_video_output && m_video_output->IsEmbedding())
     {
         m_delay = CalcDelay();
         if (m_delay > 0)
@@ -513,20 +457,15 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         return;
     }
 
-    int err;
     if (!m_context)
         return;
-    unsigned int frameNum = 0;
 
-    OpenGLContextLocker ctx_lock(m_context);
-    err = gMythGLXGetVideoSyncSGI(&frameNum);
-    checkGLSyncError("Frame Number Query", err);
+    unsigned int frameNum = m_context->GetVideoSyncCount();
 
     // Always sync to the next retrace execpt when we are very late.
     if ((m_delay = CalcDelay()) > -(m_refresh_interval/2))
     {
-        err = gMythGLXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
-        checkGLSyncError(msg1, err);
+        m_context->WaitForVideoSync(2, (frameNum+1)%2 ,&frameNum);
         m_delay = CalcDelay();
     }
 
@@ -534,11 +473,9 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     if (m_delay > 0)
     {
         uint n = m_delay / m_refresh_interval + 1;
-        err = gMythGLXWaitVideoSyncSGI((n+1), (frameNum+n)%(n+1), &frameNum);
-        checkGLSyncError(msg2, err);
+        m_context->WaitForVideoSync((n+1), (frameNum+n)%(n+1), &frameNum);
         m_delay = CalcDelay();
     }
-
 #endif /* USING_OPENGL_VSYNC */
 }
 

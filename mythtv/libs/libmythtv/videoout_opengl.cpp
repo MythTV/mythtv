@@ -5,7 +5,6 @@
 #include "videodisplayprofile.h"
 #include "filtermanager.h"
 #include "osd.h"
-#include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
 #include "mythuihelper.h"
 
@@ -41,10 +40,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 VideoOutputOpenGL::VideoOutputOpenGL(void)
     : VideoOutput(),
     gl_context_lock(QMutex::Recursive),
-    gl_context(NULL), gl_videochain(NULL),
-    gl_osdchain(NULL), gl_pipchain_active(NULL),
-    gl_osd(false), gl_osd_ready(false),
-    gl_parent_win(0), gl_embed_win(0)
+    gl_context(NULL), gl_videochain(NULL), gl_pipchain_active(NULL),
+    gl_parent_win(0), gl_embed_win(0), gl_painter(NULL)
 {
     bzero(&av_pause_frame, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
@@ -85,7 +82,7 @@ void VideoOutputOpenGL::TearDown(void)
     }
 
     if (gl_context)
-        gl_context->MakeCurrent(true);
+        gl_context->makeCurrent();
 
     if (gl_videochain)
     {
@@ -93,13 +90,11 @@ void VideoOutputOpenGL::TearDown(void)
         gl_videochain = NULL;
     }
 
-    if (gl_osdchain)
+    if (gl_painter)
     {
-        delete gl_osdchain;
-        gl_osdchain = NULL;
+        delete gl_painter;
+        gl_painter = NULL;
     }
-    gl_osd = false;
-    gl_osd_ready = false;
 
     while (!gl_pipchains.empty())
     {
@@ -109,7 +104,7 @@ void VideoOutputOpenGL::TearDown(void)
     gl_pip_ready.clear();
 
     if (gl_context)
-        gl_context->MakeCurrent(false);
+        gl_context->doneCurrent();
 }
 
 bool VideoOutputOpenGL::Init(int width, int height, float aspect,
@@ -210,10 +205,21 @@ bool VideoOutputOpenGL::SetupContext(void)
     }
     else
     {
-        gl_context = OpenGLContext::Create(&gl_context_lock);
-        success = gl_context->Create(gl_parent_win,
-                                     windows[0].GetDisplayVisibleRect(),
-                                     db_use_picture_controls);
+        QGLFormat fmt;
+        fmt.setDepth(false);
+
+        QGLWidget *device = (QGLWidget*)QWidget::find(gl_parent_win);
+        if (!device)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + QString("Failed to cast parent to QGLWidget."));
+            return false;
+        }
+        gl_context  = new MythRenderOpenGL(fmt, device);
+        if (gl_context && gl_context->create())
+        {
+            success = true;
+            VERBOSE(VB_GENERAL, LOC + QString("Created MythRenderOpenGL device."));
+        }
     }
     return success;
 }
@@ -230,13 +236,13 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
         ResizeDisplayWindow(tmprect, true);
     }
     bool success = false;
-    OpenGLContextLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
     success = gl_videochain->Init(gl_context, db_use_picture_controls,
                                   windows[0].GetVideoDim(), dvr,
                                   windows[0].GetDisplayVideoRect(),
                                   windows[0].GetVideoRect(), true,
-                                  GetFilters(), false, db_letterbox_colour);
+                                  GetFilters(), db_letterbox_colour);
     if (success)
     {
         bool temp_deinterlacing = m_deinterlacing;
@@ -258,33 +264,15 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
 void VideoOutputOpenGL::InitOSD(void)
 {
     QMutexLocker locker(&gl_context_lock);
-    if (!db_vdisp_profile || !gl_videochain)
-        return;
-    if (db_vdisp_profile->GetOSDRenderer() != "opengl2")
-        return;
 
-    gl_osd = true;
-    gl_osd_ready = false;
-
-    gl_osdchain = new OpenGLVideo();
-    if (!gl_osdchain->Init(
-            gl_context, db_use_picture_controls,
-            GetTotalOSDBounds().size(),
-            GetTotalOSDBounds(), windows[0].GetDisplayVisibleRect(),
-            QRect(QPoint(0, 0), GetTotalOSDBounds().size()), false,
-            GetFilters(), true))
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-                "InitOSD(): Failed to create OpenGL2 OSD");
-        delete gl_osdchain;
-        gl_osdchain = NULL;
-        gl_osd = false;
-    }
+    gl_painter = new MythOpenGLPainter(gl_context,
+                                       (QGLWidget*)QWidget::find(gl_parent_win));
+    if (!gl_painter)
+        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create OpenGL OSD"));
     else
-    {
-        gl_osdchain->SetMasterViewport(gl_videochain->GetViewPort());
-    }
+        gl_painter->SetTarget(-1);
 }
+
 bool VideoOutputOpenGL::CreateBuffers(void)
 {
     QMutexLocker locker(&gl_context_lock);
@@ -302,7 +290,15 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     if (!av_pause_frame.buf)
+    {
         success = false;
+    }
+    else
+    {
+        int size = av_pause_frame.width * av_pause_frame.height;
+        memset(av_pause_frame.buf, 0,   size);
+        memset(av_pause_frame.buf + size, 127, size / 2);
+    }
 
     return success;
 }
@@ -317,7 +313,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
 
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
-    OpenGLContextLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(gl_context);
 
     bool pauseframe = false;
     if (!frame)
@@ -341,8 +337,6 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
     {
         gl_pipchain_active = NULL;
         ShowPIPs(frame, pipPlayers);
-        if (osd)
-            DisplayOSD(frame, osd);
     }
 
     if ((!pauseframe || safepauseframe) &&
@@ -357,12 +351,14 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         gl_videochain->UpdateInputFrame(frame, soft_bob);
 }
 
-void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t)
+void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
+                                     OSD *osd)
 {
+    (void)osd;
     if (!gl_videochain || !gl_context)
         return;
 
-    OpenGLContextLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(gl_context);
 
     if (!buffer)
     {
@@ -378,10 +374,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     if (buffer->codec != FMT_YV12)
         return;
 
-    gl_videochain->SetVideoRect((vsz_enabled && gl_osd) ?
-                                 vsz_desired_display_rect :
-                                 windows[0].GetDisplayVideoRect(),
-                                 windows[0].GetVideoRect());
+    gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
+                                              windows[0].GetDisplayVideoRect(),
+                                windows[0].GetVideoRect());
     gl_videochain->PrepareFrame(buffer->top_field_first, t,
                                 m_deinterlacing, framesPlayed);
 
@@ -396,9 +391,8 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         }
     }
 
-    if (gl_osd_ready && gl_osdchain && gl_osd)
-        gl_osdchain->PrepareFrame(buffer->top_field_first, t,
-                                  m_deinterlacing, framesPlayed);
+    if (osd && gl_painter)
+        osd->DrawDirect(gl_painter, GetTotalOSDBounds().size(), true);
 
     gl_context->Flush(false);
 
@@ -416,7 +410,7 @@ void VideoOutputOpenGL::Show(FrameScanType scan)
     }
 
     if (gl_context)
-        gl_context->SwapBuffers();
+        gl_context->swapBuffers();
 }
 
 QStringList VideoOutputOpenGL::GetAllowedRenderers(
@@ -459,9 +453,16 @@ void VideoOutputOpenGL::UpdatePauseFrame(void)
 
 DisplayInfo VideoOutputOpenGL::GetDisplayInfo(void)
 {
+    // TODO - move DisplayInfo into libmythui/MythXDisplay
+    DisplayInfo ret;
+
     if (gl_context)
-        return gl_context->GetDisplayInfo();
-    return DisplayInfo();
+    {
+        ret.rate = gl_context->GetRefreshRate();
+        ret.res  = gl_context->GetDisplaySize();
+        ret.size = gl_context->GetDisplayDimensions();
+    }
+    return ret;
 }
 
 void VideoOutputOpenGL::InitPictureAttributes(void)
@@ -469,7 +470,10 @@ void VideoOutputOpenGL::InitPictureAttributes(void)
     if (!gl_context)
         return;
 
-    supported_attributes = gl_context->GetSupportedPictureAttributes();
+    supported_attributes =(PictureAttributeSupported)
+                          (kPictureAttributeSupported_Brightness |
+                           kPictureAttributeSupported_Contrast |
+                           kPictureAttributeSupported_Colour);
 
     VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
             .arg(toString(supported_attributes)));
@@ -484,7 +488,25 @@ int VideoOutputOpenGL::SetPictureAttribute(
         return -1;
 
     newValue = min(max(newValue, 0), 100);
-    newValue = gl_context->SetPictureAttribute(attribute, newValue);
+
+    uint gl_attrib = kGLAttribNone;
+    switch (attribute)
+    {
+        case kPictureAttribute_Brightness:
+            gl_attrib = kGLAttribBrightness;
+            break;
+        case kPictureAttribute_Contrast:
+            gl_attrib = kGLAttribContrast;
+            break;
+        case kPictureAttribute_Colour:
+            gl_attrib = kGLAttribColour;
+            break;
+        default:
+            newValue = -1;
+    }
+
+    if (gl_attrib != kGLAttribNone)
+        newValue = gl_context->SetPictureAttribute(attribute, newValue);
     if (newValue >= 0)
         SetPictureAttributeDBValue(attribute, newValue);
     return newValue;
@@ -496,7 +518,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(
     if (!gl_videochain || !gl_context)
         return false;
 
-    OpenGLContextLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(gl_context);
 
     if (db_vdisp_profile)
         m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
@@ -559,7 +581,7 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool enable)
     if (!gl_videochain || !gl_context)
         return false;
 
-    OpenGLContextLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(gl_context);
 
     if (enable)
     {
@@ -586,42 +608,6 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool enable)
     m_deinterlacing = enable;
 
     return m_deinterlacing;
-}
-
-int VideoOutputOpenGL::DisplayOSD(VideoFrame *frame, OSD *osd,
-                                  int stride, int revision)
-{
-    if (!gl_osd)
-        return VideoOutput::DisplayOSD(frame, osd, stride, revision);
-
-    gl_osd_ready = false;
-
-    if (!osd || !gl_osdchain)
-        return -1;
-
-    OSDSurface *surface = osd->Display();
-    if (!surface)
-        return -1;
-
-    gl_osd_ready = true;
-
-    bool changed = (-1 == revision) ?
-        surface->Changed() : (surface->GetRevision()!=revision);
-
-    if (changed)
-    {
-        QSize visible = GetTotalOSDBounds().size();
-
-        int offsets[3] =
-        {
-            surface->y - surface->yuvbuffer,
-            surface->u - surface->yuvbuffer,
-            surface->v - surface->yuvbuffer,
-        };
-        gl_osdchain->UpdateInput(surface->yuvbuffer, offsets,
-                                 FMT_YV12, visible, surface->alpha);
-    }
-    return changed;
 }
 
 void VideoOutputOpenGL::ShowPIP(VideoFrame        *frame,
@@ -715,7 +701,7 @@ void VideoOutputOpenGL::RemovePIP(NuppelVideoPlayer *pipplayer)
     if (!gl_pipchains.contains(pipplayer))
         return;
 
-    OpenGLContextLocker ctx_lock(gl_context);
+    OpenGLLocker ctx_lock(gl_context);
 
     OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
     if (gl_pipchain)
@@ -733,11 +719,8 @@ void VideoOutputOpenGL::MoveResizeWindow(QRect new_rect)
 void VideoOutputOpenGL::EmbedInWidget(int x, int y, int w, int h)
 {
     if (!windows[0].IsEmbedding())
-    {
         VideoOutput::EmbedInWidget(x,y,w,h);
-        if (gl_context)
-            gl_context->EmbedInWidget(x,y,w,h);
-    }
+
     MoveResize();
 }
 
@@ -746,12 +729,9 @@ void VideoOutputOpenGL::StopEmbedding(void)
     if (!windows[0].IsEmbedding())
         return;
 
-    if (gl_context)
-        gl_context->StopEmbedding();
     VideoOutput::StopEmbedding();
     MoveResize();
 }
-
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
 {

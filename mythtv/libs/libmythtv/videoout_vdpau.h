@@ -5,6 +5,10 @@
 #include "videooutbase.h"
 #include "mythrender_vdpau.h"
 
+class VDPAUContext;
+class MythVDPAUPainter;
+class OSD;
+
 struct vdpauPIP
 {
     QSize videoSize;
@@ -27,7 +31,7 @@ class VideoOutputVDPAU : public VideoOutput
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan);
-    void PrepareFrame(VideoFrame*, FrameScanType);
+    void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd);
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
     void Show(FrameScanType);
     void ClearAfterSeek(void);
@@ -59,6 +63,7 @@ class VideoOutputVDPAU : public VideoOutput
         { return codec_is_vdpau(m_codec_id); }
     virtual bool IsSyncLocked(void) const { return true; }
     void SetNextFrameDisplayTimeOffset(int delayus) { m_frame_delay = delayus; }
+    virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
 
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }
@@ -78,8 +83,6 @@ class VideoOutputVDPAU : public VideoOutput
     void DiscardFrames(bool next_frame_keyframe);
     void DoneDisplayingFrame(VideoFrame *frame);
     void CheckFrameStates(void);
-    virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
-                           int stride = -1, int revision = -1);
     virtual void ShowPIP(VideoFrame        *frame,
                          NuppelVideoPlayer *pipplayer,
                          PIPLocation        loc);
@@ -88,8 +91,6 @@ class VideoOutputVDPAU : public VideoOutput
     void DeinitPIPS(void);
     void DeinitPIPLayer(void);
     void ParseOptions(void);
-    void InitOSD(QSize size);
-    void DeinitOSD(void);
 
     MythCodecID          m_codec_id;
     Window               m_win;
@@ -116,14 +117,7 @@ class VideoOutputVDPAU : public VideoOutput
     bool                 m_pip_ready;
     QMap<NuppelVideoPlayer*,vdpauPIP> m_pips;
 
-    uint                 m_osd_layer;
-    uint                 m_osd_surface;
-    uint                 m_osd_output_surface;
-    uint                 m_osd_alpha_surface;
-    uint                 m_osd_mixer;
-    bool                 m_osd_ready;
-    bool                 m_osd_avail;
-    QSize                m_osd_size;
+    MythVDPAUPainter    *m_osd_painter;
 
     bool                 m_using_piccontrols;
     bool                 m_skip_chroma;

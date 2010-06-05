@@ -1666,8 +1666,10 @@ void VideoOutputQuartz::StopEmbedding(void)
  * If we are using DVDV hardware acceleration, decodes the frame.
  * Otherwise, just makes sure we have a valid frame to show.
  */
-void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
+void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t,
+                                     OSD *osd)
 {
+    (void)osd;
     (void)t;
 
 #ifdef USING_DVDV

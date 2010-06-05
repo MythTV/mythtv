@@ -30,14 +30,25 @@ class CC708CharacterAttribute
     uint bg_opacity;
     uint edge_color;
 
+    // remove this
     uint FontIndex(void) const
     {
         return (((font_tag & 0x7) * 6) + ((italics) ? 3 : 0) +
                 (pen_size & 0x3));
     }
     static QColor ConvertToQColor(uint eia708color);
-    QColor GetFGColor(void) const { return ConvertToQColor(fg_color); }
-    QColor GetBGColor(void) const { return ConvertToQColor(bg_color); }
+    QColor GetFGColor(void) const
+    {
+        QColor fg = ConvertToQColor(fg_color);
+        fg.setAlpha(GetFGAlpha());
+        return fg;
+    }
+    QColor GetBGColor(void) const
+    {
+        QColor bg = ConvertToQColor(bg_color);
+        bg.setAlpha(GetBGAlpha());
+        return bg;
+    }
     QColor GetEdgeColor(void) const { return ConvertToQColor(edge_color); }
 
     uint GetFGAlpha(void) const
@@ -131,6 +142,12 @@ class CC708Window
     CC708Character &GetCCChar(void) const;
     vector<CC708String*> GetStrings(void) const;
 
+    QColor GetFillColor(void) const
+    {
+        QColor fill = CC708CharacterAttribute::ConvertToQColor(fill_color);
+        fill.setAlpha(GetFillAlpha());
+        return fill;
+    }
     uint GetFillAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
@@ -179,6 +196,7 @@ class CC708Window
 
     /// set to false when DeleteWindow is called on the window.
     bool            exists;
+    bool            changed;
 
     static bool     forceWhiteOnBlackText;
 
@@ -232,6 +250,13 @@ extern const uint k708AttrFontProportionalSansSerif;
 extern const uint k708AttrFontCasual;
 extern const uint k708AttrFontCursive;
 extern const uint k708AttrFontSmallCaps;
+
+extern const uint k708AttrEdgeNone;
+extern const uint k708AttrEdgeRaised;
+extern const uint k708AttrEdgeDepressed;
+extern const uint k708AttrEdgeUniform;
+extern const uint k708AttrEdgeLeftDropShadow;
+extern const uint k708AttrEdgeRightDropShadow;
 
 extern const uint k708AttrColorBlack;
 extern const uint k708AttrColorWhite;

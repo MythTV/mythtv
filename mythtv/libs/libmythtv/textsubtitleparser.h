@@ -66,10 +66,14 @@ class TextSubtitles
     uint GetSubtitleCount(void) const
         { return m_subtitles.size(); }
 
+    void Lock(void)   { m_lock.lock();   }
+    void Unlock(void) { m_lock.unlock(); }
+
   private:
     TextSubtitleList          m_subtitles;
     mutable text_subtitle_t   m_lastReturnedSubtitle;
     bool                      m_frameBasedTiming;
+    QMutex                    m_lock;
 };
 
 class TextSubtitleParser

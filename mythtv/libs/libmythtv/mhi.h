@@ -23,7 +23,6 @@ using namespace std;
 #include "../libmythfreemheg/freemheg.h"
 #include "interactivetv.h"
 #include "dsmcc.h"
-#include "osdtypes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "NuppelVideoPlayer.h"
@@ -33,7 +32,8 @@ extern "C" {
 #include "avcodec.h" // to decode single MPEG I-frames
 }
 
-class OSDSet;
+class MythPainter;
+class InteractiveScreen;
 class DSMCCPacket;
 class MHIImageData;
 
@@ -56,7 +56,7 @@ class MHIContext : public MHContext
     // This will depend on the current profile.
     bool OfferKey(QString key);
     /// Update the display
-    void UpdateOSD(OSDSet *osdSet);
+    void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
     void Reinit(const QRect &display);
 

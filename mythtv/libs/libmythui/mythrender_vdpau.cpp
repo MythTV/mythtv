@@ -999,7 +999,7 @@ void MythRenderVDPAU::DestroyLayer(uint id)
 bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
                                  uint vid_surface, uint out_surface,
                                  const QVector<uint>* refs, bool top,
-                                 QRect src, const QSize &dst,
+                                 QRect src, const QRect &dst,
                                  QRect dst_vid, uint layer1, uint layer2)
 {
     CHECK_VIDEO_SURFACES(true)
@@ -1096,10 +1096,10 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
 
     VdpRect outRect, srcRect, outRectVid;
 
-    outRect.x0    = 0;
-    outRect.y0    = 0;
-    outRect.x1    = dst.width();
-    outRect.y1    = dst.height();
+    outRect.x0    = dst.left();
+    outRect.y0    = dst.top();
+    outRect.x1    = dst.left() + dst.width();
+    outRect.y1    = dst.top()  + dst.height();
     srcRect.x0    = src.left();
     srcRect.y0    = src.top();
     srcRect.x1    = src.left() + src.width();

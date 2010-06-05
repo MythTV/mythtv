@@ -104,12 +104,16 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
 
 void TextSubtitles::AddSubtitle(const text_subtitle_t &newSub)
 {
+    m_lock.lock();
     m_subtitles.push_back(newSub);
+    m_lock.unlock();
 }
 
 void TextSubtitles::Clear(void)
 {
+    m_lock.lock();
     m_subtitles.clear();
+    m_lock.unlock();
 }
 
 bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)

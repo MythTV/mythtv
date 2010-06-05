@@ -1,25 +1,9 @@
-#ifndef OSD_TYPE_TELETEXT_H_
-#define OSD_TYPE_TELETEXT_H_
+#ifndef TELETEXTSCREEN_H
+#define TELETEXTSCREEN_H
 
-#include <vector>
-#include <map>
-using namespace std;
-
-#include <QString>
-#include <QRect>
-#include <QMap>
-#include <QColor>
-#include <QMutex>
-
-#include "osdtypes.h"
+#include "mythscreentype.h"
 #include "teletextdecoder.h"
-
-class TTFFont;
-class OSD;
-class OSDType;
-class OSDSurface;
-class OSDTypeTeletext;
-class TV;
+#include "NuppelVideoPlayer.h"
 
 typedef enum
 {
@@ -104,63 +88,41 @@ class TeletextMagazine
     int_to_page_t     pages;
 };
 
-class OSDUpdateLocker
+class TeletextScreen: public MythScreenType, public TeletextViewer
 {
-  public:
-    OSDUpdateLocker(QMutex *lock, OSDTypeTeletext *parent);
-    ~OSDUpdateLocker(void);
-
-  private:
-    QMutex          *m_lock;
-    OSDTypeTeletext *m_parent;
-};
-
-class OSDTypeTeletext : public OSDType, public TeletextViewer
-{
-    friend QColor color_tt2qt(int ttcolor);
-    friend class OSDUpdateLocker;
+    static bool  InitialiseFont(void);
 
   public:
-    OSDTypeTeletext(const QString &name, TTFFont *font,
-                    QRect displayrect, float wmult, float hmult, OSD *osd);
-    OSDTypeTeletext(const OSDTypeTeletext &other);
-    virtual ~OSDTypeTeletext() {}
+    TeletextScreen(NuppelVideoPlayer *player, const char * name);
+   ~TeletextScreen();
 
-    void Reinit(float wmult, float hmult);
-
-    // Teletext Drawing methods
-    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
+    // MythScreenType methods
+    virtual bool Create(void);
+    virtual void Pulse(void);
 
     // TeletextViewer interface methods
-    void KeyPress(uint key);
-    void SetPage(int page, int subpage);
-    void SetDisplaying(bool display) { m_displaying = display; };
-
-    void Reset(void);
-    void AddPageHeader(int page, int subpage,
-                       const uint8_t *buf, int vbimode, int lang, int flags);
-    void AddTeletextData(int magazine, int row,
-                         const uint8_t* buf, int vbimode);
+    virtual void KeyPress(uint key);
+    virtual void SetPage(int page, int subpage);
+    virtual void SetDisplaying(bool display) { m_displaying = display; }
+    virtual void Reset(void);
+    virtual void AddPageHeader(int page, int subpage, const uint8_t *buf,
+                               int vbimode, int lang, int flags);
+    virtual void AddTeletextData(int magazine, int row,
+                                 const uint8_t* buf, int vbimode);
 
   private:
-    // Internal Teletext Sets
-    void SetForegroundColor(int color) const;
-    void SetBackgroundColor(int color) const;
+    void OptimiseDisplayedArea(void);
+    void SetForegroundColor(int color);
+    void SetBackgroundColor(int color);
+    void DrawBackground(int x, int y);
+    void DrawRect(const QRect);
+    void DrawCharacter(int x, int y, QChar ch, int doubleheight = 0);
+    void DrawMosaic(int x, int y, int code, int doubleheight);
+    void DrawLine(const uint8_t *page, uint row, int lang);
+    void DrawHeader(const uint8_t *page, int lang);
+    void DrawStatus(void);
+    void DrawPage(void);
 
-    // Teletext Drawing methods
-    void DrawBackground(OSDSurface *surface, int x, int y) const;
-    void DrawRect(OSDSurface *surface, const QRect) const;
-    void DrawCharacter(OSDSurface *surface, int x, int y,
-                       QChar ch, int doubleheight = 0) const;
-    void DrawMosaic(OSDSurface *surface, int x, int y,
-                    int code, int doubleheight) const;
-    void DrawLine(OSDSurface *surface, const uint8_t *page,
-                  uint row, int lang) const;
-    void DrawHeader(OSDSurface *surface, const uint8_t *page, int lang) const;
-    void DrawStatus(OSDSurface *surface) const;
-    void DrawPage(OSDSurface *surface) const;
-
-    // Internal Teletext Commands
     void NewsFlash(void) {};
     void PageUpdated(int page, int subpage);
     void HeaderUpdated(uint8_t *page, int lang);
@@ -178,28 +140,16 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
     const TeletextSubPage *FindSubPageInternal(int,int,int) const;
     const TeletextPage    *FindPageInternal(int,int) const;
 
-  private:
-    QMutex       m_lock;
-    QRect        m_displayrect;
-    QRect        m_unbiasedrect;
+    NuppelVideoPlayer *m_player;
+    QRect              m_safeArea;
+    int                m_colSize;
+    int                m_rowSize;
 
-    OSDTypeBox  *m_box;
+    QMutex m_lock;
 
-    int          m_tt_colspace;
-    int          m_tt_rowspace;
-
-    // last fetched page
     int          m_fetchpage;
     int          m_fetchsubpage;
-
-    // needs to mutable so we can change color character by character.
-    mutable TTFFont *m_font;
-
-    // current character background
-    mutable uint8_t  m_bgcolor_y;
-    mutable uint8_t  m_bgcolor_u;
-    mutable uint8_t  m_bgcolor_v;
-    mutable uint8_t  m_bgcolor_a;
+    QColor       m_bgColor;
 
     // currently displayed page:
     mutable int  m_curpage;
@@ -208,21 +158,16 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
     mutable bool m_curpage_issubtitle;
 
     int          m_pageinput[3];
-
     bool         m_transparent;
     bool         m_revealHidden;
-
     bool         m_displaying;
-
-    OSD         *m_osd;
     uint8_t      m_header[40];
     mutable bool m_header_changed;
     mutable bool m_page_changed;
-    mutable bool m_osd_changed;
-
     TeletextMagazine m_magazines[8];
     unsigned char    m_bitswap[256];
 
+  public:
     static const QColor kColorBlack;
     static const QColor kColorRed;
     static const QColor kColorGreen;
@@ -231,9 +176,9 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
     static const QColor kColorMagenta;
     static const QColor kColorCyan;
     static const QColor kColorWhite;
+    static const QColor kColorTransp;
     static const int    kTeletextColumns;
     static const int    kTeletextRows;
 };
 
-#endif
-
+#endif // TELETEXTSCREEN_H

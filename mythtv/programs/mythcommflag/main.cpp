@@ -28,7 +28,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythversion.h"
-#include "NuppelVideoPlayer.h"
+#include "mythcommflagplayer.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
@@ -170,15 +170,13 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
-
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
     PlayerContext *ctx = new PlayerContext("seektable rebuilder");
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
-    ctx->SetNVP(nvp);
-    nvp->SetPlayerInfo(NULL, NULL, true, ctx);
-
-    nvp->RebuildSeekTable(!quiet);
+    ctx->SetNVP(cfp);
+    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+    cfp->RebuildSeekTable(!quiet);
 
     if (!quiet)
         cerr << "Rebuilt" << endl;
@@ -562,13 +560,13 @@ void incomingCustomEvent(QEvent* e)
 int DoFlagCommercials(
     ProgramInfo *program_info,
     bool showPercentage, bool fullSpeed, bool inJobQueue,
-    NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod,
+    MythCommFlagPlayer* cfp, enum SkipTypes commDetectMethod,
     const QString &outputfilename, bool useDB)
 {
     CommDetectorFactory factory;
     commDetector = factory.makeCommDetector(
         commDetectMethod, showPercentage,
-        fullSpeed, nvp,
+        fullSpeed, cfp,
         program_info->GetChanID(),
         program_info->GetScheduledStartTime(),
         program_info->GetScheduledEndTime(),
@@ -627,7 +625,7 @@ int DoFlagCommercials(
         }
 
         print_comm_flag_output(
-            program_info, commBreakList, nvp->GetTotalFrameCount(),
+            program_info, commBreakList, cfp->GetTotalFrameCount(),
             (outputMethod == kOutputMethodFull) ? commDetector : NULL,
             outputfilename);
     }
@@ -755,17 +753,17 @@ int FlagCommercials(
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
 
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
-    ctx->SetNVP(nvp);
-    nvp->SetPlayerInfo(NULL, NULL, true, ctx);
+    ctx->SetNVP(cfp);
+    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (rebuildSeekTable)
     {
-        nvp->RebuildSeekTable();
+        cfp->RebuildSeekTable();
 
         if (!quiet)
             cerr << "Rebuilt\n";
@@ -798,7 +796,7 @@ int FlagCommercials(
             VERBOSE(VB_IMPORTANT, "Unable to find active recorder for this "
                     "recording, realtime flagging will not be enabled.");
         }
-        nvp->SetWatchingRecording(watchingRecording);
+        cfp->SetWatchingRecording(watchingRecording);
     }
 
     int fakeJobID = -1;
@@ -823,7 +821,7 @@ int FlagCommercials(
 
     breaksFound = DoFlagCommercials(
         program_info, showPercentage, fullSpeed, inJobQueue,
-        nvp, commDetectMethod, outputfilename, useDB);
+        cfp, commDetectMethod, outputfilename, useDB);
 
     if (fakeJobID >= 0)
     {

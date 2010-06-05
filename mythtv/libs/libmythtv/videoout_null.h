@@ -16,7 +16,7 @@ class VideoOutputNull : public VideoOutput
               int winx, int winy, int winw, int winh, WId embedid = 0);
     bool SetupDeinterlace(bool, const QString &ovrf = "")
         { (void)ovrf; return false; } // we don't deinterlace in null output..
-    void PrepareFrame(VideoFrame *buffer, FrameScanType);
+    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void Show(FrameScanType );
     void CreatePauseFrame(void);
     bool InputChanged(const QSize &input_size,

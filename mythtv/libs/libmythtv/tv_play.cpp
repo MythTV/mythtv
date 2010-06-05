@@ -20,9 +20,6 @@ using namespace std;
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "osd.h"
-#include "osdsurface.h"
-#include "osdtypes.h"
-#include "osdlistbtntype.h"
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -61,6 +58,7 @@ using namespace std;
 #include "recordinginfo.h"
 #include "mythsystemevent.h"
 #include "videometadatautil.h"
+#include "mythdialogbox.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -75,6 +73,25 @@ using namespace std;
 
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)
+
+#define SetOSDText(CTX, GROUP, FIELD, TEXT) { \
+    OSD *osd = GetOSDLock(CTX); \
+    if (osd) \
+    { \
+        QHash<QString,QString> map; \
+        map.insert(FIELD,TEXT); \
+        osd->SetText(GROUP, map); \
+    } \
+    ReturnOSDLock(CTX, osd); }
+
+#define SetOSDMessage(CTX, MESSAGE) \
+    SetOSDText(CTX, "osd_message", "message_text", MESSAGE)
+
+#define HideOSDWindow(CTX, WINDOW) { \
+    OSD *osd = GetOSDLock(CTX); \
+    if (osd) \
+        osd->HideWindow(WINDOW); \
+    ReturnOSDLock(CTX, osd); }
 
 const int  TV::kInitFFRWSpeed                = 0;
 const uint TV::kInputKeysMax                 = 6;
@@ -203,7 +220,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     if (tvrec)
     {
         curProgram = new ProgramInfo(*tvrec);
-
         curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
     }
 
@@ -618,6 +634,8 @@ void TV::InitKeys(void)
             "Toggle ATSC CC"), "");
     REG_KEY("TV Playback", "TOGGLETTM", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Teletext Menu"), "");
+    REG_KEY("TV Playback", "TOGGLETEXT", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Text Subtitles"), "");
 
     REG_KEY("TV Playback", "SELECTAUDIO_0", QT_TRANSLATE_NOOP("MythControls",
             "Play audio track 1"), "");
@@ -856,7 +874,7 @@ TV::TV(void)
       queuedTranscode(false),
       adjustingPicture(kAdjustingPicture_None),
       adjustingPictureAttribute(kPictureAttribute_None),
-      askAllowType(kAskAllowCancel), askAllowLock(QMutex::Recursive),
+      askAllowLock(QMutex::Recursive),
       // Channel Editing
       chanEditMapLock(QMutex::Recursive),
       ddMapSourceId(0), ddMapLoaderRunning(false),
@@ -886,7 +904,7 @@ TV::TV(void)
       //Recorder switching info
       switchToRec(NULL),
       // OSD info
-      treeMenu(NULL), osdMenuEntries(NULL), udpnotify(NULL),
+      osdMenuEntries(NULL), udpnotify(NULL),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
@@ -1177,9 +1195,6 @@ TV::~TV(void)
     if (!db_use_gui_size_for_tv)
         mwnd->move(saved_gui_bounds.topLeft());
 
-    if (treeMenu)
-        delete treeMenu;
-
     if (lastProgram)
         delete lastProgram;
 
@@ -1423,10 +1438,10 @@ void TV::AskAllowRecording(PlayerContext *ctx,
         delete info;
     }
 
-    UpdateOSDAskAllowDialog(ctx);
+    ShowOSDAskAllow(ctx);
 }
 
-void TV::UpdateOSDAskAllowDialog(PlayerContext *ctx)
+void TV::ShowOSDAskAllow(PlayerContext *ctx)
 {
     QMutexLocker locker(&askAllowLock);
     if (!ctx->recorder)
@@ -1462,13 +1477,8 @@ void TV::UpdateOSDAskAllowDialog(PlayerContext *ctx)
         }
         it = next;
     }
-
-    AskAllowType type      = kAskAllowCancel;
-    int          sel       = 0;
     int          timeuntil = 0;
     QString      message   = QString::null;
-    QStringList  options;
-
     uint conflict_count = askAllowPrograms.size();
 
     it = askAllowPrograms.begin();
@@ -1551,7 +1561,6 @@ void TV::UpdateOSDAskAllowDialog(PlayerContext *ctx)
         //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- " +
         //        "kAskAllowOneRec");
 
-        type = kAskAllowOneRec;
         it = askAllowPrograms.begin();
 
         QString channel = db_channel_format;
@@ -1562,17 +1571,23 @@ void TV::UpdateOSDAskAllowDialog(PlayerContext *ctx)
 
         message = single_rec.arg((*it).info->GetTitle()).arg(channel);
 
-        options += record_watch;
-        options += let_record1;
-        options += ((*it).has_later) ? record_later1 : do_not_record1;
-
-        sel = ((*it).has_rec) ? 2 : 0;
-        timeuntil = QDateTime::currentDateTime().secsTo((*it).expiry);
+        OSD *osd = GetOSDLock(ctx);
+        if (osd)
+        {
+            BrowseEnd(ctx, false);
+            timeuntil = QDateTime::currentDateTime().secsTo((*it).expiry);
+            osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
+            osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0",
+                                 false, !((*it).has_rec));
+            osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0");
+            osd->DialogAddButton(((*it).has_later) ? record_later1 : do_not_record1,
+                                 "DIALOG_ASKALLOW_CANCELRECORDING_0",
+                                 false, ((*it).has_rec));
+        }
+        ReturnOSDLock(ctx, osd);
     }
     else
     {
-        type = kAskAllowMultiRec;
-
         if (conflict_count > 1)
         {
             message = QObject::tr(
@@ -1618,136 +1633,82 @@ void TV::UpdateOSDAskAllowDialog(PlayerContext *ctx)
         }
 
         bool all_have_later = true;
+        timeuntil = 9999;
         it = askAllowPrograms.begin();
         for (; it != askAllowPrograms.end(); ++it)
         {
             if ((*it).is_conflicting)
+            {
                 all_have_later &= (*it).has_later;
-        }
-
-        if (conflict_count > 1)
-        {
-            options += let_recordm;
-            options += (all_have_later) ? record_laterm : do_not_recordm;
-            sel = 0;
-        }
-        else
-        {
-            options += let_record1;
-            options += (all_have_later) ? record_later1 : do_not_record1;
-            sel = (has_rec) ? 1 : 0;
-        }
-
-        it = askAllowPrograms.begin();
-        timeuntil = 9999;
-        for (; it != askAllowPrograms.end(); ++it)
-        {
-            if (!(*it).is_conflicting)
-                continue;
-            int tmp = QDateTime::currentDateTime().secsTo((*it).expiry);
-            timeuntil = min(timeuntil, max(tmp, 0));
+                int tmp = QDateTime::currentDateTime().secsTo((*it).expiry);
+                timeuntil = min(timeuntil, max(tmp, 0));
+            }
         }
         timeuntil = (9999 == timeuntil) ? 0 : timeuntil;
-    }
 
-
-    OSD *osd = GetOSDLock(ctx);
-    if (!osd)
-    {
+        OSD *osd = GetOSDLock(ctx);
+        if (osd && conflict_count > 1)
+        {
+            BrowseEnd(ctx, false);
+            osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
+            osd->DialogAddButton(let_recordm, "DIALOG_ASKALLOW_EXIT_0",
+                                 false, true);
+            osd->DialogAddButton((all_have_later) ? record_laterm : do_not_recordm,
+                                 "DIALOG_ASKALLOW_CANCELCONFLICTING_0");
+        }
+        else if (osd)
+        {
+            BrowseEnd(ctx, false);
+            osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
+            osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0",
+                                 false, !has_rec);
+            osd->DialogAddButton((all_have_later) ? record_later1 : do_not_record1,
+                                 "DIALOG_ASKALLOW_CANCELRECORDING_0",
+                                 false, has_rec);
+        }
         ReturnOSDLock(ctx, osd);
-        return;
     }
-
-    // Only allow one of these dialogs at a time...
-    if (osd->DialogShowing(kOSDDialogAllowRecording))
-    {
-        askAllowType = kAskAllowCancel;
-        osd->HideSet(kOSDDialogAllowRecording, true);
-    }
-
-    askAllowType = type;
-
-    if (kAskAllowCancel != askAllowType)
-    {
-        BrowseEnd(ctx, false);
-        osd->DialogAbortAndHideAll();
-        osd->HideTreeMenu();
-        osd->NewDialogBox(
-            kOSDDialogAllowRecording, message, options, timeuntil, sel);
-    }
-
-    ReturnOSDLock(ctx, osd);
-    //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- done");
 }
 
-void TV::HandleOSDAskAllowResponse(PlayerContext *ctx, int dialog_result)
+void TV::HandleOSDAskAllow(PlayerContext *ctx, QString action)
 {
+    if (!DialogIsVisible(ctx, OSD_DLG_ASKALLOW))
+        return;
+
     if (!askAllowLock.tryLock())
     {
         VERBOSE(VB_IMPORTANT, "allowrecordingbox : askAllowLock is locked");
         return;
     }
 
-    if (kAskAllowOneRec == askAllowType)
+    if (action == "CANCELRECORDING")
     {
-        //VERBOSE(VB_IMPORTANT, "allowrecordingbox : one : "<<result);
-        switch (dialog_result)
+        if (ctx->recorder)
+            ctx->recorder->CancelNextRecording(true);
+    }
+    else if (action == "CANCELCONFLICTING")
+    {
+        QMap<QString,AskProgramInfo>::iterator it =
+            askAllowPrograms.begin();
+        for (; it != askAllowPrograms.end(); ++it)
         {
-            default:
-            case 1:
-                // watch while it records
-                if (ctx->recorder)
-                    ctx->recorder->CancelNextRecording(false);
-                break;
-            case 2:
-                // return to main menu
-                PrepareToExitPlayer(ctx, __LINE__);
-                SetExitPlayer(true, true);
-                break;
-            case 3:
-                // cancel scheduled recording
-                if (ctx->recorder)
-                    ctx->recorder->CancelNextRecording(true);
-                break;
+            if ((*it).is_conflicting)
+                RemoteCancelNextRecording((*it).info->GetCardID(), true);
         }
     }
-    else if (kAskAllowMultiRec == askAllowType)
+    else if (action == "WATCH")
     {
-        //VERBOSE(VB_IMPORTANT, "allowrecordingbox : multi : "<<result);
-        switch (dialog_result)
-        {
-            default:
-            case 1:
-                // return to main menu
-                PrepareToExitPlayer(ctx, __LINE__);
-                SetExitPlayer(true, true);
-                break;
-            case 2:
-            {
-                // cancel conflicting scheduled recordings
-                QMap<QString,AskProgramInfo>::iterator it =
-                    askAllowPrograms.begin();
-                for (; it != askAllowPrograms.end(); ++it)
-                {
-                    if ((*it).is_conflicting)
-                    {
-                        RemoteCancelNextRecording(
-                            (*it).info->GetCardID(), true);
-                    }
-                }
-                break;
-            }
-        }
+        if (ctx->recorder)
+            ctx->recorder->CancelNextRecording(false);
     }
-    else
+    else // if (action == "EXIT")
     {
-        //VERBOSE(VB_IMPORTANT,
-        //        "allowrecordingbox : cancel : "<<result);
+        PrepareToExitPlayer(ctx, __LINE__);
+        SetExitPlayer(true, true);
     }
 
     askAllowLock.unlock();
 }
-
 
 int TV::Playback(const ProgramInfo &rcinfo)
 {
@@ -2135,27 +2096,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         SET_NEXT();
     }
 
-    // Check that new state is valid
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    bool decoder_died_unexpectedly = (kState_None != nextState) &&
-        ctx->nvp && !ctx->nvp->IsDecoderThreadAlive();
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-    if (decoder_died_unexpectedly)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Decoder not alive, and trying to play..");
-        if (nextState == kState_WatchingLiveTV)
-        {
-            StopStuff(mctx, ctx, true, true, true);
-        }
-
-        nextState = kState_None;
-        changed = true;
-
-        if ((mctx != ctx) && (GetPlayer(ctx,-1) == ctx))
-            SetActive(mctx, 0, true);
-    }
-
     // Print state changed message...
     if (!changed)
     {
@@ -2190,13 +2130,13 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         }
         else if (StateIsPlaying(ctx->GetState()) && lastState == kState_None)
         {
-            OSD *osd = GetOSDLock(ctx);
             ctx->LockPlayingInfo(__FILE__, __LINE__);
-            if (osd && (PlayGroup::GetCount() > 0))
-                osd->SetSettingsText(tr("%1 Settings")
-                    .arg(tv_i18n(ctx->playingInfo->GetPlaybackGroup())), 3);
+            int count = PlayGroup::GetCount();
+            QString msg = tr("%1 Settings")
+                    .arg(tv_i18n(ctx->playingInfo->GetPlaybackGroup()));
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-            ReturnOSDLock(ctx, osd);
+            if (count > 0)
+                SetOSDMessage(ctx, msg);
             ITVRestart(ctx, false);
         }
 
@@ -2335,8 +2275,8 @@ void TV::StopStuff(PlayerContext *mctx, PlayerContext *ctx,
     }
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (stopPlayer && ctx->nvp)
-        ctx->nvp->StopPlaying();
+    if (stopPlayer)
+        ctx->StopPlaying();
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (stopRingBuffer)
@@ -2475,11 +2415,11 @@ void TV::timerEvent(QTimerEvent *te)
     if (timer_id == lcdTimerId)
         HandleLCDTimerEvent();
     else if (timer_id == sleepTimerId)
-        SleepDialogCreate();
+        ShowOSDSleep();
     else if (timer_id == sleepDialogTimerId)
         SleepDialogTimeout();
     else if (timer_id == idleTimerId)
-        IdleDialogCreate();
+        ShowOSDIdle();
     else if (timer_id == idleDialogTimerId)
         IdleDialogTimeout();
     else if (timer_id == endOfPlaybackTimerId)
@@ -2727,21 +2667,18 @@ void TV::timerEvent(QTimerEvent *te)
 
         OSD *osd = GetOSDLock(mctx);
         if (osd)
-            osd->DialogAbortAndHideAll();
+        {
+            osd->DialogQuit();
+            osd->HideAll();
+        }
         ReturnOSDLock(mctx, osd);
 
         if (jumpToProgram && lastProgram)
         {
             if (!lastProgram->IsFileReadable())
             {
-                OSD *osd = GetOSDLock(mctx);
-                if (osd)
-                {
-                    QString msg = tr("Last Program: %1 Doesn't Exist")
-                                    .arg(lastProgram->GetTitle());
-                    osd->SetSettingsText(msg, 3);
-                }
-                ReturnOSDLock(mctx, osd);
+                SetOSDMessage(mctx, tr("Last Program: %1 Doesn't Exist")
+                                        .arg(lastProgram->GetTitle()));
                 lastProgramStringList.clear();
                 SetLastProgram(NULL);
                 VERBOSE(VB_PLAYBACK, LOC_ERR +
@@ -2767,7 +2704,10 @@ void TV::timerEvent(QTimerEvent *te)
 
     if (timer_id == jumpMenuTimerId)
     {
-        DoDisplayJumpMenu();
+        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+        if (actx)
+            ShowOSDJumpRec(actx);
+        ReturnPlayerLock(actx);
 
         QMutexLocker locker(&timerIdLock);
         KillTimer(jumpMenuTimerId);
@@ -2859,12 +2799,8 @@ void TV::timerEvent(QTimerEvent *te)
         if (HasQueuedChannel())
         {
             OSD *osd = GetOSDLock(actx);
-            if (osd)
-            {
-                OSDSet *oset = osd->GetSet("channel_number");
-                if ((oset && !oset->Displaying()) || !oset)
-                    CommitQueuedInput(actx);
-            }
+            if (osd && !osd->IsWindowVisible("osd_input"))
+                CommitQueuedInput(actx);
             ReturnOSDLock(actx, osd);
         }
         ReturnPlayerLock(actx);
@@ -2896,26 +2832,18 @@ void TV::timerEvent(QTimerEvent *te)
     {
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(actx);
-        OSDSet *osdset = NULL;
-        if (osd && (osdset = osd->GetSet("status")) &&
-            osdset->Displaying() &&
+        if (osd && osd->IsWindowVisible("osd_status") &&
             (StateIsLiveTV(actx->GetState()) ||
              StateIsPlaying(actx->GetState())))
         {
-            ReturnOSDLock(actx, osd);
-            struct StatusPosInfo posInfo;
-            if (actx->CalcNVPSliderPosition(posInfo))
+            osdInfo info;
+            if (actx->CalcNVPSliderPosition(info))
             {
-                OSD *osd = GetOSDLock(actx);
-                if (osd)
-                    osd->UpdateStatus(posInfo);
-                ReturnOSDLock(actx, osd);
+                osd->SetText("osd_status", info.text, false);
+                osd->SetValues("osd_status", info.values, false);
             }
         }
-        else
-        {
-            ReturnOSDLock(actx, osd);
-        }
+        ReturnOSDLock(actx, osd);
         ReturnPlayerLock(actx);
         handled = true;
     }
@@ -3042,9 +2970,9 @@ bool TV::HandleLCDTimerEvent(void)
 
         if (showProgress)
         {
-            struct StatusPosInfo posInfo;
-            if (actx->CalcNVPSliderPosition(posInfo))
-                progress = posInfo.position * 0.001f;
+            osdInfo info;
+            if (actx->CalcNVPSliderPosition(info))
+                progress = info.values["position"] * 0.001f;
         }
         lcd->setChannelProgress(progress);
     }
@@ -3229,7 +3157,7 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent(void)
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     OSD *osd = GetOSDLock(mctx);
-    if (osd && !osd->GetDialogActive().isEmpty())
+    if (osd && osd->DialogVisible())
     {
         ReturnOSDLock(mctx, osd);
         ReturnPlayerLock(mctx);
@@ -3250,7 +3178,7 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent(void)
     mctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (do_prompt)
-        PromptDeleteRecording(mctx, tr("End Of Recording"));
+        ShowOSDPromptDeleteRecording(mctx, tr("End Of Recording"));
 
     ReturnPlayerLock(mctx);
 }
@@ -3267,14 +3195,14 @@ void TV::HandleVideoExitDialogTimerEvent(void)
     // disable dialog and exit playback after timeout
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     OSD *osd = GetOSDLock(mctx);
-    if (!osd || !IsVideoExitDialog(osd->GetDialogActive()))
+    if (!osd || !osd->DialogVisible(OSD_DLG_VIDEOEXIT))
     {
         ReturnOSDLock(mctx, osd);
         ReturnPlayerLock(mctx);
         return;
     }
     if (osd)
-        osd->TurnDialogOff(kOSDDialogActive);
+        osd->DialogQuit();
     ReturnOSDLock(mctx, osd);
     DoTogglePause(mctx, true);
     ClearOSD(mctx);
@@ -3436,7 +3364,12 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
 
     bool handled = false;
 
-    if (action == "TOGGLECC" && !browsemode)
+    if (action == "TOGGLETEXT")
+    {
+        handled = true;
+        ctx->nvp->ToggleCaptions(kTrackTypeTextSubtitle);
+    }
+    else if (action == "TOGGLECC" && !browsemode)
     {
         handled = true;
         if (ccInputMode)
@@ -3568,30 +3501,37 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             return;
     }
 
-    if (editmode)
+    OSD *osd = GetOSDLock(actx);
+    if (osd && osd->DialogVisible())
     {
-        actx->LockDeleteNVP(__FILE__, __LINE__);
-        if (actx->nvp && !actx->nvp->DoKeypress(e))
-            editmode = actx->nvp->GetEditMode();
-        actx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-        if (!editmode)
-        {
-            actx->paused = !actx->paused;
-            DoTogglePause(actx, true);
-        }
-
-        return;
+        osd->DialogHandleKeypress(e);
+        handled = true;
     }
 
-    OSD *osd = GetOSDLock(actx);
-    if (osd && osd->IsRunningTreeMenu())
+    if (editmode && osd && !handled)
     {
-        osd->TreeMenuHandleKeypress(e);
-        ReturnOSDLock(actx, osd);
-        return;
+        handled |= GetMythMainWindow()->TranslateKeyPress(
+                   "TV Editing", e, actions);
+
+        if (!handled)
+        {
+            if(has_action("SELECT", actions))
+            {
+                ShowOSDCutpoint(actx, true);
+                handled = true;
+            }
+            else
+            {
+                handled |= actx->nvp->HandleProgrameEditorActions(actions);
+            }
+        }
+        if (handled)
+            editmode = actx->nvp->GetEditMode();
     }
     ReturnOSDLock(actx, osd);
+
+    if (handled)
+        return;
 
     // If text is already queued up, be more lax on what is ok.
     // This allows hex teletext entry and minor channel entry.
@@ -3606,15 +3546,6 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             return;
         }
     }
-
-    osd = GetOSDLock(actx);
-    if (osd && osd->IsDialogActive("channel_editor"))
-    {
-        ChannelEditKey(actx, e);
-        ReturnOSDLock(actx, osd);
-        return;
-    }
-    ReturnOSDLock(actx, osd);
 
     // Teletext menu
     actx->LockDeleteNVP(__FILE__, __LINE__);
@@ -3669,7 +3600,6 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     bool isDVD = actx->buffer && actx->buffer->isDVD();
     bool isDVDStill = isDVD && actx->buffer->InDVDMenuOrStillFrame();
 
-    handled = handled || OSDDialogHandleAction(actx, actions);
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
     handled = handled || PictureAttributeHandleAction(actx, actions);
@@ -3829,234 +3759,6 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
     return handled;
 }
 
-bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
-{
-    QString dialogname = QString::null;
-    {
-        OSD *osd = GetOSDLock(actx);
-
-        if (!osd || !osd->DialogShowing(kOSDDialogActive))
-        {
-            ReturnOSDLock(actx, osd);
-            return false;
-        }
-
-        if (has_action("UP", actions))
-        {
-            osd->DialogUp(kOSDDialogActive);
-            ReturnOSDLock(actx, osd);
-            return true;
-        }
-        else if (has_action("DOWN", actions))
-        {
-            osd->DialogDown(kOSDDialogActive);
-            ReturnOSDLock(actx, osd);
-            return true;
-        }
-
-        dialogname = osd->GetDialogActive();
-
-        ReturnOSDLock(actx, osd);
-    }
-
-    bool handled = true;
-    actx->LockDeleteNVP(__FILE__, __LINE__);
-    bool isnearend = actx->nvp && actx->nvp->IsNearEnd();
-    actx->UnlockDeleteNVP(__FILE__, __LINE__);
-    if (((has_action("RWNDSTICKY", actions) ||
-          has_action("SEEKRWND", actions) ||
-          has_action("JUMPRWND", actions))) &&
-        IsVideoExitDialog(dialogname) &&
-        !has_action("UP", actions) &&
-        !has_action("DOWN", actions) &&
-        !(has_action("LEFT", actions) && arrowAccel))
-    {
-        DoTogglePause(actx, false);
-
-        OSD *osd = GetOSDLock(actx);
-        if (osd)
-            osd->TurnDialogOff(kOSDDialogActive);
-        ReturnOSDLock(actx, osd);
-
-        ClearInputQueues(actx, true);
-        requestDelete = false;
-        jumped_back = true;
-        if (has_action("RWNDSTICKY", actions))
-            ChangeFFRew(actx, -3);
-        else if (has_action("JUMPRWND", actions))
-            DoSeek(actx, -actx->jumptime * 60, tr("Jump Back"));
-        else
-            DoSeek(actx, -actx->rewtime, tr("Skip Back"));
-    }
-    else if (has_action("ESCAPE", actions) && isnearend)
-    {
-        requestDelete = false;
-        PrepareToExitPlayer(actx, __LINE__, false);
-        SetExitPlayer(true, true);
-    }
-    else if (has_action("SELECT", actions)  ||
-             has_action("ESCAPE", actions)   ||
-             has_action("CLEAROSD", actions) ||
-             (arrowAccel &&
-              (has_action("LEFT",  actions) ||
-               has_action("RIGHT", actions))))
-    {
-        dialogname = QString::null;
-        int result = -1;
-        {
-            OSD *osd = GetOSDLock(actx);
-            if (osd)
-            {
-                dialogname = osd->GetDialogActive();
-                if (has_action("ESCAPE", actions)   ||
-                    has_action("CLEAROSD", actions) ||
-                    (arrowAccel && has_action("LEFT", actions)))
-                {
-                    osd->DialogAbort(dialogname);
-                }
-                osd->TurnDialogOff(dialogname);
-                result = osd->GetDialogResponse(dialogname);
-            }
-            ReturnOSDLock(actx, osd);
-        }
-
-        if (dialogname == kOSDDialogAlreadyEditing)
-        {
-            if (result == 1)
-            {
-                actx->LockPlayingInfo(__FILE__, __LINE__);
-                if (actx->playingInfo)
-                    actx->playingInfo->SaveEditing(false);
-                actx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-                actx->LockDeleteNVP(__FILE__, __LINE__);
-                if (actx->nvp)
-                    editmode = actx->nvp->EnableEdit();
-                actx->UnlockDeleteNVP(__FILE__, __LINE__);
-            }
-            else
-            {
-                actx->paused = !actx->paused;
-                DoTogglePause(actx, true);
-            }
-        }
-        else if (dialogname == kOSDDialogExitOptions)
-        {
-            if (result > 0)
-            {
-                if (!IsBookmarkAllowed(actx))
-                    result++;
-                if (result > 2 && !IsDeleteAllowed(actx))
-                    result++;
-            }
-
-            switch (result)
-            {
-                case 0: case 4:
-                    DoTogglePause(actx, true);
-                    break;
-                case 1:
-                    PrepareToExitPlayer(actx, __LINE__);
-                    SetExitPlayer(true, true);
-                    break;
-                case 3:
-                    DoTogglePause(actx, true);
-                    PromptDeleteRecording(
-                        actx, tr("Delete this recording?"));
-                    return handled;
-                default:
-                    PrepareToExitPlayer(actx, __LINE__, false);
-                    SetExitPlayer(true, true);
-                    break;
-            }
-        }
-        else if (dialogname == kOSDDialogAskDelete)
-        {
-            switch (result)
-            {
-                case 1:
-                    allowRerecord = true;
-                    requestDelete = true;
-                    SetExitPlayer(true, true);
-                    break;
-                case 2:
-                    requestDelete = true;
-                    SetExitPlayer(true, true);
-                    break;
-                case 3:
-                    PrepareToExitPlayer(actx, __LINE__);
-                    SetExitPlayer(true, true);
-                    break;
-                default:
-                    if (isnearend)
-                    {
-                        PrepareToExitPlayer(actx, __LINE__, false);
-                        SetExitPlayer(true, true);
-                    }
-                    else
-                        DoTogglePause(actx, true);
-                    break;
-            }
-        }
-        else if (dialogname == kOSDDialogAllowRecording)
-        {
-            HandleOSDAskAllowResponse(GetPlayer(actx,0), result);
-        }
-        else if (dialogname == kOSDDialogIdleTimeout)
-        {
-            if (result == 1)
-            {
-                if (idleDialogTimerId)
-                {
-                    KillTimer(idleDialogTimerId);
-                    idleDialogTimerId = 0;
-                }
-
-                if (idleTimerId)
-                    KillTimer(idleTimerId);
-                idleTimerId = StartTimer(db_idle_timeout, __LINE__);
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, LOC +
-                        "No longer watching LiveTV, exiting");
-                SetExitPlayer(true, true);
-            }
-        }
-        else if (dialogname == kOSDDialogSleepTimeout)
-        {
-            if (result == 1)
-            {
-                if (sleepDialogTimerId)
-                {
-                    KillTimer(sleepDialogTimerId);
-                    sleepDialogTimerId = 0;
-                }
-                sleepTimerId = StartTimer(sleepTimerTimeout * 1000, __LINE__);
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, LOC +
-                        "No longer watching TV, exiting");
-                SetExitPlayer(true, true);
-            }
-        }
-        else if (dialogname == kOSDDialogChannelTimeout)
-        {
-            lockTimerOn = false;
-        }
-
-        OSD *osd = GetOSDLock(actx);
-        if (osd)
-            osd->HideSet(dialogname, true);
-        ReturnOSDLock(actx, osd);
-    }
-    else
-        handled = false;
-
-    return handled;
-}
-
 bool TV::PictureAttributeHandleAction(PlayerContext *ctx,
                                       const QStringList &actions)
 {
@@ -4168,7 +3870,7 @@ bool TV::DVDMenuHandleAction(PlayerContext *ctx,
         else if (has_action("SELECT", actions))
         {
             ctx->LockDeleteNVP(__FILE__, __LINE__);
-            ctx->nvp->ActivateDVDButton();
+            ctx->buffer->DVD()->ActivateButton();
             ctx->UnlockDeleteNVP(__FILE__, __LINE__);
         }
         else
@@ -4228,19 +3930,14 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
         if (!msg.isEmpty())
-        {
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->SetSettingsText(msg, 3);
-            ReturnOSDLock(ctx, osd);
-        }
+            SetOSDMessage(ctx, msg);
     }
     else if (has_action("ARBSEEK", actions) && !isDVD)
     {
         if (asInputMode)
         {
             ClearInputQueues(ctx, true);
-            UpdateOSDTextEntry(ctx, tr("Seek:"));
+            SetOSDText(ctx, "osd_input", "osd_number_entry", tr("Seek:"));
 
             QMutexLocker locker(&timerIdLock);
             asInputMode = false;
@@ -4332,10 +4029,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
 
             if (timeout == 0xffffffff)
             {
-                OSD *osd = GetOSDLock(ctx);
-                if (osd)
-                    osd->SetSettingsText("No Signal Monitor", 2);
-                ReturnOSDLock(ctx, osd);
+                SetOSDMessage(ctx, "No Signal Monitor");
                 return false;
             }
 
@@ -4378,8 +4072,9 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         else
         {
             OSD *osd = GetOSDLock(ctx);
-            if (osd && ClearOSD(ctx))
+            if (osd && osd->IsVisible())
             {
+                ClearOSD(ctx);
                 ReturnOSDLock(ctx, osd);
                 return handled;
             }
@@ -4396,7 +4091,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         {
             if (ctx->HasNVP() && (12 & db_playback_exit_prompt))
             {
-                PromptStopWatchingRecording(ctx);
+                ShowOSDStopWatchingRecording(ctx);
                 return handled;
             }
             else
@@ -4409,7 +4104,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             if (ctx->HasNVP() && (5 & db_playback_exit_prompt) &&
                 !underNetworkControl && !isDVDStill)
             {
-                PromptStopWatchingRecording(ctx);
+                ShowOSDStopWatchingRecording(ctx);
                 return handled;
             }
             PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 2);
@@ -4446,7 +4141,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action("STRETCHDEC", actions))
         ChangeTimeStretch(ctx, -1);
     else if (has_action("MENU", actions))
-        ShowOSDTreeMenu(ctx);
+        ShowOSDMenu(ctx);
     else if (has_action("INFO", actions))
     {
         if (HasQueuedInput())
@@ -4546,7 +4241,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         if (islivetv)
             BrowseStart(ctx);
         else if (!isDVD)
-            ShowOSDTreeMenu(ctx);
+            ShowOSDMenu(ctx);
         else
             handled = false;
     }
@@ -4678,7 +4373,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
         if (ctx->nvp)
             ctx->nvp->SetBookmark();
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-        PromptDeleteRecording(ctx, tr("Delete this recording?"));
+        ShowOSDPromptDeleteRecording(ctx, tr("Delete this recording?"));
     }
     else if (has_action("JUMPTODVDROOTMENU", actions) && isDVD)
     {
@@ -4723,17 +4418,16 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
 
     OSD *osd = GetOSDLock(ctx);
-    QString dlg;
+    bool dlg = false;
     if (osd)
-        dlg = osd->GetDialogActive();
+        dlg = osd->DialogVisible();
     ReturnOSDLock(ctx, osd);
 
-    if (!dlg.isEmpty())
+    if (dlg)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Ignoring network "
                 "control command\n\t\t\t" +
-                QString("because dialog '%1'").arg(dlg) +
-                "is waiting for a response");
+                QString("because dialog is waiting for a response"));
         return;
     }
 
@@ -4938,8 +4632,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             else if (ctx->ts_normal != 1.0)
                 speedStr = QString("%1X").arg(ctx->ts_normal);
 
-            struct StatusPosInfo posInfo;
-            ctx->CalcNVPSliderPosition(posInfo, true);
+            osdInfo info;
+            ctx->CalcNVPSliderPosition(info, true);
 
             QDateTime respDate = mythCurrentDateTime();
             QString infoStr = "";
@@ -4973,7 +4667,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             if ((infoStr == "Recorded") || (infoStr == "LiveTV"))
             {
                 infoStr += QString(" %1 %2 %3 %4 %5 %6 %7")
-                    .arg(posInfo.desc)
+                    .arg(info.text["description"])
                     .arg(speedStr)
                     .arg(ctx->playingInfo != NULL ?
                          ctx->playingInfo->GetChanID() : 0)
@@ -4984,7 +4678,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             }
             else
             {
-                QString position = posInfo.desc.section(" ",0,0);
+                QString position = info.text["description"].section(" ",0,0);
                 infoStr += QString(" %1 %2 %3 %4 %5")
                     .arg(position)
                     .arg(speedStr)
@@ -5233,7 +4927,8 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
             if (mctx->nvp && pipctx->nvp)
             {
                 PIPLocation loc = mctx->nvp->GetNextPIPLocation();
-                ok = mctx->nvp->AddPIPPlayer(pipctx->nvp, loc, 4000);
+                if (loc != kPIP_END)
+                    ok = mctx->nvp->AddPIPPlayer(pipctx->nvp, loc, 4000);
             }
             mctx->deleteNVPLock.unlock();
             pipctx->deleteNVPLock.unlock();
@@ -5314,10 +5009,7 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
     if (!err_msg.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + err_msg);
-        OSD *osd = GetOSDLock(actx);
-        if (osd)
-            osd->SetSettingsText(err_msg, 3);
-        ReturnOSDLock(actx, osd);
+        SetOSDMessage(actx, err_msg);
         return;
     }
 
@@ -5332,10 +5024,7 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
         ((wantPBP) ? tr("Creating PBP")      : tr("Creating PIP")) :
         ((wantPBP) ? tr("Cannot create PBP") : tr("Cannot create PIP"));
 
-    OSD *osd = GetOSDLock(actx);
-    if (osd)
-        osd->SetSettingsText(msg, 3);
-    ReturnOSDLock(actx, osd);
+    SetOSDMessage(actx, msg);
 }
 
 /// \brief stop PIP/PBP
@@ -5369,10 +5058,7 @@ void TV::PxPTeardownView(PlayerContext *actx)
             ForceNextStateNone(GetPlayer(actx,i));
     }
 
-    OSD *osd = GetOSDLock(mctx);
-    if (osd)
-        osd->SetSettingsText(msg, 3);
-    ReturnOSDLock(mctx, osd);
+    SetOSDMessage(mctx, msg);
 }
 
 /**
@@ -5416,10 +5102,7 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
         QString err_msg = tr("Too many views to switch");
 
         PlayerContext *actx = GetPlayer(mctx, -1);
-        OSD *osd = GetOSDLock(actx);
-        if (osd)
-            osd->SetSettingsText(err_msg, 3);
-        ReturnOSDLock(actx, osd);
+        SetOSDMessage(actx, err_msg);
         return;
     }
 
@@ -6194,10 +5877,7 @@ void TV::DoQueueTranscode(PlayerContext *ctx, QString profile)
                 ctx->playingInfo->GetChanID(),
                 ctx->playingInfo->GetRecordingStartTime(), JOB_STOP);
             queuedTranscode = false;
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->SetSettingsText(tr("Stopping Transcode"), 3);
-            ReturnOSDLock(ctx, osd);
+            SetOSDMessage(ctx, tr("Stopping Transcode"));
         }
         else
         {
@@ -6208,21 +5888,16 @@ void TV::DoQueueTranscode(PlayerContext *ctx, QString profile)
             if (db_run_jobs_on_remote)
                 jobHost = ctx->playingInfo->GetHostname();
 
-            OSD *osd = GetOSDLock(ctx);
-            if (JobQueue::QueueJob(
-                    JOB_TRANSCODE,
-                    ctx->playingInfo->GetChanID(),
-                    ctx->playingInfo->GetRecordingStartTime(),
-                    jobHost, "", "", JOB_USE_CUTLIST))
+            QString msg = tr("Try Again");
+            if (JobQueue::QueueJob(JOB_TRANSCODE,
+                       ctx->playingInfo->GetChanID(),
+                       ctx->playingInfo->GetRecordingStartTime(),
+                       jobHost, "", "", JOB_USE_CUTLIST))
             {
                 queuedTranscode = true;
-                if (osd)
-                    osd->SetSettingsText(tr("Transcoding"), 3);
-            } else {
-                if (osd)
-                    osd->SetSettingsText(tr("Try Again"), 3);
+                msg = tr("Transcoding");
             }
-            ReturnOSDLock(ctx, osd);
+            SetOSDMessage(ctx, msg);
         }
     }
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -6261,23 +5936,13 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     NormalSpeed(ctx);
     StopFFRew(ctx);
 
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
     PauseAudioUntilBuffered(ctx);
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    struct StatusPosInfo posInfo;
-    ctx->CalcNVPSliderPosition(posInfo);
-
-    bool slidertype = false;
-
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-    {
-        posInfo.desc = tr("Searching...");
-        osd->ShowStatus(posInfo, slidertype, tr("Jump Chapter"), 3);
-        SetUpdateOSDPosition(true);
-    }
-    ReturnOSDLock(ctx, osd);
+    osdInfo info;
+    ctx->CalcNVPSliderPosition(info);
+    info.text["description"] = tr("Jump Chapter");
+    info.text["title"] = tr("Searching");
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
@@ -6293,23 +5958,14 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
     if (StateIsLiveTV(GetState(ctx)))
         return;
 
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
     PauseAudioUntilBuffered(ctx);
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    struct StatusPosInfo posInfo;
-    ctx->CalcNVPSliderPosition(posInfo);
-
-    bool slidertype = false;
-
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-    {
-        posInfo.desc = tr("Searching...");
-        osd->ShowStatus(posInfo, slidertype, tr("Skip"), 6);
-        SetUpdateOSDPosition(true);
-    }
-    ReturnOSDLock(ctx, osd);
+    osdInfo info;
+    ctx->CalcNVPSliderPosition(info);
+    info.text["title"] = tr("Skip");
+    info.text["description"] = tr("Searching");
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
+    SetUpdateOSDPosition(true);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
@@ -6489,7 +6145,7 @@ void TV::SwitchCards(PlayerContext *ctx,
         // shutdown stuff
         ctx->buffer->Pause();
         ctx->buffer->WaitForPause();
-        ctx->nvp->StopPlaying();
+        ctx->StopPlaying();
         ctx->recorder->StopLiveTV();
         ctx->SetNVP(NULL);
 
@@ -6584,11 +6240,7 @@ void TV::ToggleInputs(PlayerContext *ctx, uint inputid)
     // If Nuppel Video Player is paused, unpause it
     if (ctx->paused)
     {
-        OSD *osd = GetOSDLock(ctx);
-        if (osd)
-            osd->EndStatus();
-        ReturnOSDLock(ctx, osd);
-
+        HideOSDWindow(ctx, "osd_status");
         GetMythUI()->DisableScreensaver();
         ctx->paused = false;
     }
@@ -6683,10 +6335,8 @@ QString TV::GetQueuedChanNum(void) const
  */
 void TV::ClearInputQueues(const PlayerContext *ctx, bool hideosd)
 {
-    OSD *osd = GetOSDLock(ctx);
-    if (hideosd && osd)
-        osd->HideSet("channel_number");
-    ReturnOSDLock(ctx, osd);
+    if (hideosd)
+        HideOSDWindow(ctx, "osd_input");
 
     QMutexLocker locker(&timerIdLock);
     queuedInput   = "";
@@ -6731,7 +6381,7 @@ void TV::AddKeyToInputQueue(PlayerContext *ctx, char key)
     }
     else if (asInputMode)
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
-    UpdateOSDTextEntry(ctx, inputStr);
+    SetOSDText(ctx, "osd_input", "osd_number_entry", inputStr);
 
     // Commit the channel if it is complete and smart changing is enabled.
     if (commitSmart)
@@ -6816,26 +6466,6 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     return !is_not_complete;
 }
 
-void TV::UpdateOSDTextEntry(const PlayerContext *ctx, const QString &message)
-{
-    OSD *osd = GetOSDLock(ctx);
-    if (!osd)
-    {
-        ReturnOSDLock(ctx, osd);
-        return;
-    }
-
-    InfoMap infoMap;
-
-    infoMap["channum"]  = message;
-    infoMap["callsign"] = "";
-
-    osd->ClearAllText("channel_number");
-    osd->SetText("channel_number", infoMap, 2);
-
-    ReturnOSDLock(ctx, osd);
-}
-
 bool TV::CommitQueuedInput(PlayerContext *ctx)
 {
     bool commited = false;
@@ -6871,10 +6501,7 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
                 channum.detach();
             }
             BrowseChannel(ctx, channum);
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->HideSet("channel_number");
-            ReturnOSDLock(ctx, osd);
+            HideOSDWindow(ctx, "osd_input");
         }
         else if (GetQueuedChanID() || !channum.isEmpty())
         {
@@ -6921,12 +6548,9 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
     if (ctx->paused)
     {
-        OSD *osd = GetOSDLock(ctx);
-        if (osd)
-            osd->EndStatus();
+        HideOSDWindow(ctx, "osd_status");
         GetMythUI()->DisableScreensaver();
         ctx->paused = false;
-        ReturnOSDLock(ctx, osd);
     }
 
     // Save the current channel if this is the first time
@@ -6948,7 +6572,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
     ClearInputQueues(ctx, false);
 
     if (ctx->nvp)
-        ctx->nvp->ResetAudio();
+        ctx->nvp->GetAudio()->Reset();
 
     UnpauseLiveTV(ctx);
 
@@ -7035,14 +6659,12 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (getit || !ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && ctx->paused)
+    if (ctx->paused)
     {
-        osd->EndStatus();
+        HideOSDWindow(ctx, "osd_status");
         GetMythUI()->DisableScreensaver();
         ctx->paused = false;
     }
-    ReturnOSDLock(ctx, osd);
 
     // Save the current channel if this is the first time
     if (ctx->prevChan.empty())
@@ -7062,7 +6684,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     ctx->recorder->SetChannel(channum);
 
     if (ctx->nvp)
-        ctx->nvp->ResetAudio();
+        ctx->nvp->GetAudio()->Reset();
 
     UnpauseLiveTV(ctx);
 
@@ -7080,10 +6702,7 @@ void TV::ChangeChannel(const PlayerContext *ctx, const DBChanList &options)
         if (chanid && !channum.isEmpty() && IsTunable(ctx, chanid))
         {
             // hide the channel number, activated by certain signal monitors
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->HideSet("channel_number");
-            ReturnOSDLock(ctx, osd);
+            HideOSDWindow(ctx, "osd_input");
 
             QMutexLocker locker(&timerIdLock);
             queuedInput   = channum; queuedInput.detach();
@@ -7106,20 +6725,7 @@ void TV::ShowPreviousChannel(PlayerContext *ctx)
     if (channum.isEmpty())
         return;
 
-    // Display channel name in the OSD for up to 1 second.
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-    {
-        osd->HideSet("program_info");
-
-        InfoMap infoMap;
-
-        infoMap["channum"] = channum;
-        infoMap["callsign"] = "";
-        osd->ClearAllText("channel_number");
-        osd->SetText("channel_number", infoMap, 1);
-    }
-    ReturnOSDLock(ctx, osd);
+    SetOSDText(ctx, "osd_input", "osd_number_entry", channum);
 }
 
 void TV::PopPreviousChannel(PlayerContext *ctx, bool immediate_change)
@@ -7150,10 +6756,7 @@ void TV::PopPreviousChannel(PlayerContext *ctx, bool immediate_change)
     if (immediate_change)
     {
         // Turn off OSD Channel Num so the channel changes right away
-        OSD *osd = GetOSDLock(ctx);
-        if (osd)
-            osd->HideSet("channel_number");
-        ReturnOSDLock(ctx, osd);
+        HideOSDWindow(ctx, "osd_input");
     }
 }
 
@@ -7168,15 +6771,12 @@ bool TV::ClearOSD(const PlayerContext *ctx)
     }
 
     OSD *osd = GetOSDLock(ctx);
-    if (osd && osd->HideAll())
+    if (osd)
+    {
+        osd->DialogQuit();
+        osd->HideAll();
         res = true;
-
-    while (res && osd && osd->HideAll())
-        usleep(1000);
-
-    while (osd && osd->DialogShowing(kOSDDialogActive))
-        osd->TurnDialogOff(kOSDDialogActive);
-
+    }
     ReturnOSDLock(ctx, osd);
 
     if (browsemode)
@@ -7206,15 +6806,15 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
         ReturnOSDLock(ctx, osd);
         return;
     }
-    bool is_status_disp          = osd->IsSetDisplaying("status");
-    bool has_prog_info_small     = osd->HasSet("program_info_small");
-    bool is_prog_info_small_disp = osd->IsSetDisplaying("program_info_small");
-    bool has_prog_info           = osd->HasSet("program_info");
-    bool is_prog_info_disp       = osd->IsSetDisplaying("program_info");
-    bool has_prog_video          = osd->HasSet("program_info_video");
-    bool has_prog_small_video    = osd->HasSet("program_info_small_video");
-    bool has_prog_rec            = osd->HasSet("program_info_recording");
-    bool has_prog_small_rec      = osd->HasSet("program_info_small_recording");
+    bool is_status_disp          = osd->IsWindowVisible("osd_status");
+    bool has_prog_info_small     = osd->HasWindow("program_info_small");
+    bool is_prog_info_small_disp = osd->IsWindowVisible("program_info_small");
+    bool has_prog_info           = osd->HasWindow("program_info");
+    bool is_prog_info_disp       = osd->IsWindowVisible("program_info");
+    bool has_prog_video          = osd->HasWindow("program_info_video");
+    bool has_prog_small_video    = osd->HasWindow("program_info_small_video");
+    bool has_prog_rec            = osd->HasWindow("program_info_recording");
+    bool has_prog_small_rec      = osd->HasWindow("program_info_small_recording");
 
     ReturnOSDLock(ctx, osd);
 
@@ -7301,16 +6901,11 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
 
     if (showStatus)
     {
-        struct StatusPosInfo posInfo;
-        if (ctx->CalcNVPSliderPosition(posInfo))
+        osdInfo info;
+        if (ctx->CalcNVPSliderPosition(info))
         {
-            osd = GetOSDLock(ctx);
-            if (osd)
-            {
-                osd->ShowStatus(posInfo, false, tr("Position"),
-                                osd_prog_info_timeout);
-            }
-            ReturnOSDLock(ctx, osd);
+            info.text["title"] = tr("Position");
+            UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
             SetUpdateOSDPosition(true);
         }
         else
@@ -7336,11 +6931,39 @@ void TV::UpdateOSDProgInfo(const PlayerContext *ctx, const char *whichInfo)
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
-        osd->ClearAllText(whichInfo);
         osd->HideAll();
-        osd->SetText(whichInfo, infoMap, osd_prog_info_timeout);
+        osd->SetText(whichInfo, infoMap);
     }
     ReturnOSDLock(ctx, osd);
+}
+
+void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
+                         int type, bool set_expiry)
+{
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+    {
+        osd->SetValues("osd_status", info.values);
+        osd->SetText("osd_status",   info.text);
+        if (type != kOSDFunctionalType_Default)
+            osd->SetFunctionalWindow("osd_status", (OSDFunctionalType)type);
+    }
+    ReturnOSDLock(ctx, osd);
+}
+
+void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
+                         QString value, int type, QString units,
+                         int position, int prev, int next)
+{
+    osdInfo info;
+    info.values.insert("position", position);
+    info.values.insert("previous", prev);
+    info.values.insert("next",     next);
+    info.text.insert("title", title);
+    info.text.insert("description", desc);
+    info.text.insert("value", value);
+    info.text.insert("units", units);
+    UpdateOSDStatus(ctx, info, type);
 }
 
 void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
@@ -7349,16 +6972,13 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
     VERBOSE(VB_PLAYBACK, QString("UpdateOSDSeekMessage(%1, %2)")
             .arg(mesg).arg(disptime));
 
-    struct StatusPosInfo posInfo;
-    if (ctx->CalcNVPSliderPosition(posInfo))
+    osdInfo info;
+    if (ctx->CalcNVPSliderPosition(info))
     {
-        bool slidertype = StateIsLiveTV(GetState(ctx));
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
             kOSDFunctionalType_Default;
-        OSD *osd = GetOSDLock(ctx);
-        if (osd)
-            osd->ShowStatus(posInfo, slidertype, mesg, disptime, osdtype);
-        ReturnOSDLock(ctx, osd);
+        info.text["title"] = mesg;
+        UpdateOSDStatus(ctx, info, osdtype, disptime > 0);
         SetUpdateOSDPosition(true);
     }
 }
@@ -7378,10 +6998,7 @@ void TV::UpdateOSDInput(const PlayerContext *ctx, QString inputname)
     if (displayName.isEmpty())
         displayName = QString("%1: %2").arg(cardid).arg(inputname);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-        osd->SetSettingsText(displayName, 3);
-    ReturnOSDLock(ctx, osd);
+    SetOSDMessage(ctx, displayName);
 }
 
 /** \fn TV::UpdateOSDSignal(const PlayerContext*, const QStringList&)
@@ -7411,8 +7028,6 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     if (ctx->lastSignalUIInfoTime.elapsed() > 5000 ||
         infoMap["callsign"].isEmpty())
     {
-        //ctx->lastSignalUIInfo["name"]  = "signalmonitor";
-        //ctx->lastSignalUIInfo["title"] = "Signal Monitor";
         ctx->lastSignalUIInfo.clear();
         ctx->GetPlayingInfoMap(ctx->lastSignalUIInfo);
 
@@ -7514,18 +7129,11 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     else if (!msg.isEmpty())
         sigDesc = msg;
 
-    //osd->ClearAllText("signal_info");
-    //osd->SetText("signal_info", infoMap, -1);
-
-    infoMap["description"] = sigDesc;
-
     osd = GetOSDLock(ctx);
     if (osd)
     {
-        osd->ClearAllText("channel_number");
-        osd->SetText("channel_number", infoMap, osd_prog_info_timeout);
-        osd->ClearAllText("program_info");
-        osd->SetText("program_info", infoMap, osd_prog_info_timeout);
+        infoMap["description"] = sigDesc;
+        osd->SetText("program_info", infoMap);
     }
     ReturnOSDLock(ctx, osd);
 
@@ -7564,15 +7172,16 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
         return;
     }
 
+    bool showing = osd->DialogVisible(OSD_DLG_INFO);
     if (!timed_out)
     {
-        if (osd->DialogShowing(kOSDDialogChannelTimeout))
-            osd->TurnDialogOff(kOSDDialogChannelTimeout);
+        if (showing)
+            osd->DialogQuit();
         ReturnOSDLock(ctx, osd);
         return;
     }
 
-    if (osd->DialogShowing(kOSDDialogChannelTimeout))
+    if (showing)
     {
         ReturnOSDLock(ctx, osd);
         return;
@@ -7591,10 +7200,10 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
         "video source (%3), inputs (%4), etc.")
         .arg(chan_up).arg(chan_down).arg(next_src).arg(tog_cards);
 
-    QStringList options;
-    options += tr("OK");
-
-    osd->NewDialogBox(kOSDDialogChannelTimeout, message, options, 0);
+    osd->DialogShow(OSD_DLG_INFO, message);
+    QString action = "DIALOG_INFO_CHANNELLOCK_0";
+    osd->DialogAddButton(tr("OK"), action);
+    osd->DialogBack("", action, true);
 
     ReturnOSDLock(ctx, osd);
 }
@@ -8180,16 +7789,13 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
     uint curvol = ctx->nvp->AdjustVolume((up) ? +2 : -2);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    QString text = tr("Volume %1 %").arg(curvol);
-
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode)
+    if (!browsemode)
     {
-        osd->ShowStatus(curvol * 10, true, tr("Adjust Volume"), text, 5,
-                        kOSDFunctionalType_PictureAdjust);
+        UpdateOSDStatus(ctx, tr("Adjust Volume"), tr("Volume"),
+                        QString::number(curvol),
+                        kOSDFunctionalType_PictureAdjust, "%", curvol * 10);
         SetUpdateOSDPosition(false);
     }
-    ReturnOSDLock(ctx, osd);
 }
 
 void TV::ToggleTimeStretch(PlayerContext *ctx)
@@ -8240,8 +7846,6 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
     }
 
-    QString text = QString(tr("Time Stretch %1X")).arg(ctx->ts_normal);
-
     if (!browsemode)
     {
         if (!allowEdit)
@@ -8251,14 +7855,10 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
         }
         else
         {
-            int val = (int)(ctx->ts_normal*(1000/kTimeStretchMax));
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-            {
-                osd->ShowStatus(val, false, tr("Adjust Time Stretch"), text,
-                                10, kOSDFunctionalType_TimeStretchAdjust);
-            }
-            ReturnOSDLock(ctx, osd);
+            UpdateOSDStatus(ctx, tr("Adjust Time Stretch"), tr("Time Stretch"),
+                            QString::number(ctx->ts_normal),
+                            kOSDFunctionalType_TimeStretchAdjust, "X",
+                            (int)(ctx->ts_normal*(1000/kTimeStretchMax)));
             SetUpdateOSDPosition(false);
         }
     }
@@ -8271,13 +7871,13 @@ void TV::ToggleUpmix(PlayerContext *ctx)
     if (!ctx->nvp || !ctx->nvp->HasAudioOut())
         return;
     QString text;
-    if (ctx->nvp->ToggleUpmix())
+    if (ctx->nvp->GetAudio()->ToggleUpmix())
         text = tr("Upmixer On");
     else
         text = tr("Upmixer Off");
 
-    if (ctx->nvp->GetOSD() && !browsemode)
-        ctx->nvp->GetOSD()->SetSettingsText(text, 5);
+    if (!browsemode)
+        SetOSDMessage(ctx, text);
 }
 
 // dir in 10ms jumps
@@ -8316,24 +7916,24 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
     }
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode)
+    if (!browsemode)
     {
-        QString text = QString(" %1 ms").arg(newval);
+        QString text;
         int val = (int)newval;
         if (dir == 1000000 || dir == -1000000)
         {
-            text = tr("Audio Resync") + text;
+            text = tr("Audio Resync");
             val = 0;
         }
         else
-            text = tr("Audio Sync") + text;
+            text = tr("Audio Sync");
 
-        osd->ShowStatus((val/2)+500, false, tr("Adjust Audio Sync"), text,
-                             10, kOSDFunctionalType_AudioSyncAdjust);
+        UpdateOSDStatus(ctx, tr("Adjust Audio Sync"), text,
+                        QString::number(val),
+                        kOSDFunctionalType_AudioSyncAdjust,
+                        "ms", (val/2) + 500);
         SetUpdateOSDPosition(false);
     }
-    ReturnOSDLock(ctx, osd);
 }
 
 void TV::ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels)
@@ -8368,10 +7968,7 @@ void TV::ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels)
         case kMuteRight: text = tr("Right Channel Muted"); break;
     }
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode)
-        osd->SetSettingsText(text, 5);
-    ReturnOSDLock(ctx, osd);
+    SetOSDMessage(ctx, text);
 }
 
 void TV::ToggleSleepTimer(const PlayerContext *ctx)
@@ -8398,38 +7995,55 @@ void TV::ToggleSleepTimer(const PlayerContext *ctx)
 
     text = tr("Sleep ") + " " + sleep_times[sleep_index].dispString;
 
-    // display OSD
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode)
-        osd->SetSettingsText(text, 3);
-    ReturnOSDLock(ctx, osd);
+    if (!browsemode)
+        SetOSDMessage(ctx, text);
 }
 
-void TV::SleepDialogCreate(void)
+void TV::ShowOSDSleep(void)
 {
     KillTimer(sleepTimerId);
     sleepTimerId = 0;
 
-    QString message = QObject::tr(
-        "MythTV was set to sleep after %1 minutes and "
-        "will exit in %2 seconds.\n"
-        "Do you wish to continue watching?")
-        .arg(sleepTimerTimeout * (1.0f/60000.0f))
-        .arg("%d");
-
-    QStringList options;
-    options += tr("Yes");
-    options += tr("No");
-
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     OSD *osd = GetOSDLock(mctx);
     if (osd)
-        osd->NewDialogBox(kOSDDialogSleepTimeout, message, options,
-                          (int)(kSleepTimerDialogTimeout * 0.001), 0);
+    {
+        QString message = QObject::tr(
+            "MythTV was set to sleep after %1 minutes and "
+            "will exit in %d seconds.\n"
+            "Do you wish to continue watching?")
+            .arg(sleepTimerTimeout * (1.0f/60000.0f));
+
+        osd->DialogShow(OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout / 1000);
+        osd->DialogAddButton(tr("Yes"), "DIALOG_SLEEP_YES_0");
+        osd->DialogAddButton(tr("No"),  "DIALOG_SLEEP_NO_0");
+    }
     ReturnOSDLock(mctx, osd);
     ReturnPlayerLock(mctx);
 
     sleepDialogTimerId = StartTimer(kSleepTimerDialogTimeout, __LINE__);
+}
+
+void TV::HandleOSDSleep(PlayerContext *ctx, QString action)
+{
+    if (!DialogIsVisible(ctx, OSD_DLG_SLEEP))
+        return;
+
+    if (action == "YES")
+    {
+        if (sleepDialogTimerId)
+        {
+            KillTimer(sleepDialogTimerId);
+            sleepDialogTimerId = 0;
+        }
+        sleepTimerId = StartTimer(sleepTimerTimeout * 1000, __LINE__);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                "No longer watching TV, exiting");
+        SetExitPlayer(true, true);
+    }
 }
 
 void TV::SleepDialogTimeout(void)
@@ -8451,30 +8065,52 @@ void TV::SleepDialogTimeout(void)
  *         If the user so decides, they may hit ok and we reset the timer
  *         back to the default expiry period.
  */
-void TV::IdleDialogCreate(void)
+void TV::ShowOSDIdle(void)
 {
     KillTimer(idleTimerId);
     idleTimerId = 0;
 
-    QString message = QObject::tr(
-        "MythTV has been idle for %1 minutes and "
-        "will exit in %2 seconds. Are you still watching?")
-        .arg(db_idle_timeout * (1.0f/60000.0f))
-        .arg("%d");
-
-    QStringList options;
-    options += tr("Yes");
-    options += tr("No");
-
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     OSD *osd = GetOSDLock(mctx);
     if (osd)
-        osd->NewDialogBox(kOSDDialogIdleTimeout, message, options,
-                          (int)(kIdleTimerDialogTimeout * 0.001f), 0);
+    {
+        QString message = QObject::tr(
+            "MythTV has been idle for %1 minutes and "
+            "will exit in %d seconds. Are you still watching?")
+            .arg(db_idle_timeout * (1.0f/60000.0f));
+
+        osd->DialogShow(OSD_DLG_IDLE, message, kIdleTimerDialogTimeout / 1000);
+        osd->DialogAddButton(tr("Yes"), "DIALOG_IDLE_YES_0");
+        osd->DialogAddButton(tr("No"),  "DIALOG_IDLE_NO_0");
+    }
     ReturnOSDLock(mctx, osd);
     ReturnPlayerLock(mctx);
 
     idleDialogTimerId = StartTimer(kIdleTimerDialogTimeout, __LINE__);
+}
+
+void TV::HandleOSDIdle(PlayerContext *ctx, QString action)
+{
+    if (!DialogIsVisible(ctx, OSD_DLG_IDLE))
+        return;
+
+    if (action == "YES")
+    {
+        if (idleDialogTimerId)
+        {
+            KillTimer(idleDialogTimerId);
+            idleDialogTimerId = 0;
+        }
+        if (idleTimerId)
+            KillTimer(idleTimerId);
+        idleTimerId = StartTimer(db_idle_timeout * 1000, __LINE__);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                "No longer watching LiveTV, exiting");
+        SetExitPlayer(true, true);
+    }
 }
 
 void TV::IdleDialogTimeout(void)
@@ -8504,10 +8140,7 @@ void TV::ToggleAspectOverride(PlayerContext *ctx, AspectOverrideMode aspectMode)
     QString text = toString(ctx->nvp->GetAspectOverride());
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode && !osd->IsRunningTreeMenu())
-        osd->SetSettingsText(text, 3);
-    ReturnOSDLock(ctx, osd);
+    SetOSDMessage(ctx, text);
 }
 
 void TV::ToggleAdjustFill(PlayerContext *ctx, AdjustFillMode adjustfillMode)
@@ -8525,10 +8158,7 @@ void TV::ToggleAdjustFill(PlayerContext *ctx, AdjustFillMode adjustfillMode)
     QString text = toString(ctx->nvp->GetAdjustFill());
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode && !osd->IsRunningTreeMenu())
-        osd->SetSettingsText(text, 3);
-    ReturnOSDLock(ctx, osd);
+    SetOSDMessage(ctx, text);
 }
 
 void TV::PauseAudioUntilBuffered(PlayerContext *ctx)
@@ -8538,30 +8168,24 @@ void TV::PauseAudioUntilBuffered(PlayerContext *ctx)
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
-        ctx->nvp->PauseAudioUntilBuffered();
+        ctx->nvp->GetAudio()->PauseAudioUntilBuffered();
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 }
 
 void TV::customEvent(QEvent *e)
 {
-    if (e->type() == OSDCloseEvent::kEventType)
+    if (e->type() == DialogCompletionEvent::kEventType)
     {
-        OSDCloseEvent *ce = (OSDCloseEvent *)e;
-        HandleOSDClosed(ce->GetFunctionType());
+        DialogCompletionEvent *dce = (DialogCompletionEvent *)e;
+        OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
+                       dce->GetData().toString());
         return;
     }
 
-    if (e->type() == OSDListTreeItemEnteredEvent::kEventType)
+    if (e->type() == OSDHideEvent::kEventType)
     {
-        OSDListTreeItemEnteredEvent *ee = (OSDListTreeItemEnteredEvent *)e;
-        TreeMenuEntered(ee);
-        return;
-    }
-
-    if (e->type() == OSDListTreeItemSelectedEvent::kEventType)
-    {
-        OSDListTreeItemSelectedEvent *se = (OSDListTreeItemSelectedEvent *)e;
-        TreeMenuSelected(se);
+        OSDHideEvent *ce = (OSDHideEvent *)e;
+        HandleOSDClosed(ce->GetFunctionalType());
         return;
     }
 
@@ -8654,13 +8278,7 @@ void TV::customEvent(QEvent *e)
                     tr("PiP", "Picture-in-Picture") :
                     tr("PbP", "Picture-by-Picture");
                 StopStuff(mctx, ctx, true, true, true);
-                OSD *osd = GetOSDLock(mctx);
-                if (osd)
-                {
-                    osd->SetSettingsText(
-                        tr("Disabling %1 for recording").arg(type), 3);
-                }
-                ReturnOSDLock(mctx, osd);
+                SetOSDMessage(mctx, tr("Disabling %1 for recording").arg(type));
             }
         }
         ReturnPlayerLock(mctx);
@@ -8953,14 +8571,10 @@ void TV::BrowseStart(PlayerContext *ctx)
         return;
 
     OSD *osd = GetOSDLock(ctx);
-    if (osd)
+    if (osd && osd->IsWindowVisible("browse_info"))
     {
-        OSDSet *oset = osd->GetSet("browse_info");
-        if (!oset)
-        {
-            ReturnOSDLock(ctx, osd);
-            return;
-        }
+        ReturnOSDLock(ctx, osd);
+        return;
     }
     ReturnOSDLock(ctx, osd);
 
@@ -9008,9 +8622,7 @@ void TV::BrowseEnd(PlayerContext *ctx, bool change_channel)
     if (!browsemode)
         return;
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-        osd->HideSet("browse_info");
+    HideOSDWindow(ctx, "browse_info");
 
     if (change_channel)
         ChangeChannel(ctx, 0, browsechannum);
@@ -9119,9 +8731,8 @@ void TV::BrowseDispInfo(PlayerContext *ctx, BrowseDirection direction)
     recinfo.ToMap(infoMap);
     infoMap["iconpath"] = ChannelUtil::GetIcon(recinfo.GetChanID());
 
-    osd->ClearAllText("browse_info");
-    osd->SetText("browse_info", infoMap, -1);
-
+    osd->SetText("browse_info", infoMap);
+    osd->DisableExpiry("browse_info");
     ReturnOSDLock(ctx, osd);
 }
 
@@ -9161,10 +8772,10 @@ void TV::ToggleRecord(PlayerContext *ctx)
         OSD *osd = GetOSDLock(ctx);
         if (osd)
         {
-            osd->ClearAllText("browse_info");
-            osd->SetText("browse_info", infoMap, -1);
-
-            osd->SetSettingsText(tr("Record"), 3);
+            osd->SetText("browse_info", infoMap);
+            QHash<QString,QString> map;
+            map.insert("message_text", tr("Record"));
+            osd->SetText("osd_message", map);
         }
         ReturnOSDLock(ctx, osd);
         return;
@@ -9208,10 +8819,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
 
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-        osd->SetSettingsText(msg, 3);
-    ReturnOSDLock(ctx, osd);
+    SetOSDMessage(ctx, msg);
 }
 
 void TV::BrowseChannel(PlayerContext *ctx, const QString &chan)
@@ -9322,18 +8930,11 @@ void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
         value = ctx->recorder->GetPictureAttribute(attr);
     }
 
-    QString text = toString(attr) + " " + toTypeString(type) +
-        QString(" %1 %").arg(value);
+    QString text = toString(attr) + " " + toTypeString(type);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-    {
-        osd->GetSet("status");
-        osd->ShowStatus(value * 10, true, title, text, 5,
-                        kOSDFunctionalType_PictureAdjust);
-    }
-    ReturnOSDLock(ctx, osd);
-
+    UpdateOSDStatus(ctx, title, text, QString::number(value),
+                    kOSDFunctionalType_PictureAdjust, "%",
+                    value * 10);
     SetUpdateOSDPosition(false);
 }
 
@@ -9366,17 +8967,11 @@ void TV::DoChangePictureAttribute(
         value = ctx->recorder->ChangePictureAttribute(type, attr, up);
     }
 
-    QString text = toString(attr) + " " + toTypeString(type) +
-        QString(" %1 %").arg(value);
+    QString text = toString(attr) + " " + toTypeString(type);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-    {
-        osd->ShowStatus(value * 10, true, toTitleString(type), text, 5,
-                        kOSDFunctionalType_PictureAdjust);
-    }
-    ReturnOSDLock(ctx, osd);
-
+    UpdateOSDStatus(ctx, toTitleString(type), text, QString::number(value),
+                    kOSDFunctionalType_PictureAdjust, "%",
+                    value * 10);
     SetUpdateOSDPosition(false);
 }
 
@@ -9411,19 +9006,85 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
     if (osd_msg && !GetPlayer(lctx, -1)->IsPIP() && player.size() > 1)
     {
         PlayerContext *actx = GetPlayer(lctx, -1);
-        OSD *osd = GetOSDLock(actx);
-        if (osd)
-            osd->SetSettingsText(tr("Active Changed"), 3);
-        ReturnOSDLock(actx, osd);
+        SetOSDMessage(actx, tr("Active Changed"));
     }
 
     VERBOSE(VB_PLAYBACK, loc + " -- end");
 }
 
-void TV::TreeMenuEntered(OSDListTreeItemEnteredEvent *e)
+void TV::ShowOSDCutpoint(PlayerContext *ctx, bool allowSelectNear)
 {
-    // show help text somewhere, perhaps?
-    (void)e;
+    OSD *osd = GetOSDLock(ctx);
+    if (!osd)
+    {
+        ReturnOSDLock(ctx, osd);
+        return;
+    }
+
+    bool cut_after   = false;
+    int  direction   = 0;
+    bool deletepoint = false;
+    uint64_t frame   = 0;
+    uint64_t nearest_mark = 0;
+
+    deletepoint = ctx->nvp->IsNearDeletePoint(direction, cut_after,
+                                              nearest_mark);
+    frame = ctx->nvp->GetFramesPlayed();
+
+    if (deletepoint && nearest_mark > 0 && allowSelectNear)
+    {
+        osd->DialogShow(OSD_DLG_CUTPOINT,
+                        QObject::tr("You are close to an existing cut point. "
+                                    "Would you like to:"));
+        osd->DialogAddButton(QObject::tr("Delete this cut point"),
+                             QString("DIALOG_CUTPOINT_DELETE_%1").arg(nearest_mark));
+        osd->DialogAddButton(QObject::tr("Move this cut point to the current position"),
+                             QString("DIALOG_CUTPOINT_MOVETOCURRENT_%1").arg(nearest_mark));
+        osd->DialogAddButton(QObject::tr("Flip directions - delete to the %1")
+                             .arg(direction ? QObject::tr("left") : QObject::tr("right")),
+                             QString("DIALOG_CUTPOINT_REVERSE_%1").arg(nearest_mark));
+        osd->DialogAddButton(QObject::tr("Insert a new cut point"),
+                             QString("DIALOG_CUTPOINT_INSERTNEW_%1").arg(frame));
+    }
+    else
+    {
+        osd->DialogShow(OSD_DLG_CUTPOINT, QObject::tr("Insert a new cut point?"));
+        osd->DialogAddButton(QObject::tr("Delete before this frame"),
+                             QString("DIALOG_CUTPOINT_NEWCUTTOLEFT_%1").arg(frame));
+        osd->DialogAddButton(QObject::tr("Delete after this frame"),
+                             QString("DIALOG_CUTPOINT_NEWCUTTORIGHT_%1").arg(frame),
+                             false, cut_after);
+    }
+    osd->DialogBack("", "DIALOG_CUTPOINT_DONOTHING_0", true);
+    QHash<QString,QString> map;
+    map.insert("title", tr("Edit"));
+    osd->SetText("osd_program_editor", map, false);
+    ReturnOSDLock(ctx, osd);
+}
+
+bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame)
+{
+    bool res = true;
+    if (!DialogIsVisible(ctx, OSD_DLG_CUTPOINT))
+        return res;
+
+    OSD *osd = GetOSDLock(ctx);
+    if (action == "INSERTNEW" && osd)
+    {
+        ShowOSDCutpoint(ctx, false);
+        res = false;
+    }
+    else if (action == "DONOTHING" && osd)
+    {
+    }
+    else if (osd)
+    {
+        QStringList actions(action);
+        if (!ctx->nvp->HandleProgrameEditorActions(actions, frame))
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unrecognised cutpoint action");
+    }
+    ReturnOSDLock(ctx, osd);
+    return res;
 }
 
 /** \fn TV::StartProgramEditMode(PlayerContext *ctx)
@@ -9435,31 +9096,60 @@ void TV::StartProgramEditMode(PlayerContext *ctx)
     bool isEditing = ctx->playingInfo->QueryIsEditing();
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    OSD *osd = GetOSDLock(ctx);
-    if (isEditing && osd)
+    if (isEditing)
     {
-        DoTogglePause(ctx, true);
-
-        QString message = tr("This program is currently being edited");
-
-        QStringList options;
-        options += tr("Continue Editing");
-        options += tr("Do not edit");
-
-        osd->NewDialogBox(kOSDDialogAlreadyEditing, message, options, 0);
-
-        ReturnOSDLock(ctx, osd);
-        ReturnPlayerLock(ctx);
-
+        ShowOSDAlreadyEditing(ctx);
         return;
     }
-
-    ReturnOSDLock(ctx, osd);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
         editmode = ctx->nvp->EnableEdit();
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+}
+
+void TV::ShowOSDAlreadyEditing(PlayerContext *ctx)
+{
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+    {
+        DoTogglePause(ctx, true);
+
+        QString message = tr("This program is currently being edited");
+        osd->DialogShow(OSD_DLG_EDITING, message);
+        QString def = "DIALOG_EDITING_CONTINUE_0";
+        osd->DialogAddButton(tr("Continue Editing"), def, false, true);
+        osd->DialogAddButton(tr("Do not edit"), "DIALOG_EDITING_STOP_0");
+        osd->DialogBack("", def, true);
+    }
+    ReturnOSDLock(ctx, osd);
+}
+
+void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action)
+{
+    if (!DialogIsVisible(ctx, OSD_DLG_EDITING))
+        return;
+
+    if (action == "STOP")
+    {
+        ctx->LockPlayingInfo(__FILE__, __LINE__);
+        if (ctx->playingInfo)
+            ctx->playingInfo->SaveEditing(false);
+        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+        if (ctx->paused)
+            DoTogglePause(ctx, true);
+    }
+    else // action == "CONTINUE"
+    {
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (ctx->nvp)
+        {
+            ctx->playingInfo->SaveEditing(false);
+            editmode = ctx->nvp->EnableEdit();
+        }
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    }
+
 }
 
 static void insert_map(InfoMap &infoMap, const InfoMap &newMap)
@@ -9516,13 +9206,6 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     // Get the info available from the backend
     chanEditMap.clear();
     ctx->recorder->GetChannelInfo(chanEditMap);
-    chanEditMap["dialog_label"]   = tr("Channel Editor");
-    chanEditMap["callsign_label"] = tr("Callsign");
-    chanEditMap["channum_label"]  = tr("Channel #");
-    chanEditMap["channame_label"] = tr("Channel Name");
-    chanEditMap["XMLTV_label"]    = tr("XMLTV ID");
-    chanEditMap["probe_all"]      = tr("[P]robe");
-    chanEditMap["ok"]             = tr("[O]k");
 
     // Assuming the data is valid, try to load DataDirect listings.
     uint sourceid = chanEditMap["sourceid"].toUInt();
@@ -9544,8 +9227,8 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     osd = GetOSDLock(ctx);
     if (osd)
     {
-        osd->SetText(kOSDDialogEditChannel, chanEditMap, -1);
-        osd->PushDialog(kOSDDialogEditChannel);
+        osd->DialogShow(OSD_DLG_EDITOR);
+        osd->SetText(OSD_DLG_EDITOR, chanEditMap, false);
     }
     ReturnOSDLock(ctx, osd);
 }
@@ -9553,47 +9236,33 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
 /** \fn TV::ChannelEditKey(const PlayerContext*, const QKeyEvent *e)
  *  \brief Processes channel editing key.
  */
-void TV::ChannelEditKey(const PlayerContext *ctx, const QKeyEvent *e)
+bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)
 {
     QMutexLocker locker(&chanEditMapLock);
+    bool hide = false;
 
-    bool     focus_change   = false;
-    QString  button_pressed = "";
-    OSDSet  *osdset         = NULL;
+    if (!DialogIsVisible(ctx, OSD_DLG_EDITOR));
+        return hide;
 
     OSD *osd = GetOSDLock(ctx);
-    if (osd && osd->IsDialogActive(kOSDDialogEditChannel))
-        osdset = osd->GetSet(kOSDDialogEditChannel);
-
-    if (!osdset || !osdset->HandleKey(e, &focus_change, &button_pressed))
-    {
-        ReturnOSDLock(ctx, osd);
-        return;
-    }
-
-    if (button_pressed == "probe_all")
+    if (osd && action == "PROBE")
     {
         InfoMap infoMap;
-        osdset->GetText(infoMap);
+        osd->DialogGetText(infoMap);
         ChannelEditAutoFill(ctx, infoMap);
         insert_map(chanEditMap, infoMap);
-        osdset->SetText(chanEditMap);
+        osd->SetText(OSD_DLG_EDITOR, chanEditMap, false);
     }
-    else if (button_pressed == "ok")
+    else if (osd && action == "OK")
     {
         InfoMap infoMap;
-        osdset->GetText(infoMap);
+        osd->DialogGetText(infoMap);
         insert_map(chanEditMap, infoMap);
         ctx->recorder->SetChannelInfo(chanEditMap);
+        hide = true;
     }
-
-    if (!osdset->Displaying())
-    {
-        VERBOSE(VB_IMPORTANT, "hiding channel_editor");
-        osd->TurnDialogOff(kOSDDialogEditChannel);
-    }
-
     ReturnOSDLock(ctx, osd);
+    return hide;
 }
 
 /** \fn TV::ChannelEditAutoFill(const PlayerContext*,InfoMap&) const
@@ -9819,9 +9488,8 @@ void TV::RunLoadDDMap(uint sourceid)
         insert_map(tmp, chanEditMap);
         for (uint i = 0; i < 4; i++)
             tmp[keys[i]] = "Loading...";
-        osd->SetText(kOSDDialogEditChannel, tmp, -1);
-        if (!osd->IsDialogExisting(kOSDDialogEditChannel))
-            osd->PushDialog(kOSDDialogEditChannel);
+        osd->DialogShow(OSD_DLG_EDITOR);
+        osd->SetText(OSD_DLG_EDITOR, tmp, false);
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);
@@ -9837,9 +9505,8 @@ void TV::RunLoadDDMap(uint sourceid)
     osd = GetOSDLock(actx);
     if (osd)
     {
-        osd->SetText(kOSDDialogEditChannel, chanEditMap, -1);
-        if (!osd->IsDialogExisting(kOSDDialogEditChannel))
-            osd->PushDialog(kOSDDialogEditChannel);
+        osd->DialogShow(OSD_DLG_EDITOR);
+        osd->SetText(OSD_DLG_EDITOR, chanEditMap, false);
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);
@@ -9898,16 +9565,73 @@ bool TV::LoadDDMap(uint sourceid)
     return !ddMap.empty();
 }
 
-void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
+void TV::OSDDialogEvent(int result, QString text, QString action)
 {
-    bool hidetree = true;
-    bool handled  = true;
-
-    QString action = e->GetAction();
-
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
-    if (HandleTrackAction(actx, action))
+    VERBOSE(VB_IMPORTANT, LOC + QString("OSDDialogEvent: result %1 text %2 action %3")
+        .arg(result).arg(text).arg(action));
+
+    bool hide = true;
+
+    if (action.startsWith("DIALOG_"))
+    {
+        action.remove("DIALOG_");
+        QStringList desc = action.split("_");
+        bool valid = desc.size() == 3;
+        if (valid && desc[0] == "MENU")
+        {
+            ShowOSDMenu(actx, desc[1], desc[2].toInt(), text);
+            hide = false;
+        }
+        else if (valid && desc[0] == "JUMPREC")
+        {
+            ShowOSDJumpRec(actx, desc[1], desc[2].toInt(), text);
+            hide = false;
+        }
+        else if (valid && desc[0] == "VIDEOEXIT")
+        {
+            hide = HandleOSDVideoExit(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "SLEEP")
+        {
+            HandleOSDSleep(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "IDLE")
+        {
+            HandleOSDIdle(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "INFO")
+        {
+            HandleOSDInfo(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "EDITING")
+        {
+            HandleOSDAlreadyEditing(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "ASKALLOW")
+        {
+            HandleOSDAskAllow(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "EDITOR")
+        {
+            hide = HandleOSDChannelEdit(actx, desc[1]);
+        }
+        else if (valid && desc[0] == "CUTPOINT")
+        {
+            hide = HandleOSDCutpoint(actx, desc[1], desc[2].toLongLong());
+        }
+        else if (valid && desc[0] == "DELETE")
+        {
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "Unrecognised dialog event.");
+        }
+    }
+    else if (result < 0)
+        ; // exit dialog
+    else if (HandleTrackAction(actx, action))
         ;
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
@@ -9942,12 +9666,7 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
         msg = toString(actx->nvp->GetScanType());
 
         if (!msg.isEmpty())
-        {
-            OSD *osd = GetOSDLock(actx);
-            if (osd)
-                osd->SetSettingsText(msg, 3);
-            ReturnOSDLock(actx, osd);
-        }
+            SetOSDMessage(actx, msg);
     }
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
         ChangeAudioSync(actx, 0);
@@ -10031,10 +9750,7 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
                     }
 
                     // Turn off OSD Channel Num so the channel changes right away
-                    OSD *osd = GetOSDLock(actx);
-                    if (osd)
-                        osd->HideSet("channel_number");
-                    ReturnOSDLock(actx, osd);
+                    HideOSDWindow(actx, "osd_input");
                 }
             }
         }
@@ -10050,15 +9766,8 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
     }
     else if (PxPHandleAction(actx, QStringList(action)))
     {
-        // Hide the tree on old active context..
         for (uint i = 0; i < player.size(); i++)
-        {
-            OSD *osd = GetOSDLock(GetPlayer(actx,i));
-            if (osd)
-                osd->HideTreeMenu(true);
-            ReturnOSDLock(GetPlayer(actx,i), osd);
             ClearOSD(GetPlayer(actx,i));
-        }
         actx = GetPlayer(actx,-1); // "NEXTPIPWINDOW" changes active context..
     }
     else if (StateIsLiveTV(GetState(actx)))
@@ -10080,7 +9789,7 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unknown menu action selected: " + action);
-            hidetree = false;
+            hide = false;
         }
     }
     else if (StateIsPlaying(actx->GetState()))
@@ -10125,240 +9834,238 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unknown menu action selected: " + action);
-            hidetree = false;
+            hide = false;
         }
     }
 
-    if (!handled)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Unknown menu action selected: " + action);
-        hidetree = false;
-    }
-
-    if (hidetree)
+    if (hide)
     {
         OSD *osd = GetOSDLock(actx);
         if (osd)
-            osd->HideTreeMenu(true);
+            osd->DialogQuit();
         ReturnOSDLock(actx, osd);
     }
+
     ReturnPlayerLock(actx);
 }
 
-void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
+bool TV::DialogIsVisible(PlayerContext *ctx, const QString &dialog)
 {
-    int osdMenuCount = osdMenuEntries->GetCount();
+    bool visible = false;
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+        visible = osd->DialogVisible(dialog);
+    ReturnOSDLock(ctx, osd);
+    return visible;
+}
 
-    if (treeMenu)
+void TV::HandleOSDInfo(PlayerContext *ctx, QString action)
+{
+    if (!DialogIsVisible(ctx, OSD_DLG_INFO))
+        return;
+
+    if (action == "CHANNELLOCK")
     {
-        for (uint i = 0; i < player.size(); i++)
-        {
-            OSD *osd = GetOSDLock(GetPlayer(ctx,i));
-            if (osd)
-                osd->HideTreeMenu();
-            ReturnOSDLock(GetPlayer(ctx,i), osd);
-        }
-        delete treeMenu;
+        lockTimerOn = false;
     }
+}
 
-    treeMenu = new OSDGenericTree(NULL, "treeMenu");
-
-    QListIterator<TVOSDMenuEntry*> cm = osdMenuEntries->GetIterator();
-    while(cm.hasNext())
+void TV::ShowOSDMenu(const PlayerContext *ctx, const QString category,
+                     int level, const QString selected)
+{
+    bool in_category = !category.isEmpty() && level > 0;
+    if (level < 0 || level > 1)
     {
-        TVOSDMenuEntry *entry = cm.next();
-        if (entry->GetEntry(GetState(ctx)) > 0)
-            FillOSDTreeMenu(ctx, treeMenu, entry->GetCategory());
+        level = 0;
+        in_category = false;
     }
-
-    OSDListTreeType *tree = NULL;
-
-    ClearOSD(ctx);
 
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
-        int treeMenuDepth = treeMenu->calculateDepth(0) - 1;
-        // something is wrong with reading osd menu DB table
-        if (osdMenuCount == 0)
-            osd->SetSettingsText("Cannot Display OSD Menu", 5);
-        else if (treeMenuDepth <= 0)
-            osd->SetSettingsText("No OSD Menu Entries", 3);
-        else
-            tree = osd->ShowTreeMenu("menu", treeMenu);
+        osd->DialogShow(OSD_DLG_MENU, tr("Playback Options"));
+        QListIterator<TVOSDMenuEntry*> cm = osdMenuEntries->GetIterator();
+        while(cm.hasNext())
+        {
+            TVOSDMenuEntry *entry = cm.next();
+            QString cat = entry->GetCategory();
+            bool skip = in_category && cat != category;
+            if (entry->GetEntry(GetState(ctx)) > 0 && !skip)
+            {
+                QString text = FillOSDMenu(ctx, osd, cat, selected, level);
+                if (!text.isEmpty())
+                    osd->DialogSetText(text);
+            }
+        }
+        if (level > 0 && !category.isEmpty())
+        {
+            osd->DialogBack(category, QString("DIALOG_MENU_%1_%2")
+                            .arg(level > 1 ? category : "").arg(level - 1));
+        }
     }
     ReturnOSDLock(ctx, osd);
-
-    if (tree)
-        tree->SetListener(this);
 }
 
-void TV::FillOSDTreeMenu(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu,
-    QString category) const
+QString TV::FillOSDMenu(const PlayerContext *ctx, OSD *osd,
+                        QString category, const QString selected, int level)
 {
-    bool    mainCtx    = ctx == GetPlayer(ctx, 0);
-    // DVD menu stuff first
-    if (category == "DVD")
+    QString title = QString();
+    bool mainCtx  = ctx == GetPlayer(ctx, 0);
+    bool select   = selected == category;
+    bool top      = level == 0;
+
+    if (category == "DVD" && top)
     {
-        new OSDGenericTree(
-            treeMenu, tr("DVD Root Menu"),    "JUMPTODVDROOTMENU");
-        new OSDGenericTree(
-            treeMenu, tr("DVD Title Menu"),   "JUMPTODVDTITLEMENU");
-        new OSDGenericTree(
-            treeMenu, tr("DVD Chapter Menu"), "JUMPTODVDCHAPTERMENU");
+        osd->DialogAddButton(tr("DVD Root Menu"),        "JUMPTODVDROOTMENU");
+        osd->DialogAddButton(tr("DVD Title Menu"),       "JUMPTODVDTITLEMENU");
+        osd->DialogAddButton(tr("DVD Chapter Menu"),     "JUMPTODVDCHAPTERMENU");
     }
+    else if (category == "GUIDE" && top)
+        osd->DialogAddButton(tr("Program Guide"),        "GUIDE");
+    else if (category == "EDITCHANNEL" && top)
+        osd->DialogAddButton(tr("Edit Channel"),         "EDIT");
+    else if (category == "EDITRECORDING" && top)
+        osd->DialogAddButton(tr("Edit Recording"),       "EDIT");
+    else if (category == "TOGGLEBROWSE" && top && !db_browse_always)
+        osd->DialogAddButton(tr("Enable Browse Mode"),   "TOGGLEBROWSE");
+    else if ( category == "PREVCHAN" && top)
+        osd->DialogAddButton(tr("Previous Channel"),     "PREVCHAN");
+    else if (category == "AUDIOSYNC" && top)
+        osd->DialogAddButton(tr("Adjust Audio Sync"),    "TOGGLEAUDIOSYNC");
+    else if (category == "TOGGLEUPMIX" && top)
+        osd->DialogAddButton(tr("Toggle Audio Upmixer"), "TOGGLEUPMIX");
+    else if (category == "MANUALZOOM"  && mainCtx && top)
+        osd->DialogAddButton(tr("Manual Zoom Mode"),     "TOGGLEMANUALZOOM");
+    else if (category == "TRANSCODE")
+        title = FillOSDMenuTranscode(ctx, osd, select, level);
+    else if (category == "COMMSKIP")
+        title = FillOSDMenuCommskip(ctx, osd, select, level);
+    else if (category == "TOGGLEEXPIRE")
+        title = FillOSDMenuExpire(ctx, osd, select, level);
+    else if (category == "SCHEDULERECORDING")
+        title = FillOSDMenuSchedule(ctx, osd, select, level);
     else if (category == "AVCHAPTER")
-        FillMenuAVChapter(ctx, treeMenu);
-    else if (category == "GUIDE")
-        new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
+        title = FillOSDMenuAVChapter(ctx, osd, select, level);
     else if (category ==  "PIP")
-        FillMenuPxP(ctx, treeMenu);
+        title = FillOSDMenuPxP(ctx, osd, select, level);
     else if (category == "INPUTSWITCHING")
-        FillMenuInputSwitching(ctx, treeMenu);
-    else if (category == "EDITCHANNEL")
-        new OSDGenericTree(treeMenu, tr("Edit Channel"), "EDIT");
-    else if (category == "EDITRECORDING")
-        new OSDGenericTree(treeMenu, tr("Edit Recording"), "EDIT");
+        title = FillOSDMenuSwitchInput(ctx, osd, select, level);
+    else if (category == "SOURCESWITCHING")
+        title = FillOSDMenuSwitchSrc(ctx, osd, select, level);
     else if (category == "JUMPREC")
-    {
-        OSDGenericTree *jtp_item =
-        new OSDGenericTree(treeMenu, tr("Jump to Program"));
-        new OSDGenericTree(jtp_item, tr("Recorded Program"), "JUMPREC");
-        if (lastProgram != NULL)
-        {
-            if (lastProgram->GetSubtitle().isEmpty())
-                new OSDGenericTree(jtp_item,
-                                   lastProgram->GetTitle(), "JUMPPREV");
-            else
-                new OSDGenericTree(jtp_item,
-                                   QString("%1: %2")
-                                   .arg(lastProgram->GetTitle())
-                                   .arg(lastProgram->GetSubtitle()),
-                                   "JUMPPREV");
-        }
-    }
+        title = FillOSDMenuJumpRec(ctx, osd, select, level);
     else if (category == "CHANNELGROUP")
-    {
-        FillMenuChanGroups(ctx, treeMenu);
-    }
-    else if (category == "TOGGLEBROWSE")
-    {
-        if (!db_browse_always)
-        {
-            new OSDGenericTree(
-                treeMenu, tr("Enable Browse Mode"), "TOGGLEBROWSE");
-        }
-    }
-    else if ( category == "PREVCHAN")
-        new OSDGenericTree(treeMenu, tr("Previous Channel"), "PREVCHAN");
-
-    FillMenuPlaying(ctx, treeMenu, category);
-
-    if (category == "AUDIOTRACKS")
-        FillMenuTracks(ctx, treeMenu, kTrackTypeAudio);
+        title = FillOSDMenuChanGroups(ctx, osd, select, level);
+    else if (category == "AUDIOTRACKS")
+        title = FillOSDMenuTracks(ctx, osd, select, level, kTrackTypeAudio);
     else if (category == "SUBTITLETRACKS")
-        FillMenuTracks(ctx, treeMenu, kTrackTypeSubtitle);
+        title = FillOSDMenuTracks(ctx, osd, select, level, kTrackTypeSubtitle);
+    else if (category == "TEXTTRACKS")
+        title = FillOSDMenuTextSubs(ctx, osd, select, level);
+    else if (category == "VIDEOASPECT" && mainCtx)
+        title = FillOSDMenuVidAspect(ctx, osd, select, level);
+    else if (category == "ADJUSTFILL" && mainCtx)
+        title = FillOSDMenuAdjustFill(ctx, osd, select, level);
+    else if (category == "ADJUSTPICTURE" && mainCtx)
+        title = FillOSDMenuAdjustPic(ctx, osd, select, level);
+    else if (category == "TIMESTRETCH")
+        title = FillOSDMenuTimeStretch(ctx, osd, select, level);
+    else if (category == "VIDEOSCAN")
+        title = FillOSDMenuVideoScan(ctx, osd, select, level);
+    else if (category == "SLEEP")
+        title = FillOSDMenuSleepMode(ctx, osd, select, level);
+    else if (category == "ATSCTRACKS")
+        title = FillOSDMenuTracks(ctx, osd, select, level, kTrackTypeCC708);
     else if (category == "CCTRACKS")
     {
-        FillMenuTracks(ctx, treeMenu, kTrackTypeCC708);
         if (VBIMode::NTSC_CC == vbimode)
-            FillMenuTracks(ctx, treeMenu, kTrackTypeCC608);
+            title = FillOSDMenuTracks(ctx, osd, select, level, kTrackTypeCC608);
         else if (VBIMode::PAL_TT == vbimode)
         {
-            new OSDGenericTree(
-                treeMenu, tr("Toggle Teletext Captions"), "TOGGLETTC");
-            new OSDGenericTree(
-                treeMenu, tr("Toggle Teletext Menu"), "TOGGLETTM");
-            FillMenuTracks(ctx, treeMenu, kTrackTypeTeletextCaptions);
+            title = FillOSDMenuTracks(ctx, osd, select,
+                                      level, kTrackTypeTeletextCaptions);
+            if (top)
+                osd->DialogAddButton(tr("Toggle Teletext Menu"),
+                                        "TOGGLETTM");
         }
     }
 
-    if (mainCtx)
-    {
-        if (category == "VIDEOASPECT")
-            FillMenuVideoAspect(ctx, treeMenu);
-        else if (category == "ADJUSTFILL")
-            FillMenuAdjustFill(ctx, treeMenu);
-        else if (category ==  "MANUALZOOM")
-            new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), "TOGGLEMANUALZOOM");
-        else if (category == "ADJUSTPICTURE")
-            FillMenuAdjustPicture(ctx, treeMenu);
-    }
-
-    if (category == "AUDIOSYNC")
-        new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
-    else if (category == "TOGGLEUPMIX")
-        new OSDGenericTree(treeMenu, tr("Toggle Audio Upmixer"), "TOGGLEUPMIX");
-    else if (category == "TIMESTRETCH")
-        FillMenuTimeStretch(ctx, treeMenu);
-    else if (category == "VIDEOSCAN")
-        FillMenuVideoScan(ctx, treeMenu);
-    else if (category == "SLEEP")
-        FillMenuSleepMode(ctx, treeMenu);
+    return title;
 }
 
-void TV::FillMenuChanGroups(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuChanGroups(const PlayerContext *ctx, OSD *osd, bool select,
+                               int level) const
 {
+    QString result = QString();
+    QString title  = tr("Channel Groups");
     if (!browse_changrp)
-        return;
+        return result;
 
-    OSDGenericTree *cg_item = new OSDGenericTree(treeMenu, tr("Channel Groups"),
-                                                 "CHANGROUP");
-    new OSDGenericTree(cg_item, tr("All Channels"), "CHANGROUP_ALL_CHANNELS",
-                                (channel_group_id == -1) ? 1 : 0,
-                                NULL, "CHANNELGROUP");
-
-    ChannelGroupList::const_iterator it;
-
-    for (it = m_changrplist.begin(); it != m_changrplist.end(); ++it)
+    if (level == 0)
     {
-        QString name = QString("CHANGROUP_%1").arg(it->grpid);
-        new OSDGenericTree(cg_item, it->name, name,
-                           ((int)(it->grpid) == channel_group_id) ? 1 : 0,
-                           NULL, "CHANNELGROUP");
+        osd->DialogAddButton(title, "DIALOG_MENU_CHANNELGROUP_1",
+                             true, select);
     }
+    else if (level == 1)
+    {
+        result = title;
+        osd->DialogAddButton(tr("All Channels"), "CHANGROUP_ALL_CHANNELS");
+        ChannelGroupList::const_iterator it;
+        for (it = m_changrplist.begin(); it != m_changrplist.end(); ++it)
+            osd->DialogAddButton(it->name,
+                                 QString("CHANGROUP_%1").arg(it->grpid),
+                                 false, (int)(it->grpid) == channel_group_id);
+    }
+    return result;
 }
 
-void TV::FillMenuPlaying(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu,
-    QString category) const
+QString TV::FillOSDMenuTranscode(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
 {
+    QString result = QString();
+    QString title  = tr("Begin Transcoding");
     ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (category == "TRANSCODE")
+
+    bool transcoding = JobQueue::IsJobQueuedOrRunning(
+                            JOB_TRANSCODE,
+                            ctx->playingInfo->GetChanID(),
+                            ctx->playingInfo->GetScheduledStartTime());
+    if (level == 0 && transcoding)
     {
-        if (JobQueue::IsJobQueuedOrRunning(
-            JOB_TRANSCODE,
-            ctx->playingInfo->GetChanID(),
-            ctx->playingInfo->GetScheduledStartTime()))
-        {
-            new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
-        }
-        else
-        {
-            OSDGenericTree *bt_item =
-                new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
-            new OSDGenericTree(bt_item, tr("Default"),
-                            "QUEUETRANSCODE");
-            new OSDGenericTree(bt_item, tr("Autodetect"),
-                           "QUEUETRANSCODE_AUTO");
-            new OSDGenericTree(bt_item, tr("High Quality"),
-                           "QUEUETRANSCODE_HIGH");
-            new OSDGenericTree(bt_item, tr("Medium Quality"),
-                           "QUEUETRANSCODE_MEDIUM");
-            new OSDGenericTree(bt_item, tr("Low Quality"),
-                           "QUEUETRANSCODE_LOW");
-        }
+        osd->DialogAddButton(tr("Stop Transcoding"), "QUEUETRANSCODE");
     }
-
-    else if (category == "COMMSKIP")
+    else if (level == 0 && !transcoding)
     {
-        OSDGenericTree *cas_item =
-            new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
-        uint cas_ord[] = { 0, 2, 1 };
+        osd->DialogAddButton(title, "DIALOG_MENU_TRANSCODE_1",
+                             true, select);
+    }
+    else if (level == 1 && !transcoding)
+    {
+        result = title;
+        osd->DialogAddButton(tr("Default"),       "QUEUETRANSCODE");
+        osd->DialogAddButton(tr("Autodetect"),    "QUEUETRANSCODE_AUTO");
+        osd->DialogAddButton(tr("High Quality"),  "QUEUETRANSCODE_HIGH");
+        osd->DialogAddButton(tr("Medium Quality"),"QUEUETRANSCODE_MEDIUM");
+        osd->DialogAddButton(tr("Low Quality"),   "QUEUETRANSCODE_LOW");
+    }
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    return result;
+}
 
+QString TV::FillOSDMenuCommskip(const PlayerContext *ctx, OSD *osd, bool select,
+                                int level) const
+{
+    QString result = QString();
+    QString title  = tr("Commercial Auto-Skip");
+    ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_COMMSKIP_1", true, select);
+    }
+    else if (level == 1)
+    {
+        result = title;
+        uint cas_ord[] = { 0, 2, 1 };
         ctx->LockDeleteNVP(__FILE__, __LINE__);
         CommSkipMode cur = kCommSkipOff;
         if (ctx->nvp)
@@ -10368,108 +10075,274 @@ void TV::FillMenuPlaying(
         for (uint i = 0; i < sizeof(cas_ord)/sizeof(uint); i++)
         {
             const CommSkipMode mode = (CommSkipMode) cas_ord[i];
-            new OSDGenericTree(
-                cas_item, toString(mode),
-                QString("TOGGLECOMMSKIP%1").arg(cas_ord[i]),
-                (mode == cur) ? 1 : 0, NULL, "COMMSKIPGROUP");
+            osd->DialogAddButton(toString((CommSkipMode) cas_ord[i]),
+                                 QString("TOGGLECOMMSKIP%1").arg(cas_ord[i]),
+                                 false, mode == cur);
         }
     }
-
-    else if (category == "TOGGLEEXPIRE")
-    {
-        if (ctx->playingInfo->QueryAutoExpire() != kDisableAutoExpire)
-        {
-            new OSDGenericTree(
-                treeMenu, tr("Turn Auto-Expire OFF"), "TOGGLEAUTOEXPIRE");
-        }
-        else
-        {
-            new OSDGenericTree(
-                treeMenu, tr("Turn Auto-Expire ON"), "TOGGLEAUTOEXPIRE");
-        }
-    }
-
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    if (category == "SCHEDULERECORDING")
-    {
-        OSDGenericTree *sr_item =
-            new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
-         new OSDGenericTree(
-            sr_item, tr("Upcoming Recordings"),     "VIEWSCHEDULED");
-        new OSDGenericTree(
-            sr_item, tr("Program Finder"),          "FINDER");
-        new OSDGenericTree(
-            sr_item, tr("Edit Recording Schedule"), "SCHEDULE");
-    }
+    return result;
 }
 
-/// \brief Adds AVChapter menu if chapters available
-void TV::FillMenuAVChapter(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuExpire(const PlayerContext *ctx, OSD *osd, bool select,
+                              int level) const
 {
+    ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (level == 0)
+    {
+        bool is_on = ctx->playingInfo->QueryAutoExpire() != kDisableAutoExpire;
+        osd->DialogAddButton(is_on ? tr("Turn Auto-Expire OFF") :
+                               tr("Turn Auto-Expire ON"), "TOGGLEAUTOEXPIRE");
+    }
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    return QString();
+}
+
+QString TV::FillOSDMenuSchedule(const PlayerContext *ctx, OSD *osd, bool select,
+                                int level) const
+{
+    QString result = QString();
+    QString title  = tr("Schedule Recordings");
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_SCHEDULERECORDING_1", true, select);
+    }
+    else if (level == 1)
+    {
+        result = title;
+        osd->DialogAddButton(tr("Upcoming Recordings"),     "VIEWSCHEDULED");
+        osd->DialogAddButton(tr("Program Finder"),          "FINDER");
+        osd->DialogAddButton(tr("Edit Recording Schedule"), "SCHEDULE");
+    }
+    return result;
+}
+
+QString TV::FillOSDMenuAVChapter(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
+{
+    QString result = QString();
+    QString title  = tr("Chapter");
     int num_chapters = GetNumChapters(ctx);
     if (!num_chapters)
-        return;
+        return result;
 
-    int current_chapter =  GetCurrentChapter(ctx);
-    QList<long long> times;
-    GetChapterTimes(ctx, times);
-    if (num_chapters != times.size())
-        return;
-
-    OSDGenericTree *item =
-        new OSDGenericTree(treeMenu, tr("Chapter"));
-
-    int size = QString::number(num_chapters).size();
-    for (int i = 0; i < num_chapters; i++)
+    if (level == 0)
     {
-        int hours   = times[i] / 60 / 60;
-        int minutes = (times[i] / 60) - (hours * 60);
-        int secs    = times[i] % 60;
-        QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
-        QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
-        QString desc = chapter1 + QString(" (%1:%2:%3)")
-            .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
-            .arg(secs, 2, 10, QChar(48));
-        new OSDGenericTree(item, desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
-                           (current_chapter == i) ? 1 : 0);
+        osd->DialogAddButton(title , "DIALOG_MENU_AVCHAPTER_1", true, select);
     }
+    else if (level == 1)
+    {
+        result = title;
+        int current_chapter =  GetCurrentChapter(ctx);
+        QList<long long> times;
+        GetChapterTimes(ctx, times);
+        if (num_chapters != times.size())
+            return result;
+
+        int size = QString::number(num_chapters).size();
+        for (int i = 0; i < num_chapters; i++)
+        {
+            int hours   = times[i] / 60 / 60;
+            int minutes = (times[i] / 60) - (hours * 60);
+            int secs    = times[i] % 60;
+            QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
+            QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
+            QString desc = chapter1 + QString(" (%1:%2:%3)")
+                .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
+                .arg(secs, 2, 10, QChar(48));
+            osd->DialogAddButton(desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
+                                 false, current_chapter == i);
+        }
+    }
+    return result;
 }
 
-/// \brief Constructs Picture-X-Picture portion of menu
-void TV::FillMenuPxP(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuJumpRec(const PlayerContext *ctx, OSD *osd, bool select,
+                               int level)
+{
+    QString result = QString();
+    QString title  = tr("Jump to Program");
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_JUMPREC_1", true, select);
+    }
+    else if (level == 1)
+    {
+        result = title;
+        osd->DialogAddButton(tr("Recorded Program"), "DIALOG_JUMPREC_JUMPREC_0",
+                                 true, select);
+        if (lastProgram != NULL)
+        {
+            if (lastProgram->GetSubtitle().isEmpty())
+                osd->DialogAddButton(lastProgram->GetTitle(), "JUMPPREV");
+            else
+                osd->DialogAddButton(QString("%1: %2")
+                        .arg(lastProgram->GetTitle())
+                        .arg(lastProgram->GetSubtitle()), "JUMPPREV");
+        }
+    }
+    return result;
+}
+
+void TV::ShowOSDJumpRec(PlayerContext* ctx, const QString category,
+                        int level, const QString selected)
+{
+    bool in_recgroup = !category.isEmpty() && level > 0;
+    if (level < 0 || level > 1)
+    {
+        level = 0;
+        in_recgroup = false;
+    }
+
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+    {
+        QString title = tr("Jump to Program");
+        osd->DialogShow("osd_jumprec", title);
+
+        QMutexLocker locker(&progListsLock);
+        progLists.clear();
+        vector<ProgramInfo*> *infoList = RemoteGetRecordedList(false);
+        bool LiveTVInAllPrograms = gCoreContext->GetNumSetting("LiveTVInAllPrograms",0);
+        if (infoList)
+        {
+            QList<QString> titles_seen;
+
+            ctx->LockPlayingInfo(__FILE__, __LINE__);
+            QString currecgroup = ctx->playingInfo->GetRecordingGroup();
+            ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+            vector<ProgramInfo *>::const_iterator it = infoList->begin();
+            for ( ; it != infoList->end(); it++)
+            {
+                if ((*it)->GetRecordingGroup() != "LiveTV" || LiveTVInAllPrograms ||
+                     (*it)->GetRecordingGroup() == currecgroup)
+                {
+                    progLists[(*it)->GetRecordingGroup()].push_front(
+                        new ProgramInfo(*(*it)));
+                }
+            }
+
+            ProgramInfo *lastprog = GetLastProgram();
+            QMap<QString,ProgramList>::const_iterator Iprog;
+            for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
+            {
+                const ProgramList &plist = *Iprog;
+                uint progIndex = (uint) plist.size();
+                QString group = Iprog.key();
+
+                if (plist[0]->GetRecordingGroup() != currecgroup)
+                {
+                    SetLastProgram(plist[0]);
+                    if (!PromptRecGroupPassword(ctx))
+                        continue;
+                }
+
+                if (progIndex == 1 && level == 0)
+                {
+                    osd->DialogAddButton(Iprog.key(),
+                                         QString("JUMPPROG %1 0").arg(group));
+                }
+                else if (progIndex > 1 && level == 0)
+                {
+
+                    osd->DialogAddButton(group,
+                                         QString("DIALOG_JUMPREC_%1_1").arg(group),
+                                         true, selected == group);
+                }
+                else if (level == 1 && Iprog.key() == category)
+                {
+                    ProgramList::const_iterator it = plist.begin();
+                    for (; it != plist.end(); ++it)
+                    {
+                        const ProgramInfo *p = *it;
+
+                        if (titles_seen.contains(p->GetTitle()))
+                            continue;
+
+                        titles_seen.push_back(p->GetTitle());
+
+                        ProgramList::const_iterator it2 = plist.begin();
+                        int j = -1;
+                        for (; it2 != plist.end(); ++it2)
+                        {
+                            const ProgramInfo *q = *it2;
+                            j++;
+
+                            if (q->GetTitle() != p->GetTitle())
+                                continue;
+
+                            osd->DialogAddButton(q->GetSubtitle().isEmpty() ?
+                                    q->GetTitle() : q->GetSubtitle(),
+                                    QString("JUMPPROG %1 %2")
+                                        .arg(Iprog.key()).arg(j));
+                        }
+                    }
+                }
+            }
+            SetLastProgram(lastprog);
+            if (lastprog)
+                delete lastprog;
+
+            while (!infoList->empty())
+            {
+                delete infoList->back();
+                infoList->pop_back();
+            }
+            delete infoList;
+        }
+
+        if (!category.isEmpty())
+        {
+            if (level == 1)
+                osd->DialogBack(category, QString("DIALOG_JUMPREC_X_0"));
+            else if (level == 0)
+                osd->DialogBack("JUMPREC", "DIALOG_MENU_JUMPREC_1");
+        }
+    }
+    ReturnOSDLock(ctx, osd);
+}
+
+QString TV::FillOSDMenuPxP(const PlayerContext *ctx, OSD *osd, bool select,
+                           int level) const
 
 {
+    QString result = QString();
+    QString title  = tr("Picture-in-Picture");
     bool allowPIP = IsPIPSupported(ctx);
     bool allowPBP = IsPBPSupported(ctx);
     if (!(allowPIP || allowPBP))
-        return;
+        return result;
 
-    OSDGenericTree *item =
-        new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_PIP_1", true, select);
+    }
 
+    if (level != 1)
+        return result;
+
+    result = title;
     bool hasPBP = (player.size()>1) && GetPlayer(ctx,1)->IsPBP();
     bool hasPIP = (player.size()>1) && GetPlayer(ctx,1)->IsPIP();
 
     if (RemoteGetFreeRecorderCount())
     {
         if (player.size() <= kMaxPIPCount && !hasPBP && allowPIP)
-            new OSDGenericTree(item, tr("Open Live TV PIP"), "CREATEPIPVIEW");
+            osd->DialogAddButton(tr("Open Live TV PIP"), "CREATEPIPVIEW");
         if (player.size() < kMaxPBPCount && !hasPIP && allowPBP)
-            new OSDGenericTree(item, tr("Open Live TV PBP"), "CREATEPBPVIEW");
+            osd->DialogAddButton(tr("Open Live TV PBP"), "CREATEPBPVIEW");
     }
 
     if (player.size() <= kMaxPIPCount && !hasPBP && allowPIP)
-        new OSDGenericTree(item, tr("Open Recording PIP"), "JUMPRECPIP");
+        osd->DialogAddButton(tr("Open Recording PIP"), "JUMPRECPIP");
     if (player.size() < kMaxPBPCount && !hasPIP && allowPBP)
-        new OSDGenericTree(item, tr("Open Recording PBP"), "JUMPRECPBP");
+        osd->DialogAddButton(tr("Open Recording PBP"), "JUMPRECPBP");
 
     if (player.size() <= 1)
-        return;
+        return result;
 
-    new OSDGenericTree(item, tr("Change Active Window"), "NEXTPIPWINDOW");
+    osd->DialogAddButton(tr("Change Active Window"), "NEXTPIPWINDOW");
 
     QString pipType  = (ctx->IsPBP()) ? "PBP" : "PIP";
     QString toggleMode = QString("TOGGLE%1MODE").arg(pipType);
@@ -10482,15 +10355,15 @@ void TV::FillMenuPxP(
         if (player.size() > 2)
             pipClose = (isPBP) ? tr("Close PBPs") : tr("Close PIPs");
 
-        new OSDGenericTree(item, pipClose, toggleMode);
+        osd->DialogAddButton(pipClose, toggleMode);
 
         if (player.size() == 2)
-            new OSDGenericTree(item, tr("Swap Windows"), "SWAPPIP");
+            osd->DialogAddButton(tr("Swap Windows"), "SWAPPIP");
     }
     else
     {
-        new OSDGenericTree(item, pipClose, toggleMode);
-        new OSDGenericTree(item, tr("Swap Windows"), "SWAPPIP");
+        osd->DialogAddButton(pipClose, toggleMode);
+        osd->DialogAddButton(tr("Swap Windows"), "SWAPPIP");
     }
 
     uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
@@ -10499,15 +10372,19 @@ void TV::FillMenuPxP(
         !(hasPBP && !allowPIP))
     {
         QString switchTo = (isPBP) ? tr("Switch to PIP") : tr("Switch to PBP");
-        new OSDGenericTree(item, switchTo, "TOGGLEPIPSTATE");
+        osd->DialogAddButton(switchTo, "TOGGLEPIPSTATE");
     }
+    return result;
 }
 
-void TV::FillMenuInputSwitching(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuSwitchInput(const PlayerContext *ctx, OSD *osd,
+                                   bool select, int level) const
 {
+    QString result = QString();
     if (!ctx->recorder)
-        return;
+        return result;
+
+    QString title = tr("Switch Input");
 
     // Input switching
     QMap<uint,InputInfo> sources;
@@ -10523,7 +10400,6 @@ void TV::FillMenuInputSwitching(
     ctx->recorder->GetChannelInfo(info);
     uint sourceid = info["sourceid"].toUInt();
 
-    OSDGenericTree *si_item = NULL;
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
@@ -10533,19 +10409,15 @@ void TV::FillMenuInputSwitching(
         if (inputs.empty())
             continue;
 
-        if (!si_item)
-            si_item = new OSDGenericTree(treeMenu, tr("Switch Input"));
+        if (level == 0)
+        {
+            osd->DialogAddButton(title, "DIALOG_MENU_INPUTSWITCHING_1",
+                                 true, select);
+            return result;
+        }
 
         for (uint i = 0; i < inputs.size(); i++)
         {
-            // prefer the current card's input in sources list
-            if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                ((cardid == inputs[i].cardid) &&
-                 (cardid != sources[inputs[i].sourceid].cardid)))
-            {
-                sources[inputs[i].sourceid] = inputs[i];
-            }
-
             // don't add current input to list
             if ((inputs[i].cardid   == cardid) &&
                 (inputs[i].sourceid == sourceid))
@@ -10560,82 +10432,146 @@ void TV::FillMenuInputSwitching(
                     tr("I", "Input") + ":" + inputs[i].name;
             }
 
-            new OSDGenericTree(
-                si_item, name,
-                QString("SWITCHTOINPUT_%1").arg(inputs[i].inputid));
+            if (level == 1)
+            {
+                result = title;
+                osd->DialogAddButton(name,
+                    QString("SWITCHTOINPUT_%1").arg(inputs[i].inputid));
+            }
         }
     }
+    return result;
+}
 
-    // Source switching
+QString TV::FillOSDMenuSwitchSrc(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
+{
+    QString result = QString();
+    if (!ctx->recorder)
+        return result;
+
+    QString title = tr("Switch Source");
+
+    QMap<uint,InputInfo> sources;
+    vector<uint> cardids = RemoteRequestFreeRecorderList();
+    uint         cardid  = ctx->GetCardID();
+    cardids.push_back(cardid);
+    stable_sort(cardids.begin(), cardids.end());
+
+    vector<uint> excluded_cardids;
+    excluded_cardids.push_back(cardid);
+
+    InfoMap info;
+    ctx->recorder->GetChannelInfo(info);
+    uint sourceid = info["sourceid"].toUInt();
+
+    vector<uint>::const_iterator it = cardids.begin();
+    for (; it != cardids.end(); ++it)
+    {
+        vector<InputInfo> inputs = RemoteRequestFreeInputList(
+            *it, excluded_cardids);
+
+        if (inputs.empty())
+            continue;
+
+        for (uint i = 0; i < inputs.size(); i++)
+        {
+            if ((sources.find(inputs[i].sourceid) == sources.end()) ||
+                ((cardid == inputs[i].cardid) &&
+                 (cardid != sources[inputs[i].sourceid].cardid)))
+            {
+                sources[inputs[i].sourceid] = inputs[i];
+            }
+        }
+    }
     // delete current source from list
     sources.remove(sourceid);
-
-    // create menu if we have any sources left
-    OSDGenericTree *sit_item = NULL;
     QMap<uint,InputInfo>::const_iterator sit = sources.begin();
-    if (sit != sources.end())
-        sit_item = new OSDGenericTree(treeMenu, tr("Switch Source"));
-    for (; sit != sources.end(); ++sit)
+    if (sit == sources.end())
+        return result;
+
+    if (level == 0)
     {
-        new OSDGenericTree(
-            sit_item, SourceUtil::GetSourceName((*sit).sourceid),
-            QString("SWITCHTOINPUT_%1").arg((*sit).inputid));
+        osd->DialogAddButton(title, "DIALOG_MENU_SOURCESWITCHING_1",
+                             true, select);
     }
+    else if (level == 1)
+    {
+        result = title;
+        for (; sit != sources.end(); ++sit)
+        {
+            osd->DialogAddButton(SourceUtil::GetSourceName((*sit).sourceid),
+                                 QString("SWITCHTOINPUT_%1").arg((*sit).inputid));
+        }
+    }
+    return result;
 }
 
-void TV::FillMenuVideoAspect(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuVidAspect(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
 {
-    AspectOverrideMode aspectoverride = kAspect_Off;
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp)
-        aspectoverride = ctx->nvp->GetAspectOverride();
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    OSDGenericTree *car_item = new OSDGenericTree(
-        treeMenu, tr("Change Aspect Ratio"));
-    for (int j = kAspect_Off; j < kAspect_END; j++)
+    QString result = QString();
+    QString title  = tr("Change Aspect Ratio");
+    if (level == 0)
     {
-        // swap 14:9 and 16:9
-        int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
-                 ((kAspect_16_9 == j) ? kAspect_14_9 : j));
-
-        bool sel = (i != kAspect_Off) ? (aspectoverride == i) :
-            (aspectoverride <= kAspect_Off) || (aspectoverride >= kAspect_END);
-        new OSDGenericTree(car_item, toString((AspectOverrideMode) i),
-                           QString("TOGGLEASPECT%1").arg(i),
-                           (sel) ? 1 : 0, NULL, "ASPECTGROUP");
+        osd->DialogAddButton(title, "DIALOG_MENU_VIDEOASPECT_1", true, select);
     }
+    else if (level == 1)
+    {
+        result = title;
+        AspectOverrideMode aspectoverride = kAspect_Off;
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (ctx->nvp)
+            aspectoverride = ctx->nvp->GetAspectOverride();
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+        for (int j = kAspect_Off; j < kAspect_END; j++)
+        {
+            // swap 14:9 and 16:9
+            int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
+                     ((kAspect_16_9 == j) ? kAspect_14_9 : j));
+            osd->DialogAddButton(toString((AspectOverrideMode) i),
+                                 QString("TOGGLEASPECT%1").arg(i), false,
+                                 aspectoverride == i);
+        }
+    }
+    return result;
 }
 
-void TV::FillMenuAdjustFill(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuAdjustFill(const PlayerContext *ctx, OSD *osd,
+                                  bool select, int level) const
 {
-    AdjustFillMode adjustfill = kAdjustFill_Off;
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp)
-        adjustfill = ctx->nvp->GetAdjustFill();
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    OSDGenericTree *af_item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
-    new OSDGenericTree(af_item, tr("Auto Detect"),
-                       "AUTODETECT_FILL",
-                       (ctx->nvp->detect_letter_box->GetDetectLetterbox()) ? 1 : 0,
-                       NULL, "ADJUSTFILLGROUP");
-
-    for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
+    QString result = QString();
+    QString title  = tr("Adjust Fill");
+    if (level == 0)
     {
-        bool sel = (i != kAdjustFill_Off) ? (adjustfill == i) :
-            (adjustfill <= kAdjustFill_Off) || (adjustfill >= kAdjustFill_END);
-        new OSDGenericTree(af_item, toString((AdjustFillMode) i),
-                           QString("TOGGLEFILL%1").arg(i),
-                           (sel) ? 1 : 0, NULL, "ADJUSTFILLGROUP");
+        osd->DialogAddButton(title, "DIALOG_MENU_ADJUSTFILL_1", true, select);
     }
+    else if (level == 1)
+    {
+        result = title;
+        AdjustFillMode adjustfill = kAdjustFill_Off;
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (ctx->nvp)
+            adjustfill = ctx->nvp->GetAdjustFill();
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+        osd->DialogAddButton(tr("Auto Detect"), "AUTODETECT_FILL");
+        for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
+        {
+            osd->DialogAddButton(toString((AdjustFillMode) i),
+                                 QString("TOGGLEFILL%1").arg(i), false,
+                                 adjustfill == i);
+        }
+    }
+    return result;
 }
 
-void TV::FillMenuAdjustPicture(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuAdjustPic(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
 {
+    QString result = QString();
+    QString title  = tr("Adjust Picture");
     uint sup = kPictureAttributeSupported_None;
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
@@ -10643,60 +10579,72 @@ void TV::FillMenuAdjustPicture(
         sup = ctx->nvp->getVideoOutput()->GetSupportedPictureAttributes();
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    OSDGenericTree *ap_item = NULL;
-    for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
+    if (sup == kPictureAttributeSupported_None)
+        return result;
+
+    if (level == 0)
     {
-        if (toMask((PictureAttribute)i) & sup)
+        osd->DialogAddButton(title, "DIALOG_MENU_ADJUSTPICTURE_1", true, select);
+    }
+    else if (level == 1)
+    {
+        result = title;
+        for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
         {
-            if (!ap_item)
-                ap_item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
-            new OSDGenericTree(
-                ap_item, toString((PictureAttribute) i),
-                QString("TOGGLEPICCONTROLS%1").arg(i));
+            if (toMask((PictureAttribute)i) & sup)
+            {
+                osd->DialogAddButton(toString((PictureAttribute) i),
+                               QString("TOGGLEPICCONTROLS%1").arg(i));
+            }
         }
     }
+    return result;
 }
 
-void TV::FillMenuTimeStretch(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuTimeStretch(const PlayerContext *ctx, OSD *osd,
+                                   bool select, int level) const
 {
+    QString result = QString();
+    QString title  = tr("Adjust Time Stretch");
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_TIMESTRETCH_1", true, select);
+        return result;
+    }
+
+    if (level != 1)
+        return result;
+
+    result = title;
     int speedX100 = (int)(round(ctx->ts_normal * 100));
-
-    OSDGenericTree *ats_item = new OSDGenericTree(
-        treeMenu, tr("Adjust Time Stretch"), "ADJUSTSTRETCH");
-
-    new OSDGenericTree(ats_item, tr("Toggle"), "TOGGLESTRETCH");
-    new OSDGenericTree(ats_item, tr("Adjust"), "ADJUSTSTRETCH");
-    new OSDGenericTree(ats_item, tr("0.5X"), "ADJUSTSTRETCH0.5",
-                       (speedX100 == 50) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("0.9X"), "ADJUSTSTRETCH0.9",
-                       (speedX100 == 90) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("1.0X"), "ADJUSTSTRETCH1.0",
-                       (speedX100 == 100) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("1.1X"), "ADJUSTSTRETCH1.1",
-                       (speedX100 == 110) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("1.2X"), "ADJUSTSTRETCH1.2",
-                       (speedX100 == 120) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("1.3X"), "ADJUSTSTRETCH1.3",
-                       (speedX100 == 130) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("1.4X"), "ADJUSTSTRETCH1.4",
-                       (speedX100 == 140) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
-    new OSDGenericTree(ats_item, tr("1.5X"), "ADJUSTSTRETCH1.5",
-                       (speedX100 == 150) ? 1 : 0, NULL,
-                       "STRETCHGROUP");
+    osd->DialogAddButton(tr("Toggle"), "TOGGLESTRETCH");
+    osd->DialogAddButton(tr("Adjust"), "ADJUSTSTRETCH");
+    osd->DialogAddButton(tr("0.5X"), "ADJUSTSTRETCH0.5", false, speedX100 == 50);
+    osd->DialogAddButton(tr("0.9X"), "ADJUSTSTRETCH0.9", false, speedX100 == 90);
+    osd->DialogAddButton(tr("1.0X"), "ADJUSTSTRETCH1.0", false, speedX100 == 100);
+    osd->DialogAddButton(tr("1.1X"), "ADJUSTSTRETCH1.1", false, speedX100 == 110);
+    osd->DialogAddButton(tr("1.2X"), "ADJUSTSTRETCH1.2", false, speedX100 == 120);
+    osd->DialogAddButton(tr("1.3X"), "ADJUSTSTRETCH1.3", false, speedX100 == 130);
+    osd->DialogAddButton(tr("1.4X"), "ADJUSTSTRETCH1.4", false, speedX100 == 140);
+    osd->DialogAddButton(tr("1.5X"), "ADJUSTSTRETCH1.5", false, speedX100 == 150);
+    return result;
 }
 
-/// \brief Add scan mode override settings to menu.
-void TV::FillMenuVideoScan(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuVideoScan(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
 {
+    QString result = QString();
+    QString title  = tr("Video Scan");
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_VIDEOSCAN_1", true, select);
+        return result;
+    }
+
+    if (level != 1)
+        return result;
+
+    result = title;
     FrameScanType scan_type = kScan_Ignore;
     bool scan_type_locked = false;
     QString cur_mode = "";
@@ -10720,42 +10668,70 @@ void TV::FillMenuVideoScan(
     }
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    OSDGenericTree *vs_item = new OSDGenericTree(
-        treeMenu, tr("Video Scan"), "SCANMODE");
-    new OSDGenericTree(
-        vs_item, tr("Detect") + cur_mode, "SELECTSCAN_0",
-        (scan_type == kScan_Detect) ? 1 : 0, NULL, "SCANGROUP");
-    new OSDGenericTree(
-        vs_item, tr("Progressive"), "SELECTSCAN_3",
-        (scan_type == kScan_Progressive) ? 1 : 0, NULL, "SCANGROUP");
-    new OSDGenericTree(
-        vs_item, tr("Interlaced (Normal)"), "SELECTSCAN_1",
-        (scan_type == kScan_Interlaced) ? 1 : 0, NULL, "SCANGROUP");
-    new OSDGenericTree(
-        vs_item, tr("Interlaced (Reversed)"), "SELECTSCAN_2",
-        (scan_type == kScan_Intr2ndField) ? 1 : 0, NULL, "SCANGROUP");
+    osd->DialogAddButton(tr("Detect") + cur_mode, "SELECTSCAN_0", false,
+                         scan_type == kScan_Detect);
+    osd->DialogAddButton(tr("Progressive"), "SELECTSCAN_3", false,
+                         scan_type == kScan_Progressive);
+    osd->DialogAddButton(tr("Interlaced (Normal)"), "SELECTSCAN_1", false,
+                         scan_type == kScan_Interlaced);
+    osd->DialogAddButton(tr("Interlaced (Reversed)"), "SELECTSCAN_2", false,
+                         scan_type == kScan_Intr2ndField);
+    return result;
 }
 
-/// \brief Add sleep items to menu.
-void TV::FillMenuSleepMode(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+QString TV::FillOSDMenuSleepMode(const PlayerContext *ctx, OSD *osd,
+                                 bool select, int level) const
 {
-    OSDGenericTree *s_item = new OSDGenericTree(
-        treeMenu, tr("Sleep"), "TOGGLESLEEPON");
+    QString result = QString();
+    QString title  = tr("Sleep");
+    if (level == 0)
+    {
+        osd->DialogAddButton(title, "DIALOG_MENU_SLEEP_1", true, select);
+        return result;
+    }
+
+    if (level != 1)
+        return result;
+
+    result = title;
     if (sleepTimerId)
-        new OSDGenericTree(s_item, tr("Sleep Off"), "TOGGLESLEEPON");
-    new OSDGenericTree(s_item, tr("%n minute(s)", "", 30), "TOGGLESLEEP30");
-    new OSDGenericTree(s_item, tr("%n minute(s)", "", 60), "TOGGLESLEEP60");
-    new OSDGenericTree(s_item, tr("%n minute(s)", "", 90), "TOGGLESLEEP90");
-    new OSDGenericTree(s_item, tr("%n minute(s)", "", 120), "TOGGLESLEEP120");
+        osd->DialogAddButton(tr("Sleep Off"), "TOGGLESLEEPON");
+    osd->DialogAddButton(tr("%n minute(s)", "", 30), "TOGGLESLEEP30");
+    osd->DialogAddButton(tr("%n minute(s)", "", 60), "TOGGLESLEEP60");
+    osd->DialogAddButton(tr("%n minute(s)", "", 90), "TOGGLESLEEP90");
+    osd->DialogAddButton(tr("%n minute(s)", "", 120), "TOGGLESLEEP120");
+    return result;
 }
 
-bool TV::FillMenuTracks(const PlayerContext *ctx,
-                        OSDGenericTree *treeMenu, uint type) const
+QString TV::FillOSDMenuTextSubs(const PlayerContext* ctx, OSD *osd,
+                                bool select, int level) const
 {
+    QString result = "";
+    if (level != 0)
+        return result;
+
+    bool havetext = false;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        havetext = ctx->nvp->HasTextSubtitles();
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+    if (!havetext)
+        return result;
+
+    result = tr("Toggle Text Subtitles");
+    osd->DialogAddButton(result, "TOGGLETEXT");
+    return result;
+}
+
+QString TV::FillOSDMenuTracks(const PlayerContext *ctx, OSD *osd, bool select,
+                              int level, uint type) const
+{
+    QString result = QString();
+
     QString mainMsg = QString::null;
     QString selStr  = QString::null;
-    QString grpStr  = QString::null;
+    QString catStr  = QString::null;
     QString typeStr = QString::null;
     bool    sel     = true;
     uint    capmode = 0;
@@ -10767,46 +10743,46 @@ bool TV::FillMenuTracks(const PlayerContext *ctx,
 
     if (kTrackTypeAudio == type)
     {
+        catStr  = "AUDIOTRACKS";
         mainMsg = tr("Select Audio Track");
         typeStr = "AUDIO";
         selStr  = "SELECTAUDIO_";
-        grpStr  = "AUDIOGROUP";
     }
     else if (kTrackTypeSubtitle == type)
     {
+        catStr = "SUBTITLETRACKS";
         mainMsg = tr("Select Subtitle");
         typeStr = "SUBTITLE";
         selStr  = "SELECTSUBTITLE_";
-        grpStr  = "SUBTITLEGROUP";
         sel     = capmode & kDisplayAVSubtitle;
     }
     else if (kTrackTypeCC608 == type)
     {
+        catStr  = "CCTRACKS";
         mainMsg = tr("Select VBI CC");
         typeStr = "CC608";
         selStr  = "SELECTCC608_";
-        grpStr  = "CC608GROUP";
         sel     = capmode & kDisplayCC608;
     }
     else if (kTrackTypeCC708 == type)
     {
+        catStr  = "ATSCTRACKS";
         mainMsg = tr("Select ATSC CC");
         typeStr = "CC708";
         selStr  = "SELECTCC708_";
-        grpStr  = "CC608GROUP";
         sel     = capmode & kDisplayCC708;
     }
     else if (kTrackTypeTeletextCaptions == type)
     {
+        catStr  = "CCTRACKS";
         mainMsg = tr("Select DVB CC");
         typeStr = "TTC";
         selStr  = "SELECTTTC_";
-        grpStr  = "TTCGROUP";
         sel     = capmode & kTrackTypeTeletextCaptions;
     }
     else
     {
-        return false;
+        return result;
     }
 
     QStringList tracks;
@@ -10822,25 +10798,32 @@ bool TV::FillMenuTracks(const PlayerContext *ctx,
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (tracks.empty())
-        return false;
+        return result;
 
     if ((kTrackTypeAudio == type) && tracks.size() <= 1)
-        return false;
+        return result;
 
-    OSDGenericTree *tm_item = new OSDGenericTree(
-        treeMenu, mainMsg, "DUMMY" + QString::number(type));
+    if (level == 0)
+    {
+        osd->DialogAddButton(mainMsg, "DIALOG_MENU_" + catStr + "_1", true, select);
+        return result;
+    }
+
+    if (level != 1)
+        return result;
+
+    result = mainMsg;
 
     if (kTrackTypeAudio != type)
-        new OSDGenericTree(tm_item, tr("Toggle On/Off"), "TOGGLE"+typeStr);
+        osd->DialogAddButton(tr("Toggle On/Off"), "TOGGLE"+typeStr);
 
     for (uint i = 0; i < (uint)tracks.size(); i++)
     {
-        new OSDGenericTree(
-            tm_item, tracks[i], selStr + QString::number(i),
-            (sel && (i == curtrack)) ? 1 : 0, NULL, grpStr);
+        osd->DialogAddButton(tracks[i], selStr + QString::number(i), false,
+                             sel && (i == curtrack));
     }
 
-    return true;
+    return result;
 }
 
 void TV::ToggleAutoExpire(PlayerContext *ctx)
@@ -10863,17 +10846,7 @@ void TV::ToggleAutoExpire(PlayerContext *ctx)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (!desc.isEmpty())
-    {
-        struct StatusPosInfo posInfo;
-        if (ctx->CalcNVPSliderPosition(posInfo))
-        {
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->ShowStatus(posInfo, false, desc, 1);
-            ReturnOSDLock(ctx, osd);
-        }
-        SetUpdateOSDPosition(false);
-    }
+        UpdateOSDSeekMessage(ctx, desc, osd_general_timeout);
 }
 
 void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
@@ -10890,17 +10863,7 @@ void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (!desc.isEmpty())
-    {
-        struct StatusPosInfo posInfo;
-        if (ctx->CalcNVPSliderPosition(posInfo))
-        {
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->ShowStatus(posInfo, false, desc, 1);
-            ReturnOSDLock(ctx, osd);
-        }
-        SetUpdateOSDPosition(false);
-    }
+        UpdateOSDSeekMessage(ctx, desc, osd_general_timeout);
 }
 
 void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
@@ -10913,17 +10876,7 @@ void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
         ClearOSD(ctx);
 
     if (!desc.isEmpty())
-    {
-        struct StatusPosInfo posInfo;
-        if (ctx->CalcNVPSliderPosition(posInfo))
-        {
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-                osd->ShowStatus(posInfo, false, desc, 1);
-            ReturnOSDLock(ctx, osd);
-        }
-        SetUpdateOSDPosition(false);
-    }
+        UpdateOSDSeekMessage(ctx, desc, osd_general_timeout);
 }
 
 bool TV::HandleJumpToProgramAction(
@@ -11106,20 +11059,12 @@ void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
         }
     }
 
-    // display OSD
-    OSD *osd = GetOSDLock(ctx);
-    if (osd && !browsemode)
-    {
-        QString out;
-
-        if (mins != 0)
-            out = tr("Sleep") + " " + QString::number(mins);
-        else
-            out = tr("Sleep") + " " + sleep_times[0].dispString;
-
-        osd->SetSettingsText(out, 3);
-    }
-    ReturnOSDLock(ctx, osd);
+    QString out;
+    if (mins != 0)
+        out = tr("Sleep") + " " + QString::number(mins);
+    else
+        out = tr("Sleep") + " " + sleep_times[0].dispString;
+    SetOSDMessage(ctx, out);
 }
 
 void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
@@ -11154,8 +11099,8 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
     }
     else if (osd)
     {
-        QStringList options("OK");
-        osd->NewDialogBox(kOSDDialogInfo, errorText, options, 0);
+        osd->DialogShow(OSD_DLG_INFO, errorText);
+        osd->DialogAddButton(tr("OK"), "DIALOG_INFO_X_X");
     }
     else
     {
@@ -11297,12 +11242,7 @@ bool TV::ScreenShot(PlayerContext *ctx, long long frameNumber)
     previewgen->deleteLater();
 
     QString msg = tr("Screen Shot") + " " + ((ok) ? tr("OK") : tr("Error"));
-
-    OSD *osd = GetOSDLock(ctx);
-    if (osd)
-        osd->SetSettingsText(msg, 3);
-    ReturnOSDLock(ctx, osd);
-
+    SetOSDMessage(ctx, msg);
     return ok;
 }
 
@@ -11443,7 +11383,7 @@ bool TV::IsDeleteAllowed(const PlayerContext *ctx) const
     return allowed;
 }
 
-void TV::PromptStopWatchingRecording(PlayerContext *ctx)
+void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
 {
     ClearOSD(ctx);
 
@@ -11470,24 +11410,31 @@ void TV::PromptStopWatchingRecording(PlayerContext *ctx)
     if (videotype.isEmpty())
         videotype = tr("this recording");
 
-    message = tr("You are exiting %1").arg(videotype);
-
-    if (IsBookmarkAllowed(ctx))
-    {
-        options += tr("Save this position and go to the menu");
-        options += tr("Do not save, just exit to the menu");
-    }
-    else
-        options += tr("Exit %1").arg(videotype);
-
-    if (IsDeleteAllowed(ctx))
-        options += tr("Delete this recording");
-
-    options += tr("Keep watching");
-
     OSD *osd = GetOSDLock(ctx);
     if (osd)
-        osd->NewDialogBox(kOSDDialogExitOptions, message, options, 0);
+    {
+        osd->DialogShow(OSD_DLG_VIDEOEXIT,
+                        tr("You are exiting %1").arg(videotype));
+
+        if (IsBookmarkAllowed(ctx))
+        {
+            osd->DialogAddButton(tr("Save this position and go to the menu"),
+                                 "DIALOG_VIDEOEXIT_SAVEPOSITIONANDEXIT_0");
+            osd->DialogAddButton(tr("Do not save, just exit to the menu"),
+                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0");
+        }
+        else
+            osd->DialogAddButton(tr("Exit %1").arg(videotype),
+                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0");
+
+        if (IsDeleteAllowed(ctx))
+            osd->DialogAddButton(tr("Delete this recording"),
+                                 "DIALOG_VIDEOEXIT_CONFIRMDELETE_0");
+
+        osd->DialogAddButton(tr("Keep watching"),
+                             "DIALOG_VIDEOEXIT_KEEPWATCHING_0");
+        osd->DialogBack("", "DIALOG_VIDEOEXIT_KEEPWATCHING_0", true);
+    }
     ReturnOSDLock(ctx, osd);
 
     QMutexLocker locker(&timerIdLock);
@@ -11496,7 +11443,8 @@ void TV::PromptStopWatchingRecording(PlayerContext *ctx)
     videoExitDialogTimerId = StartTimer(kVideoExitDialogTimeout, __LINE__);
 }
 
-void TV::PromptDeleteRecording(PlayerContext *ctx, QString title)
+void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
+                                      bool force)
 {
     ctx->LockPlayingInfo(__FILE__, __LINE__);
 
@@ -11525,17 +11473,15 @@ void TV::PromptDeleteRecording(PlayerContext *ctx, QString title)
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         OSD *osd = GetOSDLock(ctx);
-        bool has_dialog = osd && !osd->GetDialogActive().isEmpty();
-
-        if (!has_dialog)
+        if (osd && !osd->DialogVisible())
         {
-            QStringList options(QObject::tr("OK"));
             QString message = QObject::tr("Can not delete program") +
-                QString("\n%1\n%2\n\n")
+                QString("%1 %2 ")
                 .arg(pginfo.GetTitle()).arg(pginfo.GetSubtitle());
+
             if (!pginfo.IsRecording())
             {
-                message += QObject::tr("because it not a recording.");
+                message += QObject::tr("because it is not a recording.");
             }
             else
             {
@@ -11549,11 +11495,13 @@ void TV::PromptDeleteRecording(PlayerContext *ctx, QString title)
                         continue;
                     if (byWho[i+0].contains(kRecorderInUseID))
                         continue;
-                    message += "\n" + byWho[i+2];
+                    message += " " + byWho[i+2];
                 }
             }
-            if (osd && !has_dialog)
-                osd->NewDialogBox(kOSDDialogCanNotDelete, message, options, 0);
+            osd->DialogShow(OSD_DLG_DELETE, message);
+            QString action = "DIALOG_DELETE_OK_0";
+            osd->DialogAddButton(tr("OK"), action);
+            osd->DialogBack("", action, true);
         }
         ReturnOSDLock(ctx, osd);
 
@@ -11566,52 +11514,88 @@ void TV::PromptDeleteRecording(PlayerContext *ctx, QString title)
     if (!ctx->paused)
         DoTogglePause(ctx, false);
 
+    InfoMap infoMap;
+    ctx->GetPlayingInfoMap(infoMap);
+    QString message = QString("%1\n%2\n%3")
+        .arg(title).arg(infoMap["title"]).arg(infoMap["timedate"]);
+
     OSD *osd = GetOSDLock(ctx);
-    bool has_dialog = osd && !osd->GetDialogActive().isEmpty();
-    ReturnOSDLock(ctx, osd);
-
-    if (!has_dialog)
+    if (osd && (!osd->DialogVisible() || force))
     {
-        InfoMap infoMap;
-        ctx->GetPlayingInfoMap(infoMap);
-
-        QString message = QString("%1\n%2\n%3")
-            .arg(title).arg(infoMap["title"]).arg(infoMap["timedate"]);
-
-        QStringList options;
+        osd->DialogShow(OSD_DLG_VIDEOEXIT, message);
         if (title == "End Of Recording")
         {
-            options += tr("Delete it, but allow it to re-record");
-            options += tr("Delete it");
-            options += tr("Save it so I can watch it again");
+            osd->DialogAddButton(tr("Delete it, but allow it to re-record"),
+                                 "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0");
+            osd->DialogAddButton(tr("Delete it"),
+                                 "DIALOG_VIDEOEXIT_JUSTDELETE_0");
+            osd->DialogAddButton(tr("Save it so I can watch it again"),
+                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0", false, true);
         }
         else
         {
-            options += tr("Yes, and allow re-record");
-            options += tr("Yes, delete it");
-            options += tr("No, keep it, I changed my mind");
+            osd->DialogAddButton(tr("Yes, and allow re-record"),
+                                 "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0");
+            osd->DialogAddButton(tr("Yes, delete it"),
+                                 "DIALOG_VIDEOEXIT_JUSTDELETE_0");
+            osd->DialogAddButton(tr("No, keep it, I changed my mind"),
+                                 "DIALOG_VIDEOEXIT_JUSTEXIT_0", false, true);
         }
 
-        OSD *osd = GetOSDLock(ctx);
-        has_dialog = osd && !osd->GetDialogActive().isEmpty();
-        if (osd && !has_dialog)
-            osd->NewDialogBox(kOSDDialogAskDelete, message, options, 0, 2);
-        ReturnOSDLock(ctx, osd);
-    }
-
-    if (!has_dialog)
-    {
         QMutexLocker locker(&timerIdLock);
         if (videoExitDialogTimerId)
             KillTimer(videoExitDialogTimerId);
         videoExitDialogTimerId = StartTimer(kVideoExitDialogTimeout, __LINE__);
     }
+    ReturnOSDLock(ctx, osd);
 }
 
-bool TV::IsVideoExitDialog(const QString &dialogname)
+bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
 {
-    return (dialogname == kOSDDialogAskDelete ||
-            dialogname == kOSDDialogExitOptions);
+    if (!DialogIsVisible(ctx, OSD_DLG_VIDEOEXIT))
+        return false;
+
+    bool hide        = true;
+    bool delete_ok   = IsDeleteAllowed(ctx);
+    bool bookmark_ok = IsBookmarkAllowed(ctx);
+
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    bool near_end = ctx->nvp && ctx->nvp->IsNearEnd();
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+    if (action == "DELETEANDRERECORD" && delete_ok)
+    {
+        allowRerecord = true;
+        requestDelete = true;
+        SetExitPlayer(true, true);
+    }
+    else if (action == "JUSTDELETE" && delete_ok)
+    {
+        requestDelete = true;
+        SetExitPlayer(true, true);
+    }
+    else if (action == "CONFIRMDELETE")
+    {
+        hide = false;
+        ShowOSDPromptDeleteRecording(ctx, tr("Delete this recording?"),
+                                     true);
+    }
+    else if (action == "SAVEPOSITIONANDEXIT" && bookmark_ok)
+    {
+        PrepareToExitPlayer(ctx, __LINE__);
+        SetExitPlayer(true, true);
+    }
+    else if (action == "KEEPWATCHING" && !near_end)
+    {
+        DoTogglePause(ctx, true);
+    }
+    else/* (action == "JUSTEXIT")*/
+    {
+        PrepareToExitPlayer(ctx, __LINE__, false);
+        SetExitPlayer(true, true);
+    }
+
+    return hide;
 }
 
 void TV::SetLastProgram(const ProgramInfo *rcinfo)
@@ -11699,13 +11683,7 @@ bool TV::PromptRecGroupPassword(PlayerContext *ctx)
         //qApp->unlock();
         if (!ok)
         {
-            OSD *osd = GetOSDLock(ctx);
-            if (osd)
-            {
-                QString msg = tr("Password Failed");
-                osd->SetSettingsText(msg, 3);
-            }
-            ReturnOSDLock(ctx, osd);
+            SetOSDMessage(ctx, tr("Password Failed"));
 
             if (ctx->paused && !stayPaused)
                 DoTogglePause(ctx, false);
@@ -11718,124 +11696,6 @@ bool TV::PromptRecGroupPassword(PlayerContext *ctx)
         DoTogglePause(ctx, false);
 
     return true;
-}
-
-void TV::DoDisplayJumpMenu(void)
-{
-    if (treeMenu)
-        delete treeMenu;
-
-    treeMenu = new OSDGenericTree(NULL, "treeMenu");
-
-    PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-
-    // Build jumpMenu of recorded program titles
-    QMutexLocker locker(&progListsLock);
-    progLists.clear();
-    vector<ProgramInfo*> *infoList = RemoteGetRecordedList(false);
-
-    bool LiveTVInAllPrograms = gCoreContext->GetNumSetting("LiveTVInAllPrograms",0);
-    if (infoList)
-    {
-        QList<QString> titles_seen;
-
-        actx->LockPlayingInfo(__FILE__, __LINE__);
-        QString currecgroup = actx->playingInfo->GetRecordingGroup();
-        actx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-        vector<ProgramInfo *>::const_iterator it = infoList->begin();
-        for ( ; it != infoList->end(); it++)
-        {
-            if ((*it)->GetRecordingGroup() != "LiveTV" || LiveTVInAllPrograms ||
-                (*it)->GetRecordingGroup() == currecgroup)
-            {
-                progLists[(*it)->GetRecordingGroup()].push_front(
-                    new ProgramInfo(*(*it)));
-            }
-        }
-
-        ProgramInfo *lastprog = GetLastProgram();
-        QMap<QString,ProgramList>::const_iterator Iprog;
-        for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
-        {
-            const ProgramList &plist = *Iprog;
-            uint progIndex = (uint) plist.size();
-
-            if (plist[0]->GetRecordingGroup() != currecgroup)
-            {
-                SetLastProgram(plist[0]);
-                if (!PromptRecGroupPassword(actx))
-                    continue;
-            }
-
-            if (progIndex == 1)
-            {
-                new OSDGenericTree(
-                    treeMenu, Iprog.key(),
-                    QString("JUMPPROG %1 0").arg(Iprog.key()));
-            }
-            else
-            {
-                OSDGenericTree *j_item =
-                    new OSDGenericTree(treeMenu, Iprog.key());
-
-                ProgramList::const_iterator it = plist.begin();
-                for (; it != plist.end(); ++it)
-                {
-                    const ProgramInfo *p = *it;
-
-                    if (titles_seen.contains(p->GetTitle()))
-                        continue;
-                    titles_seen.push_back(p->GetTitle());
-
-                    OSDGenericTree *jsub_item =
-                        new OSDGenericTree(j_item, p->GetTitle());
-                    ProgramList::const_iterator it2 = plist.begin();
-                    int j = -1;
-                    for (; it2 != plist.end(); ++it2)
-                    {
-                        const ProgramInfo *q = *it2;
-                        j++;
-
-                        if (q->GetTitle() != p->GetTitle())
-                            continue;
-
-                        new OSDGenericTree(
-                            jsub_item,
-                            q->GetSubtitle().isEmpty() ?
-                            q->GetTitle() : q->GetSubtitle(),
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(j));
-                    }
-                }
-            }
-        }
-        SetLastProgram(lastprog);
-        if (lastprog)
-            delete lastprog;
-
-        while (!infoList->empty())
-        {
-            delete infoList->back();
-            infoList->pop_back();
-        }
-        delete infoList;
-    }
-    else
-    {
-        ReturnPlayerLock(actx);
-        return;
-    }
-
-    OSD *osd = GetOSDLock(actx);
-    if (osd)
-    {
-        ClearOSD(actx);
-        OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
-        if (tree)
-            tree->SetListener(this);
-    }
-    ReturnOSDLock(actx, osd);
-    ReturnPlayerLock(actx);
 }
 
 void TV::RestoreScreenSaver(const PlayerContext *ctx)
@@ -11904,10 +11764,12 @@ void TV::HandleUDPNotifyEvent(void)
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     OSD *osd = GetOSDLock(mctx);
+/*
     if (osd && set)
         osd->StartNotify(set);
     else if (osd && !name.isEmpty())
         osd->ClearNotify(name);
+*/
     ReturnOSDLock(mctx, osd);
     ReturnPlayerLock(mctx);
 }

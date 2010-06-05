@@ -20,7 +20,7 @@ class VideoOutputQuartz : public VideoOutput
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan);
-    void PrepareFrame(VideoFrame *buffer, FrameScanType t);
+    void PrepareFrame(VideoFrame *buffer, FrameScanType t, OSD *osd);
     void Show(FrameScanType);
 
     void SetVideoFrameRate(float playback_fps);

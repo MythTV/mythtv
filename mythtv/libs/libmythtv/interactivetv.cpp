@@ -48,9 +48,10 @@ bool InteractiveTV::ImageHasChanged(void)
 }
 
 // Called by the video player to redraw the image.
-void InteractiveTV::UpdateOSD(OSDSet *osdSet)
+void InteractiveTV::UpdateOSD(InteractiveScreen *osdWindow,
+                              MythPainter *osdPainter)
 {
-    m_context->UpdateOSD(osdSet);
+    m_context->UpdateOSD(osdWindow, osdPainter);
 }
 
 // Process an incoming DSMCC table.

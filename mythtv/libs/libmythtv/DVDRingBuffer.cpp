@@ -8,7 +8,7 @@
 #include "mythmediamonitor.h"
 #include "iso639.h"
 
-#include "NuppelVideoPlayer.h"
+#include "mythdvdplayer.h"
 #include "compat.h"
 #include "mythverbose.h"
 #include "mythuihelper.h"
@@ -749,6 +749,7 @@ void DVDRingBufferPriv::ActivateButton(void)
 {
     if (NumMenuButtons() > 0)
     {
+        ClearSubtitlesOSD();
         pci_t *pci = dvdnav_get_current_nav_pci(m_dvdnav);
         dvdnav_button_activate(m_dvdnav, pci);
     }
@@ -1220,10 +1221,9 @@ uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
 void DVDRingBufferPriv::ClearSubtitlesOSD(void)
 {
     if (m_parent && m_parent->GetOSD() &&
-        m_parent->GetOSD()->IsSetDisplaying("subtitles"))
+        m_parent->GetOSD()->IsWindowVisible(OSD_WIN_SUBTITLE))
     {
-        m_parent->GetOSD()->HideSet("subtitles");
-        m_parent->GetOSD()->ClearAll("subtitles");
+        m_parent->GetOSD()->EnableSubtitles(kDisplayNone);
     }
 }
 

@@ -29,7 +29,6 @@
 
 #include "videooutwindow.h"
 #include "osd.h"
-#include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
 #include "videodisplayprofile.h"
 #include "decoderbase.h"

@@ -390,7 +390,7 @@ int Transcode::TranscodeFile(
 
     AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
-    nvp->SetAudioOutput(audioOutput);
+    nvp->GetAudio()->SetAudioOutput(audioOutput);
     nvp->SetTranscoding(true);
 
     if (nvp->OpenFile(false) < 0)
@@ -452,7 +452,7 @@ int Transcode::TranscodeFile(
         curtime = curtime.addSecs(60);
     }
 
-    nvp->ReinitAudio();
+    nvp->GetAudio()->ReinitAudio();
     QString encodingType = nvp->GetEncodingType();
     bool copyvideo = false, copyaudio = false;
 
@@ -881,7 +881,7 @@ int Transcode::TranscodeFile(
             }
             videoOutput->DoneDisplayingFrame(lastDecode);
             audioOutput->Reset();
-            nvp->FlushTxtBuffers();
+            nvp->GetCC608Reader()->FlushTxtBuffers();
             lasttimecode = frame.timecode;
         }
         else if (copyaudio)
@@ -990,7 +990,7 @@ int Transcode::TranscodeFile(
                 nvr->WriteVideo(&frame, true, writekeyframe);
             }
             audioOutput->Reset();
-            nvp->FlushTxtBuffers();
+            nvp->GetCC608Reader()->FlushTxtBuffers();
         }
         else
         {
@@ -1069,7 +1069,8 @@ int Transcode::TranscodeFile(
                 arb->audiobuffer_len = 0;
             }
 
-            nvp->TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
+            nvp->GetCC608Reader()->TranscodeWriteText(&TranscodeWriteText,
+                                                   (void *)(nvr));
 
             lasttimecode = frame.timecode;
             frame.timecode -= timecodeOffset;

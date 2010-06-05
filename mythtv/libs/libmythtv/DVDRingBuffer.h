@@ -23,7 +23,7 @@ extern "C" {
  *   A spiffy little class to allow a RingBuffer to read from DVDs.
  */
 
-class NuppelVideoPlayer;
+class MythDVDPlayer;
 
 class MPUBLIC DVDRingBufferPriv
 {
@@ -109,7 +109,7 @@ class MPUBLIC DVDRingBufferPriv
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);
 
-    void SetParent(NuppelVideoPlayer *p) { m_parent = p; }
+    void SetParent(MythDVDPlayer *p) { m_parent = p; }
 
   protected:
     dvdnav_t      *m_dvdnav;
@@ -171,7 +171,7 @@ class MPUBLIC DVDRingBufferPriv
 //    QMap<uint, uint> m_audioTrackMap;
 //    QMap<uint, uint> m_subTrackMap;
 
-    NuppelVideoPlayer *m_parent;
+    MythDVDPlayer *m_parent;
 
     QMutex m_menuBtnLock;
     QMutex m_seekLock;

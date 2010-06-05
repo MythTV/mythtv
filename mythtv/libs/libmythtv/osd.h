@@ -1,294 +1,202 @@
 #ifndef OSD_H
 #define OSD_H
 
-// ANSI C
-#include <ctime>
-#include <stdint.h> // for [u]int[32,64]_t
-
-// C++
-#include <deque>
-#include <vector>
 using namespace std;
 
-// Qt
-#include <QKeyEvent>
-#include <QObject>
-#include <QRegExp>
-#include <QString>
-#include <QMutex>
-#include <QPoint>
-#include <QRect>
-#include <QHash>
-#include <QMap>
+#include "programtypes.h"
+#include "mythscreentype.h"
 
-// MythTV Headers
-#include "themeinfo.h"
-#include "programtypes.h" // for frm_dir_map_t
+class MythDialogBox;
+struct AVSubtitle;
+
+#define OSD_DLG_VIDEOEXIT "OSD_VIDEO_EXIT"
+#define OSD_DLG_MENU      "OSD_MENU"
+#define OSD_DLG_SLEEP     "OSD_SLEEP"
+#define OSD_DLG_IDLE      "OSD_IDLE"
+#define OSD_DLG_INFO      "OSD_INFO"
+#define OSD_DLG_EDITING   "OSD_EDITING"
+#define OSD_DLG_ASKALLOW  "OSD_ASKALLOW"
+#define OSD_DLG_EDITOR    "OSD_EDITOR"
+#define OSD_DLG_CUTPOINT  "OSD_CUTPOINT"
+#define OSD_DLG_DELETE    "OSD_DELETE"
+#define OSD_WIN_TELETEXT  "OSD_TELETEXT"
+#define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
+#define OSD_WIN_INTERACT  "OSD_INTERACTIVE"
+
+class NuppelVideoPlayer;
+class TeletextScreen;
+class TeletextViewer;
+class ccText;
+class CC708Service;
+class TV;
+class SubtitleScreen;
+class SubtitleReader;
 
 enum OSDFunctionalType
 {
     kOSDFunctionalType_Default = 0,
     kOSDFunctionalType_PictureAdjust,
-    kOSDFunctionalType_RecPictureAdjust,
     kOSDFunctionalType_SmartForward,
     kOSDFunctionalType_TimeStretchAdjust,
     kOSDFunctionalType_AudioSyncAdjust
 };
 
-struct StatusPosInfo
+class MPUBLIC OSDHideEvent : public QEvent
 {
-    QString desc;
-    QString extdesc;
-    int position;
-    bool progBefore;
-    bool progAfter;
+  public:
+    OSDHideEvent(enum OSDFunctionalType osdFunctionalType)
+        : QEvent(kEventType), m_osdFunctionalType(osdFunctionalType) { }
+
+    int GetFunctionalType() { return m_osdFunctionalType; }
+
+    static Type kEventType;
+
+  private:
+    OSDFunctionalType m_osdFunctionalType;
 };
 
-extern const char *kOSDDialogActive;
-extern const char *kOSDDialogAllowRecording;
-extern const char *kOSDDialogAlreadyEditing;
-extern const char *kOSDDialogExitOptions;
-extern const char *kOSDDialogAskDelete;
-extern const char *kOSDDialogCanNotDelete;
-extern const char *kOSDDialogIdleTimeout;
-extern const char *kOSDDialogSleepTimeout;
-extern const char *kOSDDialogChannelTimeout;
-extern const char *kOSDDialogInfo;
-extern const char *kOSDDialogEditChannel;
-
-class QImage;
-class TTFFont;
-class OSDSet;
-class OSDTypeImage;
-class OSDTypePositionIndicator;
-class OSDSurface;
-class OSDTypeText;
-class TV;
-class UDPNotifyOSDSet;
-class OSDListTreeType;
-class QKeyEvent;
-class OSDGenericTree;
-class ccText;
-class CC708Service;
-class TeletextViewer;
-class QStringList;
-class QDomElement;
-
-class OSD : public QObject
+class ChannelEditor : public MythScreenType
 {
     Q_OBJECT
- public:
-    OSD();
-   ~OSD(void);
 
-    void Init(const QRect &totalBounds,   int   frameRate,
-        const QRect &visibleBounds, float visibleAspect, float fontScaling);
+  public:
+    ChannelEditor(const char * name);
 
-    OSDSurface *Display(void);
+    virtual bool Create(void);
+    virtual bool keyPressEvent(QKeyEvent *event);
 
-    OSDSurface *GetDisplaySurface(void);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
+    void SetText(QHash<QString,QString>&map);
+    void GetText(QHash<QString,QString>&map);
 
-    void SetListener(QObject *listener) { m_listener = listener; }
+  protected:
+    MythUITextEdit *m_callsignEdit;
+    MythUITextEdit *m_channumEdit;
+    MythUITextEdit *m_channameEdit;
+    MythUITextEdit *m_xmltvidEdit;
 
-    void ClearAll(const QString &name);
-    void ClearAllText(const QString &name);
-    void SetText(const QString &name, QHash<QString, QString> &infoMap,
-                         int length);
-    void SetInfoText(QHash<QString, QString> infoMap, int length);
-    void SetInfoText(const QString &text, const QString &subtitle, 
-                     const QString &desc, const QString &category,
-                     const QString &start, const QString &end, 
-                     const QString &callsign, const QString &iconpath,
-                     int length);
-    void SetChannumText(const QString &text, int length);
+    QObject *m_retObject;
 
-    // CC-608 and DVB text captions (not DVB/DVD subtitles).
-    void AddCCText(const QString &text, int x, int y, int color, 
-                   bool teletextmode = false);
-    void ClearAllCCText();
-    void UpdateCCText(vector<ccText*> *ccbuf,
-                      int replace = 0, int scroll = 0,
-                      bool scroll_prsv = false,
-                      int scroll_yoff = 0, int scroll_ymax = 15);
-    // CC-708 text captions (for ATSC)
-    void SetCC708Service(const CC708Service *service);
-    void CC708Updated(void);
+    void sendResult(int result, bool confirm);
 
-    // Teletext menus (for PAL)
-    TeletextViewer *GetTeletextViewer(void);
-
-    void SetSettingsText(const QString &text, int length);
-
-    void    NewDialogBox(const QString &name,
-                         const QString &message,
-                         QStringList &options,
-                         int length, int sel = 0);
-    void    DialogUp(const QString &name);
-    void    DialogDown(const QString &name);
-    bool    DialogShowing(const QString &name);
-    void    TurnDialogOff(const QString &name);
-    void    DialogAbort(const QString &name);
-    int     GetDialogResponse(const QString &name);
-    void    DialogAbortAndHideAll(void);
-    void    PushDialog(const QString &dialogname);
-    QString GetDialogActive(void) const;
-    bool    IsDialogActive(const QString &dialogname) const;
-    bool    IsDialogExisting(const QString &dialogname) const;
-
-    void SetUpOSDClosedHandler(TV *tv);
-
-    // position is 0 - 1000 
-    void ShowStatus(int pos, bool fill, QString msgtext, QString desc,
-                    int displaytime,
-                    int osdFunctionalType = kOSDFunctionalType_Default);
-    void ShowStatus(struct StatusPosInfo posInfo,
-                      bool fill, QString msgtext, int displaytime,
-                      int osdFunctionalType = kOSDFunctionalType_Default);
-    void UpdateStatus(struct StatusPosInfo posInfo);
-    void EndStatus(void);
-
-    bool Visible(void);
-
-    bool HideAll(void) { return HideAllExcept(QString::null); };
-    bool HideAllExcept(const QString &name);
-    bool HideSet(const QString &name, bool wait = false);
-    bool HideSets(QStringList &name);
-
-    void AddSet(OSDSet *set, QString name, bool withlock = true);
-
-    void SetVisible(OSDSet *set, int length);
- 
-    OSDSet *GetSet(const QString &text);
-    TTFFont *GetFont(const QString &text);
-
-    void ShowEditArrow(long long number, long long totalframes, int type);
-    void HideEditArrow(long long number, int type);
-    void UpdateEditText(const QString &seek_amount, const QString &deletemarker,
-                        const QString &edittime, const QString &framecnt);
-    void DoEditSlider(const frm_dir_map_t &deleteMap,
-                      uint64_t curFrame, uint64_t totalFrames);
-
-    int getTimeType(void) { return timeType; }
-
-    void Reinit(const QRect &totalBounds,   int   frameRate,
-                const QRect &visibleBounds,
-                float visibleAspect, float fontScaling);
-
-    void SetFrameInterval(int frint);
-
-    void StartNotify(const UDPNotifyOSDSet *notifySet);
-    void ClearNotify(const QString &udpnotify_name);
-
-    bool IsRunningTreeMenu(void);
-    bool TreeMenuHandleKeypress(QKeyEvent *e);
-    OSDListTreeType *ShowTreeMenu(const QString &name, 
-                                  OSDGenericTree *treeToShow);
-
-    void HideTreeMenu(bool hideMenu = false);
-    void DisableFade(void);
-    bool IsSetDisplaying(const QString &name);
-    bool HasSet(const QString &name);
-    QRect GetSubtitleBounds();
-
-    void SetTextSubtitles(const QStringList&);
-    void ClearTextSubtitles(void);
-
-    void UpdateTeletext(void);
-
-    float GetThemeAspect(void) { return m_themeaspect; }
-
-    bool HasChanged(void) const { return changed; }
-
- private:
-    bool InitDefaults(void);
-    bool InitCC608(void);
-    bool InitCC708(void);
-    bool InitTeletext(void);
-    bool InitSubtitles(void);
-    bool InitMenu(void);
-    bool InitInteractiveTV(void);
-
-    TTFFont *LoadFont(const QString &name, int size);
-    void ReinitFonts(void);
-    QString FindTheme(QString name);
-
-    void HighlightDialogSelection(OSDSet *container, int num);  
- 
-    bool LoadTheme();
-    void normalizeRect(QRect &rect);
-    QPoint parsePoint(QString text);
-    QColor parseColor(QString text);
-    QRect parseRect(QString text);
-
-    void RemoveSet(OSDSet *set);
-
-    QString getFirstText(QDomElement &element);
-    void parseFont(QDomElement &element);
-    void parseContainer(QDomElement &element);
-    void parseImage(OSDSet *container, QDomElement &element);
-    void parseTextArea(OSDSet *container, QDomElement &element);
-    void parseSlider(OSDSet *container, QDomElement &element);
-    void parseBox(OSDSet *container, QDomElement &element);
-    void parseEditArrow(OSDSet *container, QDomElement &element);
-    void parsePositionRects(OSDSet *container, QDomElement &element);
-    void parsePositionImage(OSDSet *container, QDomElement &element);
-    void parseListTree(OSDSet *container, QDomElement &element);
-
-    QObject *m_listener;
-
-    QRect osdBounds;
-    int   frameint;
-    bool  needPillarBox;
-
-    QString themepath;
-
-    float wscale, fscale;
-
-    ThemeInfo *m_themeinfo;
-    float m_themeaspect;
-
-    float hmult, wmult;
-    int xoffset, yoffset, displaywidth, displayheight;
-
-    mutable QMutex osdlock;
-
-    bool m_setsvisible;
-
-    int totalfadetime;
-    int timeType;
-
-    QString timeFormat;
-
-    QMap<QString, OSDSet *> setMap;
-    vector<OSDSet *> *setList;
-
-    QMap<QString, TTFFont *> fontMap;
-
-    QMutex loadFontLock;
-    QHash<QString, TTFFont*> loadFontHash;
-    QHash<TTFFont*, QString> reinitFontHash;
-
-    QMap<QString, int> dialogResponseList;
-    deque<QString> dialogs;
-
-    OSDTypeImage *editarrowleft;
-    OSDTypeImage *editarrowright;
-    QRect editarrowRect;
-
-    OSDSurface *drawSurface;
-    bool changed;
-
-    OSDListTreeType *runningTreeMenu;
-    QString treeMenuContainer;
-
-    // EIA-708 captions
-    QString fontname;
-    QString ccfontname;
-    QString cc708fontnames[16];
-    QString fontSizeType;
-
-    // Text file subtitles
-    QRegExp removeHTML;
+  public slots:
+    void Confirm();
+    void Probe();
 };
-    
+
+class MythOSDWindow : public MythScreenType
+{
+    Q_OBJECT
+  public:
+    MythOSDWindow(MythScreenStack *parent, const QString &name,
+                  bool themed)
+      : MythScreenType(parent, name, true), m_themed(themed)
+    {
+    }
+
+    virtual bool Create(void)
+    {
+        if (m_themed)
+            return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(),
+                                                   this);
+        return false;
+    }
+
+  private:
+    bool m_themed;
+};
+
+class OSD
+{
+  public:
+    OSD(NuppelVideoPlayer *player, QObject *parent);
+   ~OSD();
+
+    bool    Init(const QRect &rect, float font_aspect);
+    QRect   Bounds(void) { return m_Rect; }
+    int     GetFontStretch(void) { return m_fontStretch; }
+    void    OverrideUIScale(void);
+    void    RevertUIScale(void);
+    bool    Reinit(const QRect &rect, float font_aspect);
+    void    DisableFade(void) { m_Effects = false; }
+    void    SetFunctionalWindow(const QString window,
+                                enum OSDFunctionalType type);
+
+    bool    IsVisible(void);
+    void    HideAll(bool keepsubs = true);
+
+    MythScreenType *GetWindow(const QString &window);
+    void    DisableExpiry(const QString &window);
+    void    HideWindow(const QString &window);
+    bool    HasWindow(const QString &window);
+    void    ResetWindow(const QString &window);
+    void    PositionWindow(MythScreenType *window);
+
+    bool    DrawDirect(MythPainter* painter, QSize size, bool repaint = false);
+    QRegion Draw(MythPainter* painter, QPaintDevice *device, QSize size,
+                 QRegion &changed, int alignx = 0, int aligny = 0);
+
+    void SetValues(const QString &window, QHash<QString,int> &map,
+                   bool set_expiry = true);
+    void SetValues(const QString &window, QHash<QString,float> &map,
+                   bool set_expiry = true);
+    void SetText(const QString &window, QHash<QString,QString> &map,
+                 bool set_expiry = true);
+    void SetRegions(const QString &window, frm_dir_map_t &map,
+                 long long total);
+    bool IsWindowVisible(const QString &window);
+
+    bool DialogVisible(QString window = QString());
+    bool DialogHandleKeypress(QKeyEvent *e);
+    void DialogQuit(void);
+    void DialogShow(const QString &window, const QString &text = "",
+                    int updatefor = 0);
+    void DialogSetText(const QString &text);
+    void DialogBack(QString text = "", QVariant data = 0, bool exit = false);
+    void DialogAddButton(QString text, QVariant data,
+                         bool menu = false, bool current = false);
+    void DialogGetText(QHash<QString,QString> &map);
+
+    TeletextScreen* InitTeletext(void);
+    void EnableTeletext(bool enable, int page);
+    bool TeletextAction(const QString &action);
+    void TeletextReset(void);
+
+    SubtitleScreen* InitSubtitles(void);
+    void EnableSubtitles(int type);
+    void ClearSubtitles(void);
+    void DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos);
+
+  private:
+    void TearDown(void);
+    void LoadWindows(void);
+    void RemoveWindow(const QString &window);
+    void CheckExpiry(void);
+    void SetExpiry(MythScreenType *window, int time = 5);
+    void SendHideEvent(void);
+
+  private:
+    NuppelVideoPlayer *m_parent;
+    QObject        *m_ParentObject;
+    QRect           m_Rect;
+    bool            m_Effects;
+    int             m_FadeTime;
+    MythScreenType *m_Dialog;
+    QString         m_PulsedDialogText;
+    QDateTime       m_NextPulseUpdate;
+    bool            m_Refresh;
+
+    bool            m_UIScaleOverride;
+    float           m_SavedWMult;
+    float           m_SavedHMult;
+    QRect           m_SavedUIRect;
+    int             m_fontStretch;
+
+    enum OSDFunctionalType m_FunctionalType;
+    QString                m_FunctionalWindow;
+
+    QHash<QString, MythScreenType*>   m_Children;
+    QHash<MythScreenType*, QDateTime> m_ExpireTimes;
+};
+
 #endif

@@ -28,7 +28,6 @@ using namespace std;
 // MythTV OSD headers
 #include "yuv2rgb.h"
 #include "osd.h"
-#include "osdsurface.h"
 #include "osdxvmc.h"
 #include "osdchromakey.h"
 
@@ -251,10 +250,7 @@ void VideoOutputXv::MoveResize(void)
     QMutexLocker locker(&global_lock);
     VideoOutput::MoveResize();
     if (chroma_osd)
-    {
-        chroma_osd->Reset();
         windows[0].SetNeedRepaint(true);
-    }
 }
 
 void VideoOutputXv::WindowResized(const QSize &new_size)
@@ -2291,8 +2287,9 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 }
 
 // this is documented in videooutbase.cpp
-void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
+void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *osd)
 {
+    (void)osd;
     if (IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in PrepareFrame()");
@@ -2938,12 +2935,9 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     if (xvmc_osd && xvmc_osd->IsValid())
     {
         VideoFrame *osdframe = NULL;
-        int ret = DisplayOSD(xvmc_osd->OSDFrame(), osd, -1,
-                             xvmc_osd->GetRevision());
-        OSDSurface *osdsurf = osd->GetDisplaySurface();
-        if (osdsurf)
-            xvmc_osd->SetRevision(osdsurf->GetRevision());
-        if (ret >= 0 && xvmc_osd->NeedFrame())
+        bool show = DisplayOSD(xvmc_osd->OSDFrame(), osd);
+
+        if (show && xvmc_osd->NeedFrame())
         {
             // If there are no available buffer, try to toss old
             // displayed frames.
@@ -2997,7 +2991,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
                 DiscardFrame(osdframe);
             }
         }
-        if (ret >= 0 && !xvmc_osd->NeedFrame())
+        if (show && !xvmc_osd->NeedFrame())
         {
             xvmc_osd->CompositeOSD(frame);
         }
@@ -3537,6 +3531,14 @@ QStringList VideoOutputXv::GetAllowedRenderers(
 
     delete disp;
     return list;
+}
+
+MythPainter* VideoOutputXv::GetOSDPainter(void)
+{
+    if (chroma_osd)
+        return chroma_osd->GetPainter();
+
+    return VideoOutput::GetOSDPainter();
 }
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,

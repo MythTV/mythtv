@@ -1,7 +1,8 @@
 #ifndef INTERACTIVE_TV_H_
 #define INTERACTIVE_TV_H_
 
-class OSDSet;
+class InteractiveScreen;
+class MythPainter;
 class MHIContext;
 class NuppelVideoPlayer;
 
@@ -28,7 +29,7 @@ class InteractiveTV
     // See if the image has changed.
     bool ImageHasChanged(void);
     // Draw the (updated) image.
-    void UpdateOSD(OSDSet *osdSet);
+    void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     // Called when the visible display area has changed.
     void Reinit(const QRect &display);
 

@@ -13,6 +13,7 @@ using namespace std;
 #include <QMutex>
 #include <QHash>
 #include <QRect>
+#include <QThread>
 
 #include "mythdeque.h"
 #include "tv.h"
@@ -28,6 +29,12 @@ class LiveTVChain;
 class MythDialog;
 class QPainter;
 
+struct osdInfo
+{
+    QHash<QString,QString> text;
+    QHash<QString,int>     values;
+};
+
 typedef enum
 {
     kPseudoNormalLiveTV  = 0,
@@ -37,6 +44,20 @@ typedef enum
 
 typedef deque<QString>         StringDeque;
 typedef QHash<QString,QString> InfoMap;
+
+class PlayerThread : public QThread
+{
+    Q_OBJECT
+
+  public:
+    PlayerThread(NuppelVideoPlayer *nvp) : QThread(NULL), m_nvp(nvp) { }
+
+  protected:
+    virtual void run(void);
+
+  private:
+    NuppelVideoPlayer *m_nvp;
+};
 
 class MPUBLIC PlayerContext
 {
@@ -50,7 +71,9 @@ class MPUBLIC PlayerContext
                    WId embedwinid, const QRect *embedBounds,
                    bool muted = false);
     void TeardownPlayer(void);
-    bool StartDecoderThread(int maxWait = -1);
+    bool StartPlaying(int maxWait = -1);
+    void StopPlaying(void);
+    void DeletePlayerThread(void);
     bool StartOSD(TV *tv);
     void UpdateTVChain(void);
     bool ReloadTVChain(void);
@@ -59,7 +82,6 @@ class MPUBLIC PlayerContext
     void ResizePIPWindow(const QRect&);
     bool StartPIPPlayer(TV *tv, TVState desiredState);
     void PIPTeardown(void);
-    void DrawARGBFrame(QPainter *p);
     void SetNullVideo(bool setting) { useNullVideo = setting; }
     bool StartEmbedding(WId wid, const QRect&);
     void StopEmbedding(void);
@@ -102,7 +124,7 @@ class MPUBLIC PlayerContext
     QRect    GetStandAlonePIPRect(void);
     PIPState GetPIPState(void) const { return pipState; }
     QString  GetPreviousChannel(void) const;
-    bool     CalcNVPSliderPosition(struct StatusPosInfo &posInfo,
+    bool     CalcNVPSliderPosition(osdInfo &info,
                                    bool paddedFields = false) const;
     uint     GetCardID(void) const { return last_cardid; }
     QString  GetFilters(const QString &baseFilters) const;
@@ -148,8 +170,6 @@ class MPUBLIC PlayerContext
     ProgramInfo        *playingInfo; ///< Currently playing info
     long long           playingLen;  ///< Initial CalculateLength()
     bool                nohardwaredecoders; // < Disable use of VDPAU decoding
-    bool                decoding;    ///< Video decoder thread started
-    pthread_t           decode;      ///< Video decoder thread
     int                 last_cardid; ///< CardID of current/last recorder
     float               last_framerate; ///< Estimated framerate from recorder
     /// 0 == normal, +1 == fast forward, -1 == rewind
@@ -203,6 +223,8 @@ class MPUBLIC PlayerContext
     int                 pipLocation;
     /// True iff software scaled PIP should be used
     bool                useNullVideo;
+    bool                playerNeedsThread;
+    PlayerThread        *playerThread;
 
     // Embedding related
     WId   embedWinID;       ///< Window ID when embedded in another widget

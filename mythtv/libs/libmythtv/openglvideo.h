@@ -9,6 +9,7 @@ using namespace std;
 
 #include "videooutbase.h"
 #include "videoouttypes.h"
+#include "mythrender_opengl.h"
 
 enum OpenGLFilterType
 {
@@ -16,7 +17,6 @@ enum OpenGLFilterType
 
     // Conversion filters
     kGLFilterYUV2RGB,
-    kGLFilterYUV2RGBA,
 
     // Frame scaling/resizing filters
     kGLFilterResize,
@@ -29,8 +29,6 @@ enum DisplayBuffer
     kFrameBufferObject
 };
 
-class OpenGLContext;
-
 class OpenGLFilter;
 typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
 
@@ -42,16 +40,13 @@ class OpenGLVideo
     OpenGLVideo();
    ~OpenGLVideo();
 
-    bool Init(OpenGLContext *glcontext, bool colour_control,
+    bool Init(MythRenderOpenGL *glcontext, bool colour_control,
               QSize videoDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
-              bool viewport_control,  QString options, bool osd = FALSE,
+              bool viewport_control,  QString options,
               LetterBoxColour letterbox_colour = kLetterBoxColour_Black);
 
     void UpdateInputFrame(const VideoFrame *frame, bool soft_bob = false);
-    void UpdateInput(const unsigned char *buf, const int *offsets,
-                     int format, QSize size,
-                     const unsigned char *alpha);
 
     /// \brief Public interface to AddFilter(OpenGLFilterType filter)
     bool AddFilter(const QString &filter)
@@ -82,8 +77,7 @@ class OpenGLVideo
     bool RemoveFilter(OpenGLFilterType filter);
     void CheckResize(bool deinterlacing, bool allow = true);
     bool OptimiseFilters(void);
-    bool AddFrameBuffer(uint &framebuffer, QSize fb_size,
-                        uint &texture, QSize vid_size);
+    bool AddFrameBuffer(uint &framebuffer, uint &texture, QSize vid_size);
     uint AddFragmentProgram(OpenGLFilterType name,
                             QString deint = QString::null,
                             FrameScanType field = kScan_Progressive);
@@ -103,7 +97,7 @@ class OpenGLVideo
     void TearDownDeinterlacer(void);
     uint ParseOptions(QString options);
 
-    OpenGLContext *gl_context;
+    MythRenderOpenGL *gl_context;
     QSize          video_dim;
     QSize          actual_video_dim;
     QSize          viewportSize;

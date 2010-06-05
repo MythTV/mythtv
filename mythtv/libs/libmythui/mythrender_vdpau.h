@@ -108,7 +108,7 @@ class MPUBLIC MythRenderVDPAU : public MythRender
     bool MixAndRend(uint id, VdpVideoMixerPictureStructure field,
                     uint vid_surface, uint out_surface,
                     const QVector<uint>* refs, bool top, QRect src,
-                    const QSize &dst, QRect dst_vid,
+                    const QRect &dst, QRect dst_vid,
                     uint layer1 = 0, uint layer2 = 0);
     bool SetDeinterlacing(uint id, uint deinterlacers = kVDPFeatNone);
     bool ChangeVideoMixerFeatures(uint id, uint features);

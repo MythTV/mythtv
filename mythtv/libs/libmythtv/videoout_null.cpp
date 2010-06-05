@@ -181,8 +181,10 @@ void VideoOutputNull::StopEmbedding(void)
         VideoOutput::StopEmbedding();
 }
 
-void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t)
+void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
+                                   OSD *osd)
 {
+    (void)osd;
     (void)t;
 
     if (!buffer)

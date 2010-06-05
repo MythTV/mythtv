@@ -23,7 +23,7 @@
 #include <time.h>
 
 class VideoOutput;
-class OpenGLContext;
+class MythRenderOpenGL;
 
 extern bool tryingVideoSync;
 
@@ -182,8 +182,8 @@ class OpenGLVideoSync : public VideoSync
     void AdvanceTrigger(void);
 
   private:
-    OpenGLContext  *m_context;
-    mutable QMutex  m_context_lock;
+    MythRenderOpenGL  *m_context;
+    QPixmap           *m_device;
 };
 #endif // !_WIN32
 

@@ -3,17 +3,6 @@
 
 #include <stdint.h>
 
-class OSDType;
-
-class TeletextReader
-{
-  public:
-    TeletextReader() { }
-    virtual ~TeletextReader() { }
-    virtual void AddTextData(unsigned char *buf, int len,
-                             long long timecode, char type) = 0;
-};
-
 class TeletextViewer
 {
   public:
