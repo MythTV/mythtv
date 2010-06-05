@@ -2716,7 +2716,7 @@ void VideoDialog::VideoOptionMenu()
  */
 void VideoDialog::ManageMenu()
 {
-    QString label = tr("Manage Metadata");
+    QString label = tr("Manage Video Details");
 
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
