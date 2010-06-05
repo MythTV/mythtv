@@ -10,7 +10,7 @@
 
 class MythRenderVDPAU;
 
-class MythVDPAUPainter : public MythPainter
+class MPUBLIC MythVDPAUPainter : public MythPainter
 {
   public:
     MythVDPAUPainter(MythRenderVDPAU *render = NULL);

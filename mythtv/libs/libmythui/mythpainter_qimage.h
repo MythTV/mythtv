@@ -14,7 +14,7 @@
 
 class QPainter;
 
-class MythQImagePainter : public MythPainter
+class MPUBLIC MythQImagePainter : public MythPainter
 {
   public:
     MythQImagePainter();

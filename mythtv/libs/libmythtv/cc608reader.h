@@ -3,6 +3,8 @@
 
 #include <QMutex>
 
+#include "mythexp.h"
+
 #define MAXTBUFFER 60
 
 class CC608Text
@@ -49,7 +51,7 @@ class CC608Buffer
 
 class NuppelVideoPlayer;
 
-class CC608Reader
+class MPUBLIC CC608Reader
 {
   public:
     CC608Reader(NuppelVideoPlayer *parent);

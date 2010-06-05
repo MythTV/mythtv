@@ -3,7 +3,7 @@
 
 #include "NuppelVideoPlayer.h"
 
-class MythCommFlagPlayer : public NuppelVideoPlayer
+class MPUBLIC MythCommFlagPlayer : public NuppelVideoPlayer
 {
   public:
     MythCommFlagPlayer(bool muted = false) : NuppelVideoPlayer(muted) { }

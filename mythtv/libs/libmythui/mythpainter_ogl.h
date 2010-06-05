@@ -11,7 +11,7 @@
 #include "mythimage.h"
 #include "mythrender_opengl.h"
 
-class MythOpenGLPainter : public MythPainter
+class MPUBLIC MythOpenGLPainter : public MythPainter
 {
   public:
     MythOpenGLPainter(MythRenderOpenGL *render =  NULL, QGLWidget *parent = NULL);

@@ -4,7 +4,7 @@
 class NuppelVideoPlayer;
 class AudioOutput;
 
-class AudioPlayer
+class MPUBLIC AudioPlayer
 {
   public:
     AudioPlayer(NuppelVideoPlayer *parent, bool muted);
