@@ -1205,6 +1205,8 @@ void VideoDialog::reloadAllData(bool dbChanged)
         m_d->m_videoList->InvalidateCache();
     }
     reloadData();
+
+    VideoAutoSearch();
 }
 
 /** \fn VideoDialog::reloadData()
@@ -3514,14 +3516,17 @@ void VideoDialog::VideoSearch(MythGenericTree *node,
     else
         m_query->addLookup(lookup);
 
-    QString msg = tr("Fetching details for %1")
-                       .arg(metadata->GetTitle());
-    if (!metadata->GetSubtitle().isEmpty())
-        msg += QString(": %1").arg(metadata->GetSubtitle());
-    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
-        msg += tr(" %1x%2").arg(metadata->GetSeason())
-               .arg(metadata->GetEpisode());
-    createBusyDialog(msg);
+    if (!automode)
+    {
+        QString msg = tr("Fetching details for %1")
+                           .arg(metadata->GetTitle());
+        if (!metadata->GetSubtitle().isEmpty())
+            msg += QString(": %1").arg(metadata->GetSubtitle());
+        if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
+            msg += tr(" %1x%2").arg(metadata->GetSeason())
+                   .arg(metadata->GetEpisode());
+        createBusyDialog(msg);
+    }
 }
 
 void VideoDialog::VideoAutoSearch(MythGenericTree *node)
@@ -3531,7 +3536,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     typedef QList<MythGenericTree *> MGTreeChildList;
     MGTreeChildList *lchildren = node->getAllChildren();
 
-    VERBOSE(VB_GENERAL,
+    VERBOSE(VB_GENERAL|VB_EXTRA,
             QString("Fetching details in %1").arg(node->getString()));
 
     for (MGTreeChildList::const_iterator p = lchildren->begin();
