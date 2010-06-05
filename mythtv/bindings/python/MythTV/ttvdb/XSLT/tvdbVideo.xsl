@@ -130,7 +130,7 @@
                             </xsl:for-each>
                         </people>
                     </xsl:if>
-                    <xsl:if test="./filename/text() != '' or //Banners/banner">
+                    <xsl:if test="./filename/text() != '' or //Banners/Banner">
                         <images>
                             <xsl:if test="./filename/text() != ''">
                                 <xsl:element name="image">
