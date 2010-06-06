@@ -4,6 +4,7 @@ TEMPLATE = subdirs
 
 # Libraries without dependencies
 SUBDIRS += libavutil libmythsamplerate
+SUBDIRS += libpostproc
 SUBDIRS += libmythsoundtouch libmythmpeg2 libmythdvdnav
 SUBDIRS += libmythbdnav libmythfreesurround libmythdb
 
