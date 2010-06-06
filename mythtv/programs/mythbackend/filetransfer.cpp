@@ -29,6 +29,9 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     pginfo = new ProgramInfo(filename);
     pginfo->SetPathname(pginfo->GetPlaybackURL());
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
+
+    if (write)
+        remote->useReadyReadCallback(false);
 }
 
 FileTransfer::~FileTransfer()

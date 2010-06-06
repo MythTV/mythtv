@@ -153,12 +153,12 @@ void MythSocketThread::ReadyToBeRead(MythSocket *sock)
     VERBOSE(VB_SOCKET, SLOC(sock) + "socket is readable");
     int bytesAvail = sock->bytesAvailable();
     
-    if (bytesAvail == 0)
+    if (bytesAvail == 0 && sock->closedByRemote())
     {
         VERBOSE(VB_SOCKET, SLOC(sock) + "socket closed");
         sock->close();
     }
-    else if (sock->m_cb)
+    else if (bytesAvail > 0 && sock->m_cb && sock->m_useReadyReadCallback)
     {
         sock->m_notifyread = true;
         VERBOSE(VB_SOCKET, SLOC(sock) + "calling m_cb->readyRead()");

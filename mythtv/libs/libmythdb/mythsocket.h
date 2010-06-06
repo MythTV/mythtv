@@ -29,6 +29,7 @@ class MPUBLIC MythSocket : public MSocketDevice
     };
 
     void close(void);
+    bool closedByRemote(void);
     void deleteLater(void);
 
     void UpRef(void);
@@ -43,6 +44,8 @@ class MPUBLIC MythSocket : public MSocketDevice
 
     void setSocket(int socket, Type type = MSocketDevice::Stream);
     void setCallbacks(MythSocketCBs *cb);
+    void useReadyReadCallback(bool useReadyReadCallback = true)
+        { m_useReadyReadCallback = useReadyReadCallback; }
 
     qint64 readBlock(char *data, quint64 len);
     qint64 writeBlock(const char *data, quint64 len);
@@ -73,6 +76,7 @@ class MPUBLIC MythSocket : public MSocketDevice
     void  setState(const State state);
 
     MythSocketCBs  *m_cb;
+    bool            m_useReadyReadCallback;
     State           m_state;
     QHostAddress    m_addr;
     quint16         m_port;
