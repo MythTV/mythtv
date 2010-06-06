@@ -175,6 +175,17 @@ static HostComboBox *SRCQuality()
     return gc;
 }
 
+static HostCheckBox *Audio48kOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("Audio48kOverride");
+    gc->setLabel(QObject::tr("Force audio card output to 48kHz"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Force audio sample rate to 48kHz. "
+                                "Some audio cards will report various rates, "
+                                "but they ultimately crash."));
+    return gc;
+}
+
 static HostCheckBox *PassThroughOverride()
 {
     HostCheckBox *gc = new HostCheckBox("PassThruDeviceOverride");
@@ -3491,9 +3502,10 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
     settings4->addChild(srcqualityoverride);
     settings4->addChild(sub4);
 
-    group2->addChild(settings3);
     group2->addChild(settings4);
-
+    group2->addChild(Audio48kOverride());
+    group2->addChild(settings3);
+    
     return vcg;
 
 }

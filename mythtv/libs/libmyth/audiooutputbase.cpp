@@ -344,7 +344,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             !output_settings->IsSupportedChannels(channels)));
 
     int dest_rate = 0;
-    if ((need_resampler = !output_settings->IsSupportedRate(samplerate)))
+    if (gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
+        gCoreContext->GetNumSetting("Audio48kOverride", false))
+    {
+        dest_rate = 48000;
+        if ((need_resampler = (samplerate != dest_rate)))
+            VBAUDIO("Forcing resample to 48 kHz");
+    }
+    else if ((need_resampler = !output_settings->IsSupportedRate(samplerate)))
         dest_rate = output_settings->NearestSupportedRate(samplerate);
 
     // Force resampling if we are encoding to AC3 and sr > 48k
