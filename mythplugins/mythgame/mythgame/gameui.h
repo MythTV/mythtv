@@ -2,9 +2,14 @@
 #define GAMEUI_H_
 
 #include <QString>
+#include <QObject>
 
 // myth
 #include <mythscreentype.h>
+#include <metadatacommon.h>
+#include <metadatadownload.h>
+#include <metadataimagedownload.h>
+#include <mythprogressdialog.h>
 
 class MythUIButtonTree;
 class MythGenericTree;
@@ -31,6 +36,10 @@ class GameUI : public MythScreenType
     void itemClicked(MythUIButtonListItem* item);
     void showImages(void);
     void searchComplete(QString);
+    void gameSearch(MythGenericTree *node = NULL,
+                     bool automode = false);
+    void OnGameSearchListSelection(MetadataLookup *lookup);
+    void OnGameSearchDone(MetadataLookup *lookup);
 
   private:
     void updateRomInfo(RomInfo *rom);
@@ -41,6 +50,7 @@ class GameUI : public MythScreenType
     void searchStart(void);
     void toggleFavorite(void);
     void customEvent(QEvent *event);
+    void createBusyDialog(QString title);
 
     QString getFillSql(MythGenericTree* node) const;
     QString getChildLevelString(MythGenericTree *node) const;
@@ -59,6 +69,9 @@ class GameUI : public MythScreenType
     MythGenericTree  *m_gameTree;
     MythGenericTree  *m_favouriteNode;
 
+    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack;
+
     MythUIButtonTree *m_gameUITree;
     MythUIText       *m_gameTitleText;
     MythUIText       *m_gameSystemText;
@@ -69,6 +82,9 @@ class GameUI : public MythScreenType
     MythUIImage      *m_gameImage; 
     MythUIImage      *m_fanartImage;
     MythUIImage      *m_boxImage;
+
+    MetadataDownload      *m_query;
+    MetadataImageDownload *m_imageDownload;
 };
 
 #endif

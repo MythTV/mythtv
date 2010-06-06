@@ -100,7 +100,8 @@ void setupKeys(void)
         "Show incremental search dialog"), "Ctrl+S");
     REG_KEY("Game", "INCSEARCHNEXT", QT_TRANSLATE_NOOP("MythControls",
         "Incremental search find next match"), "Ctrl+N");
-
+    REG_KEY("Game","DOWNLOADDATA", QT_TRANSLATE_NOOP("MythControls",
+        "Download metadata for current item"), "W");
 }
 
 int mythplugin_init(const char *libversion)

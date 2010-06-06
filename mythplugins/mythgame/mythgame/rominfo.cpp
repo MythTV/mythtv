@@ -67,7 +67,7 @@ void RomInfo::UpdateDatabase()
                       "    favorite = :FAVORITE,"
                       "    screenshot = :SCREENSHOT,"
                       "    fanart = :FANART,"
-                      "    boxart = :BOXART "
+                      "    boxart = :BOXART, "
                       "    inetref = :INETREF "
                       "WHERE gametype = :GAMETYPE AND "
                       "      romname  = :ROMNAME");

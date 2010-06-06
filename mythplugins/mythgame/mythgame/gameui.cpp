@@ -10,6 +10,7 @@
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythgenerictree.h>
+#include <mythdirs.h>
 
 // MythGame headers
 #include "gamehandler.h"
@@ -38,9 +39,166 @@ class GameTreeInfo
 
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
-GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI")
+namespace
 {
+    class SearchResultsDialog : public MythScreenType
+    {
+        Q_OBJECT
+
+      public:
+        SearchResultsDialog(MythScreenStack *lparent,
+                const MetadataLookupList results) :
+            MythScreenType(lparent, "videosearchresultspopup"),
+            m_results(results), m_resultsList(0)
+        {
+            m_imageDownload = new MetadataImageDownload(this);
+        }
+
+        ~SearchResultsDialog()
+        {
+            cleanCacheDir();
+
+            if (m_imageDownload)
+            {
+                delete m_imageDownload;
+                m_imageDownload = NULL;
+            }
+        }
+
+        bool Create()
+        {
+            if (!LoadWindowFromXML("video-ui.xml", "moviesel", this))
+                return false;
+
+            bool err = false;
+            UIUtilE::Assign(this, m_resultsList, "results", &err);
+            if (err)
+            {
+                VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
+                return false;
+            }
+
+            for (MetadataLookupList::const_iterator i = m_results.begin();
+                    i != m_results.end(); ++i)
+            {
+                MythUIButtonListItem *button =
+                    new MythUIButtonListItem(m_resultsList,
+                    (*i)->GetTitle());
+                MetadataMap metadataMap;
+                (*i)->toMap(metadataMap);
+
+                QString coverartfile;
+                ArtworkList art = (*i)->GetArtwork(COVERART);
+                if (art.count() > 0)
+                    coverartfile = art.takeFirst().thumbnail;
+                else
+                {
+                    art = (*i)->GetArtwork(SCREENSHOT);
+                    if (art.count() > 0)
+                        coverartfile = art.takeFirst().thumbnail;
+                }
+
+                QString dlfile = getDownloadFilename((*i)->GetTitle(),
+                    coverartfile);
+
+                if (!coverartfile.isEmpty())
+                {
+                    int pos = m_resultsList->GetItemPos(button);
+
+                    if (QFile::exists(dlfile))
+                        button->SetImage(dlfile);
+                    else
+                        m_imageDownload->addThumb((*i)->GetTitle(),
+                                         coverartfile,
+                                         qVariantFromValue<uint>(pos));
+                }
+
+                button->SetTextFromMap(metadataMap);
+                button->SetData(qVariantFromValue<MetadataLookup*>(*i));
+            }
+
+            connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+                    SLOT(sendResult(MythUIButtonListItem *)));
+
+            BuildFocusList();
+
+            return true;
+        }
+
+        void cleanCacheDir()
+        {
+            QString cache = QString("%1/thumbcache")
+                       .arg(GetConfDir());
+            QDir cacheDir(cache);
+            QStringList thumbs = cacheDir.entryList(QDir::Files);
+
+            for (QStringList::const_iterator i = thumbs.end() - 1;
+                    i != thumbs.begin() - 1; --i)
+            {
+                QString filename = QString("%1/%2").arg(cache).arg(*i);
+                QFileInfo fi(filename);
+                QDateTime lastmod = fi.lastModified();
+                if (lastmod.addDays(2) < QDateTime::currentDateTime())
+                {
+                    VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
+                          .arg(filename));
+                    QFile::remove(filename);
+                }
+            }
+        }
+
+        void customEvent(QEvent *event)
+        {
+            if (event->type() == ThumbnailDLEvent::kEventType)
+            {
+                ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
+
+                ThumbnailData *data = tde->thumb;
+
+                QString file = data->url;
+                uint pos = qVariantValue<uint>(data->data);
+
+                if (file.isEmpty())
+                    return;
+
+                if (!((uint)m_resultsList->GetCount() >= pos))
+                    return;
+
+                MythUIButtonListItem *item =
+                          m_resultsList->GetItemAt(pos);
+
+                if (item)
+                {
+                    item->SetImage(file);
+                }
+                delete data;
+            }
+        }
+
+     signals:
+        void haveResult(MetadataLookup*);
+
+      private:
+        MetadataLookupList m_results;
+        MythUIButtonList  *m_resultsList;
+        MetadataImageDownload *m_imageDownload;
+
+      private slots:
+        void sendResult(MythUIButtonListItem* item)
+        {
+            emit haveResult(qVariantValue<MetadataLookup *>(item->GetData()));
+            Close();
+        }
+    };
+}
+
+GameUI::GameUI(MythScreenStack *parent)
+       : MythScreenType(parent, "GameUI"), m_busyPopup(0)
+{
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    m_query = new MetadataDownload(this);
+    m_imageDownload = new MetadataImageDownload(this);
 }
 
 GameUI::~GameUI()
@@ -69,7 +227,7 @@ bool GameUI::Create()
         VERBOSE(VB_IMPORTANT, "Cannot load screen 'gameui'");
         return false;
     }
-    
+
     connect(m_gameUITree, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(itemClicked(MythUIButtonListItem*)));
 
@@ -183,6 +341,8 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
             searchStart();
         else if (action == "INCSEARCHNEXT")
             searchStart();
+        else if (action == "DOWNLOADDATA")
+            gameSearch();
         else
             handled = false;
     }
@@ -316,11 +476,20 @@ void GameUI::updateRomInfo(RomInfo *rom)
     }
 
     if (m_gameImage)
+    {
+        m_gameImage->Reset();
         m_gameImage->SetFilename(rom->Screenshot());
+    }
     if (m_fanartImage)
+    {
+        m_fanartImage->Reset();
         m_fanartImage->SetFilename(rom->Fanart());
+    }
     if (m_boxImage)
+    {
+        m_boxImage->Reset();
         m_boxImage->SetFilename(rom->Boxart());
+    }
 }
 
 void GameUI::clearRomInfo(void)
@@ -397,9 +566,6 @@ void GameUI::showMenu()
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
-        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
-        if (!romInfo)
-            return;
         MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
         MythDialogBox *showMenuPopup =
@@ -408,12 +574,18 @@ void GameUI::showMenu()
         if (showMenuPopup->Create())
         {
             showMenuPopup->SetReturnEvent(this, "showMenuPopup");
-            showMenuPopup->AddButton(tr("Show Information"));
-            if (romInfo->Favorite())
-                showMenuPopup->AddButton(tr("Remove Favorite"));
-            else
-                showMenuPopup->AddButton(tr("Make Favorite"));
-            showMenuPopup->AddButton(tr("Edit Metadata"));
+
+            RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+            if (romInfo)
+            {
+                showMenuPopup->AddButton(tr("Show Information"));
+                if (romInfo->Favorite())
+                    showMenuPopup->AddButton(tr("Remove Favorite"));
+                else
+                    showMenuPopup->AddButton(tr("Make Favorite"));
+                showMenuPopup->AddButton(tr("Retrieve Details"));
+                showMenuPopup->AddButton(tr("Edit Details"));
+            }
             popupStack->AddScreen(showMenuPopup);
         }
         else
@@ -489,6 +661,10 @@ void GameUI::customEvent(QEvent *event)
             {
                 toggleFavorite();
             }
+            else if (resulttext == tr("Retrieve Details"))
+            {
+                gameSearch();
+            }
         }
         else if (resultid == "chooseSystemPopup")
         {
@@ -516,6 +692,65 @@ void GameUI::customEvent(QEvent *event)
         {
             // Play button pushed
             itemClicked(0);
+        }
+    }
+    if (event->type() == MetadataLookupEvent::kEventType)
+    {
+        MetadataLookupEvent *lue = (MetadataLookupEvent *)event;
+
+        MetadataLookupList lul = lue->lookupList;
+
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
+        if (lul.isEmpty())
+            return;
+
+        if (lul.count() == 1)
+        {
+            OnGameSearchDone(lul.takeFirst());
+        }
+        else
+        {
+            SearchResultsDialog *resultsdialog =
+                  new SearchResultsDialog(m_popupStack, lul);
+
+            connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
+                    SLOT(OnGameSearchListSelection(MetadataLookup*)),
+                    Qt::QueuedConnection);
+
+            if (resultsdialog->Create())
+                m_popupStack->AddScreen(resultsdialog);
+        }
+    }
+    else if (event->type() == MetadataLookupFailure::kEventType)
+    {
+        MetadataLookupFailure *luf = (MetadataLookupFailure *)event;
+
+        MetadataLookupList lul = luf->lookupList;
+
+        if (m_busyPopup)
+        {
+            m_busyPopup->Close();
+            m_busyPopup = NULL;
+        }
+
+        if (lul.size())
+        {
+            MetadataLookup *lookup = lul.takeFirst();
+            MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+            if (node)
+            {
+                RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+                if (metadata)
+                {
+                }
+            }
+            VERBOSE(VB_GENERAL,
+                QString("No results found for %1").arg(lookup->GetTitle()));
         }
     }
 }
@@ -770,3 +1005,99 @@ void GameUI::updateChangedNode(MythGenericTree *node, RomInfo *romInfo)
     else
         nodeChanged(node);
 }
+
+void GameUI::gameSearch(MythGenericTree *node,
+                              bool automode)
+{
+    if (!node)
+        node = m_gameUITree->GetCurrentNode();
+
+    if (!node)
+        return;
+
+    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+
+    if (!metadata)
+        return;
+
+    MetadataLookup *lookup = new MetadataLookup();
+    lookup->SetStep(SEARCH);
+    lookup->SetType(GAME);
+    lookup->SetData(qVariantFromValue(node));
+
+    if (automode)
+    {
+        lookup->SetAutomatic(true);
+    }
+
+    lookup->SetTitle(metadata->Gamename());
+    lookup->SetInetref(metadata->Inetref());
+    if (m_query->isRunning())
+        m_query->prependLookup(lookup);
+    else
+        m_query->addLookup(lookup);
+
+    if (!automode)
+    {
+        QString msg = tr("Fetching details for %1")
+                           .arg(metadata->Gamename());
+        createBusyDialog(msg);
+    }
+}
+
+void GameUI::createBusyDialog(QString title)
+{
+    if (m_busyPopup)
+        return;
+
+    QString message = title;
+
+    m_busyPopup = new MythUIBusyDialog(message, m_popupStack,
+            "mythgamebusydialog");
+
+    if (m_busyPopup->Create())
+        m_popupStack->AddScreen(m_busyPopup);
+}
+
+void GameUI::OnGameSearchListSelection(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return;
+
+    lookup->SetStep(GETDATA);
+    m_query->prependLookup(lookup);
+}
+
+void GameUI::OnGameSearchDone(MetadataLookup *lookup)
+{
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
+    }
+
+    if (!lookup)
+       return;
+
+    MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+
+    if (!node)
+        return;
+
+    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+
+    if (!metadata)
+        return;
+
+//    QStringList coverart, fanart, screenshot;
+
+    metadata->setGamename(lookup->GetTitle());
+    metadata->setYear(QString::number(lookup->GetYear()));
+    metadata->setPlot(lookup->GetDescription());
+    metadata->setSystem(lookup->GetSystem());
+
+    metadata->UpdateDatabase();
+    updateChangedNode(node, metadata);
+}
+
+#include "gameui.moc"
