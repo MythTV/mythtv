@@ -67,14 +67,14 @@ namespace
 
         bool Create()
         {
-            if (!LoadWindowFromXML("video-ui.xml", "moviesel", this))
+            if (!LoadWindowFromXML("game-ui.xml", "gamesel", this))
                 return false;
 
             bool err = false;
             UIUtilE::Assign(this, m_resultsList, "results", &err);
             if (err)
             {
-                VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
+                VERBOSE(VB_IMPORTANT, "Cannot load screen 'gamesel'");
                 return false;
             }
 

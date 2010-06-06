@@ -1,5 +1,18 @@
 <mythuitheme>
 
+    <window name="gamesel">
+        <area>-1,-1,413,426</area>
+
+        <imagetype name="box">
+            <filename>mv_results_popup.png</filename>
+        </imagetype>
+
+        <buttonlist name="results" from="basebuttonlist">
+            <area>20,22,357,378</area>
+            <showarrow>no</showarrow>
+        </buttonlist>
+    </window>
+
     <window name="gameui">
 
         <imagetype name="fanart">
