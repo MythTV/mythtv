@@ -721,11 +721,6 @@ namespace
         if (DBup->versionsBehind == 0)  // same schema 
             return true;
 
-        // An upgrade is likely. Ensure we have a backup first:
-        if ((DBup->backupStatus == kDB_Backup_Unknown) ||
-            (DBup->backupStatus == kDB_Backup_Failed))
-            DBup->BackupDB();
-
         // Pop up messages, questions, warnings, et c. 
         switch (DBup->PromptForUpgrade("Video", true, false)) 
         { 
