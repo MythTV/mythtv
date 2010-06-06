@@ -18,7 +18,7 @@ MythNetvision Grabber scripts that run as a Web application and global functions
 MNV grabbers.
 '''
 
-__version__="v0.1.6"
+__version__="v0.1.7"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -36,6 +36,7 @@ __version__="v0.1.6"
 #       Added XSLT stylsheets as an alternate process option in the threaded URL download functions
 # 0.1.6 Removed all logic associated with Web CGI calls as the MNV plugin is now on the backend
 #       Made the pubDate fucntion more adaptable to various input date strings
+# 0.1.7 Added a common function to get the current selected language (default is 'en' English)
 
 import os, struct, sys, re, datetime, time, subprocess, string
 import urllib
@@ -197,6 +198,7 @@ class Common(object):
             ]
         self.nv_python_libs_path = u'nv_python_libs'
         self.apiSuffix = u'_api'
+        self.language = u'en'
     # end __init__()
 
     def massageText(self, text):
@@ -568,6 +570,7 @@ class Common(object):
             'stringEscape': self.stringEscape,
             'removePunc': self.removePunc,
             'htmlToString': self.htmlToString,
+            'getLanguage': self.getLanguage,
             }
         # Get the specific source functions
         self.addDynamicFunctions('xsltfunctions')
@@ -624,7 +627,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         index = args[0].find('+')
         if index == -1:
             index = args[0].find('-')
-        if index != -1:
+        if index != -1 and index > 5:
             args[0] = args[0][:index].strip()
         args[0] = args[0].replace(',', u'').replace('.', u'')
         try:
@@ -790,7 +793,14 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         if not len(html):
             return u""
         return self.massageText(html).strip().replace(u'\n', u' ').replace(u'', u"&apos;").replace(u'', u"&apos;")
-    # end removePunc()
+    # end htmlToString()
+
+    def getLanguage(self, context, args):
+        ''' Return the current selected language code
+        return language code
+        '''
+        return self.language
+    # end getLanguage()
 
     ##############################################################################
     # End  - Utility functions specifically used to modify MNV item data

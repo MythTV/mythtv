@@ -12,9 +12,23 @@
     automatically have at least one per "subDirectory" enabled so the user will be alerted to the new
     source the next time they update their treeview maps.
 -->
+<!--
+    The Trailers Search Mashup's RSS feed and HTML URLs.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+    "pageFunction" Identifies a XPath extension function that returns the start page/index for the
+                    specific source.
+-->
+<search name="Movie Trailers Search">
+  <subDirectory name="YouTube">
+    <sourceURL enabled="true" name="YouTube Movie Trailers" xsltFile="youtubeTrailersRSS_item" type="xml" url="http://gdata.youtube.com/feeds/api/videos?vq=movie+trailer+hd+%(searchterm)s&amp;max-results=%(pagemax)s&amp;start-index=%(pagenum)s&amp;Ir=%(language)s" pageFunction="youtubePaging"/>
+  </subDirectory>
+</search>
 
 <!--
-    The Trailers Mashup's RSS feed and HTML URLs.
+    The Trailers Treeview Mashup's RSS feed and HTML URLs.
     "globalmax" (optional) Is a way to limit the number of items processed per source for all
                 treeview URLs. A value of zero (0) means there are no limitations.
     "max" (optional) Is a way to limit the number of items processed for an individual sourceURL.

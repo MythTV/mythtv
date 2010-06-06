@@ -23,14 +23,15 @@
 __title__ ="Movie Trailers";
 __mashup_title__ = "trailersMashup"
 __author__="R.D. Vaughan"
-__version__="0.10"
+__version__="0.11"
 # 0.10 Initial development
+# 0.11 Added a Movie Trailer Search option
 
 __usage_examples__ ='''
 (Option Help)
 > ./trailers.py -h
 Usage: ./trailers.py -hduvlST [parameters] <search text>
-Version: v0.1.0 Author: R.D.Vaughan
+Version: 0.XX Author: R.D. Vaughan
 
 For details on the MythTV Netvision plugin see the wiki page at:
 http://www.mythtv.org/wiki/MythNetvision
@@ -50,15 +51,25 @@ Options:
                         Display specific page of the search results. Default
                         is page 1. Page number is ignored with the Tree View
                         option (-T).
+  -S, --search          Search for videos
   -T, --treeview        Display a Tree View of a sites videos
 
 > ./trailers.py -v
-trailers Mashup|T
-
+<grabber>
+  <name>Movie Trailers</name>
+  <author>R.D. Vaughan</author>
+  <thumbnail>trailers.png</thumbnail>
+  <command>trailers.py</command>
+  <type>video</type>
+  <description>Mashups combines media from multiple sources to create a new work</description>
+  <version>0.11</version>
+  <search>true</search>
+  <tree>true</tree>
+</grabber>
 
 > ./trailers.py -T
 '''
-__search_max_page_items__ = 20
+__search_max_page_items__ = 50
 __tree_max_page_items__ = 20
 
 import sys, os
@@ -161,7 +172,7 @@ if __name__ == '__main__':
     main.grabberInfo['type'] = ['video', ]
     main.grabberInfo['desc'] = u"Mashups combines media from multiple sources to create a new work"
     main.grabberInfo['version'] = __version__
-    main.grabberInfo['search'] = False
+    main.grabberInfo['search'] = True
     main.grabberInfo['tree'] = True
     main.grabberInfo['html'] = False
     main.grabberInfo['usage'] = __usage_examples__

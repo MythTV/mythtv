@@ -21,7 +21,7 @@
 #-------------------------------------
 __title__ ="Netvision Common Query Processing";
 __author__="R.D.Vaughan"
-__version__="v0.2.4"
+__version__="v0.2.5"
 # 0.1.0 Initial development
 # 0.1.1 Refining the code like the additional of a grabber specifing the maximum number of items to return
 # 0.1.2 Added the Tree view option
@@ -31,6 +31,7 @@ __version__="v0.2.4"
 # 0.2.2 Added support of the -H option
 # 0.2.3 Added support of the XML version information
 # 0.2.4 Added the "command" tag to the XML version information
+# 0.2.5 Fixed a bug in the setting up of a search mashup page item maximum
 
 import sys, os
 from optparse import OptionParser
@@ -413,16 +414,20 @@ class mainProcess:
                     search_all_languages = False,)
 
         # Set the maximum number of items to display per Mythtvnetvision search page
-        if not 'SmaxPage' in self.grabberInfo.keys():
-            Queries.page_limit = 20   # Default items per page
-        else:
-            Queries.page_limit = self.grabberInfo['SmaxPage']
+        if self.grabberInfo['search']:
+            if opts.search:
+                if not 'SmaxPage' in self.grabberInfo.keys():
+                    Queries.page_limit = 20   # Default items per page
+                else:
+                    Queries.page_limit = self.grabberInfo['SmaxPage']
 
         # Set the maximum number of items to display per Mythtvnetvision tree view page
-        if not 'TmaxPage' in self.grabberInfo.keys():
-            Queries.page_limit = 20   # Default items per page
-        else:
-            Queries.page_limit = self.grabberInfo['TmaxPage']
+        if self.grabberInfo['tree']:
+            if opts.treeview:
+                if not 'TmaxPage' in self.grabberInfo.keys():
+                    Queries.page_limit = 20   # Default items per page
+                else:
+                    Queries.page_limit = self.grabberInfo['TmaxPage']
 
         # Set the grabber title
         Queries.grabber_title = self.grabberInfo['title']
@@ -444,10 +449,12 @@ class mainProcess:
         # Process requested option
         if self.grabberInfo['search']:
             if opts.search:                 # Video search -S
+                self.page_limit = Queries.page_limit
                 Queries.searchForVideos(args[0], opts.pagenumber)
 
         if self.grabberInfo['tree']:
             if opts.treeview:               # Video treeview -T
+                self.page_limit = Queries.page_limit
                 Queries.displayTreeView()
 
         if self.grabberInfo['html']:
