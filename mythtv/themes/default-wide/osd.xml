@@ -17,7 +17,7 @@
         <textarea name="message_text">
             <font>medium</font>
             <area>20,20,440,30</area>
-            <align>hcenter, vcenter</align>
+            <align>hcenter,vcenter</align>
         </textarea>
     </window>
 
@@ -39,7 +39,7 @@
         <textarea name="osd_number_entry">
             <font>medium</font>
             <area>20,20,130,30</area>
-            <align>hcenter, vcenter</align>
+            <align>hcenter,vcenter</align>
         </textarea>
     </window>
 
@@ -61,18 +61,18 @@
         <textarea name="title">
             <font>small</font>
             <area>10,10,600,30</area>
-            <align>left, top</align>
+            <align>left,top</align>
         </textarea>
         <textarea name="description">
             <font>small</font>
             <area>10,50,1060,30</area>
-            <align>hcenter, bottom</align>
+            <align>hcenter,bottom</align>
             <template>%DESCRIPTION% %VALUE%%UNITS%</template>
         </textarea>
         <clock name="clock">
             <area>770,10,300,30</area>
             <font>small</font>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <align>right,top</align>
         </clock>
         <progressbar name="position">
@@ -80,11 +80,11 @@
             <layout>horizontal</layout>
             <style>reveal</style>
             <imagetype name="background">
-        	    <area>0,0,100%,100%</area>
+                <area>0,0,100%,100%</area>
                 <filename>progressbar_background.png</filename>
             </imagetype>
             <imagetype name="progressimage">
-        	    <area>0,0,100%,100%</area>
+                <area>0,0,100%,100%</area>
                 <filename>progressbar_fill.png</filename>
             </imagetype>
         </progressbar>
@@ -114,24 +114,24 @@
         <textarea name="title">
             <font>medium</font>
             <area>10,10,600,30</area>
-            <align>left, top</align>
+            <align>left,top</align>
         </textarea>
         <textarea name="starttime">
             <font>smaller</font>
             <area>10,50,700,30</area>
-            <align>left, top</align>
+            <align>left,top</align>
             <template>%STARTTIME%-%ENDTIME% : %LENMINS%</template>
         </textarea>
         <clock name="clock">
             <area>770,10,300,30</area>
             <font>small</font>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <align>right,top</align>
         </clock>
         <textarea name="channum">
             <font>small</font>
             <area>20,100,150,30</area>
-            <align>hcenter, vcenter</align>
+            <align>hcenter,vcenter</align>
         </textarea>
         <imagetype name="iconpath">
             <area>30,140,130,100</area>
@@ -139,12 +139,12 @@
         <textarea name="callsign">
             <font>smaller</font>
             <area>20,250,150,30</area>
-            <align>hcenter, vcenter</align>
+            <align>hcenter,vcenter</align>
         </textarea>
         <textarea name="description">
             <font>small</font>
             <area>200,100,860,180</area>
-            <align>left, top</align>
+            <align>left,top</align>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
@@ -174,24 +174,24 @@
         <textarea name="title">
             <font>medium</font>
             <area>10,10,600,30</area>
-            <align>left, top</align>
+            <align>left,top</align>
         </textarea>
         <textarea name="starttime">
             <font>smaller</font>
             <area>10,50,700,30</area>
-            <align>left, top</align>
+            <align>left,top</align>
             <template>%STARTTIME%-%ENDTIME% : %LENMINS%</template>
         </textarea>
         <clock name="clock">
             <area>770,10,300,30</area>
             <font>small</font>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <align>right,top</align>
         </clock>
         <textarea name="channum">
             <font>small</font>
             <area>20,100,150,30</area>
-            <align>hcenter, vcenter</align>
+            <align>hcenter,vcenter</align>
         </textarea>
         <imagetype name="iconpath">
             <area>30,140,130,100</area>
@@ -199,12 +199,12 @@
         <textarea name="callsign">
             <font>smaller</font>
             <area>20,250,150,30</area>
-            <align>hcenter, vcenter</align>
+            <align>hcenter,vcenter</align>
         </textarea>
         <textarea name="description">
             <font>small</font>
             <area>200,100,860,180</area>
-            <align>left, top</align>
+            <align>left,top</align>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
@@ -231,7 +231,7 @@
         <textarea name="title">
             <font>small</font>
             <area>10,10,480,30</area>
-            <align>left, top</align>
+            <align>left,top</align>
         </textarea>
         <textarea name="message">
             <font>small</font>
@@ -265,7 +265,7 @@
             </imagetype>
             <textarea name="text">
                 <font>small</font>
-                <align>left, vcenter</align>
+                <align>left,vcenter</align>
             </textarea>
         </textedit>
 
@@ -298,12 +298,12 @@
             <value>Probe</value>
             <statetype name="buttonstate">
                 <state name="active">
-	            <shape name="buttonbackground">
-	                <type>roundbox</type>
-	                <area>0,0,150,40</area>
-	    	    <fill color="#666666" alpha="50" />
-	    	    <cornerradius>20</cornerradius>
-	            </shape>
+                <shape name="buttonbackground">
+                    <type>roundbox</type>
+                    <area>0,0,150,40</area>
+                <fill color="#666666" alpha="50" />
+                <cornerradius>20</cornerradius>
+                </shape>
                     <textarea name="text">
                         <area>5,5,140,30</area>
                         <align>allcenter</align>
@@ -313,7 +313,7 @@
                     </textarea>
                 </state>
                 <state name="selected" from="active">
-	            <shape name="buttonbackground">
+                <shape name="buttonbackground">
                     <fill color="#ffffff" alpha="50" />
                 </shape>
                 </state>
@@ -353,15 +353,15 @@
         </textarea>
         <textarea name="timedisplay" from="title">
             <area>10,50,1060,30</area>
-            <align>hcenter, bottom</align>
+            <align>hcenter,bottom</align>
         </textarea>
         <textarea name="cutindicator" from="title">
             <area>10,50,300,30</area>
-            <align>left, bottom</align>
+            <align>left,bottom</align>
         </textarea>
         <textarea name="framedisplay" from="title">
             <area>770,50,300,30</area>
-            <align>right, bottom</align>
+            <align>right,bottom</align>
         </textarea>
         <editbar name="editbar">
             <area>10,30,1060,30</area>
@@ -434,12 +434,12 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,100%,30</area>
-        	        <shape name="buttonbackground">
-        	            <type>roundbox</type>
-        	            <area>0,0,99%,30</area>
-            		    <fill color="#666666" alpha="50" />
-            		    <cornerradius>15</cornerradius>
-        	        </shape>
+                    <shape name="buttonbackground">
+                        <type>roundbox</type>
+                        <area>0,0,99%,30</area>
+                        <fill color="#666666" alpha="50" />
+                        <cornerradius>15</cornerradius>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallgrey</font>
                         <cutdown>yes</cutdown>
@@ -452,23 +452,23 @@
                     </imagetype>
                 </state>
                 <state name="selectedactive" from="active">
-    	            <shape name="buttonbackground">
-    	                <type>roundbox</type>
-    	                <area>0,0,99%,30</area>
-    	                <fill color="#ffffff" alpha="50" />
-    	                <cornerradius>15</cornerradius>
-        	        </shape>
+                    <shape name="buttonbackground">
+                        <type>roundbox</type>
+                        <area>0,0,99%,30</area>
+                        <fill color="#ffffff" alpha="50" />
+                        <cornerradius>15</cornerradius>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmall</font>
                     </textarea>
                 </state>
                 <state name="selectedinactive" from="active">
-        	        <shape name="buttonbackground">
-        	            <type>roundbox</type>
-                	    <area>0,0,99%,30</area>
-        	            <fill color="#ffffff" alpha="50" />
-        	            <cornerradius>15</cornerradius>
-        	        </shape>
+                    <shape name="buttonbackground">
+                        <type>roundbox</type>
+                        <area>0,0,99%,30</area>
+                        <fill color="#ffffff" alpha="50" />
+                        <cornerradius>15</cornerradius>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallgrey</font>
                     </textarea>
