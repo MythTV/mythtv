@@ -54,6 +54,8 @@ class MPUBLIC MetadataDownload : public QThread
     MetadataLookupList  handleTelevision(MetadataLookup* lookup);
     MetadataLookupList  handleVideoUndetermined(MetadataLookup* lookup);
 
+    MetadataLookupList  handleGame(MetadataLookup* lookup);
+
     bool                findBestMatch(MetadataLookupList list,
                                       QString originaltitle);
     MetadataLookupList  runGrabber(QString cmd, QStringList args,

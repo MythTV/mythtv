@@ -323,6 +323,12 @@ QString getLocalWritePath(MetadataType metadatatype, ArtworkType type)
     }
     else if (metadatatype == GAME)
     {
+        if (type == COVERART)
+            ret = gCoreContext->GetSetting("mythgame.boxartdir");
+        else if (type == FANART)
+            ret = gCoreContext->GetSetting("mythgame.fanartdir");
+        else if (type == SCREENSHOT)
+            ret = gCoreContext->GetSetting("mythgame.screenshotdir");
     }
 
     return ret;

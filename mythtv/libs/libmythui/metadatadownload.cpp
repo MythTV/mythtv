@@ -76,8 +76,8 @@ void MetadataDownload::run()
         }
 //        else if (lookup->GetType() == MUSIC)
 //            list = handleMusic(lookup);
-//        else if (lookup->GetType() == GAME)
-//            list = handleGame(lookup);
+        else if (lookup->GetType() == GAME)
+            list = handleGame(lookup);
 
         // inform parent we have lookup ready for it
         if (m_parent && list.count() >= 1)
@@ -200,6 +200,42 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
             item = item.nextSiblingElement("item");
         }
     }
+    return list;
+}
+
+MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
+{
+    MetadataLookupList list;
+
+    QString def_cmd = QDir::cleanPath(QString("%1/%2")
+        .arg(GetShareDir())
+        .arg("mythgame/scripts/giantbomb.py"));
+
+    QString cmd = gCoreContext->GetSetting("mythgame.MetadataGrabber", def_cmd);
+
+    QStringList args;
+    args.append(QString("-l")); // Language Flag
+    args.append(GetMythUI()->GetLanguage()); // UI Language
+
+    // If the inetref is populated, even in search mode,
+    // become a getdata grab and use that.
+    if (lookup->GetStep() == SEARCH &&
+        (!lookup->GetInetref().isEmpty() &&
+         lookup->GetInetref() != "00000000"))
+        lookup->SetStep(GETDATA);
+
+    if (lookup->GetStep() == SEARCH)
+    {
+        args.append(QString("-M"));
+        args.append(lookup->GetTitle());
+    }
+    else if (lookup->GetStep() == GETDATA)
+    {
+        args.append(QString("-D"));
+        args.append(lookup->GetInetref());
+    }
+    list = runGrabber(cmd, args, lookup);
+
     return list;
 }
 
