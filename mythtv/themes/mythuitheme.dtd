@@ -3,7 +3,7 @@
                               from CDATA #IMPLIED" >
 <!ENTITY % widgets "textarea|imagetype|statetype|button|buttonlist|buttontree|
                     textedit|checkbox|spinbox|progressbar|clock|webbrowser|
-                    shape|guidegrid" >
+                    shape|guidegrid|editbar" >
 <!ENTITY % widget_common "area|position|alpha|alphapulse|helptext|focusorder|
                            minsize|loadondemand" >
 
@@ -12,7 +12,7 @@
 
 <!-- Font Definition -->
 <!ELEMENT fontdef (pixelsize|size|color|shadowcolor|shadowoffset|shadowalpha|
-                   outlinecolor|outlinesize|outlinealpha|italics|weight|bold|
+                   outlinecolor|outlinesize|outlinealpha|weight|
                    letterspacing|wordspacing|decoration)*>
 <!ATTLIST fontdef %common_attributes;
                   face CDATA #IMPLIED>
@@ -25,7 +25,6 @@
 <!ELEMENT outlinecolor  (#PCDATA)>
 <!ELEMENT outlinesize  (#PCDATA)>
 <!ELEMENT outlinealpha  (#PCDATA)>
-<!ELEMENT italics  (#PCDATA)>
 <!ELEMENT weight  (#PCDATA)>
 <!ELEMENT letterspacing  (#PCDATA)>
 <!ELEMENT wordspacing  (#PCDATA)>
@@ -128,7 +127,7 @@
                 from CDATA #IMPLIED>
 
 <!-- Clock Widget -->
-<!ELEMENT clock (%widget_common;|%textarea_elements;|format|secondflash|
+<!ELEMENT clock (%widget_common;|%textarea_elements;|secondflash|
                  %widgets;)*>
 <!ATTLIST clock %common_attributes;>
 <!ELEMENT secondflash (#PCDATA)>
@@ -159,7 +158,7 @@
 <!-- Textedit Widget -->
 <!ELEMENT textedit (%widget_common;|%widgets;)*> <!-- textarea|statetype|imagetype -->
 <!ATTLIST textedit %common_attributes;>
-   
+
 <!-- Checkbox Widget -->
 <!ELEMENT checkbox (%widget_common;|%widgets;)*> <!-- statetype -->
 <!ATTLIST checkbox %common_attributes;>
@@ -209,5 +208,9 @@
 <!ELEMENT background (#PCDATA)>
 <!ATTLIST background color CDATA #REQUIRED
                      alpha CDATA #IMPLIED>
-<!ELEMENT userstylesheet (#PCDATA)> 
+<!ELEMENT userstylesheet (#PCDATA)>
 <!ELEMENT updateinterval (#PCDATA)>
+
+<!-- Editbar Widget -->
+<!ELEMENT editbar (%widget_common;|%widgets;)*>
+<!ATTLIST editbar %common_attributes;>

@@ -31,6 +31,7 @@
                 <xs:element ref="webbrowser" />
                 <xs:element ref="shape" />
                 <xs:element ref="guidegrid" />
+                <xs:element ref="editbar" />
             </xs:choice>
         </xs:sequence>
     </xs:group>
@@ -87,7 +88,7 @@
 
     <xs:simpleType name="area">
         <xs:restriction base="xs:string">
-            <xs:pattern value="(-?[0-9]*|\d{0,3}%),(-?[0-9]*|\d{0,3}%),([0-9]*|\d{0,3}%),([0-9]*|\d{0,3}%)" />
+            <xs:pattern value="(-?[0-9]*|\d{0,3}%),(-?[0-9]*|\d{0,3}%),(-?[0-9]*|\d{0,3}%),(-?[0-9]*|\d{0,3}%)" />
         </xs:restriction>
     </xs:simpleType>
 
@@ -692,7 +693,6 @@
 
     </xs:element>
 
-
     <!-- Webbrowser Widget -->
     <xs:element name="webbrowser">
         <xs:complexType>
@@ -708,6 +708,18 @@
                 </xs:element>
                 <xs:element name="userstylesheet" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="updateinterval" type="xs:integer" minOccurs="0" maxOccurs="1" />
+                <xs:group ref="widgets" />
+            </xs:choice>
+            <xs:attributeGroup ref="common_attributes" />
+        </xs:complexType>
+    </xs:element>
+
+
+    <!-- Editbar Widget -->
+    <xs:element name="editbar">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="widget_common" />
                 <xs:group ref="widgets" />
             </xs:choice>
             <xs:attributeGroup ref="common_attributes" />
