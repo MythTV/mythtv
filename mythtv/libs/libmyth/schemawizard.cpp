@@ -261,10 +261,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         return MYTH_SCHEMA_USE_EXISTING;
 #endif
 
-    // Only back up the database if it's old/about to be upgraded
-    // (not if it's too new)
-    // or if a user is doing something they probably shouldn't ("expert mode")
-    if ((upgradeAllowed && (versionsBehind > 0)) || m_expertMode)
+    // Only back up the database if we haven't already successfully made a
+    // backup and the database is old/about to be upgraded (not if it's too
+    // new) or if a user is doing something they probably shouldn't ("expert
+    // mode")
+    if (((backupStatus == kDB_Backup_Unknown) ||
+         (backupStatus == kDB_Backup_Failed)) &&
+        ((upgradeAllowed && (versionsBehind > 0)) ||
+         m_expertMode))
         BackupDB();
 
     connections = CountClients() > 1;
