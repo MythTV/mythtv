@@ -31,8 +31,6 @@ class MythSqlDatabase;
 
 struct SwsContext;
 
-#define AUDIOMAXFRAMES       30
-
 extern "C" void HandleStreamChange(void*);
 
 class AudioInfo
@@ -305,8 +303,6 @@ class AvFormatDecoder : public DecoderBase
     bool              internal_vol;
     bool              disable_passthru;
     uint              max_channels;
-    uint              last_ac3_channels;
-    long long         last_framesRead;
 
     VideoFrame       *dummy_frame;
 

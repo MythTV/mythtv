@@ -499,7 +499,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       internal_vol(false),
       disable_passthru(false),      max_channels(2),
-      last_ac3_channels(0),         last_framesRead(0),
       dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1),
@@ -3978,40 +3977,17 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 ctx->request_channels = 0;
             }
             else // No passthru, the decoder will downmix
+            {
                 ctx->request_channels = max_channels;
+                if (ctx->codec_id == CODEC_ID_AC3)
+                    ctx->channels = max_channels;
+            }
 
             data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             ret = avcodec_decode_audio3(ctx, audioSamples,
                                         &data_size, &tmp_pkt);
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
-        }
-
-        if (ctx->codec_id == CODEC_ID_AC3)
-        {
-            GetBitContext gbc;
-            init_get_bits(&gbc, tmp_pkt.data, tmp_pkt.size * 8);
-            if (!ff_ac3_parse_header(&gbc, &hdr))
-            {
-                if (hdr.channels != last_ac3_channels)
-                {
-                    VERBOSE(VB_AUDIO,
-                            LOC + QString("AC3 changed from %1 to "
-                                          "%2 channels (frame %3)")
-                                  .arg(last_ac3_channels).arg(hdr.channels)
-                                  .arg(framesRead));
-
-                    if ((framesRead - last_framesRead) > AUDIOMAXFRAMES ||
-                        hdr.channels < last_ac3_channels)
-                    {
-                        ctx->channels = hdr.channels;
-                    }
-
-                    last_ac3_channels = hdr.channels;
-                    last_framesRead = framesRead;
-                    SetupAudioStream();
-                }
-            }
         }
 
         if (reselectAudioTrack)
@@ -4055,7 +4031,11 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             if (!already_decoded)
             {
                 if (DecoderWillDownmix(ctx))
+                {
                     ctx->request_channels = max_channels;
+                    if (ctx->codec_id == CODEC_ID_AC3)
+                        ctx->channels = max_channels;
+                }
                 else
                     ctx->request_channels = 0;
 
