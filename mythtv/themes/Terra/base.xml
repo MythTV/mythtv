@@ -144,8 +144,8 @@
                 </imagetype>
                 <textarea name="text">
                     <area>5,5,213,43</area>
-                    <align>allcenter</align>
                     <font>baselarge</font>
+                    <align>allcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -175,8 +175,8 @@
                 </imagetype>
                 <textarea name="text">
                     <area>18,0,324,50</area>
-                    <align>allcenter</align>
                     <font>basemedium</font>
+                    <align>allcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -320,8 +320,8 @@
     <buttonlist name="baseselector">
         <area>0,0,220,35</area>
         <layout>horizontal</layout>
-        <buttonarea>18,0,184,100%</buttonarea>
         <wrapstyle>selection</wrapstyle>
+        <buttonarea>18,0,184,100%</buttonarea>
         <shape name="background">
             <area>0,0,100%,100%</area>
             <type>roundbox</type>
@@ -483,16 +483,16 @@
         <clock name="date">
             <area>825,689,350,30</area>
             <font>datefont</font>
-            <template>%DATE%</template>
             <align>right,vcenter</align>
+            <template>%DATE%</template>
         </clock>
 
         <clock name="time">
             <area>1185,688,80,30</area>
             <font>timefont</font>
-            <template>hh:mm</template>
-            <align>left,vcenter</align>
             <cutdown>no</cutdown>
+            <align>left,vcenter</align>
+            <template>hh:mm</template>
         </clock>
 
     </window>
@@ -509,16 +509,16 @@
 
         <textarea name="messagearea">
             <area>12,93,378,125</area>
+            <font>basesmall</font>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <font>basesmall</font>
         </textarea>
 
         <buttonlist name="list">
             <area>15,238,378,350</area>
-            <buttonarea>0,0,378,350</buttonarea>
             <spacing>3</spacing>
             <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,378,350</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,367,53</area>
                 <state name="active">
@@ -528,8 +528,8 @@
                     </imagetype>
                     <textarea name="buttontext">
                         <area>18,0,324,50</area>
-                        <align>allcenter</align>
                         <font>basemedium</font>
+                        <align>allcenter</align>
                     </textarea>
                     <imagetype name="buttonarrow">
                         <position>346,16</position>
@@ -563,17 +563,17 @@
 
         <textarea name="messagearea">
             <area>270,90,740,270</area>
+            <font>basesmall</font>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <font>basesmall</font>
         </textarea>
 
         <buttonlist name="list">
             <area>270,385,770,170</area>
-            <buttonarea>0,0,770,170</buttonarea>
-            <spacing>4</spacing>
             <layout>grid</layout>
+            <spacing>4</spacing>
             <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,770,170</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="buttonbackground">
@@ -581,8 +581,8 @@
                     </imagetype>
                     <textarea name="buttontext">
                         <area>18,0,324,50</area>
-                        <align>allcenter</align>
                         <font>basemedium</font>
+                        <align>allcenter</align>
                     </textarea>
                     <imagetype name="buttonarrow">
                         <position>346,16</position>
@@ -615,9 +615,9 @@
 
         <textarea name="message" from="basetextarea">
             <area>395,227,490,110</area>
-            <align>allcenter</align>
-            <multiline>yes</multiline>
             <cutdown>no</cutdown>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
         </textarea>
 
         <button name="cancel" from="basebutton">
@@ -665,8 +665,8 @@
         </imagetype>
         <textarea name="message" from="basetextarea">
             <area>20,10,580,50</area>
-            <align>allcenter</align>
             <multiline>true</multiline>
+            <align>allcenter</align>
         </textarea>
 
         <imagetype name="background">
@@ -692,8 +692,8 @@
         </imagetype>
         <textarea name="message" from="basetextarea">
             <area>20,10,580,50</area>
-            <align>allcenter</align>
             <multiline>true</multiline>
+            <align>allcenter</align>
         </textarea>
         <progressbar name="progressbar" from="baseprogressbar">
             <position>22,62</position>
@@ -720,8 +720,8 @@
 
         <textarea name="progresstext" from="basetextarea">
             <area>0,660,1280,60</area>
-            <value>Playback starting …</value>
             <align>allcenter</align>
+            <value>Playback starting …</value>
         </textarea>
 
     </window>
@@ -738,8 +738,8 @@
         <buttonlist name="filelist">
             <area>285,90,740,270</area>
             <layout>grid</layout>
-            <buttonarea>0,0,720,270</buttonarea>
             <spacing>10</spacing>
+            <buttonarea>0,0,720,270</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,170,130</area>
@@ -774,8 +774,8 @@
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
                         <area>5,80,160,50</area>
-                        <align>allcenter</align>
                         <multiline>yes</multiline>
+                        <align>allcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedinactive" from="active" />

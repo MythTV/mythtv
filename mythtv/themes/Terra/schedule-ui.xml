@@ -44,14 +44,14 @@
 
         <textarea name="timelabel" from="titlelabel">
             <area>40,368,400,30</area>
-            <value>Start Time:</value>
             <align>right</align>
+            <value>Start Time:</value>
         </textarea>
 
         <textarea name="hourlabel" from="basetextarea">
             <area>460,370,80,30</area>
-            <value>Hour</value>
             <align>right</align>
+            <value>Hour</value>
         </textarea>
 
         <spinbox name="starthour" from="basespinbox">
@@ -235,27 +235,27 @@
 
         <buttonlist name="groups">
             <area>0,60,1280,40</area>
+            <layout>horizontal</layout>
             <spacing>15</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
-            <layout>horizontal</layout>
             <buttonarea>12,0,1260,40</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,40</area>
                     <textarea name="buttontext" from="basetextarea">
                         <area>4,3,232,36</area>
-                        <align>allcenter</align>
-                        <cutdown>yes</cutdown>
-                        <font>basemedium</font>
                         <alpha>220</alpha>
+                        <font>basemedium</font>
+                        <cutdown>yes</cutdown>
+                        <align>allcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <area>4,1,232,36</area>
-                        <font>basemediumbrown</font>
                         <alpha>255</alpha>
+                        <font>basemediumbrown</font>
                     </textarea>
                 </state>
                 <state name="selectedinactive" from="selectedactive" />
@@ -297,8 +297,8 @@
         <textarea name="statuslabel" from="basetextarea">
             <area>700,183,180,30</area>
             <font>basemedium</font>
-            <value>First Conflict:</value>
             <align>vcenter</align>
+            <value>First Conflict:</value>
         </textarea>
 
         <textarea name="status" from="basetextarea">
@@ -347,8 +347,8 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -357,10 +357,10 @@
 
         <textarea name="norecordings_info" from="description">
             <font>basemedium</font>
+            <align>allcenter</align>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
                 select 'Program Guide' or 'Program Finder'</value>
-            <align>allcenter</align>
         </textarea>
 
     </window>
@@ -374,13 +374,13 @@
         </textarea>
 
         <imagetype name="background">
-            <filename>rk-background.png</filename>
             <area>0,40,1280,420</area>
+            <filename>rk-background.png</filename>
         </imagetype>
 
         <imagetype name="showinglines">
-            <filename>rk-lines.png</filename>
             <position>0,40</position>
+            <filename>rk-lines.png</filename>
         </imagetype>
 
         <buttonlist name="channels" from="basebuttonlist2">
@@ -460,17 +460,17 @@
         <textarea name="norecordings_info">
             <area>0,210,1280,70</area>
             <font>basemedium</font>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
                 select 'Program Guide' or 'Program Finder'</value>
-            <multiline>yes</multiline>
-            <align>allcenter</align>
         </textarea>
 
         <textarea name="helptext" from="basetextarea">
             <area>0,670,1280,30</area>
-            <value>(1) Channel (2) Priority</value>
             <align>center</align>
+            <value>(1) Channel (2) Priority</value>
         </textarea>
 
     </window>
@@ -504,8 +504,8 @@
 
         <buttonlist name="programs">
             <area>0,111,1280,310</area>
-            <buttonarea>0,0,1280,300</buttonarea>
             <spacing>0</spacing>
+            <buttonarea>0,0,1280,300</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <shape name="background" />
@@ -601,14 +601,14 @@
 
         <textarea name="titlelabel" from="basetextarea">
             <area>50,77,100,40</area>
-            <value>Title</value>
             <align>left</align>
+            <value>Title</value>
         </textarea>
 
         <textarea name="typelabel" from="titlelabel">
             <position>810,77</position>
-            <value>Type</value>
             <align>hcenter</align>
+            <value>Type</value>
         </textarea>
 
         <textarea name="prioritylabel" from="typelabel">
@@ -710,8 +710,8 @@
 
         <textarea name="clauseslabel" from="ruleslabel">
             <area>340,300,600,40</area>
-            <value>Select a clause from the list.</value>
             <align>allcenter</align>
+            <value>Select a clause from the list.</value>
         </textarea>
 
         <buttonlist name="clauses" from="basewideselector">
@@ -1122,14 +1122,14 @@
         <textarea name="curviewlabel" from="basetextarea">
             <area>700,183,160,30</area>
             <font>basemedium</font>
-            <value>Current View:</value>
             <align>vcenter</align>
+            <value>Current View:</value>
         </textarea>
 
         <textarea name="curview" from="basetextarea">
             <area>870,183,380,30</area>
-            <align>vcenter</align>
             <case>capitaliseall</case>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="positionlabel" from="curviewlabel">
@@ -1173,8 +1173,8 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1237,8 +1237,8 @@
                         <font state="favourite">basesmallyellow</font>
                         <font state="unavailable">basesmallblue</font>
                         <font state="favunavailable">basesmallpurple</font>
-                        <align>allcenter</align>
                         <multiline>yes</multiline>
+                        <align>allcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active" />
@@ -1307,8 +1307,8 @@
 
         <textarea name="datetext" from="basetextarea">
             <area>10,67,220,30</area>
-            <align>hcenter</align>
             <multiline>yes</multiline>
+            <align>hcenter</align>
         </textarea>
 
         <shape name="descriptionbackground" from="basetextbackground">
@@ -1330,8 +1330,8 @@
         <textarea name="description" from="basetextarea">
             <area>48,527,1190,100</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="year" from="basetextarea">
@@ -1429,8 +1429,8 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1444,32 +1444,32 @@
 
         <button name="schedoptions" from="basewidebutton">
             <position>157,230</position>
-            <value>Schedule Options</value>
             <helptext></helptext>
+            <value>Schedule Options</value>
         </button>
 
         <button name="storeoptions" from="basewidebutton">
             <position>157,295</position>
-            <value>Storage Options</value>
             <helptext></helptext>
+            <value>Storage Options</value>
         </button>
 
         <button name="postprocessing" from="basewidebutton">
             <position>157,360</position>
-            <value>Post Processing</value>
             <helptext></helptext>
+            <value>Post Processing</value>
         </button>
 
         <button name="schedinfo" from="basewidebutton">
             <position>157,425</position>
-            <value>Schedule Info</value>
             <helptext></helptext>
+            <value>Schedule Info</value>
         </button>
 
         <button name="preview" from="basewidebutton">
             <position>157,490</position>
-            <value>Preview</value>
             <helptext></helptext>
+            <value>Preview</value>
         </button>
 
         <button name="cancel" from="basebutton">
@@ -1540,8 +1540,8 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1550,10 +1550,10 @@
 
         <spinbox name="priority" from="basewidespinbox">
             <position>40,160</position>
+            <helptext></helptext>
             <template type="negative">Reduce priority by %n</template>
             <template type="zero">Normal recording priority</template>
             <template type="positive">Raise priority by %n</template>
-            <helptext></helptext>
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
@@ -1563,18 +1563,18 @@
 
         <spinbox name="startoffset" from="basewidespinbox">
             <position>40,280</position>
+            <helptext></helptext>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
             <template type="positive">Start recording %n minute(s) early</template>
-            <helptext></helptext>
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
             <position>40,340</position>
+            <helptext></helptext>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
-            <helptext></helptext>
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
@@ -1659,8 +1659,8 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1689,9 +1689,9 @@
 
         <spinbox name="maxepisodes" from="basewidespinbox">
             <position>40,400</position>
+            <helptext></helptext>
             <template type="zero">No episode limit</template>
             <template type="positive">Keep at most %n episode(s)</template>
-            <helptext></helptext>
         </spinbox>
 
         <buttonlist name="maxnewest" from="basewideselector">
@@ -1771,8 +1771,8 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
