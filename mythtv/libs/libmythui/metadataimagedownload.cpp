@@ -269,8 +269,11 @@ QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
         if (type == SCREENSHOT)
             inter += QString("x%1").arg(QString::number(episode));
     }
-    else
+    else if (lookup->GetType() == VID)
         title = lookup->GetInetref();
+    else if (lookup->GetType() == GAME)
+        title = QString("%1 (%2)").arg(lookup->GetTitle())
+                    .arg(lookup->GetSystem());
 
     if (tracknum > 0)
         inter = QString(" Track %1").arg(QString::number(tracknum));

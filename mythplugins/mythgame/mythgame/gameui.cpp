@@ -753,6 +753,17 @@ void GameUI::customEvent(QEvent *event)
                 QString("No results found for %1").arg(lookup->GetTitle()));
         }
     }
+    else if (event->type() == ImageDLEvent::kEventType)
+    {
+        ImageDLEvent *ide = (ImageDLEvent *)event;
+
+        MetadataLookup *lookup = ide->item;
+
+        if (!lookup)
+            return;
+
+        handleDownloadedImages(lookup);
+    }
 }
 
 QString GameUI::getFillSql(MythGenericTree *node) const
@@ -1089,12 +1100,122 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
     if (!metadata)
         return;
 
-//    QStringList coverart, fanart, screenshot;
-
     metadata->setGamename(lookup->GetTitle());
     metadata->setYear(QString::number(lookup->GetYear()));
     metadata->setPlot(lookup->GetDescription());
     metadata->setSystem(lookup->GetSystem());
+
+    QStringList coverart, fanart, screenshot;
+
+    // Imagery
+    ArtworkList coverartlist = lookup->GetArtwork(COVERART);
+    for (ArtworkList::const_iterator p = coverartlist.begin();
+        p != coverartlist.end(); ++p)
+    {
+        coverart.prepend((*p).url);
+    }
+    ArtworkList fanartlist = lookup->GetArtwork(FANART);
+    for (ArtworkList::const_iterator p = fanartlist.begin();
+        p != fanartlist.end(); ++p)
+    {
+        fanart.prepend((*p).url);
+    }
+    ArtworkList screenshotlist = lookup->GetArtwork(SCREENSHOT);
+    for (ArtworkList::const_iterator p = screenshotlist.begin();
+        p != screenshotlist.end(); ++p)
+    {
+        screenshot.prepend((*p).url);
+    }
+
+    StartGameImageSet(node, coverart, fanart, screenshot);
+
+    metadata->UpdateDatabase();
+    updateChangedNode(node, metadata);
+}
+
+void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
+                                     QStringList fanart, QStringList screenshot)
+{
+    if (!node)
+        return;
+
+    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+
+    if (!metadata)
+        return;
+
+    ArtworkMap map;
+
+    QString inetref = metadata->Inetref();
+    QString system = metadata->System();
+    QString title = metadata->Gamename();
+
+    if (metadata->Boxart().isEmpty())
+    {
+        ArtworkInfo info;
+        info.url = coverart.takeAt(0).trimmed();
+        map.insert(COVERART, info);
+    }
+
+    if (metadata->Fanart().isEmpty())
+    {
+        ArtworkInfo info;
+        info.url = fanart.takeAt(0).trimmed();
+        map.insert(FANART, info);
+    }
+
+    if (metadata->Screenshot().isEmpty())
+    {
+        ArtworkInfo info;
+        info.url = screenshot.takeAt(0).trimmed();
+        map.insert(SCREENSHOT, info);
+    }
+
+    MetadataLookup *lookup = new MetadataLookup();
+    lookup->SetTitle(metadata->Gamename());
+    lookup->SetSystem(metadata->System());
+    lookup->SetInetref(metadata->Inetref());
+    lookup->SetType(GAME);
+    lookup->SetDownloads(map);
+    lookup->SetData(qVariantFromValue(node));
+
+    m_imageDownload->addDownloads(lookup);
+}
+
+void GameUI::handleDownloadedImages(MetadataLookup *lookup)
+{
+    if (!lookup)
+        return;
+
+    MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
+
+    if (!node)
+        return;
+
+    RomInfo *metadata = qVariantValue<RomInfo *>(node->GetData());
+
+    if (!metadata)
+        return;
+
+    DownloadMap downloads = lookup->GetDownloads();
+
+    if (downloads.isEmpty())
+        return;
+
+    for (DownloadMap::iterator i = downloads.begin();
+            i != downloads.end(); ++i)
+    {
+        ArtworkType type = i.key();
+        ArtworkInfo info = i.value();
+        QString filename = info.url;
+
+        if (type == COVERART)
+            metadata->setBoxart(filename);
+        else if (type == FANART)
+            metadata->setFanart(filename);
+        else if (type == SCREENSHOT)
+            metadata->setScreenshot(filename);
+    }
 
     metadata->UpdateDatabase();
     updateChangedNode(node, metadata);

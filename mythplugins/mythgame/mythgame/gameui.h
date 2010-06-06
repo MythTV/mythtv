@@ -40,6 +40,8 @@ class GameUI : public MythScreenType
                      bool automode = false);
     void OnGameSearchListSelection(MetadataLookup *lookup);
     void OnGameSearchDone(MetadataLookup *lookup);
+    void StartGameImageSet(MythGenericTree *node, QStringList coverart,
+                           QStringList fanart, QStringList screenshot);
 
   private:
     void updateRomInfo(RomInfo *rom);
@@ -60,6 +62,7 @@ class GameUI : public MythScreenType
     void    fillNode(MythGenericTree *node);
     void    resetOtherTrees(MythGenericTree *node);
     void    updateChangedNode(MythGenericTree *node, RomInfo *romInfo);
+    void    handleDownloadedImages(MetadataLookup *lookup);
 
   private:
     bool m_showHashed;

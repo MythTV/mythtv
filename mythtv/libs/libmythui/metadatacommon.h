@@ -110,7 +110,7 @@ class MPUBLIC MetadataLookup : public QObject
         const uint revenue,
         QString album,
         uint tracknum,
-        const QString system,
+        QString system,
         const uint year,
         const QDate releasedate,
         const QDateTime lastupdated,
@@ -160,6 +160,9 @@ class MPUBLIC MetadataLookup : public QObject
     // General Sets - Music
     void SetAlbum(QString album) { m_album = album; };
     void SetTrack(uint track) { m_tracknum = track; };
+
+    // General Sets - Games
+    void SetSystem(QString system) { m_system = system; };
 
     // GETS
 
@@ -256,7 +259,7 @@ class MPUBLIC MetadataLookup : public QObject
     uint m_tracknum;
 
     // General - Game
-    const QString m_system;
+    QString m_system;
 
     // Times
     uint m_year;
