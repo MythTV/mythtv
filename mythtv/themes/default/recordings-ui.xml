@@ -28,7 +28,7 @@
                 <state name="inactive">
                     <area>0,0,300,55</area>
                     <shape name="recGroupShape">
-                        <area>0, 0, 100%, 100%</area>
+                        <area>0,0,100%,100%</area>
                         <minsize>150,100%</minsize>
                         <type>roundbox</type>
                         <fill color="#000000" alpha="192" />
