@@ -1204,6 +1204,8 @@ void VideoDialog::reloadAllData(bool dbChanged)
     if (dbChanged) {
         m_d->m_videoList->InvalidateCache();
     }
+
+    m_d->m_currentNode = NULL;
     reloadData();
 
     VideoAutoSearch();
@@ -2332,6 +2334,9 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     MythGenericTree *node = GetNodePtrFromButton(item);
 
+    if (!node)
+        return;
+
     if (metadata)
     {
         MetadataMap metadataMap;
@@ -2348,7 +2353,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     ScreenCopyDest dest(this);
     CopyMetadataToUI(metadata, dest);
 
-    if (node && node->getInt() == kSubFolder && !metadata)
+    if (node->getInt() == kSubFolder && !metadata)
     {
         QString cover = GetFirstImage(node, "Coverart");
         QString fanart = GetFirstImage(node, "Fanart");
