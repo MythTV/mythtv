@@ -2040,17 +2040,12 @@ bool NuppelVideoPlayer::VideoLoop(void)
 void NuppelVideoPlayer::VideoEnd(void)
 {
     QMutexLocker locker(&vidExitLock);
-    if (videosync)
-    {
-        delete videosync;
-        videosync = NULL;
-    }
-
-    if (videoOutput)
-    {
-        delete videoOutput;
-        videoOutput = NULL;
-    }
+    delete osd;
+    delete videosync;
+    delete videoOutput;
+    osd         = NULL;
+    videosync   = NULL;
+    videoOutput = NULL;
 }
 
 bool NuppelVideoPlayer::FastForward(float seconds)

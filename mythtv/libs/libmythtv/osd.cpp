@@ -174,9 +174,8 @@ OSD::~OSD()
 
 void OSD::TearDown(void)
 {
-    HideAll(false);
     foreach(MythScreenType* screen, m_Children)
-        screen->deleteLater();
+        delete screen;
     m_Children.clear();
 }
 
@@ -240,6 +239,7 @@ bool OSD::Reinit(const QRect &rect, float font_aspect)
     if ((rect == m_Rect) && (new_stretch == m_fontStretch))
         return true;
 
+    HideAll(false);
     TearDown();
     if (!Init(rect, font_aspect))
     {
