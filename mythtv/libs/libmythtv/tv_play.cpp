@@ -6944,8 +6944,8 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
-        osd->SetValues("osd_status", info.values);
-        osd->SetText("osd_status",   info.text);
+        osd->SetValues("osd_status", info.values, set_expiry);
+        osd->SetText("osd_status",   info.text, set_expiry);
         if (type != kOSDFunctionalType_Default)
             osd->SetFunctionalWindow("osd_status", (OSDFunctionalType)type);
     }
