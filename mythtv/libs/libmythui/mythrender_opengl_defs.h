@@ -157,4 +157,31 @@ typedef int ( * MYTH_GLXGETVIDEOSYNCSGIPROC)
     (unsigned int *count);
 typedef int ( * MYTH_GLXWAITVIDEOSYNCSGIPROC)
     (int divisor, int remainder, unsigned int *count);
+typedef GLuint ( * MYTH_GLCREATESHADEROBJECT)
+    (GLenum shaderType);
+typedef void ( * MYTH_GLSHADERSOURCE)
+    (GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);
+typedef void ( * MYTH_GLCOMPILESHADER)
+    (GLuint shader);
+typedef GLuint ( * MYTH_GLCREATEPROGRAMOBJECT)
+    (void);
+typedef void ( * MYTH_GLATTACHOBJECT)
+    (GLuint program, GLuint shader);
+typedef void ( * MYTH_GLLINKPROGRAM)
+    (GLuint program);
+typedef void ( * MYTH_GLUSEPROGRAM)
+    (GLuint program);
+typedef void ( * MYTH_GLGETINFOLOG)
+    (GLuint object, int maxLen, int *len, char *log);
+typedef void ( * MYTH_GLGETOBJECTPARAMETERIV)
+    (GLuint object, GLenum type, int *param);
+typedef void ( * MYTH_GLDETACHOBJECT)
+    (GLuint program, GLuint shader);
+typedef void ( * MYTH_GLDELETEOBJECT)
+    (GLuint id);
+typedef GLint ( * MYTH_GLGETUNIFORMLOCATION)
+    (GLuint program, const char *name);
+typedef void  ( * MYTH_GLUNIFORM4F)
+    (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+
 #endif

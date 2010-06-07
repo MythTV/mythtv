@@ -40,7 +40,8 @@ typedef enum
     kGLAppleFence  = 0x0040,
     kGLYCbCrTex    = 0x0080,
     kGLMipMaps     = 0x0100,
-    kGLMaxFeat     = 0x0200,
+    kGLSL          = 0x0200,
+    kGLMaxFeat     = 0x0400,
 } GLFeatures;
 
 class MythGLTexture;
@@ -204,9 +205,23 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLDELETEFENCESAPPLEPROC         gMythGLDeleteFencesAPPLE;
     MYTH_GLSETFENCEAPPLEPROC             gMythGLSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          gMythGLFinishFenceAPPLE;
-
+    // GLX_SGI_video_sync
     static MYTH_GLXGETVIDEOSYNCSGIPROC   gMythGLXGetVideoSyncSGI;
     static MYTH_GLXWAITVIDEOSYNCSGIPROC  gMythGLXWaitVideoSyncSGI;
+    // GLSL
+    MYTH_GLCREATESHADEROBJECT            gMythGLCreateShaderObject;
+    MYTH_GLSHADERSOURCE                  gMythGLShaderSource;
+    MYTH_GLCOMPILESHADER                 gMythGLCompileShader;
+    MYTH_GLCREATEPROGRAMOBJECT           gMythGLCreateProgramObject;
+    MYTH_GLATTACHOBJECT                  gMythGLAttachObject;
+    MYTH_GLLINKPROGRAM                   gMythGLLinkProgram;
+    MYTH_GLUSEPROGRAM                    gMythGLUseProgram;
+    MYTH_GLGETINFOLOG                    gMythGLInfoLog;
+    MYTH_GLGETOBJECTPARAMETERIV          gMythGLGetObjectParameteriv;
+    MYTH_GLDETACHOBJECT                  gMythGLDetachObject;
+    MYTH_GLDELETEOBJECT                  gMythGLDeleteObject;
+    MYTH_GLGETUNIFORMLOCATION            gMythGLGetUniformLocation;
+    MYTH_GLUNIFORM4F                     gMythGLUniform4f;
 };
 
 #endif

@@ -1211,6 +1211,32 @@ void MythRenderOpenGL::InitProcs(void)
         getProcAddress("glSetFenceAPPLE");
     gMythGLFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
         getProcAddress("glFinishFenceAPPLE");
+    gMythGLCreateShaderObject = (MYTH_GLCREATESHADEROBJECT)
+        getProcAddress("glCreateShaderObjectARB");
+    gMythGLShaderSource = (MYTH_GLSHADERSOURCE)
+        getProcAddress("glShaderSourceARB");
+    gMythGLCompileShader = (MYTH_GLCOMPILESHADER)
+        getProcAddress("glCompileShaderARB");
+    gMythGLCreateProgramObject = (MYTH_GLCREATEPROGRAMOBJECT)
+        getProcAddress("glCreateProgramObjectARB");
+    gMythGLAttachObject = (MYTH_GLATTACHOBJECT)
+        getProcAddress("glAttachObjectARB");
+    gMythGLLinkProgram = (MYTH_GLLINKPROGRAM)
+        getProcAddress("glLinkProgramARB");
+    gMythGLUseProgram = (MYTH_GLUSEPROGRAM)
+        getProcAddress("glUseProgramObjectARB");
+    gMythGLInfoLog = (MYTH_GLGETINFOLOG)
+        getProcAddress("glGetInfoLogARB");
+    gMythGLGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIV)
+        getProcAddress("glGetObjectParameterivARB");
+    gMythGLDetachObject = (MYTH_GLDETACHOBJECT)
+        getProcAddress("glDetachObjectARB");
+    gMythGLDeleteObject = (MYTH_GLDELETEOBJECT)
+        getProcAddress("glDeleteObjectARB");
+    gMythGLGetUniformLocation = (MYTH_GLGETUNIFORMLOCATION)
+        getProcAddress("glGetUniformLocationARB");
+    gMythGLUniform4f = (MYTH_GLUNIFORM4F)
+        getProcAddress("glUniform4fARB");
 }
 
 void MythRenderOpenGL::InitFeatures(void)
@@ -1251,6 +1277,18 @@ void MythRenderOpenGL::InitFeatures(void)
         gMythGLProgramStringARB && gMythGLDeleteProgramsARB &&
         gMythGLGetProgramivARB  && gMythGLProgramEnvParameter4fARB)
         m_exts_supported += kGLExtFragProg;
+
+    if (m_extensions.contains("GL_ARB_shader_objects") &&
+        m_extensions.contains("GL_ARB_vertex_shader") &&
+        m_extensions.contains("GL_ARB_fragment_shader") &&
+        gMythGLShaderSource  && gMythGLCreateShaderObject &&
+        gMythGLCompileShader && gMythGLCreateProgramObject &&
+        gMythGLAttachObject  && gMythGLLinkProgram &&
+        gMythGLUseProgram    && gMythGLInfoLog &&
+        gMythGLDetachObject  && gMythGLGetObjectParameteriv &&
+        gMythGLDeleteObject  && gMythGLGetUniformLocation &&
+        gMythGLUniform4f)
+        m_exts_supported += kGLSL;
 
     if (m_extensions.contains("GL_EXT_framebuffer_object") &&
         gMythGLGenFramebuffersEXT      && gMythGLBindFramebufferEXT &&
@@ -1365,6 +1403,19 @@ void MythRenderOpenGL::ResetProcs(void)
     gMythGLDeleteFencesAPPLE = NULL;
     gMythGLSetFenceAPPLE = NULL;
     gMythGLFinishFenceAPPLE = NULL;
+    gMythGLCreateShaderObject = NULL;
+    gMythGLShaderSource = NULL;
+    gMythGLCompileShader = NULL;
+    gMythGLCreateProgramObject = NULL;
+    gMythGLAttachObject = NULL;
+    gMythGLLinkProgram = NULL;
+    gMythGLUseProgram = NULL;
+    gMythGLInfoLog = NULL;
+    gMythGLGetObjectParameteriv = NULL;
+    gMythGLDetachObject = NULL;
+    gMythGLDeleteObject = NULL;
+    gMythGLGetUniformLocation = NULL;
+    gMythGLUniform4f = NULL;
 }
 
 uint MythRenderOpenGL::CreatePBO(uint tex)
