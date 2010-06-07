@@ -30,24 +30,23 @@
 #-------------------------------------
 __title__ ="GiantBomb Query";
 __author__="R.D. Vaughan"
-__version__="v0.10"
+__version__="v0.11"
 # 0.10  Initial development
+# 0.11  Added the -l option to conform to grabber standards. Currently www.giantbomb.com does not support
+#       multiple languages.
 
 
 __usage_examples__='''
 Request giantbomb.py verison number:
 > ./giantbomb.py -v
-GiantBomb Query (v0.10) by R.D. Vaughan
 <grabber>
   <name>GiantBomb Query</name>
   <author>R.D. Vaughan</author>
   <thumbnail>giantbomb.png</thumbnail>
   <command>giantbomb.py</command>
   <type>games</type>
-  <description>Search and Metadata downloads for Games</description>
-  <version>v0.10</version>
-  <search>true</search>
-  <data>true</data>
+  <description>Search and Metadata downloads for Games from the giantbomb.com API</description>
+  <version>v0.11</version>
 </grabber>
 
 Request a list of matching game titles:
@@ -203,7 +202,7 @@ def main():
     # api.giantbomb.com api key provided for Mythtv
     apikey = "b5883a902a8ed88b15ce21d07787c94fd6ad9f33"
 
-    parser = OptionParser(usage=u"%prog usage: giantbomb -hduvMD [parameters]\n <game name or gameid number>\n\nFor details on using giantbomb from the command execute './giantbomb.py -u'. For details on the meaning of the XML element tags see the wiki page at:\nhttp://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format")
+    parser = OptionParser(usage=u"%prog usage: giantbomb -hdluvMD [parameters]\n <game name or gameid number>\n\nFor details on using giantbomb from the command execute './giantbomb.py -u'. For details on the meaning of the XML element tags see the wiki page at:\nhttp://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format")
 
     parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
                         help=u"Show debugging info")
@@ -211,6 +210,8 @@ def main():
                         help=u"Display examples for executing the giantbomb script")
     parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
                         help=u"Display version and author")
+    parser.add_option(  "-l", "--language", metavar="LANGUAGE", default=u'en', dest="language",
+                        help=u"Select data that matches the specified language. At this time giantbomb.com only supports 'en' English.")
     parser.add_option(  "-M", "--gamelist", action="store_true", default=False, dest="gamelist",
                         help=u"Get matching Movie list")
     parser.add_option(  "-D", "--gamedata", action="store_true", default=False, dest="gamedata",
