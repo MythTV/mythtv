@@ -8765,8 +8765,14 @@ void TV::ToggleRecord(PlayerContext *ctx)
         if (recinfo.IsVideoFile() &&
             recinfo.GetPathname() != recinfo.GetBasename())
         {
-            infoMap["coverartpath"] = VideoMetaDataUtil::GetCoverArtPath(
-                recinfo.GetPathname());
+            infoMap["coverartpath"] = VideoMetaDataUtil::GetArtPath(
+                recinfo.GetPathname(), "Coverart");
+            infoMap["fanartpath"] = VideoMetaDataUtil::GetArtPath(
+                recinfo.GetPathname(), "Fanart");
+            infoMap["bannerpath"] = VideoMetaDataUtil::GetArtPath(
+                recinfo.GetPathname(), "Banners");
+            infoMap["screenshotpath"] = VideoMetaDataUtil::GetArtPath(
+                recinfo.GetPathname(), "Screenshots");
         }
 
         OSD *osd = GetOSDLock(ctx);

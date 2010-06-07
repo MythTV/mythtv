@@ -10,7 +10,7 @@
 class MPUBLIC VideoMetaDataUtil
 {
   public:
-    static QString GetCoverArtPath(const QString &pathname);
+    static QString GetArtPath(const QString &basename, const QString &type);
 };
 
 #endif // _VIDEO_META_DATA_UTIL_H_

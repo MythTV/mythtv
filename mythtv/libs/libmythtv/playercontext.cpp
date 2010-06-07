@@ -737,8 +737,14 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
         if (playingInfo->IsVideoFile() &&
             playingInfo->GetPathname() != playingInfo->GetBasename())
         {
-            infoMap["coverartpath"] = VideoMetaDataUtil::GetCoverArtPath(
-                playingInfo->GetPathname());
+            infoMap["coverartpath"] = VideoMetaDataUtil::GetArtPath(
+                playingInfo->GetPathname(), "Coverart");
+            infoMap["fanartpath"] = VideoMetaDataUtil::GetArtPath(
+                playingInfo->GetPathname(), "Fanart");
+            infoMap["bannerpath"] = VideoMetaDataUtil::GetArtPath(
+                playingInfo->GetPathname(), "Banners");
+            infoMap["screenshotpath"] = VideoMetaDataUtil::GetArtPath(
+                playingInfo->GetPathname(), "Screenshots");
         }
         infoMap.detach();
         loaded = true;
