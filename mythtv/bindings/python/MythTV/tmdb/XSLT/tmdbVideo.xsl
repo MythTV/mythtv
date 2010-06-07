@@ -120,9 +120,7 @@
                                     </xsl:if>
                                     <xsl:if test="@thumb != ''">
                                         <xsl:attribute name="thumb"><xsl:value-of select="normalize-space(@thumb)"/></xsl:attribute>
-                                    </xsl:if>
-                                    <xsl:if test="@url != ''">
-                                        <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>
+                                        <xsl:attribute name="url"><xsl:value-of select="normalize-space(tmdbXpath:replaceText(@thumb, 'thumb', 'profile'))"/></xsl:attribute>
                                     </xsl:if>
                                     <xsl:if test="@department != ''">
                                         <xsl:attribute name="department"><xsl:value-of select="normalize-space(@department)"/></xsl:attribute>

@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.2.4"
+__version__="v0.2.5"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -39,6 +39,8 @@ __version__="v0.2.4"
 # 0.2.2 Fixed a bug with XSLT title and subtitle.
 # 0.2.3 Added encoding XML declaration "<?xml version='1.0' encoding='UTF-8'?>" to output
 # 0.2.4 Added width and height attributes to images
+# 0.2.5 Added a replace text XPatch extention so that "person" full size images can be created from
+#       the thumbnail.
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -1032,6 +1034,14 @@ class MovieDb(object):
         return imageList
     # end makeImageElements()
 
+    def replaceText(self, context, *inputArgs):
+        '''Replace text in a string
+        return the text after a replace was performed
+        '''
+        text = inputArgs[0][0]
+        return text.replace(inputArgs[1], inputArgs[2])
+    # end replaceText()
+
     def buildFuncDict(self):
         """ Build a dictionary of the XPath extention function for the XSLT stylesheets
         Returns nothing
@@ -1043,6 +1053,7 @@ class MovieDb(object):
             'translateName': self.translateName,
             'makeImageElements': self.makeImageElements,
             'titleElement': self.titleElement,
+            'replaceText': self.replaceText,
             }
         return
     # end buildFuncDict()
