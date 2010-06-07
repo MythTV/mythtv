@@ -75,7 +75,7 @@ class MPUBLIC CC608Reader
                          int replace = 0, int scroll = 0,
                          bool scroll_prsv = false,
                          int scroll_yoff = 0, int scroll_ymax = 15);
-    int  NumInputBuffers(void);
+    int  NumInputBuffers(bool need_to_lock = true);
 
     NuppelVideoPlayer *m_parent;
     bool     m_enabled;

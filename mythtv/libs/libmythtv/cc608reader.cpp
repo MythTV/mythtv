@@ -32,9 +32,8 @@ CC608Reader::~CC608Reader()
 
 void CC608Reader::FlushTxtBuffers(void)
 {
-    m_inputBufLock.lock();
+    QMutexLocker locker(&m_inputBufLock);
     m_readPosition = m_writePosition;
-    m_inputBufLock.unlock();
 }
 
 CC608Buffer* CC608Reader::GetOutputText(bool &changed)
@@ -91,10 +90,9 @@ CC608Buffer* CC608Reader::GetOutputText(bool &changed)
             changed = true;
         }
 
-        m_inputBufLock.lock();
+        QMutexLocker locker(&m_inputBufLock);
         if (m_writePosition != m_readPosition)
             m_writePosition = (m_writePosition + 1) % MAXTBUFFER;
-        m_inputBufLock.unlock();
     }
 
     m_changed = false;
@@ -269,9 +267,10 @@ void CC608Reader::TranscodeWriteText(void (*func)
                                     (void *, unsigned char *, int, int, int),
                                      void * ptr)
 {
-
-    while (NumInputBuffers())
+    QMutexLocker locker(&m_inputBufLock);
+    while (NumInputBuffers(false))
     {
+        locker.unlock();
         int pagenr = 0;
         unsigned char *inpos = m_inputBuffers[m_readPosition].buffer;
         if (m_inputBuffers[m_readPosition].type == 'T')
@@ -282,9 +281,9 @@ void CC608Reader::TranscodeWriteText(void (*func)
         }
         func(ptr, inpos, m_inputBuffers[m_readPosition].len,
              m_inputBuffers[m_readPosition].timecode, pagenr);
-        m_inputBufLock.lock();
+
+        locker.relock();
         m_readPosition = (m_readPosition + 1) % MAXTBUFFER;
-        m_inputBufLock.unlock();
     }
 }
 
@@ -391,10 +390,10 @@ void CC608Reader::ClearBuffers(bool input, bool output)
             if (m_inputBuffers[i].buffer)
                 memset(m_inputBuffers[i].buffer, 0, m_maxTextSize);
         }
-        m_inputBufLock.lock();
+
+        QMutexLocker locker(&m_inputBufLock);
         m_readPosition  = 0;
         m_writePosition = 0;
-        m_inputBufLock.unlock();
     }
 
     if (output)
@@ -407,15 +406,21 @@ void CC608Reader::ClearBuffers(bool input, bool output)
     }
 }
 
-int CC608Reader::NumInputBuffers(void)
+int CC608Reader::NumInputBuffers(bool need_to_lock)
 {
     int ret;
-    m_inputBufLock.lock();
+
+    if (need_to_lock)
+        m_inputBufLock.lock();
+
     if (m_readPosition >= m_writePosition)
         ret = m_readPosition - m_writePosition;
     else
         ret = MAXTBUFFER - (m_writePosition - m_readPosition);
-    m_inputBufLock.unlock();
+
+    if (need_to_lock)
+        m_inputBufLock.unlock();
+
     return ret;
 }
 
@@ -437,7 +442,7 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
     if (len > m_maxTextSize)
         len = m_maxTextSize;
 
-    m_inputBufLock.lock();
+    QMutexLocker locker(&m_inputBufLock);
     int prev_readpos = (m_readPosition - 1 + MAXTBUFFER) % MAXTBUFFER;
     /* Check whether the reader appears to be waiting on a caption
        whose timestamp is too large.  We can guess this is the case
@@ -446,7 +451,7 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
        Note that even if the text buffer is full, the entry at index
        m_readPosition-1 should still be valid.
     */
-    if (NumInputBuffers() > 0 &&
+    if (NumInputBuffers(false) > 0 &&
         m_inputBuffers[m_readPosition].timecode > timecode &&
         timecode > m_inputBuffers[prev_readpos].timecode)
     {
@@ -470,5 +475,4 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
     memcpy(m_inputBuffers[m_readPosition].buffer, buffer, len);
 
     m_readPosition = (m_readPosition+1) % MAXTBUFFER;
-    m_inputBufLock.unlock();
 }
