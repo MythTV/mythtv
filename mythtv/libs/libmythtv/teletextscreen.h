@@ -94,7 +94,7 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
 
   public:
     TeletextScreen(NuppelVideoPlayer *player, const char * name);
-   ~TeletextScreen();
+    virtual ~TeletextScreen();
 
     // MythScreenType methods
     virtual bool Create(void);
