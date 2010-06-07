@@ -59,7 +59,6 @@ using namespace std;
 #import <QuickTime/QuickTime.h>
 
 #include "osd.h"
-#include "osdsurface.h"
 #include "mythconfig.h"
 #include "mythverbose.h"
 #include "videodisplayprofile.h"
