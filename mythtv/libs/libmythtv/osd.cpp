@@ -158,7 +158,7 @@ void ChannelEditor::sendResult(int result, bool ok)
 
 OSD::OSD(NuppelVideoPlayer *player, QObject *parent)
   : m_parent(player), m_ParentObject(parent), m_Rect(QRect()),
-    m_Effects(true),  m_FadeTime(1000),       m_Dialog(NULL),
+    m_Effects(true),  m_FadeTime(kOSDFadeTime), m_Dialog(NULL),
     m_PulsedDialogText(QString()),            m_NextPulseUpdate(QDateTime()),
     m_Refresh(false),   m_UIScaleOverride(false),
     m_SavedWMult(1.0f), m_SavedHMult(1.0f),   m_SavedUIRect(QRect()),
@@ -658,7 +658,7 @@ void OSD::SetExpiry(MythScreenType *window, int time)
 {
     if (time > 0)
     {
-        QDateTime expires = QDateTime::currentDateTime().addSecs(time);
+        QDateTime expires = QDateTime::currentDateTime().addMSecs(time);
         m_ExpireTimes.insert(window, expires);
     }
     else if (time < 0)

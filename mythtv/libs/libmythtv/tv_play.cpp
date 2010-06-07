@@ -1575,7 +1575,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         if (osd)
         {
             BrowseEnd(ctx, false);
-            timeuntil = QDateTime::currentDateTime().secsTo((*it).expiry);
+            timeuntil = QDateTime::currentDateTime().secsTo((*it).expiry) * 1000;
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0",
                                  false, !((*it).has_rec));
@@ -1633,7 +1633,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         }
 
         bool all_have_later = true;
-        timeuntil = 9999;
+        timeuntil = 9999999;
         it = askAllowPrograms.begin();
         for (; it != askAllowPrograms.end(); ++it)
         {
@@ -1641,10 +1641,11 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             {
                 all_have_later &= (*it).has_later;
                 int tmp = QDateTime::currentDateTime().secsTo((*it).expiry);
+                tmp *= 1000;
                 timeuntil = min(timeuntil, max(tmp, 0));
             }
         }
-        timeuntil = (9999 == timeuntil) ? 0 : timeuntil;
+        timeuntil = (9999999 == timeuntil) ? 0 : timeuntil;
 
         OSD *osd = GetOSDLock(ctx);
         if (osd && conflict_count > 1)
@@ -8014,7 +8015,7 @@ void TV::ShowOSDSleep(void)
             "Do you wish to continue watching?")
             .arg(sleepTimerTimeout * (1.0f/60000.0f));
 
-        osd->DialogShow(OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout / 1000);
+        osd->DialogShow(OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout);
         osd->DialogAddButton(tr("Yes"), "DIALOG_SLEEP_YES_0");
         osd->DialogAddButton(tr("No"),  "DIALOG_SLEEP_NO_0");
     }
@@ -8079,7 +8080,7 @@ void TV::ShowOSDIdle(void)
             "will exit in %d seconds. Are you still watching?")
             .arg(db_idle_timeout * (1.0f/60000.0f));
 
-        osd->DialogShow(OSD_DLG_IDLE, message, kIdleTimerDialogTimeout / 1000);
+        osd->DialogShow(OSD_DLG_IDLE, message, kIdleTimerDialogTimeout);
         osd->DialogAddButton(tr("Yes"), "DIALOG_IDLE_YES_0");
         osd->DialogAddButton(tr("No"),  "DIALOG_IDLE_NO_0");
     }

@@ -23,6 +23,9 @@ struct AVSubtitle;
 #define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
 #define OSD_WIN_INTERACT  "OSD_INTERACTIVE"
 
+#define kOSDTimeout  5000
+#define kOSDFadeTime 1000
+
 class NuppelVideoPlayer;
 class TeletextScreen;
 class TeletextViewer;
@@ -172,7 +175,7 @@ class OSD
     void LoadWindows(void);
     void RemoveWindow(const QString &window);
     void CheckExpiry(void);
-    void SetExpiry(MythScreenType *window, int time = 5);
+    void SetExpiry(MythScreenType *window, int time = kOSDTimeout);
     void SendHideEvent(void);
 
   private:
