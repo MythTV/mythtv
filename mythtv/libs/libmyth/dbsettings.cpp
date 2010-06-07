@@ -193,7 +193,7 @@ MythDbSettings2::MythDbSettings2(void) :
     addChild(sub3);
 
     wolEnabled = new TransCheckBoxSetting();
-    wolEnabled->setLabel(QObject::tr("Enable Database Server Wakeup"));
+    wolEnabled->setLabel(QObject::tr("Enable database server wakeup"));
     wolEnabled->setHelpText(QObject::tr("If checked, the frontend will use "
                                         "database wakeup parameters to "
                                         "reconnect to the database server."));

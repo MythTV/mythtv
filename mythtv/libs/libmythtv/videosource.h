@@ -119,7 +119,7 @@ public:
    DataDirectLineupSelector(const VideoSource& parent) :
        ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "lineupid")
    {
-       setLabel(QObject::tr("Data Direct Lineup"));
+       setLabel(QObject::tr("Data Direct lineup"));
    };
 
  public slots:
@@ -356,7 +356,7 @@ class SingleCardInput : public TunerCardInput
   public:
     SingleCardInput(const CaptureCard &parent) : TunerCardInput(parent)
     {
-        setLabel(QObject::tr("Default Input"));
+        setLabel(QObject::tr("Default input"));
         addSelection("MPEG2TS");
         setVisible(false);
     }
@@ -752,7 +752,7 @@ class StartingChannel : public ComboBoxSetting, public CardInputDBStorage
         CardInputDBStorage(this, parent, "startchan")
     {
         setLabel(QObject::tr("Starting channel"));
-        setHelpText(QObject::tr("Starting LiveTV channel.") + " " +
+        setHelpText(QObject::tr("Starting Live TV channel.") + " " +
                     QObject::tr("This is updated on every successful "
                                 "channel change."));
     }

@@ -297,7 +297,7 @@ class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
     UseEIT(const VideoSource &parent) :
         CheckBoxSetting(this), VideoSourceDBStorage(this, parent, "useeit")
     {
-        setLabel(QObject::tr("Perform EIT Scan"));
+        setLabel(QObject::tr("Perform EIT scan"));
         setHelpText(QObject::tr(
                         "If this is enabled the data in this source will be "
                         "updated with listing data provided by the channels "
@@ -746,7 +746,7 @@ VideoSource::VideoSource()
     addChild(id = new ID());
 
     ConfigurationGroup *group = new VerticalConfigurationGroup(false, false);
-    group->setLabel(QObject::tr("Video source setup"));
+    group->setLabel(QObject::tr("Video Source Setup"));
     group->addChild(name = new Name(*this));
     group->addChild(xmltv = new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
@@ -992,7 +992,7 @@ class SignalTimeout : public SpinBoxSetting, public CaptureCardDBStorage
         SpinBoxSetting(this, min_val, 60000, 250),
         CaptureCardDBStorage(this, parent, "signal_timeout")
     {
-        setLabel(QObject::tr("Signal Timeout (msec)"));
+        setLabel(QObject::tr("Signal timeout (msec)"));
         setValue(value);
         setHelpText(QObject::tr(
                         "Maximum time MythTV waits for any signal when "
@@ -1007,12 +1007,12 @@ class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
         SpinBoxSetting(this, min_val, 65000, 250),
         CaptureCardDBStorage(this, parent, "channel_timeout")
     {
-        setLabel(QObject::tr("Tuning Timeout (msec)"));
+        setLabel(QObject::tr("Tuning timeout (msec)"));
         setValue(value);
         setHelpText(QObject::tr(
                         "Maximum time MythTV waits for a channel lock "
                         "when scanning for channels. Or, for issuing "
-                        "a warning in LiveTV mode."));
+                        "a warning in Live TV mode."));
     };
 };
 
@@ -1058,7 +1058,7 @@ class DVBInput : public ComboBoxSetting, public CaptureCardDBStorage
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "defaultinput")
     {
-        setLabel(QObject::tr("Default Input"));
+        setLabel(QObject::tr("Default input"));
         fillSelections(false);
     }
 
@@ -1076,7 +1076,7 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
-        setLabel(QObject::tr("DVB Device Number"));
+        setLabel(QObject::tr("DVB device number"));
         setHelpText(
             QObject::tr("When you change this setting, the text below "
                         "should change to the name and type of your card. "
@@ -1197,7 +1197,7 @@ class DVBEITScan : public CheckBoxSetting, public CaptureCardDBStorage
         CheckBoxSetting(this),
         CaptureCardDBStorage(this, parent, "dvb_eitscan")
     {
-        setLabel(QObject::tr("Use DVB Card for active EIT scan"));
+        setLabel(QObject::tr("Use DVB card for active EIT scan"));
         setValue(true);
         setHelpText(
             QObject::tr("This option activates the active scan for "
@@ -1213,7 +1213,7 @@ class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
         SpinBoxSetting(this, 0, 2000, 25),
         CaptureCardDBStorage(this, parent, "dvb_tuning_delay")
     {
-        setLabel(QObject::tr("DVB Tuning Delay (msec)"));
+        setLabel(QObject::tr("DVB tuning delay (msec)"));
         setHelpText(
             QObject::tr("Some Linux DVB drivers, in particular for the "
                         "Hauppauge Nova-T, require that we slow down "
@@ -1492,7 +1492,7 @@ HDHomeRunDeviceIDList::HDHomeRunDeviceIDList(
     _cardtuner(cardtuner),
     _devicelist(devicelist)
 {
-    setLabel(QObject::tr("Available Devices"));
+    setLabel(QObject::tr("Available devices"));
     setHelpText(
         QObject::tr(
             "DevicedID and Tuner Number of available HDHomeRun devices."));
@@ -2218,10 +2218,10 @@ void CardType::fillSelections(SelectSetting* setting)
 #endif // USING_HDHOMERUN
 
 #ifdef USING_IPTV
-    setting->addSelection(QObject::tr("Network Recorder"), "FREEBOX");
+    setting->addSelection(QObject::tr("Network recorder"), "FREEBOX");
 #endif // USING_IPTV
 
-    setting->addSelection(QObject::tr("Import Recorder"), "IMPORT");
+    setting->addSelection(QObject::tr("Import recorder"), "IMPORT");
 }
 
 class CardID : public SelectLabelSetting, public CardInputDBStorage
@@ -2251,7 +2251,7 @@ class InputDisplayName : public LineEditSetting, public CardInputDBStorage
         LineEditSetting(this),
         CardInputDBStorage(this, parent, "displayname")
     {
-        setLabel(QObject::tr("Display Name (optional)"));
+        setLabel(QObject::tr("Display name (optional)"));
         setHelpText(QObject::tr(
                         "This name is displayed on screen when live TV begins "
                         "and when changing the selected input or card. If you "
@@ -2300,7 +2300,7 @@ class InputGroup : public TransComboBoxSetting
         TransComboBoxSetting(false), cardinput(parent),
         groupnum(group_num), groupid(0)
     {
-        setLabel(QObject::tr("Input Group") +
+        setLabel(QObject::tr("Input group") +
                  QString(" %1").arg(groupnum + 1));
         setHelpText(QObject::tr(
                         "Leave as 'Generic' unless this input is shared with "
@@ -2519,7 +2519,7 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
         CheckBoxSetting(this),
         CardInputDBStorage(this, parent, "dishnet_eit")
     {
-        setLabel(QObject::tr("Use DishNet Long-term EIT Data"));
+        setLabel(QObject::tr("Use DishNet long-term EIT data"));
         setValue(false);
         setHelpText(
             QObject::tr(

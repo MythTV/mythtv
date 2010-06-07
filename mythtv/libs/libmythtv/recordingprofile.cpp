@@ -87,10 +87,10 @@ class MP3Quality : public SliderSetting, public CodecParamStorage
         SliderSetting(this, 1, 9, 1),
         CodecParamStorage(this, parent, "mp3quality")
     {
-        setLabel(QObject::tr("MP3 Quality"));
+        setLabel(QObject::tr("MP3 quality"));
         setValue(7);
         setHelpText(QObject::tr("The higher the slider number, the lower the "
-                    "quality of the audio.  Better quality audio (lower "
+                    "quality of the audio. Better quality audio (lower "
                     "numbers) requires more CPU."));
     };
 };
@@ -104,7 +104,7 @@ class BTTVVolume : public SliderSetting, public CodecParamStorage
     {
        setLabel(QObject::tr("Volume (%)"));
        setValue(90);
-       setHelpText(QObject::tr("Recording volume of the capture card"));
+       setHelpText(QObject::tr("Recording volume of the capture card."));
     };
 };
 
@@ -524,7 +524,7 @@ class MPEG4bitrate : public SliderSetting, public CodecParamStorage
         setLabel(QObject::tr("Bitrate"));
         setValue(2200);
         setHelpText(QObject::tr("Bitrate in kilobits/second.  2200Kbps is "
-                    "approximately 1 Gigabyte per hour."));
+                    "approximately 1 gigabyte per hour."));
     };
 };
 
@@ -538,7 +538,7 @@ class ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
         setLabel(QObject::tr("Scale bitrate for frame size"));
         setValue(true);
         setHelpText(QObject::tr("If set, the bitrate specified will be used "
-                    "for 640x480.  If other resolutions are used, the "
+                    "for 640x480. If other resolutions are used, the "
                     "bitrate will be scaled appropriately."));
     };
 };
@@ -597,7 +597,7 @@ class MPEG4OptionIDCT : public CheckBoxSetting, public CodecParamStorage
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
                     "interlaced DCT encoding. You may want this when encoding "
-                    "interlaced video, however, this is experimental and may "
+                    "interlaced video; however, this is experimental and may "
                     "cause damaged video."));
     };
 };
@@ -613,7 +613,7 @@ class MPEG4OptionIME : public CheckBoxSetting, public CodecParamStorage
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
                     "interlaced motion estimation. You may want this when "
-                    "encoding interlaced video, however, this is experimental "
+                    "encoding interlaced video; however, this is experimental "
                     "and may cause damaged video."));
     };
 };
@@ -628,7 +628,7 @@ class MPEG4OptionVHQ : public CheckBoxSetting, public CodecParamStorage
         setLabel(QObject::tr("Enable high-quality encoding"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
-                    "'high-quality' encoding options.  This requires much "
+                    "'high-quality' encoding options. This requires much "
                     "more processing, but can result in better video."));
     };
 };
@@ -961,7 +961,7 @@ class TranscodeResize : public CheckBoxSetting, public CodecParamStorage
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "transcoderesize")
     {
-        setLabel(QObject::tr("Resize Video while transcoding"));
+        setLabel(QObject::tr("Resize video while transcoding"));
         setValue(false);
         setHelpText(QObject::tr("Allows the transcoder to "
                                 "resize the video during transcoding."));
@@ -1015,7 +1015,7 @@ class TranscodeFilters : public LineEditSetting, public CodecParamStorage
         LineEditSetting(this),
         CodecParamStorage(this, parent, "transcodefilters")
     {
-        setLabel(QObject::tr("Custom Filters"));
+        setLabel(QObject::tr("Custom filters"));
         setHelpText(QObject::tr("Filters used when transcoding with this "
                                 "profile. This value must be blank to perform "
                                 "lossless transcoding.  Format: "
