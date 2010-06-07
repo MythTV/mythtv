@@ -209,7 +209,7 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
 
     QString def_cmd = QDir::cleanPath(QString("%1/%2")
         .arg(GetShareDir())
-        .arg("mythgame/scripts/giantbomb.py"));
+        .arg("metadata/Game/giantbomb.py"));
 
     QString cmd = gCoreContext->GetSetting("mythgame.MetadataGrabber", def_cmd);
 
