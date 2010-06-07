@@ -526,6 +526,8 @@ class Program( DictData ):
         if type != 'r':
             raise MythFileError(MythError.FILE_FAILED_WRITE, self.filename, 
                             'Program () objects cannot be opened for writing')
+        if not self.filename.startswith('myth://'):
+            self.filename = 'myth://%s/%s' % (self.hostname, self.filename)
         return ftopen(self.filename, 'r')
 
 class Record( DBDataWrite ):
