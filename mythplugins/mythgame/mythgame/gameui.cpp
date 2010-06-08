@@ -1150,21 +1150,21 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     QString system = metadata->System();
     QString title = metadata->Gamename();
 
-    if (metadata->Boxart().isEmpty())
+    if (metadata->Boxart().isEmpty() && coverart.size())
     {
         ArtworkInfo info;
         info.url = coverart.takeAt(0).trimmed();
         map.insert(COVERART, info);
     }
 
-    if (metadata->Fanart().isEmpty())
+    if (metadata->Fanart().isEmpty() && fanart.size())
     {
         ArtworkInfo info;
         info.url = fanart.takeAt(0).trimmed();
         map.insert(FANART, info);
     }
 
-    if (metadata->Screenshot().isEmpty())
+    if (metadata->Screenshot().isEmpty() && screenshot.size())
     {
         ArtworkInfo info;
         info.url = screenshot.takeAt(0).trimmed();
