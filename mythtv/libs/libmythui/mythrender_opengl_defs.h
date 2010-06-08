@@ -95,6 +95,19 @@
 #define GL_UNSIGNED_SHORT_8_8_MESA        0x85BA
 #endif
 
+#ifndef GL_FRAGMENT_SHADER
+#define GL_FRAGMENT_SHADER                0x8B30
+#endif
+#ifndef GL_VERTEX_SHADER
+#define GL_VERTEX_SHADER                  0x8B31
+#endif
+#ifndef GL_OBJECT_LINK_STATUS_ARB
+#define GL_OBJECT_LINK_STATUS_ARB         0x8B82
+#endif
+#ifndef GL_OBJECT_INFO_LOG_LENGTH_ARB
+#define GL_OBJECT_INFO_LOG_LENGTH_ARB     0x8B84
+#endif
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif

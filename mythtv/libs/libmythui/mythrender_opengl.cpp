@@ -13,6 +13,23 @@
 MYTH_GLXGETVIDEOSYNCSGIPROC  MythRenderOpenGL::gMythGLXGetVideoSyncSGI  = NULL;
 MYTH_GLXWAITVIDEOSYNCSGIPROC MythRenderOpenGL::gMythGLXWaitVideoSyncSGI = NULL;
 
+static const QString kDefaultVertexShader =
+"#version 140\n"
+"uniform Transformation {\n"
+"    mat4 projection_matrix;\n"
+"    mat4 modelview_matrix;\n"
+"};\n"
+"in vec3 vertex;\n"
+"void main() {\n"
+"    gl_Position = projection_matrix * modelview_matrix * vec4(vertex, 1.0);\n"
+"}\n";
+
+static const QString kDefaultFragmentShader =
+"void main(void)\n"
+"{\n"
+"    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
+"}\n";
+
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 {
     int error = glGetError();
@@ -26,6 +43,18 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 }
 
 #define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
+
+class MythGLShaderObject
+{
+  public:
+    MythGLShaderObject(uint vert, uint frag)
+      : m_vertex_shader(vert), m_fragment_shader(frag) { }
+    MythGLShaderObject()
+      : m_vertex_shader(0), m_fragment_shader(0) { }
+
+    GLuint m_vertex_shader;
+    GLuint m_fragment_shader;
+};
 
 class MythGLTexture
 {
@@ -913,6 +942,80 @@ void MythRenderOpenGL::EnableFragmentProgram(int fp)
     doneCurrent();
 }
 
+uint MythRenderOpenGL::CreateShaderObject(const QString &vertex,
+                                          const QString &fragment)
+{
+    if (!m_exts_supported & kGLSL)
+        return 0;
+
+    OpenGLLocker locker(this);
+
+    uint result = 0;
+    QString vert_shader = vertex.isEmpty() ? kDefaultVertexShader : vertex;
+    QString frag_shader = fragment.isEmpty() ? kDefaultFragmentShader: fragment;
+    vert_shader.detach();
+    frag_shader.detach();
+
+    result = gMythGLCreateProgramObject();
+    if (!result)
+        return 0;
+
+    MythGLShaderObject object(CreateShader(GL_VERTEX_SHADER, vert_shader),
+                              CreateShader(GL_FRAGMENT_SHADER, frag_shader));
+    m_shader_objects.insert(result, object);
+
+    if (!ValidateShaderObject(result))
+    {
+        DeleteShaderObject(result);
+        return 0;
+    }
+
+    return result;
+}
+
+void MythRenderOpenGL::DeleteShaderObject(uint obj)
+{
+    if (!m_shader_objects.contains(obj))
+        return;
+
+    makeCurrent();
+
+    GLuint vertex   = m_shader_objects[obj].m_vertex_shader;
+    GLuint fragment = m_shader_objects[obj].m_fragment_shader;
+    gMythGLDetachObject(obj, vertex);
+    gMythGLDetachObject(obj, fragment);
+    gMythGLDeleteObject(vertex);
+    gMythGLDeleteObject(fragment);
+    gMythGLDeleteObject(obj);
+    m_shader_objects.remove(obj);
+
+    Flush(true);
+    doneCurrent();
+}
+
+void MythRenderOpenGL::EnableShaderObject(uint obj)
+{
+    if (obj == m_active_obj)
+        return;
+
+    if (!obj && m_active_obj)
+    {
+        makeCurrent();
+        gMythGLUseProgram(0);
+        m_active_obj = 0;
+        doneCurrent();
+        return;
+    }
+
+    if (!m_shader_objects.contains(obj))
+        return;
+
+    makeCurrent();
+    gMythGLUseProgram(obj);
+    m_active_obj = obj;
+    doneCurrent();
+}
+
 void MythRenderOpenGL::DrawBitmap(uint tex, uint target, const QRect *src,
                                   const QRect *dst, uint prog, int alpha,
                                   int red, int green, int blue)
@@ -1225,7 +1328,7 @@ void MythRenderOpenGL::InitProcs(void)
         getProcAddress("glLinkProgramARB");
     gMythGLUseProgram = (MYTH_GLUSEPROGRAM)
         getProcAddress("glUseProgramObjectARB");
-    gMythGLInfoLog = (MYTH_GLGETINFOLOG)
+    gMythGLGetInfoLog = (MYTH_GLGETINFOLOG)
         getProcAddress("glGetInfoLogARB");
     gMythGLGetObjectParameteriv = (MYTH_GLGETOBJECTPARAMETERIV)
         getProcAddress("glGetObjectParameterivARB");
@@ -1284,7 +1387,7 @@ void MythRenderOpenGL::InitFeatures(void)
         gMythGLShaderSource  && gMythGLCreateShaderObject &&
         gMythGLCompileShader && gMythGLCreateProgramObject &&
         gMythGLAttachObject  && gMythGLLinkProgram &&
-        gMythGLUseProgram    && gMythGLInfoLog &&
+        gMythGLUseProgram    && gMythGLGetInfoLog &&
         gMythGLDetachObject  && gMythGLGetObjectParameteriv &&
         gMythGLDeleteObject  && gMythGLGetUniformLocation &&
         gMythGLUniform4f)
@@ -1363,6 +1466,7 @@ void MythRenderOpenGL::ResetVars(void)
     m_active_tex      = 0;
     m_active_tex_type = 0;
     m_active_prog     = 0;
+    m_active_obj      = 0;
     m_active_fb       = 0;
     m_blend           = false;
     m_color           = 0x00000000;
@@ -1410,7 +1514,7 @@ void MythRenderOpenGL::ResetProcs(void)
     gMythGLAttachObject = NULL;
     gMythGLLinkProgram = NULL;
     gMythGLUseProgram = NULL;
-    gMythGLInfoLog = NULL;
+    gMythGLGetInfoLog = NULL;
     gMythGLGetObjectParameteriv = NULL;
     gMythGLDetachObject = NULL;
     gMythGLDeleteObject = NULL;
@@ -1447,6 +1551,7 @@ void MythRenderOpenGL::DeleteOpenGLResources(void)
     DeletePrograms();
     DeleteTextures();
     DeleteFrameBuffers();
+    DeleteShaderObjects();
     Flush(true);
 
     if (m_fence)
@@ -1492,6 +1597,71 @@ void MythRenderOpenGL::DeleteFrameBuffers(void)
         gMythGLDeleteFramebuffersEXT(1, &(*(it)));
     m_framebuffers.clear();
     Flush(true);
+}
+
+void MythRenderOpenGL::DeleteShaderObjects(void)
+{
+    QHash<GLuint, MythGLShaderObject>::iterator it;
+    for (it = m_shader_objects.begin(); it != m_shader_objects.end(); ++it)
+    {
+        GLuint object   = it.key();
+        GLuint vertex   = it.value().m_vertex_shader;
+        GLuint fragment = it.value().m_fragment_shader;
+        gMythGLDetachObject(object, vertex);
+        gMythGLDetachObject(object, fragment);
+        gMythGLDeleteObject(vertex);
+        gMythGLDeleteObject(fragment);
+        gMythGLDeleteObject(object);
+    }
+    m_shader_objects.clear();
+    Flush(true);
+}
+
+uint MythRenderOpenGL::CreateShader(int type, const QString source)
+{
+    uint result = gMythGLCreateShaderObject(type);
+    QByteArray src = source.toAscii();
+    const char* tmp[1] = { src.constData() };
+    gMythGLShaderSource(result, 1, tmp, NULL);
+    gMythGLCompileShader(result);
+    return result;
+}
+
+bool MythRenderOpenGL::ValidateShaderObject(uint obj)
+{
+    if (!m_shader_objects.contains(obj))
+        return false;
+    if (!m_shader_objects[obj].m_fragment_shader ||
+        !m_shader_objects[obj].m_vertex_shader)
+        return false;
+
+    gMythGLAttachObject(obj, m_shader_objects[obj].m_fragment_shader);
+    gMythGLAttachObject(obj, m_shader_objects[obj].m_vertex_shader);
+    gMythGLLinkProgram(obj);
+    return CheckObjectStatus(obj);
+}
+
+bool MythRenderOpenGL::CheckObjectStatus(uint obj)
+{
+    int ok;
+    gMythGLGetObjectParameteriv(obj, GL_OBJECT_LINK_STATUS_ARB, &ok);
+    if (ok > 0)
+        return true;
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to link shader object."));
+    int infologLength = 0;
+    int charsWritten  = 0;
+    char *infoLog;
+    gMythGLGetObjectParameteriv(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+                                &infologLength);
+    if (infologLength > 0)
+    {
+        infoLog = (char *)malloc(infologLength);
+        gMythGLGetInfoLog(obj, infologLength, &charsWritten, infoLog);
+        VERBOSE(VB_IMPORTANT, QString("\n\n%1").arg(infoLog));
+        free(infoLog);
+    }
+    return false;
 }
 
 bool MythRenderOpenGL::ClearTexture(uint tex)

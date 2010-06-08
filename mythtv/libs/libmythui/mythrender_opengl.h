@@ -45,6 +45,7 @@ typedef enum
 } GLFeatures;
 
 class MythGLTexture;
+class MythGLShaderObject;
 class MythRenderOpenGL;
 
 class OpenGLLocker
@@ -108,6 +109,10 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     void DeleteFragmentProgram(uint prog);
     void EnableFragmentProgram(int fp);
 
+    uint CreateShaderObject(const QString &vert, const QString &frag);
+    void DeleteShaderObject(uint obj);
+    void EnableShaderObject(uint obj);
+
     void DrawBitmap(uint tex, uint target, const QRect *src, const QRect *dst,
                     uint prog, int alpha = 255, int red = 255, int green = 255,
                     int blue = 255);
@@ -135,7 +140,12 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     void DeleteOpenGLResources(void);
     void DeleteTextures(void);
     void DeletePrograms(void);
+    void DeleteShaderObjects(void);
     void DeleteFrameBuffers(void);
+
+    uint CreateShader(int type, const QString source);
+    bool ValidateShaderObject(uint obj);
+    bool CheckObjectStatus(uint obj);
 
     bool ClearTexture(uint tex);
     uint GetBufferSize(QSize size, uint fmt, uint type);
@@ -145,6 +155,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     // GL resources
     QHash<int, float>            m_attribs;
     QHash<GLuint, MythGLTexture> m_textures;
+    QHash<GLuint, MythGLShaderObject> m_shader_objects;
     QVector<GLuint>              m_programs;
     QVector<GLuint>              m_framebuffers;
     GLuint                       m_fence;
@@ -164,6 +175,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     int      m_active_tex;
     int      m_active_tex_type;
     int      m_active_prog;
+    uint     m_active_obj;
     int      m_active_fb;
     bool     m_blend;
     uint32_t m_color;
@@ -216,7 +228,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     MYTH_GLATTACHOBJECT                  gMythGLAttachObject;
     MYTH_GLLINKPROGRAM                   gMythGLLinkProgram;
     MYTH_GLUSEPROGRAM                    gMythGLUseProgram;
-    MYTH_GLGETINFOLOG                    gMythGLInfoLog;
+    MYTH_GLGETINFOLOG                    gMythGLGetInfoLog;
     MYTH_GLGETOBJECTPARAMETERIV          gMythGLGetObjectParameteriv;
     MYTH_GLDETACHOBJECT                  gMythGLDetachObject;
     MYTH_GLDELETEOBJECT                  gMythGLDeleteObject;
