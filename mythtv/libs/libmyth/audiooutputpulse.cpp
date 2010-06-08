@@ -554,9 +554,16 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     else
         pa_cvolume_reset(&volume_control, audio_channels);
 
-    // set myth sizes and pa buffer metrics
-    fragment_size = (float)sample_rate * 0.020f * // 20msec
-        (float)(audio_bits / 8 * audio_channels);
+    // set myth sizes and pa buffer metrics (20 ms)
+    // Note: The 20 is an unsigned long (at least 32 bits).
+    // sample_rate, audio_bits and audio_channels are at least
+    // that size, so the math will be done with a range of at
+    // least 2 billion. If we assume a max audio_bits of 32,
+    // audio_channels of 16 and sample_rate of <= 448000, then
+    // the largest number will be 230 million, well within range.
+    fragment_size = 20UL * sample_rate * audio_bits * audio_channels
+        / 8 /* 8 bits per byte */ / 1000 /* 1000 ms per second */;
+
     soundcard_buffer_size = 16 * fragment_size;
     buffer_settings.maxlength = soundcard_buffer_size;
     buffer_settings.tlength = fragment_size * 4;
