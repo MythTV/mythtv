@@ -27,7 +27,7 @@ static MythFontManager *gFontManager = NULL;
 void MythFontManager::LoadFonts(const QString &directory,
                                 const QString &registeredFor)
 {
-    if (directory.isEmpty() || registeredFor.isEmpty())
+    if (directory.isEmpty() || directory == "/" || registeredFor.isEmpty())
         return;
 
     // Load the font files from this directory
@@ -107,7 +107,7 @@ void MythFontManager::ReleaseFonts(const QString &registeredFor)
 void MythFontManager::LoadFontsFromDirectory(const QString &directory,
                                              const QString &registeredFor)
 {
-    if (directory.isEmpty() || registeredFor.isEmpty())
+    if (directory.isEmpty() || directory == "/" || registeredFor.isEmpty())
         return;
 
     VERBOSE(VB_FILE|VB_EXTRA, LOC +
@@ -132,7 +132,7 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
 void MythFontManager::LoadFontFile(const QString &fontPath,
                                    const QString &registeredFor)
 {
-    if (fontPath.isEmpty() || registeredFor.isEmpty())
+    if (fontPath.isEmpty() || fontPath == "/" || registeredFor.isEmpty())
         return;
 
     QMutexLocker locker(&m_lock);
