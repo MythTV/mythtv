@@ -712,7 +712,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname) :
         LoadProgramFromRecorded(_chanid, recstartts))
     {
         return;
-    }   
+    }
 
     clear();
 
@@ -1816,7 +1816,7 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
     if (title != other.title)
         return false;
-    if (startts == other.startts && 
+    if (startts == other.startts &&
         (chanid == other.chanid ||
          (!chansign.isEmpty() && chansign == other.chansign)))
         return true;
@@ -2308,7 +2308,7 @@ void ProgramInfo::SaveWatched(bool watched)
                     " AND subtitle = :SUBTITLE"
                     " AND filename = :FILENAME ;");
         query.bindValue(":TITLE", title);
-        query.bindValue(":SUBTITLE", subtitle); 
+        query.bindValue(":SUBTITLE", subtitle);
         query.bindValue(":FILENAME", url);
         query.bindValue(":WATCHEDFLAG", watched);
 
@@ -2444,6 +2444,10 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
                 usageStr = QObject::tr("Commercial Detection");
             else if (recusage == kTranscoderInUseID)
                 usageStr = QObject::tr("Transcoding");
+            else if (recusage == kPreviewGeneratorInUseID)
+                usageStr = QObject::tr("Preview Generation");
+            else if (recusage == kJobQueueInUseID)
+                usageStr = QObject::tr("User Job");
 
             byWho.push_back(recusage);
             byWho.push_back(query.value(0).toString());
@@ -2476,7 +2480,7 @@ bool ProgramInfo::QueryIsInUse(QString &byWho) const
  *         iff one_playback_allowed is set.
  *  \param one_playback_allowed iff true still returns true if there
  *         is one playback in progress and all other checks pass.
- */ 
+ */
 bool ProgramInfo::QueryIsDeleteCandidate(bool one_playback_allowed) const
 {
     if (!IsRecording())
@@ -3310,11 +3314,11 @@ uint ProgramInfo::QueryAverageHeight(void) const
 /** \brief If present in recording this loads average width of the
  *         main video stream from database's stream markup table.
  *  \note Saves loaded value for future reference by GetWidth().
- */ 
+ */
 uint ProgramInfo::QueryAverageWidth(void) const
-{ 
+{
     return load_markup_datum(MARK_VIDEO_WIDTH, chanid, recstartts);
-} 
+}
 
 void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
 {
@@ -3633,7 +3637,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         query.bindValue(":HOSTNAME",   gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",   inUseForWhat);
         query.bindValue(":UPDATETIME", inUseTime);
-        
+
         if (!query.exec())
             MythDB::DBError("MarkAsInUse -- update failed", query);
         else
@@ -3655,7 +3659,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         query.bindValue(":UPDATETIME", inUseTime);
         query.bindValue(":RECHOST",    hostname);
         query.bindValue(":RECDIR",     recDir);
-        
+
         if (!query.exec())
             MythDB::DBError("MarkAsInUse -- insert failed", query);
         else
@@ -4056,7 +4060,7 @@ bool LoadFromOldRecorded(
     destination.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    
+
     QString querystr =
         "SELECT oldrecorded.chanid, starttime, endtime, "
         "       title, subtitle, description, category, seriesid, "
