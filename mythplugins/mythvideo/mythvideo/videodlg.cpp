@@ -3999,7 +3999,13 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     // Cast
     QList<PersonInfo> actors = lookup->GetPeople(ACTOR);
     QList<PersonInfo> gueststars = lookup->GetPeople(GUESTSTAR);
-    actors.append(gueststars);
+
+    for (QList<PersonInfo>::const_iterator p = gueststars.begin();
+        p != gueststars.end(); ++p)
+    {
+        actors.append(*p);
+    }
+
     Metadata::cast_list cast;
     QStringList cl;
 
