@@ -4457,13 +4457,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         switch (codec_type)
         {
-        case CODEC_TYPE_AUDIO:
+            case CODEC_TYPE_AUDIO:
             {
                 if (!ProcessAudioPacket(curstream, pkt, decodetype))
                     have_err = true;
                 break;
             }
-        case CODEC_TYPE_VIDEO:
+
+            case CODEC_TYPE_VIDEO:
             {
                 if (pkt->stream_index != selectedVideoIndex)
                 {
@@ -4487,13 +4488,15 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     have_err = true;
                 break;
             }
-        case CODEC_TYPE_SUBTITLE:
+
+            case CODEC_TYPE_SUBTITLE:
             {
                 if (!ProcessSubtitlePacket(curstream, pkt))
                     have_err = true;
                 break;
             }
-                default:
+
+            default:
             {
                 AVCodecContext *enc = curstream->codec;
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -4506,9 +4509,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         }
 
         if (!have_err)
-        {
             frame_decoded = 1;
-        }
 
         av_free_packet(pkt);
     }
