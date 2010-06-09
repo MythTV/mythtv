@@ -665,9 +665,21 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
         item->zmaStatus = "";
         item->events = 0;
         item->status = "";
+        item->isV4L2 = (item->palette > 255);
         monitorList->push_back(item);
-        VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3")
-                .arg(item->name).arg(item->id).arg(item->palette));
+        if (item->isV4L2)
+        {
+            QString pallete;
+            pallete  = (char) (item->palette & 0xff);
+            pallete += (char) ((item->palette >> 8) & 0xff);
+            pallete += (char) ((item->palette >> 16) & 0xff);
+            pallete += (char) ((item->palette >> 24) & 0xff);
+            VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3 (%4)")
+                    .arg(item->name).arg(item->id).arg(item->palette).arg(pallete));
+        }
+        else
+            VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3")
+                    .arg(item->name).arg(item->id).arg(item->palette));
     }
 }
 
