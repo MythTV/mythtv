@@ -5776,10 +5776,10 @@ details, see the help output:
 $ mythconverg_backup.pl --help
 </verb></tscreen>
 
-To restore: (assuming that you've <ref id="dropdb" name="dropped the database">
-and <ref id="setupdb" name="created a new database">)
+To restore:
 <tscreen><verb>
-$ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz
+$ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz \
+                         --drop_database --create_database
 </verb></tscreen>
 
 For more information on usage and details of the restore script, see the help
@@ -5793,22 +5793,6 @@ You may need to alter the MySQL permissions if this database is being shared
 with multiple systems.  See the <ref id="modify_perm_mysql" name="Modifying
 access to the MySQL database for multiple systems"> section for more
 information.
-
-<sect1>Deleting the MySQL database <label id="dropdb">
-<p><figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  Performing this step will remove the entire database.
-You will lose all of your settings and will need to <ref id="setupdb"
-name="re-run the mc.sql script"> to setup the database structure before running
-the mythtv-setup program or performing a database restore.
-</caption>
-</figure>
-<tscreen><verb>
-$ mysql -u root
-mysql> DROP DATABASE IF EXISTS mythconverg;
-mysql> quit
-</verb></tscreen>
 
 <sect1>btaudio <label id="btaudio">
 <p>btaudio allows you to obtain the audio data from your tuner card directly
