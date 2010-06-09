@@ -62,17 +62,9 @@ MythArchive GUI theme
 
     <window name="themeselector">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,50</area>
-            <font>title</font>
+            <font>baselarge</font>
             <align>allcenter</align>
             <value>DVD Menu Theme</value>
         </textarea>
@@ -179,23 +171,15 @@ MythArchive GUI theme
 
     <window name="mythburn">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="smallstatsfont" from="basesmall">
+        <fontdef name="smallstatsfont" from="basesmall">
             <color>#ffffff</color>
             <size>10</size>
-        </font>
+        </fontdef>
 
-        <font name="statserror" from="basesmall">
+        <fontdef name="statserror" from="basesmall">
             <color>#ff0000</color>
             <size>10</size>
-        </font>
+        </fontdef>
 
         <shape name="bottombackground" from="basebackground">
             <area>30,70,1220,500</area>
@@ -203,7 +187,7 @@ MythArchive GUI theme
 
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,50</area>
-            <font>title</font>
+            <font>baselarge</font>
             <align>center</align>
             <value>Select Archive Items</value>
         </textarea>
@@ -379,17 +363,9 @@ MythArchive GUI theme
 
   <window name="edit_metadata">
 
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <textarea name="title" from="basetextarea">
             <area>0,15,800,50</area>
-            <font>title</font>
+            <font>baselarge</font>
             <align>allcenter</align>
             <value>Archive Item Details</value>
         </textarea>
@@ -465,17 +441,9 @@ MythArchive GUI theme
 
   <window name="thumbfinder">
 
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <textarea name="title" from="basetextarea">
             <area>0,10,800,45</area>
-            <font>title</font>
+            <font>baselarge</font>
             <align>allcenter</align>
             <value>Thumb Image Selector</value>
         </textarea>
