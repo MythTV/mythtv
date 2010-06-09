@@ -521,6 +521,7 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
     if (!readData(data, imageSize))
     {
         VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to get image data");
+        delete [] data;
         return;
     }
 
@@ -532,8 +533,9 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
     if (!(*image)->loadFromData(data, imageSize, "JPEG"))
     {
         VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to load image from data");
-        return;
     }
+
+    delete [] data;
 }
 
 void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &image)
@@ -558,13 +560,17 @@ void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &
         VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to get image data");
         image = QImage();
     }
-
-    // extract the image data and create a QImage from it
-    if (!image.loadFromData(data, imageSize, "JPEG"))
+    else
     {
-        VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to load image from data");
-        image = QImage();
+        // extract the image data and create a QImage from it
+        if (!image.loadFromData(data, imageSize, "JPEG"))
+        {
+            VERBOSE(VB_GENERAL, "ZMClient::getAnalyseFrame(): Failed to load image from data");
+            image = QImage();
+        }
     }
+
+    delete [] data;
 }
 
 int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize)
