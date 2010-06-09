@@ -1,12 +1,6 @@
 <mythuitheme>
 
     <window name="functionpopup">
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <size>14</size>
-            <bold>yes</bold>
-        </font>
-
         <area>-1,-1,413,426</area>
 
         <imagetype name="box">
@@ -15,7 +9,7 @@
 
         <textarea name="title" from="basetextarea">
             <area>20,20,360,40</area>
-            <font>title</font>
+            <font>baselarge</font>
             <align>hcenter,top</align>
             <value>Edit Monitor Function</value>
         </textarea>
@@ -47,46 +41,39 @@
 
     <window name="zmconsole">
 
-        <font name="heading" from="basesmall">
-            <color>#ffff00</color>
-            <size>18</size>
-            <shadow>2,2</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="listlabel" from="basesmall">
+        <fontdef name="listlabel" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="date" from="basesmall">
+        <fontdef name="date" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="running" from="basesmall">
-        <color>#00ff00</color>
-        <size>16</size>
-        <bold>no</bold>
-        </font>
+        <fontdef name="running" from="basesmall">
+            <color>#00ff00</color>
+            <size>16</size>
+            <bold>no</bold>
+        </fontdef>
 
-        <font name="stopped" from="running">
+        <fontdef name="stopped" from="running">
             <color>#ff0000</color>
-        </font>
+        </fontdef>
 
-        <font name="footer" from="basesmall">
+        <fontdef name="footer" from="basesmall">
             <color>#ffffff</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="info" from="basesmall">
+        <fontdef name="info" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
@@ -143,19 +130,19 @@
         </textarea>
 
         <textarea name="label1" from="basetextarea">
-            <area>60,220,130,30</area>
+            <area>70,220,130,30</area>
             <font>basesmallyellow</font>
             <value>Camera</value>
         </textarea>
 
         <textarea name="label2" from="basetextarea">
-            <area>370,220,130,30</area>
+            <area>390,220,130,30</area>
             <font>basesmallyellow</font>
             <value>Function</value>
         </textarea>
 
         <textarea name="label3" from="basetextarea">
-            <area>680,220,130,30</area>
+            <area>710,220,130,30</area>
             <font>basesmallyellow</font>
             <value>Source</value>
         </textarea>
@@ -172,7 +159,7 @@
         </shape>
 
         <buttonlist name="monitor_list">
-            <area>40,270,1180,380</area>
+            <area>60,270,1180,380</area>
             <layout>vertical</layout>
             <spacing>5</spacing>
             <buttonarea>0,0,1180,350</buttonarea>
@@ -183,32 +170,36 @@
                         <area>0,2,25,25</area>
                         <preserveaspect>yes</preserveaspect>
                     </imagetype>
-                    <imagetype name="buttonbackground">
-                        <area>15,0,1180,25</area>
-                        <gradient start="#505050" end="#000000" alpha="200" />
-                    </imagetype>
+                    <shape name="buttonbackground"> 
+                        <area>0,0,1160,30</area> 
+                        <fill style="gradient"> 
+                            <gradient start="#505050" end="#000000" alpha="200" /> 
+                        </fill> 
+                    </shape> 
                     <textarea name="buttontext" from="basetextarea">
-                        <area>20,4,250,30</area>
+                        <area>20,2,250,30</area>
                         <font>basesmallgrey</font>
                     </textarea>
                     <textarea name="name" from="buttontext">
-                        <area>20,4,200,25</area>
+                        <area>10,2,200,25</area>
                     </textarea>
                     <textarea name="zmcstatus" from="buttontext">
-                        <area>330,4,200,25</area>
+                        <area>330,2,200,25</area>
                     </textarea>
                     <textarea name="zmastatus" from="buttontext">
-                        <area>640,4,350,25</area>
+                        <area>640,2,350,25</area>
                     </textarea>
                     <textarea name="eventcount" from="buttontext">
-                        <area>1050,4,100,25</area>
+                        <area>1050,2,100,25</area>
                         <align>right</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground"> 
+                        <fill style="gradient"> 
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill> 
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
@@ -258,70 +249,71 @@
 
     <window name="zmevents">
 
-        <font name="active" from="basesmall">
+        <fontdef name="active" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="inactive" from="basesmall">
+        <fontdef name="inactive" from="basesmall">
             <color>#9999cc</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="selected" from="basesmall">
+        <fontdef name="selected" from="basesmall">
             <color>#00ff00</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="date" from="basesmall">
+        <fontdef name="date" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
-        <font name="description" from="basesmall">
+        </fontdef>
+
+        <fontdef name="description" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="label" from="basesmall">
+        <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="listlabel" from="basesmall">
+        <fontdef name="listlabel" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="buttons" from="basesmall">
+        <fontdef name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="subtitle_active" from="basesmall">
+        <fontdef name="subtitle_active" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="subtitle_inactive" from="basesmall">
+        <fontdef name="subtitle_inactive" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="subtitle_selected" from="basesmall">
+        <fontdef name="subtitle_selected" from="basesmall">
             <color>#ff0000</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
@@ -400,10 +392,12 @@
             <statetype name="buttonitem">
                 <area>0,0,740,25</area>
                 <state name="active">
-                    <imagetype name="buttonbackground">
+                    <shape name="buttonbackground">
                         <area>15,0,1155,30</area>
-                        <gradient start="#505050" end="#000000" alpha="200" />
-                    </imagetype>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext" from="basetextarea">
                         <area>25,4,385,25</area>
                         <font>basesmallgrey</font>
@@ -420,9 +414,11 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
@@ -438,9 +434,11 @@
                     </textarea>
                 </state>
                <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
@@ -489,10 +487,12 @@
             <statetype name="buttonitem">
                 <area>0,0,800,400</area>
                 <state name="active">
-                    <imagetype name="buttonbackground">
+                    <shape name="buttonbackground">
                         <area>0,0,800,400</area>
-                        <gradient start="#505050" end="#000000" alpha="200" />
-                    </imagetype>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
                     <imagetype name="buttonimage">
                         <area>15,15,500,370</area>
                     </imagetype>
@@ -533,18 +533,22 @@
 
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
                     </textarea>
                 </state>
                <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
@@ -584,10 +588,12 @@
             <statetype name="buttonitem">
                 <area>0,0,280,195</area>
                 <state name="active">
-                    <imagetype name="buttonbackground">
+                    <shape name="buttonbackground">
                         <area>0,0,280,195</area>
-                        <gradient start="#505050" end="#000000" alpha="200" />
-                    </imagetype>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
                     <imagetype name="buttonimage">
                         <area>25,10,230,150</area>
                     </imagetype>
@@ -599,18 +605,22 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
                     </textarea>
                 </state>
                <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
 
                     <textarea name="buttontext">
                         <font>basesmall</font>
@@ -771,42 +781,33 @@
 
     <window name="zmliveplayer">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="monitor" from="basesmall">
+        <fontdef name="monitor" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="idle" from="basesmall">
+        <fontdef name="idle" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="alarm" from="basesmall">
+        <fontdef name="alarm" from="basesmall">
             <color>#ff0000</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="alert" from="basesmall">
+        <fontdef name="alert" from="basesmall">
             <color>#ffa500</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <textarea name="title" from="basetextarea">
-            <area>20,30,1240,50</area>
-            <font>title</font>
-            <align>hcenter,top</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Zone Minder Live Player</value>
         </textarea>
 

@@ -1,11 +1,11 @@
 <mythuitheme>
 
     <window name="functionpopup">
-        <font name="title" from="basesmall">
+        <fontdef name="title" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
         <area>193,87,413,426</area>
 
@@ -47,46 +47,46 @@
 
     <window name="zmconsole">
 
-        <font name="heading" from="basesmall">
+        <fontdef name="heading" from="basesmall">
             <color>#ffff00</color>
             <size>18</size>
             <shadow>2,2</shadow>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="listlabel" from="basesmall">
+        <fontdef name="listlabel" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="date" from="basesmall">
+        <fontdef name="date" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="running" from="basesmall">
-        <color>#00ff00</color>
-        <size>16</size>
-        <bold>no</bold>
-        </font>
+        <fontdef name="running" from="basesmall">
+            <color>#00ff00</color>
+            <size>16</size>
+            <bold>no</bold>
+        </fontdef>
 
-        <font name="stopped" from="running">
+        <fontdef name="stopped" from="running">
             <color>#ff0000</color>
-        </font>
+        </fontdef>
 
-        <font name="footer" from="basesmall">
+        <fontdef name="footer" from="basesmall">
             <color>#ffffff</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="info" from="basesmall">
+        <fontdef name="info" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
@@ -262,70 +262,70 @@
 
     <window name="zmevents">
 
-        <font name="active" from="basesmall">
+        <fontdef name="active" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="inactive" from="basesmall">
+        <fontdef name="inactive" from="basesmall">
             <color>#9999cc</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="selected" from="basesmall">
+        <fontdef name="selected" from="basesmall">
             <color>#00ff00</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="date" from="basesmall">
+        <fontdef name="date" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
-        <font name="description" from="basesmall">
+        </fontdef>
+        <fontdef name="description" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="label" from="basesmall">
+        <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="listlabel" from="basesmall">
+        <fontdef name="listlabel" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="buttons" from="basesmall">
+        <fontdef name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="subtitle_active" from="basesmall">
+        <fontdef name="subtitle_active" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="subtitle_inactive" from="basesmall">
+        <fontdef name="subtitle_inactive" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="subtitle_selected" from="basesmall">
+        <fontdef name="subtitle_selected" from="basesmall">
             <color>#ff0000</color>
             <size>14</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
@@ -652,23 +652,23 @@
 
     <window name="zmplayer">
 
-        <font name="label" from="basesmall">
+        <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="data" from="basesmall">
+        <fontdef name="data" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="buttons" from="basesmall">
+        <fontdef name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
@@ -774,29 +774,29 @@
 
     <window name="zmliveplayer">
 
-        <font name="monitor" from="basesmall">
+        <fontdef name="monitor" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="idle" from="basesmall">
+        <fontdef name="idle" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="alarm" from="basesmall">
+        <fontdef name="alarm" from="basesmall">
             <color>#ff0000</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
-        <font name="alert" from="basesmall">
+        <fontdef name="alert" from="basesmall">
             <color>#ffa500</color>
             <size>16</size>
             <bold>no</bold>
-        </font>
+        </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
             <area>30,10,570,40</area>
