@@ -686,7 +686,7 @@ FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan,
             scan = newScan;
     };
 
-    VERBOSE(VB_PLAYBACK, dbg+toQString(scan));
+    VERBOSE(VB_PLAYBACK, LOC + dbg+toQString(scan));
 
     return scan;
 }
@@ -1556,10 +1556,10 @@ void NuppelVideoPlayer::InitAVSync(void)
         QString timing_type = videosync->getName();
 
         QString msg = QString("Video timing method: %1").arg(timing_type);
-        VERBOSE(VB_GENERAL, msg);
+        VERBOSE(VB_GENERAL, LOC + msg);
         msg = QString("Refresh rate: %1, frame interval: %2")
                        .arg(refreshrate).arg(frame_interval);
-        VERBOSE(VB_PLAYBACK, msg);
+        VERBOSE(VB_PLAYBACK, LOC + msg);
 
         // try to get preferential scheduling, but ignore if we fail to.
         myth_nice(-19);
@@ -1649,7 +1649,7 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
 
         if (videoOutput->IsErrored())
         {
-            VERBOSE(VB_IMPORTANT, "NVP: Error condition detected "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "NVP: Error condition detected "
                     "in videoOutput after Show(), aborting playback.");
             SetErrored(QObject::tr("Serious error detected in Video Output"));
             return;
@@ -2148,7 +2148,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         ResetCaptions();
     }
 
-    VERBOSE(VB_PLAYBACK, QString("SwitchToProgram(void) "
+    VERBOSE(VB_PLAYBACK, LOC + QString("SwitchToProgram(void) "
             "discont: %1 newtype: %2 newid: %3 eof: %4")
             .arg(discontinuity).arg(newtype).arg(newid).arg(eof));
 
@@ -2198,7 +2198,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
 void NuppelVideoPlayer::FileChangedCallback(void)
 {
-    VERBOSE(VB_PLAYBACK, "FileChangedCallback");
+    VERBOSE(VB_PLAYBACK, LOC + "FileChangedCallback");
 
     Pause();
     ChangeSpeed();
@@ -2223,7 +2223,7 @@ void NuppelVideoPlayer::FileChangedCallback(void)
 
 void NuppelVideoPlayer::JumpToProgram(void)
 {
-    VERBOSE(VB_PLAYBACK, "JumpToProgram - start");
+    VERBOSE(VB_PLAYBACK, LOC + "JumpToProgram - start");
     bool discontinuity = false, newtype = false;
     int newid = -1;
     long long nextpos = player_ctx->tvchain->GetJumpPos();
@@ -2302,7 +2302,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
     eof = false;
     player_ctx->SetNVPChangingBuffers(false);
-    VERBOSE(VB_PLAYBACK, "JumpToProgram - end");
+    VERBOSE(VB_PLAYBACK, LOC + "JumpToProgram - end");
 }
 
 bool NuppelVideoPlayer::StartPlaying(void)

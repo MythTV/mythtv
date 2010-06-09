@@ -71,6 +71,8 @@ int VideoSync::m_forceskip = 0;
         delete trial; \
     } } while (false)
 
+#define LOC QString("VSYNC: ")
+
 /** \fn VideoSync::BestMethod(VideoOutput*,uint,uint,bool)
  *  \brief Returns the most sophisticated video sync method available.
  */
@@ -88,8 +90,8 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     int skip = 0;
     if (m_forceskip)
     {
-        VERBOSE(VB_PLAYBACK, QString("A previous trial crashed,"
-                " skipping %1").arg(m_forceskip));
+        VERBOSE(VB_PLAYBACK, LOC +
+            QString("A previous trial crashed, skipping %1").arg(m_forceskip));
 
         skip = m_forceskip;
         m_forceskip = 0;
@@ -149,8 +151,8 @@ void VideoSync::SetFrameInterval(int fr, bool intr)
     if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
         m_interlaced = false; // can't display both fields at 2x rate
 
-    VERBOSE(VB_PLAYBACK, QString("Set video sync frame interval to %1")
-                                 .arg(m_frame_interval));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Set video sync frame interval to %1")
+                                       .arg(m_frame_interval));
 }
 
 void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
@@ -309,7 +311,7 @@ bool DRMVideoSync::TryInit(void)
     m_dri_fd = open(sm_dri_dev, O_RDWR);
     if (m_dri_fd < 0)
     {
-        VERBOSE(VB_PLAYBACK, QString("DRMVideoSync: Could not open device"
+        VERBOSE(VB_PLAYBACK, LOC + QString("DRMVideoSync: Could not open device"
                 " %1, %2").arg(sm_dri_dev).arg(strerror(errno)));
         return false; // couldn't open device
     }
@@ -318,8 +320,8 @@ bool DRMVideoSync::TryInit(void)
     blank.request.sequence = 1;
     if (drmWaitVBlank(m_dri_fd, &blank))
     {
-        VERBOSE(VB_PLAYBACK, QString("DRMVideoSync: VBlank ioctl did not work,"
-                " unimplemented in this driver?"));
+        VERBOSE(VB_PLAYBACK, LOC + QString("DRMVideoSync: VBlank ioctl did not"
+                " work, unimplemented in this driver?"));
         return false; // VBLANK ioctl didn't worko
     }
 
@@ -385,12 +387,12 @@ OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
     VideoSync(video_output, frame_interval, refresh_interval, interlaced),
     m_context(NULL), m_device(NULL)
 {
-    VERBOSE(VB_IMPORTANT, "OpenGLVideoSync()");
+    VERBOSE(VB_IMPORTANT, LOC + "OpenGLVideoSync()");
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
 {
-    VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- closing opengl vsync");
+    VERBOSE(VB_IMPORTANT, LOC + "~OpenGLVideoSync()");
 #ifdef USING_OPENGL_VSYNC
     if (m_context)
         delete m_context;
@@ -415,11 +417,12 @@ bool OpenGLVideoSync::TryInit(void)
         if (m_context->HasGLXWaitVideoSyncSGI())
             return true;
 
-        VERBOSE(VB_IMPORTANT, "OpenGLVideoSync: GLX_SGI_video_sync extension "
-                              "not supported by driver.");
+        VERBOSE(VB_IMPORTANT, LOC +
+            "OpenGLVideoSync: GLX_SGI_video_sync extension not "
+            "supported by driver.");
     }
 
-    VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: "
+    VERBOSE(VB_PLAYBACK, LOC + "OpenGLVideoSync: "
             "Failed to Initialize OpenGL V-Sync");
 
 #endif /* USING_OPENGL_VSYNC */
@@ -508,7 +511,7 @@ bool RTCVideoSync::TryInit(void)
     m_rtcfd = open("/dev/rtc", O_RDONLY);
     if (m_rtcfd < 0)
     {
-        VERBOSE(VB_PLAYBACK, QString("RTCVideoSync: Could not"
+        VERBOSE(VB_PLAYBACK, LOC + QString("RTCVideoSync: Could not"
                 " open /dev/rtc, %1.").arg(strerror(errno)));
         return false;
     }
@@ -516,15 +519,15 @@ bool RTCVideoSync::TryInit(void)
     // FIXME, does it make sense to tie RTCRATE to the desired framerate?
     if ((ioctl(m_rtcfd, RTC_IRQP_SET, RTCRATE) < 0))
     {
-        VERBOSE(VB_PLAYBACK, QString("RTCVideoSync: Could not"
+        VERBOSE(VB_PLAYBACK, LOC + QString("RTCVideoSync: Could not"
                 " set RTC frequency, %1.").arg(strerror(errno)));
         return false;
     }
 
     if (ioctl(m_rtcfd, RTC_PIE_ON, 0) < 0)
     {
-        VERBOSE(VB_PLAYBACK, QString("RTCVideoSync: Could not enable periodic "
-                "timer interrupts, %1.").arg(strerror(errno)));
+        VERBOSE(VB_PLAYBACK, LOC + QString("RTCVideoSync: Could not enable "
+                "periodic timer interrupts, %1.").arg(strerror(errno)));
         return false;
     }
 

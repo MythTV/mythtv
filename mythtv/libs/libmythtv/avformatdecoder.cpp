@@ -2017,7 +2017,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (!codec_is_std(video_codec_id))
                     thread_count = 1;
 
-                VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
+                VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 CPUs for decoding")
                         .arg(HAVE_THREADS ? thread_count : 1));
 
                 if (HAVE_THREADS && thread_count > 1)
@@ -4728,7 +4728,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (!ctx)
     {
-        VERBOSE(VB_PLAYBACK, "No codec context. Returning false");
+        VERBOSE(VB_PLAYBACK, LOC + "No codec context. Returning false");
         return false;
     }
 
