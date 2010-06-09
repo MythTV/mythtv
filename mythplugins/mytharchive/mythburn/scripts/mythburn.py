@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20100526-1"
+VERSION="0.1.20100609-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -732,27 +732,27 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
 
     write( "Video length is %s seconds. Each chapter will be %s seconds" % (lengthofvideo,segment))
 
-    chapters=""
+    chapters=[]
 
-    thumbList=""
+    thumbList=[]
     starttime=0
     count=1
     while count<=numofchapters:
-        chapters+=time.strftime("%H:%M:%S",time.gmtime(starttime))
+        chapters.append(time.strftime("%H:%M:%S",time.gmtime(starttime)))
 
         if starttime==0:
             if thumboffset < segment:
-                thumbList+="%s," % thumboffset
+                thumbList.append(str(thumboffset))
             else:
-                thumbList+="%s," % starttime
+                thumbList.append(str(starttime))
         else:
-            thumbList+="%s," % starttime
-
-        if numofchapters>1:
-            chapters+=","
+            thumbList.append(str(starttime))
 
         starttime+=segment
         count+=1
+
+    chapters = ','.join(chapters)
+    thumbList = ','.join(thumbList)
 
     if getthumbnails==True:
         extractVideoFrames( os.path.join(getItemTempPath(itemnum),"stream.mv2"),
