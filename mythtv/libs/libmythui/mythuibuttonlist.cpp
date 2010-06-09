@@ -1486,6 +1486,14 @@ int MythUIButtonList::GetCount() const
     return m_itemCount;
 }
 
+uint MythUIButtonList::GetVisibleCount()
+{
+    if (m_needsUpdate)
+        SetPositionArrowStates();
+
+    return m_itemsVisible; 
+}
+
 bool MythUIButtonList::IsEmpty() const
 {
     if (m_itemCount > 0)
@@ -1496,6 +1504,9 @@ bool MythUIButtonList::IsEmpty() const
 
 MythUIButtonListItem* MythUIButtonList::GetItemAt(int pos) const
 {
+    if (pos < 0 || pos >= m_itemList.size())
+        return NULL;
+
     return m_itemList.at(pos);
 }
 

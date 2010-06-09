@@ -144,7 +144,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     int GetItemPos(MythUIButtonListItem* item) const;
     int GetTopItemPos(void) const { return m_topPosition; }
     int GetCount() const;
-    uint GetVisibleCount() const { return m_itemsVisible; }
+    uint GetVisibleCount();
     bool IsEmpty() const;
 
     virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
