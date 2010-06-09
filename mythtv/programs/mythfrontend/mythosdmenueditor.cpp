@@ -98,7 +98,7 @@ bool MythOSDMenuEditor::Create()
     item->setDrawArrow(true);
     item->SetData(qVariantFromValue(&WatchingVideo));
 
-    item = new MythUIButtonListItem(m_states, "DVD");
+    item = new MythUIButtonListItem(m_states, "DVD/BD");
     item->setDrawArrow(true);
     item->SetData(qVariantFromValue(&WatchingDVD));
 

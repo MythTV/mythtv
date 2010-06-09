@@ -111,6 +111,8 @@ void PlayerContext::SetInitialTVState(bool islivetv)
         }
         else if (playingInfo->IsVideoDVD())
             newState = kState_WatchingDVD;
+        else if (playingInfo->IsVideoBD())
+            newState = kState_WatchingBD;
         else
             newState = kState_WatchingVideo;
 

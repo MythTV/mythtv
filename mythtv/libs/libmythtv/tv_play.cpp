@@ -1827,7 +1827,8 @@ bool TV::StateIsPlaying(TVState state)
     return (state == kState_WatchingPreRecorded ||
             state == kState_WatchingRecording   ||
             state == kState_WatchingVideo       ||
-            state == kState_WatchingDVD);
+            state == kState_WatchingDVD         ||
+            state == kState_WatchingBD);
 }
 
 bool TV::StateIsLiveTV(TVState state)
@@ -2007,6 +2008,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingVideo) ||
              TRANSITION(kState_None, kState_WatchingDVD)   ||
+             TRANSITION(kState_None, kState_WatchingBD)    ||
              TRANSITION(kState_None, kState_WatchingRecording))
     {
         ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -2082,6 +2084,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     else if (TRANSITION(kState_WatchingPreRecorded, kState_None) ||
              TRANSITION(kState_WatchingVideo, kState_None)       ||
              TRANSITION(kState_WatchingDVD, kState_None)         ||
+             TRANSITION(kState_WatchingBD, kState_None)          ||
              TRANSITION(kState_WatchingRecording, kState_None))
     {
         SET_NEXT();
@@ -2175,6 +2178,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingVideo) ||
              TRANSITION(kState_None, kState_WatchingDVD)   ||
+             TRANSITION(kState_None, kState_WatchingBD)    ||
              TRANSITION(kState_None, kState_WatchingRecording) ||
              TRANSITION(kState_None, kState_WatchingLiveTV))
     {
@@ -9921,7 +9925,7 @@ QString TV::FillOSDMenu(const PlayerContext *ctx, OSD *osd,
     bool select   = selected == category;
     bool top      = level == 0;
 
-    if (category == "DVD" && top)
+    if (category == "DVD" && top && (ctx->GetState() == kState_WatchingDVD))
     {
         osd->DialogAddButton(tr("DVD Root Menu"),        "JUMPTODVDROOTMENU");
         osd->DialogAddButton(tr("DVD Title Menu"),       "JUMPTODVDTITLEMENU");

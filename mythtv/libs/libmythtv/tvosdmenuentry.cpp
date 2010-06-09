@@ -46,6 +46,7 @@ int TVOSDMenuEntry::GetEntry(TVState state)
         case kState_WatchingVideo:
             return video;
         case kState_WatchingDVD:
+        case kState_WatchingBD:
             return dvd;
         default:
             return -1;
@@ -86,6 +87,7 @@ void TVOSDMenuEntry::UpdateEntry(int change, TVState state)
             video = change;
             break;
         case kState_WatchingDVD:
+        case kState_WatchingBD:
             dvd = change;
             break;
         default:

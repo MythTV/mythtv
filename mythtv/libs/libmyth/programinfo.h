@@ -285,6 +285,8 @@ class MPUBLIC ProgramInfo
         { return GetProgramInfoType() & kProgramInfoTypeVideoFile; }
     bool IsVideoDVD(void) const
         { return GetProgramInfoType() & kProgramInfoTypeVideoDVD; }
+    bool IsVideoBD(void) const
+        { return GetProgramInfoType() & kProgramInfoTypeVideoBD; }
     bool IsLocal(void) const { return pathname.left(1) == "/"; }
     bool IsMythStream(void) const { return pathname.left(7) == "myth://"; }
     bool IsPathSet(void) const { return GetBasename() != pathname; }

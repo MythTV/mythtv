@@ -49,11 +49,13 @@ typedef enum
      */
     kState_WatchingPreRecorded,
     /** \brief Watching Video is the state when we are watching a video and is not
-    *             a dvd
+    *             a dvd or BD
     */
     kState_WatchingVideo,
     /** \brief Watching DVD is the state when we are watching a DVD */
     kState_WatchingDVD,
+    /** \brief Watching BD is the state when we are watching a BD */
+    kState_WatchingBD,
     /** \brief Watching Recording is the state for when we are watching
      *         an in progress recording, but the user does not have control
      *         over the channel and recorder to use.
