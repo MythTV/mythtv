@@ -429,6 +429,16 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 */
 
+    rule.title = tr("Re-record SDTV in HDTV (disable duplicate matching)");
+    rule.subtitle = ", recordedprogram rp1 LEFT OUTER JOIN recordedprogram rp2"
+                    " ON rp1.programid = rp2.programid AND rp2.hdtv = 1";
+    rule.description = "program.programid = rp1.programid \n"
+                       "AND rp1.hdtv = 0 \n"
+                       "AND program.hdtv = 1 \n"
+                       "AND rp2.starttime IS NULL ";
+    new MythUIButtonListItem(m_clauseList, rule.title,
+                             qVariantFromValue(rule));
+
     rule.title = tr("Multiple sports teams (complete example)");
     rule.subtitle.clear();
     rule.description = "program.title = 'NBA Basketball' \n"
