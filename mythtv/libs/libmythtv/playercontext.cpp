@@ -7,6 +7,7 @@
 #include "playercontext.h"
 #include "NuppelVideoPlayer.h"
 #include "mythdvdplayer.h"
+#include "mythbdplayer.h"
 #include "remoteencoder.h"
 #include "livetvchain.h"
 #include "RingBuffer.h"
@@ -413,6 +414,8 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
     }
 
     NuppelVideoPlayer *_nvp = NULL;
+    if (kState_WatchingBD  == desiredState)
+        _nvp = new MythBDPlayer(muted);
     if (kState_WatchingDVD == desiredState)
         _nvp = new MythDVDPlayer(muted);
     else
