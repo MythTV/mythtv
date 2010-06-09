@@ -450,10 +450,20 @@ void Player::updateFrame(const unsigned char* buffer)
             r = buffer[pos_data++];
             g = buffer[pos_data++];
             b = buffer[pos_data++];
-            m_rgba[pos_rgba++] = b;
-            m_rgba[pos_rgba++] = g;
-            m_rgba[pos_rgba++] = r;
-            m_rgba[pos_rgba++] = 0xff;
+            if (m_monitor.isV4L2)
+            {
+                m_rgba[pos_rgba++] = g;
+                m_rgba[pos_rgba++] = r;
+                m_rgba[pos_rgba++] = b;
+                m_rgba[pos_rgba++] = 0xff;
+            }
+            else
+            {
+                m_rgba[pos_rgba++] = b;
+                m_rgba[pos_rgba++] = g;
+                m_rgba[pos_rgba++] = r;
+                m_rgba[pos_rgba++] = 0xff;
+            }
         }
     }
 

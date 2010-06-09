@@ -61,6 +61,7 @@ typedef struct
     int width;
     int height;
     int palette;
+    bool isV4L2;
 } Monitor;
 
 #endif
