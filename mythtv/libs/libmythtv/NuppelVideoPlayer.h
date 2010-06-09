@@ -101,13 +101,15 @@ class DecoderThread : public QThread
     Q_OBJECT
 
   public:
-    DecoderThread(NuppelVideoPlayer *nvp) : QThread(NULL), m_nvp(nvp) { }
+    DecoderThread(NuppelVideoPlayer *nvp, bool start_paused)
+      : QThread(NULL), m_nvp(nvp), m_start_paused(start_paused) { }
 
   protected:
     virtual void run(void);
 
   private:
     NuppelVideoPlayer *m_nvp;
+    bool               m_start_paused;
 };
 
 class MPUBLIC NuppelVideoPlayer
@@ -397,7 +399,7 @@ class MPUBLIC NuppelVideoPlayer
     virtual bool VideoLoop(void);
     virtual void VideoEnd(void);
     virtual void DecoderStart(void);
-    virtual void DecoderLoop(void);
+    virtual void DecoderLoop(bool pause);
     virtual void DecoderEnd(void);
     virtual void AudioEnd(void);
     virtual void EventStart(void);

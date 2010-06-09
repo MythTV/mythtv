@@ -130,7 +130,7 @@ void DecoderThread::run(void)
         return;
 
     VERBOSE(VB_PLAYBACK, LOC_DEC + QString("Decoder thread starting."));
-    m_nvp->DecoderLoop();
+    m_nvp->DecoderLoop(m_start_paused);
     VERBOSE(VB_PLAYBACK, LOC_DEC + QString("Decoder thread exiting."));
 }
 
@@ -2003,16 +2003,6 @@ void NuppelVideoPlayer::VideoStart(void)
             videoOutput, (int)fr_int, (int)rf_int, m_double_framerate);
     }
 
-    if (bookmarkseek > 30)
-    {
-        DoFastForward(bookmarkseek, true, false);
-        if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
-            !player_ctx->IsPIP())
-        {
-            ClearBookmark(false);
-        }
-    }
-
     if (isDummy)
         ChangeSpeed();
 
@@ -2608,9 +2598,20 @@ void NuppelVideoPlayer::DecoderStart(void)
     }
 
     killdecoder = false;
-    decoderThread = new DecoderThread(this);
+    decoderThread = new DecoderThread(this, bookmarkseek > 30);
     if (decoderThread)
         decoderThread->start();
+
+    if (bookmarkseek > 30)
+    {
+        DoFastForward(bookmarkseek, true, false);
+        if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
+            !player_ctx->IsPIP())
+        {
+            ClearBookmark(false);
+        }
+        UnpauseDecoder();
+    }
 }
 
 void NuppelVideoPlayer::DecoderEnd(void)
@@ -2627,8 +2628,11 @@ void NuppelVideoPlayer::DecoderEnd(void)
         VERBOSE(VB_PLAYBACK, LOC + "Exited decoder loop.");
 }
 
-void NuppelVideoPlayer::DecoderLoop(void)
+void NuppelVideoPlayer::DecoderLoop(bool pause)
 {
+    if (pause)
+        PauseDecoder();
+
     while (!killdecoder && !IsErrored())
     {
         if (pauseDecoder)
