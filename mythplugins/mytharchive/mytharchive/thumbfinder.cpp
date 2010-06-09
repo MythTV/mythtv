@@ -51,6 +51,7 @@
 #include <mythuibutton.h>
 #include <mythuiimage.h>
 #include <mythuibuttonlist.h>
+#include <mythimage.h>
 #include <mythconfig.h>
 extern "C" {
 #include <swscale.h>
@@ -106,6 +107,7 @@ ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
     m_startPTS = -1;
     m_currentPTS = -1;
     m_firstIFramePTS = -1;
+    m_image = NULL;
 }
 
 void ThumbFinder::Init(void)
@@ -120,6 +122,12 @@ ThumbFinder::~ThumbFinder()
     m_thumbList.clear();
 
     closeAVCodec();
+
+    if (m_image)
+    {
+        m_image->DownRef();
+        m_image = NULL;
+    }
 }
 
 bool ThumbFinder::Create(void)
@@ -240,7 +248,7 @@ int  ThumbFinder::getChapterCount(const QString &menuTheme)
             menuTheme + "/theme.xml";
     QDomDocument doc("mydocument");
     QFile file(filename);
-    cout << "loading file from: " << qPrintable(filename) << endl;
+
     if (!file.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, "Failed to open theme file: " + filename);
@@ -255,8 +263,7 @@ int  ThumbFinder::getChapterCount(const QString &menuTheme)
     file.close();
 
     QDomNodeList chapterNodeList = doc.elementsByTagName("chapter");
-    cout << "chapterNodeList.count(): " << chapterNodeList.count() << endl;
-    cout << "chapterNodeList.size(): " << chapterNodeList.size() << endl;
+
     return chapterNodeList.count();
 }
 
@@ -378,7 +385,7 @@ void ThumbFinder::updateThumb(void)
     QFile src(m_frameFile);
     copy(dst, src);
 
-    item->SetImage(imageFile);
+    item->SetImage(imageFile, "", true);
 
     // update the image grid item
     int64_t pos = (int) ((m_currentPTS - m_startPTS) / m_frameTime);
@@ -631,7 +638,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     m_frame = avcodec_alloc_frame();
 
     m_frameFile = getTempDirectory() + "work/frame.jpg";
-    //cout << "m_frameFile initAV: " << m_frameFile << endl;
+
     return true;
 }
 
@@ -854,10 +861,20 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         {
             VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + m_frameFile);
         }
+
         if (m_updateFrame)
         {
-            m_frameImage->SetFilename(m_frameFile);
-            m_frameImage->Load();
+            if (m_image)
+            {
+                m_image->DownRef();
+                m_image = NULL;
+            }
+
+            m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+            m_image->Assign(img);
+            m_image->UpRef();
+
+            m_frameImage->SetImage(m_image);
         }
 
         updateCurrentPos();
