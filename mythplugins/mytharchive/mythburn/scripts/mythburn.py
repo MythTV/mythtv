@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20100609-1"
+VERSION="0.1.20100609-2"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2104,51 +2104,49 @@ def renameProjectXFiles(folder, pxbasename):
     logdata = logf.readlines()
     logf.close()
 
-    # find stream PIDs
+    # find stream PIDs and Files
     streamIds = []
+    streamFiles = []    
     for line in logdata:
          tokens = line.split()
          if len(tokens) > 0:
-            if tokens[0] == "ok>":
-                write("found stream %s" % tokens[2], False)
-                streamIds.append(int(tokens[2], 16))
-
-    sortedstreamIds = []
-    sortedstreamIds = sorted(streamIds)
-    streamIds = sortedstreamIds
-
-    # if we haven't found any PIDs look for PES-IDs
-    if len(streamIds) == 0:
-         for line in logdata:
-            if line.startswith("-> found PES-ID"):
-                index = line.find("(SubID 0x")
-                if index > 0:
-                    streamId = line[index + 7:index + 11]
-                    write("found stream %s" % streamId, False)
-                    streamIds.append(int(streamId, 16))
-                else:
-                    tokens = line.split()
-                    if len(tokens) > 0:
-                        write("found stream %s" % tokens[3], False)
-                        streamIds.append(int(tokens[3], 16))
-
-    # find files
-    streamFiles = []
-    for line in logdata:
-        if line.startswith("---> new File: "):
-            file = line[15:-1]
-            # strip any ' chars from start/end
-            if file.startswith("'"):
-                file = file[1: -1]
-            if file.endswith("'"):
-                file = file[0: -2]
-            write(file, False)
-            streamFiles.append(file)
-
-        if line.startswith("--> stream omitted"):
-            file = ""
-            write(line, False)
-            streamFiles.append(file)
+            if tokens[0] == "++>":
+              # From ProjectX/resources/pjxresources_en.properties:
+              if tokens[1] == "Mpg":
+                if tokens[2] == "Video:":
+                  write("found MPEG video stream %s" % tokens[4], False)
+                  streamIds.append(int(tokens[4], 16))
+                if tokens[2] == "Audio:":
+                  write("found MPEG audio stream %s" % tokens[4], False)
+                  streamIds.append(int(tokens[4], 16))
+              if tokens[1] == "AC3/DTS":
+                write("found AC3/DTS audio stream %s" % tokens[4], False)
+                streamIds.append(int(tokens[4], 16))              
+              if tokens[1] == "LPCM":
+                write("found LPCM audio stream %s" % tokens[4], False)
+                streamIds.append(int(tokens[4], 16))             
+              if tokens[1] == "Teletext:":
+                write("found Teletext stream %s" % tokens[3], False)
+                streamIds.append(int(tokens[3], 16))              
+              if tokens[1] == "Subpicture:":
+                write("found Subpicture stream %s" % tokens[3], False)
+                streamIds.append(int(tokens[3], 16))
+              if tokens[1] == "Generic_VBI:":
+                write("found Generic_VBI stream %s" % tokens[3], False)
+                streamIds.append(int(tokens[3], 16))                                            
+            if tokens[0] == "--->":
+              if tokens[1] == "new":
+                if tokens[2] == "File:":
+                  write("found file for stream 0x%x, %s" % (streamIds[len(streamIds)-1], tokens[3]), False)
+                  streamFiles.append(tokens[3].replace("'","")) # let's hope the path never has a space in it
+            if tokens[0] == "-->":
+              if tokens[1] == "stream":
+                if tokens[2] == "omitted":
+                  write("stream 0x%x omitted" % streamIds[len(streamIds)-1], False)
+                  streamFiles.append("")
+                  
+    write("streadmIds=%s" % streamIds)
+    write("streamFiles=%s" % streamFiles)
 
     # choose which streams we need
     video, audio1, audio2 = selectStreams(folder)
