@@ -12,6 +12,27 @@ static MythFontManager *gFontManager = NULL;
 #define LOC      QString("MythFontManager: ")
 #define LOC_ERR  QString("MythFontManager, Error: ")
 #define LOC_WARN QString("MythFontManager, Warning: ")
+#define MAX_DIRS 100
+
+/**
+ *  \brief Loads the fonts in font files within the given directory structure
+ *
+ *   Scans directory and its subdirectories, up to MAX_DIRS total, looking for
+ *   TrueType (.ttf) and OpenType (.otf) font files or TrueType font
+ *   collections (.ttc) and loads the fonts to make them available to the
+ *   application.
+ *
+ *  \param directory      The directory to scan
+ *  \param registeredFor  The user of the font. Used with releaseFonts() to
+ *                        unload the font if no longer in use (by any users)
+ *  \sa LoadFonts(const QString &, const QString &, int *)
+ */
+void MythFontManager::LoadFonts(const QString &directory,
+                                const QString &registeredFor)
+{
+    int maxDirs = MAX_DIRS;
+    LoadFonts(directory, registeredFor, &maxDirs);
+}
 
 /**
  *  \brief Loads the fonts in font files within the given directory structure
@@ -23,12 +44,20 @@ static MythFontManager *gFontManager = NULL;
  *  \param directory      The directory to scan
  *  \param registeredFor  The user of the font. Used with releaseFonts() to
  *                        unload the font if no longer in use (by any users)
+ *  \param maxDirs        The maximum number of subdirectories to scan
  */
 void MythFontManager::LoadFonts(const QString &directory,
-                                const QString &registeredFor)
+                                const QString &registeredFor, int *maxDirs)
 {
     if (directory.isEmpty() || directory == "/" || registeredFor.isEmpty())
         return;
+    (*maxDirs)--;
+    if (*maxDirs < 1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Reached the maximum directory depth "
+                "for a font directory structure. Terminating font scan.");
+        return;
+    }
 
     // Load the font files from this directory
     LoadFontsFromDirectory(directory, registeredFor);
@@ -37,13 +66,13 @@ void MythFontManager::LoadFonts(const QString &directory,
     QFileInfoList files = dir.entryInfoList();
     QFileInfo info;
     for (QFileInfoList::const_iterator it = files.begin();
-         it != files.end(); ++it)
+         ((it != files.end()) && (*maxDirs > 0)); ++it)
     {
         info = *it;
         // Skip '.' and '..' and other files starting with "." by checking
         // baseName()
         if (!info.baseName().isEmpty() && info.isDir())
-            LoadFonts(info.absoluteFilePath(), registeredFor);
+            LoadFonts(info.absoluteFilePath(), registeredFor, maxDirs);
     }
 }
 

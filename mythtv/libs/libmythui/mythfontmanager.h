@@ -21,6 +21,8 @@ class MPUBLIC MythFontManager
     static MythFontManager *GetGlobalFontManager(void);
 
   private:
+    void LoadFonts(const QString &directory, const QString &registeredFor,
+                   int *maxDirs);
     void LoadFontsFromDirectory(const QString &directory,
                                 const QString &registeredFor);
     void LoadFontFile(const QString &fontPath, const QString &registeredFor);
