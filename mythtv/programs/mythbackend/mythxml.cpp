@@ -66,10 +66,6 @@ static QString extract_id(const QString &raw_request)
 MythXML::MythXML( UPnpDevice *pDevice , const QString &sSharePath)
   : Eventing( "MythXML", "MYTHTV_Event", sSharePath)
 {
-    m_pEncoders = &tvList;
-    m_pSched    = sched;
-    m_pExpirer  = expirer;
-
     m_nPreRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
 
     // Add any event variables...
@@ -587,8 +583,8 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     RecList      recList;
     ProgramList  schedList;
 
-    if (m_pSched)
-        m_pSched->getAllPending( &recList);
+    if (sched)
+        sched->getAllPending( &recList);
 
     // ----------------------------------------------------------------------
     // We need to convert from a RecList to a ProgramList
@@ -699,8 +695,8 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
     RecList      recList;
     ProgramList  schedList;
 
-    if (m_pSched)
-        m_pSched->getAllPending( &recList);
+    if (sched)
+        sched->getAllPending( &recList);
 
     // ----------------------------------------------------------------------
     // We need to convert from a RecList to a ProgramList
@@ -979,8 +975,8 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 void MythXML::GetRecorded( HTTPRequest *pRequest )
 {
     QMap<QString,ProgramInfo*> recMap;
-    if (m_pSched)
-        recMap = m_pSched->GetRecording();
+    if (sched)
+        recMap = sched->GetRecording();
     QMap<QString,uint32_t> inUseMap = ProgramInfo::QueryInUseMap();
     QMap<QString,bool> isJobRunning =
         ProgramInfo::QueryJobsRunning(JOB_COMMFLAG);
@@ -1027,7 +1023,8 @@ void MythXML::GetExpiring( HTTPRequest *pRequest )
 {
     pginfolist_t  infoList;
 
-    m_pExpirer->GetAllExpiring( infoList );
+    if (expirer)
+        expirer->GetAllExpiring( infoList );
 
     // Build Response XML
 

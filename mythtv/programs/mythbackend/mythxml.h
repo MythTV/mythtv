@@ -24,7 +24,6 @@
 #include "recordinginfo.h"
 #include "scheduler.h"
 
-extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire              *expirer;
 extern Scheduler               *sched;
 
@@ -73,9 +72,6 @@ class MythXML : public Eventing
         QString                      m_sControlUrl;
         QString                      m_sServiceDescFileName;
 
-        Scheduler                   *m_pSched;
-        QMap<int, EncoderLink *>    *m_pEncoders;
-        AutoExpire                  *m_pExpirer;
         bool                         m_bIsMaster;
         int                          m_nPreRollSeconds;
 
