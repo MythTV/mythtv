@@ -3866,6 +3866,10 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(
     if ((lastDecodedFrameNumber == 0) && honorCutList)
         deleteMap.TrackerReset(0, 0);
 
+    if (!decoderThread)
+        DecoderStart();
+    PauseDecoder();
+
     if (!GetDecoder()->GetFrame(kDecodeAV))
         return false;
     if (eof)
