@@ -869,7 +869,7 @@ int main(int argc, char *argv[])
     QString filename;
     QString outputfilename = QString::null;
 
-    uint chanid;
+    uint chanid = 0;
     QString starttime;
     QString allStart = "19700101000000";
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
