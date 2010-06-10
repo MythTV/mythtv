@@ -2057,7 +2057,7 @@ int MPEG2fixup::Start()
                     {
                         if (saveMap.begin().key() <= frame_count)
                            saveMap.remove(saveMap.begin());
-                        if (saveMap.count() && saveMap.begin().data() == 0)
+                        if (saveMap.count() && saveMap.begin().value() == 0)
                         {
                             VERBOSE(MPF_IMPORTANT, QString("Saving frame #%1")
                                                .arg(frame_count));
@@ -2070,11 +2070,12 @@ int MPEG2fixup::Start()
                     }
                     if (delMap.count() && delMap.begin().key() <= frame_count)
                     {
-                        new_discard_state = delMap.begin().data();
+                        new_discard_state = delMap.begin().value();
+
                         delMap.remove(delMap.begin());
                         markedFrameP = curFrame;
 
-                        if (! new_discard_state)
+                        if (!new_discard_state)
                         {
                             cutEndPTS = markedFrameP->pkt.pts;
                             poq.SetNextPTS(
