@@ -52,6 +52,7 @@
 #endif
 
 using namespace std;
+#include "videooutbase.h"
 #include "vsync.h"
 
 bool tryingVideoSync = false;
