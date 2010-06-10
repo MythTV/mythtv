@@ -1291,6 +1291,14 @@ static float normalized_fps(AVStream *stream, AVCodecContext *enc)
             fps = tmpfps;
     }
 
+    // and finally try the ffmpeg estimated rate
+    if (fps > 121.0f || fps < 3.0f)
+    {
+        float tmpfps = av_q2d(stream->r_frame_rate);
+        if (tmpfps > 20 && tmpfps < 70)
+            fps = tmpfps;
+    }
+
     // If it is still out of range, just assume NTSC...
     fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
     return fps;
