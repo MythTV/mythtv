@@ -18,11 +18,10 @@ using namespace std;
 
 MetadataSettings::MetadataSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_movieGrabberButtonList(NULL),      m_tvGrabberButtonList(NULL),
       m_trailerSpin(NULL),                 m_helpText(NULL),
-      m_unknownFileCheck(NULL),            m_treeLoadsMetaCheck(NULL),
-      m_randomTrailerCheck(NULL),          m_okButton(NULL),
-      m_cancelButton(NULL)
+      m_unknownFileCheck(NULL),            m_autoMetaUpdateCheck(NULL),
+      m_treeLoadsMetaCheck(NULL),          m_randomTrailerCheck(NULL),
+      m_okButton(NULL),                    m_cancelButton(NULL)
 {
 }
 
@@ -36,19 +35,18 @@ bool MetadataSettings::Create()
     if (!foundtheme)
         return false;
 
-    m_movieGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("moviegrabber"));
-    m_tvGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("tvgrabber"));
     m_trailerSpin = dynamic_cast<MythUISpinBox *> (GetChild("trailernum"));
 
     m_helpText = dynamic_cast<MythUIText *> (GetChild("helptext"));
     m_unknownFileCheck = dynamic_cast<MythUICheckBox *> (GetChild("unknownfilecheck"));
+    m_autoMetaUpdateCheck = dynamic_cast<MythUICheckBox *> (GetChild("autometaupdatecheck"));
     m_treeLoadsMetaCheck = dynamic_cast<MythUICheckBox *> (GetChild("treeloadsmetacheck"));
     m_randomTrailerCheck = dynamic_cast<MythUICheckBox *> (GetChild("randomtrailercheck"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-    if (!m_movieGrabberButtonList || !m_tvGrabberButtonList || !m_trailerSpin ||
+    if (!m_trailerSpin || !m_autoMetaUpdateCheck ||
         !m_helpText || !m_unknownFileCheck || !m_treeLoadsMetaCheck ||
         !m_randomTrailerCheck ||!m_okButton || !m_cancelButton)
     {
@@ -59,6 +57,9 @@ bool MetadataSettings::Create()
     int unknownSetting = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     if (unknownSetting == 1)
         m_unknownFileCheck->SetCheckState(MythUIStateType::Full);
+    int autoMetaSetting = gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 0);
+    if (autoMetaSetting == 1)
+        m_autoMetaUpdateCheck->SetCheckState(MythUIStateType::Full);
     int loadMetaSetting = gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 0);
     if (loadMetaSetting == 1)
         m_treeLoadsMetaCheck->SetCheckState(MythUIStateType::Full);
@@ -80,20 +81,15 @@ bool MetadataSettings::Create()
 
     connect(m_randomTrailerCheck, SIGNAL(valueChanged()), SLOT(toggleTrailers()));
 
-    connect(m_movieGrabberButtonList, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_tvGrabberButtonList,    SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_trailerSpin,            SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_unknownFileCheck,       SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_autoMetaUpdateCheck,    SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_treeLoadsMetaCheck,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_randomTrailerCheck,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_okButton,               SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_cancelButton,           SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
 
     BuildFocusList();
-
-    SetFocusWidget(m_movieGrabberButtonList);
-
-    loadData();
 
     return true;
 }
@@ -102,98 +98,19 @@ MetadataSettings::~MetadataSettings()
 {
 }
 
-void MetadataSettings::loadData(void)
-{
-    QString busymessage = tr("Searching for Grabbers...");
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
-                                                       "metadatabusydialog");
-
-    if (busyPopup->Create())
-    {
-        popupStack->AddScreen(busyPopup, false);
-    }
-    else
-    {
-        delete busyPopup;
-        busyPopup = NULL;
-    }
-
-    QDir TVScriptPath = QString("%1/mythvideo/scripts/Television/").arg(GetShareDir());
-    QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
-    QDir MovieScriptPath = QString("%1/mythvideo/scripts/Movie/").arg(GetShareDir());
-    QStringList MovieScripts = MovieScriptPath.entryList(QDir::Files);
-    QString currentTVGrabber = gCoreContext->GetSetting("mythvideo.TVGrabber",
-                                         QString("%1mythvideo/scripts/Television/%2")
-                                         .arg(GetShareDir()).arg("ttvdb.py"));
-    QString currentMovieGrabber = gCoreContext->GetSetting("mythvideo.MovieGrabber",
-                                         QString("%1mythvideo/scripts/Movie/%2")
-                                         .arg(GetShareDir()).arg("tmdb.py"));
-
-    for (QStringList::const_iterator i = MovieScripts.end() - 1;
-            i != MovieScripts.begin() - 1; --i)
-    {
-        QProcess versionCheck;
-
-        QString commandline = QString("%1mythvideo/scripts/Movie/%2")
-                                      .arg(GetShareDir()).arg(*i);
-        versionCheck.setReadChannelMode(QProcess::MergedChannels);
-        versionCheck.start(commandline, QStringList() << "-v");
-        versionCheck.waitForFinished();
-        QByteArray result = versionCheck.readAll();
-        QString resultString(result);
-
-        if (resultString.isEmpty())
-            resultString = *i;
-
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_movieGrabberButtonList, resultString);
-        item->SetData(commandline);
-    }
-
-    for (QStringList::const_iterator i = TVScripts.end() - 1;
-            i != TVScripts.begin() - 1; --i)
-    {
-        QProcess versionCheck;
-
-        QString commandline = QString("%1mythvideo/scripts/Television/%2")
-                                      .arg(GetShareDir()).arg(*i);
-        versionCheck.setReadChannelMode(QProcess::MergedChannels);
-        versionCheck.start(commandline, QStringList() << "-v");
-        versionCheck.waitForFinished();
-        QByteArray result = versionCheck.readAll();
-        QString resultString(result);
-
-        if (resultString.isEmpty())
-            resultString = *i;
-
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_tvGrabberButtonList, resultString);
-        item->SetData(commandline);
-    }
-
-    m_movieGrabberButtonList->SetValueByData(qVariantFromValue(currentMovieGrabber));
-    m_tvGrabberButtonList->SetValueByData(qVariantFromValue(currentTVGrabber));
-
-    if (busyPopup)
-    {
-        busyPopup->Close();
-        busyPopup = NULL;
-    }
-}
-
 void MetadataSettings::slotSave(void)
 {
     gCoreContext->SaveSetting("mythvideo.TrailersRandomCount", m_trailerSpin->GetValue());
-    gCoreContext->SaveSetting("mythvideo.TVGrabber", m_tvGrabberButtonList->GetDataValue().toString());
-    gCoreContext->SaveSetting("mythvideo.MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString());
 
     int listUnknownState = 0;
     if (m_unknownFileCheck->GetCheckState() == MythUIStateType::Full)
         listUnknownState = 1;
     gCoreContext->SaveSetting("VideoListUnknownFiletypes", listUnknownState);
+
+    int autoMetaState = 0;
+    if (m_autoMetaUpdateCheck->GetCheckState() == MythUIStateType::Full)
+        autoMetaState = 1;
+    gCoreContext->SaveSetting("mythvideo.AutoMetaDataScan", autoMetaState);
 
     int loadMetaState = 0;
     if (m_treeLoadsMetaCheck->GetCheckState() == MythUIStateType::Full)
@@ -227,13 +144,7 @@ void MetadataSettings::slotFocusChanged(void)
         return;
 
     QString msg = "";
-    if (GetFocusWidget() == m_movieGrabberButtonList)
-        msg = tr("This is the script used to search "
-                 "for and download Movie Metadata.");
-    else if (GetFocusWidget() == m_tvGrabberButtonList)
-        msg = tr("This is the script used to search "
-                 "for and download Television Metadata.");
-    else if (GetFocusWidget() == m_randomTrailerCheck)
+    if (GetFocusWidget() == m_randomTrailerCheck)
         msg = tr("If set, this will enable a button "
                  "called \"Watch With Trailers\" which will "
                  "play a user-specified number of trailers "
@@ -244,6 +155,10 @@ void MetadataSettings::slotFocusChanged(void)
         msg = tr("If set, all files below the Myth Video "
                  "directory will be displayed unless their "
                  "extension is explicitly set to be ignored.");
+    else if (GetFocusWidget() == m_autoMetaUpdateCheck)
+        msg = tr("If set, every time a scan for new videos "
+                 "is performed, a mass metadata update of the "
+                 "collection will also occur.");
     else if (GetFocusWidget() == m_treeLoadsMetaCheck)
         msg = tr("If set along with Browse Files, this "
                  "will cause the Video List to load any known video meta"

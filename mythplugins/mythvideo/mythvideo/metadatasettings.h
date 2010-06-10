@@ -28,13 +28,12 @@ class MetadataSettings : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
   private:
-    MythUIButtonList   *m_movieGrabberButtonList;
-    MythUIButtonList   *m_tvGrabberButtonList;
     MythUISpinBox      *m_trailerSpin;
 
     MythUIText         *m_helpText;
 
     MythUICheckBox     *m_unknownFileCheck;
+    MythUICheckBox     *m_autoMetaUpdateCheck;
     MythUICheckBox     *m_treeLoadsMetaCheck;
     MythUICheckBox     *m_randomTrailerCheck;
 
@@ -45,7 +44,6 @@ class MetadataSettings : public MythScreenType
     void slotSave(void);
     void slotFocusChanged(void);
     void toggleTrailers(void);
-    void loadData(void);
 };
 
 #endif

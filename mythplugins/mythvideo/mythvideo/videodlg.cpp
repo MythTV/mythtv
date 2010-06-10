@@ -864,6 +864,8 @@ class VideoDialogPrivate
         m_altPlayerEnabled =
                     gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer");
 
+        m_autoMeta = gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 1);
+
         m_artDir = gCoreContext->GetSetting("VideoArtworkDir");
         m_sshotDir = gCoreContext->GetSetting("mythvideo.screenshotDir");
         m_fanDir = gCoreContext->GetSetting("mythvideo.fanartDir");
@@ -927,6 +929,8 @@ class VideoDialogPrivate
     bool m_altPlayerEnabled;
     VideoDialog::DialogType m_type;
     VideoDialog::BrowseType m_browse;
+
+    bool m_autoMeta;
 
     QString m_artDir;
     QString m_sshotDir;
@@ -1208,7 +1212,8 @@ void VideoDialog::reloadAllData(bool dbChanged)
     m_d->m_currentNode = NULL;
     reloadData();
 
-    VideoAutoSearch();
+    if (m_d->m_autoMeta)
+        VideoAutoSearch();
 }
 
 /** \fn VideoDialog::reloadData()

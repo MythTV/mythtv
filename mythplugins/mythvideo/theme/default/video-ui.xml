@@ -1426,49 +1426,39 @@
             <align>allcenter</align>
         </textarea>
         
-        <textarea name="movie_text" from="basetextarea">
-            <area>25,110,175,40</area>
-            <value>Movie Grabber:</value>
-            <align>right,vcenter</align>
-        </textarea>
-        
-        <textarea name="tv_text" from="movie_text">
-            <position>25,170</position>
-            <value>TV Grabber:</value>
+        <textarea name="autometa_text" from="basetextarea">
+            <area>285,170,400,40</area>
+            <value>Perform metadata update after video scan</value>
         </textarea>
 
-        <textarea name="trailercheck_text" from="movie_text">
+        <textarea name="trailercheck_text" from="basetextarea">
             <area>285,230,400,40</area>
             <value>Enable Random Trailer Playback</value>
             <align>left,vcenter</align>
         </textarea>
 
-        <textarea name="unknownfilecheck_text" from="movie_text">
+        <textarea name="unknownfilecheck_text" from="basetextarea">
             <area>285,350,400,40</area>
             <value>Display unknown file types</value>
             <align>left,vcenter</align>
         </textarea>
 
-        <textarea name="treeloadsmetacheck_text" from="movie_text">
+        <textarea name="treeloadsmetacheck_text" from="basetextarea">
             <area>285,410,400,40</area>
             <value>Enable metadata in file browse mode</value>
             <align>left,vcenter</align>
         </textarea>
 
-        <textarea name="trailerplay_text" from="movie_text">
+        <textarea name="trailerplay_text" from="basetextarea">
             <position>25,290</position>
             <value>Trailers to Play:</value>
         </textarea>
 
     <!--Widgets-->
         
-        <buttonlist name="moviegrabber" from="basewideselector">
-            <position>205,107</position>
-        </buttonlist>
-
-        <buttonlist name="tvgrabber" from="basewideselector">
-            <position>205,167</position>
-        </buttonlist>
+        <checkbox name="autometaupdatecheck" from="basecheckbox">
+            <position>245,167</position>
+        </checkbox>
 
         <checkbox name="randomtrailercheck" from="basecheckbox">
             <position>245,232</position>
