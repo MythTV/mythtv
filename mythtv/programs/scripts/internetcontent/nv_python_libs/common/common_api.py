@@ -18,7 +18,7 @@ MythNetvision Grabber scripts that run as a Web application and global functions
 MNV grabbers.
 '''
 
-__version__="v0.1.7"
+__version__="v0.1.8"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -37,6 +37,8 @@ __version__="v0.1.7"
 # 0.1.6 Removed all logic associated with Web CGI calls as the MNV plugin is now on the backend
 #       Made the pubDate fucntion more adaptable to various input date strings
 # 0.1.7 Added a common function to get the current selected language (default is 'en' English)
+# 0.1.8 Fixed a bug with two string functions
+#       Added a customhtml reference for bliptv
 
 import os, struct, sys, re, datetime, time, subprocess, string
 import urllib
@@ -722,6 +724,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
             # Tribute.ca
             'tributeca': u'tributeca.html?videocode=',
             'cinemarv': u'cinemarv.html?videocode=',
+            'bliptv': u'bliptv.html?videocode=',
             }
         if sourceLink in linksWebPage.keys():
             return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, linksWebPage[sourceLink])
@@ -739,14 +742,18 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         '''
         return a lower case string
         '''
-        return data.lower()
+        if not len(data):
+            return u''
+        return data[0].lower()
     # end stringLower()
 
     def stringUpper(self, context, data):
         '''
         return a upper case string
         '''
-        return data.upper()
+        if not len(data):
+            return u''
+        return data[0].upper()
     # end stringUpper()
 
     def stringReplace(self, context, *inputArgs):

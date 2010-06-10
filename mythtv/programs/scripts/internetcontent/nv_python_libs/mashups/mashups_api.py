@@ -19,9 +19,11 @@ meta data, video and image URLs from various Internet sources. These routines pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/xxxxMashup.xml" where "xxxx" is the specific mashup name matching the associated grabber name that calls these functions.
 '''
 
-__version__="v0.1.1"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Added Search Mashup capabilities
+# 0.1.2 Fixed a couple of error messages with improper variable names
+# 0.1.3 Add the ability for a Mashup to search the "internetcontentarticles" table
 
 import os, struct, sys, time, datetime, shutil, urllib
 from socket import gethostname, gethostbyname
@@ -163,7 +165,7 @@ class Videos(object):
         self.error_messages = {'MashupsUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'MashupsHttpError': u"! Error: An HTTP communications error with the Mashups was raised (%s)\n", 'MashupsRssError': u"! Error: Invalid RSS meta data\nwas received from the Mashups error (%s). Skipping item.\n", 'MashupsVideoNotFound': u"! Error: Video search with the Mashups did not return any results (%s)\n", 'MashupsConfigFileError': u"! Error: mashups_config.xml file missing\nit should be located in and named as (%s).\n", 'MashupsUrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'', 'channel_link': u'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': u"Mashups combines media from multiple sources to create a new work", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': u'', 'channel_link': u'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': u"Mashups combines media from multiple sources to create a new work", 'channel_numresults': 0, 'channel_returned': 0, u'channel_startindex': 0}
 
         self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/mashups.png'
 
@@ -210,7 +212,7 @@ class Videos(object):
             print
         try:
             self.mashups_config = etree.parse(url)
-        except Exception, e:
+        except Exception, errormsg:
             raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (url, errormsg))
         return
     # end getMashupsConfig()
@@ -257,7 +259,7 @@ class Videos(object):
         # additions or changes
         try:
             defaultPrefs = etree.parse(defaultConfig)
-        except Exception, e:
+        except Exception, errormsg:
             raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (defaultConfig, errormsg))
         urlFilter = etree.XPath('//sourceURL[@url=$url]', namespaces=self.common.namespaces)
         globalmaxFilter = etree.XPath('./../..', namespaces=self.common.namespaces)
@@ -314,6 +316,18 @@ class Videos(object):
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
             print
 
+        # Import the mnvsearch_api.py functions
+        fullPath = u'%s/nv_python_libs/%s' % (self.common.baseProcessingDir, 'mnvsearch')
+        sys.path.append(fullPath)
+        try:
+            exec('''import mnvsearch_api''')
+        except Exception, errmsg:
+            sys.stderr.write(u'! Error: Dynamic import of mnvsearch_api functions\nmessage(%s)\n' % (errmsg))
+            sys.exit(1)
+        mnvsearch_api.common = self.common
+        mnvsearch = mnvsearch_api.Videos(None, debug=self.config['debug_enabled'], language=self.config['language'])
+        mnvsearch.page_limit = self.page_limit
+
         # Get the dictionary of mashups functions pointers
         self.common.buildFunctionDict()
 
@@ -351,6 +365,8 @@ class Videos(object):
         xsltFilename = etree.XPath('./@xsltFile', namespaces=self.common.namespaces)
         sourceData = etree.XML(u'<xml></xml>')
         for source in self.userPrefs.xpath('//search//sourceURL[@enabled="true"]'):
+            if source.attrib.get('mnvsearch'):
+                continue
             urlName = source.attrib.get('name')
             if urlName:
                  uniqueName = u'%s;%s' % (urlName, source.attrib.get('url'))
@@ -395,6 +411,19 @@ class Videos(object):
                 channelTree.xpath('startindex')[0].text = self.common.startindex
                 for item in itemFilter(result):
                     channelTree.append(item)
+
+        # Process any mnvsearches
+        for source in self.userPrefs.xpath('//search//sourceURL[@enabled="true" and @mnvsearch]'):
+            results = mnvsearch.searchForVideos(title, pagenumber, feedtitle=source.xpath('./@mnvsearch')[0])
+            if len(results[0].keys()):
+                channelTree.xpath('returned')[0].text = u'%s' % (int(channelTree.xpath('returned')[0].text)+results[1])
+                channelTree.xpath('startindex')[0].text = u'%s' % (int(channelTree.xpath('startindex')[0].text)+results[2])
+                channelTree.xpath('numresults')[0].text = u'%s' % (int(channelTree.xpath('numresults')[0].text)+results[3])
+                lastKey = None
+                for key in sorted(results[0].keys()):
+                    if lastKey != key:
+                        channelTree.append(results[0][key])
+                        lastKey = key
 
         # Check that there was at least some items
         if len(rssTree.xpath('//item')):

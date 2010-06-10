@@ -26,12 +26,13 @@
     <xsl:template name='earth-touch'>
         <xsl:for-each select='//item'>
             <dataSet>
+
                 <xsl:if test="../itunes:image/@href">
-                    <xsl:if test="not(string(../itunes:image/@href) = 'http://www.earth-touch.com/i/podcast/ET_IT5.jpg')">
+                    <xsl:if test="not(contains(mnvXpath:stringLower(..//image/title/text()), 'featured videos'))">
                         <directoryThumbnail><xsl:value-of select="normalize-space(../itunes:image/@href)"/></directoryThumbnail>
                     </xsl:if>
-                    <xsl:if test="string(../itunes:image/@href) = 'http://www.earth-touch.com/i/podcast/ET_IT5.jpg'">
-                        <directoryThumbnail>%SHAREDIR%/mythnetvision/icons/nature.png</directoryThumbnail>
+                    <xsl:if test="contains(mnvXpath:stringLower(..//image/title/text()), 'featured videos')">
+                        <directoryThumbnail>%SHAREDIR%/mythnetvision/icons/earthtouch.png</directoryThumbnail>
                     </xsl:if>
                 </xsl:if>
                 <xsl:element name="specialDirectories">

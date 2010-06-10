@@ -12,6 +12,23 @@
     automatically have at least one per "subDirectory" enabled so the user will be alerted to the new
     source the next time they update their treeview maps.
 -->
+<!--
+    The Nature Search Mashup's RSS feed and HTML URLs.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+    "pageFunction" Identifies a XPath extension function that returns the start page/index for the
+                    specific source.
+    "mnvsearch" Identifies that search items are to include items from the MNV table using the
+                mnvsearch_api.py functions. This attributes value must match the "feedtitle" value
+                as is in the "internetcontentarticles" table.
+-->
+<search name="Nature Search">
+  <subDirectory name="Nature">
+    <sourceURL enabled="true" name="Nature" xsltFile="" type="xml" url="" pageFunction="" mnvsearch="Nature"/>
+  </subDirectory>
+</search>
 
 <!--
     The Nature Mashup's RSS feed and HTML URLs.
@@ -55,4 +72,17 @@
     <sourceURL enabled="false" name="iPod"  xsltFile="earthtouchRSS_item" type="xml" url="http://feeds.feedburner.com/kids-ipod?format=xml"/>
   </subDirectory>
 </directory>
+
+<directory name="Ecogeeks" globalmax="0">
+  <subDirectory name="Ecogeeks: Untamed Science Video">
+    <sourceURL enabled="true" name="Untamed Science Video" xsltFile="ecogeeksRSS_item" type="xml" url="http://biologyclipstwc.blip.tv/rss"/>
+  </subDirectory>
+</directory>
+
+<directory name="TERRA" globalmax="0">
+  <subDirectory name="TERRA: The Nature of Our World">
+    <sourceURL enabled="true" name="The Nature of Our World" xsltFile="terraRSS_item" type="xml" url="http://terraadmin.blip.tv/rss"/>
+  </subDirectory>
+</directory>
+
 </userNature>

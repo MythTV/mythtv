@@ -23,8 +23,9 @@
 __title__ ="Nature";
 __mashup_title__ = "natureMashup"
 __author__="R.D. Vaughan"
-__version__="0.10"
+__version__="0.11"
 # 0.10  Initial development
+# 0.11  Added a search of all the "Nature Mashup" items in the "internetcontentarticles" table
 
 __usage_examples__ ='''
 (Option Help)
@@ -53,9 +54,22 @@ Options:
   -T, --treeview        Display a Tree View of a sites videos
 
 > ./nature.py -v
-Nature Mashup|T
+<grabber>
+  <name>Nature</name>
+  <author>R.D. Vaughan</author>
+  <thumbnail>nature.png</thumbnail>
+  <command>nature.py</command>
+  <type>video</type>
+  <description>Mashups combines media from multiple sources to create a new work</description>
+  <version>0.XX</version>
+  <search>true</search>
+  <tree>true</tree>
+</grabber>
 
+Search:
+> ./nature.py -S "Lions"
 
+Treeview:
 > ./nature.py -T
 '''
 __search_max_page_items__ = 20
@@ -161,7 +175,7 @@ if __name__ == '__main__':
     main.grabberInfo['type'] = ['video', ]
     main.grabberInfo['desc'] = u"Mashups combines media from multiple sources to create a new work"
     main.grabberInfo['version'] = __version__
-    main.grabberInfo['search'] = False
+    main.grabberInfo['search'] = True
     main.grabberInfo['tree'] = True
     main.grabberInfo['html'] = False
     main.grabberInfo['usage'] = __usage_examples__

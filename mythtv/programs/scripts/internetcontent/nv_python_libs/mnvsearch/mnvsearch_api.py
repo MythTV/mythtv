@@ -18,12 +18,14 @@ This python script is intended to perform a data base search of MythNetvision da
 videos based on a command line search term.
 '''
 
-__version__="0.1.3"
+__version__="0.1.4"
 # 0.1.0 Initial development
 # 0.1.1 Changed the logger to only output to stderr rather than a file
 # 0.1.2 Changed the SQL query to the new "internetcontentarticles" table format and new fields
 #       Added "%SHAREDIR%" to icon directory path
 # 0.1.3 Video duration value was being erroneously multiplied by 60.
+# 0.1.4 Add the ability to search within a specific "feedtitle". Used mainly for searching large mashups
+#       Fixed a paging bug
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 import logging
@@ -193,7 +195,7 @@ class Videos(object):
     # end __init__()
 
 
-    def searchTitle(self, title, pagenumber, pagelen):
+    def searchTitle(self, title, pagenumber, pagelen, feedtitle=False):
         '''Key word video search of the MNV treeview tables
         return an array of matching item elements
         return
@@ -206,7 +208,7 @@ class Videos(object):
 
         # Perform a search
         try:
-            resultList = self.getTreeviewData(title, pagenumber, pagelen)
+            resultList = self.getTreeviewData(title, pagenumber, pagelen, feedtitle=feedtitle)
         except Exception, errormsg:
             raise MNVSQLError(self.error_messages['MNVSQLError'] % (errormsg))
 
@@ -286,7 +288,7 @@ class Videos(object):
         # end searchTitle()
 
 
-    def searchForVideos(self, title, pagenumber):
+    def searchForVideos(self, title, pagenumber, feedtitle=False):
         """Common name for a video search. Used to interface with MythTV plugin NetVision
         """
         # Usually commented out - Easier for debugging
@@ -295,8 +297,10 @@ class Videos(object):
 #        sys.exit()
 
         try:
-            data = self.searchTitle(title, pagenumber, self.page_limit)
+            data = self.searchTitle(title, pagenumber, self.page_limit, feedtitle=feedtitle)
         except MNVVideoNotFound, msg:
+            if feedtitle:
+                return [{}, '0', '0', '0']
             sys.stderr.write(u"%s\n" % msg)
             sys.exit(0)
         except MNVSQLError, msg:
@@ -317,13 +321,17 @@ class Videos(object):
         # Set the paging values
         itemCount = len(data[0].keys())
         if data[1] == True:
-            self.channel['channel_returned'] = itemCount+(self.page_limit*(int(pagenumber)-1))
-            self.channel['channel_startindex'] = self.channel['channel_returned']
+            self.channel['channel_returned'] = itemCount
+            self.channel['channel_startindex'] = itemCount+(self.page_limit*(int(pagenumber)-1))
             self.channel['channel_numresults'] = itemCount+(self.page_limit*(int(pagenumber)-1)+1)
         else:
             self.channel['channel_returned'] = itemCount+(self.page_limit*(int(pagenumber)-1))
             self.channel['channel_startindex'] = self.channel['channel_returned']
             self.channel['channel_numresults'] = self.channel['channel_returned']
+
+        # If this was a Mashup search request then just return the elements dictionary a paging info
+        if feedtitle:
+            return [data[0], self.channel['channel_returned'], self.channel['channel_startindex'], self.channel['channel_numresults']]
 
         # Add the Channel element tree
         channelTree = self.common.mnvChannelElement(self.channel)
@@ -341,13 +349,16 @@ class Videos(object):
         sys.exit(0)
     # end searchForVideos()
 
-    def getTreeviewData(self, searchTerms, pagenumber, pagelen):
+    def getTreeviewData(self, searchTerms, pagenumber, pagelen, feedtitle=False):
         ''' Use a SQL call to get any matching data base entries from the "netvisiontreeitems" and
         "netvisionrssitems" tables. The search term can contain multiple search words separated
         by a ";" character.
         return a list of items found in the search or an empty dictionary if none were found
         '''
-        sqlStatement = u'(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE %s) ORDER BY title ASC LIMIT %s , %s'
+        if feedtitle:
+            sqlStatement = u"(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE `feedtitle` LIKE '%%%%FEEDTITLE%%%%' AND (%s)) ORDER BY title ASC LIMIT %s , %s"
+        else:
+            sqlStatement = u'(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE %s) ORDER BY title ASC LIMIT %s , %s'
         searchTerm = u"`title` LIKE '%%SEARCHTERM%%' OR `description` LIKE '%%SEARCHTERM%%'"
 
         # Create the query variables search terms and the from/to paging values
@@ -369,6 +380,9 @@ class Videos(object):
         else:
             fromResults = (int(pagenumber)-1)*int(pagelen)
             pageLimit = pagelen+1
+
+        if feedtitle:
+            sqlStatement = sqlStatement.replace(u'FEEDTITLE', feedtitle)
 
         query = sqlStatement % (dbSearchStatements, fromResults, pageLimit,)
         if self.config['debug_enabled']:
