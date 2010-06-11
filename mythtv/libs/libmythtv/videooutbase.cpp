@@ -1505,11 +1505,15 @@ QRect VideoOutput::GetSafeRect(void)
     QRect result;
     if (hasFullScreenOSD())
     {
-        result = windows[0].GetDisplayVideoRect();
+        result = windows[0].GetDisplayVideoRect()
+            .intersected(windows[0].GetDisplayVisibleRect());
     }
     else
     {
-        result = QRect(QPoint(0, 0), windows[0].GetVideoDispDim());
+        float visible_aspect, font_scaling;
+        float themeaspect = 16.0f/9.0f;
+        result = windows[0].GetVisibleOSDBounds(
+            visible_aspect, font_scaling, themeaspect);
     }
     int safex = (int)((float)result.width()  * safeMargin);
     int safey = (int)((float)result.height() * safeMargin);
