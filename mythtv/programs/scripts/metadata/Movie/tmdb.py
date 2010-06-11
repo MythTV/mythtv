@@ -28,9 +28,9 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="TheMovieDB Query";
+__title__ ="TheMovieDB.org";
 __author__="R.D.Vaughan"
-__version__="v0.2.0"
+__version__="0.21"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -49,65 +49,98 @@ __version__="v0.2.0"
 # 0.1.8 Improved displayed messages on an exception abort
 # 0.1.9 Added support for XML output
 # 0.2.0 Make XML output the default
+# Version 1.12  Convert version information to XML
 
 
 __usage_examples__='''
 Request tmdb.py verison number:
 > ./tmdb.py -v
-TheMovieDB APIv2 Query Query (v0.x.x) by R.D.Vaughan
+<grabber>
+  <name>TheMovieDB.org</name>
+  <author>R.D.Vaughan</author>
+  <thumbnail>tmdb.png</thumbnail>
+  <command>tmdb.py</command>
+  <type>movie</type>
+  <description>Search and metadata downloads for themoviedb.org</description>
+  <version>0.XX</version>
+</grabber>
 
 Request a list of matching movie titles:
 > ./tmdb.py -M "Avatar"
-19995:Avatar (2009)
-8514:The Avatar State (2006)
-8518:Avatar Day (2006)
-13336:Chrysalis (2007)
-8493:The Avatar Returns (2005)
-8500:Avatar Roku (Winter Solstice (2)) (2005)
-8481:The Avatar and the Firelord (2007)
-12467:Avatar Aang (2008)
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <language>en</language>
+    <title>Avatar</title>
+    <subtitle>Creating the World of Pandora</subtitle>
+    <inetref>31631</inetref>
+    <imdb/>
+    <userrating>8.5</userrating>
+    <certifications>
+      <certification locale="us" name="PG"/>
+    </certifications>
+    <description>The cast and crew take you on an in-depth look at the making of James Cameron's epic.</description>
+    <releasedate>2009-12-01</releasedate>
+...
+  <item>
+    <language>en</language>
+    <title>Avatar 2</title>
+    <inetref>37739</inetref>
+    <imdb>1630029</imdb>
+    <userrating>0.0</userrating>
+    <description>soon :)</description>
+    <releasedate>2014-04-10</releasedate>
+    <lastupdated>Fri, 14 May 2010 05:41:13 GMT</lastupdated>
+  </item>
+</metadata>
 
 Request movie details using a TMDB#:
 > ./tmdb.py -D 19995
-Title:Avatar
-Year:2009
-ReleaseDate:2009-12-18
-InetRef:19995
-URL:http://www.themoviedb.org/movie/19995
-Director:James Cameron
-Plot:A band of humans are pitted in a battle against a distant planet's indigenous population.
-Runtime:166
-Coverart:http://images.themoviedb.org/posters/76198/avatar_xlg.jpg
-Fanart:http://images.themoviedb.org/backdrops/72434/wallpaper_05_1280x1024.jpg,http://images.themoviedb.org/backdrops/69971/avatar-newstills-101-full-01.jpg,http://images.themoviedb.org/backdrops/69968/avatar-3.jpg,http://images.themoviedb.org/backdrops/69965/avatar-2.jpg,http://images.themoviedb.org/backdrops/68648/Avatar.jpg,http://images.themoviedb.org/backdrops/67496/avatar2_resize.jpg,http://images.themoviedb.org/backdrops/67487/avatar1_resized.jpg,http://images.themoviedb.org/backdrops/52193/avatar_movie_based_ubisoft_game_concept_art_1.jpg
-Cast:Sam Worthington, Zoe Saldana, Stephen Lang, Sigourney Weaver, Michelle Rodríguez
-Genres:Science Fiction
-Studios:Lightstorm Entertainment
-Type:movie
-Imdb:0499549
-AlternativeName:Avatar
-Homepage:http://www.avatarmovie.com/
-Trailer:http://www.youtube.com/watch?v=j6AAt-oV3wE
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Avatar</title>
+    <tagline>Enter the World</tagline>
+    <language>en</language>
+    <description>A paraplegic former Marine finds a new life on the distant planet of Pandora. Only to find himself battling humankind alongside the planet's indigenous Na'vi race in this ambitious digital 3D sci-fi epic from Academy Award-winning Titanic director James Cameron.</description>
+    <certifications>
+      <certification locale="us" name="PG-13"/>
+    </certifications>
+    <categories>
+      <category type="genre" name="Action"/>
+      <category type="genre" name="Adventure"/>
+      <category type="genre" name="Fantasy"/>
+      <category type="genre" name="Science Fiction"/>
+      <category type="genre" name="Thriller"/>
+    </categories>
+    <studios>
+      <studio name="20th Century Fox"/>
+    </studios>
+...
+      <image type="fanart" thumb="http://i1.themoviedb.org/backdrops/9fa/4bc95845017a3c57fe0279fa/avatar-thumb.jpg" url="http://i2.themoviedb.org/backdrops/9fa/4bc95845017a3c57fe0279fa/avatar-original.jpg" width="1920" height="1080"/>
+      <image type="fanart" thumb="http://i2.themoviedb.org/backdrops/a1e/4bc9584d017a3c57fe027a1e/avatar-thumb.jpg" url="http://i2.themoviedb.org/backdrops/a1e/4bc9584d017a3c57fe027a1e/avatar-original.jpg" width="1920" height="1080"/>
+      <image type="fanart" thumb="http://i1.themoviedb.org/backdrops/9fe/4bc95846017a3c57fe0279fe/avatar-thumb.jpg" url="http://i3.themoviedb.org/backdrops/9fe/4bc95846017a3c57fe0279fe/avatar-original.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
 
 Request movie details using a IMDB#:
 > ./tmdb.py -D 0499549
-Title:Avatar
-Year:2009
-ReleaseDate:2009-12-18
-InetRef:19995
-URL:http://www.themoviedb.org/movie/19995
-Director:James Cameron
-Plot:A band of humans are pitted in a battle against a distant planet's indigenous population.
-Runtime:166
-Coverart:http://images.themoviedb.org/posters/76198/avatar_xlg.jpg
-Fanart:http://images.themoviedb.org/backdrops/72434/wallpaper_05_1280x1024.jpg,http://images.themoviedb.org/backdrops/69971/avatar-newstills-101-full-01.jpg,http://images.themoviedb.org/backdrops/69968/avatar-3.jpg,http://images.themoviedb.org/backdrops/69965/avatar-2.jpg,http://images.themoviedb.org/backdrops/68648/Avatar.jpg,http://images.themoviedb.org/backdrops/67496/avatar2_resize.jpg,http://images.themoviedb.org/backdrops/67487/avatar1_resized.jpg,http://images.themoviedb.org/backdrops/52193/avatar_movie_based_ubisoft_game_concept_art_1.jpg
-Cast:Sam Worthington, Zoe Saldana, Stephen Lang, Sigourney Weaver, Michelle Rodríguez
-Genres:Science Fiction
-Studios:Lightstorm Entertainment
-Type:movie
-Imdb:0499549
-AlternativeName:Avatar
-Homepage:http://www.avatarmovie.com/
-Trailer:http://www.youtube.com/watch?v=j6AAt-oV3wE
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Avatar</title>
+    <language>en</language>
+    <description>A paraplegic former Marine finds a new life on the distant planet of Pandora. Only to find himself battling humankind alongside the planet's indigenous Na'vi race in this ambitious digital 3D sci-fi epic from Academy Award-winning Titanic director James Cameron.</description>
+    <certifications>
+      <certification locale="us" name="PG-13"/>
+    </certifications>
+...
+width="1920" height="1080"/>
+      <image type="fanart" thumb="http://i1.themoviedb.org/backdrops/9fe/4bc95846017a3c57fe0279fe/avatar-thumb.jpg" url="http://i2.themoviedb.org/backdrops/9fe/4bc95846017a3c57fe0279fe/avatar-original.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
 
 Request a list of People matching a name:
 > ./tmdb.py -P "Cruise"
@@ -199,6 +232,29 @@ Error:(%s)
 
 if tmdb_api.__version__ < '0.1.3':
     sys.stderr.write("\n! Error: Your current installed tmdb_api.py version is (%s)\nYou must at least have version (0.1.3) or higher.\n" % tmdb_api.__version__)
+    sys.exit(1)
+
+
+try:
+    from StringIO import StringIO
+    from lxml import etree as etree
+except Exception, e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.exit(1)
+
+# Check that the lxml library is current enough
+# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
+# Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
+version = ''
+for digit in etree.LIBXML_VERSION:
+    version+=str(digit)+'.'
+version = version[:-1]
+if version < '2.7.2':
+    sys.stderr.write(u'''
+! Error - The installed version of the "lxml" python library "libxml" version is too old.
+          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
+''' % version)
     sys.exit(1)
 
 
@@ -519,8 +575,15 @@ def main():
 
     # Process version command line requests
     if opts.version:
-        sys.stdout.write("%s (%s) by %s\n" % (
-        __title__, __version__, __author__ ))
+        version = etree.XML(u'<grabber></grabber>')
+        etree.SubElement(version, "name").text = __title__
+        etree.SubElement(version, "author").text = __author__
+        etree.SubElement(version, "thumbnail").text = 'tmdb.png'
+        etree.SubElement(version, "command").text = 'tmdb.py'
+        etree.SubElement(version, "type").text = 'movie'
+        etree.SubElement(version, "description").text = 'Search and metadata downloads for themoviedb.org'
+        etree.SubElement(version, "version").text = __version__
+        sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
 
     # Process usage command line requests

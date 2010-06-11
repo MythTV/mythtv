@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="GiantBomb Query";
 __author__="R.D. Vaughan"
-__version__="v0.11"
+__version__="0.11"
 # 0.10  Initial development
 # 0.11  Added the -l option to conform to grabber standards. Currently www.giantbomb.com does not support
 #       multiple languages.

@@ -35,9 +35,9 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="TheTVDB.com Query";
+__title__ ="TheTVDB.com";
 __author__="R.D.Vaughan"
-__version__="v1.1.1"
+__version__="1.12"
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -131,6 +131,7 @@ __version__="v1.1.1"
 # Version 1.1.0 Added support for XML output. See:
 #               http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 # Version 1.1.1 Make XML output the default.
+# Version 1.12  Convert version information to XML
 
 usage_txt='''
 Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDS [parameters]
@@ -207,59 +208,88 @@ http://www.thetvdb.com/banners/blank/70382.jpg
 > ttvdb -Bl en "Lost"
 Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.com/banners/graphical/73739-g.jpg,http://www.thetvdb.com/banners/graphical/73739-g6.jpg,http://www.thetvdb.com/banners/graphical/73739-g8.jpg,http://www.thetvdb.com/banners/graphical/73739-g3.jpg,http://www.thetvdb.com/banners/graphical/73739-g7.jpg,http://www.thetvdb.com/banners/graphical/73739-g5.jpg,http://www.thetvdb.com/banners/graphical/24313-g2.jpg,http://www.thetvdb.com/banners/graphical/24313-g.jpg,http://www.thetvdb.com/banners/graphical/73739-g10.jpg,http://www.thetvdb.com/banners/graphical/73739-g2.jpg
 
-(Return a season and episode numbers) Note: Any other options are ignored e.g. (-BFP ... etc))
-> ttvdb -N "Eleventh Hour (US)" "H2O"
-S01E10
-
-(Return a season and episode numbers with an override of the default output format)
-(WARNING: There is no editing of an override output format, two '%d' must be included)
-> ttvdb -N "Eleventh Hour (US)" "H2O" "Season%dx%02d"
-Season1x10
-
 (Return a season and episode numbers using the override file to identify the series as the US version)
 > ttvdb -N --configure="/home/user/.tvdb/tvdb.conf" "Eleventh Hour" "H2O"
-S01E10
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Eleventh Hour (US)</title>
+    <subtitle>H2O</subtitle>
+    <language>en</language>
+    <description>An epidemic of sudden, violent outbursts by law-abiding citizens draws Dr. Jacob Hood to a quiet Texas community to investigate - but he soon succumbs to the same erratic behavior.</description>
+    <season>1</season>
+    <episode>10</episode>
+...
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-4.jpg" width="1280" height="720"/>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/83066-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/83066-g.jpg"/>
+    </images>
+  </item>
+</metadata>
 
 (Return the season numbers for a series)
 > ttvdb --configure="/home/user/.tvdb/tvdb.conf" -n "SG-1"
 0,1,2,3,4,5,6,7,8,9,10
 
 (Return the meta data for a specific series/season/episode)
-> ttvdb -D "Sanctuary" 0 1
-Title:Sanctuary
-Season:0
-Episode:1
-Subtitle:Webisode 1
-Year:2007
-ReleaseDate:2007-05-14
-Director:Martin Wood
-Plot:While tracking a young boy with dangerous powers, Dr. Helen Magnus encounters Will Zimmerman, a psychiatric resident who may have what it takes to become her new protégé.
-UserRating:8.5
-Writers:Damian Kindler, Martin Wood
-Screenshot:http://www.thetvdb.com/banners/episodes/80159/328953.jpg
-Language:en
-Combined_Episodenumber:1
-Id:328953
-Seasonid:27498
-Lastupdated:1223234120
-Combined_Season:0
-Cast:Amanda Tapping, Robin Dunne, Emilie Ullerup, Ryan Robbins, Christopher Heyerdahl, Agam Darshi, Dan Payne, Sarah Sands, Lorena Gale, Sheri Noel, Diana Pavlovska, Malik McCall, Cainan Wiebe, Kavan Smith, Michael Adamthwaite
-Seriesid:80159
-Productioncode:101
-Genres:Action and Adventure, Science-Fiction
-Runtime:60
-Coverart:http://www.thetvdb.com/banners/seasons/80159-0-2.jpg,http://www.thetvdb.com/banners/seasons/80159-0-4.jpg,http://www.thetvdb.com/banners/seasons/80159-0-3.jpg,http://www.thetvdb.com/banners/seasons/80159-0.jpg
-Fanart:http://www.thetvdb.com/banners/fanart/original/80159-2.jpg,http://www.thetvdb.com/banners/fanart/original/80159-1.jpg,http://www.thetvdb.com/banners/fanart/original/80159-8.jpg,http://www.thetvdb.com/banners/fanart/original/80159-6.jpg,http://www.thetvdb.com/banners/fanart/original/80159-5.jpg,http://www.thetvdb.com/banners/fanart/original/80159-9.jpg,http://www.thetvdb.com/banners/fanart/original/80159-3.jpg,http://www.thetvdb.com/banners/fanart/original/80159-7.jpg,http://www.thetvdb.com/banners/fanart/original/80159-4.jpg
-Banner:http://www.thetvdb.com/banners/graphical/80159-g2.jpg,http://www.thetvdb.com/banners/graphical/80159-g3.jpg,http://www.thetvdb.com/banners/graphical/80159-g.jpg
+> ttvdb.py -D 80159 2 2
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Sanctuary</title>
+    <subtitle>End of Nights (2)</subtitle>
+    <language>en</language>
+    <description>Furious at being duped into a trap, Magnus (AMANDA TAPPING) takes on Kate (AGAM DARSHI), demanding information and complete access to her Cabal contacts. The Cabal’s true agenda is revealed and Magnus realizes that they are not only holding Ashley (EMILIE ULLERUP) as ransom to obtain complete control of the Sanctuary Network, but turning her into the ultimate weapon. Now transformed into a Super Abnormal with devastating powers, Ashley and her newly cloned fighters begin their onslaught, destroying Sanctuaries in cities around the world. Tesla (JONATHON YOUNG) and Henry (RYAN ROBBINS) attempt to create a weapon that can stop the attacks…without killing Ashley. As the team prepares to defend the Sanctuary with Tesla’s new weapon, Magnus must come to the realization that they may not be able to stop the Cabal’s attacks without harming Ashley. She realizes she might have to choose between saving her only daughter, or losing the Sanctuary and all the lives and secrets within it.</description>
+    <season>2</season>
+    <episode>2</episode>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <categories>
+      <category type="genre" name="Action and Adventure"/>
+      <category type="genre" name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="SciFi"/>
+    </studios>
+...
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/80159-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/80159-g.jpg"/>
+    </images>
+  </item>
+</metadata>
 
 (Return a list of "thetv.com series id and series name" that contain specific search word(s) )
 (!! Be careful with this option as poorly defined search words can result in large lists being returned !!)
 > ttvdb.py -M "night a"
-74382:Love on a Saturday Night
-108281:A Night on Mount Edna
-118511:A Night at the Office
-71476:Star For A Night
-
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <language>en</language>
+    <title>Love on a Saturday Night</title>
+    <inetref>74382</inetref>
+    <releasedate>2004-02-01</releasedate>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night on Mount Edna</title>
+    <inetref>108281</inetref>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night at the Office</title>
+    <inetref>118511</inetref>
+    <description>On August 11th 2009, it was announced that the cast of The Office would be reuniting for a special, called "A Night at The Office", available at BBC2 and online.</description>
+    <releasedate>2009-01-01</releasedate>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/118511-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/118511-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>Star For A Night</title>
+    <inetref>71476</inetref>
+    <releasedate>1999-01-01</releasedate>
+  </item>
+</metadata>
 '''
 # Episode keys that can be used in a episode data/information search.
 # All keys are currently being used.
@@ -998,8 +1028,15 @@ def main():
 
     # Process version command line requests
     if opts.version == True:
-        sys.stdout.write("%s (%s) by %s\n" % (
-        __title__, __version__, __author__ ))
+        version = etree.XML(u'<grabber></grabber>')
+        etree.SubElement(version, "name").text = __title__
+        etree.SubElement(version, "author").text = __author__
+        etree.SubElement(version, "thumbnail").text = 'ttvdb.png'
+        etree.SubElement(version, "command").text = 'ttvdb.py'
+        etree.SubElement(version, "type").text = 'television'
+        etree.SubElement(version, "description").text = 'Search and metadata downloads for thetvdb.com'
+        etree.SubElement(version, "version").text = __version__
+        sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
 
     # Process usage command line requests
