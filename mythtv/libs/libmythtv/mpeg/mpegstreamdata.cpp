@@ -891,7 +891,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     if (!psip->IsCurrent()) // we don't cache the next table, for now
         DONE_WITH_PES_PACKET();
 
-    if (tspacket->ScramplingControl())
+    if (tspacket->Scrambled())
     { // scrambled! ATSC, DVB require tables not to be scrambled
         VERBOSE(VB_RECORD,
                 "PSIP packet is scrambled, not ATSC/DVB compiant");
@@ -975,7 +975,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (!ok)
         return false;
 
-    if (!tspacket.ScramplingControl() && tspacket.HasPayload())
+    if (!tspacket.Scrambled() && tspacket.HasPayload())
     {
         if (IsVideoPID(tspacket.PID()))
         {
@@ -1004,7 +1004,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
             HandleTSTables(&tspacket);
         }
     }
-    else if (!tspacket.ScramplingControl() && IsWritingPID(tspacket.PID()))
+    else if (!tspacket.Scrambled() && IsWritingPID(tspacket.PID()))
     {
         // PCRPID and other streams we're writing may not have payload...
         for (uint j = 0; j < _ts_writing_listeners.size(); j++)
@@ -1728,7 +1728,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     CryptStatus status = kEncUnknown;
 
-    if (tspacket.ScramplingControl())
+    if (tspacket.Scrambled())
     {
         info.decrypted_packets = 0;
 

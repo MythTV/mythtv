@@ -329,7 +329,7 @@ void FirewireDevice::SetLastChannel(const uint channel)
 
 void FirewireDevice::ProcessPATPacket(const TSPacket &tspacket)
 {
-    if (!tspacket.TransportError() && !tspacket.ScramplingControl() &&
+    if (!tspacket.TransportError() && !tspacket.Scrambled() &&
         tspacket.HasPayload() && tspacket.PayloadStart() && !tspacket.PID())
     {
         PESPacket pes = PESPacket::View(tspacket);
