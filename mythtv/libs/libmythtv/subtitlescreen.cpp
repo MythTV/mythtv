@@ -803,7 +803,7 @@ bool SubtitleScreen::InitialiseFont(void)
     if (initialised)
         return gTextSubFont;
 
-    QString font = gCoreContext->GetSetting("OSDCCFont");
+    QString font = "FreeMono";
 
     MythFontProperties *mythfont = new MythFontProperties();
     if (mythfont)
@@ -829,17 +829,18 @@ bool SubtitleScreen::Initialise708Fonts(void)
 
     initialised = true;
 
+    VERBOSE(VB_IMPORTANT, "Initialise708Fonts()");
+
     // TODO remove extra fonts from settings page
-    QString def = gCoreContext->GetSetting("OSDCC708DefaultFontType", "MonoSerif");
     QStringList fonts;
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708%1Font").arg(def)));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708MonoSerifFont")));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708PropSerifFont")));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708MonoSansSerifFont")));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708PropSansSerifFont")));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708CasualFont")));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708CursiveFont")));
-    fonts.append(gCoreContext->GetSetting(QString("OSDCC708CapitalsFont")));
+    fonts.append("Droid Sans Mono"); // default
+    fonts.append("FreeMono");        // mono serif
+    fonts.append("DejaVu Serif");    // prop serif
+    fonts.append("Droid Sans Mono"); // mono sans
+    fonts.append("Liberation Sans"); // prop sans
+    fonts.append("Purisa");          // casual
+    fonts.append("URW Chancery L");  // cursive
+    fonts.append("Impact");          // capitals
 
     int count = 0;
     foreach(QString font, fonts)
