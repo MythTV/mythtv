@@ -236,8 +236,6 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
             discard = 1;
             delMap.remove(0);
         }
-        if (delMap.begin().value() == MARK_CUT_END)
-            discard = 1;
         use_secondary = true;
     }
 
