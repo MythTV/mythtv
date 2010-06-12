@@ -379,7 +379,7 @@ VideoOutput::VideoOutput() :
 VideoOutput::~VideoOutput()
 {
     if (osd_image)
-        delete osd_image;
+        osd_image->DownRef();
     if (osd_painter)
         delete osd_painter;
 
@@ -1307,7 +1307,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     if (osd_image && (osd_image->size() != osd_size))
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("OSD size changed."));
-        delete osd_image;
+        osd_image->DownRef();
         osd_image = NULL;
     }
 
