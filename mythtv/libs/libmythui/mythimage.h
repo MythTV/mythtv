@@ -18,7 +18,6 @@ class MPUBLIC MythImage : public QImage
 {
   public:
     MythImage(MythPainter *parent);
-    virtual ~MythImage();
 
     void UpRef(void);
     bool DownRef(void);
@@ -69,6 +68,7 @@ class MPUBLIC MythImage : public QImage
     void SetIsInCache(bool bCached);
 
   protected:
+    virtual ~MythImage();
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
                              bool drawBoundary=true,
