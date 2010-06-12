@@ -2327,7 +2327,7 @@ bool NuppelVideoPlayer::StartPlaying(void)
     }
 
     EventStart();
-    DecoderStart();
+    DecoderStart(true);
     VideoStart();
 
     if (playerTimer)
@@ -2585,7 +2585,7 @@ void NuppelVideoPlayer::UnpauseDecoder(void)
     decoderPauseLock.unlock();
 }
 
-void NuppelVideoPlayer::DecoderStart(void)
+void NuppelVideoPlayer::DecoderStart(bool clear_bookmark)
 {
     if (decoderThread)
     {
@@ -2606,7 +2606,7 @@ void NuppelVideoPlayer::DecoderStart(void)
     {
         DoFastForward(bookmarkseek, true, false);
         if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
-            !player_ctx->IsPIP())
+            !player_ctx->IsPIP() && clear_bookmark)
         {
             ClearBookmark(false);
         }
@@ -3638,7 +3638,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     ClearAfterSeek();
     if (!decoderThread)
-        DecoderStart();
+        DecoderStart(false);
     PauseDecoder();
     SeekForScreenGrab(number, frameNum, absolute);
     int tries = 0;
@@ -3786,7 +3786,7 @@ VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (!decoderThread)
-        DecoderStart();
+        DecoderStart(false);
 
     if (frameNumber >= 0)
     {
@@ -3865,7 +3865,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(
         deleteMap.TrackerReset(0, 0);
 
     if (!decoderThread)
-        DecoderStart();
+        DecoderStart(false);
     PauseDecoder();
 
     if (!GetDecoder()->GetFrame(kDecodeAV))

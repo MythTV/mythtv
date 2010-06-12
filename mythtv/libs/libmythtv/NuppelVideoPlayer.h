@@ -398,7 +398,7 @@ class MPUBLIC NuppelVideoPlayer
     virtual void VideoStart(void);
     virtual bool VideoLoop(void);
     virtual void VideoEnd(void);
-    virtual void DecoderStart(void);
+    virtual void DecoderStart(bool clear_bookmark);
     virtual void DecoderLoop(bool pause);
     virtual void DecoderEnd(void);
     virtual void AudioEnd(void);
