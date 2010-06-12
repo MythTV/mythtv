@@ -24,25 +24,25 @@ HEADERS += playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 HEADERS += statusbox.h networkcontrol.h custompriority.h
 HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
-HEADERS += mythappearance.h exitprompt.h proglist.h 
+HEADERS += mythappearance.h exitprompt.h
 HEADERS += action.h mythcontrols.h keybindings.h keygrabber.h
 HEADERS += mythosdmenueditor.h progfind.h guidegrid.h customedit.h
 HEADERS += schedulecommon.h progdetails.h scheduleeditor.h
-HEADERS += backendconnectionmanager.h programinfocache.h
-HEADERS += playbackboxhelper.h
-HEADERS += viewschedulediff.h
+HEADERS += backendconnectionmanager.h   programinfocache.h
+HEADERS += proglist.h                   proglist_helpers.h 
+HEADERS += playbackboxhelper.h          viewschedulediff.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
 SOURCES += mediarenderer.cpp mythfexml.cpp playbackboxlistitem.cpp
-SOURCES += custompriority.cpp mythappearance.cpp exitprompt.cpp proglist.cpp
+SOURCES += custompriority.cpp mythappearance.cpp exitprompt.cpp
 SOURCES += action.cpp actionset.cpp  mythcontrols.cpp keybindings.cpp
 SOURCES += keygrabber.cpp mythosdmenueditor.cpp progfind.cpp guidegrid.cpp
 SOURCES += customedit.cpp schedulecommon.cpp progdetails.cpp scheduleeditor.cpp
 SOURCES += backendconnectionmanager.cpp programinfocache.cpp
-SOURCES += playbackboxhelper.cpp
-SOURCES += viewschedulediff.cpp
+SOURCES += proglist.cpp                 proglist_helpers.cpp
+SOURCES += playbackboxhelper.cpp        viewschedulediff.cpp
 
 macx {
     mac_bundle {

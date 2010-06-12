@@ -15,6 +15,8 @@ class AutoDeleteDeque
     typedef typename std::deque< T > List;
     typedef typename List::iterator iterator;
     typedef typename List::const_iterator const_iterator;
+    typedef typename List::reverse_iterator reverse_iterator;
+    typedef typename List::const_reverse_iterator const_reverse_iterator;
 
     T operator[](uint index)
     {
@@ -50,6 +52,10 @@ class AutoDeleteDeque
     iterator end(void)               { return list.end();   }
     const_iterator begin(void) const { return list.begin(); }
     const_iterator end(void)   const { return list.end();   }
+    reverse_iterator rbegin(void)             { return list.rbegin(); }
+    reverse_iterator rend(void)               { return list.rend();   }
+    const_reverse_iterator rbegin(void) const { return list.rbegin(); }
+    const_reverse_iterator rend(void)   const { return list.rend();   }
 
     T back(void)                     { return list.back();  }
     const T back(void)         const { return list.back();  }

@@ -3,14 +3,12 @@
 
 // Qt headers
 #include <QDateTime>
+#include <QString>
 
 // MythTV headers
-#include "mythscreentype.h"
-#include "programinfo.h"
-#include "mythwidgets.h"
-
-// mythfrontend
+#include "programinfo.h" // for ProgramList
 #include "schedulecommon.h"
+#include "proglist_helpers.h"
 
 enum ProgListType {
     plUnknown = 0,
@@ -30,156 +28,19 @@ enum ProgListType {
     plPreviouslyRecorded
 };
 
-class MythUIText;
-class MythUIButtonList;
-class ProgLister;
-
-class PhrasePopup : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    PhrasePopup(MythScreenStack *parentStack,
-                ProgLister *parent,
-                RecSearchType searchType,
-                const QStringList &list,
-                const QString &currentValue);
-
-    bool Create();
-
-  signals:
-    void haveResult(QString item);
-
-  private slots:
-    void okClicked(void);
-    void deleteClicked(void);
-    void recordClicked(void);
-    void phraseClicked(MythUIButtonListItem *item);
-    void phraseSelected(MythUIButtonListItem *item);
-    void editChanged(void);
-
-  private:
-    ProgLister      *m_parent;
-    RecSearchType    m_searchType;
-    QStringList      m_list;
-    QString          m_currentValue;
-
-    MythUIText       *m_titleText;
-    MythUIButtonList *m_phraseList;
-    MythUITextEdit   *m_phraseEdit;
-    MythUIButton     *m_okButton;
-    MythUIButton     *m_deleteButton;
-    MythUIButton     *m_recordButton;
-};
-
-class TimePopup : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    TimePopup(MythScreenStack *parentStack, ProgLister *parent);
-
-    bool Create();
-
-  signals:
-    void haveResult(QDateTime time);
-
-  private slots:
-    void okClicked(void);
-
-  private:
-    ProgLister      *m_parent;
-    QStringList      m_list;
-    QString          m_currentValue;
-
-    MythUIButtonList *m_dateList;
-    MythUIButtonList *m_timeList;
-    MythUIButton     *m_okButton;
-};
-
-class PowerSearchPopup : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    PowerSearchPopup(MythScreenStack *parentStack,
-                ProgLister *parent,
-                RecSearchType searchType,
-                const QStringList &list,
-                const QString &currentValue);
-
-    bool Create();
-
-  signals:
-    void haveResult(QString item);
-
-  private slots:
-    void editClicked(void);
-    void deleteClicked(void);
-    void recordClicked(void);
-    void phraseClicked(MythUIButtonListItem *item);
-    void phraseSelected(MythUIButtonListItem *item);
-
-  private:
-    ProgLister      *m_parent;
-    RecSearchType    m_searchType;
-    QStringList      m_list;
-    QString          m_currentValue;
-
-    MythUIText       *m_titleText;
-    MythUIButtonList *m_phraseList;
-    MythUITextEdit   *m_phraseEdit;
-    MythUIButton     *m_editButton;
-    MythUIButton     *m_deleteButton;
-    MythUIButton     *m_recordButton;
-};
-
-class EditPowerSearchPopup : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    EditPowerSearchPopup(MythScreenStack *parentStack, ProgLister *parent,
-                         const QString &currentValue);
-
-    bool Create();
-
-  private slots:
-    void okClicked(void);
-
-  private:
-    void initLists(void);
-
-    ProgLister      *m_parent;
-    QStringList      m_categories;
-    QStringList      m_genres;
-    QStringList      m_channels;
-
-    QString          m_currentValue;
-
-    MythUITextEdit   *m_titleEdit;
-    MythUITextEdit   *m_subtitleEdit;
-    MythUITextEdit   *m_descEdit;
-    MythUIButtonList *m_categoryList;
-    MythUIButtonList *m_genreList;
-    MythUIButtonList *m_channelList;
-
-    MythUIButton     *m_okButton;
-};
-
 class ProgLister : public ScheduleCommon
 {
-  friend class PhrasePopup;
-  friend class TimePopup;
-  friend class PowerSearchPopup;
-  friend class EditPowerSearchPopup;
+    friend class PhrasePopup;
+    friend class TimePopup;
+    friend class PowerSearchPopup;
+    friend class EditPowerSearchPopup;
 
-  Q_OBJECT
+    Q_OBJECT
 
   public:
     ProgLister(MythScreenStack *parent, ProgListType pltype,
                const QString &view, const QString &from);
-    explicit ProgLister(MythScreenStack *parent, int recid = 0, 
+    explicit ProgLister(MythScreenStack *parent, uint recid = 0, 
                         const QString &title = QString());
     ~ProgLister();
 
@@ -188,75 +49,87 @@ class ProgLister : public ScheduleCommon
     void customEvent(QEvent *);
 
   protected slots:
-    void prevView(void);
-    void nextView(void);
-    void setViewFromTime(QDateTime searchTime);
-    void select(void);
-    void edit(void);
-    void customEdit(void);
-    void deleteItem(void);
-    void deleteRule(void);
-    void deleteOldEpisode(void);
-    void deleteOldTitle(void);
-    void oldRecordedActions(void);
-    void upcoming(void);
-    void details(void);
-    void chooseView(void);
-    void updateInfo(MythUIButtonListItem *item);
-    void setViewFromList(QString item);
-    void doDeleteOldEpisode(bool ok);
-    void doDeleteOldTitle(bool ok);
-    void showSortMenu();
+    void HandleSelected(MythUIButtonListItem *item);
+    void HandleClicked(void);
 
-  protected:
-    void quickRecord(void);
+    void DeleteOldEpisode(bool ok);
+    void DeleteOldSeries(bool ok);
+    void RecordSelected(void);
+
+    void SetViewFromList(QString item);
+    void SetViewFromTime(QDateTime searchTime);
+
+    void EditScheduled(void) { ScheduleCommon::EditScheduled(GetCurrent()); }
+    void EditCustom(void)    { ScheduleCommon::EditCustom(GetCurrent());    }
+
+    void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrent());   }
+    void ShowUpcoming(void);
+    void ShowSortMenu(void);
+    void ShowDeleteRuleMenu(void);
+    void ShowDeleteOldEpisodeMenu(void);
 
   private:
     void Load(void);
 
-    void fillViewList(const QString &view);
-    void fillItemList(bool restorePosition, bool updateDisp = true);
-    void updateDisplay(bool restorePosition);
-    void updateButtonList(void);
+    void FillViewList(const QString &view);
+    void FillItemList(bool restorePosition, bool updateDisp = true);
 
-    bool powerStringToSQL(const QString &qphrase, QString &output,
-                          MSqlBindings &bindings);
+    void ClearCurrentProgramInfo(void);
+    void UpdateDisplay(const ProgramInfo *selected);
+    void UpdateButtonList(void);
+    void UpdateKeywordInDB(const QString &text, const QString &oldValue);
 
-    void updateKeywordInDB(const QString &text, const QString &oldValue);
+    virtual void ShowMenu(void); // MythScreenType
+    void ShowChooseViewMenu(void);
+    void ShowDeleteItemMenu(void);
+    void ShowDeleteOldSeriesMenu(void);
+    void ShowOldRecordedMenu(void);
 
-    void ShowMenu(void);
-    
-    ProgListType m_type;
-    int          m_recid;
-    QString      m_title;
-    QString      m_addTables;
-    QDateTime    m_startTime;
-    QDateTime    m_searchTime;
-    QString      m_dayFormat;
-    QString      m_hourFormat;
-    QString      m_timeFormat;
-    QString      m_fullDateFormat;
-    QString      m_channelOrdering;
-    QString      m_channelFormat;
+    void SwitchToPreviousView(void);
+    void SwitchToNextView(void);
 
-    RecSearchType m_searchType;
+    typedef enum { kTimeSort, kPrevTitleSort, kTitleSort, } SortBy;
+    SortBy GetSortBy(void) const;
+    void SortList(SortBy sortby, bool reverseSort);
 
-    QString       m_view;
-    int           m_curView;
-    QStringList   m_viewList;
-    QStringList   m_viewTextList;
+    ProgramInfo *GetCurrent(void);
+    const ProgramInfo *GetCurrent(void) const;
 
-    ProgramList   m_itemList;
-    ProgramList   m_schedList;
+    bool PowerStringToSQL(
+        const QString &qphrase, QString &output, MSqlBindings &bindings) const;
 
-    QStringList   m_typeList;
-    QStringList   m_genreList;
-    QStringList   m_stationList;
+  private:
+    ProgListType      m_type;
+    uint              m_recid;
+    QString           m_title;
+    QString           m_addTables;
+    QDateTime         m_startTime;
+    QDateTime         m_searchTime;
+    QString           m_dayFormat;
+    QString           m_hourFormat;
+    QString           m_timeFormat;
+    QString           m_fullDateFormat;
+    QString           m_channelOrdering;
+    QString           m_channelFormat;
 
-    bool m_allowEvents;
-    bool m_titleSort;
-    bool m_reverseSort;
-    bool m_useGenres;
+    RecSearchType     m_searchType;
+
+    QString           m_view;
+    int               m_curView;
+    QStringList       m_viewList;
+    QStringList       m_viewTextList;
+
+    ProgramList       m_itemList;
+    ProgramList       m_schedList;
+
+    QStringList       m_typeList;
+    QStringList       m_genreList;
+    QStringList       m_stationList;
+
+    bool              m_allowEvents;
+    bool              m_titleSort;
+    bool              m_reverseSort;
+    bool              m_useGenres;
 
     MythUIText       *m_schedText;
     MythUIText       *m_curviewText;
