@@ -3185,11 +3185,9 @@ bool NuppelVideoPlayer::IsNearEnd(int64_t margin)
     if (!player_ctx->IsPIP() &&
         player_ctx->GetState() == kState_WatchingPreRecorded)
     {
-        framesLeft = margin;
         if (framesRead >= deleteMap.GetLastFrame(totalFrames))
             return true;
-        else
-            framesLeft = totalFrames - framesRead;
+        framesLeft = (totalFrames > framesRead) ? totalFrames - framesRead : 0;
         return (framesLeft < (uint64_t)margin);
     }
 
