@@ -3441,6 +3441,9 @@ void AvFormatDecoder::ProcessDSMCCPacket(
 
 bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 {
+    if (!subReader)
+        return true;
+
     long long pts = 0;
 
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
@@ -3482,14 +3485,14 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     {
         subtitle.start_display_time += pts;
         subtitle.end_display_time += pts;
-        if (subReader)
-            subReader->AddAVSubtitle(subtitle);
-
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
                 QString("subtl timecode %1 %2 %3 %4")
                 .arg(pkt->pts).arg(pkt->dts)
                 .arg(subtitle.start_display_time)
                 .arg(subtitle.end_display_time));
+
+        if (subReader)
+            subReader->AddAVSubtitle(subtitle);
     }
 
     return true;

@@ -29,6 +29,7 @@ class SubtitleReader
     AVSubtitles* GetAVSubtitles(void) { return &m_AVSubtitles; }
     void AddAVSubtitle(const AVSubtitle& subtitle);
     void ClearAVSubtitles(void);
+    void FreeAVSubtitle(const AVSubtitle &sub);
 
     TextSubtitles* GetTextSubtitles(void) { return &m_TextSubtitles; }
     bool HasTextSubtitles(void);

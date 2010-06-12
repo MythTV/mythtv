@@ -252,12 +252,8 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                             QString("AV Sub was %1 ms late").arg(late));
                 }
             }
-            av_free(rect->pict.data[0]);
-            av_free(rect->pict.data[1]);
-            av_free(rect);
         }
-        if (subtitle.num_rects > 0)
-            av_free(subtitle.rects);
+        m_subreader->FreeAVSubtitle(subtitle);
     }
     subs->lock.unlock();
 }
