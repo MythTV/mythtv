@@ -103,7 +103,7 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
     // TeletextViewer interface methods
     virtual void KeyPress(uint key);
     virtual void SetPage(int page, int subpage);
-    virtual void SetDisplaying(bool display) { m_displaying = display; }
+    virtual void SetDisplaying(bool display);
     virtual void Reset(void);
     virtual void AddPageHeader(int page, int subpage, const uint8_t *buf,
                                int vbimode, int lang, int flags);

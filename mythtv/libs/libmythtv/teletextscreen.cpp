@@ -363,6 +363,13 @@ void TeletextScreen::SetPage(int page, int subpage)
     PageUpdated(m_curpage, m_cursubpage);
 }
 
+void TeletextScreen::SetDisplaying(bool display)
+{
+    m_displaying = display;
+    if (!m_displaying)
+        DeleteAllChildren();
+}
+
 void TeletextScreen::Reset(void)
 {
     QMutexLocker locker(&m_lock);
