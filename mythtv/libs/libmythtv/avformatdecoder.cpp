@@ -3928,7 +3928,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int ret             = 0;
     int data_size       = 0;
     bool firstloop      = true, dts = false;
-    AC3HeaderInfo hdr;
 
     avcodeclock->lock();
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
