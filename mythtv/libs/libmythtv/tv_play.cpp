@@ -855,7 +855,6 @@ TV::TV(void)
 
       smartChannelChange(false),
       arrowAccel(false),
-      osd_general_timeout(2), osd_prog_info_timeout(3),
       tryUnflaggedSkip(false),
       smartForward(false),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
@@ -954,8 +953,6 @@ TV::TV(void)
     kv["SmartChannelChange"]       = "0";
 
     kv["UseArrowAccels"]           = "1";
-    kv["OSDGeneralTimeout"]        = "2";
-    kv["OSDProgramInfoTimeout"]    = "3";
     kv["TryUnflaggedSkip"]         = "0";
 
     kv["ChannelGroupDefault"]      = "-1";
@@ -999,8 +996,6 @@ TV::TV(void)
     db_short_date_format   = kv["ShortDateFormat"];
     smartChannelChange     = kv["SmartChannelChange"].toInt();
     arrowAccel             = kv["UseArrowAccels"].toInt();
-    osd_general_timeout    = kv["OSDGeneralTimeout"].toInt();
-    osd_prog_info_timeout  = kv["OSDProgramInfoTimeout"].toInt();
     tryUnflaggedSkip       = kv["TryUnflaggedSkip"].toInt();
     channel_group_id       = kv["ChannelGroupDefault"].toInt();
     browse_changrp         = kv["BrowseChannelGroup"].toInt();
@@ -3296,8 +3291,7 @@ void TV::HandleSpeedChangeTimerEvent(void)
 
     if (update_msg)
     {
-        UpdateOSDSeekMessage(actx, actx->GetPlayMessage(),
-                             osd_general_timeout);
+        UpdateOSDSeekMessage(actx, actx->GetPlayMessage(), true);
     }
     ReturnPlayerLock(actx);
 }
@@ -4192,8 +4186,7 @@ bool TV::FFRewHandleAction(PlayerContext *ctx, const QStringList &actions)
         if (!handled)
         {
             DoNVPSeek(ctx, StopFFRew(ctx));
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(),
-                                 osd_general_timeout);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
             handled = true;
         }
     }
@@ -4201,7 +4194,7 @@ bool TV::FFRewHandleAction(PlayerContext *ctx, const QStringList &actions)
     if (ctx->ff_rew_speed)
     {
         NormalSpeed(ctx);
-        UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
         handled = true;
     }
 
@@ -5461,7 +5454,7 @@ void TV::DoPlay(PlayerContext *ctx)
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     DoNVPSeek(ctx, time);
-    UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), osd_general_timeout);
+    UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
 
     GetMythUI()->DisableScreensaver();
 
@@ -5523,9 +5516,9 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
         DoNVPSeek(ctx, time);
 
         if (showOSD && ctx == player[0])
-            UpdateOSDSeekMessage(ctx, tr("Paused"), -1);
+            UpdateOSDSeekMessage(ctx, tr("Paused"), false);
         else if (showOSD)
-            UpdateOSDSeekMessage(ctx, tr("Aux Paused"), -1);
+            UpdateOSDSeekMessage(ctx, tr("Aux Paused"), false);
 
         RestoreScreenSaver(ctx);
     }
@@ -5533,9 +5526,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     {
         DoNVPSeek(ctx, time);
         if (showOSD)
-            UpdateOSDSeekMessage(ctx,
-                                 ctx->GetPlayMessage(),
-                                 osd_general_timeout);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
         GetMythUI()->DisableScreensaver();
     }
 
@@ -5661,7 +5652,7 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg)
         NormalSpeed(ctx);
         time += StopFFRew(ctx);
         DoNVPSeek(ctx, time);
-        UpdateOSDSeekMessage(ctx, mesg, osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, mesg, true);
     }
 }
 
@@ -5756,7 +5747,7 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
 
     ctx->paused = false;
     DoNVPSeek(ctx, time);
-    UpdateOSDSeekMessage(ctx, mesg, osd_general_timeout);
+    UpdateOSDSeekMessage(ctx, mesg, true);
 
     SetSpeedChangeTimer(0, __LINE__);
 }
@@ -5808,8 +5799,7 @@ void TV::ChangeFFRew(PlayerContext *ctx, int direction)
         {
             float time = StopFFRew(ctx);
             DoNVPSeek(ctx, time);
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(),
-                                 osd_general_timeout);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
         }
     }
     else
@@ -5853,7 +5843,7 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
         ctx->nvp->Play((float)speed, (speed == 1) && (ctx->ff_rew_state > 0));
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    UpdateOSDSeekMessage(ctx, mesg, -1);
+    UpdateOSDSeekMessage(ctx, mesg, false);
 
     SetSpeedChangeTimer(0, __LINE__);
 }
@@ -6972,10 +6962,10 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
 }
 
 void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
-                              const QString &mesg, int disptime)
+                              const QString &mesg, bool fade)
 {
     VERBOSE(VB_PLAYBACK, QString("UpdateOSDSeekMessage(%1, %2)")
-            .arg(mesg).arg(disptime));
+            .arg(mesg).arg(fade));
 
     osdInfo info;
     if (ctx->CalcNVPSliderPosition(info))
@@ -6983,7 +6973,7 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
             kOSDFunctionalType_Default;
         info.text["title"] = mesg;
-        UpdateOSDStatus(ctx, info, osdtype, disptime > 0);
+        UpdateOSDStatus(ctx, info, osdtype, fade);
         SetUpdateOSDPosition(true);
     }
 }
@@ -7855,8 +7845,7 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
     {
         if (!allowEdit)
         {
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(),
-                                 osd_general_timeout);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
         }
         else
         {
@@ -10857,7 +10846,7 @@ void TV::ToggleAutoExpire(PlayerContext *ctx)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, desc, true);
 }
 
 void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
@@ -10874,7 +10863,7 @@ void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, desc, true);
 }
 
 void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
@@ -10887,7 +10876,7 @@ void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
         ClearOSD(ctx);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, desc, true);
 }
 
 bool TV::HandleJumpToProgramAction(
@@ -11267,8 +11256,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
 
     if (ctx->buffer->InDVDMenuOrStillFrame())
     {
-        UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"),
-                             osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), true);
     }
     else if (!ctx->buffer->DVD()->StartOfTitle())
     {
@@ -11276,8 +11264,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
         if (ctx->nvp)
             ctx->nvp->ChangeDVDTrack(0);
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-        UpdateOSDSeekMessage(ctx, tr("Previous Chapter"),
-                             osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, tr("Previous Chapter"), true);
     }
     else
     {
@@ -11294,8 +11281,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
                 ctx->nvp->GoToDVDProgram(0);
             ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-            UpdateOSDSeekMessage(ctx, tr("Previous Title"),
-                                 osd_general_timeout);
+            UpdateOSDSeekMessage(ctx, tr("Previous Title"), true);
         }
     }
 }
@@ -11311,8 +11297,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
     if (ctx->buffer->DVD()->InStillFrame())
     {
         ctx->buffer->DVD()->SkipStillFrame();
-        UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"),
-                             osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"), true);
     }
     else if (!ctx->buffer->DVD()->EndOfTitle())
     {
@@ -11321,8 +11306,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
             ctx->nvp->ChangeDVDTrack(1);
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-        UpdateOSDSeekMessage(ctx, tr("Next Chapter"),
-                             osd_general_timeout);
+        UpdateOSDSeekMessage(ctx, tr("Next Chapter"), true);
     }
     else if (!ctx->buffer->DVD()->NumMenuButtons())
     {
@@ -11342,8 +11326,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
                 ctx->nvp->GoToDVDProgram(1);
             ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-            UpdateOSDSeekMessage(ctx, tr("Next Title"),
-                                 osd_general_timeout);
+            UpdateOSDSeekMessage(ctx, tr("Next Title"), true);
         }
     }
 }

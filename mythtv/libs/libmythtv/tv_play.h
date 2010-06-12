@@ -465,7 +465,7 @@ class MPUBLIC TV : public QThread
                          int type, bool set_expiry = true);
 
     void UpdateOSDSeekMessage(const PlayerContext*,
-                              const QString &mesg, int disptime);
+                              const QString &mesg, bool fade);
     void UpdateOSDInput(const PlayerContext*,
                         QString inputname = QString::null);
     void UpdateOSDSignal(const PlayerContext*, const QStringList &strlist);
@@ -675,8 +675,6 @@ class MPUBLIC TV : public QThread
 
     bool    smartChannelChange;
     bool    arrowAccel;
-    int     osd_general_timeout;
-    int     osd_prog_info_timeout;
 
     CommSkipMode autoCommercialSkip;
     bool    tryUnflaggedSkip;
