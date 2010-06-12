@@ -937,16 +937,19 @@ TeletextScreen* OSD::InitTeletext(void)
 void OSD::EnableTeletext(bool enable, int page)
 {
     TeletextScreen *tt = InitTeletext();
-    if (!enable || !tt)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + "Disabled teletext");
+    if (!tt)
         return;
-    }
 
-    tt->SetVisible(true);
-    tt->SetDisplaying(true);
-    tt->SetPage(page, -1);
-    VERBOSE(VB_PLAYBACK, LOC + QString("Enabled teletext page %1").arg(page));
+    tt->SetVisible(enable);
+    tt->SetDisplaying(enable);
+    if (enable)
+    {
+        tt->SetPage(page, -1);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Enabled teletext page %1")
+                                   .arg(page));
+    }
+    else
+        VERBOSE(VB_PLAYBACK, LOC + "Disabled teletext");
 }
 
 bool OSD::TeletextAction(const QString &action)

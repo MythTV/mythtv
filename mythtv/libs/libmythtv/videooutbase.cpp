@@ -1313,7 +1313,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 
     if (!osd_image)
     {
-        osd_image = new MythImage(osd_painter);
+        osd_image = osd_painter->GetFormatImage();
         if (osd_image)
         {
             QImage blank = QImage(osd_size, QImage::Format_ARGB32_Premultiplied);
