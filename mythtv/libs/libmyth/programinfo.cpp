@@ -2494,7 +2494,9 @@ bool ProgramInfo::QueryIsDeleteCandidate(bool one_playback_allowed) const
         for (uint i = 0; (i+2 < (uint)byWho.size()) && ok; i++)
         {
             play_cnt += byWho[i].contains(kPlayerInUseID) ? 1 : 0;
-            ok = ok && (byWho[i].contains(kRecorderInUseID) ||
+            ok = ok && (byWho[i].contains(kRecorderInUseID)   ||
+                        byWho[i].contains(kFlaggerInUseID)    ||
+                        byWho[i].contains(kTranscoderInUseID) ||
                         (one_playback_allowed && (play_cnt <= 1)));
         }
     }
