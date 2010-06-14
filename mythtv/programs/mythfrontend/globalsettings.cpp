@@ -1609,26 +1609,6 @@ static HostCheckBox *FFRewReverse()
     return gc;
 }
 
-static HostSpinBox *OSDGeneralTimeout()
-{
-    HostSpinBox *gs = new HostSpinBox("OSDGeneralTimeout", 1, 30, 1);
-    gs->setLabel(QObject::tr("General OSD time-out (sec)"));
-    gs->setValue(2);
-    gs->setHelpText(QObject::tr("Length of time an on-screen display "
-                    "window will be visible."));
-    return gs;
-}
-
-static HostSpinBox *OSDProgramInfoTimeout()
-{
-    HostSpinBox *gs = new HostSpinBox("OSDProgramInfoTimeout", 1, 30, 1);
-    gs->setLabel(QObject::tr("Program info OSD time-out"));
-    gs->setValue(3);
-    gs->setHelpText(QObject::tr("Length of time the on-screen display "
-                    "will display program information."));
-    return gs;
-}
-
 static HostSpinBox *OSDNotifyTimeout()
 {
     HostSpinBox *gs = new HostSpinBox("OSDNotifyTimeout", 1, 30, 1);
@@ -1676,19 +1656,6 @@ static HostComboBox *MenuTheme()
         if (xml.exists())
             gc->addSelection(theme.fileName());
     }
-
-    return gc;
-}
-
-static HostComboBox *OSDFont()
-{
-    HostComboBox *gc = new HostComboBox("OSDFont");
-    gc->setLabel(QObject::tr("OSD font"));
-    QDir ttf(GetFontsDir(), GetFontsNameFilter());
-    gc->fillSelectionsFromDir(ttf, false);
-    QString defaultOSDFont = "FreeSans.ttf";
-    if (gc->findSelection(defaultOSDFont) > -1)
-        gc->setValue(defaultOSDFont);
 
     return gc;
 }
@@ -1866,29 +1833,6 @@ static HostComboBox *SubtitleCodec()
         gc->addSelection(val, val, val.toLower() == "utf-8");
     }
 
-    return gc;
-}
-
-static HorizontalConfigurationGroup *ExternalSubtitleSettings()
-{
-    HorizontalConfigurationGroup *grpmain =
-        new HorizontalConfigurationGroup(false, true, true, true);
-
-    grpmain->setLabel(QObject::tr("External subtitle settings"));
-
-    grpmain->addChild(SubtitleCodec());
-
-    return grpmain;
-}
-
-static HostComboBox *OSDThemeFontSizeType()
-{
-    HostComboBox *gc = new HostComboBox("OSDThemeFontSizeType");
-    gc->setLabel(QObject::tr("Font size"));
-    gc->addSelection(QObject::tr("default"), "default");
-    gc->addSelection(QObject::tr("small"), "small");
-    gc->addSelection(QObject::tr("big"), "big");
-    gc->setHelpText(QObject::tr("default: TV, small: monitor, big:"));
     return gc;
 }
 
@@ -2851,11 +2795,6 @@ ThemeSelector::ThemeSelector(QString label):
         themetype = THEME_UI;
         setLabel(QObject::tr("UI theme"));
     }
-    else if (label == "OSDTheme")
-    {
-        themetype = THEME_OSD;
-        setLabel(QObject::tr("OSD theme"));
-    }
     else if (label == "MenuTheme")
     {
         themetype = THEME_MENU;
@@ -2928,8 +2867,6 @@ ThemeSelector::ThemeSelector(QString label):
 
     if (themetype & THEME_UI)
         setValue(DEFAULT_UI_THEME);
-    else if (themetype & THEME_OSD)
-        setValue("BlackCurves-OSD");
 }
 
 static HostComboBox *ChannelFormat()
@@ -4424,21 +4361,13 @@ OSDSettings::OSDSettings()
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
     osd->setLabel(QObject::tr("On-screen Display"));
 
-    osd->addChild(new ThemeSelector("OSDTheme"));
-    osd->addChild(OSDGeneralTimeout());
-    osd->addChild(OSDProgramInfoTimeout());
-    osd->addChild(OSDFont());
-    osd->addChild(OSDThemeFontSizeType());
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
+    osd->addChild(OSDNotifyTimeout());
+    osd->addChild(UDPNotifyPort());
+    osd->addChild(SubtitleCodec());
     addChild(osd);
-
-    VerticalConfigurationGroup *udp = new VerticalConfigurationGroup(false);
-    udp->setLabel(QObject::tr("UDP OSD Notifications"));
-    udp->addChild(OSDNotifyTimeout());
-    udp->addChild(UDPNotifyPort());
-    addChild(udp);
 
     VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
     cc->setLabel(QObject::tr("Analog Closed Captions"));
@@ -4451,7 +4380,6 @@ OSDSettings::OSDSettings()
 
     addChild(OSDCC708Settings());
     addChild(OSDCC708Fonts());
-    addChild(ExternalSubtitleSettings());
 
 #if CONFIG_DARWIN
     // Any Mac OS-specific OSD stuff would go here.
