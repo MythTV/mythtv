@@ -47,7 +47,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
-      audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
+      audioSamples_buf(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE+16]),
       directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
@@ -58,6 +58,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
+    audioSamples = (short int*) (((long)audioSamples_buf + 15) & ~0xf);
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
 
     // set parent class variables
