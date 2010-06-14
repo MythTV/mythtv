@@ -6,6 +6,7 @@
 #include "mythfontproperties.h"
 #include "mythfontmanager.h"
 
+#include "mythdirs.h"
 #include "oldsettings.h"
 #include "mythuihelper.h"
 
@@ -29,6 +30,7 @@ MythThemeBase::MythThemeBase()
 MythThemeBase::~MythThemeBase()
 {
     GetGlobalFontManager()->ReleaseFonts("UI");
+    GetGlobalFontManager()->ReleaseFonts("Shared");
     delete d;
 }
 
@@ -72,6 +74,7 @@ void MythThemeBase::Init(void)
     d->background = new MythScreenStack(mainWindow, "background");
     d->background->DisableEffects();
 
+    GetGlobalFontManager()->LoadFonts(GetFontsDir(), "Shared");
     GetGlobalFontManager()->LoadFonts(GetMythUI()->GetThemeDir(), "UI");
     XMLParseBase::LoadBaseTheme();
     d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");

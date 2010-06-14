@@ -115,16 +115,6 @@ QString FindTranslation(const QString &translation)
 
 QString GetFontsDir(void)
 {
-    return GetShareDir();
-}
-
-QString GetFontsNameFilter(void)
-{
-    return "*ttf";
-}
-
-QString FindFont(const QString &fontname)
-{
-    return GetFontsDir() + fontname + ".ttf";
+    return GetShareDir() + "fonts/";
 }
 

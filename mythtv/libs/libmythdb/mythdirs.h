@@ -20,8 +20,6 @@ MPUBLIC QString FindPluginName(const QString &plugname);
 MPUBLIC QString GetTranslationsNameFilter(void);
 MPUBLIC QString FindTranslation(const QString &translation);
 MPUBLIC QString GetFontsDir(void);
-MPUBLIC QString GetFontsNameFilter(void);
-MPUBLIC QString FindFont(const QString &fontname);
 
 #endif
 
