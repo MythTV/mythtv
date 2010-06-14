@@ -1660,17 +1660,6 @@ static HostComboBox *MenuTheme()
     return gc;
 }
 
-static HostComboBox *OSDCCFont()
-{
-    HostComboBox *gc = new HostComboBox("OSDCCFont");
-    gc->setLabel(QObject::tr("CC font"));
-    QDir ttf(GetFontsDir(), GetFontsNameFilter());
-    gc->fillSelectionsFromDir(ttf, false);
-    gc->setHelpText(QObject::tr("Closed Caption font"));
-
-    return gc;
-}
-
 static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
 {
     QString beVBI = gCoreContext->GetSetting("VbiFormat");
@@ -1692,7 +1681,7 @@ static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
 static HostSpinBox *OSDCC708TextZoomPercentage(void)
 {
     HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
-    gs->setLabel(QObject::tr("Text zoom percentage"));
+    gs->setLabel(QObject::tr("ATSC caption text zoom percentage"));
     gs->setValue(100);
     gs->setHelpText(QObject::tr("Use this to enlarge or shrink captions."));
 
@@ -1725,100 +1714,6 @@ static HostComboBox *OSDCC708DefaultFontType(void)
     for (uint i = 0; i < 7; ++i)
         hc->addSelection(typeNames[i], types[i]);
     return hc;
-}
-
-static VerticalConfigurationGroup *OSDCC708Settings(void)
-{
-    VerticalConfigurationGroup *grp =
-        new VerticalConfigurationGroup(false, true, true, true);
-    grp->setLabel(QObject::tr("ATSC Caption Settings"));
-
-// default text zoom 1.0
-    grp->addChild(OSDCC708TextZoomPercentage());
-
-// force X lines of captions
-// force caption character color
-// force caption character border color
-// force background color
-// force background opacity
-
-// set default font type
-    grp->addChild(OSDCC708DefaultFontType());
-
-    return grp;
-}
-
-static HostComboBox *OSDCC708Font(
-    const QString &subtype, const QString &subtypeName,
-    const QString &subtypeNameForHelp)
-{
-    HostComboBox *gc = new HostComboBox(
-        QString("OSDCC708%1Font").arg(subtype));
-
-    gc->setLabel(subtypeName);
-    QDir ttf(GetFontsDir(), GetFontsNameFilter());
-    gc->fillSelectionsFromDir(ttf, false);
-    gc->setHelpText(
-        QObject::tr("ATSC %1 closed caption font.").arg(subtypeNameForHelp));
-
-    return gc;
-}
-
-static HorizontalConfigurationGroup *OSDCC708Fonts(void)
-{
-    HorizontalConfigurationGroup *grpmain =
-        new HorizontalConfigurationGroup(false, true, true, true);
-    grpmain->setLabel(QObject::tr("ATSC Caption Fonts"));
-    VerticalConfigurationGroup *col[] =
-    {
-        new VerticalConfigurationGroup(false, false, true, true),
-        new VerticalConfigurationGroup(false, false, true, true),
-    };
-    QString types[] =
-    {
-        "MonoSerif", "PropSerif", "MonoSansSerif", "PropSansSerif",
-        "Casual",    "Cursive",   "Capitals",
-    };
-    QString typeNames[] =
-    {
-        QObject::tr("Monospaced Serif"),
-        QObject::tr("Proportional Serif"),
-        QObject::tr("Monospaced Sans Serif"),
-        QObject::tr("Proportional Sans Serif"),
-        QObject::tr("Casual"),
-        QObject::tr("Cursive"),
-        QObject::tr("Capitals"),
-    };
-    QString subtypes[] = { "%1", "%1Italic", };
-
-    TransLabelSetting *col0 = new TransLabelSetting();
-    col0->setValue(QObject::tr("Regular font"));
-
-    TransLabelSetting *col1 = new TransLabelSetting();
-    col1->setValue(QObject::tr("Italic font"));
-
-    col[0]->addChild(col0);
-    col[1]->addChild(col1);
-
-    uint i = 0;
-    for (uint j = 0; j < 7; ++j)
-    {
-        col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]),
-                                      typeNames[j], typeNames[j]));
-    }
-    grpmain->addChild(col[i]);
-
-    i = 1;
-    for (uint j = 0; j < 7; ++j)
-    {
-        col[i]->addChild(OSDCC708Font(
-                             subtypes[i].arg(types[j]), "",
-                             QObject::tr("Italic") + ' ' + typeNames[j]));
-    }
-
-    grpmain->addChild(col[i]);
-
-    return grpmain;
 }
 
 static HostComboBox *SubtitleCodec()
@@ -4370,16 +4265,13 @@ OSDSettings::OSDSettings()
     addChild(osd);
 
     VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
-    cc->setLabel(QObject::tr("Analog Closed Captions"));
-    cc->addChild(OSDCCFont());
+    cc->setLabel(QObject::tr("Closed Captions"));
     //cc->addChild(DecodeVBIFormat());
     cc->addChild(CCBackground());
     cc->addChild(DefaultCCMode());
     cc->addChild(PreferCC708());
+    cc->addChild(OSDCC708TextZoomPercentage());
     addChild(cc);
-
-    addChild(OSDCC708Settings());
-    addChild(OSDCC708Fonts());
 
 #if CONFIG_DARWIN
     // Any Mac OS-specific OSD stuff would go here.
