@@ -80,8 +80,6 @@ UDPNotify::UDPNotify(uint udp_port) :
             this,     SLOT(ReadPending()));
 
     m_socket->bind(udp_port);
-
-    m_db_osd_udpnotify_timeout = gCoreContext->GetNumSetting("OSDNotifyTimeout", 5);
 }
 
 void UDPNotify::deleteLater(void)

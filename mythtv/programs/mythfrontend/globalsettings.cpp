@@ -1609,16 +1609,6 @@ static HostCheckBox *FFRewReverse()
     return gc;
 }
 
-static HostSpinBox *OSDNotifyTimeout()
-{
-    HostSpinBox *gs = new HostSpinBox("OSDNotifyTimeout", 1, 30, 1);
-    gs->setLabel(QObject::tr("UDP notify OSD time-out"));
-    gs->setValue(5);
-    gs->setHelpText(QObject::tr("How many seconds an on-screen display "
-                    "will be active for UDP Notify events."));
-    return gs;
-}
-
 static HostSpinBox *ThemeCacheSize()
 {
     HostSpinBox *gs = new HostSpinBox("ThemeCacheSize", 1, 1000, 1, true);
@@ -4259,9 +4249,8 @@ OSDSettings::OSDSettings()
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
-    osd->addChild(OSDNotifyTimeout());
-    osd->addChild(UDPNotifyPort());
     osd->addChild(SubtitleCodec());
+    osd->addChild(UDPNotifyPort());
     addChild(osd);
 
     VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
