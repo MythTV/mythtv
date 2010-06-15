@@ -28,7 +28,6 @@ using namespace std;
 #include "jobqueue.h"
 #include "mythdb.h"
 #include "mythverbose.h"
-#include "storagegroup.h"
 #include "previewgenerator.h"
 #include "channelutil.h"
 

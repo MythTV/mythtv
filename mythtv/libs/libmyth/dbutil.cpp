@@ -9,6 +9,7 @@
 #include <QRegExp>
 #include <QDateTime>
 #include <QSqlError>
+#include <QProcess>
 
 #include "dbutil.h"
 #include "mythcorecontext.h"

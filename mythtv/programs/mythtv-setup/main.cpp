@@ -14,7 +14,7 @@
 #include "langsettings.h"
 #include "exitcodes.h"
 #include "exitprompt.h"
-#include "storagegroup.h"
+#include "storagegroupeditor.h"
 #include "myththemedmenu.h"
 #include "myththemebase.h"
 #include "mythuihelper.h"

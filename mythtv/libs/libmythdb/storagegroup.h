@@ -5,11 +5,9 @@
 #include <QMutex>
 #include <QHash>
 
-#include "settings.h"
-#include "mythwidgets.h"
 #include "mythexp.h"
 
-class MPUBLIC StorageGroup: public ConfigurationWizard
+class MPUBLIC StorageGroup
 {
   public:
     StorageGroup(const QString group = "", const QString hostname = "",
@@ -59,51 +57,6 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
 
     static QMutex                 s_groupToUseLock;
     static QHash<QString,QString> s_groupToUseCache;
-};
-
-class MPUBLIC StorageGroupEditor :
-    public QObject, public ConfigurationDialog
-{
-    Q_OBJECT
-  public:
-    StorageGroupEditor(QString group);
-    virtual DialogCode exec(void);
-    virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString) { }
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetname=0);
-
-  protected slots:
-    void open(QString name);
-    void doDelete(void);
-
-  protected:
-    QString         m_group;
-    ListBoxSetting *listbox;
-    QString         lastValue;
-};
-
-class MPUBLIC StorageGroupListEditor :
-    public QObject, public ConfigurationDialog
-{
-    Q_OBJECT
-  public:
-    StorageGroupListEditor(void);
-    virtual DialogCode exec(void);
-    virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString) { }
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetname=0);
-
-  protected slots:
-    void open(QString name);
-    void doDelete(void);
-
-  protected:
-    ListBoxSetting *listbox;
-    QString         lastValue;
 };
 
 #endif

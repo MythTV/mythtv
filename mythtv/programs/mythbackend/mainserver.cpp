@@ -60,6 +60,7 @@ using namespace std;
 #include "remotefile.h"
 #include "mythsystemevent.h"
 #include "tv.h"
+#include "mythcoreutil.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
