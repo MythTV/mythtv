@@ -11,7 +11,7 @@
 
 // myth
 #include <mythcontext.h>
-#include <util.h>
+#include <mythcoreutil.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>
 #include <mythuicheckbox.h>

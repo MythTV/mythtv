@@ -21,6 +21,7 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythversion.h>
 #include <mythplugin.h>
+#include <mythcoreutil.h>
 #include <util.h>
 #include <myththemedmenu.h>
 #include <mythuihelper.h>

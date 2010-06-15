@@ -52,7 +52,7 @@ using namespace std;
 
 // MythTV headers
 #include <mythcontext.h>
-#include <util.h>
+#include <mythcoreutil.h>
 #include <mythversion.h>
 #include <exitcodes.h>
 #include <mythdb.h>
