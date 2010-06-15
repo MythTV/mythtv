@@ -27,7 +27,6 @@ MPUBLIC QDateTime MythUTCToLocal(const QDateTime &utc);
 MPUBLIC int MythSecsTo(const QDateTime &from, const QDateTime &to);
 MPUBLIC QDateTime myth_dt_from_string(const QString &dtstr);
 
-MPUBLIC long long getDiskSpace(const QString&,long long&,long long&);
 MPUBLIC bool getUptime(time_t &uptime);
 MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 
