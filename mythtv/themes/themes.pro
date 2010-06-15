@@ -12,7 +12,6 @@ themes.path = $${PREFIX}/share/mythtv/themes/
 themes.files = default default-wide classic DVR
 themes.files += Terra defaultmenu mediacentermenu
 themes.files += MythCenter MythCenter-wide
-themes.files += BlackCurves-OSD isthmus Gray-OSD
 themes.files += mythuitheme.dtd
 
 fonts.path = $${PREFIX}/share/mythtv/fonts
