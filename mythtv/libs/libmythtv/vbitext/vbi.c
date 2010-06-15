@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+// HACK. Broken kernel headers < 2.6.25 fail compile in videodev2.h when
+//       compiling with -std=c99.  We could remove this in the .pro file,
+//       but that would disable it for all .c files.
+#undef __STRICT_ANSI__
 #include <linux/videodev.h>
 #include <linux/videodev2.h>
 
