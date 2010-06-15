@@ -1678,34 +1678,6 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     return gs;
 }
 
-static HostComboBox *OSDCC708DefaultFontType(void)
-{
-    HostComboBox *hc = new HostComboBox("OSDCC708DefaultFontType");
-    hc->setLabel(QObject::tr("Default caption font type"));
-    hc->setHelpText(
-        QObject::tr("This allows you to set which font type to use "
-                    "when the broadcaster does not specify a font."));
-
-    QString types[] =
-    {
-        "MonoSerif", "PropSerif", "MonoSansSerif", "PropSansSerif",
-        "Casual",    "Cursive",   "Capitals",
-    };
-    QString typeNames[] =
-    {
-        QObject::tr("Monospaced serif"),
-        QObject::tr("Proportional serif"),
-        QObject::tr("Monospaced sans serif"),
-        QObject::tr("Proportional sans serif"),
-        QObject::tr("Casual"),
-        QObject::tr("Cursive"),
-        QObject::tr("Capitals"),
-    };
-    for (uint i = 0; i < 7; ++i)
-        hc->addSelection(typeNames[i], types[i]);
-    return hc;
-}
-
 static HostComboBox *SubtitleCodec()
 {
     HostComboBox *gc = new HostComboBox("SubtitleCodec");
