@@ -96,10 +96,10 @@ NuppelDecoder::~NuppelDecoder()
         delete [] buf;
     if (buf2)
         delete [] buf2;
-    if (strm)
-        delete [] strm;
-    if (audioSamples)
-        delete [] audioSamples;
+    if (strm_buf)
+        delete [] strm_buf;
+    if (audioSamples_buf)
+        delete [] audioSamples_buf;
 
     while (!StoredData.empty())
     {
@@ -589,7 +589,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     ringBuffer->Seek(startpos, SEEK_SET);
 
     buf = new unsigned char[video_size];
-    strm = new unsigned char[video_size * 2];
+    strm_buf = new unsigned char[video_size * 2 + 16];
+    strm = (unsigned char*) (((long)strm_buf + 15) & ~0xf);
 
     if (hasFullPositionMap)
         return 1;

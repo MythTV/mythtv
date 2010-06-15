@@ -113,6 +113,7 @@ class NuppelDecoder : public DecoderBase
 
     char lastct;
 
+    unsigned char *strm_buf;
     unsigned char *strm;
     unsigned char *buf;
     unsigned char *buf2;
