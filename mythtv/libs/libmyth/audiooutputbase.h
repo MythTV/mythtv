@@ -164,6 +164,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     int source_samplerate;
     int source_bytes_per_frame;
     bool needs_upmix;
+    bool upmix_default;
     bool needs_downmix;
     int surround_mode;
     bool allow_ac3_passthru;

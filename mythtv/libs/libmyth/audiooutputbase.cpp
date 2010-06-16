@@ -118,16 +118,15 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
         VBAUDIO(QString("SRC quality = %1").arg(quality_string(src_quality)));
     }
 
-    bool ignore, upmix_default;
+    bool ignore;
     AudioOutput::AudioSetup(max_channels, allow_ac3_passthru,
                             ignore, allow_multipcm, upmix_default);
 
-    if (settings.upmixer == 0)      // Use general settings (video)
-        configured_channels = upmix_default ? max_channels : 2;
-    else if (settings.upmixer == 1) // music, upmixer off
-        configured_channels = 2;
-    else                            // music, upmixer on
-        configured_channels = max_channels;
+    configured_channels = max_channels;
+    if (settings.upmixer == 1) // music, upmixer off
+        upmix_default = false;
+    else if (settings.upmixer == 2) // music, upmixer on
+        upmix_default = true;
 }
 
 /**
@@ -232,20 +231,12 @@ bool AudioOutputBase::ToggleUpmix(void)
     if (max_channels == 2 || source_channels > 2 || passthru)
         return false;
 
-    // Reset audiobuffer now to prevent click
-    audio_buflock.lock();
-    avsync_lock.lock();
-    waud = raud = 0;
-
-    configured_channels =
-        configured_channels == max_channels ? 2 : max_channels;
+    upmix_default = !upmix_default;
 
     const AudioSettings settings(format, source_channels, codec,
                                  source_samplerate, passthru);
-    audio_buflock.unlock();
-    avsync_lock.unlock();
     Reconfigure(settings);
-    return (configured_channels == max_channels);
+    return = configured_channels == max_channels;
 }
 
 /**
@@ -263,6 +254,19 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (!settings.use_passthru)
     {
+        // update channels configuration if source_channels has changed
+        if (lsource_channels > configured_channels)
+        {
+            if (lsource_channels <= 6)
+                configured_channels = min(max_channels, 6);
+            else if (lsource_channels > 6)
+                 configured_channels = max_channels;
+        }
+        else
+        {
+            configured_channels = upmix_default ? max_channels : 2;
+        }
+
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
         if (allow_ac3_passthru &&
@@ -274,18 +278,19 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         // Enough channels? Upmix if not, but only from mono/stereo to 5.1
         if (settings.channels <= 2 && settings.channels < configured_channels)
         {
-            int conf_channels = (configured_channels > 6) ? 6 : configured_channels;
+            int conf_channels = (configured_channels > 6) ?
+                                                    6 : configured_channels;
             VBAUDIO(QString("Needs upmix from %1 -> %2 channels")
                     .arg(settings.channels).arg(conf_channels));
             settings.channels = conf_channels;
             lneeds_upmix = true;
         }
 
-        else if (settings.channels > configured_channels)
+        else if (settings.channels > max_channels)
         {
             VBAUDIO(QString("Needs downmix from %1 -> %2 channels")
-                    .arg(settings.channels).arg(configured_channels));
-            settings.channels = configured_channels;
+                    .arg(settings.channels).arg(max_channels));
+            settings.channels = max_channels;
             lneeds_downmix = true;
         }
     }
