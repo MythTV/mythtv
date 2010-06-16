@@ -1142,8 +1142,14 @@ if ( $backend && grep(m/MythBackend/, @targets) )
 {
   my $BE = "$SCRIPTDIR/MythBackend.app";
 
+  # Copy XML files that UPnP requires:
+  my $share = "$BE/Contents/Resources/share/mythtv";
+  &Syscall([ 'mkdir', '-p', $share ]) or die;
+  &Syscall([ 'cp', glob("$PREFIX/share/mythtv/*.xml"), $share ]) or die;
+
   # The backend gets all the useful binaries it might call:
-  foreach my $binary ( 'mythjobqueue', 'mythcommflag', 'mythtranscode' )
+  foreach my $binary ( 'mythjobqueue', 'mythcommflag',
+                       'mythtranscode', 'mythfilldatabase' )
   {
     my $SRC  = "$PREFIX/bin/$binary";
     if ( -e $SRC )
