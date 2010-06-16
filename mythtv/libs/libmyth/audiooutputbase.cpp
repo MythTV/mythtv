@@ -302,6 +302,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                         settings.samplerate  == source_samplerate &&
                         settings.use_passthru == passthru &&
                         lneeds_upmix == needs_upmix && lreenc == reenc &&
+                        lsource_channels == source_channels &&
                         lneeds_downmix == needs_downmix;
 
     if (general_deps)
