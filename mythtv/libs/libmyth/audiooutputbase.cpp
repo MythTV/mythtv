@@ -236,7 +236,7 @@ bool AudioOutputBase::ToggleUpmix(void)
     const AudioSettings settings(format, source_channels, codec,
                                  source_samplerate, passthru);
     Reconfigure(settings);
-    return = configured_channels == max_channels;
+    return configured_channels == max_channels;
 }
 
 /**
