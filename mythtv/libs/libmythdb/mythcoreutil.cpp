@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+// System specific C headers
+#include "compat.h"
+
 #ifdef linux
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
