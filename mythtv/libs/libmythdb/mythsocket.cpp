@@ -34,6 +34,7 @@ MythSocketThread *MythSocket::s_readyread_thread = new MythSocketThread();
 
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
+      m_useReadyReadCallback(true),
       m_state(Idle),         m_addr(),                 m_port(0),
       m_ref_count(0),        m_notifyread(false)
 {
@@ -198,6 +199,24 @@ void MythSocket::close(void)
         VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
         m_cb->connectionClosed(this);
     }
+}
+
+bool MythSocket::closedByRemote(void)
+{
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(socket(), &rfds);
+
+    struct timeval to;
+    to.tv_sec = 0;
+    to.tv_usec = 1000;
+
+    int rval = select(socket() + 1, &rfds, NULL, NULL, &to);
+
+    if (rval > 0 && FD_ISSET(socket(), &rfds) && !bytesAvailable())
+        return true;
+
+    return false;
 }
 
 qint64 MythSocket::readBlock(char *data, quint64 len)

@@ -1270,15 +1270,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             filename = LocalFilePath(qurl, wantgroup);
 
-        if (writemode)
-        {
-            socket->setCallbacks(NULL);
-            ft = new FileTransfer(filename, socket, true);
-        }
-        else if (retries >= 0)
-            ft = new FileTransfer(filename, socket, usereadahead, retries);
+        if (retries < 0)
+            ft = new FileTransfer(filename, socket, writemode);
         else
-            ft = new FileTransfer(filename, socket, false);
+            ft = new FileTransfer(filename, socket, usereadahead, retries);
 
         sockListLock.lockForWrite();
         fileTransferList.push_back(ft);
