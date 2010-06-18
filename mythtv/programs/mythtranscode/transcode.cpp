@@ -59,7 +59,7 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Reconfigure(const AudioSettings &settings)
     {
         ClearError();
-        bytes_per_sample = channels *
+        bytes_per_frame = channels *
                            AudioOutputSettings::SampleSize(settings.format);
 
         channels = settings.channels;
@@ -82,28 +82,28 @@ class AudioReencodeBuffer : public AudioOutput
     }
 
     // timecode is in milliseconds.
-    virtual bool AddSamples(void *buffer, int samples, long long timecode)
+    virtual bool AddFrames(void *buffer, int frames, long long timecode)
     {
         int freebuf = bufsize - audiobuffer_len;
 
-        if (samples * bytes_per_sample > freebuf)
+        if (frames * bytes_per_frame > freebuf)
         {
-            bufsize += samples * bytes_per_sample - freebuf;
+            bufsize += frames * bytes_per_frame - freebuf;
             unsigned char *tmpbuf = new unsigned char[bufsize];
             memcpy(tmpbuf, audiobuffer, audiobuffer_len);
             delete [] audiobuffer;
             audiobuffer = tmpbuf;
         }
 
-        ab_len[ab_count] = samples * bytes_per_sample;
+        ab_len[ab_count] = frames * bytes_per_frame;
         ab_offset[ab_count] = audiobuffer_len;
 
         memcpy(audiobuffer + audiobuffer_len, buffer,
-               samples * bytes_per_sample);
-        audiobuffer_len += samples * bytes_per_sample;
+               frames * bytes_per_frame);
+        audiobuffer_len += frames * bytes_per_frame;
 
         // last_audiotime is at the end of the sample
-        last_audiotime = timecode + samples * 1000 / eff_audiorate;
+        last_audiotime = timecode + frames * 1000 / eff_audiorate;
 
         ab_time[ab_count] = last_audiotime;
         ab_count++;
@@ -208,7 +208,7 @@ class AudioReencodeBuffer : public AudioOutput
     int ab_offset[128];
     long long ab_time[128];
     unsigned char *audiobuffer;
-    int audiobuffer_len, channels, bits, bytes_per_sample, eff_audiorate;
+    int audiobuffer_len, channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
 };
 
@@ -731,7 +731,7 @@ int Transcode::TranscodeFile(
     {
         QString audfifo = fifodir + QString("/audout");
         QString vidfifo = fifodir + QString("/vidout");
-        int audio_size = arb->eff_audiorate * arb->bytes_per_sample;
+        int audio_size = arb->eff_audiorate * arb->bytes_per_frame;
         // framecontrol is true if we want to enforce fifo sync.
         if (framecontrol)
             VERBOSE(VB_GENERAL, "Enforcing sync on fifos");
@@ -770,7 +770,7 @@ int Transcode::TranscodeFile(
     long long lasttimecode = 0;
     long long timecodeOffset = 0;
 
-    float rateTimeConv = arb->eff_audiorate * arb->bytes_per_sample / 1000.0;
+    float rateTimeConv = arb->eff_audiorate * arb->bytes_per_frame / 1000.0;
     float vidFrameTime = 1000.0 / video_frame_rate;
     int wait_recover = 0;
     VideoOutput *videoOutput = nvp->getVideoOutput();

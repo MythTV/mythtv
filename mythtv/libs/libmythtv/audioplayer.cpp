@@ -283,6 +283,14 @@ void AudioPlayer::SetStretchFactor(float factor)
 // thread will trigger a deletion/recreation of the AudioOutput device, hence
 // they should be safe.
 
+bool AudioPlayer::CanPassthrough(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->CanPassthrough(false);
+    return ret;
+}
+
 void AudioPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
     if (m_parent->PrepareAudioSample(timecode) && m_audioOutput)
@@ -290,8 +298,8 @@ void AudioPlayer::AddAudioData(char *buffer, int len, long long timecode)
     int samplesize = m_channels * AudioOutputSettings::SampleSize(m_format);
     if ((samplesize <= 0) || !m_audioOutput)
         return;
-    int samples = len / samplesize;
-    if (!m_audioOutput->AddSamples(buffer, samples, timecode))
+    int frames = len / samplesize;
+    if (!m_audioOutput->AddFrames(buffer, frames, timecode))
         VERBOSE(VB_PLAYBACK, LOC + "AddAudioData():p1: "
                 "Audio buffer overflow, audio data lost!");
 }

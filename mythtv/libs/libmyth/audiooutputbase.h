@@ -48,7 +48,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const;
 
-    virtual bool CanPassthrough(void) const;
+    virtual bool CanPassthrough(bool willreencode=true) const;
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
@@ -57,7 +57,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     int GetSWVolume(void);
 
     // timecode is in milliseconds.
-    virtual bool AddSamples(void *buffer, int frames, long long timecode);
+    virtual bool AddFrames(void *buffer, int frames, long long timecode);
 
     virtual void SetTimecode(long long timecode);
     virtual bool IsPaused(void) const { return actually_paused; }

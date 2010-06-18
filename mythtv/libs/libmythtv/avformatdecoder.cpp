@@ -4660,6 +4660,7 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
     else if (ctx->codec_id == CODEC_ID_DTS)
         passthru = allow_dts_passthru && !internal_vol;
 
+    passthru &= m_audio->CanPassthrough();
     passthru &= !transcoding && !disable_passthru;
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams

@@ -34,14 +34,14 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0f; }
 
-    virtual bool CanPassthrough(void) const { return false; }
+    virtual bool CanPassthrough(bool willreencode) const { return false; }
 
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate) = 0;
 
     virtual void Reset(void) = 0;
 
-    virtual bool AddSamples(void *buffer, int samples, long long timecode) = 0;
+    virtual bool AddFrames(void *buffer, int samples, long long timecode) = 0;
 
     virtual void SetTimecode(long long timecode) = 0;
     virtual bool IsPaused(void) const = 0;

@@ -150,12 +150,21 @@ AudioOutputBase::~AudioOutputBase()
     assert(memory_corruption_test3 == 0xdeadbeef);
 }
 
-bool AudioOutputBase::CanPassthrough(void) const
+/**
+ * Test if we can output digital audio
+ * willreencode = true ; test if AC reencoding is permitted
+ * willreencore = false; test if straight passthrough is supported
+ *                       need to independantly check if AC3 or DTS is supported
+ *
+ */
+bool AudioOutputBase::CanPassthrough(bool willreencode) const
 {
+    bool ret = false;
     if (!output_settings)
         return false;
-    return (output_settings->IsSupportedFormat(FORMAT_S16) &&
-            allow_ac3_passthru);
+    ret = output_settings->IsSupportedFormat(FORMAT_S16);
+    ret &= willreencode ? allow_ac3_passthru : !need_resampler;
+    return ret;
 }
 
 /**
@@ -605,7 +614,7 @@ void AudioOutputBase::Reset()
  * Set the timecode of the samples most recently added to the audiobuffer
  *
  * Used by mythmusic for seeking since it doesn't provide timecodes to
- * AddSamples()
+ * AddFrames()
  */
 void AudioOutputBase::SetTimecode(long long timecode)
 {
@@ -880,14 +889,14 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, int &org_waud)
  *
  * Returns false if there's not enough space right now
  */
-bool AudioOutputBase::AddSamples(void *buffer, int frames, long long timecode)
+bool AudioOutputBase::AddFrames(void *buffer, int frames, long long timecode)
 {
     int org_waud = waud,               afree = audiofree();
     int bpf      = bytes_per_frame,    len   = frames * source_bytes_per_frame;
     int used     = kAudioRingBufferSize - afree;
     bool music   = false;
 
-    VBAUDIOTS(QString("AddSamples frames=%1, bytes=%2, used=%3, free=%4, "
+    VBAUDIOTS(QString("AddFrames frames=%1, bytes=%2, used=%3, free=%4, "
                       "timecode=%5 needsupmix=%6")
               .arg(frames).arg(len).arg(used).arg(afree).arg(timecode)
               .arg(needs_upmix));
@@ -939,7 +948,7 @@ bool AudioOutputBase::AddSamples(void *buffer, int frames, long long timecode)
 
     if (len > afree)
     {
-            VBAUDIOTS("Buffer is full, AddSamples returning false");
+            VBAUDIOTS("Buffer is full, AddFrames returning false");
             return false; // would overflow
     }
 

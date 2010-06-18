@@ -33,6 +33,7 @@ class MPUBLIC AudioPlayer
     float GetStretchFactor(void) { return m_stretchfactor;   }
     void  SetStretchFactor(float factor);
     bool  ToggleUpmix(void);
+    bool  CanPassthrough(void);
     long long GetAudioTime(void);
 
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
