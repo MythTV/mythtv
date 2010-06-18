@@ -69,7 +69,7 @@ void CdDecoder::writeBlock()
 {
     while (seekTime <= 0)
     {
-        if(output()->AddSamples(output_buf, bksFrames, -1))
+        if(output()->AddFrames(output_buf, bksFrames, -1))
         {
             output_at -= bks;
             memmove(output_buf, output_buf + bks, output_at);
