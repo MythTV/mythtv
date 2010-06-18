@@ -178,11 +178,11 @@ static char * getVolName(CFDictionaryRef diskDetails)
 
     name = (CFStringRef)
            CFDictionaryGetValue(diskDetails, kDADiskDescriptionVolumeNameKey);
-    if (name)
-        size = CFStringGetLength(name) + 1;
-    else
-        size = 9;  // 'Untitled\0'
 
+    if (!name)
+        return NULL;
+
+    size = CFStringGetLength(name) + 1;
     volName = (char *) malloc(size);
     if (!volName)
     {
@@ -191,9 +191,11 @@ static char * getVolName(CFDictionaryRef diskDetails)
         return NULL;
     }
 
-    if (!name || !CFStringGetCString(name, volName, size,
-                                     kCFStringEncodingUTF8))
-        strcpy(volName, "Untitled");
+    if (!CFStringGetCString(name, volName, size, kCFStringEncodingUTF8))
+    {
+        free(volName);
+        return NULL;
+    }
 
     return volName;
 }
@@ -291,8 +293,14 @@ void diskAppearedCallback(DADiskRef disk, void *context)
 
     // Get the volume and model name for more user-friendly interaction
     volName = getVolName(details);
-    model   = getModel(details);
+    if (!volName)
+    {
+        VERBOSE(VB_MEDIA, msg + "No volume name for dev " + BSDname);
+        CFRelease(details);
+        return;
+    }
 
+    model     = getModel(details);
     mediaType = MediaTypeForBSDName(BSDname);
     isCDorDVD = (mediaType == MEDIATYPE_DVD) || (mediaType == MEDIATYPE_AUDIO);
 
@@ -325,6 +333,9 @@ void diskChangedCallback(DADiskRef disk, CFArrayRef keys, void *context)
         const char     *BSDname = DADiskGetBSDName(disk);
         CFDictionaryRef details = DADiskCopyDescription(disk);
         char           *volName = getVolName(details);
+
+        VERBOSE(VB_MEDIA, QString("Disk %1 - changed name to '%2'.")
+                          .arg(BSDname).arg(volName));
 
         reinterpret_cast<MonitorThreadDarwin *>(context)
             ->diskRename(BSDname, volName);
