@@ -34,7 +34,7 @@ class VideoOutputD3D : public VideoOutput
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) {;}
     void Zoom(ZoomDirection direction);
-    void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
     bool hasFullScreenOSD(void) const { return true; }
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,

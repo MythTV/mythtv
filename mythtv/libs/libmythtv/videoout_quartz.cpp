@@ -1598,11 +1598,10 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
     vbuffers.DeleteBuffers();
 }
 
-void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
+void VideoOutputQuartz::EmbedInWidget(int x, int y, int w, int h)
 {
-    VERBOSE(VB_PLAYBACK,
-            (LOC + "EmbedInWidget(wid=%1, x=%2, y=%3, w=%4, h=%5)")
-            .arg(wid).arg(x).arg(y).arg(w).arg(h));
+    VERBOSE(VB_PLAYBACK, (LOC + "EmbedInWidget(x=%1, y=%2, w=%3, h=%4)")
+                         .arg(x).arg(y).arg(w).arg(h));
 
     if (windows[0].IsEmbedding())
         return;

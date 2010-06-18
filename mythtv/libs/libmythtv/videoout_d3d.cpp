@@ -356,7 +356,7 @@ void VideoOutputD3D::Show(FrameScanType )
         m_render->Present(windows[0].IsEmbedding() ? m_hEmbedWnd : NULL);
 }
 
-void VideoOutputD3D::EmbedInWidget(WId wid, int x, int y, int w, int h)
+void VideoOutputD3D::EmbedInWidget(int x, int y, int w, int h)
 {
     if (windows[0].IsEmbedding())
         return;
