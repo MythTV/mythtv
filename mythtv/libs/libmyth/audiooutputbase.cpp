@@ -848,7 +848,8 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
     {
         // Convert to floats
         short *buf_ptr = (short*)buffer;
-        for (int sample = 0; sample < samples * audio_channels; sample++)
+        int numSamples = (samples * abps) / sizeof(short);
+        for (int sample = 0; sample < numSamples; sample++)
         {
             src_in[sample] = (float)buf_ptr[sample] / (1.0 * 0x8000);
         }
@@ -861,7 +862,7 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
                     QString("Error occurred while resampling audio: %1")
                     .arg(src_strerror(error)));
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff,
-                                 src_data.output_frames_gen*audio_channels);
+                            (src_data.output_frames_gen*abps)/sizeof(short));
 
         _AddSamples(tmp_buff, true, src_data.output_frames_gen, timecode);
     }

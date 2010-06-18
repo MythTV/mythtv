@@ -57,6 +57,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void SetTimecode(long long timecode);
     virtual bool IsPaused(void) const { return audio_actually_paused; }
     virtual void Pause(bool paused);
+    virtual bool CanPassthrough(void) const { return !need_resampler; }
 
     // Wait for all data to finish playing
     virtual void Drain(void);

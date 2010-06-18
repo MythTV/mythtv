@@ -165,6 +165,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
     void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
     bool ToggleUpmix(void);
+    bool CanPassthrough(void);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }

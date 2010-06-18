@@ -5134,6 +5134,13 @@ bool NuppelVideoPlayer::ToggleUpmix()
     return false;
 }
 
+bool NuppelVideoPlayer::CanPassthrough()
+{
+    if (audioOutput)
+        return audioOutput->CanPassthrough();
+    return false;
+}
+
 void NuppelVideoPlayer::Zoom(ZoomDirection direction)
 {
     if (videoOutput)

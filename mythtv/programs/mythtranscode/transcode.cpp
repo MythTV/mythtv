@@ -217,6 +217,11 @@ class AudioReencodeBuffer : public AudioOutput
         // Do nothing
         return false;
     }
+    virtual bool CanPassthrough(void) const
+    {
+        // Do nothing
+        return false;
+    }
 
     virtual void SetSWVolume(int new_volume, bool save)
     {

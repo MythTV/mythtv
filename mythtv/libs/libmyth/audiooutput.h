@@ -49,6 +49,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual void SetTimecode(long long timecode) = 0;
     virtual bool IsPaused(void) const = 0;
     virtual void Pause(bool paused) = 0;
+    virtual bool CanPassthrough(void) const = 0;
  
     // Wait for all data to finish playing
     virtual void Drain(void) = 0;
