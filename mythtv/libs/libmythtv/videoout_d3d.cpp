@@ -1252,7 +1252,7 @@ void VideoOutputD3D::Show(FrameScanType )
     SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
 }
 
-void VideoOutputD3D::EmbedInWidget(WId wid, int x, int y, int w, int h)
+void VideoOutputD3D::EmbedInWidget(int x, int y, int w, int h)
 {
     if (windows[0].IsEmbedding())
         return;
