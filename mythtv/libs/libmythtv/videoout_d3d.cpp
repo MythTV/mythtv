@@ -362,7 +362,7 @@ void VideoOutputD3D::EmbedInWidget(int x, int y, int w, int h)
         return;
 
     VideoOutput::EmbedInWidget(x, y, w, h);
-    m_hEmbedWnd = wid;
+    // TODO: Initialise m_hEmbedWnd?
 }
 
 void VideoOutputD3D::StopEmbedding(void)
