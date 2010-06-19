@@ -2108,355 +2108,355 @@
 	</station>
 
 	<station>
-		<station_id>nf-30</station_id>
+		<station_id>nl-30</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Argentia</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-30_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-30_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-34</station_id>
+		<station_id>nl-34</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Badger</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-34_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-34_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-43</station_id>
+		<station_id>nl-43</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Bay Roberts</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-43_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-43_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-14</station_id>
+		<station_id>nl-14</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Bonavista</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-14_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-14_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-4</station_id>
+		<station_id>nl-4</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Buchans</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-4_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-4_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-31</station_id>
+		<station_id>nl-31</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Burgeo</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-31_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-31_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-2</station_id>
+		<station_id>nl-2</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Campbellton</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-2_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-2_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-28</station_id>
+		<station_id>nl-28</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Cape Race</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-28_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-28_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-32</station_id>
+		<station_id>nl-32</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Cartwright</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-32_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-32_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-17</station_id>
+		<station_id>nl-17</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Channel - Port aux Basques</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-17_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-17_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-21</station_id>
+		<station_id>nl-21</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Churchill Falls</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-21_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-21_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-1</station_id>
+		<station_id>nl-1</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Clarenville</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-1_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-1_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-41</station_id>
+		<station_id>nl-41</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Corner Brook</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-41_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-41_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-33</station_id>
+		<station_id>nl-33</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Daniel's Harbour</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-33_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-33_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-39</station_id>
+		<station_id>nl-39</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Deer Lake</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-39_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-39_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-44</station_id>
+		<station_id>nl-44</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Englee</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-44_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-44_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-16</station_id>
+		<station_id>nl-16</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Gander</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-16_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-16_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-5</station_id>
+		<station_id>nl-5</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Grand Bank</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-5_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-5_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-6</station_id>
+		<station_id>nl-6</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Grand Falls/Windsor</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-6_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-6_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-7</station_id>
+		<station_id>nl-7</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Gros Morne</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-7_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-7_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-23</station_id>
+		<station_id>nl-23</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Happy Valley-Goose Bay</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-23_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-23_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-38</station_id>
+		<station_id>nl-38</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Hopedale</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-38_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-38_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-22</station_id>
+		<station_id>nl-22</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>La Scie</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-22_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-22_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-20</station_id>
+		<station_id>nl-20</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Labrador City</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-20_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-20_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-9</station_id>
+		<station_id>nl-9</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Lewisporte</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-9_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-9_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-25</station_id>
+		<station_id>nl-25</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Makkovik</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-25_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-25_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-26</station_id>
+		<station_id>nl-26</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Marble Mountain</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-26_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-26_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-29</station_id>
+		<station_id>nl-29</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Mary's Harbour</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-29_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-29_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-3</station_id>
+		<station_id>nl-3</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Marystown</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-3_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-3_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-10</station_id>
+		<station_id>nl-10</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Musgrave Harbour</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-10_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-10_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-40</station_id>
+		<station_id>nl-40</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Nain</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-40_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-40_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-42</station_id>
+		<station_id>nl-42</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>New-Wes-Valley</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-42_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-42_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-11</station_id>
+		<station_id>nl-11</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Port au Choix</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-11_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-11_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-13</station_id>
+		<station_id>nl-13</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Rocky Harbour</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-13_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-13_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-8</station_id>
+		<station_id>nl-8</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>St Alban's</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-8_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-8_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-37</station_id>
+		<station_id>nl-37</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>St. Anthony</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-37_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-37_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-24</station_id>
+		<station_id>nl-24</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>St. John's</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-24_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-24_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-36</station_id>
+		<station_id>nl-36</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>St. Lawrence</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-36_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-36_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-27</station_id>
+		<station_id>nl-27</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Stephenville</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-27_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-27_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-15</station_id>
+		<station_id>nl-15</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Terra Nova (National Park)</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-15_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-15_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-35</station_id>
+		<station_id>nl-35</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Twillingate</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-35_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-35_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-12</station_id>
+		<station_id>nl-12</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Wabush Lake</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-12_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-12_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-19</station_id>
+		<station_id>nl-19</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Winterland</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-19_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-19_metric_e.html</html_url>
 	</station>
 
 	<station>
-		<station_id>nf-18</station_id>
+		<station_id>nl-18</station_id>
 		<region_id>NF</region_id>
 		<province>Newfoundland and Labrador</province>
 		<city>Wreckhouse</city>
-		<html_url>http://www.weatheroffice.gc.ca/city/pages/nf-18_metric_e.html</html_url>
+		<html_url>http://www.weatheroffice.gc.ca/city/pages/nl-18_metric_e.html</html_url>
 	</station>
 
 	<station>
