@@ -14,7 +14,7 @@ use Getopt::Std;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-6_day';
-my $version = 0.2;
+my $version = 0.3;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 15*60;
@@ -85,7 +85,7 @@ my $param = { maxt => 1,
     rh=>0,
     appt=>0 };
 
-my $d1 = UnixDate("8am tomorrow", "%O");
+my $d1 = UnixDate("today at 8:00am", "%O");
 my $d2 = UnixDate(DateCalc($d1, "+ 168 hours"), "%O");
 my $result;
 my $creationdate;
@@ -177,12 +177,14 @@ foreach $time (sort(keys(%$result))) {
         $geticon = 1;
     } 
     if ($geticon) {
+        my $tz = $time;
+        $tz =~ s/^.*([+-]\d{4})$/$1/;
         my $iconkey = $date;
         my $i = 0;
         my $icon;
         until ($result->{$iconkey}->{'conditions-icon_forecast-NWS'}
                 || $i++ > 8) {
-            $iconkey = UnixDate(DateCalc($iconkey, "+ 1 hour"), "%O%z");
+            $iconkey = UnixDate(DateCalc($iconkey, "+ 1 hour"), "%O").$tz;
         }
         if ($i >= 8) {
             $icon = "unknown.png";    
@@ -204,7 +206,7 @@ foreach $time (sort(keys(%$result))) {
 }
 print "high-${hiindex}::NA\n" and $hiindex++ while ($hiindex <= 5);
 print "low-${lowindex}::NA\n" and $lowindex++ while ($lowindex <= 5);
-print "low-${iconindex}::NA\n" and $iconindex++ while ($iconindex<= 5);
+print "icon-${iconindex}::unknown.png\n" and $iconindex++ while ($iconindex<= 5);
 
 foreach $date (sort(@dates)) {
     print "date-${dateindex}::" . UnixDate($date, "%A") . "\n" 
