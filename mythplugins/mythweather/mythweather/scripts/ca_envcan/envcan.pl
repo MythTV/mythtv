@@ -92,7 +92,7 @@ my %results;
 my $getData = 1;
 if (open(CACHE, "$dir/envcan_$loc")) {
     ($nextupdate, $creationdate) = split / /, <CACHE>;
-    if (Date_Cmp($nextupdate, "today") > 0) { # use cache
+    if (Date_Cmp($nextupdate, "now") > 0) { # use cache
         no strict "vars";
         %results = eval <CACHE>;
 
@@ -120,8 +120,8 @@ if ($getData) {
     # cache is good for 15 minutes
     my $newmin = 15;
 
-    $nextupdate = DateCalc("today", "+ $newmin minutes");
-    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("today", "%O\n");
+    $nextupdate = DateCalc("now", "+ $newmin minutes");
+    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("now", "%O\n");
     print CACHE Data::Dumper->Dump([\%results], ['*results']);
 }
 

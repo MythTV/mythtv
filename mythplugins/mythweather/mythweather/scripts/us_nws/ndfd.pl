@@ -96,7 +96,7 @@ if (open (CACHE, "$dir/ndfd_cache_${latitude}_${longitude}")) {
     # We don't have to check the start/end dates, since we get the same chunk
     # every time, and we update the cache atleast every hour, which is how often the
     # data is updated by the NWS.
-    if (Date_Cmp($nextupdate, "today") > 0) { # use cache
+    if (Date_Cmp($nextupdate, "now") > 0) { # use cache
         no strict "vars"; # because eval doesn't scope var correctly
         $result = eval <CACHE>;
         if ($result) {
@@ -118,15 +118,15 @@ if ($getData) {
     $Data::Dumper::Indent = 0;
     # NDFD is updated by 45 minutes after the hour, we'll give them until 50 to
     # make sure
-    my $min = UnixDate("today", "%M");
+    my $min = UnixDate("now", "%M");
     my $newmin;
     if ($min < 50) {
         $newmin = 50-$min;
     } else {
         $newmin = 60-($min-50);
     }
-    $nextupdate = DateCalc("today", "+ $newmin minutes");
-    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("today", "%O\n");
+    $nextupdate = DateCalc("now", "+ $newmin minutes");
+    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("now", "%O\n");
     print CACHE Dumper($result);
 }
 
