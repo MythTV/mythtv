@@ -347,13 +347,14 @@ void MythUIText::FillCutMessage()
         if (isNumber && m_TemplateText.contains("%n"))
         {
             m_CutMessage = qApp->translate("ThemeUI",
-                                        qPrintable(m_TemplateText), "",
-                                        QCoreApplication::CodecForTr,
-                                        qAbs(value));
+                                           m_TemplateText.toUtf8(), NULL,
+                                           QCoreApplication::UnicodeUTF8,
+                                           qAbs(value));
         }
         else if (m_TemplateText.contains("%1"))
         {
-            QString tmp = qApp->translate("ThemeUI", qPrintable(m_TemplateText));
+            QString tmp = qApp->translate("ThemeUI", m_TemplateText.toUtf8(),
+                                          NULL, QCoreApplication::UnicodeUTF8);
             m_CutMessage = tmp.arg(m_Message);
         }
     }
@@ -577,7 +578,8 @@ bool MythUIText::ParseElement(
         if (element.attribute("lang","").isEmpty())
         {
             m_Message = qApp->translate("ThemeUI",
-                                        qPrintable(getFirstText(element)));
+                                        getFirstText(element).toUtf8(), NULL,
+                                        QCoreApplication::UnicodeUTF8);
         }
         else if (element.attribute("lang","").toLower() ==
                  GetMythUI()->GetLanguageAndVariant())
