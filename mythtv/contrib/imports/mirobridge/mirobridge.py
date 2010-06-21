@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.0"
+__version__=u"v0.6.1"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -184,6 +184,7 @@ __version__=u"v0.6.0"
 # 0.5.9 Update for changes in Python Bindings
 # 0.6.0 Fixed a issue when a Miro video's metadata does not have a title. It was being re-added and the
 #       database title fields in several records was being left empty.
+# 0.6.1 Modifications to support MythTV python bindings changes
 
 
 examples_txt=u'''
@@ -296,7 +297,7 @@ try:
     get the directories to store poster, fanart, banner and episode graphics.
     '''
     from MythTV import OldRecorded, Recorded, RecordedProgram, Channel, \
-                        MythDB, Video, MythVideo, MythBE, MythError, MythLog
+                        MythDB, Video, MythVideo, MythBE, MythError, MythLog, DBDataWrite
     mythdb = None
     mythvideo = None
     mythbeconn = None
@@ -304,7 +305,7 @@ try:
     try:
         '''Create an instance of each: MythDB, MythVideo
         '''
-        MythLog._setlevel('important,general') # Set the proper bindings alert level
+        MythLog._setlevel('important,general')
         mythdb = MythDB()
         mythvideo = MythVideo(db=mythdb)
     except MythError, e:
@@ -550,27 +551,13 @@ class delOldRecorded( OldRecorded ):
     original intent.
     return nothing
     '''
-    def __init__(self, data=None):
-        super(delOldRecorded, self).__init__(data)
-
     def delete(self):
         """
         Delete video entry from database.
         """
-        if (self._where is None) or \
-                (self._wheredat is None) or \
-                (self._data is None):
-            return
-        c = self._db.cursor()
-        query = """DELETE FROM %s WHERE %s""" % (self._table, self._where)
-        self._log(self._log.DATABASE, query, str(self._wheredat))
-        try:
-            c.execute(query, self._wheredat)
-        except Exception, e:
-            logger.warning(u"Oldrecorded record delete failed (%s)" % (e, ))
-            pass
-        c.close()
+        DBDataWrite.delete(self)
 # end delOldRecorded()
+MythDB.searchOldRecorded.dbclass = delOldRecorded
 
 
 def hashFile(filename):
@@ -614,34 +601,6 @@ def hashFile(filename):
     except(IOError):    # Accessing to this video file caused and error
         return u''
 # end hashFile()
-
-
-class delRecordedProgram( RecordedProgram ):
-    '''Just delete a recordedprogram record. Never abort as sometimes a record may not exist. This routine is
-    not supported in the native python bindings but MiroBridge needs to clean up possibly orphaned records.
-    return nothing
-    '''
-    def __init__(self, data=None):
-        super(delRecordedProgram, self).__init__(data)
-
-    def delete(self):
-        """
-        Delete video entry from database.
-        """
-        if (self._where is None) or \
-                (self._wheredat is None) or \
-                (self._data is None):
-            return
-        c = self._db.cursor()
-        query = """DELETE FROM %s WHERE %s""" % (self._table, self._where)
-        self._log(self._log.DATABASE, query, str(self._wheredat))
-        try:
-            c.execute(query, self._wheredat)
-        except Exception, e:
-            logger.warning(u"Recordedprogram record delete failed (%s)" % (e, ))
-            pass
-        c.close()
-# end delRecordedProgram()
 
 
 def rtnAbsolutePath(relpath, filetype=u'mythvideo'):
@@ -1148,15 +1107,9 @@ def getOldrecordedOrphans():
     global channel_icon_override
     global graphic_suffix, graphic_path_suffix, graphic_name_suffix
 
-    recorded_array = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
-    if not recorded_array:
-        recorded_array = []
-    oldrecorded_array = mythdb.searchOldRecorded(chanid=channel_id, )
-    if not oldrecorded_array:
-        oldrecorded_array = []
-    videometadata = mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s',u'99999999'),))
-    if not videometadata:
-        videometadata = []
+    recorded_array = list(mythdb.searchRecorded(chanid=channel_id, hostname=localhostname))
+    oldrecorded_array = list(mythdb.searchOldRecorded(chanid=channel_id, ))
+    videometadata = list(mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s',u'99999999'),)))
 
     orphans = []
     for record in oldrecorded_array:
@@ -1175,10 +1128,6 @@ def getOldrecordedOrphans():
             logger.info(u"Simulation: Remove orphaned oldrecorded record (%s - %s)" % (data[u'title'], data[u'subtitle']))
         else:
             delOldRecorded((channel_id, data['starttime'])).delete()
-            try: # Attempt to clean up an orphaned recordedprogram record, there may not be one to clean up
-                delRecordedProgram((channel_id, data['starttime'])).delete()
-            except Exception, e:
-                pass
             # Attempt a clean up for orphaned recorded video files and/or graphics
             (dirName, fileName) = os.path.split(u'%s%s - %s.%s' % (vid_graphics_dirs[u'default'], data[u'title'], data[u'subtitle'], u'png'))
             (fileBaseName, fileExtension)=os.path.splitext(fileName)
@@ -1715,10 +1664,7 @@ def getPlayedMiroVideos():
     global localhostname, vid_graphics_dirs, storagegroups, verbose, channel_id, statistics
 
     filenames=[]
-    recorded = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
-    if not recorded:
-        return None
-
+    recorded = list(mythdb.searchRecorded(chanid=channel_id, hostname=localhostname))
     for record in recorded:
         if record[u'watched'] == 0:    # Skip if the video has NOT been watched
             continue
@@ -1729,7 +1675,6 @@ def getPlayedMiroVideos():
             logger.info(u"Miro video file has been removed (%s) outside of mirobridge\nError(%s)" % (storagegroups[u'default']+record[u'basename'], e))
             continue
         displayMessage(u"Miro video (%s) (%s) has been marked as watched in MythTV." % (record[u'title'], record[u'subtitle']))
-
     if len(filenames):
         return filenames
     else:
@@ -1747,46 +1692,38 @@ def updateMythRecorded(items):
 
     if not items: # There may not be any new items but a clean up of existing recorded may be required
         items = []
-    items_copy = []
-    for item in items:
-        items_copy.append(item)
+    items_copy = list(items)
 
     # Deal with existing Miro videos already in the MythTV data base
-    recorded = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
-    if recorded:
-        for record in recorded:
-            if storagegroups.has_key(u'default'):
-                sym_filepath = u"%s%s" % (storagegroups[u'default'], record[u'basename'])
+    recorded = list(mythdb.searchRecorded(chanid=channel_id, hostname=localhostname))
+    for record in recorded:
+        if storagegroups.has_key(u'default'):
+            sym_filepath = u"%s%s" % (storagegroups[u'default'], record[u'basename'])
+        else:
+            sym_filepath = u"%s%s" % (vid_graphics_dirs[u'default'], record[u'basename'])
+        # Remove any Miro related "watched" recordings (symlink, recorded and recordedprogram records)
+        # Remove any Miro related with broken symbolic video links
+        if record[u'watched'] == 1 or not os.path.isfile(os.path.realpath(sym_filepath)):
+            displayMessage(u"Removing watched Miro recording (%s) (%s)" % (record[u'title'], record[u'subtitle']))
+            # Remove the database recorded, recordedprogram and oldrecorded records
+            if simulation:
+                logger.info(u"Simulation: Remove recorded/recordedprogram/oldrecorded records and associated Miro Video file for chanid(%s), starttime(%s)" % (record['chanid'], record['starttime']))
             else:
-                sym_filepath = u"%s%s" % (vid_graphics_dirs[u'default'], record[u'basename'])
-            # Remove any Miro related "watched" recordings (symlink, recorded and recordedprogram records)
-            # Remove any Miro related with broken symbolic video links
-            if record[u'watched'] == 1 or not os.path.isfile(os.path.realpath(sym_filepath)):
-                displayMessage(u"Removing watched Miro recording (%s) (%s)" % (record[u'title'], record[u'subtitle']))
-                # Remove the database recorded, recordedprogram and oldrecorded records
-                if simulation:
-                    logger.info(u"Simulation: Remove recorded/recordedprogram/oldrecorded records and associated Miro Video file for chanid(%s), starttime(%s)" % (record['chanid'], record['starttime']))
-                else:
-                    try: # Attempting to clean up an recorded record and its associated video file (miro symlink)
-                        rtn = Recorded((record['chanid'], record['starttime'])).delete(force=True)
-                    except MythError, e:
-                        pass
-                    try: # Attempt to clean up an orphaned recordedprogram record, there may not be one to clean up
-                        delRecordedProgram((record['chanid'], record['starttime'])).delete()
-                    except Exception, e:
-                        pass
-                    try: # Attempting to clean up an orphaned oldrecorded record which may or may not exist
-                        delOldRecorded((record['chanid'], record['starttime'])).delete()
-                    except Exception, e:
-                        pass
+                try: # Attempting to clean up an recorded record and its associated video file (miro symlink)
+                    rtn = Recorded((record['chanid'], record['starttime'])).delete(force=True)
+                except MythError, e:
+                    pass
+                try: # Attempting to clean up an orphaned oldrecorded record which may or may not exist
+                    delOldRecorded((record['chanid'], record['starttime'])).delete()
+                except Exception, e:
+                    pass
 
-    recorded = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
-    if recorded:
-        for record in recorded:    # Skip any item already in MythTV data base
-            for item in items:
-                if item[u'channelTitle'] == record[u'title'] and item[u'title'] == record[u'subtitle']:
-                    items_copy.remove(item)
-                    break
+    recorded = list(mythdb.searchRecorded(chanid=channel_id, hostname=localhostname))
+    for record in recorded:    # Skip any item already in MythTV data base
+        for item in items:
+            if item[u'channelTitle'] == record[u'title'] and item[u'title'] == record[u'subtitle']:
+                items_copy.remove(item)
+                break
 
     # Add new Miro unwatched videos to MythTV'd data base
     for item in items_copy:
@@ -1876,112 +1813,108 @@ def updateMythVideo(items):
     createMiroMythVideoDirectory()
 
     # Remove any Miro Mythvideo records which the video or graphics paths are broken
-    records = mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s','99999999'),))
-    if records:
-        statistics[u'Total_Miro_MythVideos'] = len(records)
-        for record in records: # Count the Miro-MythVideos that Miro is expiring or has saved
-            if record[u'filename'][0] == u'/':
-                if os.path.islink(record[u'filename']) and os.path.isfile(record[u'filename']):
-                    statistics[u'Total_Miro_expiring']+=1
-            elif record[u'host'] and storagegroups.has_key(u'mythvideo'):
-                if os.path.islink(storagegroups[u'mythvideo']+record[u'filename']) and os.path.isfile(storagegroups[u'mythvideo']+record[u'filename']):
-                    statistics[u'Total_Miro_expiring']+=1
-        for record in records:
-            if checkVideometadataFails(record, flat):
-                delete = False
-                if os.path.islink(record[u'filename']): # Only delete video files if they are symlinks
-                    if not record[u'host'] or record[u'filename'][0] == '/':
-                        if not os.path.isfile(record[u'filename']):
-                            delete = True
-                    else:
-                        if not os.path.isfile(vid_graphics_dirs[key_trans[field]]+record[u'filename']):
-                            delete = True
-                else:
+    records = list(mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s','99999999'),)))
+    statistics[u'Total_Miro_MythVideos'] = len(records)
+    for record in records: # Count the Miro-MythVideos that Miro is expiring or has saved
+        if record[u'filename'][0] == u'/':
+            if os.path.islink(record[u'filename']) and os.path.isfile(record[u'filename']):
+                statistics[u'Total_Miro_expiring']+=1
+        elif record[u'host'] and storagegroups.has_key(u'mythvideo'):
+            if os.path.islink(storagegroups[u'mythvideo']+record[u'filename']) and os.path.isfile(storagegroups[u'mythvideo']+record[u'filename']):
+                statistics[u'Total_Miro_expiring']+=1
+    for record in records:
+        if checkVideometadataFails(record, flat):
+            delete = False
+            if os.path.islink(record[u'filename']): # Only delete video files if they are symlinks
+                if not record[u'host'] or record[u'filename'][0] == '/':
                     if not os.path.isfile(record[u'filename']):
                         delete = True
-                if delete: # Only delete video files if they are symlinks
-                    if simulation:
-                        logger.info(u"Simulation: DELETE videometadata for intid = %s" % (record[u'intid'],))
-                        logger.info(u"Simulation: DELETE oldrecorded for title(%s), subtitle(%s)" % (record[u'intid'],record[u'title'], record[u'subtitle']))
-                    else:
-                        Video(id=record[u'intid'], db=mythvideo).delete()
-                        try: # An orphaned oldrecorded record may not exist
-                            for oldrecorded in mythdb.searchOldRecorded(title=record[u'title'], subtitle=record[u'subtitle'] ):
-                                delOldRecorded((channel_id, oldrecorded.starttime)).delete()
-                        except Exception, e:
-                            pass
-                    statistics[u'Total_Miro_MythVideos']-=1
-                    if record[u'filename'][0] == '/':
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove video file symlink (%s)" % (record[u'filename']))
-                            else:
-                                os.remove(record[u'filename'])
-                                statistics[u'Miros_MythVideos_video_removed']+=1
-                        except OSError:
-                            pass
-                    elif record[u'host'] and storagegroups.has_key(u'mythvideo'):
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove video file (%s)" % (storagegroups[u'mythvideo']+record[u'filename']))
-                            else:
-                                os.remove(storagegroups[u'mythvideo']+record[u'filename'])
-                        except OSError:
-                            pass
-                if record[u'screenshot']: # Remove any associated Screenshot
-                    if record[u'screenshot'][0] == '/':
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove screenshot symlink (%s)" % (record[u'screenshot']))
-                            else:
-                                os.remove(record[u'screenshot'])
-                        except OSError:
-                            pass
-                    elif record[u'host'] and storagegroups.has_key(u'episodeimagedir'):
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove file (%s)" % (storagegroups[u'episodeimagedir']+record[u'screenshot']))
-                            else:
-                                os.remove(storagegroups[u'episodeimagedir']+record[u'screenshot'])
-                        except OSError:
-                            pass
-                # Remove any unique cover art graphic files
-                if record[u'title'].lower() in channel_icon_override:
-                    if record[u'coverfile'][0] == u'/':
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove item cover art file (%s)" % (record[u'coverfile']))
-                            else:
-                                os.remove(record[u'coverfile'])
-                        except OSError:
-                            pass
-                    elif record[u'host'] and storagegroups.has_key(u'posterdir'):
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove item cover art file (%s)" % (storagegroups[u'posterdir']+record[u'coverfile']))
-                            else:
-                                os.remove(storagegroups[u'posterdir']+record[u'coverfile'])
-                        except OSError:
-                            pass
+                else:
+                    if not os.path.isfile(vid_graphics_dirs[key_trans[field]]+record[u'filename']):
+                        delete = True
+            else:
+                if not os.path.isfile(record[u'filename']):
+                    delete = True
+            if delete: # Only delete video files if they are symlinks
+                if simulation:
+                    logger.info(u"Simulation: DELETE videometadata for intid = %s" % (record[u'intid'],))
+                    logger.info(u"Simulation: DELETE oldrecorded for title(%s), subtitle(%s)" % (record[u'title'], record[u'subtitle']))
+                else:
+                    Video(id=record[u'intid'], db=mythvideo).delete()
+                    try: # An orphaned oldrecorded record may not exist
+                        for oldrecorded in mythdb.searchOldRecorded(title=record[u'title'], subtitle=record[u'subtitle'] ):
+                            delOldRecorded((channel_id, oldrecorded.starttime)).delete()
+                    except Exception, e:
+                        pass
+                statistics[u'Total_Miro_MythVideos']-=1
+                if record[u'filename'][0] == '/':
+                    try:
+                        if simulation:
+                            logger.info(u"Simulation: Remove video file symlink (%s)" % (record[u'filename']))
+                        else:
+                            os.remove(record[u'filename'])
+                            statistics[u'Miros_MythVideos_video_removed']+=1
+                    except OSError:
+                        pass
+                elif record[u'host'] and storagegroups.has_key(u'mythvideo'):
+                    try:
+                        if simulation:
+                            logger.info(u"Simulation: Remove video file (%s)" % (storagegroups[u'mythvideo']+record[u'filename']))
+                        else:
+                            os.remove(storagegroups[u'mythvideo']+record[u'filename'])
+                    except OSError:
+                        pass
+            if record[u'screenshot']: # Remove any associated Screenshot
+                if record[u'screenshot'][0] == '/':
+                    try:
+                        if simulation:
+                            logger.info(u"Simulation: Remove screenshot symlink (%s)" % (record[u'screenshot']))
+                        else:
+                            os.remove(record[u'screenshot'])
+                    except OSError:
+                        pass
+                elif record[u'host'] and storagegroups.has_key(u'episodeimagedir'):
+                    try:
+                        if simulation:
+                            logger.info(u"Simulation: Remove file (%s)" % (storagegroups[u'episodeimagedir']+record[u'screenshot']))
+                        else:
+                            os.remove(storagegroups[u'episodeimagedir']+record[u'screenshot'])
+                    except OSError:
+                        pass
+            # Remove any unique cover art graphic files
+            if record[u'title'].lower() in channel_icon_override:
+                if record[u'coverfile'][0] == u'/':
+                    try:
+                        if simulation:
+                            logger.info(u"Simulation: Remove item cover art file (%s)" % (record[u'coverfile']))
+                        else:
+                            os.remove(record[u'coverfile'])
+                    except OSError:
+                        pass
+                elif record[u'host'] and storagegroups.has_key(u'posterdir'):
+                    try:
+                        if simulation:
+                            logger.info(u"Simulation: Remove item cover art file (%s)" % (storagegroups[u'posterdir']+record[u'coverfile']))
+                        else:
+                            os.remove(storagegroups[u'posterdir']+record[u'coverfile'])
+                    except OSError:
+                        pass
 
     if not items: # There may not be any new items to add to MythVideo
         return True
     # Reread Miro Mythvideo videometadata records
     # Remove the matching videometadata record from array of items
-    items_copy = []
-    for item in items:
-        items_copy.append(item)
-    records = mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s','99999999'),))
-    if records:
-        for record in records:
-            for item in items:
-                if item[u'channelTitle'] == record[u'title'] and item[u'title'] == record[u'subtitle']:
-                    try:
-                        items_copy.remove(item)
-                    except ValueError:
-                        logger.info(u"Video (%s - %s) was found multiple times in list of (watched and/or saved) items from Miro - skipping" % (item[u'channelTitle'], item[u'title']))
-                        pass
-                    break
+    items_copy = list(items)
+    records = list(mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s','99999999'),)))
+    for record in records:
+        for item in items:
+            if item[u'channelTitle'] == record[u'title'] and item[u'title'] == record[u'subtitle']:
+                try:
+                    items_copy.remove(item)
+                except ValueError:
+                    logger.info(u"Video (%s - %s) was found multiple times in list of (watched and/or saved) items from Miro - skipping" % (item[u'channelTitle'], item[u'title']))
+                    pass
+                break
 
     for item in items: # Remove any items that are for a Channel that does not get MythVideo records
         if filter(is_not_punct_char, item[u'channelTitle'].lower()) in channel_watch_only:
