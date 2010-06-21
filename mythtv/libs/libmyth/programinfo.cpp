@@ -2419,7 +2419,7 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
     query.bindValue(":ONEHOURAGO", oneHourAgo);
 
     byWho.clear();
-    if (query.exec())
+    if (query.exec() && query.size() > 0)
     {
         QString usageStr, recusage;
         while (query.next())
