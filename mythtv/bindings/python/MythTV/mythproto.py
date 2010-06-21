@@ -12,6 +12,7 @@ from connections import BEConnection
 from database import DBCache
 from utility import SplitInt, CMPRecord
 
+from datetime import date
 from time import mktime, strptime
 from uuid import uuid4
 import socket
