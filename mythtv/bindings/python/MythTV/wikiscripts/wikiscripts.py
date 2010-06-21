@@ -8,7 +8,7 @@ from urllib import urlopen
 from time import time
 from thread import start_new_thread, allocate_lock
 from time import sleep, time
-from MythTV import QuickDictData
+from MythTV import OrdDict
 import cPickle
 import os
 
@@ -42,6 +42,9 @@ def getScripts():
             pass
     if len(scripts) > 0:
         Script.sema.wait()
+        for i in reversed(range(len(scripts))):
+            if (scripts[i].info is None) or (scripts[i].code is None):
+                scripts.pop(i)
         scripts[0].dumpCache()
         scripts.sort()
     return scripts
@@ -80,6 +83,8 @@ class Script( object ):
 
     def __init__(self, title):
         self.url = getURL(title=title)
+        self.info = None
+        self.code = None
         if not self.fromCache(title):
             start_new_thread(self.readPage,(title,))
 
@@ -97,15 +102,21 @@ class Script( object ):
 
     def readPage(self, title):
         with self.sema:
-            page = lxml.html.parse(self.url)
-            etree = page.getroot()
-            self.getInfo(etree)
-            self.getScript(etree)
-            self.toCache(title)
+            try:
+                page = lxml.html.parse(self.url)
+                etree = page.getroot()
+                self.getInfo(etree)
+                self.getScript(etree)
+                self.toCache(title)
+            except:
+                pass
 
     def getInfo(self, etree):
         text = self.xp_info(etree)[0].strip().split('\n')
-        self.info = QuickDictData([a.split('=') for a in text])
+        for i in reversed(range(len(text))):
+            if '=' not in text[i]:
+                text[i-1] += text.pop(i)
+        self.info = OrdDict([a.split('=') for a in text])
         if self.info.webpage == 'none':
             self.info.webpage = self.url
 
@@ -140,7 +151,7 @@ class Script( object ):
         fd.close()
 
     def toCache(self, title):
-        self.cache[title] = QuickDictData(())
+        self.cache[title] = OrdDict(())
         self.cache[title].info = self.info
         self.cache[title].code = self.code
         self.cache[title].time = time()

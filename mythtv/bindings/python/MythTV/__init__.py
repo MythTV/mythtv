@@ -1,16 +1,31 @@
 #!/usr/bin/env python
 
-__all__ = ['MythStatic', \
+__all__ = ['static', 'MSearch', 'MythLog',\
             \
-           'DictData', 'QuickDictData', 'DBData', 'DBDataWrite', \
-           'DBDataRef', 'DBDataCRef', 'DBConnection', 'DBCache', \
-           'BEConnection', 'BECache', 'BEEvent', 'XMLConnection', \
-           'MythLog', 'MythError', 'StorageGroup', 'System', \
+           'MythError', 'MythDBError', 'MythBEError', \
+           'MythFEError', 'MythFileError', \
             \
-           'ftopen', 'FileTransfer', 'FreeSpace', 'Program', 'Record', \
-           'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', 'Channel', \
-           'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItem', \
-           'NetVisionTreeItem', 'NetVisionSite', 'NetVisionGrabber', \
+           'LoggedCursor', 'DBConnection','BEConnection', \
+           'FEConnection','XMLConnection',\
+            \
+           'schemaUpdate', 'databaseSearch', 'SplitInt', 'deadlinesocket',\
+            \
+           'OrdDict', 'DictData', 'DictInvert', 'DictInvertCI',\
+            \
+           'DBConnection', 'BEConnection', 'FEConnection', 'XMLConnection', \
+            \
+           'DBData', 'DBDataWrite', 'DBDataRef', 'DBDataCRef', \
+           'DBCache', 'StorageGroup', \
+            \
+           'System', 'Grabber', 'Metadata', 'VideoMetadata', 'MusicMetadata', \
+           'GameMetadata', 'InternetMetadata', 'SystemEvent', \
+            \
+           'BECache', 'BEEvent', 'findfile', 'ftopen', 'FileTransfer', \
+           'FileOps', 'FreeSpace', 'Program', \
+            \
+           'Record', 'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', \
+           'Channel', 'Guide', 'Video', 'VideoGrabber', 'InternetContent', \
+           'InternetContentArticles', 'InternetSource', \
             \
            'MythBE', 'BEEventMonitor', 'MythSystemEvent', 'SystemEvent', \
            'Frontend', 'MythDB', 'MythVideo', 'MythXML']
@@ -19,26 +34,32 @@ import26 = """
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
-    from MythStatic import *
-    from MythBase import *
-    from MythData import *
-    from MythFunc import *
+    exec(importall)
 """
 
-import25 = """
-from MythStatic import *
-from MythBase import *
-from MythData import *
-from MythFunc import *
+importall = """
+import static
+from exceptions import *
+from logging import *
+from msearch import *
+from utility import *
+from altdict import *
+from connections import *
+from database import *
+from system import *
+from mythproto import *
+from dataheap import *
+from methodheap import *
 """
 
 from sys import version_info
 if version_info >= (2, 6): # 2.6 or newer
     exec(import26)
 else:
-    exec(import25)
+    exec(importall)
 
 __version__ = OWN_VERSION
+static.mysqldb = MySQLdb.__version__
 
 if __name__ == '__main__':
     banner = 'MythTV Python interactive shell.'

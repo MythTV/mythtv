@@ -4,196 +4,18 @@
 Provides base classes for accessing MythTV
 """
 
-from MythStatic import *
-from MythBase import *
-from MythData import *
+from static import *
+from exceptions import *
+from logging import MythLog
+from connections import FEConnection, XMLConnection
+from utility import databaseSearch
+from database import DBCache
+from mythproto import BEEvent, FileOps, Program
+from dataheap import Record, Recorded, RecordedProgram, \
+                     OldRecorded, Job, Guide, Video, \
+                     InternetSource, InternetContentArticles
 
-import os
 import re
-import socket
-from datetime import datetime
-
-class schemaUpdate( object ):
-    # decorator class for database updates
-    # TODO: do locking and lock checking
-    #       if interactive terminal, ask for update permission
-    #       perform database backup (partial?)
-    def __init__(self, func):
-        self.func = func
-        self.__doc__ = self.func.__doc__
-        self.__name__ = self.func.__name__
-        self.__module__ = self.func.__module__
-
-        self.schemavar = func(-1)
-
-    def __call__(self, db=None):
-        if db is None:
-            db = DBCache()
-        log = MythLog('Schema Update')
-
-        while True:
-            try:
-                updates, newver = self.func(db.settings.NULL[self.schemavar])
-            except StopIteration:
-                break
-
-            log(log.IMPORTANT, 'Updating %s from %s to %s' % \
-                        (schemaname, db.settings.NULL[self.schemavar], newver))
-            c = db.cursor()
-
-            try:
-                for sql, values in updates:
-                    c.execute(sql, values)
-            except Exception, e:
-                log(log.IMPORTANT, 'Update of %s failed' % self.schemavar)
-                raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
-
-            c.close()
-            db.settings.NULL[self.schemavar] = newver
-
-class databaseSearch( object ):
-    # decorator class for database searches
-    def __init__(self, func):
-        # set function and update strings
-        self.func = func
-        self.__doc__ = self.func.__doc__
-        self.__name__ = self.func.__name__
-        self.__module__ = self.func.__module__
-
-        # process joins
-        res = list(self.func(self, True))
-        self.table = res[0]
-        self.dbclass = res[1]
-        self.require = res[2]
-        if len(res) > 3:
-            self.joins = res[3:]
-        else:
-            self.joins = ()
-
-    def __get__(self, inst, own):
-        # set instance and return self
-        self.inst = inst
-        return self
-
-    def __call__(self, **kwargs):
-        where = []
-        fields = []
-        joinbit = 0
-
-        # loop through inputs
-        for key, val in kwargs.items():
-            if val is None:
-                continue
-            # process custom query
-            if key == 'custom':
-                custwhere = {}
-                custwhere.update(val)
-                for k,v in custwhere.items():
-                    where.append(k)
-                    fields.append(v)
-                continue
-            # let function process remaining queries
-            res = self.func(self.inst, key=key, value=val)
-            errstr = "%s got an unexpected keyword arguemnt '%s'"
-            if res is None:
-                if 'not' not in key:
-                    raise TypeError(errstr % (self.__name__, key))
-                res = list(self.func(self.inst, key=key[3:], value=val))
-                if res is None:
-                    raise TypeError(errstr % (self.__name__, key))
-                res[0] = 'NOT '+res[0]
-
-            if len(res) == 3:
-                where.append(res[0])
-                fields.append(res[1])
-                joinbit = joinbit|res[2]
-            elif len(res) == 4:
-                lval = val.split(',')
-                where.append('(%s)=%d' %\
-                    (self.buildQuery(
-                        (   self.buildJoinOn(res[3]),
-                            '(%s)' % \
-                                 ' OR '.join(['%s=%%s' % res[0] \
-                                                    for f in lval])),
-                        'COUNT( DISTINCT %s )' % res[0],
-                        res[1],
-                        res[2]),
-                    len(lval)))
-                fields += lval
-                            
-        for key in self.require:
-            if key not in kwargs:
-                res = self.func(self.inst, key=key)
-                if res is None:
-                    continue
-                where.append(res[0])
-                fields.append(res[1])
-                joinbit = joinbit|res[2]
-
-        # process query
-        query = self.buildQuery(where, joinbit=joinbit)
-        c = self.inst.cursor(self.inst.log)
-        if len(where) > 0:
-            c.execute(query, fields)
-        else:
-            c.execute(query)
-        rows = c.fetchall()
-        c.close()
-
-        if len(rows) == 0:
-            return None
-        records = []
-        for row in rows:
-            records.append(self.dbclass(db=self.inst, raw=row))
-        if len(records):
-            return records
-        else:
-            return None
-
-    def buildJoinOn(self, i):
-        if len(self.joins[i]) == 3:
-            # shared field name
-            on = ' AND '.join(['%s.%s=%s.%s' % \
-                    (self.joins[i][0], field,\
-                     self.joins[i][1], field)\
-                             for field in self.joins[i][2]])
-        else:
-            # separate field name
-            on = ' AND '.join(['%s.%s=%s.%s' % \
-                    (self.joins[i][0], ffield,\
-                     self.joins[i][1], tfield)\
-                             for ffield, tfield in zip(\
-                                    self.joins[i][2],\
-                                    self.joins[i][3])])
-        return on
-
-    def buildQuery(self, where, select=None, tfrom=None, joinbit=0):
-        sql = 'SELECT '
-        if select:
-            sql += select
-        elif tfrom:
-            sql += tfrom+'.*'
-        else:
-            sql += self.table+'.*'
-
-        sql += ' FROM '
-        if tfrom:
-            sql += tfrom
-        else:
-            sql += self.table
-
-        if joinbit:
-            for i in range(len(self.joins)):
-                if (2**i)&joinbit:
-                    sql += ' JOIN %s ON %s' % \
-                            (self.joins[i][0], self.buildJoinOn(i))
-
-        if len(where):
-            sql += ' WHERE '
-            sql += ' AND '.join(where)
-
-        return sql
-
 
 class MythBE( FileOps ):
     __doc__ = FileOps.__doc__+"""
@@ -230,37 +52,17 @@ class MythBE( FileOps ):
     def __del__(self):
         self.freeTuner()
 
-    def _getPrograms(self, query, recstatus=None, header=0):
-        pgfieldcount = len(Program._field_order)
-        programs = []
-        res = self.backendCommand(query).split(BACKEND_SEP)
-        for i in xrange(header):
-            res.pop(0)
-
-        num_progs = int(res.pop(0))
-        for i in range(num_progs):
-            offs = i * pgfieldcount
-            programs.append(Program(res[offs:offs+pgfieldcount], db=self.db))
-
-        if recstatus:
-            for i in reversed(range(num_progs)):
-                if programs[i].recstatus != recstatus:
-                    programs.pop(i)
-
-        return sorted(programs, key=lambda p: p.starttime)
-        
-
     def getPendingRecordings(self):
         """
         Returns a list of Program objects which are scheduled to be recorded.
         """
-        return self._getPrograms('QUERY_GETALLPENDING', header=1)
+        return self._getSortedPrograms('QUERY_GETALLPENDING', header=1)
 
     def getScheduledRecordings(self):
         """
         Returns a list of Program objects which are scheduled to be recorded.
         """
-        return self._getPrograms('QUERY_GETALLSCHEDULED')
+        return self._getSortedPrograms('QUERY_GETALLSCHEDULED')
 
     def getUpcomingRecordings(self):
         """
@@ -269,14 +71,14 @@ class MythBE( FileOps ):
         Sorts the list by recording start time and only returns those with
         record status of WillRecord.
         """
-        return self._getPrograms('QUERY_GETALLPENDING', \
+        return self._getSortedPrograms('QUERY_GETALLPENDING', \
                                 recstatus=Program.rsWillRecord, header=1)
 
     def getConflictedRecordings(self):
         """
         Retuns a list of Program objects subject to conflicts in the schedule.
         """
-        return self._getPrograms('QUERY_GETALLPENDING', \
+        return self._getSortedPrograms('QUERY_GETALLPENDING', \
                                 recstatus=Program.rsConflict, header=1)
 
     def getRecorderList(self):
@@ -313,7 +115,7 @@ class MythBE( FileOps ):
         if id is not None:
             cmd += ' %d' % id
             res = self.getRecorderDetails(id).hostname
-            if res != socket.gethostname():
+            if res != self.localname():
                 local = False
 
         res = ''
@@ -337,7 +139,7 @@ class MythBE( FileOps ):
         """
         def free(self,id):
             res = self.getRecorderDetails(id).hostname
-            if res == socket.gethostname():
+            if res == self.localname():
                 self.backendCommand('FREE_TUNER %d' % id)
             else:
                 myth = MythTV(res)
@@ -399,13 +201,13 @@ class MythBE( FileOps ):
         """
         Returns a list of all Program objects which have already recorded
         """
-        return self._getPrograms('QUERY_RECORDINGS Play')
+        return self._getSortedPrograms('QUERY_RECORDINGS Play')
 
     def getExpiring(self):
         """
         Returns a tuple of all Program objects nearing expiration
         """
-        return self._getPrograms('QUERY_GETEXPIRING')
+        return self._getSortedPrograms('QUERY_GETEXPIRING')
 
     def getCheckfile(self,program):
         """
@@ -462,13 +264,16 @@ class MythBE( FileOps ):
         'filenames' is a dictionary, where the values are the file sizes.
         """
         def walk(self, host, sg, root, path):
-            dn, fn, fs = self.getSGList(host, sg, root+path+'/')
-            res = [list(dn), dict(zip(fn, fs))]
+            res = self.getSGList(host, sg, root+path+'/')
+            if res < 0:
+                return {}
+            dlist = list(res[0])
+            res = [dlist, dict(zip(res[1], res[2]))]
             if path == '':
                 res = {'/':res}
             else:
                 res = {path:res}
-            for d in dn:
+            for d in dlist:
                 res.update(walk(self, host, sg, root, path+'/'+d))
             return res
 
@@ -560,17 +365,8 @@ class BEEventMonitor( BEEvent ):
 class MythSystemEvent( BEEvent ):
     class systemeventhandler( object ):
         # decorator class for system events
-        def __init__(self, func):
-            self.func = func
-            self.__doc__ = self.func.__doc__
-            self.__name__ = self.func.__name__
-            self.__module__ = self.func.__module__
-
-            bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
-
-            self.re_search = re.compile('BACKEND_MESSAGE%sSYSTEM_EVENT %s' %\
-                                (bs, self.__name__.upper()))
-            self.re_process = re.compile(bs.join([
+        bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
+        re_process = re.compile(bs.join([
                 'BACKEND_MESSAGE',
                 'SYSTEM_EVENT (?P<event>[A-Z_]*)'
                     '( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
@@ -580,237 +376,73 @@ class MythSystemEvent( BEEvent ):
                     '( STARTTIME (?P<starttime>[0-9-]*T[0-9-]))?'
                     '( SECS (?P<secs>[0-9]*))?',
                 'empty']))
+
+        def __init__(self, func):
+            self.func = func
+            self.__doc__ = self.func.__doc__
+            self.__name__ = self.func.__name__
+            self.__module__ = self.func.__module__
+            self.filter = None
+
+            self.re_search = re.compile('BACKEND_MESSAGE%sSYSTEM_EVENT %s' %\
+                                (self.bs, self.__name__.upper()))
+
+            self.generic = (self.__name__ == '_generic_handler')
+            if self.generic:
+                self.re_search = re.compile(\
+                                'BACKEND_MESSAGE%sSYSTEM_EVENT' % self.bs)
+
         def __get__(self, inst, own):
             self.inst = inst
             return self
+
         def __call__(self, event=None):
             if event is None:
                 return self.re_search
+
+            # basic string processing
             match = self.re_process.match(event)
             event = {}
             for a in ('event','hostname','sender','cardid','secs'):
                 if match.group(a) is not None:
                     event[a] = match.group(a)
+
+            # event filter for generic handler
+            if self.generic:
+                if self.filter is None:
+                    self.filter = [f.__name__.upper() \
+                                        for f in self.inst._events]
+                if event['event'] in self.filter:
+                    return
+
+            # pull program information
             if (match.group('chanid') is not None) and \
                (match.group('starttime') is not None):
                     be = MythBE(self.inst.hostname)
                     event['program'] = be.getRecording(\
                           (match.group('chanid'),match.group('starttime')))
+
             self.func(self.inst, event)
 
     def _listhandlers(self):
-        return [self.client_connected, self.client_disconnected,
-                self.rec_pending, self.rec_started, self.rec_finished,
-                self.rec_deleted, self.rec_expired, self.livetv_started,
-                self.play_started, self.play_paused, self.play_stopped,
-                self.play_unpaused, self.play_changed, self.master_started,
-                self.master_shutdown, self.slave_connected,
-                self.slave_disconnected, self.net_ctrl_connected,
-                self.net_ctrl_disconnected, self.mythfilldatabase_ran,
-                self.scheduler_ran, self.settings_cache_cleared, self.user_1,
-                self.user_2, self.user_3, self.user_4, self.user_5,
-                self.user_6, self.user_7, self.user_8, self.user_9]
+        return []
 
     def __init__(self, backend=None, noshutdown=False, generalevents=False, \
-                       db=None, opts=None):
+                       db=None, opts=None, enablehandler=True):
         if opts is None:
             opts = BEConnection.BEConnOpts(noshutdown,\
                              True, generalevents)
         BEEvent.__init__(self, backend, db=db, opts=opts)
 
-    @systemeventhandler
-    def client_connected(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def client_disconnected(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def rec_pending(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def rec_started(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def rec_finished(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def rec_deleted(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def rec_expired(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def livetv_started(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def play_started(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def play_stopped(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def play_paused(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def play_unpaused(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def play_changed(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def master_started(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def master_shutdown(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def slave_connected(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def slave_disconnected(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def net_ctrl_connected(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def net_ctrl_disconnected(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def mythfilldatabase_ran(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def scheduler_ran(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def settings_cache_cleared(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_1(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_2(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_3(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_4(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_5(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_6(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_7(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_8(self, event):
-        SystemEvent(event['event'], self.db).command(event)
-    @systemeventhandler
-    def user_9(self, event):
-        SystemEvent(event['event'], self.db).command(event)
+        if enablehandler:
+            self._events.append(self._generic_handler)
+            self.registerevent(self._generic_handler)
 
-class SystemEvent( System ):
-    """
-    SystemEvent(eventname, db=None) -> SystemEvent object
+    @systemeventhandler
+    def _generic_handler(self, event):
+        SystemEvent(event['event'], inst.db).command(event)
 
-    External function handler for system event messages.
-        'eventname' is the event name sent in the BACKEND_MESSAGE message.
-    """
-    def __init__(self, event, db=None):
-        setting = 'EventCmd'+''.join(\
-                            [e.capitalize() for e in event.split('_')])
-        try:
-            System.__init__(self, setting=setting, db=db)
-        except MythError:
-            # no event handler registered
-            self.path = ''
-        except:
-            raise
-
-    def command(self, eventdata):
-        """
-        obj.command(eventdata) -> output string
-
-        Executes external command, substituting event information into the
-            command string. If call exits with a code not 
-            equal to 0, a MythError will be raised. The error code and
-            stderr will be available in the exception and this object
-            as attributes 'returncode' and 'stderr'.
-        """
-        if self.path is '':
-            return
-        cmd = self.path
-        if 'program' in eventdata:
-            cmd = eventdata['program'].formatJob(cmd)
-        for a in ('sender','cardid','secs'):
-            if a in eventdata:
-                cmd = cmd.replace('%%%s%%' % a, eventdata[a])
-        return self._runcmd(cmd)
-
-
-class Frontend(object):
-    isConnected = False
-    socket = None
-    host = None
-    port = None
-
-    def __init__(self, host, port):
-        self.host = host
-        self.port = int(port)
-        self.connect()
-        self.disconnect()
-
-    def __del__(self):
-        if self.isConnected:
-            self.disconnect()
-
-    def __repr__(self):
-        return "<Frontend '%s@%d' at %s>" % (self.host,self.port,hex(id(self)))
-
-    def __str__(self):
-        return "%s@%d" % (self.host, self.port)
-
-    def close(self): self.__del__()
-
-    def connect(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(10)
-        try:
-            self.socket.connect((self.host, self.port))
-        except:
-            raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
-        if re.search("MythFrontend Network Control.*",self.recv()) is None:
-            self.socket.close()
-            self.socket = None
-            raise MythFEError(MythError.FE_ANNOUNCE, self.host, self.port)
-        self.isConnected = True
-
-    def disconnect(self):
-        self.send("exit")
-        self.socket.close()
-        self.socket = None
-        self.isConnected = False
-
-    def send(self,command):
-        if not self.isConnected:
-            self.connect()
-        self.socket.send("%s\n" % command)
-
-    def recv(self):
-        curstr = ''
-        prompt = re.compile('([\r\n.]*)\r\n# ')
-        while not prompt.search(curstr):
-            try:
-                curstr += self.socket.recv(100)
-            except socket.error:
-                raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
-            except KeyboardInterrupt:
-                raise
-        return prompt.split(curstr)[0]
-
+class Frontend( FEConnection ):
     def sendJump(self,jumppoint):
         """
         Sends jumppoint to frontend
@@ -905,6 +537,9 @@ class MythDB( DBCache ):
             partnumber, parttotal,  seriesid,   showtype,   programid,
             manualid,   generic,    cast,       livetv,     basename,
             syndicatedepisodenumber
+
+        Multiple keywords can be chained as such:
+            obj.searchRecorded(title='Title', commflagged=False)
         """
 
         if init:
@@ -1002,6 +637,8 @@ class MythDB( DBCache ):
                         'parttotal','seriesid','originalairdate','showtype',
                         'syndicatedepisodenumber','programid','generic'):
             return ('%s=%%s' % key, value, 0)
+        if key == 'ondate':
+            return ('DATE(starttime)=%s', value, 0)
         if key == 'cast':
             return ('people.name', 'credits', 2, 0)
         if key == 'startbefore':
@@ -1032,6 +669,37 @@ class MythDB( DBCache ):
             return ('%s=%%s' % key, value, 0)
         return None
 
+    @databaseSearch
+    def searchInternetContent(self, init=False, key=None, value=None):
+        """
+        obj.searchInternetContent(**kwargs) -> list of content
+
+        Supports the following keywords:
+            feedtitle,  title,      subtitle,   season,     episode,
+            url,        type,       author,     rating,     player,
+            width,      height,     language,   podcast,    downloadable,
+            ondate,     olderthan,  newerthan,  longerthan, shorterthan,
+            country,    description
+        """
+        if init:
+            return ('internetcontentarticles', InternetContentArticles, ())
+        if key in ('feedtitle','title','subtitle','season','episode','url',
+                        'type','author','rating','player','width','height',
+                        'language','podcast','downloadable', 'description'):
+            return ('%s=%%s' % key, value, 0)
+        if key == 'ondate':
+            return ('DATE(starttime)=%s', value, 0)
+        if key == 'olderthan':
+            return ('date>%s', value, 0)
+        if key == 'newerthan':
+            return ('date<%s', value, 0)
+        if key == 'longerthan':
+            return ('time<%s', value, 0)
+        if key == 'shorterthan':
+            return ('time>%s', value, 0)
+        if key == 'country':
+            return ('countries LIKE %s', '%%%s%%' % value, 0)
+
     def getFrontends(self):
         """
         Returns a list of Frontend objects for accessible frontends
@@ -1042,15 +710,10 @@ class MythDB( DBCache ):
                           WHERE hostname IS NOT NULL
                           AND value='NetworkControlEnabled'
                           AND data=1""")
-        frontends = []
-        for fehost in cursor.fetchall():
-            try:
-                frontend = self.getFrontend(fehost[0])
-                frontends.append(frontend)
-            except:
-                print "%s is not a valid frontend" % fehost[0]
+        frontends = [(fe[0], self.settings[fe[0]].NetworkControlPort) \
+                            for fe in cursor.fetchall()]
         cursor.close()
-        return frontends
+        return Frontend.testList(frontends)
 
     def getFrontend(self,host):
         """
@@ -1068,9 +731,9 @@ class MythDB( DBCache ):
         records = self.searchRecorded(title=title, subtitle=subtitle,\
                             chanid=chanid, starttime=starttime,\
                             progstart=progstart)
-        if records:
-            return records[0]
-        else:
+        try:
+            return records.next()
+        except StopIteration:
             return None
 
     def getChannels(self):
@@ -1081,48 +744,61 @@ class MythDB( DBCache ):
         c = self.cursor(self.log)
         c.execute("""SELECT * FROM channel""")
         for row in c.fetchall():
-            channels.append(Channel(db=self, raw=row))
+            channels.append(Channel.fromRaw(raw, self))
         c.close()
         return channels
-
-# wrappers for backwards compatibility of old functions
-
-    def getChannel(self,chanid):
-        return Channel(chanid, db=self)
-
-    def getGuideData(self, chanid, date):
-        return self.searchGuide(chanid=chanid, 
-                                custom=(('DATE(starttime)=%s',date),))
-
-    def getSetting(self, value, hostname=None):
-        if not hostname:
-            hostname = 'NULL'
-        return self.settings[hostname][value]
-
-    def setSetting(self, value, data, hostname=None):
-        if not hostname:
-            hostname = 'NULL'
-        self.settings[hostname][value] = data
 
 class MythXML( XMLConnection ):
     """
     Provides convenient methods to access the backend XML server.
     """
+    def __init__(self, backend=None, port=None, db=None):
+        self.db = DBCache(db)
+        if backend and port:
+            XMLConnection.__init__(backend, port)
+            return
+
+        self.log = MythLog('Python XML Connection')
+        if backend is None:
+            # use master backend
+            backend = self.db.settings.NULL.MasterServerIP
+        if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend):
+            # process ip address
+            c = self.db.cursor(self.log)
+            if c.execute("""SELECT hostname FROM settings
+                            WHERE value='BackendServerIP'
+                            AND data=%s""", backend) == 0:
+                raise MythDBError(MythError.DB_SETTING, 
+                                        backend+': BackendServerIP')
+            self.host = c.fetchone()[0]
+            self.port = int(self.db.settings[self.host].BackendStatusPort)
+            c.close()
+        else:
+            # assume given a hostname
+            self.host = backend
+            self.port = int(self.db.settings[self.host].BackendStatusPort)
+            if not self.port:
+                # try a truncated hostname
+                self.host = backend.split('.')[0]
+                self.port = int(self.db.setting[self.host].BackendStatusPort)
+                if not self.port:
+                    raise MythDBError(MythError.DB_SETTING, 
+                                        backend+': BackendStatusPort')
+
     def getServDesc(self):
         """
         Returns a dictionary of valid pages, as well as input and output
         arguments.
         """
+        #TODO - broken, fix me
         tree = self._queryTree('GetServDesc')
-        acts = {}
-        for act in tree.find('actionList').getchildren():
-            actname = act.find('name').text
-            acts[actname] = {'in':[], 'out':[]}
-            for arg in act.find('argumentList').getchildren():
+        for a in tree.find('actionList').getchildren():
+            act = [act.find('name').text, {'in':[], 'out':[]}]
+            for arg in a.find('argumentList').getchildren():
                 argname = arg.find('name').text
                 argdirec = arg.find('direction').text
-                acts[actname][argdirec].append(argname)
-        return acts
+                act[1][argdirec].append(argname)
+            yield act
 
     def getHosts(self):
         """Returns a list of unique hostnames found in the settings table."""
@@ -1144,34 +820,32 @@ class MythXML( XMLConnection ):
         tree = self._queryTree('GetSetting', **args)
         return tree.find('Values').find('Value').text
 
-    def getProgramGuide(self, starttime, endtime, startchan=None, numchan=None):
+    def getProgramGuide(self, starttime, endtime, startchan, numchan=None):
         """
         Returns a list of Guide objects corresponding to the given time period.
         """
-        args = {'StartTime':starttime, 'EndTime':endtime, 'Details':1}
-        if startchan:
-            args['StartChanId'] = startchan
-            if numchan:
-                args['NumOfChannels'] = numchan
-            else:
-                args['NumOfChannels'] = 1
+        args = {'StartTime':starttime.isoformat().rsplit('.',1)[0],
+                'EndTime':endtime.isoformat().rsplit('.',1)[0], 
+                'StartChanId':startchan, 'Details':1}
+        if numchan:
+            args['NumOfChannels'] = numchan
+        else:
+            args['NumOfChannels'] = 1
 
-        progs = []
         tree = self._queryTree('GetProgramGuide', **args)
         for chan in tree.find('ProgramGuide').find('Channels').getchildren():
             chanid = int(chan.attrib['chanId'])
             for guide in chan.getchildren():
-                progs.append(Guide(db=self.db, etree=(chanid, guide)))
-        return progs
+                yield Guide.fromEtree((chanid, guide), self.db)
 
     def getProgramDetails(self, chanid, starttime):
         """
         Returns a Program object for the matching show.
         """
-        args = {'ChanId': chanid, 'StartTime':starttime}
+        args = {'ChanId': chanid, 'StartTime': starttime}
         tree = self._queryTree('GetProgramDetails', **args)
         prog = tree.find('ProgramDetails').find('Program')
-        return Program(db=self.db, etree=prog)
+        return Program.fromEtree(prog, self.db)
 
     def getChannelIcon(self, chanid):
         """Returns channel icon as a data string"""
@@ -1182,20 +856,21 @@ class MythXML( XMLConnection ):
         Returns a list of Program objects for recorded shows on the backend.
         """
         tree = self._queryTree('GetRecorded', Descending=descending)
-        progs = []
         for prog in tree.find('Recorded').find('Programs').getchildren():
-            progs.append(Program(db=self.db, etree=prog))
-        return progs
+            yield Program.fromEtree(prog, self.db)
 
     def getExpiring(self):
         """
         Returns a list of Program objects for expiring shows on the backend.
         """
         tree = self._queryTree('GetExpiring')
-        progs = []
         for prog in tree.find('Expiring').find('Programs').getchildren():
-            progs.append(Program(db=self.db, etree=prog))
-        return progs
+            yield Program.fromEtree(prog, self.db)
+
+    def getInternetSources(self):
+        for grabber in self._queryTree('GetInternetSources').\
+                        find('InternetContent').findall('grabber'):
+            yield InternetSource.fromEtree(grabber, self)
 
 class MythVideo( DBCache ):
     """
@@ -1220,9 +895,8 @@ class MythVideo( DBCache ):
             deleted from videometadata, as well as any matching 
             country, cast, genre or markup data.
         """
-        # pull available hosts and videos
+        # pull available hosts
         groups = self.getStorageGroup(groupname='Videos')
-        curvids = self.searchVideos()
         newvids = {}
 
         # pull available types
@@ -1231,12 +905,8 @@ class MythVideo( DBCache ):
         extensions = [a[0].lower() for a in c.fetchall()]
         c.close()
 
-        # filter local videos, only work on SG content
-        for i in reversed(xrange(len(curvids))):
-            if curvids[i].host in ('', None):
-                del curvids[i]
-
         # connect to backends
+        befilter = ['',None]
         backends = {}
         for sg in groups:
             hostname = sg.hostname
@@ -1245,13 +915,12 @@ class MythVideo( DBCache ):
                     backends[hostname] = MythBE(backend=hostname, db=self)
                     newvids[hostname] = []
                 except:
-                    # skip offline backend
-                    for i in reversed(xrange(len(curvids))):
-                        if curvids[i].host == hostname:
-                            del curvids[i]
+                    befilter.append(hostname)
 
-        # index by file path
-        curvids = dict([(a.filename, a) for a in curvids])
+        # filter existing videos on reachable backends, index by file path
+        curvids = dict([(vid.filename, vid) \
+                        for vid in Video.getAllEntries(self) \
+                        if vid.host not in befilter])
 
         # loop through all accessible backends
         for hostname, be in backends.iteritems():
@@ -1264,7 +933,7 @@ class MythVideo( DBCache ):
                 # loop through each file
                 for sgfile in sgfold[2]:
                     # filter by extension
-                    if sgfile.rsplit('.',1)[1].lower() not in extensions:
+                    if sgfile.rsplit('.',1)[-1].lower() not in extensions:
                         continue
 
                     tpath = prepend+sgfile
@@ -1278,7 +947,7 @@ class MythVideo( DBCache ):
                         newvids[hostname].append(tpath)
 
         # re-index by hash value
-        curvids = dict([(a.hash, a) for a in curvids.itervalues()])
+        curvids = dict([(vid.hash, vid) for vid in curvids.itervalues()])
 
         # loop through unmatched videos for missing files
         newvidlist = []
@@ -1291,7 +960,7 @@ class MythVideo( DBCache ):
                     curvids[thash].update({'filename':tpath})
                     del curvids[thash]
                 else:
-                    vid = Video(db=self).fromFilename(tpath)
+                    vid = Video.fromFilename(tpath, self)
                     vid.host = hostname
                     vid.hash = thash
                     newvidlist.append(vid)
@@ -1355,87 +1024,9 @@ class MythVideo( DBCache ):
         Returns a Video object.
         """
         videos = self.searchVideos(**kwargs)
-        if videos:
-            return videos[0]
-        else:
+        try:
+            return videos.next()
+        except StopIteration:            
             return None
 
-# wrappers for backwards compatibility of old functions
-    def pruneMetadata(self):
-        self.scanStorageGroups(returnnew=False)
 
-    def getTitleId(self, title, subtitle=None, episode=None,
-                            array=False, host=None):
-        videos = self.searchVideos(title, subtitle, season, episode, host)
-        if videos:
-            if array:
-                res = []
-                for vid in videos:
-                    res.append(vid.intid)
-                return res
-            else:
-                return videos[0].intid
-        else:
-            return None
-
-    def getMetadata(self, id):
-        return list(Video(id=id, db=self))
-
-    def getMetadataDictionary(self, id):
-        return Video(id=id, db=self).data
-
-    def setMetadata(self, data, id=None):
-        if id is None:
-            return Video(db=self).create(data)
-        else:
-            Video(id=id, db=self).update(data)
-
-    def getMetadataId(self, videopath, host=None):
-        video = self.getVideo(file=videopath, host=host)
-        if video is None:
-            return None
-        else:
-            return video.intid
-
-    def hasMetadata(self, videopath, host=None):
-        vid = self.getVideo(file=videopath, host=host, exactfile=True)
-        if vid is None:
-            return False
-        elif vid.inetref == 0:
-            return False
-        else:
-            return True
-
-    def rmMetadata(self, file=None, id=None, host=None):
-        if file:
-            self.getVideo(file=file, host=host, exactfile=True).delete()
-        elif id:
-            Video(id=id, db=self).delete()
-
-    def rtnVideoStorageGroup(self, host=None):
-        return self.getStorageGroup(groupname='Videos',hostname=host)
-
-    def getTableFieldNames(self, tablename):
-        return self.tablefields[tablename]
-
-    def setCast(self, cast_name, idvideo):
-        Video(id=idvideo, db=self).cast.add(cast_name)
-        # WARNING: no return value
-
-    def setGenres(self, genre_name, idvideo):
-        Video(id=idvideo, db=self).genre.add(genre_name)
-        # WARNING: no return value
-
-    def setCountry(self, country_name, idvideo):
-        Video(id=idvideo, db=self).country.add(country_name)
-        # WARNING: no return value
-
-    def cleanGenres(self, idvideo):
-        Video(id=idvideo, db=self).genre.clean()
-
-    def cleanCountry(self, idvideo):
-        Video(id=idvideo, db=self).country.clean()
-
-    def cleanCast(self, idvideo):
-        Video(id=idvideo, db=self).cast.clean()
-      

@@ -4,7 +4,7 @@
 Contains any static and global variables for MythTV Python Bindings
 """
 
-OWN_VERSION = (0,23,0,10)
+OWN_VERSION = (0,23,0,12)
 SCHEMA_VERSION = 1259
 MVSCHEMA_VERSION = 1036
 NVSCHEMA_VERSION = 1007
@@ -25,6 +25,13 @@ class MARKUP( object ):
     MARK_KEYFRAME       = 7
     MARK_SCENE_CHANGE   = 8
     MARK_GOP_BYFRAME    = 9
+    MARK_ASPECT_1_1     = 10
+    MARK_ASPECT_4_3     = 11
+    MARK_ASPECT_16_9    = 12
+    MARK_ASPECT_2_21_1  = 13
+    MARK_ASPECT_CUSTOM  = 14
+    MARK_VIDEO_WIDTH    = 30
+    MARK_VIDEO_HEIGHT   = 31
 
 class RECTYPE( object ):
     kNotRecording       = 0
@@ -152,6 +159,7 @@ class LOGLEVEL( object ):
 class ERRCODES( object ):
     GENERIC             = 0
     SYSTEM              = 1
+    SOCKET              = 2
     DB_RAW              = 50
     DB_CONNECTION       = 51
     DB_CREDENTIALS      = 52
@@ -161,6 +169,7 @@ class ERRCODES( object ):
     PROTO_CONNECTION    = 100
     PROTO_ANNOUNCE      = 101
     PROTO_MISMATCH      = 102
+    PROTO_PROGRAMINFO   = 103
     FE_CONNECTION       = 150
     FE_ANNOUNCE         = 151
     FILE_ERROR          = 200

@@ -1,8 +1,22 @@
 #!python
 
 from MythTV import *
+import sys
 
 if __name__ == '__main__':
+    if '--version' in sys.argv:
+        print 'MythTV Python Bindings'
+        print '  local versions'
+        print '    bindings version:  ', '.'.join([str(i) for i in static.OWN_VERSION])
+        import MythTV.ttvdb.tvdb_api
+        print '    ttvdb version:     ', str(MythTV.ttvdb.tvdb_api.__version__)
+        import MythTV.tmdb.tmdb_api
+        print '    tmdb version:      ', str(MythTV.tmdb.tmdb_api.__version__)
+        print '  external versions'
+        import lxml.etree
+        print '    lxml version:      ', str(lxml.etree.__version__)
+        print '    MySQLdb version:   ', '.'.join([str(i) for i in static.mysqldb])
+        sys.exit(0)
     banner = 'MythTV Python interactive shell.'
     import code
     try:
