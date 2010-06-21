@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.5"
+__version__=u"v0.7.6"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -304,6 +304,7 @@ __version__=u"v0.7.5"
  #       Minor change to fuzzy matching of a file named parsed title with those from TMDB and TVDB.
  # 0.7.4 Update for changes in Python bindings
  # 0.7.5 Added the TMDB MovieRating as videometadata table "rating" field
+ # 0.7.6 Modifications to support MythTV python bindings changes
 
 
 usage_txt=u'''
@@ -490,7 +491,7 @@ try:
     '''If the MythTV python interface is found, we can insert data directly to MythDB or
     get the directories to store poster, fanart, banner and episode graphics.
     '''
-    from MythTV import MythDB, DBData, Video, MythVideo, MythBE, MythError, MythLog
+    from MythTV import MythDB, DBData, Video, MythVideo, MythBE, MythError, MythLog, RecordedProgram
     mythdb = None
     mythvideo = None
     mythbeconn = None
@@ -510,7 +511,7 @@ try:
         else:
             print u'\n! Warning - Check that (%s) is correctly configured\n' % filename
     except Exception, e:
-        print u"\n! Warning - Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)\n" % e
+        print u"\n! Warning - Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)\n" % e
     try:
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
         mythbeconn = MythBE(backend=localhostname, db=mythdb)
@@ -584,29 +585,19 @@ class VideoTypes( DBData ):
     _where = 'intid=%s'
     _setwheredat = 'self.intid,'
     _logmodule = 'Python VideoType'
-    @staticmethod
-    def getAll(db=None):
-        db = MythDB(db)
-        c = db.cursor()
-        c.execute("""SELECT * FROM videotypes""")
-        types = []
-        for row in c.fetchall():
-            types.append(VideoTypes(db=db, raw=row))
-        c.close()
-        return types
     def __str__(self):
         return "<VideoTypes '%s'>" % self.extension
     def __repr__(self):
         return str(self).encode('utf-8')
-    def __init__(self, id=None, ext=None, db=None, raw=None):
-        if raw is not None:
-            DBData.__init__(self, db=db, raw=raw)
-        elif id is not None:
+    def __init__(self, id=None, ext=None, db=None):
+        if id is not None:
             DBData.__init__(self, data=(id,), db=db)
         elif ext is not None:
             self.__dict__['_where'] = 'extension=%s'
             self.__dict__['_wheredat'] = 'self.extension,'
             DBData.__init__(self, data=(ext,), db=db)
+        else:
+            DBData.__init__(self, None, db=db)
 # end VideoTypes()
 
 def isValidPosixFilename(name, NAME_MAX=255):
@@ -759,24 +750,23 @@ def getStorageGroups():
     return nothing
     '''
     records = mythdb.getStorageGroup(hostname=localhostname)
-    if records:
-        for record in records:
-            # Only include Video, coverfile, banner, fanart, screenshot and trailers storage groups
-            if record.groupname in storagegroupnames.keys():
-                dirname = record.dirname
-                try:
-                    dirname = unicode(record.dirname, 'utf8')
-                except (UnicodeDecodeError):
-                    sys.stderr.write(u"\n! Error: The local Storage group (%s) directory contained\ncharacters that caused a UnicodeDecodeError. This storage group has been rejected.'\n" % (record['groupname']))
-                    continue    # Skip any line that has non-utf8 characters in it
-                except (UnicodeEncodeError, TypeError):
-                    pass
-                # Strip the trailing slash so it is consistent with all other directory paths in Jamu
-                if dirname[-1:] == u'/':
-                    storagegroups[storagegroupnames[record.groupname]].append(dirname[:-1])
-                else:
-                    storagegroups[storagegroupnames[record.groupname]].append(dirname)
-            continue
+    for record in records:
+        # Only include Video, coverfile, banner, fanart, screenshot and trailers storage groups
+        if record.groupname in storagegroupnames.keys():
+            dirname = record.dirname
+            try:
+                dirname = unicode(record.dirname, 'utf8')
+            except (UnicodeDecodeError):
+                sys.stderr.write(u"\n! Error: The local Storage group (%s) directory contained\ncharacters that caused a UnicodeDecodeError. This storage group has been rejected.'\n" % (record['groupname']))
+                continue    # Skip any line that has non-utf8 characters in it
+            except (UnicodeEncodeError, TypeError):
+                pass
+            # Strip the trailing slash so it is consistent with all other directory paths in Jamu
+            if dirname[-1:] == u'/':
+                storagegroups[storagegroupnames[record.groupname]].append(dirname[:-1])
+            else:
+                storagegroups[storagegroupnames[record.groupname]].append(dirname)
+        continue
 
     any_storage_group = False
     tmp_storagegroups = dict(storagegroups)
@@ -1657,22 +1647,21 @@ class Configuration(object):
         """
         # Get videotypes table field names:
         try:
-            records = VideoTypes.getAll()
+            records = VideoTypes.getAllEntries(mythdb)
         except MythError, e:
             sys.stderr.write(u"\n! Error: Reading videotypes MythTV table: %s\n" % e.args[0])
             return False
 
-        if records:
-            for record in records:
-                # Remove any extentions that are in Jamu's list but the user wants ignore
-                if record.f_ignore:
-                    if record.extension in self.config['video_file_exts']:
-                        self.config['video_file_exts'].remove(record.extension)
-                    if record.extension.lower() in self.config['video_file_exts']:
-                        self.config['video_file_exts'].remove(record.extension.lower())
-                else: # Add extentions that are not in the Jamu list
-                    if not record.extension in self.config['video_file_exts']:
-                        self.config['video_file_exts'].append(record.extension)
+        for record in records:
+            # Remove any extentions that are in Jamu's list but the user wants ignore
+            if record.f_ignore:
+                if record.extension in self.config['video_file_exts']:
+                    self.config['video_file_exts'].remove(record.extension)
+                if record.extension.lower() in self.config['video_file_exts']:
+                    self.config['video_file_exts'].remove(record.extension.lower())
+            else: # Add extentions that are not in the Jamu list
+                if not record.extension in self.config['video_file_exts']:
+                    self.config['video_file_exts'].append(record.extension)
         # Make sure that all video file extensions are lower case
         for index in range(len(self.config['video_file_exts'])):
             self.config['video_file_exts'][index] = self.config['video_file_exts'][index].lower()
@@ -5015,6 +5004,7 @@ class MythTvMetaData(VideoFiles):
         '''Find all Scheduled and Recorded programs
         return array of found programs, if none then empty array is returned
         '''
+        global localhostname
         programs=[]
 
         # Get pending recordings
@@ -5045,9 +5035,9 @@ class MythTvMetaData(VideoFiles):
             else:
                 programs.append(record)
 
-        # Get recorded table field names:
+        # Get recorded records
         try:
-            recordedlist = mythbeconn.getRecordings()
+            recordedlist = list(mythdb.searchRecorded(hostname=localhostname))
         except MythError, e:
             sys.stderr.write(u"\n! Error: Getting recorded programs list: %s\n" % e.args[0])
             return programs
@@ -5056,12 +5046,7 @@ class MythTvMetaData(VideoFiles):
             return programs
 
         recordedprogram = {}
-        for recordedProgram in recordedlist:
-            try:
-                recordedRecord = recordedProgram.getRecorded()
-            except MythError, e:
-                sys.stderr.write(u"\n! Error: Getting recorded table record: %s\n" % e.args[0])
-                return programs
+        for recordedRecord in recordedlist:
             if recordedRecord.recgroup == u'Deleted':
                 continue
             recorded = {}
@@ -5080,14 +5065,14 @@ class MythTvMetaData(VideoFiles):
                 # Get Release year for recorded movies
                 # Get Recorded videos recordedprogram / airdate
                 try:
-                    recordedDetails = recordedRecord.getRecordedProgram()
+                    recordedDetails = dict(RecordedProgram.fromRecorded(recordedRecord))
                 except MythError, e:
                     sys.stderr.write(u"\n! Error: Getting recordedprogram table record: %s\n" % e.args[0])
                     continue
-                if not recordedDetails:
+                if not len(recordedDetails):
                     continue
-                if not recordedDetails.subtitle:
-                    recordedprogram[recordedDetails.title]= u'%d' % recordedDetails.airdate
+                if not recordedDetails['subtitle']:
+                    recordedprogram[recordedDetails['title']]= u'%d' % recordedDetails['airdate']
 
         # Add release year to recorded movies
         for program in programs:
