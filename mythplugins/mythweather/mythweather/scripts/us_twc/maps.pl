@@ -6,8 +6,8 @@ use English;
 use File::Basename;
 use Cwd 'abs_path';
 use lib dirname(abs_path($0 or $PROGRAM_NAME)),
-        '/usr/share/mythtv/mythweather/scripts/us_nws',
-        '/usr/local/share/mythtv/mythweather/scripts/us_nws';
+        '/usr/share/mythtv/mythweather/scripts/us_twc',
+        '/usr/local/share/mythtv/mythweather/scripts/us_twc';
 
 use Getopt::Std;
 use LWP::Simple;
@@ -17,8 +17,8 @@ use Data::Dumper;
 
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
-my $name = 'Map-Download';
-my $version = 0.2;
+my $name = 'weather.com-static';
+my $version = 0.3;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 10*60;
