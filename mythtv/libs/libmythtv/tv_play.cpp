@@ -10551,12 +10551,22 @@ QString TV::FillOSDMenuAdjustFill(const PlayerContext *ctx, OSD *osd,
     {
         result = title;
         AdjustFillMode adjustfill = kAdjustFill_Off;
+        bool autodetect = false;
         ctx->LockDeleteNVP(__FILE__, __LINE__);
         if (ctx->nvp)
+        {
             adjustfill = ctx->nvp->GetAdjustFill();
+            if (ctx->nvp->getVideoOutput())
+                autodetect = !ctx->nvp->getVideoOutput()->hasHWAcceleration();
+        }
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-        osd->DialogAddButton(tr("Auto Detect"), "AUTODETECT_FILL");
+        if (autodetect)
+        {
+            osd->DialogAddButton(tr("Auto Detect"), "AUTODETECT_FILL",
+                 false, (adjustfill == kAdjustFill_AutoDetect_DefaultHalf) ||
+                        (adjustfill == kAdjustFill_AutoDetect_DefaultOff));
+        }
         for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
         {
             osd->DialogAddButton(toString((AdjustFillMode) i),
