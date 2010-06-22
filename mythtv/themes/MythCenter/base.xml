@@ -8,6 +8,10 @@
         <color>#EEEEEE</color>
         <weight>bold</weight>
     </fontdef>
+
+    <fontdef name="basesmaller" from="basesmall">
+        <pixelsize>18</pixelsize>
+    </fontdef>
   
     <fontdef name="basesmallbold" from="basesmall">
         <weight>bold</weight>
