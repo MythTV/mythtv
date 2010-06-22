@@ -36,6 +36,9 @@ if version_info >= (2, 6): # 2.6 or newer
 else:
     exec(import25)
 
+__version__ = OWN_VERSION
+MythStatic.mysqldb = MySQLdb.__version__
+
 if __name__ == '__main__':
     banner = 'MythTV Python interactive shell.'
     import code

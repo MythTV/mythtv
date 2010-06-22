@@ -8,4 +8,5 @@ setup(
         description='MythTV Python bindings.',
         packages=['MythTV', 'MythTV/tmdb', 'MythTV/ttvdb'],
         url=['http://www.mythtv.org/'],
+        scripts=['scripts/mythpython'],
         )

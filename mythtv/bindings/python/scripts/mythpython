@@ -1,0 +1,34 @@
+#!/usr/local/bin/python
+
+from MythTV import *
+import sys
+
+if __name__ == '__main__':
+    if '--version' in sys.argv:
+        print 'MythTV Python Bindings'
+        print '  local versions'
+        print '    bindings version:  ', '.'.join([str(i) for i in MythStatic.OWN_VERSION])
+        import MythTV.ttvdb.tvdb_api
+        print '    ttvdb version:     ', str(MythTV.ttvdb.tvdb_api.__version__)
+        import MythTV.tmdb.tmdb_api
+        print '    tmdb version:      ', str(MythTV.tmdb.tmdb_api.__version__)
+        print '  external versions'
+        try:
+            import lxml.etree
+            print '    lxml version:      ', str(lxml.etree.__version__)
+        except:
+            print '    lxml version:      ', 'NOT FOUND'
+        print '    MySQLdb version:   ', '.'.join([str(i) for i in MythStatic.mysqldb])
+        sys.exit(0)
+    banner = 'MythTV Python interactive shell.'
+    import code
+    try:
+        import readline, rlcompleter
+    except:
+        pass
+    else:
+        readline.parse_and_bind("tab: complete")
+        banner += ' TAB completion available.'
+    namespace = globals().copy()
+    namespace.update(locals())
+    code.InteractiveConsole(namespace).interact(banner)
