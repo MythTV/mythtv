@@ -544,7 +544,7 @@ void Metadata::checkEmptyFields()
         m_artist = QObject::tr("Unknown Artist");
     // This should be the same as Artist if it's a compilation track or blank
     if (!m_compilation || m_compilation_artist.isEmpty())
-        m_compilation_artist = m_artist; 
+        m_compilation_artist = m_artist;
     if (m_album.isEmpty())
         m_album = QObject::tr("Unknown Album");
     if (m_title.isEmpty())
@@ -669,7 +669,7 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap["genre"] = m_genre;
     metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
-    metadataMap["artisttitle"] = QObject::tr("%1  by  %2", 
+    metadataMap["artisttitle"] = QObject::tr("%1  by  %2",
                                              "Music track 'title by artist'")
                                              .arg(FormatTitle())
                                              .arg(FormatArtist());
@@ -826,7 +826,6 @@ QImage Metadata::getAlbumArt(ImageType type)
 QString Metadata::getAlbumArtFile(void)
 {
     AlbumArtImages albumArt(this);
-    ImageType type;
     AlbumArtImage *albumart_image = NULL;
 
     if ((albumart_image = albumArt.getImage(IT_FRONTCOVER)))
