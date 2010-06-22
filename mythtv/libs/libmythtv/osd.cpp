@@ -177,6 +177,7 @@ void OSD::TearDown(void)
     foreach(MythScreenType* screen, m_Children)
         delete screen;
     m_Children.clear();
+    m_Dialog = NULL;
 }
 
 bool OSD::Init(const QRect &rect, float font_aspect)
@@ -702,7 +703,7 @@ void OSD::RemoveWindow(const QString &window)
     HideWindow(window);
     MythScreenType *child = m_Children.value(window);
     m_Children.remove(window);
-    child->deleteLater();
+    delete child;
 }
 
 MythScreenType *OSD::GetWindow(const QString &window)
