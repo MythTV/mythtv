@@ -149,9 +149,9 @@ foreach (@types) {
         # relying on this being after speed and gust
         $key = "wind_spdgst";
         if ($units =~ /ENG/ ) {
-            $xml->{$key} = "$xml->{wind_mph} ($xml->{wind_gust_mph}) mph";
+            $xml->{$key} = "$xml->{wind_mph} ($xml->{wind_gust_mph})";
         } else {
-            $xml->{$key} = "$xml->{wind_kph} ($xml->{wind_gust_kph}) km/h";
+            $xml->{$key} = "$xml->{wind_kph} ($xml->{wind_gust_kph})";
         }
     } elsif (/copyright/) {
         $key = "copyright";
