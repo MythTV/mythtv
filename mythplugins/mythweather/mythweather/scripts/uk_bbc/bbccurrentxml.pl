@@ -1,10 +1,19 @@
-#! /usr/bin/perl -w
+#! /usr/bin/perl
 
 #
 # Based on nwsxml.pl by Lucien Dunning
 #
 
 use strict;
+use warnings;
+
+use English;
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)),
+        '/usr/share/mythtv/mythweather/scripts/uk_bbc',
+        '/usr/local/share/mythtv/mythweather/scripts/uk_bbc';
+
 use XML::Simple;
 use LWP::Simple;
 # Ideally we would use the If-Modified-Since header

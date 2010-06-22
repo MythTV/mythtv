@@ -1,10 +1,18 @@
-#! /usr/bin/perl -w
+#! /usr/bin/perl
 
 #TODO the icons aren't very meaningful, the server gives them to us for 3 or 6
 # hr intervals, but since we're parsing for 12 hour, that seem a little useless
 
-package main;
+use English;
 use strict;
+use warnings;
+
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)),
+        '/usr/share/mythtv/mythweather/scripts/us_nws',
+        '/usr/local/share/mythtv/mythweather/scripts/us_nws';
+
 use Data::Dumper;
 use NDFDParser;
 use NWSLocation;

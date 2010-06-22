@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # MythWeather-revamp script to retreive weather information from Environment 
 # Canada.
 #
@@ -6,9 +6,17 @@
 # (ldunning@gmail.com) PERL scripts.  Kudos to Lucien for doing all of the
 # hard work that I shamelessly stole.
 #
-# TODO Code clean up and organization
 
 use strict;
+use warnings;
+
+use English;
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)), 
+        '/usr/share/mythtv/mythweather/scripts/ca_envcan', 
+        '/usr/local/share/mythtv/mythweather/scripts/ca_envcan';
+
 use LWP::Simple;
 use Date::Manip;
 use Getopt::Std;

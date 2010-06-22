@@ -1,6 +1,8 @@
-#! /usr/bin/perl -w
+#! /usr/bin/perl
 
 use strict;
+use warnings;
+
 use utf8;
 use LWP::UserAgent;
 use Getopt::Std;

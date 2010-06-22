@@ -1,5 +1,14 @@
-#!/usr/bin/perl -w 
+#!/usr/bin/perl
 use strict;
+use warnings;
+
+use English;
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)),
+        '/usr/share/mythtv/mythweather/scripts/us_nws',
+        '/usr/local/share/mythtv/mythweather/scripts/us_nws';
+
 use NDFDParser;
 use NWSLocation;
 use Data::Dumper;
