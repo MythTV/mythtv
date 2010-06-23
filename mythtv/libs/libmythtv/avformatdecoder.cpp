@@ -1372,11 +1372,11 @@ static bool IS_DR1_PIX_FMT(const enum PixelFormat fmt)
 {
     switch (fmt)
     {
-    case PIX_FMT_YUV420P:
-    case PIX_FMT_YUVJ420P:
-        return true;
-    default:
-        return false;
+        case PIX_FMT_YUV420P:
+        case PIX_FMT_YUVJ420P:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -1410,7 +1410,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
         aspect_ratio *= (float)enc->width / (float)enc->height;
 
-        current_width = enc->width;
+        current_width  = enc->width;
         current_height = enc->height;
         current_aspect = aspect_ratio;
     }
@@ -1437,23 +1437,22 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (selectedStream)
     {
         directrendering = true;
-        if (
-        !gCoreContext->GetNumSetting("DecodeExtraAudio", 0) &&
-        !CODEC_IS_HWACCEL(codec))
-    {
-        SetLowBuffers(false);
-    }
+        if (!gCoreContext->GetNumSetting("DecodeExtraAudio", 0) &&
+            !CODEC_IS_HWACCEL(codec))
+        {
+            SetLowBuffers(false);
+        }
     }
 
     if (CODEC_IS_XVMC(codec))
     {
         enc->flags |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer = get_avf_buffer_xvmc;
-        enc->get_format = (codec->id == CODEC_ID_MPEG2VIDEO_XVMC) ? get_format_xvmc : get_format_xvmc_vld;
+        enc->get_format = (codec->id == CODEC_ID_MPEG2VIDEO_XVMC) ?
+                            get_format_xvmc : get_format_xvmc_vld;
         enc->release_buffer = release_avf_buffer_xvmc;
         enc->draw_horiz_band = render_slice_xvmc;
-        enc->slice_flags = SLICE_FLAG_CODED_ORDER |
-            SLICE_FLAG_ALLOW_FIELD;
+        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else if (CODEC_IS_DVDV(codec))
     {
