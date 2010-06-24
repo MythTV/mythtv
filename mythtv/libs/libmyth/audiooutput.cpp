@@ -145,8 +145,10 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         VERBOSE(VB_IMPORTANT, "No useable audio output driver found.");
         VERBOSE(VB_IMPORTANT, "Don't disable OSS support unless you're "
                               "not running on Linux.");
+#ifdef USING_PULSE
         if (pulsestatus)
             pulseaudio_handle_teardown();
+#endif
         return NULL;
     }
 #ifdef USING_PULSE
