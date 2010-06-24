@@ -36,7 +36,9 @@ AudioOutputOSS::AudioOutputOSS(const AudioSettings &settings) :
     mixerfd(-1), control(SOUND_MIXER_VOLUME)
 {
     // Set everything up
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputOSS::~AudioOutputOSS()
@@ -52,24 +54,29 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
     audiofd = open(device.constData(), O_WRONLY | O_NONBLOCK);
 
     AudioFormat fmt;
-    int rate, formats;
+    int rate, formats = 0;
 
     if (audiofd < 0)
     {
         OERROR(QString("Error opening audio device (%1)").arg(main_device));
-        return settings;
+        delete settings;
+        return NULL;
     }
 
     while ((rate = settings->GetNextRate()))
-        if(ioctl(audiofd, SNDCTL_DSP_SPEED, &rate) >= 0)
+    {
+        int rate2 = rate;
+        if(ioctl(audiofd, SNDCTL_DSP_SPEED, &rate2) >= 0
+           && rate2 == rate)
             settings->AddSupportedRate(rate);
+    }
 
     if(ioctl(audiofd, SNDCTL_DSP_GETFMTS, &formats) < 0)
         OERROR("Error retrieving formats");
     else
     {
         int ofmt;
-        
+
         while ((fmt = settings->GetNextFormat()))
         {
             switch (fmt)
@@ -84,9 +91,21 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
         }
     }
 
-    for (uint i = 2; i < 9; i++)
-        if (ioctl(audiofd, SNDCTL_DSP_CHANNELS, &i) >= 0)
+#if defined(AFMT_AC3)
+        // Check if drivers supports AC3
+    settings->setAC3(formats & AFMT_AC3);
+#endif
+
+    for (uint i = 1; i <= 2; i++)
+    {
+        int channel = i;
+
+        if (ioctl(audiofd, SNDCTL_DSP_CHANNELS, &channel) >= 0 &&
+            channel == i)
+        {
             settings->AddSupportedChannels(i);
+        }
+    }
 
     close(audiofd);
     audiofd = -1;
@@ -106,7 +125,7 @@ bool AudioOutputOSS::OpenDevice()
     while (timer.elapsed() < 2000 && audiofd == -1)
     {
         QByteArray device = main_device.toAscii();
-        audiofd = open(device.constData(), O_WRONLY | O_NONBLOCK);
+        audiofd = open(device.constData(), O_WRONLY);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
         {
             if (errno == EBUSY)
@@ -146,7 +165,7 @@ bool AudioOutputOSS::OpenDevice()
 #if defined(AFMT_AC3) && defined(SNDCTL_DSP_GETFMTS)
     if (passthru)
     {
-        int format_support;
+        int format_support = 0;
         if (!ioctl(audiofd, SNDCTL_DSP_GETFMTS, &format_support) &&
             (format_support & AFMT_AC3))
         {

@@ -53,8 +53,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     main_device(settings.GetMainDevice()),
     passthru_device(settings.GetPassthruDevice()),
-    passthru(false),            enc(false),
-    reenc(false),
+    passthru(false),
+    enc(false),                 reenc(false),
     stretchfactor(1.0f),
 
     source(settings.source),    killaudio(false),
@@ -66,8 +66,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     buffer_output_data_for_use(false),
 
     // private
-    output_settings(NULL),
-
+    output_settingsraw(NULL),   output_settings(NULL),
     need_resampler(false),      src_ctx(NULL),
 
     pSoundStretch(NULL),
@@ -117,16 +116,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
         VBAUDIO(QString("SRC quality = %1").arg(quality_string(src_quality)));
     }
-
-    bool ignore;
-    AudioOutput::AudioSetup(max_channels, allow_ac3_passthru,
-                            ignore, allow_multipcm, upmix_default);
-
-    configured_channels = max_channels;
-    if (settings.upmixer == 1) // music, upmixer off
-        upmix_default = false;
-    else if (settings.upmixer == 2) // music, upmixer on
-        upmix_default = true;
 }
 
 /**
@@ -141,13 +130,112 @@ AudioOutputBase::~AudioOutputBase()
                 "~AudioOutputBase called, but KillAudio has not been called!");
 
     // We got this from a subclass, delete it
-    if (output_settings)
-        delete output_settings;
+    delete output_settings;
+    delete output_settingsraw;
 
     assert(memory_corruption_test0 == 0xdeadbeef);
     assert(memory_corruption_test1 == 0xdeadbeef);
     assert(memory_corruption_test2 == 0xdeadbeef);
     assert(memory_corruption_test3 == 0xdeadbeef);
+}
+
+void AudioOutputBase::InitSettings(const AudioSettings &settings)
+{
+    // Ask the subclass what we can send to the device
+    output_settings = GetOutputSettingsUsers();
+
+    max_channels = output_settings->BestSupportedChannels();
+    configured_channels = max_channels;
+
+    allow_ac3_passthru = output_settings->canAC3();
+    allow_multipcm = output_settings->canDTS();
+
+    upmix_default = max_channels > 2 ?
+        gCoreContext->GetNumSetting("AudioDefaultUpmix", false) :
+        false;
+    if (settings.upmixer == 1) // music, upmixer off
+        upmix_default = false;
+    else if (settings.upmixer == 2) // music, upmixer on
+        upmix_default = true;
+}
+
+/**
+ * Returns capabilities supported by the audio device
+ * amended to take into account the digital audio
+ * options (AC3 and DTS)
+ */
+AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(void)
+{
+        // If we've already checked the port, use the cache
+        // version instead
+    if (output_settingsraw)
+        return output_settingsraw;
+
+    AudioOutputSettings* aosettings = GetOutputSettings();
+
+    if (aosettings)
+    {
+        int mchannels = aosettings->BestSupportedChannels();
+
+        if (mchannels <= 2)
+            aosettings->setLPCM(false);
+        if (mchannels == 2 &&
+            (aosettings->canAC3() || aosettings->canDTS()))
+        {
+            aosettings->AddSupportedChannels(6);
+        }
+    }
+    else
+        aosettings = new AudioOutputSettings(true);
+
+    return (output_settingsraw = aosettings);
+}
+
+/**
+ * Returns capabilities supported by the audio device
+ * amended to take into account the digital audio
+ * options (AC3 and DTS) as well as the user settings
+ */
+AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
+{
+    if (output_settings)
+        return output_settings;
+
+    AudioOutputSettings* aosettings = new AudioOutputSettings;
+
+    *aosettings = *GetOutputSettingsCleaned();
+
+    if (aosettings->IsInvalid())
+    {
+        output_settings = aosettings;
+        return output_settings;
+    }
+
+    int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
+    int max_channels = aosettings->BestSupportedChannels();
+    bool bAC3  = aosettings->canAC3() &&
+        gCoreContext->GetNumSetting("AC3PassThru", false);
+    bool bDTS  = aosettings->canDTS() &&
+        gCoreContext->GetNumSetting("DTSPassThru", false);
+    bool bLPCM = aosettings->canLPCM() &&
+        gCoreContext->GetNumSetting("MultiChannelPCM", false);
+
+    if (max_channels > 2 && !bLPCM)
+        max_channels = 2;
+    if (max_channels == 2 && (bAC3 || bDTS))
+        max_channels = 6;
+
+    if (cur_channels > max_channels)
+        cur_channels = max_channels;
+
+    aosettings->SetBestSupportedChannels(cur_channels);
+    if (cur_channels <= 2)
+        bDTS = bAC3 = false;
+    aosettings->setAC3(bAC3);
+    aosettings->setDTS(bDTS);
+    aosettings->setLPCM(bLPCM);
+
+    return (output_settings = aosettings);
 }
 
 /**
@@ -160,8 +248,6 @@ AudioOutputBase::~AudioOutputBase()
 bool AudioOutputBase::CanPassthrough(bool willreencode) const
 {
     bool ret = false;
-    if (!output_settings)
-        return false;
     ret = output_settings->IsSupportedFormat(FORMAT_S16);
     ret &= willreencode ? allow_ac3_passthru : !need_resampler;
     return ret;
@@ -341,10 +427,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     killaudio = pauseaudio = false;
     was_paused = true;
     internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
-
-    // Ask the subclass what we can send to the device
-    if (!output_settings)
-        output_settings = GetOutputSettings();
 
     VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
             .arg(codec_id_string((CodecID)codec))

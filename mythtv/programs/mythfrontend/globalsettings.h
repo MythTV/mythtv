@@ -8,20 +8,68 @@
 #include "mythcontext.h"
 #include "videodisplayprofile.h"
 
-class QFileInfo;
+#include <QMutex>
+#include "audiooutput.h"
 
-class AudioOutputDevice : public HostComboBox
+class QFileInfo;
+class AudioDeviceComboBox;
+
+class AudioConfigSettings : public VerticalConfigurationGroup
 {
     Q_OBJECT
 
   public:
-    AudioOutputDevice();
+    AudioConfigSettings();
+
+    typedef QMap<QString,AudioOutput::AudioDeviceConfig> ADCMap;
+
+    ADCMap &AudioDeviceMap(void) { return audiodevs; };
+    AudioOutput::ADCVect &AudioDeviceVect(void) { return devices; };
 
   private slots:
-    void AudioDescriptionHelp(void);
+    void UpdateVisibility(const QString&);
+    void UpdateCapabilities(const QString&);
+    void AudioRescan();
 
   private:
-    QMap<QString, QString> audiodevs;
+    AudioDeviceComboBox *OutputDevice();
+    HostComboBox        *MaxAudioChannels();
+    HostCheckBox        *AudioUpmix();
+    HostComboBox        *AudioUpmixType();
+    HostCheckBox        *AC3PassThrough();
+    HostCheckBox        *DTSPassThrough();
+    HostCheckBox        *MPCM();
+    HostCheckBox        *AdvancedAudioSettings();
+    HostCheckBox        *SRCQualityOverride();
+    HostComboBox        *SRCQuality();
+    HostCheckBox        *Audio48kOverride();
+    HostCheckBox        *PassThroughOverride();
+    HostComboBox        *PassThroughOutputDevice();
+
+    AudioDeviceComboBox *m_OutputDevice;
+    HostComboBox        *m_MaxAudioChannels;
+    HostCheckBox        *m_AudioUpmix;
+    HostComboBox        *m_AudioUpmixType;
+    HostCheckBox        *m_AC3PassThrough;
+    HostCheckBox        *m_DTSPassThrough;
+    HostCheckBox        *m_MPCM;
+    ADCMap               audiodevs;
+    AudioOutput::ADCVect devices;
+    QMutex               slotlock;
+};
+
+class AudioDeviceComboBox : public HostComboBox
+{
+    Q_OBJECT
+  public:
+    AudioDeviceComboBox(AudioConfigSettings*);
+    void AudioRescan();
+
+  private slots:
+    void AudioDescriptionHelp(const QString&);
+
+  private:
+    AudioConfigSettings *m_parent;
 };
 
 class ThemeSelector : public HostImageSelect

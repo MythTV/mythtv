@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008 Alan Calvert
+ * Copyright (C) 2008 Alan Calvert, 2010 foobum@gmail.com
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -27,7 +28,8 @@
 
 AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    pcontext(NULL), pstream(NULL), mainloop(NULL)
+    pcontext(NULL), pstream(NULL), mainloop(NULL),
+    m_aosettings(NULL)
 {
     volume_control.channels = 0;
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
@@ -35,7 +37,9 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
 
     ChooseHost();
 
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputPulseAudio::~AudioOutputPulseAudio()
@@ -46,7 +50,7 @@ AudioOutputPulseAudio::~AudioOutputPulseAudio()
 AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
 {
     AudioFormat fmt;
-    output_settings = new AudioOutputSettings();
+    m_aosettings = new AudioOutputSettings();
     QString fn_log_tag = "OpenDevice, ";
 
     /* Start the mainloop and connect a context so we can retrieve the
@@ -55,7 +59,8 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
     if (!mainloop)
     {
         VBERROR(fn_log_tag + "Failed to get new threaded mainloop");
-        return false;
+        delete m_aosettings;
+        return NULL;
     }
 
     pa_threaded_mainloop_start(mainloop);
@@ -65,7 +70,8 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
     {
         pa_threaded_mainloop_unlock(mainloop);
         pa_threaded_mainloop_stop(mainloop);
-        return false;
+        delete m_aosettings;
+        return NULL;
     }
 
     /* Get the samplerate and channel count of the default sink, supported rate
@@ -87,7 +93,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
     pa_threaded_mainloop_unlock(mainloop);
 
     // All formats except S24 (pulse wants S24LSB)
-    while ((fmt = output_settings->GetNextFormat()))
+    while ((fmt = m_aosettings->GetNextFormat()))
     {
         if (fmt == FORMAT_S24
 // define from PA 0.9.15 only
@@ -96,7 +102,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
 #endif
             )
             continue;
-        output_settings->AddSupportedFormat(fmt);
+        m_aosettings->AddSupportedFormat(fmt);
     }
 
     pa_context_disconnect(pcontext);
@@ -104,7 +110,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings()
     pa_threaded_mainloop_stop(mainloop);
     mainloop = NULL;
 
-    return output_settings;
+    return m_aosettings;
 }
 
 bool AudioOutputPulseAudio::OpenDevice()
@@ -655,13 +661,12 @@ void AudioOutputPulseAudio::SinkInfoCallback(
         return;
     }
 
-    audoutP->output_settings->AddSupportedRate(info->sample_spec.rate);
+    audoutP->m_aosettings->AddSupportedRate(info->sample_spec.rate);
 
     for (uint i = 2; i <= info->sample_spec.channels; i++)
-        audoutP->output_settings->AddSupportedChannels(i);
+        audoutP->m_aosettings->AddSupportedChannels(i);
 
     pa_threaded_mainloop_signal(audoutP->mainloop, 0);
 }
-
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

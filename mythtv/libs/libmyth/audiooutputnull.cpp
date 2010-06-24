@@ -29,8 +29,9 @@ AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     locked_samplerate(settings.samplerate)
 {
     bzero(pcm_output_buffer, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
-
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputNULL::~AudioOutputNULL()
@@ -41,14 +42,14 @@ AudioOutputNULL::~AudioOutputNULL()
 bool AudioOutputNULL::OpenDevice()
 {
     VERBOSE(VB_GENERAL, "Opening NULL audio device.");
-    
+
     fragment_size = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
     soundcard_buffer_size = NULLAUDIO_OUTPUT_BUFFER_SIZE;
-    
+
     format = locked_format;
     channels = locked_channels;
     samplerate = locked_samplerate;
-    
+
     return true;
 }
 
@@ -68,8 +69,8 @@ void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
             return;
         }
         pcm_output_buffer_mutex.lock();
-            memcpy(pcm_output_buffer + current_buffer_size, aubuf, size);
-            current_buffer_size += size;
+        memcpy(pcm_output_buffer + current_buffer_size, aubuf, size);
+        current_buffer_size += size;
         pcm_output_buffer_mutex.unlock();
     }
 }
@@ -112,4 +113,3 @@ int AudioOutputNULL::GetBufferedOnSoundcard(void) const
 
     return 0;
 }
-

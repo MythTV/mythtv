@@ -112,7 +112,9 @@ AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
     m_OutPkts(NULL),
     m_UseSPDIF(settings.use_passthru)
 {
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
     m_OutPkts = (unsigned char**) calloc(kPacketCnt, sizeof(unsigned char*));
 }
 
@@ -156,6 +158,10 @@ AudioOutputSettings* AudioOutputWin::GetOutputSettings(void)
     // Guess that we can do up to 5.1
     for (uint i = 2; i < 7; i++)
         settings->AddSupportedChannels(i);
+
+    settings->setAC3(true);
+    settings->setDTS(true);
+    settings->setLPCM(true);
 
     return settings;
 }

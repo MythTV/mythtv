@@ -2,8 +2,10 @@
 #define AUDIOOUTPUT
 
 #include <QString>
+#include <QVector>
 
 #include "audiosettings.h"
+#include "audiooutputsettings.h"
 #include "mythcorecontext.h"
 #include "volumebase.h"
 #include "output.h"
@@ -11,9 +13,26 @@
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
  public:
-    static void AudioSetup(int &max_channels, bool &allow_ac3_passthru,
-                           bool &allow_dts_passthru, bool &allow_multipcm,
-                           bool &upmix_default);
+    class AudioDeviceConfig
+    {
+      public:
+        QString name;
+        QString desc;
+        AudioOutputSettings settings;
+        AudioDeviceConfig(void) :
+            name(QString()), desc(QString()),
+            settings(AudioOutputSettings(true)) { };
+        AudioDeviceConfig(const QString &name,
+                          const QString &desc) :
+            name(name), desc(desc),
+            settings(AudioOutputSettings(true)) { };
+    };
+
+    typedef QVector<AudioDeviceConfig> ADCVect;
+
+    static ADCVect* GetOutputList(void);
+    static AudioDeviceConfig* GetAudioDeviceConfig(
+        QString &name, QString &desc, bool willsuspendpa = false);
 
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(
@@ -21,12 +40,18 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         AudioFormat format, int channels, int codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
         int upmixer_startup = 0);
+    static AudioOutput *OpenAudio(AudioSettings &settings,
+                                  bool willsuspendpa = true);
+    static AudioOutput *OpenAudio(
+        const QString &main_device,
+        const QString &passthru_device = QString::null,
+        bool willsuspendpa = true);
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
         lastError(QString::null), lastWarn(QString::null) {}
 
-    virtual ~AudioOutput() { };
+    virtual ~AudioOutput();
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
@@ -34,6 +59,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0f; }
 
+    virtual AudioOutputSettings* GetOutputSettingsCleaned(void)
+        { return new AudioOutputSettings; }
+    virtual AudioOutputSettings* GetOutputSettingsUsers(void)
+        { return new AudioOutputSettings; }
     virtual bool CanPassthrough(bool willreencode) const { return false; }
 
     // dsprate is in 100 * samples/second
@@ -66,9 +95,11 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     //  Only really used by the AudioOutputNULL object
     virtual void bufferOutputData(bool y) = 0;
-    virtual int readOutputData(unsigned char *read_buffer, int max_length) = 0;
+    virtual int readOutputData(unsigned char *read_buffer,
+                               int max_length) = 0;
 
     virtual bool ToggleUpmix(void) = 0;
+    bool PulseStatus(void) { return pulsewassuspended; }
 
   protected:
     void Error(const QString &msg);
@@ -76,10 +107,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     void ClearError(void);
     void ClearWarning(void);
 
-  protected:
     QString lastError;
     QString lastWarn;
+    bool pulsewassuspended;
 };
 
 #endif
-

@@ -5,6 +5,9 @@
  * Licensed under the GPL v2 or a later version at your choosing.
  */
 
+#include <algorithm>
+#include <vector>
+
 using namespace std;
 
 #include "audiooutputsettings.h"
@@ -12,48 +15,71 @@ using namespace std;
 
 #define LOC QString("AO: ")
 
-AudioOutputSettings::AudioOutputSettings()
+AudioOutputSettings::AudioOutputSettings(bool invalid) :
+    m_AC3(false), m_DTS(false), m_LPCM(!invalid),
+    m_invalid(invalid)
 {
-    sr.assign(srs,  srs  + sizeof(srs)  / sizeof(int));
-    sf.assign(fmts, fmts + sizeof(fmts) / sizeof(AudioFormat));
-    sr_it = sr.begin();
-    sf_it = sf.begin();
+    m_sr.assign(srs,  srs  +
+                sizeof(srs)  / sizeof(int));
+    m_sf.assign(fmts, fmts +
+                sizeof(fmts) / sizeof(AudioFormat));
+    m_sr_it = m_sr.begin();
+    m_sf_it = m_sf.begin();
 }
 
 AudioOutputSettings::~AudioOutputSettings()
 {
-    sr.clear();
-    rates.clear();
-    sf.clear();
-    formats.clear();
-    channels.clear();
+    m_sr.clear();
+    m_rates.clear();
+    m_sf.clear();
+    m_formats.clear();
+    m_channels.clear();
+}
+
+AudioOutputSettings& AudioOutputSettings::operator=(
+    const AudioOutputSettings &rhs)
+{
+    if (this == &rhs)
+        return *this;
+    m_sr        = rhs.m_sr;
+    m_rates     = rhs.m_rates;
+    m_sf        = rhs.m_sf;
+    m_formats   = rhs.m_formats;
+    m_channels  = rhs.m_channels;
+    m_AC3       = rhs.m_AC3;
+    m_DTS       = rhs.m_DTS;
+    m_LPCM      = rhs.m_LPCM;
+    m_invalid   = rhs.m_invalid;
+    m_sr_it     = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
+    m_sf_it     = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
+    return *this;
 }
 
 int AudioOutputSettings::GetNextRate()
 {
-    if (sr_it == sr.end())
+    if (m_sr_it == m_sr.end())
     {
-        sr_it = sr.begin();
+        m_sr_it = m_sr.begin();
         return 0;
     }
 
-    return *sr_it++;
+    return *m_sr_it++;
 }
 
 void AudioOutputSettings::AddSupportedRate(int rate)
 {
-    rates.push_back(rate);
+    m_rates.push_back(rate);
     VERBOSE(VB_AUDIO, LOC + QString("Sample rate %1 is supported").arg(rate));
 }
 
 bool AudioOutputSettings::IsSupportedRate(int rate)
 {
-    if (rates.empty() && rate == 48000)
+    if (m_rates.empty() && rate == 48000)
         return true;
 
     vector<int>::iterator it;
 
-    for (it = rates.begin(); it < rates.end(); it++)
+    for (it = m_rates.begin(); it != m_rates.end(); it++)
         if (*it == rate)
             return true;
 
@@ -62,52 +88,52 @@ bool AudioOutputSettings::IsSupportedRate(int rate)
 
 int AudioOutputSettings::BestSupportedRate()
 {
-    if (rates.empty())
+    if (m_rates.empty())
         return 48000;
-    return rates.back();
+    return m_rates.back();
 }
 
 int AudioOutputSettings::NearestSupportedRate(int rate)
 {
-    if (rates.empty())
+    if (m_rates.empty())
         return 48000;
 
     vector<int>::iterator it;
 
     // Assume rates vector is sorted
-    for (it = rates.begin(); it != rates.end(); it++)
+    for (it = m_rates.begin(); it != m_rates.end(); it++)
     {
         if (*it >= rate)
             return *it;
     }
     // Not found, so return highest available rate
-    return rates.back();
+    return m_rates.back();
 }
 
 AudioFormat AudioOutputSettings::GetNextFormat()
 {
-    if (sf_it == sf.end())
+    if (m_sf_it == m_sf.end())
     {
-        sf_it = sf.begin();
+        m_sf_it = m_sf.begin();
         return FORMAT_NONE;
     }
 
-    return *sf_it++;
+    return *m_sf_it++;
 }
 
 void AudioOutputSettings::AddSupportedFormat(AudioFormat format)
 {
-    formats.push_back(format);
+    m_formats.push_back(format);
 }
 
 bool AudioOutputSettings::IsSupportedFormat(AudioFormat format)
 {
-    if (formats.empty() && format == FORMAT_S16)
+    if (m_formats.empty() && format == FORMAT_S16)
         return true;
 
     vector<AudioFormat>::iterator it;
 
-    for (it = formats.begin(); it < formats.end(); it++)
+    for (it = m_formats.begin(); it != m_formats.end(); it++)
         if (*it == format)
             return true;
 
@@ -116,9 +142,9 @@ bool AudioOutputSettings::IsSupportedFormat(AudioFormat format)
 
 AudioFormat AudioOutputSettings::BestSupportedFormat()
 {
-    if (formats.empty())
+    if (m_formats.empty())
         return FORMAT_S16;
-    return formats.back();
+    return m_formats.back();
 }
 
 int AudioOutputSettings::FormatToBits(AudioFormat format)
@@ -167,17 +193,17 @@ int AudioOutputSettings::SampleSize(AudioFormat format)
 
 void AudioOutputSettings::AddSupportedChannels(int channels)
 {
-    this->channels.push_back(channels);
+    m_channels.push_back(channels);
 }
 
 bool AudioOutputSettings::IsSupportedChannels(int channels)
 {
-    if (this->channels.empty() && channels == 2)
+    if (m_channels.empty() && channels == 2)
         return true;
 
     vector<int>::iterator it;
 
-    for (it = this->channels.begin(); it < this->channels.end(); it++)
+    for (it = m_channels.begin(); it != m_channels.end(); it++)
         if (*it == channels)
             return true;
 
@@ -186,7 +212,31 @@ bool AudioOutputSettings::IsSupportedChannels(int channels)
 
 int AudioOutputSettings::BestSupportedChannels()
 {
-    if (channels.empty())
+    if (m_channels.empty())
         return 2;
-    return channels.back();
+    return m_channels.back();
+}
+
+void AudioOutputSettings::SortSupportedChannels()
+{
+    if (m_channels.empty())
+        return;
+    sort(m_channels.begin(), m_channels.end());
+}
+
+void AudioOutputSettings::SetBestSupportedChannels(int channels)
+{
+    if (m_channels.empty())
+    {
+        m_channels.push_back(channels);
+        return;
+    }
+
+    vector<int>::reverse_iterator it;
+
+    for (it = m_channels.rbegin();
+         *it >= channels && it < m_channels.rend();
+         it++)
+        m_channels.pop_back();
+    m_channels.push_back(channels);
 }

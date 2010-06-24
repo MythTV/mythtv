@@ -16,7 +16,6 @@ using namespace std;
 
 // MythTV headers
 #include "audiooutput.h"
-#include "audiooutputsettings.h"
 #include "samplerate.h"
 #include "mythverbose.h"
 
@@ -37,6 +36,9 @@ class AudioOutputBase : public AudioOutput, public QThread
  public:
     AudioOutputBase(const AudioSettings &settings);
     virtual ~AudioOutputBase();
+
+    AudioOutputSettings* GetOutputSettingsCleaned(void);
+    AudioOutputSettings* GetOutputSettingsUsers(void);
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings);
@@ -87,6 +89,9 @@ class AudioOutputBase : public AudioOutput, public QThread
     static const uint kAudioRingBufferSize   = 1536000;
 
  protected:
+    // Following function must be called from subclass constructor
+    void InitSettings(const AudioSettings &settings);
+
     // You need to implement the following functions
     virtual bool OpenDevice(void) = 0;
     virtual void CloseDevice(void) = 0;
@@ -120,7 +125,6 @@ class AudioOutputBase : public AudioOutput, public QThread
     int GetBaseAudBufTimeCode() const { return audbuf_timecode; }
 
   protected:
-
     // Basic details about the audio stream
     int channels;
     int codec;
@@ -153,6 +157,7 @@ class AudioOutputBase : public AudioOutput, public QThread
 
  private:
     int CopyWithUpmix(char *buffer, int frames, int &org_waud);
+    AudioOutputSettings *output_settingsraw;
     AudioOutputSettings *output_settings;
     bool need_resampler;
     SRC_STATE *src_ctx;
@@ -214,4 +219,3 @@ class AudioOutputBase : public AudioOutput, public QThread
 };
 
 #endif
-

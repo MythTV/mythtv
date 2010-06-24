@@ -18,7 +18,8 @@ AudioSettings::AudioSettings() :
     set_initial_vol(false),
     use_passthru(false),
     source(AUDIOOUTPUT_UNKNOWN),
-    upmixer(0)
+    upmixer(0),
+    init(false)
 {
 }
 
@@ -32,7 +33,8 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
     set_initial_vol(other.set_initial_vol),
     use_passthru(other.use_passthru),
     source(other.source),
-    upmixer(other.upmixer)
+    upmixer(other.upmixer),
+    init(true)
 {
 }
 
@@ -56,7 +58,8 @@ AudioSettings::AudioSettings(
     set_initial_vol(set_initial_vol),
     use_passthru(use_passthru),
     source(source),
-    upmixer(upmixer_startup)
+    upmixer(upmixer_startup),
+    init(true)
 {
 }
 
@@ -76,7 +79,25 @@ AudioSettings::AudioSettings(
     set_initial_vol(false),
     use_passthru(use_passthru),
     source(AUDIOOUTPUT_UNKNOWN),
-    upmixer(upmixer_startup)
+    upmixer(upmixer_startup),
+    init(true)
+{
+}
+
+AudioSettings::AudioSettings(
+    const QString &main_device,
+    const QString &passthru_device) :
+    main_device(main_device),
+    passthru_device(passthru_device),
+    format(FORMAT_NONE),
+    channels(-1),
+    codec(0),
+    samplerate(-1),
+    set_initial_vol(false),
+    use_passthru(false),
+    source(AUDIOOUTPUT_UNKNOWN),
+    upmixer(0),
+    init(false)
 {
 }
 
@@ -105,4 +126,3 @@ QString AudioSettings::GetPassthruDevice(void) const
     ret.detach();
     return ret;
 }
-

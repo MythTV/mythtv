@@ -33,8 +33,10 @@ static const AudioFormat fmts[] = { FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB,
 class MPUBLIC AudioOutputSettings
 {
     public:
-        AudioOutputSettings();
+        AudioOutputSettings(bool invalid = false);
         ~AudioOutputSettings();
+        AudioOutputSettings& operator=(const AudioOutputSettings&);
+
         int  GetNextRate();
         void AddSupportedRate(int rate);
         bool IsSupportedRate(int rate);
@@ -50,14 +52,26 @@ class MPUBLIC AudioOutputSettings
         void AddSupportedChannels(int channels);
         bool IsSupportedChannels(int channels);
         int  BestSupportedChannels();
+        void SortSupportedChannels();
+        void SetBestSupportedChannels(int channels);
+        void setAC3(bool flag)  { m_AC3 = flag; };
+        void setDTS(bool flag)  { m_DTS = flag; };
+        void setLPCM(bool flag) { m_LPCM = flag; };
+        bool canAC3()           { return m_AC3; };
+        bool canDTS()           { return m_DTS; };
+        bool canLPCM()          { return m_LPCM; };
+        bool IsInvalid()        { return m_invalid; };
+
     private:
-        vector<int> sr, rates, channels;
-        vector<AudioFormat> sf, formats;
-        vector<int>::iterator sr_it, rates_it;
-        vector<AudioFormat>::iterator sf_it, formats_it;
+        bool m_AC3;
+        bool m_DTS;
+        bool m_LPCM;
+        bool m_invalid;
+
+        vector<int> m_sr, m_rates, m_channels;
+        vector<AudioFormat> m_sf, m_formats;
+        vector<int>::iterator m_sr_it;
+        vector<AudioFormat>::iterator m_sf_it;
 };
 
 #endif // _AUDIO_OUTPUT_SETTINGS_H_
-
-
-

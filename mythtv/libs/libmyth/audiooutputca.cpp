@@ -120,7 +120,9 @@ AudioOutputCA::AudioOutputCA(const AudioSettings &settings)
     : AudioOutputBase(settings),
       d(new CoreAudioData(this))
 {
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputCA::~AudioOutputCA()
@@ -271,6 +273,10 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings()
             }
         free(channels);
     }
+
+    settings->setAC3(true);
+    settings->setDTS(true);
+    settings->setLPCM(true);
 
     return settings;
 }

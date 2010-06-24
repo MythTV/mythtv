@@ -44,17 +44,18 @@ class MPUBLIC AudioSettings
                   bool        use_passthru,
                   int         upmixer_startup = 0);
 
+    AudioSettings(const QString    &main_device,
+                  const QString    &passthru_device = QString::null);
+
     void FixPassThrough(void);
     void TrimDeviceType(void);
 
     QString GetMainDevice(void) const;
     QString GetPassthruDevice(void) const;
 
-  private:
+  public:
     QString           main_device;
     QString           passthru_device;
-
-  public:
     AudioFormat       format;
     int               channels;
     int               codec;
@@ -63,6 +64,7 @@ class MPUBLIC AudioSettings
     bool              use_passthru;
     AudioOutputSource source;
     int               upmixer;
+    bool              init;
 };
 
 #endif // _AUDIO_SETTINGS_H_

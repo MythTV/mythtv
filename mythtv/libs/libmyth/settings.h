@@ -329,6 +329,8 @@ public:
     virtual void widgetInvalid(QObject *obj);
 
     void setFocus() { if (cbwidget) cbwidget->setFocus(); }
+    void resetMaxCount(int count) 
+        { if (cbwidget) cbwidget->setMaxCount(count + rw); }
 
     virtual void setEnabled(bool b);
     virtual void setVisible(bool b);

@@ -496,9 +496,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       selectedVideoIndex(-1),
       // Audio
       audioSamples(NULL),
-      allow_ac3_passthru(false),    allow_dts_passthru(false),
       internal_vol(false),
-      disable_passthru(false),      max_channels(2),
+      disable_passthru(false),
       dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1),
@@ -517,17 +516,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
-
-    bool ignore;
-    int mchannels;
-    AudioOutput::AudioSetup(mchannels, allow_ac3_passthru,
-                            allow_dts_passthru, ignore, ignore);
-    max_channels = mchannels;
-
-    // TODO: improve this when we open the card earlier in future
-    QString stmp = gCoreContext->GetSetting("AudioOutputDevice");
-    if (stmp.startsWith("JACK:"))
-        allow_dts_passthru = allow_ac3_passthru = false;
 
     internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
@@ -3987,9 +3975,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             }
             else // No passthru, the decoder will downmix
             {
-                ctx->request_channels = max_channels;
+                ctx->request_channels = m_audio->GetMaxChannels();
                 if (ctx->codec_id == CODEC_ID_AC3)
-                    ctx->channels = max_channels;
+                    ctx->channels = m_audio->GetMaxChannels();
             }
 
             data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
@@ -4041,9 +4029,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (DecoderWillDownmix(ctx))
                 {
-                    ctx->request_channels = max_channels;
+                    ctx->request_channels = m_audio->GetMaxChannels();
                     if (ctx->codec_id == CODEC_ID_AC3)
-                        ctx->channels = max_channels;
+                        ctx->channels = m_audio->GetMaxChannels();
                 }
                 else
                     ctx->request_channels = 0;
@@ -4653,11 +4641,11 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
     bool passthru = false;
 
     if (ctx->codec_id == CODEC_ID_AC3)
-        passthru = allow_ac3_passthru &&
-                   ctx->channels >= (int)max_channels &&
+        passthru = m_audio->CanAC3() &&
+            ctx->channels >= (int)m_audio->GetMaxChannels() &&
                    !internal_vol;
     else if (ctx->codec_id == CODEC_ID_DTS)
-        passthru = allow_dts_passthru && !internal_vol;
+        passthru = m_audio->CanDTS() && !internal_vol;
 
     passthru &= m_audio->CanPassthrough();
     passthru &= !transcoding && !disable_passthru;
@@ -4727,10 +4715,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         ctx->request_channels = ctx->channels;
 
-        if (!using_passthru && ctx->channels > (int)max_channels &&
+        if (!using_passthru &&
+            ctx->channels > (int)m_audio->GetMaxChannels() &&
             DecoderWillDownmix(ctx))
         {
-            ctx->request_channels = max_channels;
+            ctx->request_channels = m_audio->GetMaxChannels();
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,

@@ -65,9 +65,8 @@ class AudioOutputPulseAudio : public AudioOutputBase
     pa_channel_map          channel_map;
     pa_cvolume              volume_control;
     pa_buffer_attr          buffer_settings;
-    AudioOutputSettings    *output_settings;
+    AudioOutputSettings    *m_aosettings;
 };
 #endif
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

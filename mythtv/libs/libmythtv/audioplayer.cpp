@@ -283,6 +283,30 @@ void AudioPlayer::SetStretchFactor(float factor)
 // thread will trigger a deletion/recreation of the AudioOutput device, hence
 // they should be safe.
 
+bool AudioPlayer::CanAC3(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->canAC3();
+    return ret;
+}
+
+bool AudioPlayer::CanDTS(void)
+{
+    bool ret = false;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->canDTS();
+    return ret;
+}
+
+uint AudioPlayer::GetMaxChannels(void)
+{
+    uint ret = 2;
+    if (m_audioOutput)
+        ret = m_audioOutput->GetOutputSettingsUsers()->BestSupportedChannels();
+    return ret;
+}
+
 bool AudioPlayer::CanPassthrough(void)
 {
     bool ret = false;

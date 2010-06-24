@@ -30,7 +30,9 @@ AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     jack_latency(0), jack_underrun(false), jack_xruns(0), aubuf(NULL)
 {
     // Set everything up
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputSettings* AudioOutputJACK::GetOutputSettings()
@@ -45,7 +47,8 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings()
     {
         JERROR("Cannot start/connect to jack server "
                 "(to check supported rate/channels)");
-	return settings;
+        delete settings;
+        return NULL;
     }
 
     if (client)
@@ -88,7 +91,8 @@ err_out:
     // Our abstracted exit point in case of error
     free(matching_ports);
     _jack_client_close(&client);
-    return settings;
+    delete settings;
+    return NULL;
 }
 
 

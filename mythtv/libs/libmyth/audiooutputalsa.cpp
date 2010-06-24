@@ -44,7 +44,9 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     m_mixer.elem = NULL;
 
     // Set everything up
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputALSA::~AudioOutputALSA()
@@ -274,8 +276,6 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
 
     AudioOutputSettings *settings = new AudioOutputSettings();
 
-    VBAUDIO(QString("GetOutputSettings() opening %1").arg(real_device));
-
     if (pcm_handle)
     {
         snd_pcm_close(pcm_handle);
@@ -286,7 +286,8 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
                            SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(real_device));
-        return settings;
+        delete settings;
+        return NULL;
     }
 
     snd_pcm_hw_params_alloca(&params);
@@ -296,7 +297,8 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
         AERROR("No playback configurations available");
         snd_pcm_close(pcm_handle);
         pcm_handle = NULL;
-        return settings;
+        delete settings;
+        return NULL;
     }
 
     while ((rate = settings->GetNextRate()))
@@ -324,6 +326,13 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
 
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
+
+        // PulseAudio does not support passthrough
+    if (!real_device.contains("pulse", Qt::CaseInsensitive))
+    {
+        settings->setAC3(true);
+        settings->setDTS(true);
+    }
 
     return settings;
 }
@@ -849,11 +858,11 @@ QMap<QString, QString> *AudioOutputALSA::GetALSADevices(const char *type)
     {
           name = snd_device_name_get_hint(*n, "NAME");
           desc = snd_device_name_get_hint(*n, "DESC");
-          VBAUDIO(QString("Found ALSA device: %1, (%2)").arg(name).arg(desc));
-          alsadevs->insert(name, desc);
-          if (name != NULL)
+          if (name && desc)
+              alsadevs->insert(name, desc);
+          if (name)
               free(name);
-          if (desc != NULL)
+          if (desc)
               free(desc);
           n++;
     }

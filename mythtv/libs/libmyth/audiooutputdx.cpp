@@ -106,7 +106,9 @@ AudioOutputDX::AudioOutputDX(const AudioSettings &settings) :
     m_UseSPDIF(settings.use_passthru)
 {
     timeBeginPeriod(1);
-    Reconfigure(settings);
+    InitSettings(settings);
+    if (settings.init)
+        Reconfigure(settings);
 }
 
 AudioOutputDX::~AudioOutputDX()
@@ -379,7 +381,8 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(void)
     if ((!m_priv->dsobject || !m_priv->dsound_dll) ||
         FAILED(IDirectSound_GetCaps(m_priv->dsobject, &devcaps)) )
     {
-        return settings;
+        delete settings;
+        return NULL;
     }
 
     VBAUDIO(QString("GetCaps sample rate min: %1 max: %2")
@@ -407,6 +410,10 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(void)
        up to 5.1 */
     for (uint i = 2; i < 7; i++)
         settings->AddSupportedChannels(i);
+
+    settings->setAC3(true);
+    settings->setDTS(true);
+    settings->setLPCM(true);
 
     return settings;
 }

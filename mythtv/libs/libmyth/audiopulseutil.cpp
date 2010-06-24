@@ -71,6 +71,7 @@ static pa_mainloop_api *pau_mainloop_api = NULL;
 static QMutex           pau_lock;
 static QWaitCondition   pau_wait;
 static int              pau_value = kPA_undefined;
+static int              n_rc = 0;
 
 static void pau_set_value(int new_value)
 {
@@ -114,7 +115,6 @@ static void pau_suspend_complete(pa_context *c, int success, void *userdata)
                 .arg(pa_strerror(pa_context_errno(c))));
 
         pau_set_value(kPA_not_suspended_error);
-
         return;
     }
 
@@ -124,16 +124,14 @@ static void pau_suspend_complete(pa_context *c, int success, void *userdata)
             return;
     }
 
-    VERBOSE(VB_GENERAL, LOC + "Suspend Success");
+    VERBOSE(VB_AUDIO, LOC + "Suspend Success");
 
     pau_set_value(kPA_suspended);
 }
 
 static void pau_resume_complete(pa_context *c, int success, void *userdata)
 {
-    static int n = 0;
-
-    n++;
+    n_rc++;
 
     if (!success)
     {
@@ -148,7 +146,7 @@ static void pau_resume_complete(pa_context *c, int success, void *userdata)
         return;
     }
 
-    if (n >= 2)
+    if (n_rc >= 2)
         pau_drain(); /* drain and quit */
 
     {
@@ -157,7 +155,7 @@ static void pau_resume_complete(pa_context *c, int success, void *userdata)
             return;
     }
 
-    VERBOSE(VB_GENERAL, LOC + "Resume Success");
+    VERBOSE(VB_AUDIO, LOC + "Resume Success");
 
     pau_set_value(kPA_unsuspended_success);
 }
@@ -193,8 +191,8 @@ static void pau_context_state_callback(pa_context *c, void *userdata)
                         "Sound server is not local, can not suspend.");
 
                 pau_set_value(kPA_not_suspended_remote_server);
+                pau_quit(0);
             }
-
             break;
 
         case PA_CONTEXT_TERMINATED:
@@ -215,6 +213,7 @@ static void pau_context_state_callback(pa_context *c, void *userdata)
                 pa_context_unref(pau_context);
                 pau_context = NULL;
             }
+            pau_quit(0);
 
             break;
     }
@@ -222,6 +221,12 @@ static void pau_context_state_callback(pa_context *c, void *userdata)
 
 void pau_pulseaudio_suspend_internal(void)
 {
+        // Init context
+    pau_context = NULL;
+    pau_mainloop_api = NULL;
+    pau_value = kPA_undefined;
+    n_rc = 0;
+
     pa_mainloop* m = NULL;
     int ret = 1;
     char *server = NULL;
@@ -259,7 +264,8 @@ quit:
     if (pau_context)
         pa_context_unref(pau_context);
 
-    if (m) {
+    if (m)
+    {
         pa_signal_done();
         pa_mainloop_free(m);
     }
@@ -279,7 +285,8 @@ class PAThread : public QThread
 /// \returns true if successful
 bool pulseaudio_suspend(void)
 {
-    setenv("PULSE_INTERNAL", "1", 0);
+    pau_value = kPA_undefined;
+    n_rc = 0;
 
     QThread *t = new PAThread();
     t->start();
@@ -334,57 +341,35 @@ bool pulseaudio_unsuspend(void)
 int pulseaudio_handle_startup(void)
 {
 #ifdef USING_PULSE
-    if (getenv("DEBUG_PULSE_AUDIO_ALSA_EMULATION"))
+    if (IsPulseAudioRunning() && !pulseaudio_suspend())
     {
-        VERBOSE(VB_IMPORTANT, "WARNING: ");
-        VERBOSE(VB_IMPORTANT, "WARNING: ***Pulse Audio is running!!!!***");
-        VERBOSE(VB_IMPORTANT, "WARNING: ");
-        VERBOSE(VB_IMPORTANT, "WARNING: You have told MythTV to ignore it.");
-        VERBOSE(VB_IMPORTANT, "WARNING: ");
-    }
-    else if (gCoreContext->GetSetting("AudioOutputDevice")
-             .toLower().contains("pulse"))
-    {
-        // Don't disable PulseAudio if we're using it explicitly
-    }
-    else if (IsPulseAudioRunning() && !pulseaudio_suspend())
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR: ***Pulse Audio is running!!!!***");
-        VERBOSE(VB_IMPORTANT,
-                "ERROR: But MythTV was not able to suspend it. EXITING!");
-
-        return GENERIC_EXIT_NOT_OK;
+        VERBOSE(VB_IMPORTANT, "WARNING: Couldn't suspend Pulse Audio");
+        return -1;
     }
 #else
     if (IsPulseAudioRunning())
     {
-        VERBOSE(VB_IMPORTANT, "ERROR: ***Pulse Audio is running!!!!***");
-        VERBOSE(VB_IMPORTANT, "ERROR: But MythTV has not been compiled "
-                "with Pulse Audio disabling support. EXITING!");
-        return GENERIC_EXIT_NOT_OK;
+        VERBOSE(VB_IMPORTANT, "WARNING: ***Pulse Audio is running***");
+        return -1;
     }
 #endif
-
-    return GENERIC_EXIT_OK;
+    return 1;
 }
 
 int pulseaudio_handle_teardown(void)
 {
 #ifdef USING_PULSE
-    if (getenv("DEBUG_PULSE_AUDIO_ALSA_EMULATION"))
-        return GENERIC_EXIT_OK;
-
     {
         QMutexLocker ml(&pau_lock);
         if (kPA_suspended != pau_value)
-            return GENERIC_EXIT_OK;
+            return 1;
     }
 
     if (!pulseaudio_unsuspend())
     {
-        VERBOSE(VB_IMPORTANT, "ERROR: Encountered error re-enabling pulse audio");
+        VERBOSE(VB_IMPORTANT, "WARNING: couldn't resume Pulse Audio");
+        return -1;
     }
 #endif
-
-    return GENERIC_EXIT_OK;
+    return 1;
 }
