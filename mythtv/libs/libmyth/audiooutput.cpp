@@ -150,6 +150,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             pulseaudio_handle_teardown();
 #endif
         return NULL;
+#endif
     }
 #ifdef USING_PULSE
     ret->pulsewassuspended = pulsestatus;
