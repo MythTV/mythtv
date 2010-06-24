@@ -11,7 +11,7 @@
 
 using namespace std;
 
-class MPUBLIC AudioOutputALSA : public AudioOutputBase
+class AudioOutputALSA : public AudioOutputBase
 {
   public:
     AudioOutputALSA(const AudioSettings &settings);
