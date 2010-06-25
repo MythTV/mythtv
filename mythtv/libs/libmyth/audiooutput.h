@@ -55,7 +55,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
-    
+
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0f; }
 
@@ -63,7 +63,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         { return new AudioOutputSettings; }
     virtual AudioOutputSettings* GetOutputSettingsUsers(void)
         { return new AudioOutputSettings; }
-    virtual bool CanPassthrough(bool willreencode) const { return false; }
+    virtual bool CanPassthrough(bool willreencode __attribute__ ((unused))) const
+        { return false; }
 
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate) = 0;
@@ -76,7 +77,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual bool IsPaused(void) const = 0;
     virtual void Pause(bool paused) = 0;
     virtual void PauseUntilBuffered(void) = 0;
- 
+
     // Wait for all data to finish playing
     virtual void Drain(void) = 0;
 
