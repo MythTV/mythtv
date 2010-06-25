@@ -148,7 +148,7 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
     configured_channels = max_channels;
 
     allow_ac3_passthru = output_settings->canAC3();
-    allow_multipcm = output_settings->canDTS();
+    allow_multipcm = output_settings->canLPCM();
 
     upmix_default = max_channels > 2 ?
         gCoreContext->GetNumSetting("AudioDefaultUpmix", false) :
