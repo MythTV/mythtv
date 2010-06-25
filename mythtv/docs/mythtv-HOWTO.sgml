@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2010-05-10, v0.23.00
+<date>2010-06-25, v0.24.00pre
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2079,21 +2079,19 @@ First, you need to generate or obtain an XML file with the information for
 your stations.
 
 If you have XMLTV software installed, there is a perl script in MythTV's
-<tt>contrib/</tt> directory which will generate this file for you. Run the
+<tt>contrib/icons/master_iconmap</tt> directory which will generate this file for you. Run the
 command:
 <tscreen><verb>
-$ perl mkiconmap.pl
+$ mkdir ~/.mythtv/channels
+$ ./channel_icons.pl --find-missing --rescan
 </verb></tscreen>
-
-You will be asked for your zip code and the service that you use. If there
-are no errors, the <tt>iconmap.xml</tt> file that you need for the next step
-will be created.
 
 If you do not have XMLTV software installed and do not want to install it
 for the sake of this minor task, there is a generic
 <tt>contrib/master_iconmap.xml</tt> which you can copy and use but this may
 not be as complete as using the specific information for your service.
 
+<!-- FIX XXXXXXX -->
 Once you have an <tt>iconmap.xml</tt> file, add the icon information to your
 database and grab any new icons with the command:
 <tscreen><verb>
@@ -6800,7 +6798,7 @@ then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
-v0.23.00, 2010-05-10.  First version.
+v0.24.00, 2010-06-25.  First version.
 -->
 
 <!--
