@@ -2468,6 +2468,8 @@ if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
        cpu="athlon"
        enable small
 # Athlon 64
+   elif expr "$processor" : ".*AMD Athlon(tm) II" > /dev/null ; then
+       cpu="k8"
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        cpu="k8"
    elif expr "$processor" : ".*AMD Athlon(tm) Dual Core" > /dev/null ; then
