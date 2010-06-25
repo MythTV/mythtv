@@ -869,12 +869,12 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                 leftDarkCol = x;
         }
 
-        delete[] colMax;
-
         for(int x = commDetectBorder; x < (width - commDetectBorder);
                 x += horizSpacing)
             if (colMax[x] >= commDetectBoxBrightness)
                 rightDarkCol = x;
+
+        delete[] colMax;
 
         if ((topDarkRow > commDetectBorder) &&
             (topDarkRow < (height * .20)) &&
