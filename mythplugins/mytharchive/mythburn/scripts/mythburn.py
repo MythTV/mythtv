@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20100609-2"
+VERSION="0.1.20100626-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -1602,7 +1602,7 @@ def getFileInformation(file, folder):
         cursor = db.cursor()
         # execute SQL statement
         cursor.execute("""SELECT title, director, plot, rating, inetref, year,
-                                 userrating, length, coverfile
+                                 userrating, length, coverfile, subtitle
                           FROM videometadata
                           WHERE filename LIKE %s""", '%'+file.attributes["filename"].value)
         # get the resultset as a tuple
@@ -1646,7 +1646,7 @@ def getFileInformation(file, folder):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("subtitle")
-            #node.appendChild(infoDOM.createTextNode(""))
+            node.appendChild(infoDOM.createTextNode(unicode(record[9], "UTF-8")))
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("description")
