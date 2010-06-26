@@ -12,7 +12,7 @@
 class MPUBLIC MythLocale
 {
   public:
-    MythLocale();
+    MythLocale(QString localeName = QString());
     ~MythLocale() { };
 
     QString GetCountryCode() const; /// ISO3166 2-letter

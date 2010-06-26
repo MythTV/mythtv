@@ -12,9 +12,15 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 
-MythLocale::MythLocale()
+MythLocale::MythLocale(QString localeName)
 {
-    QLocale locale = QLocale::system();
+    QLocale locale;
+
+    if (!localeName.isEmpty())
+        locale = QLocale(localeName);
+    else
+        locale = QLocale::system();
+
     m_localeCode = locale.name();
     m_country = locale.country();
     m_language = locale.language();
