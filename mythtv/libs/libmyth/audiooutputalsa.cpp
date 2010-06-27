@@ -326,14 +326,39 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
 
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
+        // Check if name or description contains information
+        // to know if device can accept passthrough or not
+    QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
+    while(1)
+    {
+        settings->setPassthrough(-1);   // no passthrough
+            // Check if name or description contains digital
+        QString desc = alsadevs->value(real_device);
 
         // PulseAudio does not support passthrough
-    if (!real_device.contains("pulse", Qt::CaseInsensitive))
-    {
-        settings->setAC3(true);
-        settings->setDTS(true);
+        if (real_device.contains("pulse", Qt::CaseInsensitive) ||
+            desc.contains("pulse", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("analog", Qt::CaseInsensitive) ||
+            desc.contains("analog", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("surround", Qt::CaseInsensitive) ||
+            desc.contains("surround", Qt::CaseInsensitive))
+            break;
+        settings->setPassthrough(1);   // yes passthrough
+        if (real_device.contains("digital", Qt::CaseInsensitive) ||
+            desc.contains("digital", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("iec958", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("spdif", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("hdmi", Qt::CaseInsensitive))
+            break;
+        settings->setPassthrough(0);   // maybe passthrough
+        break;
     }
-
+    delete alsadevs;
     return settings;
 }
 
@@ -858,7 +883,7 @@ QMap<QString, QString> *AudioOutputALSA::GetALSADevices(const char *type)
     {
           name = snd_device_name_get_hint(*n, "NAME");
           desc = snd_device_name_get_hint(*n, "DESC");
-          if (name && desc)
+          if (name && desc && strcmp(name, "null"))
               alsadevs->insert(name, desc);
           if (name)
               free(name);

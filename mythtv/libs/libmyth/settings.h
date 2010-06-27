@@ -474,6 +474,8 @@ public:
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject*);
 
+    virtual void setVisible(bool b);
+    virtual void setLabel(QString str);
     virtual void setEnabled(bool b);
 
     virtual void setHelpText(const QString &str);

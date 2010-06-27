@@ -12,11 +12,12 @@ using namespace std;
 
 #include "audiooutputsettings.h"
 #include "mythverbose.h"
+#include "mythcorecontext.h"
 
 #define LOC QString("AO: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_AC3(false), m_DTS(false), m_LPCM(!invalid),
+    m_passthrough(-1), m_AC3(false), m_DTS(false), m_LPCM(false),
     m_invalid(invalid)
 {
     m_sr.assign(srs,  srs  +
@@ -41,17 +42,18 @@ AudioOutputSettings& AudioOutputSettings::operator=(
 {
     if (this == &rhs)
         return *this;
-    m_sr        = rhs.m_sr;
-    m_rates     = rhs.m_rates;
-    m_sf        = rhs.m_sf;
-    m_formats   = rhs.m_formats;
-    m_channels  = rhs.m_channels;
-    m_AC3       = rhs.m_AC3;
-    m_DTS       = rhs.m_DTS;
-    m_LPCM      = rhs.m_LPCM;
-    m_invalid   = rhs.m_invalid;
-    m_sr_it     = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
-    m_sf_it     = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
+    m_sr            = rhs.m_sr;
+    m_rates         = rhs.m_rates;
+    m_sf            = rhs.m_sf;
+    m_formats       = rhs.m_formats;
+    m_channels      = rhs.m_channels;
+    m_passthrough   = rhs.m_passthrough;
+    m_AC3           = rhs.m_AC3;
+    m_DTS           = rhs.m_DTS;
+    m_LPCM          = rhs.m_LPCM;
+    m_invalid       = rhs.m_invalid;
+    m_sr_it         = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
+    m_sf_it         = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
     return *this;
 }
 
@@ -239,4 +241,74 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
          it++)
         m_channels.pop_back();
     m_channels.push_back(channels);
+}
+
+/**
+ * Returns capabilities supported by the audio device
+ * amended to take into account the digital audio
+ * options (AC3 and DTS)
+ */
+AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
+{
+    AudioOutputSettings* aosettings;
+
+    if (newcopy)
+    {
+        aosettings = new AudioOutputSettings;
+        *aosettings = *this;
+    }
+    else
+        aosettings = this;
+
+    if (m_invalid)
+        return aosettings;
+
+    int mchannels = BestSupportedChannels();
+
+    if (mchannels > 2)
+        aosettings->m_LPCM = true;
+    if (mchannels == 2 && m_passthrough >= 0)
+        aosettings->AddSupportedChannels(6);
+    aosettings->m_DTS = aosettings->m_AC3 = (m_passthrough >= 0);
+
+    return aosettings;
+}
+
+/**
+ * Returns capabilities supported by the audio device
+ * amended to take into account the digital audio
+ * options (AC3 and DTS) as well as the user settings
+ */
+AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
+{
+    AudioOutputSettings* aosettings = GetCleaned(newcopy);
+
+    if (aosettings->m_invalid)
+        return aosettings;
+
+    int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
+    int max_channels = aosettings->BestSupportedChannels();
+    bool bAC3  = aosettings->m_AC3 &&
+        gCoreContext->GetNumSetting("AC3PassThru", false);
+    bool bDTS  = aosettings->m_DTS &&
+        gCoreContext->GetNumSetting("DTSPassThru", false);
+    bool bLPCM = aosettings->m_passthrough >= 0 ||
+        (aosettings->m_LPCM && gCoreContext->GetNumSetting("MultiChannelPCM", false));
+
+    if (max_channels > 2 && !bLPCM)
+        max_channels = 2;
+    if (max_channels == 2 && (bAC3 || bDTS))
+        max_channels = 6;
+
+    if (cur_channels > max_channels)
+        cur_channels = max_channels;
+
+    aosettings->SetBestSupportedChannels(cur_channels);
+    if (cur_channels <= 2)
+        bDTS = bAC3 = false;
+    aosettings->m_AC3 = bAC3;
+    aosettings->m_DTS = bDTS;
+    aosettings->m_LPCM = bLPCM;
+
+    return aosettings;
 }

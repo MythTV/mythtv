@@ -920,6 +920,25 @@ void CheckBoxSetting::widgetInvalid(QObject *obj)
     widget = (widget == obj) ? NULL : widget;
 }
 
+void CheckBoxSetting::setVisible(bool b)
+{
+    BooleanSetting::setVisible(b);
+    if (widget)
+    {
+        if (b)
+            widget->show();
+        else
+            widget->hide();
+    }
+}
+
+void CheckBoxSetting::setLabel(QString str)
+{
+    BooleanSetting::setLabel(str);
+    if (widget)
+        widget->setText(str);
+}
+
 void CheckBoxSetting::setEnabled(bool fEnabled)
 {
     BooleanSetting::setEnabled(fEnabled);

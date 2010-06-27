@@ -147,9 +147,6 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
     max_channels = output_settings->BestSupportedChannels();
     configured_channels = max_channels;
 
-    allow_ac3_passthru = output_settings->canAC3();
-    allow_multipcm = output_settings->canLPCM();
-
     upmix_default = max_channels > 2 ?
         gCoreContext->GetNumSetting("AudioDefaultUpmix", false) :
         false;
@@ -174,17 +171,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(void)
     AudioOutputSettings* aosettings = GetOutputSettings();
 
     if (aosettings)
-    {
-        int mchannels = aosettings->BestSupportedChannels();
-
-        if (mchannels <= 2)
-            aosettings->setLPCM(false);
-        if (mchannels == 2 &&
-            (aosettings->canAC3() || aosettings->canDTS()))
-        {
-            aosettings->AddSupportedChannels(6);
-        }
-    }
+        aosettings->GetCleaned();
     else
         aosettings = new AudioOutputSettings(true);
 
@@ -204,36 +191,7 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
     AudioOutputSettings* aosettings = new AudioOutputSettings;
 
     *aosettings = *GetOutputSettingsCleaned();
-
-    if (aosettings->IsInvalid())
-    {
-        output_settings = aosettings;
-        return output_settings;
-    }
-
-    int cur_channels = gCoreContext->GetNumSetting("MaxChannels", 2);
-    int max_channels = aosettings->BestSupportedChannels();
-    bool bAC3  = aosettings->canAC3() &&
-        gCoreContext->GetNumSetting("AC3PassThru", false);
-    bool bDTS  = aosettings->canDTS() &&
-        gCoreContext->GetNumSetting("DTSPassThru", false);
-    bool bLPCM = aosettings->canLPCM() &&
-        gCoreContext->GetNumSetting("MultiChannelPCM", false);
-
-    if (max_channels > 2 && !bLPCM)
-        max_channels = 2;
-    if (max_channels == 2 && (bAC3 || bDTS))
-        max_channels = 6;
-
-    if (cur_channels > max_channels)
-        cur_channels = max_channels;
-
-    aosettings->SetBestSupportedChannels(cur_channels);
-    if (cur_channels <= 2)
-        bDTS = bAC3 = false;
-    aosettings->setAC3(bAC3);
-    aosettings->setDTS(bDTS);
-    aosettings->setLPCM(bLPCM);
+    aosettings->GetUsers();
 
     return (output_settings = aosettings);
 }
@@ -249,7 +207,7 @@ bool AudioOutputBase::CanPassthrough(bool willreencode) const
 {
     bool ret = false;
     ret = output_settings->IsSupportedFormat(FORMAT_S16);
-    ret &= willreencode ? allow_ac3_passthru : !need_resampler;
+    ret &= willreencode ? output_settings->canAC3() : !need_resampler;
     return ret;
 }
 
@@ -364,7 +322,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
-        if (allow_ac3_passthru &&
+        if (output_settings->canAC3() &&
             (settings.codec == CODEC_ID_AC3 || settings.codec == CODEC_ID_DTS))
         {
             lreenc = true;
@@ -437,7 +395,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
        and we have more than 2 channels but multichannel PCM is not supported
        or if the device just doesn't support the number of channels */
     enc = (CanPassthrough() && !passthru &&
-           ((!allow_multipcm && configured_channels > 2) ||
+           ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
 
     int dest_rate = 0;

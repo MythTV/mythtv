@@ -230,10 +230,11 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     }
     QString capabilities = desc + QString("\nDevice supports up to %1")
                                       .arg(speakers);
-    if (aosettings.canAC3() || aosettings.canDTS() ||
-        aosettings.canLPCM())
+    if (aosettings.canPassthrough() >= 0)
     {
         capabilities += QString(" (");
+        if (aosettings.canPassthrough() > 0)
+            capabilities += QString("digital output, ");
         if (aosettings.canAC3())
             capabilities += QString("AC3,");
         if (aosettings.canDTS())

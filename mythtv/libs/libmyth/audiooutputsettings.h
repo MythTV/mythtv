@@ -36,6 +36,8 @@ class MPUBLIC AudioOutputSettings
         AudioOutputSettings(bool invalid = false);
         ~AudioOutputSettings();
         AudioOutputSettings& operator=(const AudioOutputSettings&);
+        AudioOutputSettings *GetCleaned(bool newcopy = false);
+        AudioOutputSettings *GetUsers(bool newcopy = false);
 
         int  GetNextRate();
         void AddSupportedRate(int rate);
@@ -52,17 +54,24 @@ class MPUBLIC AudioOutputSettings
         void AddSupportedChannels(int channels);
         bool IsSupportedChannels(int channels);
         int  BestSupportedChannels();
-        void SortSupportedChannels();
-        void SetBestSupportedChannels(int channels);
-        void setAC3(bool flag)  { m_AC3 = flag; };
-        void setDTS(bool flag)  { m_DTS = flag; };
-        void setLPCM(bool flag) { m_LPCM = flag; };
-        bool canAC3()           { return m_AC3; };
-        bool canDTS()           { return m_DTS; };
-        bool canLPCM()          { return m_LPCM; };
-        bool IsInvalid()        { return m_invalid; };
+
+        void setPassthrough(int val)    { m_passthrough = val; };
+        int  canPassthrough()           { return m_passthrough; };
+        bool canAC3()                   { return m_AC3; };
+        bool canDTS()                   { return m_DTS; };
+        bool canLPCM()                  { return m_LPCM; };
+        bool IsInvalid()                { return m_invalid; };
 
     private:
+        void SortSupportedChannels();
+        void SetBestSupportedChannels(int channels);
+
+        /* passthrough status
+         * -1 : no
+         * 0: unknown
+         * 1: yes
+         */
+        int  m_passthrough;
         bool m_AC3;
         bool m_DTS;
         bool m_LPCM;

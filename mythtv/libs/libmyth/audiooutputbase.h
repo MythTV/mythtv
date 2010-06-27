@@ -153,7 +153,6 @@ class AudioOutputBase : public AudioOutput, public QThread
     int configured_channels;
     int max_channels;
     int src_quality;
-    bool allow_multipcm;
 
  private:
     int CopyWithUpmix(char *buffer, int frames, int &org_waud);
@@ -172,7 +171,6 @@ class AudioOutputBase : public AudioOutput, public QThread
     bool upmix_default;
     bool needs_downmix;
     int surround_mode;
-    bool allow_ac3_passthru;
     float old_stretchfactor;
     int volume;
     QString volumeControl;

@@ -46,6 +46,7 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     HostCheckBox        *PassThroughOverride();
     HostComboBox        *PassThroughOutputDevice();
 
+    ConfigurationGroup  *m_cgsettings;
     AudioDeviceComboBox *m_OutputDevice;
     HostComboBox        *m_MaxAudioChannels;
     HostCheckBox        *m_AudioUpmix;

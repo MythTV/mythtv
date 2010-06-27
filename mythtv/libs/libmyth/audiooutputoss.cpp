@@ -93,7 +93,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
 
 #if defined(AFMT_AC3)
         // Check if drivers supports AC3
-    settings->setAC3(formats & AFMT_AC3);
+    settings->setPassthrough(((formats & AFMT_AC3) != 0) - 1);
 #endif
 
     for (uint i = 1; i <= 2; i++)
