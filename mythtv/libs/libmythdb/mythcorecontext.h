@@ -9,6 +9,7 @@
 #include "mythobservable.h"
 #include "mythsocket_cb.h"
 #include "mythverbose.h"
+#include "mythlocale.h"
 
 class MDBManager;
 class MythCoreContextPrivate;
@@ -160,6 +161,7 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
 
+    const MythLocale *GetLocale(void);
     void SaveLocaleDefaults(void);
 
   private:

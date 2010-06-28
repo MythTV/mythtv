@@ -16,7 +16,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
-#include "mythlocale.h"
 
 #include "mythversion.h"
 
@@ -1088,6 +1087,11 @@ QObject *MythCoreContext::GetGUIObject(void)
 MythDB *MythCoreContext::GetDB(void)
 {
     return d->m_database;
+}
+
+const MythLocale *MythCoreContext::GetLocale(void)
+{
+    return d->m_locale;
 }
 
 void MythCoreContext::SaveLocaleDefaults(void)
