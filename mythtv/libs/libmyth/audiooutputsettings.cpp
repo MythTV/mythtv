@@ -265,8 +265,7 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
 
     int mchannels = BestSupportedChannels();
 
-    if (mchannels > 2)
-        aosettings->m_LPCM = true;
+    aosettings->m_LPCM = (mchannels > 2);
     if (mchannels == 2 && m_passthrough >= 0)
         aosettings->AddSupportedChannels(6);
     aosettings->m_DTS = aosettings->m_AC3 = (m_passthrough >= 0);
@@ -292,8 +291,9 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         gCoreContext->GetNumSetting("AC3PassThru", false);
     bool bDTS  = aosettings->m_DTS &&
         gCoreContext->GetNumSetting("DTSPassThru", false);
-    bool bLPCM = aosettings->m_passthrough == -1 ||
-        (aosettings->m_LPCM && gCoreContext->GetNumSetting("MultiChannelPCM", false));
+    bool bLPCM = aosettings->m_LPCM &&
+        (aosettings->m_passthrough == -1 ||
+         gCoreContext->GetNumSetting("MultiChannelPCM", false));
 
     if (max_channels > 2 && !bLPCM)
         max_channels = 2;
