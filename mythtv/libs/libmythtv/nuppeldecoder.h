@@ -1,6 +1,8 @@
 #ifndef NUPPELDECODER_H_
 #define NUPPELDECODER_H_
 
+#include "config.h"
+
 #include <list>
 using namespace std;
 
@@ -81,7 +83,7 @@ class NuppelDecoder : public DecoderBase
     int video_width, video_height, video_size;
     double video_frame_rate;
     int audio_samplerate;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     int audio_bits_per_sample;
 #endif
 

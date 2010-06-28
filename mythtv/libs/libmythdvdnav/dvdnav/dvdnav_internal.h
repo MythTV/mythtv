@@ -85,7 +85,7 @@ typedef struct read_cache_s read_cache_t;
 
 #ifndef audio_status_t
 typedef struct {
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
   unsigned int available     : 1;
   unsigned int zero1         : 4;
   unsigned int stream_number : 3;
@@ -101,7 +101,7 @@ typedef struct {
 
 #ifndef spu_status_t
 typedef struct {
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
   unsigned int available               : 1;
   unsigned int zero1                   : 2;
   unsigned int stream_number_4_3       : 5;

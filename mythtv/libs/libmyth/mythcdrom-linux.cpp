@@ -12,7 +12,7 @@
 
 #include "mythcdrom.h"
 #include "mythcdrom-linux.h"
-#include "mythconfig.h"      // for WORDS_BIGENDIAN
+#include "mythconfig.h"      // for HAVE_BIGENDIAN
 #include "mythcontext.h"
 #include "mythverbose.h"
 
@@ -35,7 +35,7 @@ typedef struct cdrom_generic_command CDROMgenericCmd;
 typedef struct
 {
     uint16_t data_len[2];
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     uint8_t  nea                : 1;
     uint8_t  reserved1          : 4;
     uint8_t  notification_class : 3;
@@ -45,7 +45,7 @@ typedef struct
     uint8_t  nea                : 1;
 #endif
     uint8_t  supp_event_class;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     uint8_t  reserved2          : 4;
     uint8_t  media_event_code   : 4;
     uint8_t  reserved3          : 6;
@@ -65,7 +65,7 @@ typedef struct
 // and this is returned by GPCMD_READ_DISC_INFO
 typedef struct {
     uint16_t disc_information_length;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     uint8_t  reserved1          : 3;
     uint8_t  erasable           : 1;
     uint8_t  border_status      : 2;
@@ -80,7 +80,7 @@ typedef struct {
     uint8_t  n_sessions_lsb;
     uint8_t  first_track_lsb;
     uint8_t  last_track_lsb;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     uint8_t  did_v              : 1;
     uint8_t  dbc_v              : 1;
     uint8_t  uru                : 1;

@@ -27,6 +27,7 @@
 #include <QFile>
 
 // Myth headers
+#include <mythconfig.h>
 #include <mythcontext.h>
 #include <audiooutput.h>
 #include <mythverbose.h>
@@ -192,7 +193,7 @@ bool avfDecoder::initialize()
     // Given we are outputing to a sound card, this will always
     // be a PCM format
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     m_outputFormat = guess_format("s16be", NULL, NULL);
 #else
     m_outputFormat = guess_format("s16le", NULL, NULL);

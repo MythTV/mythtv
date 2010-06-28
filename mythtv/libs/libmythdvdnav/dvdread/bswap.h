@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#if defined(WORDS_BIGENDIAN)
+#if HAVE_BIGENDIAN
 /* All bigendian systems are fine, just ignore the swaps. */
 #define B2N_16(x) (void)(x)
 #define B2N_32(x) (void)(x)
@@ -101,6 +101,6 @@
 
 #endif
 
-#endif /* WORDS_BIGENDIAN */
+#endif /* HAVE_BIGENDIAN */
 
 #endif /* LIBDVDREAD_BSWAP_H */

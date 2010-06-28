@@ -123,7 +123,7 @@ bool AudioOutputOSS::OpenDevice()
             format = AFMT_S8;
             break;
         case 16:
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
             format = AFMT_S16_BE;
 #else
             format = AFMT_S16_LE;

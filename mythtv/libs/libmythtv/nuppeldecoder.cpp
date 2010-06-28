@@ -27,7 +27,7 @@ using namespace std;
 
 #include "minilzo.h"
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 extern "C" {
 #include "bswap.h"
 }
@@ -41,7 +41,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
     : DecoderBase(parent, pginfo),
       rtjd(0), video_width(0), video_height(0), video_size(0),
       video_frame_rate(0.0f), audio_samplerate(44100),
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
       audio_bits_per_sample(0),
 #endif
       ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
@@ -139,7 +139,7 @@ bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
     if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
         return false;
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     fh->width         = bswap_32(fh->width);
     fh->height        = bswap_32(fh->height);
     fh->desiredwidth  = bswap_32(fh->desiredwidth);
@@ -160,7 +160,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
     if (ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         return false;
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     fh->timecode     = bswap_32(fh->timecode);
     fh->packetlength = bswap_32(fh->packetlength);
 #endif
@@ -287,7 +287,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         else
         {
             ringBuffer->Read(&extradata, frameheader.packetlength);
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
             struct extendeddata *ed = &extradata;
             ed->version                 = bswap_32(ed->version);
             ed->video_fourcc            = bswap_32(ed->video_fourcc);
@@ -353,7 +353,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 {
                     memcpy(&ste, seekbuf + offset,
                            sizeof(struct seektable_entry));
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
                     ste.file_offset     = bswap_64(ste.file_offset);
                     ste.keyframe_number = bswap_32(ste.keyframe_number);
 #endif
@@ -422,7 +422,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 {
                     memcpy(&kfate, kfa_buf + offset,
                            sizeof(struct kfatable_entry));
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
                     kfate.adjust          = bswap_32(kfate.adjust);
                     kfate.keyframe_number = bswap_32(kfate.keyframe_number);
 #endif
@@ -495,7 +495,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         effdsp = extradata.audio_sample_rate * 100;
         GetNVP()->SetEffDsp(effdsp);
         audio_samplerate = extradata.audio_sample_rate;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
         // Why only if using extradata?
         audio_bits_per_sample = extradata.audio_bits_per_sample;
 #endif
@@ -1242,7 +1242,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             else
             {
                 getrawframes = 0;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
                 // Why endian correct the audio buffer here?
                 // Don't big-endian clients have to do it in audiooutBlah.cpp?
                 if (audio_bits_per_sample == 16) {
@@ -1290,7 +1290,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
             if (QString(fh->finfo) == "MythTVVideo")
             {
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
                 fh->width         = bswap_32(fh->width);
                 fh->height        = bswap_32(fh->height);
                 fh->desiredwidth  = bswap_32(fh->desiredwidth);

@@ -221,13 +221,13 @@ bool AudioOutputALSA::OpenDevice()
     else if (audio_bits == 16)
         // is the sound data coming in really little-endian or is it
         // CPU-endian?
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
         format = SND_PCM_FORMAT_S16;
 #else
         format = SND_PCM_FORMAT_S16_LE;
 #endif
     else if (audio_bits == 24)
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
         format = SND_PCM_FORMAT_S24;
 #else
         format = SND_PCM_FORMAT_S24_LE;

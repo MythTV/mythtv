@@ -33,7 +33,7 @@ using namespace std;
 #include "audioinput.h"
 #include "myth_imgconvert.h"
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 extern "C" {
 #include "bswap.h"
 }
@@ -1873,7 +1873,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 
 inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)
 {
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     fh->timecode     = bswap_32(fh->timecode);
     fh->packetlength = bswap_32(fh->packetlength);
 #endif
@@ -1921,7 +1921,7 @@ void NuppelVideoRecorder::WriteFileHeader(void)
     fileheader.textsblocks = -1; // TODO: make only -1 if VBI support active?
     fileheader.keyframedist = KEYFRAMEDIST;
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     fileheader.width         = bswap_32(fileheader.width);
     fileheader.height        = bswap_32(fileheader.height);
     fileheader.desiredwidth  = bswap_32(fileheader.desiredwidth);
@@ -2030,7 +2030,7 @@ void NuppelVideoRecorder::WriteHeader(void)
 
     extendeddataOffset = ringBuffer->GetWritePosition();
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     moredata.version                 = bswap_32(moredata.version);
     moredata.video_fourcc            = bswap_32(moredata.video_fourcc);
     moredata.audio_fourcc            = bswap_32(moredata.audio_fourcc);
@@ -3147,7 +3147,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     lf = fnum;
 }
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
     __attribute__ ((unused)); /* <- suppress compiler warning */
 
@@ -3214,7 +3214,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
         int sample_cnt = audio_buffer_size / audio_bytes_per_sample;
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
         bswap_16_buf((short int*) buf, sample_cnt, audio_channels);
 #endif
 
