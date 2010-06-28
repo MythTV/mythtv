@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
-
-    <!--    <imagetype name="backup">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-    </imagetype> -->
-
     <window name="weatherbase">
 
         <shape name="topbackground">
-            <area>20,75,760,33</area>
+            <area>20,80,760,33</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30" />
             <line color="#FFFFFF" alpha="255" width="2" />
@@ -25,7 +19,7 @@
         </shape>
 
         <shape name="bottombackground">
-            <area>20,533,760,33</area>
+            <area>20,529,760,66</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30" />
             <line color="#FFFFFF" alpha="255" width="2" />
@@ -39,13 +33,13 @@
         </textarea>
 
         <textarea name="pause_text" from="basetextarea">
-            <area>30,75,740,33</area>
+            <area>30,80,740,33</area>
             <align>right,vcenter</align>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="update_text" from="basetextarea">
-            <area>39,533,700,33</area>
+            <area>30,531,740,33</area>
             <align>vcenter</align>
         </textarea>
     </window>
@@ -65,7 +59,7 @@
         </shape>
 
         <textarea name="cclocation" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -152,13 +146,14 @@
         </imagetype>
 
         <textarea name="observation_time" from="basetextarea">
-            <area>39,533,700,33</area>
+            <area>30,531,740,33</area>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>39,533,700,33</area>
-            <align>right,vcenter</align>
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
         </textarea>
         
     </window>
@@ -166,7 +161,7 @@
     <window name="Three Day Forecast">
 
         <textarea name="3dlocation" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -264,11 +259,18 @@
         <textarea name="high-2" from="low-0">
             <position>650,400</position>
         </textarea>
+
+        <textarea name="copyright" from="basetextarea">
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
+        </textarea>
+        
     </window>
 
     <window name="Six Day Forecast">
         <textarea name="6dlocation" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -416,37 +418,60 @@
         <textarea name="low-5" from="low-0">
             <position>531,482</position>
         </textarea>
+
+        <textarea name="copyright" from="basetextarea">
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
+        </textarea>
+        
     </window>
 
     <window name="Static Map">
 
         <textarea name="smdesc" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
         <imagetype name="map">
             <area>40,140,720,360</area>
+            <preserveaspect>true</preserveaspect>
         </imagetype>
+
+        <textarea name="copyright" from="basetextarea">
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
+        </textarea>
+        
     </window>
 
     <window name="Animated Map">
 
         <textarea name="amdesc" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
 
         <imagetype name="animatedimage">
             <area>40,140,720,360</area>
+            <preserveaspect>true</preserveaspect>
         </imagetype>
+
+        <textarea name="copyright" from="basetextarea">
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
+        </textarea>
+        
     </window>
 
     <window name="Severe Weather Alerts">
 
         <textarea name="swlocation" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -456,11 +481,18 @@
             <multiline>yes</multiline>
             <value>Weather Alerts</value>
         </textarea>
+
+        <textarea name="copyright" from="basetextarea">
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
+        </textarea>
+        
     </window>
 
     <window name="18 Hour Forecast">
         <textarea name="18hrlocation" from="basetextarea">
-            <area>20,75,760,33</area>
+            <area>30,80,740,33</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -609,6 +641,13 @@
             <position>531,482</position>
         </textarea>
 
+
+        <textarea name="copyright" from="basetextarea">
+            <area>30,558,740,33</area>
+            <align>left,vcenter</align>
+            <font>basesmaller</font>
+        </textarea>
+        
     </window>
 
     <window name="global-setup">

@@ -8,6 +8,10 @@
         <bold>yes</bold>
     </font>
   
+    <font name="basesmaller" from="basesmall">
+        <pixelsize>18</pixelsize>
+    </font>
+  
     <font name="basesmallbold" from="basesmall">
         <bold>yes</bold>
     </font>
