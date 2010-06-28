@@ -61,6 +61,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Australia"),      "au", country == "au");
+    addSelection(QObject::tr("Chile"),          "cl", country == "cl");
     addSelection(QObject::tr("Czech Republic"), "cz", country == "cz");
     addSelection(QObject::tr("Denmark"),        "da", country == "dk"); // ISO Code for Denmark is DK, not DA
     addSelection(QObject::tr("Finland"),        "fi", country == "fi");
