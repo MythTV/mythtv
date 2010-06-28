@@ -16,16 +16,18 @@ class MPUBLIC MythLocale
     ~MythLocale() { };
 
     QString GetCountryCode() const; /// ISO3166 2-letter
-    QString GetCountry() const
+    QString GetCountry() const /// Name of country in English
     {
         return QLocale::countryToString(m_country);
     }
+    QString GetNativeCountry() const; /// Name of country in the native language
 
     QString GetLanguageCode() const; /// ISO639 2-letter
-    QString GetLanguage() const
+    QString GetLanguage() const /// Name of language in English
     {
         return QLocale::languageToString(m_language);
     }
+    QString GetNativeLanguage() const; /// Name of language in that language
 
     QString GetLocaleCode() const { return m_localeCode; }
 
