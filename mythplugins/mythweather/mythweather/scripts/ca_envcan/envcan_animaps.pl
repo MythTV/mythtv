@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # 
 # Animated satellite map grabber for Environment Canada.
 #
@@ -10,10 +10,20 @@
 # Lucien Dunning (ldunning@gmail.com).
 
 use strict;
+use warnings;
+
+use English;
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)), 
+        '/usr/share/mythtv/mythweather/scripts/ca_envcan', 
+        '/usr/local/share/mythtv/mythweather/scripts/ca_envcan';
+
 use Getopt::Std;
 use LWP::Simple;
 use Date::Manip;
 use ENVCANMapSearch;
+
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'ENVCAN-Animated-Map';

@@ -1,10 +1,18 @@
-#! /usr/bin/perl -w
+#! /usr/bin/perl
 
 #TODO the icons aren't very meaningful, the server gives them to us for 3 or 6
 # hr intervals, but since we're parsing for 12 hour, that seem a little useless
 
-package main;
+use English;
 use strict;
+use warnings;
+
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)),
+        '/usr/share/mythtv/mythweather/scripts/us_nws',
+        '/usr/local/share/mythtv/mythweather/scripts/us_nws';
+
 use Data::Dumper;
 use NDFDParser;
 use NWSLocation;
@@ -14,7 +22,7 @@ use Getopt::Std;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-6_day';
-my $version = 0.2;
+my $version = 0.3;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 15*60;
@@ -85,7 +93,7 @@ my $param = { maxt => 1,
     rh=>0,
     appt=>0 };
 
-my $d1 = UnixDate("8am tomorrow", "%O");
+my $d1 = UnixDate("today at 8:00am", "%O");
 my $d2 = UnixDate(DateCalc($d1, "+ 168 hours"), "%O");
 my $result;
 my $creationdate;
@@ -96,7 +104,7 @@ if (open (CACHE, "$dir/ndfd_cache_${latitude}_${longitude}")) {
     # We don't have to check the start/end dates, since we get the same chunk
     # every time, and we update the cache atleast every hour, which is how often the
     # data is updated by the NWS.
-    if (Date_Cmp($nextupdate, "today") > 0) { # use cache
+    if (Date_Cmp($nextupdate, "now") > 0) { # use cache
         no strict "vars"; # because eval doesn't scope var correctly
         $result = eval <CACHE>;
         if ($result) {
@@ -118,15 +126,15 @@ if ($getData) {
     $Data::Dumper::Indent = 0;
     # NDFD is updated by 45 minutes after the hour, we'll give them until 50 to
     # make sure
-    my $min = UnixDate("today", "%M");
+    my $min = UnixDate("now", "%M");
     my $newmin;
     if ($min < 50) {
         $newmin = 50-$min;
     } else {
         $newmin = 60-($min-50);
     }
-    $nextupdate = DateCalc("today", "+ $newmin minutes");
-    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("today", "%O\n");
+    $nextupdate = DateCalc("now", "+ $newmin minutes");
+    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("now", "%O\n");
     print CACHE Dumper($result);
 }
 
@@ -177,12 +185,14 @@ foreach $time (sort(keys(%$result))) {
         $geticon = 1;
     } 
     if ($geticon) {
+        my $tz = $time;
+        $tz =~ s/^.*([+-]\d{4})$/$1/;
         my $iconkey = $date;
         my $i = 0;
         my $icon;
         until ($result->{$iconkey}->{'conditions-icon_forecast-NWS'}
                 || $i++ > 8) {
-            $iconkey = UnixDate(DateCalc($iconkey, "+ 1 hour"), "%O%z");
+            $iconkey = UnixDate(DateCalc($iconkey, "+ 1 hour"), "%O").$tz;
         }
         if ($i >= 8) {
             $icon = "unknown.png";    
@@ -204,7 +214,7 @@ foreach $time (sort(keys(%$result))) {
 }
 print "high-${hiindex}::NA\n" and $hiindex++ while ($hiindex <= 5);
 print "low-${lowindex}::NA\n" and $lowindex++ while ($lowindex <= 5);
-print "low-${iconindex}::NA\n" and $iconindex++ while ($iconindex<= 5);
+print "icon-${iconindex}::unknown.png\n" and $iconindex++ while ($iconindex<= 5);
 
 foreach $date (sort(@dates)) {
     print "date-${dateindex}::" . UnixDate($date, "%A") . "\n" 

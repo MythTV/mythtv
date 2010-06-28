@@ -3,6 +3,95 @@
 # Configure script for mythplugins
 #
 
+###
+# functions from ffmpeg'sconfigure
+
+log(){
+    echo "$@" >> $logfile
+}
+
+log_file(){
+    log BEGIN $1
+    pr -n -t $1 >> $logfile
+    log END $1
+}
+
+echolog(){
+    log "$@"
+    echo "$@"
+}
+
+set_all(){
+    value=$1
+    shift
+    for var in $*; do
+        eval $var=$value
+    done
+}
+
+enable(){
+    set_all yes $*
+}
+
+disable(){
+    set_all no $*
+}
+
+enabled(){
+    test "${1#!}" = "$1" && op== || op=!=
+    eval test "x\$${1#!}" $op "xyes"
+}
+
+disabled(){
+    test "${1#!}" = "$1" && op== || op=!=
+    eval test "x\$${1#!}" $op "xno"
+}
+
+enabled_all(){
+    for opt; do
+        enabled $opt || return 1
+    done
+}
+
+disabled_all(){
+    for opt; do
+        disabled $opt || return 1
+    done
+}
+
+enabled_any(){
+    for opt; do
+        enabled $opt && return 0
+    done
+}
+
+disabled_any(){
+    for opt; do
+        disabled $opt && return 0
+    done
+    return 1
+}
+
+is_in(){
+    value=$1
+    shift
+    for var in $*; do
+        [ $var = $value ] && return 0
+    done
+    return 1
+}
+
+check_cmd(){
+    log "$@"
+    "$@" >> $logfile 2>&1
+}
+
+die_unknown(){
+    echo "Unknown option \"$1\"."
+    echo "See $0 --help for available options."
+    exit 1
+}
+
 #
 #    default parameters for all plugins
 #
@@ -10,6 +99,8 @@
 prefix="/usr/local"
 libdir_name="lib"
 sysroot=""
+
+logfile="config.ep"
 
 music="yes"
 video="yes"
@@ -383,6 +474,26 @@ if test "$exif" != "no" ; then
             exif="yes"
         fi
     fi
+fi
+
+if ! disabled weather; then
+    check_pl_lib(){
+        log check_pl_lib "$@"
+        check_cmd perl -e "use ${1};"
+    }
+ 
+    disable_weather(){
+        echo "WARNING: disabling MythWeather; missing $1"
+        disable weather
+    }
+
+    check_pl_lib "Date::Manip"  || disable_weather "Date::Manip"
+    check_pl_lib "XML::Simple"  || disable_weather "XML::Simple"
+    check_pl_lib "XML::XPath"  || disable_weather "XML::XPath"
+    check_pl_lib "Image::Size"  || disable_weather "Image::Size"
+    check_pl_lib "DateTime::Format::ISO8601" || 
+        disable_weather "DateTime::Format::ISO8601"
+    check_pl_lib "SOAP::Lite"  || disable_weather "SOAP::Lite"
 fi
 
 if test "$music" != "no" ; then

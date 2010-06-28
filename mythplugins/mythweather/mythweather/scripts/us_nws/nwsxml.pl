@@ -1,6 +1,14 @@
-#! /usr/bin/perl -w
-
+#! /usr/bin/perl
 use strict;
+use warnings;
+
+use English;
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)),
+        '/usr/share/mythtv/mythweather/scripts/us_nws',
+        '/usr/local/share/mythtv/mythweather/scripts/us_nws';
+
 use XML::Simple;
 use LWP::Simple;
 use Data::Dumper;
@@ -149,9 +157,9 @@ foreach (@types) {
         # relying on this being after speed and gust
         $key = "wind_spdgst";
         if ($units =~ /ENG/ ) {
-            $xml->{$key} = "$xml->{wind_mph} ($xml->{wind_gust_mph}) mph";
+            $xml->{$key} = "$xml->{wind_mph} ($xml->{wind_gust_mph})";
         } else {
-            $xml->{$key} = "$xml->{wind_kph} ($xml->{wind_gust_kph}) kph";
+            $xml->{$key} = "$xml->{wind_kph} ($xml->{wind_gust_kph})";
         }
     } elsif (/copyright/) {
         $key = "copyright";

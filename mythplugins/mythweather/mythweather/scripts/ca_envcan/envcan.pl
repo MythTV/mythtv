@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # MythWeather-revamp script to retreive weather information from Environment 
 # Canada.
 #
@@ -6,9 +6,17 @@
 # (ldunning@gmail.com) PERL scripts.  Kudos to Lucien for doing all of the
 # hard work that I shamelessly stole.
 #
-# TODO Code clean up and organization
 
 use strict;
+use warnings;
+
+use English;
+use File::Basename;
+use Cwd 'abs_path';
+use lib dirname(abs_path($0 or $PROGRAM_NAME)), 
+        '/usr/share/mythtv/mythweather/scripts/ca_envcan', 
+        '/usr/local/share/mythtv/mythweather/scripts/ca_envcan';
+
 use LWP::Simple;
 use Date::Manip;
 use Getopt::Std;
@@ -92,7 +100,7 @@ my %results;
 my $getData = 1;
 if (open(CACHE, "$dir/envcan_$loc")) {
     ($nextupdate, $creationdate) = split / /, <CACHE>;
-    if (Date_Cmp($nextupdate, "today") > 0) { # use cache
+    if (Date_Cmp($nextupdate, "now") > 0) { # use cache
         no strict "vars";
         %results = eval <CACHE>;
 
@@ -120,8 +128,8 @@ if ($getData) {
     # cache is good for 15 minutes
     my $newmin = 15;
 
-    $nextupdate = DateCalc("today", "+ $newmin minutes");
-    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("today", "%O\n");
+    $nextupdate = DateCalc("now", "+ $newmin minutes");
+    print CACHE UnixDate($nextupdate, "%O ") . UnixDate("now", "%O\n");
     print CACHE Data::Dumper->Dump([\%results], ['*results']);
 }
 
