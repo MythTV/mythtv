@@ -292,7 +292,7 @@ AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
         gCoreContext->GetNumSetting("AC3PassThru", false);
     bool bDTS  = aosettings->m_DTS &&
         gCoreContext->GetNumSetting("DTSPassThru", false);
-    bool bLPCM = aosettings->m_passthrough >= 0 ||
+    bool bLPCM = aosettings->m_passthrough == -1 ||
         (aosettings->m_LPCM && gCoreContext->GetNumSetting("MultiChannelPCM", false));
 
     if (max_channels > 2 && !bLPCM)
