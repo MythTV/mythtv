@@ -41,7 +41,7 @@ inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h msocketdevice.h
 inc.files += mythcorecontext.h mythsystem.h storagegroup.h
-inc.files += mythcoreutil.h
+inc.files += mythcoreutil.h mythlocale.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
