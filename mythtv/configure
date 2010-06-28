@@ -730,12 +730,12 @@ EOF
 
 check_ld_cxx(){
     log check_ld_cxx "$@"
-    check_cxx || return
     flags=''
     libs=''
     for f; do
         test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
     done
+    check_cxx $($filter_cflags $flags) || return
     check_cmd $cxx $LDFLAGS $flags -o $TMPE $TMPO $extralibs $libs
 }
 
