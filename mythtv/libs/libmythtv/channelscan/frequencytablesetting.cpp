@@ -29,8 +29,9 @@
 
 #include "frequencytablesetting.h"
 
-// Qt headers
-#include <QLocale>
+// Libmythdb headers
+#include "mythcorecontext.h"
+#include "mythlocale.h"
 
 ScanFrequencyTable::ScanFrequencyTable() : ComboBoxSetting(this)
 {
@@ -55,36 +56,13 @@ ScanFrequencyTable::ScanFrequencyTable() : ComboBoxSetting(this)
 
 ScanCountry::ScanCountry() : ComboBoxSetting(this)
 {
-    QString country = "au";
-    QLocale locale = QLocale::system();
-    QLocale::Country qtcountry = locale.country();
-    if (qtcountry == QLocale::Australia)
-        country = "au";
-    else if (qtcountry == QLocale::Germany)
-        country = "de";
-    else if (qtcountry == QLocale::CzechRepublic)
-        country = "cz";
-    else if (qtcountry == QLocale::Finland)
-        country = "fi";
-    else if (qtcountry == QLocale::Sweden)
-        country = "se";
-    else if (qtcountry == QLocale::UnitedKingdom)
-        country = "uk";
-    else if (qtcountry == QLocale::Spain)
-        country = "es";
-    else if (qtcountry == QLocale::NewZealand)
-        country = "nz";
-    else if (qtcountry == QLocale::France)
-        country = "fr";
-    else if (qtcountry == QLocale::Greece)
-        country = "gr";
-    else if (qtcountry == QLocale::Denmark)
-        country = "da";
+    QString country = "au"; // Default to first in list
+    country = gCoreContext->GetLocale()->GetCountryCode().toLower();
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Australia"),      "au", country == "au");
     addSelection(QObject::tr("Czech Republic"), "cz", country == "cz");
-    addSelection(QObject::tr("Denmark"),        "da", country == "da");
+    addSelection(QObject::tr("Denmark"),        "da", country == "dk"); // ISO Code for Denmark is DK, not DA
     addSelection(QObject::tr("Finland"),        "fi", country == "fi");
     addSelection(QObject::tr("France"),         "fr", country == "fr");
     addSelection(QObject::tr("Germany"),        "de", country == "de");
@@ -92,7 +70,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
     addSelection(QObject::tr("Spain"),          "es", country == "es");
     addSelection(QObject::tr("Sweden"),         "se", country == "se");
-    addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
+    addSelection(QObject::tr("United Kingdom"), "uk", country == "gb"); // ISO Code for UK is GB, not UK
 }
 
 
