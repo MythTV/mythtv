@@ -1,7 +1,7 @@
 #include "util-osd.h"
 #include "dithertable.h"
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 #define R_OI  1
 #define G_OI  2
 #define B_OI  3

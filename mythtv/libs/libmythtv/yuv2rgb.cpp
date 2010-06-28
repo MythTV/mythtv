@@ -417,7 +417,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
     int dstwidth;
 
 // byte indices
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 #define R_OI  1
 #define G_OI  2
 #define B_OI  3
@@ -490,7 +490,7 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
     unsigned char *p;
 
 // byte indices
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 #define R_II  3
 #define G_II  2
 #define B_II  1

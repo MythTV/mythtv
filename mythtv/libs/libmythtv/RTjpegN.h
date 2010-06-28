@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define RTJPEG_FILE_VERSION 0
 #define RTJPEG_HEADER_SIZE 12
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 #define RTJPEG_SWAP_WORD(a) ( ((a) << 24) | \
 			(((a) << 8) & 0x00ff0000) | \
 			(((a) >> 8) & 0x0000ff00) | \

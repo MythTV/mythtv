@@ -27,6 +27,7 @@
 #include <QFile>
 
 // Myth headers
+#include <mythconfig.h>
 #include <mythcontext.h>
 #include <audiooutput.h>
 #include <mythverbose.h>

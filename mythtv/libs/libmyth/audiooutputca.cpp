@@ -194,7 +194,7 @@ bool CoreAudioData::OpenAnalog()
     conv_in_desc.mSampleRate       = mCA->samplerate;
     conv_in_desc.mFormatID         = kAudioFormatLinearPCM;
     conv_in_desc.mFormatFlags      = formatFlags;
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
     conv_in_desc.mFormatFlags     |= kLinearPCMFormatFlagIsBigEndian;
 #endif
     conv_in_desc.mBytesPerPacket   = mCA->output_bytes_per_frame;
