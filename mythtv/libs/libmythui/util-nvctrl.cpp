@@ -347,6 +347,8 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
      * find the modename; stop at the last ' @' (would be easier with regex)
      */
 
+    s_end = strchr(modeString, '\0');
+
     for (char *s = modeString; *s; s++)
     {
         if (*s == ' ' && *(s+1) == '@')
