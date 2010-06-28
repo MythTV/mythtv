@@ -1,12 +1,18 @@
-#include <QCoreApplication>
-#include <QTranslator>
-
 #include "langsettings.h"
+
+#include <QTranslator>
+#include <QDir>
+#include <QFileInfo>
+#include <QApplication>
+
 #include "mythcorecontext.h"
+#include "mythstorage.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "mythlocale.h"
 
 // LangEditor provides the GUI for the prompt() routine.
+#include <mythscreentype.h>
 
 class LangEditorSetting : public ListBoxSetting, public Storage
 {
@@ -37,13 +43,15 @@ class LangEditorSetting : public ListBoxSetting, public Storage
 
 typedef QMap<QString, QTranslator*> TransMap;
 
-class LanguageSettingsPrivate {
-public:
+class LanguageSettingsPrivate
+{
+  public:
     LanguageSettingsPrivate():
         m_loaded(false),
         m_language("")    { };
 
-    void Init(void) {
+    void Init(void)
+    {
         if (!m_loaded)
         {
             m_loaded = "loaded";
@@ -51,7 +59,8 @@ public:
         }
     };
 
-    bool LanguageChanged(void) {
+    bool LanguageChanged(void)
+    {
         QString cur_language = gCoreContext->GetSetting("Language");
         bool ret = false;
         if (!cur_language.isEmpty() &&
@@ -153,61 +162,56 @@ void LanguageSettings::reload(void)
 QStringList LanguageSettings::getLanguages(void)
 {
     QStringList langs;
-    langs << QString::fromUtf8("English (US)")<< "EN_US"   // English
-          << QString::fromUtf8("Italiano")    << "IT"   // Italian
-          << QString::fromUtf8("Català")
-              << "CA"                                   // Catalan
-          << QString::fromUtf8("Español")
-              << "ES"                                   // Spanish
-          << QString::fromUtf8("Nederlands")  << "NL"   // Dutch
-          << QString::fromUtf8("Français")
-              << "FR"                                   // French
-          << QString::fromUtf8("Deutsch")     << "DE"   // German
-          << QString::fromUtf8("Dansk")       << "DA"   // Danish
-          << QString::fromUtf8("Islenska")    << "IS"   // Icelandic
-          << QString::fromUtf8("Norsk (bokmål)")
-              << "NB"                                   // Norwegian (bokmal)
-          << QString::fromUtf8("Svenska")     << "SV"   // Swedish
-          << QString::fromUtf8("Polski")      << "PL"   // Polish
-          << QString::fromUtf8("Português")
-              << "PT"                                   // Portuguese
-          << QString::fromUtf8("Nihongo")     << "JA"   // Japanese
-          << QString::fromUtf8("Slovenski")   << "SL"   // Slovenian
-          << QString::fromUtf8("Suomi")       << "FI"   // Finnish
-          << QString::fromUtf8("Hanzi (Traditional)")
-              << "ZH_TW"                                // Traditional Chinese
-          << QString::fromUtf8("Eesti")       << "ET"   // Estonian
-          << QString::fromUtf8("Português Brasileiro")
-              << "PT_BR"                                // Brazilian Portuguese
-          << QString::fromUtf8("English (British)")
-              << "EN_GB"                                // British English
-          << QString::fromUtf8("Česky")
-              << "CS"                                   // Czech
-          << QString::fromUtf8("Türkçe")
-              << "TR"                                   // Turkish
-          << QString::fromUtf8("Русский")
-              << "RU"                                   // Russian
-          << QString::fromUtf8("עברית")
-              << "HE"                                   // Hebrew
-          << QString::fromUtf8("العربية")
-              << "AR"                                   // Arabic
-          << QString::fromUtf8("Hrvatski")    << "HR"   // Croatian
-          << QString::fromUtf8("Magyar")    << "HU"   // Hungarian
-          << QString::fromUtf8("Ελληνικά")    << "EL"   // Hellenic
-          << QString::fromUtf8("Български")   << "BG"   // Bulgarian
-          ;
+
+    QDir translationDir(GetTranslationsDir());
+    translationDir.setNameFilters(QStringList("mythfrontend_*.qm"));
+    translationDir.setFilter(QDir::Files);
+    QFileInfoList translationFiles = translationDir.entryInfoList();
+    QFileInfoList::const_iterator it;
+    for (it = translationFiles.constBegin(); it != translationFiles.constEnd();
+         ++it)
+    {
+        // We write the names incorrectly as all lowercase, so fix this before
+        // sending to QLocale
+        QString languageCode = (*it).baseName().section('_', 1, 1);
+        QString countryCode = (*it).baseName().section('_', 2, 2);
+        if (!countryCode.isEmpty())
+            languageCode = QString("%1_%2").arg(languageCode)
+                                           .arg(countryCode.toUpper());
+
+        MythLocale locale(languageCode);
+        QString language = locale.GetNativeLanguage();
+        if (language.isEmpty())
+            language = locale.GetLanguage(); // Fall back to English
+
+        if (!countryCode.isEmpty())
+        {
+            QString country = locale.GetNativeCountry();
+            if (country.isEmpty())
+                country = locale.GetCountry(); // Fall back to English
+
+            language.append(QString(" (%1)").arg(country));
+        }
+
+        langs.append(language);
+        langs.append(languageCode);
+    }
+
     return langs;
 }
 
 void LanguageSettings::fillSelections(SelectSetting *widget)
 {
     QStringList langs = LanguageSettings::getLanguages();
+    QString langCode = gCoreContext->GetLocale()->GetLanguageCode();
+    if (langCode.isEmpty())
+        langCode = "en_us";
     widget->clearSelections();
     for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
     {
         QString label = *it;
         QString value = *(++it);
-        widget->addSelection(label, value);
+        widget->addSelection(label, value, (value == langCode));
     }
 }
 
