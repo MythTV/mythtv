@@ -534,8 +534,9 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
     QFileInfo file(m_strChannelDir+filename);
 
     bool fRet;
+    // Since DNS for lyngsat-logos.com times out, set a 20s timeout 
     if (!file.exists())
-        fRet = HttpComms::getHttpFile(file.absoluteFilePath(),iconUrl);
+        fRet = HttpComms::getHttpFile(file.absoluteFilePath(),iconUrl,20000);
     else
         fRet = true;
 
@@ -685,8 +686,10 @@ bool ImportIconsWizard::search(const QString& strParam)
                 iconfile = m_tmpDir.absoluteFilePath(iconfile);
                 QString iconname = entry.strName;
                 bool haveIcon = true;
+                // Since DNS for lyngsat-logos.com times out, set a 20s timeout 
                 if (!QFile(iconfile).exists())
-                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo);
+                    haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo, 
+                                                      20000);
 
                 if (haveIcon)
                 {
