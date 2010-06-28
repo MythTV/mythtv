@@ -446,6 +446,7 @@ if ! disabled weather; then
 
     check_pl_lib "Date::Manip"  || disable_weather "Date::Manip"
     check_pl_lib "XML::Simple"  || disable_weather "XML::Simple"
+    check_pl_lib "XML::XPath"  || disable_weather "XML::XPath"
     check_pl_lib "Image::Size"  || disable_weather "Image::Size"
     check_pl_lib "DateTime::Format::ISO8601" || 
         disable_weather "DateTime::Format::ISO8601"
