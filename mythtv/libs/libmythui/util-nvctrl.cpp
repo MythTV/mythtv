@@ -107,9 +107,15 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     /* first, we query the MetaModes on this X screen */
 
-    XNVCTRLQueryBinaryData(dpy, screen, 0, // n/a
+    ret = XNVCTRLQueryBinaryData(dpy, screen, 0, // n/a
                            NV_CTRL_BINARY_DATA_METAMODES,
                            (unsigned char **)&pMetaModes, &MetaModeLen);
+    if (!ret)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Unknown error. Failed to query the enabled Display Devices."));
+        delete d;
+        return -1;
+    }
 
     /*
      * then, we query the ModeLines for each display device on
@@ -122,9 +128,21 @@ int GetNvidiaRates(t_screenrate& screenmap)
     {
         if (!(display_devices & mask)) continue;
 
-        XNVCTRLQueryBinaryData(dpy, screen, mask,
+        ret = XNVCTRLQueryBinaryData(dpy, screen, mask,
                                NV_CTRL_BINARY_DATA_MODELINES,
                                (unsigned char **)&str, &len);
+        if (!ret)
+        {
+            VERBOSE(VB_PLAYBACK, QString("Unknown error. Failed to query the enabled Display Devices."));
+            // Free Memory currently allocated
+            for (j=0; j < nDisplayDevice; ++j)
+            {
+                free(pModeLines[j]);
+            }
+            delete d;
+            return -1;
+        }
+		
         pModeLines[nDisplayDevice] = str;
         ModeLineLen[nDisplayDevice] = len;
 
