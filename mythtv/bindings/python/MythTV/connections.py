@@ -46,7 +46,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
 
     def _release(self):
         if self._releaseCallback is not None:
-            self._releaseCallback(self.id)
+            self._releaseCallback(self.id, self.connection)
 
     def _ping121(self): self.connection.ping(True)
     def _ping122(self): self.connection.ping()
@@ -98,9 +98,11 @@ class DBConnection( object ):
                 diff -= 1
             else:
                 try:
-                    self._pool.pop()
+                    conn = self._pool.pop()
+                    conn.close()
                 except IndexError:
-                    self._inuse.popitem()
+                    key,conn = self._inuse.popitem()
+                    conn.close()
                 diff += 1
 
     def __init__(self, dbconn):
@@ -121,7 +123,14 @@ class DBConnection( object ):
         except:
             raise MythDBError(MythError.DB_CONNECTION, dbconn)
 
+    def __del__(self):
+        for conn in self._pool:
+            conn.close()
+        for id,conn in self._inuse.items():
+            conn.close()
+
     def connect(self):
+        self.log(MythLog.DATABASE, 'Spawning new database connection')
         dbconn = self.dbconn
         db = MySQLdb.connect(  user=   dbconn['DBUserName'],
                                host=   dbconn['DBHostName'],
@@ -137,16 +146,19 @@ class DBConnection( object ):
         try:
             conn = self._pool.pop(0)
             self._inuse[id(conn)] = conn
+            self.log(MythLog.DATABASE, 'Acquiring database connection from pool')
         except IndexError:
             conn = self.connect()
         return conn
 
-    def release(self, id):
+    def release(self, id, conn):
         try:
             conn = self._inuse.pop(id)
             self._pool.append(conn)
+            self.log(MythLog.DATABASE, 'Releasing database connection to pool')
         except KeyError:
-            pass
+            conn.close()
+            self.log(MythLog.DATABASE, 'Closing spare database connection')
 
     def cursor(self, log=None, type=LoggedCursor):
         if log is None:
