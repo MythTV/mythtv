@@ -47,7 +47,7 @@ class TriggeredItem : public TriggeredConfigurationGroup
         setTrigger(checkbox);
 
         addTarget("1", group);
-        addTarget("0", new VerticalConfigurationGroup(false, true));
+        addTarget("0", new VerticalConfigurationGroup(true));
     }
     TriggeredItem(Setting *checkbox, Setting *setting) :
         TriggeredConfigurationGroup(false, false, false, false)
@@ -155,7 +155,7 @@ AudioConfigSettings::AudioConfigSettings() :
     addChild((m_MaxAudioChannels = MaxAudioChannels()));
 
     ConfigurationGroup *group1 =
-        new VerticalConfigurationGroup(false, true, false, false);
+        new VerticalConfigurationGroup(true, false);
 
     group1->addChild((m_AudioUpmix = AudioUpmix()));
     group1->addChild((m_AudioUpmixType = AudioUpmixType()));
@@ -165,13 +165,13 @@ AudioConfigSettings::AudioConfigSettings() :
     addChild(advancedsettings);
 
     ConfigurationGroup *group2 =
-        new VerticalConfigurationGroup(false, true, false, false);
+        new VerticalConfigurationGroup(false);
 
     TriggeredItem *sub2 = new TriggeredItem(advancedsettings, group2);
     addChild(sub2);
 
     ConfigurationGroup *settings3 =
-        new HorizontalConfigurationGroup(false, false, false, false);
+        new HorizontalConfigurationGroup(false, false);
 
     Setting *passthroughoverride = PassThroughOverride();
     TriggeredItem *sub3 =
@@ -180,7 +180,7 @@ AudioConfigSettings::AudioConfigSettings() :
     settings3->addChild(sub3);
 
     ConfigurationGroup *settings4 =
-        new HorizontalConfigurationGroup(false, false, false, false);
+        new HorizontalConfigurationGroup(false, false);
     Setting *srcqualityoverride = SRCQualityOverride();
     TriggeredItem *sub4 =
         new TriggeredItem(srcqualityoverride, SRCQuality());
