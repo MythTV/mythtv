@@ -53,7 +53,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
       Contains the \ref database_subsystem "database",
       and network support code (used by the
-      \ref myth_network_protocol "myth network protocol" and 
+      \ref myth_network_protocol "myth network protocol" and
       \ref lcd_subsystem "LCDproc interface").
 
       This also contains some other basic functionality and classes which
@@ -89,7 +89,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
       Any changes to this library's ABI may trigger a myth binary version
       change because the plugins depend on it.
-		
+
   <dt>libmythtv
       <dd>%MythTV %TV functionality library. Used by some Plugins.
       The
@@ -667,7 +667,7 @@ some messages will still appear in English.
 
 If there is no exact translation for a particular message, the Qt runtime
 system attempts to build a translation from existing elements.
-The Qt Linguist tool is a handy way to update the translation files
+The Qt Linguist tool is the recommended way to update the translation files
 (which live in mythtv/i18n and mythplugins/*/i18n).
 If you choose to edit them manually, you must use a UTF compatible editor,
 so that the languages which contain accents and multi-byte strings
@@ -678,9 +678,8 @@ http://www.mythtv.org/wiki/index.php/Translation
 on the Wiki explains how to update an existing translation.
 
 To add a new language, look up the ISO 639-1 language code,
-append that to the list in the LanguageSettings::getLanguages()
-method (in mythtv/libs/libmyth/langsettings.cpp),
-and add rules for translating the files in i18n/i18n.pro
+name your .qm and .ts files accordingly and add rules for translating
+the files in i18n/i18n.pro
 
 \section lang_menu Menus
 
