@@ -132,11 +132,24 @@ AudioConfigSettings::AudioConfigSettings() :
     devices.append(*adc);
     delete adc;
 
-    ConfigurationGroup *m_cgsettings = new HorizontalConfigurationGroup();
+    m_triggerAC3 = new TransCheckBoxSetting();
+    m_AC3PassThrough = AC3PassThrough();
+    TriggeredItem *subAC3 = new TriggeredItem(m_triggerAC3, m_AC3PassThrough);
+
+    m_triggerDTS = new TransCheckBoxSetting();
+    m_DTSPassThrough = DTSPassThrough();
+    TriggeredItem *subDTS = new TriggeredItem(m_triggerDTS, m_DTSPassThrough);
+
+    m_triggerMPCM = new TransCheckBoxSetting();
+    m_MPCM = MPCM();
+    TriggeredItem *subMPCM = new TriggeredItem(m_triggerMPCM, m_MPCM);
+
+    m_cgsettings = new HorizontalConfigurationGroup();
     m_cgsettings->setLabel(QObject::tr("Audio Processing Capabilities"));
-    m_cgsettings->addChild((m_MPCM = MPCM()));
-    m_cgsettings->addChild((m_AC3PassThrough = AC3PassThrough()));
-    m_cgsettings->addChild((m_DTSPassThrough = DTSPassThrough()));
+    m_cgsettings->addChild(subMPCM);
+    m_cgsettings->addChild(subAC3);
+    m_cgsettings->addChild(subDTS);
+
     addChild(m_cgsettings);
 
     addChild((m_MaxAudioChannels = MaxAudioChannels()));
@@ -178,8 +191,6 @@ AudioConfigSettings::AudioConfigSettings() :
     group2->addChild(Audio48kOverride());
     group2->addChild(settings3);
 
-        // Check if existing entry is valid
-
         // Set slots
     connect(m_MaxAudioChannels, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateVisibility(const QString&)));
@@ -205,7 +216,7 @@ void AudioConfigSettings::AudioRescan()
     audiodevs.clear();
     for (it = list->begin(); it != list->end(); it++)
         audiodevs.insert(it->name, *it);
-    
+
     devices = *list;
     delete list;
 
@@ -246,25 +257,22 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
 {
     int max_speakers = 8;
     bool invalid = false;
+    int passthrough = 0;
     AudioOutputSettings settings;
-
-    if (!slotlock.tryLock()) // Doing a rescan of channels
-        return;
 
         // Test if everything is set yet
     if (!m_OutputDevice   || !m_MaxAudioChannels ||
         !m_AC3PassThrough || !m_DTSPassThrough   || !m_MPCM)
         return;
 
+    if (!slotlock.tryLock()) // Doing a rescan of channels
+        return;
+
     QString out = m_OutputDevice->getValue();
     if (!audiodevs.contains(out))
     {
-        invalid = true;
         VERBOSE(VB_AUDIO, QString("Update not found (%1)").arg(out));
-        m_AC3PassThrough->setEnabled(true);
-        m_DTSPassThrough->setEnabled(true);
-        m_MPCM->setEnabled(true);
-        m_MPCM->setLabel(QObject::tr("Analog or LPCM"));
+        invalid = true;
     }
     else
     {
@@ -272,53 +280,45 @@ void AudioConfigSettings::UpdateCapabilities(const QString &device)
 
         max_speakers = settings.BestSupportedChannels();
 
-        bool bAC3  = settings.canAC3() && m_AC3PassThrough->getValue().toInt();
-        bool bDTS  = settings.canDTS() && m_DTSPassThrough->getValue().toInt();
+        bool bAC3  = settings.canAC3() && m_AC3PassThrough->boolValue();
+        bool bDTS  = settings.canDTS() && m_DTSPassThrough->boolValue();
         bool bLPCM = settings.canPassthrough() == -1 ||
-            (settings.canLPCM() && m_MPCM->getValue().toInt());
-
-        m_AC3PassThrough->setEnabled(settings.canAC3());
-        m_DTSPassThrough->setEnabled(settings.canDTS());
-        m_MPCM->setEnabled(settings.canLPCM() &&
-                           settings.canPassthrough() >= 0);
-
-        switch (settings.canPassthrough())
-        {
-            case 1:
-                m_MPCM->setLabel(QObject::tr("LPCM"));
-                m_MPCM->setHelpText(QObject::tr(
-                            "Enable if your amplifier or sound decoder "
-                            "supports multi-channel LPCM."
-                            "If unchecked Dolby Digital support is "
-                            "required for multi-channel audio"));
-                break;
-            case -1:
-                m_MPCM->setLabel(QObject::tr("No digital passthrough"));
-                m_AC3PassThrough->setVisible(false);
-                m_DTSPassThrough->setVisible(false);
-                break;
-
-            default:
-                m_MPCM->setLabel(QObject::tr("Analog or LPCM"));
-                m_MPCM->setHelpText(QObject::tr(
-                            "Enable if analog output or if your amplifier "
-                            "or sound decoder supports multi-channel LPCM."
-                            "If unchecked with digital output, Dolby Digital "
-                            "support is required for multi-channel audio"));
-                break;
-        }
+            (settings.canLPCM() && m_MPCM->boolValue());
 
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;
         if (max_speakers == 2 && (bAC3 || bDTS))
             max_speakers = 6;
+        passthrough = settings.canPassthrough();
     }
 
-    if (invalid || settings.canPassthrough() >= 0)
+    m_triggerAC3->setValue(invalid || settings.canAC3());
+    m_triggerDTS->setValue(invalid || settings.canDTS());
+
+    m_MPCM->setEnabled(invalid || (settings.canLPCM() &&
+                                   settings.canPassthrough() >= 0));
+    switch (passthrough)
     {
-        m_AC3PassThrough->setVisible(true);
-        m_DTSPassThrough->setVisible(true);
+        case -1:
+            m_MPCM->setLabel(QObject::tr("No digital passthrough"));
+            break;
+        case 1:
+            m_MPCM->setLabel(QObject::tr("LPCM"));
+            m_MPCM->setHelpText(QObject::tr(
+                            "Enable if your amplifier or TV supports "
+                            "multi-channel LPCM. If unchecked Dolby Digital "
+                            "support is required for multi-channel audio"));
+            break;
+        default:
+            m_MPCM->setLabel(QObject::tr("Analog or LPCM"));
+            m_MPCM->setHelpText(QObject::tr(
+                            "Enable if analog output or if your amplifier "
+                            "or TV supports multi-channel LPCM. "
+                            "If unchecked with digital output, Dolby Digital "
+                            "support is required for multi-channel audio"));
+            break;
     }
+
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
 
     if (cur_speakers > max_speakers)

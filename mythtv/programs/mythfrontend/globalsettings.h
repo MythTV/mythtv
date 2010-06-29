@@ -32,31 +32,34 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     void AudioRescan();
 
   private:
-    AudioDeviceComboBox *OutputDevice();
-    HostComboBox        *MaxAudioChannels();
-    HostCheckBox        *AudioUpmix();
-    HostComboBox        *AudioUpmixType();
-    HostCheckBox        *AC3PassThrough();
-    HostCheckBox        *DTSPassThrough();
-    HostCheckBox        *MPCM();
-    HostCheckBox        *AdvancedAudioSettings();
-    HostCheckBox        *SRCQualityOverride();
-    HostComboBox        *SRCQuality();
-    HostCheckBox        *Audio48kOverride();
-    HostCheckBox        *PassThroughOverride();
-    HostComboBox        *PassThroughOutputDevice();
+    AudioDeviceComboBox  *OutputDevice();
+    HostComboBox         *MaxAudioChannels();
+    HostCheckBox         *AudioUpmix();
+    HostComboBox         *AudioUpmixType();
+    HostCheckBox         *AC3PassThrough();
+    HostCheckBox         *DTSPassThrough();
+    HostCheckBox         *MPCM();
+    HostCheckBox         *AdvancedAudioSettings();
+    HostCheckBox         *SRCQualityOverride();
+    HostComboBox         *SRCQuality();
+    HostCheckBox         *Audio48kOverride();
+    HostCheckBox         *PassThroughOverride();
+    HostComboBox         *PassThroughOutputDevice();
 
-    ConfigurationGroup  *m_cgsettings;
-    AudioDeviceComboBox *m_OutputDevice;
-    HostComboBox        *m_MaxAudioChannels;
-    HostCheckBox        *m_AudioUpmix;
-    HostComboBox        *m_AudioUpmixType;
-    HostCheckBox        *m_AC3PassThrough;
-    HostCheckBox        *m_DTSPassThrough;
-    HostCheckBox        *m_MPCM;
-    ADCMap               audiodevs;
-    AudioOutput::ADCVect devices;
-    QMutex               slotlock;
+    ConfigurationGroup   *m_cgsettings;
+    AudioDeviceComboBox  *m_OutputDevice;
+    HostComboBox         *m_MaxAudioChannels;
+    HostCheckBox         *m_AudioUpmix;
+    HostComboBox         *m_AudioUpmixType;
+    TransCheckBoxSetting *m_triggerAC3;
+    TransCheckBoxSetting *m_triggerDTS;
+    TransCheckBoxSetting *m_triggerMPCM;
+    HostCheckBox         *m_AC3PassThrough;
+    HostCheckBox         *m_DTSPassThrough;
+    HostCheckBox         *m_MPCM;
+    ADCMap                audiodevs;
+    AudioOutput::ADCVect  devices;
+    QMutex                slotlock;
 };
 
 class AudioDeviceComboBox : public HostComboBox
