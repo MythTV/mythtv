@@ -186,7 +186,8 @@ bool VideoOutputVDPAU::InitBuffers(void)
             for (int i = 0; i < m_video_surfaces.size(); i++)
                 ok &= vbuffers.CreateBuffer(video_dim.width(),
                                     video_dim.height(), i,
-                                    m_render->GetRender(m_video_surfaces[i]));
+                                    m_render->GetRender(m_video_surfaces[i]),
+                                    FMT_VDPAU);
         }
     }
     else if (codec_is_std(m_codec_id))

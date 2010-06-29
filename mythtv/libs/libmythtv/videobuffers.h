@@ -166,7 +166,8 @@ class VideoBuffers
                        vector<void*> surfs);
 #endif
 
-    bool CreateBuffer(int width, int height, uint num, void *data);
+    bool CreateBuffer(int width, int height, uint num, void *data,
+                      VideoFrameType fmt);
 
     QString GetStatus(int n=-1) const; // debugging method
   private:

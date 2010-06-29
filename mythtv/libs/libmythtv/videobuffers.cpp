@@ -1164,12 +1164,13 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 static unsigned char *ffmpeg_hack = (unsigned char*)
     "avlib should not use this private data";
 
-bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data)
+bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data,
+                                VideoFrameType fmt)
 {
     if (num >= allocSize())
         return false;
 
-    init(&buffers[num], FMT_VDPAU, (unsigned char*)data, width, height, -1, 0);
+    init(&buffers[num], fmt, (unsigned char*)data, width, height, -1, 0);
     buffers[num].priv[0] = ffmpeg_hack;
     buffers[num].priv[1] = ffmpeg_hack;
     return true;
