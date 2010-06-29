@@ -39,19 +39,6 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     QString language = lang.toLower();
 
-    // figure out which of the english layouts to use (UK or US)
-    if (language.left(2) == "en")
-    {
-        if (language.contains("en_gb", Qt::CaseInsensitive))
-        {
-            language = "en_gb";
-        }
-        else
-        {
-            language = "en_us";
-        }
-    }
-
     QString theme_file = QString("keyboard/%1_").arg(language);
 
     if (!loadThemedWindow("keyboard", theme_file))
