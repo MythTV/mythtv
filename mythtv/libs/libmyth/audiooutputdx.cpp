@@ -411,9 +411,7 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(void)
     for (uint i = 2; i < 7; i++)
         settings->AddSupportedChannels(i);
 
-    settings->setAC3(true);
-    settings->setDTS(true);
-    settings->setLPCM(true);
+    settings->setPassthrough(true);
 
     return settings;
 }

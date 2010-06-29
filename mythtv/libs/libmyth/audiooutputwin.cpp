@@ -159,9 +159,7 @@ AudioOutputSettings* AudioOutputWin::GetOutputSettings(void)
     for (uint i = 2; i < 7; i++)
         settings->AddSupportedChannels(i);
 
-    settings->setAC3(true);
-    settings->setDTS(true);
-    settings->setLPCM(true);
+    settings->setPassthrough(true);
 
     return settings;
 }
@@ -291,8 +289,8 @@ int AudioOutputWin::GetVolumeChannel(int channel) const
             (HIWORD(dwVolume) / (0xffff / 100));
     }
 
-    VERBOSE(VB_AUDIO, "GetVolume(" << channel << ") "
-                      << Volume << "(" << dwVolume << ")");
+    VERBOSE(VB_AUDIO, QString("GetVolume(%1) %2 (%3)")
+                      .arg(channel).arg(Volume).arg(dwVolume));
 
     return Volume;
 }
