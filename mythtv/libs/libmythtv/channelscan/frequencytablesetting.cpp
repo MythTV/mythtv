@@ -63,7 +63,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("Australia"),      "au", country == "au");
     addSelection(QObject::tr("Chile"),          "cl", country == "cl");
     addSelection(QObject::tr("Czech Republic"), "cz", country == "cz");
-    addSelection(QObject::tr("Denmark"),        "da", country == "dk"); // ISO Code for Denmark is DK, not DA
+    addSelection(QObject::tr("Denmark"),        "dk", country == "dk");
     addSelection(QObject::tr("Finland"),        "fi", country == "fi");
     addSelection(QObject::tr("France"),         "fr", country == "fr");
     addSelection(QObject::tr("Germany"),        "de", country == "de");
@@ -71,7 +71,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
     addSelection(QObject::tr("Spain"),          "es", country == "es");
     addSelection(QObject::tr("Sweden"),         "se", country == "se");
-    addSelection(QObject::tr("United Kingdom"), "uk", country == "gb"); // ISO Code for UK is GB, not UK
+    addSelection(QObject::tr("United Kingdom"), "gb", country == "gb");
 }
 
 
@@ -82,6 +82,6 @@ ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Germany"),        "de", country == "de");
-    addSelection(QObject::tr("United Kingdom"), "uk", country == "gb"); // ISO Code for UK is GB, not UK
+    addSelection(QObject::tr("United Kingdom"), "gb", country == "gb");
 }
 

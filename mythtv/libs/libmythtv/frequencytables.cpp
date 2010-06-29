@@ -301,7 +301,7 @@ int get_closest_freqid(
 static void init_freq_tables(freq_table_map_t &fmap)
 {
     // United Kingdom
-    fmap["dvbt_ofdm_uk0"] = new FrequencyTable(
+    fmap["dvbt_ofdm_gb0"] = new FrequencyTable(
         474000000, 850000000, 8000000, "Channel %1", 21,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
@@ -466,11 +466,11 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         6900000, 0, 0);
 
-    fmap["dvbc_qam_uk0"] = new FrequencyTable(
+    fmap["dvbc_qam_gb0"] = new FrequencyTable(
         12324000, 12324000+1, 10, "Channel %1", 1,
         DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAMAuto,
         29500000, 0, 0);
-    fmap["dvbc_qam_uk1"] = new FrequencyTable(
+    fmap["dvbc_qam_gb1"] = new FrequencyTable(
         459000000, 459000000+1, 10, "Channel %1", 2,
         DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAM64,
         6952000, 0, 0);
