@@ -92,6 +92,21 @@ QString toString(MythCodecID codecid)
         case kCodec_WMV3_VDPAU:
             return "WMV3 VDPAU";
 
+        case kCodec_MPEG1_VAAPI:
+            return "MPEG1 VAAPI";
+        case kCodec_MPEG2_VAAPI:
+            return "MPEG2 VAAPI";
+        case kCodec_H263_VAAPI:
+            return "H.263 VAAPI";
+        case kCodec_MPEG4_VAAPI:
+            return "MPEG4 VAAPI";
+        case kCodec_H264_VAAPI:
+            return "H.264 VAAPI";
+        case kCodec_VC1_VAAPI:
+            return "VC1 VAAPI";
+        case kCodec_WMV3_VAAPI:
+            return "WMV3 VAAPI";
+
         default:
             break;
     }
@@ -228,6 +243,28 @@ int myth2av_codecid(MythCodecID codec_id,
             vdpau = true;
             break;
 
+        case kCodec_MPEG1_VAAPI:
+            ret = CODEC_ID_MPEG1VIDEO;
+            break;
+        case kCodec_MPEG2_VAAPI:
+            ret = CODEC_ID_MPEG2VIDEO;
+            break;
+        case kCodec_H263_VAAPI:
+            ret = CODEC_ID_H263;
+            break;
+        case kCodec_MPEG4_VAAPI:
+            ret = CODEC_ID_MPEG4;
+            break;
+        case kCodec_H264_VAAPI:
+            ret = CODEC_ID_H264;
+            break;
+        case kCodec_VC1_VAAPI:
+            ret = CODEC_ID_VC1;
+            break;
+        case kCodec_WMV3_VAAPI:
+            ret = CODEC_ID_WMV3;
+            break;
+
         default:
             VERBOSE(VB_IMPORTANT,
                     QString("Error: MythCodecID %1 has not been "
@@ -283,6 +320,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG2_VLD:
         case kCodec_MPEG2_DVDV:
         case kCodec_MPEG2_VDPAU:
+        case kCodec_MPEG2_VAAPI:
             return "MPEG-2";
 
         case kCodec_H263:
@@ -291,6 +329,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H263_VLD:
         case kCodec_H263_DVDV:
         case kCodec_H263_VDPAU:
+        case kCodec_H263_VAAPI:
             return "H.263";
 
         case kCodec_NUV_MPEG4:
@@ -300,6 +339,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG4_VLD:
         case kCodec_MPEG4_DVDV:
         case kCodec_MPEG4_VDPAU:
+        case kCodec_MPEG4_VAAPI:
             return "MPEG-4";
 
         case kCodec_H264:
@@ -337,6 +377,9 @@ QString get_decoder_name(MythCodecID codec_id, bool libmpeg2)
 
     if (codec_is_vdpau(codec_id))
         return "vdpau";
+
+    if (codec_is_vaapi(codec_id))
+        return "vaapi";
 
     return "ffmpeg";
 }
