@@ -61,16 +61,3 @@ else:
 __version__ = OWN_VERSION
 static.mysqldb = MySQLdb.__version__
 
-if __name__ == '__main__':
-    banner = 'MythTV Python interactive shell.'
-    import code
-    try:
-        import readline, rlcompleter
-    except:
-        pass
-    else:
-        readline.parse_and_bind("tab: complete")
-        banner += ' TAB completion available.'
-    namespace = globals().copy()
-    namespace.update(locals())
-    code.InteractiveConsole(namespace).interact(banner)

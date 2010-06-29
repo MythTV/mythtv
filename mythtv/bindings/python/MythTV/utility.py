@@ -34,7 +34,8 @@ class schemaUpdate( object ):
     def __call__(self, db):
         log = MythLog('Schema Update')
 
-        while True:
+        with db as cursor:
+          while True:
             try:
                 updates, newver = self.func(db.settings.NULL[self.schemavar])
             except StopIteration:
@@ -42,16 +43,14 @@ class schemaUpdate( object ):
 
             log(log.IMPORTANT, 'Updating %s from %s to %s' % \
                         (schemaname, db.settings.NULL[self.schemavar], newver))
-            c = db.cursor()
 
             try:
                 for sql, values in updates:
-                    c.execute(sql, values)
+                    cursor.execute(sql, values)
             except Exception, e:
                 log(log.IMPORTANT, 'Update of %s failed' % self.schemavar)
                 raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
 
-            c.close()
             db.settings.NULL[self.schemavar] = newver
 
 class databaseSearch( object ):
@@ -179,16 +178,14 @@ class databaseSearch( object ):
 
         # process query
         query = self.buildQuery(where, joinbit=joinbit)
-        c = self.inst.cursor(self.inst.log)
-        if len(where) > 0:
-            c.execute(query, fields)
-        else:
-            c.execute(query)
+        with self.inst.cursor(self.inst.log) as cursor:
+            if len(where) > 0:
+                cursor.execute(query, fields)
+            else:
+                cursor.execute(query)
 
-        row = c.fetchone()
-        while row is not None:
+        for row in cursor:
             yield self.dbclass.fromRaw(row, self.inst)
-            row = c.fetchone()
 
     def buildJoinOn(self, i):
         if len(self.joins[i]) == 3:

@@ -86,13 +86,10 @@ class MythBE( FileOps ):
         Returns a list of recorders, or an empty list if none.
         """
         recorders = []
-        c = self.db.cursor(self.log)
-        c.execute('SELECT cardid FROM capturecard')
-        row = c.fetchone()
-        while row is not None:
-            recorders.append(int(row[0]))
-            row = c.fetchone()
-        c.close()
+        with self.db.cursor(self.log) as cursor:
+            cursor.execute('SELECT cardid FROM capturecard')
+            for row in cursor:
+                recorders.append(int(row[0]))
         return recorders
 
     def getFreeRecorderList(self):
@@ -704,15 +701,14 @@ class MythDB( DBCache ):
         """
         Returns a list of Frontend objects for accessible frontends
         """
-        cursor = self.cursor(self.log)
-        cursor.execute("""SELECT DISTINCT hostname
-                          FROM settings
-                          WHERE hostname IS NOT NULL
-                          AND value='NetworkControlEnabled'
-                          AND data=1""")
-        frontends = [(fe[0], self.settings[fe[0]].NetworkControlPort) \
-                            for fe in cursor.fetchall()]
-        cursor.close()
+        with self.cursor(self.log) as cursor:
+            cursor.execute("""SELECT DISTINCT hostname
+                              FROM settings
+                              WHERE hostname IS NOT NULL
+                              AND value='NetworkControlEnabled'
+                              AND data=1""")
+            frontends = [(fe[0], self.settings[fe[0]].NetworkControlPort) \
+                            for fe in cursor]
         return Frontend.testList(frontends)
 
     def getFrontend(self,host):
@@ -740,13 +736,7 @@ class MythDB( DBCache ):
         """
         Returns a tuple of channel object defined in the database
         """
-        channels = []
-        c = self.cursor(self.log)
-        c.execute("""SELECT * FROM channel""")
-        for row in c.fetchall():
-            channels.append(Channel.fromRaw(raw, self))
-        c.close()
-        return channels
+        return Channel.getAllEntries()
 
 class MythXML( XMLConnection ):
     """
@@ -764,15 +754,14 @@ class MythXML( XMLConnection ):
             backend = self.db.settings.NULL.MasterServerIP
         if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend):
             # process ip address
-            c = self.db.cursor(self.log)
-            if c.execute("""SELECT hostname FROM settings
-                            WHERE value='BackendServerIP'
-                            AND data=%s""", backend) == 0:
-                raise MythDBError(MythError.DB_SETTING, 
+            with self.db.cursor(self.log) as cursor:
+                if cursor.execute("""SELECT hostname FROM settings
+                                     WHERE value='BackendServerIP'
+                                     AND data=%s""", backend) == 0:
+                    raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendServerIP')
-            self.host = c.fetchone()[0]
+                self.host = cursor.fetchone()[0]
             self.port = int(self.db.settings[self.host].BackendStatusPort)
-            c.close()
         else:
             # assume given a hostname
             self.host = backend
@@ -900,10 +889,11 @@ class MythVideo( DBCache ):
         newvids = {}
 
         # pull available types
-        c = self.cursor(self.log)
-        c.execute("""SELECT extension FROM videotypes WHERE f_ignore=False""")
-        extensions = [a[0].lower() for a in c.fetchall()]
-        c.close()
+        with self.cursor(self.log) as cursor:
+            cursor.execute("""SELECT extension
+                              FROM videotypes
+                              WHERE f_ignore=False""")
+            extensions = [a[0].lower() for a in cursor]
 
         # connect to backends
         befilter = ['',None]

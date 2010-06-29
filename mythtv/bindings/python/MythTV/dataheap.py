@@ -323,10 +323,10 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
         OldRecorded.setDuplicate(record=False) -> None
                 Toggles re-recordability
         """
-        c = self._db.cursor(self._log)
-        c.execute("""UPDATE oldrecorded SET duplicate=%%s
-                     WHERE %s""" % self._where, \
-                tuple([record]+list(self._wheredat)))
+        with self._db.cursor(self._log) as cursor:
+            cursor.execute("""UPDATE oldrecorded SET duplicate=%%s
+                              WHERE %s""" % self._where, \
+                        tuple([record]+list(self._wheredat)))
         FileOps(db=self._db).reschedule(0)
 
     def update(self, *args, **keywords):
@@ -488,11 +488,10 @@ class Video( DBDataWrite, CMPVideo ):
     def _fill_cm(self):
         if len(self._cm_toid) > 1:
             return
-        c = self._db.cursor(self._log)
-        c.execute("""SELECT * FROM videocategory""")
-        for row in c.fetchall():
-            self._cm_toname[row[0]] = row[1]
-        c.close()
+        with self._db.cursor(self._log) as cursor:
+            cursor.execute("""SELECT * FROM videocategory""")
+            for row in cursor:
+                self._cm_toname[row[0]] = row[1]
 
     def _cat_toname(self):
         if self.category is not None:
@@ -506,12 +505,14 @@ class Video( DBDataWrite, CMPVideo ):
         if self.category is not None:
             try:
                 if self.category.lower() not in self._cm_toid:
-                    c = self._db.cursor(self._log)
-                    c.execute("""INSERT INTO videocategory SET category=%s""",
-                              self.category)
-                    self._cm_toid[self.category] = c.lastrowid
+                    with self._db.cursor(self._log) as cursor:
+                        cursor.execute("""INSERT INTO videocategory
+                                          SET category=%s""",
+                                      self.category)
+                    self._cm_toid[self.category] = cursor.lastrowid
                 self.category = self._cm_toid[self.category]
-            except: pass
+            except:
+                pass
         else:
             self.category = 0
 
@@ -562,15 +563,17 @@ class Video( DBDataWrite, CMPVideo ):
         c = self._db.cursor(self._log)
         fields = ' AND '.join(['%s=%%s' % f for f in \
                         ('title','subtitle','season','episode')])
-        count = c.execute("""SELECT intid FROM videometadata WHERE %s""" %
-                fields, (self.title, self.subtitle, self.season, self.episode))
-        if count:
-            id = c.fetchone()[0]
-        else:
-            self._import(data)
-            self._cat_toid()
-            id = DBDataWrite.create(self)
-        c.close()
+        with self._db.cursor(self._log) as cursor:
+            count = cursor.execute("""SELECT intid
+                                      FROM videometadata
+                                      WHERE %s""" % fields, 
+                      (self.title, self.subtitle, self.season, self.episode))
+            if count:
+                id = cursor.fetchone()[0]
+            else:
+                self._import(data)
+                self._cat_toid()
+                id = DBDataWrite.create(self)
         self._wheredat = (id,)
         self._pull()
         self._postinit()

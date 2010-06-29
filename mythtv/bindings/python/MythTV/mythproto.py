@@ -79,16 +79,14 @@ class BECache( SplitInt ):
 
         if self.hostname is None:
             # reverse lookup hostname from address
-            c = self.db.cursor(self.log)
-            if c.execute("""SELECT hostname FROM settings
-                            WHERE value='BackendServerIP'
-                            AND data=%s""", self.host) == 0:
-                # no match found
-                c.close()
-                raise MythDBError(MythError.DB_SETTING, 'BackendServerIP',
+            with self.db.cursor(self.log) as cursor:
+                if cursor.execute("""SELECT hostname FROM settings
+                                     WHERE value='BackendServerIP'
+                                     AND data=%s""", self.host) == 0:
+                    # no match found
+                    raise MythDBError(MythError.DB_SETTING, 'BackendServerIP',
                                             self.host)
-            self.hostname = c.fetchone()[0]
-            c.close()
+                self.hostname = cursor.fetchone()[0]
 
         # lookup port from database
         self.port = int(self.db.settings[self.hostname].BackendServerPort)
@@ -197,15 +195,13 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
 
     # get full system name
     if reip.match(host):
-        c = db.cursor(log)
-        if c.execute("""SELECT hostname FROM settings
-                        WHERE value='BackendServerIP'
-                        AND data=%s""", host) == 0:
-            c.close()
-            raise MythDBError(MythError.DB_SETTING, \
-                              'BackendServerIP', backend)
-        host = c.fetchone()[0]
-        c.close()
+        with db.cursor(log) as cursor:
+            if cursor.execute("""SELECT hostname FROM settings
+                                 WHERE value='BackendServerIP'
+                                 AND data=%s""", host) == 0:
+                raise MythDBError(MythError.DB_SETTING, \
+                                  'BackendServerIP', backend)
+            host = cursor.fetchone()[0]
 
     # user forced to remote access
     if forceremote:

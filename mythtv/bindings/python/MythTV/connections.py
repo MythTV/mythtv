@@ -12,7 +12,7 @@ from utility import deadlinesocket
 
 from select import select
 from urllib import urlopen
-from thread import start_new_thread, allocate_lock
+from thread import start_new_thread, allocate_lock, get_ident
 from time import sleep, time
 import socket
 import re
@@ -28,12 +28,26 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     """
     def __init__(self, connection):
         self.log = None
+        self._releaseCallback = None
+        self.id = id(connection)
         MySQLdb.cursors.Cursor.__init__(self, connection)
         self.ping = self._ping121
         if MySQLdb.__version__ >= ('1','2','2'):
             self.ping = self._ping122
         self.ping()
-        
+
+    def __del__(self):
+        self._release()
+        MySQLdb.cursors.Cursor.__del__(self)
+
+    def close(self):
+        self._release()
+        MySQLdb.cursors.Cursor.close(self)
+
+    def _release(self):
+        if self._releaseCallback is not None:
+            self._releaseCallback(self.id)
+
     def _ping121(self): self.connection.ping(True)
     def _ping122(self): self.connection.ping()
 
@@ -58,37 +72,104 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         except Exception, e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
+    def __enter__(self): return self
+    def __exit__(self, type, value, traceback): self.close()
+
 class DBConnection( object ):
     """
     This is the basic database connection object.
     You dont want to use this directly.
     """
 
+    _defpoolsize = 2
+    @classmethod
+    def setDefaultSize(cls, size):
+        cls._defpoolsize = size
+
+    def resizePool(self, size):
+        if size < 1:
+            size = 1
+        diff = size - self._poolsize
+        self._poolsize = size
+
+        while diff:
+            if diff > 0:
+                self._pool.append(self.connect())
+                diff -= 1
+            else:
+                try:
+                    self._pool.pop()
+                except IndexError:
+                    self._inuse.popitem()
+                diff += 1
+
     def __init__(self, dbconn):
         self.log = MythLog('Python Database Connection')
         self.tablefields = None
         self.settings = None
+        self._pool = []
+        self._inuse = {}
+        self._stack = {}
+        self._poolsize = self._defpoolsize
+        self.dbconn = dbconn
+
         try:
             self.log(MythLog.DATABASE, "Attempting connection", 
                                                 str(dbconn))
-            self.db = MySQLdb.connect(  user=   dbconn['DBUserName'],
-                                        host=   dbconn['DBHostName'],
-                                        passwd= dbconn['DBPassword'],
-                                        db=     dbconn['DBName'],
-                                        port=   dbconn['DBPort'],
-                                        use_unicode=True,
-                                        charset='utf8')
+            for i in range(self._poolsize):
+                self._pool.append(self.connect())
         except:
             raise MythDBError(MythError.DB_CONNECTION, dbconn)
-        self.db.autocommit(True)
+
+    def connect(self):
+        dbconn = self.dbconn
+        db = MySQLdb.connect(  user=   dbconn['DBUserName'],
+                               host=   dbconn['DBHostName'],
+                               passwd= dbconn['DBPassword'],
+                               db=     dbconn['DBName'],
+                               port=   dbconn['DBPort'],
+                               use_unicode=True,
+                               charset='utf8')
+        db.autocommit(True)
+        return db
+
+    def acquire(self):
+        try:
+            conn = self._pool.pop(0)
+            self._inuse[id(conn)] = conn
+        except IndexError:
+            conn = self.connect()
+        return conn
+
+    def release(self, id):
+        try:
+            conn = self._inuse.pop(id)
+            self._pool.append(conn)
+        except KeyError:
+            pass
 
     def cursor(self, log=None, type=LoggedCursor):
-        c = self.db.cursor(type)
-        if log:
-            c.log = log
-        else:
-            c.log = self.log
-        return c
+        if log is None:
+            log = self.log
+        cursor = self.acquire().cursor(type)
+        cursor._releaseCallback = self.release
+        cursor.log = log
+        return cursor
+
+    def __enter__(self):
+        cursor = self.cursor()
+        ident = get_ident()
+        if ident not in self._stack:
+            self._stack[ident] = []
+        self._stack[ident].append(cursor)
+        return cursor
+
+    def __exit__(self, type, value, traceback):
+        ident = get_ident()
+        if ident not in self._stack:
+            raise MythError('Missing context stack in DBConnection')
+        cursor = self._stack[ident].pop()
+        cursor.close()
 
 class BEConnection( object ):
     """

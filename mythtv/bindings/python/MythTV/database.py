@@ -59,13 +59,10 @@ class DBData( DictData ):
     def getAllEntries(cls, db=None):
         """cls.getAllEntries() -> tuple of DBData objects"""
         db = DBCache(db)
-
-        c = db.cursor()
-        count = c.execute("""SELECT * FROM %s""" % cls._table)
-        for i in xrange(count):
-            res = c.fetchone()
-            yield cls.fromRaw(res, db)
-        c.close()
+        with db as cursor:
+            cursor.execute("""SELECT * FROM %s""" % cls._table)
+            for row in cursor:
+                yield cls.fromRaw(row, db)
 
     @classmethod
     def fromRaw(cls, raw, db=None):
@@ -103,15 +100,14 @@ class DBData( DictData ):
 
     def _pull(self):
         """Updates table with data pulled from database."""
-        c = self._db.cursor(self._log)
-        count = c.execute("""SELECT * FROM %s WHERE %s""" \
-                           % (self._table, self._where), self._wheredat)
-        if count == 0:
-            raise MythError('DBData() could not read from database')
-        elif count > 1:
-            raise MythError('DBData() could not find unique entry')
-        data = c.fetchone()
-        c.close()
+        with self._db.cursor(self._log) as cursor:
+            count = cursor.execute("""SELECT * FROM %s WHERE %s""" \
+                               % (self._table, self._where), self._wheredat)
+            if count == 0:
+                raise MythError('DBData() could not read from database')
+            elif count > 1:
+                raise MythError('DBData() could not find unique entry')
+            data = cursor.fetchone()
         DictData.update(self, self._process(data))
 
     def copy(self):
@@ -206,13 +202,12 @@ class DBDataWrite( DBData ):
         for key in data.keys():
             if data[key] is None:
                 del data[key]
-        c = self._db.cursor(self._log)
         fields = ', '.join(data.keys())
         format_string = ', '.join(['%s' for d in data.values()])
-        c.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
+        with self._db.cursor(self._log) as cursor:
+            cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
                         % (self._table, fields, format_string), data.values())
-        intid = c.lastrowid
-        c.close()
+            intid = cursor.lastrowid
         return intid
 
     def _pull(self):
@@ -222,7 +217,6 @@ class DBDataWrite( DBData ):
     def _push(self):
         if (self._where is None) or (self._wheredat is None):
             return
-        c = self._db.cursor(self._log)
         data = self._sanitize(dict(self))
         for key, value in data.items():
             if value == self._origdata[key]:
@@ -234,10 +228,9 @@ class DBDataWrite( DBData ):
         format_string = ', '.join(['%s = %%s' % d for d in data])
         sql_values = data.values()
         sql_values.extend(self._wheredat)
-
-        c.execute("""UPDATE %s SET %s WHERE %s""" \
+        with self._db.cursor(self._log) as cursor:
+            cursor.execute("""UPDATE %s SET %s WHERE %s""" \
                     % (self._table, format_string, self._where), sql_values)
-        c.close()
         self._pull()
 
     def update(self, *args, **keywords):
@@ -263,10 +256,9 @@ class DBDataWrite( DBData ):
         if (self._where is None) or \
                 (self._wheredat is None):
             return
-        c = self._db.cursor(self._log)
-        c.execute("""DELETE FROM %s WHERE %s""" \
+        with self._db.cursor(self._log) as cursor:
+            cursor.execute("""DELETE FROM %s WHERE %s""" \
                         % (self._table, self._where), self._wheredat)
-        c.close()
 
 class DBDataRef( list ):
     """
@@ -357,14 +349,14 @@ class DBDataRef( list ):
     def _populate(self, force=False):
         if self._populated and (not force):
             return
-        c = self._db.cursor()
-        c.execute("""SELECT %s FROM %s WHERE %s""" % \
-                         (','.join(self._datfields),
-                          self._table,
-                          ' AND '.join(['%s=%%s' % f for f in self._ref])),
-                    self._refdat)
-        for row in c.fetchall():
-            list.append(self, self.SubData(zip(self._datfields, row)))
+        with self._db as cursor:
+            cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
+                           (','.join(self._datfields),
+                             self._table,
+                             ' AND '.join(['%s=%%s' % f for f in self._ref])),
+                         self._refdat)
+            for row in cursor:
+                list.append(self, self.SubData(zip(self._datfields, row)))
         self._populated = True
         self._origdata = self.deepcopy()
 
@@ -404,32 +396,31 @@ class DBDataRef( list ):
         diff = self^self._origdata
         if len(diff) == 0:
             return
-        c = self._db.cursor()
         fields = list(self._ref)+list(self._datfields)
 
-        # remove old entries
-        for v in (self._origdata&diff):
-            data = list(self._refdat)+v.values()
-            wf = []
-            for i in range(len(data)):
-                if data[i] is None:
-                    wf.append('%s IS %%s' % fields[i])
-                else:
-                    wf.append('%s=%%s' % fields[i])
-            c.execute("""DELETE FROM %s WHERE %s""" % \
-                        (self._table, ' AND '.join(wf)), data)
+        with self._db as cursor:
+            # remove old entries
+            for v in (self._origdata&diff):
+                data = list(self._refdat)+v.values()
+                wf = []
+                for i in range(len(data)):
+                    if data[i] is None:
+                        wf.append('%s IS %%s' % fields[i])
+                    else:
+                        wf.append('%s=%%s' % fields[i])
+                cursor.execute("""DELETE FROM %s WHERE %s""" % \
+                                   (self._table, ' AND '.join(wf)), data)
 
-        # add new entries
-        data = []
-        for v in (self&diff):
             # add new entries
-            data.append(list(self._refdat)+v.values())
-        if len(data) > 0:
-            c.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
-                            (self._table,
-                             ','.join(fields),
-                             ','.join(['%s' for a in fields])), data)
-        c.close()
+            data = []
+            for v in (self&diff):
+                # add new entries
+                data.append(list(self._refdat)+v.values())
+            if len(data) > 0:
+                cursor.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
+                                    (self._table,
+                                     ','.join(fields),
+                                     ','.join(['%s' for a in fields])), data)
         self._origdata = self.deepcopy()
 
     def append(self, *data):
@@ -494,23 +485,21 @@ class DBDataCRef( DBDataRef ):
         datfields = self._datfields
         reffield = '%s.%s' % (self._table[1],self._cref[-1])
 
-        c = self._db.cursor()
-        c.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
-                        (','.join(datfields+[reffield]),
-                         self._table[0],
-                         self._table[1],
-                         '%s.%s=%s.%s' % \
-                                (self._table[0], self._cref[0],
-                                 self._table[1], self._cref[-1]),
-                         ' AND '.join(['%s=%%s' % f for f in self._ref])),
-                    self._refdat)
+        with self._db as cursor:
+            cursor.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
+                          (','.join(datfields+[reffield]),
+                             self._table[0],
+                             self._table[1],
+                             '%s.%s=%s.%s' % \
+                                    (self._table[0], self._cref[0],
+                                     self._table[1], self._cref[-1]),
+                             ' AND '.join(['%s=%%s' % f for f in self._ref])),
+                        self._refdat)
 
-        for row in c.fetchall():
-            sd = self.SubData(zip(datfields, row[:-1]))
-            sd._cref = row[-1]
-            list.append(self, sd)
-
-        c.close()
+            for row in cursor:
+                sd = self.SubData(zip(datfields, row[:-1]))
+                sd._cref = row[-1]
+                list.append(self, sd)
         self._populated = True
         self._origdata = self.deepcopy()
 
@@ -523,51 +512,52 @@ class DBDataCRef( DBDataRef ):
             return
         c = self._db.cursor()
 
-        # add new cross-references
-        newdata = self&diff
-        for d in newdata:
-            data = [d[a] for a in self._crdatfields]
-            fields = self._crdatfields
-            if c.execute("""SELECT %s FROM %s WHERE %s""" % \
-                        (self._cref[-1], self._table[1],
-                         ' AND '.join(['%s=%%s' % f for f in fields])),
-                    data):
-                # match found
-                d._cref = c.fetchone()[0]
-            else:
-                c.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
-                        (self._table[1],
-                         ','.join(self._crdatfields),
-                         ','.join(['%s' for a in data])),
-                    data)
-                d._cref = c.lastrowid
-        # add new references
-        for d in newdata:
-            data = [d[a] for a in self._rdatfields]+[d._cref]+self._refdat
-            fields = self._rdatfields+self._cref[:1]+self._ref
-            c.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
+        with self._db as cursor:
+            # add new cross-references
+            newdata = self&diff
+            for d in newdata:
+                data = [d[a] for a in self._crdatfields]
+                fields = self._crdatfields
+                if cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
+                            (self._cref[-1], self._table[1],
+                             ' AND '.join(['%s=%%s' % f for f in fields])),
+                        data):
+                    # match found
+                    d._cref = cursor.fetchone()[0]
+                else:
+                    cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
+                            (self._table[1],
+                             ','.join(self._crdatfields),
+                             ','.join(['%s' for a in data])),
+                        data)
+                    d._cref = cursor.lastrowid
+            # add new references
+            for d in newdata:
+                data = [d[a] for a in self._rdatfields]+[d._cref]+self._refdat
+                fields = self._rdatfields+self._cref[:1]+self._ref
+                cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                         (self._table[0],
                          ','.join(fields),
                          ','.join(['%s' for a in data])),
                     data)
 
-        # remove old references
-        olddata = self._origdata&diff
-        crefs = [d._cref for d in olddata]
-        for d in olddata:
-            data = [d[a] for a in self._rdatfields]+[d._cref]+self._refdat
-            fields = self._rdatfields+self._cref[:1]+self._ref
-            c.execute("""DELETE FROM %s WHERE %s""" % \
+            # remove old references
+            olddata = self._origdata&diff
+            crefs = [d._cref for d in olddata]
+            for d in olddata:
+                data = [d[a] for a in self._rdatfields]+[d._cref]+self._refdat
+                fields = self._rdatfields+self._cref[:1]+self._ref
+                cursor.execute("""DELETE FROM %s WHERE %s""" % \
                         (self._table[0],
                          ' AND '.join(['%s=%%s' % f for f in fields])),
                     data)
-        # remove unused cross-references
-        for cr in crefs:
-            c.execute("""SELECT COUNT(1) FROM %s WHERE %s=%%s""" % \
+            # remove unused cross-references
+            for cr in crefs:
+                cursor.execute("""SELECT COUNT(1) FROM %s WHERE %s=%%s""" % \
                         (self._table[0], self._cref[0]), cr)
-            if c.fetchone()[0] == 0:
-                c.execute("""DELETE FROM %s WHERE %s=%%s""" % \
-                        (self._table[1], self._cref[-1]), cr)
+                if cursor.fetchone()[0] == 0:
+                    cursor.execute("""DELETE FROM %s WHERE %s=%%s""" % \
+                            (self._table[1], self._cref[-1]), cr)
 
         self._origdata = self.deepcopy()
 
@@ -641,14 +631,13 @@ class DBCache( object ):
 
         def __getitem__(self,key):
             if key not in self:
-                # pull field list from database
-                c = self._db.cursor(self._log)
-                try:
-                    c.execute("DESC %s" % (key,))
-                except Exception, e:
-                    MythDBError(MythDBError.DB_RAW, e.args)
-                self[key] = self._FieldData(c.fetchall())
-                c.close()
+                with self._db.cursor(self._log) as cursor:
+                    # pull field list from database
+                    try:
+                        cursor.execute("DESC %s" % (key,))
+                    except Exception, e:
+                        MythDBError(MythDBError.DB_RAW, e.args)
+                    self[key] = self._FieldData(cursor.fetchall())
 
             # return cached information
             return OrdDict.__getitem__(self,key)
@@ -678,42 +667,42 @@ class DBCache( object ):
 
             def __getitem__(self, key):
                 if key not in self:
-                    c = self._db.cursor(self._log)
-                    if c.execute("""SELECT data FROM settings
-                                    WHERE value=%%s
-                                    AND %s LIMIT 1""" \
-                                % self._where, key):
-                        OrdDict.__setitem__(self, key, c.fetchone()[0])
-                    else:
-                        return None
-                    c.close()
+                    with self._db.cursor(self._log) as cursor:
+                        if cursor.execute("""SELECT data FROM settings
+                                             WHERE value=%%s
+                                             AND %s LIMIT 1""" \
+                                         % self._where, key):
+                            OrdDict.__setitem__(self, key, \
+                                                cursor.fetchone()[0])
+                        else:
+                            return None
                 return OrdDict.__getitem__(self, key)
 
             def __setitem__(self, key, value):
-                c = self._db.cursor(self._log)
                 if value is None:
                     if self[key] is None:
                         return
                     del self[key]
                 else:
-                    if self[key] is not None:
-                        c.execute("""UPDATE settings
-                                     SET data=%%s
-                                     WHERE value=%%s
-                                     AND %s""" \
-                                % self._where, (value, key))
-                    else:
-                        c.execute(self._insert, (key, value))
+                    with self._db.cursor(self._log) as cursor:
+                        if self[key] is not None:
+                            cursor.execute("""UPDATE settings
+                                              SET data=%%s
+                                              WHERE value=%%s
+                                              AND %s""" \
+                                    % self._where, (value, key))
+                        else:
+                            cursor.execute(self._insert, (key, value))
                 OrdDict.__setitem__(self,key,value)
 
             def __delitem__(self, key):
                 if self[key] is None:
                     return
-                c = self._db.cursor(self._log)
-                c.execute("""DELETE FROM settings
-                             WHERE value=%%s
-                             AND %s""" \
-                        % self._where, (key,))
+                with self._db.cursor(self._log) as cursor:
+                    cursor.execute("""DELETE FROM settings
+                                      WHERE value=%%s
+                                      AND %s""" \
+                            % self._where, (key,))
                 OrdDict.__delitem__(self, key)
 
             def get(self, value, default=None):
@@ -722,11 +711,12 @@ class DBCache( object ):
                 return res
 
             def getall(self):
-                c = self._db.cursor(self._log)
-                c.execute("""SELECT value,data FROM settings
-                             WHERE %s""" % self._where)
-                for k,v in c.fetchall():
-                    OrdDict.__setitem__(self, k, v)
+                with self._db.cursor(self._log) as cursor:
+                    cursor.execute("""SELECT value,data
+                                      FROM settings
+                                      WHERE %s""" % self._where)
+                    for k,v in cursor:
+                        OrdDict.__setitem__(self, k, v)
                 return self.iteritems()
 
         _localvars = ['_field_order','_log','_db']
@@ -879,15 +869,14 @@ class DBCache( object ):
 
     def _check_schema(self, value, local, name='Database'):
         if self.settings is None:
-            c = self.cursor(self.log)
-            lines = c.execute("""SELECT data FROM settings
-                                            WHERE value LIKE(%s)""",(value,))
-            if lines == 0:
-                c.close()
-                raise MythDBError(MythError.DB_SETTING, value)
+            with self.cursor(self.log) as cursor:
+                if cursor.execute("""SELECT data
+                                     FROM settings
+                                     WHERE value LIKE(%s)""",
+                                (value,)) == 0:
+                    raise MythDBError(MythError.DB_SETTING, value)
 
-            sver = int(c.fetchone()[0])
-            c.close()
+                sver = int(cursor.fetchone()[0])
         else:
             sver = int(self.settings['NULL'][value])
 
@@ -904,7 +893,6 @@ class DBCache( object ):
                                             -> tuple of StorageGroup objects
         groupname and hostname can be used as optional filters
         """
-        c = self.cursor(self.log)
         where = []
         wheredat = []
         if groupname:
@@ -913,22 +901,25 @@ class DBCache( object ):
         if hostname:
             where.append("hostname=%s")
             wheredat.append(hostname)
-        if len(where):
-            where = 'WHERE '+' AND '.join(where)
-            count = c.execute("""SELECT * FROM storagegroup %s
-                                 ORDER BY id""" % where, wheredat)
-        else:
-            count = c.execute("""SELECT * FROM storagegroup
-                                 ORDER BY id""")
+        with self.cursor(self.log) as cursor:
+            if len(where):
+                where = 'WHERE '+' AND '.join(where)
+                cursor.execute("""SELECT * FROM storagegroup %s
+                                  ORDER BY id""" % where, wheredat)
+            else:
+                cursor.execute("""SELECT * FROM storagegroup
+                                  ORDER BY id""")
 
-        for i in xrange(count):
-            row = c.fetchone()
-            yield StorageGroup.fromRaw(row, self)
+            for row in cursor:
+                yield StorageGroup.fromRaw(row, self)
 
     def cursor(self, log=None):
         if not log:
             log = self.log
         return self.db.cursor(log, self.cursorclass)
+
+    def __enter__(self): return self.db.__enter__()
+    def __exit__(self, ty, va, tr): return self.db.__exit__(ty, va, tr)
 
 class StorageGroup( DBData ):
     """
