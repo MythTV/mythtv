@@ -3819,8 +3819,8 @@ fi
 
 if ! enabled windows; then
     check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
+    check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 fi
-enabled opengl && check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 
 VENDOR_XVMC_LIBS=""
 
