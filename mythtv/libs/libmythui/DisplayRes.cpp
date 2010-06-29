@@ -88,7 +88,7 @@ bool DisplayRes::Initialize(void)
         GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
         GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
 
-        if (!(iw && ih && ow && oh))
+        if (!((iw || ih) && ow && oh))
             break;
 
         uint key = DisplayResScreen::CalcKey(iw, ih, irate);
@@ -115,18 +115,48 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     tmode next_mode = VIDEO; // default VIDEO mode
     DisplayResScreen next = mode[next_mode];
 
-    // If requested refresh rate is 0, attempt to match video fps
-    if ((int) next.RefreshRate() == 0)
-    {
-        VERBOSE(VB_PLAYBACK, QString("*** Trying to match best refresh rate %1Hz") .arg(frate));
-        next.AddRefreshRate(frate);
-    }
-
     // try to find video override mode
     uint key = DisplayResScreen::CalcKey(iwidth, iheight, frate);
     DisplayResMapCIt it = in_size_to_output_mode.find(key);
     if (it != in_size_to_output_mode.end())
         mode[next_mode = CUSTOM_VIDEO] = next = it->second;
+    else
+    {
+        // Try to find custom resolution, ignoring refresh rate
+        key = DisplayResScreen::CalcKey(iwidth, iheight, 0);
+        it = in_size_to_output_mode.find(key);
+        if (it != in_size_to_output_mode.end())
+            mode[next_mode = CUSTOM_VIDEO] = next = it->second;
+        else
+        {
+                // Try to find resolution, ignoring X
+            for (it = in_size_to_output_mode.begin();
+                 it != in_size_to_output_mode.end();
+                 it++)
+            {
+                int w, h;
+                double rate;
+
+                key = it->first;
+                rate = (key & ((1<<5) - 1)) / 1000.0;
+                h = (key >> 5) & ((1<<14) - 1);
+                w = (key >> 19) & ((1<<13) - 1);
+                if (h != iheight)
+                    continue;
+
+                mode[next_mode = CUSTOM_VIDEO] = next = it->second;
+                break;
+            }
+        }
+    }
+
+    // If requested refresh rate is 0, attempt to match video fps
+    if ((int) next.RefreshRate() == 0)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Trying to match best refresh rate %1Hz")
+                .arg(frate));
+        next.AddRefreshRate(frate);
+    }
 
     // need to change video mode?
     double target_rate = 0.0;
