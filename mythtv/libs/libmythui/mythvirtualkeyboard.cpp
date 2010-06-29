@@ -119,13 +119,13 @@ bool MythUIVirtualKeyboard::Create()
     MythRect editArea = m_parentEdit->GetArea();
     MythRect area = GetArea();
     MythPoint newPos;
-   
+
     //FIXME this assumes the edit is a direct child of the parent screen
     MythUIType *parentScreen = NULL;
     parentScreen = dynamic_cast<MythUIType *>(m_parentEdit->parent());
     if (parentScreen)
     {
-        editArea.moveTopLeft(QPoint(editArea.x() + parentScreen->GetArea().x(), 
+        editArea.moveTopLeft(QPoint(editArea.x() + parentScreen->GetArea().x(),
                                     editArea.y() + parentScreen->GetArea().y()));
     }
 
@@ -137,7 +137,7 @@ bool MythUIVirtualKeyboard::Create()
                 newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
                                 editArea.y() - area.height() - 5);
             }
-            else 
+            else
             {
                 newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
                                 editArea.y() + editArea.height() + 5);
@@ -158,12 +158,12 @@ bool MythUIVirtualKeyboard::Create()
 
         default:
             // VK_POSBELOWEDIT
-            if (editArea.y() + editArea.height() + area.height() + 5 < screenHeight) 
+            if (editArea.y() + editArea.height() + area.height() + 5 < screenHeight)
             {
                 newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
                                 editArea.y() + editArea.height() + 5);
             }
-            else 
+            else
             {
                 newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
                                 editArea.y() - area.height() - 5);
@@ -190,27 +190,14 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
 {
     QString language = lang.toLower();
 
-    // figure out which of the english layouts to use (UK or US)
-    if (language.left(2) == "en")
-    {
-        if (language.contains("en_gb", Qt::CaseInsensitive))
-        {
-            language = "en_uk";
-        }
-        else
-        {
-            language = "en_us";
-        }
-    }
-
     QString defFile = QString("keyboard/%1.xml").arg(language);
 
     if (!GetMythUI()->FindThemeFile(defFile))
     {
         VERBOSE(VB_IMPORTANT, "No keyboard definition file found for: " + language);
 
-        // default to uk keyboard layout
-        defFile = "keyboard/en_uk.xml";
+        // default to US keyboard layout
+        defFile = "keyboard/en_us.xml";
         if (!GetMythUI()->FindThemeFile(defFile))
         {
             VERBOSE(VB_IMPORTANT, "Cannot find definitions file: " + defFile);
@@ -227,7 +214,7 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
         VERBOSE(VB_IMPORTANT, "Failed to open definitions file: " + defFile);
         return;
     }
-    if (!doc.setContent(&file)) 
+    if (!doc.setContent(&file))
     {
         VERBOSE(VB_IMPORTANT, "Failed to parse definitions file: " + defFile);
         file.close();
@@ -237,10 +224,10 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
 
     QDomElement docElem = doc.documentElement();
     QDomNode n = docElem.firstChild();
-    while(!n.isNull()) 
+    while(!n.isNull())
     {
         QDomElement e = n.toElement();
-        if(!e.isNull()) 
+        if(!e.isNull())
         {
             if (e.tagName() == "key")
                 parseKey(e);
@@ -258,10 +245,10 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
     QString type = element.attribute("type");
 
     QDomNode n = element.firstChild();
-    while(!n.isNull()) 
+    while(!n.isNull())
     {
         QDomElement e = n.toElement();
-        if(!e.isNull()) 
+        if(!e.isNull())
         {
             if (e.tagName() == "move")
             {
@@ -591,7 +578,7 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                VERBOSE(VB_IMPORTANT, 
+                VERBOSE(VB_IMPORTANT,
                         QString("MythUIVirtualKeyboard::decodeChar - bad char code (%1)")
                                 .arg(sCode));
         }

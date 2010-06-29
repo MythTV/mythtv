@@ -44,7 +44,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
     {
         if (language.contains("en_gb", Qt::CaseInsensitive))
         {
-            language = "en_uk";
+            language = "en_gb";
         }
         else
         {
@@ -56,13 +56,13 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     if (!loadThemedWindow("keyboard", theme_file))
     {
-        VERBOSE(VB_GENERAL, LOC_WARN + 
+        VERBOSE(VB_GENERAL, LOC_WARN +
                 QString("Cannot find layout for '%1'").arg(language));
 
         // cannot find layout so fallback to US English layout
         if (!loadThemedWindow("keyboard", "keyboard/en_us_"))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Cannot find layout for US English");
 
             reject();
@@ -75,7 +75,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 
     if (!container)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Cannot find the 'keyboard_container' in your theme");
 
         reject();
@@ -121,7 +121,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
         {
             newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, pwg.height() + 5);
         }
-        else 
+        else
         {
             newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, - 5 - m_popupHeight);
         }
@@ -133,7 +133,7 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
         {
             newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, - 5 - m_popupHeight);
         }
-        else 
+        else
         {
             newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, pwg.height() + 5);
         }
@@ -145,13 +145,13 @@ void VirtualKeyboardQt::SwitchLayout(const QString &lang)
     }
     else if (preferredPos == VKQT_POSBOTTOMDIALOG)
     {
-        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
+        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2,
                         tlwg.height() - 5 - m_popupHeight);
         this->move(newpos);
     }
     else if (preferredPos == VKQT_POSCENTERDIALOG)
     {
-        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
+        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2,
                         tlwg.height() / 2 - m_popupHeight / 2);
         this->move(newpos);
     }
