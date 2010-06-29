@@ -77,16 +77,11 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
 
 ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
 {
-    QString country = "de";
-    QLocale locale = QLocale::system();
-    QLocale::Country qtcountry = locale.country();
-    if (qtcountry == QLocale::Germany)
-        country = "de";
-    else if (qtcountry == QLocale::UnitedKingdom)
-        country = "uk";
+    QString country = "de"; // Default to first in list
+    country = gCoreContext->GetLocale()->GetCountryCode().toLower();
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Germany"),        "de", country == "de");
-    addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
+    addSelection(QObject::tr("United Kingdom"), "uk", country == "gb"); // ISO Code for UK is GB, not UK
 }
 
