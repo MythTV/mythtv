@@ -5,7 +5,7 @@ Provides connection cache and data handlers for accessing the backend.
 """
 
 from static import PROTO_VERSION, BACKEND_SEP, RECSTATUS
-from exceptions import MythError, MythBEError, MythFileError
+from exceptions import MythError, MythDBError, MythBEError, MythFileError
 from logging import MythLog
 from altdict import DictData
 from connections import BEConnection
