@@ -22,7 +22,8 @@ typedef enum FrameType_
     FMT_RGBA32,
     FMT_YUV422P,
     FMT_BGRA,
-    FMT_VDPAU
+    FMT_VDPAU,
+    FMT_VAAPI,
 } VideoFrameType;
 
 typedef struct VideoFrame_
