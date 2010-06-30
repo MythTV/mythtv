@@ -336,7 +336,9 @@ MythImage *MythD3D9Painter::GetImageFromString(const QString &msg,
     pm.fill(fillcolor.rgba());
 
     QPainter tmp(&pm);
-    tmp.setFont(font.face());
+    QFont tmpfont = font.face();
+    tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
+    tmp.setFont(tmpfont);
 
     if (font.hasShadow())
     {
