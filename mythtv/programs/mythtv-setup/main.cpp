@@ -220,6 +220,9 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv, use_display);
 
+    QFileInfo finfo(a.argv()[0]);
+    QString binname = finfo.baseName();
+
     QMap<QString, QString> settingsOverride;
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
@@ -416,6 +419,8 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
+    gCoreContext->SetAppName(binname);
 
     if (settingsOverride.size())
     {

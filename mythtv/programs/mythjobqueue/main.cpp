@@ -308,6 +308,8 @@ int main(int argc, char *argv[])
         return JOBQUEUE_EXIT_NO_MYTHCONTEXT;
     }
 
+    gCoreContext->SetAppName(binname);
+
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;

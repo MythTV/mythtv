@@ -1238,6 +1238,8 @@ int main(int argc, char *argv[])
         return COMMFLAG_EXIT_NO_MYTHCONTEXT;
     }
 
+    gCoreContext->SetAppName(binname);
+
     LanguageSettings::load("mythfrontend");
 
     if (settingsOverride.size())

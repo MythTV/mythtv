@@ -124,6 +124,9 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 #endif
 
+    QFileInfo finfo(a.argv()[0]);
+    QString binname = finfo.baseName();
+
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
@@ -177,6 +180,7 @@ int main(int argc, char **argv)
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
+    gCoreContext->SetAppName(binname);
 
     if (cmdline.HasBackendCommand())
     {

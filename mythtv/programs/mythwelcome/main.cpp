@@ -93,6 +93,9 @@ int main(int argc, char **argv)
     
     QApplication a(argc, argv);
 
+    QFileInfo finfo(a.argv()[0]);
+    QString binname = finfo.baseName();
+
     // Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -162,6 +165,8 @@ int main(int argc, char **argv)
                         "Exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
+
+    gCoreContext->SetAppName(binname);
 
     if (!MSqlQuery::testDBConnection())
     {

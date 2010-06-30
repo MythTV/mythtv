@@ -68,6 +68,9 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     bool Init(void);
 
+    void    SetAppName(QString appName);
+    QString GetAppName(void);
+
     void SetLocalHostname(const QString &hostname);
     void SetServerSocket(MythSocket *serverSock);
     void SetEventSocket(MythSocket *eventSock);
@@ -89,7 +92,7 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QString GetMasterHostPrefix(void);
+    QString GetMasterHostPrefix(QString storageGroup = QString());
     QString GetMasterHostName(void);
     QString GetHostName(void);
     QString GetFilePrefix(void);

@@ -1239,6 +1239,8 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
+    gCoreContext->SetAppName(binname);
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||

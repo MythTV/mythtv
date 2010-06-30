@@ -104,6 +104,9 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    QFileInfo finfo(a.argv()[0]);
+    QString binname = finfo.baseName();
+
     int argpos = 1;
     QString filename = "";
 
@@ -144,6 +147,8 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return TV_EXIT_NO_MYTHCONTEXT;
     }
+
+    gCoreContext->SetAppName(binname);
 
     QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())

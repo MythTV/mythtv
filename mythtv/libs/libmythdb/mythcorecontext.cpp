@@ -48,6 +48,7 @@ class MythCoreContextPrivate : public QObject
     QObject         *m_GUIcontext;
     QObject         *m_GUIobject;
     QString          m_appBinaryVersion;
+    QString          m_appName;
 
     QMutex  m_hostnameLock;      ///< Locking for thread-safe copying of:
     QString m_localHostname;     ///< hostname from mysql.txt or gethostname()
@@ -183,6 +184,16 @@ bool MythCoreContext::Init(void)
 MythCoreContext::~MythCoreContext()
 {
     delete d;
+}
+
+void MythCoreContext::SetAppName(QString appName)
+{
+    d->m_appName = appName;
+}
+
+QString MythCoreContext::GetAppName(void)
+{
+    return d->m_appName;
 }
 
 bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
@@ -550,9 +561,20 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
-QString MythCoreContext::GetMasterHostPrefix(void)
+QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
 {
     QString ret;
+
+    if (IsMasterHost())
+    {
+        if (storageGroup.isEmpty())
+            return QString("myth://%1:%2/").arg(GetSetting("MasterServerIP"))
+                           .arg(GetNumSetting("MasterServerPort", 6543));
+        else
+            return QString("myth://%1@%2:%3/").arg(storageGroup)
+                           .arg(GetSetting("MasterServerIP"))
+                           .arg(GetNumSetting("MasterServerPort", 6543));
+    }
 
     QMutexLocker locker(&d->m_sockLock);
     if (!d->m_serverSock)
@@ -562,9 +584,18 @@ QString MythCoreContext::GetMasterHostPrefix(void)
     }
 
     if (d->m_serverSock)
-        ret = QString("myth://%1:%2/")
-                     .arg(d->m_serverSock->peerAddress().toString())
-                     .arg(d->m_serverSock->peerPort());
+    {
+        if (storageGroup.isEmpty())
+            ret = QString("myth://%1:%2/")
+                         .arg(d->m_serverSock->peerAddress().toString())
+                         .arg(d->m_serverSock->peerPort());
+        else
+            ret = QString("myth://%1@%2:%3/")
+                         .arg(storageGroup)
+                         .arg(d->m_serverSock->peerAddress().toString())
+                         .arg(d->m_serverSock->peerPort());
+    }
+
     return ret;
 }
 

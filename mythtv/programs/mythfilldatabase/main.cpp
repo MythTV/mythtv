@@ -7,6 +7,7 @@ using namespace std;
 
 // Qt headers
 #include <QCoreApplication>
+#include <QFileInfo>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -58,6 +59,9 @@ int main(int argc, char *argv[])
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
+
+    QFileInfo finfo(a.argv()[0]);
+    QString binname = finfo.baseName();
 
     myth_nice(19);
 
@@ -510,6 +514,8 @@ int main(int argc, char *argv[])
         delete gContext;
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
+
+    gCoreContext->SetAppName(binname);
 
     LanguageSettings::load("mythfrontend");
 
