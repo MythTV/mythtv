@@ -1397,9 +1397,16 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         if (cacheMode != kCacheIgnoreDisk)
             FindThemeFile(srcfile);
 
+        QDateTime srcLastModified;
         QFileInfo original(srcfile);
+
+        if (srcfile.startsWith("myth://"))
+            srcLastModified = RemoteFile::LastModified(srcfile);
+        else if (original.exists())
+            srcLastModified = original.lastModified();
+
         if ((cacheMode == kCacheIgnoreDisk) ||
-            (fi.lastModified() > original.lastModified()))
+            (fi.lastModified() > srcLastModified))
         {
             // Check Memory Cache
             ret = GetImageFromCache(label);

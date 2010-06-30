@@ -2897,7 +2897,6 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
 {
     MythSocket *pbssock = pbs->getSocket();
 
-    QString host = gCoreContext->GetHostName();
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString filename = sList.at(3);
@@ -2905,12 +2904,14 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
 
     bool slaveUnreachable = false;
 
-    VERBOSE(VB_FILE, QString("HandleSGFileQuery: group = %1  host = %2  filename = %3 wanthost = %4").arg(groupname).arg(host).arg(filename).arg(wantHost));
+    VERBOSE(VB_FILE, QString("HandleSGFileQuery: myth://%1@%2/%3")
+                             .arg(groupname).arg(wantHost).arg(filename));
 
-    if (host.toLower() == wantHost.toLower())
+    if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
+        (wantHost == gCoreContext->GetSetting("BackendServerIP")))
     {
-        StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGFileQuery: Getting local info"));
+        StorageGroup sg(groupname, gCoreContext->GetHostName());
         strList = sg.GetFileInfo(filename);
     }
     else
@@ -2932,7 +2933,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     }
 
     if (slaveUnreachable)
-        strList << "SLAVE UNREACHABLE: " << host;
+        strList << "SLAVE UNREACHABLE: " << wantHost;
 
     if (strList.count() == 0 || (strList.at(0) == "0"))
         strList << "EMPTY LIST";
