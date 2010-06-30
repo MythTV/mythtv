@@ -159,7 +159,7 @@ AudioOutputSettings* AudioOutputWin::GetOutputSettings(void)
     for (uint i = 2; i < 7; i++)
         settings->AddSupportedChannels(i);
 
-    settings->setPassthrough(true);
+    settings->setPassthrough(0); //Maybe passthrough
 
     return settings;
 }

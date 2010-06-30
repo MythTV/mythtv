@@ -274,9 +274,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings()
         free(channels);
     }
 
-    settings->setAC3(true);
-    settings->setDTS(true);
-    settings->setLPCM(true);
+    settings->setPassthrough(0); // Maybe passthrough
 
     return settings;
 }
