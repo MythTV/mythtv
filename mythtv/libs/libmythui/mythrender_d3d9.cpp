@@ -902,24 +902,26 @@ bool MythRenderD3D9::UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
     p_vertices[0].z       = 0.0f;
     p_vertices[0].diffuse = color;
     p_vertices[0].rhw     = 1.0f;
-    p_vertices[0].t1u     = (float)src.left() / (float)norm.width();
-    p_vertices[0].t1v     = (float)src.top() / (float)norm.height();
+    p_vertices[0].t1u     = ((float)src.left() - 0.5f) / (float)norm.width();
+    p_vertices[0].t1v     = ((float)src.top() - 0.5f) / (float)norm.height();
 
     p_vertices[1].x       = (float)(dest.left() + dest.width());
     p_vertices[1].y       = (float)dest.top();
     p_vertices[1].z       = 0.0f;
     p_vertices[1].diffuse = color;
     p_vertices[1].rhw     = 1.0f;
-    p_vertices[1].t1u     = (float)(src.left() + src.width()) / (float)norm.width();
-    p_vertices[1].t1v     = (float)src.top() / (float)norm.height();
+    p_vertices[1].t1u     = ((float)(src.left() + src.width()) - 0.5f) /
+                            (float)norm.width();
+    p_vertices[1].t1v     = ((float)src.top() - 0.5f) / (float)norm.height();
 
     p_vertices[2].x       = (float)(dest.left() + dest.width());
     p_vertices[2].y       = (float)(dest.top() + dest.height());
     p_vertices[2].z       = 0.0f;
     p_vertices[2].diffuse = color;
     p_vertices[2].rhw     = 1.0f;
-    p_vertices[2].t1u     = (float)(src.left() + src.width()) / (float)norm.width();
-    p_vertices[2].t1v     = (float)(src.top() + src.height()) /
+    p_vertices[2].t1u     = ((float)(src.left() + src.width()) - 0.5f) /
+                            (float)norm.width();
+    p_vertices[2].t1v     = ((float)(src.top() + src.height()) - 0.5f) /
                             (float)norm.height();
 
     p_vertices[3].x       = (float)dest.left();
@@ -927,8 +929,8 @@ bool MythRenderD3D9::UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
     p_vertices[3].z       = 0.0f;
     p_vertices[3].diffuse = color;
     p_vertices[3].rhw     = 1.0f;
-    p_vertices[3].t1u     = (float)src.left() / (float)norm.width();
-    p_vertices[3].t1v     = (float)(src.top() + src.height()) /
+    p_vertices[3].t1u     = ((float)src.left() - 0.5f) / (float)norm.width();
+    p_vertices[3].t1v     = ((float)(src.top() + src.height()) - 0.5f) /
                             (float)norm.height();
 
     p_vertices[0].t2u     = p_vertices[0].t1u;
