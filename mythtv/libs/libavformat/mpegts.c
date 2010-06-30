@@ -1118,7 +1118,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     char *language;
     uint32_t prog_reg_desc = 0; /* registration descriptor */
     pmt_entry_t items[PMT_PIDS_MAX];
-    bzero(&items, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
+    memset(&items, 0, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
 
     // initialize to codec_type_unknown
     for (int i=0; i < PMT_PIDS_MAX; i++)
@@ -1214,7 +1214,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
                 mpegts_find_stream_type_pmt(&items[last_item], stream_type, MISC_types);
         }
 
-        bzero(&dvbci, sizeof(dvb_caption_info_t));
+        memset(&dvbci, 0, sizeof(dvb_caption_info_t));
 
         desc_list_len = get16(&p, p_end) & 0xfff;
         if (desc_list_len < 0)
