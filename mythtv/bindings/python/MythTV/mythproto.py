@@ -18,6 +18,7 @@ from uuid import uuid4
 import socket
 import weakref
 import re
+import os
 
 class BECache( SplitInt ):
     """
@@ -298,11 +299,17 @@ class FileTransfer( BEEvent ):
             else:
                 sp = res.split(BACKEND_SEP)
                 self._sockno = int(sp[1])
-                self._size = sp[2:]
+                self._size = [int(i) for i in sp[2:]]
 
         def __del__(self):
             self.socket.shutdown(1)
             self.socket.close()
+
+        def send(self, buffer):
+            return self.socket.send(buffer)
+
+        def recv(self, count):
+            return self.socket.dlrecv(count)
 
     def __repr__(self):
         return "<open file 'myth://%s:%s/%s', mode '%s' at %s>" % \
@@ -342,6 +349,7 @@ class FileTransfer( BEEvent ):
         self.open = True
 
         self._sockno = self.ftsock._sockno
+        print self.ftsock._size
         self._size = self.joinInt(*self.ftsock._size)
         self._pos = 0
         self._tsize = 2**15
@@ -417,7 +425,7 @@ class FileTransfer( BEEvent ):
                     self._tsize = self._step
 
             # append data and move position
-            buff += self.ftsock._recv(ct)
+            buff += self.ftsock.recv(ct)
             self._pos += ct
         return buff
 
@@ -439,7 +447,7 @@ class FileTransfer( BEEvent ):
                 buff = data
                 data = ''
             # push data to server
-            self.pos += int(self.ftsock._send(buff, False))
+            self.pos += int(self.ftsock.send(buff))
             # inform server of new data
             self.backendCommand('QUERY_FILETRANSFER '\
                     +BACKEND_SEP.join(\

@@ -18,6 +18,7 @@ import xml.etree.cElementTree as etree
 from time import strftime, strptime
 from datetime import date, time, datetime
 from socket import gethostname
+from urllib import urlopen
 
 class Record( DBDataWrite, RECTYPE, CMPRecord ):
     """
@@ -243,6 +244,29 @@ class Recorded( DBDataWrite, CMPRecord ):
             for char in ('\\',':','*','?','"','<','>','|'):
                 path = path.replace(char, replace)
         return path
+
+    def importMetadata(self, metadata, overwrite=False):
+        """Imports data from a VideoMetadata object."""
+        def _allow_change(self, tag, overwrite):
+            if overwrite: return True
+            if self[tag] is None: return True
+            if self[tag] == '': return True
+            if tag in self._defaults:
+                if self[tag] == self._defaults[tag]:
+                    return True
+            return False
+
+        if self._wheredat is None:
+            return
+        for tag in ('title', 'subtitle', 'description'):
+            if metadata[tag] and _allow_change(self, tag, overwrite):
+                self[tag] = metadata[tag]
+        for tagf,tagt in (('userrating','stars'),):
+            if metadata[tagf] and _allow_change(self, tagt, overwrite):
+                self[tagt] = metadata[tagf]
+        for cast in metadata.people:
+            self.cast.append((unicode(cast.name),unicode(cast.role)))
+        self.update()
 
 class RecordedProgram( DBDataWrite, CMPRecord ):
 
@@ -605,18 +629,10 @@ class Video( DBDataWrite, CMPVideo ):
         sgroup = {  'filename':'Videos',        'banner':'Banners',
                     'coverfile':'Coverart',     'fanart':'Fanart',
                     'screenshot':'Screenshots', 'trailer':'Trailers'}
-        if self._data is None:
-            return None
         if type not in sgroup:
             raise MythFileError(MythError.FILE_ERROR,
                             'Invalid type passed to Video._open(): '+str(type))
-        SG = self._db.getStorageGroup(sgroup[type], self.host)
-        if len(SG) == 0:
-            SG = self._db.getStorageGroup('Videos', self.host)
-            if len(SG) == 0:
-                raise MythFileError(MythError.FILE_ERROR,
-                                    'Could not find MythVideo Storage Groups')
-        return ftopen('myth://%s@%s/%s' % ( SG[0].groupname,
+        return ftopen('myth://%s@%s/%s' % ( sgroup[type],
                                             self.host,
                                             self[type]),
                             mode, False, nooverwrite, self._db)
@@ -696,7 +712,7 @@ class Video( DBDataWrite, CMPVideo ):
             match2 = regex2.search(title)
             if match2:
                 title = title[:match2.start()]
-                title = title[title.rindex('/')+1:]
+                title = title.rsplit('/',1)[-1]
         else:
             season = None
             episode = None
@@ -710,6 +726,74 @@ class Video( DBDataWrite, CMPVideo ):
             title = title
 
         return (title, season, episode, subtitle)
+
+    def importMetadata(self, metadata, overwrite=False):
+        """Imports data from a VideoMetadata object."""
+        def _allow_change(self, tag, overwrite):
+            if overwrite: return True
+            if self[tag] is None: return True
+            if self[tag] == '': return True
+            if tag in self._defaults:
+                if self[tag] == self._defaults[tag]:
+                    return True
+            return False
+
+        if self._wheredat is None:
+            return
+
+        for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
+                    'inetref', 'homepage', 'trailer', 'userrating', 'year'):
+            if metadata[tag] and _allow_change(self, tag, overwrite):
+                self[tag] = metadata[tag]
+
+        for tagf,tagt in (('description','plot'), ('runtime','length')):
+            if metadata[tagf] and _allow_change(self, tagt, overwrite):
+                self[tagt] = metadata[tagf]
+
+        try:
+            if _allow_change(self, 'director', overwrite):
+                self.director = [person.name for person in metadata.people \
+                                            if person.job=='Director'].pop(0)
+        except IndexError: pass
+
+        for actor in [person for person in metadata.people \
+                                  if person.job=='Actor']:
+            self.cast.add(unicode(actor.name))
+
+        for category in metadata.categories:
+            self.genre.add(unicode(category))
+
+        if not _allow_change(self, 'host', False):
+            # only perform image grabs if 'host' is set, denoting SG use
+            imgtrans = {'coverart':'coverfile', 'fanart':'fanart',
+                        'banner':'banner', 'screenshot':'screenshot'}
+            be = FileOps(self.host, db=self._db)
+            for image in metadata.images:
+                if not _allow_change(self, imgtrans[image.type], overwrite):
+                    continue
+                type = imgtrans[image.type]
+                if metadata._type == 'TV':
+                    if type == 'screenshot':
+                        fname = "%s Season %dx%d_%s." % \
+                             (self.title, self.season, self.episode, image.type)
+                    else:
+                        fname = "%s Season %d_%s." % \
+                             (self.title, self.season, image.type)
+                else:
+                    fname = "%s_%s." % (self.title, image.type)
+                fname += image.url.rsplit('.',1)[1]
+
+                self[imgtrans[image.type]] = fname
+                if be.fileExists(fname, image.type.capitalize()):
+                    continue
+                dst = self._open(type, 'w', True)
+                src = urlopen(image.url)
+                dst.write(src.read())
+                dst.close()
+                src.close()
+
+        self.update()
+        
 
     @classmethod
     def fromFilename(cls, filename, db=None):
@@ -727,18 +811,22 @@ class VideoGrabber( Grabber ):
     """
     logmodule = 'Python MythVideo Grabber'
     cls = VideoMetadata
+    _dbvalue = {'TV':'mythvideo.TVGrabber', 'Movie':'mythvideo.MovieGrabber'}
 
     def __init__(self, mode, lang='en', db=None):
-        if mode == 'TV':
-            Grabber.__init__(self, setting='mythvideo.TVGrabber', db=db)
-        elif mode == 'Movie':
-            Grabber.__init__(self, setting='mythvideo.MovieGrabber', db=db)
-        else:
+        self.mode = mode
+        try:
+            Grabber.__init__(self, setting=self._dbvalue[mode], db=db)
+        except KeyError:
             raise MythError('Invalid MythVideo grabber')
         self._check_schema('mythvideo.DBSchemaVer',
                                 MVSCHEMA_VERSION, 'MythVideo')
         self.append('-l',lang)
-        self.append('-X')
+
+    def command(self, *args):
+        for res in Grabber.command(self, *args):
+            res._type = self.mode
+            yield res
 
 #### MYTHNETVISION ####
 

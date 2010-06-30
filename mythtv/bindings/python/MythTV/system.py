@@ -93,7 +93,7 @@ class Metadata( DictData ):
             list.__init__(self)
             if xml is None: return
             for item in xml.getchildren():
-                self.append(item.attrib.copy())
+                self.append(OrdDict(item.attrib.items()))
     class Certifications( OrdDict ):
         def __init__(self, xml):
             OrdDict.__init__(self)

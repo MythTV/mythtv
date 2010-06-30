@@ -426,7 +426,10 @@ class DBDataRef( list ):
     def append(self, *data):
         """Adds a list of data matching those specified in '_datfields'."""
         self._populate()
-        list.append(self, self.SubData(zip(self._datfields, data)))
+        sd = self.SubData(zip(self._datfields, data))
+        if sd in self:
+            return
+        list.append(self, sd)
     def add(self, *data): self.append(*data)
 
     def delete(self, *data):
@@ -942,9 +945,13 @@ class StorageGroup( DBData ):
         DBData.__init__(self, (id,), db)
         if self._wheredat is None:
             return
-        if (self.hostname == gethostname()) or \
-              os.access(self.dirname.encode('utf-8'), os.F_OK):
-            self.local = True
-        else:
-            self.local = False
+
+    def _postinit(self):
+        DBData._postinit(self)
+        if self._wheredat:
+            if (self.hostname == gethostname()) or \
+                  os.access(self.dirname.encode('utf-8'), os.F_OK):
+                self.local = True
+            else:
+                self.local = False
 
