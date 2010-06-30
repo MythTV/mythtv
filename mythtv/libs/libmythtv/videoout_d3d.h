@@ -67,8 +67,6 @@ class VideoOutputD3D : public VideoOutput
     D3D9Image                          *m_pip_active;
 
     MythD3D9Painter        *m_osd_painter;
-    D3D9Image              *m_osd;
-    bool                    m_osd_ready;
 };
 
 #endif

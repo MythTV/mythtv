@@ -8,7 +8,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "videoout_d3d.h"
 #include "osd.h"
-#include "osdsurface.h"
 #include "filtermanager.h"
 #include "fourcc.h"
 #include "videodisplayprofile.h"
@@ -55,9 +54,8 @@ VideoOutputD3D::VideoOutputD3D(void)
   : VideoOutput(),         m_lock(QMutex::Recursive),
     m_hWnd(NULL),          m_render(NULL),
     m_video(NULL),
-    m_render_valid(false), m_render_reset(false),
-    m_osd_painter(NULL),   m_osd(NULL), m_osd_ready(false),
-    m_pip_active(NULL)
+    m_render_valid(false), m_render_reset(false), m_pip_active(NULL),
+    m_osd_painter(NULL)
 {
     m_pauseFrame.buf = NULL;
 }
@@ -79,13 +77,8 @@ void VideoOutputD3D::TearDown(void)
         m_pauseFrame.buf = NULL;
     }
 
-    if (m_osd_painter)
-        delete m_osd_painter;
+    delete m_osd_painter;
     m_osd_painter = NULL;
-    if (m_osd)
-        delete m_osd;
-    m_osd = NULL;
-    m_osd_ready = false;
 
     DestroyContext();
 }
@@ -264,13 +257,10 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
         TearDown();
     else
     {
-        QRect osd_rect = GetTotalOSDBounds();
-        m_osd = new D3D9Image(m_render, osd_rect.size());
         m_osd_painter = new MythD3D9Painter(m_render);
-        if (m_osd_painter && m_osd)
+        if (m_osd_painter)
         {
-            m_osd->UpdateVertices(osd_rect, osd_rect);
-            m_osd_painter->SetTarget(m_osd);
+            m_osd_painter->SetSwapControl(false);
             VERBOSE(VB_PLAYBACK, LOC + "Created D3D9 osd painter.");
         }
         else
@@ -331,11 +321,13 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                        (*it)->Draw();
                     }
                 }
-                if (m_osd_ready)
-                    m_osd->Draw();
+                if (osd && m_osd_painter)
+                    osd->DrawDirect(m_osd_painter, GetTotalOSDBounds().size(),
+                                    true);
                 m_render->End();
             }
         }
+
     }
 }
 
@@ -485,7 +477,6 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame, scan);
     }
 
-    m_osd_ready = false;
     if (m_render)
     {
         m_render_valid |= m_render->Test(m_render_reset);
@@ -493,9 +484,6 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
             SetupContext();
         if (m_render_valid && m_video)
             UpdateFrame(frame, m_video);
-        if (m_render_valid && osd && m_osd_painter)
-            m_osd_ready = osd->DrawDirect(m_osd_painter,
-                                          GetTotalOSDBounds().size());
     }
 }
 
