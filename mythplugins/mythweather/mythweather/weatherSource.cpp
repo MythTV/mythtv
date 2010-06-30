@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
+#include <QTextCodec>                                                          
 #include <QApplication>
 
 // MythTV headers
@@ -475,6 +476,8 @@ QStringList WeatherSource::getLocationList(const QString &str)
 
     QStringList locs;
     m_proc->setReadChannel(QProcess::StandardOutput);
+
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");                     
     while (m_proc->canReadLine())
     {
         QByteArray tmp = m_proc->readLine();
@@ -483,7 +486,10 @@ QStringList WeatherSource::getLocationList(const QString &str)
             tmp.chop(1);
 
         if (!tmp.isEmpty())
-            locs.push_back(QString(tmp));
+        {                                                                      
+            QString loc_string = codec->toUnicode(tmp);
+            locs.push_back(loc_string);
+        }
     }
 
     return locs;
@@ -500,7 +506,7 @@ void WeatherSource::startUpdate(bool forceUpdate)
     {
         db.prepare("SELECT updated FROM weathersourcesettings "
                 "WHERE sourceid = :ID AND "
-                "TIMESTAMPADD(SECOND,update_timeout,updated) > NOW()");
+                "TIMESTAMPADD(SECOND,update_timeout-15,updated) > NOW()");
         db.bindValue(":ID", getId());
         if (db.exec() && db.size() > 0)
         {
@@ -596,7 +602,8 @@ void WeatherSource::processExit()
     if (!tempStr.isEmpty())
         m_buffer += tempStr;
 
-    QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
+    QString locale_file = m_locale.replace("/", "-");
+    QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(locale_file);
     QFile cache(cachefile);
     if (cache.open( QIODevice::WriteOnly ))
     {
@@ -631,7 +638,11 @@ void WeatherSource::processExit()
 
 void WeatherSource::processData()
 {
-    QStringList data = QString(m_buffer).split('\n', QString::SkipEmptyParts);
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QString unicode_buffer = codec->toUnicode(m_buffer);
+    QStringList data = unicode_buffer.split('\n', QString::SkipEmptyParts);
+
+    m_data.clear();
 
     for (int i = 0; i < data.size(); ++i)
     {
@@ -647,12 +658,15 @@ void WeatherSource::processData()
             return; // we don't emit signal
         }
 
-        if (!m_data[temp[0]].isEmpty())
+        if (temp[1] != "---")
         {
-            m_data[temp[0]].append("\n" + temp[1]);
+            if (!m_data[temp[0]].isEmpty())
+            {
+                m_data[temp[0]].append("\n" + temp[1]);
+            }
+            else
+                m_data[temp[0]] = temp[1];
         }
-        else
-            m_data[temp[0]] = temp[1];
     }
 }
 

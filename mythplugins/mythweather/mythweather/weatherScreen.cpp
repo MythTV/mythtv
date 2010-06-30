@@ -98,8 +98,9 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
         ++itr;
     }
 
-    if (!m_prepared)
-        prepareScreen();
+    // This may seem like overkill, but it is necessary to actually update the
+    // static and animated maps when they are redownloaded on an update
+    prepareScreen();
 
     emit screenReady(this);
 }
@@ -167,7 +168,8 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "temp" || key == "appt" || key.contains("low",Qt::CaseInsensitive) ||
-        key.contains("high",Qt::CaseInsensitive))
+        key.contains("high",Qt::CaseInsensitive) ||
+        key.contains("temp",Qt::CaseInsensitive))
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
@@ -176,7 +178,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     }
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
-        return value + (m_units == ENG_UNITS ? " mph" : " kph");
+        return value + (m_units == ENG_UNITS ? " mph" : " km/h");
 
     /*The days of the week will be translated if the script sends elements from
      the enum DaysOfWeek.*/
