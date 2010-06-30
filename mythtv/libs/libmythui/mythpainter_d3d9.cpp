@@ -15,7 +15,8 @@
 #define LOC QString("D3D9 Painter: ")
 
 MythD3D9Painter::MythD3D9Painter(MythRenderD3D9 *render) :
-    MythPainter(), m_render(render), m_created_render(true), m_target(NULL)
+    MythPainter(), m_render(render), m_created_render(true), m_target(NULL),
+    m_swap_control(true)
 {
     if (m_render)
         m_created_render = false;
@@ -91,8 +92,10 @@ void MythD3D9Painter::Begin(QPaintDevice *parent)
         return;
     }
 
-    m_render->ClearBuffer();
-    m_render->Begin();
+    if (m_target)
+        m_render->ClearBuffer();
+    if (m_swap_control)
+        m_render->Begin();
     MythPainter::Begin(parent);
 }
 
@@ -100,8 +103,13 @@ void MythD3D9Painter::End(void)
 {
     if (m_render)
     {
-        m_render->End();
-        m_target ? m_render->SetRenderTarget(NULL) : m_render->Present(NULL);
+        if (m_swap_control)
+        {
+            m_render->End();
+            m_render->Present(NULL);
+        }
+        if (m_target)
+            m_render->SetRenderTarget(NULL);
     }
     MythPainter::End();
 }

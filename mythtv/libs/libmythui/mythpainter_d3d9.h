@@ -16,6 +16,7 @@ class MythD3D9Painter : public MythPainter
    ~MythD3D9Painter();
 
     void         SetTarget(D3D9Image *target) { m_target = target;  }
+    void         SetSwapControl(bool swap) { m_swap_control = swap; }
     virtual QString GetName(void)        { return QString("D3D9");  }
     virtual bool SupportsAnimation(void) { return true;             }
     virtual bool SupportsAlpha(void)     { return true;             }
@@ -55,6 +56,7 @@ class MythD3D9Painter : public MythPainter
     MythRenderD3D9               *m_render;
     bool                          m_created_render;
     D3D9Image                    *m_target;
+    bool                          m_swap_control;
     QMap<MythImage *, D3D9Image*> m_ImageBitmapMap;
     std::list<MythImage *>        m_ImageExpireList;
     QMap<QString, MythImage *>    m_StringToImageMap;
