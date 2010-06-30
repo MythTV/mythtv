@@ -207,164 +207,82 @@ void RemoteFile::Close(void)
 
 bool RemoteFile::DeleteFile(const QString &url)
 {
-    RemoteFile *rf = new RemoteFile();
-
-    if (!rf)
-        return false;
-
-    rf->SetURL(url);
-    bool ret = rf->DeleteFile();
-
-    delete rf;
-
-    return ret;
-}
-
-bool RemoteFile::DeleteFile(void)
-{
     bool result      = false;
-    QUrl qurl(path);
+    QUrl qurl(url);
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
 
-    if (!qurl.fragment().isEmpty() || path.right(1) == "#")
+    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
         filename = filename + "#" + qurl.fragment();
 
     if (filename.left(1) == "/")
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
-        return false;
-
-    sock = openSocket(true);
-
-    if (!sock)
         return false;
 
     QStringList strlist("DELETE_FILE");
     strlist << filename;
     strlist << sgroup;
 
-    sock->writeStringList(strlist);
-    if (!sock->readStringList(strlist, false))
-    {
-        VERBOSE(VB_IMPORTANT, "Remote file delete timeout.");
-    }
-    else if (strlist[0] == "1")
-        result = true;
+    gCoreContext->SendReceiveStringList(strlist);
 
-    sock->DownRef();
-    sock = NULL;
+    if (strlist[0] == "1")
+        result = true;
 
     return result;
 }
-
-QString RemoteFile::GetFileHash(const QString &url)
-{
-    RemoteFile *rf = new RemoteFile();
-
-    if (!rf)
-        return false;
-
-    rf->SetURL(url);
-    QString ret = rf->GetFileHash();
-
-    delete rf;
-
-    return ret;
-}
-
 
 bool RemoteFile::Exists(const QString &url)
 {
-    RemoteFile *rf = new RemoteFile();
-
-    if (!rf)
-        return false;
-
-    rf->SetURL(url);
-    bool ret = rf->Exists();
-
-    delete rf;
-
-    return ret;
-}
-
-QString RemoteFile::GetFileHash(void)
-{
-    QString result;
-    QUrl qurl(path);
-    QString filename = qurl.path();
-    QString sgroup   = qurl.userName();
-
-    if (!qurl.fragment().isEmpty() || path.right(1) == "#")
-        filename = filename + "#" + qurl.fragment();
-
-    if (filename.left(1) == "/")
-        filename = filename.right(filename.length()-1);
-
-    if (filename.isEmpty() || sgroup.isEmpty())
-        return false;
-
-    sock = openSocket(true);
-
-    if (!sock)
-        return false;
-
-    QStringList strlist("QUERY_FILE_HASH");
-    strlist << filename;
-    strlist << sgroup;
-
-    sock->writeStringList(strlist);
-    if (!sock->readStringList(strlist, false))
-    {
-        VERBOSE(VB_IMPORTANT, "Remote check file hash timeout.");
-        result = QString();
-    }
-    else
-        result = strlist[0];
-
-    sock->DownRef();
-    sock = NULL;
-
-    return result;
-}
-
-bool RemoteFile::Exists(void)
-{
     bool result      = false;
-    QUrl qurl(path);
+    QUrl qurl(url);
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
 
-    if (!qurl.fragment().isEmpty() || path.right(1) == "#")
+    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
         filename = filename + "#" + qurl.fragment();
 
     if (filename.left(1) == "/")
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
-        return false;
-
-    sock = openSocket(true);
-
-    if (!sock)
         return false;
 
     QStringList strlist("QUERY_FILE_EXISTS");
     strlist << filename;
     strlist << sgroup;
 
-    sock->writeStringList(strlist);
-    if (!sock->readStringList(strlist, false))
-    {
-        VERBOSE(VB_IMPORTANT, "Remote check file exists timeout.");
-    }
-    else if (strlist[0] == "1")
+    gCoreContext->SendReceiveStringList(strlist);
+
+    if (strlist[0] == "1")
         result = true;
 
-    sock->DownRef();
-    sock = NULL;
+    return result;
+}
+
+QString RemoteFile::GetFileHash(const QString &url)
+{
+    QString result;
+    QUrl qurl(url);
+    QString filename = qurl.path();
+    QString sgroup   = qurl.userName();
+
+    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
+        filename = filename + "#" + qurl.fragment();
+
+    if (filename.left(1) == "/")
+        filename = filename.right(filename.length()-1);
+
+    if (filename.isEmpty() || sgroup.isEmpty())
+        return false;
+
+    QStringList strlist("QUERY_FILE_HASH");
+    strlist << filename;
+    strlist << sgroup;
+
+    gCoreContext->SendReceiveStringList(strlist);
+    result = strlist[0];
 
     return result;
 }
@@ -660,6 +578,35 @@ void RemoteFile::SetTimeout(bool fast)
     lock.unlock();
 
     timeoutisfast = fast;
+}
+
+QDateTime RemoteFile::LastModified(const QString &url)
+{
+    QDateTime result;
+    QUrl qurl(url);
+    QString filename = qurl.path();
+    QString sgroup   = qurl.userName();
+
+    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
+        filename = filename + "#" + qurl.fragment();
+
+    if (filename.left(1) == "/")
+        filename = filename.right(filename.length()-1);
+
+    if (filename.isEmpty() || sgroup.isEmpty())
+        return result;
+
+    QStringList strlist("QUERY_SG_FILEQUERY");
+    strlist << qurl.host();
+    strlist << sgroup;
+    strlist << filename;
+
+    gCoreContext->SendReceiveStringList(strlist);
+
+    if (strlist.size() > 1)
+        result = QDateTime::fromTime_t(strlist[1].toUInt());
+
+    return result;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

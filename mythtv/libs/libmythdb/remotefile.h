@@ -24,11 +24,10 @@ class MPUBLIC RemoteFile
     long long Seek(long long pos, int whence, long long curpos = -1);
 
     static bool DeleteFile(const QString &url);
-    bool DeleteFile(void);
     static bool Exists(const QString &url);
-    bool Exists(void);
     static QString GetFileHash(const QString &url);
-    QString GetFileHash(void);
+    static QDateTime LastModified(const QString &url);
+
     int Write(const void *data, int size);
     int Read(void *data, int size);
     void Reset(void);

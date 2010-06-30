@@ -224,6 +224,9 @@ bool StorageGroup::FileExists(QString filename)
                                                .arg(filename));
     bool badPath = true;
 
+    if (filename.isEmpty())
+        return false;
+
     for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
     {
         if (filename.startsWith(*it))
@@ -253,8 +256,16 @@ QStringList StorageGroup::GetFileInfo(QString filename)
                                                .arg(filename));
 
     QStringList details;
+    bool searched = false;
 
-    if (FileExists(filename))
+    if (!FileExists(filename))
+    {
+        searched = true;
+        filename = FindRecordingFile(filename);
+    }
+
+    if ((searched && !filename.isEmpty()) ||
+        (FileExists(filename)))
     {
         QFileInfo fInfo(filename);
 
