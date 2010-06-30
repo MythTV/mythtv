@@ -676,8 +676,6 @@ IDirect3DTexture9* MythRenderD3D9::CreateTexture(const QSize &size)
         return NULL;
     }
 
-    VERBOSE(VB_PLAYBACK, D3DLOC + QString("Created texture (%1x%2)")
-                .arg(size.width()).arg(size.height()));
     m_textures[temp_texture] = size;;
     return temp_texture;
 }
@@ -717,8 +715,6 @@ IDirect3DSurface9* MythRenderD3D9::CreateSurface(const QSize &size, bool video)
         return NULL;
     }
 
-    VERBOSE(VB_PLAYBACK, D3DLOC + QString("Created surface (%1x%2)")
-                .arg(size.width()).arg(size.height()));
     m_surfaces[temp_surface] = MythD3DSurface(size, format);
     m_d3dDevice->ColorFill(temp_surface, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0) );
 
@@ -836,9 +832,7 @@ IDirect3DVertexBuffer9* MythRenderD3D9::CreateVertexBuffer(IDirect3DTexture9* te
         return false;
     }
 
-    VERBOSE(VB_PLAYBACK, D3DLOC + "Created vertex buffer.");
     m_vertexbuffers[temp_vbuf] = MythD3DVertexBuffer(texture);
-
     return temp_vbuf;
 }
 
