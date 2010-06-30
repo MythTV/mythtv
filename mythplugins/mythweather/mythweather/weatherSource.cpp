@@ -506,7 +506,7 @@ void WeatherSource::startUpdate(bool forceUpdate)
     {
         db.prepare("SELECT updated FROM weathersourcesettings "
                 "WHERE sourceid = :ID AND "
-                "TIMESTAMPADD(SECOND,update_timeout,updated) > NOW()");
+                "TIMESTAMPADD(SECOND,update_timeout-15,updated) > NOW()");
         db.bindValue(":ID", getId());
         if (db.exec() && db.size() > 0)
         {
@@ -641,6 +641,8 @@ void WeatherSource::processData()
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString unicode_buffer = codec->toUnicode(m_buffer);
     QStringList data = unicode_buffer.split('\n', QString::SkipEmptyParts);
+
+    m_data.clear();
 
     for (int i = 0; i < data.size(); ++i)
     {

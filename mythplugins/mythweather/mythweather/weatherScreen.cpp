@@ -98,8 +98,9 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
         ++itr;
     }
 
-    if (!m_prepared)
-        prepareScreen();
+    // This may seem like overkill, but it is necessary to actually update the
+    // static and animated maps when they are redownloaded on an update
+    prepareScreen();
 
     emit screenReady(this);
 }
