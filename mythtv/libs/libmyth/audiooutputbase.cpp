@@ -281,7 +281,7 @@ float AudioOutputBase::GetStretchFactor(void) const
 bool AudioOutputBase::ToggleUpmix(void)
 {
     // Can only upmix from stereo to 6 ch
-    if (max_channels == 2 || source_channels > 2 || passthru)
+    if (max_channels == 2 || source_channels != 2 || passthru)
         return false;
 
     upmix_default = !upmix_default;
@@ -317,7 +317,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
         else
         {
-            configured_channels = upmix_default ? max_channels : 2;
+            configured_channels = (upmix_default && lsource_channels == 2) ?
+                                        max_channels : 2;
         }
 
         /* Might we reencode a bitstream that's been decoded for timestretch?
@@ -521,8 +522,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     current_seconds = source_bitrate = -1;
     effdsp = samplerate * 100;
 
-    // Upmix to 5.1
-    if (needs_upmix && source_channels <= 2 && configured_channels > 2)
+    // Upmix Stereo to 5.1
+    if (needs_upmix && source_channels == 2 && configured_channels > 2)
     {
         surround_mode = gCoreContext->GetNumSetting("AudioUpmixType", QUALITY_HIGH);
         if ((upmixer = new FreeSurround(samplerate, source == AUDIOOUTPUT_VIDEO,
