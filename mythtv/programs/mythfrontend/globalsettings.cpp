@@ -2893,6 +2893,9 @@ static HostComboBox *ThemePainter()
 {
     HostComboBox *gc = new HostComboBox("ThemePainter");
     gc->setLabel(QObject::tr("Paint engine"));
+#ifdef USING_MINGW
+    gc->addSelection(QObject::tr("Direct3D"), "d3d9");
+#endif
     gc->addSelection(QObject::tr("Qt"), "qt");
     gc->addSelection(QObject::tr("OpenGL"), "opengl");
     gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. If "
