@@ -31,10 +31,16 @@
  */
 
 #define _WINSOCKAPI_
+#if defined(USING_MINGW)
+/* MinGW lacks wspiapi.h; set minimum WINVER to WinXP to remove dependency */
+#define WINVER 0x0501
+#endif
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#if !defined(USING_MINGW)
 #include <wspiapi.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -53,6 +59,10 @@
 #endif
 
 typedef int bool_t;
+#if defined(USING_MINGW)
+#include <stdint.h>
+#include <pthread.h>
+#else
 typedef signed __int8 int8_t;
 typedef signed __int16 int16_t;
 typedef signed __int32 int32_t;
@@ -64,6 +74,7 @@ typedef unsigned __int64 uint64_t;
 typedef void (*sig_t)(int);
 typedef HANDLE pthread_t;
 typedef HANDLE pthread_mutex_t;
+#endif
 
 #define va_copy(x, y) x = y
 #define atoll _atoi64
@@ -82,11 +93,13 @@ extern LIBTYPE uint64_t getcurrenttime(void);
 extern LIBTYPE void msleep_approx(uint64_t ms);
 extern LIBTYPE void msleep_minimum(uint64_t ms);
 
+#if !defined(PTHREAD_H)
 extern LIBTYPE int pthread_create(pthread_t *tid, void *attr, LPTHREAD_START_ROUTINE start, void *arg);
 extern LIBTYPE int pthread_join(pthread_t tid, void **value_ptr);
 extern LIBTYPE void pthread_mutex_init(pthread_mutex_t *mutex, void *attr);
 extern LIBTYPE void pthread_mutex_lock(pthread_mutex_t *mutex);
 extern LIBTYPE void pthread_mutex_unlock(pthread_mutex_t *mutex);
+#endif
 
 /*
  * The console output format should be set to UTF-8, however in XP and Vista this breaks batch file processing.
