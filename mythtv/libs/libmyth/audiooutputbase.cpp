@@ -318,7 +318,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         else
         {
             configured_channels = (upmix_default && lsource_channels == 2) ?
-                                        max_channels : 2;
+                                        max_channels : lsource_channels;
         }
 
         /* Might we reencode a bitstream that's been decoded for timestretch?
@@ -339,7 +339,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             settings.channels = conf_channels;
             lneeds_upmix = true;
         }
-
         else if (settings.channels > max_channels)
         {
             VBAUDIO(QString("Needs downmix from %1 -> %2 channels")

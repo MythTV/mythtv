@@ -91,7 +91,7 @@ bool DisplayRes::Initialize(void)
         if (!((iw || ih) && ow && oh))
             break;
 
-        uint key = DisplayResScreen::CalcKey(iw, ih, irate);
+        uint64_t key = DisplayResScreen::CalcKey(iw, ih, irate);
         DisplayResScreen scr(ow, oh, tW_mm, tH_mm, oaspect, orate);
         in_size_to_output_mode[key] = scr;            
     }
@@ -116,7 +116,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     DisplayResScreen next = mode[next_mode];
 
     // try to find video override mode
-    uint key = DisplayResScreen::CalcKey(iwidth, iheight, frate);
+    uint64_t key = DisplayResScreen::CalcKey(iwidth, iheight, frate);
     DisplayResMapCIt it = in_size_to_output_mode.find(key);
     if (it != in_size_to_output_mode.end())
         mode[next_mode = CUSTOM_VIDEO] = next = it->second;
@@ -138,9 +138,9 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
                 double rate;
 
                 key = it->first;
-                rate = (key & ((1<<5) - 1)) / 1000.0;
-                h = (key >> 5) & ((1<<14) - 1);
-                w = (key >> 19) & ((1<<13) - 1);
+                rate = (key & ((1<<18) - 1)) / 1000.0;
+                h = (key >> 18) & ((1<<16) - 1);
+                w = (key >> 34) & ((1<<16) - 1);
                 if (h != iheight)
                     continue;
 

@@ -7,6 +7,8 @@
 
 #include <QString>
 
+#include <stdint.h>   // for uint64_t
+
 #include "mythexp.h"
 
 class MPUBLIC DisplayResScreen
@@ -69,7 +71,7 @@ class MPUBLIC DisplayResScreen
     static int FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                              const DisplayResScreen& d,
                              double& target_rate);
-    static inline int CalcKey(int w, int h, double rate);
+    static inline uint64_t CalcKey(int w, int h, double rate);
     static bool compare_rates(double f1, double f2, double precision = 0.01);
 
   private:
@@ -84,7 +86,7 @@ typedef std::vector<DisplayResScreen>          DisplayResVector;
 typedef DisplayResVector::iterator        DisplayResVectorIt;
 typedef DisplayResVector::const_iterator  DisplayResVectorCIt;
 
-typedef std::map<uint, class DisplayResScreen> DisplayResMap;
+typedef std::map<uint64_t, class DisplayResScreen> DisplayResMap;
 typedef DisplayResMap::iterator           DisplayResMapIt;
 typedef DisplayResMap::const_iterator     DisplayResMapCIt;
 
@@ -126,10 +128,10 @@ inline bool DisplayResScreen::operator == (const DisplayResScreen &b) const
     return width == b.width && height == b.height;
 }  
 
-inline int DisplayResScreen::CalcKey(int w, int h, double rate)
+inline uint64_t DisplayResScreen::CalcKey(int w, int h, double rate)
 {
-    int irate = (int) (rate * 1000.0);
-    return (w << 19) | (h << 5) | irate;
+    uint64_t irate = (uint64_t) (rate * 1000.0);
+    return ((uint64_t)w << 34) | ((uint64_t)h << 18) | irate;
 }
 
 #endif // __DISPLAYRESCREEN_H__
