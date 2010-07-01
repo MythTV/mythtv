@@ -18,6 +18,7 @@
 
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "mythdownloadmanager.h"
 #include "oldsettings.h"
 #include "screensaver.h"
 #include "mythmainwindow.h"
@@ -1213,7 +1214,11 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     if (filename.isEmpty() || filename == "none")
         return NULL;
 
-    if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
+    if ((!FindThemeFile(filename)) &&
+        (!filename.startsWith("http://")) &&
+        (!filename.startsWith("https://")) &&
+        (!filename.startsWith("ftp://")) &&
+        (!filename.startsWith("myth://")))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("LoadScaleImage(%1)")
                 .arg(filename) + "Unable to find image file");
@@ -1237,6 +1242,20 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         delete rf;
 
         if (loaded)
+            tmpimage.loadFromData(data);
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScaleImage(%1) failed to load remote image")
+                    .arg(filename));
+        }
+    }
+    else if ((filename.startsWith("http://")) ||
+             (filename.startsWith("https://")) ||
+             (filename.startsWith("ftp://")))
+    {
+        QByteArray data;
+        if (GetMythDownloadManager()->download(filename, &data))
             tmpimage.loadFromData(data);
         else
         {
@@ -1400,7 +1419,13 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         QDateTime srcLastModified;
         QFileInfo original(srcfile);
 
-        if (srcfile.startsWith("myth://"))
+        if ((srcfile.startsWith("http://")) ||
+            (srcfile.startsWith("https://")) ||
+            (srcfile.startsWith("ftp://")))
+        {
+            srcLastModified = GetMythDownloadManager()->GetLastModified(srcfile);
+        }
+        else if (srcfile.startsWith("myth://"))
             srcLastModified = RemoteFile::LastModified(srcfile);
         else if (original.exists())
             srcLastModified = original.lastModified();

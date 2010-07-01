@@ -11,6 +11,7 @@
 #include <QRgb>
 
 // Mythdb headers
+#include "mythdownloadmanager.h"
 #include "mythverbose.h"
 
 // Myth headers
@@ -279,6 +280,15 @@ bool MythImage::Load(const QString &filename, bool scale)
 //            else
 //                VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
 
+        }
+        else if ((filename.startsWith("http://")) ||
+                 (filename.startsWith("https://")) ||
+                 (filename.startsWith("ftp://")))
+        {
+            im = new QImage();
+            QByteArray data;
+            if (GetMythDownloadManager()->download(filename, &data))
+                im->loadFromData(data);
         }
         else
         {
