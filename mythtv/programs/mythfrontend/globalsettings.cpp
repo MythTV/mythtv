@@ -63,7 +63,20 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     HostComboBox("AudioOutputDevice", true), m_parent(parent)
 {
     setLabel(QObject::tr("Audio output device"));
-    addSelection("NULL", "NULL", true);
+#ifdef USING_ALSA
+    QString dflt = "ALSA:default";
+#elif USING_PULSEOUTPUT
+    QString dflt = "PulseAudio:default";
+#elif USING_COREAUDIO
+    QString dflt = "CoreAudio:";
+#elif USING_MINGW
+    QString dflt = "Windows:";
+#else
+    QString dflt = "NULL";
+#endif
+    QString current = gCoreContext->GetSetting(QString("AudioOutputDevice"),
+                                               dflt);
+    addSelection(current, current, true);
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             this, SLOT(AudioDescriptionHelp(const QString&)));
@@ -110,8 +123,8 @@ AudioConfigSettings::AudioConfigSettings() :
     setUseLabel(false);
 
     ConfigurationGroup *device = new HorizontalConfigurationGroup();
-    addChild(device);
     device->addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
+    addChild(device);
 
         // Rescan button
     TransButtonSetting *rescan = new TransButtonSetting("rescan");
@@ -122,7 +135,7 @@ AudioConfigSettings::AudioConfigSettings() :
     device->addChild(rescan);
     connect(rescan, SIGNAL(pressed()), this, SLOT(AudioRescan()));
 
-    QString name = gCoreContext->GetSetting(QString("AudioOutputDevice"));
+    QString name = m_OutputDevice->getValue();
     AudioOutput::AudioDeviceConfig *adc =
         AudioOutput::GetAudioDeviceConfig(name, name, true);
     if (adc->settings.IsInvalid())
@@ -140,12 +153,13 @@ AudioConfigSettings::AudioConfigSettings() :
     m_DTSPassThrough = DTSPassThrough();
     TriggeredItem *subDTS = new TriggeredItem(m_triggerDTS, m_DTSPassThrough);
 
-    m_triggerMPCM = new TransCheckBoxSetting();
-    m_MPCM = MPCM();
-    TriggeredItem *subMPCM = new TriggeredItem(m_triggerMPCM, m_MPCM);
-
-    m_cgsettings = new HorizontalConfigurationGroup();
+    m_cgsettings = new VerticalConfigurationGroup();
     m_cgsettings->setLabel(QObject::tr("Audio Processing Capabilities"));
+
+    ConfigurationGroup *subMPCM =
+        new VerticalConfigurationGroup(false, false);
+    m_MPCM = MPCM();
+    subMPCM->addChild(m_MPCM);
     m_cgsettings->addChild(subMPCM);
     m_cgsettings->addChild(subAC3);
     m_cgsettings->addChild(subDTS);
@@ -187,8 +201,12 @@ AudioConfigSettings::AudioConfigSettings() :
     settings4->addChild(srcqualityoverride);
     settings4->addChild(sub4);
 
+    ConfigurationGroup *settings5 =
+        new HorizontalConfigurationGroup(false, false);
+    settings5->addChild(Audio48kOverride());
+
     group2->addChild(settings4);
-    group2->addChild(Audio48kOverride());
+    group2->addChild(settings5);
     group2->addChild(settings3);
 
         // Set slots
@@ -255,7 +273,7 @@ void AudioConfigSettings::UpdateVisibility(const QString &device)
 
 void AudioConfigSettings::UpdateCapabilities(const QString &device)
 {
-    int max_speakers = 8;
+   int max_speakers = 8;
     bool invalid = false;
     int passthrough = 0;
     AudioOutputSettings settings;
@@ -419,7 +437,7 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
 HostCheckBox *AudioConfigSettings::MPCM()
 {
     HostCheckBox *gc = new HostCheckBox("MultiChannelPCM");
-    gc->setValue(false);
+    gc->setValue(true);
     return gc;
 }
 
