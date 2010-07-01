@@ -465,7 +465,7 @@ HostComboBox *AudioConfigSettings::SRCQuality()
     gc->setHelpText(QObject::tr("Set the quality of audio sample-rate "
                     "conversion. \"Good\" (default) provides the best "
                     "compromise between CPU usage and quality. \"Disabled\" "
-                    "lets the audio device handle sample-rate conversion."
+                    "lets the audio device handle sample-rate conversion."));
     return gc;
 }
 
