@@ -6,6 +6,7 @@
 #include <QDir>
 
 // libmythdb
+#include "compat.h"
 #include "mythcorecontext.h"
 #include "mythdirs.h"
 #include "mythevent.h"
