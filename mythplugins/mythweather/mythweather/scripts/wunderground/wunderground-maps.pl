@@ -21,7 +21,7 @@ use POSIX qw(strftime);
 use File::Path;
 use Image::Size;
 
-our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
+our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'wunderground-maps';
 my $version = 0.1;
@@ -40,7 +40,7 @@ if (!-d $logdir) {
     mkpath( $logdir, {mode => 0755} );
 }
 
-getopts('Tvtlu:d:');
+getopts('Tvtlu:d:D');
 
 if (defined $opt_v) {
     print "$name,$version,$author,$email\n";
@@ -188,6 +188,7 @@ sub format_date {
 }
 
 sub log_print {
+    return if not defined $opt_D;
     my $dir = shift;
 
     open OF, ">>$dir/wunderground.log";

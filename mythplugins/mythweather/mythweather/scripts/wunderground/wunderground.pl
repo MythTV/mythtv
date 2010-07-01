@@ -1,4 +1,5 @@
 #! /usr/bin/perl
+# vim:ts=4:sw=4:ai:et:si:sts=4
 
 use strict;
 use warnings;
@@ -12,7 +13,7 @@ use XML::XPath::XMLParser;
 use POSIX qw(strftime);
 use File::Path;
 
-our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
+our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'wunderground';
 my $version = 0.1;
@@ -259,6 +260,7 @@ sub format_date {
 }
 
 sub log_print {
+    return if not defined $opt_D;
     my $dir = shift;
 
     open OF, ">>$dir/wunderground.log";
