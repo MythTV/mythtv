@@ -366,6 +366,7 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
         connect(childwidget[i], SIGNAL(destroyed(    QObject*)),
                 this,           SLOT(  widgetInvalid(QObject*)));
         widget->addWidget(childwidget[i]);
+        children[i]->setEnabled(children[i]->isEnabled());
     }
 
     if (childwidget[top])
