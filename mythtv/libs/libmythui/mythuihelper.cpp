@@ -1423,7 +1423,9 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
             (srcfile.startsWith("https://")) ||
             (srcfile.startsWith("ftp://")))
         {
-            srcLastModified = GetMythDownloadManager()->GetLastModified(srcfile);
+            srcLastModified = original.lastModified();
+//            srcLastModified =
+//                GetMythDownloadManager()->GetLastModified(srcfile);
         }
         else if (srcfile.startsWith("myth://"))
             srcLastModified = RemoteFile::LastModified(srcfile);
