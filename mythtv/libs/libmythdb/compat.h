@@ -337,4 +337,10 @@ inline const char *dlerror(void)
 }
 
 #endif
+
+#ifdef USING_MINGW
+#define fseeko(stream, offset, whence) fseeko64(stream, offset, whence)
+#define ftello(stream) ftello64(stream)
+#endif
+
 #endif // __COMPAT_H__

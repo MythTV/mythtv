@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #endif
 
+#include <errno.h>
 #include <dirent.h>
 
 #include "dir.h"
@@ -33,6 +34,15 @@ void dir_close_posix(DIR_H *dir)
 
 int dir_read_posix(DIR_H *dir, DIRENT *entry)
 {
+#ifdef USING_MINGW
+    errno = 0;
+    struct dirent* e = readdir((DIR*)dir->internal);
+    if (errno)
+        return -errno;
+    if (NULL == e)
+        return 1;
+    strncpy(entry->d_name, e->d_name, 256);
+#else
     struct dirent e, *p_e;
     int result;
 
@@ -43,6 +53,7 @@ int dir_read_posix(DIR_H *dir, DIRENT *entry)
         return 1;
     }
     strncpy(entry->d_name, e.d_name, 256);
+#endif
     return 0;
 }
 

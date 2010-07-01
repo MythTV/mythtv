@@ -16,6 +16,8 @@
 
 #if HAVE_DLFCN_H
 #include <dlfcn.h>
+#else
+#include "compat.h"
 #endif
 
 #include "dl.h"

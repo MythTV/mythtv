@@ -11,6 +11,7 @@
 #endif
 
 #include <stdio.h>
+#include "compat.h"
 
 #include "file.h"
 #include "../util/macro.h"
