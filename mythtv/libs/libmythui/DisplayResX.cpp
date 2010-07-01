@@ -145,7 +145,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
             for (std::vector<double>::const_iterator it = rates.begin();
                  it !=  rates.end(); ++it)
             {
-                uint64_t key = DisplayResScreen::CalcKey(w, h, *it);
+                uint key = DisplayResScreen::CalcKey(w, h, *it);
                 if (screenmap.find(key) != screenmap.end())
                 {
                     // Rate is defined in NV-CONTROL extension, use it
