@@ -53,6 +53,7 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     HostComboBox         *m_AudioUpmixType;
     TransCheckBoxSetting *m_triggerAC3;
     TransCheckBoxSetting *m_triggerDTS;
+    TransCheckBoxSetting *m_triggerMPCM;
     HostCheckBox         *m_AC3PassThrough;
     HostCheckBox         *m_DTSPassThrough;
     HostCheckBox         *m_MPCM;

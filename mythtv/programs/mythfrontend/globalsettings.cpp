@@ -122,19 +122,17 @@ AudioConfigSettings::AudioConfigSettings() :
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
 
-    ConfigurationGroup *device = new HorizontalConfigurationGroup();
-    device->addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
-    addChild(device);
-
         // Rescan button
     TransButtonSetting *rescan = new TransButtonSetting("rescan");
     rescan->setLabel(QObject::tr("Scan for audio devices"));
     rescan->setHelpText(QObject::tr("Scan for the available audio devices "
                                     "available. Custom entry will be scanned "
                                     "and capability entries populated."));
-    device->addChild(rescan);
+    addChild(rescan);
     connect(rescan, SIGNAL(pressed()), this, SLOT(AudioRescan()));
 
+    addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
+    
     QString name = m_OutputDevice->getValue();
     AudioOutput::AudioDeviceConfig *adc =
         AudioOutput::GetAudioDeviceConfig(name, name, true);
@@ -153,27 +151,26 @@ AudioConfigSettings::AudioConfigSettings() :
     m_DTSPassThrough = DTSPassThrough();
     TriggeredItem *subDTS = new TriggeredItem(m_triggerDTS, m_DTSPassThrough);
 
-    m_cgsettings = new VerticalConfigurationGroup();
-    m_cgsettings->setLabel(QObject::tr("Audio Processing Capabilities"));
-
-    ConfigurationGroup *subMPCM =
-        new VerticalConfigurationGroup(false, false);
+    m_triggerMPCM = new TransCheckBoxSetting();
     m_MPCM = MPCM();
-    subMPCM->addChild(m_MPCM);
+    TriggeredItem *subMPCM = new TriggeredItem(m_triggerMPCM, m_MPCM);
+
+    ConfigurationGroup *maingroup = new VerticalConfigurationGroup(false,
+                                                                   false);
+    addChild(maingroup);
+
+    m_cgsettings = new HorizontalConfigurationGroup();
+    m_cgsettings->setLabel(QObject::tr("Audio Capabilities"));
+
     m_cgsettings->addChild(subMPCM);
     m_cgsettings->addChild(subAC3);
     m_cgsettings->addChild(subDTS);
 
-    addChild(m_cgsettings);
+    maingroup->addChild(m_cgsettings);
 
-    addChild((m_MaxAudioChannels = MaxAudioChannels()));
-
-    ConfigurationGroup *group1 =
-        new VerticalConfigurationGroup(true, false);
-
-    group1->addChild((m_AudioUpmix = AudioUpmix()));
-    group1->addChild((m_AudioUpmixType = AudioUpmixType()));
-    addChild(group1);
+    maingroup->addChild((m_MaxAudioChannels = MaxAudioChannels()));
+    maingroup->addChild((m_AudioUpmix = AudioUpmix()));
+    maingroup->addChild((m_AudioUpmixType = AudioUpmixType()));
 
     Setting *advancedsettings = AdvancedAudioSettings();
     addChild(advancedsettings);
@@ -393,7 +390,7 @@ HostCheckBox *AudioConfigSettings::AudioUpmix()
     gc->setLabel(QObject::tr("Upconvert stereo to 5.1 surround"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("MythTV can upconvert stereo to 5.1 audio. "
-                                " Set this option to enable it by default. "
+                                "Set this option to enable it by default. "
                                 "You can enable or disable the upconversion"
                                 " during playback at anytime."));
     return gc;
@@ -402,13 +399,10 @@ HostCheckBox *AudioConfigSettings::AudioUpmix()
 HostComboBox *AudioConfigSettings::AudioUpmixType()
 {
     HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
-    gc->setLabel(QObject::tr("Upmix"));
-    gc->addSelection(QObject::tr("Fastest"), "0");
+    gc->setLabel(QObject::tr("Upmix Quality"));
     gc->addSelection(QObject::tr("Good"), "1");
     gc->addSelection(QObject::tr("Best"), "2", true);  // default
-    gc->setHelpText(QObject::tr("Set the audio surround-upconversion quality. "
-                                "'Fastest' is the least demanding on the CPU "
-                                "at the expense of quality."));
+    gc->setHelpText(QObject::tr("Set the audio surround-upconversion quality."));
     return gc;
 }
 
@@ -471,8 +465,7 @@ HostComboBox *AudioConfigSettings::SRCQuality()
     gc->setHelpText(QObject::tr("Set the quality of audio sample-rate "
                     "conversion. \"Good\" (default) provides the best "
                     "compromise between CPU usage and quality. \"Disabled\" "
-                    "lets the audio device handle sample-rate conversion. "
-                    "This only affects non-48kHz PCM audio."));
+                    "lets the audio device handle sample-rate conversion."
     return gc;
 }
 
