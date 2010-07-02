@@ -90,7 +90,7 @@ QString DisplayResScreen::toString() const
     return str;
 }
 
-QStringList DisplayResScreen::Convert(const std::vector<DisplayResScreen>& dsr)
+QStringList DisplayResScreen::Convert(const DisplayResVector& dsr)
 {
     QStringList slist;
     for (uint i=0; i<dsr.size(); ++i)
@@ -116,7 +116,7 @@ bool DisplayResScreen::compare_rates(double f1, double f2, double precision)
         return false;
 }
 
-int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
+int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                                     const DisplayResScreen& d,
                                     double& target_rate)
 {
@@ -141,13 +141,16 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
             {
                 while (!end)
                 {
-                    for (double precision = 0.001; precision < 1.0; precision *= 10.0)
+                    for (double precision = 0.001;
+                         precision < 1.0;
+                         precision *= 10.0)
                     {
                         for (uint j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(videorate,rates[j], precision) ||
-                                (fabs(videorate - fmod(rates[j],videorate)) <= precision) ||
+                                (fabs(videorate - fmod(rates[j],videorate))
+                                 <= precision) ||
                                 (fmod(rates[j],videorate) <= precision))
                             {
                                 target_rate = rates[j];
@@ -155,15 +158,19 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                             }
                         }
                     }
-                    // Can't find exact frame rate, so try rounding to the nearest integer, so 23.97Hz will work with 24Hz etc
-                    for (double precision = 0.01; precision < 2.0; precision *= 10.0)
+                    // Can't find exact frame rate, so try rounding to the
+                    // nearest integer, so 23.97Hz will work with 24Hz etc
+                    for (double precision = 0.01;
+                         precision < 2.0;
+                         precision *= 10.0)
                     {
                         double rounded = (double) ((int) (videorate + 0.5));
                         for (uint j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(rounded,rates[j], precision) ||
-                                (fabs(rounded - fmod(rates[j],rounded)) <= precision) ||
+                                (fabs(rounded - fmod(rates[j],rounded))
+                                 <= precision) ||
                                 (fmod(rates[j],rounded) <= precision))
                             {
                                 target_rate = rates[j];
@@ -185,4 +192,48 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
         }
     }
     return -1;
+}
+
+#define extract_key(key) { \
+        r = (key & ((1<<18) - 1)) / 1000.0; \
+        h = (key >> 18) & ((1<<16) - 1); \
+        w = (key >> 34) & ((1<<16) - 1); }
+
+uint64_t DisplayResScreen::FindBestScreen(const DisplayResMap& resmap,
+                                          int iwidth, int iheight, double frate)
+{
+    DisplayResMapCIt it;
+    int w, h;
+    double r;
+
+        // 1. search for exact match (width, height, rate)
+        // 2. search for resolution, ignoring rate
+        // 3. search for matching height and rate (or any rate if rate = 0)
+        // 4. search for 2x rate
+        // 5. search for 1x rate
+    for (it = resmap.begin(); it != resmap.end(); it++)
+    {
+        extract_key(it->first);
+        if (w == iwidth && h == iheight && compare_rates(frate, r, 0.01))
+            return it->first;
+    }
+    for (it = resmap.begin(); it != resmap.end(); it++)
+    {
+        extract_key(it->first);
+        if (w == iwidth && h == iheight && r == 0)
+            return it->first;
+    }
+    for (it = resmap.begin(); it != resmap.end(); it++)
+    {
+        extract_key(it->first);
+        if ((w == 0 && h == iheight &&
+             (compare_rates(frate, r, 0.01) || r == 0)) ||
+            (w == 0 && h == 0 && compare_rates(frate, r * 2.0, 0.01)) ||
+            (w == 0 && h == 0 && compare_rates(frate, r, 0.01)))
+        {
+            return it->first;
+        }
+    }
+    // not found
+    return 0;
 }

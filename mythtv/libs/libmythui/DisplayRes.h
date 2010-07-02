@@ -131,7 +131,7 @@ class MPUBLIC DisplayRes
     /// \brief Returns the pixel aspect ratio of the display.
     double GetPixelAspectRatio(void) const { return pixelAspectRatio; }
     /// \brief Returns all video modes supported by the display.
-    virtual const std::vector<DisplayResScreen>& GetVideoModes() const = 0;
+    virtual const DisplayResVector& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
     const std::vector<double> GetRefreshRates(int width, int height) const;
     /** @} */
@@ -172,6 +172,6 @@ class MPUBLIC DisplayRes
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
  */
-MPUBLIC const std::vector<DisplayResScreen> GetVideoModes(void);
+MPUBLIC const DisplayResVector GetVideoModes(void);
 
 #endif

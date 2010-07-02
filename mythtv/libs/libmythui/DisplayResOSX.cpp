@@ -125,7 +125,7 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
         int height  = get_int_CF(displayMode, kCGDisplayHeight);
         int refresh = get_int_CF(displayMode, kCGDisplayRefreshRate);
 
-        uint key = DisplayResScreen::CalcKey(width, height, 0.0);
+        uint64_t key = DisplayResScreen::CalcKey(width, height, 0.0);
 
     if (screen_map.find(key)==screen_map.end())
             screen_map[key] = DisplayResScreen(width, height,

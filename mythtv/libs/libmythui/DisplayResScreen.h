@@ -7,20 +7,34 @@
 
 #include <QString>
 
+#include <stdint.h>   // for uint64_t
+
 #include "mythexp.h"
+
+class DisplayResScreen;
+
+typedef std::vector<DisplayResScreen>     DisplayResVector;
+typedef DisplayResVector::iterator        DisplayResVectorIt;
+typedef DisplayResVector::const_iterator  DisplayResVectorCIt;
+
+typedef std::map<uint64_t, DisplayResScreen> DisplayResMap;
+typedef DisplayResMap::iterator           DisplayResMapIt;
+typedef DisplayResMap::const_iterator     DisplayResMapCIt;
 
 class MPUBLIC DisplayResScreen
 {
   public:
     // Constructors, initializers
     DisplayResScreen()
-        : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0), custom(false) {;}
+        : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0),
+        custom(false) {;}
     DisplayResScreen(int w, int h, int mw, int mh,
                      double aspectRatio/* = -1.0*/, double refreshRate/* = 0*/);
     DisplayResScreen(int w, int h, int mw, int mh,
                      const std::vector<double>& refreshRates);
     DisplayResScreen(int w, int h, int mw, int mh,
-                     const std::vector<double>& refreshRates, const std::map<double, short>& realrates);
+                     const std::vector<double>& refreshRates,
+                     const std::map<double, short>& realrates);
     DisplayResScreen(int w, int h, int mw, int mh,
                      const double* refreshRates, uint rr_length);
     DisplayResScreen(int w, int h, int mw, int mh,
@@ -46,14 +60,8 @@ class MPUBLIC DisplayResScreen
         refreshRates.push_back(rr);
         std::sort(refreshRates.begin(), refreshRates.end());
     }
-    void ClearRefreshRates(void)
-    {
-        refreshRates.clear();
-    }
-    void SetCustom(bool b)
-    {
-        custom = b;
-    }
+    void ClearRefreshRates(void) { refreshRates.clear(); }
+    void SetCustom(bool b) { custom = b; }
 
     // Map for matching real rates and xrandr rate;
     std::map<double, short> realRates;
@@ -64,13 +72,15 @@ class MPUBLIC DisplayResScreen
     inline bool operator == (const DisplayResScreen &b) const;
 
     // Statics
-    static QStringList Convert(const std::vector<DisplayResScreen>& dsr);
-    static std::vector<DisplayResScreen> Convert(const QStringList& slist);
-    static int FindBestMatch(const std::vector<DisplayResScreen>& dsr,
+    static QStringList Convert(const DisplayResVector& dsr);
+    static DisplayResVector Convert(const QStringList& slist);
+    static int FindBestMatch(const DisplayResVector& dsr,
                              const DisplayResScreen& d,
                              double& target_rate);
-    static inline int CalcKey(int w, int h, double rate);
+    static inline uint64_t CalcKey(int w, int h, double rate);
     static bool compare_rates(double f1, double f2, double precision = 0.01);
+    static uint64_t FindBestScreen(const DisplayResMap& resmap,
+                                   int iwidth, int iheight, double frate);
 
   private:
     int width, height; // size in pixels
@@ -79,14 +89,6 @@ class MPUBLIC DisplayResScreen
     std::vector<double> refreshRates;
     bool custom; // Set if resolution was defined manually
 };
-
-typedef std::vector<DisplayResScreen>          DisplayResVector;
-typedef DisplayResVector::iterator        DisplayResVectorIt;
-typedef DisplayResVector::const_iterator  DisplayResVectorCIt;
-
-typedef std::map<uint, class DisplayResScreen> DisplayResMap;
-typedef DisplayResMap::iterator           DisplayResMapIt;
-typedef DisplayResMap::const_iterator     DisplayResMapCIt;
 
 inline void DisplayResScreen::Init()
 {
@@ -126,10 +128,10 @@ inline bool DisplayResScreen::operator == (const DisplayResScreen &b) const
     return width == b.width && height == b.height;
 }  
 
-inline int DisplayResScreen::CalcKey(int w, int h, double rate)
+inline uint64_t DisplayResScreen::CalcKey(int w, int h, double rate)
 {
-    int irate = (int) (rate * 1000.0);
-    return (w << 19) | (h << 5) | irate;
+    uint64_t irate = (uint64_t) (rate * 1000.0);
+    return ((uint64_t)w << 34) | ((uint64_t)h << 18) | irate;
 }
 
 #endif // __DISPLAYRESCREEN_H__
