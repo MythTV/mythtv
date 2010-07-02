@@ -79,34 +79,53 @@ MythDownloadManager::~MythDownloadManager()
 void MythDownloadManager::run(void)
 {
     bool downloading = false;
+    bool itemsInQueue = false;
+    bool waitAnyway = false;
     m_queueThread = currentThread();
 
     QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
-                       SLOT(checkDownload(QNetworkReply*)));
+                       SLOT(downloadFinished(QNetworkReply*)));
 
     while (m_runThread)
     {
-        m_queueWaitLock.lock();
         m_infoLock->lock();
         downloading = !m_downloadInfos.isEmpty();
+        itemsInQueue = !m_downloadQueue.isEmpty();
         m_infoLock->unlock();
 
         if (downloading)
-        {
             QCoreApplication::processEvents();
-            m_queueWaitCond.wait(&m_queueWaitLock, 200);
-        }
-        else
+
+        if (!itemsInQueue || waitAnyway)
         {
-            m_queueWaitCond.wait(&m_queueWaitLock);
+            waitAnyway = false;
+            m_queueWaitLock.lock();
+
+            if (downloading)
+                m_queueWaitCond.wait(&m_queueWaitLock, 200);
+            else
+                m_queueWaitCond.wait(&m_queueWaitLock);
+
+            m_queueWaitLock.unlock();
         }
 
         m_infoLock->lock();
         if (!m_downloadQueue.isEmpty())
         {
-            DownloadInfo *dlInfo = m_downloadQueue.front();
+            MythDownloadInfo *dlInfo = m_downloadQueue.front();
+            QUrl qurl(dlInfo->m_url);
             m_downloadQueue.pop_front();
-            QUrl qurl(dlInfo->url);
+            if (m_downloadInfos.contains(qurl.toString()))
+            {
+                // Push request to the end of the queue to let others process.
+                // If this is the only item in the queue, force the loop to
+                // wait a little.
+                if (m_downloadQueue.isEmpty())
+                    waitAnyway = true;
+                m_downloadQueue.push_back(dlInfo);
+                m_infoLock->unlock();
+                continue;
+            }
             m_downloadInfos[qurl.toString()] = dlInfo;
 
             QNetworkRequest request(qurl);
@@ -115,17 +134,18 @@ void MythDownloadManager::run(void)
             request.setRawHeader("User-Agent",
                                  "MythDownloadManager v" MYTH_BINARY_VERSION);
 
-            if (!dlInfo->outFile.isEmpty() || dlInfo->data)
-                dlInfo->reply = m_manager->get(request);
+            if (!dlInfo->m_outFile.isEmpty() || dlInfo->m_data)
+                dlInfo->m_reply = m_manager->get(request);
             else
-                dlInfo->reply = m_manager->head(request);
-            m_downloadReplies[dlInfo->reply] = dlInfo;
+                dlInfo->m_reply = m_manager->head(request);
+            m_downloadReplies[dlInfo->m_reply] = dlInfo;
 
-            connect(dlInfo->reply, SIGNAL(downloadProgress(qint64, qint64)),
-                    this, SLOT(replyDownloadProgress(qint64, qint64))); 
+            connect(dlInfo->m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+                    SLOT(downloadError(QNetworkReply::NetworkError)));
+            connect(dlInfo->m_reply, SIGNAL(downloadProgress(qint64, qint64)),
+                    this, SLOT(downloadProgress(qint64, qint64))); 
         }
         m_infoLock->unlock();
-        m_queueWaitLock.unlock();
     }
 }
 
@@ -144,16 +164,11 @@ void MythDownloadManager::queueDownload(const QString &url,
 {
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("queueDownload('%1', '%2', %3)")
             .arg(url).arg(outFile).arg((long long)caller));
-    DownloadInfo *dlInfo = new DownloadInfo;
+    MythDownloadInfo *dlInfo = new MythDownloadInfo;
 
-    dlInfo->url      = url;
-    dlInfo->outFile  = outFile;
-    dlInfo->reply    = NULL;
-    dlInfo->data     = NULL;
-    dlInfo->caller   = caller;
-    dlInfo->lastStat = QDateTime::currentDateTime();
-    dlInfo->syncMode = false;
-    dlInfo->done     = false;
+    dlInfo->m_url      = url;
+    dlInfo->m_outFile  = outFile;
+    dlInfo->m_caller   = caller;
 
     QMutexLocker locker(m_infoLock);
     m_downloadQueue.push_back(dlInfo);
@@ -171,20 +186,7 @@ void MythDownloadManager::queueDownload(const QString &url,
  */
 bool MythDownloadManager::download(const QString &url, const QString &outFile)
 {
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("download('%1', '%2')")
-            .arg(url).arg(outFile));
-    DownloadInfo *dlInfo = new DownloadInfo;
-
-    dlInfo->url      = url;
-    dlInfo->outFile  = outFile;
-    dlInfo->reply    = NULL;
-    dlInfo->data     = NULL;
-    dlInfo->caller   = NULL;
-    dlInfo->lastStat = QDateTime::currentDateTime();
-    dlInfo->syncMode = true;
-    dlInfo->done     = false;
-
-    return downloadNow(dlInfo);
+    return download(url, outFile, NULL);
 }
 
 /** \fn MythDownloadManager::download(const QString &url,
@@ -198,70 +200,112 @@ bool MythDownloadManager::download(const QString &url, const QString &outFile)
  */
 bool MythDownloadManager::download(const QString &url, QByteArray *data)
 {
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("download('%1', %2)")
-            .arg(url).arg((long long)data));
-    DownloadInfo *dlInfo = new DownloadInfo;
+    return download(url, QString(), data);
+}
 
-    dlInfo->url      = url;
-    dlInfo->data     = data;
-    dlInfo->reply    = NULL;
-    dlInfo->caller   = NULL;
-    dlInfo->lastStat = QDateTime::currentDateTime();
-    dlInfo->syncMode = true;
-    dlInfo->done     = false;
+/** \fn MythDownloadManager::download(const QString &url,
+                                      const QString &outFile,
+                                      const QByteArray *data)
+ *  \brief Downloads a URI in blocking mode.
+ *  \param url     URI to download.
+ *  \param outFile Destination filename if data should be written to a file.
+ *  \param data    Destination QByteArray if data should not be saved to a file.
+ *  \return true if download was successful, false otherwise.
+ *  \sa queueDownload(const QString &url, const QString &outFile, QObject *caller)
+ *      download(const QString &url, const QString &outFile)
+ *      download(const QString &url, QByteArray *data)
+ */
+bool MythDownloadManager::download(const QString &url, const QString &outFile,
+                                   QByteArray *data)
+{
+    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("download('%1', '%2', %3)")
+            .arg(url).arg(outFile).arg((long long)data));
+    MythDownloadInfo *dlInfo = new MythDownloadInfo;
+
+    dlInfo->m_url      = url;
+    dlInfo->m_outFile  = outFile;
+    dlInfo->m_data     = data;
+    dlInfo->m_syncMode = true;
 
     return downloadNow(dlInfo);
 }
 
-/** \fn MythDownloadManager::downloadNow(DownloadInfo *dlInfo,
+/** \fn MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo,
                                          bool deleteInfo)
  *  \brief Download helper for download() blocking methods.
  *  \param dlInfo     Information on URI to download.
  *  \param deleteInfo Flag to indicate whether to delete the provided
- *                    DownloadInfo structure when done.
+ *                    MythDownloadInfo instance when done.
  *  \return true if download was successful, false otherwise.
  *  \sa download(const QString &url, const QString &outFile)
  *      download(const QString &url, QByteArray *data)
  */
-bool MythDownloadManager::downloadNow(DownloadInfo *dlInfo, bool deleteInfo)
+bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 {
+    dlInfo->m_syncMode = true;
+
     m_infoLock->lock();
     m_downloadQueue.push_back(dlInfo);
     m_infoLock->unlock();
     m_queueWaitCond.wakeAll();
 
-    int loops = 0;
+    // sleep for 200ms at a time for up to 20 seconds waiting for the download
     m_infoLock->lock();
-    while ((!dlInfo->done) &&
-           (dlInfo->lastStat.secsTo(QDateTime::currentDateTime()) < 20))
+    while ((!dlInfo->m_done) &&
+           (dlInfo->m_lastStat.secsTo(QDateTime::currentDateTime()) < 20))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
         m_queueWaitCond.wait(&m_queueWaitLock, 200);
-        loops++;
         m_queueWaitLock.unlock();
         m_infoLock->lock();
     }
     m_infoLock->unlock();
 
-    bool finished = dlInfo->done;
+    bool success =
+        dlInfo->m_done && (dlInfo->m_errorCode == QNetworkReply::NoError);
 
     if (deleteInfo)
         delete dlInfo;
 
-    if (finished)
-        return true;
-
-    return false;
+    return success;
 }
     
+/** \fn MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
+ *  \brief Slot to process download error events.
+ *  \param errorCode  error code
+ *  \sa redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedirectUrl)
+ */
+void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
+{
+    QNetworkReply *reply = (QNetworkReply*)sender();
+
+    VERBOSE(VB_FILE+VB_EXTRA, LOC +
+            QString("downloadError(%1) (for reply %2)")
+                    .arg(errorCode).arg((long long)reply));
+
+    QMutexLocker locker(m_infoLock);
+    if (!m_downloadReplies.contains(reply))
+    {
+        reply->deleteLater();
+        return;
+    }
+
+    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+
+    if (!dlInfo)
+        return;
+
+    dlInfo->m_errorCode = errorCode;
+}
+
 /** \fn MythDownloadManager::redirectUrl(const QUrl& possibleRedirectUrl,
                                          const QUrl& oldRedirectUrl)
  *  \brief Checks whether we were redirected to the given URL.
  *  \param possibleRedirectUrl Possible Redirect URL
  *  \param oldRedirectUrl      Old Redirect URL
  *  \return empty QUrl if we were not redirected, otherwise the redirected URL
- *  \sa checkDownload(QNetworkReply* reply)
+ *  \sa downloadFinished(QNetworkReply* reply)
  */
 QUrl MythDownloadManager::redirectUrl(const QUrl& possibleRedirectUrl,
                                       const QUrl& oldRedirectUrl) const
@@ -275,113 +319,126 @@ QUrl MythDownloadManager::redirectUrl(const QUrl& possibleRedirectUrl,
     return redirectUrl;
 }
 
-/** \fn MythDownloadManager::checkDownload(QNetworkReply* reply)
+/** \fn MythDownloadManager::downloadFinished(QNetworkReply* reply)
  *  \brief Slot to process download finished events.
  *  \param reply  QNetworkReply for completed download.
  *  \sa redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedirectUrl)
  */
-void MythDownloadManager::checkDownload(QNetworkReply* reply)
+void MythDownloadManager::downloadFinished(QNetworkReply* reply)
 {
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("checkDownload()"));
-    QVariant possibleRedirectUrl =
-         reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("downloadFinished(%1)")
+                                            .arg((long long)reply));
 
-    bool deleteReply = true;
-    QUrl urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
-                                       urlRedirectedTo);
-
-    if(!urlRedirectedTo.isEmpty())
+    QMutexLocker locker(m_infoLock);
+    if (!m_downloadReplies.contains(reply))
     {
-        if (m_downloadInfos.contains(reply->url().toString()))
-        {
-            DownloadInfo *dlInfo = m_downloadInfos[reply->url().toString()];
-            QNetworkRequest request(urlRedirectedTo);
-            request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
-                                 QNetworkRequest::PreferNetwork);
-            request.setRawHeader("User-Agent",
-                                 "MythDownloadManager v" MYTH_BINARY_VERSION);
-            dlInfo->reply = m_manager->get(request);
-            m_downloadReplies.remove(reply);
-            m_downloadReplies[dlInfo->reply] = dlInfo;
-        }
+        reply->deleteLater();
+        return;
+    }
+
+    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+
+    if (!dlInfo)
+        return;
+
+    QUrl possibleRedirectUrl =
+         reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+
+    dlInfo->m_redirectedTo = redirectUrl(possibleRedirectUrl, dlInfo->m_redirectedTo);
+
+    if(!dlInfo->m_redirectedTo.isEmpty())
+    {
         VERBOSE(VB_FILE+VB_EXTRA, LOC +
-                QString("checkDownload(): Redirect: %1 -> %2")
+                QString("downloadFinished(%1): Redirect: %2 -> %3")
+                        .arg((long long)reply)
                         .arg(reply->url().toString())
-                        .arg(urlRedirectedTo.toString()));
+                        .arg(dlInfo->m_redirectedTo.toString()));
+
+        QNetworkRequest request(dlInfo->m_redirectedTo);
+        request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                             QNetworkRequest::PreferNetwork);
+        request.setRawHeader("User-Agent",
+                             "MythDownloadManager v" MYTH_BINARY_VERSION);
+
+        if (!dlInfo->m_outFile.isEmpty() || dlInfo->m_data)
+            dlInfo->m_reply = m_manager->get(request);
+        else
+            dlInfo->m_reply = m_manager->head(request);
+
+        m_downloadReplies[dlInfo->m_reply] = dlInfo;
+
+        m_downloadReplies.remove(reply);
+        reply->deleteLater();
     }
     else
     {
-        VERBOSE(VB_FILE+VB_EXTRA, QString("checkDownload: COMPLETE: %1")
-                .arg(reply->url().toString()));
-        QMutexLocker locker(m_infoLock);
-        if (m_downloadInfos.contains(reply->url().toString()))
+        VERBOSE(VB_FILE+VB_EXTRA, QString("downloadFinished(%1): COMPLETE: %2")
+                .arg((long long)reply).arg(reply->url().toString()));
+
+        dlInfo->m_redirectedTo.clear();
+
+        if (dlInfo->m_data)
         {
-            DownloadInfo *dlInfo = m_downloadInfos[reply->url().toString()];
+            (*dlInfo->m_data) = reply->readAll();
+        }
+        else if (!dlInfo->m_outFile.isEmpty())
+        {
+            QByteArray data = reply->readAll();
+            saveFile(dlInfo->m_outFile, data);
+        }
 
-            if (dlInfo->data)
+        m_downloadInfos.remove(reply->url().toString());
+        m_downloadReplies.remove(reply);
+
+        dlInfo->m_done = true;
+
+        if (!dlInfo->m_syncMode)
+        {
+            if (dlInfo->m_caller)
             {
-                (*dlInfo->data) = reply->readAll();
-            }
-            else if (!dlInfo->outFile.isEmpty())
-            {
-                QByteArray data = reply->readAll();
-
-                if (!dlInfo->outFile.isEmpty())
-                    saveFile(dlInfo->outFile, data);
-            }
-
-            m_downloadInfos.remove(reply->url().toString());
-            m_downloadReplies.remove(reply);
-
-            dlInfo->done = true;
-            if (dlInfo->caller)
-            {
-                VERBOSE(VB_FILE+VB_EXTRA, QString("checkDownload: COMPLETE: %1,"
-                        "sending event to caller")
+                VERBOSE(VB_FILE+VB_EXTRA, QString("downloadFinished(%1): "
+                        "COMPLETE: %2, sending event to caller")
                         .arg(reply->url().toString()));
-                QCoreApplication::postEvent(dlInfo->caller,
-                    new MythEvent("DOWNLOAD_COMPLETE", QStringList(dlInfo->outFile)));
-
-                delete dlInfo;
+                QCoreApplication::postEvent(dlInfo->m_caller,
+                    new MythEvent("DOWNLOAD_COMPLETE", QStringList(dlInfo->m_outFile)));
             }
 
-            if (dlInfo->syncMode)
-                deleteReply = false;
+            delete dlInfo;
         }
 
         m_queueWaitCond.wakeAll();
     }
-
-    if (deleteReply)
-        reply->deleteLater();
 }
 
-/** \fn MythDownloadManager::replyDownloadProgress(qint64 bytesReceived,
-                                                   qint64 bytesTotal)
+/** \fn MythDownloadManager::downloadProgress(qint64 bytesReceived,
+                                              qint64 bytesTotal)
  *  \brief Slot to process download update events.
  *  \param bytesReceived Bytes received so far
  *  \param bytesTotal    Bytes total for the download, -1 if the total is unknown
  */
-void MythDownloadManager::replyDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
+void MythDownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("replyDownloadProgress(%1, %2)")
-            .arg(bytesReceived).arg(bytesTotal));
-
     QNetworkReply *reply = (QNetworkReply*)sender();
 
-    if (m_downloadReplies.contains(reply))
-    {
-        DownloadInfo *dlInfo = m_downloadReplies[reply];
+    VERBOSE(VB_FILE+VB_EXTRA, LOC +
+            QString("downloadProgress(%1, %2) (for reply %3)")
+                    .arg(bytesReceived).arg(bytesTotal).arg((long long)reply));
 
-        if (dlInfo)
-        {
-            dlInfo->lastStat = QDateTime::currentDateTime();
-            VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("replyDownloadProgress: %1 "
-                    "to %2 is at %3 of %4 bytes downloaded")
-                    .arg(dlInfo->url).arg(dlInfo->outFile)
-                    .arg(bytesReceived).arg(bytesTotal));
-        }
-    }
+    QMutexLocker locker(m_infoLock);
+    if (!m_downloadReplies.contains(reply))
+        return;
+
+    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+
+    if (!dlInfo)
+        return;
+
+    dlInfo->m_lastStat = QDateTime::currentDateTime();
+
+    VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("downloadProgress: %1 "
+            "to %2 is at %3 of %4 bytes downloaded")
+            .arg(dlInfo->m_url).arg(dlInfo->m_outFile)
+            .arg(bytesReceived).arg(bytesTotal));
 }
 
 /** \fn MythDownloadManager::saveFile(const QString &outFile,
@@ -446,28 +503,21 @@ bool MythDownloadManager::saveFile(const QString &outFile,
 /** \fn MythDownloadManager::GetLastModified(const QString &url)
  *  \brief Gets the Last Modified timestamp for a URI
  *  \param url    URI to test.
- *  \return Timestamp the URI was last modified
+ *  \return Timestamp the URI was last modified or now if an error occurred
  */
 QDateTime MythDownloadManager::GetLastModified(const QString &url)
 {
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetLastModified('%1')").arg(url));
-    DownloadInfo *dlInfo = new DownloadInfo;
-    QDateTime result;
+    MythDownloadInfo *dlInfo = new MythDownloadInfo;
+    QDateTime result = QDateTime::currentDateTime();
 
-    dlInfo->url      = url;
-    dlInfo->reply    = NULL;
-    dlInfo->data     = NULL;
-    dlInfo->caller   = NULL;
-    dlInfo->lastStat = QDateTime::currentDateTime();
-    dlInfo->syncMode = true;
-    dlInfo->done     = false;
+    dlInfo->m_url      = url;
+    dlInfo->m_syncMode = true;
 
-    bool success = downloadNow(dlInfo, false);
-
-    if (success && dlInfo->reply)
+    if (downloadNow(dlInfo, false) && dlInfo->m_reply)
     {
         QVariant lastMod =
-            dlInfo->reply->header(QNetworkRequest::LastModifiedHeader);
+            dlInfo->m_reply->header(QNetworkRequest::LastModifiedHeader);
         if (lastMod.isValid())
             result = lastMod.toDateTime();
     }
@@ -476,4 +526,6 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
 
     return result;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 

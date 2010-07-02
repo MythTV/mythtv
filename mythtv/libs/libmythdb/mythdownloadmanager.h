@@ -12,17 +12,38 @@
 
 #include "mythexp.h"
 
-typedef struct downloadInfo
+class MythDownloadInfo
 {
-    QString        url;
-    QNetworkReply *reply;
-    QString        outFile;
-    QByteArray    *data;
-    QObject       *caller;
-    QDateTime      lastStat;
-    bool           syncMode;
-    bool           done;
-} DownloadInfo;
+  public:
+    MythDownloadInfo() :
+        m_reply(NULL),
+        m_data(NULL),
+        m_caller(NULL),
+        m_lastStat(QDateTime::currentDateTime()),
+        m_syncMode(false),
+        m_done(false),
+        m_errorCode(QNetworkReply::NoError)
+    {
+    }
+
+   ~MythDownloadInfo()
+    {
+        if (m_reply)
+            m_reply->deleteLater();
+    }
+
+    QString        m_url;
+    QUrl           m_redirectedTo;
+    QNetworkReply *m_reply;
+    QString        m_outFile;
+    QByteArray    *m_data;
+    QObject       *m_caller;
+    QDateTime      m_lastStat;
+    bool           m_syncMode;
+    bool           m_done;
+
+    QNetworkReply::NetworkError m_errorCode;
+};
 
 class MPUBLIC MythDownloadManager : public QThread
 {
@@ -44,11 +65,16 @@ class MPUBLIC MythDownloadManager : public QThread
     QDateTime GetLastModified(const QString &url);
 
   private slots:
-    void checkDownload(QNetworkReply* reply);
-    void replyDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    // QNetworkAccessManager signals
+    void downloadFinished(QNetworkReply* reply);
+
+    // QNetworkReply signals
+    void downloadError(QNetworkReply::NetworkError errorCode);
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
   private:
-    bool downloadNow(DownloadInfo *dlInfo, bool deleteInfo = true);
+    bool download(const QString &url, const QString &dest, QByteArray *data);
+    bool downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo = true);
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
                      const QUrl& oldRedirectUrl) const;
 
@@ -61,9 +87,9 @@ class MPUBLIC MythDownloadManager : public QThread
     QMutex                                        m_queueWaitLock;
 
     QMutex                                       *m_infoLock;
-    QMap <QString, struct downloadInfo*>          m_downloadInfos;
-    QMap <QNetworkReply*, struct downloadInfo*>   m_downloadReplies;
-    QList <struct downloadInfo*>                  m_downloadQueue;
+    QMap <QString, MythDownloadInfo*>             m_downloadInfos;
+    QMap <QNetworkReply*, MythDownloadInfo*>      m_downloadReplies;
+    QList <MythDownloadInfo*>                     m_downloadQueue;
 
     QThread                                      *m_queueThread;
 
@@ -73,3 +99,6 @@ class MPUBLIC MythDownloadManager : public QThread
 MPUBLIC MythDownloadManager *GetMythDownloadManager(void);
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
+
