@@ -332,11 +332,6 @@ has_header()
     expr $HAS_IT : "yes" > /dev/null
 }
 
-is_qmake4()
-{
-    $1 --version 2>&1 | grep -q "Qt version 4"
-}
-
 check_py_lib(){
     log check_py_lib "$@"
     check_cmd $python <<EOF
@@ -349,13 +344,16 @@ sys.exit(0)
 EOF
 }
 
+is_qmake4(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
+}
+
 if ! is_qmake4 $qmake; then
-    if is_qmake4 qmake-qt4; then
-        qmake=qmake-qt4
-    else
-        echo "qmake for Qt4 not found. Please specify the correct qmake with --qmake="
-        exit 1
-    fi
+    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.5 or newer not found.\nPlease specify the correct qmake with --qmake="
+fi
+
+if ! expr $($qmake -query QT_VERSION) : "4\.[5-9]\.[0-9]" >/dev/null; then
+    die "Qt4.5 or newer is required to build MythTV."
 fi
 
 if test "$opengl" != "no" ; then
