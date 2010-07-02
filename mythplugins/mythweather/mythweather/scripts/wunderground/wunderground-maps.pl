@@ -12,19 +12,13 @@ use lib dirname(abs_path($0 or $PROGRAM_NAME)),
         '/usr/local/share/mythtv/mythweather/scripts/wunderground';
 
 use utf8;
-use LWP::UserAgent;
 use Getopt::Std;
-use URI::Escape;
-use XML::XPath;
-use XML::XPath::XMLParser;
 use POSIX qw(strftime);
-use File::Path;
-use Image::Size;
 
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'wunderground-maps';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
@@ -84,10 +78,6 @@ if (defined $opt_t) {
     exit 0;
 }
 
-my $base_url = "http://radblast-mi.wunderground.com/cgi-bin/radar/".
-               "WUNIDS_map?station=%s&type=N0R&noclutter=0&showlabels=1&".
-               "rainsnow=1&num=1";
-
 # we get here, we're doing an actual retrieval, everything must be defined
 my $loc = uc shift;
 if ( not defined $loc or $loc eq "" ) {
@@ -97,11 +87,6 @@ if ( not defined $loc or $loc eq "" ) {
 my %attrib;
 
 log_print( $logdir, "-d $dir $loc\n" );
-
-my $url = sprintf( $base_url, $loc );
-
-getCachedFile($url, $dir, $loc . "-static.gif", $updateTimeout, $logdir);
-
 
 my $search = qr{(?i)^$loc,(.*?)$};
 my @names;
@@ -114,10 +99,9 @@ close $fh;
 
 $attrib{"smdesc"} = join( " / ", @names) . " Static Radar Map";
 
-$attrib{"map"} = "$dir/$loc-static.gif";
-
-my ($x, $y) = imgsize( $attrib{"map"} );
-$attrib{"map"} .= "-${x}x$y" if ($x and $y);
+$attrib{"map"} = "http://radblast-mi.wunderground.com/cgi-bin/radar/".
+                 "WUNIDS_map?station=$loc&type=N0R&noclutter=0&showlabels=1&".
+                 "rainsnow=1&num=1";
 
 $attrib{"copyright"}  = "Weather data courtesy of Weather Underground, Inc.";
 

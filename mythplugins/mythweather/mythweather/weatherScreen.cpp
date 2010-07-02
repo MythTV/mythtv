@@ -223,8 +223,6 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
 
 QString WeatherScreen::prepareDataItem(const QString &key, const QString &value)
 {
-//    (void) key;
-//    return value;
     return formatDataItem(key, value);
 }
 
@@ -251,30 +249,8 @@ StaticImageScreen::StaticImageScreen(MythScreenStack *parent,
 QString StaticImageScreen::prepareDataItem(const QString &key,
                                            const QString &value)
 {
-    QString ret = value;
-    if (key == "map")
-    {
-        /*
-         * Image value format:
-         * /path/to/file-WIDTHxHEIGHT
-         * if no dimension, scale to max size
-         */
-        bool hasdim = (value.lastIndexOf('-') > value.lastIndexOf('/'));
-        if (hasdim)
-        {
-            QString tmp =
-                value.right(value.length() - value.lastIndexOf('-') - 1);
-            QStringList dim = tmp.split('x');
-            ret = value.left(value.lastIndexOf('-'));
-            if (dim.size() >= 2 && dim[0].toInt() && dim[1].toInt())
-            {
-                m_imgsize.setWidth(dim[0].toInt());
-                m_imgsize.setHeight(dim[1].toInt());
-            }
-        }
-    }
-
-    return ret;
+    (void)key;
+    return value;
 }
 
 void StaticImageScreen::prepareWidget(MythUIType *widget)
@@ -294,26 +270,6 @@ QString AnimatedImageScreen::prepareDataItem(const QString &key,
     QString ret = value;
     if (key == "animatedimage")
     {
-        /*
-         * Image value format:
-         * /path/to/file-IMAGECOUNT-WIDTHxHEIGHT
-         * if no dimension, scale to max size
-         */
-
-        bool hasdim = value.indexOf(QRegExp("-[0-9]{1,}x[0-9]{1,}$"));
-        if (hasdim)
-        {
-            QString tmp = value.right(
-                value.length() - value.lastIndexOf('-') - 1);
-            QStringList dim = tmp.split('x');
-            ret = value.left(value.lastIndexOf('-'));
-            if (dim.size() >= 2 && dim[0].toInt() && dim[1].toInt())
-            {
-                m_imgsize.setWidth(dim[0].toInt());
-                m_imgsize.setHeight(dim[1].toInt());
-            }
-        }
-
         QString cnt = ret.right(ret.length() - ret.lastIndexOf('-') - 1);
         m_count = cnt.toInt();
         ret = ret.left(ret.lastIndexOf('-'));

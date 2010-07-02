@@ -100,7 +100,6 @@ class StaticImageScreen : public WeatherScreen
     void prepareWidget(MythUIType *widget);
 
   private:
-    QSize m_imgsize;
 };
 
 class AnimatedImageScreen : public WeatherScreen
@@ -117,7 +116,6 @@ class AnimatedImageScreen : public WeatherScreen
 
   private:
     int m_count;
-    QSize m_imgsize;
 };
 
 #endif
