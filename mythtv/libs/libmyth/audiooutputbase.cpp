@@ -317,8 +317,17 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
         else
         {
-            configured_channels = (upmix_default && lsource_channels == 2) ?
-                                        max_channels : lsource_channels;
+            // if source was mono, and hardware doesn't support it
+            // we will upmix it to stereo (can safely assume hardware supports
+            // stereo)
+            if (lsource_channels == 1 &&
+                !output_settings->IsSupportedChannels(1))
+            {
+                configured_channels = 2;
+            }
+            else
+                configured_channels = (upmix_default && lsource_channels == 2) ?
+                    max_channels : lsource_channels;
         }
 
         /* Might we reencode a bitstream that's been decoded for timestretch?
