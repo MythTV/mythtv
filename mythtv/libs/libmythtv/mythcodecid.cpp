@@ -314,6 +314,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG1_VLD:
         case kCodec_MPEG1_DVDV:
         case kCodec_MPEG1_VDPAU:
+        case kCodec_MPEG1_VAAPI:
         case kCodec_MPEG2:
         case kCodec_MPEG2_XVMC:
         case kCodec_MPEG2_IDCT:
@@ -348,6 +349,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H264_VLD:
         case kCodec_H264_DVDV:
         case kCodec_H264_VDPAU:
+        case kCodec_H264_VAAPI:
             return "H.264";
 
         case kCodec_NONE:
@@ -355,6 +357,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_STD_XVMC_END:
         case kCodec_VLD_END:
         case kCodec_DVDV_END:
+        case kCodec_VDPAU_END:
+        case kCodec_VAAPI_END:
             return QString::null;
     }
 
