@@ -1123,11 +1123,6 @@ void MythMainWindow::SetDrawEnabled(bool enable)
         d->drawTimer->start(1000 / 70);
     else
         d->drawTimer->stop();
-
-    // TODO FIXME
-    // Sleep 50 ms to give any in progress draw a chance to finish.
-    // This should be replaced with something sane after MythTV 0.22
-    usleep(50 * 1000);
 }
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
