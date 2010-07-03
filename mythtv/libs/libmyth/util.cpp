@@ -1277,7 +1277,8 @@ bool IsPulseAudioRunning(void)
 #endif
     bool res = myth_system(command,
                            MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                           MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+                           MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
+                           MYTH_SYSTEM_DONT_BLOCK_PARENT);
     return !res;
 }
 
