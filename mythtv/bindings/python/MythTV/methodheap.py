@@ -12,7 +12,7 @@ from utility import databaseSearch
 from database import DBCache
 from mythproto import BEEvent, FileOps, Program
 from dataheap import Record, Recorded, RecordedProgram, \
-                     OldRecorded, Job, Guide, Video, \
+                     OldRecorded, Job, Guide, Video, Channel, \
                      InternetSource, InternetContentArticles
 
 import re
