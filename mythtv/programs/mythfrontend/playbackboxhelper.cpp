@@ -71,19 +71,101 @@ class PBHEventHandler : public QObject
 {
   public:
     PBHEventHandler(PlaybackBoxHelper &pbh) :
-        m_pbh(pbh), m_freeSpaceTimerId(0)
+        m_pbh(pbh), m_freeSpaceTimerId(0), m_checkAvailabilityTimerId(0)
     {
         StorageGroup::ClearGroupToUseCache();
     }
     virtual bool event(QEvent*); // QObject
     void UpdateFreeSpaceEvent(void);
+    AvailableStatusType CheckAvailability(const QStringList &slist);
     PlaybackBoxHelper &m_pbh;
     int m_freeSpaceTimerId;
+    int m_checkAvailabilityTimerId;
     static const uint kUpdateFreeSpaceInterval;
     QMap<QString, QStringList> m_fileListCache;
+    QHash<QString, QStringList> m_checkAvailability;
 };
 
 const uint PBHEventHandler::kUpdateFreeSpaceInterval = 15000; // 15 seconds
+
+AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
+{
+    QTime tm = QTime::currentTime();
+
+    QStringList::const_iterator it = slist.begin();
+    ProgramInfo evinfo(it, slist.end());
+    QSet<CheckAvailabilityType> cats;
+    for (; it != slist.end(); ++it)
+        cats.insert((CheckAvailabilityType)(*it).toUInt());
+
+    {
+        QMutexLocker locker(&m_pbh.m_lock);
+        QHash<QString, QStringList>::iterator it =
+            m_checkAvailability.find(evinfo.MakeUniqueKey());
+        if (it != m_checkAvailability.end())
+            m_checkAvailability.erase(it);
+        if (m_checkAvailability.empty())
+            killTimer(m_checkAvailabilityTimerId);
+    }
+
+    if (cats.empty())
+        return asFileNotFound;
+
+    AvailableStatusType availableStatus = asAvailable;
+    if (!evinfo.HasPathname() && !evinfo.GetChanID())
+        availableStatus = asFileNotFound;
+    else
+    {
+        // Note IsFileReadable() implicitly calls GetPlaybackURL
+        // when necessary, we rely on this.
+        if (!evinfo.IsFileReadable())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("CHECK_AVAILABILITY '%1' "
+                            "file not found")
+                    .arg(evinfo.GetPathname()));
+            availableStatus = asFileNotFound;
+        }
+        else if (!evinfo.GetFilesize())
+        {
+            evinfo.SetFilesize(evinfo.QueryFilesize());
+            if (!evinfo.GetFilesize())
+            {
+                availableStatus =
+                    (evinfo.GetRecordingStatus() == rsRecording) ?
+                    asNotYetAvailable : asZeroByte;
+            }
+        }
+    }
+
+    QStringList list;
+    list.push_back(evinfo.MakeUniqueKey());
+    list.push_back(evinfo.GetPathname());
+    MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
+    QCoreApplication::postEvent(m_pbh.m_listener, e0);
+
+    list.clear();
+    list.push_back(evinfo.MakeUniqueKey());
+    list.push_back(QString::number((int)*cats.begin()));
+    list.push_back(QString::number((int)availableStatus));
+    list.push_back(QString::number(evinfo.GetFilesize()));
+    list.push_back(QString::number(tm.hour()));
+    list.push_back(QString::number(tm.minute()));
+    list.push_back(QString::number(tm.second()));
+    list.push_back(QString::number(tm.msec()));
+
+    QSet<CheckAvailabilityType>::iterator cit = cats.begin();
+    for (; cit != cats.end(); ++cit)
+    {
+        if (*cit == kCheckForCache && cats.size() > 1)
+            continue;
+        list[1] = QString::number((int)*cit);
+        MythEvent *e = new MythEvent("AVAILABILITY", list);
+        QCoreApplication::postEvent(m_pbh.m_listener, e);
+    }
+
+    return availableStatus;
+}
 
 bool PBHEventHandler::event(QEvent *e)
 {
@@ -93,6 +175,20 @@ bool PBHEventHandler::event(QEvent *e)
         const int timer_id = te->timerId();
         if (timer_id == m_freeSpaceTimerId)
             UpdateFreeSpaceEvent();
+        if (timer_id == m_checkAvailabilityTimerId)
+        {
+            QStringList slist;
+            {
+                QMutexLocker locker(&m_pbh.m_lock);
+                QHash<QString, QStringList>::iterator it =
+                    m_checkAvailability.begin();
+                if (it != m_checkAvailability.end())
+                    slist = *it;
+            }
+
+            if (slist.size() >= 1 + NUMPROGRAMLINES)
+                CheckAvailability(slist);
+        }
         return true;
     }
     else if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
@@ -181,88 +277,37 @@ bool PBHEventHandler::event(QEvent *e)
         else if (me->Message() == "GET_PREVIEW")
         {
             ProgramInfo evinfo(me->ExtraDataList());
-            if (evinfo.HasPathname() && evinfo.IsFileReadable())
+            if (!evinfo.HasPathname())
+                return true;
+
+            QStringList list;
+            evinfo.ToStringList(list);
+            list += QString::number(kCheckForCache);
+            if (asAvailable != CheckAvailability(list))
+                return true;
+
+            QString fn = m_pbh.GeneratePreviewImage(evinfo);
+            if (!fn.isEmpty())
             {
-                // Note: IsFileReadable() implicitly calls GetPlaybackURL()
-                // when necessary, so we might as well update the pathname
-                // in the PBB cache to avoid calling this again...
                 QStringList list;
                 list.push_back(evinfo.MakeUniqueKey());
-                list.push_back(evinfo.GetPathname());
-                MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
-                QCoreApplication::postEvent(m_pbh.m_listener, e0);
-
-                QString fn = m_pbh.GeneratePreviewImage(evinfo);
-                if (!fn.isEmpty())
-                {
-                    QStringList list;
-                    list.push_back(evinfo.MakeUniqueKey());
-                    list.push_back(fn);
-                    MythEvent *e = new MythEvent("PREVIEW_READY", list);
-                    QCoreApplication::postEvent(m_pbh.m_listener, e);
-                }
+                list.push_back(fn);
+                MythEvent *e = new MythEvent("PREVIEW_READY", list);
+                QCoreApplication::postEvent(m_pbh.m_listener, e);
             }
 
             return true;
         }
         else if (me->Message() == "CHECK_AVAILABILITY")
         {
-            if (me->ExtraDataCount() < 5 + NUMPROGRAMLINES)
-                return true;
-
-            QStringList slist = me->ExtraDataList();
-            CheckAvailabilityType cat = (CheckAvailabilityType)
-                slist[0].toUInt();
-            QTime tm;
-            tm.setHMS(slist[1].toUInt(), slist[2].toUInt(),
-                      slist[3].toUInt(), slist[4].toUInt());
-
-            QStringList::const_iterator it = slist.begin() + 5;
-            ProgramInfo evinfo(it, slist.end());
-            if (!evinfo.HasPathname() && !evinfo.GetChanID())
-                return true;
-
-            AvailableStatusType availableStatus = asAvailable;
-            // Note IsFileReadable() implicitly calls GetPlaybackURL
-            // when necessary, we rely on this.
-            if (!evinfo.IsFileReadable())
+            if (me->ExtraData(0) != QString::number(kCheckForCache))
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("CHECK_AVAILABILITY '%1' "
-                                "file not found")
-                        .arg(evinfo.GetPathname()));
-                availableStatus = asFileNotFound;
+                if (m_checkAvailabilityTimerId)
+                    killTimer(m_checkAvailabilityTimerId);
+                m_checkAvailabilityTimerId = startTimer(0);
             }
-            else if (!evinfo.GetFilesize())
-            {
-                evinfo.SetFilesize(evinfo.QueryFilesize());
-                if (!evinfo.GetFilesize())
-                {
-                    availableStatus =
-                        (evinfo.GetRecordingStatus() == rsRecording) ?
-                        asNotYetAvailable : asZeroByte;
-                }
-            }
-
-            QStringList list;
-            list.push_back(evinfo.MakeUniqueKey());
-            list.push_back(evinfo.GetPathname());
-            MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
-            QCoreApplication::postEvent(m_pbh.m_listener, e0);
-
-            list.clear();
-            list.push_back(evinfo.MakeUniqueKey());
-            list.push_back(QString::number((int)cat));
-            list.push_back(QString::number((int)availableStatus));
-            list.push_back(QString::number(evinfo.GetFilesize()));
-            list.push_back(QString::number(tm.hour()));
-            list.push_back(QString::number(tm.minute()));
-            list.push_back(QString::number(tm.second()));
-            list.push_back(QString::number(tm.msec()));
-            MythEvent *e = new MythEvent("AVAILABILITY", list);
-            QCoreApplication::postEvent(m_pbh.m_listener, e);
-
-            return true;
+            else if (!m_checkAvailabilityTimerId)
+                m_checkAvailabilityTimerId = startTimer(50);
         }
         else if (me->Message() == "LOCATE_ARTWORK")
         {
@@ -528,14 +573,22 @@ uint64_t PlaybackBoxHelper::GetFreeSpaceUsedMB(void) const
 void PlaybackBoxHelper::CheckAvailability(
     const ProgramInfo &pginfo, CheckAvailabilityType cat)
 {
-    QTime tm = QTime::currentTime();
-    QStringList list(QString::number((int)cat));
-    list.push_back(QString::number(tm.hour()));
-    list.push_back(QString::number(tm.minute()));
-    list.push_back(QString::number(tm.second()));
-    list.push_back(QString::number(tm.msec()));
-    pginfo.ToStringList(list);
-    MythEvent *e = new MythEvent("CHECK_AVAILABILITY", list);
+    QString catstr = QString::number((int)cat);
+    QMutexLocker locker(&m_lock);
+    QHash<QString, QStringList>::iterator it =
+        m_eventHandler->m_checkAvailability.find(pginfo.MakeUniqueKey());
+    if (it == m_eventHandler->m_checkAvailability.end())
+    {
+        QStringList list;
+        pginfo.ToStringList(list);
+        list += catstr;
+        m_eventHandler->m_checkAvailability[pginfo.MakeUniqueKey()] = list;
+    }
+    else
+    {
+        (*it).push_back(catstr);
+    }
+    MythEvent *e = new MythEvent("CHECK_AVAILABILITY", QStringList(catstr));
     QCoreApplication::postEvent(m_eventHandler, e);        
 }
 
