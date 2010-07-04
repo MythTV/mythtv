@@ -611,7 +611,7 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
             // bookmark changes.
             previewLastModified = finfo.lastModified();
         }
-        else
+        else if (!IsGeneratingPreview(filename))
         {
             previewLastModified =
                 RemoteGetPreviewIfModified(pginfo, ret_file);

@@ -695,7 +695,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     updateIcons();
 }
 
-void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo)
+void PlaybackBox::UpdateUIListItem(
+    ProgramInfo *pginfo, bool force_preview_reload)
 {
     if (!pginfo)
         return;
@@ -707,7 +708,7 @@ void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo)
     {
         MythUIButtonListItem *sel_item =
             m_recordingList->GetItemCurrent();
-        UpdateUIListItem(item, item == sel_item, true);
+        UpdateUIListItem(item, item == sel_item, force_preview_reload);
     }
     else
     {
@@ -3874,7 +3875,7 @@ void PlaybackBox::customEvent(QEvent *event)
             }
 
             if (old_avail != availableStatus)
-                UpdateUIListItem(pginfo);
+                UpdateUIListItem(pginfo, true);
         }
         else if ((message == "PLAY_PLAYLIST") && !m_playListPlay.empty())
         {
@@ -4031,7 +4032,7 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
     {
         ProgramInfo *dst = FindProgramInUILists(evinfo);
         if (dst)
-            UpdateUIListItem(dst);
+            UpdateUIListItem(dst, false);
         return;
     }
 
@@ -4045,7 +4046,7 @@ void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
 
     ProgramInfo *dst = FindProgramInUILists(chanid, recstartts);
     if (dst)
-        UpdateUIListItem(dst);
+        UpdateUIListItem(dst, false);
 }
 
 void PlaybackBox::ScheduleUpdateUIList(void)

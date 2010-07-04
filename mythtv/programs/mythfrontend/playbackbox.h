@@ -312,7 +312,8 @@ class PlaybackBox : public ScheduleCommon
 
     void SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo);
     void UpdateUIListItem(
-        ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists);
+        ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists,
+        bool force_preview_reload);
     void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
                           bool force_preview_reload = false);
 
