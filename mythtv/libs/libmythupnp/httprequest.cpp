@@ -1118,6 +1118,8 @@ bool HTTPRequest::ParseRange( QString sRange,
                               long long *pllStart,
                               long long *pllEnd   )
 {
+    char *endptr;
+
     // ----------------------------------------------------------------------
     // -=>TODO: Only handle 1 range at this time... should make work with full spec.
     // ----------------------------------------------------------------------
@@ -1180,9 +1182,9 @@ bool HTTPRequest::ParseRange( QString sRange,
         // ------------------------------------------------------------------
 
         QByteArray tmp = parts[0].toAscii();
-        *pllStart = strtoll(tmp.constData(), NULL, 10);
+        *pllStart = strtoll(tmp.constData(), &endptr, 10);
 
-        if (*pllStart == 0)
+        if (*endptr != 0)
             return false;
 
         *pllEnd   = llSize - 1;
