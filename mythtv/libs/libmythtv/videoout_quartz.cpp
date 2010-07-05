@@ -1172,6 +1172,12 @@ void VideoOutputQuartz::MoveResize(void)
     }
 }
 
+void VideoOutputQuartz::ToggleAspectOverride(AspectOverrideMode aspectMode)
+{ 
+    VideoOutput::ToggleAspectOverride(aspectMode); 
+    MoveResize(); 
+}
+
 bool VideoOutputQuartz::InputChanged(const QSize &input_size,
                                      float        aspect,
                                      MythCodecID  av_codec_id,

@@ -24,6 +24,7 @@ class VideoOutputQuartz : public VideoOutput
     void Show(FrameScanType);
 
     void SetVideoFrameRate(float playback_fps);
+    void ToggleAspectOverride(AspectOverrideMode aspectMode);
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
