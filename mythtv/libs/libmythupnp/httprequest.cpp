@@ -92,6 +92,7 @@ static MIMETypes g_MIMETypes[] =
     { "ogg" , "audio/ogg"                  },
     // Similarly, this could be audio/flac or application/flac:
     { "flac", "audio/x-flac"               },
+    { "m4a" , "audio/x-m4a"                },
 };
 
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
