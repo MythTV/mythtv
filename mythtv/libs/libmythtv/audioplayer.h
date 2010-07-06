@@ -21,6 +21,7 @@ class MPUBLIC AudioPlayer
                          int samplerate, bool passthru);
     void  SetEffDsp(int dsprate);
 
+    void  CheckFormat(void);
     void  SetNoAudio(void)        { no_audio_out = true;  }
     bool  HasAudioIn(void) const  { return !no_audio_in;  }
     bool  HasAudioOut(void) const { return !no_audio_out; }

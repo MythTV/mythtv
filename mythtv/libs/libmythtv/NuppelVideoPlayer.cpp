@@ -996,6 +996,8 @@ int NuppelVideoPlayer::OpenFile(uint retries, bool allow_libmpeg2)
         return -1;
     }
 
+    audio.CheckFormat();
+    
     if (ret > 0)
     {
         hasFullPositionMap = true;

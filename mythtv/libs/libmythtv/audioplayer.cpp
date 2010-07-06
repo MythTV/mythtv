@@ -109,6 +109,12 @@ QString AudioPlayer::ReinitAudio(void)
     return errMsg;
 }
 
+void AudioPlayer::CheckFormat(void)
+{
+    if (m_format == FORMAT_NONE)
+        no_audio_in = no_audio_out = true;
+}
+
 bool AudioPlayer::Pause(bool pause)
 {
     bool result = false;
