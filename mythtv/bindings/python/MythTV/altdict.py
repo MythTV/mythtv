@@ -26,8 +26,6 @@ class OrdDict( dict ):
             except KeyError:
                 raise AttributeError(str(name))
 
-#    def __getitem__(self, key):
-
     def __setattr__(self, name, value):
         if (name in self.__dict__) or (name in self._localvars):
             self.__dict__[name] = value
@@ -65,7 +63,7 @@ class OrdDict( dict ):
         return iter(self._field_order)
 
     def values(self):
-        return list(self.itervalues())        
+        return list(self.itervalues())
 
     def itervalues(self):
         return imap(self.get, self.iterkeys())
@@ -123,6 +121,10 @@ class DictData( OrdDict ):
         dict.update(self, data)
 
     def _process(self, data):
+        """
+        Accepts a list of data, processes according to specified types,
+            and returns a dictionary
+        """
         if self._field_type != 'Pass':
             if len(data) != len(self._field_type):
                 raise MythError('Incorrect raw input length to DictData()')
@@ -143,6 +145,10 @@ class DictData( OrdDict ):
         return dict(zip(self._field_order,data))
 
     def _deprocess(self):
+        """
+        Returns the internal data back out in the format
+            of the original raw list.
+        """
         data = self.values()
         if self._field_type != 'Pass':
             for i in xrange(len(data)):
@@ -163,11 +169,12 @@ class DictData( OrdDict ):
         return data
 
     def _fillNone(self):
-        """Fills out dictionary fields with empty data"""
+        """Fills out dictionary fields with empty data."""
         field_order = self._field_order
         dict.update(self, zip(field_order, [None]*len(field_order)))
 
-    def copy(self):
+    def copy(self): 
+        """Returns a deep copy of itself."""
         return self.__class__(zip(self.iteritems()), _process=False)
 
 class DictInvert(dict):

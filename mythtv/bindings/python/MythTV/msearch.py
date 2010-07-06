@@ -30,11 +30,13 @@ class MSearch( object ):
         """
         obj.search(timeout=5.0, filter=None) -> response dicts
 
-            timeout -- in seconds
-            filter -- optional list of ST strings to search for
-            response -- a generator returning dicts with the following fields
-                content-length,     usn,    request,    ext,    st
-                server,      location,      cache-control,      date
+          IN:
+            timeout  -- in seconds
+            filter   -- optional list of ST strings to search for
+          OUT:
+            response -- a generator returning dicts containing the fields
+                content-length,   request,   date,   usn,    location,
+                cache-control,    server,    ext,    st
         """
         sock = self.sock
         sreq = '\r\n'.join(['M-SEARCH * HTTP/1.1',
@@ -43,8 +45,6 @@ class MSearch( object ):
                             'MX: %d' % timeout,
                             'ST: ssdp:all',''])
         self._runsearch = True
-        #reLOC = re.compile('http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
-
         # spam the request a couple times
         [sock.sendto(sreq, self.dest) for i in range(3)]
 
@@ -72,7 +72,18 @@ class MSearch( object ):
             yield sdict
 
     def searchMythBE(self, timeout=5.0):
-        """Custom search that filters for mythbackend."""
+        """
+        obj.searchMythBE(timeout=5.0) -> response dicts
+
+            Filters responses for those from `mythbackend`.
+
+          IN:
+            timeout  -- in seconds
+          OUT:
+            response -- a generator returning dicts containing the fields
+                content-length,   request,   date,   usn,    location,
+                cache-control,    server,    ext,    st
+        """
         location = []
         for res in self.search(timeout, (\
                 'urn:schemas-mythtv-org:device:MasterMediaServer:1',
@@ -82,7 +93,18 @@ class MSearch( object ):
                 yield res
 
     def searchMythFE(self, timeout=5.0):
-        """Custom search that filters for mythfrontend."""
+        """
+        obj.searchMythFE(timeout=5.0) -> response dicts
+
+            Filters responses for those from `mythfrontend`.
+
+          IN:
+            timeout  -- in seconds
+          OUT:
+            response -- a generator returning dicts containing the fields
+                content-length,   request,   date,   usn,    location,
+                cache-control,    server,    ext,    st
+        """
         location = []
         for res in self.search(timeout, \
                 'urn:schemas-upnp-org:device:MediaRenderer:1'):
@@ -93,6 +115,9 @@ class MSearch( object ):
                 yield res
 
     def terminateSearch(self):
-        """Prematurely terminate an in-progress search."""
+        """
+        Prematurely terminate an running search prior
+            to the specified timeout.
+        """
         self._runsearch = False
 

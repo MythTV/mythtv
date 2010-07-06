@@ -7,7 +7,7 @@ Provides data access classes for accessing and managing MythTV data
 from static import *
 from exceptions import *
 from altdict import DictData, DictInvertCI
-from database import DBCache, DBData, DBDataWrite, DBDataRef, DBDataCRef
+from database import *
 from system import Grabber, InternetMetadata, VideoMetadata
 from mythproto import ftopen, FileOps, Program
 from utility import CMPRecord, CMPVideo, MARKUPLIST
@@ -20,14 +20,13 @@ from datetime import date, time, datetime
 from socket import gethostname
 from urllib import urlopen
 
-class Record( DBDataWrite, RECTYPE, CMPRecord ):
+class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
     """
-    Record(id=None, db=None, raw=None) -> Record object
+    Record(id=None, db=None) -> Record object
     """
 
     _table = 'record'
-    _where = 'recordid=%s'
-    _setwheredat = 'self.recordid,'
+    _key   = ['recordid']
     _defaults = {'recordid':None,    'type':RECTYPE.kAllRecord,
                  'title':u'Unknown', 'subtitle':'',      'description':'',
                  'category':'',      'station':'',       'seriesid':'',
@@ -45,22 +44,18 @@ class Record( DBDataWrite, RECTYPE, CMPRecord ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-    def __init__(self, id, db=None):
-        DBDataWrite.__init__(self, (id,), db)
-
     def create(self, data=None):
         """Record.create(data=None) -> Record object"""
-        self._wheredat = (DBDataWrite.create(self, data),)
-        self._pull()
+        DBDataWriteAI.create(self, data)
         FileOps(db=self._db).reschedule(self.recordid)
         return self
 
     def delete(self):
-        DBDataWrite.delete(self)
+        DBDataWriteAI.delete(self)
         FileOps(db=self._db).reschedule(self.recordid)
 
     def update(self, *args, **keywords):
-        DBDataWrite.update(*args, **keywords)
+        DBDataWriteAI.update(*args, **keywords)
         FileOps(db=self._db).reschedule(self.recordid)
 
     def getUpcoming(self, deactivated=False):
@@ -108,12 +103,11 @@ class Record( DBDataWrite, RECTYPE, CMPRecord ):
 
 class Recorded( DBDataWrite, CMPRecord ):
     """
-    Recorded(data=None, db=None, raw=None) -> Recorded object
+    Recorded(data=None, db=None) -> Recorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
     _table = 'recorded'
-    _where = 'chanid=%s AND starttime=%s'
-    _setwheredat = 'self.chanid,self.starttime'
+    _key   = ['chanid','starttime']
     _defaults = {'title':u'Unknown', 'subtitle':'',          'description':'',
                  'category':'',      'hostname':'',          'bookmark':0,
                  'editing':0,        'cutlist':0,            'autoexpire':0,
@@ -161,12 +155,11 @@ class Recorded( DBDataWrite, CMPRecord ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-    def _postinit(self):
-        DBDataWrite._postinit(self)
-        if self._wheredat is not None:
-            self.cast = self._Cast(self._wheredat, self._db)
-            self.seek = self._Seek(self._wheredat, self._db)
-            self.markup = self._Markup(self._wheredat, self._db)
+    def _evalwheredat(self, wheredat=None):
+        DBDataWrite._evalwheredat(self, wheredat)
+        self.cast = self._Cast(self._wheredat, self._db)
+        self.seek = self._Seek(self._wheredat, self._db)
+        self.markup = self._Markup(self._wheredat, self._db)
 
     @classmethod
     def fromProgram(cls, program):
@@ -177,16 +170,6 @@ class Recorded( DBDataWrite, CMPRecord ):
         self.cast.commit()
         self.seek.commit()
         self.markup.commit()
-
-    def create(self, data=None):
-        """Recorded.create(data=None) -> Recorded object"""
-        DBDataWrite.create(self, data)
-        self._wheredat = (self.chanid,self.starttime)
-        self._pull()
-        self.cast = self._Cast(self._wheredat, self._db)
-        self.seek = self._Seek(self._wheredat, self._db)
-        self.markup = self._Markup(self._wheredat, self._db)
-        return self
 
     def delete(self, force=False, rerecord=False):
         """
@@ -271,12 +254,11 @@ class Recorded( DBDataWrite, CMPRecord ):
 class RecordedProgram( DBDataWrite, CMPRecord ):
 
     """
-    RecordedProgram(data=None, db=None, raw=None) -> RecordedProgram object
+    RecordedProgram(data=None, db=None) -> RecordedProgram object
             'data' is a tuple containing (chanid, storagegroup)
     """
     _table = 'recordedprogram'
-    _where = 'chanid=%s AND starttime=%s'
-    _setwheredat = 'self.chanid,self.starttime'
+    _key   = ['chanid','starttime']
     _defaults = {'title':'',     'subtitle':'',
                  'category':'',  'category_type':'',     'airdate':0,
                  'stars':0,      'previouslyshown':0,    'title_pronounce':'',
@@ -303,22 +285,14 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
     def fromRecorded(cls, recorded):
         return cls((recorded.chanid, recorded.progstart), recorded._db)
 
-    def create(self, data=None):
-        """RecordedProgram.create(data=None) -> RecordedProgram object"""
-        DBDataWrite.create(self, data)
-        self._wheredat = (self.chanid, self.starttime)
-        self._pull()
-        return self
-
 class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
     """
-    OldRecorded(data=None, db=None, raw=None) -> OldRecorded object
+    OldRecorded(data=None, db=None) -> OldRecorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
 
     _table = 'oldrecorded'
-    _where = 'chanid=%s AND starttime=%s'
-    _setwheredat = 'self.chanid,self.starttime'
+    _key   = ['chanid','starttime']
     _defaults = {'title':'',     'subtitle':'',      
                  'category':'',  'seriesid':'',      'programid':'',
                  'findid':0,     'recordid':0,       'station':'',
@@ -334,13 +308,6 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
 
     def __repr__(self):
         return str(self).encode('utf-8')
-
-    def create(self, data=None):
-        """OldRecorded.create(data=None) -> OldRecorded object"""
-        DBDataWrite.create(self, data)
-        self._wheredat = (self.chanid, self.starttime)
-        self._pull()
-        return self
 
     def setDuplicate(self, record=False):
         """
@@ -360,14 +327,13 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
         """OldRecorded entries cannot be deleted"""
         return
 
-class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
+class Job( DBDataWriteAI, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """
-    Job(id=None, db=None, raw=None) -> Job object
+    Job(id=None, db=None) -> Job object
     """
 
     _table = 'jobqueue'
-    _where = 'id=%s'
-    _setwheredat = 'self.id,'
+    _key   = ['id']
     _logmodule = 'Python Jobqueue'
     _defaults = {'id': None}
 
@@ -379,16 +345,6 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-    def __init__(self, id=None, chanid=None, starttime=None, db=None):
-            DBDataWrite.__init__(self, (id,), db)
-
-    def create(self, data=None):
-        """Job.create(data=None) -> Job object"""
-        id = DBDataWrite.create(self, data)
-        self._where = 'id=%s'
-        self._wheredat = (id,)
-        return self
-
     def setComment(self,comment):
         """Job.setComment(comment) -> None, updates comment"""
         self.comment = comment
@@ -399,11 +355,10 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
         self.status = status
         self.update()
 
-class Channel( DBDataWrite ):
+class Channel( DBDataWriteAI ):
     """Channel(chanid=None, db=None) -> Channel object"""
     _table = 'channel'
-    _where = 'chanid=%s'
-    _setwheredat = 'self.chanid,'
+    _key   = ['chanid']
     _defaults = {'icon':'none',          'videofilters':'',  'callsign':u'',
                  'xmltvid':'',           'recpriority':0,    'contrast':32768,
                  'brightness':32768,     'colour':32768,     'hue':32768,
@@ -423,24 +378,13 @@ class Channel( DBDataWrite ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-    def __init__(self, chanid=None, db=None):
-        DBDataWrite.__init__(self, (chanid,), db)
-
-    def create(self, data=None):
-        """Channel.create(data=None) -> Channel object"""
-        DBDataWrite.create(self, data)
-        self._wheredat = (self.chanid,)
-        self._pull()
-        return self
-
 class Guide( DBData, CMPRecord ):
     """
-    Guide(data=None, db=None, raw=None) -> Guide object
+    Guide(data=None, db=None) -> Guide object
             Data is a tuple of (chanid, starttime).
     """
     _table = 'program'
-    _where = 'chanid=%s AND starttime=%s'
-    _setwheredat = 'self.chanid,self.starttime'
+    _key   = ['chanid','starttime']
     _logmodule = 'Python Guide'
     
     def __str__(self):
@@ -487,11 +431,10 @@ class Guide( DBData, CMPRecord ):
 
 #### MYTHVIDEO ####
 
-class Video( DBDataWrite, CMPVideo ):
+class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
     """Video(id=None, db=None, raw=None) -> Video object"""
     _table = 'videometadata'
-    _where = 'intid=%s'
-    _setwheredat = 'self.intid,'
+    _key   = ['intid']
     _defaults = {'subtitle':u'',             'director':u'Unknown',
                  'rating':u'NR',             'inetref':u'00000000',
                  'year':1895,                'userrating':0.0,
@@ -504,9 +447,6 @@ class Video( DBDataWrite, CMPVideo ):
                  'releasedate':date(1,1,1),  'childid':-1,
                  'insertdate': datetime.now()}
     _logmodule = 'Python Video'
-    _schema_value = 'mythvideo.DBSchemaVer'
-    _schema_local = MVSCHEMA_VERSION
-    _schema_name = 'MythVideo'
     _cm_toid, _cm_toname = DictInvertCI.createPair({0:'none'})
 
     def _fill_cm(self):
@@ -540,17 +480,14 @@ class Video( DBDataWrite, CMPVideo ):
         else:
             self.category = 0
 
-    def _setDefs(self):
-        DBDataWrite._setDefs(self)
-
     def _pull(self):
-        DBDataWrite._pull(self)
+        DBDataWriteAI._pull(self)
         self._fill_cm()
         self._cat_toname()
 
     def _push(self):
         self._cat_toid()
-        DBDataWrite._push(self)
+        DBDataWriteAI._push(self)
         self._cat_toname()
         self.cast.commit()
         self.genre.commit()
@@ -569,39 +506,33 @@ class Video( DBDataWrite, CMPVideo ):
             res += u' - '+self.subtitle
         return u"<Video '%s' at %s>" % (res, hex(id(self)))
 
-    def _postinit(self):
-        DBDataWrite._postinit(self)
+    def _evalwheredat(self, wheredat=None):
+        DBDataWriteAI._evalwheredat(self, wheredat)
         self._fill_cm()
-        if self._wheredat is not None:
-            self._cat_toname()
-            self.cast = self._Cast((self.intid,), self._db)
-            self.genre = self._Genre((self.intid,), self._db)
-            self.country = self._Country((self.intid,), self._db)
-            self.markup = self._Markup((self.filename,), self._db)
-
-    def __init__(self, id=None, db=None):
-        DBDataWrite.__init__(self, (id,), db)
+        self._cat_toname()
+        self.cast = self._Cast((self.intid,), self._db)
+        self.genre = self._Genre((self.intid,), self._db)
+        self.country = self._Country((self.intid,), self._db)
+        self.markup = self._Markup((self.filename,), self._db)
 
     def create(self, data=None):
         """Video.create(data=None) -> Video object"""
-        c = self._db.cursor(self._log)
-        fields = ' AND '.join(['%s=%%s' % f for f in \
-                        ('title','subtitle','season','episode')])
-        with self._db.cursor(self._log) as cursor:
-            count = cursor.execute("""SELECT intid
-                                      FROM videometadata
-                                      WHERE %s""" % fields, 
-                      (self.title, self.subtitle, self.season, self.episode))
-            if count:
-                id = cursor.fetchone()[0]
-            else:
-                self._import(data)
-                self._cat_toid()
-                id = DBDataWrite.create(self)
-        self._wheredat = (id,)
-        self._pull()
-        self._postinit()
-        return self
+        if self.host is not None:
+            # check for pre-existing entry
+            if self.hash == '':
+                self.hash = self.getHash()
+            with self._db as cursor:
+                if cursor.execute("""SELECT intid FROM videometadata
+                                     WHERE hash=%s""", self.hash) > 0:
+                    id = cursor.fetchone()[0]
+                    self._setwheredat([id])
+                    self._pull()
+                    return self
+
+        # create new entry
+        self._import(data)
+        self._cat_toid()
+        return DBDataWriteAI.create(self)
 
     class _Cast( DBDataCRef ):
         _table = ['videometadatacast','videocast']
@@ -632,6 +563,8 @@ class Video( DBDataWrite, CMPVideo ):
         if type not in sgroup:
             raise MythFileError(MythError.FILE_ERROR,
                             'Invalid type passed to Video._open(): '+str(type))
+        if self.host == '':
+            raise MythFileError('File access only works with Storage Group content')
         return ftopen('myth://%s@%s/%s' % ( sgroup[type],
                                             self.host,
                                             self[type]),
@@ -645,7 +578,7 @@ class Video( DBDataWrite, CMPVideo ):
         self.cast.clean()
         self.genre.clean()
         self.country.clean()
-        DBDataWrite.delete(self)
+        DBDataWriteAI.delete(self)
 
     def open(self,mode='r',nooverwrite=False):
         """Video.open(mode='r', nooverwrite=False)
@@ -875,3 +808,158 @@ class InternetSource( DictData ):
             yield InternetMetadata(item)
 
 
+#### MYTHMUSIC ####
+
+class Song( MusicSchema, DBDataWriteAI ):
+    _table = 'music_songs'
+    _where = 'song_id=%s'
+    _setwheredat = 'self.song_id,'
+    _defaults = {'song_id':None}
+    _logmodule = 'Python Song'
+
+    @classmethod
+    def fromAlbum(cls, album, db=None):
+        """Returns iterable of songs from given album."""
+        try:
+            db = album._db
+            album = album.album_id
+        except AttributeError: pass
+
+        return cls._fromQuery("WHERE album_id=%s", [album], db)
+
+    @classmethod
+    def fromArtist(cls, artist, db=None):
+        """Returns iterable of songs from given artist."""
+        try:
+            db = artist._db
+            artist = artist.artist_id
+        except AttributeError: pass
+
+        return cls._fromQuery("WHERE artist_id=%s", [artist], db)
+
+    @classmethod
+    def fromPlaylist(cls, playlist, db=None):
+        """Returns iterable of songs from given playlist."""
+        try:
+            songs = playlist._songstring()
+            db = playlist._db
+        except AttributeError:
+            db = DBCache(db)
+            songs = MusicPlaylist(playlist, db)._songstring()
+
+        return cls._fromQuery("WHERE LOCATE(song_id, %s)", songs, db)
+
+class Album( MusicSchema, DBDataWriteAI ):
+    _table = 'music_albums'
+    _where = 'album_id=%s'
+    _setwheredat = 'self.album_id,'
+    _defaults = {'album_id':None}
+    _logmodule = 'Python Album'
+
+    @classmethod
+    def fromArtist(cls, artist, db=None):
+        """Returns iterable of albums from given artist."""
+        try:
+            db = artist._db
+            artist = artist.artist_id
+        except AttributeError:
+            pass
+        return cls._fromQuery("WHERE artist_id=%s", [artist], db)
+
+    @classmethod
+    def fromSong(cls, song, db=None):
+        """Returns the album for the given song."""
+        try:
+            album = song.album_id
+            db = song._db
+        except AttributeError:
+            db = DBCache(db)
+            album = Song(song, db).album_id
+        return cls(album, db)
+
+class Artist( MusicSchema, DBDataWriteAI ):
+    _table = 'music_artists'
+    _where = 'artist_id=%s'
+    _setwheredat = 'self.artist_id,'
+    _defaults = {'artist_id':None}
+    _logmodule = 'Python Artist'
+
+    @classmethod
+    def fromName(cls, name, db=None):
+        db = MythDB(db)
+        c = db.cursor()
+        count = c.execute("""SELECT * FROM %s WHERE artist_name=%s""", (cls._table, name))
+        if count > 1:
+            raise MythDBError('Non-unique music_artist entry')
+        elif count == 1:
+            return cls.fromRaw(c.fetchone(), db)
+        else:
+            artist = cls(db=db)
+            artist.artist_name = name
+            return artist.create()
+   
+    @classmethod
+    def fromSong(cls, song, db=None):
+        """Returns the artist for the given song."""
+        try:
+            artist = song.artist_id
+            db = song._db
+        except AttributeError:
+            db = DBCache(db)
+            artist = Song(song, db).artist_id
+        return cls(artist, db)
+
+    @classmethod
+    def fromAlbum(cls, album, db=None):
+        """Returns the artist for the given album."""
+        try:
+            artist = album.artist_id
+            db = album._db
+        except AttributeError:
+            db = DBCache(db)
+            artist = Album(album, db).artist_id
+        return cls(artist, db)
+
+class MusicPlaylist( MusicSchema, DBDataWriteAI ):
+    _table = 'music_playlists'
+    _where = 'playlist_id=%s'
+    _setwheredat = 'self.playlist_id,'
+    _defaults = {'playlist_id':None}
+    _logmodule = 'Python Music Playlist'
+    # TODO: provide 'playlist_songs' as a list rather than comma separated string
+
+    @classmethod
+    def fromSong(cls, song, db=None):
+        """Returns an iterable of playlists containing the given song."""
+        try:
+            db = song._db
+            song = song.song_id
+        except AttributeError:
+            db = DBCache(db)
+            song = Song(song, db).song_id
+        return cls._fromQuery("WHERE LOCATE(%s, playlist_songs)", song, db)
+
+class MusicDirectory( MusicSchema, DBDataWriteAI ):
+    _table = 'music_directories'
+    _where = 'directory_id=%s'
+    _setwheredat = 'self.directory_id,'
+    _defaults = {'directory_id':None}
+    _logmodule = 'Python Music Directory'
+
+    @classmethod
+    def fromPath(cls, path, db=None):
+        db = MythDB(db)
+        c = db.cursor()
+        count = c.execute("""SELECT * FROM %s WHERE path=%s""" \
+                                    % cls._table, path)
+        if count > 1:
+            raise MythDBError('Multiple matches for MusicDirectory.fromPath')
+        elif count == 1:
+            return cls.fromRaw(c.fetchone())
+        else:
+            directory = cls()
+            directory.path = path
+            if path.find('/') != -1:
+                directory.parent_id = \
+                        cls.fromPath(path.rsplit('/',1)[0]).directory_id
+            return directory.create()

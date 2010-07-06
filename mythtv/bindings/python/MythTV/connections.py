@@ -10,17 +10,15 @@ from exceptions import *
 from altdict import OrdDict
 from utility import deadlinesocket
 
+from time import sleep, time
 from select import select
 from urllib import urlopen
 from thread import start_new_thread, allocate_lock, get_ident
-from time import sleep, time
+import MySQLdb, MySQLdb.cursors
+import lxml.etree as etree
+import weakref
 import socket
 import re
-import weakref
-import lxml.etree as etree
-
-import MySQLdb, MySQLdb.cursors
-MySQLdb.__version__ = tuple([v for v in MySQLdb.__version__.split('.')])
 
 class LoggedCursor( MySQLdb.cursors.Cursor ):
     """
@@ -32,7 +30,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         self.id = id(connection)
         MySQLdb.cursors.Cursor.__init__(self, connection)
         self.ping = self._ping121
-        if MySQLdb.__version__ >= ('1','2','2'):
+        if MySQLdb.version_info >= ('1','2','2'):
             self.ping = self._ping122
         self.ping()
 
@@ -55,6 +53,18 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         self.log(self.log.DATABASE, ' '.join(query.split()), str(args))
 
     def execute(self, query, args=None):
+        """
+        Execute a query.
+
+        query -- string, query to execute on server
+        args -- optional sequence or mapping, parameters to use with query.
+
+        Note: If args is a sequence, then %s must be used as the
+        parameter placeholder in the query. If a mapping is used,
+        %(key)s must be used as the placeholder.
+
+        Returns long integer rows affected, if any
+        """
         self.ping()
         self.log_query(query, args)
         try:
@@ -65,6 +75,22 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def executemany(self, query, args):
+        """
+        Execute a multi-row query.
+
+        query -- string, query to execute on server
+
+        args
+
+            Sequence of sequences or mappings, parameters to use with
+            query.
+
+        Returns long integer rows affected, if any.
+
+        This method improves performance on multiple-row INSERT and
+        REPLACE. Otherwise it is equivalent to looping over args with
+        execute().
+        """
         self.ping()
         self.log_query(query, args)
         try:
@@ -84,9 +110,13 @@ class DBConnection( object ):
     _defpoolsize = 2
     @classmethod
     def setDefaultSize(cls, size):
+        """
+        Set the default connection pool size for new database connections.
+        """
         cls._defpoolsize = size
 
     def resizePool(self, size):
+        """Resize the connection pool."""
         if size < 1:
             size = 1
         diff = size - self._poolsize
@@ -143,6 +173,10 @@ class DBConnection( object ):
         return db
 
     def acquire(self):
+        """
+        Acquire one connection from the pool,
+            or open a new one if none are available.
+        """
         try:
             conn = self._pool.pop(0)
             self._inuse[id(conn)] = conn
@@ -152,6 +186,9 @@ class DBConnection( object ):
         return conn
 
     def release(self, id, conn):
+        """
+        Release a connection back to the pool to allow reuse.
+        """
         try:
             conn = self._inuse.pop(id)
             self._pool.append(conn)
@@ -161,6 +198,12 @@ class DBConnection( object ):
             self.log(MythLog.DATABASE, 'Closing spare database connection')
 
     def cursor(self, log=None, type=LoggedCursor):
+        """
+        Create a cursor on which queries may be performed. The
+        optional cursorclass parameter is used to create the
+        Cursor. By default, self.cursorclass=connections.LoggedCursor
+        is used.
+        """
         if log is None:
             log = self.log
         cursor = self.acquire().cursor(type)
@@ -214,6 +257,7 @@ class BEConnection( object ):
                 if self[key] ^ other[key]:
                     res[key] = True
             return res
+
     def __init__(self, backend, port, opts=None, deadline=10.0):
         """
         BEConnection(backend, type, db=None) -> backend socket connection

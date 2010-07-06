@@ -6,7 +6,7 @@ from static import ERRCODES
 class MythError( Exception, ERRCODES ):
     """
     MythError('Generic Error Message')
-    MythError(SYSTEM, returncode, command, stderr)  -> Exception
+    MythError(SYSTEM, returncode, command, stderr)
     MythError(SOCKET, socketcode, socketerr)
 
     Error string will be available as obj.args[0].  Additional attributes
@@ -33,7 +33,7 @@ class MythDBError( MythError ):
     MythDBError('Generic Error Message')
     MythDBError(DB_RAW, sqlerr)
     MythDBError(DB_CONNECTION, dbconn)
-    MythDBError(DB_CREDENTIALS)                     -> Exception
+    MythDBError(DB_CREDENTIALS)
     MythDBError(DB_SETTING, setting, hostname)
     MythDBError(DB_SCHEMAMISMATCH, setting, remote, local)
     MythDBError(DB_SCHEMAUPDATE, sqlerr)
@@ -92,7 +92,7 @@ class MythBEError( MythError ):
     """
     MythBEError('Generic Error Message')
     MythBEError(PROTO_CONNECTION, backend, port)
-    MythBEError(PROTO_ANNOUNCE, backend, port, response)    -> Exception
+    MythBEError(PROTO_ANNOUNCE, backend, port, response)
     MythBEError(PROTO_MISMATCH, remote, local)
     MythBEError(PROTO_PROGRAMINFO)
 
@@ -126,7 +126,7 @@ class MythBEError( MythError ):
 class MythFEError( MythError ):
     """
     MythFEError('Generic Error Message')
-    MythFEError(FE_CONNECTION, frontend, port)    -> Exception
+    MythFEError(FE_CONNECTION, frontend, port)
     MythFEError(FE_ANNOUNCE, frontend, port)
 
     Error string will be available as obj.args[0].  Additional attributes
@@ -150,7 +150,7 @@ class MythFEError( MythError ):
 class MythFileError( MythError ):
     """
     MythFileError('Generic Error Message')
-    MythFileError(FILE_ERROR)                       -> Exception
+    MythFileError(FILE_ERROR)
     MythFileError(FILE_FAILED_READ, file)
     MythFileError(FILE_FAILED_WRITE, file, reason)
 

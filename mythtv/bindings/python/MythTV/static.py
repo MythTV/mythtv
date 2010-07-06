@@ -4,10 +4,11 @@
 Contains any static and global variables for MythTV Python Bindings
 """
 
-OWN_VERSION = (0,23,0,14)
+OWN_VERSION = (0,23,0,15)
 SCHEMA_VERSION = 1259
 MVSCHEMA_VERSION = 1036
 NVSCHEMA_VERSION = 1007
+MUSICSCHEMA_VERSION = 1017
 PROTO_VERSION = 57
 BACKEND_SEP = '[]:[]'
 
@@ -175,4 +176,19 @@ class ERRCODES( object ):
     FILE_ERROR          = 200
     FILE_FAILED_READ    = 201
     FILE_FAILED_WRITE   = 202
+
+class MythSchema( object ):
+    _schema_value = 'DBSchemaVer'
+    _schema_local = SCHEMA_VERSION
+    _schema_name = 'Database'
+
+class VideoSchema( object ):
+    _schema_value = 'mythvideo.DBSchemaVer'
+    _schema_local = MVSCHEMA_VERSION
+    _schema_name = 'MythVideo'
+
+class MusicSchema( object ):
+    _schema_value = 'MusicDBSchemaVer'
+    _schema_local = MUSICSCHEMA_VERSION
+    _schema_name = 'MythMusic'
 

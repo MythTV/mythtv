@@ -11,9 +11,7 @@ from connections import FEConnection, XMLConnection
 from utility import databaseSearch
 from database import DBCache
 from mythproto import BEEvent, FileOps, Program
-from dataheap import Record, Recorded, RecordedProgram, \
-                     OldRecorded, Job, Guide, Video, Channel, \
-                     InternetSource, InternetContentArticles
+from dataheap import *
 
 import re
 
@@ -861,20 +859,10 @@ class MythXML( XMLConnection ):
                         find('InternetContent').findall('grabber'):
             yield InternetSource.fromEtree(grabber, self)
 
-class MythVideo( DBCache ):
+class MythVideo( VideoSchema, DBCache ):
     """
     Provides convenient methods to access the MythTV MythVideo database.
     """
-    def __init__(self,db=None):
-        """
-        Initialise the MythDB connection.
-        """
-        DBCache.__init__(self,db)
-
-        # check schema version
-        self._check_schema('mythvideo.DBSchemaVer', 
-                                MVSCHEMA_VERSION, 'MythVideo')
-        
     def scanStorageGroups(self, deleteold=True):
         """
         obj.scanStorageGroups(deleteold=True) ->
@@ -1019,4 +1007,32 @@ class MythVideo( DBCache ):
         except StopIteration:            
             return None
 
+class MythMusic( MusicSchema, DBCache ):
+    """
+    Provides convenient methods to access the MythTV MythMusic database.
+    """
+    @databaseSearch
+    def searchMusic(self, init=False, key=None, value=None):
+        """
+        obj.searchMusic(**kwargs) -> iterable of Song objects
 
+        Supports the following keywords:
+            name,  track,  disc_number, artist,      album,   year
+            genre, rating, format,      sample_rate, bitrate
+        """
+        if init:
+            return ('music_songs', Song, (),
+                    ('music_artists','music_songs',('artist_id',)), #1
+                    ('music_albums', 'music_songs',('album_id',)),  #2
+                    ('music_genres', 'music_songs',('genre_id',)))  #4
+        if key in ('name','track','disc_number','rating',
+                        'format','sample_rate','bitrate'):
+            return ('music_songs.%s=%%s' % key, value, 0)
+        if key == 'artist':
+            return ('music_artists.artist_name=%s', value, 1)
+        if key == 'album':
+            return ('music_albums.album_name=%s', value, 2)
+        if key == 'year':
+            return ('music_albums.year=%s', value, 2)
+        if key == 'genre':
+            return ('music_genres.genre=%s', value, 4)

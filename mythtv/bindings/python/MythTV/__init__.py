@@ -1,34 +1,46 @@
 #!/usr/bin/env python
 
-__all__ = ['static', 'MSearch', 'MythLog',\
-            \
-           'MythError', 'MythDBError', 'MythBEError', \
-           'MythFEError', 'MythFileError', \
-            \
-           'LoggedCursor', 'DBConnection','BEConnection', \
-           'FEConnection','XMLConnection',\
-            \
-           'schemaUpdate', 'databaseSearch', 'SplitInt', 'deadlinesocket',\
-            \
-           'OrdDict', 'DictData', 'DictInvert', 'DictInvertCI',\
-            \
-           'DBConnection', 'BEConnection', 'FEConnection', 'XMLConnection', \
-            \
-           'DBData', 'DBDataWrite', 'DBDataRef', 'DBDataCRef', \
-           'DBCache', 'StorageGroup', \
-            \
-           'System', 'Grabber', 'Metadata', 'VideoMetadata', 'MusicMetadata', \
-           'GameMetadata', 'InternetMetadata', 'SystemEvent', \
-            \
-           'BECache', 'BEEvent', 'findfile', 'ftopen', 'FileTransfer', \
-           'FileOps', 'FreeSpace', 'Program', \
-            \
-           'Record', 'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', \
-           'Channel', 'Guide', 'Video', 'VideoGrabber', 'InternetContent', \
-           'InternetContentArticles', 'InternetSource', \
-            \
-           'MythBE', 'BEEventMonitor', 'MythSystemEvent', 'SystemEvent', \
-           'Frontend', 'MythDB', 'MythVideo', 'MythXML']
+__all_exceptions__  = ['MythError', 'MythDBError', 'MythBEError', \
+                       'MythFEError', 'MythFileError']
+
+__all_utility__     = ['schemaUpdate', 'databaseSearch', 'SplitInt',
+                       'deadlinesocket']
+
+__all_altdict__     = ['OrdDict', 'DictData', 'DictInvert', 'DictInvertCI']
+
+__all_connections__ = ['LoggedCursor', 'DBConnection','BEConnection', \
+                       'FEConnection','XMLConnection']
+
+__all_database__    = ['DBData', 'DBDataWrite', 'DBDataWriteAI', \
+                       'DBDataRef', 'DBDataCRef', 'DBCache', 'StorageGroup']
+
+__all_system__      = ['System', 'Grabber', 'Metadata', 'VideoMetadata', \
+                       'MusicMetadata', 'GameMetadata', 'InternetMetadata', \
+                       'SystemEvent']
+
+__all_proto__       = ['BECache', 'BEEvent', 'findfile', 'ftopen', \
+                       'FileTransfer', 'FileOps', 'FreeSpace', 'Program']
+
+__all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
+                       'Job', 'Channel', 'Guide', 'Video', 'VideoGrabber', \
+                       'InternetContent', 'InternetContentArticles', \
+                       'InternetSource', 'Song', 'Album', 'Artist', \
+                       'MusicPlaylist', 'MusicDirectory']
+
+__all_method__      = ['MythBE', 'BEEventMonitor', 'MythSystemEvent', \
+                       'SystemEvent', 'Frontend', 'MythDB', 'MythVideo', \
+                       'MythXML', 'MythMusic']
+
+__all__             = ['static', 'MSearch', 'MythLog']\
+                        +__all_exceptions__\
+                        +__all_utility__\
+                        +__all_altdict__\
+                        +__all_connections__\
+                        +__all_database__\
+                        +__all_system__\
+                        +__all_proto__\
+                        +__all_data__\
+                        +__all_method__
 
 import26 = """
 import warnings
@@ -59,5 +71,5 @@ else:
     exec(importall)
 
 __version__ = OWN_VERSION
-static.mysqldb = MySQLdb.__version__
+static.mysqldb = MySQLdb.version_info
 

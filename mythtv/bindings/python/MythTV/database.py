@@ -4,7 +4,7 @@
 Provides connection cache and data handlers for accessing the database.
 """
 
-from static import SCHEMA_VERSION
+from static import MythSchema
 from altdict import OrdDict, DictData
 from logging import MythLog
 from msearch import MSearch
@@ -18,9 +18,9 @@ import os
 import weakref
 
 
-class DBData( DictData ):
+class DBData( DictData, MythSchema ):
     """
-    DBData.__init__(data=None, db=None, raw=None) --> DBData object
+    DBData.__init__(data=None, db=None) --> DBData object
 
     Altered DictData adding several functions for dealing with individual rows.
     Must be subclassed for use.
@@ -50,17 +50,25 @@ class DBData( DictData ):
     """
     _field_type = 'Pass'
     _logmodule = 'Python DBData'
-    _schema_value = 'DBSchemaVer'
-    _schema_local = SCHEMA_VERSION
-    _schema_name = 'Database'
     _localvars = ['_field_order']
+
+    _table = None
+    _where = None
+    _key   = None
+    _wheredat    = None
+    _setwheredat = None
 
     @classmethod
     def getAllEntries(cls, db=None):
         """cls.getAllEntries() -> tuple of DBData objects"""
+        return cls._fromQuery("", ())
+
+    @classmethod
+    def _fromQuery(cls, where, args, db=None):
         db = DBCache(db)
         with db as cursor:
-            cursor.execute("""SELECT * FROM %s""" % cls._table)
+            cursor.execute("""SELECT * FROM %s %s""" \
+                        % (cls._table, where), args)
             for row in cursor:
                 yield cls.fromRaw(row, db)
 
@@ -69,19 +77,33 @@ class DBData( DictData ):
         dbdata = cls(None, db=db)
         DictData.__init__(dbdata, raw)
         dbdata._evalwheredat()
-        dbdata._postinit()
         return dbdata
 
-    def _postinit(self): pass
+    def _evalwheredat(self, wheredat=None):
+        nokey = 'Invalid DBData subclass: _key or %s required'
+        gen = lambda j,s,l: j.join([s % k for k in l])
+        if self._where is None:
+            # build it from _key
+            if self._key is None:
+                raise MythError(nokey % '_where')
+            self._where = gen(' AND ', '%s=%%s', self._key)
 
-    def _evalwheredat(self):
-        self._wheredat = eval(self._setwheredat)
+        if self._setwheredat is None:
+            if self._key is None:
+                raise MythError(nokey % '_setwheredat')
+            self._setwheredat = gen('', 'self.%s,', self._key)
+
+        if wheredat is None:
+            self._wheredat = eval(self._setwheredat)
+        else:
+            self._wheredat = tuple(wheredat)
 
     def _setDefs(self):
+        if self._table is None:
+            raise MythError('Invalid DBData subclass: _table required')
         self._field_order = self._db.tablefields[self._table]
         self._log = MythLog(self._logmodule)
         self._fillNone()
-        self._wheredat = None
 
     def __init__(self, data, db=None):
         dict.__init__(self)
@@ -94,9 +116,8 @@ class DBData( DictData ):
         if data is None: pass
         elif None in data: pass
         else:
-            self._wheredat = tuple(data)
+            self._evalwheredat(tuple(data))
             self._pull()
-        self._postinit()
 
     def _pull(self):
         """Updates table with data pulled from database."""
@@ -115,7 +136,7 @@ class DBData( DictData ):
 
 class DBDataWrite( DBData ):
     """
-    DBDataWrite.__init__(data=None, db=None, raw=None) --> DBDataWrite object
+    DBDataWrite.__init__(data=None, db=None) --> DBDataWrite object
 
     Altered DBData, with support for writing back to the database.
     Must be subclassed for use.
@@ -171,10 +192,9 @@ class DBDataWrite( DBData ):
         self._fillNone()
         dict.update(self, self._defaults)
 
-    def _postinit(self):
-        DBData._postinit(self)
-        if self._wheredat is not None:
-            self._origdata = dict(self)
+    def _evalwheredat(self, wheredat=None):
+        DBData._evalwheredat(self, wheredat)
+        self._origdata = dict.copy(self)
 
     def __init__(self, data=None, db=None):
         DBData.__init__(self, data, db)
@@ -184,13 +204,11 @@ class DBDataWrite( DBData ):
             data = self._sanitize(data, False)
             dict.update(self, data)
 
-    def create(self,data=None):
+    def _create(self, data=None):
         """
-        obj.create(data=None) -> new database row
+        obj._create(data=None) -> new database row
 
         Creates a new database entry using given information.
-        Will add any information in 'data' dictionary to local information
-        before pushing the entire set onto the database.
         Will only function with an uninitialized object.
         """
         if self._wheredat is not None:
@@ -209,6 +227,18 @@ class DBDataWrite( DBData ):
                         % (self._table, fields, format_string), data.values())
             intid = cursor.lastrowid
         return intid
+
+    def create(self, data=None):
+        """
+        obj.create(data=None) -> self
+
+        Creates a new database entry using the given information.
+        Will only function on an uninitialized object.
+        """
+        self._create(data)
+        self._evalwheredat()
+        self._pull()
+        return self
 
     def _pull(self):
         DBData._pull(self)
@@ -259,6 +289,47 @@ class DBDataWrite( DBData ):
         with self._db.cursor(self._log) as cursor:
             cursor.execute("""DELETE FROM %s WHERE %s""" \
                         % (self._table, self._where), self._wheredat)
+
+class DBDataWriteAI( DBDataWrite ):
+    """
+    DBDataWriteAI.__init__(data=None, db=None) --> DBDataWriteAI object
+
+    Altered DBDataWrite, for use with tables whose unique identifier is
+        a single auto-increment field.
+    Must be subclassed for use.
+
+    Subclasses must provide:
+        _table
+            Name of database table to be accessed
+        _where
+            String defining WHERE clause for database lookup
+        _setwheredat
+            String of comma separated variables to be evaluated to set
+            'wheredat'. 'eval(setwheredat)' must return a tuple, so string must
+            contain at least one comma.
+
+    Subclasses may provide:
+        _defaults
+            Dictionary of default values to be used when creating new
+            database entries. Additionally, values of 'None' will be stripped
+            and not used to alter the database.
+
+    Can be populated in two manners:
+        data
+            Tuple used to perform a SQL query, using the subclass provided
+            'where' clause
+        raw
+            Raw list as returned by 'select * from mytable'
+    Additionally, can be left uninitialized to allow creation of a new entry
+    """
+    def __init__(self, id=None, db=None):
+        DBDataWrite.__init__(self, (id,), db)
+
+    def create(self, data=None):
+        intid = self._create(data)
+        self._evalwheredat([intid])
+        self._pull()
+        return self
 
 class DBDataRef( list ):
     """
@@ -564,7 +635,7 @@ class DBDataCRef( DBDataRef ):
 
         self._origdata = self.deepcopy()
 
-class DBCache( object ):
+class DBCache( MythSchema ):
     """
     DBCache(db=None, args=None, **kwargs) -> database connection object
 
@@ -805,7 +876,8 @@ class DBCache( object ):
             self.db = DBConnection(dbconn)
 
             # check schema version
-            self._check_schema('DBSchemaVer',SCHEMA_VERSION)
+            self._check_schema(self._schema_value, self._schema_local,
+                               self._schema_name)
 
             # add connection to cache
             self.shared[self.ident] = self.db
@@ -946,12 +1018,11 @@ class StorageGroup( DBData ):
         if self._wheredat is None:
             return
 
-    def _postinit(self):
-        DBData._postinit(self)
-        if self._wheredat:
-            if (self.hostname == gethostname()) or \
-                  os.access(self.dirname.encode('utf-8'), os.F_OK):
-                self.local = True
-            else:
-                self.local = False
+    def _evalwheredat(self, wheredat=None):
+        DBData._evalwheredat(self, wheredat)
+        if (self.hostname == gethostname()) or \
+              os.access(self.dirname.encode('utf-8'), os.F_OK):
+            self.local = True
+        else:
+            self.local = False
 
