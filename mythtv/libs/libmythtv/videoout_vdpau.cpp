@@ -131,7 +131,7 @@ bool VideoOutputVDPAU::InitRender(void)
         m_osd_painter = new MythVDPAUPainter(m_render);
         if (m_osd_painter)
         {
-            m_osd_painter->SetFlip(false);
+            m_osd_painter->SetSwapControl(false);
             VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU osd (%1x%2)")
                 .arg(size.width()).arg(size.height()));
         }

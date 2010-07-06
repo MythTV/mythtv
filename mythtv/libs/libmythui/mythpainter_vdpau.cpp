@@ -24,7 +24,7 @@
 
 MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
     MythPainter(), m_render(render), m_created_render(true), m_target(0),
-    m_flip(true)
+    m_swap_control(true)
 {
     if (m_render)
         m_created_render = false;
@@ -94,7 +94,7 @@ void MythVDPAUPainter::Begin(QPaintDevice *parent)
 
     if (m_target)
         m_render->DrawBitmap(0, m_target, NULL, NULL);
-    else if (m_flip)
+    else if (m_swap_control)
         m_render->WaitForFlip();
 
     MythPainter::Begin(parent);
@@ -102,7 +102,7 @@ void MythVDPAUPainter::Begin(QPaintDevice *parent)
 
 void MythVDPAUPainter::End(void)
 {
-    if (m_render && m_flip)
+    if (m_render && m_swap_control)
         m_render->Flip();
     MythPainter::End();
 }
