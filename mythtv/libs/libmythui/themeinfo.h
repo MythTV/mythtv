@@ -17,7 +17,6 @@ class QFileInfo;
 
 class MPUBLIC ThemeInfo
 {
-
   public:
     ThemeInfo(QString theme);
     ~ThemeInfo();
@@ -33,9 +32,13 @@ class MPUBLIC ThemeInfo
     int GetMajorVersion() const { return m_majorver; }
     int GetMinorVersion() const { return m_minorver; }
 
+    QString GetDownloadURL() const { return m_downloadurl; }
+    QString GetThemeWebSite() const { return m_themesite; }
+
   private:
     bool parseThemeInfo();
 
+    QString   m_themeurl;
     QFileInfo  *m_theme;
     int       m_type;
     QString   m_aspect;
@@ -46,6 +49,9 @@ class MPUBLIC ThemeInfo
     QString   m_errata;
     int       m_majorver;
     int       m_minorver;
+
+    QString   m_downloadurl;  // URL to download theme package from
+    QString   m_themesite;    // Theme's website
 };
 
 #endif

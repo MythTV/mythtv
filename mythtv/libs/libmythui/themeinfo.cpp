@@ -10,6 +10,7 @@
 // MythTV headers
 #include "mythverbose.h"
 #include "xmlparsebase.h" // for VERBOSE_XML
+#include "mythdownloadmanager.h"
 
 #define LOC      QString("ThemeInfo: ")
 #define LOC_ERR  QString("ThemeInfo, Error: ")
@@ -22,11 +23,16 @@ ThemeInfo::ThemeInfo(QString theme)
     m_baseres = QSize(800, 600);
     m_majorver = m_minorver = 0;
 
+    if (m_theme->exists())
+        m_themeurl = m_theme->absoluteFilePath();
+    else
+        m_themeurl = theme;
+
     if (!parseThemeInfo())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("The theme (%1) is missing a themeinfo.xml file.")
-                .arg(m_theme->fileName()));
+                .arg(m_themeurl));
     }
 }
 
@@ -40,26 +46,47 @@ bool ThemeInfo::parseThemeInfo()
 
     QDomDocument doc;
 
-    QFile f(m_theme->absoluteFilePath() + "/themeinfo.xml");
-
-    if (!f.open(QIODevice::ReadOnly))
+    if ((m_themeurl.startsWith("http://")) ||
+        (m_themeurl.startsWith("https://")) ||
+        (m_themeurl.startsWith("ftp://")))
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("Unable to open themeinfo.xml "
-                        "for %1").arg(m_theme->absoluteFilePath()));
-        return false;
+        QByteArray data;
+        bool ok = GetMythDownloadManager()->download(m_themeurl +
+                                                     "/themeinfo.xml", &data);
+        if (!ok)
+            return false;
+
+        if (!doc.setContent(data))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Unable to parse themeinfo.xml "
+                            "for %1").arg(m_themeurl));
+            return false;
+        }
     }
-
-    if (!doc.setContent(&f))
+    else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Unable to parse themeinfo.xml "
-                        "for %1").arg(m_theme->fileName()));
+        QFile f(m_themeurl + "/themeinfo.xml");
 
+        if (!f.open(QIODevice::ReadOnly))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("Unable to open themeinfo.xml "
+                            "for %1").arg(f.fileName()));
+            return false;
+        }
+
+        if (!doc.setContent(&f))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Unable to parse themeinfo.xml "
+                            "for %1").arg(f.fileName()));
+
+            f.close();
+            return false;
+        }
         f.close();
-        return false;
     }
-    f.close();
 
     QDomElement docElem = doc.documentElement();
 
@@ -152,8 +179,7 @@ bool ThemeInfo::parseThemeInfo()
                             {
                                 QString thumbnail = ce.firstChild().toText()
                                                                     .data();
-                                m_previewpath = m_theme->absoluteFilePath() + '/'
-                                                    + thumbnail;
+                                m_previewpath = m_themeurl + '/' + thumbnail;
                             }
                         }
                         else if (ce.tagName() == "description")
@@ -163,6 +189,14 @@ bool ThemeInfo::parseThemeInfo()
                         else if (ce.tagName() == "errata")
                         {
                             m_errata = ce.firstChild().toText().data();
+                        }
+                        else if (ce.tagName() == "downloadurl")
+                        {
+                            m_downloadurl = ce.firstChild().toText().data();
+                        }
+                        else if (ce.tagName() == "themesite")
+                        {
+                            m_themesite = ce.firstChild().toText().data();
                         }
                     }
                 }
