@@ -212,7 +212,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       interactiveTV(NULL),
       itvEnabled(false),
       // OSD stuff
-      osd(NULL),
+      osd(NULL), reinit_osd(false),
       // Audio
       audio(this, muted),
       // Picture-in-Picture stuff
@@ -576,6 +576,11 @@ void NuppelVideoPlayer::ReinitOSD(void)
 {
     if (videoOutput && !using_null_videoout)
     {
+        if (QThread::currentThread() != (QThread*)playerThread)
+        {
+            reinit_osd = true;
+            return;
+        }
         QRect visible, total;
         float aspect, scaling;
         if (osd)
@@ -604,6 +609,7 @@ void NuppelVideoPlayer::ReinitOSD(void)
             itvVisible = false;
         }
 #endif // USING_MHEG
+        reinit_osd = false;
     }
 }
 
@@ -2369,6 +2375,10 @@ void NuppelVideoPlayer::EventStart(void)
 
 void NuppelVideoPlayer::EventLoop(void)
 {
+    // recreate the osd if a reinit was triggered by another thread
+    if (reinit_osd)
+        ReinitOSD();
+
     // Refresh the programinfo in use status
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)

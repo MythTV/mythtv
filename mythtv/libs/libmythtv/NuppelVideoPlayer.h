@@ -598,6 +598,7 @@ class MPUBLIC NuppelVideoPlayer
 
     // OSD stuff
     OSD  *osd;
+    bool  reinit_osd;
 
     // Audio stuff
     AudioPlayer audio;
