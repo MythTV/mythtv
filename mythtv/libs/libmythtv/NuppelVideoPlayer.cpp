@@ -362,7 +362,12 @@ void NuppelVideoPlayer::UnpauseBuffer(void)
 
 void NuppelVideoPlayer::Pause(void)
 {
-    pauseLock.lock();
+    if (!pauseLock.tryLock(100))
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Waited 100ms to get pause lock.");
+        DecoderPauseCheck();
+    }
+    
     next_play_speed   = 0.0;
     next_normal_speed = false;
     PauseDecoder();
@@ -2646,6 +2651,16 @@ void NuppelVideoPlayer::DecoderEnd(void)
         VERBOSE(VB_PLAYBACK, LOC + "Exited decoder loop.");
 }
 
+void NuppelVideoPlayer::DecoderPauseCheck(void)
+{
+    if (QThread::currentThread() != (QThread*)decoderThread)
+        return;
+    if (pauseDecoder)
+        PauseDecoder();
+    if (unpauseDecoder)
+        UnpauseDecoder();
+}
+
 void NuppelVideoPlayer::DecoderLoop(bool pause)
 {
     if (pause)
@@ -2653,12 +2668,8 @@ void NuppelVideoPlayer::DecoderLoop(bool pause)
 
     while (!killdecoder && !IsErrored())
     {
-        if (pauseDecoder)
-            PauseDecoder();
-
-        if (unpauseDecoder)
-            UnpauseDecoder();
-
+        DecoderPauseCheck();
+        
         if (forcePositionMapSync)
         {
             forcePositionMapSync = false;
