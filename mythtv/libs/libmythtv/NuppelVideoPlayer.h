@@ -398,12 +398,13 @@ class MPUBLIC NuppelVideoPlayer
     virtual void VideoStart(void);
     virtual bool VideoLoop(void);
     virtual void VideoEnd(void);
-    virtual void DecoderStart(bool clear_bookmark);
+    virtual void DecoderStart(bool start_paused);
     virtual void DecoderLoop(bool pause);
     virtual void DecoderEnd(void);
     virtual void AudioEnd(void);
     virtual void EventStart(void);
     virtual void EventLoop(void);
+    virtual void InitialSeek(void);
 
   protected:
     // Private initialization stuff

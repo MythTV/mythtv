@@ -2332,8 +2332,11 @@ bool NuppelVideoPlayer::StartPlaying(void)
         return false;
     }
 
+    bool seek = bookmarkseek > 30;
     EventStart();
-    DecoderStart(true);
+    DecoderStart(seek);
+    if (seek)
+        InitialSeek();
     VideoStart();
 
     if (playerTimer)
@@ -2343,6 +2346,22 @@ bool NuppelVideoPlayer::StartPlaying(void)
     playerThread->setPriority(QThread::TimeCriticalPriority);
     return !IsErrored();
 }
+
+void NuppelVideoPlayer::InitialSeek(void)
+{
+    // TODO handle initial commskip and/or cutlist skip as well
+    if (bookmarkseek > 30)
+    {
+        DoFastForward(bookmarkseek, true, false);
+        if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
+            !player_ctx->IsPIP())
+        {
+            ClearBookmark(false);
+        }
+    }
+    UnpauseDecoder();
+}
+
 
 void NuppelVideoPlayer::StopPlaying()
 {
@@ -2595,7 +2614,7 @@ void NuppelVideoPlayer::UnpauseDecoder(void)
     decoderPauseLock.unlock();
 }
 
-void NuppelVideoPlayer::DecoderStart(bool clear_bookmark)
+void NuppelVideoPlayer::DecoderStart(bool start_paused)
 {
     if (decoderThread)
     {
@@ -2608,20 +2627,9 @@ void NuppelVideoPlayer::DecoderStart(bool clear_bookmark)
     }
 
     killdecoder = false;
-    decoderThread = new DecoderThread(this, bookmarkseek > 30);
+    decoderThread = new DecoderThread(this, start_paused);
     if (decoderThread)
         decoderThread->start();
-
-    if (bookmarkseek > 30)
-    {
-        DoFastForward(bookmarkseek, true, false);
-        if (gCoreContext->GetNumSetting("ClearSavedPosition", 1) &&
-            !player_ctx->IsPIP() && clear_bookmark)
-        {
-            ClearBookmark(false);
-        }
-        UnpauseDecoder();
-    }
 }
 
 void NuppelVideoPlayer::DecoderEnd(void)
@@ -3648,8 +3656,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     ClearAfterSeek();
     if (!decoderThread)
-        DecoderStart(false);
-    PauseDecoder();
+        DecoderStart(true /*start paused*/);
     SeekForScreenGrab(number, frameNum, absolute);
     int tries = 0;
     while (!videoOutput->ValidVideoFrames() && ((tries++) < 500))
@@ -3875,8 +3882,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(
         deleteMap.TrackerReset(0, 0);
 
     if (!decoderThread)
-        DecoderStart(false);
-    PauseDecoder();
+        DecoderStart(true/*start paused*/);
 
     if (!GetDecoder()->GetFrame(kDecodeAV))
         return false;
