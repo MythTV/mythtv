@@ -18,7 +18,7 @@ class MPUBLIC MythOpenGLPainter : public MythPainter
    ~MythOpenGLPainter();
 
     void SetTarget(int new_target)       { target = new_target;      }
-
+    void SetSwapControl(bool swap)       { swapControl = swap;       } 
     virtual QString GetName(void)        { return QString("OpenGL"); }
     virtual bool SupportsAnimation(void) { return true;              }
     virtual bool SupportsAlpha(void)     { return true;              }
@@ -56,6 +56,7 @@ class MPUBLIC MythOpenGLPainter : public MythPainter
     QGLWidget        *realParent;
     MythRenderOpenGL *realRender;
     int               target;
+    bool              swapControl;
 
     QMap<MythImage *, unsigned int> m_ImageIntMap;
     std::list<MythImage *>          m_ImageExpireList;

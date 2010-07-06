@@ -26,7 +26,7 @@ using namespace std;
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
                                      QGLWidget *parent) :
     MythPainter(), realParent(parent), realRender(render),
-    target(0)
+    target(0), swapControl(true)
 {
     if (realRender)
         VERBOSE(VB_GENERAL, "OpenGL painter using existing OpenGL context.");
@@ -85,7 +85,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
         }
     }
 
-    if (target >= 0)
+    if (target || swapControl)
     {
         realRender->BindFramebuffer(target);
         realRender->SetViewPort(QSize(realParent->width(), realParent->height()));
@@ -105,7 +105,7 @@ void MythOpenGLPainter::End(void)
     else
     {
         realRender->Flush(false);
-        if (target == 0)
+        if (target == 0 && swapControl)
             realRender->swapBuffers();
         realRender->doneCurrent();
     }

@@ -270,7 +270,7 @@ void VideoOutputOpenGL::InitOSD(void)
     if (!gl_painter)
         VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create OpenGL OSD"));
     else
-        gl_painter->SetTarget(-1);
+        gl_painter->SetSwapControl(false);
 }
 
 bool VideoOutputOpenGL::CreateBuffers(void)
