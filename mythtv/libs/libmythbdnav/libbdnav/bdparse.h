@@ -1,13 +1,32 @@
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2009-2010  John Stebbins
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 #if !defined(_BDPARSE_H_)
 #define _BDPARSE_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "mpls_parse.h"
 #include "clpi_parse.h"
 #include "navigation.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define BD_STREAM_TYPE_VIDEO_MPEG1          0x01
 #define BD_STREAM_TYPE_VIDEO_MPEG2          0x02

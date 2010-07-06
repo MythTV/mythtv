@@ -1,13 +1,33 @@
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2009-2010  Obliter0n
+ * Copyright (C) 2009-2010  John Stebbins
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef FILE_H_
 #define FILE_H_
 
+#include <util/attributes.h>
+
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdint.h>
-#include <unistd.h>
 
 //#ifdef __LINUX__
 #define file_open file_open_linux
@@ -30,10 +50,10 @@ struct file
     int64_t (*tell)(FILE_H *file);
     int (*eof)(FILE_H *file);
     int (*read)(FILE_H *file, uint8_t *buf, int64_t size);
-    int (*write)(FILE_H *file, uint8_t *buf, int64_t size);
+    int (*write)(FILE_H *file, const uint8_t *buf, int64_t size);
 };
 
-extern FILE_H *file_open_linux(const char* filename, const char *mode);
+BD_PRIVATE FILE_H *file_open_linux(const char* filename, const char *mode);
 
 #ifdef __cplusplus
 };

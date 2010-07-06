@@ -1,14 +1,28 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <libgen.h>
-#include "../util/macro.h"
-#include "../file/file.h"
-#include "../util/bits.h"
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2009-2010  John Stebbins
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
+#include "util/macro.h"
+#include "file/file.h"
+#include "util/bits.h"
 #include "clpi_parse.h"
+
+#include <stdlib.h>
 
 #define CLPI_SIG1  ('H' << 24 | 'D' << 16 | 'M' << 8 | 'V')
 #define CLPI_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
@@ -307,7 +321,7 @@ _parse_cpi(BITSTREAM *bits, CLPI_CL *cl)
     return 1;
 }
 
-uint32_t
+static uint32_t
 _find_stc_spn(CLPI_CL *cl, uint8_t stc_id)
 {
     int ii;

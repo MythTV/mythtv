@@ -1,28 +1,41 @@
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2009-2010  John Stebbins
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-
-#if HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
-
-#include <stdint.h>
-#include <string.h>
-#include "../util/macro.h"
-#include "../util/logging.h"
-#include "../util/strutl.h"
-#include "../file/dir.h"
-#include "../file/file.h"
+#include "util/macro.h"
+#include "util/logging.h"
+#include "util/strutl.h"
+#include "file/dir.h"
+#include "file/file.h"
+#include "../bluray.h"
 #include "mpls_parse.h"
 #include "navigation.h"
 
-static int _filter_dup(MPLS_PL *pl_list[], int count, MPLS_PL *pl)
+#include <stdlib.h>
+#include <string.h>
+
+static int _filter_dup(MPLS_PL *pl_list[], unsigned count, MPLS_PL *pl)
 {
-    int ii, jj;
+    unsigned ii, jj;
 
     for (ii = 0; ii < count; ii++) {
         if (pl->list_count != pl_list[ii]->list_count) {
@@ -48,10 +61,10 @@ static int _filter_dup(MPLS_PL *pl_list[], int count, MPLS_PL *pl)
     return 1;
 }
 
-static int
+static unsigned int
 _find_repeats(MPLS_PL *pl, const char *m2ts)
 {
-    int ii, count = 0;
+    unsigned ii, count = 0;
 
     for (ii = 0; ii < pl->list_count; ii++) {
         MPLS_PI *pi;
@@ -66,9 +79,9 @@ _find_repeats(MPLS_PL *pl, const char *m2ts)
 }
 
 static int
-_filter_repeats(MPLS_PL *pl, int repeats)
+_filter_repeats(MPLS_PL *pl, unsigned repeats)
 {
-    int ii;
+    unsigned ii;
 
     for (ii = 0; ii < pl->list_count; ii++) {
       MPLS_PI *pi;
@@ -85,7 +98,7 @@ _filter_repeats(MPLS_PL *pl, int repeats)
 static uint32_t
 _pl_duration(MPLS_PL *pl)
 {
-    int ii;
+    unsigned ii;
     uint32_t duration = 0;
     MPLS_PI *pi;
 
@@ -96,17 +109,17 @@ _pl_duration(MPLS_PL *pl)
     return duration;
 }
 
-NAV_TITLE_LIST* nav_get_title_list(char *root, uint32_t flags)
+NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags)
 {
     DIR_H *dir;
     DIRENT ent;
     char *path = NULL;
     MPLS_PL **pl_list = NULL;
     MPLS_PL *pl = NULL;
-    int ii, pl_list_size = 0;
+    unsigned int ii, pl_list_size = 0;
     int res;
     NAV_TITLE_LIST *title_list;
-    int title_info_alloc = 100;
+    unsigned int title_info_alloc = 100;
 
     title_list = calloc(1, sizeof(NAV_TITLE_LIST));
     title_list->title_info = calloc(title_info_alloc, sizeof(NAV_TITLE_INFO));
@@ -138,6 +151,7 @@ NAV_TITLE_LIST* nav_get_title_list(char *root, uint32_t flags)
             pl_list_size += 100;
             tmp = realloc(pl_list, pl_list_size * sizeof(MPLS_PL*));
             if (tmp == NULL) {
+                X_FREE(path);
                 break;
             }
             pl_list = tmp;
@@ -189,7 +203,7 @@ void nav_free_title_list(NAV_TITLE_LIST *title_list)
     X_FREE(title_list);
 }
 
-char* nav_find_main_title(char *root)
+char* nav_find_main_title(const char *root)
 {
     DIR_H *dir;
     DIRENT ent;
@@ -197,7 +211,7 @@ char* nav_find_main_title(char *root)
     MPLS_PL **pl_list = NULL;
     MPLS_PL **tmp = NULL;
     MPLS_PL *pl = NULL;
-    int count, ii, jj, pl_list_size = 0;
+    unsigned count, ii, jj, pl_list_size = 0;
     int res;
     char longest[11];
 
@@ -225,6 +239,7 @@ char* nav_find_main_title(char *root)
             pl_list_size += 100;
             tmp = realloc(pl_list, pl_list_size * sizeof(MPLS_PL*));
             if (tmp == NULL) {
+                X_FREE(path);
                 break;
             }
             pl_list = tmp;
@@ -253,9 +268,38 @@ char* nav_find_main_title(char *root)
         mpls_free(pl_list[ii]);
     }
     if (count > 0) {
-        return strdup(longest);
+        char *str = (char*)malloc(strlen(longest) + 1);
+        strcpy(str, longest);
+        return str;
     } else {
         return NULL;
+    }
+}
+
+static void
+_fill_mark(NAV_TITLE *title, NAV_MARK *mark, int entry)
+{
+    MPLS_PL *pl = title->pl;
+    MPLS_PLM *plm;
+    MPLS_PI *pi;
+    NAV_CLIP *clip;
+
+    plm = &pl->play_mark[entry];
+
+    mark->plm = plm;
+    mark->mark_type = plm->mark_type;
+    mark->clip_ref = plm->play_item_ref;
+    clip = &title->clip_list.clip[mark->clip_ref];
+    mark->clip_pkt = clpi_lookup_spn(clip->cl, plm->time, 1,
+        title->pl->play_item[mark->clip_ref].clip[title->angle].stc_id);
+    mark->title_pkt = clip->title_pkt + mark->clip_pkt;
+    mark->clip_time = plm->time;
+
+    // Calculate start of mark relative to beginning of playlist
+    if (plm->play_item_ref < title->clip_list.count) {
+        clip = &title->clip_list.clip[plm->play_item_ref];
+        pi = &pl->play_item[plm->play_item_ref];
+        mark->title_time = clip->title_time + plm->time - pi->in_time;
     }
 }
 
@@ -264,11 +308,11 @@ _extrapolate_title(NAV_TITLE *title)
 {
     uint64_t duration = 0;
     uint64_t pkt = 0;
-    int ii, jj;
+    unsigned ii, jj;
     MPLS_PL *pl = title->pl;
     MPLS_PI *pi;
     MPLS_PLM *plm;
-    NAV_CHAP *chap, *prev = NULL;
+    NAV_MARK *mark, *prev = NULL;
     NAV_CLIP *clip;
 
     for (ii = 0; ii < title->clip_list.count; ii++) {
@@ -291,36 +335,24 @@ _extrapolate_title(NAV_TITLE *title)
         plm = &pl->play_mark[ii];
         if (plm->mark_type == BD_MARK_ENTRY) {
 
-            chap = &title->chap_list.chapter[jj];
-
-            chap->number = jj;
-            chap->plm = plm;
-            chap->clip_ref = plm->play_item_ref;
-            clip = &title->clip_list.clip[chap->clip_ref];
-            chap->clip_pkt = clpi_lookup_spn(clip->cl, plm->time, 1,
-                title->pl->play_item[chap->clip_ref].clip[title->angle].stc_id);
-
-            // Calculate start of mark relative to beginning of playlist
-            if (plm->play_item_ref < title->clip_list.count) {
-                clip = &title->clip_list.clip[plm->play_item_ref];
-                pi = &pl->play_item[plm->play_item_ref];
-                chap->title_time = clip->title_time + plm->time - pi->in_time;
-            } else {
-                // Invalid chapter mark
-                continue;
-            }
+            mark = &title->chap_list.mark[jj];
+            _fill_mark(title, mark, ii);
+            mark->number = jj;
 
             // Calculate duration of "entry" marks (chapters)
             if (plm->duration != 0) {
-                chap->duration = plm->duration;
+                mark->duration = plm->duration;
             } else if (prev != NULL) {
                 if (prev->duration == 0) {
-                    prev->duration = chap->title_time - prev->title_time;
+                    prev->duration = mark->title_time - prev->title_time;
                 }
             }
-            prev = chap;
+            prev = mark;
             jj++;
         }
+        mark = &title->mark_list.mark[ii];
+        _fill_mark(title, mark, ii);
+        mark->number = ii;
     }
     title->chap_list.count = jj;
     if (prev->duration == 0) {
@@ -328,11 +360,11 @@ _extrapolate_title(NAV_TITLE *title)
     }
 }
 
-NAV_TITLE* nav_title_open(char *root, char *playlist)
+NAV_TITLE* nav_title_open(const char *root, const char *playlist)
 {
     NAV_TITLE *title = NULL;
     char *path;
-    int ii, chapters = 0;
+    unsigned ii, chapters = 0;
     uint32_t pos = 0;
     uint32_t time = 0;
 
@@ -340,7 +372,8 @@ NAV_TITLE* nav_title_open(char *root, char *playlist)
     if (title == NULL) {
         return NULL;
     }
-    title->root = strdup(root);
+    title->root = (char*)malloc(strlen(root) + 1);
+    strcpy(title->root, root);
     strncpy(title->name, playlist, 11);
     title->name[10] = '\0';
     path = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "PLAYLIST" DIR_SEP "%s",
@@ -412,7 +445,9 @@ NAV_TITLE* nav_title_open(char *root, char *playlist)
         }
     }
     title->chap_list.count = chapters;
-    title->chap_list.chapter = calloc(chapters, sizeof(NAV_CHAP));
+    title->chap_list.mark = calloc(chapters, sizeof(NAV_MARK));
+    title->mark_list.count = title->pl->mark_count;
+    title->mark_list.mark = calloc(title->pl->mark_count, sizeof(NAV_MARK));
 
     _extrapolate_title(title);
     return title;
@@ -420,27 +455,78 @@ NAV_TITLE* nav_title_open(char *root, char *playlist)
 
 void nav_title_close(NAV_TITLE *title)
 {
-    int ii;
+    unsigned ii;
 
-    mpls_free(title->pl);
     for (ii = 0; ii < title->pl->list_count; ii++) {
         clpi_free(title->clip_list.clip[ii].cl);
     }
+    mpls_free(title->pl);
     X_FREE(title->clip_list.clip);
     X_FREE(title->root);
+    X_FREE(title->chap_list.mark);
+    X_FREE(title->mark_list.mark);
     X_FREE(title);
 }
 
 // Search for random access point closest to the requested packet
 // Packets are 192 byte TS packets
-NAV_CLIP* nav_chapter_search(NAV_TITLE *title, int chapter, uint32_t *out_pkt)
+NAV_CLIP* nav_chapter_search(NAV_TITLE *title, unsigned chapter, uint32_t *clip_pkt, uint32_t *out_pkt)
 {
+    NAV_CLIP *clip;
+
     if (chapter > title->chap_list.count) {
-        *out_pkt = title->clip_list.clip[0].start_pkt;
-        return &title->clip_list.clip[0];
+        clip = &title->clip_list.clip[0];
+        *clip_pkt = clip->start_pkt;
+        *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
+        return clip;
     }
-    *out_pkt = title->chap_list.chapter[chapter].clip_pkt;
-    return &title->clip_list.clip[title->chap_list.chapter[chapter].clip_ref];
+    clip = &title->clip_list.clip[title->chap_list.mark[chapter].clip_ref];
+    *clip_pkt = title->chap_list.mark[chapter].clip_pkt;
+    *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
+    return clip;
+}
+
+uint32_t nav_chapter_get_current(NAV_CLIP *clip, uint32_t pkt)
+{
+    NAV_MARK * mark;
+    NAV_TITLE *title = clip->title;
+    uint32_t ii;
+
+    // Clip can be null if we haven't started the first clip yet
+    if (clip == NULL) {
+        return 0;
+    }
+    for (ii = 0; ii < title->chap_list.count; ii++) {
+        mark = &title->chap_list.mark[ii];
+        if (mark->clip_ref == clip->ref && mark->clip_pkt <= pkt) {
+            if ( ii == title->chap_list.count - 1 ) {
+                return ii;
+            }
+            mark = &title->chap_list.mark[ii+1];
+            if (mark->clip_ref != clip->ref || mark->clip_pkt > pkt) {
+                return ii;
+            }
+        }
+    }
+    return 0;
+}
+
+// Search for random access point closest to the requested packet
+// Packets are 192 byte TS packets
+NAV_CLIP* nav_mark_search(NAV_TITLE *title, unsigned mark, uint32_t *clip_pkt, uint32_t *out_pkt)
+{
+    NAV_CLIP *clip;
+
+    if (mark > title->mark_list.count) {
+        clip = &title->clip_list.clip[0];
+        *clip_pkt = clip->start_pkt;
+        *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
+        return clip;
+    }
+    clip = &title->clip_list.clip[title->mark_list.mark[mark].clip_ref];
+    *clip_pkt = title->mark_list.mark[mark].clip_pkt;
+    *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
+    return clip;
 }
 
 // Search for random access point closest to the requested packet
@@ -451,7 +537,7 @@ NAV_CLIP* nav_packet_search(NAV_TITLE *title, uint32_t pkt, uint32_t *clip_pkt, 
 {
     uint32_t pos, len;
     NAV_CLIP *clip;
-    int ii;
+    unsigned ii;
 
     pos = 0;
     for (ii = 0; ii < title->pl->list_count; ii++) {
@@ -505,7 +591,7 @@ NAV_CLIP* nav_time_search(NAV_TITLE *title, uint32_t tick, uint32_t *clip_pkt, u
     uint32_t pos, len;
     MPLS_PI *pi;
     NAV_CLIP *clip;
-    int ii;
+    unsigned ii;
 
     pos = 0;
     for (ii = 0; ii < title->pl->list_count; ii++) {
@@ -559,7 +645,7 @@ NAV_CLIP* nav_next_clip(NAV_TITLE *title, NAV_CLIP *clip)
     return &title->clip_list.clip[clip->ref + 1];
 }
 
-NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, int angle)
+NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, unsigned angle)
 {
     char *path;
     int ii;
@@ -569,10 +655,15 @@ NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, int angle)
     if (title == NULL) {
         return clip;
     }
-    if (angle < 0 || angle > 8) {
+    if (angle > 8) {
         // invalid angle
         return clip;
     }
+    if (angle == title->angle) {
+        // no change
+        return clip;
+    }
+
     title->angle = angle;
     // Find length in packets and end_pkt for each clip
     title->packets = 0;
@@ -628,3 +719,4 @@ NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, int angle)
     _extrapolate_title(title);
     return clip;
 }
+

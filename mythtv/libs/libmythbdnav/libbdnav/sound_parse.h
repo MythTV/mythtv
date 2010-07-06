@@ -17,33 +17,37 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBBLURAY_ATTRIBUTES_H_
-#define LIBBLURAY_ATTRIBUTES_H_
+#if !defined(_SOUND_PARSE_H_)
+#define _SOUND_PARSE_H_
+
+#include <util/attributes.h>
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3 ))
-#    define BD_ATTR_FORMAT_PRINTF(format,var) __attribute__((__format__(__printf__,format,var)))
-#    define BD_ATTR_MALLOC                    __attribute__((__malloc__))
-#    define BD_ATTR_PACKED                    __attribute__((packed))
-#else
-#    define BD_ATTR_FORMAT_PRINTF(format,var)
-#    define BD_ATTR_MALLOC
-#    define BD_ATTR_PACKED
-#endif
+typedef struct {
+  uint8_t    num_channels;
+  uint32_t   sample_rate;
+  uint8_t    bits_per_sample;
 
-#if defined(__GNUC__) && __GNUC__ >= 4
-#    define BD_PUBLIC  __attribute__((visibility("default")))
-#    define BD_PRIVATE __attribute__((visibility("hidden")))
-#else
-#    define BD_PUBLIC
-#    define BD_PRIVATE
-#endif
+  uint32_t   num_frames;
+  uint16_t  *samples;       /* LPCM, interleaved */
+} SOUND_OBJECT;
+
+typedef struct {
+    uint16_t     num_sounds;
+    SOUND_OBJECT sounds[];
+} SOUND_DATA;
+
+
+BD_PRIVATE SOUND_DATA* sound_parse(const char *path); /* parse sound.bdmv */
+BD_PRIVATE void        sound_free(SOUND_DATA *sound);
 
 #ifdef __cplusplus
 };
 #endif
 
-#endif /* LIBBLURAY_ATTRIBUTES_H_ */
+#endif // _MOBJ_PARSE_H_

@@ -1,17 +1,45 @@
-#include <stdlib.h>
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2009-2010  Obliter0n
+ * Copyright (C) 2009-2010  John Stebbins
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 
 #include "logging.h"
 
-char out[512];
-debug_mask_t debug_mask = 0;
-static int debug_init = 0;
-FILE *logfile = NULL;
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+static debug_mask_t debug_mask = DBG_CRIT;
 
 
-char *print_hex(uint8_t *buf, int count)
+void bd_set_debug_mask(debug_mask_t mask)
 {
-    memset(out, 0, sizeof(out));
+    debug_mask = mask;
+}
 
+debug_mask_t bd_get_debug_mask(void)
+{
+    return debug_mask;
+}
+
+char *print_hex(char *out, const uint8_t *buf, int count)
+{
     int zz;
     for(zz = 0; zz < count; zz++) {
         sprintf(out + (zz * 2), "%02X", buf[zz]);
@@ -20,28 +48,25 @@ char *print_hex(uint8_t *buf, int count)
     return out;
 }
 
-void debug(const char *file, int line, uint32_t mask, const char *format, ...)
+void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...)
 {
+    static int   debug_init = 0;
+    static FILE *logfile    = NULL;
+
     // Only call getenv() once.
     if (!debug_init) {
-        char *env;
-
         debug_init = 1;
+        logfile = stderr;
 
-        if ((env = getenv("BD_DEBUG_MASK"))) {
+        char *env = NULL;
+        if ((env = getenv("BD_DEBUG_MASK")))
             debug_mask = strtol(env, NULL, 0);
-        } else {
-            debug_mask = DBG_CRIT;
-        }
 
         // Send DEBUG to file?
         if ((env = getenv("BD_DEBUG_FILE"))) {
             logfile = fopen(env, "wb");
             setvbuf(logfile, NULL, _IOLBF, 0);
         }
-
-        if (!logfile)
-            logfile = stderr;
     }
 
     if (mask & debug_mask) {

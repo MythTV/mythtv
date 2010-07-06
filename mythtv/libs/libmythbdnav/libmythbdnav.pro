@@ -13,16 +13,16 @@ INCLUDEPATH += ../libmythdb
 #build position independent code since the library is linked into a shared library
 QMAKE_CFLAGS += -fPIC -DPIC
 
-DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
+DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE USING_DLOPEN
 
 # DEFINES += LOG_DEBUG TRACE
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
-HEADERS += bluray.h libdbdnav/*.h util/*.h file/*.h
+HEADERS += bluray.h register.h libdbdnav/*.h util/*.h file/*.h
 
-SOURCES += bluray.c libbdnav/*.c file/*.c util/*.c
+SOURCES += bluray.c register.c libbdnav/*.c file/*.c util/*.c
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bdnav
 inc_bdnav.files = bluray.h libbdnav/*.h file/*.h util/*.h

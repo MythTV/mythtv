@@ -9,6 +9,9 @@
 
 #define LOC     QString("BDRingBuffer: ")
 
+QString keyfile = GetConfDir() + "KEYDB.cfg";
+const char *keyfilepath = keyfile.toAscii().data();
+
 BDRingBufferPriv::BDRingBufferPriv()
     : bdnav(NULL)
 {
@@ -50,7 +53,7 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
         VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
                 .arg(filename.toLatin1().data()));
 
-        bdnav = bd_open(filename.toLatin1().data(), NULL);
+        bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
 
         if (!bdnav)
             return false;
@@ -119,7 +122,7 @@ double BDRingBufferPriv::GetFrameRate(void)
 {
     if (bdnav)
     {
-        uint8_t rate = bdnav->title->pl->play_item->stn.video->rate;
+        uint8_t rate = m_currentTitleInfo->clips->video_streams->rate;
         switch (rate)
         {
             case BD_VIDEO_RATE_24000_1001:

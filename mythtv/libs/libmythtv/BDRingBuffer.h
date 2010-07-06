@@ -46,11 +46,11 @@ class MPUBLIC BDRingBufferPriv
     uint64_t Seek(uint64_t pos);
 
   protected:
-    BLURAY        *bdnav;
-    uint32_t       m_mainTitle; // Index number of main title
-    uint64_t       m_mainTitleLength; // Main title's duration, in ticks (90Khz)
-    BD_TITLE_INFO *m_currentTitleInfo; // Selected title info from struct in bluray.h
-    int            m_titlesize;
-    uint           m_currentTime;
+    BLURAY            *bdnav;
+    uint32_t           m_mainTitle; // Index number of main title
+    uint64_t           m_mainTitleLength; // Main title's duration, in ticks (90Khz)
+    BLURAY_TITLE_INFO *m_currentTitleInfo; // Selected title info from struct in bluray.h
+    int                m_titlesize;
+    uint               m_currentTime;
 };
 #endif

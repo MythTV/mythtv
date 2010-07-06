@@ -24,13 +24,13 @@
 #ifndef BD_BITS_H
 #define BD_BITS_H
 
+#include "file/file.h"
+
+#include <unistd.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-//#include <stdio.h>
-#include <fcntl.h>
-#include "../file/file.h"
 
 /**
  * \file
@@ -56,9 +56,9 @@ typedef struct {
     int        size;
 } BITSTREAM;
 
-static inline void bb_init( BITBUFFER *bb, const void *p_data, size_t i_data )
+static inline void bb_init( BITBUFFER *bb, void *p_data, size_t i_data )
 {
-    bb->p_start = (void *)p_data;
+    bb->p_start = p_data;
     bb->p       = bb->p_start;
     bb->p_end   = bb->p_start + i_data;
     bb->i_left  = 8;
@@ -112,7 +112,14 @@ static inline void bb_seek( BITBUFFER *bb, off_t off, int whence)
     }
     b = off >> 3;
     bb->p = &bb->p_start[b];
-    bb->i_left = 8 - (off & 0x07);
+
+    ssize_t i_tmp = bb->i_left - (off & 0x07);
+    if (i_tmp <= 0) {
+        bb->i_left = 8 + i_tmp;
+        bb->p++;
+    } else {
+        bb->i_left = i_tmp;
+    }
 }
 
 static inline void bs_seek( BITSTREAM *bs, off_t off, int whence)
@@ -209,7 +216,7 @@ static inline uint32_t bb_read( BITBUFFER *bb, int i_count )
     return( i_result );
 }
 
-static inline uint32_t bs_read( BITSTREAM *bs, int i_count )
+static uint32_t bs_read( BITSTREAM *bs, int i_count )
 {
     int left;
     int bytes = (i_count + 7) >> 3;

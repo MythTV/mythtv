@@ -1,14 +1,29 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <libgen.h>
-#include "../util/macro.h"
-#include "../file/file.h"
-#include "../util/bits.h"
+/*
+ * This file is part of libbluray
+ * Copyright (C) 2009-2010  John Stebbins
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
+#include "util/macro.h"
+#include "file/file.h"
+#include "util/bits.h"
 #include "mpls_parse.h"
+
+#include <stdlib.h>
+#include <string.h>
 
 #define MPLS_SIG1  ('M' << 24 | 'P' << 16 | 'L' << 8 | 'S')
 #define MPLS_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
@@ -307,7 +322,7 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     // Secondary Audio Streams
     ss = NULL;
     if (stn->num_secondary_audio) {
-        ss = calloc(1, sizeof(MPLS_STREAM));
+        ss = calloc(stn->num_secondary_audio, sizeof(MPLS_STREAM));
         for (ii = 0; ii < stn->num_secondary_audio; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
