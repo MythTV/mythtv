@@ -7,4 +7,6 @@
 
 MPUBLIC long long getDiskSpace(const QString&,long long&,long long&);
 
+MPUBLIC bool extractZIP(const QString &zipFile, const QString &outDir);
+
 #endif // COREUTIL_H_

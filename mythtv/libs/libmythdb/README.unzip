@@ -1,0 +1,80 @@
+This README is for the zip and unzip related source files this directory.
+
+Currently these consist of:
+
+unzip.cpp
+unzip.h
+unzip_p.h
+zipentry_p.h
+
+==============================================================================
+
+The *.cpp and *.h files in this archive are 
+Copyright (C) 2007-2008 Angius Fabrizio (blue_death@users.sourceforge.net)
+
+You may use, distribute and copy the files under the terms of
+GNU General Public License version 2 (see the file LICENSE.GPL for details)
+
+-------------------------------------------------------------------------
+
+Website: http://osdab.sourceforge.net/
+SourceForge.net project page: https://sourceforge.net/projects/osdab/
+
+**************** ******* ******************************************************
+
+detailed description
+--------------------
+Meet a couple of pure-Qt/C++ classes capable of handling PKZIP 2.0 compatible zip archives. 
+
+This is not a "port" of some other existing implementation, everything has been written from scratch (althought some code was actually inspired by existing public domain projects) and it's all pure C++/Qt. Please note that this is not a complete stand-alone library, it's just a bunch of classes. You will have to add them to your project and modify them to best fit your needs. 
+
+It supports basic features like file extraction and compression (with optional password encryption) and archive comments. There are methods to extract single files or the whole archive and methods to compress the contents of a whole directory. Nevertheless, it should be quite trivial to add other features. The public API only has a few methods because this is what I was looking for. This does not mean you can't write a few more lines of code (it really shouldn't take more than a few lines!) to add more features. 
+
+The classes are great if you only need to use the PKZIP format for loading/saving your application's data. Just remember that you will need to customize a few parts of the code, i.e. to add your own password retrieval method. 
+
+zlib is used for actual compression and decompression.
+
+Please refer to the example application's main.cpp file or to the class comments in the source files for details and more usage examples.
+
+history
+-------
+2008-09-97 - Bug fix: end of central directory was sometimes not being found when the archive had a comment.
+2007-02-01 - New IgnorePaths compression option and two more "addDirectoryContents()" convenience methods to use this option.
+2007-01-28 - Major changes:
+ - Bug fix: there was a big problem with directory names.
+ - API changes: the Zip::addDirectory() method is now easier to use.
+   The password can now be set using a setPassword() method and a new flag allows to preserve absolute paths.
+ - Added an "encrypted" flag to the Unzip::ZipEntry struct.
+ - Removed QObject inheritance. Internationalization is now achieved through QCoreApplication::translate().
+2006-11-30 - A good part of the UnZip class has been rewritten. Zip entries with a Data Descriptor (like OpenOffice files) are now correctly parsed; some minor API changes and bug fixes; new features: comments, zip entry list, skip paths unzip option
+2006-11-24 - Bug fix. An additional directory was being created for some files in the root directory
+2006-10-23 - Minor API changes; QIODevice support added; better binary compatibility; "long long" issue with older compilers solved
+2006-06-09 - Minor API changes
+2005-10-03 - First public release
+
+features
+--------
+Pure C++/Qt based, clean & oo implementation. 
+Retrieve archive contents information before extracting any file. 
+Fast (but less robust with corrupt archives) parsing of the ZIP file format. 
+Traditional PKWARE password encryption (strong encryption as introduced by PKZip versions 5.0 and later is NOT available). 
+Support for archive comments.
+
+missing features and restrictions
+---------------------------------
+Needs to be modified to fit into an existing project (i.e.: you might need to add your own password handling routine). 
+Weak support of corrupted archives (althought some files could be extracted even if the archive is corrupted). 
+No support for filesystem specific features like unix symbolic links. 
+No support for spanned archives. 
+No support for strong encryption or features introduced after PKZIP version 2.0 (see the PKWARE specs for details).
+
+requirements
+------------
+Qt version 4.0.x or later
+zlib library
+
+
+**************** ******* ******************************************************
+BEFORE SENDING ANY EMAIL, CHECK OUT THE OSDAB WEBSITE HOSTED AT SOURCEFORGE.NET
+**************** ******* ******************************************************
+

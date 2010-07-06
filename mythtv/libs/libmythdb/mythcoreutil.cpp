@@ -25,6 +25,9 @@
 // Qt headers
 #include <QByteArray>
 
+// libmythdb headers
+#include "mythverbose.h"
+#include "unzip.h"
 
 /** \fn getDiskSpace(const QString&,long long&,long long&)
  *  \brief Returns free space on disk containing file in KiB,
@@ -61,6 +64,34 @@ long long getDiskSpace(const QString &file_on_disk,
     }
 
     return freespace;
+}
+
+bool extractZIP(const QString &zipFile, const QString &outDir)
+{
+    UnZip uz;
+    UnZip::ErrorCode ec = uz.openArchive(zipFile);
+
+    if (ec != UnZip::Ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("extractZIP(): Unable to open ZIP file %1")
+                        .arg(zipFile));
+        return false;
+    }
+
+    ec = uz.extractAll(outDir);
+    
+    if (ec != UnZip::Ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("extractZIP(): Error extracting ZIP file %1")
+                        .arg(zipFile));
+        return false;
+    }
+
+    uz.closeArchive();
+
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
