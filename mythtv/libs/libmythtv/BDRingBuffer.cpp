@@ -83,12 +83,32 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
         // Now that we've settled on which index the main title is, get info.
         m_currentTitleInfo = bd_get_title_info(bdnav, m_mainTitle);
         bd_select_title(bdnav, m_mainTitle);
-
-        VERBOSE(VB_IMPORTANT, LOC + QString("Longest title: index %1. Duration: %2. "
-                                            "Number of Chapters: %3")
-                                            .arg(m_mainTitle).arg(m_mainTitleLength)
-                                            .arg(m_currentTitleInfo->chapter_count));
-
+        uint32_t chapter_count = m_currentTitleInfo->chapter_count;
+        VERBOSE(VB_IMPORTANT, LOC + QString("Longest title: index %1. "
+                                            "Duration: %2 (%3 mins) "
+                                            "Number of Chapters: %4")
+                                            .arg(m_mainTitle)
+                                            .arg(m_mainTitleLength)
+                                            .arg(m_mainTitleLength / (90000 * 60))
+                                            .arg(chapter_count));
+        VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
+        if (chapter_count)
+        {
+            for (uint i = 0; i < chapter_count; i++)
+            {
+                uint64_t total_secs = GetChapterStartTime(i);
+                uint64_t framenum   = GetChapterStartFrame(i);
+                int hours = (int)total_secs / 60 / 60;
+                int minutes = ((int)total_secs / 60) - (hours * 60);
+                double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
+                VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
+                        .arg(QString().sprintf("%02d", i + 1))
+                        .arg(QString().sprintf("%02d", hours))
+                        .arg(QString().sprintf("%02d", minutes))
+                        .arg(QString().sprintf("%06.3f", secs))
+                        .arg(framenum));
+            }
+        }
         m_titlesize = bd_get_title_size(bdnav);
 
         return true;
@@ -100,6 +120,29 @@ uint64_t BDRingBufferPriv::GetReadPosition(void)
         return bd_tell(bdnav);
     else
         return 0;
+}
+
+uint32_t BDRingBufferPriv::GetNumChapters(void)
+{
+    if (m_currentTitleInfo)
+        return m_currentTitleInfo->chapter_count;
+    return 0;
+}
+
+uint64_t BDRingBufferPriv::GetChapterStartTime(uint32_t chapter)
+{
+    if (chapter < 0 || chapter >= GetNumChapters())
+        return 0;
+    return (uint64_t)((long double)m_currentTitleInfo->chapters[chapter].start /
+                                   90000.0f);
+}
+
+uint64_t BDRingBufferPriv::GetChapterStartFrame(uint32_t chapter)
+{
+    if (chapter < 0 || chapter >= GetNumChapters())
+        return 0;
+    return (uint64_t)((long double)(m_currentTitleInfo->chapters[chapter].start *
+                                    GetFrameRate()) / 90000.0f);
 }
 
 uint64_t BDRingBufferPriv::GetTotalReadPosition(void)

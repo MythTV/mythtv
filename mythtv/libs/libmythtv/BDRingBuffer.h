@@ -30,6 +30,9 @@ class MPUBLIC BDRingBufferPriv
     uint64_t GetCurrentTime(void) { return (m_currentTime / 90000); }
     uint64_t GetReadPosition(void);
     uint64_t GetTotalReadPosition(void);
+    uint32_t GetNumChapters(void);
+    uint64_t GetChapterStartTime(uint32_t chapter);
+    uint64_t GetChapterStartFrame(uint32_t chapter);
     bool IsOpen(void)        const { return bdnav; }
 
     void GetDescForPos(QString &desc) const;
@@ -50,7 +53,7 @@ class MPUBLIC BDRingBufferPriv
     uint32_t           m_mainTitle; // Index number of main title
     uint64_t           m_mainTitleLength; // Main title's duration, in ticks (90Khz)
     BLURAY_TITLE_INFO *m_currentTitleInfo; // Selected title info from struct in bluray.h
-    int                m_titlesize;
-    uint               m_currentTime;
+    uint64_t           m_titlesize;
+    uint64_t           m_currentTime;
 };
 #endif
