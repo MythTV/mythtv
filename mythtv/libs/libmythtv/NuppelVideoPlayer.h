@@ -500,7 +500,7 @@ class MPUBLIC NuppelVideoPlayer
     bool           pauseDecoder;
     bool           unpauseDecoder;
     bool           killdecoder;
-    uint64_t       decoderSeek;
+    int64_t        decoderSeek;
     bool           decodeOneFrame;
     bool           needNewPauseFrame;
     mutable QMutex bufferPauseLock;

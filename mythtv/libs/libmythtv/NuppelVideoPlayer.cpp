@@ -165,7 +165,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       embx(-1), emby(-1), embw(-1), embh(-1),
       // State
       decoderPaused(false), pauseDecoder(false), unpauseDecoder(false),
-      killdecoder(false),   decoderSeek(0),      decodeOneFrame(false),
+      killdecoder(false),   decoderSeek(-1),     decodeOneFrame(false),
       needNewPauseFrame(false),
       bufferPaused(false),  videoPaused(false),
       allpaused(false),     playing(false),
@@ -2678,14 +2678,14 @@ void NuppelVideoPlayer::DecoderLoop(bool pause)
             GetDecoder()->SyncPositionMap();
         }
 
-        if (decoderSeek)
+        if (decoderSeek >= 0)
         {
             decoderSeekLock.lock();
-            if ((decoderSeek < framesPlayed) && GetDecoder())
+            if (((uint64_t)decoderSeek < framesPlayed) && GetDecoder())
                 GetDecoder()->DoRewind(decoderSeek);
             else if (GetDecoder())
                 GetDecoder()->DoFastForward(decoderSeek);
-            decoderSeek = 0;
+            decoderSeek = -1;
             decoderSeekLock.unlock();
         }
 
@@ -2706,7 +2706,7 @@ void NuppelVideoPlayer::DecoderLoop(bool pause)
     // Clear any wait conditions
     PauseDecoder();
     UnpauseDecoder();
-    decoderSeek = 0;
+    decoderSeek = -1;
 }
 
 bool NuppelVideoPlayer::DecoderGetFrameFFREW(void)
@@ -3273,7 +3273,7 @@ void NuppelVideoPlayer::DoJumpToFrame(uint64_t frame)
 void NuppelVideoPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                                     bool seeks_wanted)
 {
-    if (!GetDecoder())
+    if (!GetDecoder() || frame < 0)
         return;
 
     bool after  = exactseeks && (ffrew_skip == 1);
@@ -3285,7 +3285,7 @@ void NuppelVideoPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
     decoderSeek = frame;
     decoderSeekLock.unlock();
 
-    while (decoderSeek)
+    while (decoderSeek >= 0)
         usleep(1000);
     GetDecoder()->setExactSeeks(after);
 }
