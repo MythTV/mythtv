@@ -603,10 +603,41 @@ class VoqvEmbedded : public VideoOutputQuartzView
         GetPortBounds(thePort, &portBounds);
         InvalWindowRect(parentData->window, &portBounds);
 
-        // The main class handles masking and resizing, since we set m_desired
         viewLock.unlock();
         return true;
     };
+
+    // Simple scaler setup that just uses m_desired to fill embed area:
+    bool Begin(void)
+    {
+        viewLock.lock();
+        if (DecompressSequenceBeginS(&theCodec, parentData->imgDesc,
+                                     NULL, 0, thePort, NULL, NULL, NULL,
+                                     srcCopy, theMask, 0,
+                                     codecNormalQuality, bestSpeedCodec))
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
+                    .arg(name));
+            viewLock.unlock();
+            return false;
+        }
+ 
+        // Turn off gamma correction unless requested
+        if (!parentData->correctGamma)
+            QTSetPixMapHandleRequestedGammaLevel(GetPortPixMap(thePort),
+                                                 kQTUseSourceGammaLevel);
+ 
+        SetDSequenceFlags(theCodec,
+                          codecDSequenceFlushInsteadOfDirtying,
+                          codecDSequenceFlushInsteadOfDirtying);
+        viewLock.unlock();
+ 
+        // set transformation matrix
+        Transform(m_desired);
+ 
+        return true;
+    }
 
     void EndPort(void)
     {
