@@ -39,15 +39,9 @@ extern bool tryingVideoSync;
  *   The factory method BestMethod tries subclasses in roughly quality
  *   order until one succeeds.
  *
- *   A/V sync methods may supply an additonal delay per frame. Other
+ *   A/V sync methods may supply the nominal delay per frame. Other
  *   than that, video timing is entirely up to these classes. When
  *   WaitForFrame returns, it is time to show the frame.
- *
- *   There is some basic support for interlaced video timing where the
- *   fields need to be displayed sequentially. Passing true for the
- *   interlaced flags for the constructors, BestMethod, and
- *   SetFrameInterval will cause us to wait for half the specified frame
- *   interval, if the refresh rate is sufficient to do so.
  */
 class VideoSync
 // virtual base class
@@ -80,16 +74,8 @@ class VideoSync
      */
     virtual void WaitForFrame(int sync_delay) = 0;
 
-    /// \brief Use the next frame or field for CalcDelay(void)
-    ///        and WaitForFrame(int).
-    virtual void AdvanceTrigger(void) = 0;
-
-    void SetFrameInterval(int fi, bool interlaced);
-
-    /// \brief Returns true AdvanceTrigger(void) advances a field at a time.
-    bool UsesFieldInterval(void) const { return m_interlaced; }
-    /// \brief Returns true AdvanceTrigger(void) advances a frame at a time.
-    bool UsesFrameInterval(void) const { return !m_interlaced; }
+    /// \brief Returns the (minimum) refresh interval of the output device.
+    int getRefreshInterval(void) const { return m_refresh_interval; }
 
     /** \brief Stops VSync; must be called from main thread.
      *
@@ -105,7 +91,6 @@ class VideoSync
                                  bool interlaced);
   protected:
     static void OffsetTimeval(struct timeval& tv, int offset);
-    void UpdateNexttrigger(void);
     int CalcDelay(void);
     void KeepPhase(void);
 
@@ -137,7 +122,6 @@ class DRMVideoSync : public VideoSync
     bool TryInit(void);
     void Start(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
 
   private:
     int m_dri_fd;
@@ -179,7 +163,6 @@ class OpenGLVideoSync : public VideoSync
     bool TryInit(void);
     void Start(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
 
   private:
     MythRenderOpenGL  *m_context;
@@ -208,7 +191,6 @@ class RTCVideoSync : public VideoSync
     QString getName(void) const { return QString("RTC"); }
     bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
 
   private:
     int m_rtcfd;
@@ -229,7 +211,6 @@ class VDPAUVideoSync : public VideoSync
     QString getName(void) const { return QString("VDPAU"); }
     bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
 
   private:
 };
@@ -257,7 +238,6 @@ class BusyWaitVideoSync : public VideoSync
     QString getName(void) const { return QString("USleep with busy wait"); }
     bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
 
   private:
     int m_cheat;
@@ -285,6 +265,5 @@ class USleepVideoSync : public VideoSync
     QString getName(void) const { return QString("USleep"); }
     bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
 };
 #endif /* VSYNC_H_INCLUDED */

@@ -128,32 +128,11 @@ VideoSync::VideoSync(VideoOutput *video_output,
     m_delay(-1)
 {
     bzero(&m_nexttrigger, sizeof(m_nexttrigger));
-
-    int tolerance = m_refresh_interval / 200;
-    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
-        m_interlaced = false; // can't display both fields at 2x rate
-
-    //cout << "Frame interval: " << m_frame_interval << endl;
 }
 
 void VideoSync::Start(void)
 {
     gettimeofday(&m_nexttrigger, NULL); // now
-}
-
-/** \fn VideoSync::SetFrameInterval(int fr, bool intr)
- *  \brief Change frame interval and interlacing attributes
- */
-void VideoSync::SetFrameInterval(int fr, bool intr)
-{
-    m_frame_interval = fr;
-    m_interlaced = intr;
-    int tolerance = m_refresh_interval / 200;
-    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
-        m_interlaced = false; // can't display both fields at 2x rate
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("Set video sync frame interval to %1")
-                                       .arg(m_frame_interval));
 }
 
 void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
@@ -169,21 +148,6 @@ void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
         tv.tv_sec--;
         tv.tv_usec += 1000000;
     }
-}
-
-/** \fn VideoSync::UpdateNexttrigger()
- *  \brief Internal method to tells video synchronization method to use
- *         the next frame (or field, if interlaced) for CalcDelay()
- *         and WaitForFrame().
- */
-void VideoSync::UpdateNexttrigger()
-{
-    // Offset by frame interval -- if interlaced, only delay by half
-    // frame interval
-    if (m_interlaced)
-        OffsetTimeval(m_nexttrigger, m_frame_interval/2);
-    else
-        OffsetTimeval(m_nexttrigger, m_frame_interval);
 }
 
 /** \fn VideoSync::CalcDelay()
@@ -372,12 +336,8 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
         //cerr << "Wait " << n << " intervals. Count " << blank.request.sequence;
         //cerr  << " Delay " << m_delay << endl;
     }
-}
 
-void DRMVideoSync::AdvanceTrigger(void)
-{
     KeepPhase();
-    UpdateNexttrigger();
 }
 #endif /* !_WIN32 */
 
@@ -480,15 +440,8 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         m_context->WaitForVideoSync((n+1), (frameNum+n)%(n+1), &frameNum);
         m_delay = CalcDelay();
     }
-#endif /* USING_OPENGL_VSYNC */
-}
-
-void OpenGLVideoSync::AdvanceTrigger(void)
-{
-#ifdef USING_OPENGL_VSYNC
 
     KeepPhase();
-    UpdateNexttrigger();
 #endif /* USING_OPENGL_VSYNC */
 }
 #endif /* !_WIN32 */
@@ -551,11 +504,6 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
             usleep(m_delay);
     }
 }
-
-void RTCVideoSync::AdvanceTrigger(void)
-{
-    UpdateNexttrigger();
-}
 #endif /* __linux__ */
 
 #ifdef USING_VDPAU
@@ -590,12 +538,6 @@ void VDPAUVideoSync::WaitForFrame(int sync_delay)
     VideoOutputVDPAU *vo = (VideoOutputVDPAU *)(m_video_output);
     vo->SetNextFrameDisplayTimeOffset(m_delay);
 }
-
-void VDPAUVideoSync::AdvanceTrigger(void)
-{
-    UpdateNexttrigger();
-}
-
 #endif
 
 BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo,
@@ -646,11 +588,6 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
     }
 }
 
-void BusyWaitVideoSync::AdvanceTrigger(void)
-{
-    UpdateNexttrigger();
-}
-
 USleepVideoSync::USleepVideoSync(VideoOutput *vo,
                                  int fr, int ri, bool intl) :
     VideoSync(vo, fr, ri, intl)
@@ -676,7 +613,3 @@ void USleepVideoSync::WaitForFrame(int sync_delay)
         usleep(m_delay);
 }
 
-void USleepVideoSync::AdvanceTrigger(void)
-{
-    UpdateNexttrigger();
-}

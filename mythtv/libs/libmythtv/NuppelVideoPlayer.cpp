@@ -715,9 +715,6 @@ void NuppelVideoPlayer::FallbackDeint(void)
      m_double_framerate = false;
      m_double_process   = false;
 
-     if (videosync)
-         videosync->SetFrameInterval(frame_interval, false);
-
      if (videoOutput)
          videoOutput->FallbackDeint();
 }
@@ -791,7 +788,6 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
     if (interlaced && !m_deint_possible)
     {
         m_scan = scan;
-        videosync->SetFrameInterval(frame_interval, false);
         return;
     }
 
@@ -807,9 +803,7 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         if (videoOutput->NeedsDoubleFramerate())
         {
             m_double_framerate = true;
-            videosync->SetFrameInterval(frame_interval, true);
-            // Make sure video sync can double frame rate
-            m_can_double = videosync->UsesFieldInterval();
+            m_can_double = (frame_interval / 2 > videosync->getRefreshInterval() * 0.995);
             if (!m_can_double)
             {
                 VERBOSE(VB_IMPORTANT, LOC + "Video sync method can't support "
@@ -826,7 +820,6 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         {
             m_double_process = false;
             m_double_framerate = false;
-            videosync->SetFrameInterval(frame_interval, false);
             videoOutput->SetDeinterlacingEnabled(false);
             VERBOSE(VB_PLAYBACK, LOC + "Disabled deinterlacing");
         }
@@ -1584,11 +1577,11 @@ void NuppelVideoPlayer::InitAVSync(void)
 void NuppelVideoPlayer::AVSync(bool limit_delay)
 {
     float diverge = 0.0f;
+    int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
     // attempt to reduce fps for standalone PIP
     if (player_ctx->IsPIP() && framesPlayed % 2)
     {
-        videosync->WaitForFrame(avsync_adjustment);
-        videosync->AdvanceTrigger();
+        videosync->WaitForFrame(frameDelay + avsync_adjustment);
         if (!using_null_videoout)
             videoOutput->SetFramesPlayed(framesPlayed + 1);
         return;
@@ -1619,10 +1612,8 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
-    bool dropframe = false;
     if (diverge < -MAXDIVERGE)
     {
-        dropframe = true;
         // If video is way behind of audio, adjust for it...
         QString dbg = QString("Video is %1 frames behind audio (too slow), ")
             .arg(-diverge);
@@ -1656,7 +1647,7 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
 
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, QString("AVSync waitforframe %1 %2")
                 .arg(avsync_adjustment).arg(m_double_framerate));
-        videosync->WaitForFrame(avsync_adjustment + repeat_delay);
+        videosync->WaitForFrame(frameDelay + avsync_adjustment + repeat_delay);
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, "AVSync show");
         videoOutput->Show(ps);
 
@@ -1686,8 +1677,7 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
                 videoOutput->PrepareFrame(buffer, ps, osd);
 
             // Display the second field
-            videosync->AdvanceTrigger();
-            videosync->WaitForFrame(avsync_adjustment);
+            videosync->WaitForFrame(frameDelay + avsync_adjustment);
             videoOutput->Show(ps);
         }
 
@@ -1699,14 +1689,12 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
     }
     else
     {
-        videosync->WaitForFrame(0);
+        videosync->WaitForFrame(frameDelay);
     }
 
     if (output_jmeter)
         output_jmeter->RecordCycleTime();
 
-    if (!dropframe)
-        videosync->AdvanceTrigger();
     avsync_adjustment = 0;
 
     if (diverge > MAXDIVERGE)
@@ -1746,10 +1734,8 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
                 delta < (int) frame_interval / 1000 * 3 &&
                 prevrp == 0)
             {
-                //cerr << "+ ";
-                videosync->AdvanceTrigger();
-                if (m_double_framerate)
-                    videosync->AdvanceTrigger();
+                // wait an extra frame interval
+                avsync_adjustment = frame_interval;
             }
             prevrp = buffer->repeat_pict;
 
@@ -1765,12 +1751,12 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
             {
                 if (avsync_avg > frame_interval * 3 / 2)
                 {
-                    avsync_adjustment = refreshrate;
+                    avsync_adjustment += refreshrate;
                     lastsync = true;
                 }
                 else if (avsync_avg < 0 - frame_interval * 3 / 2)
                 {
-                    avsync_adjustment = -refreshrate;
+                    avsync_adjustment -= refreshrate;
                     lastsync = true;
                 }
             }
@@ -2000,8 +1986,7 @@ void NuppelVideoPlayer::VideoStart(void)
         // Make sure video sync can do it
         if (videosync != NULL && m_double_framerate)
         {
-            videosync->SetFrameInterval(frame_interval, m_double_framerate);
-            m_can_double = videosync->UsesFieldInterval();
+            m_can_double = (frame_interval / 2 > videosync->getRefreshInterval() * 0.995);
             if (!m_can_double)
             {
                 VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
@@ -3038,7 +3023,6 @@ void NuppelVideoPlayer::ChangeSpeed(void)
 
         m_double_framerate = videoOutput->NeedsDoubleFramerate();
         m_double_process = videoOutput->IsExtraProcessingRequired();
-        videosync->SetFrameInterval(frame_interval, m_double_framerate);
     }
 
     if (normal_speed && audio.HasAudioOut())
