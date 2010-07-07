@@ -282,11 +282,11 @@ class MPUBLIC ProgramInfo
     QString GetPathname(void) const { return pathname; }
     QString GetBasename(void) const { return pathname.section('/', -1); }
     bool IsVideoFile(void) const
-        { return GetProgramInfoType() & kProgramInfoTypeVideoFile; }
+        { return GetProgramInfoType() == kProgramInfoTypeVideoFile; }
     bool IsVideoDVD(void) const
-        { return GetProgramInfoType() & kProgramInfoTypeVideoDVD; }
+        { return GetProgramInfoType() == kProgramInfoTypeVideoDVD; }
     bool IsVideoBD(void) const
-        { return GetProgramInfoType() & kProgramInfoTypeVideoBD; }
+        { return GetProgramInfoType() == kProgramInfoTypeVideoBD; }
     bool IsLocal(void) const { return pathname.left(1) == "/"; }
     bool IsMythStream(void) const { return pathname.left(7) == "myth://"; }
     bool IsPathSet(void) const { return GetBasename() != pathname; }
