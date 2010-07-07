@@ -926,7 +926,31 @@ class MusicPlaylist( MusicSchema, DBDataWriteAI ):
     _setwheredat = 'self.playlist_id,'
     _defaults = {'playlist_id':None}
     _logmodule = 'Python Music Playlist'
-    # TODO: provide 'playlist_songs' as a list rather than comma separated string
+
+    def _pl_tolist(self):
+        try:
+            self.playlist_songs = \
+                    [int(id) for id in self.playlist_songs.split(',')]
+        except: pass
+
+    def _pl_tostr(self):
+        try:
+            self.playlist_songs = \
+                    ','.join(['%d' % id for id in self.playlist_songs])
+        except: pass
+
+    def _pull(self):
+        DBDataWriteAI._pull(self)
+        self._pl_tolist()
+
+    def _push(self):
+        self._pl_tostr()
+        DBDataWriteAI._push(self)
+        self._pl_tolist()
+
+    def _evalwheredat(self, wheredat=None):
+        DBDataWriteAI._evalwheredat(self, wheredat)
+        self._pl_tolist()
 
     @classmethod
     def fromSong(cls, song, db=None):

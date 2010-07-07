@@ -134,6 +134,18 @@ class DBData( DictData, MythSchema ):
     def copy(self):
         return self.fromRaw(self.values(), self._db)
 
+    def __str__(self):
+        if self._wheredat is None:
+            return u"<Uninitialized %s at %s>" % \
+                        (self.__class__.__name__, hex(id(self)))
+        return u"<%s %s at %s>" % \
+                (self.__class__.__name__, \
+                 ','.join(["'%s'" % str(v) for v in self._wheredat]), \
+                 hex(id(self)))
+
+    def __repr__(self):
+        return str(self).encode('utf-8')
+
 class DBDataWrite( DBData ):
     """
     DBDataWrite.__init__(data=None, db=None) --> DBDataWrite object
