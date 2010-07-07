@@ -4108,10 +4108,11 @@ bool NuppelVideoPlayer::DoJumpChapter(int chapter)
 {
     int64_t desiredFrame = -1;
     int total = GetNumChapters();
+    int current = GetCurrentChapter();
 
     if (chapter < 0 || chapter > total)
     {
-        int current = GetCurrentChapter() + 1;
+
         if (chapter < 0)
         {
             chapter = current -1;
@@ -4124,8 +4125,11 @@ bool NuppelVideoPlayer::DoJumpChapter(int chapter)
         }
     }
 
-    desiredFrame = GetDecoder()->GetChapter(chapter);
-
+    desiredFrame = GetChapter(chapter);
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("DoJumpChapter: current %1 want %2 (frame %3)")
+            .arg(current).arg(chapter).arg(desiredFrame));
+                                       
     if (desiredFrame < 0)
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + QString("DoJumpChapter failed."));
@@ -4138,6 +4142,11 @@ bool NuppelVideoPlayer::DoJumpChapter(int chapter)
     ClearAfterSeek(false);
     jumpchapter = 0;
     return true;
+}
+
+int64_t NuppelVideoPlayer::GetChapter(int chapter)
+{
+    return GetDecoder()->GetChapter(chapter);
 }
 
 InteractiveTV *NuppelVideoPlayer::GetInteractiveTV(void)

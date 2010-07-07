@@ -678,7 +678,7 @@ int AvFormatDecoder::GetCurrentChapter(long long framesPlayed)
             VERBOSE(VB_IMPORTANT, LOC +
                     QString("GetCurrentChapter(selected chapter %1 framenum %2)")
                             .arg(i + 1).arg(framenum));
-            return i;
+            return i + 1;
         }
     }
     return 0;

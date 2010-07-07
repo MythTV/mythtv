@@ -375,9 +375,9 @@ class MPUBLIC NuppelVideoPlayer
     void FileChangedCallback();
 
     // Chapter public stuff
-    int  GetNumChapters();
-    int  GetCurrentChapter();
-    void GetChapterTimes(QList<long long> &times);
+    virtual int  GetNumChapters(void);
+    virtual int  GetCurrentChapter(void);
+    virtual void GetChapterTimes(QList<long long> &times);
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw)       { (void) ffw;       }
@@ -457,6 +457,7 @@ class MPUBLIC NuppelVideoPlayer
 
     // Private chapter stuff
     bool DoJumpChapter(int chapter);
+    virtual int64_t GetChapter(int chapter);
 
     // Private edit stuff
     void HandleArbSeek(bool right);

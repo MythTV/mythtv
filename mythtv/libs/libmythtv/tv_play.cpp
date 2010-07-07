@@ -10151,7 +10151,7 @@ QString TV::FillOSDMenuAVChapter(const PlayerContext *ctx, OSD *osd,
                 .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
                 .arg(secs, 2, 10, QChar(48));
             osd->DialogAddButton(desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
-                                 false, current_chapter == i);
+                                 false, current_chapter == (i + 1));
         }
     }
     return result;
