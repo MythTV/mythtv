@@ -489,13 +489,14 @@ NAV_CLIP* nav_chapter_search(NAV_TITLE *title, unsigned chapter, uint32_t *clip_
 uint32_t nav_chapter_get_current(NAV_CLIP *clip, uint32_t pkt)
 {
     NAV_MARK * mark;
-    NAV_TITLE *title = clip->title;
+    NAV_TITLE *title;
     uint32_t ii;
 
     // Clip can be null if we haven't started the first clip yet
     if (clip == NULL) {
         return 0;
     }
+    title = clip->title;
     for (ii = 0; ii < title->chap_list.count; ii++) {
         mark = &title->chap_list.mark[ii];
         if (mark->clip_ref == clip->ref && mark->clip_pkt <= pkt) {

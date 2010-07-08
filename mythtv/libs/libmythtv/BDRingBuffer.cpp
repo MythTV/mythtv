@@ -1,6 +1,6 @@
-#include "libbdnav/mpls_parse.h"
-#include "libbdnav/navigation.h"
-#include "libbdnav/bdparse.h"
+#include "bdnav/mpls_parse.h"
+#include "bdnav/navigation.h"
+#include "bdnav/bdparse.h"
 
 #include "BDRingBuffer.h"
 #include "mythverbose.h"

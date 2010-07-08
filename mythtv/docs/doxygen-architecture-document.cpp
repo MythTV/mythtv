@@ -140,7 +140,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythbdnav/libmythdvdnav
+  <dt>libmythbluray/libmythdvdnav
       <dd>Used for navigating Blu Ray and DVD menus
       when using the internal player.
 

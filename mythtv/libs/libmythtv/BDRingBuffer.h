@@ -5,7 +5,7 @@
 
 #include <QString>
 
-#include "libmythbdnav/bluray.h"
+#include "libmythbluray/bluray.h"
 
 #include "util.h"
 

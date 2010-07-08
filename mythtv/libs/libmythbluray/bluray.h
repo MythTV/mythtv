@@ -99,6 +99,7 @@ uint32_t bd_get_current_title(BLURAY *bd);          // Returns the current title
 unsigned bd_get_current_angle(BLURAY *bd);          // Returns the current angle
 
 uint64_t bd_tell(BLURAY *bd);       // Return current pos
+uint64_t bd_tell_time(BLURAY *bd);  // Return current time
 
 /*
  * player settings

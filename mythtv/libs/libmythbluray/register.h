@@ -34,7 +34,7 @@ typedef enum {
     PSR_IG_STREAM_ID     = 0,
     PSR_PRIMARY_AUDIO_ID = 1,
     PSR_PG_PIP_STREAM    = 2,
-    PSR_ANGLE_ID         = 3,
+    PSR_ANGLE_NUMBER     = 3,
     PSR_TITLE_ID         = 4,
     PSR_CHAPTER          = 5,
     PSR_PLAYLIST         = 6,

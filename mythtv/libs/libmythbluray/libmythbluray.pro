@@ -1,13 +1,13 @@
 include ( ../../settings.pro )
 
 TEMPLATE = lib
-TARGET = mythbdnav-$$LIBVERSION
+TARGET = mythbluray-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 CONFIG -= qt
 target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
-INCLUDEPATH += ./libbdnav
+INCLUDEPATH += ./bdnav
 INCLUDEPATH += ../libmythdb
 
 #build position independent code since the library is linked into a shared library
@@ -20,12 +20,14 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE USING_DLOPEN
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
-HEADERS += bluray.h register.h libdbdnav/*.h util/*.h file/*.h
+HEADERS += bluray.h register.h bdnav/*.h hdmv/*.h util/*.h file/*.h
+#HEADERS += bdj/*.h
 
-SOURCES += bluray.c register.c libbdnav/*.c file/*.c util/*.c
+SOURCES += bluray.c register.c bdnav/*.c hdmv/*.c file/*.c util/*.c
+#HEADERS += bdj/*.c
 
-inc_bdnav.path = $${PREFIX}/include/mythtv/bdnav
-inc_bdnav.files = bluray.h libbdnav/*.h file/*.h util/*.h
+inc_bdnav.path = $${PREFIX}/include/mythtv/bluray
+inc_bdnav.files = bluray.h bdnav/*.h hdmv/*.h file/*.h util/*.h
 
 INSTALLS += target inc_bdnav
 
