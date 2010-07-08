@@ -17,6 +17,7 @@
 #include "httpcomms.h"
 #include "metadataimagedownload.h"
 #include "remotefile.h"
+#include "mythdownloadmanager.h"
 
 QEvent::Type ImageDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -119,9 +120,13 @@ void MetadataImageDownload::run()
                     VERBOSE(VB_GENERAL,
                          QString("Metadata Image Download: %1 ->%2")
                          .arg(oldurl).arg(finalfile));
-                    QByteArray download = getImageFile(oldurl);
-                    if (download.isEmpty())
+                    QByteArray *download = NULL;
+                    GetMythDownloadManager()->download(oldurl, download);
+                    if (download->isEmpty())
+                    {
+                        delete download;
                         continue;
+                    }
 
                     QFile dest_file(finalfile);
                     if (dest_file.exists())
@@ -133,8 +138,8 @@ void MetadataImageDownload::run()
 
                     if (dest_file.open(QIODevice::WriteOnly))
                     {
-                        qint64 size = dest_file.write(download);
-                        if (size != download.size())
+                        qint64 size = dest_file.write(download->data());
+                        if (size != download->size())
                         {
                             VERBOSE(VB_IMPORTANT,
                             QString("Image Download: Error Writing Image "
@@ -143,6 +148,8 @@ void MetadataImageDownload::run()
                         else
                             downloaded.insert(type, info);
                     }
+
+                    delete download;
                 }
                 else
                     downloaded.insert(type, info);
@@ -166,7 +173,8 @@ void MetadataImageDownload::run()
                     VERBOSE(VB_GENERAL,
                         QString("Metadata Image Download: %1 -> %2")
                         .arg(oldurl).arg(finalfile));
-                    QByteArray download = getImageFile(oldurl);
+                    QByteArray *download = NULL;
+                    GetMythDownloadManager()->download(oldurl, download);
                     RemoteFile *outFile = new RemoteFile(finalfile, true);
                     if (!outFile->isOpen())
                     {
@@ -181,8 +189,8 @@ void MetadataImageDownload::run()
                     else
                     {
                         off_t written = outFile->Write(download,
-                                                       download.size());
-                        if (written != download.size())
+                                                       download->size());
+                        if (written != download->size())
                         {
                             VERBOSE(VB_IMPORTANT,
                             QString("Image Download: Error Writing Image "
@@ -193,6 +201,8 @@ void MetadataImageDownload::run()
                         delete outFile;
                         outFile = NULL;
                     }
+
+                    delete download;
                 }
                 else
                     downloaded.insert(type, info);
@@ -358,75 +368,5 @@ QString getStorageGroupURL(ArtworkType type, QString host)
     return QString("myth://%1@%2:%3/")
         .arg(sgroup)
         .arg(ip).arg(port);
-}
-
-QByteArray MetadataImageDownload::getImageFile(QString url)
-{
-    QByteArray ret;
-    QTimer timer;
-    QEventLoop loop;
-    QNetworkAccessManager manager;
-
-    timer.setSingleShot(true);
-
-    QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-    QObject::connect(&manager, SIGNAL(finished(QNetworkReply*)),
-            &loop, SLOT(quit()));
-    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
-
-    timer.start(35000); // 35s timeout
-    loop.exec();
-
-    QVariant possibleRedirectUrl =
-         reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-
-    QUrl urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
-                                       urlRedirectedTo);
-
-    while (!urlRedirectedTo.isEmpty() && timer.isActive())
-    {
-        reply = manager.get(QNetworkRequest(urlRedirectedTo));
-        loop.exec();
-
-        possibleRedirectUrl =
-             reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-        urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
-                                       urlRedirectedTo);
-    }
-
-    if(timer.isActive())
-    {
-        timer.stop();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT,QString("Image Download Timeout: %1")
-                 .arg(url));
-    }
-
-    ret = reply->readAll();
-
-    delete reply;
-
-    QImage testImage;
-    bool didLoad = testImage.loadFromData(ret);
-    if (didLoad)
-        return ret;
-    else
-    {
-        VERBOSE(VB_IMPORTANT,QString("Tried to write %1, but it appears to "
-                                     "be an HTML redirect (filesize %2).")
-                                    .arg(url).arg(ret.size()));
-        return QByteArray();
-    }
-}
-
-QUrl MetadataImageDownload::redirectUrl(const QUrl& possibleRedirectUrl,
-                               const QUrl& oldRedirectUrl) const
-{
-    QUrl redirectUrl;
-    if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)
-        redirectUrl = possibleRedirectUrl;
-    return redirectUrl;
 }
 

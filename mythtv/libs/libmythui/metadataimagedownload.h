@@ -50,16 +50,12 @@ class MPUBLIC MetadataImageDownload : public QThread
     void addThumb(QString title, QString url, QVariant data);
     void addDownloads(MetadataLookup *lookup);
     void cancel();
-    QByteArray getImageFile(QString url);
 
   protected:
 
     void run();
 
   private:
-
-    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
-                     const QUrl& oldRedirectUrl) const;
 
     ThumbnailData*             moreThumbs();
     MetadataLookup*            moreDownloads();
