@@ -1182,7 +1182,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     }
 
     player_ctx->buffer->Start();
-    char testbuf[kDecoderProbeBufferSize];
+    char *testbuf = new char[kDecoderProbeBufferSize];
     player_ctx->buffer->Unpause(); // so we can read testbuf if we were paused
 
     // delete any pre-existing recorder
@@ -1196,6 +1196,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
             VERBOSE(VB_IMPORTANT,
                     QString("NVP::OpenFile(): Error, couldn't read file: %1")
                     .arg(player_ctx->buffer->GetFilename()));
+            delete [] testbuf;
             return -1;
         }
 
@@ -1222,13 +1223,14 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Couldn't find an A/V decoder for: '%1'")
                 .arg(player_ctx->buffer->GetFilename()));
-
+        delete [] testbuf;
         return -1;
     }
     else if (GetDecoder()->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not initialize A/V decoder.");
         SetDecoder(NULL);
+        delete [] testbuf;
         return -1;
     }
 
@@ -1252,6 +1254,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't open decoder for: %1")
                 .arg(player_ctx->buffer->GetFilename()));
+        delete [] testbuf;
         return -1;
     }
 
@@ -1275,6 +1278,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         player_ctx->buffer->DVD()->JumpToTitle(true);
 
     bookmarkseek = GetBookmark();
+
+    delete [] testbuf;
 
     return IsErrored() ? -1 : 0;
 }
