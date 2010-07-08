@@ -50,12 +50,16 @@ class MPUBLIC MetadataImageDownload : public QThread
     void addThumb(QString title, QString url, QVariant data);
     void addDownloads(MetadataLookup *lookup);
     void cancel();
+    QByteArray getImageFile(QString url);
 
   protected:
 
     void run();
 
   private:
+
+    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
+                     const QUrl& oldRedirectUrl) const;
 
     ThumbnailData*             moreThumbs();
     MetadataLookup*            moreDownloads();
@@ -64,7 +68,6 @@ class MPUBLIC MetadataImageDownload : public QThread
     QList<MetadataLookup*>     m_downloadList;
     QList<ThumbnailData*>      m_thumbnailList;
     QMutex                     m_mutex;
-
 };
 
 MPUBLIC QString getDownloadFilename(QString title, QString url);
@@ -73,7 +76,5 @@ MPUBLIC QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
 
 MPUBLIC QString getLocalWritePath(MetadataType metadatatype, ArtworkType type);
 MPUBLIC QString getStorageGroupURL(ArtworkType type, QString host);
-
-MPUBLIC QByteArray getImageFile(QString url);
 
 #endif /* METADATAIMAGEDOWNLOAD_H */

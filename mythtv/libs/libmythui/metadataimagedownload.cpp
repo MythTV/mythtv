@@ -1,13 +1,13 @@
 // qt
 #include <QCoreApplication>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QTimer>
 #include <QImage>
 #include <QFileInfo>
 #include <QDir>
 #include <QEvent>
 #include <QImage>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 // myth
 #include "mythcorecontext.h"
@@ -360,22 +360,39 @@ QString getStorageGroupURL(ArtworkType type, QString host)
         .arg(ip).arg(port);
 }
 
-QByteArray getImageFile(QString url)
+QByteArray MetadataImageDownload::getImageFile(QString url)
 {
     QByteArray ret;
-    QNetworkAccessManager manager;
-    QEventLoop loop;
     QTimer timer;
+    QEventLoop loop;
+    QNetworkAccessManager manager;
 
     timer.setSingleShot(true);
+
     QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
     QObject::connect(&manager, SIGNAL(finished(QNetworkReply*)),
             &loop, SLOT(quit()));
-    QNetworkReply *reply = manager.get(QNetworkRequest(
-                   QUrl(url)));
+    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
 
     timer.start(35000); // 35s timeout
     loop.exec();
+
+    QVariant possibleRedirectUrl =
+         reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+
+    QUrl urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
+                                       urlRedirectedTo);
+
+    while (!urlRedirectedTo.isEmpty() && timer.isActive())
+    {
+        reply = manager.get(QNetworkRequest(urlRedirectedTo));
+        loop.exec();
+
+        possibleRedirectUrl =
+             reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+        urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
+                                       urlRedirectedTo);
+    }
 
     if(timer.isActive())
     {
@@ -389,6 +406,8 @@ QByteArray getImageFile(QString url)
 
     ret = reply->readAll();
 
+    delete reply;
+
     QImage testImage;
     bool didLoad = testImage.loadFromData(ret);
     if (didLoad)
@@ -400,5 +419,14 @@ QByteArray getImageFile(QString url)
                                     .arg(url).arg(ret.size()));
         return QByteArray();
     }
+}
+
+QUrl MetadataImageDownload::redirectUrl(const QUrl& possibleRedirectUrl,
+                               const QUrl& oldRedirectUrl) const
+{
+    QUrl redirectUrl;
+    if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)
+        redirectUrl = possibleRedirectUrl;
+    return redirectUrl;
 }
 
