@@ -3817,7 +3817,7 @@ if enabled x11; then
     require libXext X11/extensions/Xext.h XMissingExtension -lXext
 fi
 
-if ! enabled windows; then
+if enabled x11; then
     check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
     check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 fi
