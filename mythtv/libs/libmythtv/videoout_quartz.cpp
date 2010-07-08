@@ -771,6 +771,20 @@ class VoqvFullscreen : public VideoOutputQuartzView
             Begin();
         }
     };
+
+    void HideForGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() full screen");
+        End();
+        EndPort();
+    }
+
+    void ShowAfterGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() full screen");
+        BeginPort();
+        Begin();
+    }
 };
 
 /**
