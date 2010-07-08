@@ -87,8 +87,8 @@ class VideoOutput
     virtual void ResizeDisplayWindow(const QRect&, bool);
     virtual void EmbedInWidget(int x, int y, int w, int h);
     virtual void StopEmbedding(void);
-    void         ResizeForGui(void);
-    void         ResizeForVideo(uint width = 0, uint height = 0);
+    virtual void ResizeForGui(void);
+    virtual void ResizeForVideo(uint width = 0, uint height = 0);
     virtual void MoveResizeWindow(QRect new_rect) = 0;
 
     virtual void MoveResize(void);

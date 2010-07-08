@@ -90,6 +90,9 @@ class VideoOutputQuartzView
 
     virtual void EmbedChanged(bool embedded);
 
+    virtual void HideForGUI(void);
+    virtual void ShowAfterGUI(void);
+
   protected:
     virtual bool Begin(void);
     virtual void End(void);
@@ -485,6 +488,20 @@ void VideoOutputQuartzView::EmbedChanged(bool embedded)
     (void)embedded;
 }
 
+/// Subclasses that block the main window should hide
+/// their output so that the GUI behind is fully visible.
+void VideoOutputQuartzView::HideForGUI(void)
+{
+    // do nothing in default version
+}
+
+/// Subclasses that block the main window should re-enable their
+/// output after the user has finished interacing with the GUI.
+void VideoOutputQuartzView::ShowAfterGUI(void)
+{
+    // do nothing in default version
+}
+
 /**
  * This view subclass implements full-size video display in the main window.
  */
@@ -564,6 +581,19 @@ class VoqvMainWindow : public VideoOutputQuartzView
             Begin();
         }
     };
+
+    void HideForGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() main window");
+        End();
+    }
+
+
+    void ShowAfterGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() main window");
+        Begin();
+    }
 };
 
 /**
@@ -622,20 +652,20 @@ class VoqvEmbedded : public VideoOutputQuartzView
             viewLock.unlock();
             return false;
         }
- 
+
         // Turn off gamma correction unless requested
         if (!parentData->correctGamma)
             QTSetPixMapHandleRequestedGammaLevel(GetPortPixMap(thePort),
                                                  kQTUseSourceGammaLevel);
- 
+
         SetDSequenceFlags(theCodec,
                           codecDSequenceFlushInsteadOfDirtying,
                           codecDSequenceFlushInsteadOfDirtying);
         viewLock.unlock();
- 
+
         // set transformation matrix
         Transform(m_desired);
- 
+
         return true;
     }
 
@@ -934,21 +964,6 @@ class VoqvFloater : public VideoOutputQuartzView
         UnregisterToolboxObjectClass(myClass);
         viewLock.unlock();
     };
-
-    // We hide the window during embedding.
-    void EmbedChanged(bool embedded)
-    {
-        if (embedded)
-        {
-            End();
-            HideWindow(window);
-        }
-        else
-        {
-            ShowWindow(window);
-            Begin();
-        }
-    };
 };
 
 // The event callback for the floating window above
@@ -1204,9 +1219,9 @@ void VideoOutputQuartz::MoveResize(void)
 }
 
 void VideoOutputQuartz::ToggleAspectOverride(AspectOverrideMode aspectMode)
-{ 
-    VideoOutput::ToggleAspectOverride(aspectMode); 
-    MoveResize(); 
+{
+    VideoOutput::ToggleAspectOverride(aspectMode);
+    MoveResize();
 }
 
 bool VideoOutputQuartz::InputChanged(const QSize &input_size,
@@ -1644,6 +1659,8 @@ void VideoOutputQuartz::EmbedInWidget(int x, int y, int w, int h)
         return;
 
     VideoOutput::EmbedInWidget(x, y, w, h);
+    // Base class has now calculated Aspect/Fill,
+    // but currently we ignore it, and just scale into the whole embed area.
 
     data->pixelLock.lock();
 
@@ -1829,6 +1846,30 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         frame->buf + frame->offsets[2], // V plane
         frame->pitches[0], frame->pitches[1], frame->pitches[2],
         frame->width, frame->height);
+}
+
+/// Subclassed so we can hide the QuickTime drawn layer and show the GUI
+void VideoOutputQuartz::ResizeForGui(void)
+{
+    data->pixelLock.lock();
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->HideForGUI();
+    data->pixelLock.unlock();
+
+    VideoOutput::ResizeForGui();
+}
+
+/// Subclassed so we can redisplay the QuickTime layer after ResizeForGui()
+void VideoOutputQuartz::ResizeForVideo(uint width, uint height)
+{
+    VideoOutput::ResizeForVideo(width, height);
+
+    data->pixelLock.lock();
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->ShowAfterGUI();
+    data->pixelLock.unlock();
 }
 
 QStringList VideoOutputQuartz::GetAllowedRenderers(

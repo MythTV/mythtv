@@ -46,6 +46,9 @@ class VideoOutputQuartz : public VideoOutput
 
     void SetDVDVDecoder(DVDV *dvdvdec);
 
+    void ResizeForGui(void);
+    void ResizeForVideo(uint width = 0, uint height = 0);
+
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
 
