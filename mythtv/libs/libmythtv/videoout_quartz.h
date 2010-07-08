@@ -24,6 +24,7 @@ class VideoOutputQuartz : public VideoOutput
     void Show(FrameScanType);
 
     void SetVideoFrameRate(float playback_fps);
+    void ToggleAspectOverride(AspectOverrideMode aspectMode);
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
@@ -44,6 +45,9 @@ class VideoOutputQuartz : public VideoOutput
     void UpdatePauseFrame(void);
 
     void SetDVDVDecoder(DVDV *dvdvdec);
+
+    void ResizeForGui(void);
+    void ResizeForVideo(uint width = 0, uint height = 0);
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);

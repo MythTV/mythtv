@@ -91,6 +91,9 @@ class VideoOutputQuartzView
 
     virtual void EmbedChanged(bool embedded);
 
+    virtual void HideForGUI(void);
+    virtual void ShowAfterGUI(void);
+
   protected:
     virtual bool Begin(void);
     virtual void End(void);
@@ -486,6 +489,20 @@ void VideoOutputQuartzView::EmbedChanged(bool embedded)
     (void)embedded;
 }
 
+/// Subclasses that block the main window should hide
+/// their output so that the GUI behind is fully visible.
+void VideoOutputQuartzView::HideForGUI(void)
+{
+    // do nothing in default version
+}
+
+/// Subclasses that block the main window should re-enable their
+/// output after the user has finished interacing with the GUI.
+void VideoOutputQuartzView::ShowAfterGUI(void)
+{
+    // do nothing in default version
+}
+
 /**
  * This view subclass implements full-size video display in the main window.
  */
@@ -497,7 +514,7 @@ class VoqvMainWindow : public VideoOutputQuartzView
     {
         alpha = fminf(1.0, fmaxf(0.0, alphaBlend));
         applyMoveResize = true;
-        name = "Main window: ";
+        name = (char *) "Main window: ";
     };
 
    ~VoqvMainWindow()
@@ -565,6 +582,19 @@ class VoqvMainWindow : public VideoOutputQuartzView
             Begin();
         }
     };
+
+    void HideForGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() main window");
+        End();
+    }
+
+
+    void ShowAfterGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() main window");
+        Begin();
+    }
 };
 
 /**
@@ -577,7 +607,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
     : VideoOutputQuartzView(pData)
     {
         m_desired = QRect(x, y, w, h);
-        name = "Embedded window: ";
+        name = (char *) "Embedded window: ";
     };
 
    ~VoqvEmbedded()
@@ -604,10 +634,41 @@ class VoqvEmbedded : public VideoOutputQuartzView
         GetPortBounds(thePort, &portBounds);
         InvalWindowRect(parentData->window, &portBounds);
 
-        // The main class handles masking and resizing, since we set m_desired
         viewLock.unlock();
         return true;
     };
+
+    // Simple scaler setup that just uses m_desired to fill embed area:
+    bool Begin(void)
+    {
+        viewLock.lock();
+        if (DecompressSequenceBeginS(&theCodec, parentData->imgDesc,
+                                     NULL, 0, thePort, NULL, NULL, NULL,
+                                     srcCopy, theMask, 0,
+                                     codecNormalQuality, bestSpeedCodec))
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
+                    .arg(name));
+            viewLock.unlock();
+            return false;
+        }
+
+        // Turn off gamma correction unless requested
+        if (!parentData->correctGamma)
+            QTSetPixMapHandleRequestedGammaLevel(GetPortPixMap(thePort),
+                                                 kQTUseSourceGammaLevel);
+
+        SetDSequenceFlags(theCodec,
+                          codecDSequenceFlushInsteadOfDirtying,
+                          codecDSequenceFlushInsteadOfDirtying);
+        viewLock.unlock();
+
+        // set transformation matrix
+        Transform(m_desired);
+
+        return true;
+    }
 
     void EndPort(void)
     {
@@ -627,7 +688,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
     : VideoOutputQuartzView(pData)
     {
         applyMoveResize = true;
-        name = "Full screen: ";
+        name = (char *) "Full screen: ";
     };
 
    ~VoqvFullscreen()
@@ -711,6 +772,20 @@ class VoqvFullscreen : public VideoOutputQuartzView
             Begin();
         }
     };
+
+    void HideForGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() full screen");
+        End();
+        EndPort();
+    }
+
+    void ShowAfterGUI(void)
+    {
+        VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() full screen");
+        BeginPort();
+        Begin();
+    }
 };
 
 /**
@@ -722,7 +797,7 @@ class VoqvDock : public VideoOutputQuartzView
     VoqvDock(QuartzData *pData)
     : VideoOutputQuartzView(pData)
     {
-        name = "Dock icon: ";
+        name = (char *) "Dock icon: ";
     };
 
    ~VoqvDock()
@@ -766,7 +841,7 @@ class VoqvFloater : public VideoOutputQuartzView
     {
         alpha = fminf(1.0, fmaxf(0.0, alphaBlend));
         resizing = false;
-        name = "Floating window: ";
+        name = (char *) "Floating window: ";
     };
 
    ~VoqvFloater()
@@ -904,21 +979,6 @@ class VoqvFloater : public VideoOutputQuartzView
         UnregisterToolboxObjectClass(myClass);
         viewLock.unlock();
     };
-
-    // We hide the window during embedding.
-    void EmbedChanged(bool embedded)
-    {
-        if (embedded)
-        {
-            End();
-            HideWindow(window);
-        }
-        else
-        {
-            ShowWindow(window);
-            Begin();
-        }
-    };
 };
 
 // The event callback for the floating window above
@@ -1004,7 +1064,7 @@ class VoqvDesktop : public VideoOutputQuartzView
     VoqvDesktop(QuartzData *pData)
     : VideoOutputQuartzView(pData)
     {
-        name = "Desktop: ";
+        name = (char *) "Desktop: ";
     };
 
    ~VoqvDesktop()
@@ -1171,6 +1231,12 @@ void VideoOutputQuartz::MoveResize(void)
     {
         (*it)->MoveResize(newRect);
     }
+}
+
+void VideoOutputQuartz::ToggleAspectOverride(AspectOverrideMode aspectMode)
+{
+    VideoOutput::ToggleAspectOverride(aspectMode);
+    MoveResize();
 }
 
 bool VideoOutputQuartz::InputChanged(const QSize &input_size,
@@ -1607,6 +1673,8 @@ void VideoOutputQuartz::EmbedInWidget(int x, int y, int w, int h)
         return;
 
     VideoOutput::EmbedInWidget(x, y, w, h);
+    // Base class has now calculated Aspect/Fill,
+    // but currently we ignore it, and just scale into the whole embed area.
 
     data->pixelLock.lock();
 
@@ -1790,6 +1858,30 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         frame->buf + frame->offsets[2], // V plane
         frame->pitches[0], frame->pitches[1], frame->pitches[2],
         frame->width, frame->height);
+}
+
+/// Subclassed so we can hide the QuickTime drawn layer and show the GUI
+void VideoOutputQuartz::ResizeForGui(void)
+{
+    data->pixelLock.lock();
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->HideForGUI();
+    data->pixelLock.unlock();
+
+    VideoOutput::ResizeForGui();
+}
+
+/// Subclassed so we can redisplay the QuickTime layer after ResizeForGui()
+void VideoOutputQuartz::ResizeForVideo(uint width, uint height)
+{
+    VideoOutput::ResizeForVideo(width, height);
+
+    data->pixelLock.lock();
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->ShowAfterGUI();
+    data->pixelLock.unlock();
 }
 
 QStringList VideoOutputQuartz::GetAllowedRenderers(
