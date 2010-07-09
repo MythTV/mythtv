@@ -1299,6 +1299,7 @@ MYTHTV_CONFIG_LIST='
     ivtv
     joystick_menu
     libfftw3
+    libudev
     lirc
     mheg
     opengl_video
@@ -1782,6 +1783,7 @@ enable iptv
 enable ivtv
 enable lamemp3
 enable lirc
+enable libudev
 enable mheg
 enable opengl
 enable opengl_vsync
@@ -3417,6 +3419,11 @@ fi
 disabled  zlib || check_lib   zlib.h      zlibVersion -lz   || disable  zlib
 disabled bzlib || check_lib2 bzlib.h BZ2_bzlibVersion -lbz2 || disable bzlib
 
+# Attempt to use libudev for mediamonitor 
+if test $target_os = linux; then 
+    check_lib2 libudev.h udev_new -ludev || disable libudev 
+fi
+
 enabled ffmpeg_pthreads && enable pthreads
 
 # check for some common methods of building with pthread support
@@ -4554,6 +4561,10 @@ fi
 
 if ! enabled darwin && enabled opengl; then
   echo "CONFIG_OPENGL_LIBS=$gl_lib $glu_lib" >> $MYTH_CONFIG_MAK
+fi
+
+if enabled libudev; then 
+  echo "CONFIG_LIBUDEV_LIBS=-ludev" >> $MYTH_CONFIG_MAK 
 fi
 
 if test x"$CCONFIG" != x"" ; then

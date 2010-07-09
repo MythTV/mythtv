@@ -37,6 +37,13 @@ using namespace std;
 #include "mythhdd.h"
 #include "mythverbose.h"
 
+#if CONFIG_LIBUDEV
+extern "C" {
+    #include <libudev.h>
+}
+#endif
+
+
 #ifndef MNTTYPE_ISO9660
 #ifdef linux
 #define MNTTYPE_ISO9660 "iso9660"
@@ -217,6 +224,27 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     ret.replace(QRegExp(".*/"), "/dev/");
 
 #ifdef linux
+  #if CONFIG_LIBUDEV
+    // Use libudev to determine the name
+    ret = "";
+    struct udev *udev = udev_new();
+    if (udev != NULL)
+    {
+        struct udev_device *device =
+            udev_device_new_from_syspath(udev, sysfs.toAscii().constData());
+        if (device != NULL)
+        {
+            const char *name = udev_device_get_devnode(device);
+
+            if (name != NULL)
+                ret = tr(name);
+
+            udev_device_unref(device);
+        }
+        udev_unref(udev);
+    }
+  #else   // CONFIG_LIBUDEV
+    // Use udevinfo to determine the name
     QProcess    *udevinfo = new QProcess();
     QTextStream  stream(udevinfo);
     QStringList  args;
@@ -261,6 +289,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         return ret;
 
     udevinfo->deleteLater();
+  #endif // CONFIG_LIBUDEV
 #endif // linux
 
     VERBOSE(VB_MEDIA, msg + "->'" + ret + "'");

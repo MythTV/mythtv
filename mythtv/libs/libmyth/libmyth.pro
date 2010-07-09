@@ -221,6 +221,9 @@ contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -lfftw3f
 }
 
+using_libudev : LIBS += $${CONFIG_LIBUDEV_LIBS}
+
+
 include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS
