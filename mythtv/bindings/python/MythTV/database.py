@@ -148,6 +148,22 @@ class DBData( DictData, MythSchema ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
+    def __getstate__(self):
+        data = {'data':DictData.__getstate__(self)}
+        data['db'] = self._db.dbconn
+        data['wheredat'] = self._wheredat
+        return data
+
+    def __setstate__(self, state):
+        self._field_order = []
+        self._db = DBCache(**state['db'])
+        self._db._check_schema(self._schema_value,
+                                self._schema_local, self._schema_name)
+        self._setDefs()
+        DictData.__setstate__(self, state['data'])
+        if state['wheredat'] is not None:
+            self._evalwheredat(state['wheredat'])
+
 class DBDataWrite( DBData ):
     """
     DBDataWrite.__init__(data=None, db=None) --> DBDataWrite object
@@ -431,16 +447,20 @@ class DBDataRef( list ):
         self._data = None
         self._populated = False
 
-    def _populate(self, force=False):
+    def _populate(self, force=False, data=None):
         if self._populated and (not force):
             return
-        with self._db as cursor:
-            cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
-                           (','.join(self._datfields),
+        if data is None:
+            with self._db as cursor:
+                cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
+                            (','.join(self._datfields),
                              self._table,
                              ' AND '.join(['%s=%%s' % f for f in self._ref])),
                          self._refdat)
-            for row in cursor:
+                for row in cursor:
+                    list.append(self, self.SubData(zip(self._datfields, row)))
+        else:
+            for row in data:
                 list.append(self, self.SubData(zip(self._datfields, row)))
         self._populated = True
         self._origdata = self.deepcopy()
@@ -461,10 +481,10 @@ class DBDataRef( list ):
         return c
 
     def copy(self):
-        if not self._populated: return
+        if not self._populated: return []
         return self.fromCopy(self)
     def deepcopy(self):
-        if not self._populated: return
+        if not self._populated: return []
         return self.fromCopy([dat.copy() for dat in self])
 
     def revert(self):
@@ -531,6 +551,10 @@ class DBDataRef( list ):
         for i in reversed(range(len(self))): del self[i]
         self.commit()
 
+    def _picklelist(self):
+        self._populate()
+        return [a.values() for a in self.copy()]
+
 class DBDataCRef( DBDataRef ):
     """
     DBDataRef.__init__(where, db=None) --> DBDataRef object
@@ -567,14 +591,15 @@ class DBDataCRef( DBDataRef ):
         self._datfields = crfields+rfields
         self._populated = False
 
-    def _populate(self, force=False):
+    def _populate(self, force=False, data=None):
         if self._populated and (not force):
             return
         datfields = self._datfields
         reffield = '%s.%s' % (self._table[1],self._cref[-1])
 
-        with self._db as cursor:
-            cursor.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
+        if data is None:
+            with self._db as cursor:
+                cursor.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
                           (','.join(datfields+[reffield]),
                              self._table[0],
                              self._table[1],
@@ -584,10 +609,16 @@ class DBDataCRef( DBDataRef ):
                              ' AND '.join(['%s=%%s' % f for f in self._ref])),
                         self._refdat)
 
-            for row in cursor:
+                for row in cursor:
+                    sd = self.SubData(zip(datfields, row[:-1]))
+                    sd._cref = row[-1]
+                    list.append(self, sd)
+        else:
+            for row in data:
                 sd = self.SubData(zip(datfields, row[:-1]))
                 sd._cref = row[-1]
                 list.append(self, sd)
+
         self._populated = True
         self._origdata = self.deepcopy()
 
@@ -648,6 +679,10 @@ class DBDataCRef( DBDataRef ):
                             (self._table[1], self._cref[-1]), cr)
 
         self._origdata = self.deepcopy()
+
+    def _picklelist(self):
+        self._populate()
+        return [a.values()+[a._cref] for a in self.copy()]
 
 class DBCache( MythSchema ):
     """

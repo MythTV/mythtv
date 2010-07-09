@@ -177,6 +177,14 @@ class DictData( OrdDict ):
         """Returns a deep copy of itself."""
         return self.__class__(zip(self.iteritems()), _process=False)
 
+    def __getstate__(self):
+        return dict(self)
+
+    def __setstate__(self, state):
+        for k,v in state.iteritems():
+            self[k] = v
+        
+
 class DictInvert(dict):
     """
     DictInvert.__init__(other, mine=None) --> DictInvert object

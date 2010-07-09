@@ -253,6 +253,22 @@ class Recorded( DBDataWrite, CMPRecord ):
             self.cast.append((unicode(cast.name),unicode(cast.role)))
         self.update()
 
+    def __getstate__(self):
+        data = DBDataWriteAI.__getstate__(self)
+        data['cast'] = self.cast._picklelist()
+        data['seek'] = self.seek._picklelist()
+        data['markup'] = self.markup._picklelist()
+        data['rating'] = self.rating._picklelist()
+        return data
+
+    def __setstate__(self, state):
+        DBDataWriteAI.__setstate__(self, state)
+        if self._wheredat is not None:
+            self.cast._populate(data=state['cast'])
+            self.seek._populate(data=state['seek'])
+            self.markup._populate(data=state['markup'])
+            self.rating._populate(data=state['rating'])
+
 class RecordedProgram( DBDataWrite, CMPRecord ):
 
     """
@@ -728,7 +744,22 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
                 src.close()
 
         self.update()
-        
+
+    def __getstate__(self):
+        data = DBDataWriteAI.__getstate__(self)
+        data['cast'] = self.cast._picklelist()
+        data['genre'] = self.genre._picklelist()
+        data['markup'] = self.markup._picklelist()
+        data['country'] = self.country._picklelist()
+        return data
+
+    def __setstate__(self, state):
+        DBDataWriteAI.__setstate__(self, state)
+        if self._wheredat is not None:
+            self.cast._populate(data=state['cast'])
+            self.genre._populate(data=state['genre'])
+            self.markup._populate(data=state['markup'])
+            self.country._populate(data=state['country'])
 
     @classmethod
     def fromFilename(cls, filename, db=None):
