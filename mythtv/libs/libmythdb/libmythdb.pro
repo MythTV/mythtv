@@ -67,4 +67,4 @@ QT += xml sql network
 
 include ( ../libs-targetfix.pro )
 
-LIBS += $$LATE_LIBS
+LIBS += $$EXTRA_LIBS $$LATE_LIBS
