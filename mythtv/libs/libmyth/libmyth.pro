@@ -207,9 +207,6 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-using_libudev : LIBS += $${CONFIG_LIBUDEV_LIBS}
-
-
 include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
