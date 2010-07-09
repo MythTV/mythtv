@@ -39,7 +39,7 @@ QString TSPacket::toString() const {
     str.append("           payloadStart: %1\n").arg( PayloadStart() );
     str.append("               priority: %1\n").arg( Priority() );
     str.append("                    pid: %1\n").arg( PID() );
-    str.append("              scrampled: %1\n").arg( ScramplingControl() );
+    str.append("       scrambled (if>1): %1\n").arg( ScramblingControl() );
     str.append(" adaptationFieldControl: %1\n").arg( AdaptationFieldControl() );
     str.append("      continuityCounter: %1\n").arg( ContinuityCounter() );
     return str;

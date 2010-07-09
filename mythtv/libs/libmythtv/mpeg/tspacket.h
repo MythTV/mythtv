@@ -67,7 +67,7 @@ class TSHeader {
         return ((_tsdata[1] << 8) + _tsdata[2]) & 0x1fff;
     }
     //3.0  2 bit transport_scrambling_control (00,01 OK; 10,11 scrambled)
-    unsigned int ScramplingControl() const { return (_tsdata[3] >> 6) & 0x3; }
+    unsigned int ScramblingControl() const { return (_tsdata[3] >> 6) & 0x3; }
     //3.2  2 bit adaptation_field_control
     //       (01-no adaptation field,payload only
     //        10-adaptation field only,no payload
@@ -82,7 +82,7 @@ class TSHeader {
     unsigned int ContinuityCounter() const { return _tsdata[3] & 0xf; }
 
     // shortcuts
-    bool Scrampled() const { return bool(_tsdata[3]&0x80); }
+    bool Scrambled() const { return bool(_tsdata[3]&0x80); }
     bool HasAdaptationField() const { return bool(_tsdata[3] & 0x20); }
     bool HasPayload() const { return bool(_tsdata[3] & 0x10); }
 

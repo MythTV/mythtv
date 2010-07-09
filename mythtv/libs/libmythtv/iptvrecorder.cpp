@@ -211,7 +211,7 @@ void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
     if (!_stream_data)
         return;
 
-    if (tspacket.TransportError() || tspacket.ScramplingControl())
+    if (tspacket.TransportError() || tspacket.Scrambled())
         return;
 
     if (tspacket.HasAdaptationField())

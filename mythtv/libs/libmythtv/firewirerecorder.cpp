@@ -128,7 +128,7 @@ void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
     if (tspacket.TransportError())
         return;
 
-    if (tspacket.ScramplingControl())
+    if (tspacket.Scrambled())
         return;
 
     if (tspacket.HasAdaptationField())
