@@ -335,7 +335,9 @@ has_header()
 check_py_lib(){
     log check_py_lib "$@"
     check_cmd $python <<EOF
+from distutils.sysconfig import get_python_lib
 import sys
+sys.path.append(get_python_lib(prefix='${prefix}'))
 try:
     import ${1}
 except:
