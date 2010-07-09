@@ -1193,8 +1193,6 @@ HAVE_LIST="
     closesocket
     cmov
     conio_h
-    cpu_clips_negative
-    cpu_clips_positive
     dcbzl
     dev_bktr_ioctl_bt848_h
     dev_bktr_ioctl_meteor_h
@@ -1212,16 +1210,11 @@ HAVE_LIST="
     fast_clz
     fast_cmov
     fast_unaligned
-    fe_can_2g_modulation
     fork
-    freetype2
     getaddrinfo
-    ftime
     gethrtime
-    getifaddrs
     GetProcessTimes
     getrusage
-    gettimeofday
     inet_aton
     inline_asm
     isatty
@@ -1241,7 +1234,6 @@ HAVE_LIST="
     memalign
     mkstemp
     pld
-    posix_fadvise
     posix_memalign
     round
     roundf
@@ -1251,8 +1243,6 @@ HAVE_LIST="
     socklen_t
     soundcard_h
     poll_h
-    stdint_h
-    sync_file_range
     struct_addrinfo
     struct_ipv6_mreq
     struct_sockaddr_in6
@@ -1299,7 +1289,6 @@ MYTHTV_CONFIG_LIST='
     ivtv
     joystick_menu
     libfftw3
-    libudev
     lirc
     mheg
     opengl_video
@@ -1314,6 +1303,20 @@ MYTHTV_CONFIG_LIST='
     xvmc
     xvmc_vld
     xvmcw
+'
+
+MYTHTV_HAVE_LIST='
+    cpu_clips_negative
+    cpu_clips_positive
+    fe_can_2g_modulation
+    freetype2
+    ftime
+    getifaddrs
+    gettimeofday
+    posix_fadvise
+    libudev
+    stdint_h
+    sync_file_range
 '
 
 MYTHTV_LIST='
@@ -4008,6 +4011,7 @@ check_deps $CONFIG_LIST       \
            $PROTOCOL_LIST     \
            $MYTHTV_LIST       \
            $MYTHTV_CONFIG_LIST \
+           $MYTHTV_HAVE_LIST  \
            $USING_LIST        \
 
 if enabled x86 && (disabled mmx && ! enabled disable_mmx_for_debugging); then
@@ -4427,6 +4431,7 @@ fi
 
 print_config ARCH_   $TMPH $MYTH_CONFIG_MAK $ARCH_LIST
 print_config HAVE_   $TMPH $MYTH_CONFIG_MAK $HAVE_LIST
+print_config HAVE_   $TMPH $MYTH_CONFIG_MAK $MYTHTV_HAVE_LIST
 print_config CONFIG_ $TMPH $MYTH_CONFIG_MAK $CONFIG_LIST   \
                                       $CONFIG_EXTRA      \
                                       $DECODER_LIST      \
