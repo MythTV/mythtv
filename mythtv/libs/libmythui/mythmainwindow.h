@@ -113,7 +113,8 @@ class MPUBLIC MythMainWindow : public QWidget
 
     QWidget *currentWidget(void);
 
-    void SetDrawEnabled(bool enable);
+    uint PushDrawDisabled(void);
+    uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
 
   public slots:
@@ -139,6 +140,8 @@ class MPUBLIC MythMainWindow : public QWidget
     void ExitToMainMenu();
 
     QObject *getTarget(QKeyEvent &key);
+
+    void SetDrawEnabled(bool enable);
 
     MythMainWindowPrivate *d;
 };

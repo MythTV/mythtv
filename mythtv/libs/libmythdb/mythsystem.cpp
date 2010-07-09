@@ -80,7 +80,7 @@ uint myth_system(const QString &command, int flags)
     // since this function could be called inside one of those events.
     if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
     {
-        QEvent event(MythEvent::kDisableDrawingEventType);
+        QEvent event(MythEvent::kPushDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
     }
 
@@ -216,7 +216,7 @@ uint myth_system(const QString &command, int flags)
     // since this function could be called inside one of those events.
     if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
     {
-        QEvent event(MythEvent::kEnableDrawingEventType);
+        QEvent event(MythEvent::kPopDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
     }
 

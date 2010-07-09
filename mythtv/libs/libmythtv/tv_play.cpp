@@ -834,8 +834,16 @@ void TV::ResetKeys(void)
     InitKeys();
 }
 
+
+class TVInitRunnable : public QRunnable
+{
+  public:
+    TVInitRunnable(TV *ourTV) : tv(ourTV) {}
+    virtual void run(void) { tv->InitFromDB(); }
+    TV *tv;
+};
+
 /** \fn TV::TV(void)
- *  \brief Performs instance initialiation not requiring access to database.
  *  \sa Init(void)
  */
 TV::TV(void)
@@ -907,8 +915,8 @@ TV::TV(void)
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
-      myWindow(NULL),               isEmbedded(false),
-      ignoreKeyPresses(false),
+      myWindow(NULL),               weDisabledGUI(false),
+      isEmbedded(false),            ignoreKeyPresses(false),
       // Timers
       lcdTimerId(0),                keyListTimerId(0),
       networkControlTimerId(0),     jumpMenuTimerId(0),
@@ -927,6 +935,24 @@ TV::TV(void)
     setObjectName("TV");
     keyRepeatTimer.start();
 
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("30m"),   30*60));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("1h"),    60*60));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("1h30m"), 90*60));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("2h"),   120*60));
+
+    playerLock.lockForWrite();
+    player.push_back(new PlayerContext(kPlayerInUseID));
+    playerActive = 0;
+    playerLock.unlock();
+
+    QThreadPool::globalInstance()->start(new TVInitRunnable(this), 99);
+
+    VERBOSE(VB_PLAYBACK, LOC + "ctor -- end");
+}
+
+void TV::InitFromDB(void)
+{
     QMap<QString,QString> kv;
     kv["LiveTVIdleTimeout"]        = "0";
     kv["UDPNotifyPort"]            = "0";
@@ -1023,21 +1049,22 @@ TV::TV(void)
 
     vbimode = VBIMode::Parse(!feVBI.isEmpty() ? feVBI : beVBI);
 
-    sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
-    sleep_times.push_back(SleepTimerInfo(QObject::tr("30m"),   30*60));
-    sleep_times.push_back(SleepTimerInfo(QObject::tr("1h"),    60*60));
-    sleep_times.push_back(SleepTimerInfo(QObject::tr("1h30m"), 90*60));
-    sleep_times.push_back(SleepTimerInfo(QObject::tr("2h"),   120*60));
-
     osdMenuEntries = new TVOSDMenuEntryList();
+
+    if (browse_changrp && (channel_group_id > -1))
+    {
+        m_channellist = ChannelUtil::GetChannels(
+            0, true, "channum, callsign", channel_group_id);
+        ChannelUtil::SortChannels(m_channellist, "channum", true);
+    }
+
+    m_changrplist  = ChannelGroup::GetChannelGroups();
 
     gCoreContext->addListener(this);
 
-    playerLock.lockForWrite();
-    player.push_back(new PlayerContext(kPlayerInUseID));
-    playerActive = 0;
-    playerLock.unlock();
-    VERBOSE(VB_PLAYBACK, LOC + "ctor -- end");
+    QMutexLocker lock(&initFromDBLock);
+    initFromDBDone = true;
+    initFromDBWait.wakeAll();
 }
 
 /** \fn TV::Init(bool)
@@ -1049,16 +1076,6 @@ TV::TV(void)
 bool TV::Init(bool createWindow)
 {
     VERBOSE(VB_PLAYBACK, LOC + "Init -- begin");
-
-    if (browse_changrp && (channel_group_id > -1))
-    {
-      m_channellist = ChannelUtil::GetChannels(0, true, "channum, callsign", channel_group_id);
-      ChannelUtil::SortChannels(m_channellist, "channum", true);
-    }
-
-    m_changrplist  = ChannelGroup::GetChannelGroups();
-
-    VERBOSE(VB_PLAYBACK, LOC + "Init -- end channel groups");
 
     if (createWindow)
     {
@@ -1144,6 +1161,15 @@ bool TV::Init(bool createWindow)
         qApp->processEvents();
     }
 
+    {
+        QMutexLocker locker(&initFromDBLock);
+        while (!initFromDBDone)
+        {
+            qApp->processEvents();
+            initFromDBWait.wait(&initFromDBLock, 50);
+        }
+    }
+
     mainLoopCondLock.lock();
     start();
     mainLoopCond.wait(&mainLoopCondLock);
@@ -1169,7 +1195,8 @@ TV::~TV(void)
 
     gCoreContext->removeListener(this);
 
-    GetMythMainWindow()->SetDrawEnabled(true);
+    if (GetMythMainWindow() && weDisabledGUI)
+        GetMythMainWindow()->PopDrawDisabled();
 
     if (myWindow)
     {
@@ -1956,8 +1983,12 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         VERBOSE(VB_IMPORTANT, "We have a RingBuffer");
 
-        GetMythUI()->DisableScreensaver();
-        GetMythMainWindow()->SetDrawEnabled(false);
+        if (GetMythMainWindow() && !weDisabledGUI)
+        {
+            weDisabledGUI = true;
+            GetMythMainWindow()->PushDrawDisabled();
+            DrawUnusedRects();
+        }
 
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
@@ -2023,8 +2054,14 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         if (ctx->buffer && ctx->buffer->IsOpen())
         {
-            GetMythMainWindow()->SetDrawEnabled(false);
             GetMythUI()->DisableScreensaver();
+
+            if (GetMythMainWindow() && !weDisabledGUI)
+            {
+                weDisabledGUI = true;
+                GetMythMainWindow()->PushDrawDisabled();
+                DrawUnusedRects();
+            }
 
             if (desiredNextState == kState_WatchingRecording)
             {
@@ -7604,6 +7641,9 @@ void TV::StopEmbedding(PlayerContext *ctx)
 
 void TV::DrawUnusedRects(void)
 {
+    if (!weDisabledGUI)
+        return;
+
     VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- begin");
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
@@ -7757,8 +7797,13 @@ void TV::DoEditSchedule(int editType)
         }
     }
 
-    //we are embedding in a mythui window so show the gui paint window again
-    GetMythMainWindow()->SetDrawEnabled(true);
+    // We are embedding in a mythui window so assuming no one
+    // else has disabled painting show the MythUI window again.
+    if (GetMythMainWindow() && weDisabledGUI)
+    {
+        GetMythMainWindow()->PopDrawDisabled();
+        weDisabledGUI = false;
+    }
     GetMythMainWindow()->GetPaintWindow()->show();
 }
 
@@ -8440,7 +8485,6 @@ void TV::customEvent(QEvent *e)
         message.left(19)   == "PLAYBACKBOX_EXITING" ||
         message.left(22) == "SCHEDULEEDITOR_EXITING")
     {
-        GetMythMainWindow()->SetDrawEnabled(false);
         // Resize the window back to the MythTV Player size
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         PlayerContext *mctx;
@@ -8469,7 +8513,13 @@ void TV::customEvent(QEvent *e)
         GetMythMainWindow()->GetPaintWindow()->clearMask();
 
         qApp->processEvents();
-        DrawUnusedRects();
+
+        if (!weDisabledGUI)
+        {
+            weDisabledGUI = true;
+            GetMythMainWindow()->PushDrawDisabled();
+            DrawUnusedRects();
+        }
 
         isEmbedded = false;
         ignoreKeyPresses = false;

@@ -15,6 +15,7 @@ using namespace std;
 #include <QGLWidget>
 #endif
 
+#include <QWaitCondition>
 #include <QApplication>
 #include <QTimer>
 #include <QDesktopWidget>
@@ -75,6 +76,10 @@ using namespace std;
 
 #define GESTURE_TIMEOUT 1000
 
+#define LOC      QString("MythMainWindow: ")
+#define LOC_WARN QString("MythMainWindow, Warning: ")
+#define LOC_ERR  QString("MythMainWindow, Error: ")
+
 class KeyContext
 {
   public:
@@ -113,6 +118,59 @@ struct MPData {
 class MythMainWindowPrivate
 {
   public:
+    MythMainWindowPrivate() :
+        wmult(1.0f), hmult(1.0f),
+        screenwidth(0), screenheight(0),
+        xbase(0), ybase(0),
+        does_fill_screen(false),
+        ignore_lirc_keys(false),
+        ignore_joystick_keys(false),
+        lircThread(NULL),
+#ifdef USE_JOYSTICK_MENU
+        joystickThread(NULL),
+#endif
+
+#ifdef USING_APPLEREMOTE
+        appleRemoteListener(NULL),
+        appleRemote(NULL),
+#endif
+        exitingtomain(false),
+        popwindows(false),
+
+        m_useDB(true),
+
+        exitmenucallback(NULL),
+
+        exitmenumediadevicecallback(NULL),
+        mediadeviceforcallback(NULL),
+
+        escapekey(0),
+
+        sysEventHandler(NULL),
+
+        drawTimer(NULL),
+        mainStack(NULL),
+
+        painter(NULL),
+
+#ifdef USE_OPENGL_PAINTER
+        render(NULL),
+#endif
+
+        AllowInput(true),
+
+        gestureTimer(NULL),
+
+        paintwin(NULL),
+
+        oldpaintwin(NULL),
+        oldpainter(NULL),
+
+        m_drawDisabledDepth(0),
+        m_drawEnabled(true)
+    {
+    }
+
     int TranslateKeyNum(QKeyEvent *e);
 
     float wmult, hmult;
@@ -182,7 +240,11 @@ class MythMainWindowPrivate
     QWidget *oldpaintwin;
     MythPainter *oldpainter;
 
-    volatile bool m_drawEnabled;
+    QMutex m_drawDisableLock;
+    QMutex m_setDrawEnabledLock;
+    QWaitCondition m_setDrawEnabledWait;
+    uint m_drawDisabledDepth;
+    bool m_drawEnabled;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -1114,8 +1176,45 @@ QWidget *MythMainWindow::currentWidget(void)
 }
 /* FIXME: end compatibility */
 
+uint MythMainWindow::PushDrawDisabled(void)
+{
+    QMutexLocker locker(&d->m_drawDisableLock);
+    d->m_drawDisabledDepth++;
+    if (d->m_drawDisabledDepth && d->m_drawEnabled)
+        SetDrawEnabled(false);
+    return d->m_drawDisabledDepth;
+}
+
+uint MythMainWindow::PopDrawDisabled(void)
+{
+    QMutexLocker locker(&d->m_drawDisableLock);
+    if (d->m_drawDisabledDepth)
+    {
+        d->m_drawDisabledDepth--;
+        if (!d->m_drawDisabledDepth && !d->m_drawEnabled)
+            SetDrawEnabled(true);
+    }
+    return d->m_drawDisabledDepth;
+}
+
 void MythMainWindow::SetDrawEnabled(bool enable)
 {
+    QMutexLocker locker(&d->m_setDrawEnabledLock);
+
+    if (!gCoreContext->IsUIThread())
+    {
+        QCoreApplication::postEvent(
+            this, new MythEvent(
+                (enable) ?
+                MythEvent::kEnableDrawingEventType :
+                MythEvent::kDisableDrawingEventType));
+
+        while (QCoreApplication::hasPendingEvents())
+            d->m_setDrawEnabledWait.wait(&d->m_setDrawEnabledLock);
+
+        return;
+    }
+
     setUpdatesEnabled(enable);
     d->m_drawEnabled = enable;
 
@@ -1123,6 +1222,8 @@ void MythMainWindow::SetDrawEnabled(bool enable)
         d->drawTimer->start(1000 / 70);
     else
         d->drawTimer->stop();
+
+    d->m_setDrawEnabledWait.wakeAll();
 }
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
@@ -1925,6 +2026,14 @@ void MythMainWindow::customEvent(QEvent *ce)
                         .arg(sse->getSSEventType()));
             }
         }
+    }
+    else if (ce->type() == MythEvent::kPushDisableDrawingEventType)
+    {
+        PushDrawDisabled();
+    }
+    else if (ce->type() == MythEvent::kPopDisableDrawingEventType)
+    {
+        PopDrawDisabled();
     }
     else if (ce->type() == MythEvent::kDisableDrawingEventType)
     {

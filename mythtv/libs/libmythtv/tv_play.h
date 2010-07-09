@@ -182,6 +182,7 @@ class MPUBLIC TV : public QThread
     TV(void);
    ~TV();
 
+    void InitFromDB(void);
     bool Init(bool createWindow = true);
 
     // User input processing commands
@@ -689,6 +690,11 @@ class MPUBLIC TV : public QThread
 
     QTime ctorTime;
     uint switchToInputId;
+
+    QMutex         initFromDBLock;
+    bool           initFromDBDone;
+    QWaitCondition initFromDBWait;
+
     /// True if the user told MythTV to stop plaback. If this is false
     /// when we exit the player, we display an error screen.
     mutable bool wantsToQuit;
@@ -811,6 +817,8 @@ class MPUBLIC TV : public QThread
     QRect player_bounds;
     ///< Prior GUI window bounds, for DoEditSchedule() and player exit().
     QRect saved_gui_bounds;
+    /// true if this instance disabled MythUI drawing.
+    bool  weDisabledGUI;
 
     // embedded status
     bool         isEmbedded;       ///< are we currently embedded
