@@ -1309,7 +1309,6 @@ MYTHTV_HAVE_LIST='
     cpu_clips_negative
     cpu_clips_positive
     fe_can_2g_modulation
-    freetype2
     ftime
     getifaddrs
     gettimeofday
@@ -4369,7 +4368,6 @@ if enabled darwin_da; then
 fi
 
 if enabled freetype2; then
-    echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
     echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
     echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
 fi
