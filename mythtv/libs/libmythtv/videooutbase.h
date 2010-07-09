@@ -110,7 +110,7 @@ class VideoOutput
     /// \brief Returns current aspect override mode
     /// \sa ToggleAspectOverride(AspectOverrideMode)
     AspectOverrideMode GetAspectOverride(void) const;
-    void ToggleAspectOverride(
+    virtual void ToggleAspectOverride(
         AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
 
     /// \brief Returns current adjust fill mode
