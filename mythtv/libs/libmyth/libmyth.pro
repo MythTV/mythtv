@@ -211,10 +211,6 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-contains( CONFIG_LIBA52, yes ) {
-    LIBS += -la52
-}
-
 contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -lfftw3f
 }
