@@ -4,6 +4,8 @@
 Provides data access classes for accessing and managing MythTV data
 """
 
+from __future__ import with_statement
+
 from static import *
 from exceptions import *
 from altdict import DictData, DictInvertCI

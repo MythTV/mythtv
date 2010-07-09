@@ -4,6 +4,8 @@
 Provides base classes for accessing MythTV
 """
 
+from __future__ import with_statement
+
 from static import *
 from exceptions import *
 from logging import MythLog

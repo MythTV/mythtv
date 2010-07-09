@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Provides decorator classes for assorted functions"""
 
+from __future__ import with_statement
+
 from logging import MythLog
 from exceptions import MythDBError
 
