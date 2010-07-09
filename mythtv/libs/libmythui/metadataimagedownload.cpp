@@ -120,7 +120,7 @@ void MetadataImageDownload::run()
                     VERBOSE(VB_GENERAL,
                          QString("Metadata Image Download: %1 ->%2")
                          .arg(oldurl).arg(finalfile));
-                    QByteArray *download = NULL;
+                    QByteArray *download = new QByteArray();
                     GetMythDownloadManager()->download(oldurl, download);
                     if (download->isEmpty())
                     {
@@ -173,7 +173,7 @@ void MetadataImageDownload::run()
                     VERBOSE(VB_GENERAL,
                         QString("Metadata Image Download: %1 -> %2")
                         .arg(oldurl).arg(finalfile));
-                    QByteArray *download = NULL;
+                    QByteArray *download = new QByteArray();
                     GetMythDownloadManager()->download(oldurl, download);
                     RemoteFile *outFile = new RemoteFile(finalfile, true);
                     if (!outFile->isOpen())
@@ -188,7 +188,7 @@ void MetadataImageDownload::run()
                     }
                     else
                     {
-                        off_t written = outFile->Write(download,
+                        off_t written = outFile->Write(download->data(),
                                                        download->size());
                         if (written != download->size())
                         {
