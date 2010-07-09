@@ -53,13 +53,14 @@ for file in $(find . -name .svn -prune -or -print); do
         ext=${file##*.}
         if [ "x$ext" = "xpy" ]; then
             sed "1s%^#.*%#!${MYTHPYTHON}%" "$file" > "$DEST/$file"
+            chmod `stat -r "$file" | awk '{ print substr($3, 5) }'` "$DEST/$file" &> /dev/null
 #        elif [ "x$ext" = "xpl" ]; then
 #            do some perly stuff
         else
             cp -pR "$file" "$DEST/$file"
+        fi
         chown -h $EUID:$EGID "$DEST/$file"
         chmod +r "$DEST/$file" &> /dev/null
-        fi
     fi
 done
 
