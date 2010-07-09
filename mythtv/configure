@@ -3808,7 +3808,7 @@ if enabled firewire; then
     fi
 fi
 
-enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3 ||
+enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
     disable libfftw3
 
 enabled x11 && check_lib X11/Xlib.h XQueryExtension -lX11 || disable x11

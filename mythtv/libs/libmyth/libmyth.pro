@@ -207,10 +207,6 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-contains( CONFIG_LIBFFTW3, yes ) {
-    LIBS += -lfftw3f
-}
-
 using_libudev : LIBS += $${CONFIG_LIBUDEV_LIBS}
 
 
