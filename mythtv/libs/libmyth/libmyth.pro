@@ -195,14 +195,12 @@ using_alsa {
     DEFINES += USE_ALSA
     HEADERS += audiooutputalsa.h
     SOURCES += audiooutputalsa.cpp
-    LIBS += $$ALSA_LIBS
 }
 
 using_jack {
     DEFINES += USE_JACK
     HEADERS += audiooutputjack.h
     SOURCES += audiooutputjack.cpp
-    LIBS += $$JACK_LIBS
 }
 
 contains( HAVE_MMX, yes ) {

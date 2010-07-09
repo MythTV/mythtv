@@ -65,7 +65,6 @@ INSTALLS += inc
 
 LIBS += $$LOCAL_LIBDIR_X11
 LIBS += -L../libavutil -lmythavutil-$$LIBVERSION $$EXTRALIBS
-#LIBS += -lz
 
 
 # parts needed for many different codecs

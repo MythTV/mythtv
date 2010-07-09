@@ -54,7 +54,7 @@ using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
-LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
+LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
@@ -447,13 +447,11 @@ using_backend {
         HEADERS += audioinputalsa.h
         SOURCES += audioinputalsa.cpp
         DEFINES += USING_ALSA
-        LIBS += $$ALSA_LIBS
     }
     using_oss {
         HEADERS += audioinputoss.h
         SOURCES += audioinputoss.cpp
         DEFINES += USING_OSS
-        LIBS += $$OSS_LIBS
     }
 
     # Support for Video4Linux devices

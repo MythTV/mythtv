@@ -1762,12 +1762,9 @@ CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
 
 audio_pulse="default"
-audio_pulse_libs="-lpulse"
 audio_pulseoutput="default"
 audio_alsa="default"
-audio_alsa_libs="-lasound"
 audio_jack="default"
-audio_jack_libs="-ljack"
 
 enable audio_oss
 enable bindings_perl
@@ -3629,7 +3626,7 @@ enabled jack_indev && check_lib2 jack/jack.h jack_client_open -ljack
 
 # PulseAudio probe
 ! disabled audio_pulse &&
-    check_lib pulse/version.h pa_get_library_version $audio_pulse_libs &&
+    check_lib pulse/version.h pa_get_library_version -lpulse &&
     $(pkg-config --atleast-version=0.9.7 libpulse) &&
     enable  audio_pulse ||
     disable audio_pulse
@@ -3643,7 +3640,7 @@ fi
 
 # ALSA probe
 ! disabled audio_alsa &&
-    check_lib alsa/asoundlib.h snd_asoundlib_version $audio_alsa_libs &&
+    check_lib alsa/asoundlib.h snd_asoundlib_version -lasound &&
     check_cpp_condition alsa/asoundlib.h "(defined(SND_PCM_NO_AUTO_RESAMPLE))" &&
     enable  audio_alsa ||
     { { ! enabled audio_alsa || die "ERROR: Alsa >= 1.0.16 required"; } &&
@@ -3652,7 +3649,7 @@ fi
 
 # JACK probe
 ! disabled audio_jack &&
-    check_lib jack/jack.h jack_client_new $audio_jack_libs &&
+    check_lib jack/jack.h jack_client_new -ljack &&
     enable  audio_jack ||
     disable audio_jack
 
@@ -4322,8 +4319,7 @@ TARGET_PATH=$target_path
 SDL_LIBS=$sdl_libs
 SDL_CFLAGS=$sdl_cflags
 LIB_INSTALL_EXTRA_CMD=$LIB_INSTALL_EXTRA_CMD
-EXTRALIBS=$extralibs
-EXTRA_LIBS=$ldl
+EXTRALIBS=$extralibs $ldl
 EOF
 
 get_version(){
@@ -4359,33 +4355,15 @@ EOF
 echo "RUNPREFIX=$runprefix" >> $MYTH_CONFIG_MAK
 echo "SYSROOT=$sysroot" >> $MYTH_CONFIG_MAK
 
-if enabled audio_oss; then
-    append CCONFIG "using_oss"
-fi
-
-if enabled audio_alsa; then
-    append CCONFIG "using_alsa"
-  echo "CONFIG_AUDIO_ALSA_LIBS=$audio_alsa_libs" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled audio_pulse; then
-  append CCONFIG "using_pulse"
-  echo "CONFIG_AUDIO_PULSE_LIBS=$audio_pulse_libs" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled audio_jack; then
-    append CCONFIG "using_jack"
-  echo "CONFIG_AUDIO_JACK_LIBS=$audio_jack_libs" >> $MYTH_CONFIG_MAK
-fi
+enabled audio_alsa        && append CCONFIG "using_alsa"
+enabled audio_jack        && append CCONFIG "using_jack"
+enabled audio_oss         && append CCONFIG "using_oss"
+enabled audio_pulse       && append CCONFIG "using_pulse"
+enabled audio_pulseoutput && append CCONFIG "using_pulseoutput"
 
 if enabled darwin_da; then
   append CCONFIG "darwin_da"
   echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled audio_pulseoutput; then
-  append CCONFIG "using_pulseoutput"
-  echo "CONFIG_AUDIO_PULSE_LIBS=$audio_pulse_libs" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled freetype2; then
@@ -4536,18 +4514,9 @@ if enabled dvb; then
 fi
 
 if enabled x11; then
-  echo "CONFIG_X11_LIBS=-lXinerama -lX11 -lXext -lXxf86vm" >> $MYTH_CONFIG_MAK
   if [ -d $x11_path ] ; then
     append CONFIG_INCLUDEPATH "$x11_path"
   fi
-fi
-
-if enabled xv; then
-  echo "CONFIG_XV_LIBS=-lXv" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled xrandr; then
-  echo "CONFIG_XRANDR_LIBS=-lXrandr" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled xvmc; then
