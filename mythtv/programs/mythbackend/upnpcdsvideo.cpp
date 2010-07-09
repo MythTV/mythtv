@@ -481,6 +481,6 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
     pRes->AddAttribute( "size"      , QString("%1").arg(fInfo.size()) );
-    pRes->AddAttribute( "duration"  , "0:00:00.000"      );
+    pRes->AddAttribute( "duration"  , "0:01:00.000"      );
 
 }

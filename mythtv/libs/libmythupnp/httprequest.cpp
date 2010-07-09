@@ -85,7 +85,8 @@ static MIMETypes g_MIMETypes[] =
     { "nuv" , "video/nupplevideo"          },
     { "mov" , "video/quicktime"            },
     { "mp4" , "video/mp4"                  },
-    { "mkv" , "video/x-matroska"           },
+    // This formerly was video/x-matroska, but got changed due to #8643
+    { "mkv" , "video/x-mkv"                },
     { "mka" , "audio/x-matroska"           },
     { "wmv" , "video/x-ms-wmv"             },
     // This should be application/ogg, but most clients don't understand that.
