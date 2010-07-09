@@ -84,7 +84,6 @@ LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
 LIBS += -L../libavcodec          -lmythavcodec-$${LIBVERSION}
 LIBS += -L../libavutil           -lmythavutil-$${LIBVERSION}
-unix:LIBS += -ldl
 
 TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
@@ -184,7 +183,6 @@ linux {
 freebsd {
     SOURCES += mythcdrom-freebsd.cpp
     HEADERS += mythcdrom-freebsd.h
-    LIBS    -= -ldl
 }
 
 INSTALLS += inc inc2
