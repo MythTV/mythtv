@@ -119,12 +119,10 @@ using_oss {
     DEFINES += USING_OSS
     SOURCES += audiooutputoss.cpp
     HEADERS += audiooutputoss.h
-    LIBS += $$OSS_LIBS
 }
 
 using_pulse {
     DEFINES += USING_PULSE
-    LIBS += $$PULSE_LIBS
     using_pulseoutput {
         DEFINES += USING_PULSEOUTPUT
         HEADERS += audiooutputpulse.h
@@ -220,4 +218,4 @@ using_libudev : LIBS += $${CONFIG_LIBUDEV_LIBS}
 
 include ( ../libs-targetfix.pro )
 
-LIBS += $$LATE_LIBS
+LIBS += $$EXTRA_LIBS $$LATE_LIBS
