@@ -1674,7 +1674,15 @@ void VideoOutputQuartz::EmbedInWidget(int x, int y, int w, int h)
 
     VideoOutput::EmbedInWidget(x, y, w, h);
     // Base class has now calculated Aspect/Fill,
-    // but currently we ignore it, and just scale into the whole embed area.
+    // so copy for precision sizing of new widget:
+    QRect newArea = windows[0].GetDisplayVideoRect();
+
+    x = newArea.left(), y = newArea.top(),
+    w = newArea.width(), h = newArea.height();
+
+    VERBOSE(VB_PLAYBACK, (LOC + "EmbedInWidget() - now x=%1, y=%2, w=%3, h=%4")
+                         .arg(x).arg(y).arg(w).arg(h));
+
 
     data->pixelLock.lock();
 
