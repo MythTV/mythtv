@@ -37,17 +37,28 @@ esac
 
 IFS='
 '
+if [ ! -z ${MYTHPYTHON} ]; then
+    if [ ! -f ${MYTHPYTHON} ]; then
+        MYTHPYTHON='/usr/bin/env ${MYTHPYTHON}'
+    fi
+fi
 
 # Copy all files and directories except .svn
 cd "$SRC"
 for file in $(find . -name .svn -prune -or -print); do
     #echo "processing $file"
     if [ -d "$file" -a ! -L "$file" ]; then
-	mkdir -p "$DEST/$file"
+        mkdir -p "$DEST/$file"
     else
-	cp -pR "$file" "$DEST/$file"
+        cp -pR "$file" "$DEST/$file"
+        ext=${file##*.}
+        if [ "x$ext" = "xpy" ]; then
+            sed "1s%^#.*%#!${MYTHPYTHON}%" "$file" > "$DEST/$file"
+#        elif [ "x$ext" = "xpl" ]; then
+#            do some perly stuff
+        fi
         chown -h $EUID:$EGID "$DEST/$file"
-	chmod +r "$DEST/$file" &> /dev/null
+        chmod +r "$DEST/$file" &> /dev/null
     fi
 done
 
