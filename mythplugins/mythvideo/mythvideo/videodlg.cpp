@@ -137,7 +137,8 @@ namespace
       public slots:
         void InspectHeader(const QHttpResponseHeader &header)
         {
-            if (header.statusCode() == 302)
+            if (header.statusCode() == 302 || header.statusCode() == 301 ||
+                header.statusCode() == 307)
             {
                 QString m_redirectUrl = header.value("Location");
                 m_redirectCount++;
