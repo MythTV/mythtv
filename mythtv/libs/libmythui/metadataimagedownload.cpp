@@ -128,6 +128,19 @@ void MetadataImageDownload::run()
                         continue;
                     }
 
+                    QImage testImage;
+                    bool didLoad = testImage.loadFromData(download->data());
+                    if (!didLoad)
+                    {
+                        VERBOSE(VB_IMPORTANT,QString("Tried to write %1, "
+                                "but it appears to be an HTML redirect "
+                                "(filesize %2).")
+                                .arg(oldurl).arg(download->size()));
+                        delete download;
+                        download = NULL;
+                        continue;
+                    }
+
                     QFile dest_file(finalfile);
                     if (dest_file.exists())
                     {
@@ -175,6 +188,20 @@ void MetadataImageDownload::run()
                         .arg(oldurl).arg(finalfile));
                     QByteArray *download = new QByteArray();
                     GetMythDownloadManager()->download(oldurl, download);
+
+                    QImage testImage;
+                    bool didLoad = testImage.loadFromData(download->data());
+                    if (!didLoad)
+                    {
+                        VERBOSE(VB_IMPORTANT,QString("Tried to write %1, "
+                                "but it appears to be an HTML redirect "
+                                "or corrupt file (filesize %2).")
+                                .arg(oldurl).arg(download->size()));
+                        delete download;
+                        download = NULL;
+                        continue;
+                    }
+
                     RemoteFile *outFile = new RemoteFile(finalfile, true);
                     if (!outFile->isOpen())
                     {
