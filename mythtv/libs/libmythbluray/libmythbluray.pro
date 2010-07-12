@@ -24,7 +24,7 @@ HEADERS += bluray.h register.h bdnav/*.h hdmv/*.h util/*.h file/*.h
 #HEADERS += bdj/*.h
 
 SOURCES += bluray.c register.c bdnav/*.c hdmv/*.c file/*.c util/*.c
-#HEADERS += bdj/*.c
+#SOURCES += bdj/*.c
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bluray
 inc_bdnav.files = bluray.h bdnav/*.h hdmv/*.h file/*.h util/*.h
