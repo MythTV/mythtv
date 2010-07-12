@@ -39,7 +39,7 @@ IFS='
 '
 if [ ! -z ${MYTHPYTHON} ]; then
     if [ ! -f ${MYTHPYTHON} ]; then
-        MYTHPYTHON='/usr/bin/env ${MYTHPYTHON}'
+        MYTHPYTHON="/usr/bin/env ${MYTHPYTHON}"
     fi
 fi
 
