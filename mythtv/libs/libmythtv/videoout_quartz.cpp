@@ -89,10 +89,8 @@ class VideoOutputQuartzView
                               MythCodecID av_codec_id);
     virtual void MoveResize(QRect newRect);
 
-    virtual void EmbedChanged(bool embedded);
-
     virtual void HideForGUI(void);
-    virtual void ShowAfterGUI(void);
+    virtual void ShowAfterGUI(QRect size);
 
   protected:
     virtual bool Begin(void);
@@ -481,14 +479,6 @@ void VideoOutputQuartzView::MoveResize(QRect newRect)
         Transform(newRect);
 }
 
-/// Subclasses that block the main window should suspend
-/// playback, hide windows, etc by overriding this method.
-void VideoOutputQuartzView::EmbedChanged(bool embedded)
-{
-    // do nothing in default version
-    (void)embedded;
-}
-
 /// Subclasses that block the main window should hide
 /// their output so that the GUI behind is fully visible.
 void VideoOutputQuartzView::HideForGUI(void)
@@ -498,7 +488,7 @@ void VideoOutputQuartzView::HideForGUI(void)
 
 /// Subclasses that block the main window should re-enable their
 /// output after the user has finished interacing with the GUI.
-void VideoOutputQuartzView::ShowAfterGUI(void)
+void VideoOutputQuartzView::ShowAfterGUI(QRect size)
 {
     // do nothing in default version
 }
@@ -568,32 +558,17 @@ class VoqvMainWindow : public VideoOutputQuartzView
         viewLock.unlock();
     };
 
-    // On embedding, we stop video playback.
-    void EmbedChanged(bool embedded)
-    {
-        if (embedded)
-        {
-            End();
-            EndPort();
-        }
-        else
-        {
-            BeginPort();
-            Begin();
-        }
-    };
-
     void HideForGUI(void)
     {
         VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() main window");
         End();
     }
 
-
-    void ShowAfterGUI(void)
+    void ShowAfterGUI(QRect size)
     {
         VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() main window");
         Begin();
+        Transform(size);
     }
 };
 
@@ -757,22 +732,6 @@ class VoqvFullscreen : public VideoOutputQuartzView
         viewLock.unlock();
     };
 
-    // On embedding, we release the display, and
-    // restore everything when we're through.
-    void EmbedChanged(bool embedded)
-    {
-        if (embedded)
-        {
-            End();
-            EndPort();
-        }
-        else
-        {
-            BeginPort();
-            Begin();
-        }
-    };
-
     void HideForGUI(void)
     {
         VERBOSE(VB_PLAYBACK, "VOQV::HideForGUI() full screen");
@@ -780,11 +739,12 @@ class VoqvFullscreen : public VideoOutputQuartzView
         EndPort();
     }
 
-    void ShowAfterGUI(void)
+    void ShowAfterGUI(QRect size)
     {
         VERBOSE(VB_PLAYBACK, "VOQV::ShowAfterGUI() full screen");
         BeginPort();
         Begin();
+        Transform(size);
     }
 };
 
@@ -1686,13 +1646,6 @@ void VideoOutputQuartz::EmbedInWidget(int x, int y, int w, int h)
 
     data->pixelLock.lock();
 
-    // warn other views that embedding is starting
-    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
-    for (; it != data->views.end(); ++it)
-    {
-        (*it)->EmbedChanged(true);
-    }
-
     // create embedded widget
     data->embeddedView = new VoqvEmbedded(data, x, y, w, h);
     if (data->embeddedView)
@@ -1727,11 +1680,6 @@ void VideoOutputQuartz::StopEmbedding(void)
         }
         data->embeddedView = NULL;
     }
-
-    // tell other views to return to normal
-    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
-    for (; it != data->views.end(); ++it)
-        (*it)->EmbedChanged(false);
 
     data->pixelLock.unlock();
 }
@@ -1885,10 +1833,13 @@ void VideoOutputQuartz::ResizeForVideo(uint width, uint height)
 {
     VideoOutput::ResizeForVideo(width, height);
 
+    // Base class gives us the correct dimensions for main window/screen:
+    QRect size = windows[0].GetDisplayVideoRect();
+
     data->pixelLock.lock();
     vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
     for (; it != data->views.end(); ++it)
-        (*it)->ShowAfterGUI();
+        (*it)->ShowAfterGUI(size);
     data->pixelLock.unlock();
 }
 
