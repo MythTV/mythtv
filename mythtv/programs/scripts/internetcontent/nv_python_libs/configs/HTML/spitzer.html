@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+  <!-- Author: R.D. Vaughan
+       July 6th, 2010
+       Purpose: Implement full screen browser video display for the www.spitzer.caltech.edu
+  Example:
+  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/spitzer.html?title=Spitzer_Telescope&videocode=IRAstroMusical_HD_fl9&image=/uploaded_files/graphics/high_definition_graphics/0005/8057/SpitzerTheMusical-Rec.jpg
+  -->
+    <script type="text/javascript">
+      function gup( name )
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        }
+
+      var pageTitle = gup( 'title' );
+      if (pageTitle != "")
+          pageTitle = unescape(pageTitle);
+      var videocode = gup( 'videocode' );
+      var image = gup( 'image' );
+
+      var embedded = '<embed type="application/x-shockwave-flash" src="http://www.spitzer.caltech.edu/flash/player.swf" style="visibility: visible;" id="ply" name="ply" bgcolor="#FFFFFF" quality="high" allowfullscreen="true" allowscriptaccess="always" wmode="transparent" flashvars="&amp;file=mp4:VIDEOCODE.f4v&amp;streamer=rtmp://mrisgstream01.ipac.caltech.edu/vod/&amp;image=http://www.spitzer.caltech.eduIMAGE&amp;autostart=true" height="98%" width="100%"></embed>'
+
+      document.write('<title>'+pageTitle+'</title>');
+      embedded = embedded.replace(/VIDEOCODE/g, videocode)
+      embedded = embedded.replace(/IMAGE/g, image)
+
+      document.write(embedded);
+
+    </script>
+  </head>
+</html>

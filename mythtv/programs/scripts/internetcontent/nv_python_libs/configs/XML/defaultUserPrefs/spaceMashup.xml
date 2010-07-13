@@ -1,0 +1,143 @@
+<userSpace>
+<!--
+    This is the Mashup user preference file. This is the place to enable or disable the
+    source URLs which will make up the videos added to a MythNetvision treeview. Within each
+    subDirectory are one or more source URLs that are used to get the videos and meta data
+    information.
+    The only attribute that a user should ever change would be to enable "true" or disable "false" a
+    specific "sourceURL".
+    These user files are maintained automatically with a user's preferences preserved. This means
+    that when an updated Mashup file is distributed with MythNetvision then the user's preference file
+    will be updated accordingly. New source URLs can be added and others removed. Any new URLs will
+    automatically have at least one per "subDirectory" enabled so the user will be alerted to the new
+    source the next time they update their treeview maps.
+-->
+
+<!--
+    The Space Search Mashup's RSS feed and HTML URLs.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+    "pageFunction" Identifies a XPath extension function that returns the start page/index for the
+                    specific source.
+    "mnvsearch" (optional) Identifies that search items are to include items from the MNV table using the
+                mnvsearch_api.py functions. This attributes value must match the "feedtitle" value
+                as it is in the "internetcontentarticles" table. When present the "xsltFile",
+                "url" and "pageFunction" attributes are left empty as they will be ignored.
+-->
+<search name="Space Search">
+  <subDirectory name="Space">
+    <sourceURL enabled="true" name="Space" xsltFile="" type="xml" url="" pageFunction="" mnvsearch="Space"/>
+  </subDirectory>
+</search>
+
+<!--
+    The Space Mashup's RSS feed and HTML URLs.
+    "globalmax" (optional) Is a way to limit the number of items processed per source for all
+                treeview URLs. A value of zero (0) means there are no limitations.
+    "max" (optional) Is a way to limit the number of items processed for an individual sourceURL.
+          This value will override any "globalmax" setting. A value of zero (0) means
+          there are no limitations and would be the same if the attribute was no included at all.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+    "parameter" (optional) Specifies source specific parameter that are passed to the XSLT stylesheet.
+                Multiple parameters require the use of key/value pairs. Example:
+                parameter="key1:value1;key2:value2" with the ";" as the separator value.
+-->
+
+<directory name="Space" globalmax="0">
+  <subDirectory name="Hubblecast">
+    <sourceURL enabled="true" name="Hubblecast Full HD" xsltFile="hubblecastRSS_item" type="xml" url="http://feeds.feedburner.com/hubblecast_fullhd?format=xml"/>
+    <sourceURL enabled="false" name="Hubblecast HD" xsltFile="hubblecastRSS_item" type="xml" url="http://feeds.feedburner.com/hubblecast/"/>
+    <sourceURL enabled="false" name="Hubblecast SD" xsltFile="hubblecastRSS_item" type="xml" url="http://feeds.feedburner.com/hubblecast_sd?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Jet Propulsion Laboratory">
+    <sourceURL enabled="true" name="Jet Propulsion Laboratory HD"  xsltFile="jplRSS_item" type="xml" url="http://www.jpl.nasa.gov/multimedia/rss/podfeed-hd.xml"/>
+    <sourceURL enabled="false" name="Jet Propulsion Laboratory SD"  xsltFile="jplRSS_item" type="xml" url="http://www.jpl.nasa.gov/multimedia/podcast/podfeed.xml"/>
+  </subDirectory>
+
+  <subDirectory name="NASA's Spitzer Space Telescope">
+    <sourceURL enabled="true" name="Spitzer HD"  xsltFile="spitzerRSS_item" type="xml" url="http://www.spitzer.caltech.edu/resource_list/6-Hidden-Universe-NASA-s-Spitzer-Space-Telescope?def=hi&amp;format=xml" parameter="NASA's Spitzer Space Telescope"/>
+    <sourceURL enabled="false" name="Spitzer SD"  xsltFile="spitzerRSS_item" type="xml" url="http://www.spitzer.caltech.edu/resource_list/6-Hidden-Universe-NASA-s-Spitzer-Space-Telescope?format=xml" parameter="NASA's Spitzer Space Telescope"/>
+    <sourceURL enabled="false" name="El Universo Escondido Spitzer HD"  xsltFile="spitzerRSS_item" type="xml" url="http://www.spitzer.caltech.edu/resource_list/12-El-Universo-Escondido-NASA-s-Spitzer-Space-Telescope?def=hi&amp;format=xml" parameter="El Universo Escondido Spitzer"/>
+    <sourceURL enabled="false" name="El Universo Escondido Spitzer SD"  xsltFile="spitzerRSS_item" type="xml" url="http://www.spitzer.caltech.edu/resource_list/12-El-Universo-Escondido-NASA-s-Spitzer-Space-Telescope?format=xml" parameter="El Universo Escondido Spitzer"/>
+  </subDirectory>
+
+  <subDirectory name="IRrelevant Astronomy">
+    <sourceURL enabled="true" name="IRrelevant Astronomy HD"  xsltFile="spitzerRSS_item" type="xml" url="http://www.spitzer.caltech.edu/resource_list/4-IRrelevant-Astronomy?def=hi&amp;format=xml" parameter="IRrelevant Astronomy"/>
+    <sourceURL enabled="false" name="IRrelevant Astronomy SD"  xsltFile="spitzerRSS_item" type="xml" url="http://www.spitzer.caltech.edu/resource_list/4-IRrelevant-Astronomy?format=xml" parameter="IRrelevant Astronomy"/>
+  </subDirectory>
+
+  <subDirectory name="The Beautiful Universe: Chandra">
+    <sourceURL enabled="true" name="Chandra HD"  xsltFile="chandraRSS_item" type="xml" url="http://chandra.harvard.edu/resources/podcasts/hd/podcasts.xml"/>
+    <sourceURL enabled="false" name="Chandra SD"  xsltFile="chandraRSS_item" type="xml" url="http://chandra.harvard.edu/resources/podcasts/podcasts.xml"/>
+  </subDirectory>
+
+  <subDirectory name="NASACast">
+    <sourceURL enabled="true" name="NASACast"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/NASAcast_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="NASACast VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/NASAcast_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="This Week @NASA">
+    <sourceURL enabled="true" name="This Week @NASA"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/TWAN_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="This Week @NASA VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/TWAN_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="NASA 360">
+    <sourceURL enabled="true" name="NASA 360"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/nasa360_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="NASA 360 VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/nasa360_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="NASA Edge">
+    <sourceURL enabled="true" name="NASA Edge"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/NASAEdge_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="NASA Edge VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/NASAEdge_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="NASA Mission Update">
+    <sourceURL enabled="true" name="NASA Mission Update"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/mission_update_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="NASA Mission Update VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/mission_update_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="Last Mission to Hubble">
+    <sourceURL enabled="true" name="Last Mission to Hubble"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/hubble_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="Last Mission to Hubble VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/hubble_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="Universe">
+    <sourceURL enabled="true" name="Universe"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/universe_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="Universe VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/universe_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="Solar System">
+    <sourceURL enabled="true" name="Solar System"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/solar_system_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="Solar System VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/solar_system_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="Shuttle and Station">
+    <sourceURL enabled="true" name="Shuttle and Station"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/shuttle_station_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="Shuttle and Station VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/shuttle_station_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="Earth">
+    <sourceURL enabled="true" name="Earth"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/Earth_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="Earth VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/Earth_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="What's Up?">
+    <sourceURL enabled="true" name="What's Up?"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/whatsup_vodcast.rss" parameter="false"/>
+    <sourceURL enabled="false" name="What's Up? VideoPlugin"  xsltFile="nasaRSS_item" type="xml" url="http://www.nasa.gov/rss/whatsup_vodcast.rss" parameter="true"/>
+  </subDirectory>
+
+  <subDirectory name="BBC Sky at Night magazine">
+    <sourceURL enabled="true" name="BBC Sky at Night magazine"  xsltFile="skyAtNightRSS_item" type="xml" url="http://www.skyatnightmagazine.com/podcast/SANpodcast.xml"/>
+  </subDirectory>
+
+  <subDirectory name="DiscoveryNow Audio only">
+    <sourceURL enabled="true" name="DiscoveryNow Audio only"  xsltFile="discoveryNowRSS_item" type="xml" url="http://www.whro.org/home/html/podcasts/discoverynow/podcast.xml"/>
+  </subDirectory>
+</directory>
+</userSpace>

@@ -43,35 +43,42 @@
                         <xsl:attribute name="reverse">true</xsl:attribute>
                     </xsl:element>
                 </xsl:element>
-                <xsl:element name="item">
-                    <xsl:if test="contains(string(title), 'Trailer')">
-                        <title><xsl:value-of select="normalize-space(substring-before(string(title), 'Trailer'))"/></title>
-                    </xsl:if>
-                    <xsl:if test="not(contains(string(title), 'Trailer'))">
-                        <title><xsl:value-of select='normalize-space(title)'/></title>
-                    </xsl:if>
-                    <author><xsl:value-of select="normalize-space(dc:creator)"/></author>
-                    <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %B %Y %H:%M:%S')"/></pubDate>
-                    <description><xsl:value-of select="normalize-space(description)"/></description>
-                    <link><xsl:value-of select="mnvXpath:cinemarvLinkGeneration(string(link))"/></link>
-                    <xsl:if test="mnvXpath:cinemarvIsCustomHTML(('dummy'))">
-                        <mythtv:customhtml>true</mythtv:customhtml>
-                    </xsl:if>
-                    <xsl:element name="media:group">
-                        <xsl:element name="media:thumbnail">
-                            <xsl:attribute name="url"><xsl:value-of select="normalize-space('%SHAREDIR%/mythnetvision/icons/trailers.png')"/></xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="mnvXpath:cinemarvCheckIfDBItem(normalize-space(title), normalize-space(dc:creator), normalize-space(description))">
+                        <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:element name="item">
+                            <xsl:if test="contains(string(title), 'Trailer')">
+                                <title><xsl:value-of select="normalize-space(substring-before(string(title), 'Trailer'))"/></title>
+                            </xsl:if>
+                            <xsl:if test="not(contains(string(title), 'Trailer'))">
+                                <title><xsl:value-of select='normalize-space(title)'/></title>
+                            </xsl:if>
+                            <author><xsl:value-of select="normalize-space(dc:creator)"/></author>
+                            <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %B %Y %H:%M:%S')"/></pubDate>
+                            <description><xsl:value-of select="normalize-space(description)"/></description>
+                            <link><xsl:value-of select="mnvXpath:cinemarvLinkGeneration(string(link))"/></link>
+                            <xsl:if test="mnvXpath:cinemarvIsCustomHTML(('dummy'))">
+                                <mythtv:customhtml>true</mythtv:customhtml>
+                            </xsl:if>
+                            <xsl:element name="media:group">
+                                <xsl:element name="media:thumbnail">
+                                    <xsl:attribute name="url"><xsl:value-of select="normalize-space('%SHAREDIR%/mythnetvision/icons/trailers.png')"/></xsl:attribute>
+                                </xsl:element>
+                                <xsl:element name="media:content">
+                                    <xsl:attribute name="url"><xsl:value-of select="mnvXpath:cinemarvLinkGeneration(string(link))"/></xsl:attribute>
+                                    <xsl:attribute name="duration"></xsl:attribute>
+                                    <xsl:attribute name="width"></xsl:attribute>
+                                    <xsl:attribute name="height"></xsl:attribute>
+                                     <xsl:attribute name="length"></xsl:attribute>
+                                    <xsl:attribute name="lang"><xsl:value-of select="normalize-space(../language)"/></xsl:attribute>
+                                </xsl:element>
+                            </xsl:element>
+                            <rating></rating>
                         </xsl:element>
-                        <xsl:element name="media:content">
-                            <xsl:attribute name="url"><xsl:value-of select="mnvXpath:cinemarvLinkGeneration(string(link))"/></xsl:attribute>
-                            <xsl:attribute name="duration"></xsl:attribute>
-                            <xsl:attribute name="width"></xsl:attribute>
-                            <xsl:attribute name="height"></xsl:attribute>
-                             <xsl:attribute name="length"></xsl:attribute>
-                            <xsl:attribute name="lang"><xsl:value-of select="normalize-space(../language)"/></xsl:attribute>
-                        </xsl:element>
-                    </xsl:element>
-                    <rating></rating>
-                </xsl:element>
+                    </xsl:otherwise>
+                </xsl:choose>
             </dataSet>
         </xsl:for-each>
     </xsl:template>

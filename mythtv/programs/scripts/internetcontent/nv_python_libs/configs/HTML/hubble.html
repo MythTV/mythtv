@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+  <!-- Author: R.D. Vaughan
+       Apr 28th, 2010
+       Purpose: Implement full screen browser video display for the BBC iPlayer
+  Example:
+  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/hubble.html?videocode=heic1011a
+  -->
+    <script type="text/javascript">
+      function gup( name )
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        }
+
+      var videocode = gup( 'videocode' );
+      var embedded = '<embed type="application/x-shockwave-flash" src="http://www.spacetelescope.org/static/djangoplicity/shadowbox3/libraries/mediaplayer-licensed/player-licensed.swf" style="" id="mpl" name="mpl" quality="high" allowfullscreen="true" flashvars="file=http://www.spacetelescope.org/static/archives/videos/medium_flash/VIDEOCODE.flv&amp;autostart=true&amp;image=/static/archives/videos/videoframe/VIDEOCODE.jpg&amp;backcolor=0x000000&amp;frontcolor=0xCCCCCC&amp;lightcolor=0x005ba0&amp;plugins=gapro-1&amp;gapro.accountid=UA-2368492-6" height="98%" width="100%">';
+      document.write('<title>HubbleCast Full Screen</title>');
+      document.write(embedded.replace(/VIDEOCODE/g, videocode));
+
+    </script>
+  </head>
+</html>

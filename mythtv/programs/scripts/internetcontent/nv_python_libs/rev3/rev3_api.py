@@ -20,13 +20,15 @@ meta data, video and image URLs from rev3. These routines process RSS feeds prov
 a user XML preference file usually found at "~/.mythtv/MythNetvision/userGrabberPrefs/rev3.xml"
 '''
 
-__version__="v0.1.3"
+__version__="v0.1.4"
 # 0.1.0 Initial development
 # 0.1.1 Changed the search functionality to be "Videos" only rather than the site search.
 #       Added support for Revision3's Personal RSS feed
 #       Changed the logger to only output to stderr rather than a file
 # 0.1.2 Fixed an abort when no RSS feed data was returned
 # 0.1.3 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.1.4 Fixed missing shows from the creation of the user default preference due to Web site changes
+#       Fixed two incorrect variable names in debug messages
 
 import os, struct, sys, re, time, datetime, urllib, re
 import logging
@@ -304,14 +306,14 @@ class Videos(object):
 
         # Extract the show name and Web page links
         showData = etree.XML(u'<xml></xml>')
-        complexFilter = u"//div[@class='clear expand']//div//p[.='MP4']/..//a"
+        complexFilter = u"//div[@class='subscribe_rss']//div//p[.='MP4']/..//a"
         for result in linksTree.xpath('//results'):
             tmpDirectory = etree.XML(u'<directory></directory>')
             dirName = result.find('name').text
             tmpDirectory.attrib['name'] = dirName
 
             if self.config['debug_enabled']:
-                print "Results: #Items(%s) for (%s)" % (len(itemFilter(result)), dirName)
+                print "Results: #Items(%s) for (%s)" % (len(result.xpath('.//a')), dirName)
                 print
 
             for anchor in result.xpath('.//a'):
@@ -372,7 +374,7 @@ class Videos(object):
                     tmpShow.attrib['name'] = show.find('name').text
 
                     if self.config['debug_enabled']:
-                        print "Results: #Items(%s) for (%s)" % (len(itemFilter(result)), tmpShow.attrib['name'])
+                        print "Results: #Items(%s) for (%s)" % (len(show.xpath('.//a')), tmpShow.attrib['name'])
                         print
 
                     for format in show.xpath('.//a'):

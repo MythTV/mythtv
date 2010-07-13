@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: nature.py
+# Name: technology.py
 # Python Script
 # Author: R.D. Vaughan
 # Purpose:
-#   This python script is intended to perform a mashup of various Nature Internet media sources
+#   This python script is intended to perform a mashup of various Technology Internet media sources
 #   for the MythTV Netvision plugin. It follows the MythTV Netvision grabber standards.
 #
 # Command example:
 # See help (-u and -h) options
 #
 # Design:
-#   1) Read "~/.mythtv/MythNetvision/userGrabberPrefs/natureMashup.xml" configuration file
+#   1) Read "~/.mythtv/MythNetvision/userGrabberPrefs/technologyMashup.xml" configuration file
 #   2) Input the sources that are marked as enabled
 #   3) Process the results and display to stdout
 #
@@ -20,20 +20,17 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="Nature";
-__mashup_title__ = "natureMashup"
+__title__ ="Technology";
+__mashup_title__ = "technologyMashup"
 __author__="R.D. Vaughan"
-__version__="0.12"
+__version__="0.10"
 # 0.10  Initial development
-# 0.11  Added a search of all the "Nature Mashup" items in the "internetcontentarticles" table
-# 0.12  Toggle the search option off if there are NO "Nature" items in the "internetcontentarticles"
-#       table
 
 __usage_examples__ ='''
 (Option Help)
-> ./nature.py -h
-Usage: ./nature.py -hduvlST [parameters] <search text>
-Version: v0.1.0 Author: R.D.Vaughan
+> ./technology.py -h
+Usage: ./technology.py -hduvlST [parameters] <search text>
+Version: v0.XX Author: R.D.Vaughan
 
 For details on the MythTV Netvision plugin see the wiki page at:
 http://www.mythtv.org/wiki/MythNetvision
@@ -55,12 +52,12 @@ Options:
                         option (-T).
   -T, --treeview        Display a Tree View of a sites videos
 
-> ./nature.py -v
+> ./technology.py -v
 <grabber>
-  <name>Nature</name>
+  <name>Technology</name>
   <author>R.D. Vaughan</author>
-  <thumbnail>nature.png</thumbnail>
-  <command>nature.py</command>
+  <thumbnail>technology.png</thumbnail>
+  <command>technology.py</command>
   <type>video</type>
   <description>Mashups combines media from multiple sources to create a new work</description>
   <version>0.XX</version>
@@ -69,10 +66,10 @@ Options:
 </grabber>
 
 Search:
-> ./nature.py -S "Lions"
+> ./technology.py -S "Video"
 
 Treeview:
-> ./nature.py -T
+> ./technology.py -T
 '''
 __search_max_page_items__ = 20
 __tree_max_page_items__ = 20
@@ -138,7 +135,7 @@ except Exception, e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/mashups" containing the modules mashups_api and
 mashups_exceptions.py (v0.1.0 or greater),
-They should have been included with the distribution of nature.py.
+They should have been included with the distribution of technology.py.
 Error(%s)
 ''' % e)
     sys.exit(1)
@@ -170,10 +167,10 @@ if __name__ == '__main__':
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
-    main.grabberInfo['command'] = u'nature.py'
+    main.grabberInfo['command'] = u'technology.py'
     main.grabberInfo['mashup_title'] = __mashup_title__
     main.grabberInfo['author'] = __author__
-    main.grabberInfo['thumbnail'] = 'nature.png'
+    main.grabberInfo['thumbnail'] = 'technology.png'
     main.grabberInfo['type'] = ['video', ]
     main.grabberInfo['desc'] = u"Mashups combines media from multiple sources to create a new work"
     main.grabberInfo['version'] = __version__

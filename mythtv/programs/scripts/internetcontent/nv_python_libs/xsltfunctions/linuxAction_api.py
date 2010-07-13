@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: cinemarv_api - XPath and XSLT functions for the CinemaRV.com grabber
+# Name: linuxAction_api - XPath and XSLT functions for the www.jupiterbroadcasting.com RSS/HTML items
 # Python Script
 # Author:   R.D. Vaughan
 # Purpose:  This python script is intended to perform a variety of utility functions
@@ -12,7 +12,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="cinemarv_api - XPath and XSLT functions for the CinemaRV.com grabber"
+__title__ ="linuxAction_api - XPath and XSLT functions for the www.jupiterbroadcasting.com RSS/HTML"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions
@@ -21,7 +21,7 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
 
 
@@ -91,9 +91,28 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['cinemarvLinkGeneration', 'cinemarvIsCustomHTML', 'cinemarvCheckIfDBItem', ]
-        self.TextTail = etree.XPath("string()")
-        self.persistence = {}
+        self.functList = ['linuxActionLinkGeneration', 'linuxActionTitleSeEp', 'linuxActioncheckIfDBItem', ]
+        self.s_e_Regex = [
+            # s12e05
+            re.compile(u'''^.+?[Ss](?P<seasno>[0-9]+)\\e(?P<epno>[0-9]+).*$''', re.UNICODE),
+            # Season 11 Episode 3
+            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+)\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            ]
+        self.namespaces = {
+            'atom': "http://www.w3.org/2005/Atom",
+            'atom10': "http://www.w3.org/2005/Atom",
+            'media': "http://search.yahoo.com/mrss/",
+            'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
+            'xhtml': "http://www.w3.org/1999/xhtml",
+            'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
+            'feedburner': "http://rssnamespace.org/feedburner/ext/1.0",
+            'fb': "http://www.facebook.com/2008/fbml",
+            }
+        self.mediaIdFilters = [
+            [etree.XPath('//object/@id', namespaces=self.namespaces ), None],
+            ]
+        self.FullScreen = u'http://linuxAction.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
+        self.FullScreenParser = common.parsers['html'].copy()
     # end __init__()
 
 ######################################################################################################
@@ -102,69 +121,85 @@ class xpathFunctions(object):
 #
 ######################################################################################################
 
-    def cinemarvLinkGeneration(self, context, *args):
-        '''Generate a link for the CinemaRV.com site. A read of the item's web page is required to
-        extract the flash video id.
-        Call example: 'mnvXpath:cinemarvLinkGeneration(string(link))'
+    def linuxActionLinkGeneration(self, context, *arg):
+        '''Generate a link for the video.
+        Call example: 'mnvXpath:linuxActionLinkGeneration(string(link))'
         return the url link
         '''
-        webURL = args[0]
-        # If this is for the download then just return what was found for the "link" element
-        if self.persistence.has_key('cinemarvLinkGeneration'):
-            if self.persistence['cinemarvLinkGeneration'] != None:
-                returnValue = self.persistence['cinemarvLinkGeneration']
-                self.persistence['cinemarvLinkGeneration'] = None
-                return returnValue
-        else:
-            self.persistence['cinemarvLinkGenerationVideoID'] = etree.XPath('//object[@id="flashObj"]//param[@name="flashVars"]/@value', namespaces=common.namespaces)
-            self.persistence['cinemarvLinkGenerationParser'] = etree.HTMLParser()
-
+        webURL = arg[0]
         try:
-            webPageElement = etree.parse(webURL, self.persistence['cinemarvLinkGenerationParser'])
+            tmpHandle = urllib.urlopen(webURL)
+            tmpHTML = unicode(tmpHandle.read(), 'utf-8')
+            tmpHandle.close()
         except Exception, errmsg:
-            sys.stderr.write(u'!Warning: The web page URL(%s) could not be read, error(%s)\n' % (webURL, errmsg))
-            return webURL
-        if webPageElement == None:
-            self.persistence['cinemarvLinkGeneration'] = webURL
+            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
             return webURL
 
-        tmpVideoID = self.persistence['cinemarvLinkGenerationVideoID'](webPageElement)
-        if not len(tmpVideoID):
-            self.persistence['cinemarvLinkGeneration'] = webURL
+        findText = u"<embed src="
+        lenText = len(findText)
+        posText = tmpHTML.find(findText)
+        if posText == -1:
             return webURL
-        index = tmpVideoID[0].find('&')
-        if index == -1:
-            self.persistence['cinemarvLinkGeneration'] = webURL
-            return webURL
-        videocode = tmpVideoID[0][:index].replace(u'videoId=', u'')
-        self.persistence['cinemarvLinkGeneration'] = common.linkWebPage(u'dummycontext', 'cinemarv')+videocode
-        return self.persistence['cinemarvLinkGeneration']
-    # end cinemarvLinkGeneration()
+        tmpHTML = tmpHTML[posText+lenText+1:]
 
-    def cinemarvIsCustomHTML(self, context, *args):
-        '''Check if the link is for a custom HTML
-        Example call: mnvXpath:cinemarvIsCustomHTML(('dummy'))
-        return True if the link does not starts with "http://"
-        return False if the link starts with "http://"
-        '''
-        if self.persistence['cinemarvLinkGeneration'] == None:
-            return False
-
-        if self.persistence['cinemarvLinkGeneration'].startswith(u'http://'):
-            return False
+        tmpLink = tmpHTML[:tmpHTML.find('"')]
+        if tmpLink.find('www.youtube.com') != -1:
+            return u'%s&autoplay=1' % tmpLink
         else:
-            return True
-    # end cinemarvIsCustomHTML()
+            return u'%s?autostart=1' % tmpLink
+    # end linuxActionLinkGeneration()
 
-    def cinemarvCheckIfDBItem(self, context, *arg):
+    def linuxActionTitleSeEp(self, context, *arg):
+        '''Parse the download link and extract an episode number
+        Call example: 'mnvXpath:linuxActionTitleSeEp(title)'
+        return the a massaged title element and an episode element in an array
+        '''
+        title = arg[0]
+        index = title.find('|')
+        if index > 0:
+            title = title[:index].strip()
+        index = title.find('The Linux Action Show')
+        if index > 0:
+            title = title[:index].strip()
+        index = title.find('! Season')
+        if index > 0:
+            title = title[:index-1].strip()
+        title = common.htmlToString('dummy', title)
+
+        elementArray = []
+        seasonNumber = u''
+        episodeNumber = u''
+        for index in range(len(self.s_e_Regex)):
+            match = self.s_e_Regex[index].match(arg[0])
+            if match:
+                (seasonNumber, episodeNumber) = match.groups()
+                seasonNumber = u'%s' % int(seasonNumber)
+                episodeNumber = u'%s' % int(episodeNumber)
+                elementArray.append(etree.XML(u"<title>%s</title>" % (u'S%02dE%02d: %s' % (int(seasonNumber), int(episodeNumber), title))))
+                break
+        else:
+            elementArray.append(etree.XML(u"<title>%s</title>" % title ))
+        if seasonNumber:
+            tmpElement = etree.Element('{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season')
+            tmpElement.text = seasonNumber
+            elementArray.append(tmpElement)
+        if episodeNumber:
+            tmpElement = etree.Element('{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode')
+            tmpElement.text = episodeNumber
+            elementArray.append(tmpElement)
+        return elementArray
+    # end linuxActionTitleSeEp()
+
+    def linuxActioncheckIfDBItem(self, context, *arg):
         '''Use a unique key value pairing to find out if the 'internetcontentarticles' table already
         has a matching item. This is done to save accessing the Internet when not required.
-        Call example: 'mnvXpath:cinemarvCheckIfDBItem(.)'
+        Call example: 'mnvXpath:linuxActioncheckIfDBItem(title, author)'
         return True if a match was found
         return False if a match was not found
         '''
-        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0].replace('Trailer', u'').strip(), 'author': arg[1], 'description': arg[2]})
-    # end cinemarvCheckIfDBItem()
+        titleElement = self.linuxActionTitleSeEp('dummy', arg[0])[0]
+        return common.checkIfDBItem('dummy', {'feedtitle': 'Technology', 'title': titleElement.text, 'author': arg[1]})
+    # end linuxActioncheckIfDBItem()
 
 ######################################################################################################
 #

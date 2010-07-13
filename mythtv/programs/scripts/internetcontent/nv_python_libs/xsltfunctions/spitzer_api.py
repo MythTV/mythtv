@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: traileraddicts_api - XPath and XSLT functions for the TrailerAddicts.com grabber
+# Name: spitzer_api - XPath and XSLT functions for the www.spitzer.caltech.edu grabber
 # Python Script
 # Author:   R.D. Vaughan
 # Purpose:  This python script is intended to perform a variety of utility functions
@@ -12,7 +12,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="traileraddicts_api - XPath and XSLT functions for the TrailerAddicts.com grabber"
+__title__ ="spitzer_api - XPath and XSLT functions for the www.spitzer.caltech.edu grabber"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions
@@ -91,9 +91,10 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['traileraddictsLinkGenerationMovie', 'traileraddictsLinkGenerationClip', 'traileraddictsCheckIfDBItem']
+        self.functList = ['spitzerLinkGeneration', 'spitzerThumbnailLink', 'spitzerCheckIfDBItem', ]
         self.TextTail = etree.XPath("string()")
         self.persistence = {}
+        self.htmlParser = common.parsers['html'].copy()
     # end __init__()
 
 ######################################################################################################
@@ -102,63 +103,69 @@ class xpathFunctions(object):
 #
 ######################################################################################################
 
-    def traileraddictsLinkGenerationMovie(self, context, *args):
-        '''Generate a link for the TrailerAddicts.com site.
-        Call example: 'mnvXpath:traileraddictsLinkGenerationMovie(position(), link)'
+    def spitzerLinkGeneration(self, context, *args):
+        '''Generate a link for the www.spitzer.caltech.edu site.
+        Call example: 'mnvXpath:spitzerLinkGeneration(normalize-space(link), $paraMeter)'
         return the url link
         '''
-        webURL = args[1].strip()
+        webURL = args[0]
+        pageTitle = args[1]
+        try:
+            tmpHandle = urllib.urlopen(webURL)
+            tmpHTML = unicode(tmpHandle.read(), 'utf-8')
+            tmpHandle.close()
+        except Exception, errmsg:
+            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+            return webURL
 
-        # If this is for the download element then just return what was found for the "link" element
-        if self.persistence.has_key('traileraddictsLinkGenerationMovie'):
-            if args[0] == self.persistence['traileraddictsLinkGenerationMovie']['position']:
-                return self.persistence['traileraddictsLinkGenerationMovie']['link']
-        else:
-            self.persistence['traileraddictsLinkGenerationMovie'] = {}
-            self.persistence['traileraddictsLinkGenerationMovie']['embedRSS'] = etree.parse(u'http://www.traileraddict.com/embedrss', common.parsers['xml'].copy())
-            self.persistence['traileraddictsLinkGenerationMovie']['matchlink'] = etree.XPath('//link[string()=$link]/..', namespaces=common.namespaces)
-            self.persistence['traileraddictsLinkGenerationMovie']['description'] = etree.XPath('normalize-space(description)', namespaces=common.namespaces)
-            self.persistence['traileraddictsLinkGenerationMovie']['embedded'] = etree.XPath('//embed/@src', namespaces=common.namespaces)
+        # Get videocode
+        findText = u"file=mp4:"
+        lenText = len(findText)
+        posText = tmpHTML.find(findText)
+        if posText == -1:
+            return webURL
+        tmpHTML = tmpHTML[posText+lenText:]
+        tmpLink = tmpHTML[:tmpHTML.find('.')]
 
-        self.persistence['traileraddictsLinkGenerationMovie']['position'] = args[0]
+        # Fill out as much of the URL as possible
+        customHTML = common.linkWebPage('dummy', 'spitzer')
+        customHTML = customHTML.replace('TITLE', urllib.quote(pageTitle))
+        customHTML = customHTML.replace('VIDEOCODE', tmpLink)
 
-        matchLink = self.persistence['traileraddictsLinkGenerationMovie']['matchlink'](self.persistence['traileraddictsLinkGenerationMovie']['embedRSS'], link=webURL)[0]
-        self.persistence['traileraddictsLinkGenerationMovie']['link'] = self.persistence['traileraddictsLinkGenerationMovie']['embedded'](common.getHtmlData(u'dummy',(self.persistence['traileraddictsLinkGenerationMovie']['description'](matchLink))))[0]
+        # Get Thumbnail image
+        findText = u"image="
+        lenText = len(findText)
+        posText = tmpHTML.find(findText)
+        if posText == -1:
+            self.persistence['spitzerThumbnailLink'] = False
+            return customHTML.replace('IMAGE', u'')
+        tmpHTML = tmpHTML[posText+lenText:]
+        tmpImage = tmpHTML[:tmpHTML.find('"')]
+        self.persistence['spitzerThumbnailLink'] = u'http://www.spitzer.caltech.edu%s' % tmpImage
 
-        return self.persistence['traileraddictsLinkGenerationMovie']['link']
-    # end traileraddictsLinkGenerationMovie()
+        return customHTML.replace('IMAGE', tmpImage)
+    # end spitzerLinkGeneration()
 
-
-    def traileraddictsLinkGenerationClip(self, context, *args):
-        '''Generate a link for the TrailerAddicts.com site.
-        Call example: 'mnvXpath:traileraddictsLinkGenerationClip(position(), link)'
-        return the url link
+    def spitzerThumbnailLink(self, context, *args):
+        '''Verify that the thumbnail actually exists. If it does not then use the site image.
+        Call example: 'mnvXpath:spitzerThumbnailLink('dummy')'
+        return the thumbnail url
         '''
-        webURL = args[1].strip()
-        # If this is for the download element then just return what was found for the "link" element
-        if self.persistence.has_key('traileraddictsLinkGenerationClip'):
-            if args[0] == self.persistence['traileraddictsLinkGenerationClip']['position']:
-                return self.persistence['traileraddictsLinkGenerationClip']['link']
+        if not self.persistence['spitzerThumbnailLink']:
+            return u''
         else:
-            self.persistence['traileraddictsLinkGenerationClip'] = {}
-            self.persistence['traileraddictsLinkGenerationClip']['embedded'] = etree.XPath('//embed[@allowfullscreen="true"]/@src', namespaces=common.namespaces)
+            return self.persistence['spitzerThumbnailLink']
+    # end spitzerThumbnailLink()
 
-        self.persistence['traileraddictsLinkGenerationClip']['position'] = args[0]
-
-        tmpHTML = etree.parse(webURL, etree.HTMLParser())
-        self.persistence['traileraddictsLinkGenerationClip']['link'] = self.persistence['traileraddictsLinkGenerationClip']['embedded'](tmpHTML)[0]
-        return self.persistence['traileraddictsLinkGenerationClip']['link']
-    # end traileraddictsLinkGenerationClip()
-
-    def traileraddictsCheckIfDBItem(self, context, *arg):
+    def spitzerCheckIfDBItem(self, context, *arg):
         '''Use a unique key value pairing to find out if the 'internetcontentarticles' table already
         has a matching item. This is done to save accessing the Internet when not required.
-        Call example: 'mnvXpath:traileraddictsCheckIfDBItem(.)'
+        Call example: 'mnvXpath:spitzerCheckIfDBItem(title, author, description)'
         return True if a match was found
         return False if a match was not found
         '''
-        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0], 'author': arg[1], 'description': arg[2]})
-    # end traileraddictsCheckIfDBItem()
+        return common.checkIfDBItem('dummy', {'feedtitle': 'Space', 'title': arg[0], 'author': arg[1], 'description': arg[2]})
+    # end spitzerCheckIfDBItem()
 
 ######################################################################################################
 #
@@ -171,7 +178,6 @@ class xpathFunctions(object):
 # Start of XSLT extension functions
 #
 ######################################################################################################
-
 
 ######################################################################################################
 #

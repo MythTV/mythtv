@@ -20,9 +20,10 @@
     "url" The link that is used to retrieve the information from the Internet
     "pageFunction" Identifies a XPath extension function that returns the start page/index for the
                     specific source.
-    "mnvsearch" Identifies that search items are to include items from the MNV table using the
+    "mnvsearch" (optional) Identifies that search items are to include items from the MNV table using the
                 mnvsearch_api.py functions. This attributes value must match the "feedtitle" value
-                as is in the "internetcontentarticles" table.
+                as it is in the "internetcontentarticles" table. When present the "xsltFile",
+                "url" and "pageFunction" attributes are left empty as they will be ignored.
 -->
 <search name="Nature Search">
   <subDirectory name="Nature">
@@ -85,4 +86,9 @@
   </subDirectory>
 </directory>
 
+<directory name="DiveFilm">
+  <subDirectory name="DiveFilm HD Videos">
+    <sourceURL enabled="true" name="HD" xsltFile="divefilmRSS_item" type="xml" url="http://divefilmhd.com/podcasts/podcast.xml"/>
+  </subDirectory>
+</directory>
 </userNature>

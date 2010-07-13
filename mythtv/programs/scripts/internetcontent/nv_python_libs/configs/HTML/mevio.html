@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+  <!-- Author: R.D. Vaughan
+       June 9th, 2010
+       Purpose: Implement full screen browser video display for the Mevio hosted videos
+  Example:
+  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/mevio.html?videocode=8040431
+  -->
+    <script type="text/javascript">
+      function gup( name )
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        }
+
+      var videocode = gup( 'videocode' );
+      var embedded = '<embed src="http://ui.mevio.com/widgets/mwm/MevioWM.swf?r=36418" quality="high" 		bgcolor="#000000" width="100%" height="98%" FlashVars="distribConfig=http://www.mevio.com/widgets/configFiles/distribconfig_mwm_pcw_default.php?r=36418&autoPlay=true&container=false&rssFeed=/%3FsId=13917%26sMediaId=VIDEOCODE%26format=json&playerIdleEnabled=false" name="MevioWM" align="middle"		allowScriptAccess="never" allowFullScreen="true" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"/>';
+
+      document.write('<title>Mevio Full Screen</title>');
+      document.write(embedded.replace(/VIDEOCODE/g, videocode));
+
+    </script>
+  </head>
+</html>

@@ -35,30 +35,36 @@
             <xsl:for-each select="//a[@class]/img[@src]/..">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
-                    <xsl:element name="item">
-                        <title><xsl:value-of select="normalize-space(string(.))"/></title>
-                        <author>Tribute.ca</author>
-                        <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
-                        <description><xsl:value-of select="normalize-space(img/@alt)"/></description>
-                        <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //a[@class]/img[@src]/..)"/></link>
-                        <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
-                            <mythtv:customhtml>true</mythtv:customhtml>
-                        </xsl:if>
-                        <xsl:element name="media:group">
-                            <xsl:element name="media:thumbnail">
-                                <xsl:attribute name="url"><xsl:value-of select="normalize-space(mnvXpath:tributecaThumbnailLink(string(.//img/@src)))"/></xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="mnvXpath:tributecaCheckIfDBItem(normalize-space(string(.)), 'Tribute.ca', normalize-space(img/@alt))">
+                            <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:element name="item">
+                                <title><xsl:value-of select="normalize-space(string(.))"/></title>
+                                <author>Tribute.ca</author>
+                                <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
+                                <description><xsl:value-of select="normalize-space(img/@alt)"/></description>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //a[@class]/img[@src]/..)"/></link>
+                                <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
+                                    <mythtv:customhtml>true</mythtv:customhtml>
+                                </xsl:if>
+                                <xsl:element name="media:group">
+                                    <xsl:element name="media:thumbnail">
+                                        <xsl:attribute name="url"><xsl:value-of select="normalize-space(mnvXpath:tributecaThumbnailLink(string(.//img/@src)))"/></xsl:attribute>
+                                    </xsl:element>
+                                    <xsl:element name="media:content">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //a[@class]/img[@src]/..)"/></xsl:attribute>
+                                        <xsl:attribute name="duration"></xsl:attribute>
+                                        <xsl:attribute name="width"></xsl:attribute>
+                                        <xsl:attribute name="height"></xsl:attribute>
+                                        <xsl:attribute name="length"></xsl:attribute>
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                                    </xsl:element>
+                                </xsl:element>
                             </xsl:element>
-                            <xsl:element name="media:content">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //a[@class]/img[@src]/..)"/></xsl:attribute>
-                                <xsl:attribute name="duration"></xsl:attribute>
-                                <xsl:attribute name="width"></xsl:attribute>
-                                <xsl:attribute name="height"></xsl:attribute>
-                                <xsl:attribute name="length"></xsl:attribute>
-                                <xsl:attribute name="lang">en</xsl:attribute>
-                            </xsl:element>
-                        </xsl:element>
-                        <rating></rating>
-                    </xsl:element>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </dataSet>
             </xsl:for-each>
         </xsl:element>
@@ -71,30 +77,36 @@
             <xsl:for-each select="//h3[string(span)='Movie Trailers Now Playing']/..//a">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
-                    <xsl:element name="item">
-                        <title><xsl:value-of select="normalize-space(string(.))"/></title>
-                        <author>Tribute.ca</author>
-                        <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
-                        <description><xsl:value-of select="normalize-space(./@title)"/></description>
-                        <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Movie Trailers Now Playing']/..//a)"/></link>
-                        <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
-                            <mythtv:customhtml>true</mythtv:customhtml>
-                        </xsl:if>
-                        <xsl:element name="media:group">
-                            <xsl:element name="media:thumbnail">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="mnvXpath:tributecaCheckIfDBItem(normalize-space(string(.)), 'Tribute.ca', normalize-space(./@title))">
+                            <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:element name="item">
+                                <title><xsl:value-of select="normalize-space(string(.))"/></title>
+                                <author>Tribute.ca</author>
+                                <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
+                                <description><xsl:value-of select="normalize-space(./@title)"/></description>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Movie Trailers Now Playing']/..//a)"/></link>
+                                <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
+                                    <mythtv:customhtml>true</mythtv:customhtml>
+                                </xsl:if>
+                                <xsl:element name="media:group">
+                                    <xsl:element name="media:thumbnail">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                                    </xsl:element>
+                                    <xsl:element name="media:content">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Movie Trailers Now Playing']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="duration"></xsl:attribute>
+                                        <xsl:attribute name="width"></xsl:attribute>
+                                        <xsl:attribute name="height"></xsl:attribute>
+                                        <xsl:attribute name="length"></xsl:attribute>
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                                    </xsl:element>
+                                </xsl:element>
                             </xsl:element>
-                            <xsl:element name="media:content">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Movie Trailers Now Playing']/..//a)"/></xsl:attribute>
-                                <xsl:attribute name="duration"></xsl:attribute>
-                                <xsl:attribute name="width"></xsl:attribute>
-                                <xsl:attribute name="height"></xsl:attribute>
-                                <xsl:attribute name="length"></xsl:attribute>
-                                <xsl:attribute name="lang">en</xsl:attribute>
-                            </xsl:element>
-                        </xsl:element>
-                        <rating></rating>
-                    </xsl:element>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </dataSet>
             </xsl:for-each>
         </xsl:element>
@@ -107,30 +119,36 @@
             <xsl:for-each select="//h3[string(span)='Coming Soon Movie Trailers']/..//a">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
-                    <xsl:element name="item">
-                        <title><xsl:value-of select="normalize-space(string(.))"/></title>
-                        <author>Tribute.ca</author>
-                        <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
-                        <description><xsl:value-of select="concat(normalize-space(string(.)), ' coming ', normalize-space(string(../small/i)))"/></description>
-                        <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Coming Soon Movie Trailers']/..//a)"/></link>
-                        <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
-                            <mythtv:customhtml>true</mythtv:customhtml>
-                        </xsl:if>
-                        <xsl:element name="media:group">
-                            <xsl:element name="media:thumbnail">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="mnvXpath:tributecaCheckIfDBItem(normalize-space(string(.)), 'Tribute.ca', concat(normalize-space(string(.)), ' coming ', normalize-space(string(../small/i))))">
+                            <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:element name="item">
+                                <title><xsl:value-of select="normalize-space(string(.))"/></title>
+                                <author>Tribute.ca</author>
+                                <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
+                                <description><xsl:value-of select="concat(normalize-space(string(.)), ' coming ', normalize-space(string(../small/i)))"/></description>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Coming Soon Movie Trailers']/..//a)"/></link>
+                                <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
+                                    <mythtv:customhtml>true</mythtv:customhtml>
+                                </xsl:if>
+                                <xsl:element name="media:group">
+                                    <xsl:element name="media:thumbnail">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                                    </xsl:element>
+                                    <xsl:element name="media:content">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Coming Soon Movie Trailers']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="duration"></xsl:attribute>
+                                        <xsl:attribute name="width"></xsl:attribute>
+                                        <xsl:attribute name="height"></xsl:attribute>
+                                        <xsl:attribute name="length"></xsl:attribute>
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                                    </xsl:element>
+                                </xsl:element>
                             </xsl:element>
-                            <xsl:element name="media:content">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Coming Soon Movie Trailers']/..//a)"/></xsl:attribute>
-                                <xsl:attribute name="duration"></xsl:attribute>
-                                <xsl:attribute name="width"></xsl:attribute>
-                                <xsl:attribute name="height"></xsl:attribute>
-                                <xsl:attribute name="length"></xsl:attribute>
-                                <xsl:attribute name="lang">en</xsl:attribute>
-                            </xsl:element>
-                        </xsl:element>
-                        <rating></rating>
-                    </xsl:element>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </dataSet>
             </xsl:for-each>
         </xsl:element>
@@ -143,30 +161,36 @@
             <xsl:for-each select="//h3[string(span)='Top 10 Upcoming Trailers']/..//a">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
-                    <xsl:element name="item">
-                        <title><xsl:value-of select="normalize-space(string(.))"/></title>
-                        <author>Tribute.ca</author>
-                        <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
-                        <description><xsl:value-of select="normalize-space(./@title)"/></description>
-                        <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top 10 Upcoming Trailers']/..//a)"/></link>
-                        <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
-                            <mythtv:customhtml>true</mythtv:customhtml>
-                        </xsl:if>
-                        <xsl:element name="media:group">
-                            <xsl:element name="media:thumbnail">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="mnvXpath:tributecaCheckIfDBItem(normalize-space(string(.)), 'Tribute.ca', normalize-space(./@title))">
+                            <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:element name="item">
+                                <title><xsl:value-of select="normalize-space(string(.))"/></title>
+                                <author>Tribute.ca</author>
+                                <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
+                                <description><xsl:value-of select="normalize-space(./@title)"/></description>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top 10 Upcoming Trailers']/..//a)"/></link>
+                                <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
+                                    <mythtv:customhtml>true</mythtv:customhtml>
+                                </xsl:if>
+                                <xsl:element name="media:group">
+                                    <xsl:element name="media:thumbnail">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                                    </xsl:element>
+                                    <xsl:element name="media:content">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top 10 Upcoming Trailers']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="duration"></xsl:attribute>
+                                        <xsl:attribute name="width"></xsl:attribute>
+                                        <xsl:attribute name="height"></xsl:attribute>
+                                        <xsl:attribute name="length"></xsl:attribute>
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                                    </xsl:element>
+                                </xsl:element>
                             </xsl:element>
-                            <xsl:element name="media:content">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top 10 Upcoming Trailers']/..//a)"/></xsl:attribute>
-                                <xsl:attribute name="duration"></xsl:attribute>
-                                <xsl:attribute name="width"></xsl:attribute>
-                                <xsl:attribute name="height"></xsl:attribute>
-                                <xsl:attribute name="length"></xsl:attribute>
-                                <xsl:attribute name="lang">en</xsl:attribute>
-                            </xsl:element>
-                        </xsl:element>
-                        <rating></rating>
-                    </xsl:element>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </dataSet>
             </xsl:for-each>
         </xsl:element>
@@ -179,30 +203,36 @@
             <xsl:for-each select="//h3[string(span)='Top Box Office Movie Trailers']/..//a">
                 <dataSet>
                     <directoryThumbnail>http://www.tribute.ca/images/tribute_title.gif</directoryThumbnail>
-                    <xsl:element name="item">
-                        <title><xsl:value-of select="normalize-space(mnvXpath:tributecaTopTenTitle(string(..)))"/></title>
-                        <author>Tribute.ca</author>
-                        <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
-                        <description><xsl:value-of select="normalize-space(./@title)"/></description>
-                        <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top Box Office Movie Trailers']/..//a)"/></link>
-                        <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
-                            <mythtv:customhtml>true</mythtv:customhtml>
-                        </xsl:if>
-                        <xsl:element name="media:group">
-                            <xsl:element name="media:thumbnail">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="mnvXpath:tributecaCheckIfDBItem(normalize-space(mnvXpath:tributecaTopTenTitle(string(..))), 'Tribute.ca', normalize-space(./@title))">
+                            <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:element name="item">
+                                <title><xsl:value-of select="normalize-space(mnvXpath:tributecaTopTenTitle(string(..)))"/></title>
+                                <author>Tribute.ca</author>
+                                <pubDate><xsl:value-of select="mnvXpath:pubDate('Now')"/></pubDate>
+                                <description><xsl:value-of select="normalize-space(./@title)"/></description>
+                                <link><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top Box Office Movie Trailers']/..//a)"/></link>
+                                <xsl:if test="mnvXpath:tributecaIsCustomHTML(('dummy'))">
+                                    <mythtv:customhtml>true</mythtv:customhtml>
+                                </xsl:if>
+                                <xsl:element name="media:group">
+                                    <xsl:element name="media:thumbnail">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaThumbnailLink(string(.))"/></xsl:attribute>
+                                    </xsl:element>
+                                    <xsl:element name="media:content">
+                                        <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top Box Office Movie Trailers']/..//a)"/></xsl:attribute>
+                                        <xsl:attribute name="duration"></xsl:attribute>
+                                        <xsl:attribute name="width"></xsl:attribute>
+                                        <xsl:attribute name="height"></xsl:attribute>
+                                        <xsl:attribute name="length"></xsl:attribute>
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                                    </xsl:element>
+                                </xsl:element>
                             </xsl:element>
-                            <xsl:element name="media:content">
-                                <xsl:attribute name="url"><xsl:value-of select="mnvXpath:tributecaLinkGeneration(position(), //h3[string(span)='Top Box Office Movie Trailers']/..//a)"/></xsl:attribute>
-                                <xsl:attribute name="duration"></xsl:attribute>
-                                <xsl:attribute name="width"></xsl:attribute>
-                                <xsl:attribute name="height"></xsl:attribute>
-                                <xsl:attribute name="length"></xsl:attribute>
-                                <xsl:attribute name="lang">en</xsl:attribute>
-                            </xsl:element>
-                        </xsl:element>
-                        <rating></rating>
-                    </xsl:element>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </dataSet>
             </xsl:for-each>
         </xsl:element>

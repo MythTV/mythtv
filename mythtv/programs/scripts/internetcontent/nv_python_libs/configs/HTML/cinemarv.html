@@ -21,7 +21,7 @@
 
       var videocode = gup( 'videocode' );
 
-      var embedded = '<embed src="http://c.brightcove.com/services/viewer/federated_f9/45599838001?isVid=1" bgcolor="#FFFFFF" flashVars="videoId=VIDEOCODE&#038;linkBaseURL=www.hollywood.com%2Ftrailer%2Fexternal%2F83118210001&#038;playerID=45599838001&#038;domain=embed&#038;dynamicStreaming=true" base="http://admin.brightcove.com" name="flashObj" width="100%" height="100%" seamlesstabbing="false" type="application/x-shockwave-flash" allowFullScreen="true" swLiveConnect="true" allowScriptAccess="always" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed>/>'
+      var embedded = '<embed src="http://c.brightcove.com/services/viewer/federated_f9/45599838001?isVid=1" bgcolor="#FFFFFF" flashVars="videoId=VIDEOCODE&#038;linkBaseURL=www.hollywood.com%2Ftrailer%2Fexternal%2F83118210001&#038;playerID=45599838001&#038;domain=embed&#038;dynamicStreaming=true" base="http://admin.brightcove.com" name="flashObj" width="100%" height="98%" seamlesstabbing="false" type="application/x-shockwave-flash" allowFullScreen="true" swLiveConnect="true" allowScriptAccess="always" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed>/>'
 
       document.write('<title>CinemaRV.com Full Screen</title>');
       document.write(embedded.replace(/VIDEOCODE/g, videocode));

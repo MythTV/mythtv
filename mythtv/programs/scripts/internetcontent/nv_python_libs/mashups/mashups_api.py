@@ -19,11 +19,12 @@ meta data, video and image URLs from various Internet sources. These routines pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/xxxxMashup.xml" where "xxxx" is the specific mashup name matching the associated grabber name that calls these functions.
 '''
 
-__version__="v0.1.3"
+__version__="v0.1.4"
 # 0.1.0 Initial development
 # 0.1.1 Added Search Mashup capabilities
 # 0.1.2 Fixed a couple of error messages with improper variable names
 # 0.1.3 Add the ability for a Mashup to search the "internetcontentarticles" table
+# 0.1.4 Add the ability for a Mashup to pass variables to a XSLT style sheet
 
 import os, struct, sys, time, datetime, shutil, urllib
 from socket import gethostname, gethostbyname
@@ -487,6 +488,8 @@ class Videos(object):
             url = etree.XML(u'<url></url>')
             etree.SubElement(url, "name").text = uniqueName
             etree.SubElement(url, "href").text = source.attrib.get('url')
+            if source.attrib.get('parameter') != None:
+                etree.SubElement(url, "parameter").text = source.attrib.get('parameter')
             if len(xsltFilename(source)):
                 for xsltName in xsltFilename(source):
                     etree.SubElement(url, "xslt").text = xsltName.strip()

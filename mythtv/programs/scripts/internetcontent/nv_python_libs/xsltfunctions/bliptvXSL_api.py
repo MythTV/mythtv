@@ -114,7 +114,7 @@ class xpathFunctions(object):
             'mediaad': "http://blip.tv/dtd/mediaad/1.0",
             }
         self.flvFilter = etree.XPath(".//media:content[@type='video/x-flv']", namespaces=self.namespaces)
-        self.m4vFilter = etree.XPath(".//media:content[@type='video/mp4' or @type='video/quicktime' or @type='video/quicktime']", namespaces=self.namespaces)
+        self.m4vFilter = etree.XPath(".//media:content[@type='video/mp4' or @type='video/quicktime' or @type='video/x-m4v']", namespaces=self.namespaces)
         self.durationFilter = etree.XPath(".//blip:runtime/text()", namespaces=self.namespaces)
         self.linkFilter = etree.XPath("./link/text()", namespaces=self.namespaces)
         self.languageFilter = etree.XPath("../language/text()", namespaces=self.namespaces)
@@ -221,4 +221,3 @@ class xpathFunctions(object):
 # End of XSLT extension functions
 #
 ######################################################################################################
-

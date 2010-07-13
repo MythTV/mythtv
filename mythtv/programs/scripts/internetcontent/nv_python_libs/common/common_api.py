@@ -18,7 +18,7 @@ MythNetvision Grabber scripts that run as a Web application and global functions
 MNV grabbers.
 '''
 
-__version__="v0.1.8"
+__version__="v0.2.1"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -39,6 +39,16 @@ __version__="v0.1.8"
 # 0.1.7 Added a common function to get the current selected language (default is 'en' English)
 # 0.1.8 Fixed a bug with two string functions
 #       Added a customhtml reference for bliptv
+# 0.1.9 Add a function that allows grabbers to check if an item is already in the data base. This is used
+#       to make grabbers more efficient when processing sources that are largely made up of the same
+#       data. This is particularly important when a grabber is forces to do additional Interent accesses
+#       to aquire all the needed MNV item data.
+#       Added a function that checks if there are any treeview items in the data base for a specific
+#       grabber. Some Mashup grabber's search option only returns results when then there are treeview
+#       items in the database.
+# 0.2.0 Made the creation of custom HTML page links more flexible so code did not need to be changed
+#       when new custom HTML pages were added.
+# 0.2.1 Add the ability for a parameters to be passed to a XSLT style sheet
 
 import os, struct, sys, re, datetime, time, subprocess, string
 import urllib
@@ -201,6 +211,8 @@ class Common(object):
         self.nv_python_libs_path = u'nv_python_libs'
         self.apiSuffix = u'_api'
         self.language = u'en'
+        self.mythdb = None
+        self.linksWebPage = None
     # end __init__()
 
     def massageText(self, text):
@@ -392,7 +404,7 @@ class Common(object):
     def displayCustomHTML(self):
         """Common name for a custom HTML display. Used to interface with MythTV plugin NetVision
         """
-        embedFlashVarFilter = etree.XPath('//embed', namespaces=self.common.namespaces)
+        embedFlashVarFilter = etree.XPath('//embed', namespaces=self.namespaces)
         variables = self.HTMLvideocode.split(u'?')
 
         url = u'%s/nv_python_libs/configs/HTML/%s' % (baseProcessingDir, variables[0])
@@ -489,6 +501,8 @@ class Common(object):
             urlDictionary[key]['morePages'] = u'false'
             urlDictionary[key]['tmp'] = None
             urlDictionary[key]['tree'] = None
+            if element.find('parameter') != None:
+                urlDictionary[key]['parameter'] = element.find('parameter').text
 
         if self.debug:
             print "urlDictionary:"
@@ -572,7 +586,10 @@ class Common(object):
             'stringEscape': self.stringEscape,
             'removePunc': self.removePunc,
             'htmlToString': self.htmlToString,
-            'getLanguage': self.getLanguage,
+            'checkIfDBItem': self.checkIfDBItem,
+            'getItemElement': self.getItemElement,
+            'getDBRecords': self.getDBRecords,
+            'createItemElement': self.createItemElement,
             }
         # Get the specific source functions
         self.addDynamicFunctions('xsltfunctions')
@@ -720,14 +737,10 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         return a file://.... link to a local HTML web page
         '''
         # Currently there are no link specific Web pages
-        linksWebPage = {
-            # Tribute.ca
-            'tributeca': u'tributeca.html?videocode=',
-            'cinemarv': u'cinemarv.html?videocode=',
-            'bliptv': u'bliptv.html?videocode=',
-            }
-        if sourceLink in linksWebPage.keys():
-            return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, linksWebPage[sourceLink])
+        if not self.linksWebPage:
+            self.linksWebPage = etree.parse(u'%s/nv_python_libs/configs/XML/customeHtmlPageList.xml' % (self.baseProcessingDir, ))
+        if self.linksWebPage.find(sourceLink) != None:
+            return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, self.linksWebPage.find(sourceLink).text)
         return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, 'nodownloads.html')
     # end linkWebPage()
 
@@ -769,7 +782,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
             args[0] = args[0].replace(args[1], "")
         else:
             args[0] = args[0].replace(args[1], args[2])
-        return args[0]
+        return args[0].strip()
     # end stringReplace()
 
     def stringEscape(self, context, *args):
@@ -808,6 +821,115 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         '''
         return self.language
     # end getLanguage()
+
+    def checkIfDBItem(self, context, arg):
+        ''' Find an 'internetcontentarticles' table record based on fields and values
+        return True if a record was found and an item element created
+        return False if no record was found
+        '''
+        results = self.getDBRecords('dummy', arg)
+        if len(results):
+            self.itemElement = self.createItemElement('dummy', results[0])
+            return True
+        return False
+    # end checkIfDBItem()
+
+    def getItemElement(self, context, arg):
+        ''' Return an item element that was created by a previous call to the checkIfDBItem function
+        '''
+        return self.itemElement
+    # end getItemElement()
+
+    def getDBRecords(self, context, *arg):
+        ''' Return a list of 'internetcontentarticles' table records based on field and value matches
+        '''
+        if not self.mythdb:
+            self.initializeMythDB()
+            self.itemThumbnail = etree.XPath('.//media:thumbnail', namespaces=self.namespaces)
+            self.itemContent = etree.XPath('.//media:content', namespaces=self.namespaces)
+        # Encode the search text to UTF-8
+        for key in arg[0].keys():
+            try:
+                arg[0][key] = arg[0][key].encode('UTF-8')
+            except:
+                return []
+        return list(self.mythdb.searchInternetContent(**arg[0]))
+    # end getDBItem()
+
+    def createItemElement(self, context, *arg):
+        ''' Create an item element from an 'internetcontentarticles' table record dictionary
+        return the item element
+        '''
+        result = arg[0]
+        itemElement = etree.XML(self.mnvItem)
+        # Insert data into a new item element
+        itemElement.find('link').text = result['url']
+        if result['title']:
+            itemElement.find('title').text = result['title']
+        if result['subtitle']:
+            etree.SubElement(itemElement, "subtitle").text = result['subtitle']
+        if result['description']:
+            itemElement.find('description').text = result['description']
+        if result['author']:
+            itemElement.find('author').text = result['author']
+        if result['date']:
+            itemElement.find('pubDate').text = result['date'].strftime(self.pubDateFormat)
+        if result['rating'] != '32576' and result['rating'][0] != '-':
+            itemElement.find('rating').text = result['rating']
+        if result['thumbnail']:
+            self.itemThumbnail(itemElement)[0].attrib['url'] = result['thumbnail']
+        if result['mediaURL']:
+            self.itemContent(itemElement)[0].attrib['url'] = result['mediaURL']
+        if result['filesize'] > 0:
+            self.itemContent(itemElement)[0].attrib['length'] = unicode(result['filesize'])
+        if result['time'] > 0:
+            self.itemContent(itemElement)[0].attrib['duration'] = unicode(result['time'])
+        if result['width'] > 0:
+            self.itemContent(itemElement)[0].attrib['width'] = unicode(result['width'])
+        if result['height'] > 0:
+            self.itemContent(itemElement)[0].attrib['height'] = unicode(result['height'])
+        if result['language']:
+            self.itemContent(itemElement)[0].attrib['lang'] = result['language']
+        if result['season'] > 0:
+            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = unicode(result['season'])
+        if result['episode'] > 0:
+            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = unicode(result['episode'])
+        if result['customhtml'] == 1:
+            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
+        if result['countries']:
+            countries = result['countries'].split(u' ')
+            for country in countries:
+                etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = country
+        return itemElement
+    # end createItemElement()
+
+    def initializeMythDB(self):
+        ''' Import the MythTV database bindings
+        return nothing
+        '''
+        try:
+            from MythTV import MythDB, MythLog, MythError
+            try:
+                '''Create an instance of each: MythDB
+                '''
+                MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
+                self.mythdb = MythDB()
+            except MythError, e:
+                sys.stderr.write(u'\n! Error - %s\n' % e.args[0])
+                filename = os.path.expanduser("~")+'/.mythtv/config.xml'
+                if not os.path.isfile(filename):
+                    sys.stderr.write(u'\n! Error - A correctly configured (%s) file must exist\n' % filename)
+                else:
+                    sys.stderr.write(u'\n! Error - Check that (%s) is correctly configured\n' % filename)
+                sys.exit(1)
+            except Exception, e:
+                sys.stderr.write(u"\n! Error - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
+                sys.exit(1)
+        except Exception, e:
+            sys.stderr.write(u"\n! Error - MythTV python bindings could not be imported. error(%s)\n" % e)
+            sys.exit(1)
+    # end initializeMythDB()
+
 
     ##############################################################################
     # End  - Utility functions specifically used to modify MNV item data
@@ -858,9 +980,13 @@ class getURL(Thread):
             for index in range(len(self.urlDictionary[self.urlKey]['xslt'])):
                 # Process the results through a XSLT stylesheet out the desired data
                 try:
-                   self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'])
+                    if self.urlDictionary[self.urlKey].has_key('parameter'):
+                        self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'], paraMeter= etree.XSLT.strparam(
+self.urlDictionary[self.urlKey]['parameter']) )
+                    else:
+                        self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'])
                 except Exception, e:
-                    sys.stderr.write("! Error:(%s)\n" % e)
+                    sys.stderr.write("! XSLT Error:(%s) Key(%s)\n" % (e, self.urlKey))
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:

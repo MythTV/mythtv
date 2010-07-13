@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+  <!-- Author: R.D. Vaughan
+       July 5th, 2010
+       Purpose: Implement full screen browser video display for the NASA
+  Example:
+  file:///usr/local/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML/cinemarv.html?redirect=http://www.nasa.gov/mp4/466480main_ksc_070110_mcc_demo_pod.mp4
+  -->
+    <script type="text/javascript">
+      function gup( name )
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        }
+
+      var redirect = gup( 'redirect' );
+
+      document.write('<title>NASA Full Screen</title>');
+      window.location = redirect;
+
+    </script>
+  </head>
+</html>

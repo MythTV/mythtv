@@ -91,7 +91,7 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['tributecaLinkGeneration', 'tributecaThumbnailLink', 'tributecaTopTenTitle', 'tributecaIsCustomHTML', ]
+        self.functList = ['tributecaLinkGeneration', 'tributecaThumbnailLink', 'tributecaTopTenTitle', 'tributecaIsCustomHTML', 'tributecaCheckIfDBItem', ]
         self.TextTail = etree.XPath("string()")
         self.persistence = {}
     # end __init__()
@@ -241,6 +241,16 @@ class xpathFunctions(object):
         else:
             return True
     # end isCustomHTML()
+
+    def tributecaCheckIfDBItem(self, context, *arg):
+        '''Use a unique key value pairing to find out if the 'internetcontentarticles' table already
+        has a matching item. This is done to save accessing the Internet when not required.
+        Call example: 'mnvXpath:tributecaCheckIfDBItem(.)'
+        return True if a match was found
+        return False if a match was not found
+        '''
+        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0].replace('Trailer', u'').strip(), 'author': arg[1], 'description': arg[2]})
+    # end tributecaCheckIfDBItem()
 
 ######################################################################################################
 #

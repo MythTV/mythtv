@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: traileraddicts_api - XPath and XSLT functions for the TrailerAddicts.com grabber
+# Name: mevio_api - XPath and XSLT functions for the Mevio RSS/HTML items
 # Python Script
 # Author:   R.D. Vaughan
 # Purpose:  This python script is intended to perform a variety of utility functions
@@ -12,7 +12,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="traileraddicts_api - XPath and XSLT functions for the TrailerAddicts.com grabber"
+__title__ ="mevio_api - XPath and XSLT functions for the www.mevio.com RSS/HTML"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions
@@ -21,9 +21,11 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
-
+# 0.1.1 Fixed a bug when an autoplay link cannot be created
+#       Added MP4 as an acceptable downloadable video file type
+#       Added checking to see if the item is already in the data base
 
 # Specify the class names that have XPath extention functions
 __xpathClassList__ = ['xpathFunctions', ]
@@ -91,9 +93,27 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['traileraddictsLinkGenerationMovie', 'traileraddictsLinkGenerationClip', 'traileraddictsCheckIfDBItem']
-        self.TextTail = etree.XPath("string()")
-        self.persistence = {}
+        self.functList = ['mevioLinkGeneration', 'mevioTitle', 'mevioEpisode', 'mevioCheckIfDBItem', ]
+        self.episodeRegex = [
+            # Episode 224
+            re.compile(u'''^.+?Episode\\ (?P<episodeno>[0-9]+).*$''', re.UNICODE),
+            # CrankyGeeks 136:
+            re.compile(u'''^.+?(?P<episodeno>[0-9]+)\\:.*$''', re.UNICODE),
+            ]
+        self.namespaces = {
+            'atom10': u"http://www.w3.org/2005/Atom",
+            'media': u"http://search.yahoo.com/mrss/",
+            'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
+            'xhtml': u"http://www.w3.org/1999/xhtml",
+            'feedburner': u"http://rssnamespace.org/feedburner/ext/1.0",
+            'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
+            'dc': "http://purl.org/dc/elements/1.1/",
+            'fb': "http://www.facebook.com/2008/fbml/",
+            }
+        self.mediaIdFilters = [
+            [etree.XPath(".//embed/@flashvars", namespaces=self.namespaces), re.compile(u'''^.+?MediaId=(?P<videocode>[0-9]+).*$''', re.UNICODE)],
+            [etree.XPath(".//div[@class='player_wrapper']/a/@href", namespaces=self.namespaces), re.compile(u'''^.+?\\'(?P<videocode>[0-9]+)\\'\\)\\;.*$''', re.UNICODE)]
+            ]
     # end __init__()
 
 ######################################################################################################
@@ -102,63 +122,81 @@ class xpathFunctions(object):
 #
 ######################################################################################################
 
-    def traileraddictsLinkGenerationMovie(self, context, *args):
-        '''Generate a link for the TrailerAddicts.com site.
-        Call example: 'mnvXpath:traileraddictsLinkGenerationMovie(position(), link)'
+    def mevioLinkGeneration(self, context, *arg):
+        '''Generate a link for the video.
+        Call example: 'mnvXpath:mevioLinkGeneration(string(link))'
         return the url link
         '''
-        webURL = args[1].strip()
+        webURL = arg[0]
+        try:
+            tmpHTML = etree.parse(webURL, etree.HTMLParser())
+        except Exception, errmsg:
+            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+            return webURL
 
-        # If this is for the download element then just return what was found for the "link" element
-        if self.persistence.has_key('traileraddictsLinkGenerationMovie'):
-            if args[0] == self.persistence['traileraddictsLinkGenerationMovie']['position']:
-                return self.persistence['traileraddictsLinkGenerationMovie']['link']
+        for index in range(len(self.mediaIdFilters)):
+            mediaId = self.mediaIdFilters[index][0](tmpHTML)
+            if not len(mediaId):
+            	continue
+            match = self.mediaIdFilters[index][1].match(mediaId[0])
+            if match:
+                videocode = match.groups()
+                return u'file://%s/nv_python_libs/configs/HTML/mevio.html?videocode=%s' % (common.baseProcessingDir, videocode[0])
         else:
-            self.persistence['traileraddictsLinkGenerationMovie'] = {}
-            self.persistence['traileraddictsLinkGenerationMovie']['embedRSS'] = etree.parse(u'http://www.traileraddict.com/embedrss', common.parsers['xml'].copy())
-            self.persistence['traileraddictsLinkGenerationMovie']['matchlink'] = etree.XPath('//link[string()=$link]/..', namespaces=common.namespaces)
-            self.persistence['traileraddictsLinkGenerationMovie']['description'] = etree.XPath('normalize-space(description)', namespaces=common.namespaces)
-            self.persistence['traileraddictsLinkGenerationMovie']['embedded'] = etree.XPath('//embed/@src', namespaces=common.namespaces)
+            return webURL
+    # end mevioLinkGeneration()
 
-        self.persistence['traileraddictsLinkGenerationMovie']['position'] = args[0]
-
-        matchLink = self.persistence['traileraddictsLinkGenerationMovie']['matchlink'](self.persistence['traileraddictsLinkGenerationMovie']['embedRSS'], link=webURL)[0]
-        self.persistence['traileraddictsLinkGenerationMovie']['link'] = self.persistence['traileraddictsLinkGenerationMovie']['embedded'](common.getHtmlData(u'dummy',(self.persistence['traileraddictsLinkGenerationMovie']['description'](matchLink))))[0]
-
-        return self.persistence['traileraddictsLinkGenerationMovie']['link']
-    # end traileraddictsLinkGenerationMovie()
-
-
-    def traileraddictsLinkGenerationClip(self, context, *args):
-        '''Generate a link for the TrailerAddicts.com site.
-        Call example: 'mnvXpath:traileraddictsLinkGenerationClip(position(), link)'
-        return the url link
+    def mevioTitle(self, context, arg):
+        '''Parse the title string extract only the title text removing the redundant show name
+        Call example: 'mnvXpath:mevioTitle(./title/text())'
+        return the title text
         '''
-        webURL = args[1].strip()
-        # If this is for the download element then just return what was found for the "link" element
-        if self.persistence.has_key('traileraddictsLinkGenerationClip'):
-            if args[0] == self.persistence['traileraddictsLinkGenerationClip']['position']:
-                return self.persistence['traileraddictsLinkGenerationClip']['link']
+        epText = self.mevioEpisode('dummy', arg).text
+        if epText:
+            epText = u'Ep %s: ' % epText
         else:
-            self.persistence['traileraddictsLinkGenerationClip'] = {}
-            self.persistence['traileraddictsLinkGenerationClip']['embedded'] = etree.XPath('//embed[@allowfullscreen="true"]/@src', namespaces=common.namespaces)
+            epText = u''
+        seperatorStrs = [[' | ', 'before'], [': ', 'after'], [' - ', 'before']]
+        for sepStr in seperatorStrs:
+            if sepStr[1] == 'after':
+                index = arg[0].find(sepStr[0])
+            else:
+                index = arg[0].rfind(sepStr[0])
+            if index != -1:
+                if sepStr[1] == 'after':
+                    return u'%s%s' % (epText, arg[0][index+len(sepStr[0]):].strip())
+                else:
+                    return u'%s%s' % (epText, arg[0][:index].strip())
+        else:
+            if epText:
+                return epText
+            else:
+                return arg[0].strip()
+    # end mevioTitle()
 
-        self.persistence['traileraddictsLinkGenerationClip']['position'] = args[0]
+    def mevioEpisode(self, context, arg):
+        '''Parse the title string and extract an episode number
+        Call example: 'mnvXpath:mevioEpisode(./title/text())'
+        return an episode element
+        '''
+        episodeNumber = u''
+        for index in range(len(self.episodeRegex)):
+            match = self.episodeRegex[index].match(arg[0])
+            if match:
+                episodeNumber = match.groups()
+                break
+        return etree.XML(u'<episode>%s</episode>' % episodeNumber)
+    # end mevioEpisode()
 
-        tmpHTML = etree.parse(webURL, etree.HTMLParser())
-        self.persistence['traileraddictsLinkGenerationClip']['link'] = self.persistence['traileraddictsLinkGenerationClip']['embedded'](tmpHTML)[0]
-        return self.persistence['traileraddictsLinkGenerationClip']['link']
-    # end traileraddictsLinkGenerationClip()
-
-    def traileraddictsCheckIfDBItem(self, context, *arg):
+    def mevioCheckIfDBItem(self, context, *arg):
         '''Use a unique key value pairing to find out if the 'internetcontentarticles' table already
         has a matching item. This is done to save accessing the Internet when not required.
-        Call example: 'mnvXpath:traileraddictsCheckIfDBItem(.)'
+        Call example: 'mnvXpath:mevioCheckIfDBItem(title, description)'
         return True if a match was found
         return False if a match was not found
         '''
-        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0], 'author': arg[1], 'description': arg[2]})
-    # end traileraddictsCheckIfDBItem()
+        return common.checkIfDBItem('dummy', {'feedtitle': 'Technology', 'title': arg[0], 'description': arg[1]})
+    # end mevioCheckIfDBItem()
 
 ######################################################################################################
 #
@@ -171,7 +209,6 @@ class xpathFunctions(object):
 # Start of XSLT extension functions
 #
 ######################################################################################################
-
 
 ######################################################################################################
 #

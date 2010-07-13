@@ -32,27 +32,34 @@
         <xsl:for-each select='//item'>
             <dataSet>
                 <directoryThumbnail>http://www.traileraddict.com/images/widgettop.png</directoryThumbnail>
-                <xsl:element name="item">
-                    <title><xsl:value-of select="normalize-space(title)"/></title>
-                    <author>TrailerAddict.Com</author>
-                    <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %b %Y %H:%M:%S')"/></pubDate>
-                    <description><xsl:value-of select="normalize-space(mnvXpath:htmlToString(string(description)))"/></description>
-                    <link><xsl:value-of select="mnvXpath:traileraddictsLinkGenerationMovie(position(), string(link))"/></link>
-                    <xsl:element name="media:group">
-                        <xsl:element name="media:thumbnail">
-                            <xsl:attribute name="url">http://www.traileraddict.com/images/widgettop.png</xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="mnvXpath:traileraddictsCheckIfDBItem(normalize-space(title), 'TrailerAddict.Com', normalize-space(mnvXpath:htmlToString(string(description))))">
+                        <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:element name="item">
+                            <title><xsl:value-of select="normalize-space(title)"/></title>
+                            <author>TrailerAddict.Com</author>
+                            <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %b %Y %H:%M:%S')"/></pubDate>
+                            <description><xsl:value-of select="normalize-space(mnvXpath:htmlToString(string(description)))"/></description>
+                            <link><xsl:value-of select="mnvXpath:traileraddictsLinkGenerationMovie(position(), string(link))"/></link>
+                            <xsl:element name="media:group">
+                                <xsl:element name="media:thumbnail">
+                                    <xsl:attribute name="url">http://www.traileraddict.com/images/widgettop.png</xsl:attribute>
+                                </xsl:element>
+                                <xsl:element name="media:content">
+                                    <xsl:attribute name="url"><xsl:value-of select='mnvXpath:traileraddictsLinkGenerationMovie(position(), string(link))'/></xsl:attribute>
+                                    <xsl:attribute name="duration"></xsl:attribute>
+                                    <xsl:attribute name="width"></xsl:attribute>
+                                    <xsl:attribute name="height"></xsl:attribute>
+                                    <xsl:attribute name="length"></xsl:attribute>
+                                    <xsl:attribute name="lang"><xsl:value-of select="normalize-space(substring-before(../language, '-'))"/></xsl:attribute>
+                                </xsl:element>
+                            </xsl:element>
+                            <rating></rating>
                         </xsl:element>
-                        <xsl:element name="media:content">
-                            <xsl:attribute name="url"><xsl:value-of select='mnvXpath:traileraddictsLinkGenerationMovie(position(), string(link))'/></xsl:attribute>
-                            <xsl:attribute name="duration"></xsl:attribute>
-                            <xsl:attribute name="width"></xsl:attribute>
-                            <xsl:attribute name="height"></xsl:attribute>
-                            <xsl:attribute name="length"></xsl:attribute>
-                            <xsl:attribute name="lang"><xsl:value-of select="normalize-space(substring-before(../language, '-'))"/></xsl:attribute>
-                        </xsl:element>
-                    </xsl:element>
-                    <rating></rating>
-                </xsl:element>
+                    </xsl:otherwise>
+                </xsl:choose>
             </dataSet>
         </xsl:for-each>
     </xsl:template>
@@ -61,27 +68,34 @@
         <xsl:for-each select='//item'>
             <dataSet>
                 <directoryThumbnail>http://www.traileraddict.com/images/widgettop.png</directoryThumbnail>
-                <xsl:element name="item">
-                    <title><xsl:value-of select="normalize-space(title)"/></title>
-                    <author><xsl:value-of select="TrailerAddict.Com"/></author>
-                    <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %b %Y %H:%M:%S')"/></pubDate>
-                    <description><xsl:value-of select="normalize-space(mnvXpath:htmlToString(string(description)))"/></description>
-                    <link><xsl:value-of select="mnvXpath:traileraddictsLinkGenerationClip(position(), string(link))"/></link>
-                    <xsl:element name="media:group">
-                        <xsl:element name="media:thumbnail">
-                            <xsl:attribute name="url">http://www.traileraddict.com/images/widgettop.png</xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="mnvXpath:traileraddictsCheckIfDBItem(normalize-space(title), 'TrailerAddict.Com', normalize-space(mnvXpath:htmlToString(string(description))))">
+                        <xsl:copy-of select="mnvXpath:getItemElement('dummy')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:element name="item">
+                            <title><xsl:value-of select="normalize-space(title)"/></title>
+                            <author>TrailerAddict.Com</author>
+                            <pubDate><xsl:value-of select="mnvXpath:pubDate(string(pubDate), '%a, %d %b %Y %H:%M:%S')"/></pubDate>
+                            <description><xsl:value-of select="normalize-space(mnvXpath:htmlToString(string(description)))"/></description>
+                            <link><xsl:value-of select="mnvXpath:traileraddictsLinkGenerationClip(position(), string(link))"/></link>
+                            <xsl:element name="media:group">
+                                <xsl:element name="media:thumbnail">
+                                    <xsl:attribute name="url">http://www.traileraddict.com/images/widgettop.png</xsl:attribute>
+                                </xsl:element>
+                                <xsl:element name="media:content">
+                                    <xsl:attribute name="url"><xsl:value-of select='mnvXpath:traileraddictsLinkGenerationClip(position(), string(link))'/></xsl:attribute>
+                                    <xsl:attribute name="duration"></xsl:attribute>
+                                    <xsl:attribute name="width"></xsl:attribute>
+                                    <xsl:attribute name="height"></xsl:attribute>
+                                    <xsl:attribute name="length"></xsl:attribute>
+                                    <xsl:attribute name="lang"><xsl:value-of select="normalize-space(substring-before(../language, '-'))"/></xsl:attribute>
+                                </xsl:element>
+                            </xsl:element>
+                            <rating></rating>
                         </xsl:element>
-                        <xsl:element name="media:content">
-                            <xsl:attribute name="url"><xsl:value-of select='mnvXpath:traileraddictsLinkGenerationClip(position(), string(link))'/></xsl:attribute>
-                            <xsl:attribute name="duration"></xsl:attribute>
-                            <xsl:attribute name="width"></xsl:attribute>
-                            <xsl:attribute name="height"></xsl:attribute>
-                            <xsl:attribute name="length"></xsl:attribute>
-                            <xsl:attribute name="lang"><xsl:value-of select="normalize-space(substring-before(../language, '-'))"/></xsl:attribute>
-                        </xsl:element>
-                    </xsl:element>
-                    <rating></rating>
-                </xsl:element>
+                    </xsl:otherwise>
+                </xsl:choose>
             </dataSet>
         </xsl:for-each>
     </xsl:template>

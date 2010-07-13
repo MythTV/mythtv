@@ -1,0 +1,13 @@
+<customeHtmlPageList>
+    <!--
+        This file contains the name of Custom HTML pages.
+        The element name is a key used to identify the specific custom html page that is being requested
+        The element text is the actual custom web page file name and any attributes used in the "link"
+    -->
+    <tributeca>tributeca.html?videocode=</tributeca>
+    <cinemarv>cinemarv.html?videocode=</cinemarv>
+    <bliptv>bliptv.html?videocode=</bliptv>
+    <hubble>hubble.html?videocode=</hubble>
+    <nasa>nasa.html?redirect=</nasa>
+    <spitzer>spitzer.html?title=TITLE&amp;videocode=VIDEOCODE&amp;image=IMAGE</spitzer>
+</customeHtmlPageList>

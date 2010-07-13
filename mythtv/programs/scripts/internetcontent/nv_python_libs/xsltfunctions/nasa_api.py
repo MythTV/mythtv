@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: cinemarv_api - XPath and XSLT functions for the CinemaRV.com grabber
+# Name: nasa_api - XPath and XSLT functions for the NASA RSS/HTML items
 # Python Script
 # Author:   R.D. Vaughan
 # Purpose:  This python script is intended to perform a variety of utility functions
@@ -12,7 +12,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="cinemarv_api - XPath and XSLT functions for the CinemaRV.com grabber"
+__title__ ="nasa_api - XPath and XSLT functions for the NASA RSS/HTML"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions
@@ -91,9 +91,9 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['cinemarvLinkGeneration', 'cinemarvIsCustomHTML', 'cinemarvCheckIfDBItem', ]
-        self.TextTail = etree.XPath("string()")
-        self.persistence = {}
+        self.functList = ['nasaTitleEp', ]
+        # Show 1
+        self.regexPattern = re.compile(u'''Show\\ (?P<seasno>[0-9]+).*$''', re.UNICODE)
     # end __init__()
 
 ######################################################################################################
@@ -102,69 +102,35 @@ class xpathFunctions(object):
 #
 ######################################################################################################
 
-    def cinemarvLinkGeneration(self, context, *args):
-        '''Generate a link for the CinemaRV.com site. A read of the item's web page is required to
-        extract the flash video id.
-        Call example: 'mnvXpath:cinemarvLinkGeneration(string(link))'
-        return the url link
+    def nasaTitleEp(self, context, *arg):
+        '''Parse the guid element and extract an episode number
+        Call example: 'mnvXpath:nasaTitleEp(string(title))'
+        return the a massaged title element and an episode element
         '''
-        webURL = args[0]
-        # If this is for the download then just return what was found for the "link" element
-        if self.persistence.has_key('cinemarvLinkGeneration'):
-            if self.persistence['cinemarvLinkGeneration'] != None:
-                returnValue = self.persistence['cinemarvLinkGeneration']
-                self.persistence['cinemarvLinkGeneration'] = None
-                return returnValue
+        stripArray = ['HST SM4:', 'NASA 360:', 'NASA 360', 'NASA EDGE:', 'NASA EDGE', 'NE Live@', 'NE@', 'NASA Mission Update:', "NASA TV's This Week @NASA," ]
+        title = arg[0]
+        for stripText in stripArray:
+            title = title.replace(stripText, u'')
+        title = title.strip()
+        episodeNumber = None
+        if title.startswith('Show'):
+            match = self.regexPattern.match(title)
+            if match:
+                episodeNumber = match.groups()
+                episodeNumber = int(episodeNumber[0])
+                title = title[title.find(':')+1:].strip()
+
+        mythtvNamespace = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format"
+        mythtv = "{%s}" % mythtvNamespace
+        NSMAP = {'mythtv' : mythtvNamespace}
+        elementTmp = etree.Element(mythtv + "mythtv", nsmap=NSMAP)
+        if not episodeNumber == None:
+            etree.SubElement(elementTmp, "title").text = u"EP%02d: %s" % (episodeNumber, title)
+            etree.SubElement(elementTmp, mythtv + "episode").text = u"%s" % episodeNumber
         else:
-            self.persistence['cinemarvLinkGenerationVideoID'] = etree.XPath('//object[@id="flashObj"]//param[@name="flashVars"]/@value', namespaces=common.namespaces)
-            self.persistence['cinemarvLinkGenerationParser'] = etree.HTMLParser()
-
-        try:
-            webPageElement = etree.parse(webURL, self.persistence['cinemarvLinkGenerationParser'])
-        except Exception, errmsg:
-            sys.stderr.write(u'!Warning: The web page URL(%s) could not be read, error(%s)\n' % (webURL, errmsg))
-            return webURL
-        if webPageElement == None:
-            self.persistence['cinemarvLinkGeneration'] = webURL
-            return webURL
-
-        tmpVideoID = self.persistence['cinemarvLinkGenerationVideoID'](webPageElement)
-        if not len(tmpVideoID):
-            self.persistence['cinemarvLinkGeneration'] = webURL
-            return webURL
-        index = tmpVideoID[0].find('&')
-        if index == -1:
-            self.persistence['cinemarvLinkGeneration'] = webURL
-            return webURL
-        videocode = tmpVideoID[0][:index].replace(u'videoId=', u'')
-        self.persistence['cinemarvLinkGeneration'] = common.linkWebPage(u'dummycontext', 'cinemarv')+videocode
-        return self.persistence['cinemarvLinkGeneration']
-    # end cinemarvLinkGeneration()
-
-    def cinemarvIsCustomHTML(self, context, *args):
-        '''Check if the link is for a custom HTML
-        Example call: mnvXpath:cinemarvIsCustomHTML(('dummy'))
-        return True if the link does not starts with "http://"
-        return False if the link starts with "http://"
-        '''
-        if self.persistence['cinemarvLinkGeneration'] == None:
-            return False
-
-        if self.persistence['cinemarvLinkGeneration'].startswith(u'http://'):
-            return False
-        else:
-            return True
-    # end cinemarvIsCustomHTML()
-
-    def cinemarvCheckIfDBItem(self, context, *arg):
-        '''Use a unique key value pairing to find out if the 'internetcontentarticles' table already
-        has a matching item. This is done to save accessing the Internet when not required.
-        Call example: 'mnvXpath:cinemarvCheckIfDBItem(.)'
-        return True if a match was found
-        return False if a match was not found
-        '''
-        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0].replace('Trailer', u'').strip(), 'author': arg[1], 'description': arg[2]})
-    # end cinemarvCheckIfDBItem()
+            etree.SubElement(elementTmp, "title").text = title
+        return elementTmp
+    # end nasaTitleEp()
 
 ######################################################################################################
 #

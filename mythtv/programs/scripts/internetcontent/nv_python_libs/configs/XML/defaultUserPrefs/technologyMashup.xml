@@ -1,0 +1,172 @@
+<userTechnology>
+<!--
+    This is the Mashup user preference file. This is the place to enable or disable the
+    source URLs which will make up the videos added to a MythNetvision treeview. Within each
+    subDirectory are one or more source URLs that are used to get the videos and meta data
+    information.
+    The only attribute that a user should ever change would be to enable "true" or disable "false" a
+    specific "sourceURL".
+    These user files are maintained automatically with a user's preferences preserved. This means
+    that when an updated Mashup file is distributed with MythNetvision then the user's preference file
+    will be updated accordingly. New source URLs can be added and others removed. Any new URLs will
+    automatically have at least one per "subDirectory" enabled so the user will be alerted to the new
+    source the next time they update their treeview maps.
+-->
+<!--
+    The Technology Search Mashup's RSS feed and HTML URLs.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+    "pageFunction" Identifies a XPath extension function that returns the start page/index for the
+                    specific source.
+    "mnvsearch" (optional) Identifies that search items are to include items from the MNV table using the
+                mnvsearch_api.py functions. This attributes value must match the "feedtitle" value
+                as it is in the "internetcontentarticles" table. When present the "xsltFile",
+                "url" and "pageFunction" attributes are left empty as they will be ignored.
+-->
+<search name="Technology Search">
+  <subDirectory name="Technology">
+    <sourceURL enabled="true" name="Technology" xsltFile="" type="xml" url="" pageFunction="" mnvsearch="Technology"/>
+  </subDirectory>
+</search>
+
+<!--
+    The Technology Mashup's RSS feed and HTML URLs.
+    "globalmax" (optional) Is a way to limit the number of items processed per source for all
+                treeview URLs. A value of zero (0) means there are no limitations.
+    "max" (optional) Is a way to limit the number of items processed for an individual sourceURL.
+          This value will override any "globalmax" setting. A value of zero (0) means
+          there are no limitations and would be the same if the attribute was no included at all.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+-->
+
+<directory name="CNet" globalmax="0">
+  <subDirectory name="CNET News">
+    <sourceURL enabled="true" name="CNET News HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/cnetnewshd?format=xml"/>
+    <sourceURL enabled="false" name="CNET News SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/news?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Prizefight">
+    <sourceURL enabled="true" name="Prizefight HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds2.feedburner.com/cnet/prizefighthd?format=xml"/>
+    <sourceURL enabled="false" name="Prizefight SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/prizefight?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Loaded">
+    <sourceURL enabled="true" name="Loaded HD" xsltFile="cnetRSS_item" type="xml" url="http://loadedhdpodcast.cnettv.com?format=xml"/>
+    <sourceURL enabled="false" name="Loaded SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/loaded?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="CNet's Top 5'">
+    <sourceURL enabled="true" name="CNet's Top 5 HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/top5hd?format=xml"/>
+    <sourceURL enabled="false" name="CNet's Top 5 SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/top5?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Car Tech">
+    <sourceURL enabled="true" name="Car Tech HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds2.feedburner.com/cnet/cartechvideohd?format=xml"/>
+    <sourceURL enabled="false" name="Car Tech SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/cartechvideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Buzz Report">
+    <sourceURL enabled="true" name="Buzz Report HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds2.feedburner.com/cnet/buzzreporthd?format=xml"/>
+    <sourceURL enabled="false" name="Buzz Report SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/buzzreport?format=xml"/>
+  </subDirectory>
+</directory>
+
+<directory name="Howcast Tech &amp; Gadgets" globalmax="0">
+  <subDirectory name="Howcast Tech &amp; Gadgets">
+    <sourceURL enabled="true" name="Howcast Tech &amp; Gadgets" xsltFile="howcastRSS_item" type="xml" url="http://feeds.feedburner.com/howcast/tech_and_gadgets?format=xml"/>
+  </subDirectory>
+</directory>
+
+<directory name="MacMost" globalmax="0">
+  <subDirectory name="MacMost">
+    <sourceURL enabled="true" name="MacMost" xsltFile="macmostRSS_item" type="xml" url="http://macmost.blip.tv/rss"/>
+  </subDirectory>
+</directory>
+
+<directory name="CrankyGeeks" globalmax="0">
+  <subDirectory name="CrankyGeeks">
+    <sourceURL enabled="true" name="CrankyGeeks" xsltFile="crankygeeksRSS_item" type="xml" url="http://www.mevio.com/feeds/crankygeeks.xml"/>
+  </subDirectory>
+</directory>
+
+<directory name="Revision3" globalmax="0">
+  <subDirectory name="AppJudgment">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/appjudgment/feed/MP4-High-Definition"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/appjudgment/feed/MP4-hd30"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/appjudgment/feed/MP4-Large"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/appjudgment/feed/MP4-Small"/>
+  </subDirectory>
+
+  <subDirectory name="Hack5">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hak5/feed/MP4-High-Definition"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hak5/feed/MP4-hd30"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hak5/feed/MP4-Large"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hak5/feed/MP4-Small"/>
+  </subDirectory>
+
+  <subDirectory name="GeekBeat.TV">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/geekbeattv/feed/MP4-High-Definition"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/geekbeattv/feed/MP4-hd30"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/geekbeattv/feed/MP4-Large"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/geekbeattv/feed/MP4-Small"/>
+  </subDirectory>
+
+  <subDirectory name="HD Nation">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hdnation/feed/MP4-High-Definition"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hdnation/feed/MP4-hd30"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hdnation/feed/MP4-Large"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/hdnation/feed/MP4-Small"/>
+  </subDirectory>
+
+  <subDirectory name="PixelPerfect">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/pixelperfect/feed/MP4-High-Definition"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/pixelperfect/feed/MP4-hd30"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/pixelperfect/feed/MP4-Large"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/pixelperfect/feed/MP4-Small"/>
+  </subDirectory>
+
+  <subDirectory name="Tekzilla Daily">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tzdaily/feed/MP4-High-Definition"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tzdaily/feed/MP4-hd30"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tzdaily/feed/MP4-Large"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tzdaily/feed/MP4-Small"/>
+  </subDirectory>
+
+  <subDirectory name="Tekzilla Weekly">
+    <sourceURL enabled="true" name="HD" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tekzilla/feed/MP4-High-Definition?subshow=false"/>
+    <sourceURL enabled="false" name="HD (30fps)" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tekzilla/feed/MP4-hd30?subshow=false"/>
+    <sourceURL enabled="false" name="Large" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tekzilla/feed/MP4-Large?subshow=false"/>
+    <sourceURL enabled="false" name="Small" xsltFile="revision3RSS_item" type="xml" url="http://revision3.com/tekzilla/feed/MP4-Small?subshow=false"/>
+  </subDirectory>
+</directory>
+
+<directory name="The Daily App Show" globalmax="0">
+  <subDirectory name="The Daily App Show">
+    <sourceURL enabled="true" name="The Daily App Show" xsltFile="dailyappRSS_item" type="xml" url="http://dailyappshow.blip.tv/rss/flash"/>
+  </subDirectory>
+</directory>
+
+<directory name="Bleeding Edge TV" globalmax="0">
+  <subDirectory name="Bleeding Edge TV">
+    <sourceURL enabled="true" name="Bleeding Edge TV" xsltFile="bleedingedgeRSS_item" type="xml" url="http://bleedingedge.blip.tv/rss/flash"/>
+  </subDirectory>
+</directory>
+
+<directory name="Chris Pirillo Show" globalmax="0">
+  <subDirectory name="Chris Pirillo Show">
+    <sourceURL enabled="true" name="Chris Pirillo Show" xsltFile="chrisPirilloRSS_item" type="xml" url="http://feeds.pirillo.com/ChrisPirilloShow"/>
+  </subDirectory>
+</directory>
+
+<directory name="The Linux Action Show!" globalmax="0">
+  <subDirectory name="The Linux Action Show!">
+    <sourceURL enabled="true" name="The Linux Action Show!" xsltFile="linuxActionRSS_item" type="xml" url="http://feeds.feedburner.com/computeractionshowvideo?format=xml"/>
+  </subDirectory>
+</directory>
+
+</userTechnology>

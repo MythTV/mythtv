@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: traileraddicts_api - XPath and XSLT functions for the TrailerAddicts.com grabber
+# Name: revision3XSL_api - XPath and XSLT functions for the Revision3 RSS/HTML items
 # Python Script
 # Author:   R.D. Vaughan
 # Purpose:  This python script is intended to perform a variety of utility functions
@@ -12,7 +12,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="traileraddicts_api - XPath and XSLT functions for the TrailerAddicts.com grabber"
+__title__ ="revision3XSL_api - XPath and XSLT functions for the www.revision3L.com RSS/HTML"
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions
@@ -21,7 +21,7 @@ See this link for the specifications:
 http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
 
 
@@ -91,9 +91,26 @@ class xpathFunctions(object):
     """Functions specific extending XPath
     """
     def __init__(self):
-        self.functList = ['traileraddictsLinkGenerationMovie', 'traileraddictsLinkGenerationClip', 'traileraddictsCheckIfDBItem']
-        self.TextTail = etree.XPath("string()")
-        self.persistence = {}
+        self.functList = ['revision3LinkGeneration', 'revision3Episode', 'revision3checkIfDBItem', ]
+        self.episodeRegex = [
+            re.compile(u'''^.+?\\-\\-(?P<episodeno>[0-9]+)\\-\\-.*$''', re.UNICODE),
+            ]
+        self.namespaces = {
+            'atom': "http://www.w3.org/2005/Atom",
+            'media': "http://search.yahoo.com/mrss/",
+            'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
+            'xhtml': "http://www.w3.org/1999/xhtml",
+            'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
+            'cnettv': "http://cnettv.com/mrss/",
+            'creativeCommons': "http://backend.userland.com/creativeCommonsRssModule",
+            'amp': "http://www.adobe.com/amp/1.0",
+            'content': "http://purl.org/rss/1.0/modules/content/",
+            }
+        self.mediaIdFilters = [
+            [etree.XPath('//object/@id', namespaces=self.namespaces ), None],
+            ]
+        self.FullScreen = u'http://revision3.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
+        self.FullScreenParser = common.parsers['html'].copy()
     # end __init__()
 
 ######################################################################################################
@@ -102,63 +119,63 @@ class xpathFunctions(object):
 #
 ######################################################################################################
 
-    def traileraddictsLinkGenerationMovie(self, context, *args):
-        '''Generate a link for the TrailerAddicts.com site.
-        Call example: 'mnvXpath:traileraddictsLinkGenerationMovie(position(), link)'
+    def revision3LinkGeneration(self, context, *arg):
+        '''Generate a link for the video.
+        Call example: 'mnvXpath:revision3LinkGeneration(string(link))'
         return the url link
         '''
-        webURL = args[1].strip()
+        webURL = arg[0]
+        try:
+            tmpHTML = etree.parse(webURL, self.FullScreenParser)
+        except Exception, errmsg:
+            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+            return webURL
 
-        # If this is for the download element then just return what was found for the "link" element
-        if self.persistence.has_key('traileraddictsLinkGenerationMovie'):
-            if args[0] == self.persistence['traileraddictsLinkGenerationMovie']['position']:
-                return self.persistence['traileraddictsLinkGenerationMovie']['link']
+        for index in range(len(self.mediaIdFilters)):
+            mediaId = self.mediaIdFilters[index][0](tmpHTML)
+            if not len(mediaId):
+            	continue
+            if self.mediaIdFilters[index][1]:
+                match = self.mediaIdFilters[index][1].match(mediaId[0])
+                if match:
+                    videocode = match.groups()
+                    return self.FullScreen % (videocode[0])
+            else:
+                return self.FullScreen % (mediaId[0].strip().replace(u'player-', u''))
         else:
-            self.persistence['traileraddictsLinkGenerationMovie'] = {}
-            self.persistence['traileraddictsLinkGenerationMovie']['embedRSS'] = etree.parse(u'http://www.traileraddict.com/embedrss', common.parsers['xml'].copy())
-            self.persistence['traileraddictsLinkGenerationMovie']['matchlink'] = etree.XPath('//link[string()=$link]/..', namespaces=common.namespaces)
-            self.persistence['traileraddictsLinkGenerationMovie']['description'] = etree.XPath('normalize-space(description)', namespaces=common.namespaces)
-            self.persistence['traileraddictsLinkGenerationMovie']['embedded'] = etree.XPath('//embed/@src', namespaces=common.namespaces)
+            return webURL
+    # end revision3LinkGeneration()
 
-        self.persistence['traileraddictsLinkGenerationMovie']['position'] = args[0]
-
-        matchLink = self.persistence['traileraddictsLinkGenerationMovie']['matchlink'](self.persistence['traileraddictsLinkGenerationMovie']['embedRSS'], link=webURL)[0]
-        self.persistence['traileraddictsLinkGenerationMovie']['link'] = self.persistence['traileraddictsLinkGenerationMovie']['embedded'](common.getHtmlData(u'dummy',(self.persistence['traileraddictsLinkGenerationMovie']['description'](matchLink))))[0]
-
-        return self.persistence['traileraddictsLinkGenerationMovie']['link']
-    # end traileraddictsLinkGenerationMovie()
-
-
-    def traileraddictsLinkGenerationClip(self, context, *args):
-        '''Generate a link for the TrailerAddicts.com site.
-        Call example: 'mnvXpath:traileraddictsLinkGenerationClip(position(), link)'
-        return the url link
+    def revision3Episode(self, context, *arg):
+        '''Parse the download link and extract an episode number
+        Call example: 'mnvXpath:revision3Episode(.)'
+        return the a massaged title element and an episode element in an array
         '''
-        webURL = args[1].strip()
-        # If this is for the download element then just return what was found for the "link" element
-        if self.persistence.has_key('traileraddictsLinkGenerationClip'):
-            if args[0] == self.persistence['traileraddictsLinkGenerationClip']['position']:
-                return self.persistence['traileraddictsLinkGenerationClip']['link']
-        else:
-            self.persistence['traileraddictsLinkGenerationClip'] = {}
-            self.persistence['traileraddictsLinkGenerationClip']['embedded'] = etree.XPath('//embed[@allowfullscreen="true"]/@src', namespaces=common.namespaces)
+        title = arg[0][0].find('title').text
+        link = arg[0][0].find('enclosure').attrib['url']
 
-        self.persistence['traileraddictsLinkGenerationClip']['position'] = args[0]
+        episodeNumber = u''
+        for index in range(len(self.episodeRegex)):
+            match = self.episodeRegex[index].match(link)
+            if match:
+                episodeNumber = int(match.groups()[0])
+                break
+        titleElement = etree.XML(u"<xml></xml>")
+        etree.SubElement(titleElement, "title").text = u'Ep%03d: %s' % (episodeNumber, title)
+        if episodeNumber:
+            etree.SubElement(titleElement, "episode").text = u'%s' % episodeNumber
+        return [titleElement]
+    # end revision3Episode()
 
-        tmpHTML = etree.parse(webURL, etree.HTMLParser())
-        self.persistence['traileraddictsLinkGenerationClip']['link'] = self.persistence['traileraddictsLinkGenerationClip']['embedded'](tmpHTML)[0]
-        return self.persistence['traileraddictsLinkGenerationClip']['link']
-    # end traileraddictsLinkGenerationClip()
-
-    def traileraddictsCheckIfDBItem(self, context, *arg):
+    def revision3checkIfDBItem(self, context, arg):
         '''Use a unique key value pairing to find out if the 'internetcontentarticles' table already
         has a matching item. This is done to save accessing the Internet when not required.
-        Call example: 'mnvXpath:traileraddictsCheckIfDBItem(.)'
+        Call example: 'mnvXpath:revision3checkIfDBItem(.)'
         return True if a match was found
         return False if a match was not found
         '''
-        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0], 'author': arg[1], 'description': arg[2]})
-    # end traileraddictsCheckIfDBItem()
+        return common.checkIfDBItem('dummy', {'title': self.revision3Episode(context, arg)[0].find('title').text, })
+    # end revision3checkIfDBItem()
 
 ######################################################################################################
 #
@@ -171,7 +188,6 @@ class xpathFunctions(object):
 # Start of XSLT extension functions
 #
 ######################################################################################################
-
 
 ######################################################################################################
 #

@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: nature.py
+# Name: space.py
 # Python Script
 # Author: R.D. Vaughan
 # Purpose:
-#   This python script is intended to perform a mashup of various Nature Internet media sources
+#   This python script is intended to perform a mashup of various Space Internet media sources
 #   for the MythTV Netvision plugin. It follows the MythTV Netvision grabber standards.
 #
 # Command example:
 # See help (-u and -h) options
 #
 # Design:
-#   1) Read "~/.mythtv/MythNetvision/userGrabberPrefs/natureMashup.xml" configuration file
+#   1) Read "~/.mythtv/MythNetvision/userGrabberPrefs/spaceMashup.xml" configuration file
 #   2) Input the sources that are marked as enabled
 #   3) Process the results and display to stdout
 #
@@ -20,19 +20,16 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="Nature";
-__mashup_title__ = "natureMashup"
+__title__ ="Space";
+__mashup_title__ = "spaceMashup"
 __author__="R.D. Vaughan"
-__version__="0.12"
+__version__="v0.10"
 # 0.10  Initial development
-# 0.11  Added a search of all the "Nature Mashup" items in the "internetcontentarticles" table
-# 0.12  Toggle the search option off if there are NO "Nature" items in the "internetcontentarticles"
-#       table
 
 __usage_examples__ ='''
 (Option Help)
-> ./nature.py -h
-Usage: ./nature.py -hduvlST [parameters] <search text>
+> ./space.py -h
+Usage: ./space.py -hduvlST [parameters] <search text>
 Version: v0.1.0 Author: R.D.Vaughan
 
 For details on the MythTV Netvision plugin see the wiki page at:
@@ -55,24 +52,11 @@ Options:
                         option (-T).
   -T, --treeview        Display a Tree View of a sites videos
 
-> ./nature.py -v
-<grabber>
-  <name>Nature</name>
-  <author>R.D. Vaughan</author>
-  <thumbnail>nature.png</thumbnail>
-  <command>nature.py</command>
-  <type>video</type>
-  <description>Mashups combines media from multiple sources to create a new work</description>
-  <version>0.XX</version>
-  <search>true</search>
-  <tree>true</tree>
-</grabber>
+> ./space.py -v
+Space Mashup|T
 
-Search:
-> ./nature.py -S "Lions"
 
-Treeview:
-> ./nature.py -T
+> ./space.py -T
 '''
 __search_max_page_items__ = 20
 __tree_max_page_items__ = 20
@@ -111,22 +95,23 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 # Used for debugging
 #import nv_python_libs.common.common_api
+
 try:
     '''Import the common python class
     '''
     import nv_python_libs.common.common_api as common_api
 except Exception, e:
     sys.stderr.write('''
-The subdirectory "nv_python_libs/common" containing the modules common_api.py and
-common_exceptions.py (v0.1.3 or greater),
+The subdirectory "nv_python_libs/common" containing the modules mashups_api.py and
+mashups_exceptions.py (v0.1.3 or greater),
 They should have been included with the distribution of MythNetvision
 Error(%s)
 ''' % e)
     sys.exit(1)
+
 if common_api.__version__ < '0.1.3':
     sys.stderr.write("\n! Error: Your current installed common_api.py version is (%s)\nYou must at least have version (0.1.3) or higher.\n" % target.__version__)
     sys.exit(1)
-
 
 # Used for debugging
 #import nv_python_libs.mashups.mashups_api as target
@@ -138,7 +123,7 @@ except Exception, e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/mashups" containing the modules mashups_api and
 mashups_exceptions.py (v0.1.0 or greater),
-They should have been included with the distribution of nature.py.
+They should have been included with the distribution of space.py.
 Error(%s)
 ''' % e)
     sys.exit(1)
@@ -148,13 +133,13 @@ if target.__version__ < '0.1.0':
 
 # Verify that the main process modules are installed and accessable
 try:
-  import nv_python_libs.mainProcess as process
+    import nv_python_libs.mainProcess as process
 except Exception, e:
-  sys.stderr.write('''
+    sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
 Error(%s)
 ''' % e)
-  sys.exit(1)
+    sys.exit(1)
 
 if process.__version__ < '0.2.0':
     sys.stderr.write("\n! Error: Your current installed mainProcess.py version is (%s)\nYou must at least have version (0.2.0) or higher.\n" % process.__version__)
@@ -170,14 +155,13 @@ if __name__ == '__main__':
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
     main.grabberInfo['title'] = __title__
-    main.grabberInfo['command'] = u'nature.py'
+    main.grabberInfo['command'] = u'space.py'
     main.grabberInfo['mashup_title'] = __mashup_title__
     main.grabberInfo['author'] = __author__
-    main.grabberInfo['thumbnail'] = 'nature.png'
+    main.grabberInfo['thumbnail'] = 'space.png'
     main.grabberInfo['type'] = ['video', ]
     main.grabberInfo['desc'] = u"Mashups combines media from multiple sources to create a new work"
     main.grabberInfo['version'] = __version__
-    # Check if there are any Nature items in the DB to to actually search
     main.grabberInfo['search'] = target.common.checkIfDBItem('dummy', {'feedtitle': __title__, })
     main.grabberInfo['tree'] = True
     main.grabberInfo['html'] = False

@@ -41,10 +41,6 @@
 -->
 
 <directory name="Movie Trailers" globalmax="0">
-  <subDirectory name="HD Movie Trailers Online">
-    <sourceURL enabled="true" name="HD Movie Trailers Online" xsltFile="hdmovietrailersRSS_item" type="xml" url="http://feeds.feedburner.com/HdMovieTrailersOnline?format=xml"/>
-  </subDirectory>
-
   <subDirectory name="CinemaRV.com">
     <sourceURL enabled="true" name="CinemaRV.com"  xsltFile="cinemarvRSS_item" type="xml" url="http://cinemarv.com/feed/"/>
   </subDirectory>
