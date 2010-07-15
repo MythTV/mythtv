@@ -144,11 +144,9 @@ bool MythRenderOpenGL::create(const QGLContext * shareContext)
         CGPoint pt;
         pt.x = bounds.left;
         pt.y = bounds.top;
-        if (CGGetDisplaysWithPoint(pt, 1, &m_screen, &ct))
-        {
+        if (kCGErrorSuccess != CGGetDisplaysWithPoint(pt, 1, &m_screen, &ct))
             m_screen = CGMainDisplayID();
-            success = true;
-        }
+        success = true;
     }
 #else
 #warning Qt for Mac using COCOA - FIXME
