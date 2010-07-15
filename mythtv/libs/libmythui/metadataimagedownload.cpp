@@ -132,7 +132,7 @@ void MetadataImageDownload::run()
                     GetMythDownloadManager()->download(oldurl, download);
 
                     QImage testImage;
-                    bool didLoad = testImage.loadFromData(download->data());
+                    bool didLoad = testImage.loadFromData(*download);
                     if (!didLoad)
                     {
                         VERBOSE(VB_IMPORTANT,QString("Tried to write %1, "
@@ -146,7 +146,7 @@ void MetadataImageDownload::run()
 
                     if (dest_file.open(QIODevice::WriteOnly))
                     {
-                        off_t size = dest_file.write(download->data(), download->size());
+                        off_t size = dest_file.write(*download, download->size());
                         if (size != download->size())
                         {
                             VERBOSE(VB_IMPORTANT,
@@ -185,7 +185,7 @@ void MetadataImageDownload::run()
                     GetMythDownloadManager()->download(oldurl, download);
 
                     QImage testImage;
-                    bool didLoad = testImage.loadFromData(download->data());
+                    bool didLoad = testImage.loadFromData(*download);
                     if (!didLoad)
                     {
                         VERBOSE(VB_IMPORTANT,QString("Tried to write %1, "
@@ -210,7 +210,7 @@ void MetadataImageDownload::run()
                     }
                     else
                     {
-                        off_t written = outFile->Write(download->data(),
+                        off_t written = outFile->Write(*download,
                                                        download->size());
                         if (written != download->size())
                         {
