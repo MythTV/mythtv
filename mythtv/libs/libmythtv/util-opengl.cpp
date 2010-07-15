@@ -206,7 +206,6 @@ void pack_yv12alpha(const unsigned char *source,
     int c_start_w = mmx_width;
 #else
     int residual  = 0;
-    int mmx_width = width;
     int c_start_w = 0;
 #endif
 
