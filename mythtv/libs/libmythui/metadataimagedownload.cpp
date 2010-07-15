@@ -117,16 +117,19 @@ void MetadataImageDownload::run()
                 info.url = finalfile;
                 if (!QFile::exists(finalfile) || lookup->GetAllowOverwrites())
                 {
+                    QFile dest_file(finalfile);
+                    if (dest_file.exists())
+                    {
+                        QFileInfo fi(finalfile);
+                        GetMythUI()->RemoveFromCacheByFile(fi.fileName());
+                        dest_file.remove();
+                    }
+
                     VERBOSE(VB_GENERAL,
                          QString("Metadata Image Download: %1 ->%2")
                          .arg(oldurl).arg(finalfile));
                     QByteArray *download = new QByteArray();
                     GetMythDownloadManager()->download(oldurl, download);
-                    if (download->isEmpty())
-                    {
-                        delete download;
-                        continue;
-                    }
 
                     QImage testImage;
                     bool didLoad = testImage.loadFromData(download->data());
@@ -141,17 +144,9 @@ void MetadataImageDownload::run()
                         continue;
                     }
 
-                    QFile dest_file(finalfile);
-                    if (dest_file.exists())
-                    {
-                        QFileInfo fi(finalfile);
-                        GetMythUI()->RemoveFromCacheByFile(fi.fileName());
-                        dest_file.remove();
-                    }
-
                     if (dest_file.open(QIODevice::WriteOnly))
                     {
-                        qint64 size = dest_file.write(download->data());
+                        off_t size = dest_file.write(download->data(), download->size());
                         if (size != download->size())
                         {
                             VERBOSE(VB_IMPORTANT,
