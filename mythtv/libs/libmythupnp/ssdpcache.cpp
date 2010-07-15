@@ -164,8 +164,6 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
         (*it)->Release();
     }
 
-    Unlock();
-
     nCount = lstKeys.count();
 
     // ----------------------------------------------------------------------
@@ -177,6 +175,8 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
                                 it != lstKeys.end();
                               ++it ) 
         Remove( *it );
+
+    Unlock();
 
     return nCount;
 }
