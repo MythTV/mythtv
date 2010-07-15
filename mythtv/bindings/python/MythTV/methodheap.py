@@ -577,14 +577,14 @@ class MythDB( DBCache ):
         Supports the following keywords:
             title,      subtitle,   chanid,     starttime,  endtime,
             category,   seriesid,   programid,  station,    duplicate,
-            generic
+            generic,    recstatus
         """
 
         if init:
             return ('oldrecorded', OldRecorded, ())
         if key in ('title','subtitle','chanid','starttime','endtime',
                         'category','seriesid','programid','station',
-                        'duplicate','generic'):
+                        'duplicate','generic','recstatus'):
             return ('oldrecorded.%s=%%s' % key, value, 0)
         return None
 

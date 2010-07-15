@@ -535,7 +535,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
 
     def create(self, data=None):
         """Video.create(data=None) -> Video object"""
-        if self.host is not None:
+        if (self.host is not None) and (self.host != ''):
             # check for pre-existing entry
             if self.hash == '':
                 self.hash = self.getHash()
