@@ -331,20 +331,8 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
     QMap<QString, QString> *alsadevs = GetALSADevices("pcm");
     while(1)
     {
-        settings->setPassthrough(-1);   // no passthrough
-            // Check if name or description contains digital
         QString desc = alsadevs->value(real_device);
 
-        // PulseAudio does not support passthrough
-        if (real_device.contains("pulse", Qt::CaseInsensitive) ||
-            desc.contains("pulse", Qt::CaseInsensitive))
-            break;
-        if (real_device.contains("analog", Qt::CaseInsensitive) ||
-            desc.contains("analog", Qt::CaseInsensitive))
-            break;
-        if (real_device.contains("surround", Qt::CaseInsensitive) ||
-            desc.contains("surround", Qt::CaseInsensitive))
-            break;
         settings->setPassthrough(1);   // yes passthrough
         if (real_device.contains("digital", Qt::CaseInsensitive) ||
             desc.contains("digital", Qt::CaseInsensitive))
@@ -355,6 +343,19 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings()
             break;
         if (real_device.contains("hdmi", Qt::CaseInsensitive))
             break;
+
+        settings->setPassthrough(-1);   // no passthrough
+        // PulseAudio does not support passthrough
+        if (real_device.contains("pulse", Qt::CaseInsensitive) ||
+            desc.contains("pulse", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("analog", Qt::CaseInsensitive) ||
+            desc.contains("analog", Qt::CaseInsensitive))
+            break;
+        if (real_device.contains("surround", Qt::CaseInsensitive) ||
+            desc.contains("surround", Qt::CaseInsensitive))
+            break;
+
         settings->setPassthrough(0);   // maybe passthrough
         break;
     }
