@@ -10,4 +10,5 @@
     <hubble>hubble.html?videocode=</hubble>
     <nasa>nasa.html?redirect=</nasa>
     <spitzer>spitzer.html?title=TITLE&amp;videocode=VIDEOCODE&amp;image=IMAGE</spitzer>
+    <pbs>pbs.html?title=TITLE&amp;videocode=VIDEOCODE</pbs>
 </customeHtmlPageList>

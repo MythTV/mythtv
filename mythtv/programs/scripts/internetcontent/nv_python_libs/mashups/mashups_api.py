@@ -19,12 +19,13 @@ meta data, video and image URLs from various Internet sources. These routines pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/xxxxMashup.xml" where "xxxx" is the specific mashup name matching the associated grabber name that calls these functions.
 '''
 
-__version__="v0.1.4"
+__version__="v0.1.5"
 # 0.1.0 Initial development
 # 0.1.1 Added Search Mashup capabilities
 # 0.1.2 Fixed a couple of error messages with improper variable names
 # 0.1.3 Add the ability for a Mashup to search the "internetcontentarticles" table
 # 0.1.4 Add the ability for a Mashup to pass variables to a XSLT style sheet
+# 0.1.5 Removed a redundant build of the common XSLT function dictionary
 
 import os, struct, sys, time, datetime, shutil, urllib
 from socket import gethostname, gethostbyname
@@ -451,9 +452,6 @@ class Videos(object):
             print "self.userPrefs:"
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
             print
-
-        # Get the dictionary of mashups functions pointers
-        self.common.buildFunctionDict()
 
         # Massage channel icon
         self.channel_icon = self.common.ampReplace(self.channel_icon)

@@ -1,0 +1,48 @@
+<Configuration>
+    <!-- Name of the user's config file for a specific source -->
+    <userPreferenceFile>~/.mythtv/MythNetvision/userGrabberPrefs/pbs.xml</userPreferenceFile>
+
+    <!--
+        PBS search URL(s). This is a search generic URL, do not modify
+        NOTE: Only one URL is supported at this time.
+        NOTE: PBS will use a data base search as the Web page search results are so poor.
+    -->
+    <searchURLS>
+        <urls>
+            <!--
+                Elements:
+                    "name" of the grabber directory
+                    "href" Generic URL for the source of the information
+                    "filter" filter(s) used to select the elements of interest to appear in the XML/XHTML
+                             structure
+                    "pageFilter" optional filter that determines if there are any more pages to display
+                    "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+             -->
+            <url>
+                <name>PBS Search</name>
+                <href></href>
+                <filter></filter>
+                <pageFilter></pageFilter>
+                <parserType></parserType>
+            </url>
+        </urls>
+    </searchURLS>
+
+    <!-- URLs that provide the source details for the treeviews-->
+    <treeviewUrls>
+        <!--
+            Three attributes:
+                "name" of the tree view directory
+                "href" URL for the source of the information
+                "filter" filter used to select the elements of interest
+                 that will appear in the XML structure
+                "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+         -->
+        <url>
+            <name>Shows</name>
+            <href>http://video.pbs.org/</href>
+            <parserType>html</parserType>
+            <xslt>pbsUser_config</xslt>
+        </url>
+    </treeviewUrls>
+</Configuration>
