@@ -160,7 +160,7 @@ bool MythRenderOpenGL::create(const QGLContext * shareContext)
 #endif
 
     if (ok)
-        VERBOSE(VB_GENERAL, "Initialised MythRenderOpenGL");
+        VERBOSE(VB_GENERAL, LOC + "Initialised MythRenderOpenGL");
 
     return ok;
 }
@@ -201,6 +201,8 @@ int MythRenderOpenGL::GetRefreshRate(void)
         if (ref)
         {
             int rate = get_float_CF(ref, kCGDisplayRefreshRate);
+            // N.B. A rate of zero typically indicates the internal macbook
+            // lcd display which does not have a rate in the traditional sense
             if (rate > 20 && rate < 200)
                 ret = 1000000 / rate;
         }
