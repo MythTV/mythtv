@@ -41,6 +41,8 @@ void ImageDownloadManager::addURL(const QString& title, const QString& url,
     idat->pos      = pos;
     idat->filename = QString();
     m_fileList.append(idat);
+    if (!isRunning())
+        start();
     m_mutex.unlock();
 }
 

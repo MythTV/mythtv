@@ -10,7 +10,7 @@
 #include <mythuihelper.h>
 #include <mythdirs.h>
 #include <mythverbose.h>
-#include <httpcomms.h>
+#include <mythdownloadmanager.h>
 
 #include "downloadmanager.h"
 
@@ -38,6 +38,8 @@ void DownloadManager::addDL(ResultItem *video)
     dl->download     = video->GetDownloader();
     dl->downloadargs = video->GetDownloaderArguments();
     m_fileList.append(dl);
+    if (!isRunning())
+        start();
     m_mutex.unlock();
 }
 
@@ -91,17 +93,22 @@ void DownloadManager::run()
         {
             bool exists = QFile::exists(filename);
             if (!exists && !url.isEmpty())
-                HttpComms::getHttpFile(filename, url, 20000000, 5, 5);
-
-            // inform parent we have video ready for it
-            if (QFile::exists(filename))
+            {
+                bool success = GetMythDownloadManager()->download(url, filename);
+                if (success)
+                {
+                    VERBOSE(VB_GENERAL, QString("Video Download Finished: %1").arg(filename));
+                    QCoreApplication::postEvent(m_parent, new VideoDLEvent(dl));
+                }
+                else
+                    VERBOSE(VB_GENERAL, QString("Internal Video Download Failed: (%1) - Check "
+                                                "permissions...").arg(url));
+            }
+            else
             {
                 VERBOSE(VB_GENERAL, QString("Threaded Video Download Finished: %1").arg(filename));
                 QCoreApplication::postEvent(m_parent, new VideoDLEvent(dl));
             }
-            else
-                VERBOSE(VB_GENERAL, QString("Internal Video Download Failed: (%1) - Check "
-                                            "permissions...").arg(url));
         }
     }
 }

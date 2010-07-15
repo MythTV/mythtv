@@ -548,7 +548,6 @@ void NetSearch::populateResultList(ResultItem::resultList list)
         else
             delete item;
     }
-    m_imageDownload->start();
 }
 
 void NetSearch::showWebVideo()
@@ -768,7 +767,6 @@ void NetSearch::doDownloadAndPlay()
     m_currentDownload = filename;
 
     m_download->addDL(item);
-    m_download->start();
 }
 
 void NetSearch::slotItemChanged()

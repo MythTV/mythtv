@@ -262,7 +262,6 @@ void NetTree::loadData(void)
                     m_siteButtonList->SetItemCurrent(item);
             }
         }
-        m_imageDownload->start();
 
         slotItemChanged();
     }
@@ -998,8 +997,6 @@ void NetTree::doDownloadAndPlay()
 
     // Initialize the download
     m_download->addDL(item);
-    if (!m_download->isRunning())
-        m_download->start();
 }
 
 QString NetTree::getDownloadFilename(ResultItem *item)
