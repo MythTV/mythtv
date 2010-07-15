@@ -83,8 +83,6 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 {
     VideoSync *trial = NULL;
     tryingVideoSync  = true;
-    bool tryOpenGL   = (gCoreContext->GetNumSetting("UseOpenGLVSync", 1) &&
-                        (getenv("NO_OPENGL_VSYNC") == NULL));
 
     // m_forceskip allows for skipping one sync method
     // due to crash on the previous run.
@@ -103,8 +101,13 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 #endif
 #ifndef _WIN32
     TESTVIDEOSYNC(DRMVideoSync);
-    if (tryOpenGL)
+#ifdef USING_OPENGL_VSYNC
+    if (gCoreContext->GetNumSetting("UseOpenGLVSync", 1) &&
+       (getenv("NO_OPENGL_VSYNC") == NULL))
+    {
         TESTVIDEOSYNC(OpenGLVideoSync);
+    }
+#endif
 #endif // _WIN32
 #ifdef __linux__
     TESTVIDEOSYNC(RTCVideoSync);
