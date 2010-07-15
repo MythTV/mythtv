@@ -554,14 +554,15 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
 
         if (m_deintFilter == NULL)
         {
-            VERBOSE(VB_IMPORTANT,QString("Couldn't load deinterlace filter %1")
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Couldn't load deinterlace filter %1")
                     .arg(m_deintfiltername));
             m_deinterlacing = false;
             m_deintfiltername = "";
         }
 
-        VERBOSE(VB_PLAYBACK, QString("Using deinterlace method %1")
-                .arg(m_deintfiltername));
+        VERBOSE(VB_PLAYBACK, LOC + QString("Using deinterlace method %1")
+                                   .arg(m_deintfiltername));
 
         if (m_deintfiltername == "bobdeint")
             m_deinterlaceBeforeOSD = false;
