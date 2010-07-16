@@ -20,8 +20,9 @@ provided by PBS (http://video.pbs.org/). The specific PBS RSS feeds that are pro
 "~/.mythtv/MythNetvision/userGrabberPrefs/pbs.xml"
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
+# 0.1.1 Debug code was should have been commented out. This has been corrected.
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 from string import capitalize
@@ -389,6 +390,7 @@ class Videos(object):
 #        sys.exit()
 
         try:
+            self.Search = True
             self.mashups_api.Search = True
             self.mashups_api.searchForVideos(title, pagenumber)
         except Exception, e:
@@ -409,11 +411,12 @@ class Videos(object):
         self.mashups_api.mashup_title = u'pbs'
 
         # Easier for debugging
-        self.mashups_api.displayTreeView()
-        print
-        sys.exit(1)
+#        self.mashups_api.displayTreeView()
+#        print
+#        sys.exit(1)
 
         try:
+            self.Search = False
             self.mashups_api.Search = False
             self.mashups_api.displayTreeView()
         except Exception, e:
