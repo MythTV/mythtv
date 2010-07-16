@@ -245,7 +245,7 @@ for opt do
   ;;
   --enable-new-exif)  enable exif newexif
   ;;
-  --disable-new-exif) disable neexif
+  --disable-new-exif) disable newexif
   ;;
   --enable-all)
       enable $PLUGIN_LIST $CONFIG_LIST
