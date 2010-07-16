@@ -9,9 +9,6 @@
 
 #define LOC     QString("BDRingBuffer: ")
 
-QString keyfile = GetConfDir() + "KEYDB.cfg";
-const char *keyfilepath = keyfile.toAscii().data();
-
 BDRingBufferPriv::BDRingBufferPriv()
     : bdnav(NULL)
 {
@@ -53,8 +50,14 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
         VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
                 .arg(filename.toLatin1().data()));
 
+        QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
+        QByteArray keyarray = keyfile.toAscii();
+        const char *keyfilepath = keyarray.data();
+
         bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
 
+        VERBOSE(VB_IMPORTANT, LOC + QString("Using %1 as keyfile...")
+                .arg(QString(keyfilepath)));
         if (!bdnav)
             return false;
 
