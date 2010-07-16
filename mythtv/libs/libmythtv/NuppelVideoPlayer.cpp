@@ -807,7 +807,7 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
             if (!m_can_double)
             {
                 VERBOSE(VB_IMPORTANT, LOC + "Video sync method can't support "
-                    "double framerate (refresh rate too low for bob deint)");
+                        "double framerate (refresh rate too low for 2x deint)");
                 FallbackDeint();
             }
         }
@@ -1989,8 +1989,8 @@ void NuppelVideoPlayer::VideoStart(void)
             m_can_double = (frame_interval / 2 > videosync->getRefreshInterval() * 0.995);
             if (!m_can_double)
             {
-                VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
-                        "framerate (refresh rate too low for bob deint)");
+                VERBOSE(VB_IMPORTANT, LOC + "Video sync method can't support "
+                        "double framerate (refresh rate too low for 2x deint)");
                 FallbackDeint();
             }
         }
