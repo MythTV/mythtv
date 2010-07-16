@@ -1735,7 +1735,7 @@ void NuppelVideoPlayer::AVSync(bool limit_delay)
                 prevrp == 0)
             {
                 // wait an extra frame interval
-                avsync_adjustment = frame_interval;
+                avsync_adjustment += frame_interval;
             }
             prevrp = buffer->repeat_pict;
 
