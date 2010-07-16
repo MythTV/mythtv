@@ -389,10 +389,9 @@ HostCheckBox *AudioConfigSettings::AudioUpmix()
     HostCheckBox *gc = new HostCheckBox("AudioDefaultUpmix");
     gc->setLabel(QObject::tr("Upconvert stereo to 5.1 surround"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("MythTV can upconvert stereo to 5.1 audio. "
-                                "Set this option to enable it by default. "
-                                "You can enable or disable the upconversion"
-                                " during playback at anytime."));
+    gc->setHelpText(QObject::tr("If enabled, MythTV will upconvert stereo "
+                    "to 5.1 audio. You can enable or disable "
+                    "the upconversion during playback at any time."));
     return gc;
 }
 
@@ -449,8 +448,8 @@ HostCheckBox *AudioConfigSettings::SRCQualityOverride()
     HostCheckBox *gc = new HostCheckBox("SRCQualityOverride");
     gc->setLabel(QObject::tr("Override SRC quality"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Override audio sample-rate conversion "
-                                "quality."));
+    gc->setHelpText(QObject::tr("Enable to override audio sample rate "
+                    "conversion quality."));
     return gc;
 }
 
@@ -516,10 +515,10 @@ static HostCheckBox *MythControlsVolume()
     HostCheckBox *gc = new HostCheckBox("MythControlsVolume");
     gc->setLabel(QObject::tr("Use internal volume controls"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("MythTV can control the PCM and master "
-                    "mixer volume. If you prefer to control the volume "
-                    "externally (for example, using your amplifier) or to "
-                    "use an external mixer program, disable this option."));
+    gc->setHelpText(QObject::tr("If enabled, MythTV will control the PCM and "
+                    "master mixer volume. Disable this option if you prefer "
+                    "to control the volume externally (for example, using "
+                    "your amplifier) or if you use an external mixer program."));
     return gc;
 }
 
@@ -672,9 +671,9 @@ static HostCheckBox *QueryInitialFilter()
     HostCheckBox *gc = new HostCheckBox("QueryInitialFilter");
     gc->setLabel(QObject::tr("Always prompt for initial group filter"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Always prompt the user for the initial filter "
-                    "to apply when entering the Watch Recordings screen."));
-
+    gc->setHelpText(QObject::tr("If enabled, always prompt the user for the "
+                                "initial filter to apply when entering the "
+                                "Watch Recordings screen."));
     return gc;
 }
 
@@ -683,10 +682,9 @@ static HostCheckBox *RememberRecGroup()
     HostCheckBox *gc = new HostCheckBox("RememberRecGroup");
     gc->setLabel(QObject::tr("Save current group filter when changed"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Remember the last selected filter "
+    gc->setHelpText(QObject::tr("If enabled, remember the last selected filter "
                     "instead of displaying the default filter "
                     "whenever you enter the playback screen."));
-
     return gc;
 }
 
@@ -695,9 +693,9 @@ static HostCheckBox *UseGroupNameAsAllPrograms()
     HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
     gc->setLabel(QObject::tr("Show filter name instead of \"All Programs\""));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Use the name of the display filter currently "
-                    "applied in place of the term \"All Programs\" in the "
-                    "playback screen."));
+    gc->setHelpText(QObject::tr("If enabled, use the name of the display "
+                    "filter currently applied in place of the term \"All "
+                    "Programs\" in the playback screen."));
     return gc;
 }
 
@@ -839,16 +837,17 @@ static GlobalCheckBox *CommSkipAllBlanks()
     bc->setLabel(QObject::tr("Skip blank frames after commercials"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("When using blank frame detection and "
-                    "automatic flagging, include blank frames following "
-                    "commercial breaks as part of the commercial break."));
+                    "automatic flagging, enable this option to include blank "
+                    "frames following commercial breaks as part of the "
+                    "commercial break."));
     return bc;
 }
 
 static HostSpinBox *CommRewindAmount()
 {
     HostSpinBox *gs = new HostSpinBox("CommRewindAmount", 0, 10, 1);
-    gs->setLabel(QObject::tr("Commercial skip automatic rewind amount"));
-    gs->setHelpText(QObject::tr("If set, MythTV will automatically rewind "
+    gs->setLabel(QObject::tr("Commercial skip automatic rewind amount (secs)"));
+    gs->setHelpText(QObject::tr("MythTV will automatically rewind "
                     "this many seconds after performing a commercial skip."));
     gs->setValue(0);
     return gs;
@@ -857,8 +856,8 @@ static HostSpinBox *CommRewindAmount()
 static HostSpinBox *CommNotifyAmount()
 {
     HostSpinBox *gs = new HostSpinBox("CommNotifyAmount", 0, 10, 1);
-    gs->setLabel(QObject::tr("Commercial skip notify amount"));
-    gs->setHelpText(QObject::tr("If set, MythTV will act like a commercial "
+    gs->setLabel(QObject::tr("Commercial skip notify amount (secs)"));
+    gs->setHelpText(QObject::tr("MythTV will act like a commercial "
                     "begins this many seconds early. This can be useful "
                     "when commercial notification is used in place of "
                     "automatic skipping."));
@@ -869,7 +868,7 @@ static HostSpinBox *CommNotifyAmount()
 static GlobalSpinBox *MaximumCommercialSkip()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MaximumCommercialSkip", 0, 3600, 10);
-    bs->setLabel(QObject::tr("Maximum commercial skip (in seconds)"));
+    bs->setLabel(QObject::tr("Maximum commercial skip (secs)"));
     bs->setHelpText(QObject::tr("MythTV will discourage long manual commercial "
                     "skips. Skips which are longer than this will require the "
                     "user to hit the SKIP key twice. Automatic commercial "
@@ -881,7 +880,7 @@ static GlobalSpinBox *MaximumCommercialSkip()
 static GlobalSpinBox *MergeShortCommBreaks()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("MergeShortCommBreaks", 0, 3600, 5);
-    bs->setLabel(QObject::tr("Merge short commercial breaks (in seconds)"));
+    bs->setLabel(QObject::tr("Merge short commercial breaks (secs)"));
     bs->setHelpText(QObject::tr("Treat consecutive commercial breaks shorter "
                     "than this as one break when skipping forward. Useful if "
                     "you have to skip a few times during breaks. Applies to "
@@ -893,7 +892,7 @@ static GlobalSpinBox *MergeShortCommBreaks()
 static GlobalSpinBox *AutoExpireExtraSpace()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
-    bs->setLabel(QObject::tr("Extra disk space"));
+    bs->setLabel(QObject::tr("Extra disk space (GB)"));
     bs->setHelpText(QObject::tr("Extra disk space (in gigabytes) beyond what "
                     "MythTV requires that you want to keep free on the "
                     "recording file systems."));
@@ -906,16 +905,16 @@ static GlobalCheckBox *AutoExpireInsteadOfDelete()
     GlobalCheckBox *cb = new GlobalCheckBox("AutoExpireInsteadOfDelete");
     cb->setLabel(QObject::tr("Auto-Expire instead of delete recording"));
     cb->setValue(false);
-    cb->setHelpText(QObject::tr("Instead of deleting a recording, "
-                    "move recording to the 'Deleted' recgroup and turn on "
-                    "Auto-Expire."));
+    cb->setHelpText(QObject::tr("If enabled, move deleted recordings to the "
+                    "'Deleted' recgroup and turn on autoexpire "
+                    "instead of deleting immediately."));
     return cb;
 }
 
 static GlobalSpinBox *DeletedMaxAge()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", 0, 365, 1);
-    bs->setLabel(QObject::tr("Deleted max age"));
+    bs->setLabel(QObject::tr("Deleted max age (days)"));
     bs->setHelpText(QObject::tr("When set to a number greater than zero, "
                     "Auto-Expire will force expiration of Deleted recordings "
                     "when they are this many days old."));
@@ -929,7 +928,7 @@ static GlobalCheckBox *DeletedFifoOrder()
     cb->setLabel(QObject::tr("Expire in deleted order"));
     cb->setValue(false);
     cb->setHelpText(QObject::tr(
-                    "Expire Deleted recordings in the order which they were "
+                    "If enabled, delete recordings in the order which they were "
                     "originally deleted."));
     return cb;
 };
@@ -975,7 +974,7 @@ static GlobalCheckBox *AutoExpireWatchedPriority()
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireWatchedPriority");
     bc->setLabel(QObject::tr("Watched before unwatched"));
     bc->setValue(false);
-    bc->setHelpText(QObject::tr("If set, programs that have been marked as "
+    bc->setHelpText(QObject::tr("If enabled, programs that have been marked as "
                     "watched will be expired before programs that have not "
                     "been watched."));
     return bc;
@@ -997,8 +996,8 @@ static GlobalCheckBox *AutoExpireDefault()
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
     bc->setLabel(QObject::tr("Auto-Expire default"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("When enabled, any new recording schedules "
-                    "will be marked as eligible for Auto-expiration. "
+    bc->setHelpText(QObject::tr("If enabled, any new recording schedules "
+                    "will be marked as eligible for auto-expiration. "
                     "Existing schedules will keep their current value."));
     return bc;
 }
@@ -1006,9 +1005,9 @@ static GlobalCheckBox *AutoExpireDefault()
 static GlobalSpinBox *AutoExpireLiveTVMaxAge()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireLiveTVMaxAge", 1, 365, 1);
-    bs->setLabel(QObject::tr("Live TV max age"));
-    bs->setHelpText(QObject::tr("Auto-Expire will force expiration of Live TV "
-                    "recordings when they are this many days old. Live TV "
+    bs->setLabel(QObject::tr("Live TV max age (days)"));
+    bs->setHelpText(QObject::tr("Auto-Expire will force expiration of Live "
+                    "TV recordings when they are this many days old. Live TV "
                     "recordings may also be expired early if necessary to "
                     "free up disk space."));
     bs->setValue(1);
@@ -1021,10 +1020,10 @@ static GlobalSpinBox *MinRecordDiskThreshold()
     GlobalSpinBox *bs = new GlobalSpinBox("MinRecordDiskThreshold",
                                             0, 1000000, 100);
     bs->setLabel(QObject::tr("New recording free disk space threshold "
-                 "(in megabytes)"));
+                 "(MB)"));
     bs->setHelpText(QObject::tr("MythTV will stop scheduling new recordings on "
-                    "a backend when its free disk space falls below this "
-                    "value."));
+                    "a backend when its free disk space (in megabytes) falls "
+                    "below this value."));
     bs->setValue(300);
     return bs;
 }
@@ -1035,7 +1034,7 @@ static GlobalCheckBox *RerecordWatched()
     GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched");
     bc->setLabel(QObject::tr("Re-record watched"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("If set, programs that have been marked as "
+    bc->setHelpText(QObject::tr("If enabled, programs that have been marked as "
                     "watched and are Auto-Expired will be re-recorded if "
                     "they are shown again."));
     return bc;
@@ -1045,7 +1044,7 @@ static GlobalSpinBox *RecordPreRoll()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("RecordPreRoll", 0, 600, 60, true);
     bs->setLabel(QObject::tr("Time to record before start of show "
-                 "(in seconds)"));
+                 "(secs)"));
     bs->setHelpText(QObject::tr("This global setting allows the recorder "
                     "to start before the scheduled start time. It does "
                     "not affect the scheduler. It is ignored when two shows "
@@ -1057,7 +1056,7 @@ static GlobalSpinBox *RecordPreRoll()
 static GlobalSpinBox *RecordOverTime()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("RecordOverTime", 0, 1800, 60, true);
-    bs->setLabel(QObject::tr("Time to record past end of show (in seconds)"));
+    bs->setLabel(QObject::tr("Time to record past end of show (secs)"));
     bs->setValue(0);
     bs->setHelpText(QObject::tr("This global setting allows the recorder "
                     "to record beyond the scheduled end time. It does "
@@ -1095,12 +1094,12 @@ static GlobalSpinBox *CategoryOverTime()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("CategoryOverTime",
                                           0, 180, 60, true);
-    bs->setLabel(QObject::tr("Record past end of show (in minutes)"));
+    bs->setLabel(QObject::tr("Record past end of show (mins)"));
     bs->setValue(30);
     bs->setHelpText(QObject::tr("For the specified category, an attempt "
                     "will be made to extend the recording by the specified "
-                    "time. It is ignored when two shows have been scheduled "
-                    "without enough time in between."));
+                    "number of minutes. It is ignored when two shows have "
+                    "been scheduled without enough time in-between."));
     return bs;
 }
 
@@ -1206,7 +1205,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     skiploop->setHelpText(
         tr("When unchecked the deblocking loopfilter will be disabled ") + "\n" +
         tr("Disabling will significantly reduce the load on the CPU "
-           "when watching HD h264 but may significantly reduce video quality."));
+           "when watching HD H.264 but may significantly reduce video quality."));
 
     osdfade->setHelpText(
         tr("When unchecked the OSD will not fade away but instead "
@@ -1920,7 +1919,7 @@ static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
     gc->addSelection(QObject::tr("PAL teletext"),        "pal_txt", 1 == sel);
     gc->addSelection(QObject::tr("NTSC closed caption"), "ntsc_cc", 2 == sel);
     gc->setHelpText(
-        QObject::tr("If set, this overrides the mythtv-setup setting "
+        QObject::tr("If enabled, this overrides the mythtv-setup setting "
                     "used during recording when decoding captions."));
 
     return gc;
@@ -2006,10 +2005,9 @@ static HostCheckBox *AlwaysStreamFiles()
     gc->setLabel(QObject::tr("Always stream recordings from the backend"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
-                        "Enable this setting if you want MythTV to "
-                        "always stream files from a remote backend "
-                        "instead of directly reading a recording "
-                        "file if it is accessible locally."));
+                        "If enabled, MythTV will always stream files from a "
+                        "remote backend instead of directly reading a "
+                        "recording file if it is accessible locally."));
     return gc;
 }
 
@@ -2045,8 +2043,8 @@ static HostCheckBox *PreferCC708()
     gc->setValue(true);
     gc->setHelpText(
         QObject::tr(
-            "When enabled the new EIA-708 captions will be preferred over "
-            "the old EIA-608 captions in ATSC streams."));
+            "If enabled, the newer EIA-708 captions will be preferred over "
+            "the older EIA-608 captions in ATSC streams."));
 
     return gc;
 }
@@ -2093,10 +2091,10 @@ static HostCheckBox *ClearSavedPosition()
     HostCheckBox *gc = new HostCheckBox("ClearSavedPosition");
     gc->setLabel(QObject::tr("Clear bookmark on playback"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Automatically clear the bookmark on a "
-                    "recording when the recording is played back. If "
-                    "disabled, you can mark the beginning with rewind "
-                    "then save position."));
+    gc->setHelpText(QObject::tr("If enabled, automatically clear the "
+                    "bookmark on a recording when the recording is played "
+                    "back. If disabled, you can mark the beginning with "
+                    "rewind then save position."));
     return gc;
 }
 
@@ -2160,7 +2158,7 @@ static HostCheckBox *EndOfRecordingExitPrompt()
     HostCheckBox *gc = new HostCheckBox("EndOfRecordingExitPrompt");
     gc->setLabel(QObject::tr("Prompt at end of recording"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, a menu will be displayed allowing "
+    gc->setHelpText(QObject::tr("If enabled, a menu will be displayed allowing "
                     "you to delete the recording when it has finished "
                     "playing."));
     return gc;
@@ -2175,7 +2173,7 @@ static HostCheckBox *JumpToProgramOSD()
                         "Set the choice between viewing the current "
                         "recording group in the OSD, or showing the "
                         "'Watch Recording' screen when 'Jump to Program' "
-                        "is activated. If set, the recordings are shown "
+                        "is activated. If enabled, the recordings are shown "
                         "in the OSD"));
     return gc;
 }
@@ -2186,7 +2184,7 @@ static HostCheckBox *ContinueEmbeddedTVPlay()
     gc->setLabel(QObject::tr("Continue playback when embedded"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
-                    "This option continues TV playback when the TV window "
+                    "If enabled, TV playback continues when the TV window "
                     "is embedded in the upcoming program list or recorded "
                     "list. The default is to pause the recorded show when "
                     "embedded."));
@@ -2198,7 +2196,7 @@ static HostCheckBox *AutomaticSetWatched()
     HostCheckBox *gc = new HostCheckBox("AutomaticSetWatched");
     gc->setLabel(QObject::tr("Automatically mark a recording as watched"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, when you exit near the end of a "
+    gc->setHelpText(QObject::tr("If enabled, when you exit near the end of a "
                     "recording it will be marked as watched. The automatic "
                     "detection is not foolproof, so do not enable this "
                     "setting if you don't want an unwatched recording marked "
@@ -2209,7 +2207,7 @@ static HostCheckBox *AutomaticSetWatched()
 static HostSpinBox *LiveTVIdleTimeout()
 {
     HostSpinBox *gs = new HostSpinBox("LiveTVIdleTimeout", 0, 3600, 1);
-    gs->setLabel(QObject::tr("Live TV idle timeout"));
+    gs->setLabel(QObject::tr("Live TV idle timeout (mins)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr(
                         "Exit Live TV automatically if left idle for the "
@@ -2223,7 +2221,7 @@ static HostCheckBox *PlaybackPreview()
     HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
     gc->setLabel(QObject::tr("Display live preview of recordings"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("When enabled, a preview of the recording "
+    gc->setHelpText(QObject::tr("If enabled, a preview of the recording "
                     "will play in a small window on the \"Watch a "
                     "Recording\" menu."));
     return gc;
@@ -2236,9 +2234,10 @@ static HostCheckBox *HWAccelPlaybackPreview()
     gc->setValue(false);
     gc->setHelpText(
         QObject::tr(
-            "Use HW acceleration for the live recording preview. "
-            "Video renderer used is determined by the CPU profiles. "
-            "Disable if playback is sluggish or causes high CPU."));
+            "If enabled, live recording preview will use hardware "
+            "acceleration. The video renderer used is determined by the "
+            "selected CPU profile. Disable if playback is sluggish or "
+            "causes high CPU load"));
     return gc;
 }
 
@@ -2249,8 +2248,8 @@ static HostCheckBox *GeneratePreviewRemotely()
     gc->setValue(false);
     gc->setHelpText(
         QObject::tr(
-            "If you have a very slow frontend you can enable this to "
-            "always have a backend server generate preview images."));
+            "If enabled, a backend server will generate preview images. "
+            "Recommended for very slow frontends."));
     return gc;
 }
 
@@ -2285,9 +2284,9 @@ static HostCheckBox *UseVirtualKeyboard()
     HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
     gc->setLabel(QObject::tr("Use line edit virtual keyboards"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Allows you to use a virtual keyboard "
-                    "in MythTV line edit boxes. To use, hit SELECT (Enter or "
-                    "Space) while a line edit is in focus."));
+    gc->setHelpText(QObject::tr("If enabled, you can use a virtual keyboard "
+                    "in MythTV's line edit boxes. To use, hit SELECT (Enter "
+                    "or Space) while a line edit is in focus."));
     return gc;
 }
 
@@ -2313,7 +2312,7 @@ static HostCheckBox *NoPromptOnExit()
     HostCheckBox *gc = new HostCheckBox("NoPromptOnExit");
     gc->setLabel(QObject::tr("Confirm exit"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("When enabled, MythTV will prompt "
+    gc->setHelpText(QObject::tr("If enabled, MythTV will prompt "
                     "for confirmation when you press the System Exit "
                     "key."));
     return gc;
@@ -2406,7 +2405,7 @@ static HostCheckBox *SetupPinCodeRequired()
     HostCheckBox *gc = new HostCheckBox("SetupPinCodeRequired");
     gc->setLabel(QObject::tr("Require setup PIN") + "    ");
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, you will not be able to return "
+    gc->setHelpText(QObject::tr("If enabled, you will not be able to return "
                     "to this screen and reset the Setup PIN without first "
                     "entering the current PIN."));
     return gc;
@@ -2489,7 +2488,7 @@ static HostComboBox *AdjustFill()
 static HostSpinBox *GuiWidth()
 {
     HostSpinBox *gs = new HostSpinBox("GuiWidth", 0, 1920, 8, true);
-    gs->setLabel(QObject::tr("GUI width (px)"));
+    gs->setLabel(QObject::tr("GUI width (pixels)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The width of the GUI. Do not make the GUI "
                     "wider than your actual screen resolution. Set to 0 to "
@@ -2500,7 +2499,7 @@ static HostSpinBox *GuiWidth()
 static HostSpinBox *GuiHeight()
 {
     HostSpinBox *gs = new HostSpinBox("GuiHeight", 0, 1600, 8, true);
-    gs->setLabel(QObject::tr("GUI height (px)"));
+    gs->setLabel(QObject::tr("GUI height (pixels)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The height of the GUI. Do not make the GUI "
                     "taller than your actual screen resolution. Set to 0 to "
@@ -2783,7 +2782,7 @@ static HostCheckBox *UseFixedWindowSize()
     gc->setLabel(QObject::tr("Use fixed window size"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr(
-                        "When disabled the video playback "
+                        "If disabled, the video playback "
                         "window can be resized"));
     return gc;
 }
@@ -3092,7 +3091,7 @@ static HostCheckBox *EPGShowCategoryColors()
     HostCheckBox *gc = new HostCheckBox("EPGShowCategoryColors");
     gc->setLabel(QObject::tr("Display genre colors"));
     gc->setHelpText(QObject::tr("Colorize program guide using "
-                    "genre colors. (Not available for all grabbers.)"));
+                    "genre colors (not available for all grabbers)."));
     gc->setValue(true);
     return gc;
 }
@@ -3660,7 +3659,7 @@ static HostCheckBox *PlaybackWLStart()
     HostCheckBox *gc = new HostCheckBox("PlaybackWLStart");
     gc->setLabel(QObject::tr("Start from the Watch List view"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, the 'Watch List' will be the "
+    gc->setHelpText(QObject::tr("If enabled, the 'Watch List' will be the "
                     "initial view each time you enter the "
                     "Watch Recordings screen"));
     return gc;
@@ -3732,7 +3731,7 @@ static HostCheckBox *UseOpenGLVSync()
     gc->setLabel(QObject::tr("Enable OpenGL vertical sync for timing"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
-                        "If it is supported by your hardware/drivers, "
+                        "If supported by your hardware/drivers, "
                         "MythTV will use OpenGL vertical syncing for "
                         "video timing, reducing frame jitter."));
     return gc;
@@ -3771,7 +3770,7 @@ static HostSpinBox *LCDPopupTime()
 {
     HostSpinBox *gs = new HostSpinBox("LCDPopupTime", 1, 300, 1, true);
     gs->setLabel(QObject::tr("Menu pop-up time"));
-    gs->setHelpText(QObject::tr("The time (in seconds) that the menu will "
+    gs->setHelpText(QObject::tr("How many seconds the menu will "
                     "remain visible after navigation."));
     gs->setValue(5);
     return gs;
@@ -3929,7 +3928,7 @@ static HostCheckBox *MacGammaCorrect()
     HostCheckBox *gc = new HostCheckBox("MacGammaCorrect");
     gc->setLabel(QObject::tr("Enable gamma correction for video"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If checked, QuickTime will correct the gamma "
+    gc->setHelpText(QObject::tr("If enabled, QuickTime will correct the gamma "
                     "of the video to match your monitor. Turning this off can "
                     "save some CPU cycles."));
     return gc;
@@ -3940,7 +3939,7 @@ static HostCheckBox *MacScaleUp()
     HostCheckBox *gc = new HostCheckBox("MacScaleUp");
     gc->setLabel(QObject::tr("Scale video as necessary"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If checked, video will be scaled to fit your "
+    gc->setHelpText(QObject::tr("If enabled, video will be scaled to fit your "
                     "window or screen. If unchecked, video will never be made "
                     "larger than its actual pixel size."));
     return gc;
@@ -3964,7 +3963,7 @@ static HostCheckBox *MacMainEnabled()
     HostCheckBox *gc = new HostCheckBox("MacMainEnabled");
     gc->setLabel(QObject::tr("Video in main window"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If checked, video will be displayed in the "
+    gc->setHelpText(QObject::tr("If enabled, video will be displayed in the "
                     "main GUI window. Disable this when you only want video "
                     "on the desktop or in a floating window. Only valid when "
                     "\"Use GUI size for TV playback\" and \"Run the "
@@ -4020,7 +4019,7 @@ static HostCheckBox *MacFloatEnabled()
     HostCheckBox *gc = new HostCheckBox("MacFloatEnabled");
     gc->setLabel(QObject::tr("Video in floating window"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If checked, video will be displayed in a "
+    gc->setHelpText(QObject::tr("If enabled, video will be displayed in a "
                     "floating window. Only valid when \"Use GUI size for TV "
                     "playback\" and \"Run the frontend in a window\" are "
                     "checked."));
@@ -4075,7 +4074,7 @@ static HostCheckBox *MacDockEnabled()
     HostCheckBox *gc = new HostCheckBox("MacDockEnabled");
     gc->setLabel(QObject::tr("Video in the dock"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If checked, video will be displayed in the "
+    gc->setHelpText(QObject::tr("If enabled, video will be displayed in the "
                     "application's dock icon. Only valid when \"Use GUI size "
                     "for TV playback\" and \"Run the frontend in a window\" "
                     "are checked."));
@@ -4115,7 +4114,7 @@ static HostCheckBox *MacDesktopEnabled()
     HostCheckBox *gc = new HostCheckBox("MacDesktopEnabled");
     gc->setLabel(QObject::tr("Video on the desktop"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If checked, video will be displayed on the "
+    gc->setHelpText(QObject::tr("If enabled, video will be displayed on the "
                     "desktop, behind the Finder icons. Only valid when \"Use "
                     "GUI size for TV playback\" and \"Run the frontend in a "
                     "window\" are checked."));

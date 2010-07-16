@@ -117,7 +117,7 @@ MythTV Archive GUI theme
             <area>1010,555,100,40</area>
             <font>detail</font>
             <align>right</align>
-            <value>x.xx Gb</value>
+            <value>x.xx GB</value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -136,25 +136,25 @@ MythTV Archive GUI theme
         <textarea name="maxsize" from="basetextarea">
             <area>1190,425,100,30</area>
             <font>smallstatsfont</font>
-            <value>xxxxx mb</value>
+            <value>xxxxx MB</value>
         </textarea>
 
         <textarea name="minsize" from="basetextarea">
             <area>1190,565,100,30</area>
             <font>smallstatsfont</font>
-            <value>0 mb</value>
+            <value>0 MB</value>
         </textarea>
 
         <textarea name="currentsize" from="basetextarea">
             <area>1190,480,100,30</area>
             <font>smallstatsfont</font>
-            <value>xxxxx mb</value>
+            <value>xxxxx MB</value>
         </textarea>
 
         <textarea name="currentsize_error" from="basetextarea">
             <area>1190,480,100,30</area>
             <font>statserror</font>
-            <value>xxxxx mb</value>
+            <value>xxxxx MB</value>
         </textarea>
 
         <button name="cancel_button" from="basebutton">

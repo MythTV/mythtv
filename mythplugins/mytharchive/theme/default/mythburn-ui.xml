@@ -40,14 +40,14 @@ MythArchive GUI theme
             <area>30,300,200,60</area>
             <font>basesmallpurple</font>
             <align>left</align>
-            <value>12.34GB</value>
+            <value>12.34 GB</value>
         </textarea>
 
        <textarea name="newsize_text" from="basetextarea">
             <area>170,300,200,60</area>
             <font>basesmallpurple</font>
             <align>right</align>
-            <value>12.34GB</value>
+            <value>12.34 GB</value>
         </textarea>
 
         <button name="ok_button" from="basebutton">
@@ -316,20 +316,20 @@ MythArchive GUI theme
             <area>546,480,100,30</area>
             <font>smallstatsfont</font>
             <align>right</align>
-            <value>xxxxx mb</value>
+            <value>xxxxx MB</value>
         </textarea>
 
         <textarea name="minsize" from="basetextarea">
             <area>130,480,100,30</area>
             <font>smallstatsfont</font>
-            <value>0 mb</value>
+            <value>0 MB</value>
         </textarea>
 
         <textarea name="currentsize" from="basetextarea">
             <area>120,480,536,30</area>
             <font>smallstatsfont</font>
             <align>hcenter</align>
-            <value>xxxxx mb</value>
+            <value>xxxxx MB</value>
         </textarea>
 
         <textarea name="currentsize_error" from="currentsize">

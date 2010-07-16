@@ -79,7 +79,7 @@ class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
                        "(" + QObject::tr("default") + ")"),
         PlayGroupDBStorage(this, _parent, "jump")
     {
-        setLabel(QObject::tr("Jump amount (in minutes)"));
+        setLabel(QObject::tr("Jump amount (minutes)"));
         setHelpText(QObject::tr("How many minutes to jump forward or backward "
                     "when the jump keys are pressed."));
     };

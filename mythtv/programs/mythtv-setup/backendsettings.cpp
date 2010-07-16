@@ -96,8 +96,8 @@ static GlobalComboBox *VbiFormat()
     gc->addSelection("None");
     gc->addSelection("PAL Teletext");
     gc->addSelection("NTSC Closed Caption");
-    gc->setHelpText(QObject::tr("VBI stands for Vertical Blanking Interrupt. "
-                    "VBI is used to carry Teletext and Closed Captioning "
+    gc->setHelpText(QObject::tr("The VBI (Vertical Blanking Interval) is "
+                    "used to carry Teletext or Closed Captioning "
                     "data."));
     return gc;
 };
@@ -121,7 +121,7 @@ static GlobalCheckBox *SaveTranscoding()
     GlobalCheckBox *gc = new GlobalCheckBox("SaveTranscoding");
     gc->setLabel(QObject::tr("Save original files after transcoding (globally)"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("When set and the transcoder is active, the "
+    gc->setHelpText(QObject::tr("If enabled and the transcoder is active, the "
                     "original files will be renamed to .old once the "
                     "transcoding is complete."));
     return gc;
@@ -133,8 +133,8 @@ static HostCheckBox *TruncateDeletes()
     hc->setLabel(QObject::tr("Delete files slowly"));
     hc->setValue(false);
     hc->setHelpText(QObject::tr("Some filesystems use a lot of resources when "
-                    "deleting large recording files. This option makes MythTV "
-                    "delete the file slowly on this backend to lessen the "
+                    "deleting large files. If enabled, this option makes "
+                    "MythTV delete files slowly on this backend to lessen the "
                     "impact."));
     return hc;
 };
@@ -144,7 +144,7 @@ static GlobalCheckBox *DeletesFollowLinks()
     GlobalCheckBox *gc = new GlobalCheckBox("DeletesFollowLinks");
     gc->setLabel(QObject::tr("Follow symbolic links when deleting files"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("This will cause MythTV to follow symlinks "
+    gc->setHelpText(QObject::tr("If enabled, MythTV will follow symlinks "
                     "when recordings and related files are deleted, instead "
                     "of deleting the symlink and leaving the actual file."));
     return gc;
@@ -154,10 +154,10 @@ static GlobalSpinBox *HDRingbufferSize()
 {
     GlobalSpinBox *bs = new GlobalSpinBox(
         "HDRingbufferSize", 25*188, 512*188, 25*188);
-    bs->setLabel(QObject::tr("HD ringbuffer size (KB)"));
+    bs->setLabel(QObject::tr("HD ringbuffer size (kB)"));
     bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
                     "backend to weather moments of stress. "
-                    "The larger the ringbuffer, the longer "
+                    "The larger the ringbuffer (in kilobytes), the longer "
                     "the moments of stress can be. However, "
                     "setting the size too large can cause "
                     "swapping, which is detrimental."));
@@ -185,23 +185,23 @@ static GlobalCheckBox *DisableAutomaticBackup()
     GlobalCheckBox *gc = new GlobalCheckBox("DisableAutomaticBackup");
     gc->setLabel(QObject::tr("Disable automatic database backup"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("This will prevent MythTV from backing up the "
-                                "database before upgrades. If disabled, "
-                                "you should have your own backup strategy "
-                                "in place."));
+    gc->setHelpText(QObject::tr("If enabled, MythTV will not backup the "
+                                "database before upgrades. You should "
+                                "therefore have your own database backup "
+                                "strategy in place."));
     return gc;
 };
 
 static HostCheckBox *DisableFirewireReset()
 {
     HostCheckBox *hc = new HostCheckBox("DisableFirewireReset");
-    hc->setLabel(QObject::tr("Disable firewire reset"));
+    hc->setLabel(QObject::tr("Disable FireWire reset"));
     hc->setHelpText(
         QObject::tr(
-            "By default MythTV will reset the firewire bus when a "
-            "firewire recorder stops responding to commands. "
-            "When set, this disables firewire bus resets for "
-            "Linux firewire recorders."));
+            "By default, MythTV resets the FireWire bus when a "
+            "FireWire recorder stops responding to commands. If "
+            "this causes problems, you can disable this behaviour "
+            "here."));
     hc->setValue(false);
     return hc;
 }
@@ -308,8 +308,9 @@ static GlobalSpinBox *EITTransportTimeout()
     gc->setLabel(QObject::tr("EIT transport timeout (mins)"));
     gc->setValue(5);
     QString helpText = QObject::tr(
-        "Maximum time to spend waiting for listings data on one DTV channel "
-        "before checking for new listings data on the next channel.");
+        "Maximum time to spend waiting (in minutes) for listings data "
+        "on one digital TV channel before checking for new listings data "
+        "on the next channel.");
     gc->setHelpText(helpText);
     return gc;
 }
@@ -343,7 +344,7 @@ static GlobalCheckBox *EITIgnoresSource()
 static GlobalSpinBox *EITCrawIdleStart()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("EITCrawIdleStart", 30, 7200, 30);
-    gc->setLabel(QObject::tr("Backend idle before EIT crawl (seconds)"));
+    gc->setLabel(QObject::tr("Backend idle before EIT crawl (secs)"));
     gc->setValue(60);
     QString help = QObject::tr(
         "The minimum number of seconds after a recorder becomes idle "
@@ -380,7 +381,7 @@ static GlobalLineEdit *WOLbackendCommand()
     gc->setLabel(QObject::tr("Wake command"));
     gc->setValue("");
     gc->setHelpText(QObject::tr("The command used to wake up your master "
-            "backend server (eg. sudo /etc/init.d/mythtv-backend restart)."));
+            "backend server (e.g. sudo /etc/init.d/mythtv-backend restart)."));
     return gc;
 };
 
@@ -433,20 +434,21 @@ static GlobalSpinBox *idleTimeoutSecs()
     GlobalSpinBox *gc = new GlobalSpinBox("idleTimeoutSecs", 0, 1200, 5);
     gc->setLabel(QObject::tr("Idle shutdown timeout (secs)"));
     gc->setValue(0);
-    gc->setHelpText(QObject::tr("The amount of time the master backend idles "
-                    "before it shuts down all backends. Set to 0 to disable "
-                    "automatic shutdown."));
+    gc->setHelpText(QObject::tr("The number of seconds the master backend "
+                    "idles before it shuts down all other backends. Set to 0 to "
+                    "disable automatic shutdown."));
     return gc;
 };
 
 static GlobalSpinBox *idleWaitForRecordingTime()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("idleWaitForRecordingTime", 0, 120, 1);
-    gc->setLabel(QObject::tr("Maximum wait for recording (min)"));
+    gc->setLabel(QObject::tr("Maximum wait for recording (mins)"));
     gc->setValue(15);
-    gc->setHelpText(QObject::tr("The amount of time the master backend waits "
-                    "for a recording. If it's idle but a recording starts "
-                    "within this time period, the backends won't shut down."));
+    gc->setHelpText(QObject::tr("The number of minutes the master backend "
+                    "waits for a recording. If it's idle but a recording "
+                    "starts within this time period, the backends won't "
+                    "shut down."));
     return gc;
 };
 
@@ -455,8 +457,8 @@ static GlobalSpinBox *StartupSecsBeforeRecording()
     GlobalSpinBox *gc = new GlobalSpinBox("StartupSecsBeforeRecording", 0, 1200, 5);
     gc->setLabel(QObject::tr("Startup before recording (secs)"));
     gc->setValue(120);
-    gc->setHelpText(QObject::tr("The amount of time the master backend will be "
-                    "woken up before a recording starts."));
+    gc->setHelpText(QObject::tr("The number of seconds the master backend "
+                    "will be woken up before a recording starts."));
     return gc;
 };
 
@@ -509,7 +511,7 @@ static GlobalCheckBox *blockSDWUwithoutClient()
     GlobalCheckBox *gc = new GlobalCheckBox("blockSDWUwithoutClient");
     gc->setLabel(QObject::tr("Block shutdown before client connected"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set, the automatic shutdown routine will "
+    gc->setHelpText(QObject::tr("If enabled, the automatic shutdown routine will "
                     "be disabled until a client connects."));
     return gc;
 };
@@ -540,9 +542,9 @@ static HostSpinBox *JobQueueMaxSimultaneousJobs()
 static HostSpinBox *JobQueueCheckFrequency()
 {
     HostSpinBox *gc = new HostSpinBox("JobQueueCheckFrequency", 5, 300, 5);
-    gc->setLabel(QObject::tr("Job Queue check frequency (in seconds)"));
+    gc->setLabel(QObject::tr("Job Queue check frequency (secs)"));
     gc->setHelpText(QObject::tr("When looking for new jobs to process, the "
-                    "Job Queue will wait this long between checks."));
+                    "Job Queue will wait this many seconds between checks."));
     gc->setValue(60);
     return gc;
 };
@@ -586,7 +588,7 @@ static GlobalCheckBox *JobsRunOnRecordHost()
     GlobalCheckBox *gc = new GlobalCheckBox("JobsRunOnRecordHost");
     gc->setLabel(QObject::tr("Run jobs only on original recording backend"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, jobs in the queue will be required "
+    gc->setHelpText(QObject::tr("If enabled, jobs in the queue will be required "
                                 "to run on the backend that made the "
                                 "original recording."));
     return gc;
@@ -598,7 +600,7 @@ static GlobalCheckBox *AutoTranscodeBeforeAutoCommflag()
     gc->setLabel(QObject::tr("Run transcode jobs before auto commercial "
                              "detection"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set and both auto transcode and auto "
+    gc->setHelpText(QObject::tr("If enabled, and if both auto-transcode and "
                                 "commercial detection are turned ON for a "
                                 "recording, transcoding will run first; "
                                 "otherwise, commercial detection runs first."));
@@ -611,8 +613,8 @@ static GlobalCheckBox *AutoCommflagWhileRecording()
     gc->setLabel(QObject::tr("Start auto-commercial-detection jobs when the "
                              "recording starts"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set and auto commercial detection is ON "
-                                "for a recording, the flagging job will be "
+    gc->setHelpText(QObject::tr("If enabled, and Auto Commercial Flagging is "
+                                "ON for a recording, the flagging job will be "
                                 "started as soon as the recording starts. NOT "
                                 "recommended on underpowered systems."));
     return gc;
@@ -643,8 +645,8 @@ static HostCheckBox *JobAllowCommFlag()
     HostCheckBox *gc = new HostCheckBox("JobAllowCommFlag");
     gc->setLabel(QObject::tr("Allow commercial-detection jobs"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                                "backend."));
+    gc->setHelpText(QObject::tr("If enabled, allow jobs of this type to "
+                                "run on this backend."));
     return gc;
 };
 
@@ -653,8 +655,8 @@ static HostCheckBox *JobAllowTranscode()
     HostCheckBox *gc = new HostCheckBox("JobAllowTranscode");
     gc->setLabel(QObject::tr("Allow transcoding jobs"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                                "backend."));
+    gc->setHelpText(QObject::tr("If enabled, allow jobs of this type to "
+                                "run on this backend."));
     return gc;
 };
 
@@ -695,8 +697,8 @@ static HostCheckBox *JobAllowUserJob(uint job_num)
     // if (QString(gCoreContext->GetSetting(QString("UserJob%1").arg(job_num)))
     //            .length() == 0)
     //     bc->setEnabled(false);
-    bc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                    "backend."));
+    bc->setHelpText(QObject::tr("If enabled, allow jobs of this type to "
+                    "run on this backend."));
     return bc;
 }
 
@@ -766,9 +768,9 @@ static HostCheckBox *LogCleanEnabled()
     HostCheckBox *gc = new HostCheckBox("LogCleanEnabled");
     gc->setLabel(QObject::tr("Automatic log cleaning enabled"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("This enables the periodic cleanup of the "
-                    "events stored in the MythTV database (see \"Log MythTV "
-                    "events to database\")."));
+    gc->setHelpText(QObject::tr("If enabled, a periodic cleanup of the "
+                    "events stored in the MythTV database occurs (see \"Log "
+                    "MythTV events to database\")."));
     return gc;
 }
 
@@ -829,8 +831,8 @@ static GlobalCheckBox *MythFillEnabled()
     GlobalCheckBox *bc = new GlobalCheckBox("MythFillEnabled");
     bc->setLabel(QObject::tr("Automatically run mythfilldatabase"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("This enables the automatic execution of "
-                    "mythfilldatabase."));
+    bc->setHelpText(QObject::tr("If enabled, execution of "
+                    "mythfilldatabase occurs automatically."));
     return bc;
 }
 
@@ -876,11 +878,10 @@ static GlobalCheckBox *MythFillGrabberSuggestsTime()
     bc->setLabel(QObject::tr("Run mythfilldatabase at time suggested by the "
                              "grabber."));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("This setting allows a DataDirect guide data "
+    bc->setHelpText(QObject::tr("If enabled, allow a DataDirect guide data "
                     "provider to specify the next download time in order to "
-                    "distribute load on their servers. If this setting is "
-                    "enabled, mythfilldatabase execution start/end times are "
-                    "ignored."));
+                    "distribute load on their servers. mythfilldatabase "
+                    "Execution Start/End times are also ignored."));
     return bc;
 }
 

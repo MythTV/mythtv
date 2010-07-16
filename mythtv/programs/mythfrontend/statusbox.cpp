@@ -763,7 +763,7 @@ void StatusBox::doTunerStatus()
             fontstate = "warning";
         }
         else if (state == kState_WatchingLiveTV)
-            status = tr("is watching live TV");
+            status = tr("is watching Live TV");
         else if (state == kState_RecordingOnly ||
                  state == kState_WatchingRecording)
             status = tr("is recording");
@@ -971,7 +971,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
                                         long long used, long long free,
                                         const recprof2bps_t& prof2bps)
 {
-    const QString tail = QObject::tr(", using your %1 rate of %2 Kb/sec");
+    const QString tail = QObject::tr(", using your %1 rate of %2 kb/s");
 
     out<<usage_str_kb(total, used, free);
     if (free<0)

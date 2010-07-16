@@ -55,9 +55,9 @@ static GlobalTimeBox *DailyWakeupEnd2()
 static HostCheckBox *AutoStartFrontend()
 {
     HostCheckBox *gc = new HostCheckBox("AutoStartFrontend");
-    gc->setLabel(QObject::tr("Automatically Start Myth Frontend"));
+    gc->setLabel(QObject::tr("Automatically Start mythfrontend"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Mythwelcome will automatically start the "
+    gc->setHelpText(QObject::tr("Mythwelcome will automatically start "
                     "mythfrontend if it is determined that it was not started to "
                     "record a program."));
     return gc;

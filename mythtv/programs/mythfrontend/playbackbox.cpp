@@ -1493,7 +1493,7 @@ bool PlaybackBox::UpdateUILists(void)
                     (p->GetRecordingGroup() == "LiveTV") &&
                     (m_viewMask & VIEW_LIVETVGRP))
                 {
-                    QString tmpTitle = tr("LiveTV");
+                    QString tmpTitle = tr("Live TV");
                     sortedList[tmpTitle.toLower()] = tmpTitle;
                     m_progLists[tmpTitle.toLower()].push_front(p);
                     m_progLists[tmpTitle.toLower()].setAutoDelete(false);
@@ -1880,8 +1880,8 @@ bool PlaybackBox::UpdateUILists(void)
     if (m_progLists[m_watchGroupLabel].size() > 0)
         m_titleList << m_watchGroupName;
     if ((m_progLists["livetv"].size() > 0) &&
-        (!sortedList.values().contains(tr("LiveTV"))))
-        m_titleList << tr("LiveTV");
+        (!sortedList.values().contains(tr("Live TV"))))
+        m_titleList << tr("Live TV");
     m_titleList << sortedList.values();
 
     // Populate list of recording groups
@@ -3243,9 +3243,9 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(
 {
     // LiveTV ProgramInfo's are not in the aggregated list
     ProgramList::iterator _it[2] = {
-        m_progLists[tr("LiveTV").toLower()].begin(), m_progLists[""].begin() };
+        m_progLists[tr("Live TV").toLower()].begin(), m_progLists[""].begin() };
     ProgramList::iterator _end[2] = {
-        m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
+        m_progLists[tr("Live TV").toLower()].end(),   m_progLists[""].end()   };
 
     if (recgroup != "LiveTV")
     {
@@ -4127,7 +4127,7 @@ void PlaybackBox::showGroupFilter(void)
 
             dispGroup = (dispGroup == "Default") ? tr("Default") : dispGroup;
             dispGroup = (dispGroup == "Deleted") ? tr("Deleted") : dispGroup;
-            dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
+            dispGroup = (dispGroup == "LiveTV")  ? tr("Live TV")  : dispGroup;
 
             displayNames.append(tr("%1 [%n item(s)]", 0, items).arg(dispGroup));
 
@@ -4315,7 +4315,7 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
         if (dispGroup == "Default")
             dispGroup = tr("Default");
         else if (dispGroup == "LiveTV")
-            dispGroup = tr("LiveTV");
+            dispGroup = tr("Live TV");
         else if (dispGroup == "Deleted")
             dispGroup = tr("Deleted");
 

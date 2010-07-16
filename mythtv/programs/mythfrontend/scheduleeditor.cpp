@@ -813,7 +813,7 @@ void StoreOptEditor::Load()
         if (*it == "Default")
             dispValue = tr("Default");
         else if (*it == "LiveTV")
-            dispValue = tr("LiveTV");
+            dispValue = tr("Live TV");
         else
             dispValue = *it;
 

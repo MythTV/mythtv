@@ -3746,8 +3746,8 @@ static int init_tr(void)
         QObject::tr("Live TV",        "Recording Profile Live TV") +
         QObject::tr("Low Quality",    "Recording Profile Low Quality") +
         QObject::tr("Medium Quality", "Recording Profile Medium Quality") +
-        QObject::tr("MPEG2",          "Recording Profile MPEG2") +
-        QObject::tr("RTjpeg/MPEG4",   "Recording Profile RTjpeg/MPEG4");
+        QObject::tr("MPEG-2",         "Recording Profile MPEG-2") +
+        QObject::tr("RTjpeg/MPEG-4",  "Recording Profile RTjpeg/MPEG-4");
 
 
     QString rec_profile_groups =
@@ -3769,23 +3769,23 @@ static int init_tr(void)
                     "Recording Profile Group Name") +
         QObject::tr("MPEG-2 Encoders (PVR-x50, PVR-500)",
                     "Recording Profile Group Name") +
-        QObject::tr("Software Encoders (v4l based)",
+        QObject::tr("Software Encoders (V4L based)",
                     "Recording Profile Group Name") +
         QObject::tr("Transcoders",
                     "Recording Profile Group Name") +
-        QObject::tr("USB Mpeg-4 Encoder (Plextor ConvertX, etc)",
+        QObject::tr("USB MPEG-4 Encoder (Plextor ConvertX, etc)",
                     "Recording Profile Group Name");
 
     QString display_rec_groups =
         QObject::tr("All Programs",   "Recording Group All Programs") +
         QObject::tr("All", "Recording Group All Programs -- short form") +
-        QObject::tr("LiveTV",         "Recording Group LiveTV") +
+        QObject::tr("Live TV",        "Recording Group Live TV") +
         QObject::tr("Default",        "Recording Group Default") +
         QObject::tr("Deleted",        "Recording Group Deleted");
 
     QString storage_groups =
         QObject::tr("Default",        "Storage Group Name") +
-        QObject::tr("LiveTV",         "Storage Group Name") +
+        QObject::tr("Live TV",        "Storage Group Name") +
         QObject::tr("Thumbnails",     "Storage Group Name") +
         QObject::tr("DB Backups",     "Storage Group Name");
 

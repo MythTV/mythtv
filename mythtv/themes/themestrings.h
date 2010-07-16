@@ -274,9 +274,9 @@ void strings_null() {
     ThemeUI::tr("title goes here");
     ThemeUI::tr("sep 13, 2004 11:00 pm (1h 15m)");
     ThemeUI::tr("description goes here.");
-    ThemeUI::tr("x.xx Gb");
-    ThemeUI::tr("xxxxx mb");
-    ThemeUI::tr("0 mb");
+    ThemeUI::tr("x.xx GB");
+    ThemeUI::tr("xxxxx MB");
+    ThemeUI::tr("0 MB");
     ThemeUI::tr("File Finder To Import");
     ThemeUI::tr("Watch Recordings");
     ThemeUI::tr("%|\"SUBTITLE|\"% %STARS% %DESCRIPTION%");
@@ -309,7 +309,7 @@ void strings_null() {
     ThemeUI::tr("Post Processing Editor");
     ThemeUI::tr("Run User job #2");
     ThemeUI::tr("Details");
-    ThemeUI::tr("Mythbuntu is based off of ProjectGrayhem, a dark, shiny theme originally inspired by XBMC's ProjectMayhem skin");
+    ThemeUI::tr("Mythbuntu is based on ProjectGrayhem - a dark, shiny theme originally inspired by XBMC's ProjectMayhem skin");
     ThemeUI::tr("MythTV is idle and will shutdown shortly.");
     ThemeUI::tr("Current Recording(s)");
     ThemeUI::tr("Next Scheduled Recording(s)");
@@ -560,7 +560,7 @@ void strings_null() {
     ThemeUI::tr("Sample Clauses:");
     ThemeUI::tr(" This was adapted from the Jeroen Brosens' MythCenter theme. The fonts have been changed to freely redistributable ones and layout changes have been made to make this theme look good on 1280x720 and 1920x1080 screens with a 1:1 pixel aspect ratio. ");
     ThemeUI::tr("Heading");
-    ThemeUI::tr("Playback starting â¦");
+    ThemeUI::tr("Playback starting...");
     ThemeUI::tr("Bookmark Manager");
     ThemeUI::tr("Web Page");
     ThemeUI::tr("Icon Importer");

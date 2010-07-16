@@ -12,7 +12,7 @@ MythUIBusyDialog::MythUIBusyDialog(const QString &message,
     if (!message.isEmpty())
         m_message = message;
     else
-        m_message = tr("Please Wait ...");
+        m_message = tr("Please Wait...");
     m_messageText = NULL;
 }
 

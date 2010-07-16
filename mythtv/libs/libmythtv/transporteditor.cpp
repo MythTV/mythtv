@@ -350,8 +350,8 @@ void TransportListEditor::Menu(void)
         GetMythMainWindow(), 
         "", 
         tr("Transport Menu"), 
-        tr("Edit.."), 
-        tr("Delete.."), kDialogCodeButton0);
+        tr("Edit..."), 
+        tr("Delete..."), kDialogCodeButton0);
 
     if (kDialogCodeButton0 == val)
         emit Edit();
@@ -460,8 +460,8 @@ class DVBSymbolRate : public ComboBoxSetting, public MuxDBStorage
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(
             QObject::tr(
-                "Symbol Rate (symbols/second).\n"
-                "Most dvb-s transponders transmit at 27.5 "
+                "Symbol Rate (symbols/sec).\n"
+                "Most DVB-S transponders transmit at 27.5 "
                 "million symbols per second."));
         addSelection("3333000");
         addSelection("22000000");

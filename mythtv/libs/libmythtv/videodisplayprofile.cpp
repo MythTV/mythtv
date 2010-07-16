@@ -731,23 +731,23 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
     else if ("opengldoubleratelinearblend" == short_name)
         return QObject::tr("Linear blend (2x, HW)");
     else if ("opengldoubleratefieldorder" == short_name)
-        return QObject::tr("Interlaced (2x, Hw)");
+        return QObject::tr("Interlaced (2x, HW)");
     else if ("opengldoublerateyadif" == short_name)
-        return QObject::tr("Yadif (2x, Hw)");
+        return QObject::tr("Yadif (2x, HW)");
     else if ("openglyadif" == short_name)
-        return QObject::tr("Yadif (Hw)");
+        return QObject::tr("Yadif (HW)");
     else if ("vdpauonefield" == short_name)
-        return QObject::tr("One Field (1x, Hw)");
+        return QObject::tr("One Field (1x, HW)");
     else if ("vdpaubobdeint" == short_name)
-        return QObject::tr("Bob (2x, Hw)");
+        return QObject::tr("Bob (2x, HW)");
     else if ("vdpaubasic" == short_name)
-        return QObject::tr("Temporal (1x, Hw)");
+        return QObject::tr("Temporal (1x, HW)");
     else if ("vdpaubasicdoublerate" == short_name)
-        return QObject::tr("Temporal (2x, Hw)");
+        return QObject::tr("Temporal (2x, HW)");
     else if ("vdpauadvanced" == short_name)
-        return QObject::tr("Advanced (1x, Hw)");
+        return QObject::tr("Advanced (1x, HW)");
     else if ("vdpauadvanceddoublerate" == short_name)
-        return QObject::tr("Advanced (2x, Hw)");
+        return QObject::tr("Advanced (2x, HW)");
 
     return "";
 }

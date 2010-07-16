@@ -299,9 +299,9 @@ class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
     {
         setLabel(QObject::tr("Perform EIT scan"));
         setHelpText(QObject::tr(
-                        "If this is enabled the data in this source will be "
-                        "updated with listing data provided by the channels "
-                        "themselves 'over-the-air'."));
+                        "If enabled, program guide data for channels on this "
+                        "source will be updated with data provided by the "
+                        "channels themselves 'Over-the-Air'."));
     }
 };
 
@@ -437,7 +437,7 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
 
     TransButtonSetting *config = new TransButtonSetting();
     config->setLabel(tr("Configure"));
-    config->setHelpText(tr("Run xmltv configure command."));
+    config->setHelpText(tr("Run XMLTV configure command."));
 
     addChild(config);
 
@@ -992,11 +992,11 @@ class SignalTimeout : public SpinBoxSetting, public CaptureCardDBStorage
         SpinBoxSetting(this, min_val, 60000, 250),
         CaptureCardDBStorage(this, parent, "signal_timeout")
     {
-        setLabel(QObject::tr("Signal timeout (msec)"));
+        setLabel(QObject::tr("Signal timeout (ms)"));
         setValue(value);
         setHelpText(QObject::tr(
-                        "Maximum time MythTV waits for any signal when "
-                        "scanning for channels."));
+                        "Maximum time (in milliseconds) MythTV waits for "
+                        "a signal when scanning for channels."));
     };
 };
 
@@ -1007,12 +1007,12 @@ class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
         SpinBoxSetting(this, min_val, 65000, 250),
         CaptureCardDBStorage(this, parent, "channel_timeout")
     {
-        setLabel(QObject::tr("Tuning timeout (msec)"));
+        setLabel(QObject::tr("Tuning timeout (ms)"));
         setValue(value);
         setHelpText(QObject::tr(
-                        "Maximum time MythTV waits for a channel lock "
-                        "when scanning for channels. Or, for issuing "
-                        "a warning in Live TV mode."));
+                        "Maximum time (in milliseconds) MythTV waits for "
+                        "a channel lock when scanning for channels during setup, or for "
+                        "issuing a warning in Live TV mode."));
     };
 };
 
@@ -1025,7 +1025,7 @@ class AudioRateLimit : public ComboBoxSetting, public CaptureCardDBStorage
     {
         setLabel(QObject::tr("Audio sampling rate limit"));
         setHelpText(
-            QObject::tr("If other than None, override the audio sampling "
+            QObject::tr("If non-zero, override the audio sampling "
                         "rate in the recording profile when this card is "
                         "used.  Use this if your capture card does not "
                         "support all of the standard rates."));
@@ -1169,8 +1169,8 @@ class DVBNoSeqStart : public CheckBoxSetting, public CaptureCardDBStorage
         setLabel(QObject::tr("Wait for SEQ start header."));
         setValue(true);
         setHelpText(
-            QObject::tr("Make the dvb-recording drop packets from "
-                        "the card until a sequence start header is seen."));
+            QObject::tr("If enabled, drop packets from the start of a DVB "
+                        "recording until a sequence start header is seen."));
     };
 };
 
@@ -1184,9 +1184,8 @@ class DVBOnDemand : public CheckBoxSetting, public CaptureCardDBStorage
         setLabel(QObject::tr("Open DVB card on demand"));
         setValue(true);
         setHelpText(
-            QObject::tr("This option makes the backend dvb-recorder "
-                        "only open the card when it is actually in-use, leaving "
-                        "it free for other programs at other times."));
+            QObject::tr("If enabled, only open the DVB card when required, "
+                        "leaving it free for other programs at other times."));
     };
 };
 
@@ -1200,8 +1199,8 @@ class DVBEITScan : public CheckBoxSetting, public CaptureCardDBStorage
         setLabel(QObject::tr("Use DVB card for active EIT scan"));
         setValue(true);
         setHelpText(
-            QObject::tr("This option activates the active scan for "
-                        "program data (EIT). With this option enabled "
+            QObject::tr("If enabled, activate active scanning for "
+                        "program data (EIT). When this option is enabled "
                         "the DVB card is constantly in-use."));
     };
 };
@@ -1213,11 +1212,12 @@ class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
         SpinBoxSetting(this, 0, 2000, 25),
         CaptureCardDBStorage(this, parent, "dvb_tuning_delay")
     {
-        setLabel(QObject::tr("DVB tuning delay (msec)"));
+        setLabel(QObject::tr("DVB tuning delay (ms)"));
         setHelpText(
             QObject::tr("Some Linux DVB drivers, in particular for the "
                         "Hauppauge Nova-T, require that we slow down "
-                        "the tuning process."));
+                        "the tuning process by specifying a delay "
+                        "(in milliseconds)."));
     };
 };
 
@@ -1445,7 +1445,7 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent) :
     _overridedeviceid(QString::null)
 {
     setLabel(tr("Device ID"));
-    setHelpText(tr("Deviced ID of HDHomeRun device"));
+    setHelpText(tr("Device ID of HDHomeRun device"));
 }
 
 void HDHomeRunDeviceID::SetIP(const QString &ip)
@@ -1495,7 +1495,7 @@ HDHomeRunDeviceIDList::HDHomeRunDeviceIDList(
     setLabel(QObject::tr("Available devices"));
     setHelpText(
         QObject::tr(
-            "DevicedID and Tuner Number of available HDHomeRun devices."));
+            "Device ID and Tuner Number of available HDHomeRun devices."));
 
     connect(this, SIGNAL(valueChanged( const QString&)),
             this, SLOT(  UpdateDevices(const QString&)));
@@ -2253,7 +2253,7 @@ class InputDisplayName : public LineEditSetting, public CardInputDBStorage
     {
         setLabel(QObject::tr("Display name (optional)"));
         setHelpText(QObject::tr(
-                        "This name is displayed on screen when live TV begins "
+                        "This name is displayed on screen when Live TV begins "
                         "and when changing the selected input or card. If you "
                         "use this, make sure the information is unique for "
                         "each input."));
@@ -2424,7 +2424,7 @@ class QuickTune : public ComboBoxSetting, public CardInputDBStorage
         addSelection(QObject::tr("Live TV only"), "1", false);
         addSelection(QObject::tr("Always"),       "2", false);
         setHelpText(QObject::tr(
-                        "If enabled MythTV will tune using only the "
+                        "If enabled, MythTV will tune using only the "
                         "MPEG program number. The program numbers "
                         "change more often than DVB or ATSC tuning "
                         "parameters, so this is slightly less reliable. "
@@ -2605,7 +2605,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     ingrpbtn->setLabel(QObject::tr("Create a New Input Group"));
     ingrpbtn->setHelpText(
         QObject::tr("Input groups are only needed when two or more cards "
-                    "share the same resource such as a firewire card and "
+                    "share the same resource such as a FireWire card and "
                     "an analog card input controlling the same set top box."));
     interact->addChild(ingrpbtn);
     interact->addChild(inputgrp0);
@@ -2936,8 +2936,8 @@ void CaptureCardEditor::menu(void)
             GetMythMainWindow(),
             "",
             tr("Capture Card Menu"),
-            tr("Edit.."),
-            tr("Delete.."),
+            tr("Edit..."),
+            tr("Delete..."),
             kDialogCodeButton0);
 
         if (kDialogCodeButton0 == val)
@@ -3069,8 +3069,8 @@ void VideoSourceEditor::menu(void)
             GetMythMainWindow(),
             "",
             tr("Video Source Menu"),
-            tr("Edit.."),
-            tr("Delete.."),
+            tr("Edit..."),
+            tr("Delete..."),
             kDialogCodeButton0);
 
         if (kDialogCodeButton0 == val)

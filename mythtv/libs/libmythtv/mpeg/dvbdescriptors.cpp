@@ -297,7 +297,7 @@ void ContentDescriptor::Init(void)
 
     categoryDesc[0x40] = QObject::tr("Sports");
     categoryDesc[0x41] =
-        QObject::tr("Special Events (World Cup, World Series..)");
+        QObject::tr("Special Events (World Cup, World Series, etc)");
     categoryDesc[0x42] = QObject::tr("Sports Magazines");
     categoryDesc[0x43] = QObject::tr("Football (Soccer)");
     categoryDesc[0x44] = QObject::tr("Tennis/Squash");

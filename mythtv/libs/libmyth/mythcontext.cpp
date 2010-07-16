@@ -1234,12 +1234,12 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
     QString message = (persistent) ?
         QObject::tr(
             "The connection to the master backend "
-            "server has gone away for some reason.. "
+            "server has gone away for some reason. "
             "Is it running?") :
         QObject::tr(
-            "Could not connect to the master backend server -- is "
-            "it running?  Is the IP address set for it in the "
-            "setup program correct?");
+            "Could not connect to the master backend server. Is "
+            "it running?  Is the IP address set for it in "
+            "mythtv-setup correct?");
 
     if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
     {

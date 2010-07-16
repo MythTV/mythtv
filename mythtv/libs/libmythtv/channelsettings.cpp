@@ -273,7 +273,7 @@ class Visible : public CheckBoxSetting, public ChannelDBStorage
     {
         setValue(true);
         setLabel(QObject::tr("Visible"));
-        setHelpText(QObject::tr("If set, the channel will be visible in the "
+        setHelpText(QObject::tr("If enabled, the channel will be visible in the "
                     "EPG."));
     }
 };
@@ -285,8 +285,9 @@ class OnAirGuide : public CheckBoxSetting, public ChannelDBStorage
         CheckBoxSetting(this), ChannelDBStorage(this, id, "useonairguide")
     {
         setLabel(QObject::tr("Use on air guide"));
-        setHelpText(QObject::tr("If set the guide information will be taken "
-                    "from the On Air Channel guide."));
+        setHelpText(QObject::tr("If enabled, guide information for this "
+                    "channel will be updated using 'Over-the-Air' "
+                    "program listings."));
     }
 };
 
@@ -303,7 +304,7 @@ class Freqid : public LineEditSetting, public ChannelDBStorage
         setLabel(QObject::tr("Frequency")+" "+QObject::tr("or")+" "+
                  QObject::tr("Channel"));
         setHelpText(QObject::tr(
-                        "Specify either the exact frequency in kHz or "
+                        "Specify either the exact frequency (in kHz) or "
                         "a valid channel for your 'TV Format'."));
     }
 };
@@ -317,7 +318,7 @@ class Finetune : public SliderSetting, public ChannelDBStorage
     {
         setLabel(QObject::tr("Finetune")+" (kHz)");
         setHelpText(QObject::tr("Value to be added to your desired frequency "
-                                "in kHz, for 'fine tuning'."));
+                                "(in kHz) for 'fine tuning'."));
     }
 };
 
@@ -479,7 +480,7 @@ ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id) :
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :
     VerticalConfigurationGroup(false, true, false, false)
 {
-    setLabel(QObject::tr("Channel Options - Video 4 Linux"));
+    setLabel(QObject::tr("Channel Options - Video4Linux"));
     setUseLabel(false);
 
     addChild(new Freqid(id));

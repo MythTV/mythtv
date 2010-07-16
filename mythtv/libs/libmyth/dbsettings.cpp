@@ -89,7 +89,7 @@ MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
         info->setValue(QObject::tr("All database settings take effect when "
                                    "you restart this program."));
     else
-        info->setValue(QObject::tr("Myth could not connect to the database. "
+        info->setValue(QObject::tr("MythTV could not connect to the database. "
                                    "Please verify your database settings "
                                    "below."));
     addChild(info);
@@ -194,7 +194,7 @@ MythDbSettings2::MythDbSettings2(void) :
 
     wolEnabled = new TransCheckBoxSetting();
     wolEnabled->setLabel(QObject::tr("Enable database server wakeup"));
-    wolEnabled->setHelpText(QObject::tr("If checked, the frontend will use "
+    wolEnabled->setHelpText(QObject::tr("If enabled, the frontend will use "
                                         "database wakeup parameters to "
                                         "reconnect to the database server."));
 

@@ -412,7 +412,7 @@ void WelcomeDialog::updateScreen(void)
 
     // update status message
     if (m_statusList.empty())
-        status = tr("Please Wait ...");
+        status = tr("Please Wait...");
     else
     {
         if ((int)m_statusListNo >= m_statusList.count())

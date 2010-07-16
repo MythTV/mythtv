@@ -521,10 +521,10 @@ class MPEG4bitrate : public SliderSetting, public CodecParamStorage
         SliderSetting(this, 100, 8000, 100),
         CodecParamStorage(this, parent, "mpeg4bitrate")
     {
-        setLabel(QObject::tr("Bitrate"));
+        setLabel(QObject::tr("Bitrate (kb/s)"));
         setValue(2200);
-        setHelpText(QObject::tr("Bitrate in kilobits/second.  2200Kbps is "
-                    "approximately 1 gigabyte per hour."));
+        setHelpText(QObject::tr("Bitrate in kilobits/second. As a guide, "
+                    "2200 kb/s is approximately 1 GB/hr."));
     };
 };
 
@@ -680,12 +680,12 @@ class AverageBitrate : public SliderSetting, public CodecParamStorage
         CodecParamStorage(this, parent, setting)
     {
         if (label.isEmpty())
-            label = QObject::tr("Avg. Bitrate");
+            label = QObject::tr("Avg. Bitrate (kb/s)");
         setLabel(label);
         setValue(default_br);
         setHelpText(QObject::tr(
-                        "Average bit rate in kilobits/second. "
-                        "2200Kbps is approximately 1 Gigabyte per hour."));
+                        "Average bitrate in kilobits/second. As a guide, "
+                        "2200 kb/s is approximately 1 GB/hour."));
     };
 };
 
@@ -701,11 +701,11 @@ class PeakBitrate : public SliderSetting, public CodecParamStorage
         CodecParamStorage(this, parent, setting)
     {
         if (label.isEmpty())
-            label = QObject::tr("Max. Bitrate");
+            label = QObject::tr("Max. Bitrate (kb/s)");
         setLabel(label);
         setValue(default_br);
-        setHelpText(QObject::tr("Maximum bit rate in kilobits/second. "
-                    "2200Kbps is approximately 1 Gigabyte per hour."));
+        setHelpText(QObject::tr("Maximum bitrate in kilobits/second. "
+                    "As a guide, 2200 kb/s is approximately 1 GB/hour."));
     };
 };
 

@@ -721,7 +721,7 @@
         <textarea name="progresstext" from="basetextarea">
             <area>0,660,1280,60</area>
             <align>allcenter</align>
-            <value>Playback starting …</value>
+            <value>Playback starting...</value>
         </textarea>
 
     </window>

@@ -318,7 +318,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
                 if (p->GetRecordingStatus() == rsRecorded &&
                     p->GetRecordingGroup()  == "LiveTV")
                 {
-                    buttonTitle = tr("LiveTV, chan %1: %2")
+                    buttonTitle = tr("Live TV, chan %1: %2")
                         .arg(p->GetChanNum()).arg(p->GetTitle());
                 }
                 else
@@ -11138,7 +11138,7 @@ void TV::ShowNoRecorderDialog(const PlayerContext *ctx, NoRecorderMsg msgType)
                            "inputs for the channel you selected. "
                            "If you want to watch an in-progress recording, "
                            "select one from the playback menu.  If you "
-                           "want to watch live TV, cancel one of the "
+                           "want to watch Live TV, cancel one of the "
                            "in-progress recordings from the delete "
                            "menu.");
             break;

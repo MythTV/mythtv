@@ -593,7 +593,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
                                       "menu file %1").arg(menuname));
 
         if (menuname != "mainmenu.xml")
-            ShowOkPopup(QObject::tr("Myth could not locate the menu file %1")
+            ShowOkPopup(QObject::tr("MythTV could not locate the menu file %1")
                         .arg(menuname));
         return false;
     }

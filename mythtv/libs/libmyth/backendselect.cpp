@@ -194,7 +194,7 @@ void BackendSelect::CreateUI(void)
 #endif
 
 
-    label = new QLabel(tr("Please select default Myth Backend Server"), this);
+    label = new QLabel(tr("Please select default MythTV Backend Server"), this);
 
     m_backends = new QListWidget(this);
     OK         = new MythPushButton(tr("OK"), this);
