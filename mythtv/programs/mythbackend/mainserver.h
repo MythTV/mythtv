@@ -18,6 +18,7 @@ using namespace std;
 #include "autoexpire.h"
 #include "mythsocket.h"
 #include "mythdeque.h"
+#include "mythdownloadmanager.h"
 
 #ifdef DeleteFile
 #undef DeleteFile
@@ -162,6 +163,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryMemStats(PlaybackSock *pbs);
     void HandleQueryTimeZone(PlaybackSock *pbs);
     void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);
+    void HandleDownloadFile(const QStringList &command, PlaybackSock *pbs);
 
     void SendResponse(MythSocket *pbs, QStringList &commands);
 
@@ -239,6 +241,9 @@ class MainServer : public QObject, public MythSocketCBs
 
     QMap<QString, int> fsIDcache;
     QMutex fsIDcacheLock;
+
+    QMutex                     m_downloadURLsLock;
+    QMap<QString, QString>     m_downloadURLs;
 
     int m_exitCode;
 

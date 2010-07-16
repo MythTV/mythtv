@@ -88,6 +88,7 @@ class MPUBLIC MythUIHelper
     QString FindThemeDir(const QString &themename);
     QString FindMenuThemeDir(const QString &menuname);
     QString GetThemeDir(void);
+    QString GetThemeName(void);
     QStringList GetThemeSearchPath(void);
     QString GetMenuThemeDir(void);
 

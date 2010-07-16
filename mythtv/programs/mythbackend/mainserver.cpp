@@ -60,7 +60,11 @@ using namespace std;
 #include "remotefile.h"
 #include "mythsystemevent.h"
 #include "tv.h"
+#include "mythcorecontext.h"
 #include "mythcoreutil.h"
+#include "mythdirs.h"
+#include "mythdownloadmanager.h"
+
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -677,6 +681,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         MythEvent me(message, extra);
         gCoreContext->dispatch(me);
     }
+    else if ((command == "DOWNLOAD_FILE") ||
+             (command == "DOWNLOAD_FILE_NOW"))
+    {
+        if (listline.size() != 4)
+            VERBOSE(VB_IMPORTANT, QString("Bad %1 command").arg(command));
+        else
+            HandleDownloadFile(listline, pbs);
+    }
     else if (command == "REFRESH_BACKEND")
     {
         VERBOSE(VB_IMPORTANT,"Reloading backend settings");
@@ -720,6 +732,7 @@ void MainServer::customEvent(QEvent *e)
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
+        QStringList extraDataList = me->ExtraDataList();
 
         if (me->Message().left(11) == "AUTO_EXPIRE")
         {
@@ -826,7 +839,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().left(23) == "SCHEDULER_ADD_RECORDING" && m_sched)
         {
-            ProgramInfo pi(me->ExtraDataList());
+            ProgramInfo pi(extraDataList);
             if (!pi.GetChanID())
             {
                 VERBOSE(VB_IMPORTANT, "Bad SCHEDULER_ADD_RECORDING message");
@@ -912,9 +925,25 @@ void MainServer::customEvent(QEvent *e)
             }
         }
 
+        if (me->Message().left(13) == "DOWNLOAD_FILE")
+        {
+            QString localFile = extraDataList[1];
+            QFile file(localFile);
+            QStringList tokens = me->Message().simplified().split(" ");
+            QMutexLocker locker(&m_downloadURLsLock);
+
+            if (!m_downloadURLs.contains(localFile))
+                return;
+
+            extraDataList[1] = m_downloadURLs[localFile];
+
+            if ((tokens.size() >= 2) && (tokens[1] == "FINISHED"))
+                m_downloadURLs.remove(localFile);
+        }
+
         broadcast = QStringList( "BACKEND_MESSAGE" );
         broadcast << me->Message();
-        broadcast += me->ExtraDataList();
+        broadcast += extraDataList;
     }
 
     if (!broadcast.empty())
@@ -4473,6 +4502,58 @@ void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
         SendResponse(pbssock, retlist);
 
     return;
+}
+
+void MainServer::HandleDownloadFile(const QStringList &command,
+                                    PlaybackSock *pbs)
+{
+    bool synchronous = (command[0] == "DOWNLOAD_FILE_NOW");
+    QString srcURL = command[1];
+    QString storageGroup = command[2];
+    QString filename = command[3];
+    StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
+    QString outDir = sgroup.FindNextDirMostFree();
+    QString outFile;
+    
+
+    if (filename.isEmpty())
+    {
+        QFileInfo finfo(srcURL);
+        filename = finfo.fileName();
+    }
+
+    outFile = outDir + filename;
+
+    MythSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    QStringList retlist;
+    if (synchronous)
+    {
+        if (GetMythDownloadManager()->download(srcURL, outFile))
+        {
+            retlist << "OK";
+            retlist << gCoreContext->GetMasterHostPrefix(storageGroup)
+                       + filename;
+        }
+        else
+            retlist << "ERROR";
+    }
+    else
+    {
+        QMutexLocker locker(&m_downloadURLsLock);
+        m_downloadURLs[outFile] =
+            gCoreContext->GetMasterHostPrefix(storageGroup) +
+            StorageGroup::GetRelativePathname(outFile);
+
+        GetMythDownloadManager()->queueDownload(srcURL, outFile, this);
+        retlist << "OK";
+        retlist << gCoreContext->GetMasterHostPrefix(storageGroup) + filename;
+    }
+
+    if (pbssock)
+        SendResponse(pbssock, retlist);
 }
 
 void MainServer::HandleSetSetting(QStringList &tokens,

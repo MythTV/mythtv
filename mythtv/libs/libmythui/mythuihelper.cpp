@@ -88,6 +88,7 @@ class MythUIHelperPrivate
     bool      m_themeloaded;       ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
     QString   m_themepathname;
+    QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
     QString language;
@@ -442,6 +443,7 @@ void MythUIHelper::LoadQtConfig(void)
         d->m_isWide = themeinfo->IsWide();
         d->m_baseWidth = themeinfo->GetBaseRes()->width();
         d->m_baseHeight = themeinfo->GetBaseRes()->height();
+        d->m_themename = themeinfo->GetName();
         VERBOSE(VB_GUI, LOC + QString("Using theme base resolution of %1x%2")
                 .arg(d->m_baseWidth).arg(d->m_baseHeight));
         delete themeinfo;
@@ -1067,6 +1069,11 @@ QString MythUIHelper::GetMenuThemeDir(void)
 QString MythUIHelper::GetThemeDir(void)
 {
     return d->m_themepathname;
+}
+
+QString MythUIHelper::GetThemeName(void)
+{
+    return d->m_themename;
 }
 
 QStringList MythUIHelper::GetThemeSearchPath(void)

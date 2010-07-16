@@ -8,6 +8,7 @@
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythcoreutil.h"
+#include "mythdirs.h"
 
 #define LOC QString("SG(%1): ").arg(m_groupname)
 #define LOC_WARN QString("SG(%1) Warning: ").arg(m_groupname)
@@ -15,6 +16,9 @@
 
 const char *StorageGroup::kDefaultStorageDir = "/mnt/store";
 
+QMutex                 StorageGroup::m_staticInitLock;
+bool                   StorageGroup::m_staticInitDone = false;
+QMap<QString, QString> StorageGroup::m_builtinGroups;
 QMutex                 StorageGroup::s_groupToUseLock;
 QHash<QString,QString> StorageGroup::s_groupToUseCache;
 
@@ -51,6 +55,32 @@ StorageGroup::StorageGroup(const QString group, const QString hostname,
     Init(m_groupname, m_hostname, m_allowFallback);
 }
 
+void StorageGroup::StaticInit(void)
+{
+    QMutexLocker locker(&m_staticInitLock);
+
+    if (m_staticInitDone)
+        return;
+
+    m_staticInitDone = true;
+
+    m_builtinGroups["Themes"] = GetConfDir() + "/themes";
+    m_builtinGroups["Temp"] = GetConfDir() + "/tmp";
+
+    QMap<QString, QString>::iterator it = m_builtinGroups.begin();
+    for (; it != m_builtinGroups.end(); ++it)
+    {
+        QDir qdir(it.value());
+        if (!qdir.exists())
+            qdir.mkpath(it.value());
+
+        if (!qdir.exists())
+            VERBOSE(VB_IMPORTANT, QString("SG() Error: Could not create builtin"
+                    "Storage Group directory '%1' for '%2'").arg(it.value())
+                    .arg(it.key()));
+    }
+}
+
 /**
  *  \brief Initilizes the groupname, hostname, and dirlist
  *
@@ -72,7 +102,23 @@ void StorageGroup::Init(const QString group, const QString hostname,
     m_allowFallback = allowFallback;
     m_dirlist.clear();
 
+    StaticInit();
+
     found = FindDirs(m_groupname, m_hostname, &m_dirlist);
+
+    if (!found && m_builtinGroups.contains(group))
+    {
+        QDir testdir(m_builtinGroups[group]);
+        if (!testdir.exists())
+            testdir.mkpath(m_builtinGroups[group]);
+
+        if (testdir.exists())
+        {
+            m_dirlist.prepend(testdir.absolutePath() + "/");
+            found = true;
+        }
+    }
+
     if ((!found) && m_allowFallback && (m_groupname != "LiveTV") &&
         (!hostname.isEmpty()))
     {
@@ -293,6 +339,8 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     VERBOSE(VB_FILE+VB_EXTRA,
             QString("StorageGroup::GetRelativePathname(%1)").arg(filename));
 
+    StaticInit();
+
     if (filename.startsWith("myth://"))
     {
         QUrl qurl(filename);
@@ -357,6 +405,28 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         }
     }
 
+    QMap<QString, QString>::iterator it = m_builtinGroups.begin();
+    for (; it != m_builtinGroups.end(); ++it)
+    {
+        QDir qdir(it.value());
+        if (!qdir.exists())
+            qdir.mkpath(it.value());
+
+        QString directory = it.value();
+        if (filename.startsWith(directory))
+        {
+            result = filename;
+            result.replace(0, directory.length(), "");
+            if (result.startsWith("/"))
+                result.replace(0, 1, "");
+
+            VERBOSE(VB_FILE+VB_EXTRA,
+                    QString("StorageGroup::GetRelativePathname(%1) "
+                            "= '%2'").arg(filename).arg(result));
+            return result;
+        }
+    }
+
     return result;
 }
 
@@ -375,6 +445,8 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
     bool found = false;
     QString dirname;
     MSqlQuery query(MSqlQuery::InitCon());
+
+    StaticInit();
 
     QString sql = "SELECT DISTINCT dirname "
                   "FROM storagegroup ";
@@ -413,6 +485,18 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
         }
         while (query.next());
         found = true;
+    }
+
+    if (m_builtinGroups.contains(group))
+    {
+        QDir testdir(m_builtinGroups[group]);
+        if (testdir.exists())
+        {
+            QString tmpDir = testdir.absolutePath() + "/";
+            if (dirlist && !dirlist->contains(tmpDir))
+                dirlist->prepend(tmpDir);
+            found = true;
+        }
     }
 
     return found;

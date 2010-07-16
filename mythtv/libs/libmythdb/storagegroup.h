@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QMutex>
 #include <QHash>
+#include <QMap>
 
 #include "mythexp.h"
 
@@ -50,10 +51,16 @@ class MPUBLIC StorageGroup
         const QString &host, const QString &sgroup);
 
   private:
+    static void    StaticInit(void);
+    static bool    m_staticInitDone;
+    static QMutex  m_staticInitLock;
+
     QString      m_groupname;
     QString      m_hostname;
     bool         m_allowFallback;
     QStringList  m_dirlist;
+
+    static QMap<QString, QString> m_builtinGroups;
 
     static QMutex                 s_groupToUseLock;
     static QHash<QString,QString> s_groupToUseCache;
