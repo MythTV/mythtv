@@ -44,7 +44,7 @@ class ThumbItem
     // gets
     long    GetRotationAngle(void);
     QString GetName(void)    const { return m_name;               }
-    bool    HasCaption(void) const { return !m_caption.isEmpty(); }
+    bool    HasCaption(void) const { return !m_caption.trimmed().isEmpty(); }
     QString GetCaption(void) const { return m_caption;            }
     QString GetImageFilename(void) const { return m_imageFilename; }
     QString GetPath(void)    const { return m_path;               }

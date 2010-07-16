@@ -293,7 +293,7 @@ QString GalleryUtil::GetCaption(const QString &filePath)
                     caption = exif_entry_get_value(entry);
 #endif
                     // Found one, done
-                    if(!caption.isEmpty())
+                    if(!caption.trimmed().isEmpty())
                        break;
                 }
 
@@ -308,7 +308,7 @@ QString GalleryUtil::GetCaption(const QString &filePath)
                     caption = exif_entry_get_value(entry);
 #endif
                     // Found one, done
-                    if(!caption.isEmpty())
+                    if(!caption.trimmed().isEmpty())
                        break;
                 }
             }
