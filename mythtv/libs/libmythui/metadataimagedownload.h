@@ -73,4 +73,6 @@ MPUBLIC QString getDownloadFilename(ArtworkType type, MetadataLookup *lookup,
 MPUBLIC QString getLocalWritePath(MetadataType metadatatype, ArtworkType type);
 MPUBLIC QString getStorageGroupURL(ArtworkType type, QString host);
 
+MPUBLIC void cleanThumbnailCacheDir(void);
+
 #endif /* METADATAIMAGEDOWNLOAD_H */

@@ -66,7 +66,6 @@ void MetadataImageDownload::cancel()
     m_thumbnailList.clear();
     qDeleteAll(m_downloadList);
     m_downloadList.clear();
-    m_parent = NULL;
     m_mutex.unlock();
 }
 
@@ -390,5 +389,27 @@ QString getStorageGroupURL(ArtworkType type, QString host)
     return QString("myth://%1@%2:%3/")
         .arg(sgroup)
         .arg(ip).arg(port);
+}
+
+void cleanThumbnailCacheDir()
+{
+    QString cache = QString("%1/thumbcache")
+               .arg(GetConfDir());
+    QDir cacheDir(cache);
+    QStringList thumbs = cacheDir.entryList(QDir::Files);
+
+    for (QStringList::const_iterator i = thumbs.end() - 1;
+            i != thumbs.begin() - 1; --i)
+    {
+        QString filename = QString("%1/%2").arg(cache).arg(*i);
+        QFileInfo fi(filename);
+        QDateTime lastmod = fi.lastModified();
+        if (lastmod.addDays(2) < QDateTime::currentDateTime())
+        {
+            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Deleting file %1")
+                  .arg(filename));
+            QFile::remove(filename);
+        }
+    }
 }
 

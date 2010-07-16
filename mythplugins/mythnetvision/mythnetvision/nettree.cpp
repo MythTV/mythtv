@@ -46,12 +46,11 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_busyPopup(NULL),
       m_menuPopup(NULL),             m_popupStack(),
-      m_externaldownload(NULL),      m_type(type),
-      m_lock(QMutex::Recursive)
+      m_type(type),                  m_lock(QMutex::Recursive)
 {
-    m_download = new DownloadManager(this);
-    m_imageDownload = new ImageDownloadManager(this);
+    m_imageDownload = new MetadataImageDownload(this);
     m_gdt = new GrabberDownloadThread(this);
+    m_download = new MythDownloadManager();
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_updateFreq = gCoreContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
@@ -171,17 +170,7 @@ NetTree::~NetTree()
         m_siteGeneric = NULL;
     }
 
-    if (m_externaldownload)
-    {
-        delete m_externaldownload;
-        m_externaldownload = NULL;
-    }
-
-    if (m_download)
-    {
-        delete m_download;
-        m_download = NULL;
-    }
+    cleanThumbnailCacheDir();
 
     if (m_imageDownload)
     {
@@ -193,6 +182,12 @@ NetTree::~NetTree()
     {
         delete m_gdt;
         m_gdt = NULL;
+    }
+
+    if (m_download)
+    {
+        delete m_download;
+        m_download = NULL;
     }
 
     m_rssList.clear();
@@ -332,13 +327,14 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         if (dlfile.contains("%SHAREDIR%"))
             dlfile.replace("%SHAREDIR%", GetShareDir());
         else
-            dlfile = GetThumbnailFilename(video->GetThumbnail(),
-                                          video->GetTitle());
+            dlfile = getDownloadFilename(video->GetTitle(),
+                                          video->GetThumbnail());
 
         if (QFile::exists(dlfile))
             item->SetImage(dlfile);
-        else if (dlfile.startsWith("http"))
-            m_imageDownload->addURL(video->GetTitle(), video->GetThumbnail(), pos);
+        else if (video->GetThumbnail().startsWith("http"))
+            m_imageDownload->addThumb(video->GetTitle(), video->GetThumbnail(),
+                                      qVariantFromValue<uint>(pos));
     }
     else
     {
@@ -359,7 +355,8 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                 if (QFile::exists(dlfile))
                     item->SetImage(dlfile);
                 else
-                    m_imageDownload->addURL(node->getString(), tpath, pos);
+                    m_imageDownload->addThumb(node->getString(), tpath,
+                                              qVariantFromValue<uint>(pos));
             }
             else if (tpath != "0")
             {
@@ -886,7 +883,7 @@ void NetTree::doPlayVideo()
     if (!item)
         return;
 
-    GetMythMainWindow()->HandleMedia("Internal", getDownloadFilename(item));
+    GetMythMainWindow()->HandleMedia("Internal", getVideoDownloadFilename(item));
 }
 
 void NetTree::slotDeleteVideo()
@@ -931,7 +928,7 @@ void NetTree::doDeleteVideo(bool remove)
     if (!item)
         return;
 
-    QString filename = getDownloadFilename(item);
+    QString filename = getVideoDownloadFilename(item);
 
     if (filename.startsWith("myth://"))
         RemoteFile::DeleteFile(filename);
@@ -962,23 +959,7 @@ void NetTree::doDownloadAndPlay()
     if (!item)
         return;
 
-    if (m_download->isRunning())
-    {
-        QString message = tr("Download already running.  Try again "
-                             "when the download is finished.");
-
-        MythConfirmationDialog *okPopup =
-            new MythConfirmationDialog(m_popupStack, message, false);
-
-        if (okPopup->Create())
-            m_popupStack->AddScreen(okPopup);
-        else
-            delete okPopup;
-
-        return;
-    }
-
-    QString filename = getDownloadFilename(item);
+    QString filename = getVideoDownloadFilename(item);
 
     VERBOSE(VB_GENERAL, QString("Downloading %1").arg(filename));
 
@@ -995,11 +976,10 @@ void NetTree::doDownloadAndPlay()
         return;
     }
 
-    // Initialize the download
-    m_download->addDL(item);
+    m_download->queueDownload(item->GetMediaURL(), filename, this);
 }
 
-QString NetTree::getDownloadFilename(ResultItem *item)
+QString NetTree::getVideoDownloadFilename(ResultItem *item)
 {
     QByteArray urlarr(item->GetMediaURL().toLatin1());
     quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
@@ -1058,32 +1038,7 @@ void NetTree::slotItemChanged()
             }
             else
             {
-                QString fileprefix = GetConfDir();
-
-                QDir dir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/MythNetvision";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/thumbcache";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                   dir.mkdir(fileprefix);
-
-                QString url = item->GetThumbnail();
-                QString title = item->GetTitle();
-                QString sFilename = QString("%1/%2_%3")
-                    .arg(fileprefix)
-                    .arg(qChecksum(url.toLocal8Bit().constData(),
-                                   url.toLocal8Bit().size()))
-                    .arg(qChecksum(title.toLocal8Bit().constData(),
-                                   title.toLocal8Bit().size()));
+                QString sFilename = getDownloadFilename(item->GetTitle(), item->GetThumbnail());
 
                 bool exists = QFile::exists(sFilename);
                 if (exists)
@@ -1177,23 +1132,6 @@ void NetTree::slotItemChanged()
             }
             else
             {
-                QString fileprefix = GetConfDir();
-
-                QDir dir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/MythNetvision";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/thumbcache";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                   dir.mkdir(fileprefix);
 
                 QString url = thumb;
                 QString title;
@@ -1201,14 +1139,9 @@ void NetTree::slotItemChanged()
                     title = m_siteMap->GetItemCurrent()->GetText();
                 else
                     title = m_siteButtonList->GetItemCurrent()->GetText();
-                QString sFilename = QString("%1/%2_%3")
-                    .arg(fileprefix)
-                    .arg(qChecksum(url.toLocal8Bit().constData(),
-                                   url.toLocal8Bit().size()))
-                    .arg(qChecksum(title.toLocal8Bit().constData(),
-                                   title.toLocal8Bit().size()));
 
-                // Hello, I am code that causes hangs.
+                QString sFilename = getDownloadFilename(title, url);
+
                 bool exists = QFile::exists(sFilename);
                 if (exists && !url.isEmpty())
                 {
@@ -1307,7 +1240,6 @@ void NetTree::updateTrees()
     QString title(tr("Updating Site Maps.  This could take a while..."));
     createBusyDialog(title);
     m_gdt->refreshAll();
-    m_gdt->start();
 }
 
 void NetTree::toggleRSSUpdates()
@@ -1328,50 +1260,71 @@ void NetTree::customEvent(QEvent *event)
 {
     QMutexLocker locker(&m_lock);
 
-    if (event->type() == ImageDLEvent::kEventType)
+    if (event->type() == MythEvent::MythEventMessage)
     {
-        ImageDLEvent *ide = (ImageDLEvent *)event;
+        MythEvent *me = (MythEvent *)event;
 
-        ImageData *id = ide->imageData;
-        if (!id)
+        if (me->Message().left(17) == "DOWNLOAD_COMPLETE")
+        {
+            QStringList tokens = me->Message()
+                .split(" ", QString::SkipEmptyParts);
+
+            if (tokens.size() != 2)
+            {
+                VERBOSE(VB_IMPORTANT, "Bad DOWNLOAD_COMPLETE message");
+                return;
+            }
+
+            GetMythMainWindow()->HandleMedia("Internal", tokens.takeAt(1));
+        }
+    }
+    else if (event->type() == ThumbnailDLEvent::kEventType)
+    {
+        ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
+
+        if (!tde)
+            return;
+
+        ThumbnailData *data = tde->thumb;
+
+        if (!data)
+            return;
+
+        QString title = data->title;
+        QString file = data->url;
+        uint pos = qVariantValue<uint>(data->data);
+
+        if (file.isEmpty())
             return;
 
         if (m_type == DLG_TREE)
         {
-            if (id->title == m_siteMap->GetCurrentNode()->getString() &&
+            if (title == m_siteMap->GetCurrentNode()->getString() &&
                 m_thumbImage)
             {
-                m_thumbImage->SetFilename(id->filename);
+                m_thumbImage->SetFilename(file);
                 m_thumbImage->Load();
                 m_thumbImage->Show();
             }
         }
         else
         {
-            if (!((uint)m_siteButtonList->GetCount() >= id->pos))
+            if (!((uint)m_siteButtonList->GetCount() >= pos))
+            {
+                delete data;
                 return;
+            }
 
             MythUIButtonListItem *item =
-                      m_siteButtonList->GetItemAt(id->pos);
+                      m_siteButtonList->GetItemAt(pos);
 
-            if (item && item->GetText() == id->title)
+            if (item && item->GetText() == title)
             {
-                item->SetImage(id->filename);
+                item->SetImage(file);
             }
         }
 
-        delete id;
-    }
-    else if (event->type() == VideoDLEvent::kEventType)
-    {
-        VideoDLEvent *vde = (VideoDLEvent *)event;
-
-        VideoDL *dl = vde->videoDL;
-        if (!dl)
-            return;
-
-        GetMythMainWindow()->HandleMedia("Internal", dl->filename);
-        delete dl;
+        delete data;
     }
     else if (event->type() == kGrabberUpdateEventType)
     {

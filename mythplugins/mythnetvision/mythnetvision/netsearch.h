@@ -15,13 +15,10 @@
 #include <mythuistatetype.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
-
-// libmyth
 #include <netgrabbermanager.h>
 #include <mythrssmanager.h>
-
-#include "downloadmanager.h"
-#include "imagedownloadmanager.h"
+#include <mythdownloadmanager.h>
+#include <metadataimagedownload.h>
 
 class MythUIBusyDialog;
 
@@ -72,8 +69,8 @@ class NetSearch : public MythScreenType
 
     QNetworkAccessManager *m_netSearch;
     QNetworkReply         *m_reply;
-    DownloadManager       *m_download;
-    ImageDownloadManager  *m_imageDownload;
+    MythDownloadManager   *m_download;
+    MetadataImageDownload *m_imageDownload;
     QFile                 *m_file;
     QProcess              *m_externaldownload;
 

@@ -17,9 +17,8 @@
 #include <mythdialogbox.h>
 #include <netgrabbermanager.h>
 #include <mythrssmanager.h>
-
-#include "downloadmanager.h"
-#include "imagedownloadmanager.h"
+#include <mythdownloadmanager.h>
+#include <metadataimagedownload.h>
 
 enum DialogType { DLG_DEFAULT = 0, DLG_GALLERY = 0x1, DLG_TREE = 0x2,
                   DLG_BROWSER = 0x4, dtLast };
@@ -56,7 +55,7 @@ class NetTree : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
     void populateResultList(ResultItem::resultList list);
-    QString getDownloadFilename(ResultItem *item);
+    QString getVideoDownloadFilename(ResultItem *item);
 
   public slots:
 
@@ -111,13 +110,11 @@ class NetTree : public MythScreenType
     MythDialogBox      *m_menuPopup;
     MythScreenStack    *m_popupStack;
 
-    DownloadManager    *m_download;
-    ImageDownloadManager  *m_imageDownload;
+    MetadataImageDownload *m_imageDownload;
     GrabberDownloadThread *m_gdt;
+    MythDownloadManager   *m_download;
 
     QFile              *m_file;
-
-    QProcess           *m_externaldownload;
 
     GrabberScript::scriptList m_grabberList;
     RSSSite::rssList m_rssList;

@@ -206,6 +206,8 @@ void GrabberDownloadThread::refreshAll()
 {
     m_mutex.lock();
     m_refreshAll = true;
+    if (!isRunning())
+        start();
     m_mutex.unlock();
 }
 

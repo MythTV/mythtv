@@ -45,8 +45,8 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
 {
     m_mythXML = GetMythXMLURL();
     m_playing = false;
-    m_download = new DownloadManager(this);
-    m_imageDownload = new ImageDownloadManager(this);
+    m_download = new MythDownloadManager();
+    m_imageDownload = new MetadataImageDownload(this);
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_menuPopup = NULL;
 }
@@ -143,6 +143,8 @@ NetSearch::~NetSearch()
         delete m_download;
         m_download = NULL;
     }
+
+    cleanThumbnailCacheDir();
 
     if (m_imageDownload)
     {
@@ -509,39 +511,11 @@ void NetSearch::populateResultList(ResultItem::resultList list)
                 }
                 else
                 {
-                    QString fileprefix = GetConfDir();
-
-                    QDir dir(fileprefix);
-                    if (!dir.exists())
-                            dir.mkdir(fileprefix);
-
-                    fileprefix += "/MythNetvision";
-
-                    dir = QDir(fileprefix);
-                    if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                    fileprefix += "/thumbcache";
-
-                    dir = QDir(fileprefix);
-                    if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                    QString title = (*i)->GetTitle();
-                    QString url = (*i)->GetThumbnail();
-                    QUrl qurl(url);
-                    QString ext = QFileInfo(qurl.path()).suffix();
-                    QString sFilename = QString("%1/%2_%3.%4")
-                        .arg(fileprefix)
-                        .arg(qChecksum(url.toLocal8Bit().constData(),
-                                   url.toLocal8Bit().size()))
-                        .arg(qChecksum(title.toLocal8Bit().constData(),
-                                   title.toLocal8Bit().size()))
-                        .arg(ext);
                     uint pos = m_searchResultList->GetItemPos(item);
-                    m_imageDownload->addURL((*i)->GetTitle(),
-                                            (*i)->GetThumbnail(),
-                                            pos);
+
+                    m_imageDownload->addThumb((*i)->GetTitle(),
+                                              (*i)->GetThumbnail(),
+                                              qVariantFromValue<uint>(pos));
                 }
             }
         }
@@ -716,22 +690,6 @@ void NetSearch::doDownloadAndPlay()
     if (!item)
         return;
 
-    if (m_download->isRunning())
-    {
-        QString message = tr("Download already running.  Try again "
-                             "when the download is finished.");
-
-        MythConfirmationDialog *okPopup =
-            new MythConfirmationDialog(m_popupStack, message, false);
-
-        if (okPopup->Create())
-            m_popupStack->AddScreen(okPopup);
-        else
-            delete okPopup;
-
-        return;
-    }
-
     VERBOSE(VB_GENERAL, QString("Downloading and Inserting %1 "
                                 "into Recordings").arg(item->GetTitle()));
 
@@ -766,7 +724,6 @@ void NetSearch::doDownloadAndPlay()
     m_redirects = 0;
     m_currentDownload = filename;
 
-    m_download->addDL(item);
 }
 
 void NetSearch::slotItemChanged()
@@ -876,40 +833,55 @@ QString NetSearch::getDownloadFilename(ResultItem *item)
 
 void NetSearch::customEvent(QEvent *event)
 {
-    if (event->type() == ImageDLEvent::kEventType)
+    if (event->type() == MythEvent::MythEventMessage)
     {
-        ImageDLEvent *ide = (ImageDLEvent *)event;
+        MythEvent *me = (MythEvent *)event;
 
-        ImageData *id = ide->imageData;
-        if (!id)
+        if (me->Message().left(17) == "DOWNLOAD_COMPLETE")
+        {
+            QStringList tokens = me->Message()
+                .split(" ", QString::SkipEmptyParts);
+
+            if (tokens.size() != 2)
+            {
+                VERBOSE(VB_IMPORTANT, "Bad DOWNLOAD_COMPLETE message");
+                return;
+            }
+
+            GetMythMainWindow()->HandleMedia("Internal", tokens.takeAt(1));
+        }
+    }
+    else if (event->type() == ThumbnailDLEvent::kEventType)
+    {
+        ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
+
+        if (!tde)
             return;
 
-        if ((uint)m_searchResultList->GetCount() <= id->pos)
+        ThumbnailData *data = tde->thumb;
+
+        if (!data)
+            return;
+
+        QString title = data->title;
+        QString file = data->url;
+        uint pos = qVariantValue<uint>(data->data);
+
+        if (file.isEmpty() || !((uint)m_searchResultList->GetCount() >= pos))
         {
-            delete id;
+            delete data;
             return;
         }
 
         MythUIButtonListItem *item =
-                  m_searchResultList->GetItemAt(id->pos);
+                  m_searchResultList->GetItemAt(pos);
 
-        if (item && item->GetText() == id->title)
+        if (item && item->GetText() == title)
         {
-            item->SetImage(id->filename);
+            item->SetImage(file);
         }
 
-        delete id;
-    }
-    else if (event->type() == VideoDLEvent::kEventType)
-    {
-        VideoDLEvent *vde = (VideoDLEvent *)event;
-
-        VideoDL *dl = vde->videoDL;
-        if (!dl)
-            return;
-
-        GetMythMainWindow()->HandleMedia("Internal", dl->filename);
-        delete dl;
+        delete data;
     }
 }
 
