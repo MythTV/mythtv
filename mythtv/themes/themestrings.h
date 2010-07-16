@@ -186,7 +186,6 @@ void strings_null() {
     ThemeUI::tr("1280 x 720");
     ThemeUI::tr("0 x 0");
     ThemeUI::tr("Filename");
-    ThemeUI::tr("Please Wait....");
     ThemeUI::tr("Select an Icon");
     ThemeUI::tr("Icon Download Status...");
     ThemeUI::tr("Search terms:");
