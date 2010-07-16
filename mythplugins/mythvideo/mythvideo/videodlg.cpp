@@ -120,8 +120,14 @@ namespace
       public:
         void StartCopy()
         {
-            m_id = m_http.get(m_url.toEncoded(), &m_data_buffer);
-
+            m_http.setHost(m_url.host(), m_url.port(80));
+            QByteArray path = m_url.encodedPath();
+            if (m_url.hasQuery())
+            {
+                path.append("?");
+                path.append(m_url.encodedQuery());
+            }
+            m_id = m_http.get(path, &m_data_buffer);
             m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
                           * 1000);
         }
@@ -166,9 +172,9 @@ namespace
                     SLOT(OnFinished(int, bool)));
 
             connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            
+
             m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
+            m_http.setHost(m_url.host(), m_url.port(80));
         }
 
         ~ImageDownloadProxy() {}
