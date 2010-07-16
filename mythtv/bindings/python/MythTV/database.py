@@ -979,7 +979,7 @@ class DBCache( MythSchema ):
         if not os.access(confdir, os.F_OK):
             os.mkdir(confdir,0755)
         fp = open(conffile, 'w')
-        fp.write(config)
+        fp.write(etree.tostring(doc))
         fp.close()
 
     def _check_dbconn(self,dbconn):
