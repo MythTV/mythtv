@@ -442,7 +442,8 @@ void StatusBox::customEvent(QEvent *event)
             if ((buttonnum == 0) && rec->QueryIsDeleteCandidate())
             {
                 RemoteDeleteRecording(
-                    rec->GetChanID(), rec->GetRecordingStartTime(), false);
+                    rec->GetChanID(), rec->GetRecordingStartTime(), 
+                    false, false);
             }
             else if (buttonnum == 1)
             {

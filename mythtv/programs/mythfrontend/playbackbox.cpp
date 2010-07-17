@@ -288,12 +288,13 @@ static void push_onto_del(QStringList &list, const ProgramInfo &pginfo)
     list.push_back(QString::number(pginfo.GetChanID()));
     list.push_back(pginfo.GetRecordingStartTime(ISODate));
     list.push_back(false /* force Delete */);
+    list.push_back(false); /* forget history */
 }
 
 static bool extract_one_del(
     QStringList &list, uint &chanid, QDateTime &recstartts)
 {
-    if (list.size() < 3)
+    if (list.size() < 4)
     {
         list.clear();
         return false;
@@ -302,6 +303,7 @@ static bool extract_one_del(
     chanid     = list[0].toUInt();
     recstartts = QDateTime::fromString(list[1], Qt::ISODate);
 
+    list.pop_front();
     list.pop_front();
     list.pop_front();
     list.pop_front();
@@ -2286,19 +2288,13 @@ void PlaybackBox::RemoveProgram(
     delItem->SetAvailableStatus(asPendingDelete, "RemoveProgram");
     m_helper.DeleteRecording(
         delItem->GetChanID(), delItem->GetRecordingStartTime(),
-        forceMetadataDelete);
+        forceMetadataDelete, forgetHistory);
 
     // if the item is in the current recording list UI then delete it.
     MythUIButtonListItem *uiItem =
         m_recordingList->GetItemByData(qVariantFromValue(delItem));
     if (uiItem)
         m_recordingList->RemoveItem(uiItem);
-
-    if (forgetHistory)
-    {
-        RecordingInfo recInfo(*delItem);
-        recInfo.ForgetHistory();
-    }
 }
 
 void PlaybackBox::fanartLoad(void)
@@ -2339,7 +2335,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     {
         push_onto_del(m_delList, *delItem);
     }
-    else if (m_delList.size() >= 3)
+    else if (m_delList.size() >= 4)
     {
         delItem = FindProgramInUILists(
             m_delList[0].toUInt(),
@@ -2349,7 +2345,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     if (!delItem)
         return;
 
-    uint other_delete_cnt = (m_delList.size() / 3) - 1;
+    uint other_delete_cnt = (m_delList.size() / 4) - 1;
 
     label += CreateProgramInfoString(*delItem);
 
@@ -3160,11 +3156,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
             list.push_back(QString::number(tmpItem->GetChanID()));
             list.push_back(tmpItem->GetRecordingStartTime(ISODate));
             list.push_back(forceDeleteStr);
-            if (forgetHistory)
-            {
-                RecordingInfo recInfo(*tmpItem);
-                recInfo.ForgetHistory();
-            }
+            list.push_back(forgetHistory ? "1" : "0");
 
             // if the item is in the current recording list UI then delete it.
             MythUIButtonListItem *uiItem =
@@ -3746,18 +3738,14 @@ void PlaybackBox::customEvent(QEvent *event)
                     continue;
 
                 QString forceDeleteStr = me->ExtraDataList()[i+2];
-                bool    forgetHistory  = me->ExtraDataList()[i+3].toInt();
+                QString forgetHistoryStr = me->ExtraDataList()[i+3];
 
                 list.push_back(QString::number(pginfo->GetChanID()));
                 list.push_back(pginfo->GetRecordingStartTime(ISODate));
                 list.push_back(forceDeleteStr);
+                list.push_back(forgetHistoryStr);
                 pginfo->SetAvailableStatus(asPendingDelete,
                                            "LOCAL_PBB_DELETE_RECORDINGS");
-                if (forgetHistory)
-                {
-                    RecordingInfo recInfo(*pginfo);
-                    recInfo.ForgetHistory();
-                }
 
                 // if the item is in the current recording list UI
                 // then delete it.
@@ -3775,10 +3763,10 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "DELETE_FAILURES")
         {
-            if (me->ExtraDataList().size() < 3)
+            if (me->ExtraDataList().size() < 4)
                 return;
 
-            for (uint i = 0; i+2 < (uint)me->ExtraDataList().size(); i+=3)
+            for (uint i = 0; i+3 < (uint)me->ExtraDataList().size(); i += 4)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
                         me->ExtraDataList()[i+0].toUInt(),

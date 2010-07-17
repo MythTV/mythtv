@@ -433,10 +433,11 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "DELETE_RECORDING")
     {
-        if (3 <= tokens.size() && tokens.size() <= 4)
+        if (3 <= tokens.size() && tokens.size() <= 5)
         {
             bool force = (tokens.size() >= 4) && (tokens[3] == "FORCE");
-            HandleDeleteRecording(tokens[1], tokens[2], pbs, force);
+            bool forget = (tokens.size() >= 5) && (tokens[4] == "FORGET");
+            HandleDeleteRecording(tokens[1], tokens[2], pbs, force, forget);
         }
         else
             HandleDeleteRecording(listline, pbs, false);
@@ -761,7 +762,7 @@ void MainServer::customEvent(QEvent *e)
                 {
                     recInfo.ForgetHistory();
                 }
-                DoHandleDeleteRecording(recInfo, NULL, false, true);
+                DoHandleDeleteRecording(recInfo, NULL, false, true, false);
             }
             else
             {
@@ -807,9 +808,9 @@ void MainServer::customEvent(QEvent *e)
             if (recInfo.GetChanID())
             {
                 if (tokens[0] == "FORCE_DELETE_RECORDING")
-                    DoHandleDeleteRecording(recInfo, NULL, true);
+                    DoHandleDeleteRecording(recInfo, NULL, true, false, false);
                 else
-                    DoHandleDeleteRecording(recInfo, NULL, false);
+                    DoHandleDeleteRecording(recInfo, NULL, false, false, false);
             }
             else
             {
@@ -2164,7 +2165,8 @@ void MainServer::DoHandleStopRecording(
 
 void MainServer::HandleDeleteRecording(QString &chanid, QString &starttime,
                                        PlaybackSock *pbs,
-                                       bool forceMetadataDelete)
+                                       bool forceMetadataDelete, 
+                                       bool forgetHistory)
 {
     QDateTime recstartts = myth_dt_from_string(starttime);
     RecordingInfo recinfo(chanid.toUInt(), recstartts);
@@ -2181,7 +2183,7 @@ void MainServer::HandleDeleteRecording(QString &chanid, QString &starttime,
         return;
     }
 
-    DoHandleDeleteRecording(recinfo, pbs, forceMetadataDelete);
+    DoHandleDeleteRecording(recinfo, pbs, forceMetadataDelete, false, forgetHistory);
 }
 
 void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
@@ -2190,12 +2192,12 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
     QStringList::const_iterator it = slist.begin() + 1;
     RecordingInfo recinfo(it, slist.end());
     if (recinfo.GetChanID())
-        DoHandleDeleteRecording(recinfo, pbs, forceMetadataDelete);
+        DoHandleDeleteRecording(recinfo, pbs, forceMetadataDelete, false, false);
 }
 
 void MainServer::DoHandleDeleteRecording(
     RecordingInfo &recinfo, PlaybackSock *pbs,
-    bool forceMetadataDelete, bool expirer)
+    bool forceMetadataDelete, bool expirer, bool forgetHistory)
 {
     int resultCode = -1;
     MythSocket *pbssock = NULL;
@@ -2255,6 +2257,9 @@ void MainServer::DoHandleDeleteRecording(
                     m_sched->UpdateRecStatus(&recinfo);
             }
 
+            if (forgetHistory)
+                recinfo.ForgetHistory();
+
             if (pbssock)
             {
                 QStringList outputlist( QString::number(num) );
@@ -2294,6 +2299,9 @@ void MainServer::DoHandleDeleteRecording(
             }
         }
     }
+
+    if (forgetHistory)
+        recinfo.ForgetHistory();
 
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();

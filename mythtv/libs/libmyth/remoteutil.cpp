@@ -133,14 +133,16 @@ bool RemoteCheckFile(const ProgramInfo *pginfo, bool checkSlaves)
 }
 
 bool RemoteDeleteRecording(
-    uint chanid, const QDateTime &recstartts, bool forceMetadataDelete)
+    uint chanid, const QDateTime &recstartts, bool forceMetadataDelete,
+    bool forgetHistory)
 {
     bool result = true;
     QString cmd =
-        QString("DELETE_RECORDING %1 %2 %3")
+        QString("DELETE_RECORDING %1 %2 %3 %4")
         .arg(chanid)
         .arg(recstartts.toString(Qt::ISODate))
-        .arg(forceMetadataDelete ? "FORCE" : "NO_FORCE");
+        .arg(forceMetadataDelete ? "FORCE" : "NO_FORCE")
+        .arg(forgetHistory ? "FORGET" : "NO_FORGET");
     QStringList strlist(cmd);
 
     if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())

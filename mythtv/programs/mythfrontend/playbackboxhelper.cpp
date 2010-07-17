@@ -211,18 +211,19 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList successes;
             QStringList failures;
             QStringList list = me->ExtraDataList();
-            while (list.size() >= 3)
+            while (list.size() >= 4)
             {
                 uint      chanid        = list[0].toUInt();
                 QDateTime recstartts    = QDateTime::fromString(
                     list[1], Qt::ISODate);
                 bool      forceDelete   = list[2].toUInt();
+                bool      forgetHistory = list[3].toUInt();
 
                 bool ok = RemoteDeleteRecording(
-                    chanid, recstartts, forceDelete);
+                    chanid, recstartts, forceDelete, forgetHistory);
 
                 QStringList &res = (ok) ? successes : failures;
-                for (uint i = 0; i < 3; i++)
+                for (uint i = 0; i < 4; i++)
                 {
                     res.push_back(list.front());
                     list.pop_front();
@@ -512,12 +513,14 @@ void PlaybackBoxHelper::StopRecording(const ProgramInfo &pginfo)
 }
 
 void PlaybackBoxHelper::DeleteRecording(
-    uint chanid, const QDateTime &recstartts, bool forceDelete)
+    uint chanid, const QDateTime &recstartts, bool forceDelete, 
+    bool forgetHistory)
 {
     QStringList list;
     list.push_back(QString::number(chanid));
     list.push_back(recstartts.toString(Qt::ISODate));
     list.push_back((forceDelete)    ? "1" : "0");
+    list.push_back((forgetHistory)  ? "1" : "0");
     DeleteRecordings(list);
 }
 

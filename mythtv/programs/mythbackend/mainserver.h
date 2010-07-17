@@ -97,11 +97,13 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QString &chanid, QString &starttime,
-                               PlaybackSock *pbs, bool forceMetadataDelete);
+                               PlaybackSock *pbs, bool forceMetadataDelete,
+                               bool forgetHistory);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
                                bool forceMetadataDelete);
     void DoHandleDeleteRecording(RecordingInfo &recinfo, PlaybackSock *pbs,
-                                 bool forceMetadataDelete, bool expirer=false);
+                                 bool forceMetadataDelete, bool expirer=false,
+                                 bool forgetHistory=false);
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleUndeleteRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
