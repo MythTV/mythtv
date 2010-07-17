@@ -30,7 +30,7 @@
  *       mythtv/bindings/python/MythTV/MythStatic.py (version number)
  *       mythtv/bindings/python/MythTV/MythTV.py (layout)
  */
-#define MYTH_PROTO_VERSION "57"
+#define MYTH_PROTO_VERSION "58"
 
 MPUBLIC const char *GetMythSourceVersion();
 
