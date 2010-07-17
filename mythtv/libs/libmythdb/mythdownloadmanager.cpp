@@ -27,6 +27,56 @@ using namespace std;
 MythDownloadManager *downloadManager = NULL;
 
 /*!
+* \class MythDownloadInfo
+*/
+class MythDownloadInfo
+{
+  public:
+    MythDownloadInfo() :
+        m_request(NULL),         m_reply(NULL),       m_data(NULL),
+        m_caller(NULL),          m_post(false),       m_reload(false),
+        m_preferCache(false),    m_syncMode(false),   m_done(false),
+        m_bytesReceived(0),      m_bytesTotal(0),
+        m_lastStat(QDateTime::currentDateTime()),
+        m_errorCode(QNetworkReply::NoError)
+    {
+    }
+
+   ~MythDownloadInfo()
+    {
+        if (m_request)
+            delete m_request;
+        if (m_reply)
+            m_reply->deleteLater();
+    }
+
+    void detach(void)
+    {
+        m_url.detach();
+        m_outFile.detach();
+    }       
+
+    QString          m_url;
+    QUrl             m_redirectedTo;
+    QNetworkRequest *m_request;
+    QNetworkReply   *m_reply;
+    QString          m_outFile;
+    QByteArray      *m_data;
+    QByteArray       m_privData;
+    QObject         *m_caller;
+    bool             m_post;
+    bool             m_reload;
+    bool             m_preferCache;
+    bool             m_syncMode;
+    bool             m_done;
+    qint64           m_bytesReceived;
+    qint64           m_bytesTotal;
+    QDateTime        m_lastStat;
+
+    QNetworkReply::NetworkError m_errorCode;
+};
+
+/*!
 * \class RemoteFileDownloadThread
 */
 class RemoteFileDownloadThread : public QRunnable
@@ -58,7 +108,6 @@ class RemoteFileDownloadThread : public QRunnable
     MythDownloadManager *m_parent;
     MythDownloadInfo    *m_dlInfo;
 };
-
 
 /** \fn GetMythDownloadManger(void)
  *  \brief Gets the pointer to the MythDownloadManager singleton.
@@ -696,15 +745,27 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         int dataSize = -1;
         if (reply)
         {
+            bool append = (!dlInfo->m_syncMode && dlInfo->m_caller);
             QByteArray data = reply->readAll();
             dataSize = data.size();
+
+            if (append)
+                dlInfo->m_bytesReceived += dataSize;
+            else
+                dlInfo->m_bytesReceived = dataSize;
+
+            dlInfo->m_bytesTotal = dlInfo->m_bytesReceived;
+
             if (dlInfo->m_data)
             {
-                (*dlInfo->m_data) = data;
+                if (append)
+                    dlInfo->m_data->append(data);
+                else
+                    *dlInfo->m_data = data;
             }
             else if (!dlInfo->m_outFile.isEmpty())
             {
-                saveFile(dlInfo->m_outFile, data);
+                saveFile(dlInfo->m_outFile, data, append);
             }
         }
         else
@@ -717,7 +778,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             {
                 saveFile(dlInfo->m_outFile, dlInfo->m_privData);
             }
-            dataSize = dlInfo->m_privData.size();
+            dlInfo->m_bytesReceived += dataSize;
+            dlInfo->m_bytesTotal = dlInfo->m_bytesReceived;
         }
 
         m_downloadInfos.remove(dlInfo->m_url);
@@ -737,7 +799,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                 QStringList args;
                 args << dlInfo->m_url;
                 args << dlInfo->m_outFile;
-                args << QString::number(dataSize);
+                args << QString::number(dlInfo->m_bytesTotal);
                 args << QString();  // placeholder for error string
                 args << QString::number((int)dlInfo->m_errorCode);
 
@@ -788,6 +850,17 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTot
                 "sending event to caller")
                 .arg(reply->url().toString()));
 
+        bool appendToFile = (dlInfo->m_bytesReceived != 0);
+        QByteArray data = reply->readAll();
+        if (!dlInfo->m_outFile.isEmpty())
+            saveFile(dlInfo->m_outFile, data, appendToFile);
+
+        if (dlInfo->m_data)
+            dlInfo->m_data->append(data);
+
+        dlInfo->m_bytesReceived = bytesReceived;
+        dlInfo->m_bytesTotal = bytesTotal;
+
         QStringList args;
         args << dlInfo->m_url;
         args << dlInfo->m_outFile;
@@ -800,61 +873,66 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTot
 }
 
 /** \fn MythDownloadManager::saveFile(const QString &outFile,
-                                      const QByteArray &data)
+                                      const QByteArray &data,
+                                      const bool append)
  *  \brief Saves a QByteArray of data to a given filename.  Any parent
  *         directories are created automatically.
  *  \param outFile Filename to save to.
  *  \param data    Data to save.
+ *  \param append  Append data to output file instead of overwriting.
  *  \return true if successful, false otherwise
  */
-bool MythDownloadManager::saveFile(const QString &outFile, const QByteArray &data)
+bool MythDownloadManager::saveFile(const QString &outFile,
+                                   const QByteArray &data,
+                                   const bool append)
 {
-    bool ok = false;
+    if (outFile.isEmpty() || !data.size())
+        return false;
 
-    if (data.size())
+    QFile file(outFile);
+    QFileInfo fileInfo(outFile);
+    QDir qdir(fileInfo.absolutePath());
+
+    if (!qdir.exists() && !qdir.mkpath(fileInfo.absolutePath()))
     {
-        QFile file(outFile);
-        QFileInfo fileInfo(outFile);
-        QDir qdir(fileInfo.absolutePath());
-
-        if (!qdir.exists() && !qdir.mkpath(fileInfo.absolutePath()))
-        {
-            VERBOSE(VB_IMPORTANT, QString("Failed to create: '%1'")
-                    .arg(fileInfo.absolutePath()));
-            return false;
-        }
-
-        ok = file.open(QIODevice::Unbuffered|QIODevice::WriteOnly);
-        if (!ok)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Failed to open: '%1'")
-                    .arg(outFile));
-            return false;
-        }
-
-        off_t offset = 0;
-        size_t remaining = (ok) ? data.size() : 0;
-        uint failure_cnt = 0;
-        while ((remaining > 0) && (failure_cnt < 5))
-        {
-            ssize_t written = file.write(data.data() + offset, remaining);
-            if (written < 0)
-            {
-                failure_cnt++;
-                usleep(50000);
-                continue;
-            }
-
-            failure_cnt  = 0;
-            offset      += written;
-            remaining   -= written;
-        }
-
-        if (remaining > 0)
-            ok = false;
+        VERBOSE(VB_IMPORTANT, QString("Failed to create: '%1'")
+                .arg(fileInfo.absolutePath()));
+        return false;
     }
 
-    return ok;
+    QIODevice::OpenMode mode = QIODevice::Unbuffered|QIODevice::WriteOnly;
+    if (append)
+        mode |= QIODevice::Append;
+
+    if (!file.open(mode))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to open: '%1'")
+                .arg(outFile));
+        return false;
+    }
+
+    off_t offset = 0;
+    size_t remaining = data.size();
+    uint failure_cnt = 0;
+    while ((remaining > 0) && (failure_cnt < 5))
+    {
+        ssize_t written = file.write(data.data() + offset, remaining);
+        if (written < 0)
+        {
+            failure_cnt++;
+            usleep(50000);
+            continue;
+        }
+
+        failure_cnt  = 0;
+        offset      += written;
+        remaining   -= written;
+    }
+
+    if (remaining > 0)
+        return false;
+
+    return true;
 }
 
 /** \fn MythDownloadManager::GetLastModified(const QString &url)

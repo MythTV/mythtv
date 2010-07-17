@@ -12,51 +12,8 @@
 
 #include "mythexp.h"
 
+class MythDownloadInfo;
 class RemoteFileDownloadThread;
-
-class MythDownloadInfo
-{
-  public:
-    MythDownloadInfo() :
-        m_request(NULL),         m_reply(NULL),       m_data(NULL),
-        m_caller(NULL),          m_post(false),       m_reload(false),
-        m_preferCache(false),    m_syncMode(false),   m_done(false),
-        m_lastStat(QDateTime::currentDateTime()),
-        m_errorCode(QNetworkReply::NoError)
-    {
-    }
-
-   ~MythDownloadInfo()
-    {
-        if (m_request)
-            delete m_request;
-        if (m_reply)
-            m_reply->deleteLater();
-    }
-
-    void detach(void)
-    {
-        m_url.detach();
-        m_outFile.detach();
-    }       
-
-    QString          m_url;
-    QUrl             m_redirectedTo;
-    QNetworkRequest *m_request;
-    QNetworkReply   *m_reply;
-    QString          m_outFile;
-    QByteArray      *m_data;
-    QByteArray       m_privData;
-    QObject         *m_caller;
-    bool             m_post;
-    bool             m_reload;
-    bool             m_preferCache;
-    bool             m_syncMode;
-    bool             m_done;
-    QDateTime        m_lastStat;
-
-    QNetworkReply::NetworkError m_errorCode;
-};
 
 class MPUBLIC MythDownloadManager : public QThread
 {
@@ -121,7 +78,8 @@ class MPUBLIC MythDownloadManager : public QThread
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
                      const QUrl& oldRedirectUrl) const;
 
-    bool saveFile(const QString &outFile, const QByteArray &data);
+    bool saveFile(const QString &outFile, const QByteArray &data,
+                  const bool append = false);
 
     QNetworkAccessManager                        *m_manager;
     QNetworkDiskCache                            *m_diskCache;
