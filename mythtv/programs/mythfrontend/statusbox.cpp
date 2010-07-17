@@ -442,7 +442,7 @@ void StatusBox::customEvent(QEvent *event)
             if ((buttonnum == 0) && REC_CAN_BE_DELETED(rec))
             {
                 RemoteDeleteRecording(
-                    rec->chanid.toUInt(), rec->recstartts, false);
+                    rec->chanid.toUInt(), rec->recstartts, false, false);
             }
             else if (buttonnum == 1)
             {

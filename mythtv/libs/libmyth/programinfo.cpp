@@ -1377,7 +1377,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         "       r.editing,          r.bookmark,    r.watched,         "//31-33
         "       r.preserve,         r.transcoded,  r.deletepending,   "//34-36
         "       p.audioprop+0,      p.videoprop+0, p.subtitletypes+0, "//37-39
-        "       p.airdate                                             "//40
+        "       p.airdate,          r.findid                          "//40-41
         "FROM recorded AS r "
         "LEFT JOIN (channel AS c, recordedprogram AS p) "
         "ON (r.chanid    = c.chanid AND "
@@ -1474,6 +1474,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     storagegroup = query.value(27).toString();
     playgroup    = query.value(21).toString();
     recpriority  = query.value(22).toInt();
+    findid       = query.value(41).toInt();
 
     QString old_basename = pathname.section('/', -1);
     QString new_basename = query.value(25).toString();

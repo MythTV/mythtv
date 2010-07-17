@@ -55,7 +55,8 @@ class PlaybackBoxHelper : public QThread
     void ForceFreeSpaceUpdate(void);
     void StopRecording(const ProgramInfo&);
     void DeleteRecording(
-        uint chanid, const QDateTime &recstartts, bool forceDelete);
+        uint chanid, const QDateTime &recstartts, 
+        bool forceDelete, bool forgetHistory);
     void DeleteRecordings(const QStringList&);
     void UndeleteRecording(uint chanid, const QDateTime &recstartts);
     void CheckAvailability(const ProgramInfo&,
