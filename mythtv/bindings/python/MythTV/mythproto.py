@@ -656,7 +656,7 @@ class FileOps( BEEvent ):
             eventlock = self.allocateEventLock(\
                     re.escape(BACKEND_SEP).\
                             join(['BACKEND_MESSAGE',
-                                  'DOWNLOAD_FILE FINISHED',
+                                  'DOWNLOAD_FILE UPDATE',
                                   re.escape(url)]))
         res = self.backendCommand(BACKEND_SEP.join((\
                     'DOWNLOAD_FILE', url, storagegroup, filename))).\
