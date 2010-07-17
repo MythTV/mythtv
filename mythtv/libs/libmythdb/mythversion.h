@@ -27,8 +27,8 @@
  *       mythtv/bindings/perl/MythTV/Program.pm (layout)
  *
  *   MythTV Python Bindings
- *       mythtv/bindings/python/MythTV/MythStatic.py (version number)
- *       mythtv/bindings/python/MythTV/MythTV.py (layout)
+ *       mythtv/bindings/python/MythTV/static.py (version number)
+ *       mythtv/bindings/python/MythTV/mythproto.py (layout)
  */
 #define MYTH_PROTO_VERSION "58"
 
