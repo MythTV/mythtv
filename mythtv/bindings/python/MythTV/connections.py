@@ -358,7 +358,7 @@ class BEConnection( object ):
                     % PROTO_VERSION).split(BACKEND_SEP)
         if res[0] == 'REJECT':
             self.log(MythLog.IMPORTANT|MythLog.NETWORK, 
-                            "Backend has version %s, and we speak %d" %\
+                            "Backend has version %s, and we speak %s" %\
                             (res[1], PROTO_VERSION))
             raise MythBEError(MythError.PROTO_MISMATCH,
                                                 int(res[1]), PROTO_VERSION)

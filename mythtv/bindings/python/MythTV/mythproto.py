@@ -15,7 +15,9 @@ from database import DBCache
 from utility import SplitInt, CMPRecord
 
 from datetime import date
-from time import mktime, strptime
+from time import mktime, strptime, sleep
+from thread import allocate_lock
+from random import randint
 from uuid import uuid4
 import socket
 import weakref
@@ -141,6 +143,9 @@ class BEEvent( BECache ):
             regex = func()
         self.be.registerevent(regex, func)
 
+    def clearevents(self):
+        self._events = []
+
 def findfile(filename, sgroup, db=None):
     """
     findfile(filename, sgroup, db=None) -> StorageGroup object
@@ -164,7 +169,7 @@ def findfile(filename, sgroup, db=None):
     return None
 
 def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
-                       chanid=None, starttime=None):
+                       chanid=None, starttime=None, download=False):
     """
     ftopen(file, mode, forceremote=False, nooverwrite=False, db=None)
                                         -> FileTransfer object
@@ -175,7 +180,8 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     'file' takes a standard MythURI:
                 myth://<group>@<host>:<port>/<path>
     'mode' takes a 'r' or 'w'
-    'nooverwrite' will refuse to open a file writable, if a local file is found.
+    'nooverwrite' will refuse to open a file writable,
+                if a local file is found.
     """
     db = DBCache(db)
     log = MythLog('Python File Transfer', db=db)
@@ -185,6 +191,18 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
 
     if mode not in ('r','w'):
         raise TypeError("File I/O must be of type 'r' or 'w'")
+
+    if chanid and starttime:
+        protoopen = lambda host, file, storagegroup: \
+                      RecordFileTransfer(host, file, storagegroup,\
+                                         mode, chanid, starttime, db)
+    elif download:
+        protoopen = lambda host, lfile, storagegroup: \
+                      DownloadFileTransfer(host, lfile, storagegroup, \
+                                           mode, file, db)
+    else:
+        protoopen = lambda host, file, storagegroup: \
+                      FileTransfer(host, file, storagegroup, mode, db)
 
     # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
     match = reuri.match(file)
@@ -214,8 +232,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
         if nooverwrite and FileOps(host, db=db).fileExists(filename, sgroup):
             raise MythFileError(MythError.FILE_FAILED_WRITE, file,
                                 'refusing to overwrite existing file')
-        return FileTransfer(host, filename, sgroup, mode, db, \
-                                  chanid, starttime)
+        return protoopen(host, filename, sgroup)
 
     if mode == 'w':
         # check for pre-existing file
@@ -230,8 +247,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                     if sg.local:
                         return open(sg.dirname+filename, mode)
                     else:
-                        return FileTransfer(host, filename, sgroup, 'w', \
-                                    db, chanid, starttime)
+                        return protoopen(host, filename, sgroup)
 
         # prefer local storage for new files
         for i in reversed(xrange(len(sgs))):
@@ -256,8 +272,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
             if filename.find('/') != -1:
                 raise MythFileError(MythError.FILE_FAILED_WRITE, file,
                                 'attempting remote write outside base path')
-            return FileTransfer(host, filename, sgroup, 'w', db, \
-                                      chanid, starttime)
+            return protoopen(host, filename, sgroup)
     else:
         # search for file in local directories
         sg = findfile(filename, sgroup, db)
@@ -268,8 +283,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
             return open(sg.dirname+filename, mode)
         else:
         # file not found, open remote
-            return FileTransfer(host, filename, sgroup, mode, db, \
-                                  chanid=None, starttime=None)
+            return protoopen(host, filename, sgroup)
 
 class FileTransfer( BEEvent ):
     """
@@ -314,34 +328,14 @@ class FileTransfer( BEEvent ):
             return self.socket.dlrecv(count)
 
     def __repr__(self):
-        return "<open file 'myth://%s:%s/%s', mode '%s' at %s>" % \
+        return "<open file 'myth://%s@%s/%s', mode '%s' at %s>" % \
                           (self.sgroup, self.host, self.filename, \
                                 self.mode, hex(id(self)))
 
-    def _listhandlers(self):
-        if self.chanid and self.starttime:
-            self.re_update = re.compile(\
-                    BACKEND_SEP.join(['BACKEND_MESSAGE',
-                             'UPDATE_FILE_SIZE %s %s (?P<size>[0-9]*)' %\
-                            (self.chanid, \
-                             self.starttime.strftime('%Y-%m-%dT%H-%M-%S')),
-                             'empty']))
-            return [self.updatesize]
-        return []
-
-    def updatesize(self, event):
-        if event is None:
-            return self.re_update
-        match = self.re_update(event)
-        self._size = match.group('size')
-
-    def __init__(self, host, filename, sgroup, mode, db=None, \
-                       chanid=None, starttime=None):
+    def __init__(self, host, filename, sgroup, mode, db=None):
         self.filename = filename
         self.sgroup = sgroup
         self.mode = mode
-        self.chanid = chanid
-        self.starttime = starttime
 
         # open control socket
         BEEvent.__init__(self, host, True, db=db)
@@ -351,7 +345,6 @@ class FileTransfer( BEEvent ):
         self.open = True
 
         self._sockno = self.ftsock._sockno
-        print self.ftsock._size
         self._size = self.joinInt(*self.ftsock._size)
         self._pos = 0
         self._tsize = 2**15
@@ -496,6 +489,87 @@ class FileTransfer( BEEvent ):
                  ).split(BACKEND_SEP)
         self._pos = self.joinInt(*res)
 
+class RecordFileTransfer( FileTransfer ):
+    """
+    A connection to mythbackend intended for file transfers.
+    Emulates the primary functionality of the local 'file' object.
+    Listens for UPDATE_FILE_SIZE events from the backend.
+    """
+    logmodule = 'Python RecordFileTransfer'
+
+    def _listhandlers(self):
+        return [self.updatesize]
+
+    def updatesize(self, event=None):
+        if event is None:
+            self.re_update = re.compile(\
+              re.escape(BACKEND_SEP).\
+                join(['BACKEND_MESSAGE',
+                      'UPDATE_FILE_SIZE %s %s (?P<size>[0-9]*)' %\
+                         (self.chanid, \
+                          self.starttime.strftime('%Y-%m-%dT%H-%M-%S')),
+                      'empty']))
+            return self.re_update
+        match = self.re_update(event)
+        self._size = int(match.group('size'))
+
+    def __init__(self, host, filename, sgroup, mode,
+                       chanid, starttime, db=None):
+        self.chanid = chanid
+        self.starttime = starttime
+        FileTransfer.__init__(self, host, filename, sgroup, mode, db)
+
+class DownloadFileTransfer( FileTransfer ):
+    """
+    A connection to mythbackend intended for file transfers.
+    Emulates the primary functionality of the local 'file' object.
+    Listens for DOWNLOAD_FILE events from the backend.
+    """
+    logmodule = 'Python DownloadFileTransfer'
+
+    def _listhandlers(self):
+        return [self.updatesize, self.downloadcomplete]
+
+    def updatesize(self, event=None):
+        if event is None:
+            self.re_update = re.compile(\
+                    re.escape(BACKEND_SEP).\
+                            join(['BACKEND_MESSAGE',
+                                  'DOWNLOAD_FILE UPDATE',
+                                  '.*',
+                                  re.escape(self.uri),
+                                  '(?P<size>[0-9]*)',
+                                  '(?P<total>[0-9]*)']))
+            return self.re_update
+        match = self.re_update.match(event)
+        self._size = int(match.group('size'))
+
+    def downloadcomplete(self, event=None):
+        if event is None:
+            self.re_complete = re.compile(\
+                    re.escape(BACKEND_SEP).\
+                            join(['BACKEND_MESSAGE',
+                                  'DOWNLOAD_FILE FINISHED',
+                                  '.*',
+                                  re.escape(self.uri),
+                                  '(?P<total>[0-9]*)',
+                                  '(?P<errstr>.*)',
+                                  '(?P<errcode>.*)']))
+            return self.re_complete
+        match = self.re_complete.match(event)
+        self._size = int(match.group('total'))
+        self.clearevents()
+
+    def __init__(self, host, filename, sgroup, mode, uri, db=None):
+        self.uri = uri
+        FileTransfer.__init__(self, host, filename, sgroup, mode, db)
+
+    def __del__(self):
+        FileTransfer.__del__(self)
+        if self.sgroup == 'Temp':
+            FileOps(self.host, db=self.db).\
+                        deleteFile(self.filename, self.sgroup)
+
 class FileOps( BEEvent ):
     __doc__ = BEEvent.__doc__+"""
         getRecording()      - return a Program object for a recording
@@ -505,6 +579,13 @@ class FileOps( BEEvent ):
                               in a storage group
         getHash()           - return the hash of a file in a storage group
         reschedule()        - trigger a run of the scheduler
+        fileExists()        - check whether a file can be found on a backend
+        download()          - issue a download by the backend
+        downloadTo()        - issue a download by the backend to a defined 
+                              location
+        allocateEventLock() - create an EventLock object that will be locked
+                              until a requested regular expression is
+                              encountered
     """
     logmodule = 'Python Backend FileOps'
 
@@ -544,11 +625,17 @@ class FileOps( BEEvent ):
         return self.backendCommand(BACKEND_SEP.join((\
                     'QUERY_FILE_HASH',file, sgroup)))
 
-    def reschedule(self, recordid=-1):
+    def reschedule(self, recordid=-1, wait=False):
         """FileOps.reschedule() -> None"""
+        if wait:
+            eventlock = self.allocateEventLock(\
+                            re.escape(BACKEND_SEP).join(\
+                                    ['BACKEND_MESSAGE',
+                                     'SCHEDULE_CHANGE',
+                                     'empty']))
         self.backendCommand('RESCHEDULE_RECORDINGS '+str(recordid))
-        #TODO - register event to wait for
-        #           BACKEND_MESSAGE[]:[]SCHEDULE_CHANGE[]:[]empty
+        if wait:
+            eventlock.wait()
 
     def fileExists(self, file, sgroup='Default'):
         """FileOps.fileExists() -> file path"""
@@ -558,6 +645,35 @@ class FileOps( BEEvent ):
             return None
         else:
             return res[1]
+
+    def download(self, url):
+        filename = 'download_%s.tmp' % hex(randint(0,2**32)).split('x')[-1]
+        return self.downloadTo(url, 'Temp', filename, True, True)
+
+    def downloadTo(self, url, storagegroup, filename, \
+                         forceremote=False, openfile=False):
+#        if openfile:
+#            eventlock = self.allocateEventLock(\
+#                    re.escape(BACKEND_SEP).\
+#                            join(['BACKEND_MESSAGE',
+#                                  'DOWNLOAD_FILE UPDATE',
+#                                  re.escape(url)]))
+        res = self.backendCommand(BACKEND_SEP.join((\
+                    'DOWNLOAD_FILE', url, storagegroup, filename))).\
+                    split(BACKEND_SEP)
+        if res[0] != 'OK':
+            raise MythBEError('Download failed')
+        if openfile:
+#            eventlock.wait()
+            sleep(1)  # hackish fix for possible race condition in the downloader
+            return ftopen(res[1], 'r', forceremote, db=self.db, download=True)
+
+    def allocateEventLock(self, regex):
+        try:
+            regex.match('')
+        except AttributeError:
+            regex = re.compile(regex)
+        return EventLock(regex, self.hostname, self.db)
 
     def _getPrograms(self, query, recstatus=None, recordid=None, header=0):
         pgfieldcount = len(Program._field_order)
@@ -794,3 +910,25 @@ class Program( DictData, RECSTATUS, CMPRecord ):
                     (self.chanid, self.recstartts),db=self._db).reactivate))
         return cmd
 
+
+class EventLock( BEEvent ):
+    def __init__(self, regex, backend=None, db=None):
+        self.regex = regex
+        self._lock = allocate_lock()
+        self._lock.acquire()
+        BEEvent.__init__(self, backend, db=db)
+
+    def _listhandlers(self):
+        return [self._unlock]
+
+    def _unlock(self, event=None):
+        if event is None:
+            return self.regex
+        self._lock.release()
+        self._events = []
+
+    def wait(self, blocking=True):
+        res = self._lock.acquire(blocking)
+        if res:
+            self._lock.release()
+        return res

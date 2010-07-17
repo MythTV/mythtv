@@ -20,7 +20,6 @@ import xml.etree.cElementTree as etree
 from time import strftime, strptime
 from datetime import date, time, datetime
 from socket import gethostname
-from urllib import urlopen
 
 class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
     """
@@ -46,10 +45,10 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-    def create(self, data=None):
+    def create(self, data=None, wait=False):
         """Record.create(data=None) -> Record object"""
         DBDataWriteAI.create(self, data)
-        FileOps(db=self._db).reschedule(self.recordid)
+        FileOps(db=self._db).reschedule(self.recordid, wait)
         return self
 
     def delete(self):
@@ -58,7 +57,7 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
 
     def update(self, *args, **keywords):
         DBDataWriteAI.update(*args, **keywords)
-        FileOps(db=self._db).reschedule(self.recordid)
+        FileOps(db=self._db).reschedule(self.recordid, wait)
 
     def getUpcoming(self, deactivated=False):
         recstatus = None
@@ -68,7 +67,7 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
                     header=1, recordid=self.recordid, recstatus=recstatus)
 
     @classmethod
-    def fromGuide(cls, guide, type=RECTYPE.kAllRecord):
+    def fromGuide(cls, guide, type=RECTYPE.kAllRecord, wait=False):
         if datetime.now() > guide.endtime:
             raise MythError('Cannot create recording rule for past recording.')
         rec = cls(None, db=guide._db)
@@ -83,10 +82,10 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
 
         rec.station = Channel(guide.chanid, db=guide._db).callsign
         rec.type = type
-        return rec.create()
+        return rec.create(wait=wait)
 
     @classmethod
-    def fromProgram(cls, program, type=RECTYPE.kAllRecord):
+    def fromProgram(cls, program, type=RECTYPE.kAllRecord, wait=False):
         if datetime.now() > program.endtime:
             raise MythError('Cannot create recording rule for past recording.')
         rec = cls(None, db=program._db)
@@ -101,7 +100,7 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
 
         rec.station = program.callsign
         rec.type = type
-        return rec.create()
+        return rec.create(wait=wait)
 
 class Recorded( DBDataWrite, CMPRecord ):
     """
@@ -716,32 +715,33 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
 
         if not _allow_change(self, 'host', False):
             # only perform image grabs if 'host' is set, denoting SG use
-            imgtrans = {'coverart':'coverfile', 'fanart':'fanart',
-                        'banner':'banner', 'screenshot':'screenshot'}
+            t1 = ['coverart','fanart','banner','screenshot']
+            t2 = ['coverfile','fanart','banner','screenshot']
+            t3 = ['Coverart','Fanart','Banners','Screenshots']
+            trans1 = dict(zip(t1,t2))
+            trans2 = dict(zip(t1,t3))
+
             be = FileOps(self.host, db=self._db)
             for image in metadata.images:
-                if not _allow_change(self, imgtrans[image.type], overwrite):
+                mdtype = trans1[image.type]
+                sgtype = trans2[image.type]
+                if not _allow_change(self, mdtype, overwrite):
                     continue
-                type = imgtrans[image.type]
                 if metadata._type == 'TV':
-                    if type == 'screenshot':
+                    if image.type == 'screenshot':
                         fname = "%s Season %dx%d_%s." % \
                              (self.title, self.season, self.episode, image.type)
                     else:
                         fname = "%s Season %d_%s." % \
                              (self.title, self.season, image.type)
                 else:
-                    fname = "%s_%s." % (self.title, image.type)
+                    fname = "%s_%s." % (self.inetref, image.type)
                 fname += image.url.rsplit('.',1)[1]
 
-                self[imgtrans[image.type]] = fname
-                if be.fileExists(fname, image.type.capitalize()):
+                self[mdtype] = fname
+                if be.fileExists(fname, sgtype):
                     continue
-                dst = self._open(type, 'w', True)
-                src = urlopen(image.url)
-                dst.write(src.read())
-                dst.close()
-                src.close()
+                be.downloadTo(image.url, sgtype, fname)
 
         self.update()
 
