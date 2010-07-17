@@ -652,20 +652,19 @@ class FileOps( BEEvent ):
 
     def downloadTo(self, url, storagegroup, filename, \
                          forceremote=False, openfile=False):
-#        if openfile:
-#            eventlock = self.allocateEventLock(\
-#                    re.escape(BACKEND_SEP).\
-#                            join(['BACKEND_MESSAGE',
-#                                  'DOWNLOAD_FILE UPDATE',
-#                                  re.escape(url)]))
+        if openfile:
+            eventlock = self.allocateEventLock(\
+                    re.escape(BACKEND_SEP).\
+                            join(['BACKEND_MESSAGE',
+                                  'DOWNLOAD_FILE FINISHED',
+                                  re.escape(url)]))
         res = self.backendCommand(BACKEND_SEP.join((\
                     'DOWNLOAD_FILE', url, storagegroup, filename))).\
                     split(BACKEND_SEP)
         if res[0] != 'OK':
             raise MythBEError('Download failed')
         if openfile:
-#            eventlock.wait()
-            sleep(1)  # hackish fix for possible race condition in the downloader
+            eventlock.wait()
             return ftopen(res[1], 'r', forceremote, db=self.db, download=True)
 
     def allocateEventLock(self, regex):
