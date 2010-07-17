@@ -27,6 +27,7 @@ using namespace std;
 #include "subtitlereader.h"
 #include "interactivetv.h"
 #include "DVDRingBuffer.h"
+#include "BDRingBuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
 
@@ -1851,7 +1852,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     selectedVideoIndex = -1;
 
     map<int,uint> lang_sub_cnt;
+    uint subtitleStreamCount = 0;
     map<int,uint> lang_aud_cnt;
+    uint audioStreamCount = 0;
 
     if (ringBuffer && ringBuffer->isDVD() &&
         ringBuffer->DVD()->AudioStreamsChanged())
@@ -2219,10 +2222,18 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
-            AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
-                                                     "language", NULL, 0);
-            int lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
+            int lang;
+            if (ringBuffer && ringBuffer->isBD())
+                lang = ringBuffer->BD()->GetSubtitleLanguage(subtitleStreamCount);
+            else
+            {
+                AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
+                                                        "language", NULL, 0);
+                lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
+            }
+
             int lang_indx = lang_sub_cnt[lang]++;
+            subtitleStreamCount++;
 
             tracks[kTrackTypeSubtitle].push_back(
                 StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
@@ -2240,6 +2251,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (ringBuffer && ringBuffer->isDVD())
                 lang = ringBuffer->DVD()->GetAudioLanguage(
                     ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id));
+            else if (ringBuffer && ringBuffer->isBD())
+                lang = ringBuffer->BD()->GetAudioLanguage(audioStreamCount);
             else
             {
                 AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
@@ -2248,6 +2261,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
 
             int lang_indx = lang_aud_cnt[lang]++;
+            audioStreamCount++;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {

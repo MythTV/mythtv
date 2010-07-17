@@ -38,6 +38,9 @@ class MPUBLIC BDRingBufferPriv
     void GetDescForPos(QString &desc) const;
     double GetFrameRate(void);
 
+    int GetAudioLanguage(uint streamID);
+    int GetSubtitleLanguage(uint streamID);
+
     // commands
     bool OpenFile(const QString &filename);
     void close(void);

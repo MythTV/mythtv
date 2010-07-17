@@ -1,7 +1,11 @@
+
+#include <cstring>
+
 #include "bdnav/mpls_parse.h"
 #include "bdnav/navigation.h"
 #include "bdnav/bdparse.h"
 
+#include "iso639.h"
 #include "BDRingBuffer.h"
 #include "mythverbose.h"
 #include "mythdirs.h"
@@ -196,4 +200,47 @@ double BDRingBufferPriv::GetFrameRate(void)
     }
     else
         return 0;
+}
+
+int BDRingBufferPriv::GetAudioLanguage(uint streamID)
+{
+    if (!m_currentTitleInfo ||
+        streamID >= m_currentTitleInfo->clips->audio_stream_count)
+        return iso639_str3_to_key("und");
+
+    uint8_t lang[4] = { 0, 0, 0, 0 };
+    memcpy(lang, m_currentTitleInfo->clips->audio_streams[streamID].lang, 4);
+    int code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+
+    VERBOSE(VB_IMPORTANT, QString("Audio Lang: %1 Code: %2").arg(code).arg(iso639_key_to_str3(code)));
+
+    return code;
+}
+
+int BDRingBufferPriv::GetSubtitleLanguage(uint streamID)
+{
+    if (m_currentTitleInfo)
+    {
+        int pgCount = m_currentTitleInfo->clips->pg_stream_count;
+        uint subCount = 0;
+        for (int i = 0; i < pgCount; ++i)
+        {
+            if (m_currentTitleInfo->clips->pg_streams[i].coding_type >= 0x90 &&
+                m_currentTitleInfo->clips->pg_streams[i].coding_type <= 0x92)
+            {
+                if (streamID == subCount)
+                {
+
+                    uint8_t lang[4] = { 0, 0, 0, 0 };
+                    memcpy(lang, m_currentTitleInfo->clips->pg_streams[streamID].lang, 4);
+                    int code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+                    VERBOSE(VB_IMPORTANT, QString("Subtitle Lang: %1 Code: %2").arg(code).arg(iso639_key_to_str3(code)));
+                    return code;
+                }
+                subCount++;
+            }
+        }
+    }
+
+    return iso639_str3_to_key("und");
 }
