@@ -5982,6 +5982,68 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 }
 
+int TV::GetNumTitles(const PlayerContext *ctx) const
+{
+    int num_titles = 0;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        num_titles = ctx->nvp->GetNumTitles();
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    return num_titles;
+}
+
+int TV::GetCurrentTitle(const PlayerContext *ctx) const
+{
+    int currentTitle = 0;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        currentTitle = ctx->nvp->GetCurrentTitle();
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    return currentTitle;
+}
+
+int TV::GetTitleDuration(const PlayerContext *ctx, int title) const
+{
+    int seconds = 0;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        seconds = ctx->nvp->GetTitleDuration(title);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    return seconds;
+}
+
+
+QString TV::GetTitleName(const PlayerContext *ctx, int title) const
+{
+    QString name;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        name = ctx->nvp->GetTitleName(title);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    return name;
+}
+
+void TV::DoSwitchTitle(PlayerContext *ctx, int title)
+{
+    NormalSpeed(ctx);
+    StopFFRew(ctx);
+
+    PauseAudioUntilBuffered(ctx);
+
+    osdInfo info;
+    ctx->CalcNVPSliderPosition(info);
+    info.text["description"] = tr("Jump Title");
+    info.text["title"] = tr("Searching");
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
+
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+    {
+        ctx->nvp->SwitchTitle(title);
+    }
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+}
+
 void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
 {
     NormalSpeed(ctx);
@@ -9863,6 +9925,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             int chapter = action.right(3).toInt();
             DoJumpChapter(actx, chapter);
         }
+        else if (action.left(11) == "JUMPTOTITLE")
+        {
+            int title = action.right(3).toInt();
+            DoSwitchTitle(actx, title);
+        }
         else if (action == "EDIT")
             StartProgramEditMode(actx);
         else if (action == "TOGGLEAUTOEXPIRE")
@@ -9995,7 +10062,13 @@ QString TV::FillOSDMenu(const PlayerContext *ctx, OSD *osd,
     else if (category == "SCHEDULERECORDING")
         title = FillOSDMenuSchedule(ctx, osd, select, level);
     else if (category == "AVCHAPTER")
+    {
         title = FillOSDMenuAVChapter(ctx, osd, select, level);
+    }
+    else if (category == "AVTITLE")
+    {
+        title = FillOSDMenuAVTitle(ctx, osd, select, level);
+    }
     else if (category ==  "PIP")
         title = FillOSDMenuPxP(ctx, osd, select, level);
     else if (category == "INPUTSWITCHING")
@@ -10202,6 +10275,38 @@ QString TV::FillOSDMenuAVChapter(const PlayerContext *ctx, OSD *osd,
                 .arg(secs, 2, 10, QChar(48));
             osd->DialogAddButton(desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
                                  false, current_chapter == (i + 1));
+        }
+    }
+    return result;
+}
+
+QString TV::FillOSDMenuAVTitle(const PlayerContext *ctx, OSD *osd,
+                               bool select, int level) const
+{
+    QString result = QString();
+    QString title  = tr("Title");
+    int num_titles = GetNumTitles(ctx);
+    if (!num_titles)
+        return result;
+
+    if (level == 0)
+    {
+        osd->DialogAddButton(title , "DIALOG_MENU_AVTITLE_1", true, select);
+    }
+    else if (level == 1)
+    {
+        result = title;
+        int current_title = GetCurrentTitle(ctx);
+
+        for (int i = 0; i < num_titles; i++)
+        {
+            if (GetTitleDuration(ctx, i) < 120) // Ignore titles less than 2 minutes longer
+                continue;
+
+            QString titleIdx = QString("%1").arg(i, 3, 10, QChar(48));
+            QString desc = GetTitleName(ctx, i);
+            osd->DialogAddButton(desc, QString("JUMPTOTITLE%1").arg(titleIdx),
+                                 false, current_title == i);
         }
     }
     return result;

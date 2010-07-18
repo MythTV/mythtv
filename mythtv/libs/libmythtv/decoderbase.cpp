@@ -73,8 +73,10 @@ void DecoderBase::Reset(void)
 
     QMutexLocker locker(&m_positionMapLock);
     m_positionMap.clear();
+    posmapStarted = false;
     framesPlayed = 0;
     framesRead = 0;
+    dontSyncPositionMap = false;
 
     waitingForChange = false;
     ateof = false;

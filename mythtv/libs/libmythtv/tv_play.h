@@ -443,10 +443,15 @@ class MPUBLIC TV : public QThread
     int  GetNumChapters(const PlayerContext*) const;
     void GetChapterTimes(const PlayerContext*, QList<long long> &times) const;
     int  GetCurrentChapter(const PlayerContext*) const;
+    int  GetNumTitles(const PlayerContext *ctx) const;
+    int  GetCurrentTitle(const PlayerContext *ctx) const;
+    int  GetTitleDuration(const PlayerContext *ctx, int title) const;
+    QString GetTitleName(const PlayerContext *ctx, int title) const;
+    void DoSwitchTitle(PlayerContext*, int title);
     void DoJumpChapter(PlayerContext*, int direction);
     void DoSkipCommercials(PlayerContext*, int direction);
 
-    void DoQueueTranscode(PlayerContext*,QString profile);
+    void DoQueueTranscode(PlayerContext*, QString profile);
 
     void SetAutoCommercialSkip(const PlayerContext*,
                                CommSkipMode skipMode = kCommSkipOff);
@@ -584,6 +589,8 @@ class MPUBLIC TV : public QThread
     QString FillOSDMenuSchedule(   const PlayerContext*, OSD *osd,
                                    bool select, int level) const;
     QString FillOSDMenuAVChapter(  const PlayerContext*, OSD *osd,
+                                   bool select, int level) const;
+    QString FillOSDMenuAVTitle(    const PlayerContext *, OSD *osd,
                                    bool select, int level) const;
     QString FillOSDMenuPxP(        const PlayerContext*, OSD *osd,
                                    bool select, int level) const;

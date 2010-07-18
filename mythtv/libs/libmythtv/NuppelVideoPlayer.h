@@ -165,7 +165,7 @@ class MPUBLIC NuppelVideoPlayer
     virtual void SetBookmark(void);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
-                        float a = 1.33333, FrameScanType scan = kScan_Ignore, 
+                        float a = 1.33333, FrameScanType scan = kScan_Ignore,
                         bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
     void Zoom(ZoomDirection direction);
@@ -255,8 +255,7 @@ class MPUBLIC NuppelVideoPlayer
     bool PauseDecoder(void);
     void UnpauseDecoder(void);
     void Pause(void);
-    bool Play(float speed = 1.0, bool normal = true,
-              bool unpauseaudio = true);
+    bool Play(float speed = 1.0, bool normal = true, bool unpauseaudio = true);
 
     // Seek stuff
     virtual bool FastForward(float seconds);
@@ -265,6 +264,11 @@ class MPUBLIC NuppelVideoPlayer
 
     // Chapter stuff
     void JumpChapter(int chapter);
+
+    // Title stuff
+    virtual bool SwitchTitle(int title) { return false; }
+    virtual bool NextTitle(void) { return false; }
+    virtual bool PrevTitle(void) { return false; }
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)
@@ -365,7 +369,7 @@ class MPUBLIC NuppelVideoPlayer
         { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
     long long ResyncAudioTimecodeOffset(void)
         { tc_wrap[TC_AUDIO] = LONG_LONG_MIN; return 0L; }
-    long long GetAudioTimecodeOffset(void) const 
+    long long GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
     void SaveAudioTimecodeOffset(long long v)
         { savedAudioTimecodeOffset = v; }
@@ -378,6 +382,12 @@ class MPUBLIC NuppelVideoPlayer
     virtual int  GetNumChapters(void);
     virtual int  GetCurrentChapter(void);
     virtual void GetChapterTimes(QList<long long> &times);
+
+    // Title public stuff
+    virtual int GetNumTitles(void) const { return 0; }
+    virtual int GetCurrentTitle(void) const { return 0; }
+    virtual int GetTitleDuration(int title) const { return 0; }
+    virtual QString GetTitleName(int title) const { return QString(); }
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw)       { (void) ffw;       }
@@ -551,7 +561,7 @@ class MPUBLIC NuppelVideoPlayer
     long long totalLength;
     long long rewindtime;
 
-    // -- end state stuff -- 
+    // -- end state stuff --
 
 
     // Input Video Attributes
@@ -559,7 +569,7 @@ class MPUBLIC NuppelVideoPlayer
     QSize    video_dim;       ///< Video (input) buffer width & height
     double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
     float    video_aspect;    ///< Video (input) Apect Ratio
-    float    forced_video_aspect; 
+    float    forced_video_aspect;
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
     FrameScanType m_scan;
     /// Set when the user selects a scan type, overriding the detected one
@@ -632,12 +642,12 @@ class MPUBLIC NuppelVideoPlayer
     float      next_play_speed;
     bool       next_normal_speed;
 
-    float      play_speed;    
-    bool       normal_speed;  
+    float      play_speed;
+    bool       normal_speed;
     int        frame_interval;///< always adjusted for play_speed
     int        m_frame_interval;///< used to detect changes to frame_interval
 
-    int        ffrew_skip;    
+    int        ffrew_skip;
 
     // Audio and video synchronization stuff
     VideoSync *videosync;
@@ -648,7 +658,7 @@ class MPUBLIC NuppelVideoPlayer
     bool       lastsync;
     bool       decode_extra_audio;
     int        repeat_delay;
- 
+
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
     int        prevrp;        ///< repeat_pict of last frame

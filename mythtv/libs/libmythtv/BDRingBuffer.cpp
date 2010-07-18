@@ -1,5 +1,6 @@
 
 #include <cstring>
+#include "iso639.h"
 
 #include "bdnav/mpls_parse.h"
 #include "bdnav/navigation.h"
@@ -14,7 +15,7 @@
 #define LOC     QString("BDRingBuffer: ")
 
 BDRingBufferPriv::BDRingBufferPriv()
-    : bdnav(NULL)
+    : bdnav(NULL), m_numTitles(0)
 {
 }
 
@@ -66,57 +67,31 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
             return false;
 
         // Return an index of relevant titles (excludes dupe clips + titles)
-        uint32_t numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
+        m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
         m_mainTitle = 0;
-        m_mainTitleLength = 0;
+        m_currentTitleLength = 0;
         m_titlesize = 0;
         m_currentTime = 0;
+        m_currentTitleInfo = NULL;
 
         VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
-                .arg(numTitles));
+                .arg(m_numTitles));
 
         // Loop through the relevant titles and find the longest
-        for( unsigned i=0; i < numTitles; ++i)
+        uint64_t titleLength = 0;
+        BLURAY_TITLE_INFO *titleInfo = NULL;
+        for( unsigned i=0; i < m_numTitles; ++i)
         {
-            m_currentTitleInfo = bd_get_title_info(bdnav, i);
-            if (m_mainTitleLength == 0 ||
-                m_currentTitleInfo->duration > m_mainTitleLength)
+            titleInfo = bd_get_title_info(bdnav, i);
+            if (titleLength == 0 || titleInfo->duration > titleLength)
             {
-                m_mainTitle = m_currentTitleInfo->idx;
-                m_mainTitleLength = m_currentTitleInfo->duration;
+                m_mainTitle = titleInfo->idx;
+                titleLength = titleInfo->duration;
             }
         }
 
         // Now that we've settled on which index the main title is, get info.
-        m_currentTitleInfo = bd_get_title_info(bdnav, m_mainTitle);
-        bd_select_title(bdnav, m_mainTitle);
-        uint32_t chapter_count = m_currentTitleInfo->chapter_count;
-        VERBOSE(VB_IMPORTANT, LOC + QString("Longest title: index %1. "
-                                            "Duration: %2 (%3 mins) "
-                                            "Number of Chapters: %4")
-                                            .arg(m_mainTitle)
-                                            .arg(m_mainTitleLength)
-                                            .arg(m_mainTitleLength / (90000 * 60))
-                                            .arg(chapter_count));
-        VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
-        if (chapter_count)
-        {
-            for (uint i = 0; i < chapter_count; i++)
-            {
-                uint64_t total_secs = GetChapterStartTime(i);
-                uint64_t framenum   = GetChapterStartFrame(i);
-                int hours = (int)total_secs / 60 / 60;
-                int minutes = ((int)total_secs / 60) - (hours * 60);
-                double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
-                VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
-                        .arg(QString().sprintf("%02d", i + 1))
-                        .arg(QString().sprintf("%02d", hours))
-                        .arg(QString().sprintf("%02d", minutes))
-                        .arg(QString().sprintf("%06.3f", secs))
-                        .arg(framenum));
-            }
-        }
-        m_titlesize = bd_get_title_size(bdnav);
+        SwitchTitle(m_mainTitle);
 
         return true;
 }
@@ -150,6 +125,78 @@ uint64_t BDRingBufferPriv::GetChapterStartFrame(uint32_t chapter)
         return 0;
     return (uint64_t)((long double)(m_currentTitleInfo->chapters[chapter].start *
                                     GetFrameRate()) / 90000.0f);
+}
+
+int BDRingBufferPriv::GetCurrentTitle(void) const
+{
+    if (m_currentTitleInfo)
+        return m_currentTitleInfo->idx;
+    else
+        return -1;
+}
+
+int BDRingBufferPriv::GetTitleDuration(int title) const
+{
+    int numTitles = GetNumTitles();
+
+    if (numTitles > 0 && title >= 0 && title < numTitles)
+    {
+        BLURAY_TITLE_INFO *info = bd_get_title_info(bdnav, title);
+        if (!info)
+            return 0;
+        int duration = ((info->duration) / 90000.0f);
+        bd_free_title_info(info);
+        return duration;
+    }
+    else
+        return 0;
+}
+
+bool BDRingBufferPriv::SwitchTitle(uint title)
+{
+    if (bdnav)
+    {
+        if (m_currentTitleInfo)
+            bd_free_title_info(m_currentTitleInfo);
+
+        m_currentTitleInfo = bd_get_title_info(bdnav, title);
+
+        if (!m_currentTitleInfo)
+            return false;
+
+        m_currentTitleLength = m_currentTitleInfo->duration;
+        bd_select_title(bdnav, title);
+        uint32_t chapter_count = m_currentTitleInfo->chapter_count;
+        VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
+                                            "Duration: %2 (%3 mins) "
+                                            "Number of Chapters: %4")
+                                            .arg(title)
+                                            .arg(m_currentTitleLength)
+                                            .arg(m_currentTitleLength / (90000 * 60))
+                                            .arg(chapter_count));
+        VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
+        if (chapter_count)
+        {
+            for (uint i = 0; i < chapter_count; i++)
+            {
+                uint64_t total_secs = GetChapterStartTime(i);
+                uint64_t framenum   = GetChapterStartFrame(i);
+                int hours = (int)total_secs / 60 / 60;
+                int minutes = ((int)total_secs / 60) - (hours * 60);
+                double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
+                VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
+                        .arg(QString().sprintf("%02d", i + 1))
+                        .arg(QString().sprintf("%02d", hours))
+                        .arg(QString().sprintf("%02d", minutes))
+                        .arg(QString().sprintf("%06.3f", secs))
+                        .arg(framenum));
+            }
+        }
+        m_titlesize = bd_get_title_size(bdnav);
+        return true;
+    }
+    else
+        return false;
 }
 
 uint64_t BDRingBufferPriv::GetTotalReadPosition(void)

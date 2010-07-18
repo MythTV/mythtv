@@ -194,6 +194,8 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "AVCHAPTER",         -1,  0,  1,  0, "Chapter"));
     curMenuEntries.append(new TVOSDMenuEntry(
+        "AVTITLE",           -1,  0,  1,  0, "Title"));
+    curMenuEntries.append(new TVOSDMenuEntry(
         "GUIDE",              1,  1,  0,  0, "Program Guide"));
     curMenuEntries.append(new TVOSDMenuEntry(
         "PIP",                1,  1,  1, -1, "Picture-in-Picture"));
