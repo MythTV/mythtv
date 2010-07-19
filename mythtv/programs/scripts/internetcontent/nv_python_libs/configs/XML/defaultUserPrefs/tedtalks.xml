@@ -1,0 +1,70 @@
+<userTedTalks>
+<!--
+    This is the TedTalks user preference file. This is the place to enable or disable the
+    source URLs which will make up the videos added to a MythNetvision treeview. Within each
+    subDirectory are one or more source URLs that are used to get the videos and meta data
+    information.
+    The only attributes that a user should ever change would be to enable "true" or disable "false" a
+    specific "sourceURL" or change the Flash video quality by changeing the "parameter attribute".
+    These user files are maintained automatically with a user's preferences preserved. This means
+    that when an updated the Tedtalks file is distributed with MythNetvision then the user's
+    preference file will be updated accordingly. New source URLs can be added and others removed.
+    Any new URLs will automatically have at least one per "subDirectory" enabled so the user will be
+    alerted to the new source the next time they update their treeview maps.
+-->
+
+<!--
+    The TedTalks Search HTML URLs.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet. If this value is empty
+          then the url is specified in a configuration file that should not be altered by a user.
+    "pageFunction" Identifies a XPath extension function that returns the start page/index for the
+                    specific source.
+    "mnvsearch" (optional) Identifies that search items are to include items from the MNV table using the
+                mnvsearch_api.py functions. This attributes value must match the "feedtitle" value
+                as it is in the "internetcontentarticles" table. When present the "xsltFile",
+                "url" and "pageFunction" attributes are left empty as they will be ignored.
+    "parameter" (optional) Specifies source specific parameter that are passed to the XSLT stylesheet.
+                Multiple parameters require the use of key/value pairs. Example:
+                parameter="key1=value1;key2=value2" with a "=" or ";" as the separator value.
+                For this grabber the parameter specifies the quality of the Flash video played in
+                the MythBrowser. Permisable values are "flv=high", "flv=medium" and "flv=low". If you
+                experience excessive stuttering or tearing during MythBrowser Flash playback use a lower
+                quality setting.
+-->
+<search name="TedTalks Search">
+  <subDirectory name="TedTalks">
+    <sourceURL enabled="true" name="TedTalks HD" xsltFile="tedtalksHTML_item" type="html" url="" parameter="download=HD;flv=high"/>
+    <sourceURL enabled="false" name="TedTalks SD" xsltFile="tedtalksHTML_item" type="html" url="" parameter="download=SD;flv=high"/>
+  </subDirectory>
+</search>
+
+<!--
+    The TedTalks RSS feed and HTML URLs.
+    "globalmax" (optional) Is a way to limit the number of items processed per source for all
+                treeview URLs. A value of zero (0) means there are no limitations.
+    "max" (optional) Is a way to limit the number of items processed for an individual sourceURL.
+          This value will override any "globalmax" setting. A value of zero (0) means
+          there are no limitations and would be the same if the attribute was no included at all.
+    "enabled" If you want to remove a source URL then change the "enabled" attribute to "false".
+    "xsltFile" The XSLT file name that is used to translate data into MNV item format
+    "type" The source type "xml", "html" and "xhtml"
+    "url" The link that is used to retrieve the information from the Internet
+    "parameter" (optional) Specifies source specific parameter that are passed to the XSLT stylesheet.
+                Multiple parameters require the use of key/value pairs. Example:
+                parameter="key1=value1;key2=value2" with a "=" or ";" as the separator value.
+                For this grabber the parameter specifies the quality of the Flash video played in
+                the MythBrowser. Permisable values are "flv=high", "flv=medium" and "flv=low". If you
+                experience excessive stuttering or tearing during MythBrowser Flash playback use a lower
+                quality setting.
+-->
+
+<directory name="TedTalks" globalmax="0">
+  <subDirectory name="Last 6 months">
+    <sourceURL enabled="true" name="Last 6 months: HD" xsltFile="tedtalksRSS_item" type="xml" url="http://feeds.feedburner.com/tedtalksHD" parameter="flv=high"/>
+    <sourceURL enabled="false" name="Last 6 months: SD" xsltFile="tedtalksRSS_item" type="xml" url="http://feeds.feedburner.com/tedtalks_video" parameter="flv=high"/>
+  </subDirectory>
+</directory>
+</userTedTalks>

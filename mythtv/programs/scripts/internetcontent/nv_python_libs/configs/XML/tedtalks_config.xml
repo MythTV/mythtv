@@ -1,0 +1,36 @@
+<Configuration>
+    <!-- The relative file path and filename that contains the user specific preferences for this mashup -->
+    <userPreferenceFile>~/.mythtv/MythNetvision/userGrabberPrefs/tedtalks.xml</userPreferenceFile>
+    <!--
+        TedTalks search URL(s). This is a search generic URL, do not modify
+        NOTE: Only one URL is supported at this time.
+    -->
+    <searchURLS>
+        <urls>
+            <!--
+                Attributes:
+                    "name" of the grabber directory
+                    "href" Generic URL for the source of the information
+                    "filter" filter(s) used to select the elements of interest to appear in the XML/XHTML
+                             structure
+                    "pageFilter" optional filter that determines if there are any more pages to display
+                    "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+             -->
+            <url>
+                <name>TedTalks Search</name>
+                <href>http://www.ted.com/search/index/q/SEARCHTERM/page/PAGENUM</href>
+                <parserType>html</parserType>
+                <xslt>tedtalksHTML_item</xslt>
+            </url>
+        </urls>
+    </searchURLS>
+
+    <!--
+        XSLT style sheets used to translate input XML data into MNV compliant formats.
+        NOTE: Sometimes mashup macros are used for data translation instead of stylesheets.
+    -->
+    <XSLTstyleSheets>
+        <channel></channel>
+        <item></item>
+    </XSLTstyleSheets>
+</Configuration>

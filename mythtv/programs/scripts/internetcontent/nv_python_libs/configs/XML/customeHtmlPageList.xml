@@ -11,4 +11,5 @@
     <nasa>nasa.html?redirect=</nasa>
     <spitzer>spitzer.html?title=TITLE&amp;videocode=VIDEOCODE&amp;image=IMAGE</spitzer>
     <pbs>pbs.html?title=TITLE&amp;videocode=VIDEOCODE</pbs>
+    <comedycentral>comedycentral.html?title=TITLE&amp;videocode=VIDEOCODE</comedycentral>
 </customeHtmlPageList>

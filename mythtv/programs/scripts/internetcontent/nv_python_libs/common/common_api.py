@@ -18,7 +18,7 @@ MythNetvision Grabber scripts that run as a Web application and global functions
 MNV grabbers.
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -49,6 +49,7 @@ __version__="v0.2.1"
 # 0.2.0 Made the creation of custom HTML page links more flexible so code did not need to be changed
 #       when new custom HTML pages were added.
 # 0.2.1 Add the ability for a parameters to be passed to a XSLT style sheet
+# 0.2.2 Added a common XPath extention to test if a string starts or ends with a substring
 
 import os, struct, sys, re, datetime, time, subprocess, string
 import urllib
@@ -590,6 +591,7 @@ class Common(object):
             'getItemElement': self.getItemElement,
             'getDBRecords': self.getDBRecords,
             'createItemElement': self.createItemElement,
+            'testSubString': self.testSubString,
             }
         # Get the specific source functions
         self.addDynamicFunctions('xsltfunctions')
@@ -839,6 +841,21 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         '''
         return self.itemElement
     # end getItemElement()
+
+    def testSubString(self, context, *arg):
+        ''' Return True or False if a substring is at the beginning or end of a string
+        '''
+        if arg[0] == 'starts':
+            return arg[1].startswith(arg[2])
+        elif arg[0] == 'ends':
+            return arg[1].endswith(arg[2])
+        else:
+            index = arg[1].find(arg[2])
+            if index == -1:
+                return False
+            else:
+                return True
+    # end testSubString()
 
     def getDBRecords(self, context, *arg):
         ''' Return a list of 'internetcontentarticles' table records based on field and value matches
