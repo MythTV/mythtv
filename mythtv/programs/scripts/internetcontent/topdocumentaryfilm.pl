@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
-# @(#)$Header: /home/mythtv/mythtvrep/scripts/twit.tv.pl,v 1.31 2010/07/17 09:06:20 mythtv Exp $
+# @(#)$Header: /home/mythtv/mythtvrep/scripts/topdocumentaryfilm.pl,v 1.16 2010/07/17 06:06:33 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #
-# MythNetvision Grabber Script for TWiT.tv site.
+# MythNetvision Grabber Script for topdocumentaryfilm site.
 #
 # If you want to alter any of the default settings.
-# Create/Change $HOME/.mythtv/MythNetvision/userGrabberPrefs/twit.tv.cfg
+# Create/Change $HOME/.mythtv/MythNetvision/userGrabberPrefs/topdocumentaryfilm.cfg
 # Format of file
 # player=mplayer
 # playerargs=-fs -zoom %MEDIAURL%
@@ -51,14 +51,23 @@ use mnvcommonsubs;
 #################################### Settings #################################
 # Load from config file. May overwrite above.
 mnvloadconfig(fileparse($Script, '.pl'), "notused");
+# SKIP completely skips the video
+my %autoplay = (
+'youtube.com' => '&autoplay=1',
+'220.ro' => '&aplay=true',
+'megavideo.com' => 'SKIP',
+'veoh.com' => 'videoAutoPlay=1',
+'crunchyroll.com' => 'auto_play=true',
+'mediaservices.myspace.com' => ',AutoPlay=true',
+);
 
 #################################### Globals ##################################
-my $version = '$Revision: 1.31 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
-my $command = "twit.tv.pl"; my $commandthumbnail = "twit.tv.png"; my $author = "Auric";
-my $site = 'TWiT.tv';
-my $description = 'Leo Laporte &amp; Friends';
-my $baseurl = 'http://twit.tv';
-my $baseicon = 'http://twit.tv/sites/all/themes/twit/img/logo.gif';
+my $version = '$Revision: 1.16 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
+my $command = "topdocumentaryfilm.pl"; my $commandthumbnail = "topdocumentaryfilm.png"; my $author = "Auric";
+my $site = 'TopDocumentaryFilms';
+my $description = 'Great collection of documentary movies';
+my $baseurl = 'http://topdocumentaryfilms.com/';
+my $baseicon = 'http://www.danaroc.com/ezine_pics_031510_websites.jpg';
 my $store = "/tmp/.${site}.diritemsref.store";
 our ($opt_v, $opt_T, $opt_p, $opt_S);
 my %diritems;
@@ -94,6 +103,7 @@ my %diritems;
 # Basically this hash ref is what you need to build.
 # input base url
 # output items found
+
 sub builddiritems {
 	my $diritemsref = shift @_;
 	my $baseurl = shift @_;
@@ -103,28 +113,64 @@ sub builddiritems {
 	my $itemsfound = 0;
 	foreach my $dir (keys(%$vidurlsref)) {
 		my $diritemsfound = 0;
-		for (my $c = 0; $c <= $#{$vidurlsref->{$dir}}; $c++) {
-			my $found = builditems($diritemsref, $dir, ${$vidurlsref->{$dir}}[$c]);
+		foreach my $urltitle (@{$vidurlsref->{$dir}}) {
+			my($url, $title) = @{$urltitle};
+			my $found = builditems($diritemsref, $dir, $url, $title);
 			$itemsfound += $found;
 			$diritemsfound += $found;
-			# Skip rest as nothing found so far. (To speed things up)
-			if ($c > 0 && $diritemsfound == 0) {
-				mnvinfomsg(2, "Skipping rest of $dir as nothing found so far");
-				last;
-			}
 		}
 		mnvinfomsg(1, "$dir Items found $diritemsfound");
 	}
 	return $itemsfound;
 }
 
+sub addautoplay {
+	my $link = shift @_;
+
+	$link = decode_entities($link);
+	unless ($link =~ s/(.*[?&]autoplay=)false(.*)/${1}true${2}/i) {
+		unless ($link =~ s/(.*[?&]autostart=)false(.*)/${1}true${2}/i) {
+			unless ($link =~ s/(.*[?&]aplay=)false(.*)/${1}true${2}/i) {
+				unless ($link =~ s/(.*[?&]autoplay=)0(.*)/${1}1${2}/i) {
+					unless ($link =~ s/(.*[?&]autostart=)0(.*)/${1}1${2}/i) {
+						unless ($link =~ s/(.*[?&]aplay=)0(.*)/${1}1${2}/i) {
+							foreach my $ap (keys(%autoplay)) {
+								if ($link =~ /$ap/) {
+									($autoplay{$ap}) or return encode_entities($link);
+									($autoplay{$ap} eq 'SKIP') and return 0;
+									if ($autoplay{$ap} =~ /^[\?\&,]/) {
+											$link .= $autoplay{$ap};
+									} else {
+										if ($link =~ /\?/) {
+											$link .= '&' . $autoplay{$ap};
+										} else {
+											$link .= '?' . $autoplay{$ap};
+										}
+									}
+									return encode_entities($link);
+								}
+							}
+							if ($link =~ /\?/) {
+								$link .= '&' . mnvgetconfig('defaultautoplay');
+							} else {
+								$link .= '?' . mnvgetconfig('defaultautoplay');
+							}
+							return encode_entities($link);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 # Collect url's of all the podcasts
 # input base url
 # return hash ref to { "directory name" => "url" }
 sub builddirurls {
-	my $baseurl = shift@_;
+	my $baseurl = shift @_;
 
-	my %dirurls;
+    my %dirurls;
 
 	mnvinfomsg(1, "Getting $baseurl");
 	my $content = get($baseurl);
@@ -138,31 +184,25 @@ sub builddirurls {
 	}
 	$tree->eof();
 
-	my @ptrs;
-	my $tmp = $tree->look_down('class', 'leaf first');
-	($tmp) and push(@ptrs, $tmp);
-	my @tmp = $tree->look_down('class', 'leaf');
-	(@tmp) and push(@ptrs, @tmp);
+	my @ptrs = $tree->find_by_tag_name('a');
 	foreach my $ptr (@ptrs) {
-		my @as = $ptr->find_by_tag_name('a');
-		foreach my $a (@as) {
-			my $dir = $a->as_trimmed_text();
-			$dirurls{$dir} = mnvcleantext($baseurl.$a->attr('href'));
+		if ($ptr->attr('href') =~ /topdocumentaryfilms.com\/category\//) {
+			my $dir = $ptr->as_trimmed_text();
+			$dirurls{$dir} = mnvcleantext($ptr->attr('href'));
 		}
 	}
-	#print STDERR Dumper(%dirurls);
-	(keys(%dirurls)) or die "No urls found";
+    (keys(%dirurls)) or die "No urls found";
 
-	return \%dirurls;
+    return \%dirurls;
 }
 
 # Collect url's to all vids
-# input hash ref to  { "directory name" => "url" }
-# return hash ref to { "directory name" => [url] }
+# return hash ref to { "directory name" => "url" }
+# return hash ref to { "directory name" => [[url,title]] }
 sub buildvidurls {
 	my $dirurls = shift @_;
 
-	my %vidurls;
+    my %vidurls;
 
 	foreach my $dir (sort(keys(%$dirurls))) {
 		mnvinfomsg(1, "Getting $dir $dirurls->{$dir}");
@@ -179,33 +219,31 @@ sub buildvidurls {
 		}
 		$tree->eof();
 
-		# Not used anywhere.
-		#my $dirdesc;
-		#my $ptr = $tree->look_down('class', 'podcast-description');
-		#($ptr) and $dirdesc = $ptr->as_trimmed_text();
+		my @ptrs = $tree->find_by_tag_name('h2');
+		(@ptrs) or next;
 
-		my @ptrs;
-		my $tmp = $tree->look_down('class', 'podcast-number current');
-		($tmp) and push(@ptrs, $tmp);
-		my @tmp = $tree->look_down('class', 'podcast-number');
-		(@tmp) and push(@ptrs, @tmp);
-		foreach my $urlp (@ptrs) {
-			push(@{$vidurls{$dir}}, mnvcleantext($baseurl.$urlp->attr('href')));
+		foreach my $ptr (@ptrs) {
+			my $a = $ptr->find_by_tag_name('a');
+			($a) or next;
+			my $url = mnvcleantext($a->attr('href'));
+			my $title = mnvcleantext($a->as_trimmed_text());
+			push(@{$vidurls{$dir}}, [$url, $title]);
 		}
 	}
-	#print STDERR Dumper(%vidurls);
-	return \%vidurls;
+    return \%vidurls;;
 }
 
 # Build all items
 # input hash ref to { "directory name" => [array of anonymous hash's] }
 # input "directory name"
 # input url
+# input title
 # output number of items added
 sub builditems {
 	my $diritemsref = shift @_;
 	my $dir = shift @_;
 	my $url = shift @_;
+	my $title = shift @_;
 
 	mnvinfomsg(2, "Getting $dir Episode $url");
 	my $content = get($url);
@@ -221,124 +259,63 @@ sub builditems {
 	}
 	$tree->eof();
 
-	my @links;
-	my @as = $tree->find_by_tag_name('a');
-	foreach my $a (@as) {
-		$a->as_trimmed_text() =~ /Download Video/ or next;
-		$a->attr('href') =~ /^http:.*video.*mp4$/ and push(@links, mnvcleantext($a->attr('href')));
+	my $desc = ""; my $icon = $baseicon; my @links;
+	my $pc = $tree->look_down('class', 'postContent');
+	($pc) or return 0;
+	my $ptr = $pc->find_by_tag_name('p');
+	($ptr) and $desc = mnvcleantext($ptr->as_trimmed_text());
+	$ptr = $pc->find_by_tag_name('img');
+	($ptr) and $icon = mnvcleantext($ptr->attr('src'));
+	my @ptrs = $pc->find_by_tag_name('embed');
+	foreach my $ptr (@ptrs) {
+		my $l = mnvcleantext($ptr->attr('src'));
+		($l) or next;
+		my $lap = addautoplay($l);
+		if ($lap) {
+			push(@links, $lap);
+		} else {
+			mnvinfomsg(2, "Skipped $l");
+		}
 	}
 	(@links) or return 0;
 
-	my $title = ""; my $pubDate = ""; my $desc = "";
-	my @ptrs;
-	my $tmp = $tree->look_down('class', 'podcast-number current');
-	($tmp) and push(@ptrs, $tmp);
-	my @tmp = $tree->look_down('class', 'podcast-number');
-	(@tmp) and push(@ptrs, @tmp);
-	my $ptr;
-	foreach my $tmp (@ptrs) {
-		my $testurl = $tmp->attr('href');
-		$url =~ /http:.*${testurl}/ and $ptr = $tmp and last;
-	}
-	if ($ptr) {
-		$title = mnvcleantext($ptr->attr('title'));
-		$ptr = $ptr->parent();
-		my $ptr2 = $ptr->look_down('class', 'podcast-date');
-		if ($ptr2) {
-			my $time = str2time($ptr2->as_trimmed_text());
-			$pubDate = time2str("%a, %d %b %Y 00:00:00 GMT", $time);
-			$pubDate = mnvcleantext($pubDate);
-		}
-		$ptr2 = $ptr->find_by_tag_name('p');
-		($ptr2) and $desc = mnvcleantext($ptr2->as_trimmed_text());
-	}
-	($title) or return 0;
-
-	my $icon = $baseicon;
-	$ptr = $tree->look_down('class', 'imagecache imagecache-coverart');
-	($ptr) and $icon = mnvcleantext($ptr->attr('src'));
-
-	my $duration = "";
-	$ptr = $tree->look_down('class', 'running-time');
-	($ptr) and my $tmpdur = $ptr->as_trimmed_text();
-	if ($tmpdur =~ s/Running time: //) {
-		my $hours = 0; my $mins = 0; my $secs = 0;
-		my $count = $tmpdur =~ s/(:)/$1/g;
-		if ($count == 1) {
-			($mins, $secs) = split(':', $tmpdur);
-		} elsif ($count == 2) {
-			($hours, $mins, $secs) = split(':', $tmpdur);
-		} else {
-			goto NODURATION;
-		}
-		$tmpdur = ($hours * 60 * 60) + ($mins * 60) + $secs;
-		($tmpdur > 0) and $duration = mnvcleantext($tmpdur);
-	}
-NODURATION:
-
 	my $country = "";
-
-	my $count = 0;
-	foreach my $contenturl (@links) {
-		my ($width, $height, $titleresolution);
-		$contenturl =~ /_(\d\d\d)x(\d\d\d)_/;
-		if ($1 && $2) {
-			$width = $1;
-			$height = $2;
+	my $addpart = 1;
+	my $oldtitle = $title;
+	foreach my $link (@links) {
+		if ($#links > 0) {
+			$title = "$oldtitle Pt $addpart";
+			$addpart++;
 		}
-		if (mnvgetconfig('resolution')) {
-			$titleresolution = $title;
-			if ((mnvgetconfig('resolution') eq "high") && ($width < 750)) {
-				mnvinfomsg(1, "Skipping $contenturl due to wrong resolution");
-				next;
-			}
-			if ((mnvgetconfig('resolution') eq "low") && ($width >= 750)) {
-				mnvinfomsg(1, "Skipping $contenturl due to wrong resolution");
-				next;
-			}
-		} else {
-			$titleresolution = "$title (${width}x${height})";
-		}
-		my $link = $url;
-		if ((mnvgetconfig('netplayer')) && ($contenturl)) {
-			if (mnvistype(mnvgetconfig('netplayertype'), $contenturl)) {
-				my $encodedtitle = decode_entities($title);
-				$encodedtitle = mnvURLEncode($encodedtitle);
-				$link = mnvcleantext(mnvgetconfig('netplayer')."?title=${encodedtitle}&videofile=").$contenturl;
-			} else {
-				mnvinfomsg(1, "Not ".mnvgetconfig('netplayertype')." $contenturl");
-			}
-		}
-		push(@{$diritemsref->{$dir}}, {
-			'dirthumbnail' => $icon,
-			'title' => $titleresolution,
+        push(@{$diritemsref->{$dir}}, {
+            'dirthumbnail' => $icon,
+            'title' => $title,
 			'mythtv:subtitle' => "",
-			'author' => "twit.tv",
-			'pubDate' => $pubDate,
-			'description' => $desc,
-			'link' => $link,
+            'author' => "",
+            'pubDate' => "",
+            'description' => $desc,
+            'link' => $link,
 			'player' => mnvgetconfig('player'),
 			'playerargs' => mnvgetconfig('playerargs'),
 			'download' => mnvgetconfig('download'),
 			'downloadargs' => mnvgetconfig('downloadargs'),
-			'media:thumbnailurl' => $icon,
-			'media:contenturl' => $contenturl,
-			'media:contentlength' => "",
-			'media:contentduration' => $duration,
-			'media:contentwidth' => $width,
-			'media:contentheight' => $height,
-			'media:contentlanguage' => "",
-			'rating' => "",
+            'media:thumbnailurl' => $icon,
+            'media:contenturl' => $link,
+            'media:contentlength' => "",
+            'media:contentduration' => "",
+            'media:contentwidth' => "",
+            'media:contentheight' => "",
+            'media:contentlanguage' => "",
+            'rating' => "",
 			'mythtv:country' => $country,
 			'mythtv:season' => "",
 			'mythtv:episode' => "",
 			'mythtv:customhtml' => "no"
-		});
+        });
 
-		mnvinfomsg(2, "Added $title");
-		$count ++;
-	}
-	return $count;
+        mnvinfomsg(2, "Added $title");
+    }
+	return $#links + 1;
 }
 
 #################################### Main #####################################
@@ -396,7 +373,7 @@ if ($type eq "search") {
 	mnvprintsearch($diritemsref, $page);
 	mnvinfomsg(1, "Total Items match $filtereditems of $totalitems");
 } else {
-	mnvprinttree($diritemsref, 4);
+	mnvprinttree($diritemsref);
 	mnvinfomsg(1, "Total Items found $totalitems");
 }
 print "</channel>\n";
