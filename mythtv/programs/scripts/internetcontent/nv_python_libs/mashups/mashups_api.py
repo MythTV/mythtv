@@ -19,13 +19,14 @@ meta data, video and image URLs from various Internet sources. These routines pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/xxxxMashup.xml" where "xxxx" is the specific mashup name matching the associated grabber name that calls these functions.
 '''
 
-__version__="v0.1.5"
+__version__="v0.1.6"
 # 0.1.0 Initial development
 # 0.1.1 Added Search Mashup capabilities
 # 0.1.2 Fixed a couple of error messages with improper variable names
 # 0.1.3 Add the ability for a Mashup to search the "internetcontentarticles" table
 # 0.1.4 Add the ability for a Mashup to pass variables to a XSLT style sheet
 # 0.1.5 Removed a redundant build of the common XSLT function dictionary
+# 0.1.6 Corrected a bug were a users custom setting were not being updated properly
 
 import os, struct, sys, time, datetime, shutil, urllib
 from socket import gethostname, gethostbyname
@@ -263,11 +264,12 @@ class Videos(object):
             defaultPrefs = etree.parse(defaultConfig)
         except Exception, errormsg:
             raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (defaultConfig, errormsg))
-        urlFilter = etree.XPath('//sourceURL[@url=$url]', namespaces=self.common.namespaces)
+        urlFilter = etree.XPath('//sourceURL[@url=$url and @name=$name]', namespaces=self.common.namespaces)
         globalmaxFilter = etree.XPath('./../..', namespaces=self.common.namespaces)
         for sourceURL in self.userPrefs.xpath('//sourceURL'):
             url = sourceURL.attrib['url']
-            defaultSourceURL = urlFilter(defaultPrefs, url=url)
+            name = sourceURL.attrib['name']
+            defaultSourceURL = urlFilter(defaultPrefs, url=url, name=name)
             if len(defaultSourceURL):
                 defaultSourceURL[0].attrib['enabled'] = sourceURL.attrib['enabled']
                 if sourceURL.attrib.get('max'):
