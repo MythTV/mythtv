@@ -812,15 +812,6 @@ uint64_t bd_tell_time(BLURAY *bd)
     return ((uint64_t)out_time) * 2;
 }
 
-// This must be called after bd_open() and before bd_select_title().
-// Populates the title list in BLURAY.
-// Filtering of the returned list is controled throught flags
-//  TITLES_ALL              - all titles
-//  TITLES_FILTER_DUP_TITLE - remove duplicate titles
-//  TITLES_FILTER_DUP_CLIP  - remove titles that have duplicated clips
-//  TITLES_RELEVANT         - remove dup titles and clips
-//
-//  Returns the number of titles found
 uint32_t bd_get_titles(BLURAY *bd, uint8_t flags)
 {
     if (!bd) {

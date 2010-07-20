@@ -25,13 +25,20 @@
 extern "C" {
 #endif
 
+/**
+ * @file libbluray/bluray.h
+ * external API header
+ */
+
 #include <stdint.h>
 
-/* Title flags */
-#define TITLES_ALL              0
-#define TITLES_FILTER_DUP_TITLE 0x01
-#define TITLES_FILTER_DUP_CLIP  0x02
-#define TITLES_RELEVANT         (TITLES_FILTER_DUP_TITLE | TITLES_FILTER_DUP_CLIP)
+#define TITLES_ALL              0    /**< all titles. */
+#define TITLES_FILTER_DUP_TITLE 0x01 /**< remove duplicate titles. */
+#define TITLES_FILTER_DUP_CLIP  0x02 /**< remove titles that have duplicate
+                                          clips. */
+#define TITLES_RELEVANT \
+  (TITLES_FILTER_DUP_TITLE | TITLES_FILTER_DUP_CLIP) /**< remove duplicate
+                                                          titles and clips */
 
 typedef struct bluray BLURAY;
 
@@ -76,30 +83,206 @@ typedef struct bd_title_info {
     BLURAY_TITLE_CHAPTER *chapters;
 } BLURAY_TITLE_INFO;
 
+/**
+ *
+ *  This must be called after bd_open() and before bd_select_title().
+ *  Populates the title list in BLURAY.
+ *  Filtering of the returned list is controled through title flags
+ *
+ * @param bd  BLURAY object
+ * @param flags  title flags
+ * @return number of titles found
+ */
 uint32_t bd_get_titles(BLURAY *bd, uint8_t flags);
+
+/**
+ *
+ *  Get information about a title
+ *
+ * @param bd  BLURAY object
+ * @param title_idx title index number
+ * @return allocated BLURAY_TITLE_INFO object, NULL on error
+ */
 BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx);
+
+/**
+ *
+ *  Free BLURAY_TITLE_INFO object
+ *
+ * @param title_info  BLURAY_TITLE_INFO object
+ */
 void bd_free_title_info(BLURAY_TITLE_INFO *title_info);
 
-BLURAY *bd_open(const char* device_path, const char* keyfile_path); // Init libbluray objs
-void bd_close(BLURAY *bd);                                          // Free libbluray objs
+/**
+ *  Initializes libbluray objects
+ *
+ * @param device_path   path to mounted Blu-ray disc
+ * @param keyfile_path  path to KEYDB.cfg (may be NULL)
+ * @return allocated BLURAY object, NULL if error
+ */
+BLURAY *bd_open(const char* device_path, const char* keyfile_path);
 
-int64_t bd_seek(BLURAY *bd, uint64_t pos);              // Seek to pos in currently selected title file
-int64_t bd_seek_time(BLURAY *bd, uint64_t tick); // Seek to a specific time in 90Khz ticks
-int bd_read(BLURAY *bd, unsigned char *buf, int len);   // Read from currently selected title file, decrypt if possible
-int64_t bd_seek_chapter(BLURAY *bd, unsigned chapter);  // Seek to a chapter. First chapter is 0
-int64_t bd_chapter_pos(BLURAY *bd, unsigned chapter);   // Find the byte position of a chapter
-uint32_t bd_get_current_chapter(BLURAY *bd);            // Get the current chapter
-int64_t bd_seek_mark(BLURAY *bd, unsigned mark);        // Seek to a playmark. First mark is 0
+/**
+ *  Free libbluray objects
+ *
+ * @param bd  BLURAY object
+ */
+void bd_close(BLURAY *bd);
+
+/**
+ *  Seek to pos in corrently selected title
+ *
+ * @param bd  BLURAY object
+ * @param pos position to seek to
+ * @return current seek position
+ */
+int64_t bd_seek(BLURAY *bd, uint64_t pos);
+
+/**
+ *
+ * Seek to specific time in 90Khz ticks
+ *
+ * @param bd    BLURAY ojbect
+ * @param tick  tick count
+ * @return current seek position
+ */
+int64_t bd_seek_time(BLURAY *bd, uint64_t tick);
+
+/**
+ *
+ *  Read from currently selected title file, decrypt if possible
+ *
+ * @param bd  BLURAY object
+ * @param buf buffer to read data into
+ * @param len size of data to be read
+ * @return size of data read, -1 if error
+ */
+int bd_read(BLURAY *bd, unsigned char *buf, int len);
+
+/**
+ *
+ *  Seek to a chapter. First chapter is 0
+ *
+ * @param bd  BLURAY object
+ * @param chapter chapter to seek to
+ * @return current seek position
+ */
+int64_t bd_seek_chapter(BLURAY *bd, unsigned chapter);
+
+/**
+ *
+ *  Find the byte position of a chapter
+ *
+ * @param bd  BLURAY object
+ * @param chapter chapter to find position of
+ * @return seek position of chapter start
+ */
+int64_t bd_chapter_pos(BLURAY *bd, unsigned chapter);
+
+/**
+ *
+ *  Get the current chapter
+ *
+ * @param bd  BLURAY object
+ * @return current chapter
+ */
+uint32_t bd_get_current_chapter(BLURAY *bd);
+
+/**
+ *
+ * Seek to a playmark. First mark is 0
+ *
+ * @param bd  BLURAY object
+ * @param mark playmark to seek to
+ * @return current seek position
+ */
+int64_t bd_seek_mark(BLURAY *bd, unsigned mark);
+
+/**
+ *
+ *  Select a playlist
+ *
+ * @param bd  BLURAY object
+ * @param playlist playlist to select
+ * @return 1 on success, 0 if error
+ */
 int bd_select_playlist(BLURAY *bd, uint32_t playlist);
-int bd_select_title(BLURAY *bd, uint32_t title);    // Select the title from the list created by bd_get_titles()
-int bd_select_angle(BLURAY *bd, unsigned angle);           // Set the angle to play
-void bd_seamless_angle_change(BLURAY *bd, unsigned angle); // Initiate seamless angle change
-uint64_t bd_get_title_size(BLURAY *bd);             // Returns file size in bytes of currently selected title, 0 in no title selected
-uint32_t bd_get_current_title(BLURAY *bd);          // Returns the current title index
-unsigned bd_get_current_angle(BLURAY *bd);          // Returns the current angle
 
-uint64_t bd_tell(BLURAY *bd);       // Return current pos
-uint64_t bd_tell_time(BLURAY *bd);  // Return current time
+/**
+ *
+ *  Select the title from the list created by bd_get_titles()
+ *
+ * @param bd  BLURAY object
+ * @param title title to select
+ * @return 1 on success, 0 if error
+ */
+int bd_select_title(BLURAY *bd, uint32_t title);
+
+/**
+ *
+ *  Set the angle to play
+ *
+ * @param bd  BLURAY object
+ * @param angle angle to play
+ * @return 1 on success, 0 if error
+ */
+int bd_select_angle(BLURAY *bd, unsigned angle);
+
+/**
+ *
+ *  Initiate seamless angle change
+ *
+ * @param bd  BLURAY object
+ * @param angle angle to change to
+ */
+void bd_seamless_angle_change(BLURAY *bd, unsigned angle);
+
+/**
+ *
+ *  Returns file size in bytes of currently selected title, 0 in no title
+ *  selected
+ *
+ * @param bd  BLURAY object
+ * @return file size in bytes of currently selected title, 0 if no title
+ * selected
+ */
+uint64_t bd_get_title_size(BLURAY *bd);
+
+/**
+ *
+ *  Returns the current title index
+ *
+ * @param bd  BLURAY object
+ * @return current title index
+ */
+uint32_t bd_get_current_title(BLURAY *bd);
+
+/**
+ *
+ *  Return the current angle
+ *
+ * @param bd  BLURAY object
+ * @return current angle
+ */
+unsigned bd_get_current_angle(BLURAY *bd);
+
+/**
+ *
+ *  Return current pos
+ *
+ * @param bd  BLURAY object
+ * @return current seek position
+ */
+uint64_t bd_tell(BLURAY *bd);
+
+/**
+ *
+ *  Return current time
+ *
+ * @param bd  BLURAY object
+ * @return current time
+ */
+uint64_t bd_tell_time(BLURAY *bd);
 
 /*
  * player settings
