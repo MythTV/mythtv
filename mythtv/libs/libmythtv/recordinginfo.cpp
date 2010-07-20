@@ -688,12 +688,13 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE recorded SET endtime = :ENDTIME, "
-                  "       duplicate = 1 "
+                  "       duplicate = :DUPLICATE "
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
     query.bindValue(":ENDTIME", recendts);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":DUPLICATE", !prematurestop);
 
     if (!query.exec())
         MythDB::DBError("FinishedRecording update", query);
