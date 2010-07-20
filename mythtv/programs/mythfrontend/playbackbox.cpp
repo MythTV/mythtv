@@ -523,7 +523,8 @@ void PlaybackBox::Load(void)
 void PlaybackBox::Init()
 {
     m_groupList->SetLCDTitles(tr("Groups"));
-    m_recordingList->SetLCDTitles(tr("Recordings"), "titlesubtitle|shortdate|starttime");
+    m_recordingList->SetLCDTitles(tr("Recordings"),
+                                  "titlesubtitle|shortdate|starttime");
 
     if (!m_player && !m_recGroupPassword.isEmpty())
         displayRecGroup(m_recGroup);
@@ -2179,7 +2180,8 @@ void PlaybackBox::ShowGroupPopup()
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
+    connect(m_popupMenu, SIGNAL(Closed(QString, int)),
+                         SLOT(popupClosed(QString, int)));
 
     if (m_popupMenu->Create())
         m_popupStack->AddScreen(m_popupMenu);
@@ -2351,7 +2353,8 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
+    connect(m_popupMenu, SIGNAL(Closed(QString, int)),
+                         SLOT(popupClosed(QString, int)));
 
     if (m_popupMenu->Create())
         m_popupStack->AddScreen(m_popupMenu);
@@ -2655,7 +2658,8 @@ bool PlaybackBox::CreatePopupMenu(const QString &label)
     if (!m_popupMenu)
         return false;
 
-    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
+    connect(m_popupMenu, SIGNAL(Closed(QString, int)),
+                         SLOT(popupClosed(QString, int)));
 
     if (m_popupMenu->Create())
     {
@@ -3512,7 +3516,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend",
+                                                     event, actions);
 
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
@@ -3685,15 +3690,15 @@ void PlaybackBox::customEvent(QEvent *event)
                     Qt::AltModifier |
                     Qt::MetaModifier |
                     Qt::KeypadModifier;
-                keyevent = new QKeyEvent(QEvent::KeyPress, Qt::Key_LaunchMedia,
-                                      modifiers);
+                keyevent = new QKeyEvent(QEvent::KeyPress,
+                                         Qt::Key_LaunchMedia, modifiers);
                 QCoreApplication::postEvent((QObject*)(GetMythMainWindow()),
-                                        keyevent);
+                                            keyevent);
 
-                keyevent = new QKeyEvent(QEvent::KeyRelease, Qt::Key_LaunchMedia,
-                                      modifiers);
+                keyevent = new QKeyEvent(QEvent::KeyRelease,
+                                         Qt::Key_LaunchMedia, modifiers);
                 QCoreApplication::postEvent((QObject*)(GetMythMainWindow()),
-                                        keyevent);
+                                            keyevent);
             }
         }
         else if (message.left(17) == "UPDATE_FILE_SIZE")
@@ -4895,8 +4900,7 @@ bool HelpPopup::Create()
     if (!LoadWindowFromXML("recordings-ui.xml", "iconhelp", this))
         return false;
 
-    m_iconList = dynamic_cast<MythUIButtonList*>
-                                                        (GetChild("iconlist"));
+    m_iconList = dynamic_cast<MythUIButtonList*>(GetChild("iconlist"));
 
     if (!m_iconList)
     {
