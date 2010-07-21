@@ -461,6 +461,7 @@ clpi_access_point(CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_
     // If the timestamp is before the first entry, then return
     // the beginning of the clip
     if (ii == 0) {
+        *time = 0;
         return 0;
     }
     ii--;
@@ -518,6 +519,8 @@ clpi_access_point(CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_
         *time = 0;
         return cl->clip.num_source_packets;
     }
+    *time = ((uint64_t)(entry->coarse[ii].pts_ep & ~0x01) << 18) +
+            ((uint64_t)entry->fine[jj].pts_ep << 8);
     return coarse_spn + entry->fine[jj].spn_ep;
 }
 

@@ -550,11 +550,16 @@ NAV_CLIP* nav_packet_search(NAV_TITLE *title, uint32_t pkt, uint32_t *clip_pkt, 
     }
     if (ii == title->pl->list_count) {
         clip = &title->clip_list.clip[ii-1];
+        *out_time = clip->duration;
         *clip_pkt = clip->end_pkt;
     } else {
         clip = &title->clip_list.clip[ii];
         *clip_pkt = clpi_access_point(clip->cl, pkt - pos + clip->start_pkt, 0, 0, out_time);
     }
+    if(*out_time < clip->in_time)
+        *out_time = 0;
+    else
+        *out_time -= clip->in_time;
     *out_pkt = clip->pos + *clip_pkt - clip->start_pkt;
     return clip;
 }
