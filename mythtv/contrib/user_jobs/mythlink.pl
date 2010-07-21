@@ -311,7 +311,15 @@ EOF
     }
 
 # Create symlinks for the files on this machine
-    my %rows = $Myth->backend_rows('QUERY_RECORDINGS Delete');
+    my %rows = ();
+    if (defined($chanid)) {
+        %rows = $Myth->backend_rows('QUERY_RECORDING TIMESLOT '.
+                                    "$chanid $starttime");
+
+    }
+    else {
+        %rows = $Myth->backend_rows('QUERY_RECORDINGS DELETE');
+    }
     foreach my $row (@{$rows{'rows'}}) {
         my $show = new MythTV::Recording(@$row);
     # Skip LiveTV recordings?
