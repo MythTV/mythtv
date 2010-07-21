@@ -294,7 +294,7 @@ EOF
     vprint("Link destination directory:  $dest");
 # Create nonexistent paths
     unless (-e $dest) {
-        mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
+        mkpath($dest, 0, 0775) or die "Failed to create $dest:  $!\n";
     }
 # Bad path
     die "$dest is not a directory.\n" unless (-d $dest);
@@ -372,7 +372,7 @@ EOF
     # Create the link
         my $directory = dirname("$dest/$name");
         unless (-e $directory) {
-            mkpath($directory, 0, 0755)
+            mkpath($directory, 0, 0775)
                 or die "Failed to create $directory:  $!\n";
         }
         symlink $show->{'local_path'}, "$dest/$name"
