@@ -1217,6 +1217,12 @@ bool HTTPRequest::ParseRange( QString sRange,
 
 void HTTPRequest::ExtractMethodFromURL()
 {
+    // Strip out leading http://192.168.1.1:6544/ -> /
+    // Should fix #8678
+    QRegExp sRegex("^http://.*/");
+    sRegex.setMinimal(true);
+    m_sBaseUrl.replace(sRegex, "/");
+
     QStringList sList = m_sBaseUrl.split('/', QString::SkipEmptyParts);
 
     m_sMethod = "";
@@ -1228,7 +1234,7 @@ void HTTPRequest::ExtractMethodFromURL()
     }
 
     m_sBaseUrl = '/' + sList.join( "/" );
-    //VERBOSE(VB_UPNP, QString("ExtractMethodFromURL : %1 : ").arg(m_sMethod));
+    VERBOSE(VB_UPNP, QString("ExtractMethodFromURL(end) : %1 : %2").arg(m_sMethod).arg(m_sBaseUrl));
 }
 
 /////////////////////////////////////////////////////////////////////////////
