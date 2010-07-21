@@ -99,9 +99,14 @@ package MythTV;
     our $BACKEND_SEP    = '[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
-# MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
-# and should be the current MythTV protocol version.
-    our $PROTO_VERSION = 58;
+# MYTH_PROTO_VERSION is defined in libmythdb in 
+# mythtv/libs/libmythdb/mythversion.h and should be the current MythTV 
+# protocol version.
+#
+# Note: as of July 21, 2010, this is actually a string, to account for proto
+# versions of the form "58a".  This will get used if protocol versions are 
+# changed on a fixes branch ongoing.
+    our $PROTO_VERSION = "58";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
