@@ -75,6 +75,7 @@ typedef struct bd_chapter {
 
 typedef struct bd_title_info {
     uint32_t             idx;
+    uint32_t             playlist;
     uint64_t             duration;
     uint32_t             clip_count;
     uint8_t              angle_count;

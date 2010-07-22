@@ -33,12 +33,12 @@ extern "C" {
 typedef enum {
     PSR_IG_STREAM_ID     = 0,
     PSR_PRIMARY_AUDIO_ID = 1,
-    PSR_PG_PIP_STREAM    = 2,
-    PSR_ANGLE_NUMBER     = 3,
-    PSR_TITLE_ID         = 4,
-    PSR_CHAPTER          = 5,
-    PSR_PLAYLIST         = 6,
-    PSR_PLAYITEM         = 7,
+    PSR_PG_STREAM        = 2, /* PG TextST and PIP PG TextST stream number */
+    PSR_ANGLE_NUMBER     = 3, /* 1..N */
+    PSR_TITLE_NUMBER     = 4, /* 1..N  (0 = top menu, 0xffff = first play) */
+    PSR_CHAPTER          = 5, /* 1..N  (0xffff = invalid) */
+    PSR_PLAYLIST         = 6, /* playlist file name number */
+    PSR_PLAYITEM         = 7, /* 0..N-1 (playitem_id) */
     PSR_TIME             = 8, /* presetation time */
     PSR_NAV_TIMER        = 9,
     PSR_SELECTED_BUTTON_ID = 10,
@@ -81,6 +81,9 @@ uint32_t bd_psr_read(BD_REGISTERS *, int reg);
 
 void     bd_psr_save_state(BD_REGISTERS *);
 void     bd_psr_restore_state(BD_REGISTERS *);
+
+void     bd_psr_lock(BD_REGISTERS *);
+void     bd_psr_unlock(BD_REGISTERS *);
 
 int      bd_gpr_write(BD_REGISTERS *, int reg, uint32_t val);
 uint32_t bd_gpr_read(BD_REGISTERS *, int reg);

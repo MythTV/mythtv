@@ -38,6 +38,12 @@ typedef enum {
     HDMV_EVENT_PLAY_PM,        /* seek to playmark */
     HDMV_EVENT_PLAY_STOP,      /* stop playing playlist */
 
+    HDMV_EVENT_STILL,          /* param: boolean */
+
+    HDMV_EVENT_ENABLE_BUTTON,
+    HDMV_EVENT_DISABLE_BUTTON,
+    HDMV_EVENT_POPUP_OFF,
+
 } hdmv_event_e;
 
 typedef struct hdmv_vm_event_s {

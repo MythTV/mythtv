@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #define BD_PSR_COUNT 128
 #define BD_GPR_COUNT 4096
@@ -108,9 +109,9 @@ static const uint32_t bd_psr_init[BD_PSR_COUNT] = {
 static const char * const bd_psr_name[BD_PSR_COUNT] = {
     "IG_STREAM_ID",
     "PRIMARY_AUDIO_ID",
-    "PG_PIP_STREAM",
+    "PG_STREAM",
     "ANGLE_NUMBER",
-    "TITLE_ID",
+    "TITLE_NUMBER",
     "CHAPTER",
     "PLAYLIST",
     "PLAYITEM",
@@ -147,6 +148,8 @@ struct bd_registers_s
     /* callbacks */
     int          num_cb;
     PSR_CB_DATA *cb;
+
+    pthread_mutex_t mutex;
 };
 
 /*
@@ -159,12 +162,16 @@ BD_REGISTERS *bd_registers_init(void)
 
     memcpy(p->psr, bd_psr_init, sizeof(bd_psr_init));
 
+    pthread_mutex_init(&p->mutex, NULL);
+
     return p;
 }
 
 void bd_registers_free(BD_REGISTERS *p)
 {
     if (p) {
+        pthread_mutex_destroy(&p->mutex);
+
         X_FREE(p->cb);
     }
 
@@ -172,15 +179,34 @@ void bd_registers_free(BD_REGISTERS *p)
 }
 
 /*
- * register / unregister state change callback
+ * PSR lock / unlock
+ */
+
+void bd_psr_lock(BD_REGISTERS *p)
+{
+    pthread_mutex_lock(&p->mutex);
+}
+
+void bd_psr_unlock(BD_REGISTERS *p)
+{
+    pthread_mutex_unlock(&p->mutex);
+}
+
+/*
+ * PSR change callback register / unregister
  */
 
 void bd_psr_register_cb  (BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle)
 {
     /* no duplicates ! */
     int i;
+
+    bd_psr_lock(p);
+
     for (i = 0; i < p->num_cb; i++) {
         if (p->cb[i].handle == cb_handle && p->cb[i].cb == callback) {
+
+            bd_psr_unlock(p);
             return;
         }
     }
@@ -190,12 +216,16 @@ void bd_psr_register_cb  (BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*)
 
     p->cb[p->num_cb - 1].cb     = callback;
     p->cb[p->num_cb - 1].handle = cb_handle;
+
+    bd_psr_unlock(p);
 }
 
 void bd_psr_unregister_cb(BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle)
 {
     if (p->cb) {
         int i = 0;
+
+        bd_psr_lock(p);
 
         while (i < p->num_cb) {
             if (p->cb[i].handle == cb_handle && p->cb[i].cb == callback) {
@@ -206,23 +236,32 @@ void bd_psr_unregister_cb(BD_REGISTERS *p, void (*callback)(void*,BD_PSR_EVENT*)
             }
             i++;
         }
+
+        bd_psr_unlock(p);
     }
 }
 
 /*
- * save / restore
+ * PSR state save / restore
  */
 
 void bd_psr_save_state(BD_REGISTERS *p)
 {
     /* store registers 4-8 and 10-12 to backup registers */
+
+    bd_psr_lock(p);
+
     memcpy(p->psr + 36, p->psr + 4,  sizeof(uint32_t) * 5);
     memcpy(p->psr + 42, p->psr + 10, sizeof(uint32_t) * 3);
+
+    bd_psr_unlock(p);
 }
 
 void bd_psr_restore_state(BD_REGISTERS *p)
 {
     uint32_t old_psr[BD_PSR_COUNT];
+
+    bd_psr_lock(p);
 
     if (p->cb)
         memcpy(old_psr, p->psr, sizeof(old_psr));
@@ -254,6 +293,8 @@ void bd_psr_restore_state(BD_REGISTERS *p)
             }
         }
     }
+
+    bd_psr_unlock(p);
 }
 
 /*
@@ -287,12 +328,20 @@ uint32_t bd_gpr_read(BD_REGISTERS *p, int reg)
 
 uint32_t bd_psr_read(BD_REGISTERS *p, int reg)
 {
+    uint32_t val;
+
     if (reg < 0 || reg > BD_PSR_COUNT) {
         DEBUG(DBG_BLURAY, "bd_psr_read(%d): invalid register\n", reg);
         return -1;
     }
 
-    return p->psr[reg];
+    bd_psr_lock(p);
+
+    val = p->psr[reg];
+
+    bd_psr_unlock(p);
+
+    return val;
 }
 
 int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
@@ -306,6 +355,8 @@ int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
         DEBUG(DBG_BLURAY, "bd_psr_write(%d, %d): no change in value\n", reg, val);
         return 0;
     }
+
+    bd_psr_lock(p);
 
     if (bd_psr_name[reg]) {
         DEBUG(DBG_BLURAY, "bd_psr_write(): PSR%-4d (%s) 0x%x -> 0x%x\n", reg, bd_psr_name[reg], p->psr[reg], val);
@@ -333,7 +384,9 @@ int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
         p->psr[reg] = val;
     }
 
-  return 0;
+    bd_psr_unlock(p);
+
+    return 0;
 }
 
 int bd_psr_write(BD_REGISTERS *p, int reg, uint32_t val)
