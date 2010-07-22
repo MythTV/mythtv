@@ -2253,32 +2253,6 @@ static HostCheckBox *GeneratePreviewRemotely()
     return gc;
 }
 
-static HostCheckBox *PlayBoxTransparency()
-{
-    HostCheckBox *gc = new HostCheckBox("PlayBoxTransparency");
-    gc->setLabel(QObject::tr("Use transparent boxes"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, the Watch Recordings and Delete "
-                    "Recordings screens will use transparency. Disable "
-                    "if selecting the recordings is slow due to high "
-                    "CPU usage."));
-    return gc;
-}
-
-static HostComboBox *PlayBoxShading()
-{
-    HostComboBox *gc = new HostComboBox("PlayBoxShading");
-    gc->setLabel(QObject::tr("Popup background shading method"));
-    gc->addSelection(QObject::tr("Fill"), "0");
-    gc->addSelection(QObject::tr("Image"), "1");
-    gc->addSelection(QObject::tr("None"), "2");
-
-    gc->setHelpText(QObject::tr("\"Fill\" is the quickest shading method. "
-                    "\"Image\" is somewhat slow, but has a higher visual "
-                    "quality. No shading will be the fastest."));
-    return gc;
-}
-
 static HostCheckBox *UseVirtualKeyboard()
 {
     HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
@@ -4556,8 +4530,6 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(QtFontMedium());
     qttheme->addChild(QtFontBig());
     qttheme->addChild(QtFonTweak());
-    qttheme->addChild(PlayBoxTransparency());
-    qttheme->addChild(PlayBoxShading());
     qttheme->addChild(UseVirtualKeyboard());
     addChild(qttheme );
 

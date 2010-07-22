@@ -695,7 +695,6 @@ UIImageType::UIImageType(const QString &name, const QString &filename, int dorde
     m_drop_x = 0;
     m_drop_y = 0;
     m_show = false;
-    m_transparent = gCoreContext->GetNumSetting("PlayBoxTransparency", 1);
 }
 
 UIImageType::~UIImageType()
@@ -713,7 +712,7 @@ void UIImageType::LoadImage()
     QString file;
     if (m_flex == true)
     {
-        QString flexprefix = m_transparent ? "trans-" : "solid-";
+        QString flexprefix = "trans-";
         int pathStart = m_filename.lastIndexOf('/');
         if (pathStart < 0 )
             m_filename = flexprefix + m_filename;
@@ -1922,17 +1921,17 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
             {
                 cerr << "   +UIStatusBarType::Draw() <- within Layer\n";
             }
-            
+
             // Width or height of 0 will draw the full image, not what we want for 0%
             if (m_used < 1)
                 m_used = 1;
-                
+
             int width = (int)((double)((double)m_container.width() - (double)(2*m_fillerSpace))
                     * (double)((double)m_used / (double)m_total));
 
             int height = (int)((double)((double)m_container.height() - (double)(2*m_fillerSpace))
                     * (double)((double)m_used / (double)m_total));
-            
+
             if (m_debug == true)
             {
                 cerr << "       -Width  = " << width << "\n";

@@ -471,7 +471,6 @@ class MPUBLIC UIImageType : public UIType
     bool    m_isvalid;
     bool    m_flex;
     bool    m_show;
-    bool    m_transparent;
     int     m_drop_x;
     int     m_drop_y;
     int     m_force_x;

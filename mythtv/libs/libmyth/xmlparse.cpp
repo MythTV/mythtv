@@ -26,7 +26,7 @@ using namespace std;
 #define LOC_WARN QString("XMLParse, Warning: ")
 #define LOC_ERR QString("XMLParse, Error: ")
 
-XMLParse::XMLParse(void) : wmult(0.0), hmult(0.0), usetrans(-1)
+XMLParse::XMLParse(void) : wmult(0.0), hmult(0.0)
 {
     allTypes = new vector<LayerSet *>;
     ui = GetMythUI();
@@ -46,8 +46,6 @@ XMLParse::~XMLParse()
 
 bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
-    usetrans = gCoreContext->GetNumSetting("PlayBoxTransparency", 1);
-
     fontSizeType = gCoreContext->GetSetting("ThemeFontSizeType", "default");
 
     QStringList searchpath = ui->GetThemeSearchPath();
@@ -1687,20 +1685,11 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                     if (flex.toLower() == "yes")
                     {
                         int pathStart = confile.lastIndexOf('/');
-                        if (usetrans == 1)
-                        {
-                            if (pathStart < 0 )
-                                confile = "trans-" + confile;
-                            else
-                                confile.replace(pathStart, 1, "/trans-");
-                        }
+
+                        if (pathStart < 0 )
+                            confile = "trans-" + confile;
                         else
-                        {
-                            if (pathStart < 0 )
-                                confile = "solid-" + confile;
-                            else
-                                confile.replace(pathStart, 1, "/solid-");
-                        }
+                            confile.replace(pathStart, 1, "/trans-");
 
                         imgContainer = ui->LoadScalePixmap(confile);
                     }
@@ -1728,10 +1717,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 {
                     if (flex.toLower() == "yes")
                     {
-                        if (usetrans == 1)
-                            fillfile = "trans-" + fillfile;
-                        else
-                            fillfile = "solid-" + fillfile;
+                        fillfile = "trans-" + fillfile;
 
                         imgFiller = ui->LoadScalePixmap(fillfile);
                      }

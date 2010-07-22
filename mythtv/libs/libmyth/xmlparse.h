@@ -56,8 +56,6 @@ class MPUBLIC XMLParse
     double wmult;
     double hmult;
 
-    int usetrans;
-
     QString fontSizeType;
 
     MythUIHelper *ui;
