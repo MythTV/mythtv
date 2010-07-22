@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1259";
+const QString currentDatabaseVersion = "1260";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5339,6 +5339,93 @@ NULL
             return false;
 
         dbver = "1259";
+    }
+
+    if (dbver == "1259")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM keybindings WHERE "
+                      "action IN ('PAGEUP','PAGEDOWN') AND "
+                      "context = 'TV FRONTEND'");
+        query.exec();
+
+        query.prepare("SELECT data FROM settings "
+                       " WHERE value = 'EPGEnableJumpToChannel'");
+
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to retrieve EPGEnableJumpToChannel values.",
+                            query);
+        }
+        else
+        {
+            MSqlQuery bindings(MSqlQuery::InitCon());
+            while (query.next())
+            {
+                QString EPGEnableJumpToChannel = query.value(0).toString();
+
+                if ("1" == EPGEnableJumpToChannel)
+                {
+                    bindings.prepare("SELECT action, context, hostname, keylist "
+                                     " FROM keybindings "
+                                     " WHERE action IN ('DAYLEFT', "
+                                     " 'DAYRIGHT', 'TOGGLEEPGORDER') AND "
+                                     " context IN ('TV Frontend', "
+                                     " 'TV Playback')");
+
+                    if (!bindings.exec())
+                    {
+                         MythDB::DBError("Unable to update keybindings",
+                                         bindings);
+                         continue;
+                    }
+                    else
+                    {
+                        while (bindings.next())
+                        {
+                            QString action = bindings.value(0).toString();
+                            QString context = bindings.value(1).toString();
+                            QString hostname = bindings.value(2).toString();
+                            QStringList oldKeylist = bindings.value(3).toString().split(',');
+                            QStringList newKeyList;
+
+                            QStringList::iterator it;
+                            for (it = oldKeylist.begin(); it != oldKeylist.end();++it)
+                            {
+                                bool ok = false;
+                                int num = (*it).toInt(&ok);
+                                if (!ok && num >= 0 && num <= 9)
+                                    newKeyList << (*it);
+                            }
+                            QString keyList = newKeyList.join(",");
+
+                            MSqlQuery update(MSqlQuery::InitCon());
+                            update.prepare("UPDATE keybindings "
+                                           "   SET keylist = :KEYLIST "
+                                           " WHERE action = :ACTION "
+                                           " AND   context = :CONTEXT "
+                                           " AND   hostname = :HOSTNAME");
+
+                            update.bindValue(":KEYLIST", keyList);
+                            update.bindValue(":ACTION", action);
+                            update.bindValue(":CONTEXT", context);
+                            update.bindValue(":HOSTNAME", hostname);
+
+                            if (!update.exec())
+                            {
+                                MythDB::DBError("Unable to update keybindings",
+                                                update);
+                                continue;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1260"))
+            return false;
     }
 
     return true;

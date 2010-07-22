@@ -221,8 +221,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_previewVideoRefreshTimer(new QTimer(this)),
     m_updateTimer(NULL),
     m_jumpToChannelLock(QMutex::Recursive),
-    m_jumpToChannel(NULL),
-    m_jumpToChannelEnabled(true)
+    m_jumpToChannel(NULL)
 {
     connect(m_previewVideoRefreshTimer, SIGNAL(timeout()),
             this,                     SLOT(refreshVideo()));
@@ -233,7 +232,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_changrpid = changrpid;
     m_changrplist = ChannelGroup::GetChannelGroups(false);
 
-    m_jumpToChannelEnabled = gCoreContext->GetNumSetting("EPGEnableJumpToChannel", 1);
     m_sortReverse = gCoreContext->GetNumSetting("EPGSortReverse", 0);
     m_selectRecThreshold = gCoreContext->GetNumSetting("SelChangeRecThreshold", 16);
 
@@ -413,26 +411,23 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     if (handled)
         return true;
 
-    // We want to handle jump to channel before everything else
-    // The reason is because the number keys could be mapped to
-    // other things. If this is the case, then the jump to channel
-    // will not work correctly.
-    if (m_jumpToChannelEnabled)
+    if (actions.size())
     {
         QMutexLocker locker(&m_jumpToChannelLock);
 
         if (!m_jumpToChannel)
         {
+            QString chanNum = actions[0];
             bool isNum;
-            event->text().toInt(&isNum);
-            if (isNum && !m_jumpToChannel)
+            chanNum.toInt(&isNum);
+            if (isNum)
             {
                 // see if we can find a matching channel before creating the JumpToChannel otherwise
                 // JumpToChannel will delete itself in the ctor leading to a segfault
-                int i = FindChannel(0, event->text(), false);
+                int i = FindChannel(0, chanNum, false);
                 if (i >= 0)
                 {
-                    m_jumpToChannel = new JumpToChannel(this, event->text(),
+                    m_jumpToChannel = new JumpToChannel(this, chanNum,
                                                         m_currentStartChannel,
                                                         m_currentRow, m_channelCount);
                     updateJumpToChannel();

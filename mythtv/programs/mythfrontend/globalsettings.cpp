@@ -132,7 +132,7 @@ AudioConfigSettings::AudioConfigSettings() :
     connect(rescan, SIGNAL(pressed()), this, SLOT(AudioRescan()));
 
     addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
-    
+
     QString name = m_OutputDevice->getValue();
     AudioOutput::AudioDeviceConfig *adc =
         AudioOutput::GetAudioDeviceConfig(name, name, true);
@@ -3107,17 +3107,6 @@ static HostCheckBox *EPGShowChannelIcon()
     return gc;
 }
 
-
-static GlobalCheckBox *EPGEnableJumpToChannel()
-{
-    GlobalCheckBox *gc = new GlobalCheckBox("EPGEnableJumpToChannel");
-    gc->setLabel(QObject::tr("Allow channel jumping in guide"));
-    gc->setHelpText(QObject::tr("If enabled, you will be able to press numbers "
-                    "and jump the selection to whatever channel you enter."));
-    gc->setValue(false);
-    return gc;
-}
-
 static HostCheckBox *ChannelGroupRememberLast()
 {
     HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
@@ -4488,7 +4477,6 @@ EPGSettings::EPGSettings()
     gen->addChild(UnknownCategory());
     gen->addChild(DefaultTVChannel());
     gen->addChild(EPGRecThreshold());
-    gen->addChild(EPGEnableJumpToChannel());
     addChild(gen);
 }
 

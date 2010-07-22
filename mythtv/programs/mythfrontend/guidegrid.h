@@ -233,7 +233,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     QMutex            m_jumpToChannelLock;
     JumpToChannel    *m_jumpToChannel;
-    bool              m_jumpToChannelEnabled;
 
     MythUIButtonList *m_timeList;
     MythUIButtonList *m_channelList;

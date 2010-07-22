@@ -490,18 +490,14 @@ void TV::SetFuncPtr(const char *string, void *lptr)
 
 void TV::InitKeys(void)
 {
-    REG_KEY("TV Frontend", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
-            "Page Up"), "3");
-    REG_KEY("TV Frontend", "PAGEDOWN", QT_TRANSLATE_NOOP("MythControls",
-            "Page Down"), "9");
     REG_KEY("TV Frontend", "PLAYBACK", QT_TRANSLATE_NOOP("MythControls",
             "Play Program"), "P");
     REG_KEY("TV Frontend", "TOGGLERECORD", QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
     REG_KEY("TV Frontend", "DAYLEFT", QT_TRANSLATE_NOOP("MythControls",
-            "Page the program guide back one day"), "Home,7");
+            "Page the program guide back one day"), "Home");
     REG_KEY("TV Frontend", "DAYRIGHT", QT_TRANSLATE_NOOP("MythControls",
-            "Page the program guide forward one day"), "End,1");
+            "Page the program guide forward one day"), "End");
     REG_KEY("TV Frontend", "PAGELEFT", QT_TRANSLATE_NOOP("MythControls",
             "Page the program guide left"), ",,<");
     REG_KEY("TV Frontend", "PAGERIGHT", QT_TRANSLATE_NOOP("MythControls",
@@ -509,7 +505,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
     REG_KEY("TV Frontend", "TOGGLEEPGORDER", QT_TRANSLATE_NOOP("MythControls",
-            "Reverse the channel order in the program guide"), "0");
+            "Reverse the channel order in the program guide"), "");
     REG_KEY("TV Frontend", "GUIDE", QT_TRANSLATE_NOOP("MythControls",
             "Show the Program Guide"), "S");
     REG_KEY("TV Frontend", "FINDER", QT_TRANSLATE_NOOP("MythControls",
