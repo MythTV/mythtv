@@ -17,7 +17,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /* If currentDatabaseVersion gets updated, the following files need updated:
-   mythtv/bindings/python/MythTV/MythStatic.py
+   mythtv/bindings/python/MythTV/static.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
 const QString currentDatabaseVersion = "1260";
