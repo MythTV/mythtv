@@ -2988,17 +2988,6 @@ static HostComboBox *LongChannelFormat()
     return gc;
 }
 
-static HostCheckBox *SmartChannelChange()
-{
-    HostCheckBox *gc = new HostCheckBox("SmartChannelChange");
-    gc->setLabel(QObject::tr("Change channels immediately without select"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("When a complete channel number is entered "
-                    "MythTV will switch to that channel immediately without "
-                    "requiring you to hit the select button."));
-    return gc;
-}
-
 static GlobalCheckBox *LastFreeCard()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("LastFreeCard");
@@ -4334,7 +4323,6 @@ GeneralSettings::GeneralSettings()
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
     general->addChild(LongChannelFormat());
-    general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
     general->addChild(LiveTVPriority());
     addChild(general);

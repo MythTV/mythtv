@@ -98,8 +98,8 @@ With the video paused:
 Watching TV only:
 
 - 0-9    Enter a channel number...
-         If the channel is not unique or smart channel change is disabled
-         press Return/OK when done, to commit the channel change.
+         press Return/OK when done to commit the channel change immediately
+         or Escape to cancel channel change.
 - G      Rotate between the various Picture Adjustments (Colour, Hue, etc.)
          for recording.  These values affect the look for all recordings made
          with the current capture card and are independent of the playback

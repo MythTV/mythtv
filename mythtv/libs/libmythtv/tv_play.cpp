@@ -857,7 +857,6 @@ TV::TV(void)
       db_use_fixed_size(true),      db_browse_always(false),
       db_browse_all_tuners(false),
 
-      smartChannelChange(false),
       arrowAccel(false),
       tryUnflaggedSkip(false),
       smartForward(false),
@@ -972,7 +971,6 @@ void TV::InitFromDB(void)
     kv["ChannelFormat"]            = "<num> <sign>";
     kv["TimeFormat"]               = "h:mm AP";
     kv["ShortDateFormat"]          = "M/d";
-    kv["SmartChannelChange"]       = "0";
 
     kv["UseArrowAccels"]           = "1";
     kv["TryUnflaggedSkip"]         = "0";
@@ -1016,7 +1014,6 @@ void TV::InitFromDB(void)
     db_channel_format      = kv["ChannelFormat"];
     db_time_format         = kv["TimeFormat"];
     db_short_date_format   = kv["ShortDateFormat"];
-    smartChannelChange     = kv["SmartChannelChange"].toInt();
     arrowAccel             = kv["UseArrowAccels"].toInt();
     tryUnflaggedSkip       = kv["TryUnflaggedSkip"].toInt();
     channel_group_id       = kv["ChannelGroupDefault"].toInt();
@@ -6453,11 +6450,11 @@ void TV::AddKeyToInputQueue(PlayerContext *ctx, char key)
     bool commitSmart = false;
     QString inputStr = GetQueuedInput();
 
-    // Always use smartChannelChange when channel numbers are entered
+    // Always use immediate channel change when channel numbers are entered
     // in browse mode because in browse mode space/enter exit browse
     // mode and change to the currently browsed channel.
     if (StateIsLiveTV(GetState(ctx)) && !ccInputMode && !asInputMode &&
-        (smartChannelChange || browsemode))
+        browsemode)
     {
         commitSmart = ProcessSmartChannel(ctx, inputStr);
     }

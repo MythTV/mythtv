@@ -681,7 +681,6 @@ class MPUBLIC TV : public QThread
     bool    db_browse_all_tuners;
     DBChanList db_browse_all_channels;
 
-    bool    smartChannelChange;
     bool    arrowAccel;
 
     CommSkipMode autoCommercialSkip;
