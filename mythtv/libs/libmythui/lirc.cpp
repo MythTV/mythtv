@@ -383,6 +383,8 @@ void LIRC::Process(const QByteArray &data)
             mod |= (Qt::CTRL  & keycode) ? Qt::ControlModifier: Qt::NoModifier;
             mod |= (Qt::ALT   & keycode) ? Qt::AltModifier   : Qt::NoModifier;
 
+            keycode &= ~Qt::MODIFIER_MASK;
+
             QString text = "";
             if (!mod)
                 text = QString(QChar(keycode));
