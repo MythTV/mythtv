@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.1"
+__version__=u"v0.6.2"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -185,6 +185,7 @@ __version__=u"v0.6.1"
 # 0.6.0 Fixed a issue when a Miro video's metadata does not have a title. It was being re-added and the
 #       database title fields in several records was being left empty.
 # 0.6.1 Modifications to support MythTV python bindings changes
+# 0.6.2 Trapped possible unicode errors which would hang the MiroBridge process
 
 
 examples_txt=u'''
@@ -1159,16 +1160,19 @@ def getOldrecordedOrphans():
                 fileBaseName = unicode(fileBaseName, u'utf8')
             except (UnicodeEncodeError, TypeError):
                 pass
-            for name in os.listdir(dirName): # Clean up
-                if name.startswith(fileBaseName):
-                    try:
-                        if simulation:
-                            logger.info(u"Simulation: Remove screenshot file (%s)" % (u"%s/%s" % (dirName, name)))
-                        else:
-                            os.remove(u"%s/%s" % (dirName, name))
-                    except OSError:
-                        pass
-                    break
+            try:
+                for name in os.listdir(dirName): # Clean up
+                    if name.startswith(fileBaseName):
+                        try:
+                            if simulation:
+                                logger.info(u"Simulation: Remove screenshot file (%s)" % (u"%s/%s" % (dirName, name)))
+                            else:
+                                os.remove(u"%s/%s" % (dirName, name))
+                        except OSError:
+                            pass
+                        break
+            except UnicodeDecodeError:
+                pass
             # Remove any unique cover art graphic files
             if data[u'title'].lower() in channel_icon_override:
                 (dirName, fileName) = os.path.split(u'%s%s - %s%s.%s' % (vid_graphics_dirs[u'posterdir'], data[u'title'], data[u'subtitle'], graphic_suffix[u'posterdir'], u'png'))
@@ -1181,16 +1185,19 @@ def getOldrecordedOrphans():
                     fileBaseName = unicode(fileBaseName, u'utf8')
                 except (UnicodeEncodeError, TypeError):
                     pass
-                for name in os.listdir(dirName): # Clean up
-                    if name.startswith(fileBaseName):
-                        try:
-                            if simulation:
-                                logger.info(u"Simulation: Remove unique cover art file (%s)" % (u"%s/%s" % (dirName, name)))
-                            else:
-                                os.remove(u"%s/%s" % (dirName, name))
-                        except OSError:
-                            pass
-                        break
+                try:
+                    for name in os.listdir(dirName): # Clean up
+                        if name.startswith(fileBaseName):
+                            try:
+                                if simulation:
+                                    logger.info(u"Simulation: Remove unique cover art file (%s)" % (u"%s/%s" % (dirName, name)))
+                                else:
+                                    os.remove(u"%s/%s" % (dirName, name))
+                            except OSError:
+                                pass
+                            break
+                except UnicodeDecodeError:
+                    pass
             displayMessage(u"Removed orphaned Miro video and graphics files (%s - %s)" % (data[u'title'], data[u'subtitle']))
 
     return orphans
