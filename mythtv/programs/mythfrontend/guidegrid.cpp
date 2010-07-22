@@ -39,6 +39,9 @@ QWaitCondition epgIsVisibleCond;
 #define LOC_ERR  QString("GuideGrid, Error: ")
 #define LOC_WARN QString("GuideGrid, Warning: ")
 
+const QString kUnknownTitle = QObject::tr("Unknown");
+const QString kUnknownCategory = QObject::tr("Unknown");
+
 JumpToChannel::JumpToChannel(
     JumpToChannelListener *parent, const QString &start_entry,
     int start_chan_idx, int cur_chan_idx, uint rows_disp) :
@@ -241,9 +244,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
     m_channelFormat.replace(' ', "\n");
-
-    m_unknownTitle = gCoreContext->GetSetting("UnknownTitle", "Unknown");
-    m_unknownCategory = gCoreContext->GetSetting("UnknownCategory", "Unknown");
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
         m_programs.push_back(NULL);
@@ -525,7 +525,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 int secsTillStart =
                     (pginfo) ? QDateTime::currentDateTime().secsTo(
                         pginfo->GetScheduledStartTime()) : 0;
-                if (pginfo && (pginfo->GetTitle() != m_unknownTitle) &&
+                if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
                     ((secsTillStart / 60) >= m_selectRecThreshold))
                 {
                     editRecSchedule();
@@ -1121,8 +1121,8 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             }
             else
             {
-                proginfo = new ProgramInfo(
-                    m_unknownTitle, m_unknownCategory, ts, ts.addSecs(5*60));
+                proginfo = new ProgramInfo(kUnknownTitle, kUnknownCategory,
+                                           ts, ts.addSecs(5*60));
                 unknownlist.push_back(proginfo);
                 proginfo->startCol = x;
                 proginfo->spread = 1;
@@ -1462,8 +1462,6 @@ void GuideGrid::updateChannels(void)
     if (m_player)
         m_player->ClearTunableCache();
 
-    bool showChannelIcon = gCoreContext->GetNumSetting("EPGShowChannelIcon", 0);
-
     for (unsigned int y = 0; (y < (unsigned int)m_channelCount) && chinfo; ++y)
     {
         unsigned int chanNumber = y + m_currentStartChannel;
@@ -1518,7 +1516,7 @@ void GuideGrid::updateChannels(void)
 
         item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
 
-        if (showChannelIcon && chinfo && !chinfo->icon.isEmpty())
+        if (chinfo && !chinfo->icon.isEmpty())
         {
             if (chinfo->CacheChannelIcon())
             {
@@ -1550,12 +1548,10 @@ void GuideGrid::updateInfo(void)
 
     PixmapChannel *chinfo = GetChannelInfo(chanNum);
 
-    bool showChannelIcon = gCoreContext->GetNumSetting("EPGShowChannelIcon", 0);
-
     if (m_channelImage)
     {
         m_channelImage->Reset();
-        if (showChannelIcon && !chinfo->icon.isEmpty())
+        if (!chinfo->icon.isEmpty())
         {
             if (chinfo->CacheChannelIcon())
             {
@@ -1989,7 +1985,7 @@ void GuideGrid::quickRecord()
     if (!pginfo)
         return;
 
-    if (pginfo->GetTitle() == m_unknownTitle)
+    if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
     RecordingInfo ri(*pginfo);
@@ -2008,7 +2004,7 @@ void GuideGrid::editRecSchedule()
     if (!pginfo)
         return;
 
-    if (pginfo->GetTitle() == m_unknownTitle)
+    if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
     EditRecording(pginfo);
@@ -2021,7 +2017,7 @@ void GuideGrid::editSchedule()
     if (!pginfo)
         return;
 
-    if (pginfo->GetTitle() == m_unknownTitle)
+    if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
     EditScheduled(pginfo);
@@ -2072,7 +2068,7 @@ void GuideGrid::upcoming()
     if (!pginfo)
         return;
 
-    if (pginfo->GetTitle() == m_unknownTitle)
+    if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
     ShowUpcoming(pginfo);
@@ -2085,7 +2081,7 @@ void GuideGrid::details()
     if (!pginfo)
         return;
 
-    if (pginfo->GetTitle() == m_unknownTitle)
+    if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
     ShowDetails(pginfo);

@@ -223,8 +223,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QString m_channelOrdering;
     QString m_dateFormat;
     QString m_timeFormat;
-    QString m_unknownTitle;
-    QString m_unknownCategory;
 
     QTimer *m_updateTimer; // audited ref #5318
 

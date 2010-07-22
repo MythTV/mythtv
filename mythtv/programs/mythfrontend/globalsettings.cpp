@@ -3096,17 +3096,6 @@ static HostCheckBox *EPGShowCategoryColors()
     return gc;
 }
 
-static HostCheckBox *EPGShowChannelIcon()
-{
-    HostCheckBox *gc = new HostCheckBox("EPGShowChannelIcon");
-    gc->setLabel(QObject::tr("Display the channel icons"));
-    gc->setHelpText(QObject::tr("Display the icons/logos for the channels "
-                    "in the guide. See section 9.5 of the "
-                    "Installation Guide for how to grab icons."));
-    gc->setValue(true);
-    return gc;
-}
-
 static HostCheckBox *ChannelGroupRememberLast()
 {
     HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
@@ -3419,22 +3408,6 @@ static HostLineEdit *DefaultTVChannel()
     ge->setValue("3");
     ge->setHelpText(QObject::tr("The program guide starts on this channel if "
                     "it is run from outside of Live TV mode."));
-    return ge;
-}
-
-static HostLineEdit *UnknownTitle()
-{
-    HostLineEdit *ge = new HostLineEdit("UnknownTitle");
-    ge->setLabel(QObject::tr("What to call 'unknown' programs"));
-    ge->setValue(QObject::tr("Unknown"));
-    return ge;
-}
-
-static HostLineEdit *UnknownCategory()
-{
-    HostLineEdit *ge = new HostLineEdit("UnknownCategory");
-    ge->setLabel(QObject::tr("What category to give 'unknown' programs"));
-    ge->setValue(QObject::tr("Unknown"));
     return ge;
 }
 
@@ -4467,10 +4440,7 @@ EPGSettings::EPGSettings()
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel(QObject::tr("Program Guide") + " 1/1");
     epg->addChild(EPGShowCategoryColors());
-    epg->addChild(EPGShowChannelIcon());
     epg->addChild(WatchTVGuide());
-    epg->addChild(UnknownTitle());
-    epg->addChild(UnknownCategory());
     epg->addChild(DefaultTVChannel());
     epg->addChild(EPGRecThreshold());
     addChild(epg);
