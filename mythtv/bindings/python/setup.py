@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
         name='MythTV',
-        version='0.23.0',
+        version='0.23.1',
         description='MythTV Python bindings.',
         packages=['MythTV', 'MythTV/tmdb', 'MythTV/ttvdb'],
         url=['http://www.mythtv.org/'],

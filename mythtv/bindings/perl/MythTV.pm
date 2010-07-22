@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '.21svn';
+    $VERSION = '.23.1svn';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
