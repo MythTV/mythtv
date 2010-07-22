@@ -4465,19 +4465,15 @@ GeneralSettings::GeneralSettings()
 EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
-    epg->setLabel(QObject::tr("Program Guide") + " 1/2");
+    epg->setLabel(QObject::tr("Program Guide") + " 1/1");
     epg->addChild(EPGShowCategoryColors());
     epg->addChild(EPGShowChannelIcon());
     epg->addChild(WatchTVGuide());
+    epg->addChild(UnknownTitle());
+    epg->addChild(UnknownCategory());
+    epg->addChild(DefaultTVChannel());
+    epg->addChild(EPGRecThreshold());
     addChild(epg);
-
-    VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
-    gen->setLabel(QObject::tr("Program Guide") + " 2/2");
-    gen->addChild(UnknownTitle());
-    gen->addChild(UnknownCategory());
-    gen->addChild(DefaultTVChannel());
-    gen->addChild(EPGRecThreshold());
-    addChild(gen);
 }
 
 GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
