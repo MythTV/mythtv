@@ -170,6 +170,9 @@ void MythUIEditBar::Display(void)
         if (keeptoright && (region.first > 0.0f))
             AddMark(rightshape, rightimage, left, false);
     }
+
+    if (position)
+        position->MoveToTop();
 }
 
 void MythUIEditBar::AddBar(MythUIShape *shape, MythUIImage *image,
