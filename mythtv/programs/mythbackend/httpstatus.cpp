@@ -35,6 +35,7 @@
 #include "encoderlink.h"
 #include "scheduler.h"
 #include "mainserver.h"
+#include "cardutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -199,6 +200,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 encoder.setAttribute("hostname", gCoreContext->GetHostName());
             else
                 encoder.setAttribute("hostname", elink->GetHostName());
+
+            encoder.setAttribute("devlabel", 
+                          CardUtil::GetDeviceLabel(elink->GetCardID()) );
 
             if (elink->IsConnected())
                 numencoders++;
@@ -708,8 +712,10 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                 bool bIsLowOnFreeSpace=e.attribute( "lowOnFreeSpace", "0").toInt();
 
-                os << "    Encoder " << sCardId << " is " << sIsLocal
-                   << " on " << sHostName;
+                QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
+
+                os << "    Encoder " << sCardId << " " << sDevlabel 
+                   << " is " << sIsLocal << " on " << sHostName;
 
                 if ((sIsLocal == "remote") && !bConnected)
                 {

@@ -226,6 +226,7 @@ class MPUBLIC CardUtil
 
     static QString      GetDeviceLabel(const QString &cardtype,
                                        const QString &videodevice);
+    static QString      GetDeviceLabel(uint cardid);
 
     static QString      ProbeSubTypeName(uint cardid);
 

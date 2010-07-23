@@ -127,8 +127,7 @@ QStringList CardUtil::GetCardTypes(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT DISTINCT cardtype "
-                  "FROM capturecard "
-                  "ORDER BY cardtype");
+                  "FROM capturecard");
 
     if (!query.exec())
     {
@@ -1732,6 +1731,23 @@ QString CardUtil::GetDeviceLabel(const QString &cardtype,
                                  const QString &videodevice)
 {
     return QString("[ %1 : %2 ]").arg(cardtype).arg(videodevice);
+}
+
+QString CardUtil::GetDeviceLabel(uint cardid)
+{
+    QString devlabel;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype, videodevice "
+		  "FROM capturecard WHERE cardid = :CARDID ");
+    query.bindValue(":CARDID", cardid);
+
+    if (query.exec() && query.next())
+    {
+	return( GetDeviceLabel( query.value(0).toString(), 
+	 	                query.value(1).toString()) );
+    }
+
+    return( "[ UNKNOWN ]" );
 }
 
 void CardUtil::GetCardInputs(
