@@ -550,7 +550,7 @@ NAV_CLIP* nav_packet_search(NAV_TITLE *title, uint32_t pkt, uint32_t *clip_pkt, 
     }
     if (ii == title->pl->list_count) {
         clip = &title->clip_list.clip[ii-1];
-        *out_time = clip->duration;
+        *out_time = clip->duration + clip->in_time;
         *clip_pkt = clip->end_pkt;
     } else {
         clip = &title->clip_list.clip[ii];
