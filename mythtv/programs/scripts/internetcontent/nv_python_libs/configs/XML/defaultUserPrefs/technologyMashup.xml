@@ -74,6 +74,74 @@
     <sourceURL enabled="true" name="Buzz Report HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds2.feedburner.com/cnet/buzzreporthd?format=xml"/>
     <sourceURL enabled="false" name="Buzz Report SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/buzzreport?format=xml"/>
   </subDirectory>
+
+  <subDirectory name="The Apple Byte">
+    <sourceURL enabled="true" name="The Apple Byte HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/applebytehd?format=xml"/>
+    <sourceURL enabled="false" name="The Apple Byte SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/applebyte?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="CNET Conversations">
+    <sourceURL enabled="true" name="CNET Conversations HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/conversationshd?format=xml"/>
+    <sourceURL enabled="false" name="CNET Conversations SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/conversations?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Buzz Out Loud">
+    <sourceURL enabled="true" name="Buzz Out Loud" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/bolvideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Car Tech Live">
+    <sourceURL enabled="true" name="Car Tech Live" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/cartechpodcastvideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="CNET Tech Review">
+    <sourceURL enabled="true" name="CNET Tech Review HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/techreviewhd?format=xml"/>
+    <sourceURL enabled="false" name="CNET Tech Review SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/techreview?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="CNET to the Rescue">
+    <sourceURL enabled="true" name="CNET to the Rescue" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/rescuesdvideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Crave">
+    <sourceURL enabled="true" name="Crave" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/crave?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Dialed In">
+    <sourceURL enabled="true" name="Dialed In" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/dialedinvideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Digital City">
+    <sourceURL enabled="true" name="Digital City" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/digitalcityvideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="First Look">
+    <sourceURL enabled="true" name="First Look HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/firstlookhd?format=xml"/>
+    <sourceURL enabled="false" name="First Look SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/firstlook?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="The Green Show">
+    <sourceURL enabled="true" name="The Green Show HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/greenshowhd?format=xml"/>
+    <sourceURL enabled="false" name="The Green Show SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/greenshow?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Hacks">
+    <sourceURL enabled="true" name="Hacks HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/hackshd?format=xml"/>
+    <sourceURL enabled="false" name="Hacks SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/hacks?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="How To">
+    <sourceURL enabled="true" name="How To HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/howtohd?format=xml"/>
+    <sourceURL enabled="false" name="How To SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/howto?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Reporters' Roundtable">
+    <sourceURL enabled="true" name="Reporters' Roundtable" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/roundtablevideo?format=xml"/>
+  </subDirectory>
+
+  <subDirectory name="Tap That App">
+    <sourceURL enabled="true" name="Tap That App HD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/tapthatapphd?format=xml"/>
+    <sourceURL enabled="false" name="Tap That App SD" xsltFile="cnetRSS_item" type="xml" url="http://feeds.feedburner.com/cnet/tapthatapp?format=xml"/>
+  </subDirectory>
 </directory>
 
 <directory name="Howcast Tech &amp; Gadgets" globalmax="0">

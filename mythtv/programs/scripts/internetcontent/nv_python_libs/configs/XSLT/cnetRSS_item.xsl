@@ -48,7 +48,7 @@
                         commented out alternative link only creates a Web page link.
                     -->
 <!--                    <link><xsl:value-of select="mnvXpath:stringReplace('http://news.cnet.com/1606-2_3-WEBCODE.html', 'WEBCODE', string(guid))"/></link>-->
-                    <link><xsl:value-of select="concat('http://www.hd-trailers.net/mediaplayer/player.swf?autostart=true&amp;file=', normalize-space(link))"/></link>
+                    <link><xsl:value-of select="concat('http://www.hd-trailers.net/mediaplayer/player.swf?autostart=true&amp;backcolor=000000&amp;frontcolor=999999&amp;lightcolor=000000&amp;screencolor=000000&amp;controlbar=over&amp;file=', normalize-space(link))"/></link>
                     <xsl:element name="media:group">
                         <xsl:element name="media:thumbnail">
                             <xsl:if test="..//itunes:image/@href">
