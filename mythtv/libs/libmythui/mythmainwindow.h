@@ -102,7 +102,6 @@ class MPUBLIC MythMainWindow : public QWidget
     QSize NormSize(const QSize &size);
     int NormX(const int x);
     int NormY(const int y);
-    int fonTweak;
     void SetScalingFactors(float wmult, float hmult);
 
     void StartLIRC(void);

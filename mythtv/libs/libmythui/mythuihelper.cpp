@@ -126,8 +126,6 @@ class MythUIHelperPrivate
 
     QString themecachedir;
 
-    int bigfontsize, mediumfontsize, smallfontsize;
-
     ScreenSaverControl *screensaver;
     bool screensaverEnabled;
 
@@ -156,7 +154,6 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_cacheLock(new QMutex(QMutex::Recursive)), m_cacheSize(0),
       m_cacheSizeLock(new QMutex(QMutex::Recursive)),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
-      bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
       screenSetup(false), m_imageThreadPool(new QThreadPool()), parent(p)
 {
@@ -462,10 +459,6 @@ void MythUIHelper::LoadQtConfig(void)
     if (themename == "default")
         themename = "defaultmenu";
     d->m_menuthemepathname = FindMenuThemeDir(themename) + '/';
-
-    d->bigfontsize    = GetMythDB()->GetNumSetting("QtFontBig",    25);
-    d->mediumfontsize = GetMythDB()->GetNumSetting("QtFontMedium", 16);
-    d->smallfontsize  = GetMythDB()->GetNumSetting("QtFontSmall",  12);
 }
 
 Settings *MythUIHelper::qtconfig(void)
@@ -1478,7 +1471,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 QFont MythUIHelper::GetBigFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->bigfontsize));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(25));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -1487,8 +1480,7 @@ QFont MythUIHelper::GetBigFont(void)
 QFont MythUIHelper::GetMediumFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()
-                          ->NormalizeFontSize(d->mediumfontsize));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(16));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -1497,7 +1489,7 @@ QFont MythUIHelper::GetMediumFont(void)
 QFont MythUIHelper::GetSmallFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->smallfontsize));
+    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(12));
     font.setWeight(QFont::Bold);
 
     return font;
