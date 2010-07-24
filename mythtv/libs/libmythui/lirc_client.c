@@ -1,4 +1,5 @@
 /* NOTE: Extracted from LIRC release 0.8.4a -- dtk */
+/*       Updated to LIRC release 0.8.6 */
 
 /****************************************************************************
  ** lirc_client.c ***********************************************************
@@ -1575,14 +1576,19 @@ static int lirc_iscode(struct lirc_config_entry *scan, char *remote,
 			if(scan->code->next==NULL || rep==0)
 			{
 				scan->next_code=scan->next_code->next;
+				if(scan->code->next != NULL)
+				{
+					iscode=1;
+				}
 			}
 			/* sequence completed? */
 			if(scan->next_code==NULL)
 			{
 				scan->next_code=scan->code;
-				iscode=scan->code->next!=NULL || rep==0 ||
+				if(scan->code->next!=NULL || rep==0 ||
 				   (scan->rep>0 && rep>scan->rep_delay &&
-				    ((rep-scan->rep_delay-1)%scan->rep)==0);
+				    ((rep-scan->rep_delay-1)%scan->rep)==0))
+					iscode=2;
                         }
 			return iscode;
 		}
@@ -1720,6 +1726,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 	char *remote,*button;
 	char *s=NULL;
 	struct lirc_config_entry *scan;
+	int exec_level;
 	int quit_happened;
 
 	*string=NULL;
@@ -1743,7 +1750,8 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 		quit_happened=0;
 		while(scan!=NULL)
 		{
-			if(lirc_iscode(scan,remote,button,rep) &&
+			exec_level = lirc_iscode(scan,remote,button,rep);
+			if(exec_level > 0 &&
 			   (scan->mode==NULL ||
 			    (scan->mode!=NULL && 
 			     config->current_mode!=NULL &&
@@ -1751,10 +1759,17 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 			   quit_happened==0
 			   )
 			{
-				s=lirc_execute(state,config,scan);
-				if(s != NULL && prog != NULL)
+				if(exec_level > 1)
 				{
-					*prog = scan->prog;
+					s=lirc_execute(state,config,scan);
+					if(s != NULL && prog != NULL)
+					{
+						*prog = scan->prog;
+					}
+				}
+				else
+				{
+					s = NULL;
 				}
 				if(scan->flags&quit)
 				{
