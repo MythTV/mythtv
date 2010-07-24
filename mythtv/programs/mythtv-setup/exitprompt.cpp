@@ -36,9 +36,10 @@ void ExitPrompter::masterPromptExit()
 {
     if (gCoreContext->IsMasterHost())
     {
-        QString label = tr("If this is the master backend server,"
-                           " please run 'mythfilldatabase' to populate"
-                           " the database with channel information.");
+        QString label = tr("If you've added or altered channels,"
+                           " please run 'mythfilldatabase' on the"
+                           " master backend to populate the"
+                           " database with guide information.");
 
         MythConfirmationDialog *dia = new MythConfirmationDialog(m_d->stk,
                                                                  label,
