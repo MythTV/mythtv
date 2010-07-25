@@ -892,10 +892,14 @@ void ProgLister::FillViewList(const QString &view)
         {
             while (query.next())
             {
-                QString phrase = query.value(0).toString();
+                /* The keyword.phrase column uses utf8_bin collation, so
+                 * Qt uses QString::fromAscii() for toString(). Explicitly
+                 * convert the value using QString::fromUtf8() to prevent
+                 * corruption. */
+                QString phrase = QString::fromUtf8(query.value(0)
+                                                   .toByteArray().constData());
                 if (phrase.isEmpty())
                     continue;
-                phrase = query.value(0).toString();
                 m_viewList.push_back(phrase);
                 m_viewTextList.push_back(phrase);
             }
