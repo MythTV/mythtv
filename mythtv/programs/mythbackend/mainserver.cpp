@@ -733,7 +733,6 @@ void MainServer::customEvent(QEvent *e)
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
-        QStringList extraDataList = me->ExtraDataList();
 
         if (me->Message().left(11) == "AUTO_EXPIRE")
         {
@@ -840,7 +839,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().left(23) == "SCHEDULER_ADD_RECORDING" && m_sched)
         {
-            ProgramInfo pi(extraDataList);
+            ProgramInfo pi(me->ExtraDataList());
             if (!pi.GetChanID())
             {
                 VERBOSE(VB_IMPORTANT, "Bad SCHEDULER_ADD_RECORDING message");
@@ -928,6 +927,7 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().left(13) == "DOWNLOAD_FILE")
         {
+            QStringList extraDataList = me->ExtraDataList();
             QString localFile = extraDataList[1];
             QFile file(localFile);
             QStringList tokens = me->Message().simplified().split(" ");
@@ -944,7 +944,7 @@ void MainServer::customEvent(QEvent *e)
 
         broadcast = QStringList( "BACKEND_MESSAGE" );
         broadcast << me->Message();
-        broadcast += extraDataList;
+        broadcast += me->ExtraDataList();
     }
 
     if (!broadcast.empty())
@@ -2165,7 +2165,7 @@ void MainServer::DoHandleStopRecording(
 
 void MainServer::HandleDeleteRecording(QString &chanid, QString &starttime,
                                        PlaybackSock *pbs,
-                                       bool forceMetadataDelete, 
+                                       bool forceMetadataDelete,
                                        bool forgetHistory)
 {
     QDateTime recstartts = myth_dt_from_string(starttime);
@@ -4522,7 +4522,7 @@ void MainServer::HandleDownloadFile(const QStringList &command,
     StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
     QString outDir = sgroup.FindNextDirMostFree();
     QString outFile;
-    
+
 
     if (filename.isEmpty())
     {
@@ -4922,7 +4922,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
             SendResponse(pbssock, outputlist);
             return;
         }
-        VERBOSE(VB_IMPORTANT, LOC + 
+        VERBOSE(VB_IMPORTANT, LOC +
                 QString("HandleGenPreviewPixmap() "
                         "Couldn't find backend for:\n\t\t\t%1")
                 .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)));
