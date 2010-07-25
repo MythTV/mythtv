@@ -4,7 +4,6 @@ using namespace std;
 #include <QString>
 #include <QSqlError>
 #include "dbcheck.h"
-#include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs
 #include "videodisplayprofile.h" // for "1214"
 
 #include "dbutil.h"
@@ -20,7 +19,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/static.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1260";
+const QString currentDatabaseVersion = "1261";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -455,9 +454,6 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 
     GetMythDB()->SetSuppressDBMessages(true);
     gCoreContext->ActivateSettingsCache(false);
-
-    if (!gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
-        DataDirectProcessor::FixProgramIDs();
 
     DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "MythTV",
                                     currentDatabaseVersion);
@@ -5426,6 +5422,33 @@ NULL
 
         if (!UpdateDBVersionNumber("1260"))
             return false;
+
+        dbver = "1260";
+    }
+
+    if (dbver == "1260")
+    {
+        if (gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+        {
+            if (!UpdateDBVersionNumber("1261"))
+                return false;
+            dbver = "1261";
+        }
+        else
+        {
+
+            const char *updates[] = {
+"UPDATE recorded SET programid=CONCAT(SUBSTRING(programid, 1, 2), '00', "
+"       SUBSTRING(programid, 3)) WHERE length(programid) = 12;",
+"UPDATE oldrecorded SET programid=CONCAT(SUBSTRING(programid, 1, 2), '00', "
+"       SUBSTRING(programid, 3)) WHERE length(programid) = 12;",
+"UPDATE program SET programid=CONCAT(SUBSTRING(programid, 1, 2), '00', "
+"       SUBSTRING(programid, 3)) WHERE length(programid) = 12;",
+NULL
+};
+            if (!performActualUpdate(updates, "1261", dbver))
+                return false;
+        }
     }
 
     return true;

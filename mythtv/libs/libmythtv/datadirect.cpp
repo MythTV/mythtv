@@ -926,54 +926,6 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     //cerr << "Done...\n";
 }
 
-void DataDirectProcessor::FixProgramIDs(void)
-{
-    VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- begin");
-    QMap<QString,bool> found_table = DBUtil::GetTableMap();
-
-    MSqlQuery query(MSqlQuery::DDCon());
-    query.prepare(
-        "UPDATE recorded "
-        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
-        "                     '00', SUBSTRING(programid, 3)) "
-        "WHERE length(programid) = 12");
-
-    if (found_table["recorded"] && !query.exec())
-    {
-        MythDB::DBError("Fixing program ids in recorded", query);
-        return;
-    }
-
-    query.prepare(
-        "UPDATE oldrecorded "
-        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
-        "                     '00', SUBSTRING(programid, 3)) "
-        "WHERE length(programid) = 12");
-
-    if (found_table["oldrecorded"] && !query.exec())
-    {
-        MythDB::DBError("Fixing program ids in oldrecorded", query);
-        return;
-    }
-
-    query.prepare(
-        "UPDATE program "
-        "SET programid=CONCAT(SUBSTRING(programid, 1, 2), "
-        "                     '00', SUBSTRING(programid, 3)) "
-        "WHERE length(programid) = 12");
-
-    if (found_table["program"] && !query.exec())
-    {
-        MythDB::DBError("Fixing program ids in program", query);
-        return;
-    }
-
-    if (found_table["settings"])
-        gCoreContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
-
-    VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- end");
-}
-
 FILE *DataDirectProcessor::DDPost(
     QString    ddurl,
     QString    postFilename, QString    inputFile,

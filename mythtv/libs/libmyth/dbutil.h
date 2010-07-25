@@ -2,7 +2,6 @@
 #define DBUTIL_H_
 
 #include <QStringList>
-#include <QMap>
 
 #include "mythexp.h"
 #include "mythdbcon.h"
@@ -39,7 +38,6 @@ class MPUBLIC DBUtil
 
     MythDBBackupStatus BackupDB(QString &filename);
 
-    static QMap<QString,bool> GetTableMap(void);
     static bool IsNewDatabase(void);
     static bool IsBackupInProgress(void);
     static int  CountClients(void);

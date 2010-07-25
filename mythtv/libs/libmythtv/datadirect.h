@@ -329,9 +329,6 @@ class MPUBLIC DataDirectProcessor
         uint sourceid, bool filter_new_channels);
     static void DataDirectProgramUpdate(void);
 
-    // static command, makes Labs and Schedules Direct ProgramIDs compatible.
-    static void FixProgramIDs(void);
-
     QStringList GetFatalErrors(void) const { return fatalErrors; }
 
   private:

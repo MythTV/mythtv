@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     bool from_file = false;
     bool mark_repeats = true;
 
-    bool usingDataDirect = false, usingDataDirectLabs = false;
+    bool usingDataDirect = false;
     bool grab_data = true;
 
     bool export_iconmap = false;
@@ -634,8 +634,6 @@ int main(int argc, char *argv[])
                        sourcelist.push_back(newsource);
                        usingDataDirect |=
                            is_grabber_datadirect(newsource.xmltvgrabber);
-                       usingDataDirectLabs |=
-                           is_grabber_labs(newsource.xmltvgrabber);
                   }
              }
              else
@@ -943,12 +941,6 @@ int main(int argc, char *argv[])
         (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
     {
         fill_data.ddprocessor.GrabNextSuggestedTime();
-    }
-
-    if (usingDataDirectLabs ||
-        !gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
-    {
-        DataDirectProcessor::FixProgramIDs();
     }
 
     VERBOSE(VB_GENERAL, "\n"

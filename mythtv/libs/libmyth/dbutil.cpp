@@ -262,15 +262,6 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename)
     return kDB_Backup_Failed;
 }
 
-QMap<QString,bool> DBUtil::GetTableMap(void)
-{
-    QMap<QString,bool> found_table;
-    const QStringList list = GetTables();
-    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
-        found_table[*it] = true;
-    return found_table;
-}
-
 /** \fn DBUtil::GetTables(void)
  *  \brief Retrieves a list of tables from the database.
  *
