@@ -5,12 +5,12 @@ import sys
 
 if __name__ == '__main__':
     if '--version' in sys.argv:
+        import MythTV.ttvdb.tvdb_api
+        import MythTV.tmdb.tmdb_api
         print 'MythTV Python Bindings'
         print '  local versions'
         print '    bindings version:  ', '.'.join([str(i) for i in MythStatic.OWN_VERSION])
-        import MythTV.ttvdb.tvdb_api
         print '    ttvdb version:     ', str(MythTV.ttvdb.tvdb_api.__version__)
-        import MythTV.tmdb.tmdb_api
         print '    tmdb version:      ', str(MythTV.tmdb.tmdb_api.__version__)
         print '  external versions'
         try:
@@ -19,7 +19,13 @@ if __name__ == '__main__':
         except:
             print '    lxml version:      ', 'NOT FOUND'
         print '    MySQLdb version:   ', '.'.join([str(i) for i in MythStatic.mysqldb])
+        print '  protocol versions'
+        print '    backend:           ', str(MythStatic.PROTO_VERSION)
+        print '    schema:            ', str(MythStatic.SCHEMA_VERSION)
+        print '    video schema:      ', str(MythStatic.MVSCHEMA_VERSION)
+        print '    netvision schema:  ', str(MythStatic.NVSCHEMA_VERSION)
         sys.exit(0)
+
     banner = 'MythTV Python interactive shell.'
     import code
     try:
