@@ -21,7 +21,7 @@ using namespace std;
 /// This is the DB schema version expected by the running MythTV instance.
 const QString currentDatabaseVersion = "1261";
 
-static bool UpdateDBVersionNumber(const QString &newnumber);
+static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
     const char **updates, const char *version, QString &dbver);
 static bool InitializeDatabase(void);
@@ -341,13 +341,15 @@ The duplicate field is used to indicate if this record should be used
 to check for duplicates in the BUSQ
  */
 
-/** \fn UpdateDBVersionNumber(const QString&)
+/** \fn UpdateDBVersionNumber(const QString&, QString&)
  *  \brief Updates the schema version stored in the database.
  *
  *   Updates "DBSchemaVer" property in the settings table.
  *  \param newnumber New schema version.
+ *  \param dbver the database version at the end of the function is returned
+ *               in this parameter, if things go well this will be 'newnumber'.
  */
-static bool UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver)
 {
     // delete old schema version
     MSqlQuery query(MSqlQuery::InitCon());
@@ -383,6 +385,8 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
         VERBOSE(VB_IMPORTANT, msg);
         return false;
     }
+
+    dbver = newnumber;
 
     return true;
 }
@@ -425,10 +429,9 @@ static bool performActualUpdate(
         thequery = updates[counter];
     }
 
-    if (!UpdateDBVersionNumber(version))
+    if (!UpdateDBVersionNumber(version, dbver))
         return false;
 
-    dbver = version;
     return true;
 }
 
@@ -1673,6 +1676,8 @@ NULL
 
     if (dbver == "1093")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1094");
+
         MSqlQuery recordids(MSqlQuery::InitCon());
         recordids.prepare("SELECT recordid,recpriority FROM record;");
         if (!recordids.exec())
@@ -1692,10 +1697,8 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1094"))
+        if (!UpdateDBVersionNumber("1094", dbver))
             return false;
-
-        dbver = "1094";
     }
 
     if (dbver == "1094")
@@ -3022,10 +3025,8 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1182"))
+        if (!UpdateDBVersionNumber("1182", dbver))
             return false;
-
-        dbver = "1182";
     }
 
     if (dbver == "1182")
@@ -3094,10 +3095,8 @@ NULL
                 MythDB::DBError("dbcheck -- CCRecPriority", ppuq);
         }
 
-        if (!UpdateDBVersionNumber("1186"))
+        if (!UpdateDBVersionNumber("1186", dbver))
             return false;
-
-        dbver = "1186";
     }
 
     if (dbver == "1186")
@@ -4956,6 +4955,8 @@ NULL
 
     if (dbver == "1249")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1250");
+
         MSqlQuery select(MSqlQuery::InitCon());
         select.prepare("SELECT hostname, data FROM settings "
                        " WHERE value = 'StickyKeys'");
@@ -5033,10 +5034,8 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1250"))
+        if (!UpdateDBVersionNumber("1250", dbver))
             return false;
-
-        dbver = "1250";
     }
 
     if (dbver == "1250")
@@ -5051,6 +5050,8 @@ NULL
 
     if (dbver == "1251")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1252");
+
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SHOW INDEX FROM recgrouppassword");
 
@@ -5080,14 +5081,14 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1252"))
+        if (!UpdateDBVersionNumber("1252", dbver))
             return false;
-
-        dbver = "1252";
     }
 
     if (dbver == "1252")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1253");
+
         MSqlQuery select(MSqlQuery::InitCon());
         select.prepare("SELECT hostname, data FROM settings "
                        " WHERE value = 'StickyKeys'");
@@ -5141,10 +5142,8 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1253"))
+        if (!UpdateDBVersionNumber("1253", dbver))
             return false;
-
-        dbver = "1253";
     }
 
     if (dbver == "1253")
@@ -5152,8 +5151,8 @@ NULL
         if (gCoreContext->GetNumSetting("have-nit-fix") == 1)
         {
             // User has previously applied patch from ticket #7486.
-            VERBOSE (VB_IMPORTANT, "Sneaky schema change detected");
-            if (!UpdateDBVersionNumber("1254"))
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1254");
+            if (!UpdateDBVersionNumber("1254", dbver))
                 return false;
         }
         else
@@ -5255,6 +5254,8 @@ NULL
 
     if (dbver == "1258")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1259");
+
         MSqlQuery select(MSqlQuery::InitCon());
         select.prepare("SELECT hostname, data FROM settings "
                        " WHERE value = 'IndividualMuteControl'");
@@ -5331,14 +5332,14 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1259"))
+        if (!UpdateDBVersionNumber("1259", dbver))
             return false;
-
-        dbver = "1259";
     }
 
     if (dbver == "1259")
     {
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1260");
+
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM keybindings WHERE "
                       "action IN ('PAGEUP','PAGEDOWN') AND "
@@ -5420,19 +5421,17 @@ NULL
             }
         }
 
-        if (!UpdateDBVersionNumber("1260"))
+        if (!UpdateDBVersionNumber("1260", dbver))
             return false;
-
-        dbver = "1260";
     }
 
     if (dbver == "1260")
     {
         if (gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         {
-            if (!UpdateDBVersionNumber("1261"))
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1261");
+            if (!UpdateDBVersionNumber("1261", dbver))
                 return false;
-            dbver = "1261";
         }
         else
         {
