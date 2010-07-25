@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythlocale>
+  <!-- Global Settings -->
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">NTSC</setting>
+    <setting name="VbiFormat" global="true">NTSC Closed Caption</setting>
+    <setting name="FreqTable" global="true">us-bcast</setting>
+
+    <!-- Scheduling -->
+
+    <!-- Advert Detection -->
+
+
+  <!-- Per-host Settings -->
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language">EN_US</setting>
+    <setting name="ISO639Language0">eng</setting>
+    <setting name="ISO639Language1">eng</setting>
+
+    <!-- Date/Time format -->
+
+
+    <!-- Playback -->
+
+  <!-- Plugins -->
+    <!-- MythArchive -->
+    <setting name="MythArchiveVideoFormat">NTSC</setting>
+</mythlocale>
