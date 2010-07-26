@@ -9,6 +9,7 @@
 // Libmyth
 #include "mythcorecontext.h"
 #include "storagegroup.h"
+#include "programtypes.h"
 
 // Libmythtv
 #include "playgroup.h"
@@ -221,7 +222,7 @@ void ScheduleEditor::Load()
     }
     m_rulesList->SetValueByData(ENUM_TO_QVARIANT(type));
 
-    QHash<QString, QString> progMap;
+    InfoMap progMap;
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
     else
@@ -599,7 +600,7 @@ void SchedOptEditor::Load()
     // Active/Disabled
     m_ruleactiveCheck->SetCheckState(!m_recordingRule->m_isInactive);
 
-    QHash<QString, QString> progMap;
+    InfoMap progMap;
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
     else
@@ -855,7 +856,7 @@ void StoreOptEditor::Load()
     m_maxbehaviourList->SetValueByData(m_recordingRule->m_maxNewest);
 
 
-    QHash<QString, QString> progMap;
+    InfoMap progMap;
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
     else
@@ -1066,7 +1067,7 @@ void PostProcEditor::Load()
         userjob4Text->SetText(tr("Run '%1'")
                     .arg(gCoreContext->GetSetting("UserJobDesc4", "User Job 4")));
 
-    QHash<QString, QString> progMap;
+    InfoMap progMap;
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
     else
