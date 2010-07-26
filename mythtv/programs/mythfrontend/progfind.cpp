@@ -21,7 +21,6 @@
 
 // mythfrontend
 #include "guidegrid.h"
-#include "proglist.h"
 #include "customedit.h"
 #include "progfind.h"
 
@@ -855,8 +854,8 @@ void JaProgFinder::restoreSelectedData(QString& data)
 
 // Hebrew alphabet list and more
 const char* HeProgFinder::searchChars[] = {
-    "\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8", 
-    "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6", 
+    "\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8",
+    "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6",
     "\u05e7", "\u05e8", "\u05e9", "\u05ea", "E", "#", 0 };
 
 HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg,

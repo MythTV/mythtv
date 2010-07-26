@@ -2,7 +2,6 @@
 
 #include "customedit.h"
 #include "recordinginfo.h"
-#include "proglist.h"
 #include "tv_play.h"
 #include "recordingrule.h"
 #include "mythverbose.h"

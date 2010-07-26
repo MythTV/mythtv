@@ -44,7 +44,6 @@
 
 //  Mythfrontend
 #include "playbackboxlistitem.h"
-#include "proglist.h"
 #include "customedit.h"
 
 #define LOC      QString("PlaybackBox: ")
@@ -831,13 +830,13 @@ void PlaybackBox::UpdateUIListItem(
         {
             if (!m_artImage[i])
                 continue;
-  
+
             if (arthost.isEmpty())
             {
                 arthost = (!m_artHostOverride.isEmpty()) ?
                     m_artHostOverride : pginfo->GetHostname();
             }
-  
+
             QString fn = m_helper.LocateArtwork(
                 pginfo->GetSeriesID(), pginfo->GetTitle(),
                 s_artType[i], arthost, pginfo);
@@ -1078,7 +1077,6 @@ void PlaybackBox::UpdateUIRecGroupList(void)
 
         if (idx == m_recGroupIdx)
             m_recgroupList->SetItemCurrent(item);
-
         item->SetText(name);
     }
 }
@@ -1832,7 +1830,7 @@ bool PlaybackBox::UpdateUILists(void)
                         else
                         {
                             (*pit)->SetRecordingPriority2(
-                                (*pit)->GetRecordingPriority2() + 
+                                (*pit)->GetRecordingPriority2() +
                                 (baseValue / 3) + (baseValue * hrs / 24 / 4));
                         }
                     }
