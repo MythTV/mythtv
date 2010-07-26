@@ -468,9 +468,7 @@ PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
     // Preview Image Variables
     m_previewGeneratorRunning(0), m_previewGeneratorMaxThreads(2)
 {
-    m_previewGeneratorMode =
-        gCoreContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
-        PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
+    m_previewGeneratorMode = PreviewGenerator::kRemote;
 
     int idealThreads = QThread::idealThreadCount();
     if (idealThreads >= 1)
@@ -513,7 +511,7 @@ void PlaybackBoxHelper::StopRecording(const ProgramInfo &pginfo)
 }
 
 void PlaybackBoxHelper::DeleteRecording(
-    uint chanid, const QDateTime &recstartts, bool forceDelete, 
+    uint chanid, const QDateTime &recstartts, bool forceDelete,
     bool forgetHistory)
 {
     QStringList list;
@@ -592,7 +590,7 @@ void PlaybackBoxHelper::CheckAvailability(
         (*it).push_back(catstr);
     }
     MythEvent *e = new MythEvent("CHECK_AVAILABILITY", QStringList(catstr));
-    QCoreApplication::postEvent(m_eventHandler, e);        
+    QCoreApplication::postEvent(m_eventHandler, e);
 }
 
 QString PlaybackBoxHelper::LocateArtwork(
@@ -627,7 +625,7 @@ void PlaybackBoxHelper::GetPreviewImage(const ProgramInfo &pginfo)
     QStringList extra;
     pginfo.ToStringList(extra);
     MythEvent *e = new MythEvent("GET_PREVIEW", extra);
-    QCoreApplication::postEvent(m_eventHandler, e);        
+    QCoreApplication::postEvent(m_eventHandler, e);
 }
 
 QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
@@ -776,7 +774,7 @@ void PlaybackBoxHelper::UpdatePreviewGeneratorThreads(void)
 {
     QMutexLocker locker(&m_previewGeneratorLock);
     QStringList &q = m_previewGeneratorQueue;
-    if (!q.empty() && 
+    if (!q.empty() &&
         (m_previewGeneratorRunning < m_previewGeneratorMaxThreads))
     {
         QString fn = q.back();
@@ -898,7 +896,7 @@ void PlaybackBoxHelper::previewReady(const ProgramInfo *pginfo)
 {
     if (!pginfo)
         return;
-    
+
     QString xfn = pginfo->GetPathname() + ".png";
     QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
 
@@ -921,6 +919,6 @@ void PlaybackBoxHelper::previewReady(const ProgramInfo *pginfo)
         list.push_back(pginfo->MakeUniqueKey());
         list.push_back(xfn);
         MythEvent *e = new MythEvent("PREVIEW_READY", list);
-        QCoreApplication::postEvent(m_listener, e);        
+        QCoreApplication::postEvent(m_listener, e);
     }
 }

@@ -2241,18 +2241,6 @@ static HostCheckBox *HWAccelPlaybackPreview()
     return gc;
 }
 
-static HostCheckBox *GeneratePreviewRemotely()
-{
-    HostCheckBox *gc = new HostCheckBox("GeneratePreviewRemotely");
-    gc->setLabel(QObject::tr("Generate preview image remotely"));
-    gc->setValue(false);
-    gc->setHelpText(
-        QObject::tr(
-            "If enabled, a backend server will generate preview images. "
-            "Recommended for very slow frontends."));
-    return gc;
-}
-
 static HostCheckBox *UseVirtualKeyboard()
 {
     HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
@@ -4185,9 +4173,9 @@ PlaybackSettings::PlaybackSettings()
                    QString(" (%1/%2)").arg(++i).arg(total));
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
-    pbox->addChild(GeneratePreviewRemotely());
-    pbox->addChild(PlaybackPreview());
-    pbox->addChild(HWAccelPlaybackPreview());
+    // Disabled until we re-enable live previews
+    // pbox->addChild(PlaybackPreview());
+    // pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());
     addChild(pbox);
 
