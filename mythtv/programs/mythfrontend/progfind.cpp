@@ -14,10 +14,14 @@
 #include "mythcorecontext.h"
 #include "recordinginfo.h"
 #include "tv.h"
+
+// MythUI
 #include "mythuitext.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuihelper.h"
+#include "mythscreenstack.h"
+#include "mythmainwindow.h"
 
 // mythfrontend
 #include "guidegrid.h"
