@@ -33,6 +33,7 @@
 #include "startprompt.h"
 #include "mythsystemevent.h"
 #include "expertsettingseditor.h"
+#include "dbutil.h"
 
 using namespace std;
 
@@ -591,6 +592,13 @@ int main(int argc, char *argv[])
 
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
+
+    if (!DBUtil::CheckTables(true))
+    {
+        VERBOSE(VB_IMPORTANT, "Error checking database tables. Please "
+                "run optimize_mythdb.pl or mysqlcheck --repair.");;
+        return BACKEND_EXIT_DB_ERROR;
+    }
 
     if (!UpgradeTVDatabaseSchema(true))
     {

@@ -10,6 +10,7 @@
 #include <QRegExp>
 #include <QDateTime>
 #include <QSqlError>
+#include <QSqlRecord>
 #include <QProcess>
 
 #include "dbutil.h"
@@ -260,6 +261,153 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename)
         return kDB_Backup_Completed;
 
     return kDB_Backup_Failed;
+}
+
+/** \fn DBUtil::CheckTables(const bool repair, const QString options)
+ *  \brief Checks database tables
+ *
+ *   This function will check database tables.
+ *
+ *  \param repair Repair any tables whose status is not OK
+ *  \param options Options to be passed to CHECK TABLE; defaults to QUICK
+ *  \return false if any tables have status other than OK; if repair is true,
+ *          returns true if those tables were repaired successfully
+ *  \sa DBUtil::RepairTables(const QStringList)
+ */
+bool DBUtil::CheckTables(const bool repair, const QString options)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
+        return false;
+
+    const QStringList all_tables = GetTables();
+
+    if (all_tables.empty())
+        return true;
+
+    QString sql = QString("CHECK TABLE %1 %2;").arg(all_tables.join(", "))
+                                               .arg(options);
+
+    VERBOSE(VB_IMPORTANT, "Checking database tables.");
+    if (!query.exec(sql))
+    {
+        MythDB::DBError("DBUtil Checking Tables", query);
+        return false;
+    }
+
+    QStringList tables = CheckRepairStatus(query);
+    bool result = true;
+    if (!tables.empty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Found crashed database table(s): %1")
+                                     .arg(tables.join(", ")));
+        if (repair == true)
+            // If RepairTables() repairs the crashed tables, return true
+            result = RepairTables(tables);
+        else
+            result = false;
+    }
+
+    return result;
+}
+
+/** \fn DBUtil::RepairTables(const QStringList &tables)
+ *  \brief Repairs database tables
+ *
+ *   This function will repair MyISAM database tables.
+ *
+ *   Care should be taken in calling this function. It should only be called
+ *   when no clients are accessing the database, and in the event the MySQL
+ *   server crashes, it is critical that a REPAIR TABLE is run on the table
+ *   that was being processed at the time of the server crash before any other
+ *   operations are performed on that table, or the table may be destroyed. It
+ *   is up to the caller of this function to guarantee the safety of performing
+ *   database repairs.
+ *
+ *  \param tables List of tables to repair
+ *  \return false if errors were encountered repairing tables
+ *  \sa DBUtil::CheckTables(const bool, const QString)
+ */
+bool DBUtil::RepairTables(const QStringList &tables)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
+        return false;
+
+    QString all_tables = tables.join(", ");
+    VERBOSE(VB_IMPORTANT, QString("Repairing database tables: %1")
+                                  .arg(all_tables));
+
+    QString sql = QString("REPAIR TABLE %1;").arg(all_tables);
+    if (!query.exec(sql))
+    {
+        MythDB::DBError("DBUtil Repairing Tables", query);
+        return false;
+    }
+
+    QStringList bad_tables = CheckRepairStatus(query);
+    bool result = true;
+    if (!bad_tables.empty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unable to repair crashed table(s): %1")
+                                     .arg(bad_tables.join(", ")));
+        result = false;
+    }
+    return result;
+}
+
+/** \fn DBUtil::CheckRepairStatus(MSqlQuery &query)
+ *  \brief Parse the results of a CHECK TABLE or REPAIR TABLE run.
+ *
+ *   This function reads the records returned by a CHECK TABLE or REPAIR TABLE
+ *   run and determines the status of the table(s). The query should have
+ *   columns Table, Msg_type, and Msg_text.
+ *
+ *   The function properly handles multiple records for a single table. If the
+ *   last record for a given table shows a status (Msg_type) of OK (Msg_text),
+ *   the table is considered OK, even if an error or warning appeared before
+ *   (this could be the case, for example, when an empty table is crashed).
+ *
+ *  \param query An already-executed CHECK TABLE or REPAIR TABLE query whose
+ *               results should be parsed.
+ *  \return A list of names of not-OK (errored or crashed) tables
+ *  \sa DBUtil::CheckTables(const bool, const QString)
+ *  \sa DBUtil::RepairTables(const QStringList)
+ */
+QStringList DBUtil::CheckRepairStatus(MSqlQuery &query)
+{
+    QStringList tables;
+    QSqlRecord record = query.record();
+    int table_index = record.indexOf("Table");
+    int type_index = record.indexOf("Msg_type");
+    int text_index = record.indexOf("Msg_text");
+    QString table, type, text, previous_table;
+    bool ok = true;
+    while (query.next())
+    {
+        table = query.value(table_index).toString();
+        type = query.value(type_index).toString();
+        text = query.value(text_index).toString();
+        if (table != previous_table)
+        {
+            if (!ok)
+            {
+                tables.append(previous_table);
+                ok = true;
+            }
+            previous_table = table;
+        }
+        // If the final row shows status OK, the table is now good
+        if ("status" == type.toLower() && "ok" == text.toLower())
+            ok = true;
+        else if ("error" == type.toLower() ||
+                 ("status" == type.toLower() && "ok" != text.toLower()))
+            ok = false;
+    }
+    // Check the last table in the list
+    if (!ok)
+        tables.append(table);
+    return tables;
 }
 
 /** \fn DBUtil::GetTables(void)

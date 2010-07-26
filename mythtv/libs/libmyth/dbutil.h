@@ -37,6 +37,9 @@ class MPUBLIC DBUtil
     int CompareDBMSVersion(int major, int minor=0, int point=0);
 
     MythDBBackupStatus BackupDB(QString &filename);
+    static bool CheckTables(const bool repair = false,
+                            const QString options = "QUICK");
+    static bool RepairTables(const QStringList &tables);
 
     static bool IsNewDatabase(void);
     static bool IsBackupInProgress(void);
@@ -57,6 +60,7 @@ class MPUBLIC DBUtil
     bool ParseDBMSVersion(void);
 
     static QStringList GetTables(void);
+    static QStringList CheckRepairStatus(MSqlQuery &query);
 
     QString CreateBackupFilename(QString prefix = "mythconverg",
                                  QString extension = ".sql");
