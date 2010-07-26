@@ -67,6 +67,7 @@ class ProgLister : public ScheduleCommon
     void ShowSortMenu(void);
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);
+    void ShowChooseViewMenu(void);
 
   private:
     void Load(void);
@@ -80,7 +81,6 @@ class ProgLister : public ScheduleCommon
     void UpdateKeywordInDB(const QString &text, const QString &oldValue);
 
     virtual void ShowMenu(void); // MythScreenType
-    void ShowChooseViewMenu(void);
     void ShowDeleteItemMenu(void);
     void ShowDeleteOldSeriesMenu(void);
     void ShowOldRecordedMenu(void);

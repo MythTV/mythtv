@@ -308,7 +308,7 @@ void ProgLister::ShowMenu(void)
     if (m_type != plPreviouslyRecorded)
     {
         menuPopup->AddButton(tr("Choose Search Phrase..."),
-                             SLOT(chooseView()));
+                             SLOT(ShowChooseViewMenu()));
     }
 
     menuPopup->AddButton(tr("Sort"), SLOT(ShowSortMenu()), true);
