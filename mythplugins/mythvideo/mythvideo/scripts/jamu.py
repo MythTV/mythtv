@@ -491,7 +491,8 @@ try:
     '''If the MythTV python interface is found, we can insert data directly to MythDB or
     get the directories to store poster, fanart, banner and episode graphics.
     '''
-    from MythTV import MythDB, DBData, Video, MythVideo, MythBE, MythError, MythLog, RecordedProgram
+    from MythTV import MythDB, Video, MythVideo, MythBE, MythError, MythLog, RecordedProgram
+    from MythTV.database import DBData
     mythdb = None
     mythvideo = None
     mythbeconn = None

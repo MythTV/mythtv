@@ -298,7 +298,8 @@ try:
     get the directories to store poster, fanart, banner and episode graphics.
     '''
     from MythTV import OldRecorded, Recorded, RecordedProgram, Channel, \
-                        MythDB, Video, MythVideo, MythBE, MythError, MythLog, DBDataWrite
+                        MythDB, Video, MythVideo, MythBE, MythError, MythLog
+    from MythTV.database import DBDataWrite
     mythdb = None
     mythvideo = None
     mythbeconn = None

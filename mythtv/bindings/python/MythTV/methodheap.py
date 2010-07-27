@@ -12,6 +12,7 @@ from logging import MythLog
 from connections import FEConnection, XMLConnection
 from utility import databaseSearch
 from database import DBCache
+from system import SystemEvent
 from mythproto import BEEvent, FileOps, Program
 from dataheap import *
 

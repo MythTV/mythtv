@@ -3,23 +3,13 @@
 __all_exceptions__  = ['MythError', 'MythDBError', 'MythBEError', \
                        'MythFEError', 'MythFileError']
 
-__all_utility__     = ['schemaUpdate', 'databaseSearch', 'SplitInt',
-                       'deadlinesocket']
-
-__all_altdict__     = ['OrdDict', 'DictData', 'DictInvert', 'DictInvertCI']
-
-__all_connections__ = ['LoggedCursor', 'DBConnection','BEConnection', \
-                       'FEConnection','XMLConnection']
-
-__all_database__    = ['DBData', 'DBDataWrite', 'DBDataWriteAI', \
-                       'DBDataRef', 'DBDataCRef', 'DBCache', 'StorageGroup']
+__all_utility__     = ['schemaUpdate', 'databaseSearch']
 
 __all_system__      = ['System', 'Grabber', 'Metadata', 'VideoMetadata', \
                        'MusicMetadata', 'GameMetadata', 'InternetMetadata', \
                        'SystemEvent']
 
-__all_proto__       = ['BECache', 'BEEvent', 'findfile', 'ftopen', \
-                       'FileTransfer', 'FileOps', 'FreeSpace', 'Program']
+__all_proto__       = ['findfile', 'ftopen', 'FreeSpace', 'Program']
 
 __all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
                        'Job', 'Channel', 'Guide', 'Video', 'VideoGrabber', \
@@ -28,15 +18,12 @@ __all_data__        = ['Record', 'Recorded', 'RecordedProgram', 'OldRecorded', \
                        'MusicPlaylist', 'MusicDirectory']
 
 __all_method__      = ['MythBE', 'BEEventMonitor', 'MythSystemEvent', \
-                       'SystemEvent', 'Frontend', 'MythDB', 'MythVideo', \
+                       'Frontend', 'MythDB', 'MythVideo', \
                        'MythXML', 'MythMusic']
 
-__all__             = ['static', 'MSearch', 'MythLog']\
+__all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_exceptions__\
                         +__all_utility__\
-                        +__all_altdict__\
-                        +__all_connections__\
-                        +__all_database__\
                         +__all_system__\
                         +__all_proto__\
                         +__all_data__\
@@ -55,8 +42,7 @@ from exceptions import *
 from logging import *
 from msearch import *
 from utility import *
-from altdict import *
-from connections import *
+from connections import MySQLdb
 from database import *
 from system import *
 from mythproto import *
