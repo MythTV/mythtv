@@ -1282,7 +1282,6 @@ MYTHTV_CONFIG_LIST='
     firewire
     fribidi
     frontend
-    glx_proc_addr_arb
     hdhomerun
     hdpvr
     iptv
@@ -1959,10 +1958,6 @@ for opt do
     ;;
     --*able-xvmc-pro)
     echo "$opt is deprecated. XvMC Pro is autodetected if xvmc-vld is enabled"
-    ;;
-    --enable-glx-procaddrarb) enable glx_proc_addr_arb
-    ;;
-    --disable-glx-procaddrarb) disable glx_proc_addr_arb
     ;;
     --enable-mac-accel) enable dvdv
     ;;

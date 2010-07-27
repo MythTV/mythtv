@@ -342,8 +342,6 @@ using_frontend {
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
     using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
 
-    using_glx_proc_addr_arb:DEFINES += USING_GLX_PROC_ADDR_ARB
-
     # Misc. frontend
     HEADERS += DetectLetterbox.h
     SOURCES += DetectLetterbox.cpp
