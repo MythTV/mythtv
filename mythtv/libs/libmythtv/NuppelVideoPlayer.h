@@ -580,6 +580,8 @@ class MPUBLIC NuppelVideoPlayer
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     keyframedist;
+    /// Stream has no video tracks
+    bool     noVideoTracks;
     // Buffering
     bool     buffering;
     QTime    buffering_start;

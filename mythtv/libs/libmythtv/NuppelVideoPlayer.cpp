@@ -194,7 +194,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       forced_video_aspect(-1),
       m_scan(kScan_Interlaced),     m_scan_locked(false),
       m_scan_tracker(0),            m_scan_initialized(false),
-      keyframedist(30),
+      keyframedist(30),             noVideoTracks(false),
       // Prebuffering
       buffering(false), buffering_start(),
       // General Caption/Teletext/Subtitle support
@@ -971,6 +971,9 @@ int NuppelVideoPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     GetDecoder()->setWatchingRecording(watchingrecording);
     GetDecoder()->setTranscoding(transcoding);
     CheckExtraAudioDecode();
+    noVideoTracks = GetDecoder() &&
+                   !GetDecoder()->GetTrackCount(kTrackTypeVideo);
+
 
     eof = false;
 
@@ -2010,7 +2013,7 @@ void NuppelVideoPlayer::VideoStart(void)
 
 bool NuppelVideoPlayer::VideoLoop(void)
 {
-    if (videoPaused || isDummy)
+    if (videoPaused || isDummy || noVideoTracks)
     {
         usleep(frame_interval);
         DisplayPauseFrame();
@@ -2431,8 +2434,10 @@ void NuppelVideoPlayer::EventLoop(void)
     }
 
     // Disable rewind if we are too close to the beginning of the buffer
-    if (CalcRWTime(-ffrew_skip) >= 0 && (framesPlayed <= keyframedist))
+    if (CalcRWTime(-ffrew_skip) >= 0 &&
+       (!noVideoTracks && (framesPlayed <= keyframedist)))
     {
+        VERBOSE(VB_PLAYBACK, LOC + "Near start, stopping rewind.");
         float stretch = (ffrew_skip > 0) ? 1.0f : audio.GetStretchFactor();
         Play(stretch, true, true);
     }
@@ -2655,6 +2660,9 @@ void NuppelVideoPlayer::DecoderLoop(bool pause)
 
     while (!killdecoder && !IsErrored())
     {
+        noVideoTracks = GetDecoder() &&
+                    !GetDecoder()->GetTrackCount(kTrackTypeVideo);
+
         DecoderPauseCheck();
         
         if (forcePositionMapSync)
@@ -2684,6 +2692,8 @@ void NuppelVideoPlayer::DecoderLoop(bool pause)
 
         DecodeType dt = (audio.HasAudioOut() && normal_speed) ?
             kDecodeAV : kDecodeVideo;
+        if (noVideoTracks && audio.HasAudioOut())
+            dt = kDecodeAudio;
         DecoderGetFrame(dt);
         decodeOneFrame = false;
     }
