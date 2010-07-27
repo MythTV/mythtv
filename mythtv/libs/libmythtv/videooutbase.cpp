@@ -1703,7 +1703,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
         source = "Guessed!";
         VERBOSE(VB_GENERAL, LOC + "Physical size of display unknown."
                 "\n\t\t\tAssuming 17\" monitor with square pixels.");
-        disp_dim = QSize(300, (int) ((300 * pixel_aspect) + 0.5));
+        disp_dim = QSize((int) ((300 * pixel_aspect) + 0.5), 300);
     }
 
     disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();
