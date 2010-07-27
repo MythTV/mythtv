@@ -6,8 +6,6 @@ from static import LOGLEVEL
 from sys import version_info, stdout
 from datetime import datetime
 
-#TODO: make 'extra' work properly
-
 class MythLog( LOGLEVEL ):
     """
     MythLog(module='pythonbindings', lstr=None, lbit=None, \
@@ -142,6 +140,14 @@ class MythLog( LOGLEVEL ):
     def _time25(self): return datetime.now().strftime('%Y-%m-%d %H:%M:%S.000')
     def _time26(self): return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
+    def _testLevel(self, level):
+        if level&self.EXTRA:
+            if not self.LEVEL&self.EXTRA:
+                return False
+            return self._testLevel(level&(self.ALL-self.EXTRA))
+        else:
+            return bool(level&self.LEVEL)
+
     def log(self, level, message, detail=None):
         """
         MythLog.log(level, message, detail=None) -> None
@@ -153,13 +159,12 @@ class MythLog( LOGLEVEL ):
                         ---- or ----
                 <timestamp> <module>: <message> -- <detail>
         """
-        if level&self.LEVEL:
+        if self._testLevel(level):
             lstr = "%s %s: %s" % (self.time(), self.module, message)
             if detail is not None:
                 lstr += " -- %s" % detail
             self.LOGFILE.write(lstr+'\n')
             self.LOGFILE.flush()
-        return
 
 #        if (dblevel is not None) and (self.db is not None):
 #            c = self.db.cursor(self.log)
