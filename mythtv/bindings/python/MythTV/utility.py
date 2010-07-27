@@ -238,12 +238,12 @@ class SplitInt( object ):
     @staticmethod
     def joinInt(high,low):
         """obj.joinInt(high, low) -> 64-bit int, from two signed ints"""
-        return (high + (low<0))*2**32 + low
+        return (int(high) + (int(low)<0))*2**32 + int(low)
 
     @staticmethod
-    def splitInt(integer):
+    def splitInt(dint):
         """obj.joinInt(64-bit int) -> (high, low)"""
-        return integer/(2**32),integer%2**32 - (integer%2**32 > 2**31)*2**32
+        return dint/(2**32),dint%2**32 - (dint%2**32 > 2**31)*2**32
 
 class CMPVideo( object ):
     """

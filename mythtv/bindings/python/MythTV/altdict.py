@@ -90,6 +90,8 @@ class DictData( OrdDict ):
     Modified OrdDict, with a pre-defined item order. Allows processing of
         raw input data.
     """
+    _field_order = None
+    _field_type = None
     def __setattr__(self, name, value):
         if name in self._localvars:
             self.__dict__[name] = value

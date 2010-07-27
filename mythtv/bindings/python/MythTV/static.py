@@ -4,7 +4,7 @@
 Contains any static and global variables for MythTV Python Bindings
 """
 
-OWN_VERSION = (0,23,0,17)
+OWN_VERSION = (0,23,0,18)
 SCHEMA_VERSION = 1261
 MVSCHEMA_VERSION = 1036
 NVSCHEMA_VERSION = 1007
@@ -176,6 +176,7 @@ class ERRCODES( object ):
     FILE_ERROR          = 200
     FILE_FAILED_READ    = 201
     FILE_FAILED_WRITE   = 202
+    FILE_FAILED_SEEK    = 203
 
 class MythSchema( object ):
     _schema_value = 'DBSchemaVer'

@@ -12,6 +12,7 @@ class MythError( Exception, ERRCODES ):
     Error string will be available as obj.args[0].  Additional attributes
         may be available depending on the error code.
     """
+    ecode = None
 
     def __init__(self, *args):
         if args[0] == self.SYSTEM:
@@ -22,7 +23,7 @@ class MythError( Exception, ERRCODES ):
             self.ename = 'SOCKET'
             self.ecode, (self.sockcode, self.sockerr) = args
             self.args = ("Socket Error: %s" %self.sockerr,)
-        else:
+        elif self.ecode is not None:
             self.ename = 'GENERIC'
             self.ecode = self.GENERIC
             self.args = args
@@ -84,9 +85,7 @@ class MythDBError( MythError ):
             else:
                 self.sqlcode, self.sqlerr = sqlerr
                 self.args = ("Schema update failure %d: %s" % sqlerr,)
-        else:
-            MythError.__init__(self, *args)
-        self.message = str(self.args[0])
+        MythError.__init__(self, *args)
 
 class MythBEError( MythError ): 
     """
@@ -119,9 +118,7 @@ class MythBEError( MythError ):
             self.ename = 'PROTO_PROGRAMINFO'
             self.ecode = args[0]
             self.args = ("Received invalid field count for program info",)
-        else:
-            MythError.__init__(self, *args)
-        self.message = str(self.args[0])
+        MythError.__init__(self, *args)
 
 class MythFEError( MythError ):
     """
@@ -143,9 +140,7 @@ class MythFEError( MythError ):
             self.ecode, self.frontend, self.port = args
             self.args = ('Open socket at %s:%d not recognized as mythfrontend'\
                                             % (self.frontend, self.port),)
-        else:
-            MythError.__init__(self, *args)
-        self.message = str(self.args[0])
+        MythError.__init__(self, *args)
 
 class MythFileError( MythError ):
     """
@@ -169,8 +164,12 @@ class MythFileError( MythError ):
         elif args[0] == self.FILE_FAILED_WRITE:
             self.ename = 'FILE_FAILED_WRITE'
             self.ecode, self.file, self.reason = args
-            self.args = ("Error writing to %s, %s" % (self.file, self.reason),)
-        else:
-            MythError.__init__(self, *args)
-        self.message = str(self.args[0])
+            self.args = ("Error writing to %s, %s" % \
+                    (self.file, self.reason),)
+        elif args[0] == self.FILE_FAILED_SEEK:
+            self.ename = 'FILE_FAILED_SEEK'
+            self.ecode, self.file, self.offset, self.whence = args
+            self.args = ("Error seeking %s to %d,%d" % \
+                    (self.file, self.offset, self.whence),)
+        MythError.__init__(self, *args)
 

@@ -385,6 +385,8 @@ class BEConnection( object ):
 
         # send command string
         if data is not None:
+            # flush socket
+            self.backendCommand(deadline=0.)
             self.socket.sendheader(data.encode('utf-8'))
 
         # lock socket access
@@ -415,7 +417,8 @@ class BEConnection( object ):
                         # no sent data, no further response expected
                         return u''
                 else:
-                    return event
+                    if data is not None:
+                        return event
 
                 if t >= deadline:
                     break
@@ -433,7 +436,7 @@ class BEConnection( object ):
     def eventloop(self):
         self.threadrunning = True
         while (len(self._regevents) > 0) and self.connected:
-            self.backendCommand(deadline=0.001)
+            self.backendCommand(deadline=0.)
             sleep(0.1)
         self.threadrunning = False
 

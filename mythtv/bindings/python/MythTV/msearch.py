@@ -2,6 +2,7 @@
 """Provides tools for UPNP searches"""
 
 from exceptions import MythError
+from logging import MythLog
 
 from time import time
 import socket
@@ -11,6 +12,7 @@ class MSearch( object ):
     Opens a socket for performing UPNP searches.
     """
     def __init__(self):
+        self.log = MythLog('Python M-Search')
         port = 1900
         addr = '239.255.255.250'
         self.dest = (addr, port)
@@ -38,6 +40,7 @@ class MSearch( object ):
                 content-length,   request,   date,   usn,    location,
                 cache-control,    server,    ext,    st
         """
+        self.log(MythLog.UPNP, 'running UPnP search')
         sock = self.sock
         sreq = '\r\n'.join(['M-SEARCH * HTTP/1.1',
                             'HOST: %s:%s' % self.dest,
@@ -69,6 +72,7 @@ class MSearch( object ):
                 if sdict['st'] not in filter:
                     continue
 
+            self.log(MythLog.UPNP, sdict['st'], sdict['location'])
             yield sdict
 
     def searchMythBE(self, timeout=5.0):

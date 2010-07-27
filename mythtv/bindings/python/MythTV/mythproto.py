@@ -327,10 +327,12 @@ class FileTransfer( BEEvent ):
         def recv(self, count):
             return self.socket.dlrecv(count)
 
+    def __str__(self):
+        return 'myth://%s@%s/%s' % (self.sgroup, self.host, self.filename)
+
     def __repr__(self):
-        return "<open file 'myth://%s@%s/%s', mode '%s' at %s>" % \
-                          (self.sgroup, self.host, self.filename, \
-                                self.mode, hex(id(self)))
+        return "<open file '%s', mode '%s' at %s>" % \
+                          (str(self), self.mode, hex(id(self)))
 
     def __init__(self, host, filename, sgroup, mode, db=None):
         self.filename = filename
@@ -398,6 +400,12 @@ class FileTransfer( BEEvent ):
                                 [str(self._sockno),
                                  'REQUEST_BLOCK',
                                  str(ct)]))
+
+            if res == '':
+                # complete failure, hard reset position and retry
+                self._count = 0
+                self.seek(self._pos)
+                continue
 
             if int(res) == ct:
                 if (self._count >= 5) and (self._tsize < self._tmax):
@@ -487,6 +495,9 @@ class FileTransfer( BEEvent ):
                          str(whence),
                          str(curhigh),str(curlow)])\
                  ).split(BACKEND_SEP)
+        if res[0] == '-1':
+            raise MythFileError(MythError.FILE_FAILED_SEEK, \
+                                    str(self), offset, whence)
         self._pos = self.joinInt(*res)
 
 class RecordFileTransfer( FileTransfer ):
@@ -748,7 +759,7 @@ class Program( DictData, RECSTATUS, CMPRecord ):
                      0,      0,      4,
                      4,      3,      3,
                      3,      3,      3,
-                     3,      1,      3,
+                     4,      1,      3,
                      3,      0,      3,
                      3,      0,      0,
                      0,      0]
