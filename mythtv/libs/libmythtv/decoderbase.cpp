@@ -1124,6 +1124,8 @@ QString toString(TrackType type)
 
     if (kTrackTypeAudio == type)
         str = QObject::tr("Audio track");
+    else if (kTrackTypeVideo == type)
+        str = QObject::tr("Video track");
     else if (kTrackTypeSubtitle == type)
         str = QObject::tr("Subtitle track");
     else if (kTrackTypeCC608 == type)
@@ -1145,6 +1147,8 @@ int to_track_type(const QString &str)
 
     if (str.left(5) == "AUDIO")
         ret = kTrackTypeAudio;
+    else if (str.left(5) == "VIDEO")
+        ret = kTrackTypeVideo;
     else if (str.left(8) == "SUBTITLE")
         ret = kTrackTypeSubtitle;
     else if (str.left(5) == "CC608")
