@@ -494,7 +494,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       ttd(new TeletextDecoder()),   subReader(parent->GetSubReader()),
       // Interactive TV
       itv(NULL),
-      selectedVideoIndex(-1),
       // Audio
       audioSamples(NULL),
       internal_vol(false),
@@ -1849,7 +1848,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
     tracks[kTrackTypeTeletextCaptions].clear();
-    selectedVideoIndex = -1;
+    tracks[kTrackTypeVideo].clear();
+    selectedTrack[kTrackTypeVideo].av_stream_index = -1;
 
     map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
@@ -1894,6 +1894,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     enc->bit_rate = 500000;
                 // HACK -- end
 
+                StreamInfo si(i, 0, 0, 0);
+                tracks[kTrackTypeVideo].push_back(si);
                 bitrate += enc->bit_rate;
                 if (novideo)
                     break;
@@ -2061,13 +2063,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 // Set the default stream to the stream
                 // that is found first in the PMT
-                if (selectedVideoIndex < 0)
-                {
-                    selectedVideoIndex = i;
-                }
+                if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
+                    selectedTrack[kTrackTypeVideo] = si;
 
                 InitVideoCodec(ic->streams[i], enc,
-                               selectedVideoIndex == (int) i);
+                    selectedTrack[kTrackTypeVideo].av_stream_index == (int) i);
 
                 ScanATSCCaptionStreams(i);
                 UpdateATSCCaptionTracks();
@@ -2365,7 +2365,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     // if we don't have a video stream we still need to make sure some
     // video params are set properly
-    if (selectedVideoIndex == -1)
+    if (selectedTrack[kTrackTypeVideo].av_stream_index == -1)
     {
         QString tvformat = gCoreContext->GetSetting("TVFormat").toLower();
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
@@ -2758,11 +2758,11 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     if (!need_change_608 && !need_change_708)
         return;
 
-    ScanATSCCaptionStreams(selectedVideoIndex);
+    ScanATSCCaptionStreams(selectedTrack[kTrackTypeVideo].av_stream_index);
 
     stream_tracks.clear();
     stream_track_types.clear();
-    int av_index = selectedVideoIndex;
+    int av_index = selectedTrack[kTrackTypeVideo].av_stream_index;
     int lang = iso639_str3_to_key("und");
     for (uint i = 0; i < 4; i++)
     {
@@ -3635,7 +3635,8 @@ bool AvFormatDecoder::SetVideoByComponentTag(int tag)
         {
             if (s->component_tag == tag)
             {
-                selectedVideoIndex = i;
+                StreamInfo si(i, 0, 0, 0);
+                selectedTrack[kTrackTypeVideo] = si;
                 return true;
             }
         }
@@ -4019,7 +4020,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
             lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
-        if (skipaudio)
+        if (skipaudio && selectedTrack[kTrackTypeVideo].av_stream_index > -1)
         {
             if ((lastapts < lastvpts - (10.0 / fps)) || lastvpts == 0)
                 break;
@@ -4167,7 +4168,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     if (m_audio->GetBufferStatus(ofill, ototal))
     {
         othresh =  ((ototal>>1) + (ototal>>2));
-        allowedquit = (!(decodetype & kDecodeAudio)) && (ofill > othresh);
+        allowedquit = ofill > othresh;
     }
 
     while (!allowedquit)
@@ -4193,7 +4194,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
             bool inDVDMenu  = ringBuffer->DVD()->IsInMenu();
             int storedPktCount = storedPackets.count();
-            selectedVideoIndex = 0;
+            selectedTrack[kTrackTypeVideo].av_stream_index = 0;
             if (dvdTitleChanged)
             {
                 if ((storedPktCount > 10 && !decodeStillFrame) ||
@@ -4422,7 +4423,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         }
 
         if (codec_type == CODEC_TYPE_VIDEO &&
-            pkt->stream_index == selectedVideoIndex)
+            pkt->stream_index == selectedTrack[kTrackTypeVideo].av_stream_index)
         {
             if (!PreProcessVideoPacket(curstream, pkt))
                 continue;
@@ -4477,7 +4478,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
             case CODEC_TYPE_VIDEO:
             {
-                if (pkt->stream_index != selectedVideoIndex)
+                if (pkt->stream_index != selectedTrack[kTrackTypeVideo].av_stream_index)
                 {
                     break;
                 }
@@ -4549,7 +4550,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
         has_video |= pmt.IsVideo(i, "dvb");
 
         // MHEG may explicitly select a private stream as video
-        has_video |= ((i == (uint)selectedVideoIndex) &&
+        has_video |= ((i == (uint)selectedTrack[kTrackTypeVideo].av_stream_index) &&
                       (pmt.StreamType(i) == StreamID::PrivData));
     }
 

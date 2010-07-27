@@ -27,6 +27,7 @@ const int kDecoderProbeBufferSize = 128 * 1024;
 typedef enum TrackTypes
 {
     kTrackTypeAudio = 0,
+    kTrackTypeVideo,
     kTrackTypeSubtitle,
     kTrackTypeCC608,
     kTrackTypeCC708,

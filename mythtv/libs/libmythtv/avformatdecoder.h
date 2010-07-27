@@ -294,7 +294,6 @@ class AvFormatDecoder : public DecoderBase
 
     // MHEG
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
-    int               selectedVideoIndex; ///< MHEG/MHP video stream to use.
 
     // Audio
     short int        *audioSamples;
