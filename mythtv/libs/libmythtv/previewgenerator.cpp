@@ -179,7 +179,7 @@ bool PreviewGenerator::RunReal(void)
 bool PreviewGenerator::Run(void)
 {
     bool ok = false;
-    QString command = GetInstallPrefix() + "/bin/mythbackend";
+    QString command = GetInstallPrefix() + "/bin/mythpreviewgen";
     bool local_ok = (IsLocal() && (mode & kLocal) &&
                      QFileInfo(command).isExecutable());
     if (!local_ok)
@@ -197,13 +197,16 @@ bool PreviewGenerator::Run(void)
     }
     else
     {
-        // This is where we fork and run mythbackend to actually make preview
-        command += " --generate-preview ";
-        command += QString("%1x%2")
+        // This is where we fork and run mythpreviewgen to actually make preview
+        command += QString(" --size %1x%2")
             .arg(outSize.width()).arg(outSize.height());
         if (captureTime >= 0)
-            command += QString("@%1%2")
-                .arg(captureTime).arg(timeInSeconds ? "s" : "f");
+        {
+            if (timeInSeconds)
+                command += QString(" --seconds %1").arg(captureTime);
+            else
+                command += QString(" --frame %1").arg(captureTime);
+        }
         command += " ";
         command += QString("--chanid %1 ").arg(programInfo.GetChanID());
         command += QString("--starttime %1 ")

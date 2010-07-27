@@ -16,10 +16,6 @@ void cleanup(void);
 int log_rotate(int report_error);
 void log_rotate_handler(int);
 void upnp_rebuild(int);
-int preview_helper(const QString &chanid, const QString &starttime,
-                   long long previewFrameNumber, long long previewSeconds,
-                   const QSize &previewSize,
-                   const QString &infile, const QString &outfile);
 void showUsage(const MythCommandLineParser &cmdlineparser,
                const QString &version);
 void setupLogfile(void);

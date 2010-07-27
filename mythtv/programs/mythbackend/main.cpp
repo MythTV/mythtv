@@ -99,8 +99,7 @@ int main(int argc, char **argv)
         kCLPSystemEvent          |
         kCLPChannelId            |
         kCLPStartTime            |
-        kCLPPrintExpire          |
-        kCLPGeneratePreview);
+        kCLPPrintExpire);
 
     for (int argpos = 0; argpos < argc; ++argpos)
     {
@@ -144,14 +143,6 @@ int main(int argc, char **argv)
             cout << help.constData();
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
-    }
-
-    if (cmdline.HasInvalidPreviewGenerationParams())
-    {
-        cerr << "--generate-preview must be accompanied by either " <<endl
-             << "\nboth --chanid and --starttime parameters, " << endl
-             << "\nor the --infile parameter." << endl;
-        return BACKEND_EXIT_INVALID_CMDLINE;
     }
 
     logfile = cmdline.GetLogFilename();

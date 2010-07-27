@@ -92,18 +92,16 @@ class MPUBLIC MythCommandLineParser
 
     bool    HasInvalidPreviewGenerationParams(void) const
     {
-        return ((previewFrameNumber >= -1) || previewSeconds >= -1) &&
-            (!chanid || !starttime.isValid()) && infile.isEmpty();
+        return ((!chanid || !starttime.isValid()) && infile.isEmpty());
     }
 
     bool    HasBackendCommand(void) const
     {
-        return 
+        return
             !eventString.isEmpty()    || wantupnprebuild       ||
             setverbose                || clearsettingscache    ||
             printsched                || testsched             ||
-            resched                   || !printexpire.isEmpty() ||
-            (previewFrameNumber >= -1) || (previewSeconds >= -1);
+            resched                   || !printexpire.isEmpty();
     }
 
     bool    WantsToExit(void) const { return wantsToExit; }

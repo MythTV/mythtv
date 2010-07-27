@@ -12,12 +12,6 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 
-static bool parse_preview_info(
-    const QString &param,
-    long long     &previewFrameNumber,
-    long long     &previewSeconds,
-    QSize         &previewSize);
-
 MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
     parseTypes(things_to_parse),
     display(), geometry(),
@@ -618,29 +612,71 @@ bool MythCommandLineParser::Parse(
         }
         return true;
     }
-    else if ((parseTypes & kCLPGeneratePreview) &&
-             !strcmp(argv[argpos],"--generate-preview"))
+    else if (parseTypes & kCLPGeneratePreview &&
+             (!strcmp(argv[argpos],"--seconds")))
     {
         QString tmp;
         if ((argc - 1) > argpos)
         {
             tmp = argv[argpos+1];
             bool ok = true;
-            if (tmp.left(1) == "-")
-                tmp.left(2).toInt(&ok);
+            long long seconds = tmp.toInt(&ok);
             if (ok)
-                argpos++;
+            {
+                previewSeconds = seconds;
+                ++argpos;
+            }
             else
                 tmp.clear();
         }
 
-        if (!parse_preview_info(tmp, previewFrameNumber, previewSeconds,
-                                previewSize))
+        return true;
+    }
+    else if (parseTypes & kCLPGeneratePreview &&
+             (!strcmp(argv[argpos],"--frame")))
+    {
+        QString tmp;
+        if ((argc - 1) > argpos)
         {
-            cerr << "Unable to parse --generate-preview option '"
-                 << tmp.toAscii().constData() << "'" << endl;
+            tmp = argv[argpos+1];
+            VERBOSE(VB_IMPORTANT, QString("--frame: %1").arg(tmp));
+            bool ok = true;
+            long long frame = tmp.toInt(&ok);
+            if (ok)
+            {
+                previewFrameNumber = frame;
+                ++argpos;
+            }
+            else
+                tmp.clear();
+        }
 
-            err = true;
+        return true;
+    }
+    else if (parseTypes & kCLPGeneratePreview &&
+             (!strcmp(argv[argpos],"--size")))
+    {
+        QString tmp;
+        if ((argc - 1) > argpos)
+        {
+            tmp = argv[argpos+1];
+            int xat = tmp.indexOf("x", 0, Qt::CaseInsensitive);
+            if (xat > 0)
+            {
+                QString widthStr  = tmp.left(xat);
+                QString heightStr;
+                heightStr = tmp.mid(xat + 1);
+
+                bool ok1, ok2;
+                previewSize = QSize(widthStr.toInt(&ok1), heightStr.toInt(&ok2));
+                if (!ok1 || !ok2)
+                {
+                    VERBOSE(VB_IMPORTANT, QString(
+                                "Error: Failed to parse preview generator "
+                                "param '%1'").arg(tmp));
+                }
+            }
+            ++argpos;
         }
 
         return true;
@@ -824,8 +860,12 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
 
     if (parseTypes & kCLPGeneratePreview)
     {
-        msg << "--generate-preview             "
-            << "Generate a preview image" << endl;
+        msg << "--seconds                      "
+            << "Number of seconds into video that preview should be taken" << endl;
+        msg << "--frame                        "
+            << "Number of frames into video that preview should be taken" << endl;
+        msg << "--size                         "
+            << "Dimensions of preview image" << endl;
     }
 
     if (parseTypes & kCLPUPnPRebuild)
@@ -875,64 +915,3 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     return str;
 }
 
-// [WxH] | [WxH@]seconds[S] | [WxH@]frame_numF
-static bool parse_preview_info(
-    const QString &param,
-    long long     &previewFrameNumber,
-    long long     &previewSeconds,
-    QSize         &previewSize)
-{
-    previewFrameNumber = -1;
-    previewSeconds = -1;
-    previewSize = QSize(0,0);
-    if (param.isEmpty())
-        return true;
-
-    int xat = param.indexOf("x", 0, Qt::CaseInsensitive);
-    int aat = param.indexOf("@", 0);
-    if (xat > 0)
-    {
-        QString widthStr  = param.left(xat);
-        QString heightStr;
-        if (aat > xat)
-            heightStr = param.mid(xat + 1, aat - xat - 1);
-        else
-            heightStr = param.mid(xat + 1);
-
-        bool ok1, ok2;
-        previewSize = QSize(widthStr.toInt(&ok1), heightStr.toInt(&ok2));
-        if (!ok1 || !ok2)
-        {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Error: Failed to parse --generate-preview "
-                        "param '%1'").arg(param));
-        }
-    }
-    if ((xat > 0) && (aat < xat))
-        return true;
-
-    QString lastChar = param.at(param.length() - 1).toLower();
-    QString frameNumStr;
-    QString secsStr;
-    if (lastChar == "f")
-        frameNumStr = param.mid(aat + 1, param.length() - aat - 2);
-    else if (lastChar == "s")
-        secsStr = param.mid(aat + 1, param.length() - aat - 2);
-    else
-        secsStr = param.mid(aat + 1, param.length() - aat - 1);
-
-    bool ok = false;
-    if (!frameNumStr.isEmpty())
-        previewFrameNumber = frameNumStr.toUInt(&ok);
-    else if (!secsStr.isEmpty())
-        previewSeconds = secsStr.toUInt(&ok);
-
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "Error: Failed to parse --generate-preview "
-                    "param '%1'").arg(param));
-    }
-
-    return ok;
-}
