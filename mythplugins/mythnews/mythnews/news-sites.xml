@@ -410,67 +410,67 @@
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Certified Fresh on DVD/Video</title>
+        <title>Rotten Tomatoes - Certified Fresh on DVD/Video</title>
         <url>http://i.rottentomatoes.com/syndication/rss/complete_certified_fresh_dvds.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Certified Fresh in Theaters</title>
+        <title>Rotten Tomatoes - Certified Fresh in Theaters</title>
         <url>http://i.rottentomatoes.com/syndication/rss/in_theaters_certified_fresh.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Certified Fresh Top DVD/Video Pick</title>
+        <title>Rotten Tomatoes - Certified Fresh Top DVD/Video Pick</title>
         <url>http://i.rottentomatoes.com/syndication/rss/video_certified_fresh.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Certified Fresh Top Movie Pick</title>
+        <title>Rotten Tomatoes - Certified Fresh Top Movie Pick</title>
         <url>http://i.rottentomatoes.com/syndication/rss/movie_certified_fresh.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Complete Listing of DVD/Videos</title>
+        <title>Rotten Tomatoes - Complete Listing of DVD/Videos</title>
         <url>http://i.rottentomatoes.com/syndication/rss/complete_dvds.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Complete Listing of Movies</title>
+        <title>Rotten Tomatoes - Complete Listing of Movies</title>
         <url>http://i.rottentomatoes.com/syndication/rss/complete_movies.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - In Theaters</title>
+        <title>Rotten Tomatoes - In Theaters</title>
         <url>http://i.rottentomatoes.com/syndication/rss/in_theaters.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - New DVD Releases</title>
+        <title>Rotten Tomatoes - New DVD Releases</title>
         <url>http://i.rottentomatoes.com/syndication/rss/new_releases.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Opening Movies</title>
+        <title>Rotten Tomatoes - Opening Movies</title>
         <url>http://i.rottentomatoes.com/syndication/rss/opening.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Top DVDs</title>
+        <title>Rotten Tomatoes - Top DVDs</title>
         <url>http://i.rottentomatoes.com/syndication/rss/top_dvds.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Top Movies</title>
+        <title>Rotten Tomatoes - Top Movies</title>
         <url>http://i.rottentomatoes.com/syndication/rss/top_movies.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Top Movie News</title>
+        <title>Rotten Tomatoes - Top Movie News</title>
         <url>http://i.rottentomatoes.com/syndication/rss/top_news.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Upcoming Movies</title>
+        <title>Rotten Tomatoes - Upcoming Movies</title>
         <url>http://i.rottentomatoes.com/syndication/rss/upcoming.xml</url>
     </item>
 
@@ -735,7 +735,7 @@
 
     <item>
         <title>Wired News - Top Stories</title>
-        <url>http://feeds.wired.com/wired/topheadlines</url>
+        <url>http://feeds.wired.com/wired/index</url>
         <ico>http://www.wired.com/favicon.ico</ico>
     </item>
 
