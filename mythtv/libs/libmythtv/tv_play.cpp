@@ -45,7 +45,6 @@ using namespace std;
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "util-osx-cocoa.h"
 #include "compat.h"
 #include "mythverbose.h"
 #include "mythuihelper.h"

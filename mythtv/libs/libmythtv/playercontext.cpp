@@ -12,7 +12,6 @@
 #include "livetvchain.h"
 #include "RingBuffer.h"
 #include "playgroup.h"
-#include "util-osx-cocoa.h"
 #include "videoouttypes.h"
 #include "storagegroup.h"
 #include "mythcorecontext.h"
