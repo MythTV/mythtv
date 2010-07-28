@@ -15,6 +15,7 @@
 
 #import "util-osx.h"
 #import "util-osx-cocoa.h"
+#import "Carbon/Carbon.h"
 #import <CoreFoundation/CFNumber.h>
 #include <stdio.h>
 
