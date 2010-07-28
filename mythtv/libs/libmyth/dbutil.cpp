@@ -280,7 +280,7 @@ bool DBUtil::CheckTables(const bool repair, const QString options)
     if (!query.isConnected())
         return false;
 
-    const QStringList all_tables = GetTables();
+    const QStringList all_tables = GetTables(QStringList("MyISAM"));
 
     if (all_tables.empty())
         return true;
@@ -410,16 +410,12 @@ QStringList DBUtil::CheckRepairStatus(MSqlQuery &query)
     return tables;
 }
 
-/** \fn DBUtil::GetTables(void)
+/** \fn DBUtil::GetTables(const QStringList &engines)
  *  \brief Retrieves a list of tables from the database.
- *
- *   The function tries to ensure that the list contains only tables and no
- *   views.  However, for MySQL 5.0.1, the list will also contain any views
- *   defined in the database.
  *
  *  \return QStringList containing table names
  */
-QStringList DBUtil::GetTables(void)
+QStringList DBUtil::GetTables(const QStringList &engines)
 {
     QStringList result;
 
@@ -432,7 +428,10 @@ QStringList DBUtil::GetTables(void)
                   "              '`') AS `TABLE_NAME` "
                   "  FROM INFORMATION_SCHEMA.TABLES "
                   " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = DATABASE() "
-                  "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = 'BASE TABLE';";
+                  "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = 'BASE TABLE'";
+    if (!engines.empty())
+        sql.append(QString("   AND INFORMATION_SCHEMA.TABLES.ENGINE IN ('%1')")
+                           .arg(engines.join("', '")));
     if (!query.exec(sql))
     {
         MythDB::DBError("DBUtil Finding Tables", query);

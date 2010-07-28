@@ -59,7 +59,7 @@ class MPUBLIC DBUtil
     bool QueryDBMSVersion(void);
     bool ParseDBMSVersion(void);
 
-    static QStringList GetTables(void);
+    static QStringList GetTables(const QStringList &engines = QStringList());
     static QStringList CheckRepairStatus(MSqlQuery &query);
 
     QString CreateBackupFilename(QString prefix = "mythconverg",
