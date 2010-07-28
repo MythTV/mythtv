@@ -36,7 +36,6 @@ class VideoOutputDirectfb: public VideoOutput
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
-    DisplayInfo  GetDisplayInfo(void);
     void MoveResizeWindow(QRect ) {;}
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);

@@ -1625,7 +1625,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
  */
 void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
 {
-    DisplayInfo disp = GetDisplayInfo();
+    DisplayInfo disp = MythDisplay::GetDisplayInfo();
     QString     source = "Actual";
 
     // The very first Resize needs to be the maximum possible

@@ -36,7 +36,6 @@ class VideoOutputNull : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     void MoveResizeWindow(QRect ) {;}
-    DisplayInfo GetDisplayInfo(void) { return DisplayInfo(); }
 
   private:
     QMutex     global_lock;

@@ -1266,13 +1266,6 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
     return true;
 }
 
-DisplayInfo VideoOutputQuartz::GetDisplayInfo(void)
-{
-    VERBOSE(VB_PLAYBACK, (LOC + "GetDisplayInfo() [returning %1]")
-                         .arg((int)data->refreshRate));
-    return DisplayInfo((int)(1000000 / data->refreshRate));
-}
-
 bool VideoOutputQuartz::Init(int width, int height, float aspect,
                              WId winid, int winx, int winy,
                              int winw, int winh, WId embedid)

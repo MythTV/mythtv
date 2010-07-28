@@ -342,18 +342,6 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     return ok;
 }
 
-DisplayInfo VideoOutputXv::GetDisplayInfo(void)
-{
-    DisplayInfo ret;
-    if (XJ_started)
-    {
-        ret.rate = disp->GetRefreshRate();
-        ret.res  = disp->GetDisplaySize();
-        ret.size = disp->GetDisplayDimensions();
-    }
-    return ret;
-}
-
 void VideoOutputXv::MoveResizeWindow(QRect new_rect)
 {
     if (disp)

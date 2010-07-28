@@ -189,37 +189,6 @@ bool VideoOutputD3D::SetupContext()
     return true;
 }
 
-DisplayInfo VideoOutputD3D::GetDisplayInfo(void)
-{
-    DisplayInfo ret;
-    HDC hdc = GetDC(m_hWnd);
-    if (hdc)
-    {
-        int rate = GetDeviceCaps(hdc, VREFRESH);
-        if (rate > 20 && rate < 200)
-        {
-            // see http://support.microsoft.com/kb/2006076
-            switch (rate)
-            {
-                case 23:  ret.rate = 41708; break; // 23.976Hz
-                case 29:  ret.rate = 33367; break; // 29.970Hz
-                case 47:  ret.rate = 20854; break; // 47.952Hz
-                case 59:  ret.rate = 16683; break; // 59.940Hz
-                case 71:  ret.rate = 13903; break; // 71.928Hz
-                case 119: ret.rate = 8342;  break; // 119.880Hz
-                default:  ret.rate = 1000000 / rate;
-            }
-        }
-        int width  = GetDeviceCaps(hdc, HORZSIZE);
-        int height = GetDeviceCaps(hdc, VERTSIZE);
-        ret.size   = QSize((uint)width, (uint)height);
-        width      = GetDeviceCaps(hdc, HORZRES);
-        height     = GetDeviceCaps(hdc, VERTRES);
-        ret.res    = QSize((uint)width, (uint)height);
-    }
-    return ret;
-}
-
 bool VideoOutputD3D::Init(int width, int height, float aspect,
                           WId winid, int winx, int winy, int winw,
                           int winh, WId embedid)

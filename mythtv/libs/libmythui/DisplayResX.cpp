@@ -6,6 +6,7 @@
 
 #include "mythverbose.h"
 #include "mythdb.h"
+#include "mythdisplay.h"
 #include "mythxdisplay.h"
 #include "util-nvctrl.h"
 
@@ -28,29 +29,16 @@ DisplayResX::~DisplayResX(void)
 bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                                  int &h_mm, double &rate, double &par) const
 {
-    bool success = false;
-    MythXDisplay *d = OpenMythXDisplay();
-    if (!d)
-        return success;
-
-    QSize mm  = d->GetDisplayDimensions();
-    QSize pix = d->GetDisplaySize();
-    double  rr = 1000000.0 / d->GetRefreshRate();
-
-    if (mm.width() > 0 && mm.height() > 0 &&
-        pix.width() > 0 && pix.height() > 0 && rr > 0)
-    {
-        rate = rr;
-        w_mm = mm.width();
-        h_mm = mm.height();
-        w_pix = pix.width();
-        h_pix = pix.height();
-        par = d->GetPixelAspectRatio();
-        success = true;
-    }
-
-    delete d;
-    return success;
+    DisplayInfo info = MythDisplay::GetDisplayInfo();
+    w_mm   = info.res.width();
+    h_mm   = info.res.height();
+    w_pix  = info.size.width();
+    h_pix  = info.size.height();
+    rate   = info.rate;
+    par    = 1.0;
+    if (w_mm > 0 && h_mm > 0 && w_pix > 0 && h_pix > 0)
+        par = ((double)w_mm  / (double)w_pix) / ((double)h_mm / (double)h_pix);
+    return true;
 }
 
 bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)

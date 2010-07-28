@@ -450,20 +450,6 @@ void VideoOutputOpenGL::UpdatePauseFrame(void)
     CopyFrame(&av_pause_frame, used_frame);
 }
 
-DisplayInfo VideoOutputOpenGL::GetDisplayInfo(void)
-{
-    // TODO - move DisplayInfo into libmythui/MythXDisplay
-    DisplayInfo ret;
-
-    if (gl_context)
-    {
-        ret.rate = gl_context->GetRefreshRate();
-        ret.res  = gl_context->GetDisplaySize();
-        ret.size = gl_context->GetDisplayDimensions();
-    }
-    return ret;
-}
-
 void VideoOutputOpenGL::InitPictureAttributes(void)
 {
     if (!gl_context)

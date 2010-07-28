@@ -890,20 +890,6 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
     return test_cid;
 }
 
-DisplayInfo VideoOutputVDPAU::GetDisplayInfo(void)
-{
-    DisplayInfo ret;
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        ret.rate = d->GetRefreshRate();
-        ret.res  = d->GetDisplaySize();
-        ret.size = d->GetDisplayDimensions();
-        delete d;
-    }
-    return ret;
-}
-
 void VideoOutputVDPAU::UpdateReferenceFrames(VideoFrame *frame)
 {
     while (m_reference_frames.size() > (NUM_REFERENCE_FRAMES - 1))

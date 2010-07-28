@@ -34,7 +34,6 @@ class MPUBLIC MythXDisplay
     int      GetNumberXineramaScreens(void);
     QSize    GetDisplaySize(void);
     QSize    GetDisplayDimensions(void);
-    double   GetPixelAspectRatio(void);
     int      GetRefreshRate(void);
     void     Sync(bool flush = false);
     void     StartLog(void);

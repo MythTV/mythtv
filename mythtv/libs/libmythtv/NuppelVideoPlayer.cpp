@@ -1555,7 +1555,7 @@ void NuppelVideoPlayer::InitAVSync(void)
 
     repeat_delay = 0;
 
-    refreshrate = videoOutput ? videoOutput->GetDisplayInfo().rate : 0;
+    refreshrate = MythDisplay::GetDisplayInfo().rate;
     if (refreshrate <= 0)
         refreshrate = frame_interval;
 
@@ -1955,9 +1955,7 @@ void NuppelVideoPlayer::VideoStart(void)
 
     float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
     uint fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
-    uint rf_int = 0;
-    if (videoOutput)
-        rf_int = videoOutput->GetDisplayInfo().rate;
+    uint rf_int = MythDisplay::GetDisplayInfo().rate;
 
     // Default to Interlaced playback to allocate the deinterlacer structures
     // Enable autodetection of interlaced/progressive from video stream

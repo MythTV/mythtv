@@ -19,6 +19,7 @@ extern "C" {
 #include "mythcodecid.h"
 #include "videoouttypes.h"
 #include "videooutwindow.h"
+#include "mythdisplay.h"
 #include "DisplayRes.h"
 #include "videodisplayprofile.h"
 using namespace std;
@@ -98,8 +99,6 @@ class VideoOutput
                               float &visibleAspect, float &fontScale,
                               float themeAspect) const;
     QRect        GetMHEGBounds(void);
-    /// \brief Returns information about the current display
-    virtual DisplayInfo GetDisplayInfo(void) = 0;
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     /// \brief Draws non-video portions of the screen

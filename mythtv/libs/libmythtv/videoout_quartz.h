@@ -38,7 +38,6 @@ class VideoOutputQuartz : public VideoOutput
     void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
 
-    DisplayInfo GetDisplayInfo(void);
     void MoveResizeWindow(QRect new_rect) {;}
     void DrawUnusedRects(bool sync = true);
 

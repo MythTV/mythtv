@@ -129,39 +129,8 @@ bool MythRenderOpenGL::create(const QGLContext * shareContext)
     Init2DState();
     InitFeatures();
 
-#if defined(Q_WS_MAC)
-    bool success = false;
-#ifndef QT_MAC_USE_COCOA
-    QWidget *w = (QWidget*)this->device();
-    HIViewRef hiview = (HIViewRef)w->winId();
-    WindowRef window = HIViewGetWindow(hiview);
-    Rect bounds;
-    if (!GetWindowBounds(window,
-                         kWindowStructureRgn,
-                        &bounds))
-    {
-        CGDisplayCount ct ;
-        CGPoint pt;
-        pt.x = bounds.left;
-        pt.y = bounds.top;
-        if (kCGErrorSuccess != CGGetDisplaysWithPoint(pt, 1, &m_screen, &ct))
-            m_screen = CGMainDisplayID();
-        success = true;
-    }
-#else
-#warning Qt for Mac using COCOA - FIXME
-#endif
-    if (!success)
-    {
-        VERBOSE(VB_IMPORTANT,
-            LOC_ERR + QString("Failed to get Mac Display ID"));
-        ok = false;
-    }
-#endif
-
     if (ok)
         VERBOSE(VB_GENERAL, LOC + "Initialised MythRenderOpenGL");
-
     return ok;
 }
 
@@ -181,115 +150,6 @@ void MythRenderOpenGL::doneCurrent()
     if (m_lock_level < 0)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Mis-matched calls to makeCurrent()");
     m_lock->unlock();
-}
-
-int MythRenderOpenGL::GetRefreshRate(void)
-{
-    int ret = -1;
-
-#if defined(Q_WS_X11)
-    MythXDisplay *m_display = OpenMythXDisplay();
-    if (m_display)
-    {
-        ret = m_display->GetRefreshRate();
-        delete m_display;
-    }
-#elif defined(Q_WS_MAC)
-    if (m_screen)
-    {
-        CFDictionaryRef ref = CGDisplayCurrentMode(m_screen);
-        if (ref)
-        {
-            int rate = get_float_CF(ref, kCGDisplayRefreshRate);
-            // N.B. A rate of zero typically indicates the internal macbook
-            // lcd display which does not have a rate in the traditional sense
-            if (rate > 20 && rate < 200)
-                ret = 1000000 / rate;
-        }
-    }
-#elif defined(Q_WS_WIN)
-    QWidget *parent = (QWidget*)this->device();
-    if (parent && parent->winId())
-    {
-        HDC hDC = GetDC(parent->winId());
-        if (hDC)
-        {
-            int rate = GetDeviceCaps(hDC, VREFRESH);
-            if (rate > 20 && rate < 200)
-                ret = 1000000 / rate;
-        }
-    }
-#endif
-    return ret;
-}
-
-QSize MythRenderOpenGL::GetDisplaySize(void)
-{
-    QSize ret = QSize();
-
-#if defined(Q_WS_X11)
-    MythXDisplay *m_display = OpenMythXDisplay();
-    if (m_display)
-    {
-        ret = m_display->GetDisplaySize();
-        delete m_display;
-    }
-#elif defined(Q_WS_MAC)
-    if (m_screen)
-    {
-        CGSize size_in_mm = CGDisplayScreenSize(m_screen);
-        ret = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
-    }
-#elif defined(Q_WS_WIN)
-    QWidget *parent = (QWidget*)this->device();
-    if (parent && parent->winId())
-    {
-        HDC hDC = GetDC(parent->winId());
-        if (hDC)
-        {
-            int width  = GetDeviceCaps(hDC, HORZSIZE);
-            int height = GetDeviceCaps(hDC, VERTSIZE);
-            ret        = QSize((uint)width, (uint)height);
-        }
-    }
-#endif
-
-    return ret;
-}
-
-QSize MythRenderOpenGL::GetDisplayDimensions(void)
-{
-    QSize ret = QSize();
-
-#if defined(Q_WS_X11)
-    MythXDisplay *m_display = OpenMythXDisplay();
-    if (m_display)
-    {
-        ret = m_display->GetDisplayDimensions();
-        delete m_display;
-    }
-#elif defined(Q_WS_MAC)
-    if (m_screen)
-    {
-        uint width  = (uint)CGDisplayPixelsWide(m_screen);
-        uint height = (uint)CGDisplayPixelsHigh(m_screen);
-        ret         = QSize(width, height);
-    }
-#elif defined(Q_WS_WIN)
-    QWidget *parent = (QWidget*)this->device();
-    if (parent && parent->winId())
-    {
-        HDC hDC = GetDC(parent->winId());
-        if (hDC)
-        {
-            int width  = GetDeviceCaps(hDC, HORZRES);
-            int height = GetDeviceCaps(hDC, VERTRES);
-            ret        = QSize((uint)width, (uint)height);
-        }
-    }
-#endif
-
-    return ret;
 }
 
 int MythRenderOpenGL::SetPictureAttribute(int attribute, int newValue)
@@ -1471,10 +1331,6 @@ void MythRenderOpenGL::ResetVars(void)
     m_blend           = false;
     m_color           = 0x00000000;
     m_background      = 0x00000000;
-
-#if defined(Q_WS_MAC)
-    m_screen = NULL;
-#endif
 }
 
 void MythRenderOpenGL::ResetProcs(void)

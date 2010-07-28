@@ -89,7 +89,6 @@ class VideoOutputXv : public VideoOutput
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
-    DisplayInfo GetDisplayInfo(void);
 
     virtual bool IsPIPSupported(void) const
         { return XVideo == VideoOutputSubType(); }

@@ -71,9 +71,6 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     int   GetMaxTextureSize(void)    { return m_max_tex_size;   }
     uint  GetFeatures(void)          { return m_exts_supported; }
     void  SetFeatures(uint features) { m_exts_used = features;  }
-    int   GetRefreshRate(void);
-    QSize GetDisplaySize(void);
-    QSize GetDisplayDimensions(void);
     int   SetPictureAttribute(int attribute, int newValue);
 
     void  MoveResizeWindow(const QRect &rect);
@@ -180,10 +177,6 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     bool     m_blend;
     uint32_t m_color;
     uint32_t m_background;
-
-#if defined(Q_WS_MAC)
-    CGDirectDisplayID  m_screen;
-#endif
 
     // Multi-texturing
     MYTH_GLACTIVETEXTUREPROC             gMythGLActiveTexture;

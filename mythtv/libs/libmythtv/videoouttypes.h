@@ -109,17 +109,6 @@ typedef enum VideoErrorState
     kError_Switch_Renderer = 0x04, // Current renderer is not preferred choice
 } VideoErrorState;
 
-class DisplayInfo
-{
-  public:
-    DisplayInfo(void)  : size(QSize(0,0)), res(QSize(0,0)), rate(-1) {}
-    DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  {}
-
-    QSize size;
-    QSize res;
-    int   rate;
-};
-
 inline bool is_interlaced(FrameScanType scan)
 {
     return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);

@@ -29,7 +29,6 @@ class VideoOutputD3D : public VideoOutput
                       MythCodecID  av_codec_id,
                       void        *codec_private,
                       bool        &aspect_only);
-    DisplayInfo GetDisplayInfo(void);
     void MoveResizeWindow(QRect new_rect) {;}
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) {;}

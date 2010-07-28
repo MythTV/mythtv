@@ -224,23 +224,6 @@ QSize MythXDisplay::GetDisplayDimensions(void)
     return QSize(displayWidthMM, displayHeightMM);
 }
 
-double MythXDisplay::GetPixelAspectRatio()
-{
-    double pixelAspect = 1.0;
-    QSize dim = GetDisplayDimensions();
-    QSize sz  = GetDisplaySize();
-
-    if ((dim.width() > 0) && (dim.height() > 0) &&
-        (sz.width()  > 0) && (sz.height()  > 0))
-    {
-        pixelAspect =
-            ((double)dim.width()  / (double)sz.width()) /
-            ((double)dim.height() / (double)sz.height());
-    }
-
-    return pixelAspect;
-}
-
 int MythXDisplay::GetRefreshRate(void)
 {
     XF86VidModeModeLine mode_line;
