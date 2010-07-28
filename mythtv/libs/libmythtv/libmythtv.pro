@@ -21,7 +21,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil ../libswscale
-DEPENDPATH  += ../libmythmpeg2 ../libmythdb ../libmythhdhomerun
+DEPENDPATH  += ../libmythdb ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythbluray/
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan
@@ -42,25 +42,30 @@ INCLUDEPATH += $$POSTINC
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat
 LIBS += -L../libswscale
 LIBS += -L../libmythui -L../libmythupnp
-LIBS += -L../libmythmpeg2 -L../libmythdvdnav -L../libmythbluray
+LIBS += -L../libmythdvdnav
+LIBS += -L../libmythbluray
 LIBS += -L../libmythdb
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythswscale-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
-LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
+LIBS += -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythbluray-$$LIBVERSION    -lmythdb-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
+!contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
+        DEPENDPATH  += ../libmythmpeg2
+        LIBS += -L../libmythmpeg2 -lmythmpeg2-$$LIBVERSION
+        TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
+}
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}

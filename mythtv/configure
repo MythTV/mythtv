@@ -1290,6 +1290,7 @@ MYTHTV_CONFIG_LIST='
     ivtv
     joystick_menu
     libfftw3
+    libmpeg2external
     lirc
     mheg
     opengl_video
@@ -1338,6 +1339,7 @@ USING_LIST='
     bindings_python
     darwin_da
     dvdv
+    mythtranscode
     opengl
     vdpau
 '
@@ -1673,6 +1675,7 @@ ivtv_deps="backend v4l"
 hdpvr_deps="backend v4l"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
+mythtranscode="backend frontend"
 opengl_deps_any="agl_h GL_gl_h darwin windows x11"
 opengl_video_deps="opengl"
 opengl_vsync_deps="opengl"
@@ -2903,6 +2906,7 @@ EOF
         disable dv1394
         disable dvb
         enable  memalign_hack
+        disable mythtranscode
         disable network
         enable opengl
         if enabled wince; then
@@ -3486,6 +3490,14 @@ enabled libx264    && require  libx264 x264.h x264_encoder_encode -lx264 -lm &&
                         die "ERROR: libx264 version must be >= 0.83."; }
 enabled libxvid    && require  libxvid xvid.h xvid_global -lxvidcore
 enabled mlib       && require  mediaLib mlib_types.h mlib_VectorSub_S16_U8_Mod -lmlib
+
+if enabled libmpeg2external; then
+    check_lib mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
+    if disabled libmpeg2external; then
+        die "Warning! No suiteable external libmpeg2 found, use internal copy."
+    fi
+    disable mythtranscode
+fi
 
 # libdc1394 check
 if enabled libdc1394; then

@@ -4,13 +4,14 @@ TEMPLATE = subdirs
 
 # Libraries without dependencies
 SUBDIRS += libavutil libmythsamplerate
-SUBDIRS += libmythsoundtouch libmythmpeg2 libmythdvdnav
+SUBDIRS += libmythsoundtouch libmythdvdnav
 SUBDIRS += libmythbluray libmythfreesurround libmythdb
 
 using_mheg:SUBDIRS += libmythfreemheg
 using_live:SUBDIRS += libmythlivemedia
 using_hdhomerun:SUBDIRS += libmythhdhomerun
 using_x11:SUBDIRS += libmythnvctrl
+!contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
 # Libraries with dependencies
 SUBDIRS += libmythui libmyth libmythupnp libmythtv libavcodec libavformat libswscale

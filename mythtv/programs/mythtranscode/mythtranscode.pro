@@ -19,5 +19,11 @@ HEADERS += replex/element.h replex/mpg_common.h replex/multiplex.h \
            replex/pes.h     replex/ringbuffer.h replex/ts.h
 
 INCLUDEPATH += replex
-INCLUDEPATH += ../../libs/libavcodec ../../libs/libavformat \
-               ../../libs/libavutil  ../../libs/ ../../libs/libmythmpeg2
+INCLUDEPATH += ../../libs/libavcodec
+INCLUDEPATH += ../../libs/libavformat
+INCLUDEPATH += ../../libs/libavutil
+INCLUDEPATH += ../../libs/
+
+!contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
+        INCLUDEPATH += ../../libs/libmythmpeg2
+}

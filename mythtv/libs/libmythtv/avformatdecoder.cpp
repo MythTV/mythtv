@@ -56,7 +56,11 @@ extern "C" {
 extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 #include "avio.h"
 #include "libswscale/swscale.h"
+#if CONFIG_LIBMPEG2EXTERNAL
+#include <mpeg2dec/mpeg2.h>
+#else
 #include "../libmythmpeg2/mpeg2.h"
+#endif
 #include "ivtv_myth.h"
 }
 
@@ -392,7 +396,11 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                               PIC_FLAG_PROGRESSIVE_FRAME);
                         frm->repeat_pict =
                             !!(info->display_picture->flags &
+#if CONFIG_LIBMPEG2EXTERNAL
+                               PIC_FLAG_REPEAT_FIRST_FIELD);
+#else
                                PIC_FLAG_REPEAT_FIELD);
+#endif
                         partialFrames.enqueue(frm);
 
                     }
