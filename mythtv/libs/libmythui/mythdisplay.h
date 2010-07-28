@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QSize>
 
+#include "mythexp.h"
+
 class DisplayInfo
 {
   public:
@@ -16,7 +18,7 @@ class DisplayInfo
     int   rate;
 };
 
-class MythDisplay
+class MPUBLIC MythDisplay
 {
   public:
     static DisplayInfo GetDisplayInfo(void);
