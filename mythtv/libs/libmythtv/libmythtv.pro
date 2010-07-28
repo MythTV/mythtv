@@ -297,9 +297,7 @@ using_frontend {
 
     using_dvdv:DEFINES +=         USING_DVDV
     using_dvdv:HEADERS +=         videoout_dvdv_private.h
-    using_dvdv:HEADERS +=         util-osx-cocoa.h
     using_dvdv:SOURCES +=         videoout_dvdv.mm
-    using_dvdv:SOURCES +=         util-osx-cocoa.mm
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp

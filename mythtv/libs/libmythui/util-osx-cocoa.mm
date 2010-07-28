@@ -10,6 +10,7 @@
 
 @end
 
+#ifdef USING_DVDV
 void *CreateOSXCocoaPool(void)
 {
     // Cocoa requires a message to be sent informing the Cocoa event
@@ -37,4 +38,17 @@ void DeleteOSXCocoaPool(void* &pool)
         pool = NULL;
         [a_pool release];
     }
+}
+#endif // USING_DVDV
+
+CGDirectDisplayID GetOSXCocoaDisplay(void* view)
+{
+    NSView *thisview = static_cast<NSView *>(view);
+    if (!thisview)
+        return NULL;
+    NSScreen *screen = [[thisview window] screen];
+    if (!screen)
+        return NULL;
+    NSDictionary* desc = [screen deviceDescription];
+    return [[desc objectForKey:@"NSScreenNumber"] intValue];
 }

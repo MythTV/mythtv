@@ -1,5 +1,7 @@
-#ifndef _UTIL_OSX_H__
-#define _UTIL_OSX_H__
+#ifndef _UTIL_OSX_COCOA_H__
+#define _UTIL_OSX_COCOA_H__
+
+#import "ApplicationServices/ApplicationServices.h"
 
 #ifdef USING_DVDV
 void *CreateOSXCocoaPool(void);
@@ -9,4 +11,6 @@ inline void *CreateOSXCocoaPool(void) { return NULL; }
 inline void DeleteOSXCocoaPool(void*&) {}
 #endif
 
-#endif // _UTIL_OSX_H__
+CGDirectDisplayID GetOSXCocoaDisplay(void* view);
+
+#endif // _UTIL_OSX_COCOA_H__

@@ -85,12 +85,15 @@ using_x11 {
 }
 
 macx {
-    HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
-    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
+    using_dvdv: DEFINES += USING_DVDV
+    QMAKE_EXT_CPP += .mm
+    HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h   util-osx-cocoa.h
+    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp util-osx-cocoa.mm
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
-    LIBS           += -framework Carbon -framework IOKit
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Cocoa.framework/Frameworks
+    LIBS           += -framework Carbon -framework Cocoa -framework IOKit
 
     using_appleremote {
         HEADERS += AppleRemote.h   AppleRemoteListener.h
