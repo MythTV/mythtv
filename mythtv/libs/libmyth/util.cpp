@@ -713,7 +713,8 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 
 #elif CONFIG_DARWIN
     mach_port_t             mp;
-    mach_msg_type_number_t  count, pageSize;
+    mach_msg_type_number_t  count;
+    vm_size_t               pageSize;
     vm_statistics_data_t    s;
 
     mp = mach_host_self();
