@@ -16,7 +16,7 @@ HEADERS += ts.h replex.h pes.h
 
 INCLUDEPATH += replex
 INCLUDEPATH += ../../../libs/libavcodec ../../../libs/libavformat
-INCLUDEPATH += ../../../libs/libavutil  ../../../libs ../../../libs/libmythmpeg2
+INCLUDEPATH += ../../../libs/libavutil  ../../../libs
 
 LIBS += -L../../../libs/libavutil -L../../../libs/libavcodec -L../../../libs/libavformat
 LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION -lmythavutil-$$LIBVERSION
