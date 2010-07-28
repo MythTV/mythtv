@@ -27,6 +27,7 @@ class MPUBLIC MythDownloadManager : public QThread
     void run(void);
     void setRunThread(void) { m_runThread = true; }
     QThread *getQueueThread(void) { return m_queueThread; }
+    bool isRunning(void) { return m_isRunning; }
 
     // Methods to GET a URL
     void preCache(const QString &url);
@@ -95,6 +96,7 @@ class MPUBLIC MythDownloadManager : public QThread
     QThread                                      *m_queueThread;
 
     bool                                          m_runThread;
+    bool                                          m_isRunning;
 
     friend class RemoteFileDownloadThread;
 };

@@ -124,6 +124,9 @@ MythDownloadManager *GetMythDownloadManager(void)
 
         downloadManager->moveToThread(downloadManager->getQueueThread());
         downloadManager->setRunThread();
+
+        while (!downloadManager->isRunning())
+            usleep(10000);
     }
 
     return downloadManager;
@@ -138,7 +141,8 @@ MythDownloadManager::MythDownloadManager() :
     m_diskCache(NULL),
     m_infoLock(new QMutex(QMutex::Recursive)),
     m_queueThread(NULL),
-    m_runThread(false)
+    m_runThread(false),
+    m_isRunning(false)
 {
 }
 
@@ -181,6 +185,7 @@ void MythDownloadManager::run(void)
     QObject::connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
                        SLOT(downloadFinished(QNetworkReply*)));
 
+    m_isRunning = true;
     while (m_runThread)
     {
         m_infoLock->lock();
@@ -231,6 +236,7 @@ void MythDownloadManager::run(void)
         }
         m_infoLock->unlock();
     }
+    m_isRunning = false;
 }
 
 /** \fn MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
