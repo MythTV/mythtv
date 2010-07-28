@@ -19,7 +19,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/static.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1261";
+const QString currentDatabaseVersion = "1262";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5448,6 +5448,35 @@ NULL
             if (!performActualUpdate(updates, "1261", dbver))
                 return false;
         }
+    }
+
+    if (dbver == "1261")
+    {
+        const char *updates[] = {
+"ALTER TABLE program MODIFY COLUMN description VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE record MODIFY COLUMN description VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE recorded MODIFY COLUMN description VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE recordedprogram MODIFY COLUMN description VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE oldrecorded MODIFY COLUMN description VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE mythlog MODIFY COLUMN details VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE settings MODIFY COLUMN data VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE powerpriority MODIFY COLUMN selectclause VARCHAR(16000) "
+"    NOT NULL default '';",
+"ALTER TABLE customexample MODIFY COLUMN fromclause VARCHAR(10000) "
+"    NOT NULL default '';",
+"ALTER TABLE customexample MODIFY COLUMN whereclause VARCHAR(10000) "
+"    NOT NULL default '';",
+NULL
+};
+        if (!performActualUpdate(updates, "1262", dbver))
+            return false;
     }
 
     return true;
