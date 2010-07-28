@@ -181,9 +181,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
         init_run = true;
 #endif
     }
-    else if ((genOpt.cardtype == "IMPORT") ||
-             (genOpt.cardtype == "MPEG" &&
-              genOpt.videodev.toLower().left(5) == "file:"))
+    else if ((genOpt.cardtype == "IMPORT") || (genOpt.cardtype == "DEMOFILE"))
     {
         channel = new DummyChannel(this);
         if (!channel->Open())
@@ -1023,6 +1021,14 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "IMPORT")
     {
         recorder = new ImportRecorder(this);
+    }
+    else if (genOpt.cardtype == "DEMOFILE")
+    {
+    // TODO: Replace this with something that will work on non-V4L platforms,
+    //       or support other file types than .mpg ?
+#ifdef USING_IVTV
+        recorder = new MpegRecorder(this);
+#endif // USING_IVTV
     }
     else
     {
@@ -4322,15 +4328,20 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
 
     uint    sourceid = channel->GetCurrentSourceID();
     QString channum  = channel->GetCurrentName();
-    uint chanid = ChannelUtil::GetChanID(sourceid, channum);
+    int     chanid   = ChannelUtil::GetChanID(sourceid, channum);
 
-    if (!chanid)
+    if (chanid < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                 "Channel: \'%1\' was not found in the database.\n"
                 "\t\t\tMost likely, your DefaultTVChannel setting is wrong.\n"
                 "\t\t\tCould not start livetv.").arg(channum));
-        return false;
+
+        // Test setups might have zero channels
+        if (genOpt.cardtype == "IMPORT")
+            chanid = 9999;
+        else
+            return false;
     }
 
     int hoursMax = gCoreContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
