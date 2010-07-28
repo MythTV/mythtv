@@ -181,7 +181,9 @@ bool TVRec::CreateChannel(const QString &startchannel)
         init_run = true;
 #endif
     }
-    else if ((genOpt.cardtype == "IMPORT") || (genOpt.cardtype == "DEMOFILE"))
+    else if ((genOpt.cardtype == "IMPORT") ||
+             (genOpt.cardtype == "MPEG" &&
+              genOpt.videodev.toLower().left(5) == "file:"))
     {
         channel = new DummyChannel(this);
         if (!channel->Open())
@@ -1021,14 +1023,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "IMPORT")
     {
         recorder = new ImportRecorder(this);
-    }
-    else if (genOpt.cardtype == "DEMOFILE")
-    {
-    // TODO: Replace this with something that will work on non-V4L platforms,
-    //       or support other file types than .mpg ?
-#ifdef USING_IVTV
-        recorder = new MpegRecorder(this);
-#endif // USING_IVTV
     }
     else
     {
