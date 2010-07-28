@@ -140,6 +140,8 @@ Advanced options (experts only):
                            Supported bindings: perl, python
                            comma-separated list
   --python=PATH            Force a specific python executable to use [$python_default]
+  --perl-config-opts=OPTS  Additional options to pass when generating
+                           Makefile.perl for building Perl bindings.
 EOF
 
 #following is ffmpeg's configure help text
@@ -1995,6 +1997,9 @@ for opt do
                 bindings_python="no"
             fi
         done
+    ;;
+    --perl-config-opts=*)
+      PERL_CONFIG_OPTS=`echo ${optval}`
     ;;
     --disable-devices) disable $INDEV_LIST $OUTDEV_LIST
     ;;
@@ -4244,6 +4249,9 @@ echo
 
 echo "# Bindings"
 echo "bindings_perl             ${bindings_perl-no}"
+if test x"$PERL_CONFIG_OPTS" != x""; then
+  echo "Perl config options       $PERL_CONFIG_OPTS"
+fi
 echo "bindings_python           ${bindings_python-no}"
 echo ""
 
@@ -4526,6 +4534,10 @@ fi
 
 if ! enabled darwin && enabled opengl; then
   echo "CONFIG_OPENGL_LIBS=$gl_lib $glu_lib" >> $MYTH_CONFIG_MAK
+fi
+
+if test x"$PERL_CONFIG_OPTS" != x"" ; then
+  echo "PERL_CONFIG_OPTS=$PERL_CONFIG_OPTS" >> $MYTH_CONFIG_MAK
 fi
 
 if test x"$CCONFIG" != x"" ; then
