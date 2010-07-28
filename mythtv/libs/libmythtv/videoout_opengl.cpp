@@ -26,7 +26,6 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     (*opts.deints)["opengl"].append("opengldoubleratefieldorder");
     (*opts.deints)["opengl"].append("opengldoublerateyadif");
     (*opts.deints)["opengl"].append("openglyadif");
-    (*opts.osds)["opengl"].append("softblend");
     (*opts.osds)["opengl"].append("opengl2");
     (*opts.safe_renderers)["dummy"].append("opengl");
     (*opts.safe_renderers)["nuppel"].append("opengl");
