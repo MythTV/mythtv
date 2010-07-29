@@ -65,7 +65,7 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 {
     if (pginfo)
-        VERBOSE(VB_RECORD, LOC + QString("SetRecording(0x%1) title(%1)")
+        VERBOSE(VB_RECORD, LOC + QString("SetRecording(0x%1) title(%2)")
                 .arg((uintptr_t)pginfo,0,16).arg(pginfo->GetTitle()));
     else
         VERBOSE(VB_RECORD, LOC + "SetRecording(0x0)");
