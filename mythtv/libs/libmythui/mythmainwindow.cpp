@@ -936,6 +936,13 @@ void MythMainWindow::Init(void)
         d->paintwin = new MythPainterWindowQt(this, d);
     }
 
+    if (!d->paintwin)
+    {
+        VERBOSE(VB_IMPORTANT, "MythMainWindow failed to create a "
+                              "painter window.");
+        return;
+    }
+
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
