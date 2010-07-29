@@ -1002,7 +1002,8 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb->is_streamed = streamed;
 }
 
-extern "C" void HandleStreamChange(void* data) {
+extern "C" void HandleStreamChange(void* data)
+{
     AvFormatDecoder* decoder = (AvFormatDecoder*) data;
     int cnt = decoder->ic->nb_streams;
 
@@ -2980,50 +2981,50 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
 bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
-            AVCodecContext *context = curstream->codec;
-            bool on_frame = true;
+    AVCodecContext *context = curstream->codec;
+    bool on_frame = true;
 
-            if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
+    if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
+    {
+        if (!ringBuffer->isDVD())
+            MpegPreProcessPkt(curstream, pkt);
+    }
+    else if (CODEC_IS_H264(context->codec_id))
+    {
+        on_frame = H264PreProcessPkt(curstream, pkt);
+    }
+    else
+    {
+        if (pkt->flags & PKT_FLAG_KEY)
+        {
+            HandleGopStart(pkt, false);
+            seen_gop = true;
+        }
+        else
+        {
+            seq_count++;
+            if (!seen_gop && seq_count > 1)
             {
-                if (!ringBuffer->isDVD())
-                    MpegPreProcessPkt(curstream, pkt);
+                HandleGopStart(pkt, false);
             }
-            else if (CODEC_IS_H264(context->codec_id))
-            {
-                on_frame = H264PreProcessPkt(curstream, pkt);
-            }
-            else
-            {
-                if (pkt->flags & PKT_FLAG_KEY)
-                {
-                    HandleGopStart(pkt, false);
-                    seen_gop = true;
-                }
-                else
-                {
-                    seq_count++;
-                    if (!seen_gop && seq_count > 1)
-                    {
-                        HandleGopStart(pkt, false);
-                    }
-                }
-            }
+        }
+    }
 
-            if (framesRead == 0 && !justAfterChange &&
-                !(pkt->flags & PKT_FLAG_KEY))
-            {
-                av_free_packet(pkt);
-                return false;
-            }
+    if (framesRead == 0 && !justAfterChange &&
+        !(pkt->flags & PKT_FLAG_KEY))
+    {
+        av_free_packet(pkt);
+        return false;
+    }
 
-            if (on_frame)
-                framesRead++;
-            justAfterChange = false;
+    if (on_frame)
+        framesRead++;
+    justAfterChange = false;
 
-            if (exitafterdecoded)
-                gotvideo = 1;
+    if (exitafterdecoded)
+        gotvideo = 1;
 
-            return true;
+    return true;
 }
 
 bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
