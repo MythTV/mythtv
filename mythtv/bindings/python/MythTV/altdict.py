@@ -92,6 +92,17 @@ class DictData( OrdDict ):
     """
     _field_order = None
     _field_type = None
+    _trans = [  int,
+                locale.atof,
+                bool,
+                str,
+                lambda x: datetime.fromtimestamp(int(x))]
+    _inv_trans = [  str,
+                    lambda x: locale.format("%0.6f", x),
+                    lambda x: str(int(x)),
+                    str,
+                    lambda x: str(int(mktime(x.timetuple())))]
+                    
     def __setattr__(self, name, value):
         if name in self._localvars:
             self.__dict__[name] = value
@@ -134,16 +145,8 @@ class DictData( OrdDict ):
             for i in xrange(len(data)):
                 if data[i] == '':
                     data[i] = None
-                elif self._field_type[i] == 0:
-                    data[i] = int(data[i])
-                elif self._field_type[i] == 1:
-                    data[i] = locale.atof(data[i])
-                elif self._field_type[i] == 2:
-                    data[i] = bool(data[i])
-                elif self._field_type[i] == 3:
-                    data[i] = data[i]
-                elif self._field_type[i] == 4:
-                    data[i] = datetime.fromtimestamp(int(data[i]))
+                else:
+                    data[i] = self._trans[self._field_type[i]](data[i])
         return dict(zip(self._field_order,data))
 
     def _deprocess(self):
@@ -156,18 +159,8 @@ class DictData( OrdDict ):
             for i in xrange(len(data)):
                 if data[i] is None:
                     data[i] = ''
-                elif self._field_type == 'Pass':
-                    pass
-                elif self._field_type[i] == 0:
-                    data[i] = str(data[i])
-                elif self._field_type[i] == 1:
-                    data[i] = locale.format("%0.6f", data[i])
-                elif self._field_type[i] == 2:
-                    data[i] = str(int(data[i]))
-                elif self._field_type[i] == 3:
-                    pass
-                elif self._field_type[i] == 4:
-                    data[i] = str(int(mktime(data[i].timetuple())))
+                else:
+                    data[i] = self._inv_trans[self._field_type[i]](data[i])
         return data
 
     def _fillNone(self):
