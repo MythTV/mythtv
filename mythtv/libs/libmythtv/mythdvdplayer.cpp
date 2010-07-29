@@ -215,8 +215,8 @@ void MythDVDPlayer::SetBookmark(void)
     else
     {
         SetDVDBookmark(framesPlayed);
-        SetOSDStatus(QObject::tr("Position"));
-        SetOSDMessage(QObject::tr("Bookmark Saved"));
+        SetOSDStatus(QObject::tr("Position"), kOSDTimeout_Med);
+        SetOSDMessage(QObject::tr("Bookmark Saved"), kOSDTimeout_Med);
     }
 }
 
@@ -224,7 +224,7 @@ void MythDVDPlayer::ClearBookmark(bool message)
 {
     SetDVDBookmark(0);
     if (message)
-        SetOSDMessage(QObject::tr("Bookmark Cleared"));
+        SetOSDMessage(QObject::tr("Bookmark Cleared"), kOSDTimeout_Med);
 }
 
 uint64_t MythDVDPlayer::GetBookmark(void) const
@@ -405,7 +405,7 @@ bool MythDVDPlayer::GoToDVDMenu(QString str)
 
     if (!ret)
     {
-        SetOSDMessage(QObject::tr("DVD Menu Not Available"));
+        SetOSDMessage(QObject::tr("DVD Menu Not Available"), kOSDTimeout_Med);
         VERBOSE(VB_GENERAL, "No DVD Menu available.");
         return false;
     }

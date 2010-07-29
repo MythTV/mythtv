@@ -36,6 +36,7 @@ using namespace std;
 #include "volumebase.h"
 #include "inputinfo.h"
 #include "channelgroup.h"
+#include "osd.h"
 
 class QDateTime;
 class OSD;
@@ -466,12 +467,13 @@ class MPUBLIC TV : public QThread
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
     void UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
-                         int position = 0, int prev = 0, int next = 0);
+                         int position = 0, int prev = 0, int next = 0,
+                         enum OSDTimeout timeout = kOSDTimeout_Med);
     void UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
-                         int type, bool set_expiry = true);
+                         int type, enum OSDTimeout timeout);
 
     void UpdateOSDSeekMessage(const PlayerContext*,
-                              const QString &mesg, bool fade);
+                              const QString &mesg, enum OSDTimeout timeout);
     void UpdateOSDInput(const PlayerContext*,
                         QString inputname = QString::null);
     void UpdateOSDSignal(const PlayerContext*, const QStringList &strlist);

@@ -19,7 +19,6 @@ using namespace std;
 #include "mythdb.h"
 #include "tv_play.h"
 #include "tv_rec.h"
-#include "osd.h"
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -73,18 +72,18 @@ using namespace std;
 #define GetPlayer(X,Y) GetPlayerHaveLock(X, Y, __FILE__ , __LINE__)
 #define GetOSDLock(X) GetOSDL(X, __FILE__, __LINE__)
 
-#define SetOSDText(CTX, GROUP, FIELD, TEXT) { \
+#define SetOSDText(CTX, GROUP, FIELD, TEXT, TIMEOUT) { \
     OSD *osd = GetOSDLock(CTX); \
     if (osd) \
     { \
         QHash<QString,QString> map; \
         map.insert(FIELD,TEXT); \
-        osd->SetText(GROUP, map); \
+        osd->SetText(GROUP, map, TIMEOUT); \
     } \
     ReturnOSDLock(CTX, osd); }
 
 #define SetOSDMessage(CTX, MESSAGE) \
-    SetOSDText(CTX, "osd_message", "message_text", MESSAGE)
+    SetOSDText(CTX, "osd_message", "message_text", MESSAGE, kOSDTimeout_Med)
 
 #define HideOSDWindow(CTX, WINDOW) { \
     OSD *osd = GetOSDLock(CTX); \
@@ -2868,8 +2867,8 @@ void TV::timerEvent(QTimerEvent *te)
             osdInfo info;
             if (actx->CalcNVPSliderPosition(info))
             {
-                osd->SetText("osd_status", info.text, false);
-                osd->SetValues("osd_status", info.values, false);
+                osd->SetText("osd_status", info.text, kOSDTimeout_Ignore);
+                osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
             }
         }
         ReturnOSDLock(actx, osd);
@@ -3320,7 +3319,7 @@ void TV::HandleSpeedChangeTimerEvent(void)
 
     if (update_msg)
     {
-        UpdateOSDSeekMessage(actx, actx->GetPlayMessage(), true);
+        UpdateOSDSeekMessage(actx, actx->GetPlayMessage(), kOSDTimeout_Med);
     }
     ReturnPlayerLock(actx);
 }
@@ -3965,7 +3964,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         if (asInputMode)
         {
             ClearInputQueues(ctx, true);
-            SetOSDText(ctx, "osd_input", "osd_number_entry", tr("Seek:"));
+            SetOSDText(ctx, "osd_input", "osd_number_entry", tr("Seek:"),
+                       kOSDTimeout_Med);
 
             QMutexLocker locker(&timerIdLock);
             asInputMode = false;
@@ -4215,7 +4215,7 @@ bool TV::FFRewHandleAction(PlayerContext *ctx, const QStringList &actions)
         if (!handled)
         {
             DoNVPSeek(ctx, StopFFRew(ctx));
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
             handled = true;
         }
     }
@@ -4223,7 +4223,7 @@ bool TV::FFRewHandleAction(PlayerContext *ctx, const QStringList &actions)
     if (ctx->ff_rew_speed)
     {
         NormalSpeed(ctx);
-        UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
+        UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
         handled = true;
     }
 
@@ -5483,7 +5483,7 @@ void TV::DoPlay(PlayerContext *ctx)
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     DoNVPSeek(ctx, time);
-    UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
+    UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
 
     GetMythUI()->DisableScreensaver();
 
@@ -5545,9 +5545,9 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
         DoNVPSeek(ctx, time);
 
         if (showOSD && ctx == player[0])
-            UpdateOSDSeekMessage(ctx, tr("Paused"), false);
+            UpdateOSDSeekMessage(ctx, tr("Paused"), kOSDTimeout_None);
         else if (showOSD)
-            UpdateOSDSeekMessage(ctx, tr("Aux Paused"), false);
+            UpdateOSDSeekMessage(ctx, tr("Aux Paused"), kOSDTimeout_None);
 
         RestoreScreenSaver(ctx);
     }
@@ -5555,7 +5555,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     {
         DoNVPSeek(ctx, time);
         if (showOSD)
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
         GetMythUI()->DisableScreensaver();
     }
 
@@ -5681,7 +5681,7 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg)
         NormalSpeed(ctx);
         time += StopFFRew(ctx);
         DoNVPSeek(ctx, time);
-        UpdateOSDSeekMessage(ctx, mesg, true);
+        UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_Med);
     }
 }
 
@@ -5776,7 +5776,7 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
 
     ctx->paused = false;
     DoNVPSeek(ctx, time);
-    UpdateOSDSeekMessage(ctx, mesg, true);
+    UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_Med);
 
     SetSpeedChangeTimer(0, __LINE__);
 }
@@ -5828,7 +5828,7 @@ void TV::ChangeFFRew(PlayerContext *ctx, int direction)
         {
             float time = StopFFRew(ctx);
             DoNVPSeek(ctx, time);
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
         }
     }
     else
@@ -5872,7 +5872,7 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
         ctx->nvp->Play((float)speed, (speed == 1) && (ctx->ff_rew_state > 0));
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    UpdateOSDSeekMessage(ctx, mesg, false);
+    UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_None);
 
     SetSpeedChangeTimer(0, __LINE__);
 }
@@ -5966,7 +5966,7 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     ctx->CalcNVPSliderPosition(info);
     info.text["description"] = tr("Jump Chapter");
     info.text["title"] = tr("Searching");
-    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
@@ -6026,7 +6026,7 @@ void TV::DoSwitchTitle(PlayerContext *ctx, int title)
     ctx->CalcNVPSliderPosition(info);
     info.text["description"] = tr("Jump Title");
     info.text["title"] = tr("Searching");
-    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
@@ -6050,7 +6050,7 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
     ctx->CalcNVPSliderPosition(info);
     info.text["title"] = tr("Skip");
     info.text["description"] = tr("Searching");
-    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
     SetUpdateOSDPosition(true);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
@@ -6467,7 +6467,8 @@ void TV::AddKeyToInputQueue(PlayerContext *ctx, char key)
     }
     else if (asInputMode)
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
-    SetOSDText(ctx, "osd_input", "osd_number_entry", inputStr);
+    SetOSDText(ctx, "osd_input", "osd_number_entry", inputStr,
+               kOSDTimeout_Med);
 
     // Commit the channel if it is complete and smart changing is enabled.
     if (commitSmart)
@@ -6811,7 +6812,7 @@ void TV::ShowPreviousChannel(PlayerContext *ctx)
     if (channum.isEmpty())
         return;
 
-    SetOSDText(ctx, "osd_input", "osd_number_entry", channum);
+    SetOSDText(ctx, "osd_input", "osd_number_entry", channum, kOSDTimeout_Med);
 }
 
 void TV::PopPreviousChannel(PlayerContext *ctx, bool immediate_change)
@@ -6991,7 +6992,8 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
         if (ctx->CalcNVPSliderPosition(info))
         {
             info.text["title"] = tr("Position");
-            UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default);
+            UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default,
+                            kOSDTimeout_Med);
             SetUpdateOSDPosition(true);
         }
         else
@@ -7018,19 +7020,19 @@ void TV::UpdateOSDProgInfo(const PlayerContext *ctx, const char *whichInfo)
     if (osd)
     {
         osd->HideAll();
-        osd->SetText(whichInfo, infoMap);
+        osd->SetText(whichInfo, infoMap, kOSDTimeout_Med);
     }
     ReturnOSDLock(ctx, osd);
 }
 
 void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
-                         int type, bool set_expiry)
+                         int type, OSDTimeout timeout)
 {
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
-        osd->SetValues("osd_status", info.values, set_expiry);
-        osd->SetText("osd_status",   info.text, set_expiry);
+        osd->SetValues("osd_status", info.values, timeout);
+        osd->SetText("osd_status",   info.text, timeout);
         if (type != kOSDFunctionalType_Default)
             osd->SetFunctionalWindow("osd_status", (OSDFunctionalType)type);
     }
@@ -7039,7 +7041,7 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
 
 void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
-                         int position, int prev, int next)
+                         int position, int prev, int next, OSDTimeout timeout)
 {
     osdInfo info;
     info.values.insert("position", position);
@@ -7049,14 +7051,14 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
     info.text.insert("description", desc);
     info.text.insert("value", value);
     info.text.insert("units", units);
-    UpdateOSDStatus(ctx, info, type);
+    UpdateOSDStatus(ctx, info, type, timeout);
 }
 
 void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
-                              const QString &mesg, bool fade)
+                              const QString &mesg, enum OSDTimeout timeout)
 {
     VERBOSE(VB_PLAYBACK, QString("UpdateOSDSeekMessage(%1, %2)")
-            .arg(mesg).arg(fade));
+            .arg(mesg).arg(timeout));
 
     osdInfo info;
     if (ctx->CalcNVPSliderPosition(info))
@@ -7064,7 +7066,7 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
             kOSDFunctionalType_Default;
         info.text["title"] = mesg;
-        UpdateOSDStatus(ctx, info, osdtype, fade);
+        UpdateOSDStatus(ctx, info, osdtype, timeout);
         SetUpdateOSDPosition(true);
     }
 }
@@ -7219,7 +7221,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     if (osd)
     {
         infoMap["description"] = sigDesc;
-        osd->SetText("program_info", infoMap);
+        osd->SetText("program_info", infoMap, kOSDTimeout_Med);
     }
     ReturnOSDLock(ctx, osd);
 
@@ -7887,7 +7889,8 @@ void TV::ChangeVolume(PlayerContext *ctx, bool up)
     {
         UpdateOSDStatus(ctx, tr("Adjust Volume"), tr("Volume"),
                         QString::number(curvol),
-                        kOSDFunctionalType_PictureAdjust, "%", curvol * 10);
+                        kOSDFunctionalType_PictureAdjust, "%", curvol * 10,
+                        kOSDTimeout_Med);
         SetUpdateOSDPosition(false);
     }
 }
@@ -7944,14 +7947,15 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
     {
         if (!allowEdit)
         {
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), true);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
         }
         else
         {
             UpdateOSDStatus(ctx, tr("Adjust Time Stretch"), tr("Time Stretch"),
                             QString::number(ctx->ts_normal),
                             kOSDFunctionalType_TimeStretchAdjust, "X",
-                            (int)(ctx->ts_normal*(1000/kTimeStretchMax)));
+                            (int)(ctx->ts_normal*(1000/kTimeStretchMax)),
+                            kOSDTimeout_Med);
             SetUpdateOSDPosition(false);
         }
     }
@@ -8024,7 +8028,7 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
         UpdateOSDStatus(ctx, tr("Adjust Audio Sync"), text,
                         QString::number(val),
                         kOSDFunctionalType_AudioSyncAdjust,
-                        "ms", (val/2) + 500);
+                        "ms", (val/2) + 500, kOSDTimeout_Med);
         SetUpdateOSDPosition(false);
     }
 }
@@ -8829,8 +8833,8 @@ void TV::BrowseDispInfo(PlayerContext *ctx, BrowseDirection direction)
     recinfo.ToMap(infoMap);
     infoMap["iconpath"] = ChannelUtil::GetIcon(recinfo.GetChanID());
 
-    osd->SetText("browse_info", infoMap);
-    osd->DisableExpiry("browse_info");
+    osd->SetText("browse_info", infoMap, kOSDTimeout_None);
+    osd->SetExpiry("browse_info", kOSDTimeout_None);
     ReturnOSDLock(ctx, osd);
 }
 
@@ -8876,10 +8880,10 @@ void TV::ToggleRecord(PlayerContext *ctx)
         OSD *osd = GetOSDLock(ctx);
         if (osd)
         {
-            osd->SetText("browse_info", infoMap);
+            osd->SetText("browse_info", infoMap, kOSDTimeout_Med);
             QHash<QString,QString> map;
             map.insert("message_text", tr("Record"));
-            osd->SetText("osd_message", map);
+            osd->SetText("osd_message", map, kOSDTimeout_Med);
         }
         ReturnOSDLock(ctx, osd);
         return;
@@ -9038,7 +9042,7 @@ void TV::DoTogglePictureAttribute(const PlayerContext *ctx,
 
     UpdateOSDStatus(ctx, title, text, QString::number(value),
                     kOSDFunctionalType_PictureAdjust, "%",
-                    value * 10);
+                    value * 10, kOSDTimeout_Med);
     SetUpdateOSDPosition(false);
 }
 
@@ -9075,7 +9079,7 @@ void TV::DoChangePictureAttribute(
 
     UpdateOSDStatus(ctx, toTitleString(type), text, QString::number(value),
                     kOSDFunctionalType_PictureAdjust, "%",
-                    value * 10);
+                    value * 10, kOSDTimeout_Med);
     SetUpdateOSDPosition(false);
 }
 
@@ -9162,7 +9166,7 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, bool allowSelectNear)
     osd->DialogBack("", "DIALOG_CUTPOINT_DONOTHING_0", true);
     QHash<QString,QString> map;
     map.insert("title", tr("Edit"));
-    osd->SetText("osd_program_editor", map, false);
+    osd->SetText("osd_program_editor", map, kOSDTimeout_None);
     ReturnOSDLock(ctx, osd);
 }
 
@@ -9332,7 +9336,7 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     if (osd)
     {
         osd->DialogShow(OSD_DLG_EDITOR);
-        osd->SetText(OSD_DLG_EDITOR, chanEditMap, false);
+        osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
     }
     ReturnOSDLock(ctx, osd);
 }
@@ -9355,7 +9359,7 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)
         osd->DialogGetText(infoMap);
         ChannelEditAutoFill(ctx, infoMap);
         insert_map(chanEditMap, infoMap);
-        osd->SetText(OSD_DLG_EDITOR, chanEditMap, false);
+        osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
     }
     else if (osd && action == "OK")
     {
@@ -9593,7 +9597,7 @@ void TV::RunLoadDDMap(uint sourceid)
         for (uint i = 0; i < 4; i++)
             tmp[keys[i]] = "Loading...";
         osd->DialogShow(OSD_DLG_EDITOR);
-        osd->SetText(OSD_DLG_EDITOR, tmp, false);
+        osd->SetText(OSD_DLG_EDITOR, tmp, kOSDTimeout_None);
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);
@@ -9610,7 +9614,7 @@ void TV::RunLoadDDMap(uint sourceid)
     if (osd)
     {
         osd->DialogShow(OSD_DLG_EDITOR);
-        osd->SetText(OSD_DLG_EDITOR, chanEditMap, false);
+        osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);
@@ -11003,7 +11007,7 @@ void TV::ToggleAutoExpire(PlayerContext *ctx)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, true);
+        UpdateOSDSeekMessage(ctx, desc, kOSDTimeout_Med);
 }
 
 void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
@@ -11020,7 +11024,7 @@ void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, true);
+        UpdateOSDSeekMessage(ctx, desc, kOSDTimeout_Med);
 }
 
 void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
@@ -11033,7 +11037,7 @@ void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
         ClearOSD(ctx);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, true);
+        UpdateOSDSeekMessage(ctx, desc, kOSDTimeout_Med);
 }
 
 bool TV::HandleJumpToProgramAction(
@@ -11413,7 +11417,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
 
     if (ctx->buffer->InDVDMenuOrStillFrame())
     {
-        UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), true);
+        UpdateOSDSeekMessage(ctx, tr("Skip Back Not Allowed"), kOSDTimeout_Med);
     }
     else if (!ctx->buffer->DVD()->StartOfTitle())
     {
@@ -11421,7 +11425,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
         if (ctx->nvp)
             ctx->nvp->ChangeDVDTrack(0);
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-        UpdateOSDSeekMessage(ctx, tr("Previous Chapter"), true);
+        UpdateOSDSeekMessage(ctx, tr("Previous Chapter"), kOSDTimeout_Med);
     }
     else
     {
@@ -11438,7 +11442,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
                 ctx->nvp->GoToDVDProgram(0);
             ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-            UpdateOSDSeekMessage(ctx, tr("Previous Title"), true);
+            UpdateOSDSeekMessage(ctx, tr("Previous Title"), kOSDTimeout_Med);
         }
     }
 }
@@ -11454,7 +11458,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
     if (ctx->buffer->DVD()->InStillFrame())
     {
         ctx->buffer->DVD()->SkipStillFrame();
-        UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"), true);
+        UpdateOSDSeekMessage(ctx, tr("Skip Still Frame"), kOSDTimeout_Med);
     }
     else if (!ctx->buffer->DVD()->EndOfTitle())
     {
@@ -11463,7 +11467,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
             ctx->nvp->ChangeDVDTrack(1);
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-        UpdateOSDSeekMessage(ctx, tr("Next Chapter"), true);
+        UpdateOSDSeekMessage(ctx, tr("Next Chapter"), kOSDTimeout_Med);
     }
     else if (!ctx->buffer->DVD()->NumMenuButtons())
     {
@@ -11483,7 +11487,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
                 ctx->nvp->GoToDVDProgram(1);
             ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-            UpdateOSDSeekMessage(ctx, tr("Next Title"), true);
+            UpdateOSDSeekMessage(ctx, tr("Next Title"), kOSDTimeout_Med);
         }
     }
 }

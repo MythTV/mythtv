@@ -23,7 +23,6 @@ struct AVSubtitle;
 #define OSD_WIN_SUBTITLE  "OSD_SUBTITLES"
 #define OSD_WIN_INTERACT  "OSD_INTERACTIVE"
 
-#define kOSDTimeout  5000
 #define kOSDFadeTime 1000
 
 class NuppelVideoPlayer;
@@ -42,6 +41,15 @@ enum OSDFunctionalType
     kOSDFunctionalType_SmartForward,
     kOSDFunctionalType_TimeStretchAdjust,
     kOSDFunctionalType_AudioSyncAdjust
+};
+
+enum OSDTimeout
+{
+    kOSDTimeout_Ignore = -1, // Don't update existing timeout
+    kOSDTimeout_None   = 0,  // Don't timeout
+    kOSDTimeout_Short  = 1,
+    kOSDTimeout_Med    = 2,
+    kOSDTimeout_Long   = 3,
 };
 
 class MPUBLIC OSDHideEvent : public QEvent
@@ -124,12 +132,14 @@ class OSD
     void    DisableFade(void) { m_Effects = false; }
     void    SetFunctionalWindow(const QString window,
                                 enum OSDFunctionalType type);
+    void    SetTimeouts(int _short, int _medium, int _long);
 
     bool    IsVisible(void);
     void    HideAll(bool keepsubs = true);
 
     MythScreenType *GetWindow(const QString &window);
-    void    DisableExpiry(const QString &window);
+    void    SetExpiry(const QString &window, enum OSDTimeout timeout,
+                      int custom_timeout = 0);
     void    HideWindow(const QString &window);
     bool    HasWindow(const QString &window);
     void    ResetWindow(const QString &window);
@@ -140,11 +150,11 @@ class OSD
                  QRegion &changed, int alignx = 0, int aligny = 0);
 
     void SetValues(const QString &window, QHash<QString,int> &map,
-                   bool set_expiry = true);
+                   OSDTimeout timeout);
     void SetValues(const QString &window, QHash<QString,float> &map,
-                   bool set_expiry = true);
+                   OSDTimeout timeout);
     void SetText(const QString &window, QHash<QString,QString> &map,
-                 bool set_expiry = true);
+                 OSDTimeout timeout);
     void SetRegions(const QString &window, frm_dir_map_t &map,
                  long long total);
     bool IsWindowVisible(const QString &window);
@@ -175,7 +185,6 @@ class OSD
     void LoadWindows(void);
     void RemoveWindow(const QString &window);
     void CheckExpiry(void);
-    void SetExpiry(MythScreenType *window, int time = kOSDTimeout);
     void SendHideEvent(void);
 
   private:
@@ -188,6 +197,7 @@ class OSD
     QString         m_PulsedDialogText;
     QDateTime       m_NextPulseUpdate;
     bool            m_Refresh;
+    int             m_Timeouts[4];
 
     bool            m_UIScaleOverride;
     float           m_SavedWMult;

@@ -1295,7 +1295,7 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
     if (!msg.isEmpty() && osd_msg)
     {
         msg += " " + QObject::tr("Off");
-        SetOSDMessage(msg);
+        SetOSDMessage(msg, kOSDTimeout_Med);
     }
 }
 
@@ -1336,7 +1336,7 @@ void NuppelVideoPlayer::EnableCaptions(uint mode, bool osd_msg)
 
     textDisplayMode = mode;
     if (osd_msg)
-        SetOSDMessage(msg);
+        SetOSDMessage(msg, kOSDTimeout_Med);
 }
 
 bool NuppelVideoPlayer::ToggleCaptions(void)
@@ -1378,7 +1378,8 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     if ((kDisplayNone == mode) && osd_msg)
     {
         SetOSDMessage(QObject::tr(
-            "No captions", "CC/Teletext/Subtitle text not available"));
+            "No captions", "CC/Teletext/Subtitle text not available"),
+            kOSDTimeout_Med);
     }
     else if (mode)
     {
@@ -1411,7 +1412,8 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     {
         QString msg = "";
         if (decoder)
-            SetOSDMessage(decoder->GetTrackDesc(type, GetTrack(type)));
+            SetOSDMessage(decoder->GetTrackDesc(type, GetTrack(type)),
+                          kOSDTimeout_Med);
         return ret;
     }
 
@@ -1463,7 +1465,8 @@ int NuppelVideoPlayer::ChangeTrack(uint type, int dir)
         int retval = GetDecoder()->ChangeTrack(type, dir);
         if (retval >= 0)
         {
-            SetOSDMessage(GetDecoder()->GetTrackDesc(type, GetTrack(type)));
+            SetOSDMessage(GetDecoder()->GetTrackDesc(type, GetTrack(type)),
+                          kOSDTimeout_Med);
             return retval;
         }
     }
@@ -2507,7 +2510,7 @@ void NuppelVideoPlayer::EventLoop(void)
     {
         if (!commBreakMap.HasMap())
         {
-            SetOSDStatus(QObject::tr("Not Flagged"));
+            SetOSDStatus(QObject::tr("Not Flagged"), kOSDTimeout_Med);
             QString message = "COMMFLAG_REQUEST ";
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
             message += player_ctx->playingInfo->GetChanID() + " " +
@@ -2522,7 +2525,7 @@ void NuppelVideoPlayer::EventLoop(void)
             bool jump = commBreakMap.DoSkipCommercials(jumpto, framesPlayed,
                                             video_frame_rate, totalFrames, msg);
             if (!msg.isEmpty())
-                SetOSDStatus(msg);
+                SetOSDStatus(msg, kOSDTimeout_Med);
             if (jump)
                 DoJumpToFrame(jumpto);
         }
@@ -2540,7 +2543,7 @@ void NuppelVideoPlayer::EventLoop(void)
                                                     video_frame_rate,
                                                     totalFrames, msg);
         if (!msg.isEmpty())
-            SetOSDStatus(msg);
+            SetOSDStatus(msg, kOSDTimeout_Med);
         if (jump)
             DoJumpToFrame(jumpto);
     }
@@ -2934,8 +2937,8 @@ void NuppelVideoPlayer::SetBookmark(void)
     if (player_ctx->playingInfo)
     {
         player_ctx->playingInfo->SaveBookmark(framesPlayed);
-        SetOSDStatus(QObject::tr("Position"));
-        SetOSDMessage(QObject::tr("Bookmark Saved"));
+        SetOSDStatus(QObject::tr("Position"), kOSDTimeout_Med);
+        SetOSDMessage(QObject::tr("Bookmark Saved"), kOSDTimeout_Med);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
@@ -2947,7 +2950,7 @@ void NuppelVideoPlayer::ClearBookmark(bool message)
     {
         player_ctx->playingInfo->SaveBookmark(0);
         if (message)
-            SetOSDMessage(QObject::tr("Bookmark Cleared"));
+            SetOSDMessage(QObject::tr("Bookmark Cleared"), kOSDTimeout_Med);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
@@ -3334,7 +3337,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (!hasFullPositionMap)
     {
         VERBOSE(VB_IMPORTANT, "Cannot edit - no full position map");
-        SetOSDStatus(QObject::tr("No Seektable"));
+        SetOSDStatus(QObject::tr("No Seektable"), kOSDTimeout_Med);
         return false;
     }
 
@@ -4288,17 +4291,17 @@ QString NuppelVideoPlayer::GetError(void) const
     return tmp;
 }
 
-void NuppelVideoPlayer::SetOSDMessage(const QString &msg)
+void NuppelVideoPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
 {
     if (!osd)
         return;
 
     QHash<QString,QString> info;
     info.insert("message_text", msg);
-    osd->SetText("osd_message", info);
+    osd->SetText("osd_message", info, timeout);
 }
 
-void NuppelVideoPlayer::SetOSDStatus(const QString &title, bool fade)
+void NuppelVideoPlayer::SetOSDStatus(const QString &title, OSDTimeout timeout)
 {
     if (!osd)
         return;
@@ -4306,8 +4309,8 @@ void NuppelVideoPlayer::SetOSDStatus(const QString &title, bool fade)
     osdInfo info;
     calcSliderPos(info);
     info.text.insert("title", title);
-    osd->SetText("osd_status", info.text, fade);
-    osd->SetValues("osd_status", info.values, fade);
+    osd->SetText("osd_status", info.text, timeout);
+    osd->SetValues("osd_status", info.values, timeout);
 }
 
 static unsigned dbg_ident(const NuppelVideoPlayer *nvp)

@@ -322,8 +322,8 @@ class MPUBLIC NuppelVideoPlayer
     virtual bool PrepareAudioSample(long long &timecode);
 
     // OSD conveniences
-    void SetOSDMessage(const QString &msg);
-    void SetOSDStatus(const QString &title, bool fade = true);
+    void SetOSDMessage(const QString &msg, OSDTimeout timeout);
+    void SetOSDStatus(const QString &title, OSDTimeout timeout);
 
     // Closed caption and teletext stuff
     uint GetCaptionMode(void) const { return textDisplayMode; }

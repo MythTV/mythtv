@@ -99,8 +99,8 @@ void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
 
     QHash<QString,float> posMap;
     posMap.insert("position", (float)((double)frame/(double)total));
-    osd->SetValues("osd_program_editor", posMap, false);
-    osd->SetText("osd_program_editor", infoMap, false);
+    osd->SetValues("osd_program_editor", posMap, kOSDTimeout_None);
+    osd->SetText("osd_program_editor", infoMap,  kOSDTimeout_None);
     if (m_changed)
         osd->SetRegions("osd_program_editor", m_deleteMap, total);
     m_changed = false;

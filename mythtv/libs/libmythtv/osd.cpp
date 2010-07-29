@@ -165,6 +165,7 @@ OSD::OSD(NuppelVideoPlayer *player, QObject *parent)
     m_fontStretch(100),
     m_FunctionalType(kOSDFunctionalType_Default), m_FunctionalWindow(QString())
 {
+    SetTimeouts(3000, 5000, 10000);
 }
 
 OSD::~OSD()
@@ -300,7 +301,7 @@ void OSD::LoadWindows(void)
 }
 
 void OSD::SetValues(const QString &window, QHash<QString,int> &map,
-                    bool set_expiry)
+                    OSDTimeout timeout)
 {
     MythScreenType *win = GetWindow(window);
     if (!win)
@@ -320,12 +321,12 @@ void OSD::SetValues(const QString &window, QHash<QString,int> &map,
         }
     }
 
-    if (set_expiry && found)
-        SetExpiry(win);
+    if (found)
+        SetExpiry(window, timeout);
 }
 
 void OSD::SetValues(const QString &window, QHash<QString,float> &map,
-                    bool set_expiry)
+                    OSDTimeout timeout)
 {
     MythScreenType *win = GetWindow(window);
     if (!win)
@@ -339,12 +340,12 @@ void OSD::SetValues(const QString &window, QHash<QString,float> &map,
             edit->SetPosition(map.value("position"));
     }
 
-    if (set_expiry && found)
-        SetExpiry(win);
+    if (found)
+        SetExpiry(window, timeout);
 }
 
 void OSD::SetText(const QString &window, QHash<QString,QString> &map,
-                  bool set_expiry)
+                  OSDTimeout timeout)
 {
     MythScreenType *win = GetWindow(window);
     if (!win)
@@ -405,8 +406,7 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
     else
         win->SetTextFromMap(map);
 
-    if (set_expiry)
-        SetExpiry(win);
+    SetExpiry(window, timeout);
 }
 
 void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
@@ -655,18 +655,32 @@ void OSD::CheckExpiry(void)
     }
 }
 
-void OSD::SetExpiry(MythScreenType *window, int time)
+void OSD::SetExpiry(const QString &window, enum OSDTimeout timeout,
+                    int custom_timeout)
 {
-    if (time > 0)
+    if (timeout == kOSDTimeout_Ignore && !custom_timeout)
+        return;
+
+    MythScreenType *win = GetWindow(window);
+    int time = custom_timeout ? custom_timeout : m_Timeouts[timeout];
+    if ((time > 0) && win)
     {
         QDateTime expires = QDateTime::currentDateTime().addMSecs(time);
-        m_ExpireTimes.insert(window, expires);
+        m_ExpireTimes.insert(win, expires);
     }
-    else if (time < 0)
+    else if ((time < 0) && win)
     {
-        if (m_ExpireTimes.contains(window))
-            m_ExpireTimes.remove(window);
+        if (m_ExpireTimes.contains(win))
+            m_ExpireTimes.remove(win);
     }
+}
+
+void OSD::SetTimeouts(int _short, int _medium, int _long)
+{
+    m_Timeouts[kOSDTimeout_None]  = -1;
+    m_Timeouts[kOSDTimeout_Short] = _short;
+    m_Timeouts[kOSDTimeout_Med]   = _medium;
+    m_Timeouts[kOSDTimeout_Long]  = _long;
 }
 
 bool OSD::IsWindowVisible(const QString &window)
@@ -736,12 +750,6 @@ MythScreenType *OSD::GetWindow(const QString &window)
     return NULL;
 }
 
-void OSD::DisableExpiry(const QString &window)
-{
-    if (m_Children.contains(window))
-        SetExpiry(m_Children.value(window), -1);
-}
-
 void OSD::SetFunctionalWindow(const QString window, enum OSDFunctionalType type)
 {
     if (m_FunctionalType != kOSDFunctionalType_Default &&
@@ -758,7 +766,7 @@ void OSD::HideWindow(const QString &window)
         return;
     m_Children.value(window)->SetVisible(false);
     m_Children.value(window)->Close(); // for InteractiveScreen
-    DisableExpiry(window);
+    SetExpiry(window, kOSDTimeout_None);
     m_Refresh = true;
 
     if (m_FunctionalType != kOSDFunctionalType_Default)
@@ -859,7 +867,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
     {
         m_NextPulseUpdate  = QDateTime::currentDateTime();
         m_PulsedDialogText = text;
-        SetExpiry(m_Dialog, updatefor);
+        SetExpiry(window, kOSDTimeout_None, updatefor);
     }
 
     DialogBack();
