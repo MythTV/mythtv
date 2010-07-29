@@ -114,7 +114,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
 
         if (testdir.exists())
         {
-            m_dirlist.prepend(testdir.absolutePath() + "/");
+            m_dirlist.prepend(testdir.absolutePath());
             found = true;
         }
     }
@@ -492,9 +492,8 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
         QDir testdir(m_builtinGroups[group]);
         if (testdir.exists())
         {
-            QString tmpDir = testdir.absolutePath() + "/";
-            if (dirlist && !dirlist->contains(tmpDir))
-                dirlist->prepend(tmpDir);
+            if (dirlist && !dirlist->contains(testdir.absolutePath()))
+                dirlist->prepend(testdir.absolutePath());
             found = true;
         }
     }

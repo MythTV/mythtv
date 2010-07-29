@@ -4522,7 +4522,11 @@ void MainServer::HandleDownloadFile(const QStringList &command,
     StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
     QString outDir = sgroup.FindNextDirMostFree();
     QString outFile;
+    QStringList retlist;
 
+    MythSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
 
     if (filename.isEmpty())
     {
@@ -4530,13 +4534,30 @@ void MainServer::HandleDownloadFile(const QStringList &command,
         filename = finfo.fileName();
     }
 
-    outFile = outDir + filename;
+    if (outDir.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unable to determine directory "
+                "to write to in %1 write command").arg(command[0]));
+        retlist << "downloadfile_directory_not_found";
+        if (pbssock)
+            SendResponse(pbssock, retlist);
+        return;
+    }
 
-    MythSocket *pbssock = NULL;
-    if (pbs)
-        pbssock = pbs->getSocket();
+    if ((filename.contains("/../")) ||
+        (filename.startsWith("../")))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR: %1 write "
+                "filename '%2' does not pass sanity checks.")
+                .arg(command[0]).arg(filename));
+        retlist << "downloadfile_filename_dangerous";
+        if (pbssock)
+            SendResponse(pbssock, retlist);
+        return;
+    }
 
-    QStringList retlist;
+    outFile = outDir + "/" + filename;
+
     if (synchronous)
     {
         if (GetMythDownloadManager()->download(srcURL, outFile))
