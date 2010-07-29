@@ -45,6 +45,30 @@ using namespace std;
 #include "metaiomp4.h"
 #include "metaiowavpack.h"
 
+// size of the buffer used for streaming
+#define BUFFER_SIZE 4096
+
+// streaming callbacks
+int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
+{
+
+    QIODevice *io = (QIODevice*)opaque;
+    buf_size = min(buf_size, (int) io->bytesAvailable());
+    return io->read((char*)buf, buf_size);
+}
+
+int WriteFunc(void *opaque, uint8_t *buf, int buf_size)
+{
+    // we don't support writing to the steam
+    return -1;
+}
+
+int64_t SeekFunc(void *opaque, int64_t offset, int whence) 
+{
+    // we dont support seeking while streaming
+    return -1;
+}
+
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                        AudioOutput *o) :
     Decoder(d, i, o),
@@ -60,7 +84,8 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     m_inputFormat(NULL),        m_inputContext(NULL),
     m_decStream(NULL),          m_codec(NULL),
     m_audioDec(NULL),           errcode(0),
-    m_samples(NULL)
+    m_samples(NULL),            m_buffer(NULL),
+    m_byteIOContext(NULL)
 {
     setFilename(file);
     memset(&m_params, 0, sizeof(AVFormatParameters));
@@ -103,10 +128,34 @@ bool avfDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
+    // register av codecs
+    av_register_all();
+
     if (output())
         output()->PauseUntilBuffered();
 
-    filename = ((QFile *)input())->fileName();
+    m_inputIsFile = !input()->isSequential();
+
+    // open device
+    if (m_inputIsFile)
+        filename = ((QFile *)input())->fileName();
+    else
+    {
+        // if the input is not a file then setup the buffer
+        // and iocontext to stream from it
+        m_buffer = (unsigned char*) av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+        m_byteIOContext = new ByteIOContext;
+        init_put_byte(m_byteIOContext, m_buffer, BUFFER_SIZE, 0, input(), &ReadFunc, &WriteFunc, &SeekFunc);
+        filename = "stream";
+
+        // probe the stream
+        AVProbeData probe_data;
+        probe_data.filename = filename;
+        probe_data.buf_size = min(BUFFER_SIZE, (int) input()->bytesAvailable());
+        probe_data.buf = m_buffer;
+        input()->read((char*)probe_data.buf, probe_data.buf_size);
+        m_inputFormat = av_probe_input_format(&probe_data, 1);
+    }
 
     if (!m_samples)
     {
@@ -120,15 +169,15 @@ bool avfDecoder::initialize()
         }
     }
 
-    // open device
-    // register av codecs
-    av_register_all();
-
     // open the media file
     // this should populate the input context
     int error;
-    error = av_open_input_file(&m_inputContext, filename.toLocal8Bit().constData(),
-                               m_inputFormat, 0, &m_params);
+    if (m_inputIsFile)
+        error = av_open_input_file(&m_inputContext, filename.toLocal8Bit().constData(),
+                                    m_inputFormat, 0, &m_params);
+    else
+        error = av_open_input_stream(&m_inputContext, m_byteIOContext, "decoder",
+                                      m_inputFormat, &m_params);
 
     if (error < 0)
     {
@@ -248,7 +297,8 @@ bool avfDecoder::initialize()
 
 void avfDecoder::seek(double pos)
 {
-    seekTime = pos;
+    if (m_inputIsFile)
+        seekTime = pos;
 }
 
 void avfDecoder::deinit()
@@ -263,7 +313,10 @@ void avfDecoder::deinit()
     // Cleanup here
     if (m_inputContext)
     {
-        av_close_input_file(m_inputContext);
+        if (m_inputIsFile)
+            av_close_input_file(m_inputContext);
+        else
+            av_close_input_stream(m_inputContext);
         m_inputContext = NULL;
     }
 
@@ -275,6 +328,18 @@ void avfDecoder::deinit()
     m_codec = NULL;
     m_audioDec = NULL;
     m_inputFormat = NULL;
+
+    if (m_buffer)
+    {
+        av_free(m_buffer);
+        m_buffer = NULL;
+    }
+
+    if (m_byteIOContext)
+    {
+        delete m_byteIOContext;
+        m_byteIOContext = NULL;
+    }
 }
 
 void avfDecoder::run()
