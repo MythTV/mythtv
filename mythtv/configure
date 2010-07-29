@@ -130,7 +130,6 @@ Advanced options (experts only):
   --enable-vdpau           enable NVidia VDPAU hardware acceleration.
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
-  --enable-mac-accel       enable Mac OS X MPEG acceleration
   --disable-opengl-vsync   disable OpenGL vsync method
   --disable-directfb       disable DirectFB (Linux non-X11 video)
 
@@ -1281,7 +1280,6 @@ MYTHTV_CONFIG_LIST='
     directfb
     disable_mmx_for_debugging
     dvb
-    dvdv
     firewire
     fribidi
     frontend
@@ -1340,7 +1338,6 @@ USING_LIST='
     bindings_perl
     bindings_python
     darwin_da
-    dvdv
     mythtranscode
     opengl
     vdpau
@@ -1495,7 +1492,6 @@ mpeg1video_encoder_select="aandct"
 mpeg2video_encoder_select="aandct"
 mpeg4_decoder_select="h263_decoder mpeg4video_parser"
 mpeg4_encoder_select="h263_encoder"
-mpeg_dvdv_decoder_deps="dvdv"
 mpeg_vdpau_decoder_deps="vdpau_vdpau_h vdpau_vdpau_x11_h"
 mpeg_vdpau_decoder_select="vdpau mpegvideo_decoder"
 mpeg1_vdpau_decoder_deps="vdpau_vdpau_h vdpau_vdpau_x11_h"
@@ -1971,10 +1967,6 @@ for opt do
     --enable-quartz-video) enable quartz_video
     ;;
     --disable-quartz-video) disable quartz_video
-    ;;
-    --enable-mac-accel) enable dvdv
-    ;;
-    --disable-mac-accel) disable dvdv
     ;;
 # disabled due to abuse in Gentoo ebuild
     --disable-frontend)
@@ -3884,8 +3876,6 @@ fi
 
 # Quartz video is Mac only and requires Carbon which is 32bit only
 enabled quartz_video && test $target_os = darwin && check_cpp_condition QtCore/qglobal.h "!defined(QT_MAC_USE_COCOA)" || disable quartz_video
-# Can only do Mac accel on Mac platform
-enabled dvdv && enabled quartz_video && test $target_os = darwin || disable dvdv
 
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
 # This checks for it, and some other calls that the module needs
@@ -4252,7 +4242,6 @@ fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$target_os" = x"darwin" ; then
     echo "Quartz video              ${quartz_video-no}"
-    echo "Mac acceleration          ${dvdv-no}"
   fi
   echo "OpenGL vsync              ${opengl_vsync-no}"
   echo "DirectFB                  ${directfb-no}"

@@ -102,11 +102,6 @@ macx {
         # which may clash with symbols in /usr/lib/gcc/darwin/3.3/libstdc++.a
         # In that case, rebuild the framework with your (old) Xcode version
     }
-
-    using_dvdv {
-        # DVDUtils uses Objective-C++, activated by .mm suffix
-        QMAKE_EXT_CPP += .mm
-    }
 }
 
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
@@ -296,14 +291,9 @@ using_frontend {
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp       util-osd.cpp
 
-    macx: HEADERS += videoout_dvdv.h
     using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
     using_quartz_video: HEADERS += videoout_quartz.h
     using_quartz_video: SOURCES += videoout_quartz.cpp
-
-    using_dvdv:DEFINES +=         USING_DVDV
-    using_dvdv:HEADERS +=         videoout_dvdv_private.h
-    using_dvdv:SOURCES +=         videoout_dvdv.mm
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp
