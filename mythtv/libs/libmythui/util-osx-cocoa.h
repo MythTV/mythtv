@@ -3,13 +3,8 @@
 
 #import "ApplicationServices/ApplicationServices.h"
 
-#ifdef USING_DVDV
 void *CreateOSXCocoaPool(void);
 void DeleteOSXCocoaPool(void*&);
-#else
-inline void *CreateOSXCocoaPool(void) { return NULL; }
-inline void DeleteOSXCocoaPool(void*&) {}
-#endif
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* view);
 

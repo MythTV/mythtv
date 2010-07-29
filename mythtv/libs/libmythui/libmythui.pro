@@ -87,7 +87,6 @@ using_x11 {
 }
 
 macx {
-    using_dvdv: DEFINES += USING_DVDV
     QMAKE_EXT_CPP += .mm
     HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h   util-osx-cocoa.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp util-osx-cocoa.mm

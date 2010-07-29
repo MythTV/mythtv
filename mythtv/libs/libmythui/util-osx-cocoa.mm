@@ -10,7 +10,6 @@
 
 @end
 
-#ifdef USING_DVDV
 void *CreateOSXCocoaPool(void)
 {
     // Cocoa requires a message to be sent informing the Cocoa event
@@ -39,7 +38,6 @@ void DeleteOSXCocoaPool(void* &pool)
         [a_pool release];
     }
 }
-#endif // USING_DVDV
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* view)
 {

@@ -1667,7 +1667,6 @@ doc_deps="texi2html"
 # mythtv dependencies
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
-dvdv_deps="quartz_video"
 firewire_deps="backend"
 iptv_deps="backend"
 ivtv_deps="backend v4l"
