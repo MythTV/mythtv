@@ -1,13 +1,15 @@
 #ifndef MUSICPLAYER_H_
 #define MUSICPLAYER_H_
 
+// mythtv
 #include <mythdialogs.h>
 #include <audiooutput.h>
 #include <mythobservable.h>
 
+// mythmusic
 #include "metadata.h"
+#include "decoderhandler.h"
 
-class Decoder;
 class AudioOutput;
 class MainVisual;
 
@@ -19,16 +21,16 @@ class MusicPlayerEvent : public MythEvent
         MusicPlayerEvent(Type t, uint vol, bool muted) :
         MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
         ~MusicPlayerEvent() {}
-        
+
         virtual MythEvent *clone(void) const { return new MusicPlayerEvent(*this); }
-        
+
         // for track changed/added/deleted/metadata changed events
         int TrackID;
-        
+
         // for volume changed event
         uint Volume;
         bool IsMuted;
-        
+
         static Type TrackChangeEvent;
         static Type VolumeChangeEvent;
         static Type TrackAddedEvent;
@@ -44,7 +46,6 @@ class MusicPlayer : public QObject, public MythObservable
   public:
      MusicPlayer(QObject *parent, const QString &dev);
 
-    void playFile(const QString &filename);
     void playFile(const Metadata &meta);
 
     void addListener(QObject *listener);
@@ -88,8 +89,9 @@ class MusicPlayer : public QObject, public MythObservable
     void canShowPlayer(bool canShow) { m_canShowPlayer = canShow; }
     bool getCanShowPlayer(void) { return m_canShowPlayer; }
 
-    Decoder     *getDecoder(void) { return m_decoder; }
-    AudioOutput *getOutput(void) { return m_output; }
+    Decoder        *getDecoder(void) { return m_decoderHandler ? m_decoderHandler->getDecoder() : NULL; }
+    DecoderHandler *getDecoderHandler(void) { return m_decoderHandler; }
+    AudioOutput    *getOutput(void) { return m_output; }
 
     GenericTree *constructPlaylist(void);
     GenericTree *getPlaylistTree() { return m_playlistTree; }
@@ -112,6 +114,7 @@ class MusicPlayer : public QObject, public MythObservable
     void         seek(int pos);
 
     Metadata    *getCurrentMetadata(void);
+    Metadata    *getDisplayMetadata(void) { return &m_displayMetadata; }
     void         refreshMetadata(void);
     void         sendMetadataChangedEvent(int trackID);
 
@@ -162,6 +165,12 @@ class MusicPlayer : public QObject, public MythObservable
     void updateLastplay(void);
     void sendVolumeChangedEvent(void);
 
+    void setupDecoderHandler(void);
+    void decoderHandlerReady(void);
+    void decoderHandlerInfo(const QString&, const QString&);
+    void decoderHandlerOperationStart(const QString &);
+    void decoderHandlerOperationStop();
+
     Playlist    *m_currentPlaylist;
     int          m_currentTrack;
 
@@ -169,12 +178,12 @@ class MusicPlayer : public QObject, public MythObservable
 
     GenericTree *m_currentNode;
     Metadata    *m_currentMetadata;
-    QString      m_currentFile;
     int          m_currentTime;
 
-    QIODevice   *m_input;
-    AudioOutput *m_output;
-    Decoder     *m_decoder;
+    Metadata     m_displayMetadata;
+
+    AudioOutput    *m_output;
+    DecoderHandler *m_decoderHandler;
 
     QSet<QObject*>  m_visualisers;
 

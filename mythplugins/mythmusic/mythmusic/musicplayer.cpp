@@ -15,6 +15,7 @@
 // mythmusic
 #include "musicplayer.h"
 #include "decoder.h"
+#include "decoderhandler.h"
 #include "cddecoder.h"
 #include "constants.h"
 #include "mainvisual.h"
@@ -38,10 +39,11 @@ QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::reg
 MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     :QObject(parent)
 {
+    setObjectName("MusicPlayer");
+
     m_CDdevice = dev;
-    m_decoder = NULL;
-    m_input = NULL;
     m_output = NULL;
+    m_decoderHandler = NULL;
 
     m_playlistTree = NULL;
     m_currentNode = NULL;
@@ -103,10 +105,11 @@ MusicPlayer::~MusicPlayer()
     if (m_playlistTree)
         delete m_playlistTree;
 
-    if (m_currentMetadata)
+    if (m_decoderHandler)
     {
-        delete m_currentMetadata;
-        m_currentMetadata = NULL;
+        m_decoderHandler->removeListener(this);
+        m_decoderHandler->deleteLater();
+        m_decoderHandler = NULL;
     }
 
     if (m_shuffleMode == SHUFFLE_INTELLIGENT)
@@ -136,8 +139,11 @@ void MusicPlayer::addListener(QObject *listener)
     if (listener && m_output)
         m_output->addListener(listener);
 
-    if (listener && m_decoder)
-        m_decoder->addListener(listener);
+    if (listener && getDecoder())
+        getDecoder()->addListener(listener);
+
+    if (listener && m_decoderHandler)
+        m_decoderHandler->addListener(listener);
 
     MythObservable::addListener(listener);
 
@@ -149,8 +155,11 @@ void MusicPlayer::removeListener(QObject *listener)
     if (listener && m_output)
         m_output->removeListener(listener);
 
-    if (listener && m_decoder)
-        m_decoder->removeListener(listener);
+    if (listener && getDecoder())
+        getDecoder()->removeListener(listener);
+
+    if (listener && m_decoderHandler)
+        m_decoderHandler->removeListener(listener);
 
     MythObservable::removeListener(listener);
 
@@ -187,15 +196,9 @@ void MusicPlayer::removeVisual(MainVisual *visual)
 
 void MusicPlayer::playFile(const Metadata &meta)
 {
-    playFile(meta.Filename());
     m_currentMetadata = new Metadata(meta);
-    m_currentNode = NULL;
-}
-
-void MusicPlayer::playFile(const QString &filename)
-{
-    m_currentFile = filename;
     play();
+    m_currentNode = NULL;
 }
 
 void MusicPlayer::stop(bool stopAll)
@@ -211,15 +214,19 @@ void MusicPlayer::stop(bool stopAll)
 
     m_isPlaying = false;
 
-    if (m_input)
-        delete m_input;
-    m_input = NULL;
-
-    if (stopAll && m_decoder)
+    if (stopAll && getDecoder())
     {
-        m_decoder->removeListener(this);
-        delete m_decoder;
-        m_decoder = NULL;
+        getDecoder()->removeListener(this);
+
+        // remove any listeners from the decoder
+        {
+            QMutexLocker locker(m_lock);
+            QSet<QObject*>::const_iterator it = m_listeners.begin();
+            for (; it != m_listeners.end() ; ++it)
+            {
+                getDecoder()->removeListener(*it);
+            }
+        }
     }
 
     if (stopAll && m_output)
@@ -243,11 +250,11 @@ void MusicPlayer::pause(void)
         m_output->Pause(!m_isPlaying);
     }
     // wake up threads
-    if (m_decoder)
+    if (getDecoder())
     {
-        m_decoder->lock();
-        m_decoder->cond()->wakeAll();
-        m_decoder->unlock();
+        getDecoder()->lock();
+        getDecoder()->cond()->wakeAll();
+        getDecoder()->unlock();
     }
 }
 
@@ -255,108 +262,28 @@ void MusicPlayer::play(void)
 {
     stopDecoder();
 
+    Metadata *meta = getCurrentMetadata();
+    if (!meta)
+        return;
+
     if (!m_output)
         openOutputDevice();
 
-    if (m_input)
-        delete m_input;
+    if (!getDecoderHandler()) 
+        setupDecoderHandler();
 
-    m_input = new QFile(m_currentFile);
-
-    if (m_decoder && !m_decoder->factory()->supports(m_currentFile))
-    {
-        m_decoder->removeListener(this);
-        delete m_decoder;
-        m_decoder = NULL;
-    }
-
-    if (!m_decoder)
-    {
-        m_decoder = Decoder::create(m_currentFile, m_input, m_output, true);
-        if (!m_decoder)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "MusicPlayer: Failed to create decoder for playback");
-            return;
-        }
-
-        if (m_currentFile.contains("cda") == 1)
-            dynamic_cast<CdDecoder*>(m_decoder)->setDevice(m_CDdevice);
-
-        m_decoder->addListener(this);
-        // add any listeners to the decoder
-        {
-            QMutexLocker locker(m_lock);
-            QSet<QObject*>::const_iterator it = m_listeners.begin();
-            for (; it != m_listeners.end() ; ++it)
-            {
-                m_decoder->addListener(*it);
-            }
-        }
-    }
-    else
-    {
-        m_decoder->setInput(m_input);
-        m_decoder->setFilename(m_currentFile);
-        m_decoder->setOutput(m_output);
-    }
-
-    if (m_decoder->initialize())
-    {
-        if (m_output)
-            m_output->Reset();
-
-        m_decoder->start();
-
-        m_isPlaying = true;
-
-        if (m_currentNode)
-        {
-            if (m_currentNode->getInt() > 0)
-            {
-                m_currentMetadata = Metadata::getMetadataFromID(
-                    m_currentNode->getInt());
-                m_updatedLastplay = false;
-            }
-            else
-            {
-                // CD track
-                CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(m_decoder);
-                if (cddecoder)
-                    m_currentMetadata = cddecoder->getMetadata(
-                        -m_currentNode->getInt());
-            }
-        }
-
-        MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentNode->getInt());
-        dispatch(me);
-    }
+    getDecoderHandler()->start(meta);
 }
 
 void MusicPlayer::stopDecoder(void)
 {
-    if (m_decoder && m_decoder->isRunning())
-    {
-        m_decoder->lock();
-        m_decoder->stop();
-        m_decoder->unlock();
-    }
-
-    if (m_decoder)
-    {
-        m_decoder->lock();
-        m_decoder->cond()->wakeAll();
-        m_decoder->unlock();
-    }
-
-    if (m_decoder)
-        m_decoder->wait();
+    if (getDecoderHandler())
+        getDecoderHandler()->stop();
 
     if (m_currentMetadata)
     {
         if (m_currentMetadata->hasChanged())
             m_currentMetadata->persist();
-        delete m_currentMetadata;
     }
     m_currentMetadata = NULL;
 }
@@ -433,9 +360,9 @@ void MusicPlayer::next(void)
             return; // stop()
     }
 
-    QString filename = getFilenameFromID(node->getInt());
-    if (!filename.isEmpty())
-        playFile(filename);
+    m_currentMetadata = gMusicData->all_music->getMetadata(node->getInt());
+    if (m_currentMetadata)
+        play();
     else
         stop();
 }
@@ -450,9 +377,9 @@ void MusicPlayer::previous(void)
     if (node)
     {
         m_currentNode = node;
-        QString filename = getFilenameFromID(node->getInt());
-        if (!filename.isEmpty())
-            playFile(filename);
+        m_currentMetadata = gMusicData->all_music->getMetadata(node->getInt());
+        if (m_currentMetadata)
+            play();
         else
             return;//stop();
     }
@@ -477,7 +404,10 @@ void MusicPlayer::nextAuto(void)
         return;
     }
     else
-        next();
+    {
+        if (!m_decoderHandler->next())
+            next();
+    }
 
     if (m_canShowPlayer && m_autoShowPlayer)
     {
@@ -495,6 +425,27 @@ void MusicPlayer::nextAuto(void)
 
 void MusicPlayer::customEvent(QEvent *event)
 {
+    if (event->type() == DecoderHandlerEvent::Ready)
+    {
+        decoderHandlerReady();
+    }
+    else if (event->type() == DecoderEvent::Decoding)
+    {
+        m_displayMetadata = *getCurrentMetadata();
+    }
+    else if (event->type() == DecoderHandlerEvent::Info)
+    {
+        DecoderHandlerEvent *dxe = (DecoderHandlerEvent*)event;
+        m_displayMetadata = *getCurrentMetadata();
+        m_displayMetadata.setArtist("");
+        m_displayMetadata.setTitle(*dxe->getMessage());
+    }
+    else if (event->type() == DecoderHandlerEvent::Meta)
+    {
+        DecoderHandlerEvent *dxe = (DecoderHandlerEvent*)event;
+        m_displayMetadata = *dxe->getMetadata();
+    }
+
     if (m_isAutoplay)
     {
         if (event->type() == OutputEvent::Error)
@@ -617,7 +568,7 @@ QString MusicPlayer::getFilenameFromID(int id)
     else
     {
         // cd track
-        CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(m_decoder);
+        CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
         if (cddecoder)
         {
             Metadata *meta = cddecoder->getMetadata(-id);
@@ -692,11 +643,8 @@ void MusicPlayer::setCurrentTrackPos(int pos)
 
     m_currentTrack = pos;
 
-    QString filename = getFilenameFromID(m_currentPlaylist->getSongAt(m_currentTrack)->getValue());
-    if (!filename.isEmpty())
-        playFile(filename);
-    else
-        stop();
+    m_currentMetadata = gMusicData->all_music->getMetadata(m_currentPlaylist->getSongAt(m_currentTrack)->getValue());
+    play();
 }
 
 void MusicPlayer::savePosition(void)
@@ -734,7 +682,6 @@ void MusicPlayer::restorePosition(const QString &position)
 
         //try to restore the position
         m_currentNode = m_playlistTree->findNode(branches_to_current_node);
-
         if (m_currentNode)
             return;
     }
@@ -750,9 +697,8 @@ void MusicPlayer::restorePosition(const QString &position)
         m_currentNode = m_currentNode->getChildAt(0, -1);
         if (m_currentNode)
         {
-            m_currentFile = getFilenameFromID(m_currentNode->getInt());
-            if (!m_currentFile.isEmpty())
-                play();
+            m_currentMetadata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
+            play();
         }
     }
 }
@@ -768,22 +714,21 @@ void MusicPlayer::restorePosition(int position)
     {
         m_currentTrack = position;
     }
-    
-    m_currentFile.clear();
+
     Track *track = m_currentPlaylist->getSongAt(m_currentTrack);
+
     if (track)
-        m_currentFile = getFilenameFromID(track->getValue());
-    
-    if (!m_currentFile.isEmpty())
-        play();
+        m_currentMetadata = gMusicData->all_music->getMetadata(track->getValue());
+
+    play();
 }
 
 void MusicPlayer::seek(int pos)
 {
     if (m_output)
     {
-        if (m_decoder && m_decoder->isRunning())
-            m_decoder->seek(pos);
+        if (getDecoder() && getDecoder()->isRunning())
+            getDecoder()->seek(pos);
 
         m_output->SetTimecode(pos*1000);
     }
@@ -822,7 +767,7 @@ void MusicPlayer::refreshMetadata(void)
 {
     if (m_currentMetadata)
     {
-        delete m_currentMetadata;
+        //delete m_currentMetadata;
         m_currentMetadata = NULL;
     }
 
@@ -1018,4 +963,80 @@ void MusicPlayer::playlistChanged(int trackID, bool deleted)
             dispatch(me);
         }
     }
+}
+
+void MusicPlayer::setupDecoderHandler() 
+{
+    m_decoderHandler = new DecoderHandler();
+    m_decoderHandler->addListener(this);
+
+    // add any listeners to the decoderHandler
+    {
+        QMutexLocker locker(m_lock);
+        QSet<QObject*>::const_iterator it = m_listeners.begin();
+        for (; it != m_listeners.end() ; ++it)
+        {
+            m_decoderHandler->addListener(*it);
+        }
+    }
+}
+
+void MusicPlayer::decoderHandlerReady(void)
+{
+    VERBOSE(VB_PLAYBACK, QString ("decoder handler is ready, decoding %1").
+            arg(getDecoder()->getFilename()));
+
+    if (getDecoder()->getFilename().contains("cda") == 1)
+        dynamic_cast<CdDecoder*>(getDecoder())->setDevice(m_CDdevice);
+
+    getDecoder()->setOutput(m_output);
+    //getDecoder()-> setBlockSize(2 * 1024);
+    getDecoder()->addListener(this);
+
+    // add any listeners to the decoder
+    {
+        QMutexLocker locker(m_lock);
+        QSet<QObject*>::const_iterator it = m_listeners.begin();
+        for (; it != m_listeners.end() ; ++it)
+        {
+            getDecoder()->addListener(*it);
+        }
+    }
+
+    m_currentTime = 0;
+
+    QSet<QObject*>::const_iterator it = m_visualisers.begin();
+    for (; it != m_visualisers.end() ; ++it)
+    {
+        //m_output->addVisual((MythTV::Visual*)(*it));
+        //(*it)->setDecoder(getDecoder());
+        //m_visual->setOutput(m_output);
+    }
+
+    if (getDecoder()->initialize()) 
+    {
+        if (m_output)
+             m_output->Reset();
+
+        getDecoder()->start();
+
+        if (m_resumeMode == RESUME_EXACT &&
+            gCoreContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
+        {
+            seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
+            gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
+        }
+
+        m_isPlaying = true;
+        m_updatedLastplay = false;
+    }
+    else
+    {
+        VERBOSE(VB_PLAYBACK, QString ("Cannot initialise decoder for %1")
+                .arg (getDecoder()->getFilename ()));
+    }
+
+    // tell any listeners we've started playing a new track
+    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentNode->getInt());
+    dispatch(me);
 }

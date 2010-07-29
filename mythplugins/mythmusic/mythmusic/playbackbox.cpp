@@ -1335,7 +1335,7 @@ void PlaybackBoxMusic::play()
     }
 
     gPlayer->setCurrentNode(music_tree_list->getCurrentNode());
-    gPlayer->playFile(playfile);
+    gPlayer->play();
 
     currentTime = 0;
 
