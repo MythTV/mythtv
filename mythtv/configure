@@ -129,6 +129,7 @@ Advanced options (experts only):
   --xvmc-lib=LIB           XvMC library override (for crosscompiling)
   --enable-vdpau           enable NVidia VDPAU hardware acceleration.
   --disable-opengl-video   disable OpenGL based video display
+  --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --enable-mac-accel       enable Mac OS X MPEG acceleration
   --disable-opengl-vsync   disable OpenGL vsync method
   --disable-directfb       disable DirectFB (Linux non-X11 video)
@@ -1297,6 +1298,7 @@ MYTHTV_CONFIG_LIST='
     opengl_vsync
     qtdbus
     qtwebkit
+    quartz_video
     v4l
     valgrind
     x11
@@ -1669,6 +1671,7 @@ doc_deps="texi2html"
 # mythtv dependencies
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
+dvdv_deps="quartz_video"
 firewire_deps="backend"
 iptv_deps="backend"
 ivtv_deps="backend v4l"
@@ -1790,6 +1793,7 @@ enable mheg
 enable opengl
 enable opengl_vsync
 enable opengl_video
+enable quartz_video
 enable v4l
 enable x11
 enable xrandr
@@ -1963,6 +1967,10 @@ for opt do
     ;;
     --*able-xvmc-pro)
     echo "$opt is deprecated. XvMC Pro is autodetected if xvmc-vld is enabled"
+    ;;
+    --enable-quartz-video) enable quartz_video
+    ;;
+    --disable-quartz-video) disable quartz_video
     ;;
     --enable-mac-accel) enable dvdv
     ;;
@@ -3874,8 +3882,10 @@ elif test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
     disable xvmc_vld
 fi
 
+# Quartz video is Mac only and requires Carbon which is 32bit only
+enabled quartz_video && test $target_os = darwin && check_cpp_condition QtCore/qglobal.h "!defined(QT_MAC_USE_COCOA)" || disable quartz_video
 # Can only do Mac accel on Mac platform
-enabled dvdv && test $target_os = darwin || disable dvdv
+enabled dvdv && enabled quartz_video && test $target_os = darwin || disable dvdv
 
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
 # This checks for it, and some other calls that the module needs
@@ -4241,6 +4251,7 @@ fi
 fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$target_os" = x"darwin" ; then
+    echo "Quartz video              ${quartz_video-no}"
     echo "Mac acceleration          ${dvdv-no}"
   fi
   echo "OpenGL vsync              ${opengl_vsync-no}"
