@@ -1,2037 +1,2023 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="hu_HU">
 <context>
     <name></name>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="51"/>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ezen érték beállítása megkönnyíti az életedet.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="742"/>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="744"/>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="746"/>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="748"/>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="208"/>
-        <location filename="../mythvideo/videodlg.cpp" line="253"/>
         <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Amíg a(z) %1-et megpróbáltam írni, megjelent egy HTML átirányítás (fájlméret: %2).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="231"/>
         <source>Error writing image to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba történt a kép %1 fájlba írásakor.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="265"/>
         <source>Error writing data to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba történt az adat %1 fájlba írásakor.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="273"/>
         <source>Error: file error &apos;%1&apos; for file %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba: fájl hiba &apos;%1&apos; a(z) %2-hoz</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="368"/>
         <source>No command to run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs futtatható parancs.</translation>
     </message>
 </context>
 <context>
     <name>DVDRipBox</name>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="170"/>
         <source>New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation>Új rippelés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="171"/>
         <source>Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladat eldobása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="241"/>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation type="unfinished"></translation>
+        <translation>A kapcsolat a Myth Transcoding Daemonnal megszakadt. Ez nem túl jó dolog.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="268"/>
         <source>Attempting to launch mtd...</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD indítási kísérlet...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="272"/>
         <source>Cannot connect to your Myth Transcoding Daemon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehetett csatlakozni a Myth Transcoding Daemonhoz.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="280"/>
         <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az MTD-hez való csatlakozás során gép nem található választ kaptam. Nem helyreállítható hiba.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="286"/>
         <source>Unknown connection error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen kapcsolódási hiba.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="451"/>
         <source>Job %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladat %1 a(z) %2-ből</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="524"/>
-        <location filename="../mythvideo/dvdripbox.cpp" line="547"/>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs feladat és nincs más tennivaló. Rippelhetsz DVD-t.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="527"/>
-        <location filename="../mythvideo/dvdripbox.cpp" line="549"/>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs feladat. A DVD meghajtó ellenőrzése és/vagy várakozás.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="866"/>
         <source>Cancelling ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eldobás...</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="284"/>
         <source>Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 szint</translation>
     </message>
     <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="298"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="463"/>
         <source>Enter new category</source>
-        <translation type="unfinished"></translation>
+        <translation>Új kategória</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="373"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Törlés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="374"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Kész</translation>
     </message>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="375"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Új</translation>
     </message>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="435"/>
         <source>Enter the new extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Új kiterjesztés bevitele:</translation>
+    </message>
+</context>
+<context>
+    <name>MetadataSettings</name>
+    <message>
+        <source>Searching for Grabbers...</source>
+        <translation>Grabber keresése...</translation>
+    </message>
+    <message>
+        <source>This is the script used to search for and download Movie Metadata.</source>
+        <translation>Ez a szkript használható a filmek meta adatainak keresésére.</translation>
+    </message>
+    <message>
+        <source>This is the script used to search for and download Television Metadata.</source>
+        <translation>Ez a szkript használható a TV műsorok meta adatainak keresésére.</translation>
+    </message>
+    <message>
+        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
+        <translation>Bejelölésével engedélyezel egy &quot;Lejátszás előzetessel&quot; gombot, mely a felhasználó által megadott számú előzetest játssza le a film előtt.</translation>
+    </message>
+    <message>
+        <source>Number of trailers to play before a film.</source>
+        <translation>Előzetesek száma a film előtt.</translation>
+    </message>
+    <message>
+        <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored.</source>
+        <translation>Beállítva az összes fájl a Myth Video könyvtár alatt megjelenik, amíg azok kiterjesztései kivülről nincs figyelmen kívülinek jelölve.</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
+        <translation>Bejelölve a fájlok böngészésekor a videó lista az összes ismert cideó meta adatot betölti az adatbázisból. Kikapcsolva jelentős sebességnövekedés érhető el a video lista fa struktúra betöltésekor.</translation>
+    </message>
+    <message>
+        <source>Exit without saving settings</source>
+        <translation>Kilépés a beállítások mentése nélkül</translation>
+    </message>
+    <message>
+        <source>Save settings and Exit</source>
+        <translation>Beállítások mentése és kilépés</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythvideo/main.cpp" line="344"/>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo alapértelmezett nézet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="346"/>
         <source>The MythVideo video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythVideo videó kezelő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="348"/>
         <source>The MythVideo video browser</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythVideo videó böngésző</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="350"/>
         <source>The MythVideo video listings</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythVideo videó lista</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="352"/>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythVideo videó galéria</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="355"/>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation>A kiválasztott elem lejátszása egyéb lejátszóval</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="358"/>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó szűró dialógus megnyitása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="361"/>
         <source>Change browsable in video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészhetőre váltás a videó kezelőben</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="363"/>
         <source>Increase Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyeleti szint növelése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="365"/>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyeleti szint csökkentése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="368"/>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Részletes kereső mutatása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="370"/>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta adat letöltése a jelenlegi elemhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="372"/>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Elem részletek mutatása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="375"/>
         <source>Go to the first video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás az első videóhoz</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="377"/>
         <source>Go to the last video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás az utolsó videóhoz</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="381"/>
         <source>Play a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy DVD lejátszása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="383"/>
         <source>MythDVD DVD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD DVD média kezelő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="387"/>
         <source>Play a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy VCD lejátszása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="389"/>
         <source>MythDVD VCD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD VCD média kezelő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="393"/>
         <source>Import a DVD into your MythVideo database</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD importálása a MythVideó adatbázisba</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerSettings</name>
+    <message>
+        <source>This is the command used for any file whose extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation>Ez a parancs használható bármely fájlhoz, melynek kiterjesztése nincs definiálva. Továbbá begépelheted egy lejátszó nevét is, mely egy olyan plugin lehet, mint a &apos;belső&apos;.</translation>
+    </message>
+    <message>
+        <source>This can be any command to launch a DVD  player. Internal is the default.  For other players, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
+        <translation>Ez a parancs indítja a DVD lejátszót. A &apos;belső&apos; az alapértelmezett.  Egyéb lejátszókat a %d fogja helyettesíteni a DVD eszközön (pl.: /dev/dvd).</translation>
+    </message>
+    <message>
+        <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation>Ennek az eszköznek megnyithatónak és a felhasználó által olvashatónak kell lennie a DVD-k lejátszásához.  Az &apos;alapértelmezett&apos; a MediaMonitor által választott eszköz.</translation>
+    </message>
+    <message>
+        <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
+        <translation>Ez a parancs indítja a VCD lejátszót. A &apos;belső&apos; az alapértelmezett.  Egyéb lejátszókat a %d fogja helyettesíteni a VCD eszközön (pl.: /dev/cdrom).</translation>
+    </message>
+    <message>
+        <source>This device must exist, and the user playing the VCD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation>Ennek az eszköznek megnyithatónak és a felhasználó által olvashatónak kell lennie a VCD-k lejátszásához.  Az &apos;alapértelmezett&apos; a MediaMonitor által választott eszköz.</translation>
+    </message>
+    <message>
+        <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
+        <translation>Ha bármilyen okból az alapértelmezett lejátszó nem játszik le videót, kiválaszthatsz egy másikat a &apos;Lejátszás egyéb lejátszóval&apos; pontban</translation>
+    </message>
+    <message>
+        <source>Exit without saving settings</source>
+        <translation>Kilépés a beállítások mentése nélkül</translation>
+    </message>
+    <message>
+        <source>Save settings and Exit</source>
+        <translation>Beállítások mentése és kilépés</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mtd/dvdprobe.cpp" line="416"/>
-        <location filename="../mtd/dvdprobe.cpp" line="425"/>
-        <location filename="../mythvideo/globals.cpp" line="6"/>
-        <location filename="../mythvideo/globals.cpp" line="7"/>
-        <location filename="../mythvideo/globals.cpp" line="8"/>
-        <location filename="../mythvideo/globals.cpp" line="9"/>
-        <location filename="../mythvideo/globals.cpp" line="10"/>
-        <location filename="../mythvideo/globals.cpp" line="11"/>
-        <location filename="../mythvideo/globals.cpp" line="12"/>
-        <location filename="../mythvideo/videofilter.cpp" line="792"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="373"/>
         <source>Waiting For Access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Várakozás a DVD-re</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="590"/>
-        <location filename="../mtd/jobthread.cpp" line="757"/>
         <source>Ripping to file ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Rippelés fájlba ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="651"/>
         <source>ISO copy of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO másolás %1</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="662"/>
         <source>Waiting for access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Várakozás a DVD-re</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="799"/>
         <source>Perfect DVD Rip of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Teljes DVD-je</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="871"/>
-        <location filename="../mtd/jobthread.cpp" line="876"/>
         <source>Transcode of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Átkódolása</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="894"/>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Várakozás az átkódolás engedélyezésére</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1431"/>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolás első ütem ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1439"/>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolás második ütem ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1448"/>
         <source>Transcoding ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolás ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1453"/>
         <source>Transcode is thinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolás folyamatban</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dbcheck.cpp" line="36"/>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba: &apos;%1&apos; új fájltipus hozzáadása sikertelen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globals.cpp" line="22"/>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation>NR</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globals.cpp" line="23"/>
-        <location filename="../mythvideo/videofilter.cpp" line="799"/>
-        <location filename="../mythvideo/videoutils.cpp" line="19"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="18"/>
         <source>Starting Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyeleti szint inditása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="19"/>
         <source>4 - Highest</source>
-        <translation type="unfinished"></translation>
+        <translation>4 - Legmagasabb</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="21"/>
         <source>1 - Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>1 - Legalacsonyabb</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="25"/>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az a &apos;szint&apos; melyen a MythVideo elindul. Bármely videó ezzel a szintel vagy ez alattival megjelenik a listában, amikor böngészel. A szülői PIN kóddal korlátozhatod az alapértelmezett szülői szintet.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="35"/>
-        <source>Default View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="36"/>
-        <source>Gallery</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="38"/>
-        <source>Browser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="40"/>
-        <source>Listings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="42"/>
-        <source>Manager</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="44"/>
-        <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="57"/>
         <source>Parental Level 4 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>4-es szülői szint PIN</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="59"/>
         <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a PIN használható a 4-es szülői felügyeleti szint, úgy mint videó kezelő.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="68"/>
         <source>Parental Level 3 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>3-as szülői szint PIN</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="70"/>
         <source>This PIN is used to enter Parental Control Level 3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a PIN használható a 3-as szülői felügyeleti szint.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="78"/>
         <source>Parental Level 2 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>2-es szülői szint PIN</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="80"/>
         <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a PIN használható a 2-es szülői felügyeleti szint.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="88"/>
         <source>Aggressive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Erőteljes szülői felügyelet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="90"/>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölésével nem térhetsz vissza erre a lapra és a szülői PIN-t is reseteled vele, mielőtt először adnád meg a jelenlegi PIN-t. Figyelmeztetve lettél.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="100"/>
-        <source>Show Unknown File Types</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="102"/>
-        <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="111"/>
-        <source>Video List Loads Video Meta Data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="113"/>
-        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="123"/>
-        <source>Newly scanned files are browsable by default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="125"/>
-        <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="134"/>
-        <source>Sorting ignores case</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="136"/>
-        <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="144"/>
-        <source>Enable Metadata Browse Modes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="146"/>
-        <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="155"/>
-        <source>Group based on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="156"/>
-        <source>Folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="157"/>
-        <source>Genres</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="158"/>
-        <source>Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="159"/>
-        <location filename="../mythvideo/videofilter.cpp" line="808"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Év</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="160"/>
-        <source>Director</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="161"/>
-        <source>Cast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="162"/>
-        <location filename="../mythvideo/videofilter.cpp" line="810"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézői értékelés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="163"/>
-        <source>Date Added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="164"/>
-        <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="165"/>
-        <source>Group videos in the tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="172"/>
-        <source>Video Tree remembers last selected position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="174"/>
-        <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="182"/>
-        <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="184"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="194"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="204"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="214"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="224"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="234"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="244"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="254"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="264"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="274"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="284"/>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ezt a parancsot kell indítani, mikor a felhasználó a MythVideo-t futtatja.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="192"/>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a filmposzterek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="202"/>
-        <source>Command to search for movie fanart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="212"/>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a filmek adatainak részletezéséhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="222"/>
         <source>Command to search for TV shows in MythVideo</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a TV műsorok kereséséshez a MythVideo-ban</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="232"/>
         <source>Command to search for TV Season posters</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a TV sorozatok posztereinek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="242"/>
-        <source>Command to search for TV fanart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="252"/>
         <source>Command to search for TV banners</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a TV bannerek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="262"/>
         <source>Command to search for TV Screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a TV pillanatképek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="272"/>
         <source>Command to extract data for TV Episodes</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a TV epizódok részletes adatainak kinyeréséhez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="282"/>
         <source>Command to search for TV by Title/Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parancs a cím/alcím alapú TV műsorok közötti kereséshez</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="292"/>
         <source>Directories that hold videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtárak, ahol a videók találhatók</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="294"/>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Több könyvtár is megadható &apos;:&apos;-al elválasztva.. Legalább egy könyvtárnak a felhasználó által megnyithatónak és olvashatónak kell lennie a MythVideo futtatásához.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="303"/>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár, ahol a filmek poszterei tárolva vannak</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="305"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="316"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="327"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="338"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="349"/>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>A könyvtárnak megnyithatónak és a felhasználó által futattott MythVideo-nak olvasási/írási jog szükséges.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="314"/>
         <source>Directory that holds movie screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár, ahol a filmek pillanatképei vannak tárolva</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="325"/>
         <source>Directory that holds movie/TV Banners</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár, ahol a filmek és TV bannerek vannak tárolva</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="336"/>
         <source>Directory that holds movie fanart</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár, ahol a filmek &quot;fanart&quot; tárolva vannak</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="347"/>
         <source>Directory that holds movie trailers</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár, ahol a filmelőzetesek vannak tárolva</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="360"/>
         <source>Default Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Alapértelemezett videó lejátszó</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="362"/>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ez a parancs használható bármely fájl lejátszásához, melynek kiterjesztése nincs definiálva. További lehetőségként egy olyan lejátszó plugint is beírhatsz, mint a &apos;Belső&apos;.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="372"/>
         <source>Enable Alternate Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Egyéb videó lejátszó engedélyezése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="374"/>
         <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Bejelölve kiválaszthatsz egy másik videó lejátszó parancsot, ha az alapértelmezett választás hibás.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="383"/>
         <source>Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Egyéb lejátszó</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="385"/>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ha bármilyen okból az alapértelmezett lejátszó nem játsszik le videót, kiválaszthatsz egy másikat a &apos;Lejátszás egyéb lejátszóval&apos; pontban</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="418"/>
         <source>Location of VCD device</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">A VCD eszköz helye</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="420"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="433"/>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ennek az eszköznek megnyithatónak kell lennie és olvasási joggal kell rendelkeznie a felhasználó által futtatott MythDVD-nek.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="423"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="436"/>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete"> az &apos;alapértelmezett&apos; a MediaMonitorra bízza az eszközválasztást.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="431"/>
         <source>Location of DVD device</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">A DVD eszköz helye</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="444"/>
         <source>On DVD insertion</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD behelyezése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="445"/>
         <source>Display mythdvd menu</source>
-        <translation type="unfinished"></translation>
+        <translation>mythdvd menü megjelenítése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="446"/>
         <source>Do nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne csináljon semmit</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="447"/>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD lejátszása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="448"/>
         <source>Rip DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD rippelése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="449"/>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">A média figyelés bekapcsolható (Beállítások -&gt; Általános -&gt; CD/DVD figyelő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="457"/>
         <source>Remove DVD Bookmarks Older than (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Azon DVD könyvjelzők törlése, ami régebbi, mint (napok)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="459"/>
         <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">DVD könyvjelzők törlése, melyek régebbiek, mint a meghatározott napok száma</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="467"/>
         <source>DVD Drive Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD meghajtó sebesség</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="469"/>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítja a DVD meghajtó sebességét a DVD lejátszása közben. A sebesség a 177KB/s többszöröse. Az alacsonyabb sebesség csökkenti a meghajtó zajterhelését, de néhány esetben a lejátszás megakadhat.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="479"/>
-        <location filename="../mythvideo/globalsettings.cpp" line="481"/>
         <source>Enable DVD Bookmark Support</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">DVD könyvjelző támogatása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="488"/>
         <source>DVD Bookmark Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">DVD könyvjelző súgó</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="490"/>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Súgót jelenít meg a DVD lejásztás kezdetétől vagy a könyvjelzőtől</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="519"/>
         <source>DVD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">DVD lejátszó paracs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="521"/>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ez bármilyen parancs lehet, ami elindítja a DVD lejátszót (pl. Mplayer, ogle, stb.). Ha létezik, %d lesz helyettesítve a DVD eszközhöz (pl.: /dev/dvd).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="530"/>
         <source>VCD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">VCD lejátszó parancs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="532"/>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ez bármilyen parancs lehet, ami elindítja a VCD lejátszót (pl. Mplayer, xine, stb.). Ha létezik, %d lesz helyettesítve a DVD eszközhöz (pl.: /dev/cdrom).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="543"/>
         <source>Directory to hold temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár, ami az átmeneti fájlokat tárolja</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="549"/>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ennek a könyvtárnak megnyithatónak kell lennie és a felhasználó által futtatott MythDVD-nek írási jogra van szüksége.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="558"/>
         <source>Title Playing Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím lejátszás parancs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="561"/>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez egy parancs, mely a DVD-n kapott címek megjelenítésére használható. Ha létezik, %t lesz beállítva címnek, %d az eszköznek, %a a hangsávnak, %c a hangcsatornáknak.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="571"/>
         <source>Subtitle arguments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Felirat argumentumok:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="573"/>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation type="unfinished"></translation>
+        <translation>Ha bármely feliratot kiválasztod a rippeléshez, ez a parancs hozzáadódik a cím lejátszó parancs parancshoz. Ezzel lehetővé teszi a feliratok előnézet megjelenítését. Ha jelen van, a(z) %s lesz beállítva a felirat sávnak.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="583"/>
         <source>Base transcode command</source>
-        <translation type="unfinished"></translation>
+        <translation>Alap átkódoló parancs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="585"/>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az alap (argumentumok nélküli) parancs fut átkódolóként a rendszeren.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="593"/>
         <source>MTD port number</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD port szám</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="595"/>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezt a portszám használható az MTD-vel (Myth Transcoding Daemon) való kommunikációra</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="604"/>
         <source>MTD logs to terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>Az MTD terminál ablakba naplóz</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="606"/>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve az MTD (Myth Transcoding Daemon) abba az ablakba fog naplózni, amelyből elindult. Máskülönben az mtd.log nevű fájlba írja ki a rippelés célkönyvtárba.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="616"/>
         <source>Transcode AC3 Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>AC3 hangsáv átkódolása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="618"/>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation type="unfinished"></translation>
+        <translation>Beállításával az MTD alapértelmezésben megőrzi az AC3 (Dolby Digital) hangsávot az átkódolt fájlban. </translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="627"/>
         <source>Use xvid rather than divx</source>
-        <translation type="unfinished"></translation>
+        <translation>Használjon xvid-et divx helyett</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="629"/>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve a mythdvd inkább a (nyílt, szabad) xvid codec-et használja, mint a divx-et.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="638"/>
         <source>Let transcode determine frame rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Az átkódoló érzékelje a képsebességet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="640"/>
         <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve az átkódoló automatikusan érzékeli a képsebességet. Ha nincs bejelölve, akkor a 23.976-ot hasznája.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="649"/>
         <source>Nice level for MTD</source>
-        <translation type="unfinished"></translation>
+        <translation>Az MTD nice szintje</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="651"/>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezzel meghatározhatod az átkódoló daemon (MTD) prioriás szintjét. A magasabb szám alacsonyabb CPU terhelést jelent (több CPU erőforrás más feladatoknak).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="660"/>
         <source>Simultaneous Transcode Jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyidejű átkódolási feladatok</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="662"/>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Meghatározza az egyidejű átkódolási feladatok számát. 1-re állítva (alapértelmezés) csak egyetlen aktív feladat végezhető egyidejűleg.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="671"/>
         <source>Ripped video segments</source>
-        <translation type="unfinished"></translation>
+        <translation>Rippelt videó szegmensek</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="673"/>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha 0-tól más van beállítva, a rippelt videók ezen méretű (MB-ban megadva) fájlokra oszlanak. Alkalmas a tökéletes minőség és közbenső fájlok használatára az átkódoláshoz.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="730"/>
         <source>Enable automatic Parental Level from rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatikus szülői szint engedélyezése értékelésből</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="733"/>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve automatikusan megkeresi és beállítja a szülői szintet értékelés egyeztetése esetén.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="757"/>
         <source>Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 szint</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="758"/>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az értékelések ezeket a stringeket tartalmazzák ( &apos;:&apos;-al elválasztva), melyek az %1 szülői szinthez lesznek kijelölve.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="784"/>
         <source>Enable random trailers before videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Véletlen előzetes lejátszása a videó előtt</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="786"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Bejelölésével engedélyezel egy &quot;Lejátszás előzetessel&quot; gombot, mely a felhasználó által megadott számú előzetest játssza le a film előtt.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="797"/>
         <source>Number of trailers to play</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Lejátszandó előzetesek száma</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="799"/>
         <source>The number of trailers to play before playing the film itself </source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Meghatározza, hogy mennyi előzetes legyen lejátszva a film lejátszása előtt </translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="841"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Videó kezelő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="875"/>
         <source>Television in MythVideo</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Televízió a MythVideo-ban</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="891"/>
         <source>General Settings (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Általános beállítások (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="901"/>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Lejátszó beállítások</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="913"/>
         <source>DVD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD rippelő beállítások</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="922"/>
         <source>MTD Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD beállítások</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="31"/>
         <source>Loading videos ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Videók betöltése...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="126"/>
         <source>No directory %1 - DVD importing will fail</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs könyvtár %1 -A DVD importálás meghiúsult</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="164"/>
         <source>You have no VCD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs VCD lejátszó parancs definiálva.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="171"/>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>OK, menjünk a beállíásokba</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="440"/>
         <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erőteljes szülői felügyeleti vezérlők. Figyelem: érvénytelen jelszó. Egy kisérlet a MythVideo beállító képernyőbe való belépésre megelőzve.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadata.cpp" line="865"/>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Évad</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadata.cpp" line="866"/>
         <source>Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Epizód</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadata.cpp" line="940"/>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation>^(A(z) |Egy |Egy)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/parentalcontrols.cpp" line="306"/>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Szülői PIN kód:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="310"/>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Parancs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="436"/>
         <source>%1 failed
 
 %2
 
 Check VideoManager Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 meghiúsult %2 Ellenőrizd a videókezelő beállításokat</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="672"/>
-        <location filename="../mythvideo/videofilter.cpp" line="688"/>
-        <location filename="../mythvideo/videofilter.cpp" line="701"/>
-        <location filename="../mythvideo/videofilter.cpp" line="714"/>
-        <location filename="../mythvideo/videofilter.cpp" line="728"/>
-        <location filename="../mythvideo/videofilter.cpp" line="743"/>
-        <location filename="../mythvideo/videofilter.cpp" line="760"/>
-        <location filename="../mythvideo/videofilter.cpp" line="774"/>
-        <location filename="../mythvideo/videofilter.cpp" line="782"/>
-        <location filename="../mythvideo/videofilter.cpp" line="790"/>
-        <location filename="../mythvideo/videofilter.cpp" line="797"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="775"/>
-        <location filename="../mythvideo/videofilter.cpp" line="783"/>
-        <location filename="../mythvideo/videoutils.cpp" line="157"/>
-        <location filename="../mythvideo/videoutils.cpp" line="162"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Igen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="777"/>
-        <location filename="../mythvideo/videofilter.cpp" line="785"/>
-        <location filename="../mythvideo/videoutils.cpp" line="157"/>
-        <location filename="../mythvideo/videoutils.cpp" line="162"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="804"/>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="806"/>
         <source>Season/Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Évad/epizód</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="812"/>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Futásidő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="814"/>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájlnév</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="816"/>
         <source>Video ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Video ID</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="893"/>
-        <location filename="../mythvideo/videolist.cpp" line="901"/>
         <source>Video Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Video home</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="903"/>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájl nem található</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="1170"/>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>Televízió</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="1173"/>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Filmek</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="1185"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 évad</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="1231"/>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen előtag</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="1235"/>
         <source>Storage Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló csopotok</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="1329"/>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>videók</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoutils.cpp" line="20"/>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs boritó</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoutils.cpp" line="173"/>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs elérhető értékelés.</translation>
+    </message>
+    <message>
+        <source>Transcode is thinking...</source>
+        <translation>Átkódolás folyamatban...</translation>
+    </message>
+    <message>
+        <source>Transcode complete.</source>
+        <translation>Átkódolás kész.</translation>
+    </message>
+    <message>
+        <source>Error: failed to hash file &apos;%1&apos;</source>
+        <translation>Hiba: meghiúsult a(z) &apos;%1&apos; hash-elése</translation>
+    </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation>Ezen érték beállítása megkönnyíti az életedet.</translation>
+    </message>
+    <message>
+        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
+        <translation>A médiafigyelő bekapcsolhatja ezt a lehetőséget (Beállítások -&gt; Általános -&gt; CD/DVD figyelés).</translation>
+    </message>
+    <message>
+        <source>Delete DVD Bookmarks that are older than the number of days specified.</source>
+        <translation>Olyan DVD könyvjelzők törlése, melyek régebbiek a megadott napok számánál.</translation>
+    </message>
+    <message>
+        <source>Parental Control Settings</source>
+        <translation>Szülői felügyelet beállítások</translation>
+    </message>
+    <message>
+        <source>Parental PIN:</source>
+        <translation>Szülői PIN kód:</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
         <source>Rip/Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Rippelés/átkódolás</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
         <source>Job 1 of 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladat 1 az 1-ből</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
         <source>Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hossz:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
         <source>Select:</source>
-        <translation type="unfinished"></translation>
+        <translation>Válassz:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Név:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
         <source>Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Minőség:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
         <source>Audio Track:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangsáv:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
         <source>AC3 Audio:</source>
-        <translation type="unfinished"></translation>
+        <translation>AC3 hang:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
         <source>Subtitles:</source>
-        <translation type="unfinished"></translation>
+        <translation>Feliratok:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
         <source>View:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
         <source>0:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
         <source>Title 1 of 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím 1-ből 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezte:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Év:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
         <source>User Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói értékelés:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Futásidő:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Kész</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
         <source>Director:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendező:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
         <source>Rated:</source>
-        <translation type="unfinished"></translation>
+        <translation>Értékelve:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
         <source>Parental Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyeleti szint:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Legalacsonyabb</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Alacsony</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Közepes</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Magas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
         <source>Browsable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészhető:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tervezett:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájlnév:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
         <source>Cover File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Boritónév:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
         <source>Video Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó száma:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
         <source>Directed by</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezte</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Futásidő</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Év</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézői értékelés</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyeleti szint</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
         <source>MythVideo File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo fájl társítások</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
         <source>Extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiterjesztés:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Parancs:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
         <source>Use default player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alapértelmezett lejátszó használata:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
         <source>Ignore:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mellőz:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
         <source>Edit Video Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Video információk szerkesztése</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alcím:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation>Évad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Epizód:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategória:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
         <source>Parental Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyelet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
         <source>File to Always Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájl, melyet mindig a következőként játszik:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
         <source>Include while Browsing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészéssel egybefoglalva:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
         <source>Item has been watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tételek megtekintve:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Borítórajz:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pillanatkép:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Banner:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
         <source>Fanart:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Előzetes:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
         <source>Unique Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi lejátszó parancs:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
         <source>/path/to/the/thing.jpg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó lista szűrése</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szöveg szűrő:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategória :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Műfaj :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>Ország :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
         <source>Actor/Actress :</source>
-        <translation type="unfinished"></translation>
+        <translation>Színész(nő) :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>Év :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Futásidő :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói értékelés :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészés:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
         <source>InetRef :</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
         <source>Cover File :</source>
-        <translation type="unfinished"></translation>
+        <translation>Boritó fájl :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorbarendezés :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
         <source>Watched :</source>
-        <translation type="unfinished"></translation>
+        <translation>Megtekintve :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Eredmény</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Mentés alapértelmezettként</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Általános beállítások</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszó beállítások</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
         <source>File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájl tipusok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
         <source>Rip Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Rip beállítások</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
         <source>Browse Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videók böngészése</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó listák</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó galéria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó kezelő</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD lejátszása</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>VCD lejátszása</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
         <source>Rip DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD rippelés</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Média kiadása</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
         <source>Videos Settings</source>
+        <translation>Videó beállítások</translation>
+    </message>
+    <message>
+        <source>Configure playback and DVD ripping</source>
+        <translation>Lejátszás és DVD rippelés konfigurálása</translation>
+    </message>
+    <message>
+        <source>Select a Title to Rip</source>
+        <translation>Cím választása rippeléshez</translation>
+    </message>
+    <message>
+        <source>Select the parts of the DVD you wish to copy.</source>
+        <translation>Azon DVD rész kiválasztása, melyet másolni szeretnél.</translation>
+    </message>
+    <message>
+        <source>Film Name:</source>
+        <translation>Filmnév:</translation>
+    </message>
+    <message>
+        <source>Track Length:</source>
+        <translation>Sávhossz:</translation>
+    </message>
+    <message>
+        <source>Rip AC-3 Audio</source>
+        <translation>AC3 hangsáv rippelése</translation>
+    </message>
+    <message>
+        <source>Preview this title</source>
+        <translation>Cím előnézete</translation>
+    </message>
+    <message>
+        <source>Rip This Track</source>
+        <translation>Sáv rippelése</translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation>Korábbi cím</translation>
+    </message>
+    <message>
+        <source>Next Title</source>
+        <translation>Következő cím</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation>Rippelés kezdése</translation>
+    </message>
+    <message>
+        <source>No Current Jobs</source>
+        <translation>Jelenleg nincs feladat</translation>
+    </message>
+    <message>
+        <source>Select a Track to Rip</source>
+        <translation>Válassz egy sávot a rippeléshez</translation>
+    </message>
+    <message>
+        <source>Name of Film:</source>
+        <translation>Film neve:</translation>
+    </message>
+    <message>
+        <source>Selected track length:</source>
+        <translation>Kiválasztott sáv hossza:</translation>
+    </message>
+    <message>
+        <source>Check this box to select this track:</source>
+        <translation>Jelöld be ezt a négyzet a sáv kiválasztásához:</translation>
+    </message>
+    <message>
+        <source>Check to rip AC-3 audio:</source>
+        <translation>Jelöld be az AC-3 hangsáv rippeléséhez:</translation>
+    </message>
+    <message>
+        <source>Press to view excerpt:</source>
+        <translation>Nyomd meg a kivonat megtekintéséhez:</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Előző</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Következő</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Szereplők</translation>
+    </message>
+    <message>
+        <source>Plot</source>
+        <translation>Tervezet</translation>
+    </message>
+    <message>
+        <source>Season/Episode: %1</source>
+        <translation>Évad/Epizód: %1</translation>
+    </message>
+    <message>
+        <source>Directed by %1</source>
+        <translation>Rendezte %1</translation>
+    </message>
+    <message>
+        <source>Starring: %1</source>
+        <translation>Főszereplő: %1</translation>
+    </message>
+    <message>
+        <source>Parental Level 0</source>
+        <translation>Szülői szint 0</translation>
+    </message>
+    <message>
+        <source>Parental Level 1</source>
+        <translation>Szülői szint 1</translation>
+    </message>
+    <message>
+        <source>Parental Level 2</source>
+        <translation>Szülői szint 2</translation>
+    </message>
+    <message>
+        <source>Parental Level 3</source>
+        <translation>Szülői szint 3</translation>
+    </message>
+    <message>
+        <source>Parental Level 4</source>
+        <translation>Szülői szint 4</translation>
+    </message>
+    <message>
+        <source>Add New File Types</source>
+        <translation>Új fájltipus hozzáadása</translation>
+    </message>
+    <message>
+        <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
+
+If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
+        <translation>Ezen a lapon új kiterjesztéseket adhatsz a rendszerhez, melyeket felismerhet a Video plugin.  Ha a keresés nem adja hozzá az új kiterjesztésű fájlokat, kattints az &quot;Új&quot; gombra.
+
+Ha alapértelmezett lejátszót használsz, akkor a &apos;lejátszó parancskészlet a kiterjesztésekehez figyelmen kívül hagyása.  &quot; és a &quot;Ezen kiterjesztés figyelmen kívül hagyása&quot;. megelőzi a tétel megjelenését kereséskor.</translation>
+    </message>
+    <message>
+        <source>Use Default Player</source>
+        <translation>Alapértelmezett lejátszó használata</translation>
+    </message>
+    <message>
+        <source>Ignore This File Type</source>
+        <translation>Ezen fájltipus figyelmen kívül hagyása</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>Új</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Törlés</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Meta adatok szerkesztése</translation>
+    </message>
+    <message>
+        <source>Modify your film&apos;s metadata.</source>
+        <translation>A film meta adatainak módosítása.</translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation>Értékelés:</translation>
+    </message>
+    <message>
+        <source>TMDB Number:</source>
+        <translation>TMDB szám:</translation>
+    </message>
+    <message>
+        <source>Homepage:</source>
+        <translation>Honlap:</translation>
+    </message>
+    <message>
+        <source>Custom Player:</source>
+        <translation>Egyedi lejátszó:</translation>
+    </message>
+    <message>
+        <source>Film has been Watched</source>
+        <translation>A filmet már megnézték</translation>
+    </message>
+    <message>
+        <source>Film is Browsable</source>
+        <translation>A film böngészhető</translation>
+    </message>
+    <message>
+        <source>Next File:</source>
+        <translation>Következő fájl:</translation>
+    </message>
+    <message>
+        <source>Click here to search existing coverart...</source>
+        <translation>Kattints ide a meglévő boritók kereséséhez...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing screenshots...</source>
+        <translation>Kattints ide a meglévő pillanatképek kereséséhez...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing banners...</source>
+        <translation>Kattints ide a meglévő bannerek kereséséhez...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing fanart...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
-        <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <source>Click here to search existing trailers...</source>
+        <translation>Kattints ide a meglévő előzetesek kereséséhez...</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Műfaj :</translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation>Ország :</translation>
+    </message>
+    <message>
+        <source>Actor/Actress:</source>
+        <translation>Színész(nő) :</translation>
+    </message>
+    <message>
+        <source>Browse:</source>
+        <translation>Böngészés:</translation>
+    </message>
+    <message>
+        <source>TMDB/TVDB #:</source>
+        <translation>TMDB/TVDB #:</translation>
+    </message>
+    <message>
+        <source>Coverart:</source>
+        <translation>Borító:</translation>
+    </message>
+    <message>
+        <source>Sort By:</source>
+        <translation>Sorbarendezés e szerint:</translation>
+    </message>
+    <message>
+        <source>Watched:</source>
+        <translation>Megtekintve:</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Mentés</translation>
+    </message>
+    <message>
+        <source>This item was released on %1.</source>
+        <translation>Ez a tétel %1-en lett kiadva.</translation>
+    </message>
+    <message>
+        <source>It was added to your collection on %1.</source>
+        <translation>%1 hozzá lett adva a gyüjteményedhez.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>Video Player Settings</source>
+        <translation>Videó lejátszó beállítások</translation>
+    </message>
+    <message>
+        <source>Default:</source>
+        <translation>Alapértelmezés:</translation>
+    </message>
+    <message>
+        <source>DVD Player:</source>
+        <translation>DVD lejátszó:</translation>
+    </message>
+    <message>
+        <source>DVD Drive:</source>
+        <translation>DVD meghajtó:</translation>
+    </message>
+    <message>
+        <source>VCD Player:</source>
+        <translation>VCD lejátszó:</translation>
+    </message>
+    <message>
+        <source>VCD Drive:</source>
+        <translation>VCD meghajtó:</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Player</source>
+        <translation>Külső lejátszó engedélyezése</translation>
+    </message>
+    <message>
+        <source>Alt. Player:</source>
+        <translation>Külső lejátszó:</translation>
+    </message>
+    <message>
+        <source>Video Metadata Settings</source>
+        <translation>Meta adat beállítások</translation>
+    </message>
+    <message>
+        <source>Movie Grab:</source>
+        <translation>Film grabbelés:</translation>
+    </message>
+    <message>
+        <source>TV Grab:</source>
+        <translation>TV műsor grabbelés:</translation>
+    </message>
+    <message>
+        <source>Display unknown file types</source>
+        <translation>Ismeretlen fájltipusok mutatása</translation>
+    </message>
+    <message>
+        <source>Enable metadata in file browse mode</source>
+        <translation>Meta adatok engedélyezése a böngészés módban</translation>
+    </message>
+    <message>
+        <source>Enable Random Trailer Playback</source>
+        <translation>Véletlen előzetes lejátszása</translation>
+    </message>
+    <message>
+        <source>Trailer #:</source>
+        <translation>Előzetes #:</translation>
+    </message>
+    <message>
+        <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
+        <translation>Nincs videó a könyvtárban vagy fájl nem található.  Ha bekonfiguráltad a video könyvtárat, nyomj &quot;M&quot; (vagy MENU gombot) és válaszd a &quot;Változások keresése.&quot; opciót</translation>
+    </message>
+    <message>
+        <source>TMDB:</source>
+        <translation>TMDB:</translation>
+    </message>
+    <message>
+        <source>Parental Lvl:</source>
+        <translation>Szülői szint:</translation>
+    </message>
+    <message>
+        <source>Browseable</source>
+        <translation>Böngészhető</translation>
+    </message>
+    <message>
+        <source>Watched</source>
+        <translation>Megtekintett</translation>
+    </message>
+    <message>
+        <source>Player Command:</source>
+        <translation>Lejátszó parancs:</translation>
+    </message>
+    <message>
+        <source>Text Filter :</source>
+        <translation>Szövegszűrő:</translation>
+    </message>
+    <message>
+        <source>Seas/Ep:</source>
+        <translation>Évad/epizód:</translation>
+    </message>
+    <message>
+        <source>SELECT: Edit</source>
+        <translation>VÁLASZTÁS:Szerkesztés</translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation>INFO - Művelet menü</translation>
+    </message>
+    <message>
+        <source>Background:</source>
+        <translation>Háttér:</translation>
+    </message>
+    <message>
+        <source>Video List Filters</source>
+        <translation>Video lista szűrő</translation>
+    </message>
+    <message>
+        <source>Default Player:</source>
+        <translation>Alapértelmezet lejátszó:</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Player:</source>
+        <translation>Egyéb videó lejátszó engedélyezése:</translation>
+    </message>
+    <message>
+        <source>Alternate Player:</source>
+        <translation>Külső lejátszó:</translation>
+    </message>
+    <message>
+        <source>Movie Grabber:</source>
+        <translation>Film grabber:</translation>
+    </message>
+    <message>
+        <source>TV Grabber:</source>
+        <translation>TV grabber:</translation>
+    </message>
+    <message>
+        <source>Trailers to Play:</source>
+        <translation>Lejátszandó előzetes:</translation>
+    </message>
+    <message>
+        <source>File Paths and general options</source>
+        <translation>Fájl útvonalak és általános opciók</translation>
+    </message>
+    <message>
+        <source>Player Applications and DVD/VCD Drives</source>
+        <translation>Lejátszó alkalmazások és DVD/VCD meghajtók</translation>
+    </message>
+    <message>
+        <source>Metadata Settings</source>
+        <translation>Meta adat beállítások</translation>
+    </message>
+    <message>
+        <source>Grabber Setup and display preferences</source>
+        <translation>Grabber beállítás és megjelenítés</translation>
+    </message>
+    <message>
+        <source>Associate new file extensions</source>
+        <translation>Új fájltipusok társítása</translation>
+    </message>
+    <message>
+        <source>DVD Rip and Transcode options</source>
+        <translation>DVD rippelés és átkódolás opciók</translation>
     </message>
 </context>
 <context>
     <name>TitleDialog</name>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="28"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="56"/>
         <source>%1 - Title %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2 cím</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="93"/>
         <source>Begin Ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Rippelés kezdése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="151"/>
         <source>ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO képfájl</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="152"/>
         <source>Perfect</source>
-        <translation type="unfinished"></translation>
+        <translation>Teljes</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="171"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="185"/>
         <source>Title %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím %1 a(z) %2-ből</translation>
     </message>
 </context>
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1928"/>
         <source>No Videos Available</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Nincs elérhető videó</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2040"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2053"/>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Évad</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2986"/>
         <source>Video Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó keresés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3047"/>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a(z) %2-ből</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3112"/>
         <source>Video Options
 %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó opciók
+%1
+%2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3115"/>
         <source>Video Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó opciók
+%1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3118"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3143"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3350"/>
         <source>Video Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó opciók</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3134"/>
         <source>Play...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3136"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3172"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3138"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3362"/>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem látottnak jelölés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3140"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3364"/>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Látottnak jelölés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3141"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3325"/>
         <source>Video Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó info</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3142"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta adat opciók</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3144"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Törlés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3147"/>
         <source>Play Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappa lejátszása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3161"/>
         <source>Playback Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás opciók
+%1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3176"/>
         <source>Play in Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás egyéb lejátszóval</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3181"/>
         <source>Play With Trailers</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás előzetessel</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3189"/>
         <source>Play Trailer</source>
-        <translation type="unfinished"></translation>
+        <translation>Előzetes lejátszása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3200"/>
         <source>Video Display Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Video képernyő menü</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3209"/>
         <source>Scan For Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Változások keresése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3210"/>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Képernyő szűrés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3213"/>
         <source>Browse By...</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészés ezzel...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3216"/>
-        <location filename="../mythvideo/videodlg.cpp" line="3239"/>
         <source>Change View</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézetváltás</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3219"/>
         <source>Disable File Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájl böngészés mód letiltása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3222"/>
         <source>Enable File Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájl böngészés mód engedélyezése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3226"/>
         <source>Disable Flat View</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapos nézet letiltása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3229"/>
         <source>Enable Flat View</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapos nézet engedélyezése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3249"/>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkapcsolás böngésző nézetbe</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3253"/>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkapcsolás galéria nézetbe</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3257"/>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkapcsolás listanézetbe</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3260"/>
         <source>Switch to Manage View</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkapcsolás kezelői nézetbe</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3270"/>
         <source>Browse By</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészés ezzel</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3282"/>
         <source>Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Szereplő</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3286"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategória</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3290"/>
         <source>Date Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Dátum hozzáadva</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3294"/>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendező</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3298"/>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappa</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3302"/>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Műfaj</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3306"/>
         <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>TV/Filmek</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3310"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézői értékelés</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3314"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Év</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3335"/>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Részletek mutatása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3337"/>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Teljes terv nézet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3341"/>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Szereposztás mutatása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3367"/>
         <source>Mark as Non-Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelölés nem böngészhetőnek</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3369"/>
         <source>Mark as Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelölés böngészhetőnek</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3378"/>
         <source>Manage Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta adatok kezelése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3387"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta adatok szerkesztése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3388"/>
         <source>Download Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta adatok letöltése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3389"/>
         <source>Download Images Only</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Csak képek letöltése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3391"/>
         <source>Search TV by Title/Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>TV keresése Cím/Alcím alapján</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3393"/>
         <source>Manually Enter Video #</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó kézi bevitele #</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3395"/>
         <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó címének kézi bevitele</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3397"/>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta adatok nullázása</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3615"/>
         <source>An error occurred when switching views.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba történt a nézetek váltásakor.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4021"/>
         <source>Enter Video Unique ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi videó azonosító bevitele:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4042"/>
         <source>Enter Video Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó cím bevitele:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4088"/>
         <source>Are you sure you want to delete:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Valóban törlöd a következőt: %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4126"/>
         <source>Failed to delete file</source>
-        <translation type="unfinished"></translation>
+        <translation>A fájl törlése sikertelen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4520"/>
         <source>%1 download finished: %2 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 letöltése befejeződött: %2 %3</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4525"/>
         <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 egy megnyitható elem, de nem hozzáférhető az váarkozási idő lejárta előtt.
+</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="4743"/>
-        <location filename="../mythvideo/videodlg.cpp" line="4792"/>
-        <location filename="../mythvideo/videodlg.cpp" line="4868"/>
         <source>No matches were found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem találtam egyezést.</translation>
+    </message>
+    <message>
+        <source>Video dialog loading, or no videos available...</source>
+        <translation>Videó dialógus betöltése, vagy nincs elérhető videó...</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Beállítások</translation>
+    </message>
+    <message>
+        <source>Video Settings</source>
+        <translation>Videó beállítások</translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation>Lejátszó beállítások</translation>
+    </message>
+    <message>
+        <source>Metadata Settings</source>
+        <translation>Meta adat beállítások</translation>
+    </message>
+    <message>
+        <source>File Type Settings</source>
+        <translation>Fájl tipus beállítások</translation>
+    </message>
+    <message>
+        <source>View Homepage</source>
+        <translation>Honlap nézet</translation>
+    </message>
+    <message>
+        <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
+        <translation>Nincs böngészőparancs beállítva! A MythVideo-nak szüksége van a MythBrowser pluginra.</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="631"/>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">A szűrés eredménye: %1 videó találat</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="637"/>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>A szűrés eredménye: nincs videó találat</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="752"/>
-        <location filename="../mythvideo/videofilter.cpp" line="753"/>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>perc</translation>
+    </message>
+    <message numerus="yes">
+        <source>Result of this filter : %n video(s)</source>
+        <translation>
+            <numerusform>A szűrő eredmény: %n videó(k)</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>VideoScanner</name>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="378"/>
         <source>Failed to Scan SG Video Hosts</source>
-        <translation type="unfinished"></translation>
+        <translation>Az SG videó gépek viszgálata meghiúsult</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="383"/>
         <source>If they no longer exist please remove them</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha már nem elérhető, lészives töröld</translation>
     </message>
 </context>
 <context>
     <name>VideoScannerThread</name>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="107"/>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Video fájlok keresése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="211"/>
         <source>Verifying video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Video fájlok ellenőrzése</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="258"/>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Video adatbázis frissítése</translation>
     </message>
 </context>
 </TS>
