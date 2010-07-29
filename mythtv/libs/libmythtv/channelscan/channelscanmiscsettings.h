@@ -127,11 +127,11 @@ class TrustEncSISetting : public CheckBoxSetting, public TransientStorage
     {
         setLabel(QObject::tr("Test Decryptability"));
         setHelpText(
-            QObject::tr("Test channels if they can be decrypted with CAM and "
-                        "smartcard. Sometimes encrypted flag is also set "
-                        "spuriously. If this option is set the data of each "
-                        "channel is checked. Attention: increases scan time "
-                        "for each encrypted by a couple of seconds."));
+            QObject::tr("Test all channels to see if they can be decrypted "
+                        "with installed CAM/smartcard. Sometimes the encrypted "
+                        "flag is set spuriously. Attention: Enabling this "
+                        "option increases the scan time for each encrypted "
+                        "channel by a couple of seconds."));
     }
 };
 
@@ -352,8 +352,8 @@ class ScanRollOff: public ComboBoxSetting, public TransientStorage
     public:
     ScanRollOff() : ComboBoxSetting(this)
     {
-        setLabel(QObject::tr("Rolloff"));
-        setHelpText(QObject::tr("Roll Off factor (Default: 0.35)"));
+        setLabel(QObject::tr("Roll-off"));
+        setHelpText(QObject::tr("Roll-off factor (Default: 0.35)"));
         addSelection("0.35");
         addSelection("0.20");
         addSelection("0.25");

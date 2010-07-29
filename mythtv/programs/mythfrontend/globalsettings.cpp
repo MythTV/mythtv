@@ -408,7 +408,7 @@ HostComboBox *AudioConfigSettings::AudioUpmixType()
 HostCheckBox *AudioConfigSettings::AC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("AC3PassThru");
-    gc->setLabel(QObject::tr("Dolby digital"));
+    gc->setLabel(QObject::tr("Dolby Digital"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
                     "supports AC3/Dolby Digital. You must use a digital "
