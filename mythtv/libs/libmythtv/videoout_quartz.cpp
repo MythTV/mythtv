@@ -62,7 +62,6 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythverbose.h"
 #include "videodisplayprofile.h"
-#include "videoout_dvdv.h"
 
 #define LOC     QString("VideoOutputQuartz::")
 #define LOC_ERR QString("VideoOutputQuartz Error: ")
@@ -150,7 +149,7 @@ class QuartzData
         scaleUpVideo(false),        correctGamma(false),
         convertI420to2VUY(NULL),
 
-        embeddedView(NULL),         dvdv(NULL)
+        embeddedView(NULL)
     {;}
     ~QuartzData() { ClearViews(); }
 
@@ -192,8 +191,6 @@ class QuartzData
 
     // Embedding:
     VideoOutputQuartzView * embeddedView;    // special embedded widget
-
-    DVDV                  * dvdv;            // MPEG acceleration data
 };
 
 VideoOutputQuartzView::VideoOutputQuartzView(QuartzData *pData)
@@ -350,16 +347,6 @@ void VideoOutputQuartzView::Transform(QRect newRect)
                              .arg(name).arg((w - sw)/2.0).arg((h - sh)/2.0));
         TranslateMatrix(&matrix, X2Fix((w - sw) / 2.0), X2Fix((h - sh) / 2.0));
     }
-
-// apply the basic sizing to DVDV
-#ifdef USING_DVDV
-    if (parentData->dvdv)
-    {
-        parentData->dvdv->MoveResize(
-            0, 0, parentData->srcWidth, parentData->srcHeight,
-            (int)((w - sw) / 2.0), (int)((h - sh) / 2.0), sw, sh);
-    }
-#endif // USING_DVDV
 
     // apply graphics port or embedding offset
     if (x || y)
@@ -1110,18 +1097,6 @@ void VideoOutputQuartz::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["libmpeg2"].append("quartz-blit");
     (*opts.render_group)["quartz"].append("quartz-blit");
     opts.priorities->insert("quartz-blit", 70);
-
-#ifdef USING_DVDV
-    if (opts.decoders->contains("macaccel"))
-    {
-        opts.deints->insert("quartz-accel", "none");
-        (*opts.osds)["quartz-accel"].append("opengl3");
-        opts.priorities->insert("quartz-accel", 80);
-        (*opts.safe_renderers)["macaccel"].append("quartz-accel");
-        (*opts.safe_renderers)["dummy"].append("quartz-accel");
-        (*opts.render_group)["quartz"].append("quartz-accel");
-    }
-#endif
 }
 
 /** \class VideoOutputQuartz
@@ -1133,7 +1108,6 @@ VideoOutputQuartz::VideoOutputQuartz(
     myth_codec_id(_myth_codec_id)
 {
     init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
-    SetDVDVDecoder((DVDV*)codec_priv);
 }
 
 VideoOutputQuartz::~VideoOutputQuartz()
@@ -1228,22 +1202,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
     }
 
     const QSize video_dim = windows[0].GetVideoDim();
-    if (cid_changed)
-    {
-        myth_codec_id = av_codec_id;
-        data->dvdv    = (DVDV*) codec_private;
-
-        if ((data->dvdv && (kCodec_MPEG2_DVDV != myth_codec_id)) ||
-            (!data->dvdv && !codec_is_std(myth_codec_id)))
-        {
-            return false;
-        }
-
-        if (data->dvdv && !data->dvdv->SetVideoSize(video_dim))
-        {
-            return false;
-        }
-    }
+    myth_codec_id = av_codec_id;
 
     DeleteQuartzBuffers();
 
@@ -1275,17 +1234,6 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                     "win_bounds(x %5, y%6, WxH %7x%8), WId embedid=%9)")
             .arg(width).arg(height).arg(aspect).arg(winid)
             .arg(winx).arg(winy).arg(winw).arg(winh).arg(embedid));
-
-    if ((data->dvdv && (kCodec_MPEG2_DVDV != myth_codec_id)) ||
-        (!data->dvdv && !codec_is_std(myth_codec_id)))
-    {
-        return false;
-    }
-
-    if (data->dvdv && !data->dvdv->SetVideoSize(QSize(width, height)))
-    {
-        return false;
-    }
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
@@ -1460,20 +1408,6 @@ void VideoOutputQuartz::SetVideoFrameRate(float playback_fps)
 {
     VERBOSE(VB_PLAYBACK, QString("SetVideoFrameRate(%1) - unimplemented?")
                          .arg(playback_fps));
-}
-
-void VideoOutputQuartz::SetDVDVDecoder(DVDV *dvdvdec)
-{
-    QString renderer = "quartz-blit";
-
-    (void) dvdvdec;
-
-#ifdef USING_DVDV
-    data->dvdv = dvdvdec;
-    renderer = (data->dvdv) ? "quartz-accel" : renderer;
-#endif // USING_DVDV
-
-    db_vdisp_profile->SetVideoRenderer(renderer);
 }
 
 static QString toCommaList(const QStringList &list)
@@ -1677,8 +1611,7 @@ void VideoOutputQuartz::StopEmbedding(void)
 }
 
 /**
- * If we are using DVDV hardware acceleration, decodes the frame.
- * Otherwise, just makes sure we have a valid frame to show.
+ * Makes sure we have a valid frame to show.
  */
 void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                                      OSD *osd)
@@ -1686,30 +1619,17 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     (void)osd;
     (void)t;
 
-#ifdef USING_DVDV
-    if (data->dvdv && buffer)
-        data->dvdv->DecodeFrame(buffer);
-#endif // USING_DVDV
-
     if (buffer)
         framesPlayed = buffer->frameNumber + 1;
 }
 
 /** \brief
- * Display the frame, using either DVDV hardware acceleration,
- * or possibly several UI output types. \sa VideoOutputQuartzView
+ * Display the frame
+ * \sa VideoOutputQuartzView
  */
 void VideoOutputQuartz::Show(FrameScanType t)
 {
     (void)t;
-
-#ifdef USING_DVDV
-    if (data->dvdv)
-    {
-        data->dvdv->ShowFrame();
-        return;
-    }
-#endif // USING_DVDV
 
     data->pixelLock.lock();
     vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
@@ -1747,26 +1667,6 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      const PIPMap &pipPlayers,
                                      FrameScanType scan)
 {
-#ifdef USING_DVDV
-    if (data->dvdv)
-    {
-        if (osd && osd->Visible())
-        {
-            OSDSurface *surface = osd->Display();
-            if (surface && surface->Changed())
-            {
-                data->dvdv->DrawOSD(surface->y, surface->u,
-                                    surface->v, surface->alpha);
-            }
-        }
-        else
-        {
-            data->dvdv->DrawOSD(NULL, NULL, NULL, NULL);
-        }
-        return;   // no need to process frame, it won't be used
-    }
-#endif // USING_DVDV
-
     if (!frame)
     {
         frame = vbuffers.GetScratchFrame();
@@ -1844,11 +1744,7 @@ QStringList VideoOutputQuartz::GetAllowedRenderers(
 
     QStringList list;
 
-    if (kCodec_MPEG2_DVDV == myth_codec_id)
-    {
-        list += "quartz-accel";
-    }
-    else if (codec_is_std(myth_codec_id))
+    if (codec_is_std(myth_codec_id))
     {
         list += "quartz-blit";
     }
@@ -1869,15 +1765,5 @@ MythCodecID VideoOutputQuartz::GetBestSupportedCodec(
     QString dec = vdp.GetDecoder();
     if ((dec == "libmpeg2") || (dec == "ffmpeg"))
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
-
-    if ((dec == "macaccel") &&
-        ((FOURCC_I420 == fourcc) || (FOURCC_IYUV == fourcc)) &&
-        ((2 == stream_type) || (1 == stream_type)))
-    {
-        return kCodec_MPEG2_DVDV;
-    }
-    else
-    {
-        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
-    }
+    return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 }

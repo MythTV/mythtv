@@ -180,7 +180,6 @@ AVCodecParser mpegvideo_parser = {
     { CODEC_ID_MPEG1VIDEO,
       CODEC_ID_MPEG2VIDEO,
       CODEC_ID_MPEG2VIDEO_XVMC,
-      CODEC_ID_MPEG2VIDEO_DVDV,
       CODEC_ID_MPEG2VIDEO_XVMC_VLD,
     },
     sizeof(ParseContext1),

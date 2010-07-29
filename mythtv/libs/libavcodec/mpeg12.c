@@ -41,10 +41,6 @@
 //#undef NDEBUG
 //#include <assert.h>
 
-#if CONFIG_MPEG_DVDV_DECODER
-#include "dvdv.h"
-#endif
-
 #define MV_VLC_BITS 9
 #define MBINCR_VLC_BITS 9
 #define MB_PAT_VLC_BITS 9
@@ -73,9 +69,6 @@ extern int XVMC_VLD_field_start(MpegEncContext *s, AVCodecContext *avctx);
 extern int XVMC_VLD_field_end(MpegEncContext *s);
 extern int XVMC_VLD_decode_slice(MpegEncContext *s, int start_code,
                                  uint8_t *buffer, int buf_size);
-
-extern void DVDV_init_block(MpegEncContext *s);
-extern void DVDV_decode_mb(MpegEncContext *s);
 
 static const enum PixelFormat pixfmt_xvmc_mpg2_420[] = {
                                            PIX_FMT_XVMC_MPEG2_IDCT,
@@ -248,11 +241,6 @@ static int mpeg_decode_mb(MpegEncContext *s,
                 s->mb_skipped = 1;
         }
 
-#if CONFIG_MPEG_DVDV_DECODER
-        if (s->avctx->dvdv)
-            *DVDV_CBP(s)++ = 0;
-#endif
-
         return 0;
     }
 
@@ -325,10 +313,6 @@ static int mpeg_decode_mb(MpegEncContext *s,
                 exchange_uv(s);
             }
         }
-#if CONFIG_MPEG_DVDV_DECODER
-        if (s->avctx->dvdv)
-            *DVDV_CBP(s)++ = 0x3F;
-#endif
 
         if (s->codec_id == CODEC_ID_MPEG2VIDEO) {
             if(s->flags2 & CODEC_FLAG2_FAST){
@@ -542,10 +526,6 @@ static int mpeg_decode_mb(MpegEncContext *s,
                     exchange_uv(s);
                 }
             }
-#if CONFIG_MPEG_DVDV_DECODER
-            if (s->avctx->dvdv)
-                *DVDV_CBP(s)++ = cbp;
-#endif
 
             if (s->codec_id == CODEC_ID_MPEG2VIDEO) {
                 if(s->flags2 & CODEC_FLAG2_FAST){
@@ -593,10 +573,6 @@ static int mpeg_decode_mb(MpegEncContext *s,
                 }
             }
         }else{
-#if CONFIG_MPEG_DVDV_DECODER
-            if (s->avctx->dvdv)
-                *DVDV_CBP(s)++ = 0;
-#endif
             for(i=0;i<12;i++)
                 s->block_last_index[i] = -1;
         }
@@ -913,15 +889,6 @@ static inline int mpeg2_decode_block_non_intra(MpegEncContext *s,
                 level= -level;
             block[0] = level;
             mismatch ^= level;
-#if CONFIG_MPEG_DVDV_DECODER
-            if (s->avctx->dvdv)
-            {
-                DVDV_DCT(s)->run_sub_one = 0;
-                DVDV_DCT(s)->elt = level;
-                DVDV_DCT(s)++;
-                dct_count++;
-            }
-#endif
             i++;
             SKIP_BITS(re, &s->gb, 2);
             if(((int32_t)GET_CACHE(re, &s->gb)) <= (int32_t)0xBFFFFFFF)
@@ -963,16 +930,6 @@ static inline int mpeg2_decode_block_non_intra(MpegEncContext *s,
 
             mismatch ^= level;
             block[j] = level;
-#if CONFIG_MPEG_DVDV_DECODER
-            if (s->avctx->dvdv)
-            {
-                //needn't write block at all but keep it for sanity
-                DVDV_DCT(s)->run_sub_one = run-1;
-                DVDV_DCT(s)->elt = level;
-                DVDV_DCT(s)++;
-                dct_count++;
-            }
-#endif
 #if MIN_CACHE_BITS < 19
             UPDATE_CACHE(re, &s->gb);
 #endif
@@ -989,10 +946,6 @@ end:
     block[63] ^= (mismatch & 1);
 
     s->block_last_index[n] = i;
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-        DVDV_MB(s)->num_coded_elts[n] = dct_count;
-#endif
     return 0;
 }
 
@@ -1016,15 +969,6 @@ static inline int mpeg2_fast_decode_block_non_intra(MpegEncContext *s,
         if(GET_CACHE(re, &s->gb)&0x40000000)
             level= -level;
         block[0] = level;
-#if CONFIG_MPEG_DVDV_DECODER
-        if (s->avctx->dvdv)
-        {
-            DVDV_DCT(s)->run_sub_one = 0;
-            DVDV_DCT(s)->elt = level;
-            DVDV_DCT(s)++;
-            dct_count++;
-        }
-#endif
         i++;
         SKIP_BITS(re, &s->gb, 2);
         if(((int32_t)GET_CACHE(re, &s->gb)) <= (int32_t)0xBFFFFFFF)
@@ -1061,16 +1005,6 @@ static inline int mpeg2_fast_decode_block_non_intra(MpegEncContext *s,
         }
 
         block[j] = level;
-#if CONFIG_MPEG_DVDV_DECODER
-        if (s->avctx->dvdv)
-        {
-            //needn't write block at all but keep it for sanity
-            DVDV_DCT(s)->run_sub_one = run-1;
-            DVDV_DCT(s)->elt = level;
-            DVDV_DCT(s)++;
-            dct_count++;
-        }
-#endif
 #if MIN_CACHE_BITS < 19
         UPDATE_CACHE(re, &s->gb);
 #endif
@@ -1084,10 +1018,6 @@ end:
     LAST_SKIP_BITS(re, &s->gb, 2);
     CLOSE_READER(re, &s->gb);
     s->block_last_index[n] = i;
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-        DVDV_MB(s)->num_coded_elts[n] = dct_count;
-#endif
     return 0;
 }
 
@@ -1122,15 +1052,6 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     block[0] = dc << (3 - s->intra_dc_precision);
     dprintf(s->avctx, "dc=%d\n", block[0]);
     mismatch = block[0] ^ 1;
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-    {
-        DVDV_DCT(s)->run_sub_one = 0;
-        DVDV_DCT(s)->elt = block[0] - 0x0400;
-        DVDV_DCT(s)++;
-        dct_count++;
-    }
-#endif
     i = 0;
     if (s->intra_vlc_format)
         rl = &ff_rl_mpeg2;
@@ -1168,35 +1089,17 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
             }
             if (i > 63){
                 av_log(s->avctx, AV_LOG_ERROR, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
-#if CONFIG_MPEG_DVDV_DECODER
-                if (s->avctx->dvdv)
-                    DVDV_MB(s)->num_coded_elts[n] = dct_count;
-#endif
                 return -1;
             }
 
             mismatch^= level;
             block[j] = level;
-#if CONFIG_MPEG_DVDV_DECODER
-            if (s->avctx->dvdv)
-            {
-                //needn't write block at all but keep it for sanity
-                DVDV_DCT(s)->run_sub_one = run-1;
-                DVDV_DCT(s)->elt = level;
-                DVDV_DCT(s)++;
-                dct_count++;
-            }
-#endif
         }
         CLOSE_READER(re, &s->gb);
     }
     block[63]^= mismatch&1;
 
     s->block_last_index[n] = i;
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-        DVDV_MB(s)->num_coded_elts[n] = dct_count;
-#endif
     return 0;
 }
 
@@ -1227,15 +1130,6 @@ static inline int mpeg2_fast_decode_block_intra(MpegEncContext *s,
     dc += diff;
     s->last_dc[component] = dc;
     block[0] = dc << (3 - s->intra_dc_precision);
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-    {
-        DVDV_DCT(s)->run_sub_one = 0;
-        DVDV_DCT(s)->elt = block[0] - 0x0400;
-        DVDV_DCT(s)++;
-        dct_count++;
-    }
-#endif
     if (s->intra_vlc_format)
         rl = &ff_rl_mpeg2;
     else
@@ -1272,25 +1166,11 @@ static inline int mpeg2_fast_decode_block_intra(MpegEncContext *s,
             }
 
             block[j] = level;
-#if CONFIG_MPEG_DVDV_DECODER
-            if (s->avctx->dvdv)
-            {
-                //needn't write block at all but keep it for sanity
-                DVDV_DCT(s)->run_sub_one = run-1;
-                DVDV_DCT(s)->elt = level;
-                DVDV_DCT(s)++;
-                dct_count++;
-            }
-#endif
         }
         CLOSE_READER(re, &s->gb);
     }
 
     s->block_last_index[n] = scantable - s->intra_scantable.permutated;
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-        DVDV_MB(s)->num_coded_elts[n] = dct_count;
-#endif
     return 0;
 }
 
@@ -1719,13 +1599,6 @@ static void mpeg_decode_picture_coding_extension(Mpeg1Context *s1)
     dprintf(s->avctx, "alternate_scan=%d\n", s->alternate_scan);
     dprintf(s->avctx, "frame_pred_frame_dct=%d\n", s->frame_pred_frame_dct);
     dprintf(s->avctx, "progressive_frame=%d\n", s->progressive_frame);
-#if CONFIG_MPEG_DVDV_DECODER
-    if (s->avctx->dvdv)
-    {
-        DVDV_FRAME(s)->intra_vlc_format = s->intra_vlc_format;
-        DVDV_FRAME(s)->alternate_scan   = s->alternate_scan;
-    }
-#endif
 }
 
 static void exchange_uv(MpegEncContext *s){
@@ -1902,9 +1775,6 @@ static int mpeg_decode_slice(Mpeg1Context *s1, int mb_y,
         if(CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration > 1)
             ff_xvmc_init_block(s);//set s->block
 
-        if (CONFIG_MPEG_DVDV_DECODER && s->avctx->dvdv)
-            DVDV_init_block(s);
-
         if(mpeg_decode_mb(s, s->block) < 0)
             return -1;
 
@@ -1941,10 +1811,7 @@ static int mpeg_decode_slice(Mpeg1Context *s1, int mb_y,
         s->dest[1] +=(16 >> lowres) >> s->chroma_x_shift;
         s->dest[2] +=(16 >> lowres) >> s->chroma_x_shift;
 
-        if (CONFIG_MPEG_DVDV_DECODER && s->avctx->dvdv)
-            DVDV_decode_mb(s);
-        else
-            MPV_decode_mb(s, s->block);
+        MPV_decode_mb(s, s->block);
 
         if (++s->mb_x >= s->mb_width) {
             const int mb_size= 16>>s->avctx->lowres;
@@ -2951,43 +2818,6 @@ AVCodec mpeg_xvmc_vld_decoder = {
 };
 
 #endif
-
-#if CONFIG_MPEG_DVDV_DECODER
-static int mpeg_dvdv_decode_init(AVCodecContext *avctx){
-
-    if (avctx->thread_count > 1)
-    {
-        av_log(avctx, AV_LOG_ERROR, " DVDV context being used twice?");
-        return -1;
-    }
-
-    mpeg_decode_init(avctx);
-
-    // avctx->priv_data stores an Mpeg1Context and a DVDV_CurPtrs.
-    // Store a pointer to the latter, by skipping over the former:
-    avctx->dvdv = avctx->priv_data + sizeof(Mpeg1Context);
-
-    av_log(avctx, AV_LOG_INFO,
-           " mpeg_dvdv_decode_init() - DVDV context @0x%lx\n", avctx->dvdv);
-
-    return 0;
-}
-
-AVCodec mpeg_dvdv_decoder = {
-    "mpegvideo_dvdv",
-    CODEC_TYPE_VIDEO,
-    CODEC_ID_MPEG2VIDEO_DVDV,
-    sizeof(Mpeg1Context) + sizeof(DVDV_CurPtrs),
-    mpeg_dvdv_decode_init,
-    NULL,
-    mpeg_decode_end,
-    mpeg_decode_frame,
-    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_HWACCEL | CODEC_CAP_DELAY,
-    .flush= ff_mpeg_flush,
-};
-
-#endif
-
 
 #if CONFIG_MPEG_VDPAU_DECODER
 AVCodec mpeg_vdpau_decoder = {

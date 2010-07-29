@@ -129,7 +129,6 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MJPEGB, mjpegb);
     REGISTER_DECODER (MMVIDEO, mmvideo);
     REGISTER_DECODER (MOTIONPIXELS, motionpixels);
-    REGISTER_DECODER (MPEG_DVDV, mpeg_dvdv);
     REGISTER_DECODER (MPEG_XVMC, mpeg_xvmc);
     REGISTER_DECODER (MPEG_XVMC_VLD, mpeg_xvmc_vld);
     REGISTER_ENCDEC  (MPEG1VIDEO, mpeg1video);

@@ -33,7 +33,6 @@ using namespace std;
 
 #include "lcddevice.h"
 
-#include "videoout_dvdv.h"    // AvFormatDecoderPrivate has DVDV ptr
 #include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
 
 #ifdef USING_XVMC
@@ -200,35 +199,29 @@ class AvFormatDecoderPrivate
 {
   public:
     AvFormatDecoderPrivate(bool allow_libmpeg2)
-        : mpeg2dec(NULL), dvdvdec(NULL), allow_mpeg2dec(allow_libmpeg2) { ; }
+        : mpeg2dec(NULL), allow_mpeg2dec(allow_libmpeg2) { ; }
    ~AvFormatDecoderPrivate() { DestroyMPEG2(); }
 
     bool InitMPEG2(const QString &dec);
     bool HasMPEG2Dec(void) const { return (bool)(mpeg2dec); }
-    bool HasDVDVDec(void) const { return (bool)(dvdvdec); }
-    bool HasDecoder(void) const { return HasMPEG2Dec() || HasDVDVDec(); }
+    bool HasDecoder(void) const { return HasMPEG2Dec(); }
 
     void DestroyMPEG2();
     void ResetMPEG2();
     int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr, AVPacket *pkt);
 
-    // Mac OS X Hardware DVD-Video decoder
-    bool SetVideoSize(const QSize &video_dim);
-    DVDV *GetDVDVDecoder(void) { return dvdvdec; }
-
   private:
     mpeg2dec_t *mpeg2dec;
-    DVDV       *dvdvdec;
     bool        allow_mpeg2dec;
     avframe_q   partialFrames;
 };
 
 /**
- * \brief Initialise either libmpeg2, or DVDV (Mac HW accel), to do decoding
+ * \brief Initialise alternative libraries to do decoding
  *
- * Both of these are meant to be alternatives to FFMPEG,
- * but currently, DVDV uses the MPEG demuxer in FFMPEG
+ * These are meant to be alternatives to FFMPEG,but may use the MPEG demuxer
+ * in FFMPEG and other FFMPEG utilities
  */
 bool AvFormatDecoderPrivate::InitMPEG2(const QString &dec)
 {
@@ -236,18 +229,6 @@ bool AvFormatDecoderPrivate::InitMPEG2(const QString &dec)
     if (!allow_mpeg2dec)
         return false;
     DestroyMPEG2();
-
-#ifdef USING_DVDV
-    if (dec == "macaccel")
-    {
-        dvdvdec = new DVDV();
-        if (dvdvdec)
-        {
-            VERBOSE(VB_PLAYBACK,
-                    LOC + "Using Mac Acceleration (DVDV) for video decoding");
-        }
-    }
-#endif // !USING_DVDV
 
     if (dec == "libmpeg2")
     {
@@ -271,12 +252,6 @@ void AvFormatDecoderPrivate::DestroyMPEG2()
             delete (*it);
         partialFrames.clear();
     }
-
-    if (dvdvdec)
-    {
-        delete dvdvdec;
-        dvdvdec = NULL;
-    }
 }
 
 void AvFormatDecoderPrivate::ResetMPEG2()
@@ -290,9 +265,6 @@ void AvFormatDecoderPrivate::ResetMPEG2()
             delete (*it);
         partialFrames.clear();
     }
-
-    if (dvdvdec)
-        dvdvdec->Reset();
 }
 
 int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
@@ -300,23 +272,6 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                                              int *got_picture_ptr,
                                              AVPacket *pkt)
 {
-    if (dvdvdec)
-    {
-        if (!dvdvdec->PreProcessFrame(avctx))
-        {
-            VERBOSE(VB_ALL, "DVDV::PreProcessFrame() failed");
-            DestroyMPEG2();
-            return -1;
-        }
-
-        int ret = avcodec_decode_video2(avctx, picture,
-                                       got_picture_ptr, pkt);
-
-        dvdvdec->PostProcessFrame(avctx, (VideoFrame *)(picture->opaque),
-                                  picture->pict_type, *got_picture_ptr);
-        return ret;
-    }
-
     *got_picture_ptr = 0;
     const mpeg2_info_t *info = mpeg2_info(mpeg2dec);
     mpeg2_buffer(mpeg2dec, pkt->data, pkt->data + pkt->size);
@@ -433,17 +388,6 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
     }
 }
 
-bool AvFormatDecoderPrivate::SetVideoSize(const QSize &video_dim)
-{
-    if (dvdvdec && !dvdvdec->SetVideoSize(video_dim))
-    {
-        DestroyMPEG2();
-        return false;
-    }
-
-    return true;
-}
-
 void AvFormatDecoder::GetDecoders(render_opts &opts)
 {
     opts.decoders->append("ffmpeg");
@@ -459,11 +403,6 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     opts.decoders->append("xvmc-vld");
     (*opts.equiv_decoders)["xvmc"].append("dummy");
     (*opts.equiv_decoders)["xvmc-vld"].append("dummy");
-#endif
-
-#ifdef USING_DVDV
-    opts.decoders->append("macaccel");
-    (*opts.equiv_decoders)["macaccel"].append("dummy");
 #endif
 
 #ifdef USING_VDPAU
@@ -1450,16 +1389,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band = render_slice_xvmc;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
-    else if (CODEC_IS_DVDV(codec))
-    {
-        enc->flags           |= (CODEC_FLAG_EMU_EDGE  |
-//                                 CODEC_FLAG_TRUNCATED |
-                                 CODEC_FLAG_LOW_DELAY |
-                                 CODEC_FLAG2_FAST);
-        enc->get_buffer       = get_avf_buffer;
-        enc->release_buffer   = release_avf_buffer;
-        enc->draw_horiz_band  = NULL;
-    }
     else if (CODEC_IS_VDPAU(codec))
     {
         enc->get_buffer      = get_avf_buffer_vdpau;
@@ -2004,22 +1933,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         handled = true;
                     }
 #endif // USING_XVMC
-#ifdef USING_DVDV
-                    MythCodecID quartz_mcid;
-                    quartz_mcid = VideoOutputQuartz::GetBestSupportedCodec(
-                        /* disp dim     */ width, height,
-                        /* osd dim      */ 0, 0,
-                        /* mpeg type    */ mpeg_version(enc->codec_id),
-                        /* pixel format */
-                        (PIX_FMT_YUV420P == enc->pix_fmt) ? FOURCC_I420 : 0);
-
-                    if (quartz_mcid >= video_codec_id)
-                    {
-                        enc->codec_id = (CodecID) myth2av_codecid(quartz_mcid);
-                        video_codec_id = quartz_mcid;
-                        handled = true;
-                    }
-#endif // USING_DVDV
                 }
 
                 if (!codec_is_std(video_codec_id))
@@ -2056,17 +1969,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     (CODEC_IS_MPEG(enc->codec_id)))
                 {
                     d->InitMPEG2(dec);
-
-                    // fallback if we can't handle this resolution
-                    if (!d->SetVideoSize(QSize(width, height)))
-                    {
-                        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                                "Failed to setup DVDV decoder, falling "
-                                "back to software decoding");
-
-                        enc->codec_id  = CODEC_ID_MPEG2VIDEO;
-                        video_codec_id = kCodec_MPEG2;
-                    }
                 }
 
                 // Set the default stream to the stream
@@ -4618,7 +4520,7 @@ QString AvFormatDecoder::GetCodecDecoderName(void) const
 
 void *AvFormatDecoder::GetVideoCodecPrivate(void)
 {
-    return d->GetDVDVDecoder();
+    return NULL; // TODO is this still needed
 }
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)

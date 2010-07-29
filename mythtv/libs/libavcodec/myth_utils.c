@@ -36,7 +36,6 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_NONE:             return "NONE";
         case CODEC_ID_MPEG1VIDEO:       return "MPEG1VIDEO";
         case CODEC_ID_MPEG2VIDEO:       return "MPEG2VIDEO";
-        case CODEC_ID_MPEG2VIDEO_DVDV:  return "MPEG2VIDEO_DVDV";
         case CODEC_ID_MPEG2VIDEO_XVMC:
             return "MPEG2VIDEO_XVMC";
         case CODEC_ID_MPEG2VIDEO_XVMC_VLD:

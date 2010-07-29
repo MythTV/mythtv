@@ -133,7 +133,6 @@ contains( CONFIG_DVBSUB_DECODER, yes )          { SOURCES *= dvbsubdec.c }
 contains( CONFIG_DVBSUB_ENCODER, yes )          { SOURCES *= dvbsub.c }
 contains( CONFIG_DVDSUB_DECODER, yes )          { SOURCES *= dvdsubdec.c }
 contains( CONFIG_DVDSUB_ENCODER, yes )          { SOURCES *= dvdsubenc.c }
-contains( CONFIG_DVDV, yes )                    { SOURCES *= dvdv.c }
 contains( CONFIG_DVVIDEO_DECODER, yes )         { SOURCES *= dv.c dvdata.c }
 contains( CONFIG_DVVIDEO_ENCODER, yes )         { SOURCES *= dv.c dvdata.c }
 contains( CONFIG_DXA_DECODER, yes )             { SOURCES *= dxa.c }

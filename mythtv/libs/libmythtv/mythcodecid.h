@@ -53,18 +53,8 @@ typedef enum
     kCodec_H264_VLD,
 
     kCodec_VLD_END,
-
-    kCodec_DVDV_BEGIN = kCodec_VLD_END,
-
-    kCodec_MPEG1_DVDV,
-    kCodec_MPEG2_DVDV,
-    kCodec_H263_DVDV,
-    kCodec_MPEG4_DVDV,
-    kCodec_H264_DVDV,
-
-    kCodec_DVDV_END,
-
-    kCodec_VDPAU_BEGIN = kCodec_DVDV_END,
+    
+    kCodec_VDPAU_BEGIN = kCodec_VLD_END,
 
     kCodec_MPEG1_VDPAU,
     kCodec_MPEG2_VDPAU,
@@ -98,8 +88,6 @@ typedef enum
                               (id < kCodec_VLD_END)
 #define codec_is_xvmc(id)     (id > kCodec_STD_XVMC_BEGIN) &&\
                               (id < kCodec_VLD_END)
-#define codec_is_dvdv(id)     (id > kCodec_DVDV_BEGIN) &&\
-                              (id < kCodec_DVDV_END)
 #define codec_is_vdpau(id)    (id > kCodec_VDPAU_BEGIN) &&\
                               (id < kCodec_VDPAU_END)
 #define codec_is_vdpau_hw(id) (codec_is_vdpau(id) &&\
@@ -122,15 +110,12 @@ inline int myth2av_codecid(MythCodecID codec_id)
 int mpeg_version(int codec_id);
 #define CODEC_IS_H264(id)     (mpeg_version(id) == 5)
 #define CODEC_IS_MPEG(id)     (mpeg_version(id) && mpeg_version(id) <= 2)
-#define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id) &&\
-                                 (id != CODEC_ID_MPEG2VIDEO_DVDV))
+#define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id))
 #define CODEC_IS_XVMC(codec) (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||\
                               codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
-#define CODEC_IS_DVDV(codec) (codec && (codec->id == CODEC_ID_MPEG2VIDEO_DVDV))
 #define CODEC_IS_VDPAU(codec) (codec &&\
                                codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
 #define CODEC_IS_HWACCEL(codec)  (CODEC_IS_XVMC(codec)  ||\
-                                  CODEC_IS_VDPAU(codec) ||\
-                                  CODEC_IS_DVDV(codec))
+                                  CODEC_IS_VDPAU(codec))
 
 #endif // _MYTH_CODEC_ID_H_

@@ -1,7 +1,6 @@
 #ifndef VIDEOOUT_QUARTZ_H_
 #define VIDEOOUT_QUARTZ_H_
 
-class DVDV;
 struct QuartzData;
 
 #include "videooutbase.h"
@@ -42,8 +41,6 @@ class VideoOutputQuartz : public VideoOutput
     void DrawUnusedRects(bool sync = true);
 
     void UpdatePauseFrame(void);
-
-    void SetDVDVDecoder(DVDV *dvdvdec);
 
     void ResizeForGui(void);
     void ResizeForVideo(uint width = 0, uint height = 0);

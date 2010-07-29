@@ -66,17 +66,6 @@ QString toString(MythCodecID codecid)
         case kCodec_H264_VLD:
             return "H.264 VLD";
 
-        case kCodec_MPEG1_DVDV:
-            return "MPEG1 DVDV";
-        case kCodec_MPEG2_DVDV:
-            return "MPEG2 DVDV";
-        case kCodec_H263_DVDV:
-            return "H.263 DVDV";
-        case kCodec_MPEG4_DVDV:
-            return "MPEG4 DVDV";
-        case kCodec_H264_DVDV:
-            return "H.264 DVDV";
-
         case kCodec_MPEG1_VDPAU:
             return "MPEG1 VDPAU";
         case kCodec_MPEG2_VDPAU:
@@ -201,20 +190,6 @@ int myth2av_codecid(MythCodecID codec_id,
                     "Error: XvMC-VLD H.264 not supported by ffmpeg");
             break;
 
-        case kCodec_MPEG1_DVDV:
-        case kCodec_MPEG2_DVDV:
-            ret = CODEC_ID_MPEG2VIDEO_DVDV;
-            break;
-        case kCodec_H263_DVDV:
-            VERBOSE(VB_IMPORTANT, "Error: DVDV H.263 not supported by ffmpeg");
-            break;
-        case kCodec_MPEG4_DVDV:
-            VERBOSE(VB_IMPORTANT, "Error: DVDV MPEG4 not supported by ffmpeg");
-            break;
-        case kCodec_H264_DVDV:
-            VERBOSE(VB_IMPORTANT, "Error: DVDV H.264 not supported by ffmpeg");
-            break;
-
         case kCodec_MPEG1_VDPAU:
             ret = CODEC_ID_MPEG1VIDEO;
             vdpau = true;
@@ -283,7 +258,6 @@ int mpeg_version(int codec_id)
         case CODEC_ID_MPEG2VIDEO:
         case CODEC_ID_MPEG2VIDEO_XVMC:
         case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
-        case CODEC_ID_MPEG2VIDEO_DVDV:
             return 2;
         case CODEC_ID_H263:
             return 3;
@@ -312,14 +286,12 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG1_XVMC:
         case kCodec_MPEG1_IDCT:
         case kCodec_MPEG1_VLD:
-        case kCodec_MPEG1_DVDV:
         case kCodec_MPEG1_VDPAU:
         case kCodec_MPEG1_VAAPI:
         case kCodec_MPEG2:
         case kCodec_MPEG2_XVMC:
         case kCodec_MPEG2_IDCT:
         case kCodec_MPEG2_VLD:
-        case kCodec_MPEG2_DVDV:
         case kCodec_MPEG2_VDPAU:
         case kCodec_MPEG2_VAAPI:
             return "MPEG-2";
@@ -328,7 +300,6 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H263_XVMC:
         case kCodec_H263_IDCT:
         case kCodec_H263_VLD:
-        case kCodec_H263_DVDV:
         case kCodec_H263_VDPAU:
         case kCodec_H263_VAAPI:
             return "H.263";
@@ -338,7 +309,6 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG4_IDCT:
         case kCodec_MPEG4_XVMC:
         case kCodec_MPEG4_VLD:
-        case kCodec_MPEG4_DVDV:
         case kCodec_MPEG4_VDPAU:
         case kCodec_MPEG4_VAAPI:
             return "MPEG-4";
@@ -347,7 +317,6 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H264_XVMC:
         case kCodec_H264_IDCT:
         case kCodec_H264_VLD:
-        case kCodec_H264_DVDV:
         case kCodec_H264_VDPAU:
         case kCodec_H264_VAAPI:
             return "H.264";
@@ -356,7 +325,6 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_NORMAL_END:
         case kCodec_STD_XVMC_END:
         case kCodec_VLD_END:
-        case kCodec_DVDV_END:
         case kCodec_VDPAU_END:
         case kCodec_VAAPI_END:
             return QString::null;
@@ -369,9 +337,6 @@ QString get_decoder_name(MythCodecID codec_id, bool libmpeg2)
 {
     if (libmpeg2)
         return "libmpeg2";
-
-    if (codec_is_dvdv(codec_id))
-        return "macaccel";
 
     if (codec_is_xvmc_std(codec_id))
         return "xvmc";
