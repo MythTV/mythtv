@@ -1866,17 +1866,6 @@ static HostCheckBox *FFRewReverse()
     return gc;
 }
 
-static HostSpinBox *ThemeCacheSize()
-{
-    HostSpinBox *gs = new HostSpinBox("ThemeCacheSize", 1, 1000, 1, true);
-    gs->setLabel(QObject::tr("Theme cache size"));
-    gs->setValue(1);
-    gs->setHelpText(QObject::tr(
-                        "Maximum number of prescaled themes to cache."));
-
-    return gs;
-}
-
 static HostComboBox *MenuTheme()
 {
     HostComboBox *gc = new HostComboBox("MenuTheme");
@@ -4404,8 +4393,6 @@ AppearanceSettings::AppearanceSettings()
     theme->setLabel(QObject::tr("Theme"));
 
     theme->addChild(new ThemeSelector("Theme"));
-
-    theme->addChild(ThemeCacheSize());
 
     theme->addChild(ThemePainter());
     theme->addChild(MenuTheme());

@@ -15,6 +15,7 @@
 #include <QStyleFactory>
 #include <QThreadPool>
 #include <QSize>
+#include <QFile>
 
 #include "mythdirs.h"
 #include "mythverbose.h"
@@ -742,8 +743,11 @@ void MythUIHelper::ClearOldImageCache(void)
         }
     }
 
-    const size_t max_cached = GetMythDB()->GetNumSetting("ThemeCacheSize", 1);
-    while ((size_t)dirtimes.size() >= max_cached)
+    // Cache two themes/resolutions to allow sampling other themes without
+    // incurring a penalty. Especially for those writing new themes or testing
+    // changes of an existing theme. The space used is neglible when compared
+    // against the average video
+    while ((size_t)dirtimes.size() >= 2)
     {
         VERBOSE(VB_GUI|VB_FILE, LOC + QString("Removing cache dir: %1")
                 .arg(dirtimes.begin().value()));
