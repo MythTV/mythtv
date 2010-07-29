@@ -120,9 +120,19 @@ MythRenderOpenGL::~MythRenderOpenGL()
 
 bool MythRenderOpenGL::create(const QGLContext * shareContext)
 {
+    if (!this->device())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "QGLContext has no paint device - "
+                                        "create will fail. Aborting.");
+        return false;
+    }
+
     bool ok = QGLContext::create(shareContext);
     if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "QGLContext::create failed.");
         return false;
+    }
 
     OpenGLLocker locker(this);
     InitProcs();
