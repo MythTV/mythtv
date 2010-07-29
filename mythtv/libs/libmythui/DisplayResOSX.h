@@ -2,6 +2,7 @@
 #define _DISPLAYRESOSX_H_
 
 #include "DisplayRes.h"
+#include "util-osx-cocoa.h"
 
 class DisplayResOSX : public DisplayRes {
   public:
@@ -17,6 +18,7 @@ class DisplayResOSX : public DisplayRes {
     
   private:
     mutable std::vector<DisplayResScreen> m_video_modes;
+    CocoaAutoReleasePool pool;
 };
 
 #endif // _DISPLAYRESOSX_H_
