@@ -23,7 +23,7 @@ class MythError( Exception, ERRCODES ):
             self.ename = 'SOCKET'
             self.ecode, (self.sockcode, self.sockerr) = args
             self.args = ("Socket Error: %s" %self.sockerr,)
-        elif self.ecode is not None:
+        elif self.ecode is None:
             self.ename = 'GENERIC'
             self.ecode = self.GENERIC
             self.args = args

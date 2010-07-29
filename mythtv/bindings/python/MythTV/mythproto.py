@@ -658,7 +658,7 @@ class FileOps( BEEvent ):
             return res[1]
 
     def download(self, url):
-        filename = 'download_%s.tmp' % hex(randint(0,2**32)).split('x')[-1]
+        filename = '/download_%s.tmp' % hex(randint(0,2**32)).split('x')[-1]
         return self.downloadTo(url, 'Temp', filename, True, True)
 
     def downloadTo(self, url, storagegroup, filename, \
@@ -669,6 +669,8 @@ class FileOps( BEEvent ):
                             join(['BACKEND_MESSAGE',
                                   'DOWNLOAD_FILE UPDATE',
                                   re.escape(url)]))
+        if filename[0] != '/':
+            filename = '/'+filename
         res = self.backendCommand(BACKEND_SEP.join((\
                     'DOWNLOAD_FILE', url, storagegroup, filename))).\
                     split(BACKEND_SEP)
@@ -759,7 +761,7 @@ class Program( DictData, RECSTATUS, CMPRecord ):
                      0,      0,      4,
                      4,      3,      3,
                      3,      3,      3,
-                     4,      1,      3,
+                     4,      1,      5,
                      3,      0,      3,
                      3,      0,      0,
                      0,      0]

@@ -240,16 +240,37 @@ class Recorded( DBDataWrite, CMPRecord ):
                     return True
             return False
 
+        # only work on existing entries
         if self._wheredat is None:
             return
+
+        # pull direct matches
         for tag in ('title', 'subtitle', 'description'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
                 self[tag] = metadata[tag]
+
+        # pull renamed matches
         for tagf,tagt in (('userrating','stars'),):
             if metadata[tagf] and _allow_change(self, tagt, overwrite):
                 self[tagt] = metadata[tagf]
+
+        # pull cast
         for cast in metadata.people:
-            self.cast.append((unicode(cast.name),unicode(cast.role)))
+            self.cast.append(unicode(cast.name),unicode(cast.job))
+
+        # pull images
+        exists = {'coverart':False,     'fanart':False,
+                  'banner':False,       'screenshot':False}
+        be = FileOps(self.hostname, db=self._db)
+        for image in metadata.images:
+            if exists[image.type]:
+                continue
+            group = Video._getGroup(self.hostname, image.type, self._db)
+            if not be.fileExists(image.filename, group):
+                be.downloadTo(image.url, group, image.filename)
+            exists[image.type] = True
+
+
         self.update()
 
     def __getstate__(self):
@@ -465,6 +486,30 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
                  'insertdate': datetime.now()}
     _logmodule = 'Python Video'
     _cm_toid, _cm_toname = DictInvertCI.createPair({0:'none'})
+
+    @classmethod
+    def _getGroup(cls, host, groupname=None, db=None):
+        db = DBCache(db)
+        metadata = ['coverart','fanart','banner','screenshot']
+        fields = ['coverfile','fanart','banner','screenshot']
+        groups = ['Coverart','Fanart','Banners','Screenshots']
+
+        if (groupname is None) or (groupname == 'Videos'):
+            if len(list(db.getStorageGroup('Videos', host))) == 0:
+                raise MythError('MythVideo not set up for this host.')
+            else:
+                return 'Videos'
+        elif groupname in groups:
+            if len(list(db.getStorageGroup(groupname, host))) == 0:
+                return cls._getGroup(host, 'Videos', db)
+            else:
+                return groupname
+        elif groupname in fields:
+            return cls._getGroup(host, groups[fields.index(groupname)])
+        elif groupname in metadata:
+            return cls._getGroup(host, groups[metadata.index(groupname)])
+        else:
+            raise MythError('Invalid Video StorageGroup name.')
 
     def _fill_cm(self):
         if len(self._cm_toid) > 1:
@@ -688,60 +733,56 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
                     return True
             return False
 
+        # only operate on existing entries
         if self._wheredat is None:
             return
 
+        # pull direct tags
         for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
                     'inetref', 'homepage', 'trailer', 'userrating', 'year'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
                 self[tag] = metadata[tag]
 
+        # pull tags needing renaming
         for tagf,tagt in (('description','plot'), ('runtime','length')):
             if metadata[tagf] and _allow_change(self, tagt, overwrite):
                 self[tagt] = metadata[tagf]
 
+        # pull director
         try:
             if _allow_change(self, 'director', overwrite):
                 self.director = [person.name for person in metadata.people \
                                             if person.job=='Director'].pop(0)
         except IndexError: pass
 
+        # pull actors
         for actor in [person for person in metadata.people \
                                   if person.job=='Actor']:
             self.cast.add(unicode(actor.name))
 
+        # pull genres
         for category in metadata.categories:
             self.genre.add(unicode(category))
 
-        if not _allow_change(self, 'host', False):
+        # pull images (SG content only)
+        if bool(self.host):
             # only perform image grabs if 'host' is set, denoting SG use
             t1 = ['coverart','fanart','banner','screenshot']
             t2 = ['coverfile','fanart','banner','screenshot']
-            t3 = ['Coverart','Fanart','Banners','Screenshots']
-            trans1 = dict(zip(t1,t2))
-            trans2 = dict(zip(t1,t3))
+            mdtype = dict(zip(t1,t2))
+            exists = dict(zip(t1,[False,False,False,False]))
 
             be = FileOps(self.host, db=self._db)
             for image in metadata.images:
-                mdtype = trans1[image.type]
-                sgtype = trans2[image.type]
-                if not _allow_change(self, mdtype, overwrite):
+                if exists[image.type]:
                     continue
-                if metadata._type == 'TV':
-                    if image.type == 'screenshot':
-                        fname = "%s Season %dx%d_%s." % \
-                             (self.title, self.season, self.episode, image.type)
-                    else:
-                        fname = "%s Season %d_%s." % \
-                             (self.title, self.season, image.type)
-                else:
-                    fname = "%s_%s." % (self.inetref, image.type)
-                fname += image.url.rsplit('.',1)[1]
-
-                self[mdtype] = fname
-                if be.fileExists(fname, sgtype):
+                if not _allow_change(self, mdtype[image.type], overwrite):
                     continue
-                be.downloadTo(image.url, sgtype, fname)
+                self[mdtype[image.type]] = image.filename
+                group = self._getGroup(self.host, image.type, self._db)
+                if not be.fileExists(image.filename, group):
+                    be.downloadTo(image.url, group, image.filename)
+                exists[image.type] = True
 
         self.update()
 

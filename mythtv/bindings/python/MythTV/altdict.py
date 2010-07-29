@@ -4,7 +4,7 @@
 from exceptions import MythError
 
 from itertools import imap, izip
-from datetime import datetime
+from datetime import datetime, date
 from time import mktime
 import locale
 
@@ -95,13 +95,17 @@ class DictData( OrdDict ):
     _trans = [  int,
                 locale.atof,
                 bool,
-                str,
-                lambda x: datetime.fromtimestamp(int(x))]
+                lambda x: x,
+                lambda x: datetime.fromtimestamp(int(x)),
+                lambda x: date(*[int(y) for y in x.split('-')]),
+                lambda x: datetime.strptime(x, '%a, %d %b %Y %H:%M:%S %Z')]
     _inv_trans = [  str,
                     lambda x: locale.format("%0.6f", x),
                     lambda x: str(int(x)),
-                    str,
-                    lambda x: str(int(mktime(x.timetuple())))]
+                    lambda x: x,
+                    lambda x: str(int(mktime(x.timetuple()))),
+                    lambda x: x.isoformat(),
+                    lambda x: x.strftime('%a, %d %b %Y %H:%M:%S %Z')]
                     
     def __setattr__(self, name, value):
         if name in self._localvars:

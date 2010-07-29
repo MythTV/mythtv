@@ -82,6 +82,16 @@ class System( DBCache ):
         return stdout
 
 class Metadata( DictData ):
+    _global_type = {'title':3,      'subtitle':3,       'tagline':3,
+                    'description':3,'season':0,         'episode':0,
+                    'dvdseason':3,  'dvdepisode':3,     'albumtitle':3,
+                    'system':3,     'inetref':3,        'imdb':3,
+                    'tmsref':3,     'homepage':3,       'trailer':3,
+                    'language':3,   'releasedate':5,    'lastupdated':6,
+                    'userrating':1, 'tracnum':0,        'popularity':0,
+                    'budget':0,     'revenue':0,        'year':0,
+                    'runtime':0,    'runtimesecs':0}
+
     class _subgroup_name( list ):
         def __init__(self, xml):
             list.__init__(self)
@@ -121,7 +131,12 @@ class Metadata( DictData ):
     def _process(self, xml):
         for element in xml.getchildren():
             if element.tag in self:
-                self[element.tag] = element.text
+                if element.text == '':
+                    self[element.tag] = None
+                else:
+                    self[element.tag] = \
+                            self._trans[self._global_type[element.tag]]\
+                                (element.text)
             if element.tag in self._groups:
                 self.__dict__[element.tag] = \
                     eval('self.%s(element)' % element.tag.capitalize())
@@ -134,6 +149,20 @@ class VideoMetadata( Metadata ):
                     'revenue','year','runtime']
     _groups = ['certifications','categories','countries',
                'studios','people','images']
+    def _process(self, xml):
+        Metadata._process(self, xml)
+        isMovie = not (bool(self.episode) or bool(self.season))
+        for image in self.images:
+            if isMovie:
+                image.filename = "%s_%s." % (self.title, image.type)
+            else:
+                if image.type == 'screenshot':
+                    image.filename = "%s Season %dx%d_%s." % \
+                         (self.title, self.season, self.episode, image.type)
+                else:
+                    image.filename = "%s Season %d_%s." % \
+                         (self.title, self.season, image.type)
+            image.filename += image.url.rsplit('.',1)[-1]
 
 class MusicMetadata( Metadata ):
     _field_order = ['title','description','albumtitie','inetref','language',
