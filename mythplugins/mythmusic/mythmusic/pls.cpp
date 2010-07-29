@@ -56,7 +56,7 @@ class CfgReader
                     break;
                 case '#':
                 {
-                    char *end = strchr(ptr, '\n');
+                    const char *end = strchr(ptr, '\n');
                     if (!end) done = true;
                     ptr = end;
                     break;
