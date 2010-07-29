@@ -28,7 +28,7 @@
 #include "videoout_d3d.h"
 #endif
 
-#ifdef Q_OS_MACX
+#ifdef USING_QUARTZ_VIDEO
 #include "videoout_quartz.h"
 #endif
 
@@ -85,9 +85,9 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
     VideoOutputXv::GetRenderOptions(opts, cpudeints);
 #endif // USING_XV
 
-#ifdef Q_OS_MACX
+#ifdef USING_QUARTZ_VIDEO
     VideoOutputQuartz::GetRenderOptions(opts, cpudeints);
-#endif // Q_OS_MACX
+#endif // USING_QUARTZ_VIDEO
 
 #ifdef USING_OPENGL_VIDEO
     VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
@@ -129,7 +129,7 @@ VideoOutput *VideoOutput::Create(
     renderers += xvlist;
 #endif // USING_XV
 
-#ifdef Q_OS_MACX
+#ifdef USING_QUARTZ_VIDEO
     const QStringList osxlist =
         VideoOutputQuartz::GetAllowedRenderers(codec_id, video_dim);
     renderers += osxlist;
@@ -190,7 +190,7 @@ VideoOutput *VideoOutput::Create(
             vo = new VideoOutputD3D();
 #endif // USING_MINGW
 
-#ifdef Q_OS_MACX
+#ifdef USING_QUARTZ_VIDEO
         if (osxlist.contains(renderer))
             vo = new VideoOutputQuartz(codec_id, codec_priv);
 #endif // Q_OS_MACX

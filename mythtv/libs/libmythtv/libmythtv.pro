@@ -296,9 +296,10 @@ using_frontend {
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp       util-osd.cpp
 
-    macx:HEADERS +=               videoout_dvdv.h
-    macx:HEADERS +=               videoout_quartz.h
-    macx:SOURCES +=               videoout_quartz.cpp
+    macx: HEADERS += videoout_dvdv.h
+    using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
+    using_quartz_video: HEADERS += videoout_quartz.h
+    using_quartz_video: SOURCES += videoout_quartz.cpp
 
     using_dvdv:DEFINES +=         USING_DVDV
     using_dvdv:HEADERS +=         videoout_dvdv_private.h
