@@ -841,6 +841,7 @@ void es_out(pes_in_t *p)
 	}
 
 	default:
+                fprintf(stderr, "UNKNOWN AUDIO type %d\n", p->type);
 		return;
 
 
@@ -1862,7 +1863,7 @@ void init_replex(struct replex *rx)
 		
 		memset(ac, 0, sizeof(avi_context));
 		re = read_avi_header(ac, rx->fd_in);
-		if (avi_read_index(ac,rx->fd_in) < 0){
+		if (avi_read_index(ac,rx->fd_in) < 0 || re < 0){
 			fprintf(stderr, "Error reading index\n");
 			exit(1);
 		}

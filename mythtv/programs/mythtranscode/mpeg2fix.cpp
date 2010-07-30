@@ -1019,7 +1019,7 @@ void MPEG2fixup::WriteYUV(const char *filename, const mpeg2_info_t *info)
     if (ret < 0)
     {
         VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
-                .arg(strerror(ret)));
+                .arg(strerror(errno)));
         goto closefd;
     }
     ret = write(fh, info->display_fbuf->buf[1],
@@ -1027,7 +1027,7 @@ void MPEG2fixup::WriteYUV(const char *filename, const mpeg2_info_t *info)
     if (ret < 0)
     {
         VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
-                .arg(strerror(ret)));
+                .arg(strerror(errno)));
         goto closefd;
     }
     ret = write(fh, info->display_fbuf->buf[2],
@@ -1035,7 +1035,7 @@ void MPEG2fixup::WriteYUV(const char *filename, const mpeg2_info_t *info)
     if (ret < 0)
     {
         VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
-                .arg(strerror(ret)));
+                .arg(strerror(errno)));
         goto closefd;
     }
 closefd:
@@ -1053,7 +1053,7 @@ void MPEG2fixup::WriteData(const char *filename, uint8_t *data, int size)
     int ret = write(fh, data, size);
     if (ret < 0)
         VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
-                .arg(strerror(ret)));
+                .arg(strerror(errno)));
     close(fh);
 }
 
@@ -1168,7 +1168,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     }
 
     pkt->size = avcodec_encode_video(c, pkt->data, outbuf_size, picture);
-    if (!fname.isEmpty())
+    if (!fname.isEmpty() && pkt->size >= 0)
     {
         QString ename = fname + ".enc";
         QByteArray aename = ename.toLocal8Bit();

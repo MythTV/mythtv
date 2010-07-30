@@ -143,8 +143,8 @@ int avi_read_index(avi_context *ac, int fd)
 
 	if (!(ac->avih_flags & AVI_HASINDEX)) return -2;
 	fprintf(stderr,"READING INDEX\n");
-	start =  lseek(fd, 0, SEEK_CUR);
-	lseek(fd, ac->movi_length+ac->movi_start+4, SEEK_SET);
+	if ((start = lseek(fd, 0, SEEK_CUR)) < 0) return -3;
+	if (lseek(fd, ac->movi_length+ac->movi_start+4, SEEK_SET) < 0) return -4;
 
 	read(fd,buf,4);			
 	tag = getle32(buf);
@@ -154,7 +154,7 @@ int avi_read_index(avi_context *ac, int fd)
 		fprintf(stderr,"  tag: %c%c%c%c\n ",*cc,
 			*(cc+1),*(cc+2),*(cc+3));
 
-		lseek(fd, start, SEEK_SET);
+		if (lseek(fd, start, SEEK_SET) < 0 ) return -5;
 		return -1;
 	}
 	isize = getsize(fd);
