@@ -1170,9 +1170,10 @@ int ProgramData::fix_end_times(void)
         endtime = query1.value(2).toString();
 
         querystr = QString("SELECT chanid, starttime, endtime FROM program "
-                           "WHERE (DATE_FORMAT(starttime, '%%Y-%%m-%%d') = "
-                           "'%1') AND chanid = '%2' "
+                           "WHERE starttime BETWEEN '%1 00:00:00'"
+                           "AND '%2 23:59:59' AND chanid = '%3' "
                            "ORDER BY starttime LIMIT 1;")
+                           .arg(endtime.left(10))
                            .arg(endtime.left(10))
                            .arg(chanid);
 
