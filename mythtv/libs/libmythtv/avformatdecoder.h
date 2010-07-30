@@ -7,6 +7,7 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
+#include "privatedecoder.h"
 #include "audiooutputsettings.h"
 #include "vbilut.h"
 #include "H264Parser.h"
@@ -78,7 +79,8 @@ class AvFormatDecoder : public DecoderBase
   public:
     static void GetDecoders(render_opts &opts);
     AvFormatDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo,
-                    bool use_null_video_out, bool allow_libmpeg2 = true,
+                    bool use_null_video_out,
+                    bool allow_private_decode = true,
                     bool no_hardware_decode = false);
    ~AvFormatDecoder();
 
@@ -219,7 +221,7 @@ class AvFormatDecoder : public DecoderBase
     bool HasVideo(const AVFormatContext *ic);
 
   private:
-    class AvFormatDecoderPrivate *d;
+    PrivateDecoder *private_dec;
 
     bool is_db_ignored;
 
@@ -264,6 +266,7 @@ class AvFormatDecoder : public DecoderBase
     bool using_null_videoout;
     MythCodecID video_codec_id;
     bool no_hardware_decoders;
+    bool allow_private_decoders;
 
     int maxkeyframedist;
 

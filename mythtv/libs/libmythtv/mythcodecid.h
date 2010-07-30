@@ -96,7 +96,7 @@ typedef enum
                               (id < kCodec_VAAPI_END)
 
 QString get_encoding_type(MythCodecID codecid);
-QString get_decoder_name(MythCodecID codec_id, bool libmpeg2);
+QString get_decoder_name(MythCodecID codec_id);
 QString toString(MythCodecID codecid);
 int myth2av_codecid(MythCodecID codec_id, bool &vld, bool &idct, bool &mc,
                     bool &vdpau);

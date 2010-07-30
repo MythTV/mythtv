@@ -11,6 +11,7 @@ using namespace std;
 // MythTV headers
 #include "mythconfig.h"
 #include "avformatdecoder.h"
+#include "privatedecoder.h"
 #include "audiooutput.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
@@ -190,214 +191,12 @@ static int get_canonical_lang(const char *lang_cstr)
     }
 }
 
-typedef MythDeque<AVFrame*> avframe_q;
-
-/**
- * Management of libmpeg2 decoding
- */
-class AvFormatDecoderPrivate
-{
-  public:
-    AvFormatDecoderPrivate(bool allow_libmpeg2)
-        : mpeg2dec(NULL), allow_mpeg2dec(allow_libmpeg2) { ; }
-   ~AvFormatDecoderPrivate() { DestroyMPEG2(); }
-
-    bool InitMPEG2(const QString &dec);
-    bool HasMPEG2Dec(void) const { return (bool)(mpeg2dec); }
-    bool HasDecoder(void) const { return HasMPEG2Dec(); }
-
-    void DestroyMPEG2();
-    void ResetMPEG2();
-    int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
-                         int *got_picture_ptr, AVPacket *pkt);
-
-  private:
-    mpeg2dec_t *mpeg2dec;
-    bool        allow_mpeg2dec;
-    avframe_q   partialFrames;
-};
-
-/**
- * \brief Initialise alternative libraries to do decoding
- *
- * These are meant to be alternatives to FFMPEG,but may use the MPEG demuxer
- * in FFMPEG and other FFMPEG utilities
- */
-bool AvFormatDecoderPrivate::InitMPEG2(const QString &dec)
-{
-    // only ffmpeg is used for decoding previews
-    if (!allow_mpeg2dec)
-        return false;
-    DestroyMPEG2();
-
-    if (dec == "libmpeg2")
-    {
-        mpeg2dec = mpeg2_init();
-        if (mpeg2dec)
-            VERBOSE(VB_PLAYBACK, LOC + "Using libmpeg2 for video decoding");
-    }
-
-    return HasDecoder();
-}
-
-void AvFormatDecoderPrivate::DestroyMPEG2()
-{
-    if (mpeg2dec)
-    {
-        mpeg2_close(mpeg2dec);
-        mpeg2dec = NULL;
-
-        avframe_q::iterator it = partialFrames.begin();
-        for (; it != partialFrames.end(); ++it)
-            delete (*it);
-        partialFrames.clear();
-    }
-}
-
-void AvFormatDecoderPrivate::ResetMPEG2()
-{
-    if (mpeg2dec)
-    {
-        mpeg2_reset(mpeg2dec, 0);
-
-        avframe_q::iterator it = partialFrames.begin();
-        for (; it != partialFrames.end(); ++it)
-            delete (*it);
-        partialFrames.clear();
-    }
-}
-
-int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
-                                             AVFrame *picture,
-                                             int *got_picture_ptr,
-                                             AVPacket *pkt)
-{
-    *got_picture_ptr = 0;
-    const mpeg2_info_t *info = mpeg2_info(mpeg2dec);
-    mpeg2_buffer(mpeg2dec, pkt->data, pkt->data + pkt->size);
-    while (1)
-    {
-        switch (mpeg2_parse(mpeg2dec))
-        {
-            case STATE_SEQUENCE:
-                // libmpeg2 needs three buffers to do its work.
-                // We set up two prediction buffers here, from
-                // the set of available video frames.
-                mpeg2_custom_fbuf(mpeg2dec, 1);
-                for (int i = 0; i < 2; i++)
-                {
-                    avctx->get_buffer(avctx, picture);
-                    mpeg2_set_buf(mpeg2dec, picture->data, picture->opaque);
-                }
-                break;
-            case STATE_PICTURE:
-                // This sets up the third buffer for libmpeg2.
-                // We use up one of the three buffers for each
-                // frame shown. The frames get released once
-                // they are drawn (outside this routine).
-                avctx->get_buffer(avctx, picture);
-                mpeg2_set_buf(mpeg2dec, picture->data, picture->opaque);
-                break;
-            case STATE_BUFFER:
-                // We're finished with the buffer...
-                if (partialFrames.size())
-                {
-                    AVFrame *frm = partialFrames.dequeue();
-                    *got_picture_ptr = 1;
-                    *picture = *frm;
-                    delete frm;
-#if 0
-                    QString msg("");
-                    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-                    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
-                        msg = nd->GetNVP()->getVideoOutput()->GetFrameStatus();
-
-                    VERBOSE(VB_IMPORTANT, "ret frame: "<<picture->opaque
-                            <<"           "<<msg);
-#endif
-                }
-                return pkt->size;
-            case STATE_INVALID:
-                // This is the error state. The decoder must be
-                // reset on an error.
-                ResetMPEG2();
-                return -1;
-
-            case STATE_SLICE:
-            case STATE_END:
-            case STATE_INVALID_END:
-                if (info->display_fbuf)
-                {
-                    bool exists = false;
-                    avframe_q::iterator it = partialFrames.begin();
-                    for (; it != partialFrames.end(); ++it)
-                        if ((*it)->opaque == info->display_fbuf->id)
-                            exists = true;
-
-                    if (!exists)
-                    {
-                        AVFrame *frm = new AVFrame();
-                        frm->data[0] = info->display_fbuf->buf[0];
-                        frm->data[1] = info->display_fbuf->buf[1];
-                        frm->data[2] = info->display_fbuf->buf[2];
-                        frm->data[3] = NULL;
-                        frm->opaque  = info->display_fbuf->id;
-                        frm->type    = FF_BUFFER_TYPE_USER;
-                        frm->top_field_first =
-                            !!(info->display_picture->flags &
-                               PIC_FLAG_TOP_FIELD_FIRST);
-                        frm->interlaced_frame =
-                            !(info->display_picture->flags &
-                              PIC_FLAG_PROGRESSIVE_FRAME);
-                        frm->repeat_pict =
-                            !!(info->display_picture->flags &
-#if CONFIG_LIBMPEG2EXTERNAL
-                               PIC_FLAG_REPEAT_FIRST_FIELD);
-#else
-                               PIC_FLAG_REPEAT_FIELD);
-#endif
-                        partialFrames.enqueue(frm);
-
-                    }
-                }
-                if (info->discard_fbuf)
-                {
-                    bool exists = false;
-                    avframe_q::iterator it = partialFrames.begin();
-                    for (; it != partialFrames.end(); ++it)
-                    {
-                        if ((*it)->opaque == info->discard_fbuf->id)
-                        {
-                            exists = true;
-                            (*it)->data[3] = (unsigned char*) 1;
-                        }
-                    }
-
-                    if (!exists)
-                    {
-                        AVFrame frame;
-                        frame.opaque = info->discard_fbuf->id;
-                        frame.type   = FF_BUFFER_TYPE_USER;
-                        avctx->release_buffer(avctx, &frame);
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-}
-
 void AvFormatDecoder::GetDecoders(render_opts &opts)
 {
     opts.decoders->append("ffmpeg");
-    opts.decoders->append("libmpeg2");
     (*opts.equiv_decoders)["ffmpeg"].append("nuppel");
-    (*opts.equiv_decoders)["libmpeg2"].append("nuppel");
-    (*opts.equiv_decoders)["libmpeg2"].append("ffmpeg");
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
-    (*opts.equiv_decoders)["libmpeg2"].append("dummy");
-
+    
 #ifdef USING_XVMC
     opts.decoders->append("xvmc");
     opts.decoders->append("xvmc-vld");
@@ -409,15 +208,17 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     opts.decoders->append("vdpau");
     (*opts.equiv_decoders)["vdpau"].append("dummy");
 #endif
+
+    PrivateDecoder::GetDecoders(opts);
 }
 
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  bool use_null_videoout,
-                                 bool allow_libmpeg2,
+                                 bool allow_private_decode,
                                  bool no_hardware_decode)
     : DecoderBase(parent, pginfo),
-      d(new AvFormatDecoderPrivate(allow_libmpeg2)),
+      private_dec(NULL),
       is_db_ignored(gCoreContext->IsDatabaseIgnored()),
       m_h264_parser(new H264Parser()),
       ic(NULL),
@@ -434,6 +235,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
+      allow_private_decoders(allow_private_decode),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
@@ -490,7 +292,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ccd608;
     delete ccd708;
     delete ttd;
-    delete d;
+    delete private_dec;
     delete m_h264_parser;
 
     sws_freeContext(sws_ctx);
@@ -547,7 +349,8 @@ void AvFormatDecoder::CloseContext()
         fmt->flags &= ~AVFMT_NOFILE;
     }
 
-    d->DestroyMPEG2();
+    delete private_dec;
+    private_dec = NULL;
     m_h264_parser->Reset();
 }
 
@@ -830,7 +633,8 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             if (enc->codec)
                 avcodec_flush_buffers(enc);
         }
-        d->ResetMPEG2();
+        if (private_dec)
+            private_dec->Reset();
     }
 
     // Discard all the queued up decoded frames
@@ -1838,7 +1642,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (novideo)
                     break;
 
-                d->DestroyMPEG2();
+                delete private_dec;
+                private_dec = NULL;
                 m_h264_parser->Reset();
 
                 uint width  = max(enc->width, 16);
@@ -1965,12 +1770,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") already open.");
                 }
 
-                // Initialize alternate decoders when needed...
-                if ((dec == "libmpeg2") &&
-                    (CODEC_IS_MPEG(enc->codec_id)))
-                {
-                    d->InitMPEG2(dec);
-                }
+                if (allow_private_decoders)
+                    private_dec = PrivateDecoder::Create(dec,
+                                                         no_hardware_decoders,
+                                                         enc->codec_id,
+                                                         enc->extradata,
+                                                         enc->extradata_size);
 
                 // Set the default stream to the stream
                 // that is found first in the PMT
@@ -2846,7 +2651,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 current_aspect = aspect;
                 fps            = seqFPS;
 
-                d->ResetMPEG2();
+                if (private_dec)
+                    private_dec->Reset();
 
                 gopset = false;
                 prevgoppos = 0;
@@ -3039,7 +2845,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
     avcodeclock->lock();
-    if (d->HasDecoder())
+    if (private_dec)
     {
         if (decodeStillFrame)
         {
@@ -3047,13 +2853,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             // HACK
             while (!gotpicture && count < 5)
             {
-                ret = d->DecodeMPEG2Video(context, &mpa_pic, &gotpicture, pkt);
+                ret = private_dec->GetFrame(context, &mpa_pic, &gotpicture, pkt);
                 count++;
             }
         }
         else
         {
-            ret = d->DecodeMPEG2Video(context, &mpa_pic, &gotpicture, pkt);
+            ret = private_dec->GetFrame(context, &mpa_pic, &gotpicture, pkt);
         }
     }
     else
@@ -3181,7 +2987,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
     picframe->frameNumber = framesPlayed;
     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
-    if (d->HasMPEG2Dec() && mpa_pic.data[3])
+    if (private_dec && mpa_pic.data[3])
         context->release_buffer(context, &mpa_pic);
 
     decoded_video_frame = picframe;
@@ -4278,10 +4084,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             if (!decodeStillFrame && inDVDStill)
             {
                 decodeStillFrame = true;
-                d->ResetMPEG2();
+                if (private_dec)
+                    private_dec->Reset();
             }
 
-            if (!d->HasMPEG2Dec())
+            if (!private_dec)
             {
                 int current_width = curstream->codec->width;
                 int video_width = GetNVP()->GetVideoSize().width();
@@ -4516,7 +4323,9 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
 
 QString AvFormatDecoder::GetCodecDecoderName(void) const
 {
-    return get_decoder_name(video_codec_id, (d && d->HasMPEG2Dec()));
+    if (private_dec)
+        return private_dec->GetName();
+    return get_decoder_name(video_codec_id);
 }
 
 void *AvFormatDecoder::GetVideoCodecPrivate(void)

@@ -266,8 +266,10 @@ using_frontend {
     # A/V decoders
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
+    HEADERS += privatedecoder.h         privatedecoder_mpeg2.h
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
+    SOURCES += privatedecoder.cpp       privatedecoder_mpeg2.cpp
 
     # On screen display (video output overlay)
     using_fribidi:DEFINES += USING_FRIBIDI

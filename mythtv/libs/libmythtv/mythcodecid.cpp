@@ -333,11 +333,8 @@ QString get_encoding_type(MythCodecID codecid)
     return QString::null;
 }
 
-QString get_decoder_name(MythCodecID codec_id, bool libmpeg2)
+QString get_decoder_name(MythCodecID codec_id)
 {
-    if (libmpeg2)
-        return "libmpeg2";
-
     if (codec_is_xvmc_std(codec_id))
         return "xvmc";
 
