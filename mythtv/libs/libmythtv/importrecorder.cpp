@@ -131,13 +131,23 @@ void ImportRecorder::StopRecording(void)
 
 bool ImportRecorder::Open(void)
 {
-    if (_import_fd >= 0)
+    if (_import_fd >= 0)   // already open
         return true;
 
     if (!curRecording)
+    {
+        VERBOSE(VB_RECORD, LOC_ERR + "no current recording!");
         return false;
+    }
 
     QString fn = curRecording->GetPathname();
+
+    if (fn.toLower().startsWith("myth://"))
+    {
+        VERBOSE(VB_RECORD, LOC_ERR + "Malformed recording ProgramInfo.");
+        return false;
+    }
+
     QFileInfo f(fn);
     if (!f.exists())
     {
