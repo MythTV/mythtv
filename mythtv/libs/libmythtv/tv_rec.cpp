@@ -4090,8 +4090,6 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
                                 transcodeFirst, earlyCommFlag);
 
     ClearFlags(kFlagNeedToStartRecorder);
-    if (tvchain)
-        delete rec;
     return;
 
   err_ret:
