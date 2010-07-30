@@ -199,14 +199,20 @@ void StorageGroupEditor::Load(void)
     else
     {
         bool first = true;
+        QString dirname;
         while (query.next())
         {
+            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * value using QString::fromUtf8() to prevent corruption. */
+            dirname = QString::fromUtf8(query.value(0)
+                                        .toByteArray().constData());
             if (first)
             {
-                lastValue = query.value(0).toString();
+                lastValue = dirname;
                 first = false;
             }
-            listbox->addSelection(query.value(0).toString());
+            listbox->addSelection(dirname);
         }
     }
 

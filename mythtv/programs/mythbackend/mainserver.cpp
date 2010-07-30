@@ -3964,7 +3964,11 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         while (query.next())
         {
             dirID = query.value(0).toString();
-            currentDir = query.value(1).toString();
+            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * value using QString::fromUtf8() to prevent corruption. */
+            currentDir = QString::fromUtf8(query.value(1)
+                                           .toByteArray().constData());
             if (currentDir.right(1) == "/")
                 currentDir.remove(currentDir.length() - 1, 1);
 

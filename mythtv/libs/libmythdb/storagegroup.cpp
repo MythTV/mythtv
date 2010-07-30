@@ -359,12 +359,18 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     query.prepare("SELECT DISTINCT dirname FROM storagegroup;");
     if (query.exec())
     {
+        QString dirname;
         while (query.next())
         {
-            if (filename.startsWith(query.value(0).toString()))
+            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * value using QString::fromUtf8() to prevent corruption. */
+            dirname = QString::fromUtf8(query.value(0)
+                                        .toByteArray().constData());
+            if (filename.startsWith(dirname))
             {
                 result = filename;
-                result.replace(0, query.value(0).toString().length(), "");
+                result.replace(0, dirname.length(), "");
                 if (result.startsWith("/"))
                     result.replace(0, 1, "");
 
@@ -472,7 +478,11 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
     {
         do
         {
-            dirname = query.value(0).toString();
+            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * value using QString::fromUtf8() to prevent corruption. */
+            dirname = QString::fromUtf8(query.value(0)
+                                        .toByteArray().constData());
             dirname.replace(QRegExp("^\\s*"), "");
             dirname.replace(QRegExp("\\s*$"), "");
             if (dirname.right(1) == "/")
@@ -655,7 +665,11 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     while (query.next())
     {
         m_groupname = query.value(0).toString();
-        dirname = query.value(1).toString();
+        /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+         * uses QString::fromAscii() for toString(). Explicitly convert the
+         * value using QString::fromUtf8() to prevent corruption. */
+        dirname = QString::fromUtf8(query.value(1)
+                                    .toByteArray().constData());
 
         dirname.replace(QRegExp("^\\s*"), "");
         dirname.replace(QRegExp("\\s*$"), "");
@@ -737,10 +751,20 @@ QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
         query.bindValue(":HOSTNAME", host);
 
     if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        QString dirname;
         while (query.next())
+        {
+            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * value using QString::fromUtf8() to prevent corruption. */
+            dirname = QString::fromUtf8(query.value(0)
+                                        .toByteArray().constData());
             groups += QString("myth://%1@%2%3").arg(groupname)
                                        .arg(query.value(1).toString())
-                                       .arg(query.value(0).toString());
+                                       .arg(dirname);
+        }
+    }
 
     groups.sort();
     groups.detach();

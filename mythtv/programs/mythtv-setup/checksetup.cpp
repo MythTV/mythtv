@@ -97,10 +97,15 @@ bool checkStoragePaths(QStringList &probs)
     }
 
     QDir checkDir("");
+    QString dirname;
     while (query.next())
     {
-        QString sgDir = query.value(0).toString();
-        QStringList tokens = query.value(1).toString().split(",");
+        /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+         * uses QString::fromAscii() for toString(). Explicitly convert the
+         * value using QString::fromUtf8() to prevent corruption. */
+        dirname = QString::fromUtf8(query.value(1)
+                                    .toByteArray().constData());
+        QStringList tokens = dirname.split(",");
         int curToken = 0;
         while (curToken < tokens.size())
         {
