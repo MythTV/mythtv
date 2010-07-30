@@ -24,6 +24,8 @@ using namespace std;
 #include <QDir>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QKeySequence>
+#include <QSize>
 
 // Platform headers
 #include "unistd.h"
@@ -44,6 +46,7 @@ using namespace std;
 #include "mythcorecontext.h"
 
 // Libmythui headers
+#include "myththemebase.h"
 #include "screensaver.h"
 #include "lirc.h"
 #include "lircevent.h"
@@ -167,7 +170,9 @@ class MythMainWindowPrivate
         oldpainter(NULL),
 
         m_drawDisabledDepth(0),
-        m_drawEnabled(true)
+        m_drawEnabled(true),
+
+        m_themeBase(NULL)
     {
     }
 
@@ -245,6 +250,8 @@ class MythMainWindowPrivate
     QWaitCondition m_setDrawEnabledWait;
     uint m_drawDisabledDepth;
     bool m_drawEnabled;
+
+    MythThemeBase *m_themeBase;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -473,7 +480,8 @@ MythMainWindow::~MythMainWindow()
         d->stackList.pop_back();
     }
 
-    while (!d->keyContexts.isEmpty()) {
+    while (!d->keyContexts.isEmpty())
+    {
         KeyContext *context = *d->keyContexts.begin();
         d->keyContexts.erase(d->keyContexts.begin());
         delete context;
@@ -947,6 +955,12 @@ void MythMainWindow::Init(void)
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
     d->paintwin->show();
+
+    GetMythUI()->UpdateImageCache();
+    if (d->m_themeBase)
+        d->m_themeBase->Reload();
+    else
+        d->m_themeBase = new MythThemeBase();
 }
 
 void MythMainWindow::InitKeys()
@@ -1091,17 +1105,11 @@ void MythMainWindow::ResetKeys()
 
 void MythMainWindow::ReinitDone(void)
 {
-    if (d->oldpainter)
-    {
-        delete d->oldpainter;
-        d->oldpainter = NULL;
-    }
+    delete d->oldpainter;
+    d->oldpainter = NULL;
 
-    if (d->oldpaintwin)
-    {
-        delete d->oldpaintwin;
-        d->oldpaintwin = NULL;
-    }
+    delete d->oldpaintwin;
+    d->oldpaintwin = NULL;
 
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
@@ -1322,11 +1330,11 @@ void MythMainWindow::ExitToMainMenu(void)
 }
 
 /**
- * \brief Get a list of actions for a keypress in the given context 
+ * \brief Get a list of actions for a keypress in the given context
  * \param context The context in which to lookup the keypress for actions.
  * \param e       The keypress event to lookup.
  * \param actions The QStringList that will contain the list of actions.
- * \param allowJumps if true then jump points are allowed 
+ * \param allowJumps if true then jump points are allowed
  *
  * \return true if the key event has been handled (the keypress was a jumpoint)
            false if the caller should continue to handle keypress
@@ -1659,7 +1667,7 @@ void MythMainWindow::RegisterMediaPlugin(const QString &name,
 
 bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
                                  const QString &plot, const QString &title,
-                                 const QString &subtitle, 
+                                 const QString &subtitle,
                                  const QString &director, int season,
                                  int episode, int lenMins,
                                  const QString &year)
@@ -1672,7 +1680,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     if (d->mediaPluginMap.count(lhandler))
     {
         d->mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
-                                          director, season, episode, lenMins, 
+                                          director, season, episode, lenMins,
                                           year);
         return true;
     }
@@ -1809,7 +1817,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                     }
 
                     ge->SetButton(button);
-                    
+
                     for (it = d->stackList.end()-1; it != d->stackList.begin()-1;
                          --it)
                     {

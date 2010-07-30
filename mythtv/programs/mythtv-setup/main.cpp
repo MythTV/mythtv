@@ -17,7 +17,6 @@
 #include "exitprompt.h"
 #include "storagegroupeditor.h"
 #include "myththemedmenu.h"
-#include "myththemebase.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
 #include "channelscanner_cli.h"
@@ -38,7 +37,6 @@
 
 using namespace std;
 
-static MythThemeBase *themeBase   = NULL;
 ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
 
@@ -146,8 +144,6 @@ bool resetTheme(QString themedir, const QString badtheme)
     MythTranslation::reload();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
-    themeBase->Reload();
-    GetMythUI()->UpdateImageCache();
 
     GetMythMainWindow()->ReinitDone();
 
@@ -586,10 +582,6 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
-
-    themeBase = new MythThemeBase();
-    GetMythUI()->UpdateImageCache();
-    (void) themeBase;
 
     LanguageSettings::prompt();
     MythTranslation::load("mythfrontend");

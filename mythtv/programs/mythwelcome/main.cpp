@@ -19,7 +19,6 @@
 #include "compat.h"
 #include "mythuihelper.h"
 #include "lcddevice.h"
-#include "myththemebase.h"
 #include "mythcommandlineparser.h"
 #include "tv.h"
 
@@ -200,8 +199,6 @@ int main(int argc, char **argv)
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
 
-    MythThemeBase *themeBase = new MythThemeBase();
-
     initKeys();
 
     if (bShowSettings)
@@ -229,7 +226,6 @@ int main(int argc, char **argv)
 
     DestroyMythMainWindow();
 
-    delete themeBase;
     delete gContext;
 
     return 0;

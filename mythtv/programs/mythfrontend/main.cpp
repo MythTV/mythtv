@@ -58,7 +58,6 @@ using namespace std;
 #include "channelgroupsettings.h"
 
 #include "myththemedmenu.h"
-#include "myththemebase.h"
 #include "mediarenderer.h"
 #include "mythmainwindow.h"
 #include "mythappearance.h"
@@ -71,7 +70,6 @@ using namespace std;
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
-static MythThemeBase  *themeBase = NULL;
 
 static QString         logfile;
 static MediaRenderer  *g_pUPnp   = NULL;
@@ -145,9 +143,6 @@ namespace
     {
         delete exitPopup;
         exitPopup = NULL;
-
-        delete themeBase;
-        themeBase = NULL;
 
         if (g_pUPnp)
         {
@@ -826,8 +821,6 @@ bool resetTheme(QString themedir, const QString badtheme)
     MythTranslation::reload();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
-    themeBase->Reload();
-    GetMythUI()->UpdateImageCache();
 
     GetMythMainWindow()->ReinitDone();
 
@@ -842,10 +835,8 @@ int reloadTheme(void)
 
     GetMythUI()->LoadQtConfig();
 
-    GetMythMainWindow()->Init();
     menu->Close();
-    GetMythUI()->UpdateImageCache();
-    themeBase->Reload();
+    GetMythMainWindow()->Init();
 
     GetMythMainWindow()->ReinitDone();
 
@@ -1386,9 +1377,6 @@ int main(int argc, char **argv)
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
-
-    GetMythUI()->UpdateImageCache();
-    themeBase = new MythThemeBase();
 
     LanguageSettings::prompt();
 
