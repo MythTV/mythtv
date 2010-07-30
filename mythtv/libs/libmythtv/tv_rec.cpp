@@ -3987,9 +3987,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 2");
             goto err_ret;
         }
-        ProgramInfo *pi = tvchain->GetProgramAt(-1);
-        rec = new RecordingInfo(*pi);
-        delete pi;
+        rec = curRecording;  // new'd in Create/SwitchLiveTVRingBuffer()
     }
 
     if (lastTuningRequest.flags & kFlagRecording)
