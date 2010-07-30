@@ -786,6 +786,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
                     be.downloadTo(image.url, group, image.filename)
                 exists[image.type] = True
 
+        self.processed = True
         self.update()
 
     def __getstate__(self):
@@ -831,11 +832,6 @@ class VideoGrabber( Grabber ):
         self._check_schema('mythvideo.DBSchemaVer',
                                 MVSCHEMA_VERSION, 'MythVideo')
         self.append('-l',lang)
-
-    def command(self, *args):
-        for res in Grabber.command(self, *args):
-            res._type = self.mode
-            yield res
 
 #### MYTHNETVISION ####
 

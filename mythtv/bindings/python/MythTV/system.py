@@ -7,6 +7,7 @@ Provides base classes for managing system calls.
 from exceptions import MythError, MythDBError
 from logging import MythLog
 from altdict import DictData, OrdDict
+from utility import levenshtein
 from database import DBCache
 
 from subprocess import Popen
@@ -130,7 +131,7 @@ class Metadata( DictData ):
     def _process(self, xml):
         for element in xml.getchildren():
             if element.tag in self:
-                if element.text == '':
+                if (element.text == '') or (element.text is None):
                     self[element.tag] = None
                 else:
                     self[element.tag] = \
@@ -196,8 +197,30 @@ class Grabber( System ):
     def command(self, *args):
         return self._processMetadata(System.command(self, *args))
 
-    def search(self, phrase):
-        return self.command('-M', '"%s"' %phrase)
+    def search(self, phrase, subtitle=None, tolerance=None):
+        if tolerance is None:
+            tolerance = int(self.db.settings.NULL.\
+                                        get('MetadataLookupTolerance', 5))
+        if subtitle is not None:
+            for res in self.command('-N', '"%s" "%s"' % (phrase, subtitle)):
+                res.levenshtein = levenshtein(res.title, phrase) + \
+                                  levenshtein(res.subtitle, subtitle)
+                if res.levenshtein > tolerance:
+                    continue
+                yield res
+        else:
+            for res in self.command('-M', '"%s"' % phrase):
+                s = res.title
+                if res.subtitle:
+                    s += ': %s' % res.subtitle
+                res.levenshtein = levenshtein(s, phrase)
+                if res.levenshtein > tolerance:
+                    continue
+                yield res
+
+    def sortedSearch(self, phrase, subtitle=None, tolerance=None):
+        return sorted(self.search(phrase, subtitle, tolerance), \
+                        key=lambda r: r.levenshtein)
 
     def grabInetref(self, inetref, season=None, episode=None):
         if season and episode:
@@ -206,7 +229,7 @@ class Grabber( System ):
             return self.command('-D', inetref)
 
     def grabTitle(self, title, subtitle):
-        return self.command('-N', '"%s" "%s"' % (title, subtitle))
+        return self.search(title, subtitle)
 
 class SystemEvent( System ):
     """
