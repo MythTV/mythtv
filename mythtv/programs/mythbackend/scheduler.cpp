@@ -3294,6 +3294,7 @@ void Scheduler::AddNewRecords(void)
 "      recduplicate = (recorded.endtime IS NOT NULL), "
 "      findduplicate = (oldfind.findid IS NOT NULL), "
 "      oldrecstatus = oldrecorded.recstatus "
+" WHERE program.endtime >= NOW() "
 );
     rmquery.replace("RECTABLE", schedTmpRecord);
 
@@ -3339,6 +3340,7 @@ void Scheduler::AddNewRecords(void)
         "ON ( oldrecstatus.station   = c.callsign  AND "
         "     oldrecstatus.starttime = p.starttime AND "
         "     oldrecstatus.title     = p.title ) "
+        "WHERE p.endtime >= NOW() "
         "ORDER BY RECTABLE.recordid DESC ");
     query.replace("RECTABLE", schedTmpRecord);
 
