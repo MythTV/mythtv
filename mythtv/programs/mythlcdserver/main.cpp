@@ -21,7 +21,7 @@ using namespace std;
 #include "mythversion.h"
 #include "tv_play.h"
 #include "compat.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 
 #include "lcdserver.h"
 
@@ -247,7 +247,7 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     gCoreContext->ConnectToMasterServer(false);
 

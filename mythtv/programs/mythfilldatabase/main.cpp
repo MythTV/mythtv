@@ -16,7 +16,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "util.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 
 #include "mythconfig.h"
 
@@ -517,7 +517,7 @@ int main(int argc, char *argv[])
 
     gCoreContext->SetAppName(binname);
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     if (!UpgradeTVDatabaseSchema(false))
     {

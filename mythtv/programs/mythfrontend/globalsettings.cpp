@@ -24,7 +24,7 @@
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "dbsettings.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 #include "iso639.h"
 #include "playbackbox.h"
 #include "globalsettings.h"
@@ -3359,7 +3359,19 @@ static HostComboBox *MythLanguage()
 {
     HostComboBox *gc = new HostComboBox("Language");
     gc->setLabel(QObject::tr("Language"));
-    LanguageSettings::fillSelections(gc);
+
+    QStringList langs = MythTranslation::getLanguages();
+    QString langCode = gCoreContext->GetSetting("Language");
+    if (langCode.isEmpty())
+        langCode = "en_us";
+    gc->clearSelections();
+    for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
+    {
+        QString label = *it;
+        QString value = *(++it);
+        gc->addSelection(label, value, (value == langCode));
+    }
+
     gc->setHelpText(
         QObject::tr("Your preferred language for the user interface."));
     return gc;

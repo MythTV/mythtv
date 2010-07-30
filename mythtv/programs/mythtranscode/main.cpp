@@ -23,7 +23,7 @@ using namespace std;
 #include "transcode.h"
 #include "mpeg2fix.h"
 #include "remotefile.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
@@ -444,7 +444,7 @@ int main(int argc, char *argv[])
 
     gCoreContext->SetAppName(binname);
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     if (settingsOverride.size())
     {

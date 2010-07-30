@@ -9,6 +9,8 @@
 */
 
 #include <unistd.h>
+#include <iostream>
+using namespace std;
 
 #include <QApplication>
 #include <QSqlDatabase>
@@ -18,7 +20,8 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythversion.h>
-#include <langsettings.h>
+
+#include <mythtranslation.h>
 #include <compat.h>
 
 #include "../mythvideo/dbcheck.h"
@@ -159,7 +162,7 @@ int main(int argc, char **argv)
     //  Nice ourself
     //
 
-    LanguageSettings::load("mythdvd");
+    MythTranslation::load("mythdvd");
 
     MythTranscodeDaemon *mtd =
       new MythTranscodeDaemon(assigned_port, log_stdout);

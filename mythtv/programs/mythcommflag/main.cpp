@@ -36,7 +36,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "RingBuffer.h"
 #include "mythcommandlineparser.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
@@ -149,7 +149,7 @@ QString get_filename(ProgramInfo *program_info)
 int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 {
     QString filename;
-    
+
     if (program_info->IsMythStream())
         filename = program_info->GetPathname();
     else
@@ -1240,7 +1240,7 @@ int main(int argc, char *argv[])
 
     gCoreContext->SetAppName(binname);
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     if (settingsOverride.size())
     {

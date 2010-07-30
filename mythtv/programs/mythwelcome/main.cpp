@@ -13,7 +13,7 @@
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "settings.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 #include "mythdbcon.h"
 #include "exitcodes.h"
 #include "compat.h"
@@ -48,7 +48,7 @@ void showUsage(const MythCommandLineParser &cmdlineparser)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();
-    
+
     QString binname = "mythwelcome";
 
     extern const char *myth_source_version;
@@ -58,14 +58,14 @@ void showUsage(const MythCommandLineParser &cmdlineparser)
                             .arg(binname)
                             .arg(myth_source_path)
                             .arg(myth_source_version));
-    
+
     cerr << "Valid options are: " << endl <<
             "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
             "-s or --setup                  Run setup for the mythshutdown program" << endl <<
             "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
             ahelp.constData() <<
             endl;
-    
+
 }
 
 int main(int argc, char **argv)
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     bool bShowSettings = false;
 
     bool cmdline_err;
-    
+
     MythCommandLineParser cmdline(
         kCLPOverrideSettingsFile |
         kCLPOverrideSettings     |
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
                 return BACKEND_EXIT_OK;
         }
     }
-    
+
     QApplication a(argc, argv);
 
     QFileInfo finfo(a.argv()[0]);
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
     if (class LCD *lcd = LCD::Get())
         lcd->switchToTime();
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     GetMythUI()->LoadQtConfig();
 
@@ -261,9 +261,9 @@ static bool log_rotate(bool report_error)
 
 #ifdef WINDOWS_CLOSE_CONSOLE
     // pure Win32 GUI app does not have standard IO streams
-    // simply assign the file descriptors to the logfile  
-    *stdout = *(_fdopen(new_logfd, "w")); 
-    *stderr = *stdout; 
+    // simply assign the file descriptors to the logfile
+    *stdout = *(_fdopen(new_logfd, "w"));
+    *stderr = *stdout;
     setvbuf(stdout, NULL, _IOLBF, 256);
 #else
     while (dup2(new_logfd, 1) < 0 && errno == EINTR);

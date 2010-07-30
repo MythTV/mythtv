@@ -12,6 +12,7 @@
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "langsettings.h"
+#include "mythtranslation.h"
 #include "exitcodes.h"
 #include "exitprompt.h"
 #include "storagegroupeditor.h"
@@ -142,7 +143,7 @@ bool resetTheme(QString themedir, const QString badtheme)
     gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
 
-    LanguageSettings::reload();
+    MythTranslation::reload();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
     themeBase->Reload();
@@ -591,7 +592,7 @@ int main(int argc, char *argv[])
     (void) themeBase;
 
     LanguageSettings::prompt();
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     if (!DBUtil::CheckTables(true))
     {

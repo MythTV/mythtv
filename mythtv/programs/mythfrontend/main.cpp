@@ -53,6 +53,7 @@ using namespace std;
 #include "statusbox.h"
 #include "lcddevice.h"
 #include "langsettings.h"
+#include "mythtranslation.h"
 #include "mythcommandlineparser.h"
 #include "channelgroupsettings.h"
 
@@ -822,7 +823,7 @@ bool resetTheme(QString themedir, const QString badtheme)
     gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
 
-    LanguageSettings::reload();
+    MythTranslation::reload();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
     themeBase->Reload();
@@ -835,7 +836,7 @@ bool resetTheme(QString themedir, const QString badtheme)
 
 int reloadTheme(void)
 {
-    LanguageSettings::reload();
+    MythTranslation::reload();
 
     GetMythMainWindow()->SetEffectsEnabled(false);
 
@@ -1368,7 +1369,7 @@ int main(int argc, char **argv)
     if (LCD *lcd = LCD::Get())
         lcd->setupLEDs(RemoteGetRecordingMask);
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
 

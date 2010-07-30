@@ -17,7 +17,7 @@ using namespace std;
 #include <mythversion.h>
 #include <remoteutil.h>
 #include <util.h>
-#include <langsettings.h>
+#include <mythtranslation.h>
 #include <mythconfig.h>
 #include <netgrabbermanager.h>
 #include <mythrssmanager.h>
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
 
-    LanguageSettings::load("mythfrontend");
+    MythTranslation::load("mythfrontend");
 
     gCoreContext->LogEntry("mythfillnetvision", LP_INFO,
                        "Online Source Listing Download Started", "");
