@@ -907,10 +907,18 @@ class DBCache( MythSchema ):
                 # push data to new settings file
                 self._writeXML(dbconn)
 
-        dbconn['DBPort'] = int(dbconn['DBPort'])
-        if dbconn['DBPort'] == 0:
+        if 'DBPort' in dbconn:
+            if dbconn['DBPort'] == '0':
+                dbconn['DBPort'] = 3306
+            else:
+                dbconn['DBPort'] = int(dbconn['DBPort'])
+        else:
             dbconn['DBPort'] = 3306
-        if dbconn['LocalHostName'] is None:
+
+        if 'LocalHostName' in dbconn:
+            if dbconn['LocalHostName'] is None:
+                dbconn['LocalHostName'] = gethostname()
+        else:
             dbconn['LocalHostName'] = gethostname()
 
         self.dbconn = dbconn
