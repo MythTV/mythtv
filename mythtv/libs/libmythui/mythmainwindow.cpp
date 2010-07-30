@@ -480,6 +480,8 @@ MythMainWindow::~MythMainWindow()
         d->stackList.pop_back();
     }
 
+    delete d->m_themeBase;
+
     while (!d->keyContexts.isEmpty())
     {
         KeyContext *context = *d->keyContexts.begin();
