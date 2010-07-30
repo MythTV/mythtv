@@ -86,14 +86,14 @@ bool InitializeDatabase()
                         "version VARCHAR(32) NULL,"
                         "email VARCHAR(255) NULL,"
                         "types MEDIUMTEXT NULL,"
-                        "PRIMARY KEY(sourceid)) TYPE=InnoDB;"
+                        "PRIMARY KEY(sourceid)) ENGINE=InnoDB;"
                << "CREATE TABLE IF NOT EXISTS weatherscreens ("
                         "screen_id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
                         "draworder INT UNSIGNED NOT NULL,"
                         "container VARCHAR(64) NOT NULL,"
                         "hostname VARCHAR(255) NULL,"
                         "units TINYINT UNSIGNED NOT NULL,"
-                        "PRIMARY KEY(screen_id)) TYPE=InnoDB;"
+                        "PRIMARY KEY(screen_id)) ENGINE=InnoDB;"
                << "CREATE TABLE IF NOT EXISTS weatherdatalayout ("
                         "location VARCHAR(64) NOT NULL,"
                         "dataitem VARCHAR(64) NOT NULL,"
@@ -110,7 +110,7 @@ bool InitializeDatabase()
                         "FOREIGN KEY(weathersourcesettings_sourceid) "
                         "REFERENCES weathersourcesettings(sourceid) "
                         "ON DELETE RESTRICT "
-                        "ON UPDATE CASCADE) TYPE=InnoDB;";
+                        "ON UPDATE CASCADE) ENGINE=InnoDB;";
         /*
          * TODO Possible want to delete old stuff (i.e. agressiveness, locale..)
          * that we don't use any more

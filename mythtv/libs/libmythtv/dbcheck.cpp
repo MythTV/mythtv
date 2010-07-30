@@ -1152,7 +1152,7 @@ NULL
 "  serviceversion smallint(6) default 33,"
 "  updatetimestamp timestamp(14) NOT NULL,"
 "  PRIMARY KEY  (mplexid)"
-") TYPE=MyISAM;",
+");",
 // These should be included in an update after the 0.17 release.
 // "DROP TABLE IF EXISTS dvb_channel;",
 // "DROP TABLE IF EXISTS dvb_pids;",
