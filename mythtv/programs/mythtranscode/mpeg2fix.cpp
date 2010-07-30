@@ -1168,7 +1168,15 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     }
 
     pkt->size = avcodec_encode_video(c, pkt->data, outbuf_size, picture);
-    if (!fname.isEmpty() && pkt->size >= 0)
+
+    if (pkt->size <= 0)
+    {
+        free(picture);
+        VERBOSE(MPF_IMPORTANT, QString("avcodec_encode_video failed (%1)").arg(pkt->size));
+        return 1;
+    }
+
+    if (!fname.isEmpty())
     {
         QString ename = fname + ".enc";
         QByteArray aename = ename.toLocal8Bit();
