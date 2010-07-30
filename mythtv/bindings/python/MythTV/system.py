@@ -10,7 +10,6 @@ from altdict import DictData, OrdDict
 from database import DBCache
 
 from subprocess import Popen
-from socket import gethostname
 import xml.etree.cElementTree as etree
 
 class System( DBCache ):
@@ -29,7 +28,7 @@ class System( DBCache ):
         if path is not None:
             self.path = path
         elif setting is not None:
-            host = gethostname()
+            host = self.gethostname()
             self.path = self.settings[host][setting]
             if self.path is None:
                 raise MythDBError(MythError.DB_SETTING, setting, host)

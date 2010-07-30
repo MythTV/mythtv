@@ -109,7 +109,8 @@ class BECache( SplitInt ):
             self.be.reconnect()
         else:
             # no existing connection, create new
-            self.be = BEConnection(self.host, self.port, self.opts)
+            self.be = BEConnection(self.host, self.port, \
+                                    self.db.gethostname(), self.opts)
             self.be.registeruser(self._uuid, self.opts)
             self._shared[self._ident] = self.be
 
@@ -293,11 +294,11 @@ class FileTransfer( BEEvent ):
     logmodule = 'Python FileTransfer'
 
     class BETransConn( BEConnection ):
-        def __init__(self, host, port, filename, sgroup, mode):
+        def __init__(self, host, port, localname, filename, sgroup, mode):
             self.filename = filename
             self.sgroup = sgroup
             self.mode = mode
-            BEConnection.__init__(self, host, port)
+            BEConnection.__init__(self, host, port, localname)
 
         def announce(self):
             if self.mode == 'r':
@@ -342,8 +343,8 @@ class FileTransfer( BEEvent ):
         # open control socket
         BEEvent.__init__(self, host, True, db=db)
         # open transfer socket
-        self.ftsock = self.BETransConn(self.host, self.port, self.filename,
-                                       self.sgroup, self.mode)
+        self.ftsock = self.BETransConn(self.host, self.port, \
+                    self.be.localname, self.filename, self.sgroup, self.mode)
         self.open = True
 
         self._sockno = self.ftsock._sockno

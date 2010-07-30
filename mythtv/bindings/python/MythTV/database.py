@@ -907,12 +907,11 @@ class DBCache( MythSchema ):
                 # push data to new settings file
                 self._writeXML(dbconn)
 
-        if 'DBPort' not in dbconn:
-            dbconn['DBPort'] = 3306
-        else:
-            dbconn['DBPort'] = int(dbconn['DBPort'])
+        dbconn['DBPort'] = int(dbconn['DBPort'])
         if dbconn['DBPort'] == 0:
             dbconn['DBPort'] = 3306
+        if dbconn['LocalHostName'] is None:
+            dbconn['LocalHostName'] = gethostname()
 
         self.dbconn = dbconn
         self.ident = "sql://%s@%s:%d/" % \
@@ -939,7 +938,7 @@ class DBCache( MythSchema ):
 
     def _readXML(self, path):
         dbconn = { 'DBHostName':None,  'DBName':None, 'DBUserName':None,
-                   'DBPassword':None,  'DBPort':0}
+                   'DBPassword':None,  'DBPort':0,    'LocalHostName':None}
         try:
             config = etree.parse(path).getroot()
             for child in config.find('UPnP').find('MythFrontend').\
@@ -1011,6 +1010,9 @@ class DBCache( MythSchema ):
             self.db = None
             raise MythDBError(MythError.DB_SCHEMAMISMATCH, value, sver, local)
 
+    def gethostname(self):
+        return self.dbconn['LocalHostName']
+
     def getStorageGroup(self, groupname=None, hostname=None):
         """
         obj.getStorageGroup(groupname=None, hostname=None)
@@ -1069,7 +1071,7 @@ class StorageGroup( DBData ):
 
     def _evalwheredat(self, wheredat=None):
         DBData._evalwheredat(self, wheredat)
-        if (self.hostname == gethostname()) or \
+        if (self.hostname == self._db.gethostname()) or \
               os.access(self.dirname.encode('utf-8'), os.F_OK):
             self.local = True
         else:

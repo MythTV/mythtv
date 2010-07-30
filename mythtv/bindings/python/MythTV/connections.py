@@ -258,7 +258,8 @@ class BEConnection( object ):
                     res[key] = True
             return res
 
-    def __init__(self, backend, port, opts=None, deadline=10.0):
+    def __init__(self, backend, port, localname=None, \
+                            opts=None, deadline=10.0):
         """
         BEConnection(backend, type, db=None) -> backend socket connection
 
@@ -276,8 +277,11 @@ class BEConnection( object ):
         self.host = backend
         self.port = port
         self.hostname = None
-        self.localname = socket.gethostname()
         self.deadline = deadline
+
+        self.localname = localname
+        if self.localname is None:
+            self.localname = socket.gethostname()
 
         self.opts = opts
         if self.opts is None:
@@ -436,7 +440,7 @@ class BEConnection( object ):
     def eventloop(self):
         self.threadrunning = True
         while (len(self._regevents) > 0) and self.connected:
-            self.backendCommand(deadline=0.)
+            self.backendCommand(deadline=0.001)
             sleep(0.1)
         self.threadrunning = False
 
