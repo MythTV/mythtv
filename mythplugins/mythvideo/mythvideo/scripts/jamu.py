@@ -492,7 +492,6 @@ try:
     mythdb = None
     mythvideo = None
     mythbeconn = None
-    localhostname = gethostname()
     try:
         '''Create an instance of each: MythDB, MythVideo
         '''
@@ -509,6 +508,10 @@ try:
             print u'\n! Warning - Check that (%s) is correctly configured\n' % filename
     except Exception, e:
         print u"\n! Warning - Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)\n" % e
+    try:
+        localhostname = mythdb.gethostname()
+    except:
+        localhostname = gethostname()
     try:
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
         mythbeconn = MythBE(backend=localhostname, db=mythdb)

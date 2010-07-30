@@ -231,7 +231,7 @@ class MythBE( FileOps ):
         if id is not None:
             cmd += ' %d' % id
             res = self.getRecorderDetails(id).hostname
-            if res != socket.gethostname():
+            if res != self.db.gethostname():
                 local = False
 
         res = ''
@@ -255,7 +255,7 @@ class MythBE( FileOps ):
         """
         def free(self,id):
             res = self.getRecorderDetails(id).hostname
-            if res == socket.gethostname():
+            if res == self.db.gethostname():
                 self.backendCommand('FREE_TUNER %d' % id)
             else:
                 myth = MythTV(res)

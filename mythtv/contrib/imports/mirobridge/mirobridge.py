@@ -297,7 +297,6 @@ try:
     mythdb = None
     mythvideo = None
     mythbeconn = None
-    localhostname = gethostname()
     try:
         '''Create an instance of each: MythDB, MythVideo
         '''
@@ -315,6 +314,10 @@ try:
         logger.critical(u'''Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)
 ''' % e)
         sys.exit(1)
+    try:
+        localhostname = mythdb.gethostname()
+    except:
+        localhostname = gethostname()
     try:
         mythbeconn = MythBE(backend=localhostname, db=mythdb)
     except MythError, e:

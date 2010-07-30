@@ -979,7 +979,7 @@ class MythDBBase( object ):
             for config_file in config_files:
                 dbconn.update({ 'DBHostName':None,  'DBName':None,
                                 'DBUserName':None,  'DBPassword':None,
-                                'DBPort':0})
+                                'DBPort':0,         'LocalHostName':None})
                 try:
                     config = etree.parse(config_file).getroot()
                     for child in config.find('UPnP').find('MythFrontend').\
@@ -1027,12 +1027,19 @@ class MythDBBase( object ):
                 fp.write(config)
                 fp.close()
                 
-        if 'DBPort' not in dbconn:
-            dbconn['DBPort'] = 3306
+        if 'DBPort' in dbconn:
+            if dbconn['DBPort'] == '0':
+                dbconn['DBPort'] = 3306
+            else:
+                dbconn['DBPort'] = int(dbconn['DBPort'])
         else:
-            dbconn['DBPort'] = int(dbconn['DBPort'])
-        if dbconn['DBPort'] == 0:
             dbconn['DBPort'] = 3306
+
+        if 'LocalHostName' in dbconn:
+            if dbconn['LocalHostName'] is None:
+                dbconn['LocalHostName'] = socket.gethostname()
+        else:
+            dbconn['LocalHostName'] = socket.gethostname()
 
         self.dbconn = dbconn
         self.ident = "sql://%s@%s:%d/" % \
@@ -1147,6 +1154,9 @@ class MythDBBase( object ):
             self.db = None
             raise MythDBError(MythError.DB_SCHEMAMISMATCH, value, sver, local)
 
+    def gethostname(self):
+        return self.dbconn['LocalHostName']
+
     def getStorageGroup(self, groupname=None, hostname=None):
         """
         obj.getStorageGroup(groupname=None, hostname=None)
@@ -1245,7 +1255,7 @@ class MythBEConn( object ):
             raise
 
     def announce(self,type):
-        res = self.backendCommand('ANN %s %s 0' % (type, socket.gethostname()))
+        res = self.backendCommand('ANN %s %s 0' % (type, self.db.gethostname()))
         if res != 'OK':
             self.log(MythLog.IMPORTANT|MythLog.NETWORK,
                             "Unexpected answer to ANN", res)
@@ -1795,7 +1805,7 @@ class StorageGroup( DBData ):
         DBData.__init__(self, (id,), db, raw)
         if self.wheredat is None:
             return
-        if (self.hostname == socket.gethostname()) or \
+        if (self.hostname == self.db.gethostname()) or \
               os.access(self.dirname.encode('utf-8'), os.F_OK):
             self.local = True
         else:
@@ -1817,7 +1827,7 @@ class Grabber( MythDBBase ):
         if path is not None:
             self.path = path
         elif setting is not None:
-            host = socket.gethostname()
+            host = self.gethostname()
             self.path = self.settings[host][setting]
             if self.path is None:
                 raise MythDBError(MythError.DB_SETTING, setting, host)

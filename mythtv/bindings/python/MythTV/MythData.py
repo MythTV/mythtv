@@ -7,11 +7,11 @@ Provides data access classes for accessing and managing MythTV data
 from MythStatic import *
 from MythBase import *
 
-import re, sys, socket, os
+import re, sys, os
 import xml.etree.cElementTree as etree
 from time import mktime, strftime, strptime
 from datetime import date, time, datetime
-from socket import gethostbyaddr, gethostname
+from socket import gethostbyaddr
 
 #### FILE ACCESS ####
 
@@ -161,7 +161,7 @@ class FileTransfer( MythBEConn ):
         elif type == 'r':
             self.w = False
         res = self.backendCommand('ANN FileTransfer %s %d %d %s' \
-                    % (socket.gethostname(), self.w, False,
+                    % (self.db.gethostname(), self.w, False,
                         BACKEND_SEP.join(['-1',self.filename,self.sgroup])))
         if res.split(BACKEND_SEP)[0] != 'OK':
             raise MythError(MythError.PROTO_ANNOUNCE, self.host, self.port, res)
@@ -1454,7 +1454,7 @@ class NetVisionGrabber( Grabber ):
                                 NVSCHEMA_VERSION, 'NetVision')
         c = db.cursor(self.log)
         log = MythLog('Python MythNetVision Grabber', db=db)
-        host = gethostname()
+        host = db.gethostname()
         glist = []
         for t in types.split(','):
             c.execute("""SELECT name,commandline
@@ -1478,7 +1478,7 @@ class NetVisionGrabber( Grabber ):
             if c.execute("""SELECT commandline
                             FROM netvision%sgrabbers
                             WHERE name=%%s AND host=%%s""" % type,
-                                        (name, gethostname())) == 1:
+                                        (name, db.gethostname())) == 1:
                 Grabber.__init__(path=c.fetchone()[0], db=db)
                 c.close()
             else:
@@ -1495,10 +1495,10 @@ class NetVisionGrabber( Grabber ):
     def setUpdated(self):
         if self.type is not 'tree':
             raise MythError('Can only update tree-type grabbers')
-        c = db.cursor(self.log)
+        c = self.db.cursor(self.log)
         c.execute("""UPDATE netvision%sgrabbers SET update=NOW()
                      WHERE name=%%s AND host=%%s""" % type,
-                     (self.name, gethostname()))
+                     (self.name, self.db.gethostname()))
         c.close()
 
 
