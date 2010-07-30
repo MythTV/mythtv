@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.2"
+__version__=u"v0.6.3"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -186,7 +186,7 @@ __version__=u"v0.6.2"
 #       database title fields in several records was being left empty.
 # 0.6.1 Modifications to support MythTV python bindings changes
 # 0.6.2 Trapped possible unicode errors which would hang the MiroBridge process
-
+# 0.6.3 Pull hostname from python bindings instead of socket libraries
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -197,7 +197,7 @@ import sys, os, re, locale, subprocess, locale, ConfigParser, codecs, shutil, st
 import datetime, fnmatch, string, time, logging, traceback, platform, fnmatch, ConfigParser
 from datetime import date
 from optparse import OptionParser
-from socket import gethostname, gethostbyname
+from socket import gethostbyname
 import formatter
 import htmlentitydefs
 
@@ -303,7 +303,6 @@ try:
     mythdb = None
     mythvideo = None
     mythbeconn = None
-    localhostname = gethostname()
     try:
         '''Create an instance of each: MythDB, MythVideo
         '''
@@ -322,6 +321,7 @@ try:
         logger.critical(u'''Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)
 ''' % e)
         sys.exit(1)
+    localhostname = mythdb.gethostname()
     try:
         mythbeconn = MythBE(backend=localhostname, db=mythdb)
     except MythError, e:

@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.6"
+__version__=u"v0.7.7"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -305,6 +305,7 @@ __version__=u"v0.7.6"
  # 0.7.4 Update for changes in Python bindings
  # 0.7.5 Added the TMDB MovieRating as videometadata table "rating" field
  # 0.7.6 Modifications to support MythTV python bindings changes
+ # 0.7.7 Pull hostname from python bindings instead of socket libraries
 
 
 usage_txt=u'''
@@ -443,7 +444,7 @@ without_ep_name (%(series)s - S%(seasonnumber)02dE%(episodenumber)02d.%(ext)s)
 import sys, os, re, locale, subprocess, locale, ConfigParser, urllib, codecs, shutil, datetime, fnmatch, string
 from datetime import date
 from optparse import OptionParser
-from socket import gethostname, gethostbyname
+from socket import gethostbyname
 import tempfile, struct
 import logging
 
@@ -496,7 +497,6 @@ try:
     mythdb = None
     mythvideo = None
     mythbeconn = None
-    localhostname = gethostname()
     try:
         '''Create an instance of each: MythDB, MythVideo
         '''
@@ -513,6 +513,7 @@ try:
             print u'\n! Warning - Check that (%s) is correctly configured\n' % filename
     except Exception, e:
         print u"\n! Warning - Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)\n" % e
+    localhostname = mythdb.gethostname()
     try:
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
         mythbeconn = MythBE(backend=localhostname, db=mythdb)
