@@ -1,6 +1,8 @@
 #include "config.h"
 #include <inttypes.h>
 
+#include "mpeg2.h"
+#include "attributes.h"
 #include "mpeg2_internal.h"
 
 extern uint16_t inv_zigzag_direct16[64];
