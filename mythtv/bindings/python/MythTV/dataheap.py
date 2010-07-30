@@ -572,9 +572,11 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         DBDataWriteAI._evalwheredat(self, wheredat)
         self._fill_cm()
         self._cat_toname()
-        self.cast = self._Cast((self.intid,), self._db)
-        self.genre = self._Genre((self.intid,), self._db)
-        self.country = self._Country((self.intid,), self._db)
+        if wheredat is None:
+            wheredat = [self.intid]
+        self.cast = self._Cast(wheredat, self._db)
+        self.genre = self._Genre(wheredat, self._db)
+        self.country = self._Country(wheredat, self._db)
         self.markup = self._Markup((self.filename,), self._db)
 
     def create(self, data=None):
@@ -712,7 +714,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
             season = None
             episode = None
             subtitle = None
-            title = filename[filename.rindex('/')+1:]
+            title = filename.rsplit('/',1)[-1]
             for left,right in (('(',')'), ('[',']'), ('{','}')):
                 while left in title:
                     lin = title.index(left)
