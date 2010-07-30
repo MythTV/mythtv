@@ -1785,6 +1785,7 @@ enable ivtv
 enable lamemp3
 enable lirc
 enable mheg
+enable mythtranscode
 enable opengl
 enable opengl_vsync
 enable opengl_video
