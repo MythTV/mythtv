@@ -5025,12 +5025,12 @@ class MythTvMetaData(VideoFiles):
             record['seriesid'] = prog.seriesid
 
             if record['subtitle'] and prog.airdate != None:
-                record['originalairdate'] = prog.airdate[:4]
+                record['originalairdate'] = prog.airdate.year
             else:
                 if prog.year != '0':
                     record['originalairdate'] = prog.year
                 elif prog.airdate != None:
-                    record['originalairdate'] = prog.airdate[:4]
+                    record['originalairdate'] = prog.airdate.year
             for program in programs:    # Skip duplicates
                 if program['title'] == record['title']:
                     break
