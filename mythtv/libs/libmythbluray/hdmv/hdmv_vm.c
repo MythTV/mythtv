@@ -365,7 +365,7 @@ static int _play_at(HDMV_VM *p, int playlist, int playitem, int playmark)
         _queue_event(p, HDMV_EVENT_PLAY_PM, playmark);
     }
 
-    DEBUG(DBG_HDMV|DBG_CRIT, "play_at: list %d, item %d, mark %d\n",
+    DEBUG(DBG_HDMV, "play_at: list %d, item %d, mark %d\n",
           playlist, playitem, playmark);
 
     return 0;

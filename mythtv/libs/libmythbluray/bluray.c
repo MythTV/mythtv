@@ -30,6 +30,7 @@
 #include "util/strutl.h"
 #include "bdnav/navigation.h"
 #include "bdnav/index_parse.h"
+#include "hdmv/hdmv_vm.h"
 #include "file/file.h"
 #ifdef DLOPEN_CRYPTO_LIBS
 #include "file/dl.h"
@@ -111,6 +112,9 @@ struct bluray {
     BD_REGISTERS   *regs;       // player registers
     BD_EVENT_QUEUE *event_queue; // navigation mode event queue
     BD_TITLE_TYPE  title_type;  // type of current title (in navigation mode)
+
+    HDMV_VM        *hdmv_vm;
+    uint8_t        hdmv_suspended;
 
     void           *bdjava;
 };
@@ -394,6 +398,7 @@ void bd_close(BLURAY *bd)
         nav_title_close(bd->title);
     }
 
+    hdmv_vm_free(bd->hdmv_vm);
     indx_free(bd->index);
     bd_registers_free(bd->regs);
 
@@ -651,7 +656,7 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
                 if (bd->clip == NULL) {
                     // We previously reached the last clip.  Nothing
                     // else to read.
-                    return -1;
+                    return 0;
                 }
                 if (clip_pkt >= bd->clip->end_pkt) {
                     bd->clip = nav_next_clip(bd->title, bd->clip);
@@ -1077,6 +1082,9 @@ void bd_stop_bdj(BLURAY *bd)
  * Navigation mode interface
  */
 
+/*
+ * notification events to APP
+ */
 static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
 {
     BLURAY *bd = (BLURAY*)handle;
@@ -1114,8 +1122,10 @@ static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
             break;
 
         case PSR_PG_STREAM:
-            _queue_event(bd, (BD_EVENT){BD_EVENT_PG_TEXTST,        !!(ev->new_val & 0x80000000)});
-            _queue_event(bd, (BD_EVENT){BD_EVENT_PG_TEXTST_STREAM,    ev->new_val & 0xfff});
+            if ((ev->new_val & 0x80000fff) != (ev->old_val & 0x80000fff)) {
+                _queue_event(bd, (BD_EVENT){BD_EVENT_PG_TEXTST,        !!(ev->new_val & 0x80000000)});
+                _queue_event(bd, (BD_EVENT){BD_EVENT_PG_TEXTST_STREAM,    ev->new_val & 0xfff});
+            }
             break;
 
         case PSR_SECONDARY_AUDIO_VIDEO:
@@ -1157,9 +1167,12 @@ static int _play_hdmv(BLURAY *bd, unsigned id_ref)
     bd_stop_bdj(bd);
 #endif
 
-    DEBUG(DBG_BLURAY|DBG_CRIT, "_hdmv_play(%u) not implemented (%p)\n", id_ref, bd);
+    if (!bd->hdmv_vm) {
+        bd->hdmv_vm = hdmv_vm_init(bd->device_path, bd->regs);
+    }
+    bd->hdmv_suspended = 0;
 
-    return -1;
+    return hdmv_vm_select_object(bd->hdmv_vm, id_ref, NULL);
 }
 
 #define TITLE_FIRST_PLAY 0xffff   /* 10.4.3.2 (E) */
@@ -1191,6 +1204,7 @@ int bd_play_title(BLURAY *bd, unsigned title)
 
     /* bd_play not called ? */
     if (bd->title_type == title_undef) {
+        DEBUG(DBG_BLURAY|DBG_CRIT, "bd_call_title(): bd_play() not called !\n");
         return -1;
     }
 
@@ -1234,7 +1248,15 @@ int bd_play_title(BLURAY *bd, unsigned title)
 
 int bd_play(BLURAY *bd)
 {
+    /* reset player state */
+
     bd->title_type = title_undef;
+
+    if (bd->hdmv_vm) {
+        hdmv_vm_free(bd->hdmv_vm);
+        bd->hdmv_vm = NULL;
+        bd->hdmv_suspended = 1;
+    }
 
     _init_event_queue(bd);
 
@@ -1253,10 +1275,84 @@ int bd_menu_call(BLURAY *bd)
     return bd_play_title(bd, TITLE_TOP_MENU);
 }
 
+static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
+{
+    DEBUG(DBG_BLURAY, "HDMV event: %d %d\n", hev->event, hev->param);
+
+    switch (hev->event) {
+        case HDMV_EVENT_TITLE:
+            bd_play_title(bd, hev->param);
+            break;
+
+        case HDMV_EVENT_PLAY_PL:
+            bd_select_playlist(bd, hev->param);
+            bd->hdmv_suspended = 1;
+            break;
+
+        case HDMV_EVENT_PLAY_PI:
+            //bd_seek_pi(bd, hev->param);
+            DEBUG(DBG_BLURAY|DBG_CRIT, "HDMV_EVENT_PLAY_PI: not implemented\n");
+            break;
+
+        case HDMV_EVENT_PLAY_PM:
+            bd_seek_mark(bd, hev->param);
+            break;
+
+        case HDMV_EVENT_PLAY_STOP:
+            DEBUG(DBG_BLURAY|DBG_CRIT, "HDMV_EVENT_PLAY_STOP: not tested !\n");
+            // stop current playlist
+            bd_seek(bd, bd->s_size - 1);
+            bd->clip = NULL;
+            // resume suspended movie object
+            bd->hdmv_suspended = 0;
+            break;
+
+        case HDMV_EVENT_END:
+        case HDMV_EVENT_NONE:
+        default:
+            break;
+    }
+}
+
+static int _run_hdmv(BLURAY *bd)
+{
+    HDMV_EVENT hdmv_ev;
+
+    /* run VM */
+    if (hdmv_vm_run(bd->hdmv_vm, &hdmv_ev) < 0) {
+        _queue_event(bd, (BD_EVENT){BD_EVENT_ERROR, 0});
+        return -1;
+    }
+
+    /* process all events */
+    do {
+        _process_hdmv_vm_event(bd, &hdmv_ev);
+
+    } while (!hdmv_vm_get_event(bd->hdmv_vm, &hdmv_ev));
+
+    return 0;
+}
+
 int bd_read_ext(BLURAY *bd, unsigned char *buf, int len, BD_EVENT *event)
 {
     if (_get_event(bd, event)) {
         return 0;
+    }
+
+    /* run HDMV VM ? */
+    if (bd->title_type == title_hdmv) {
+
+        while (!bd->hdmv_suspended) {
+
+            if (_run_hdmv(bd) < 0) {
+                DEBUG(DBG_BLURAY|DBG_CRIT, "bd_read_ext(): HDMV VM error\n");
+                bd->title_type = title_undef;
+                return -1;
+            }
+            if (_get_event(bd, event)) {
+                return 0;
+            }
+        }
     }
 
     if (len < 1) {
@@ -1265,6 +1361,13 @@ int bd_read_ext(BLURAY *bd, unsigned char *buf, int len, BD_EVENT *event)
     }
 
     int bytes = bd_read(bd, buf, len);
+
+    if (bytes == 0) {
+        if (bd->title_type == title_hdmv) {
+            DEBUG(DBG_BLURAY, "bd_read_ext(): reached end of playlist. hdmv_suspended=%d\n", bd->hdmv_suspended);
+            bd->hdmv_suspended = 0;
+        }
+    }
 
     _get_event(bd, event);
 
