@@ -780,13 +780,17 @@ class MythXML( XMLConnection ):
         Returns a dictionary of valid pages, as well as input and output
         arguments.
         """
-        #TODO - broken, fix me
+        
+        #TODO - handle namespaces better
         tree = self._queryTree('GetServDesc')
-        for a in tree.find('actionList').getchildren():
-            act = [act.find('name').text, {'in':[], 'out':[]}]
-            for arg in a.find('argumentList').getchildren():
-                argname = arg.find('name').text
-                argdirec = arg.find('direction').text
+        index = tree.tag.rindex('}')+1
+        find = lambda e,c: e.find('%s%s' % (tree.tag[:index], c))
+
+        for a in find(tree, 'actionList'):
+            act = [find(a,'name').text, {'in':[], 'out':[]}]
+            for arg in find(a, 'argumentList'):
+                argname = find(arg, 'name').text
+                argdirec = find(arg, 'direction').text
                 act[1][argdirec].append(argname)
             yield act
 
