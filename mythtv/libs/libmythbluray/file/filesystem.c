@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2010  Joakim
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,38 +17,23 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DIR_H_
-#define DIR_H_
-
-#include <util/attributes.h>
-
-#ifdef __cplusplus
-extern "C" {
+#if HAVE_CONFIG_H
+#include "config.h"
 #endif
 
-#define dir_open dir_open_posix
+#include "file.h"
 
-#define dir_close(X) X->close(X)
-#define dir_read(X,Y) X->read(X,Y)
 
-// Our dirent struct only contains the parts we care about.
-typedef struct
+BD_FILE_OPEN bd_register_file(BD_FILE_OPEN p)
 {
-    char    d_name[256];
-} DIRENT;
+  BD_FILE_OPEN old = file_open;
+  file_open = p;
+  return old;
+}
 
-typedef struct dir DIR_H;
-struct dir
+BD_DIR_OPEN bd_register_dir(BD_DIR_OPEN p)
 {
-    void* internal;
-    void (*close)(DIR_H *dir);
-    int (*read)(DIR_H *dir, DIRENT *entry);
-};
-
-BD_PRIVATE DIR_H *dir_open_posix(const char* dirname);
-
-#ifdef __cplusplus
-};
-#endif
-
-#endif /* DIR_H_ */
+  BD_DIR_OPEN old = dir_open;
+  dir_open = p;
+  return old;
+}

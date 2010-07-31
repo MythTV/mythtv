@@ -2,6 +2,7 @@
  * This file is part of libbluray
  * Copyright (C) 2009-2010  Obliter0n
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2010       hpi1
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -105,6 +106,16 @@ uint32_t bd_get_titles(BLURAY *bd, uint8_t flags);
  * @return allocated BLURAY_TITLE_INFO object, NULL on error
  */
 BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx);
+
+/**
+ *
+ *  Get information about a playlist
+ *
+ * @param bd  BLURAY object
+ * @param playlist playlist number
+ * @return allocated BLURAY_TITLE_INFO object, NULL on error
+ */
+BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist);
 
 /**
  *
@@ -317,11 +328,29 @@ typedef enum {
     BD_EVENT_NONE = 0,
     BD_EVENT_ERROR,
 
-    BD_EVENT_ANGLE_ID,
-    BD_EVENT_TITLE_ID,
-    BD_EVENT_PLAYLIST,
-    BD_EVENT_PLAYITEM,
-    BD_EVENT_CHAPTER,
+    /* current playback position */
+    BD_EVENT_ANGLE,     /* current angle, 1...N */
+    BD_EVENT_TITLE,     /* current title, 1...N (0 = top menu) */
+    BD_EVENT_PLAYLIST,  /* current playlist (xxxxx.mpls) */
+    BD_EVENT_PLAYITEM,  /* current play item */
+    BD_EVENT_CHAPTER,   /* current chapter, 1...N */
+
+    /* stream selection */
+    BD_EVENT_AUDIO_STREAM,           /* 1..32,  0xff  = none */
+    BD_EVENT_IG_STREAM,              /* 1..32                */
+    BD_EVENT_PG_TEXTST_STREAM,       /* 1..255, 0xfff = none */
+    BD_EVENT_SECONDARY_AUDIO_STREAM, /* 1..32,  0xff  = none */
+    BD_EVENT_SECONDARY_VIDEO_STREAM, /* 1..32,  0xff  = none */
+
+    BD_EVENT_PG_TEXTST,              /* 0 - disable, 1 - enable */
+    BD_EVENT_SECONDARY_AUDIO,        /* 0 - disable, 1 - enable */
+    BD_EVENT_SECONDARY_VIDEO,        /* 0 - disable, 1 - enable */
+    BD_EVENT_SECONDARY_VIDEO_SIZE,   /* 0 - PIP, 0xf - fullscreen */
+
+    /* Interactive Graphics */
+    BD_EVENT_MENU_PAGE_ID,           /* 0..0xfe */
+    BD_EVENT_SELECTED_BUTTON_ID,     /* 0..0x1fdf, 0xffff = invalid */
+
 } bd_event_e;
 
 typedef struct {
@@ -331,6 +360,7 @@ typedef struct {
 
 int  bd_play(BLURAY *bd); /* start playing disc in navigation mode */
 int  bd_read_ext(BLURAY *bd, unsigned char *buf, int len, BD_EVENT *event);
+int  bd_get_event(BLURAY *bd, BD_EVENT *event);
 
 int  bd_play_title(BLURAY *bd, unsigned title); /* play title (from disc index) */
 int  bd_menu_call(BLURAY *bd);                  /* open disc root menu */

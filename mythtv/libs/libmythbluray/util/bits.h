@@ -48,7 +48,7 @@ typedef struct {
 } BITBUFFER;
 
 typedef struct {
-    FILE_H    *fp;
+    BD_FILE_H *fp;
     uint8_t    buf[BF_BUF_SIZE];
     BITBUFFER  bb;
     off_t      pos;
@@ -64,7 +64,7 @@ static inline void bb_init( BITBUFFER *bb, void *p_data, size_t i_data )
     bb->i_left  = 8;
 }
 
-static inline void bs_init( BITSTREAM *bs, FILE_H *fp )
+static inline void bs_init( BITSTREAM *bs, BD_FILE_H *fp )
 {
     bs->fp = fp;
     bs->pos = 0;

@@ -147,7 +147,7 @@ static int _parse_header(BITSTREAM *bs, int *index_start, int *extension_data_st
 INDX_ROOT *indx_parse(const char *file_name)
 {
     BITSTREAM  bs;
-    FILE_H    *fp;
+    BD_FILE_H *fp;
     INDX_ROOT *index = calloc(1, sizeof(INDX_ROOT));
 
     int        indexes_start, extension_data_start;

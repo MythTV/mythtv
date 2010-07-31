@@ -121,7 +121,7 @@ void sound_free(SOUND_DATA *sounds)
 SOUND_DATA *sound_parse(const char *file_name)
 {
     BITSTREAM     bs;
-    FILE_H       *fp;
+    BD_FILE_H    *fp;
     SOUND_DATA   *data = NULL;
     uint16_t      num_sounds;
     uint32_t      data_len;

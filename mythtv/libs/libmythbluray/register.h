@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+#include <util/attributes.h>
+
 #include <stdint.h>
 
 /*
@@ -72,8 +74,8 @@ typedef enum {
 
 typedef struct bd_registers_s BD_REGISTERS;
 
-BD_REGISTERS *bd_registers_init(void);
-void     bd_registers_free(BD_REGISTERS *);
+BD_PRIVATE BD_REGISTERS *bd_registers_init(void);
+BD_PRIVATE void          bd_registers_free(BD_REGISTERS *);
 
 int      bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
 int      bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);

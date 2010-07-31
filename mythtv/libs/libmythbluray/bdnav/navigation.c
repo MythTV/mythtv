@@ -24,7 +24,6 @@
 #include "util/macro.h"
 #include "util/logging.h"
 #include "util/strutl.h"
-#include "file/dir.h"
 #include "file/file.h"
 #include "../bluray.h"
 #include "mpls_parse.h"
@@ -111,8 +110,8 @@ _pl_duration(MPLS_PL *pl)
 
 NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags)
 {
-    DIR_H *dir;
-    DIRENT ent;
+    BD_DIR_H *dir;
+    BD_DIRENT ent;
     char *path = NULL;
     MPLS_PL **pl_list = NULL;
     MPLS_PL *pl = NULL;
@@ -205,8 +204,8 @@ void nav_free_title_list(NAV_TITLE_LIST *title_list)
 
 char* nav_find_main_title(const char *root)
 {
-    DIR_H *dir;
-    DIRENT ent;
+    BD_DIR_H *dir;
+    BD_DIRENT ent;
     char *path = NULL;
     MPLS_PL **pl_list = NULL;
     MPLS_PL **tmp = NULL;

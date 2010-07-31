@@ -21,7 +21,7 @@
 #include "config.h"
 #endif
 
-#include "dir.h"
+#include "file.h"
 #include "util/macro.h"
 #include "util/logging.h"
 
@@ -30,7 +30,7 @@
 #include <dirent.h>
 #include <string.h>
 
-static void dir_close_posix(DIR_H *dir)
+static void dir_close_posix(BD_DIR_H *dir)
 {
     if (dir) {
         closedir((DIR *)dir->internal);
@@ -41,7 +41,7 @@ static void dir_close_posix(DIR_H *dir)
     }
 }
 
-static int dir_read_posix(DIR_H *dir, DIRENT *entry)
+static int dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
 {
 #ifdef USING_MINGW
     errno = 0;
@@ -66,10 +66,10 @@ static int dir_read_posix(DIR_H *dir, DIRENT *entry)
     return 0;
 }
 
-DIR_H *dir_open_posix(const char* dirname)
+static BD_DIR_H *dir_open_posix(const char* dirname)
 {
     DIR *dp = NULL;
-    DIR_H *dir = malloc(sizeof(DIR_H));
+    BD_DIR_H *dir = malloc(sizeof(BD_DIR_H));
 
     DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, dir);
     dir->close = dir_close_posix;
@@ -87,3 +87,5 @@ DIR_H *dir_open_posix(const char* dirname)
 
     return NULL;
 }
+
+BD_DIR_H* (*dir_open)(const char* dirname) = dir_open_posix;

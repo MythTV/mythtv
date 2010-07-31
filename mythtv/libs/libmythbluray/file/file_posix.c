@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include "compat.h"
 
-static void file_close_linux(FILE_H *file)
+static void file_close_linux(BD_FILE_H *file)
 {
     if (file) {
         fclose((FILE *)file->internal);
@@ -40,35 +40,35 @@ static void file_close_linux(FILE_H *file)
     }
 }
 
-static int64_t file_seek_linux(FILE_H *file, int64_t offset, int32_t origin)
+static int64_t file_seek_linux(BD_FILE_H *file, int64_t offset, int32_t origin)
 {
     return fseeko((FILE *)file->internal, offset, origin);
 }
 
-static int64_t file_tell_linux(FILE_H *file)
+static int64_t file_tell_linux(BD_FILE_H *file)
 {
     return ftello((FILE *)file->internal);
 }
 
-static int file_eof_linux(FILE_H *file)
+static int file_eof_linux(BD_FILE_H *file)
 {
     return feof((FILE *)file->internal);
 }
 
-static int file_read_linux(FILE_H *file, uint8_t *buf, int64_t size)
+static int64_t file_read_linux(BD_FILE_H *file, uint8_t *buf, int64_t size)
 {
     return fread(buf, 1, size, (FILE *)file->internal);
 }
 
-static int file_write_linux(FILE_H *file, const uint8_t *buf, int64_t size)
+static int64_t file_write_linux(BD_FILE_H *file, const uint8_t *buf, int64_t size)
 {
     return fwrite(buf, 1, size, (FILE *)file->internal);
 }
 
-FILE_H *file_open_linux(const char* filename, const char *mode)
+static BD_FILE_H *file_open_linux(const char* filename, const char *mode)
 {
     FILE *fp = NULL;
-    FILE_H *file = malloc(sizeof(FILE_H));
+    BD_FILE_H *file = malloc(sizeof(BD_FILE_H));
 
     DEBUG(DBG_FILE, "Opening LINUX file %s... (%p)\n", filename, file);
     file->close = file_close_linux;
@@ -91,5 +91,4 @@ FILE_H *file_open_linux(const char* filename, const char *mode)
     return NULL;
 }
 
-
-
+BD_FILE_H* (*file_open)(const char* filename, const char *mode) = file_open_linux;

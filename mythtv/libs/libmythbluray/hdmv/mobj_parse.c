@@ -108,7 +108,7 @@ void mobj_free(MOBJ_OBJECTS *objects)
 MOBJ_OBJECTS *mobj_parse(const char *file_name)
 {
     BITSTREAM     bs;
-    FILE_H       *fp;
+    BD_FILE_H    *fp;
     MOBJ_OBJECTS *objects = NULL;
     uint16_t      num_objects;
     uint32_t      data_len;

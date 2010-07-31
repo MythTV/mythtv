@@ -571,7 +571,7 @@ CLPI_CL*
 clpi_parse(char *path, int verbose)
 {
     BITSTREAM  bits;
-    FILE_H    *fp;
+    BD_FILE_H *fp;
     CLPI_CL   *cl;
 
     clpi_verbose = verbose;

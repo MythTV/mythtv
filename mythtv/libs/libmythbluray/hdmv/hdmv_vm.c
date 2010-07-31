@@ -570,6 +570,8 @@ static void _set_nv_timer(HDMV_VM *p, uint32_t dst, uint32_t src)
   bd_psr_write(p->regs, PSR_NAV_TIMER, timeout);
 }
 
+/* Unused function.
+ * Commenting out to disable "‘_check_nv_timer’ defined but not used" warning
 static int _check_nv_timer(HDMV_VM *p)
 {
     if (p->nv_timer.time.tv_sec > 0) {
@@ -599,6 +601,7 @@ static int _check_nv_timer(HDMV_VM *p)
 
     return -1;
 }
+*/
 
 /*
  * trace

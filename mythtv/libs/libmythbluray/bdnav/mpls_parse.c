@@ -716,7 +716,7 @@ MPLS_PL*
 mpls_parse(char *path, int verbose)
 {
     BITSTREAM  bits;
-    FILE_H    *fp;
+    BD_FILE_H *fp;
     MPLS_PL   *pl = NULL;
 
     mpls_verbose = verbose;

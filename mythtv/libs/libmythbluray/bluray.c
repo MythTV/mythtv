@@ -31,14 +31,14 @@
 #include "bdnav/navigation.h"
 #include "bdnav/index_parse.h"
 #include "file/file.h"
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
 #include "file/dl.h"
 #endif
 #ifdef USING_BDJAVA
 #include "bdj/bdj.h"
 #endif
 
-#ifndef USING_DLOPEN
+#ifndef DLOPEN_CRYPTO_LIBS
 #include <libaacs/aacs.h>
 #include <libbdplus/bdplus.h>
 #endif
@@ -78,7 +78,7 @@ struct bluray {
 
     /* current clip */
     NAV_CLIP       *clip;
-    FILE_H         *fp;
+    BD_FILE_H      *fp;
     uint64_t       clip_size;
     uint64_t       clip_block_pos;
     uint64_t       clip_pos;
@@ -189,7 +189,7 @@ static int _open_m2ts(BLURAY *bd)
             X_FREE(f_name);
 
             if (bd->bdplus) {
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
                 fptr_p_void bdplus_set_title;
                 bdplus_set_title = dl_dlsym(bd->h_libbdplus, "bdplus_set_title");
                 if (bdplus_set_title)
@@ -199,6 +199,18 @@ static int _open_m2ts(BLURAY *bd)
 #endif
             }
 
+/* RAM            if (bd->aacs) {
+                uint32_t title = bd_psr_read(bd->regs, PSR_TITLE_NUMBER);
+#ifdef DLOPEN_CRYPTO_LIBS
+                fptr_p_void aacs_select_title;
+                aacs_select_title = dl_dlsym(bd->h_libaacs, "aacs_select_title");
+                if (aacs_select_title)
+                    aacs_select_title(bd->aacs, title);
+#else
+                aacs_select_title(bd->aacs, title);
+#endif
+            }
+*/
             bd_psr_write(bd->regs, PSR_PLAYITEM, bd->clip->ref);
 
             return 1;
@@ -214,9 +226,9 @@ static int _open_m2ts(BLURAY *bd)
     return 0;
 }
 
- static int _libaacs_open(BLURAY *bd, const char *keyfile_path)
+static int _libaacs_open(BLURAY *bd, const char *keyfile_path)
 {
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
     if ((bd->h_libaacs = dl_dlopen("libaacs", "0"))) {
         DEBUG(DBG_BLURAY, "Downloaded libaacs (%p)\n", bd->h_libaacs);
 
@@ -242,13 +254,12 @@ static int _open_m2ts(BLURAY *bd)
 
     bd->libaacs_decrypt_unit = &aacs_decrypt_unit;
 
-    if (bd->libaacs_decrypt_unit) {
-        if ((bd->aacs = aacs_open(bd->device_path, keyfile_path))) {
-            DEBUG(DBG_BLURAY, "Opened libaacs (%p)\n", bd->aacs);
-            return 1;
-        }
-        DEBUG(DBG_BLURAY, "aacs_open() failed!\n");
+    if ((bd->aacs = aacs_open(bd->device_path, keyfile_path))) {
+
+        DEBUG(DBG_BLURAY, "Opened libaacs (%p)\n", bd->aacs);
+        return 1;
     }
+    DEBUG(DBG_BLURAY, "aacs_open() failed!\n");
 #endif
 
     bd->h_libaacs = NULL;
@@ -264,14 +275,14 @@ static void _libbdplus_open(BLURAY *bd, const char *keyfile_path)
     uint8_t vid[16] = {
         0xC5,0x43,0xEF,0x2A,0x15,0x0E,0x50,0xC4,0xE2,0xCA,
         0x71,0x65,0xB1,0x7C,0xA7,0xCB}; // FIXME
-    FILE_H *fd;
+    BD_FILE_H *fd;
     char *tmp = NULL;
     tmp = str_printf("%s/BDSVM/00000.svm", bd->device_path);
     if ((fd = file_open(tmp, "rb"))) {
         file_close(fd);
 
         DEBUG(DBG_BDPLUS, "attempting to load libbdplus\n");
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
         if ((bd->h_libbdplus = dl_dlopen("libbdplus", "0"))) {
             DEBUG(DBG_BLURAY, "Downloaded libbdplus (%p)\n",
                   bd->h_libbdplus);
@@ -322,10 +333,6 @@ BLURAY *bd_open(const char* device_path, const char* keyfile_path)
         bd->device_path = (char*)malloc(strlen(device_path) + 1);
         strcpy(bd->device_path, device_path);
 
-        bd->aacs = NULL;
-        bd->h_libaacs = NULL;
-        bd->fp = NULL;
-
         _libaacs_open(bd, keyfile_path);
 
         _libbdplus_open(bd, keyfile_path);
@@ -349,7 +356,7 @@ void bd_close(BLURAY *bd)
     bd_stop_bdj(bd);
 
     if (bd->aacs) {
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
         fptr_p_void fptr = dl_dlsym(bd->h_libaacs, "aacs_close");
         fptr(bd->aacs);  // FIXME: NULL
         dl_dlclose(bd->h_libaacs);
@@ -359,7 +366,7 @@ void bd_close(BLURAY *bd)
     }
 
     if (bd->bdplus) {
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
         fptr_p_void bdplus_free = dl_dlsym(bd->h_libbdplus, "bdplus_free");
         if (bdplus_free) bdplus_free(bd->bdplus);
 #else
@@ -367,7 +374,7 @@ void bd_close(BLURAY *bd)
 #endif
         bd->bdplus = NULL;
 
-#ifdef USING_DLOPEN
+#ifdef DLOPEN_CRYPTO_LIBS
         dl_dlclose(bd->h_libbdplus);
 #endif
         bd->h_libbdplus = NULL;
@@ -414,7 +421,8 @@ static int _read_block(BLURAY *bd)
                     DEBUG(DBG_BLURAY | DBG_CRIT, "Read %d bytes at %"PRIu64" ; requested %d ! (%p)\n", read_len, bd->clip_block_pos, len, bd);
 
                 if (bd->libaacs_decrypt_unit) {
-                    if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf, len, bd->clip_block_pos)) {
+// RAM                   if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf)) {
+                   if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf, len, bd->clip_block_pos)) {
                         DEBUG(DBG_BLURAY, "Unable decrypt unit! (%p)\n", bd);
 
                         return 0;
@@ -499,8 +507,10 @@ int64_t bd_seek_time(BLURAY *bd, uint64_t tick)
         bd->seamless_angle_change = 0;
         bd_psr_write(bd->regs, PSR_ANGLE_NUMBER, bd->title->angle + 1);
     }
-    if (tick < bd->title->duration * 2) {
-        tick /= 2;
+
+    tick /= 2;
+
+    if (tick < bd->title->duration) {
 
         // Find the closest access unit to the requested position
         clip = nav_time_search(bd->title, tick, &clip_pkt, &out_pkt);
@@ -728,6 +738,17 @@ int bd_select_playlist(BLURAY *bd, uint32_t playlist)
     char *f_name = str_printf("%05d.mpls", playlist);
     int result;
 
+    if (bd->title_list) {
+        /* update current title */
+        unsigned i;
+        for (i = 0; i < bd->title_list->count; i++) {
+            if (playlist == bd->title_list->title_info[i].mpls_id) {
+                bd->title_idx = i;
+                break;
+            }
+        }
+    }
+
     result = _open_playlist(bd, f_name);
 
     X_FREE(f_name);
@@ -846,29 +867,14 @@ static void _copy_streams(BLURAY_STREAM_INFO *streams, MPLS_STREAM *si, int coun
     }
 }
 
-BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
+static BLURAY_TITLE_INFO* _fill_title_info(NAV_TITLE* title, uint32_t title_idx, uint32_t playlist)
 {
-    NAV_TITLE *title;
     BLURAY_TITLE_INFO *title_info;
     unsigned int ii;
 
-    if (bd->title_list == NULL) {
-        DEBUG(DBG_BLURAY, "Title list not yet read! (%p)\n", bd);
-        return NULL;
-    }
-    if (bd->title_list->count <= title_idx) {
-        DEBUG(DBG_BLURAY, "Invalid title index %d! (%p)\n", title_idx, bd);
-        return NULL;
-    }
-    title = nav_title_open(bd->device_path, bd->title_list->title_info[title_idx].name);
-    if (title == NULL) {
-        DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
-              bd->title_list->title_info[title_idx].name, bd);
-        return NULL;
-    }
     title_info = calloc(1, sizeof(BLURAY_TITLE_INFO));
     title_info->idx = title_idx;
-    title_info->playlist = bd->title_list->title_info[title_idx].mpls_id;
+    title_info->playlist = playlist;
     title_info->duration = (uint64_t)title->duration * 2;
     title_info->angle_count = title->angle_count;
     title_info->chapter_count = title->chap_list.count;
@@ -903,6 +909,55 @@ BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
         _copy_streams(ci->sec_video_streams, pi->stn.secondary_video, ci->sec_video_stream_count);
         _copy_streams(ci->sec_audio_streams, pi->stn.secondary_audio, ci->sec_audio_stream_count);
     }
+
+    return title_info;
+}
+
+BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
+{
+    NAV_TITLE *title;
+    BLURAY_TITLE_INFO *title_info;
+
+    if (bd->title_list == NULL) {
+        DEBUG(DBG_BLURAY, "Title list not yet read! (%p)\n", bd);
+        return NULL;
+    }
+    if (bd->title_list->count <= title_idx) {
+        DEBUG(DBG_BLURAY, "Invalid title index %d! (%p)\n", title_idx, bd);
+        return NULL;
+    }
+    title = nav_title_open(bd->device_path, bd->title_list->title_info[title_idx].name);
+    if (title == NULL) {
+        DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
+              bd->title_list->title_info[title_idx].name, bd);
+        return NULL;
+    }
+
+    title_info = _fill_title_info(title, title_idx, bd->title_list->title_info[title_idx].mpls_id);
+
+    nav_title_close(title);
+    return title_info;
+}
+
+BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist)
+{
+    char *f_name = str_printf("%05d.mpls", playlist);
+    NAV_TITLE *title;
+    BLURAY_TITLE_INFO *title_info;
+
+    title = nav_title_open(bd->device_path, f_name);
+    if (title == NULL) {
+        DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
+              f_name, bd);
+        X_FREE(f_name);
+        return NULL;
+    }
+
+    X_FREE(f_name);
+
+    // the title number doesn't matter in this case
+    title_info = _fill_title_info(title, 0, playlist);
+
     nav_title_close(title);
     return title_info;
 }
@@ -995,7 +1050,7 @@ int bd_start_bdj(BLURAY *bd, const char *start_object)
 {
 #ifdef USING_BDJAVA
     if (bd->bdjava == NULL) {
-        bd->bdjava = bdj_open(bd->device_path, start_object, bd->regs);
+        bd->bdjava = bdj_open(bd->device_path, start_object, bd->regs, bd);
         return 0;
     } else {
         DEBUG(DBG_BLURAY | DBG_CRIT, "BD-J is already running (%p)\n", bd);
@@ -1030,11 +1085,54 @@ static void _process_psr_event(void *handle, BD_PSR_EVENT *ev)
     DEBUG(DBG_BLURAY, "PSR event %d %d (%p)\n", ev->psr_idx, ev->new_val, bd);
 
     switch (ev->psr_idx) {
-        case PSR_ANGLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_ANGLE_ID, ev->new_val - 1}); break;
-        case PSR_TITLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_TITLE_ID, ev->new_val}); break;
+
+        /* current playback position */
+
+        case PSR_ANGLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_ANGLE, ev->new_val}); break;
+        case PSR_TITLE_NUMBER: _queue_event(bd, (BD_EVENT){BD_EVENT_TITLE, ev->new_val}); break;
         case PSR_PLAYLIST: _queue_event(bd, (BD_EVENT){BD_EVENT_PLAYLIST, ev->new_val}); break;
         case PSR_PLAYITEM: _queue_event(bd, (BD_EVENT){BD_EVENT_PLAYITEM, ev->new_val}); break;
         case PSR_CHAPTER:  _queue_event(bd, (BD_EVENT){BD_EVENT_CHAPTER,  ev->new_val}); break;
+
+        /* Interactive Graphics */
+
+        case PSR_SELECTED_BUTTON_ID:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_SELECTED_BUTTON_ID, ev->new_val});
+            break;
+
+        case PSR_MENU_PAGE_ID:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_MENU_PAGE_ID, ev->new_val});
+            break;
+
+        /* stream selection */
+
+        case PSR_IG_STREAM_ID:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_IG_STREAM, ev->new_val});
+            break;
+
+        case PSR_PRIMARY_AUDIO_ID:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_AUDIO_STREAM, ev->new_val});
+            break;
+
+        case PSR_PG_STREAM:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_PG_TEXTST,        !!(ev->new_val & 0x80000000)});
+            _queue_event(bd, (BD_EVENT){BD_EVENT_PG_TEXTST_STREAM,    ev->new_val & 0xfff});
+            break;
+
+        case PSR_SECONDARY_AUDIO_VIDEO:
+            /* secondary video */
+            if ((ev->new_val & 0x8f00ff00) != (ev->old_val & 0x8f00ff00)) {
+                _queue_event(bd, (BD_EVENT){BD_EVENT_SECONDARY_VIDEO, !!(ev->new_val & 0x80000000)});
+                _queue_event(bd, (BD_EVENT){BD_EVENT_SECONDARY_VIDEO_SIZE, (ev->new_val >> 24) & 0xf});
+                _queue_event(bd, (BD_EVENT){BD_EVENT_SECONDARY_VIDEO_STREAM, (ev->new_val & 0xff00) >> 8});
+            }
+            /* secondary audio */
+            if ((ev->new_val & 0x400000ff) != (ev->old_val & 0x400000ff)) {
+                _queue_event(bd, (BD_EVENT){BD_EVENT_SECONDARY_AUDIO, !!(ev->new_val & 0x40000000)});
+                _queue_event(bd, (BD_EVENT){BD_EVENT_SECONDARY_AUDIO_STREAM, ev->new_val & 0xff});
+            }
+            break;
+
         default:;
     }
 }
@@ -1066,7 +1164,7 @@ static int _play_hdmv(BLURAY *bd, unsigned id_ref)
 }
 
 #define TITLE_FIRST_PLAY 0xffff   /* 10.4.3.2 (E) */
-#define TITLE_TOP_MENU   0x10000
+#define TITLE_TOP_MENU   0x0000   /* 5.2.3.3 */
 
 int bd_play_title(BLURAY *bd, unsigned title)
 {
@@ -1120,10 +1218,10 @@ int bd_play_title(BLURAY *bd, unsigned title)
     }
 
     /* valid title from disc index ? */
-    if (title < bd->index->num_titles) {
-        INDX_TITLE *t = &bd->index->titles[title];
+    if (title > 0 && title <= bd->index->num_titles) {
+        INDX_TITLE *t = &bd->index->titles[title-1];
 
-        bd_psr_write(bd->regs, PSR_TITLE_NUMBER, title + 1); /* 5.2.3.3 */
+        bd_psr_write(bd->regs, PSR_TITLE_NUMBER, title); /* 5.2.3.3 */
 
         if (t->object_type == indx_object_type_hdmv) {
             return _play_hdmv(bd, t->hdmv.id_ref);
@@ -1172,4 +1270,19 @@ int bd_read_ext(BLURAY *bd, unsigned char *buf, int len, BD_EVENT *event)
     _get_event(bd, event);
 
     return bytes;
+}
+
+int bd_get_event(BLURAY *bd, BD_EVENT *event)
+{
+    if (!bd->event_queue) {
+        _init_event_queue(bd);
+
+        bd_psr_register_cb(bd->regs, _process_psr_event, bd);
+    }
+
+    if (_get_event(bd, event)) {
+        return 0;
+    }
+
+    return 1;
 }

@@ -26,7 +26,12 @@
 #include <string.h>
 
 static debug_mask_t debug_mask = DBG_CRIT;
+static BD_LOG_FUNC  log_func   = NULL;
 
+void bd_set_debug_handler(BD_LOG_FUNC f)
+{
+    log_func = f;
+}
 
 void bd_set_debug_mask(debug_mask_t mask)
 {
@@ -70,13 +75,19 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
     }
 
     if (mask & debug_mask) {
-        char buffer[512];
+        char buffer[512], *pt = buffer;
         va_list args;
 
+        pt += sprintf(buffer, "%s:%d: ", file, line);
+
         va_start(args, format);
-        vsprintf(buffer, format, args);
+        vsprintf(pt, format, args);
         va_end(args);
 
-        fprintf(logfile, "%s:%d: %s", file, line, buffer);
+        if (log_func) {
+            log_func(buffer);
+        } else {
+            fprintf(logfile, "%s", buffer);
+        }
     }
 }
