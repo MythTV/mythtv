@@ -1,6 +1,14 @@
 7/30/2010:
 
-The following commits have been reverted in our local copy to keep compatibility with the only public copy of libaacs.  When libaacs goes public, need to apply them.  Search for "RAM" in the source to find local changes.
+No current significant differences with upstream.  Header files need:
 
-http://git.videolan.org/?p=libbluray.git;a=commitdiff;h=af765dbec7e1d720ec611e5d82134f1610a64a55
-http://git.videolan.org/?p=libbluray.git;a=commitdiff;h=baabab25def52ba4928f10e8f18bd143819edcb7 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+and
+
+#ifdef __cplusplus
+};
+#endif
+

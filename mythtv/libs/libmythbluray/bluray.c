@@ -199,7 +199,7 @@ static int _open_m2ts(BLURAY *bd)
 #endif
             }
 
-/* RAM            if (bd->aacs) {
+            if (bd->aacs) {
                 uint32_t title = bd_psr_read(bd->regs, PSR_TITLE_NUMBER);
 #ifdef DLOPEN_CRYPTO_LIBS
                 fptr_p_void aacs_select_title;
@@ -210,7 +210,7 @@ static int _open_m2ts(BLURAY *bd)
                 aacs_select_title(bd->aacs, title);
 #endif
             }
-*/
+
             bd_psr_write(bd->regs, PSR_PLAYITEM, bd->clip->ref);
 
             return 1;
@@ -421,8 +421,7 @@ static int _read_block(BLURAY *bd)
                     DEBUG(DBG_BLURAY | DBG_CRIT, "Read %d bytes at %"PRIu64" ; requested %d ! (%p)\n", read_len, bd->clip_block_pos, len, bd);
 
                 if (bd->libaacs_decrypt_unit) {
-// RAM                   if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf)) {
-                   if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf, len, bd->clip_block_pos)) {
+                   if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf)) {
                         DEBUG(DBG_BLURAY, "Unable decrypt unit! (%p)\n", bd);
 
                         return 0;
