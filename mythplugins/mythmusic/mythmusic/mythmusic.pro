@@ -41,7 +41,7 @@ HEADERS += treebuilders.h importmusic.h
 HEADERS += filescanner.h libvisualplugin.h musicplayer.h miniplayer.h
 HEADERS += playlistcontainer.h
 HEADERS += mythlistview-qt3.h mythlistbox-qt3.h
-HEADERS += musiccommon.h decoderhandler.h pls.h
+HEADERS += musiccommon.h decoderhandler.h pls.h shoutcast.h
 
 SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp
 SOURCES += flacencoder.cpp main.cpp
@@ -61,7 +61,7 @@ SOURCES += treebuilders.cpp importmusic.cpp
 SOURCES += filescanner.cpp libvisualplugin.cpp musicplayer.cpp miniplayer.cpp
 SOURCES += playlistcontainer.cpp
 SOURCES += mythlistview-qt3.cpp mythlistbox-qt3.cpp
-SOURCES += musiccommon.cpp decoderhandler.cpp pls.cpp
+SOURCES += musiccommon.cpp decoderhandler.cpp pls.cpp shoutcast.cpp
 
 macx {
     SOURCES -= cddecoder.cpp

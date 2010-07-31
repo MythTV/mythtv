@@ -18,6 +18,7 @@
 #include "decoder.h"
 #include "metadata.h"
 #include "streaminput.h"
+#include "shoutcast.h"
 
 /**********************************************************************/
 
@@ -454,7 +455,7 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
     {
         if ((m_decoder = Decoder::create(format, NULL, NULL, true)) == NULL)
         {
-            doFailed(url, "No decoder for this format");
+            doFailed(url, QString("No decoder for this format '%1'").arg(format));
             return;
         }
     }
@@ -468,7 +469,8 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 
 void DecoderHandler::doFailed(const QUrl &url, const QString &message)
 {
-    VERBOSE(VB_NETWORK, QString("DecoderHandler: Unsupported file format: '%1'").arg(url.toString()));
+    VERBOSE(VB_NETWORK, QString("DecoderHandler: Unsupported file format: '%1' - %2")
+            .arg(url.toString()).arg(message));
     DecoderHandlerEvent ev(DecoderHandlerEvent::Error, new QString(message));
     dispatch(ev);
 }
@@ -505,6 +507,8 @@ void DecoderHandler::createIOFactory(const QUrl &url)
     {
         m_io_factory = new DecoderIOFactoryFile(this);
     }
+    else if (m_meta && m_meta->Format() == "cast")
+        m_io_factory = new DecoderIOFactoryShoutCast(this);
     else
         m_io_factory = new DecoderIOFactoryUrl(this);
 }
