@@ -121,7 +121,7 @@ void avfDecoder::writeBlock()
 
 bool avfDecoder::initialize()
 {
-    inited = user_stop = finish = FALSE;
+    inited = user_stop = finish = false;
     freq = bitrate = 0;
     stat = m_channels = 0;
     m_sampleFmt = FORMAT_NONE;
@@ -155,6 +155,14 @@ bool avfDecoder::initialize()
         probe_data.buf = m_buffer;
         input()->read((char*)probe_data.buf, probe_data.buf_size);
         m_inputFormat = av_probe_input_format(&probe_data, 1);
+
+        if (!m_inputFormat)
+        {
+            VERBOSE(VB_GENERAL, "Could not identify the stream type in "
+                                "avfDecoder::initialize");
+            deinit();
+            return false;
+        }
     }
 
     if (!m_samples)
@@ -184,7 +192,7 @@ bool avfDecoder::initialize()
         VERBOSE(VB_IMPORTANT, QString("Could not open file (%1)").arg(filename));
         VERBOSE(VB_IMPORTANT, QString("AV decoder. Error: %1").arg(error));
         deinit();
-        return FALSE;
+        return false;
     }
 
     // determine the stream format
@@ -193,7 +201,7 @@ bool avfDecoder::initialize()
     {
         VERBOSE(VB_GENERAL, "Could not determine the stream format.");
         deinit();
-        return FALSE;
+        return false;
     }
 
     // Store the audio codec of the stream
@@ -212,14 +220,14 @@ bool avfDecoder::initialize()
         VERBOSE(VB_GENERAL, QString("Could not find audio codec: %1")
                                                     .arg(m_audioDec->codec_id));
         deinit();
-        return FALSE;
+        return false;
     }
     if (avcodec_open(m_audioDec,m_codec) < 0)
     {
         VERBOSE(VB_GENERAL, QString("Could not open audio codec: %1")
                                                     .arg(m_audioDec->codec_id));
         deinit();
-        return FALSE;
+        return false;
     }
     if (AV_TIME_BASE > 0)
         totalTime = (m_inputContext->duration / AV_TIME_BASE) * 1000;
@@ -291,8 +299,8 @@ bool avfDecoder::initialize()
                                    AVCODEC_MAX_AUDIO_FRAME_SIZE * 2);
     output_at = 0;
 
-    inited = TRUE;
-    return TRUE;
+    inited = true;
+    return true;
 }
 
 void avfDecoder::seek(double pos)
