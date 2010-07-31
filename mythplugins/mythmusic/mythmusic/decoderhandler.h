@@ -1,20 +1,24 @@
 #ifndef DECODERHANDLER_H_
 #define DECODERHANDLER_H_
 
+// c++
+#include <iostream>
+
 // qt
 #include <QObject>
 #include <QIODevice>
 #include <QFile>
-#include <QHttp>
 #include <QUrl>
+#include <QMutex>
 
 // mythtv
-#include <mythtv/mythobservable.h>
+#include <mythobservable.h>
 
 // mythmusic
 #include "metadata.h"
 #include "pls.h"
 
+class MusicBuffer;
 
 
 class QUrl;
@@ -25,6 +29,8 @@ class Decoder;
 class Metadata;
 class DecoderIOFactory;
 class DecoderHandler;
+class MusicBuffer;
+class MusicIODevice;
 
 /** \brief Events sent by the \p DecoderHandler and it's helper classes.
  */
@@ -143,6 +149,7 @@ class DecoderIOFactory : public QObject, public MythObservable
     void setMeta (Metadata *meta) { m_meta = *meta; }
 
     static const uint DefaultPrebufferSize = 128 * 1024;
+    static const uint DefaultBufferSize = 256 * 1024;
     static const uint MaxRedirects = 3;
 
   protected:
@@ -163,7 +170,8 @@ class DecoderIOFactory : public QObject, public MythObservable
 
 class DecoderIOFactoryFile : public DecoderIOFactory
 {
-    Q_OBJECT
+  Q_OBJECT
+
   public:
     DecoderIOFactoryFile(DecoderHandler *parent);
     ~DecoderIOFactoryFile(void);
@@ -173,6 +181,87 @@ class DecoderIOFactoryFile : public DecoderIOFactory
 
   private:
     QIODevice *m_input;
+};
+
+class DecoderIOFactoryUrl : public DecoderIOFactory 
+{
+  Q_OBJECT
+
+  public:
+    DecoderIOFactoryUrl(DecoderHandler *parent);
+    ~DecoderIOFactoryUrl(void);
+
+    void start(void);
+    void stop(void);
+    QIODevice *takeInput(void);
+
+  protected slots:
+    void replyFinished(QNetworkReply *reply);
+    void readyRead(void);
+
+  private:
+    void doStart(void);
+    void doClose(void);
+
+    bool m_started;
+    QNetworkAccessManager *m_accessManager;
+    QNetworkReply    *m_reply;
+    MusicIODevice *m_input;
+    QUrl   m_redirectedURL;
+    uint   m_redirectCount;
+    uint   m_bytesWritten;
+};
+
+class MusicBuffer
+{
+  public:
+    MusicBuffer(void) { }
+    ~MusicBuffer(void) { }
+
+    qint64 read(char *data, qint64 max, bool doRemove = true);
+    qint64 read(QByteArray &array, qint64 max, bool doRemove = true);
+
+    void   write(const char *data, uint sz);
+    void   write(QByteArray &array);
+
+    void   remove(int index, int len);
+
+    qint64 readBufAvail(void) const { return m_buffer.size(); }
+
+  private:
+    QByteArray m_buffer;
+    QMutex     m_mutex;
+};
+
+class MusicIODevice : public QIODevice
+{
+  Q_OBJECT
+
+  public:
+    MusicIODevice(void);
+    ~MusicIODevice(void);
+
+    bool open(int);
+    void close(void) { };
+    bool flush(void);
+
+    qint64 size(void) const;
+    qint64 pos(void) const { return 0; }
+    qint64 bytesAvailable(void) const;
+    bool   isSequential(void) const { return true; }
+
+    qint64 readData(char *data, qint64 sz);
+    qint64 writeData(const char *data, qint64 sz);
+
+    int getch(void);
+    int putch(int c);
+    int ungetch(int);
+
+  signals:
+    void freeSpaceAvailable(void);
+
+  protected:
+    MusicBuffer *m_buffer;
 };
 
 #endif /* DECODERHANDLER_H_ */

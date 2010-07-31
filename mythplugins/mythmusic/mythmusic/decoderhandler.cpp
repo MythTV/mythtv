@@ -127,6 +127,119 @@ void DecoderIOFactoryFile::start(void)
     doConnectDecoder(getUrl());
 }
 
+DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent) : DecoderIOFactory(parent)
+{
+    m_accessManager = new QNetworkAccessManager(this);
+    m_input = new MusicIODevice();
+    connect(m_input, SIGNAL(freeSpaceAvailable()), SLOT(readyRead()));
+
+    m_input->open(QIODevice::ReadWrite);
+
+    m_bytesWritten = 0;
+}
+
+DecoderIOFactoryUrl::~DecoderIOFactoryUrl(void)
+{
+    doClose();
+
+    m_accessManager->deleteLater();
+
+    if (m_input)
+        delete m_input;
+}
+
+QIODevice* DecoderIOFactoryUrl::takeInput(void) 
+{
+    QIODevice *result = m_input;
+    //m_input = NULL;
+    return result;
+}
+
+void DecoderIOFactoryUrl::start(void)
+{
+    VERBOSE(VB_PLAYBACK, QString("DecoderIOFactory: Url %1").arg(getUrl().toString()));
+
+    m_started = false;
+
+    doOperationStart("Fetching remote file");
+
+    m_reply = m_accessManager->get(QNetworkRequest(getUrl()));
+
+    connect(m_reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    connect(m_accessManager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(replyFinished(QNetworkReply*)));
+}
+
+void DecoderIOFactoryUrl::stop(void)
+{
+    doClose();
+}
+
+void DecoderIOFactoryUrl::replyFinished(QNetworkReply *reply)
+{
+    if (reply->error() != QNetworkReply::NoError) 
+    {
+        doFailed("Cannot retrieve remote file.");
+        return;
+    }
+
+    QUrl possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+
+    if (!possibleRedirectUrl.isEmpty() && (m_redirectedURL != possibleRedirectUrl))
+    {
+        VERBOSE(VB_PLAYBACK, QString("DecoderIOFactory: Got redirected to %1").arg(possibleRedirectUrl));
+
+        m_redirectCount++;
+
+        if (m_redirectCount > MaxRedirects)
+        {
+            doFailed("Too many redirects");
+        }
+        else
+        {
+            setUrl(possibleRedirectUrl);
+            m_redirectedURL = possibleRedirectUrl;
+            start();
+        }
+
+        return;
+    }
+
+    m_redirectedURL.clear();
+
+    if (!m_started)
+        doStart();
+}
+
+void DecoderIOFactoryUrl::readyRead(void)
+{
+    int available = DecoderIOFactory::DefaultBufferSize - m_input->bytesAvailable();
+    QByteArray data = m_reply->read(available);
+
+    m_bytesWritten += data.size();
+    m_input->writeData(data.data(), data.size());
+
+    if (!m_started && m_bytesWritten > DecoderIOFactory::DefaultPrebufferSize)
+    {
+        m_reply->setReadBufferSize(DecoderIOFactory::DefaultPrebufferSize);
+        doStart();
+    }
+
+//    VERBOSE(VB_IMPORTANT, QString("DecoderIOFactoryUrl::readyRead file size: %1").arg(m_bytesWritten));
+}
+
+void DecoderIOFactoryUrl::doStart(void)
+{
+    doConnectDecoder(getUrl());
+    m_started = true;
+}
+
+void DecoderIOFactoryUrl::doClose(void)
+{
+    if (m_input && m_input->isOpen())
+        m_input->close();
+}
+
 /**********************************************************************/
 
 DecoderHandler::DecoderHandler(void)
@@ -392,6 +505,8 @@ void DecoderHandler::createIOFactory(const QUrl &url)
     {
         m_io_factory = new DecoderIOFactoryFile(this);
     }
+    else
+        m_io_factory = new DecoderIOFactoryUrl(this);
 }
 
 void DecoderHandler::deleteIOFactory(void)
@@ -406,4 +521,121 @@ void DecoderHandler::deleteIOFactory(void)
     m_io_factory->disconnect();
     m_io_factory->deleteLater();
     m_io_factory = NULL;
+}
+
+/**********************************************************************/
+
+qint64 MusicBuffer::read(char *data, qint64 max, bool doRemove)
+{
+    QMutexLocker holder (&m_mutex);
+    const char *buffer_data = m_buffer.data();
+
+    if (max > m_buffer.size())
+        max = m_buffer.size();
+
+    memcpy(data, buffer_data, max);
+
+    if (doRemove)
+        m_buffer.remove(0, max);
+
+    return max;
+}
+
+qint64 MusicBuffer::read(QByteArray &data, qint64 max, bool doRemove)
+{
+    QMutexLocker holder (&m_mutex);
+    const char *buffer_data = m_buffer.data();
+
+    if (max > m_buffer.size())
+        max = m_buffer.size();
+
+    data.append(buffer_data, max);
+
+    if (doRemove)
+        m_buffer.remove(0, max);
+
+    return max;
+}
+
+void MusicBuffer::write(const char *data, uint sz)
+{
+    if (sz == 0)
+        return;
+
+    QMutexLocker holder(&m_mutex);
+    m_buffer.append(data, sz);
+}
+
+void MusicBuffer::write(QByteArray &array)
+{
+    if (array.size() == 0)
+        return;
+
+    QMutexLocker holder(&m_mutex);
+    m_buffer.append(array);
+}
+
+void MusicBuffer::remove(int index, int len)
+{
+    QMutexLocker holder(&m_mutex);
+    m_buffer.remove(index, len);
+}
+
+/**********************************************************************/
+
+MusicIODevice::MusicIODevice(void)
+{
+    m_buffer = new MusicBuffer;
+    setOpenMode(ReadWrite);
+}
+
+MusicIODevice::~MusicIODevice(void)
+{
+    delete m_buffer;
+}
+
+bool MusicIODevice::open(int)
+{
+    return true;
+}
+
+qint64 MusicIODevice::size(void) const
+{
+    return m_buffer->readBufAvail(); 
+}
+
+qint64 MusicIODevice::readData(char *data, qint64 maxlen)
+{
+    qint64 res = m_buffer->read(data, maxlen);
+    emit freeSpaceAvailable();
+    return res;
+}
+
+qint64 MusicIODevice::writeData(const char *data, qint64 sz)
+{
+    m_buffer->write(data, sz);
+    return sz;
+}
+
+qint64 MusicIODevice::bytesAvailable(void) const
+{
+    return m_buffer->readBufAvail();
+}
+
+int MusicIODevice::getch(void)
+{
+    assert(0);
+    return -1;
+}
+
+int MusicIODevice::putch(int)
+{
+    assert(0);
+    return -1;
+}
+
+int MusicIODevice::ungetch(int)
+{
+    assert(0);
+    return -1;
 }
