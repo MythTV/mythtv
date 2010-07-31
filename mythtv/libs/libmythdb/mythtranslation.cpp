@@ -23,7 +23,7 @@ class MythTranslationPrivate
     {
         if (!m_loaded)
         {
-            m_loaded = "loaded";
+            m_loaded = true;
             m_language = gCoreContext->GetSetting("Language");
         }
     };
@@ -38,7 +38,7 @@ MythTranslationPrivate MythTranslation::d;
 void MythTranslation::load(const QString &module_name)
 {
     d.Init();
-    if (d.m_language.isEmpty())
+    if (!d.m_language.isEmpty())
     {
         // unload any previous version
         unload(module_name);
