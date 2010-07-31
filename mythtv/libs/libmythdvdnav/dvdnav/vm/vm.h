@@ -139,6 +139,7 @@ void vm_get_next_cell(vm_t *vm);
 int vm_jump_pg(vm_t *vm, int pg);
 int vm_jump_cell_block(vm_t *vm, int cell, int block);
 int vm_jump_title_part(vm_t *vm, int title, int part);
+int vm_jump_title_program(vm_t *vm, int title, int pgcn, int pgn);
 int vm_jump_top_pg(vm_t *vm);
 int vm_jump_next_pg(vm_t *vm);
 int vm_jump_prev_pg(vm_t *vm);
@@ -160,8 +161,8 @@ void vm_get_angle_info(vm_t *vm, int *current, int *num_avail);
 /* currently unused */
 void vm_get_audio_info(vm_t *vm, int *current, int *num_avail);
 void vm_get_subp_info(vm_t *vm, int *current, int *num_avail);
-void vm_get_video_res(vm_t *vm, int *width, int *height);
 #endif
+void vm_get_video_res(vm_t *vm, int *width, int *height);
 int  vm_get_video_aspect(vm_t *vm);
 int  vm_get_video_scale_permission(vm_t *vm);
 int  vm_get_video_format(vm_t *vm);

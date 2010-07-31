@@ -130,7 +130,7 @@ static void ifo_print_video_attributes(int level, video_attr_t *attr) {
     printf("(please send a bug report), ");
   }
 
-  // Wide is allways allowed..!!!
+  // Wide is always allowed..!!!
   switch(attr->permitted_df) {
   case 0:
     printf("pan&scan+letterboxed, ");
@@ -328,7 +328,7 @@ static void ifo_print_audio_attributes(int level, audio_attr_t *attr) {
   case 1: // Normal audio
     printf("Normal Caption ");
     break;
-  case 2: // visually imparied
+  case 2: // visually impaired
     printf("Audio for visually impaired ");
     break;
   case 3: // Directors 1
@@ -685,7 +685,7 @@ static void ifoPrint_CELL_PLAYBACK(cell_playback_t *cell_playback, int nr) {
         break;
       case 2:
       case 3:
-        printf("(send bug repport) ");
+        printf("(send bug report) ");
         break;
       }
     }
@@ -781,7 +781,7 @@ void ifoPrint_PGC(pgc_t *pgc) {
     }
   }
 
-  /* Memmory offsets to div. tables. */
+  /* Memory offsets to div. tables. */
   ifoPrint_PGC_COMMAND_TBL(pgc->command_tbl);
   ifoPrint_PGC_PROGRAM_MAP(pgc->program_map, pgc->nr_of_programs);
   ifoPrint_CELL_PLAYBACK(pgc->cell_playback, pgc->nr_of_cells);
@@ -806,7 +806,7 @@ void ifoPrint_TT_SRPT(tt_srpt_t *tt_srpt) {
     printf("\tTitle playback type: (%02x)\n",
            *(uint8_t *)&(tt_srpt->title[i].pb_ty));
     printf("\t\t%s\n",
-           tt_srpt->title[i].pb_ty.multi_or_random_pgc_title ? "Random or Shuffle" : "Sequencial");
+           tt_srpt->title[i].pb_ty.multi_or_random_pgc_title ? "Random or Shuffle" : "Sequential");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_cell_cmd) printf("\t\tJump/Link/Call exists in cell cmd\n");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_prepost_cmd) printf("\t\tJump/Link/Call exists in pre/post cmd\n");
     if (tt_srpt->title[i].pb_ty.jlc_exists_in_button_cmd) printf("\t\tJump/Link/Call exists in button cmd\n");
@@ -1109,7 +1109,7 @@ void ifo_print(dvd_reader_t *dvd, int title) {
       printf("No PGCI Unit table present\n");
     }
 
-    printf("\nParental Manegment Information table\n");
+    printf("\nParental Management Information table\n");
     printf(  "------------------------------------\n");
     if(ifohandle->ptl_mait) {
       ifoPrint_PTL_MAIT(ifohandle->ptl_mait);
@@ -1129,12 +1129,13 @@ void ifo_print(dvd_reader_t *dvd, int title) {
       printf("No Text Data Manager Information present\n");
     }
 
-    printf("\nMenu Cell Adress table\n");
+
+    printf("\nMenu Cell Address table\n");
     printf(  "-----------------\n");
     if(ifohandle->menu_c_adt) {
       ifoPrint_C_ADT(ifohandle->menu_c_adt);
     } else {
-      printf("No Menu Cell Adress table present\n");
+      printf("No Menu Cell Address table present\n");
     }
 
     printf("\nVideo Manager Menu VOBU address map\n");
@@ -1176,12 +1177,12 @@ void ifo_print(dvd_reader_t *dvd, int title) {
       printf("No VTS Time Map table present\n");
     }
 
-    printf("\nMenu Cell Adress table\n");
+    printf("\nMenu Cell Address table\n");
     printf(  "-----------------\n");
     if(ifohandle->menu_c_adt) {
       ifoPrint_C_ADT(ifohandle->menu_c_adt);
     } else {
-      printf("No Cell Adress table present\n");
+      printf("No Cell Address table present\n");
     }
 
     printf("\nVideo Title Set Menu VOBU address map\n");

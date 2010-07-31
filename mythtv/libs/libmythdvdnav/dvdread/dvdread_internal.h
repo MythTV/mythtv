@@ -19,9 +19,9 @@
 #ifndef LIBDVDREAD_DVDREAD_INTERNAL_H
 #define LIBDVDREAD_DVDREAD_INTERNAL_H
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <unistd.h>
-#endif /* _MSC_VER */
+#endif /* _WIN32 */
 
 #define CHECK_VALUE(arg)                                                \
   if(!(arg)) {                                                          \

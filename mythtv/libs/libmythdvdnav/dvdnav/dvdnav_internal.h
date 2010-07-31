@@ -34,7 +34,7 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 #define pthread_mutex_init(a, b) InitializeCriticalSection(a)
 #define pthread_mutex_lock(a)    EnterCriticalSection(a)
 #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
-#define pthread_mutex_destroy(a)
+#define pthread_mutex_destroy(a) DeleteCriticalSection(a)
 
 #if HAVE_GETTIMEOFDAY == 0
 /* replacement gettimeofday implementation */
@@ -60,7 +60,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #endif /* WIN32 */
 
 /* where should libdvdnav write its messages (stdout/stderr) */
-#define MSG_OUT stdout
+#define MSG_OUT stderr
 
 /* Maximum length of an error string */
 #define MAX_ERR_LEN 255

@@ -19,13 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "dvdread/dvd_reader.h"
 #include "dvd_input.h"
 
@@ -170,7 +169,7 @@ static dvd_input_t file_open(const char *target)
   }
 
   /* Open the device */
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__OS2__)
   dev->fd = open(target, O_RDONLY);
 #else
   dev->fd = open(target, O_RDONLY | O_BINARY);

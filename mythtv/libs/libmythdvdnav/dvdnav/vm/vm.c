@@ -54,6 +54,8 @@
 #ifdef __OS2__
 #define INCL_DOS
 #include <os2.h>
+#include <io.h>     /* setmode() */
+#include <fcntl.h>  /* O_BINARY  */
 #endif
 
 /*
@@ -83,6 +85,8 @@ static int  set_TT(vm_t *vm, int tt);
 static int  set_PTT(vm_t *vm, int tt, int ptt);
 static int  set_VTS_TT(vm_t *vm, int vtsN, int vts_ttn);
 static int  set_VTS_PTT(vm_t *vm, int vtsN, int vts_ttn, int part);
+static int  set_PROG(vm_t *vm, int tt, int pgcn, int pgn);
+static int  set_VTS_PROG(vm_t *vm, int vtsN, int vts_ttn, int pgcn, int pgn);
 static int  set_FP_PGC(vm_t *vm);
 static int  set_MENU(vm_t *vm, int menu);
 static int  set_PGCN(vm_t *vm, int pgcN);
@@ -144,15 +148,17 @@ static int os2_open(const char *name, int oflag)
     ULONG ulAction;
     ULONG rc;
 
-    rc = DosOpen( name, &hfile, &ulAction, 0, FILE_NORMAL,
+    rc = DosOpenL(name, &hfile, &ulAction, 0, FILE_NORMAL,
                   OPEN_ACTION_OPEN_IF_EXISTS | OPEN_ACTION_FAIL_IF_NEW,
                   OPEN_ACCESS_READONLY | OPEN_SHARE_DENYNONE | OPEN_FLAGS_DASD,
-                  NULL );
+                  NULL);
 
-    if( rc )
+    if(rc)
         return -1;
 
-    return ( int )hfile;
+    setmode(hfile, O_BINARY);
+
+    return (int)hfile;
 }
 #endif
 
@@ -353,8 +359,6 @@ int vm_reset(vm_t *vm, const char *dvdroot) {
       fprintf(MSG_OUT, "libdvdnav: vm: failed to open/read the DVD\n");
       return 0;
     }
-    dvd_read_name(vm->dvd_name, vm->dvd_serial, dvdroot);
-    vm->map  = remap_loadmap(vm->dvd_name);
     vm->vmgi = ifoOpenVMGI(vm->dvd);
     if(!vm->vmgi) {
       fprintf(MSG_OUT, "libdvdnav: vm: failed to read VIDEO_TS.IFO\n");
@@ -385,6 +389,8 @@ int vm_reset(vm_t *vm, const char *dvdroot) {
       /* return 0; Not really used for now.. */
     }
     /* ifoRead_TXTDT_MGI(vmgi); Not implemented yet */
+    dvd_read_name(vm->dvd_name, vm->dvd_serial, dvdroot);
+    vm->map  = remap_loadmap(vm->dvd_name);
   }
   if (vm->vmgi) {
     int i, mask;
@@ -515,6 +521,24 @@ int vm_jump_cell_block(vm_t *vm, int cell, int block) {
   return 1;
 }
 
+int vm_jump_title_program(vm_t *vm, int title, int pgcn, int pgn) {
+  link_t link;
+
+  if(!set_PROG(vm, title, pgcn, pgn))
+    return 0;
+  /* Some DVDs do not want us to jump directly into a title and have
+   * PGC pre commands taking us back to some menu. Since we do not like that,
+   * we do not execute PGC pre commands that would do a jump. */
+  /* process_command(vm, play_PGC_PG(vm, (vm->state).pgN)); */
+  link = play_PGC_PG(vm, (vm->state).pgN);
+  if (link.command != PlayThis)
+    /* jump occured -> ignore it and play the PG anyway */
+    process_command(vm, play_PG(vm));
+  else
+    process_command(vm, link);
+  return 1;
+}
+
 int vm_jump_title_part(vm_t *vm, int title, int part) {
   link_t link;
 
@@ -594,7 +618,9 @@ int vm_jump_menu(vm_t *vm, DVDMenuID_t menuid) {
       (vm->state).domain = VTSM_DOMAIN;
       break;
     }
-    if(get_PGCIT(vm) && set_MENU(vm, menuid)) {
+    if(vm->vmgi == NULL || vm->vmgi->pgci_ut == NULL)
+      return 0;
+    else if(get_PGCIT(vm) && set_MENU(vm, menuid)) {
       process_command(vm, play_PGC(vm));
       return 1;  /* Jump */
     } else {
@@ -860,8 +886,8 @@ void vm_get_audio_info(vm_t *vm, int *current, int *num_avail) {
     break;
   }
 }
+#endif
 
-/* currently unused */
 void vm_get_subp_info(vm_t *vm, int *current, int *num_avail) {
   switch ((vm->state).domain) {
   case VTS_DOMAIN:
@@ -904,7 +930,6 @@ void vm_get_video_res(vm_t *vm, int *width, int *height) {
     break;
   }
 }
-#endif
 
 int vm_get_video_aspect(vm_t *vm) {
   int aspect = vm_get_video_attr(vm).display_aspect_ratio;
@@ -1514,7 +1539,7 @@ static int process_command(vm_t *vm, link_t link_values) {
       link_values = play_PGC(vm);
       break;
     case JumpSS_VMGM_MENU:
-      /* Jump to Video Manger domain - Title Menu:data1 or any PGC in VMG */
+      /* Jump to Video Manager domain - Title Menu:data1 or any PGC in VMG */
       /* Allowed from anywhere except the VTS Title domain */
       /* Stop SPRM9 Timer and any GPRM counters */
       assert((vm->state).domain != VTS_DOMAIN); /* ?? */
@@ -1674,6 +1699,42 @@ static int set_VTS_PTT(vm_t *vm, int vtsN, int vts_ttn, int part) {
   return res;
 }
 
+static int set_PROG(vm_t *vm, int tt, int pgcn, int pgn) {
+  assert(tt <= vm->vmgi->tt_srpt->nr_of_srpts);
+  return set_VTS_PROG(vm, vm->vmgi->tt_srpt->title[tt - 1].title_set_nr,
+		     vm->vmgi->tt_srpt->title[tt - 1].vts_ttn, pgcn, pgn);
+}
+
+static int set_VTS_PROG(vm_t *vm, int vtsN, int vts_ttn, int pgcn, int pgn) {
+  int pgcN, pgN, res, title, part = 0;
+
+  (vm->state).domain = VTS_DOMAIN;
+
+  if (vtsN != (vm->state).vtsN)
+    if (!ifoOpenNewVTSI(vm, vm->dvd, vtsN))  /* Also sets (vm->state).vtsN */
+      return 0;
+
+  if ((vts_ttn < 1) || (vts_ttn > vm->vtsi->vts_ptt_srpt->nr_of_srpts)) {
+    return 0;
+  }
+
+  pgcN = pgcn;
+  pgN = pgn;
+
+  (vm->state).TT_PGCN_REG = pgcN;
+  (vm->state).TTN_REG     = get_TT(vm, vtsN, vts_ttn);
+  assert( (vm->state.TTN_REG) != 0 );
+  (vm->state).VTS_TTN_REG = vts_ttn;
+  (vm->state).vtsN        = vtsN;  /* Not sure about this one. We can get to it easily from TTN_REG */
+  /* Any other registers? */
+
+  res = set_PGCN(vm, pgcN);   /* This clobber's state.pgN (sets it to 1), but we don't want clobbering here. */
+  (vm->state).pgN = pgN;
+  vm_get_current_title_part(vm, &title, &part);
+  (vm->state).PTTN_REG    = part;
+  return res;
+}
+
 static int set_FP_PGC(vm_t *vm) {
   (vm->state).domain = FP_DOMAIN;
   if (!vm->vmgi->first_play_pgc) {
@@ -1716,6 +1777,7 @@ static int set_PGCN(vm_t *vm, int pgcN) {
 /* Figure out the correct pgN from the cell and update (vm->state). */
 static int set_PGN(vm_t *vm) {
   int new_pgN = 0;
+  int dummy, part = 0;
 
   while(new_pgN < (vm->state).pgc->nr_of_programs
 	&& (vm->state).cellN >= (vm->state).pgc->program_map[new_pgN])
@@ -1732,15 +1794,8 @@ static int set_PGN(vm_t *vm) {
     if((vm->state).TTN_REG > vm->vmgi->tt_srpt->nr_of_srpts)
       return 0; /* ?? */
     pb_ty = &vm->vmgi->tt_srpt->title[(vm->state).TTN_REG - 1].pb_ty;
-    if(pb_ty->multi_or_random_pgc_title == /* One_Sequential_PGC_Title */ 0) {
-      int dummy, part;
       vm_get_current_title_part(vm, &dummy, &part);
       (vm->state).PTTN_REG = part;
-    } else {
-      /* FIXME: Handle RANDOM or SHUFFLE titles.
-      fprintf(MSG_OUT, "libdvdnav: RANDOM or SHUFFLE titles are NOT handled yet.\n");
-      */
-    }
   }
   return 1;
 }

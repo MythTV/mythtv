@@ -28,8 +28,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -445,6 +443,10 @@ static int UDFFileEntry( uint8_t *data, uint8_t *FileType,
 
   L_EA = GETN4( 168 );
   L_AD = GETN4( 172 );
+
+  if (176 + L_EA + L_AD > DVD_VIDEO_LB_LEN)
+    return 0;
+
   p = 176 + L_EA;
   while( p < 176 + L_EA + L_AD ) {
     switch( flags & 0x0007 ) {
@@ -928,8 +930,7 @@ static int UDFGetPVD(dvd_reader_t *device, struct pvd_t *pvd)
   if(GetUDFCache(device, PVDCache, 0, pvd))
     return 1;
 
-  if(!UDFGetDescriptor( device, 1, pvd_buf,
-                    sizeof(pvd_buf_base) - (pvd_buf - pvd_buf_base)))
+  if(!UDFGetDescriptor( device, 1, pvd_buf, DVD_VIDEO_LB_LEN))
     return 0;
 
   memcpy(pvd->VolumeIdentifier, &pvd_buf[24], 32);

@@ -52,12 +52,12 @@ static dvdnav_status_t dvdnav_clear(dvdnav_t * this) {
   if (this->file) DVDCloseFile(this->file);
   this->file = NULL;
 
+  memset(&this->position_current,0,sizeof(this->position_current));
   memset(&this->pci,0,sizeof(this->pci));
   memset(&this->dsi,0,sizeof(this->dsi));
   this->last_cmd_nav_lbn = SRI_END_OF_CELL;
 
   /* Set initial values of flags */
-  this->position_current.still = 0;
   this->skip_still = 0;
   this->sync_wait = 0;
   this->sync_wait_skip = 0;
@@ -178,9 +178,9 @@ dvdnav_status_t dvdnav_reset(dvdnav_t *this) {
 #ifdef LOG_DEBUG
   fprintf(MSG_OUT, "libdvdnav: clearing dvdnav\n");
 #endif
+  pthread_mutex_unlock(&this->vm_lock);
   result = dvdnav_clear(this);
 
-  pthread_mutex_unlock(&this->vm_lock);
   return result;
 }
 
@@ -843,6 +843,23 @@ uint8_t dvdnav_get_video_aspect(dvdnav_t *this) {
   pthread_mutex_unlock(&this->vm_lock);
 
   return retval;
+}
+
+int dvdnav_get_video_resolution(dvdnav_t *this, uint32_t *width, uint32_t *height) {
+  int w, h;
+
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return -1;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  vm_get_video_res(this->vm, &w, &h);
+  pthread_mutex_unlock(&this->vm_lock);
+
+  *width  = w;
+  *height = h;
+  return 0;
 }
 
 uint8_t dvdnav_get_video_scale_permission(dvdnav_t *this) {
