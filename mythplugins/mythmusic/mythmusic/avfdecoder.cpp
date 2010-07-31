@@ -15,11 +15,8 @@
         - Initial release
         - 1/9/2004 - Improved seek support
         - ?/?/2009 - Extended to support many more filetypes and bug fixes
+        - ?/7/2010 - Add streaming support 
 */
-
-// C++ headers
-#include <iostream>
-#include <string>
 
 // QT headers
 #include <QObject>
@@ -36,8 +33,6 @@ using namespace std;
 
 // Mythmusic Headers
 #include "avfdecoder.h"
-#include "constants.h"
-#include "metadata.h"
 #include "metaioavfcomment.h"
 #include "metaioid3.h"
 #include "metaioflacvorbis.h"
@@ -51,7 +46,6 @@ using namespace std;
 // streaming callbacks
 int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
 {
-
     QIODevice *io = (QIODevice*)opaque;
     buf_size = min(buf_size, (int) io->bytesAvailable());
     return io->read((char*)buf, buf_size);
@@ -59,12 +53,18 @@ int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
 
 int WriteFunc(void *opaque, uint8_t *buf, int buf_size)
 {
+    (void)opaque;
+    (void)buf;
+    (void)buf_size;
     // we don't support writing to the steam
     return -1;
 }
 
 int64_t SeekFunc(void *opaque, int64_t offset, int whence) 
 {
+    (void)opaque;
+    (void)offset;
+    (void)whence;
     // we dont support seeking while streaming
     return -1;
 }
@@ -83,9 +83,9 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     devicename(""),
     m_inputFormat(NULL),        m_inputContext(NULL),
     m_decStream(NULL),          m_codec(NULL),
-    m_audioDec(NULL),           errcode(0),
-    m_samples(NULL),            m_buffer(NULL),
-    m_byteIOContext(NULL)
+    m_audioDec(NULL),           m_buffer(NULL),
+    m_byteIOContext(NULL),      errcode(0),
+    m_samples(NULL)
 {
     setFilename(file);
     memset(&m_params, 0, sizeof(AVFormatParameters));
