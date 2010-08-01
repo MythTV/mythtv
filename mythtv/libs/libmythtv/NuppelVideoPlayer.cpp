@@ -593,7 +593,9 @@ void NuppelVideoPlayer::ReinitOSD(void)
                                       scaling, 1.0f);
             if (osd->Bounds() != visible)
             {
-                Pause();
+                bool was_paused = allpaused;
+                if (!was_paused)
+                    Pause();
                 uint old = textDisplayMode;
                 ToggleCaptions(old);
                 osd->Reinit(visible, aspect);
@@ -601,7 +603,8 @@ void NuppelVideoPlayer::ReinitOSD(void)
                 if (tt_view && decoder)
                     decoder->SetTeletextDecoderViewer(tt_view);
                 EnableCaptions(old, false);
-                Play();
+                if (!was_paused)
+                    Play();
             }
         }
 
