@@ -1741,19 +1741,16 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         }
         else
         {
-
             MythXLocker lock(disp);
             Display *d = disp->GetDisplay();
-            int bytes_per_line = disp->GetDepth() /
-                                    8 * display_visible_rect.width();
+            int bytes_per_line;
             int scrn = disp->GetScreen();
             Visual *visual = DefaultVisual(d, scrn);
             XJ_non_xv_image = XCreateImage(d, visual, disp->GetDepth(),
                                            ZPixmap, /*offset*/0, /*data*/0,
                                            display_visible_rect.width(),
                                            display_visible_rect.height(),
-                                           /*bitmap_pad*/0,
-                                           bytes_per_line);
+                                           /*bitmap_pad*/8, 0);
 
             if (!XJ_non_xv_image)
             {
@@ -1762,10 +1759,10 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
                         <<"                        "
                         <<"depth("<<disp->GetDepth()<<") "
                         <<"WxH("<<display_visible_rect.width()
-                        <<"x"<<display_visible_rect.height()<<") "
-                        <<"bpl("<<bytes_per_line<<")");
+                        <<"x"<<display_visible_rect.height()<<") ");
                 return false;
             }
+            bytes_per_line = XJ_non_xv_image->bytes_per_line;
             XJ_non_xv_image->data = (char*) malloc(
                 bytes_per_line * display_visible_rect.height());
         }
