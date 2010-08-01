@@ -894,22 +894,35 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     //cerr << "Finished adding program ratings...\n";
     //cerr << "Populating people table from production crew list...\n";
 
-    if (!query.exec("INSERT IGNORE INTO people (name) SELECT fullname "
-                    "FROM dd_productioncrew;"))
+    if (!query.exec("INSERT IGNORE INTO people (name) "
+                    "SELECT fullname "
+                    "FROM dd_productioncrew "
+                    "LEFT OUTER JOIN people "
+                    "ON people.name = dd_productioncrew.fullname "
+                    "WHERE people.name IS NULL;"))
         MythDB::DBError("Inserting into people table", query);
 
     //cerr << "Finished adding people...\n";
     //cerr << "Adding credits entries from production crew list...\n";
 
-    if (!query.exec("INSERT IGNORE INTO credits (chanid, starttime, person, "
-                    "role) SELECT dd_v_program.chanid, "
-                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
-                    "person, role "
-                    "FROM dd_productioncrew, dd_v_program, channel, people "
-                    "WHERE "
-                    "((dd_productioncrew.programid = dd_v_program.programid) "
-                    "AND (dd_productioncrew.fullname = people.name)) "
-                    "AND dd_v_program.chanid = channel.chanid;"))
+    if (!query.exec("INSERT IGNORE INTO credits (chanid, starttime, person, role)"
+                    "SELECT dd_v_program.chanid, "
+                    "DATE_ADD(dd_v_program.starttime, INTERVAL channel.tmoffset MINUTE), "
+                    "people.person, "
+                    "dd_productioncrew.role "
+                    "FROM dd_v_program "
+                    "JOIN channel "
+                    "ON dd_v_program.chanid = channel.chanid "
+                    "JOIN dd_productioncrew "
+                    "ON dd_productioncrew.programid = dd_v_program.programid "
+                    "JOIN people "
+                    "ON people.name = dd_productioncrew.fullname "
+                    "LEFT OUTER JOIN credits "
+                    "ON credits.chanid = dd_v_program.chanid "
+                    "AND credits.starttime = DATE_ADD(dd_v_program.starttime, INTERVAL channel.tmoffset MINUTE) "
+                    "AND credits.person = people.person "
+                    "AND credits.role = dd_productioncrew.role "
+                    "WHERE credits.role IS NULL;"))
         MythDB::DBError("Inserting into credits table", query);
 
     //cerr << "Finished inserting credits...\n";
