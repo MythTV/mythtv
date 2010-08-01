@@ -178,7 +178,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     disablevideo = novideo;
     tracks[kTrackTypeVideo].clear();
     StreamInfo si(0, 0, 0, 0);
-    tracks->push_back(si);
+    tracks[kTrackTypeVideo].push_back(si);
     selectedTrack[kTrackTypeVideo] = si;
 
     struct rtframeheader frameheader;
