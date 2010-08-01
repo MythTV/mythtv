@@ -122,7 +122,6 @@ class DecoderIOFactoryShoutCast : public DecoderIOFactory
     void periodicallyCheckBuffered(void);
     void shoutcastMeta(const QString &metadata);
     void shoutcastChangedState(ShoutCastIODevice::State newstate);
-    QString getLogoURL(void);
 
   private:
     int checkResponseOK(void);
