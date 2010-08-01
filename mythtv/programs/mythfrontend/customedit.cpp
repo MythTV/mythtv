@@ -314,6 +314,14 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
+    rule.title = tr("Only channels from the Favorites group");
+    rule.subtitle = ", channelgroup cg, channelgroupnames cgn";
+    rule.description = "cgn.name = 'Favorites' \n"
+                       "AND cg.grpid = cgn.grpid \n"
+                       "AND program.chanid = cg.chanid ";
+    new MythUIButtonListItem(m_clauseList, rule.title,
+                             qVariantFromValue(rule));
+
     rule.title = tr("Only channels from a specific video source");
     rule.subtitle.clear();
     rule.description = "channel.sourceid = 2 ";
