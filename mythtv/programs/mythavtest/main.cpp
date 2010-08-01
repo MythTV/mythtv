@@ -20,21 +20,20 @@ using namespace std;
 #include "compat.h"
 #include "mythuihelper.h"
 #include "dbcheck.h"
-#include "myththemebase.h"
 
 static void *run_priv_thread(void *data)
 {
     (void)data;
-    while (true) 
+    while (true)
     {
         gCoreContext->waitPrivRequest();
-        
-        for (MythPrivRequest req = gCoreContext->popPrivRequest(); 
-             true; req = gCoreContext->popPrivRequest()) 
+
+        for (MythPrivRequest req = gCoreContext->popPrivRequest();
+             true; req = gCoreContext->popPrivRequest())
         {
             bool done = false;
 
-            switch (req.getType()) 
+            switch (req.getType())
             {
             case MythPrivRequest::MythRealtime:
                 {
@@ -45,7 +44,7 @@ static void *run_priv_thread(void *data)
                     {
                         int status = pthread_setschedparam(
                             *target_thread, SCHED_FIFO, &sp);
-                        if (status) 
+                        if (status)
                         {
                             // perror("pthread_setschedparam");
                             VERBOSE(VB_GENERAL, "Realtime priority would require SUID as root.");
@@ -167,7 +166,7 @@ int main(int argc, char *argv[])
     bool priv_thread_created = true;
 
     int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
-    if (status) 
+    if (status)
     {
         VERBOSE(VB_IMPORTANT, QString("Warning: ") +
                 "Failed to create priveledged thread." + ENO);
@@ -178,13 +177,13 @@ int main(int argc, char *argv[])
     QString themename = gCoreContext->GetSetting("Theme");
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
-    {   
+    {
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
         VERBOSE(VB_IMPORTANT, msg);
         return TV_EXIT_NO_THEME;
     }
-    
+
     GetMythUI()->LoadQtConfig();
 
 #if defined(Q_OS_MACX)
@@ -201,7 +200,6 @@ int main(int argc, char *argv[])
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    MythThemeBase *theme = new MythThemeBase();
 
     TV::InitKeys();
 
@@ -228,13 +226,12 @@ int main(int argc, char *argv[])
         ProgramInfo pginfo(filename);
         TV::StartTV(&pginfo, kStartTVNoFlags);
     }
-    
+
     if (priv_thread_created)
     {
         gCoreContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, NULL);
     }
-    delete theme;
     delete gContext;
 
     return TV_EXIT_OK;
