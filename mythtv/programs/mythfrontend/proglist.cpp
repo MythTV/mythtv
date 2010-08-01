@@ -602,7 +602,7 @@ const ProgramInfo *ProgLister::GetCurrent(void) const
 {
     int pos = m_progList->GetCurrentPos();
     if (pos >= 0 && pos < (int) m_itemList.size())
-        return m_itemList[m_progList->GetCurrentPos()];
+        return m_itemList[pos];
     return NULL;
 }
 
@@ -610,7 +610,7 @@ ProgramInfo *ProgLister::GetCurrent(void)
 {
     int pos = m_progList->GetCurrentPos();
     if (pos >= 0 && pos < (int) m_itemList.size())
-        return m_itemList[m_progList->GetCurrentPos()];
+        return m_itemList[pos];
     return NULL;
 }
 
@@ -1382,7 +1382,11 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         }
     }
 
-    const ProgramInfo *selected = (restorePosition) ? GetCurrent() : NULL;
+    ProgramInfo        selected;
+    const ProgramInfo *selectedP = (restorePosition) ? GetCurrent() : NULL;
+    if (selectedP)
+        selected = *selectedP;
+
     m_progList->Reset();
     m_itemList.clear();
 
@@ -1480,7 +1484,7 @@ void ProgLister::ClearCurrentProgramInfo(void)
         m_positionText->Reset();
 }
 
-void ProgLister::UpdateDisplay(const ProgramInfo *selected)
+void ProgLister::UpdateDisplay(void)
 {
     m_progList->Reset();
 
@@ -1493,11 +1497,16 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
         m_curviewText->SetText(m_viewTextList[m_curView]);
 
     UpdateButtonList();
+}
+
+void ProgLister::UpdateDisplay(const ProgramInfo & selected)
+{
+    UpdateDisplay();
 
     // Restore selection
-    for (uint i = 0; selected && (i < m_itemList.size()); i++)
+    for (uint i = 0; i < m_itemList.size(); i++)
     {
-        if (selected == m_itemList[i])
+        if (selected.IsSameProgramWeakCheck(*(m_itemList[i])))
         {
             m_progList->SetItemCurrent(i);
             break;
@@ -1668,7 +1677,7 @@ void ProgLister::customEvent(QEvent *event)
         if (id == objectName())
         {
             CloseBusyPopup(); // opened by LoadInBackground()
-            UpdateDisplay(NULL);
+            UpdateDisplay();
 
             if (m_curView < 0 && m_type != plPreviouslyRecorded)
                 ShowChooseViewMenu();
