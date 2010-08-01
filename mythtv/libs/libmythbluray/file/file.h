@@ -46,7 +46,7 @@ extern "C" {
 #define file_read(X,Y,Z) X->read(X,Y,Z)
 #define file_write(X,Y,Z) X->write(X,Y,Z)
 
-BD_PRIVATE BD_FILE_H* (*file_open)(const char* filename, const char *mode);
+BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode);
 
 #ifdef __cplusplus
 };
@@ -59,6 +59,6 @@ BD_PRIVATE BD_FILE_H* (*file_open)(const char* filename, const char *mode);
 #define dir_close(X) X->close(X)
 #define dir_read(X,Y) X->read(X,Y)
 
-BD_PRIVATE BD_DIR_H* (*dir_open)(const char* dirname);
+BD_PRIVATE extern BD_DIR_H* (*dir_open)(const char* dirname);
 
 #endif /* FILE_H_ */
