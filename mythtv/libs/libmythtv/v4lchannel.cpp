@@ -441,7 +441,7 @@ bool V4LChannel::SetChannelByString(const QString &channum)
     // change inputs and return, since the act of changing
     // inputs will change the channel as well.
     if (!inputName.isEmpty())
-        return ChannelBase::SwitchToInput(inputName, channum);
+        return ChannelBase::SelectInput(inputName, channum, false);
 
     ClearDTVInfo();
 

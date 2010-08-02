@@ -190,6 +190,9 @@ void FirewireSignalMonitor::UpdateValues(void)
     if (!running || exit)
         return;
 
+    if (!IsChannelTuned())
+        return;
+
     if (dtvMonitorRunning)
     {
         EmitStatus();

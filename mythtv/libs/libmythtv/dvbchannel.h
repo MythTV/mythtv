@@ -78,7 +78,12 @@ class DVBChannel : public DTVChannel
     double GetUncorrectedBlockCount(bool *ok = NULL) const;
 
     // Commands
+#if 0
     bool SwitchToInput(const QString &inputname, const QString &chan);
+#else
+    bool SelectInput(const QString &inputname, const QString &chan,
+                     bool use_sm);
+#endif
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool SetChannelByString(const QString &chan);
     bool Tune(const DTVMultiplex &tuning, QString inputname);

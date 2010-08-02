@@ -5,6 +5,9 @@
 
 // Qt headers
 #include <QStringList>
+#include <qwaitcondition.h>
+#include <qmutex.h>
+#include <qthread.h>
 
 // MythTV headers
 #include "channelutil.h"
@@ -12,6 +15,19 @@
 #include "tv.h"
 
 class TVRec;
+class ChannelBase;
+
+/*
+ * Thread to run tunning process in
+ */
+class ChannelThread : public QThread
+{
+  public:
+    virtual void run(void);
+
+    QString      channel;
+    ChannelBase *tuner;
+};
 
 /** \class ChannelBase
  *  \brief Abstract class providing a generic interface to tuning hardware.
@@ -23,19 +39,28 @@ class TVRec;
 
 class ChannelBase
 {
- public:
+    friend class ChannelThread;
+
+  public:
+    enum Status { changeUnknown = 'U', changePending = 'P',
+                  changeFailed = 'F', changeSuccess = 'S' };
+
     ChannelBase(TVRec *parent);
-    virtual ~ChannelBase();
+    virtual ~ChannelBase(void);
 
     virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
     virtual bool IsTunable(const QString &input, const QString &channum) const;
+
+    virtual void SelectChannel(const QString & chan);
+
+    Status GetStatus(void);
+    Status Wait(void);
 
     // Methods that must be implemented.
     /// \brief Opens the channel changing hardware for use.
     virtual bool Open(void) = 0;
     /// \brief Closes the channel changing hardware to use.
     virtual void Close(void) = 0;
-    virtual bool SetChannelByString(const QString &chan) = 0;
     /// \brief Reports whether channel is already open
     virtual bool IsOpen(void) const = 0;
 
@@ -82,8 +107,9 @@ class ChannelBase
                           const QString &newChanNum);
 
     // Input toggling convenience methods
-    virtual bool SwitchToInput(const QString &input);
-    virtual bool SwitchToInput(const QString &input, const QString &chan);
+//    virtual bool SwitchToInput(const QString &input); // not used?
+    virtual bool SelectInput(const QString &input, const QString &chan,
+                             bool use_sm);
 
     virtual bool InitializeInputs(void);
 
@@ -108,6 +134,8 @@ class ChannelBase
 
     virtual int GetCardID(void) const;
   protected:
+    virtual bool SetChannelByString(const QString &chan) = 0;
+
     /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
     virtual bool SwitchToInput(int inputNum, bool setstarting);
@@ -119,6 +147,10 @@ class ChannelBase
     static void StoreDefaultInput(uint cardid, const QString &input);
     void ClearInputMap(void);
 
+    bool Aborted();
+    void setStatus(Status status);
+    void TeardownAll(void);
+
     TVRec   *m_pParent;
     QString  m_curchannelname;
     int      m_currentInputID;
@@ -126,6 +158,14 @@ class ChannelBase
     uint     m_cardid;
     InputMap m_inputs;
     DBChanList m_allchannels; ///< channels across all inputs
+
+    QWaitCondition  m_tuneCond;
+
+  private:
+    mutable  ChannelThread   m_tuneThread;
+    Status   m_tuneStatus;
+    QMutex   m_thread_lock;
+    bool     m_abort_change;
 };
 
 #endif

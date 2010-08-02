@@ -394,23 +394,27 @@ bool DVBChannel::SetChannelByString(const QString &channum)
     return true;
 }
 
-bool DVBChannel::SwitchToInput(const QString &inputname, const QString &chan)
+bool DVBChannel::SelectInput(const QString &inputname, const QString &chan,
+                             bool use_sm)
 {
     int input = GetInputByName(inputname);
 
-    bool ok = false;
     if (input >= 0)
     {
         nextInputID = input;
-        ok = SetChannelByString(chan);
+        if (use_sm)
+            SelectChannel(chan);
+        else
+            return SetChannelByString(chan);
     }
     else
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DVBChannel: Could not find input: %1 on card when "
                         "setting channel %2\n").arg(inputname).arg(chan));
+        return false;
     }
-    return ok;
+    return true;
 }
 
 bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)

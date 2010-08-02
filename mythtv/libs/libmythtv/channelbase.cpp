@@ -34,16 +34,95 @@ using namespace std;
 #define LOC_WARN QString("ChannelBase(%1) Warning: ").arg(GetCardID())
 #define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
 
+/*
+ * Run the channel change thread, and report the status when done
+ */
+void ChannelThread::run(void)
+{
+    VERBOSE(VB_CHANNEL, "ChannelThread::run");
+    bool result = tuner->SetChannelByString(channel);
+    tuner->setStatus(result ?
+                     ChannelBase::changeSuccess : ChannelBase::changeFailed);
+}
+
 ChannelBase::ChannelBase(TVRec *parent)
     :
     m_pParent(parent), m_curchannelname(""),
-    m_currentInputID(-1), m_commfree(false), m_cardid(0)
+    m_currentInputID(-1), m_commfree(false), m_cardid(0),
+    m_abort_change(false)
 {
+    m_tuneStatus = changeUnknown;
+    m_tuneThread.tuner = this;
 }
 
 ChannelBase::~ChannelBase(void)
 {
     ClearInputMap();
+    TeardownAll();
+}
+
+void ChannelBase::TeardownAll(void)
+{
+    if (m_tuneThread.isRunning())
+    {
+        m_thread_lock.lock();
+        m_abort_change = true;
+        m_tuneCond.wakeAll();
+        m_thread_lock.unlock();
+        m_tuneThread.wait();
+    }
+}
+
+void ChannelBase::SelectChannel(const QString & chan)
+{
+    VERBOSE(VB_CHANNEL, LOC + "SelectChannel " + chan);
+    TeardownAll();
+
+    m_thread_lock.lock();
+    m_abort_change = false;
+    m_tuneStatus = changePending;
+    m_thread_lock.unlock();
+
+    m_curchannelname = m_tuneThread.channel = chan;
+    m_tuneThread.start();
+}
+
+/*
+ * Returns true of the channel change thread should abort
+ */
+bool ChannelBase::Aborted(void)
+{
+    bool       result;
+
+    m_thread_lock.lock();
+    result = m_abort_change;
+    m_thread_lock.unlock();
+
+    return result;
+}
+
+ChannelBase::Status ChannelBase::GetStatus(void)
+{
+    Status status;
+
+    m_thread_lock.lock();
+    status = m_tuneStatus;
+    m_thread_lock.unlock();
+
+    return status;
+}
+
+ChannelBase::Status ChannelBase::Wait(void)
+{
+    m_tuneThread.wait();
+    return m_tuneStatus;
+}
+
+void ChannelBase::setStatus(ChannelBase::Status status)
+{
+    m_thread_lock.lock();
+    m_tuneStatus = status;
+    m_thread_lock.unlock();
 }
 
 bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
@@ -53,9 +132,12 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     if (!setchan)
         ok = inputname.isEmpty() ? false : IsTunable(inputname, startchannel);
     else if (inputname.isEmpty())
-        ok = SetChannelByString(startchannel);
+    {
+        SelectChannel(startchannel);
+        ok = Wait();
+    }
     else
-        ok = SwitchToInput(inputname, startchannel);
+        ok = SelectInput(inputname, startchannel, false);
 
     if (ok)
         return true;
@@ -124,12 +206,10 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             if (chanid && cit != channels.end())
             {
                 if (!setchan)
-                {
                     ok = IsTunable(*it, (mplexid_restriction) ?
                                    (*cit).channum : startchannel);
-                }
                 else
-                    ok = SwitchToInput(*it, (*cit).channum);
+                    ok = SelectInput(*it, (*cit).channum, false);
 
                 if (ok)
                 {
@@ -329,6 +409,7 @@ int ChannelBase::GetInputByName(const QString &input) const
     return -1;
 }
 
+#if 0 // Not used?
 bool ChannelBase::SwitchToInput(const QString &inputname)
 {
     int input = GetInputByName(inputname);
@@ -340,25 +421,30 @@ bool ChannelBase::SwitchToInput(const QString &inputname)
                                       "%1 on card\n").arg(inputname));
     return false;
 }
+#endif
 
-bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
+bool ChannelBase::SelectInput(const QString &inputname, const QString &chan,
+                              bool use_sm)
 {
     int input = GetInputByName(inputname);
 
-    bool ok = false;
     if (input >= 0)
     {
-        ok = SwitchToInput(input, false);
-        if (ok)
-            ok = SetChannelByString(chan);
+        if (!SwitchToInput(input, false))
+            return false;
+        if (use_sm)
+            SelectChannel(chan);
+        else
+            return SetChannelByString(chan);
     }
     else
     {
         VERBOSE(VB_IMPORTANT,
                 QString("ChannelBase: Could not find input: %1 on card when "
                         "setting channel %2\n").arg(inputname).arg(chan));
+        return false;
     }
-    return ok;
+    return true;
 }
 
 bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
@@ -374,7 +460,7 @@ bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
     // input switching code would go here
 
     if (setstarting)
-        return SetChannelByString((*it)->startChanNum);
+        SelectChannel((*it)->startChanNum);
 
     return true;
 }
@@ -485,8 +571,7 @@ static bool is_input_busy(
     return is_busy;
 }
 
-bool ChannelBase::IsInputAvailable(
-    int inputid, uint &mplexid_restriction) const
+bool ChannelBase::IsInputAvailable(int inputid, uint &mplexid_restriction) const
 {
     if (inputid < 0)
         return false;
@@ -651,26 +736,38 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     }
     else
     {   // child contains the pid of the new process
-        int status = 0, pid = 0;
+        QMutex      lock;
+        int         status = 0, pid = 0;
+
         VERBOSE(VB_CHANNEL, "Waiting for External Tuning program to exit");
 
         bool timed_out = false;
         uint timeout = 30; // how long to wait in seconds
         time_t start_time = time(0);
-        while (-1 != pid && !timed_out)
+        while (-1 != pid && !timed_out && !Aborted())
         {
-            sleep(1);
+            lock.lock();
+            m_tuneCond.wait(&lock, 500);  // sleep up to 0.5 seconds
             pid = waitpid(child, &status, WUNTRACED|WNOHANG);
             VERBOSE(VB_IMPORTANT, QString("ret_pid(%1) child(%2) status(0x%3)")
                     .arg(pid).arg(child).arg(status,0,16));
             if (pid==child)
+            {
+                lock.unlock();
                 break;
+            }
             else if (time(0) > (time_t)(start_time + timeout))
                 timed_out = true;
+            lock.unlock();
         }
-        if (timed_out)
+
+        if (timed_out || Aborted())
         {
-            VERBOSE(VB_IMPORTANT, "External Tuning program timed out, killing");
+            if (Aborted())
+                VERBOSE(VB_IMPORTANT, "Aborting External Tuning program");
+            else
+                VERBOSE(VB_IMPORTANT, "External Tuning program timed out, "
+                        "killing");
             kill(child, SIGTERM);
             usleep(500);
             kill(child, SIGKILL);
@@ -752,6 +849,7 @@ int ChannelBase::GetChanID() const
         return -1;
 
     query.next();
+
     return query.value(0).toInt();
 }
 

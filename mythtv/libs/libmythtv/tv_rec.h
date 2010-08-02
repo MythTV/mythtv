@@ -137,6 +137,7 @@ typedef QMap<uint,PendingInfo> PendingMap;
 class MPUBLIC TVRec : public SignalMonitorListener
 {
     friend class TuningRequest;
+    friend class SignalMonitor;
 
   public:
     TVRec(int capturecardnum);
@@ -231,6 +232,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     static TVRec *GetTVRec(uint cardid);
 
     virtual void AllGood(void) { WakeEventLoop(); }
+    virtual void StatusChannelTuned(const SignalMonitorValue&) { }
     virtual void StatusSignalLock(const SignalMonitorValue&) { }
     virtual void StatusSignalStrength(const SignalMonitorValue&) { }
 
@@ -239,6 +241,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
     static void *EventThread(void *param);
     static void *RecorderThread(void *param);
+    bool SetupDTVSignalMonitor(bool EITscan);
 
   private:
     void SetRingBuffer(RingBuffer *);
@@ -268,8 +271,8 @@ class MPUBLIC TVRec : public SignalMonitorListener
     FirewireChannel *GetFirewireChannel(void);
     V4LChannel   *GetV4LChannel(void);
 
-    bool SetupSignalMonitor(bool enable_table_monitoring, bool notify);
-    bool SetupDTVSignalMonitor(void);
+    bool SetupSignalMonitor(bool enable_table_monitoring,
+                            bool EITscan, bool notify);
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 
@@ -347,6 +350,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
 
     // State variables
     mutable QMutex stateChangeLock;
+    mutable QMutex pendingRecLock;
     TVState        internalState;
     TVState        desiredNextState;
     bool           changeState;

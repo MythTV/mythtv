@@ -9,6 +9,7 @@
 
 typedef enum {
     kAllGood,
+    kStatusChannelTuned,
     kStatusSignalLock,
     kStatusSignalStrength,
     kStatusSignalToNoise,
@@ -29,6 +30,13 @@ class MPUBLIC SignalMonitorListener
      *         has been started.
      */
     virtual void AllGood(void) = 0;
+
+    /** \brief Signal to be sent with change change status.
+     *
+     *   Note: Signals are only sent once the monitoring thread
+     *         has been started.
+     */
+    virtual void StatusChannelTuned(const SignalMonitorValue&) = 0;
 
     /** \brief Signal to be sent as true when it is safe to begin
      *   or continue recording, and false if it may not be safe.

@@ -130,7 +130,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     // change inputs and return, since the act of changing
     // inputs will change the channel as well.
     if (!inputName.isEmpty())
-        return SwitchToInput(inputName, channum);
+        return SelectInput(inputName, channum, false);
 
     ClearDTVInfo();
 
@@ -140,6 +140,9 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
 
     uint mplexid_restriction;
     if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
+        return false;
+
+    if (Aborted())
         return false;
 
     // Fetch tuning data from the database.

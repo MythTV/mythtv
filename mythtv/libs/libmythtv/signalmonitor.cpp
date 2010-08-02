@@ -8,6 +8,7 @@
 
 // MythTV headers
 #include "mythcontext.h"
+#include "tv_rec.h"
 #include "signalmonitor.h"
 #include "compat.h"
 #include "mythverbose.h"
@@ -41,6 +42,8 @@ extern "C" {
 #   include "firewiresignalmonitor.h"
 #   include "firewirechannel.h"
 #endif
+
+#include "channelchangemonitor.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
@@ -93,14 +96,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_V4L
+#if 0 // Just use ChannelChangeMonitor for these types
     if ((cardtype.toUpper() == "V4L") ||
-        (cardtype.toUpper() == "MPEG") ||
-        (cardtype.toUpper() == "HDPVR"))
+        (cardtype.toUpper() == "MPEG"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
             signalMonitor = new AnalogSignalMonitor(db_cardnum, chan);
     }
+#endif
 #endif
 
 #ifdef USING_HDHOMERUN
@@ -132,6 +136,13 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
     if (!signalMonitor)
     {
+        V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
+        if (chan)
+            signalMonitor = new ChannelChangeMonitor(db_cardnum, chan);
+    }
+
+    if (!signalMonitor)
+    {
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to create signal monitor in Init(%1, %2, 0x%3)")
                 .arg(cardtype).arg(db_cardnum).arg((long)channel,0,16));
@@ -160,11 +171,13 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
       update_rate(25),                 minimum_update_rate(5),
       running(false),                  exit(false),
       update_done(false),              notify_frontend(true),
-      error(""),
+      is_tuned(false),                 tablemon(false),
+      eit_scan(false),                 error(""),
       signalLock    (QObject::tr("Signal Lock"),  "slock",
                      1, true, 0,   1, 0),
       signalStrength(QObject::tr("Signal Power"), "signal",
                      0, true, 0, 100, 0),
+      channelTuned("Channel Tuned", "tuned", 3, true, 0, 3, 0),
       statusLock(QMutex::Recursive)
 {
 }
@@ -202,11 +215,15 @@ bool SignalMonitor::HasAnyFlag(uint64_t _flags) const
 /** \fn SignalMonitor::Start()
  *  \brief Start signal monitoring thread.
  */
-void SignalMonitor::Start()
+void SignalMonitor::Start(bool waitfor_tune)
 {
     DBG_SM("Start", "begin");
     {
         QMutexLocker locker(&startStopLock);
+
+        // When used for scanning, don't wait for the tuning thread
+        is_tuned = !waitfor_tune;
+
         if (!running)
         {
             int rval = pthread_create(
@@ -279,6 +296,7 @@ QStringList SignalMonitor::GetStatusList(bool kick)
 
     QStringList list;
     statusLock.lock();
+    list<<channelTuned.GetName()<<channelTuned.GetStatus();
     list<<signalLock.GetName()<<signalLock.GetStatus();
     if (HasFlags(kSigMon_WaitForSig))
         list<<signalStrength.GetName()<<signalStrength.GetStatus();
@@ -441,6 +459,9 @@ void SignalMonitor::SendMessage(
         case kStatusSignalStrength:
             listener->StatusSignalStrength(val);
             break;
+        case kStatusChannelTuned:
+            listener->StatusChannelTuned(val);
+            break;
         case kStatusSignalToNoise:
             if (dvblistener)
                 dvblistener->StatusSignalToNoise(val);
@@ -461,6 +482,40 @@ void SignalMonitor::SendMessage(
     }
 }
 
+bool SignalMonitor::IsChannelTuned(void)
+{
+    if (is_tuned)
+        return true;
+
+    ChannelBase::Status status = channel->GetStatus();
+    QMutexLocker locker(&statusLock);
+
+    switch (status) {
+      case ChannelBase::changePending:
+        channelTuned.SetValue(1);
+        break;
+      case ChannelBase::changeFailed:
+        channelTuned.SetValue(2);
+        break;
+      case ChannelBase::changeSuccess:
+        channelTuned.SetValue(3);
+        break;
+    }
+
+    EmitStatus();
+
+    if (status == ChannelBase::changeSuccess)
+    {
+        if (tablemon)
+            pParent->SetupDTVSignalMonitor(eit_scan);
+
+        is_tuned = true;
+        return true;
+    }
+
+    return false;
+}
+
 void SignalMonitor::SendMessageAllGood(void)
 {
     QMutexLocker locker(&listenerLock);
@@ -470,6 +525,7 @@ void SignalMonitor::SendMessageAllGood(void)
 
 void SignalMonitor::EmitStatus(void)
 {
+    SendMessage(kStatusChannelTuned, channelTuned);
     SendMessage(kStatusSignalLock, signalLock);
     if (HasFlags(kSigMon_WaitForSig))
         SendMessage(kStatusSignalStrength,    signalStrength);

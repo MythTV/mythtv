@@ -7137,6 +7137,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     float snr  = 0.0f;
     uint  ber  = 0xffffffff;
     int   pos  = -1;
+    int   tuned = -1;
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt(""), crypt("");
     QString err = QString::null, msg = QString::null;
     for (it = slist.begin(); it != slist.end(); ++it)
@@ -7163,6 +7164,8 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
             ber = it->GetValue();
         else if ("pos" == it->GetShortName())
             pos = it->GetValue();
+        else if ("tuned" == it->GetShortName())
+            tuned = it->GetValue();
         else if ("seen_pat" == it->GetShortName())
             pat = it->IsGood() ? "a" : "_";
         else if ("matching_pat" == it->GetShortName())
@@ -7196,6 +7199,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         infoMap["signal"] = QString::number(sig); // use normalized value
 
     bool    allGood = SignalMonitorValue::AllGood(slist);
+    char    tuneCode;
     QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
     QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
@@ -7208,9 +7212,18 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     if ((pos >= 0) && (pos < 100))
         sigDesc += " | " + tr("Rotor %1\%").arg(pos,2);
 
-    sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7%8) %9")
-        .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
-        .arg(nit).arg(sdt).arg(crypt).arg(sigMsg);
+    if (tuned == 1)
+        tuneCode = 't';
+    else if (tuned == 2)
+        tuneCode = 'F';
+    else if (tuned == 3)
+        tuneCode = 'T';
+    else
+        tuneCode = '_';
+
+    sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7%8%9) %10")
+              .arg(tuneCode).arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
+              .arg(nit).arg(sdt).arg(crypt).arg(sigMsg);
 
     if (!err.isEmpty())
         sigDesc = err;

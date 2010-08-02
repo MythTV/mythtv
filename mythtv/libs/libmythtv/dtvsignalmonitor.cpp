@@ -25,6 +25,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
                                    uint64_t wait_for_mask)
     : SignalMonitor(db_cardnum, _channel, wait_for_mask),
       stream_data(NULL),
+      channelTuned(QObject::tr("Channel Tuned"), "tuned", 3, true, 0, 3, 0),
       seenPAT(QObject::tr("Seen")+" PAT", "seen_pat", 1, true, 0, 1, 0),
       seenPMT(QObject::tr("Seen")+" PMT", "seen_pmt", 1, true, 0, 1, 0),
       seenMGT(QObject::tr("Seen")+" MGT", "seen_mgt", 1, true, 0, 1, 0),
@@ -63,6 +64,13 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
 {
     QStringList list = SignalMonitor::GetStatusList(kick);
     QMutexLocker locker(&statusLock);
+
+    // tuned?
+    if (flags & kSigMon_Tuned)
+    {
+        list<<channelTuned.GetName()<<channelTuned.GetStatus();
+    }
+
     // mpeg tables
     if (flags & kDTVSigMon_WaitForPAT)
     {
@@ -138,6 +146,7 @@ void DTVSignalMonitor::RemoveFlags(uint64_t _flags)
 void DTVSignalMonitor::UpdateMonitorValues(void)
 {
     QMutexLocker locker(&statusLock);
+    channelTuned.SetValue((flags & kSigMon_Tuned)      ? 3 : 1);
     seenPAT.SetValue(    (flags & kDTVSigMon_PATSeen)  ? 1 : 0);
     seenPMT.SetValue(    (flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
     seenMGT.SetValue(    (flags & kDTVSigMon_MGTSeen)  ? 1 : 0);

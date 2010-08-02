@@ -232,6 +232,9 @@ void DVBSignalMonitor::UpdateValues(void)
         return;
     }
 
+    if (!IsChannelTuned())
+        return;
+
     AddFlags(kSigMon_WaitForSig);
 
     DVBChannel *dvbchannel = GetDVBChannel();

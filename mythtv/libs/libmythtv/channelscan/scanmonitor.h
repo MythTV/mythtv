@@ -65,6 +65,7 @@ class ScanMonitor :
     // SignalMonitorListener
     virtual void AllGood(void) { }
     virtual void StatusSignalLock(const SignalMonitorValue&);
+    virtual void StatusChannelTuned(const SignalMonitorValue&);
     virtual void StatusSignalStrength(const SignalMonitorValue&);
 
     // DVBSignalMonitorListener
@@ -110,6 +111,7 @@ class ScannerEvent : public QEvent
     static Type SetStatusSignalToNoise;
     static Type SetStatusSignalStrength;
     static Type SetStatusSignalLock;
+    static Type SetStatusChannelTuned;
 
   private:
     ~ScannerEvent() { }

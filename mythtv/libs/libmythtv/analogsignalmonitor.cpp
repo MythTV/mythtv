@@ -33,6 +33,9 @@ void AnalogSignalMonitor::UpdateValues(void)
     if (videofd < 0)
         return;
 
+    if (!IsChannelTuned())
+        return;
+
     bool isLocked = false;
     if (usingv4l2)
     {

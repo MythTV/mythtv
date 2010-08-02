@@ -448,6 +448,9 @@ using_backend {
         DEFINES += USING_OSS
     }
 
+    HEADERS += channelchangemonitor.h
+    SOURCES += channelchangemonitor.cpp
+
     # Support for Video4Linux devices
     using_v4l {
         HEADERS += v4lchannel.h                analogsignalmonitor.h

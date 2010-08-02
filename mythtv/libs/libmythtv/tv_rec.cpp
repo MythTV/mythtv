@@ -368,7 +368,8 @@ ProgramInfo *TVRec::GetRecording(void)
 void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
                           bool hasLater)
 {
-    QMutexLocker lock(&stateChangeLock);
+    QMutexLocker statelock(&stateChangeLock);
+    QMutexLocker pendlock(&pendingRecLock);
 
     if (secsleft < 0)
     {
@@ -406,10 +407,12 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     pendingRecordings[rcinfo->GetCardID()].possibleConflicts = cardids;
 
-    stateChangeLock.unlock();
+    pendlock.unlock();
+    statelock.unlock();
     for (uint i = 0; i < cardids.size(); i++)
         RemoteRecordPending(cardids[i], rcinfo, secsleft, hasLater);
-    stateChangeLock.lock();
+    statelock.relock();
+    pendlock.relock();
 }
 
 /** \fn TVRec::SetPseudoLiveTVRecording(ProgramInfo*)
@@ -441,6 +444,7 @@ QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
  */
 void TVRec::CancelNextRecording(bool cancel)
 {
+    QMutexLocker pendlock(&pendingRecLock);
     VERBOSE(VB_RECORD, LOC + "CancelNextRecording("<<cancel<<") -- begin");
 
     PendingMap::iterator it = pendingRecordings.find(cardid);
@@ -524,13 +528,18 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         return retval;
     }
 
-    PendingMap::iterator it = pendingRecordings.find(cardid);
     bool cancelNext = false;
-    if (it != pendingRecordings.end())
+    PendingInfo pendinfo;
+    PendingMap::iterator it;
+    bool has_pending;
+
+    pendingRecLock.lock();
+    if ((it = pendingRecordings.find(cardid)) != pendingRecordings.end())
     {
         (*it).ask = (*it).doNotAsk = false;
         cancelNext = (*it).canceled;
     }
+    pendingRecLock.unlock();
 
     // Flush out events...
     WaitForEventThreadSleep();
@@ -538,15 +547,19 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     // Rescan pending recordings since the event loop may have deleted
     // a stale entry.  If this happens the info pointer will not be valid
     // since the HandlePendingRecordings loop will have deleted it.
+    pendingRecLock.lock();
     it = pendingRecordings.find(cardid);
+    has_pending = (it != pendingRecordings.end());
+    if (has_pending)
+        pendinfo = *it;
+    pendingRecLock.unlock();
 
     // If the needed input is in a shared input group, and we are
     // not canceling the recording anyway, check other recorders
-    if (!cancelNext &&
-        (it != pendingRecordings.end()) && (*it).possibleConflicts.size())
+    if (!cancelNext && has_pending && pendinfo.possibleConflicts.size())
     {
         VERBOSE(VB_RECORD, LOC + "Checking input group recorders - begin");
-        vector<uint> &cardids = (*it).possibleConflicts;
+        vector<uint> &cardids = pendinfo.possibleConflicts;
 
         uint mplexid = 0, sourceid = 0;
         vector<uint> cardids2;
@@ -569,8 +582,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
             if (is_busy && !sourceid)
             {
-                mplexid  = (*it).info->QueryMplexID();
-                sourceid = (*it).info->GetSourceID();
+                mplexid  = pendinfo.info->QueryMplexID();
+                sourceid = pendinfo.info->GetSourceID();
             }
 
             if (is_busy &&
@@ -954,7 +967,6 @@ void TVRec::HandleStateChange(void)
 void TVRec::ChangeState(TVState nextState)
 {
     QMutexLocker lock(&stateChangeLock);
-
     desiredNextState = nextState;
     changeState = true;
     WakeEventLoop();
@@ -1428,9 +1440,12 @@ void TVRec::RunTV(void)
             QDateTime now   = QDateTime::currentDateTime();
             bool has_finish = HasFlags(kFlagFinishRecording);
             bool has_rec    = pseudoLiveTVRecording;
+            bool enable_ui  = true;
+
+            pendingRecLock.lock();
             bool rec_soon   =
                 pendingRecordings.find(cardid) != pendingRecordings.end();
-            bool enable_ui  = true;
+            pendingRecLock.unlock();
 
             if (has_rec && (has_finish || (now > recordEndTime)))
             {
@@ -1603,6 +1618,8 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 
 void TVRec::HandlePendingRecordings(void)
 {
+    QMutexLocker pendlock(&pendingRecLock);
+
     if (pendingRecordings.empty())
         return;
 
@@ -1892,7 +1909,7 @@ bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const DTVChannel* channel)
  *   This method also grabs the ATSCStreamData() from the recorder
  *   if possible, or creates one if needed.
  */
-bool TVRec::SetupDTVSignalMonitor(void)
+bool TVRec::SetupDTVSignalMonitor(bool EITscan)
 {
     VERBOSE(VB_RECORD, LOC + "Setting up table monitoring.");
 
@@ -2026,6 +2043,12 @@ bool TVRec::SetupDTVSignalMonitor(void)
                      SignalMonitor::kDVBSigMon_WaitForPos);
         sm->SetRotorTarget(1.0f);
 
+        if (EITscan)
+        {
+            sm->GetStreamData()->SetVideoStreamsRequired(0);
+            sm->IgnoreEncrypted(true);
+        }
+
         VERBOSE(VB_RECORD, LOC + "Successfully set up MPEG table monitoring.");
         return true;
     }
@@ -2047,7 +2070,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
  *  \param notify   If set we notify the frontend of the signal values
  *  \return true on success, false on failure
  */
-bool TVRec::SetupSignalMonitor(bool tablemon, bool notify)
+bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
 {
     VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor("
             <<tablemon<<", "<<notify<<")");
@@ -2063,27 +2086,22 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool notify)
     // make sure statics are initialized
     SignalMonitorValue::Init();
 
-    if (SignalMonitor::IsSupported(genOpt.cardtype) && channel->Open())
-        signalMonitor = SignalMonitor::Init(genOpt.cardtype, cardid, channel);
+    if (channel->Open())
+        signalMonitor = SignalMonitor::Init(genOpt.cardtype, cardid,
+                                            channel);
 
     if (signalMonitor)
     {
         VERBOSE(VB_RECORD, LOC + "Signal monitor successfully created");
-        // If this is a monitor for Digital TV, initialize table monitors
-        if (GetDTVSignalMonitor() && tablemon && !SetupDTVSignalMonitor())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to setup digital signal monitoring");
 
-            return false;
-        }
-
+        signalMonitor->SetMonitoring(this, EITscan,
+                                     GetDTVSignalMonitor() && tablemon);
         signalMonitor->AddListener(this);
         signalMonitor->SetUpdateRate(kSignalMonitoringRate);
         signalMonitor->SetNotifyFrontend(notify);
 
         // Start the monitoring thread
-        signalMonitor->Start();
+        signalMonitor->Start(true);
     }
 
     return true;
@@ -2488,8 +2506,6 @@ bool TVRec::IsReallyRecording(void)
  */
 bool TVRec::IsBusy(TunedInputInfo *busy_input, int time_buffer) const
 {
-    QMutexLocker lock(&stateChangeLock);
-
     TunedInputInfo dummy;
     if (!busy_input)
         busy_input = &dummy;
@@ -2511,19 +2527,29 @@ bool TVRec::IsBusy(TunedInputInfo *busy_input, int time_buffer) const
         chanid              = channel->GetChanID();
     }
 
-    PendingMap::const_iterator it = pendingRecordings.find(cardid);
-    if (!busy_input->inputid && (it != pendingRecordings.end()))
+    PendingInfo pendinfo;
+    bool        has_pending;
+    {
+        pendingRecLock.lock();
+        PendingMap::const_iterator it = pendingRecordings.find(cardid);
+        has_pending = (it != pendingRecordings.end());
+        if (has_pending)
+            pendinfo = *it;
+        pendingRecLock.unlock();
+    }
+
+    if (!busy_input->inputid && has_pending)
     {
         int timeLeft = QDateTime::currentDateTime()
-            .secsTo((*it).recordingStart);
+            .secsTo(pendinfo.recordingStart);
 
         if (timeLeft <= time_buffer)
         {
             QString channum = QString::null, input = QString::null;
-            if ((*it).info->QueryTuningInfo(channum, input))
+            if (pendinfo.info->QueryTuningInfo(channum, input))
             {
                 busy_input->inputid = channel->GetInputByName(input);
-                chanid = (*it).info->GetChanID();
+                chanid = pendinfo.info->GetChanID();
             }
         }
     }
@@ -3667,6 +3693,11 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
     DTVChannel *dtvchan = GetDTVChannel();
+
+    bool livetv = request.flags & kFlagLiveTV;
+    bool antadj = request.flags & kFlagAntennaAdjust;
+    bool has_dummy = false;
+
     if (dtvchan)
     {
         MPEGStreamData *mpeg = NULL;
@@ -3683,16 +3714,14 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (request.minorChan && (tuningmode == "atsc"))
         {
-            channel->SetChannelByString(request.channel);
-
+            channel->SelectChannel(request.channel);
             ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
             if (atsc)
                 atsc->SetDesiredChannel(request.majorChan, request.minorChan);
         }
         else if (request.progNum >= 0)
         {
-            channel->SetChannelByString(request.channel);
-
+            channel->SelectChannel(request.channel);
             if (mpeg)
                 mpeg->SetDesiredProgram(request.progNum);
         }
@@ -3721,9 +3750,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     if (channel && !channum.isEmpty())
     {
         if (!input.isEmpty())
-            ok = channel->SwitchToInput(input, channum);
+            ok = channel->SelectInput(input, channum, true);
         else
-            ok = channel->SetChannelByString(channum);
+        {
+            channel->SelectChannel(channum);
+            ok = true;
+        }
     }
 
     if (!ok)
@@ -3750,13 +3782,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         }
     }
 
-    bool livetv = request.flags & kFlagLiveTV;
-    bool antadj = request.flags & kFlagAntennaAdjust;
-    bool use_sm = SignalMonitor::IsRequired(genOpt.cardtype);
-    bool use_dr = use_sm && (livetv || antadj);
-    bool has_dummy = false;
-
-    if (use_dr)
+    if (livetv || antadj)
     {
         // We need there to be a ringbuffer for these modes
         bool ok;
@@ -3782,59 +3808,50 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         has_dummy = true;
     }
 
-    // Start signal monitoring for devices capable of monitoring
-    if (use_sm)
+    // Start signal (or channel change) monitoring
+    VERBOSE(VB_RECORD, LOC + "Starting Signal Monitor");
+    bool error = false;
+    if (!SetupSignalMonitor(!antadj, request.flags & kFlagEITScan,
+                            livetv | antadj))
     {
-        VERBOSE(VB_RECORD, LOC + "Starting Signal Monitor");
-        bool error = false;
-        if (!SetupSignalMonitor(!antadj, livetv | antadj))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to setup signal monitor");
-            if (signalMonitor)
-            {
-                delete signalMonitor;
-                signalMonitor = NULL;
-            }
-
-            // pretend the signal monitor is running to prevent segfault
-            SetFlags(kFlagSignalMonitorRunning);
-            ClearFlags(kFlagWaitingForSignal);
-            error = true;
-        }
-
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to setup signal monitor");
         if (signalMonitor)
         {
-            if (request.flags & kFlagEITScan)
-            {
-                GetDTVSignalMonitor()->GetStreamData()->
-                    SetVideoStreamsRequired(0);
-                GetDTVSignalMonitor()->IgnoreEncrypted(true);
-            }
-
-            SetFlags(kFlagSignalMonitorRunning);
-            ClearFlags(kFlagWaitingForSignal);
-            if (!antadj)
-                SetFlags(kFlagWaitingForSignal);
+            delete signalMonitor;
+            signalMonitor = NULL;
         }
 
-        if (has_dummy && ringBuffer)
-        {
-            // Make sure recorder doesn't point to bogus ringbuffer before
-            // it is potentially restarted without a new ringbuffer, if
-            // the next channel won't tune and the user exits LiveTV.
-            if (recorder)
-                recorder->SetRingBuffer(NULL);
-
-            SetFlags(kFlagDummyRecorderRunning);
-            VERBOSE(VB_RECORD, "DummyDTVRecorder -- started");
-            SetFlags(kFlagRingBufferReady);
-        }
-
-        // if we had problems starting the signal monitor,
-        // we don't want to start the recorder...
-        if (error)
-            return;
+        // pretend the signal monitor is running to prevent segfault
+        SetFlags(kFlagSignalMonitorRunning);
+        ClearFlags(kFlagWaitingForSignal);
+        error = true;
     }
+
+    if (signalMonitor)
+    {
+        SetFlags(kFlagSignalMonitorRunning);
+        ClearFlags(kFlagWaitingForSignal);
+        if (!antadj)
+            SetFlags(kFlagWaitingForSignal);
+    }
+
+    if (has_dummy && ringBuffer)
+    {
+        // Make sure recorder doesn't point to bogus ringbuffer before
+        // it is potentially restarted without a new ringbuffer, if
+        // the next channel won't tune and the user exits LiveTV.
+        if (recorder)
+            recorder->SetRingBuffer(NULL);
+
+        SetFlags(kFlagDummyRecorderRunning);
+        VERBOSE(VB_RECORD, "DummyDTVRecorder -- started");
+        SetFlags(kFlagRingBufferReady);
+    }
+
+    // if we had problems starting the signal monitor,
+    // we don't want to start the recorder...
+    if (error)
+        return;
 
     // Request a recorder, if the command is a recording command
     ClearFlags(kFlagNeedToStartRecorder);

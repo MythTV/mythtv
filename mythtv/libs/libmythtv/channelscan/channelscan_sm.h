@@ -73,6 +73,7 @@ class AnalogSignalHandler : public SignalMonitorListener
   public slots:
     virtual inline void AllGood(void);
     virtual void StatusSignalLock(const SignalMonitorValue&) { }
+    virtual void StatusChannelTuned(const SignalMonitorValue&) { }
     virtual void StatusSignalStrength(const SignalMonitorValue&) { }
 
   private:

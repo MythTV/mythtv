@@ -53,7 +53,6 @@ class V4LChannel : public DTVChannel
     QString GetSIStandard(void) const { return "atsc"; }
 
     // Commands
-    bool SwitchToInput(int newcapchannel, bool setstarting);
     bool Retune(void);
 
     // Picture attributes.
@@ -72,6 +71,9 @@ class V4LChannel : public DTVChannel
     // Analog scanning stuff
     bool Tune(uint frequency, QString inputname,
               QString modulation, QString si_std);
+
+  protected:
+    bool SwitchToInput(int newcapchannel, bool setstarting);
 
   private:
     // Helper Sets

@@ -26,6 +26,8 @@ using namespace std;
 
 inline QString sm_flags_to_string(uint64_t);
 
+class TVRec;
+
 class SignalMonitor
 {
   public:
@@ -39,7 +41,7 @@ class SignalMonitor
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Control  // // // // // // // // // // // // // // // // // // // //
 
-    virtual void Start();
+    virtual void Start(bool waitfor_tune);
     virtual void Stop();
     virtual void Kick();
     virtual bool WaitForLock(int timeout = -1);
@@ -83,6 +85,13 @@ class SignalMonitor
      */
     void SetNotifyFrontend(bool notify) { notify_frontend = notify; }
 
+    /** \brief Indicate if table monitoring is needed
+     *  \param monitor if true parent->SetupDTVSignalMonitor is called
+     *         after the channel is tuned.
+     */
+    void SetMonitoring(TVRec * parent, bool EITscan, bool monitor)
+        { pParent = parent; eit_scan = EITscan, tablemon = monitor; }
+
     /** \brief Sets the number of milliseconds between signal monitoring
      *         attempts in the signal monitoring thread.
      *
@@ -107,6 +116,8 @@ class SignalMonitor
 
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
+
+    bool IsChannelTuned(void);
 
     /// \brief This should be overridden to actually do signal monitoring.
     virtual void UpdateValues() { ; }
@@ -138,6 +149,8 @@ class SignalMonitor
     static const uint64_t kFWSigMon_PowerSeen   = 0x0000000100ULL;
     /// We've seen something indicating whether the data stream is encrypted
     static const uint64_t kDTVSigMon_CryptSeen  = 0x0000000200ULL;
+
+    static const uint64_t kSigMon_Tuned         = 0x0000000400ULL;
 
     /// We've seen a PAT matching our requirements
     static const uint64_t kDTVSigMon_PATMatch   = 0x0000001000ULL;
@@ -184,6 +197,7 @@ class SignalMonitor
   protected:
     pthread_t    monitor_thread;
     ChannelBase *channel;
+    TVRec       *pParent;
     int          capturecardnum;
     uint64_t     flags;
     int          update_rate;
@@ -192,10 +206,14 @@ class SignalMonitor
     bool         exit;
     bool         update_done;
     bool         notify_frontend;
+    bool         is_tuned;
+    bool         tablemon;
+    bool         eit_scan;
     QString      error;
 
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;
+    SignalMonitorValue channelTuned;
 
     vector<SignalMonitorListener*> listeners;
 

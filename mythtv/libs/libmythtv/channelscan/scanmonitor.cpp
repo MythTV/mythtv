@@ -55,6 +55,8 @@ QEvent::Type ScannerEvent::SetStatusSignalStrength =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ScannerEvent::SetStatusSignalLock =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusChannelTuned =
+    (QEvent::Type) QEvent::registerEventType();
 
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6
@@ -131,6 +133,11 @@ void ScanMonitor::StatusRotorPosition(const SignalMonitorValue &val)
 void ScanMonitor::StatusSignalLock(const SignalMonitorValue &val)
 {
     post_event(this, ScannerEvent::SetStatusSignalLock, val.GetValue());
+}
+
+void ScanMonitor::StatusChannelTuned(const SignalMonitorValue &val)
+{
+    post_event(this, ScannerEvent::SetStatusChannelTuned, val.GetValue());
 }
 
 void ScanMonitor::StatusSignalToNoise(const SignalMonitorValue &val)
