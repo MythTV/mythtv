@@ -90,8 +90,6 @@ MusicCommon::~MusicCommon(void)
     if (m_mainvisual)
     {
         gPlayer->removeVisual(m_mainvisual);
-        m_mainvisual->setDecoder(NULL);
-        m_mainvisual->setOutput(NULL);
 
         delete m_mainvisual;
         m_mainvisual = NULL;
@@ -701,25 +699,12 @@ void MusicCommon::stopAll()
         lcd->switchToTime();
     }
 
-    if (m_mainvisual)
-    {
-        m_mainvisual->setDecoder(NULL);
-        m_mainvisual->setOutput(NULL);
-        m_mainvisual->deleteMetadata();
-    }
-
     gPlayer->stop(true);
 }
 
 void MusicCommon::play()
 {
     gPlayer->play();
-
-    if (m_mainvisual)
-    {
-        m_mainvisual->setDecoder(gPlayer->getDecoder());
-        m_mainvisual->setOutput(gPlayer->getOutput());
-    }
 }
 
 void MusicCommon::pause(void)
@@ -730,13 +715,6 @@ void MusicCommon::pause(void)
 void MusicCommon::stop(void)
 {
     gPlayer->stop();
-
-    if (m_mainvisual)
-    {
-        m_mainvisual->setDecoder(NULL);
-        m_mainvisual->setOutput(NULL);
-        m_mainvisual->deleteMetadata();
-    }
 
     QString time_string = getTimeString(m_maxTime, 0);
 

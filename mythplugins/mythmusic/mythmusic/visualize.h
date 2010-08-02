@@ -86,7 +86,7 @@ class Spectrum : public VisualBase
 class AlbumArt : public VisualBase
 {
   public:
-    AlbumArt(MainVisual *parent);
+    AlbumArt(void);
     virtual ~AlbumArt();
 
     void resize(const QSize &size);
@@ -101,7 +101,6 @@ class AlbumArt : public VisualBase
     QSize m_size, m_cursize;
     QString m_filename;
     ImageType m_currImageType;
-    MainVisual *m_pParent;
     QImage m_image;
 };
 

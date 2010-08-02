@@ -32,6 +32,7 @@ using namespace std;
 #include "visualize.h"
 #include "mainvisual.h"
 #include "constants.h"
+#include "musicplayer.h"
 
 // fast inlines
 #include "inlines.h"
@@ -76,7 +77,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 }
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QWidget(parent), vis(0), meta(0), playing(FALSE), fps(20),
+    : QWidget(parent), vis(0), playing(FALSE), fps(20),
       timer (0), bannerTimer(0), info_widget(0)
 {
     setObjectName(name);
@@ -221,9 +222,9 @@ void MainVisual::timeout()
     }
 
     VisualNode *node = NULL;
-    if (playing && output())
+    if (playing && gPlayer->getOutput())
     {
-        long synctime = output()->GetAudiotime();
+        long synctime = gPlayer->getOutput()->GetAudiotime();
         mutex()->lock();
         VisualNode *prev = NULL;
         while (!nodes.empty())

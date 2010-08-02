@@ -122,10 +122,6 @@ public:
 
     static QStringList Visualizations();
 
-    Metadata *metadata() const { return meta; }
-    void setMetadata(Metadata *&m) { meta = m; }
-    void deleteMetadata() { meta=NULL; };
-
 public slots:
     void timeout();
     void bannerTimeout();
@@ -135,7 +131,6 @@ signals:
 
 private:
     VisualBase *vis;
-    Metadata *meta;
     QPixmap pixmap;
     QList<VisualNode*> nodes;
     bool playing;

@@ -16,24 +16,16 @@ namespace MythTV
 class Visual
 {
 public:
-    Visual() : dec(0), out(0) { ; }
+    Visual() { ; }
     virtual ~Visual() { ; }
 
     virtual void add(uchar *b, unsigned long b_len, unsigned long w, int c, int p) = 0;
     virtual void prepare() = 0;
 
-    Decoder *decoder() const { return dec; }
-    void setDecoder(Decoder *d) { dec = d; }
-
-    AudioOutput *output() const { return out; }
-    void setOutput(AudioOutput *o) { out = o; }
-
     QMutex *mutex() { return &mtx; }
 
 
 private:
-    Decoder *dec;
-    AudioOutput *out;
     QMutex mtx;
 };
 };

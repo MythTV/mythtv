@@ -30,6 +30,7 @@ using namespace std;
 #include "inlines.h"
 #include "decoder.h"
 #include "metadata.h"
+#include "musicplayer.h"
 
 
 #define FFTW_N 512
@@ -306,15 +307,12 @@ static class SpectrumFactory : public VisFactory
     }
 }SpectrumFactory;
 
-AlbumArt::AlbumArt(MainVisual *parent)
+AlbumArt::AlbumArt(void)
 {
-    m_pParent = parent;
-
     findFrontCover();
 
-    Decoder *dec = m_pParent->decoder();
-    if (dec)
-        m_filename = dec->getFilename();
+    if (gPlayer->getDecoder())
+        m_filename = gPlayer->getDecoder()->getFilename();
 
     fps = 1;
 }
@@ -322,7 +320,7 @@ AlbumArt::AlbumArt(MainVisual *parent)
 void AlbumArt::findFrontCover(void)
 {
     // if a front cover image is available show that first
-    AlbumArtImages albumArt(m_pParent->metadata());
+    AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
     if (albumArt.getImage(IT_FRONTCOVER))
         m_currImageType = IT_FRONTCOVER;
     else
@@ -354,7 +352,7 @@ void AlbumArt::handleKeyPress(const QString &action)
 {
     if (action == "SELECT")
     {
-        AlbumArtImages albumArt(m_pParent->metadata());
+        AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
         int newType = m_currImageType;
 
         if (albumArt.getImageCount() > 0)
@@ -383,9 +381,9 @@ bool AlbumArt::needsUpdate()
     if (m_cursize != m_size)
         return true;
 
-    if (m_filename != m_pParent->decoder()->getFilename()) 
+    if (m_filename != gPlayer->getDecoder()->getFilename()) 
     {
-        m_filename = m_pParent->decoder()->getFilename();
+        m_filename = gPlayer->getDecoder()->getFilename();
         findFrontCover();
         return true;
     }
@@ -395,13 +393,13 @@ bool AlbumArt::needsUpdate()
 
 bool AlbumArt::draw(QPainter *p, const QColor &back)
 {
-    if (!m_pParent->decoder())
+    if (!gPlayer->getDecoder())
         return false;
 
     // If the directory has changed (new album) or the size, reload
     if (needsUpdate())
     {
-        QImage art(m_pParent->metadata()->getAlbumArt(m_currImageType));
+        QImage art(gPlayer->getCurrentMetadata()->getAlbumArt(m_currImageType));
         if (art.isNull())
         {
             m_cursize = m_size;
@@ -448,9 +446,10 @@ static class AlbumArtFactory : public VisFactory
 
     VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
     {
+        (void) parent;
         (void)winid;
         (void)pluginName;
-        return new AlbumArt(parent);
+        return new AlbumArt();
     }
 }AlbumArtFactory;
 

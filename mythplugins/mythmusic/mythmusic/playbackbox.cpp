@@ -1027,8 +1027,6 @@ void PlaybackBoxMusic::showEditMetadataDialog()
             QObject::tr("Rebuilding music tree"));
         busy->start();
 
-        mainvisual->deleteMetadata();
-
         // Get a reference to the current track
         QList<int> branches_to_current_node =
             *music_tree_list->getRouteToActive();
@@ -1064,7 +1062,6 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         GenericTree *node = music_tree_list->getCurrentNode();
         curMeta = gMusicData->all_music->getMetadata(node->getInt());
         updateTrackInfo(curMeta);
-        mainvisual->setMetadata(curMeta);
 
         setShuffleMode(gPlayer->getShuffleMode());
 
@@ -1339,10 +1336,6 @@ void PlaybackBoxMusic::play()
 
     currentTime = 0;
 
-    mainvisual->setDecoder(gPlayer->getDecoder());
-    mainvisual->setOutput(gPlayer->getOutput());
-    mainvisual->setMetadata(curMeta);
-
     if (gPlayer->isPlaying())
     {
         if (resumemode == MusicPlayer::RESUME_EXACT &&
@@ -1455,10 +1448,6 @@ void PlaybackBoxMusic::stop(void)
 {
     gPlayer->stop();
 
-    mainvisual->setDecoder(0);
-    mainvisual->setOutput(0);
-    mainvisual->deleteMetadata();
-
     QString time_string = getTimeString(maxTime, 0);
 
     if (time_text)
@@ -1473,10 +1462,6 @@ void PlaybackBoxMusic::stopAll()
     {
         lcd->switchToTime();
     }
-
-    mainvisual->setDecoder(0);
-    mainvisual->setOutput(0);
-    mainvisual->deleteMetadata();
 
     gPlayer->stop(true);
 }
@@ -1793,9 +1778,6 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
 
                             QString time_string = getTimeString(maxTime, 0);
 
-                            mainvisual->setDecoder(gPlayer->getDecoder());
-                            mainvisual->setOutput(gPlayer->getOutput());
-                            mainvisual->setMetadata(curMeta);
                             bannerEnable(curMeta, show_album_art);
                         }
                     }
@@ -1822,9 +1804,6 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
 
                         QString time_string = getTimeString(maxTime, 0);
 
-                        mainvisual->setDecoder(gPlayer->getDecoder());
-                        mainvisual->setOutput(gPlayer->getOutput());
-                        mainvisual->setMetadata(curMeta);
                         bannerEnable(curMeta, show_album_art);
                     }
                 }
