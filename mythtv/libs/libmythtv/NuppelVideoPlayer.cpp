@@ -2340,7 +2340,6 @@ bool NuppelVideoPlayer::StartPlaying(void)
     if (playerTimer)
         delete playerTimer;
     playerTimer = new PlayerTimer(this);
-    playerTimer->startTimer(0);
     playerThread->setPriority(QThread::TimeCriticalPriority);
     return !IsErrored();
 }
