@@ -85,7 +85,6 @@ class MpegRecorder : public DTVRecorder,
 
     void ResetForNewFile(void);
 
-    bool WaitFor_HDPVR(void);
     void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
     void HandleResolutionChanges(void);
 

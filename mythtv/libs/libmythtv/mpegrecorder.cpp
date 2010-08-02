@@ -1043,14 +1043,6 @@ void MpegRecorder::StartRecording(void)
 
     if (driver == "hdpvr")
     {
-        if (curRecording->GetRecordingGroup() == "LiveTV")
-        {
-            // Don't bother checking resolution, always use best bitrate
-            int maxbitrate = std::max(high_mpeg4peakbitrate,
-                                      high_mpeg4avgbitrate);
-            SetBitrate(high_mpeg4avgbitrate, maxbitrate, "LiveTV");
-        }
-
         int progNum = 1;
         MPEGStreamData *sd = new MPEGStreamData(progNum, true);
         sd->SetRecordingType(_recording_type);
@@ -1530,7 +1522,7 @@ bool MpegRecorder::StartEncoding(int fd)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
 
-    if (driver == "hdpvr" && curRecording->GetRecordingGroup() != "LiveTV")
+    if (driver == "hdpvr")
         HandleResolutionChanges();
 
     VERBOSE(VB_RECORD, LOC + "StartEncoding");
@@ -1620,64 +1612,6 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
         DTVRecorder::BufferedWrite(_scratch[i]);
 }
 
-/// After a resolution change, it can take the HD-PVR a few
-/// seconds before it is usable again.
-bool MpegRecorder::WaitFor_HDPVR(void)
-{
-    struct v4l2_encoder_cmd command;
-    struct v4l2_format vfmt;
-    struct pollfd polls;
-    int    idx;
-
-    // Tell it to start encoding, then wait for it to actually feed us
-    // some data.
-    QMutexLocker locker(&start_stop_encoding_lock);
-
-    // Sleep any less than 1.5 seconds, and the HD-PVR will
-    // return the old resolution, when the resolution is changing.
-    usleep(1500 * 1000);
-
-    memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
-    command.cmd = V4L2_ENC_CMD_START;
-
-    for (idx = 0; idx < 20; ++idx)
-    {
-        if (ioctl(readfd, VIDIOC_ENCODER_CMD, &command) == 0)
-            break;
-        usleep(100 * 1000);
-    }
-
-    if (idx == 20)
-        return false;
-
-    polls.fd      = readfd;
-    polls.events  = POLLIN;
-    polls.revents = 0;
-
-    if (poll(&polls, 1, 5000) <= 0)
-        return false;
-
-    // HD-PVR should now be "ready"
-    command.cmd = V4L2_ENC_CMD_STOP;
-
-    if (ioctl(readfd, VIDIOC_ENCODER_CMD, &command) < 0)
-        return false;
-
-    memset(&vfmt, 0, sizeof(vfmt));
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-    for (idx = 0; idx < 20; ++idx)
-    {
-        if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
-            return true;
-        // Typically takes 0.9 seconds after a resolution change
-        usleep(100 * 1000);
-    }
-
-    VERBOSE(VB_RECORD, LOC + "WaitForHDPVR failed");
-    return false;
-}
-
 void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
                               const QString & reason)
 {
@@ -1714,9 +1648,6 @@ void MpegRecorder::HandleResolutionChanges(void)
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-    if (driver == "hdpvr")
-        WaitFor_HDPVR();
 
     if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
     {

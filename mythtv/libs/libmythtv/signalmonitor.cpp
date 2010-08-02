@@ -96,15 +96,12 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_V4L
-#if 0 // Just use ChannelChangeMonitor for these types
-    if ((cardtype.toUpper() == "V4L") ||
-        (cardtype.toUpper() == "MPEG"))
+    if ((cardtype.toUpper() == "HDPVR"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
             signalMonitor = new AnalogSignalMonitor(db_cardnum, chan);
     }
-#endif
 #endif
 
 #ifdef USING_HDHOMERUN
