@@ -128,17 +128,26 @@ bool avfDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
+    // give up if we dont have an audiooutput set
+    if (!output())
+    {
+        VERBOSE(VB_IMPORTANT, QString("avfDecoder: initialise called with a NULL audiooutput"));
+        return false;
+    }
+
     // register av codecs
     av_register_all();
 
-    if (output())
-        output()->PauseUntilBuffered();
+    output()->PauseUntilBuffered();
 
     m_inputIsFile = !input()->isSequential();
 
     // open device
     if (m_inputIsFile)
+    {
         filename = ((QFile *)input())->fileName();
+        VERBOSE(VB_PLAYBACK, QString("avfDecoder: playing file %1").arg(filename));
+    }
     else
     {
         // if the input is not a file then setup the buffer
@@ -163,6 +172,8 @@ bool avfDecoder::initialize()
             deinit();
             return false;
         }
+
+        VERBOSE(VB_PLAYBACK, QString("avfDecoder: playing stream"));
     }
 
     if (!m_samples)
@@ -173,6 +184,7 @@ bool avfDecoder::initialize()
         {
             VERBOSE(VB_GENERAL, "Could not allocate output buffer in "
                                 "avfDecoder::initialize");
+            deinit();
             return false;
         }
     }
@@ -244,47 +256,44 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    if (output())
+    switch (m_audioDec->sample_fmt)
     {
-        switch (m_audioDec->sample_fmt)
-        {
-            case SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
-            case SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
-            case SAMPLE_FMT_FLT:    m_sampleFmt = FORMAT_FLT;   break;
-            case SAMPLE_FMT_DBL:    m_sampleFmt = FORMAT_NONE;  break;
-            case SAMPLE_FMT_S32:
-                switch (m_audioDec->bits_per_raw_sample)
-                {
-                    case  0:    m_sampleFmt = FORMAT_S32;   break;
-                    case 24:    m_sampleFmt = FORMAT_S24;   break;
-                    case 32:    m_sampleFmt = FORMAT_S32;   break;
-                    default:    m_sampleFmt = FORMAT_NONE;
-                }
-                break;
-            default:                m_sampleFmt = FORMAT_NONE;
-        }
-
-        if (m_sampleFmt == FORMAT_NONE)
-        {
-            int bps =
-                av_get_bits_per_sample_format(m_audioDec->sample_fmt);
-            if (m_audioDec->sample_fmt == SAMPLE_FMT_S32 &&
-                m_audioDec->bits_per_raw_sample)
+        case SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
+        case SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
+        case SAMPLE_FMT_FLT:    m_sampleFmt = FORMAT_FLT;   break;
+        case SAMPLE_FMT_DBL:    m_sampleFmt = FORMAT_NONE;  break;
+        case SAMPLE_FMT_S32:
+            switch (m_audioDec->bits_per_raw_sample)
             {
-                bps = m_audioDec->bits_per_raw_sample;
+                case  0:    m_sampleFmt = FORMAT_S32;   break;
+                case 24:    m_sampleFmt = FORMAT_S24;   break;
+                case 32:    m_sampleFmt = FORMAT_S32;   break;
+                default:    m_sampleFmt = FORMAT_NONE;
             }
-            VERBOSE(VB_IMPORTANT, QString("Error: Unsupported sample format "
-                                          "with %1 bits").arg(bps));
-            return false;
-        }
-
-        const AudioSettings settings(m_sampleFmt, m_audioDec->channels,
-                                     m_audioDec->codec_id,
-                                     m_audioDec->sample_rate, false);
-
-        output()->Reconfigure(settings);
-        output()->SetSourceBitrate(m_audioDec->bit_rate);
+            break;
+        default:                m_sampleFmt = FORMAT_NONE;
     }
+
+    if (m_sampleFmt == FORMAT_NONE)
+    {
+        int bps =
+            av_get_bits_per_sample_format(m_audioDec->sample_fmt);
+        if (m_audioDec->sample_fmt == SAMPLE_FMT_S32 &&
+            m_audioDec->bits_per_raw_sample)
+        {
+            bps = m_audioDec->bits_per_raw_sample;
+        }
+        VERBOSE(VB_IMPORTANT, QString("Error: Unsupported sample format "
+                                        "with %1 bits").arg(bps));
+        return false;
+    }
+
+    const AudioSettings settings(m_sampleFmt, m_audioDec->channels,
+                                    m_audioDec->codec_id,
+                                    m_audioDec->sample_rate, false);
+
+    output()->Reconfigure(settings);
+    output()->SetSourceBitrate(m_audioDec->bit_rate);
 
     // 20ms worth
     bks = (freq * m_channels *
