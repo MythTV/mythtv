@@ -10,7 +10,7 @@ TARGET = mtd
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-LIBS += -lmythdvdnav-$$LIBVERSION
+LIBS += -lmythdvdnav-$$LIBVERSION -ldl
 
 HEADERS += ../mythvideo/dbcheck.h logging.h mtd.h 
 HEADERS += jobthread.h dvdprobe.h fileobs.h threadevents.h
