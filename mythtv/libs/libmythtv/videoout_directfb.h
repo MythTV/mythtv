@@ -16,7 +16,8 @@ class VideoOutputDirectfb: public VideoOutput
     ~VideoOutputDirectfb();
 
     bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid = 0);
+              int winx, int winy, int winw, int winh,
+              MythCodecID codec_id, WId embedid = 0);
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,

@@ -165,9 +165,9 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
  * \see VideoOutput, VideoBuffers
  *
  */
-VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
+VideoOutputXv::VideoOutputXv()
     : VideoOutput(),
-      myth_codec_id(codec_id), video_output_subtype(XVUnknown),
+      video_output_subtype(XVUnknown),
       global_lock(QMutex::Recursive),
 
       XJ_win(0), XJ_curwin(0), disp(NULL), XJ_letterbox_colour(0),
@@ -279,11 +279,11 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
-            .arg(toString(myth_codec_id)).arg(toString(av_codec_id)));
+            .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&global_lock);
 
-    bool cid_changed = (myth_codec_id != av_codec_id);
+    bool cid_changed = (video_codec_id != av_codec_id);
     bool res_changed = input_size     != windows[0].GetVideoDispDim();
     bool asp_changed = aspect         != windows[0].GetVideoAspect();
 
@@ -311,8 +311,6 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     bool ok = true;
     if (cid_changed)
     {
-        myth_codec_id = av_codec_id;
-
         // ungrab port...
         if (xv_port >= 0)
         {
@@ -682,20 +680,17 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
  *
  * \return success or failure at creating any buffers.
  */
-bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
-                                     bool use_xv, bool use_shm)
+bool VideoOutputXv::InitVideoBuffers(bool use_xv, bool use_shm)
 {
-    (void)mcodecid;
-
     bool done = false;
 
     // If use_xvmc try to create XvMC buffers
 #ifdef USING_XVMC
-    if (!done && codec_is_xvmc(mcodecid))
+    if (!done && codec_is_xvmc(video_codec_id))
     {
         // Create ffmpeg VideoFrames
         bool vld, idct, mc, dummy;
-        myth2av_codecid(myth_codec_id, vld, idct, mc, dummy);
+        myth2av_codecid(video_codec_id, vld, idct, mc, dummy);
 
         vbuffers.Init(xvmc_buf_attr->GetNumSurf(),
                       false /* create an extra frame for pause? */,
@@ -706,18 +701,18 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
                       true /*use_frame_locking*/);
 
 
-        done = InitXvMC(mcodecid);
+        done = InitXvMC();
 
         if (!done)
             vbuffers.Reset();
     }
 #endif // USING_XVMC
 
-    if (!done && !codec_is_std(mcodecid))
+    if (!done && !codec_is_std(video_codec_id))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Failed to initialize buffers for codec %1")
-                .arg(toString(mcodecid)));
+                .arg(toString(video_codec_id)));
         return false;
     }
 
@@ -761,15 +756,14 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
  *
  * \return success or failure at creating any buffers.
  */
-bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
+bool VideoOutputXv::InitXvMC()
 {
-    (void)mcodecid;
 #ifdef USING_XVMC
     MythXLocker lock(disp);
     disp->StartLog();
     QString adaptor_name = QString::null;
     const QSize video_dim = windows[0].GetVideoDim();
-    xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), mcodecid,
+    xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), video_codec_id,
                                  video_dim.width(), video_dim.height(),
                                  xv_set_defaults,
                                  xvmc_chroma, &xvmc_surf_info, &adaptor_name);
@@ -1159,7 +1153,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     // Figure out what video renderer to use
     db_vdisp_profile->SetInput(windows[0].GetVideoDim());
     QStringList renderers = allowed_video_renderers(
-                                myth_codec_id, disp, XJ_curwin);
+                                video_codec_id, disp, XJ_curwin);
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
@@ -1192,20 +1186,20 @@ bool VideoOutputXv::InitSetupBuffers(void)
                     "Desired video renderer '%1' not available.\n\t\t\t"
                     "codec '%2' makes '%3' available, using '%4' instead.")
                 .arg(db_vdisp_profile->GetVideoRenderer())
-                .arg(toString(myth_codec_id)).arg(tmp).arg(renderer));
+                .arg(toString(video_codec_id)).arg(tmp).arg(renderer));
         db_vdisp_profile->SetVideoRenderer(renderer);
     }
 
     // Create video buffers
     bool use_xv     = (renderer.left(2) == "xv");
     bool use_shm    = (renderer == "xshm");
-    bool ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm);
+    bool ok = InitVideoBuffers(use_xv, use_shm);
 
     if (!ok && windows[0].GetPIPState() == kPIPOff)
     {
         use_xv     |= (bool) renderers.contains("xv-blit");
         use_shm    |= (bool) renderers.contains("xshm");
-        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm);
+        ok = InitVideoBuffers(use_xv, use_shm);
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
@@ -1227,7 +1221,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
  */
 bool VideoOutputXv::Init(
     int width, int height, float aspect,
-    WId winid, int winx, int winy, int winw, int winh, WId embedid)
+    WId winid, int winx, int winy, int winw, int winh,
+    MythCodecID codec_id, WId embedid)
 {
     windows[0].SetNeedRepaint(true);
 
@@ -1270,7 +1265,7 @@ bool VideoOutputXv::Init(
     // Basic setup
     VideoOutput::Init(width, height, aspect,
                       winid, winx, winy, winw, winh,
-                      embedid);
+                      codec_id, embedid);
 
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
     InitDisplayMeasurements(width, height, true);

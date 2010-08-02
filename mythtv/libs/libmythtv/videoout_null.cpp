@@ -27,7 +27,7 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     opts.priorities->insert("null", 10);
 }
 
-VideoOutputNull::VideoOutputNull(void) :
+VideoOutputNull::VideoOutputNull() :
     VideoOutput(), global_lock(QMutex::Recursive)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputNull()");
@@ -138,7 +138,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
 bool VideoOutputNull::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw,
-                           int winh, WId embedid)
+                           int winh, MythCodecID codec_id, WId embedid)
 {
     if ((width <= 0) || (height <= 0))
         return false;
@@ -146,7 +146,7 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     QMutexLocker locker(&global_lock);
 
     VideoOutput::Init(width, height, aspect, winid,
-                      winx, winy, winw, winh, embedid);
+                      winx, winy, winw, winh, codec_id, embedid);
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,

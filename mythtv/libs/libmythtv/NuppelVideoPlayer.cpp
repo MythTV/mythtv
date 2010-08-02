@@ -476,11 +476,12 @@ bool NuppelVideoPlayer::InitVideo(void)
 
     PIPState pipState = player_ctx->GetPIPState();
 
-    if (using_null_videoout)
+    if (using_null_videoout && GetDecoder())
     {
+        MythCodecID codec = GetDecoder()->GetVideoCodecID();
         videoOutput = new VideoOutputNull();
         if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
-                               video_aspect, 0, 0, 0, 0, 0, 0))
+                               video_aspect, 0, 0, 0, 0, 0, codec, 0))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unable to create null video out");
@@ -531,19 +532,21 @@ bool NuppelVideoPlayer::InitVideo(void)
                 0 /*embedid*/);
         }
 
-        if (!videoOutput)
+        if (videoOutput)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Couldn't create VideoOutput instance. Exiting..");
-            SetErrored(QObject::tr("Failed to initialize video output"));
-            return false;
+            videoOutput->SetVideoScalingAllowed(true);
+            // We need to tell it this for automatic deinterlacer settings
+            videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+            CheckExtraAudioDecode();
         }
-
-        videoOutput->SetVideoScalingAllowed(true);
-
-        // We need to tell it this for automatic deinterlacer settings
-        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
-        CheckExtraAudioDecode();
+    }
+    
+    if (!videoOutput)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Couldn't create VideoOutput instance. Exiting..");
+        SetErrored(QObject::tr("Failed to initialize video output"));
+        return false;
     }
 
     if (embedid > 0 && pipState == kPIPOff)

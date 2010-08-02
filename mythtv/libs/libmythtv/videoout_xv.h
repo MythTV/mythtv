@@ -51,11 +51,12 @@ class VideoOutputXv : public VideoOutput
     friend class XvMCOSD;
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
-    VideoOutputXv(MythCodecID av_codec_id);
+    VideoOutputXv();
    ~VideoOutputXv();
 
     bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid = 0);
+              int winx, int winy, int winw, int winh,
+              MythCodecID codec_id, WId embedid = 0);
 
     bool SetDeinterlacingEnabled(bool);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
@@ -157,9 +158,9 @@ class VideoOutputXv : public VideoOutput
 
     void InitColorKey(bool turnoffautopaint);
 
-    bool InitVideoBuffers(MythCodecID, bool use_xv, bool use_shm);
+    bool InitVideoBuffers(bool use_xv, bool use_shm);
 
-    bool InitXvMC(MythCodecID);
+    bool InitXvMC(void);
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
@@ -187,7 +188,6 @@ class VideoOutputXv : public VideoOutput
 #endif // USING_XVMC
 
     // Misc.
-    MythCodecID          myth_codec_id;
     VOSType              video_output_subtype;
     QMutex               global_lock;
 

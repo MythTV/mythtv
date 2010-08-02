@@ -192,7 +192,7 @@ VideoOutput *VideoOutput::Create(
 
 #ifdef USING_QUARTZ_VIDEO
         if (osxlist.contains(renderer))
-            vo = new VideoOutputQuartz(codec_id, codec_priv);
+            vo = new VideoOutputQuartz();
 #endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
@@ -202,12 +202,12 @@ VideoOutput *VideoOutput::Create(
 
 #ifdef USING_VDPAU
         if (renderer == "vdpau")
-            vo = new VideoOutputVDPAU(codec_id);
+            vo = new VideoOutputVDPAU();
 #endif // USING_VDPAU
 
 #ifdef USING_XV
         if (xvlist.contains(renderer))
-            vo = new VideoOutputXv(codec_id);
+            vo = new VideoOutputXv();
 #endif // USING_XV
 
         if (vo)
@@ -217,7 +217,8 @@ VideoOutput *VideoOutput::Create(
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
                     win_id, display_rect.x(), display_rect.y(),
-                    display_rect.width(), display_rect.height(), embed_id))
+                    display_rect.width(), display_rect.height(),
+                    codec_id, embed_id))
             {
                 return vo;
             }
@@ -311,6 +312,9 @@ VideoOutput::VideoOutput() :
     db_letterbox_colour(kLetterBoxColour_Black),
     db_deint_filtername(QString::null),
     db_use_picture_controls(false),
+
+    // Video parameters
+    video_codec_id(kCodec_NONE),
     db_vdisp_profile(NULL),             video_prate(0.0),
 
     // Picture-in-Picture stuff
@@ -405,11 +409,13 @@ VideoOutput::~VideoOutput()
  * \return true if successful, false otherwise.
  */
 bool VideoOutput::Init(int width, int height, float aspect, WId winid,
-                       int winx, int winy, int winw, int winh, WId embedid)
+                       int winx, int winy, int winw, int winh,
+                       MythCodecID codec_id, WId embedid)
 {
     (void)winid;
     (void)embedid;
 
+    video_codec_id = codec_id;
     bool mainSuccess = windows[0].Init(
         QSize(width, height), aspect,
         QRect(winx, winy, winw, winh),
@@ -669,7 +675,7 @@ bool VideoOutput::InputChanged(const QSize &input_size,
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetInput(windows[0].GetVideoDim());
-
+    video_codec_id = myth_codec_id;
     BestDeint();
 
     DiscardFrames(true);

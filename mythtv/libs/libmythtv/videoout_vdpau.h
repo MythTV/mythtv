@@ -20,10 +20,11 @@ class VideoOutputVDPAU : public VideoOutput
 {
   public:
     static void GetRenderOptions(render_opts &opts);
-    VideoOutputVDPAU(MythCodecID codec_id);
+    VideoOutputVDPAU();
     ~VideoOutputVDPAU();
     bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid = 0);
+              int winx, int winy, int winw, int winh,
+              MythCodecID codec_id, WId embedid = 0);
     bool SetDeinterlacingEnabled(bool interlaced);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
     bool ApproveDeintFilter(const QString& filtername) const;
@@ -57,9 +58,9 @@ class VideoOutputVDPAU : public VideoOutput
     virtual bool IsPIPSupported(void) const { return true; }
     virtual bool IsPBPSupported(void) const { return false; }
     virtual bool NeedExtraAudioDecode(void) const
-        { return codec_is_vdpau(m_codec_id); }
+        { return codec_is_vdpau(video_codec_id); }
     virtual bool hasHWAcceleration(void) const
-        { return codec_is_vdpau(m_codec_id); }
+        { return codec_is_vdpau(video_codec_id); }
     virtual bool IsSyncLocked(void) const { return true; }
     void SetNextFrameDisplayTimeOffset(int delayus) { m_frame_delay = delayus; }
     virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
@@ -91,7 +92,6 @@ class VideoOutputVDPAU : public VideoOutput
     void DeinitPIPLayer(void);
     void ParseOptions(void);
 
-    MythCodecID          m_codec_id;
     Window               m_win;
     MythRenderVDPAU     *m_render;
 

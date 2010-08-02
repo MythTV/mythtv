@@ -14,7 +14,8 @@ class VideoOutputOpenGL : public VideoOutput
    ~VideoOutputOpenGL();
 
     bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid = 0);
+              int winx, int winy, int winw, int winh,
+              MythCodecID codec_id, WId embedid = 0);
     void TearDown(void);
 
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);

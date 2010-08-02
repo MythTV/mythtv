@@ -157,7 +157,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
     QRect disp = windows[0].GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, m_hWnd, disp.left(), disp.top(),
-             disp.width(), disp.height(), m_hEmbedWnd))
+             disp.width(), disp.height(), av_codec_id, m_hEmbedWnd))
     {
         return true;
     }
@@ -191,7 +191,7 @@ bool VideoOutputD3D::SetupContext()
 
 bool VideoOutputD3D::Init(int width, int height, float aspect,
                           WId winid, int winx, int winy, int winw,
-                          int winh, WId embedid)
+                          int winh, MythCodecID codec_id, WId embedid)
 {
     QMutexLocker locker(&m_lock);
     m_hWnd      = winid;
@@ -199,7 +199,7 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     windows[0].SetAllowPreviewEPG(true);
 
     VideoOutput::Init(width, height, aspect, winid,
-                      winx, winy, winw, winh, embedid);
+                      winx, winy, winw, winh, codec_id, embedid);
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("direct3d");

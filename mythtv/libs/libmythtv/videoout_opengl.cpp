@@ -36,7 +36,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     opts.priorities->insert("opengl", 65);
 }
 
-VideoOutputOpenGL::VideoOutputOpenGL(void)
+VideoOutputOpenGL::VideoOutputOpenGL()
     : VideoOutput(),
     gl_context_lock(QMutex::Recursive),
     gl_context(NULL), gl_videochain(NULL), gl_pipchain_active(NULL),
@@ -108,7 +108,7 @@ void VideoOutputOpenGL::TearDown(void)
 
 bool VideoOutputOpenGL::Init(int width, int height, float aspect,
                         WId winid, int winx, int winy, int winw, int winh,
-                        WId embedid)
+                        MythCodecID codec_id, WId embedid)
 {
     QMutexLocker locker(&gl_context_lock);
 
@@ -120,7 +120,7 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
 
     VideoOutput::Init(width, height, aspect,
                       winid, winx, winy, winw, winh,
-                      embedid);
+                      codec_id, embedid);
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("opengl");
@@ -178,7 +178,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
     QRect disp = windows[0].GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, gl_parent_win, disp.left(),  disp.top(),
-             disp.width(), disp.height(), gl_embed_win))
+             disp.width(), disp.height(), av_codec_id, gl_embed_win))
     {
         BestDeint();
         return true;

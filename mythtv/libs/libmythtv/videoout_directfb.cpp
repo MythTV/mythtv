@@ -274,7 +274,7 @@ void VideoOutputDirectfb::GetRenderOptions(render_opts &opts,
     opts.priorities->insert("directfb", 60);
 }
 
-VideoOutputDirectfb::VideoOutputDirectfb(void)
+VideoOutputDirectfb::VideoOutputDirectfb()
     : VideoOutput(), XJ_started(false), widget(NULL),
       data(new DirectfbData())
 {
@@ -323,7 +323,7 @@ static QSize fix_alignment(QSize raw)
 
 bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
                                int winx, int winy, int winw, int winh,
-                               WId embedid)
+                               MythCodecID codec_id, WId embedid)
 {
     // Hack to avoid embedded video output...
     if ((winw < 320) || (winh < 240))
@@ -621,7 +621,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
                            display_visible_rect.y(),
                            display_visible_rect.width(),
                            display_visible_rect.height(),
-                           embedid))
+                           codec_id, embedid))
     {
         return false;
     }

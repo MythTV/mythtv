@@ -59,7 +59,7 @@ class VideoOutput
 
     virtual bool Init(int width, int height, float aspect,
                       WId winid, int winx, int winy, int winw,
-                      int winh, WId embedid = 0);
+                      int winh, MythCodecID codec_id, WId embedid = 0);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
     virtual bool IsPreferredRenderer(QSize video_size);
@@ -289,8 +289,10 @@ class VideoOutput
     QString db_deint_filtername;
     bool    db_use_picture_controls;
 
+    // Video parameters
+    MythCodecID          video_codec_id;
     VideoDisplayProfile *db_vdisp_profile;
-    float   video_prate;  ///< Playback frame rate of video
+    float                video_prate;  ///< Playback frame rate of video
 
     // Picture-in-Picture
     QSize   pip_desired_display_size;

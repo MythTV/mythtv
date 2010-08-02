@@ -9,11 +9,12 @@ class VideoOutputQuartz : public VideoOutput
 {
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
-    VideoOutputQuartz(MythCodecID av_codec_id, void *codec_priv);
+    VideoOutputQuartz();
    ~VideoOutputQuartz();
 
     bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid = 0);
+              int winx, int winy, int winw, int winh,
+              MythCodecID codec_id, WId embedid = 0);
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
@@ -53,7 +54,7 @@ class VideoOutputQuartz : public VideoOutput
         uint osd_width, uint osd_height,
         uint stream_type, uint fourcc);
     virtual bool NeedExtraAudioDecode(void) const
-        { return !codec_is_std(myth_codec_id); }
+        { return !codec_is_std(video_codec_id); }
 
   private:
     void Exit(void);
@@ -63,7 +64,6 @@ class VideoOutputQuartz : public VideoOutput
     bool         Started;
     QuartzData  *data;
     VideoFrame   pauseFrame;
-    MythCodecID  myth_codec_id;
 };
 
 #endif

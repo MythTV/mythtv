@@ -13,7 +13,8 @@ class VideoOutputNull : public VideoOutput
    ~VideoOutputNull();
 
     bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid = 0);
+              int winx, int winy, int winw, int winh,
+              MythCodecID codec_id, WId embedid = 0);
     bool SetupDeinterlace(bool, const QString &ovrf = "")
         { (void)ovrf; return false; } // we don't deinterlace in null output..
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);

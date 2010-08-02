@@ -1102,10 +1102,8 @@ void VideoOutputQuartz::GetRenderOptions(render_opts &opts,
 /** \class VideoOutputQuartz
  *  \brief Implementation of Quartz (Mac OS X windowing system) video output
  */
-VideoOutputQuartz::VideoOutputQuartz(
-    MythCodecID _myth_codec_id, void *codec_priv) :
-    VideoOutput(), Started(false), data(new QuartzData()),
-    myth_codec_id(_myth_codec_id)
+VideoOutputQuartz::VideoOutputQuartz() :
+    VideoOutput(), Started(false), data(new QuartzData())
 {
     init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
 }
@@ -1183,7 +1181,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
             .arg(input_size.width())
             .arg(input_size.height()).arg(aspect));
 
-    bool cid_changed = (myth_codec_id != av_codec_id);
+    bool cid_changed = (video_codec_id != av_codec_id);
     bool res_changed = input_size != windows[0].GetVideoDispDim();
     bool asp_changed = aspect != windows[0].GetVideoAspect();
 
@@ -1202,7 +1200,6 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
     }
 
     const QSize video_dim = windows[0].GetVideoDim();
-    myth_codec_id = av_codec_id;
 
     DeleteQuartzBuffers();
 
@@ -1227,7 +1224,8 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
 
 bool VideoOutputQuartz::Init(int width, int height, float aspect,
                              WId winid, int winx, int winy,
-                             int winw, int winh, WId embedid)
+                             int winw, int winh, MythCodecID codec_id,
+                             WId embedid)
 {
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Init(WxH %1x%2, aspect=%3, winid=%4\n\t\t\t"
@@ -1239,7 +1237,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
-                      winx, winy, winw, winh, embedid);
+                      winx, winy, winw, winh, codec_id, embedid);
 
     const QSize video_dim = windows[0].GetVideoDim();
     data->srcWidth  = video_dim.width();
@@ -1426,7 +1424,7 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
     const QSize video_dim = windows[0].GetVideoDim();
     db_vdisp_profile->SetInput(video_dim);
-    QStringList renderers = GetAllowedRenderers(myth_codec_id, video_dim);
+    QStringList renderers = GetAllowedRenderers(video_codec_id, video_dim);
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();

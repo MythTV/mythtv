@@ -48,9 +48,8 @@ void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
     opts.deints->insert("vdpau", deints);
 }
 
-VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
-  : VideoOutput(),
-    m_codec_id(codec_id),    m_win(0),         m_render(NULL),
+VideoOutputVDPAU::VideoOutputVDPAU()
+  : m_win(0),                m_render(NULL),
     m_buffer_size(NUM_VDPAU_BUFFERS),          m_pause_surface(0),
     m_need_deintrefs(false), m_video_mixer(0), m_mixer_features(kVDPFeatNone),
     m_checked_surface_ownership(false),
@@ -83,7 +82,8 @@ void VideoOutputVDPAU::TearDown(void)
 }
 
 bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
-                            int winx, int winy, int winw, int winh, WId embedid)
+                            int winx, int winy, int winw, int winh,
+                            MythCodecID codec_id, WId embedid)
 {
     (void) embedid;
     m_win = winid;
@@ -91,7 +91,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     windows[0].SetNeedRepaint(true);
     bool ok = VideoOutput::Init(width, height, aspect,
                                 winid, winx, winy, winw, winh,
-                                embedid);
+                                codec_id, embedid);
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
 
@@ -112,7 +112,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     MoveResize();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Created VDPAU context (%1 decode)")
-            .arg(codec_is_std(m_codec_id) ? "software" : "GPU"));
+            .arg(codec_is_std(video_codec_id) ? "software" : "GPU"));
 
     return ok;
 }
@@ -178,7 +178,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
     vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
 
     bool ok = false;
-    if (codec_is_vdpau(m_codec_id))
+    if (codec_is_vdpau(video_codec_id))
     {
         ok = CreateVideoSurfaces(m_buffer_size);
         if (ok)
@@ -190,7 +190,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
                                     FMT_VDPAU);
         }
     }
-    else if (codec_is_std(m_codec_id))
+    else if (codec_is_std(video_codec_id))
     {
         ok = CreateVideoSurfaces(NUM_REFERENCE_FRAMES);
         if (ok)
@@ -377,7 +377,7 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
     QMutexLocker locker(&m_lock);
     CHECK_ERROR("ProcessFrame")
 
-    if (!m_checked_surface_ownership && codec_is_std(m_codec_id))
+    if (!m_checked_surface_ownership && codec_is_std(video_codec_id))
         ClaimVideoSurfaces();
 
     m_pip_ready = false;
@@ -394,7 +394,8 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (!m_render)
         return;
 
-    if (!m_checked_output_surfaces && !(!codec_is_std(m_codec_id) && !m_decoder))
+    if (!m_checked_output_surfaces &&
+        !(!codec_is_std(video_codec_id) && !m_decoder))
     {
         m_render->SetMaster(kMasterVideo);
         m_render->CheckOutputSurfaces();
@@ -422,7 +423,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
             deint = false;
     }
 
-    if (!codec_is_std(m_codec_id) && frame)
+    if (!codec_is_std(video_codec_id) && frame)
     {
         struct vdpau_render_state *render =
             (struct vdpau_render_state *)frame->buf;
@@ -524,7 +525,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
     CHECK_ERROR("DrawSlice")
 
-    if (codec_is_std(m_codec_id) || !m_render)
+    if (codec_is_std(video_codec_id) || !m_render)
         return;
 
     if (!m_checked_surface_ownership)
@@ -652,10 +653,10 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
-            .arg(toString(m_codec_id)).arg(toString(av_codec_id)));
+            .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&m_lock);
-    bool cid_changed = (m_codec_id != av_codec_id);
+    bool cid_changed = (video_codec_id != av_codec_id);
     bool res_changed = input_size  != windows[0].GetVideoDim();
     bool asp_changed = aspect      != windows[0].GetVideoAspect();
 
@@ -670,12 +671,11 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
         return true;
     }
 
-    m_codec_id = av_codec_id;
     TearDown();
     QRect disp = windows[0].GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, m_win, disp.left(), disp.top(),
-             disp.width(), disp.height(), 0))
+             disp.width(), disp.height(), av_codec_id, 0))
     {
         BestDeint();
         return true;
@@ -754,7 +754,7 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
     if (vbuffers.size(kVideoBuffer_used) && m_render)
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
-        if (codec_is_std(m_codec_id))
+        if (codec_is_std(video_codec_id))
         {
             m_pause_surface = m_video_surfaces[0];
             uint32_t pitches[3] = { frame->pitches[0],
@@ -896,7 +896,7 @@ void VideoOutputVDPAU::UpdateReferenceFrames(VideoFrame *frame)
         m_reference_frames.pop_front();
 
     uint ref = m_video_surfaces[(framesPlayed +1)  % NUM_REFERENCE_FRAMES];
-    if (!codec_is_std(m_codec_id))
+    if (!codec_is_std(video_codec_id))
     {
         struct vdpau_render_state *render =
             (struct vdpau_render_state *)frame->buf;
@@ -909,7 +909,7 @@ void VideoOutputVDPAU::UpdateReferenceFrames(VideoFrame *frame)
 
 bool VideoOutputVDPAU::FrameIsInUse(VideoFrame *frame)
 {
-    if (!frame || codec_is_std(m_codec_id))
+    if (!frame || codec_is_std(video_codec_id))
         return false;
 
     uint ref = 0;
