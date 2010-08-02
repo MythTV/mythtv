@@ -24,6 +24,7 @@
 using namespace std;
 
 // Qt headers
+#include <QCoreApplication>
 #include <QThread>
 #include <QKeyEvent>
 #include <QDir>
@@ -89,38 +90,35 @@ static unsigned dbg_ident(const NuppelVideoPlayer*);
 #define LOC_ERR  QString("NVP(%1), Error: ").arg(dbg_ident(this),0,36)
 #define LOC_DEC  QString("NVP(%1): ").arg(dbg_ident(m_nvp),0,36)
 
-PlayerTimer::PlayerTimer(NuppelVideoPlayer *nvp)
+QEvent::Type PlayerTimer::kPlayerEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
+PlayerTimer::PlayerTimer(NuppelVideoPlayer *nvp) : m_nvp(nvp)
 {
-    m_nvp = nvp;
-    m_timer = new QTimer(this);
-    if (m_nvp && m_timer)
-    {
-        connect(m_timer, SIGNAL(timeout()), this, SLOT(loop()));
-        m_timer->start();
-    }
-    else
-        VERBOSE(VB_IMPORTANT, QString("Failed to start PlayerTimer."));
+    if (!m_nvp)
+        VERBOSE(VB_IMPORTANT, QString("PlayerTimer has no parent."));
+    PostNextEvent();
 }
 
-PlayerTimer::~PlayerTimer(void)
+void PlayerTimer::PostNextEvent(void)
 {
-    if (m_timer)
-    {
-        m_timer->stop();
-        m_timer->deleteLater();
-    }
+    QEvent *event = new QEvent(kPlayerEventType);
+    qApp->postEvent(this, event);
 }
 
-void PlayerTimer::loop(void)
+bool PlayerTimer::event(QEvent *e)
 {
-    if (m_nvp)
+    if (e->type() == kPlayerEventType)
     {
-        if (!m_nvp->IsErrored())
+        if (m_nvp && !m_nvp->IsErrored())
         {
             m_nvp->EventLoop();
             m_nvp->VideoLoop();
+            PostNextEvent();
         }
+        return true;
     }
+    return false;
 }
 
 void DecoderThread::run(void)
@@ -4330,3 +4328,4 @@ static unsigned dbg_ident(const NuppelVideoPlayer *nvp)
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
+

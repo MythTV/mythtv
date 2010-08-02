@@ -4,7 +4,7 @@
 #include <sys/time.h>
 
 #include <QObject>
-#include <QTimer>
+#include <QEvent>
 
 #include "playercontext.h"
 #include "volumebase.h"
@@ -86,14 +86,12 @@ class PlayerTimer : public QObject
     Q_OBJECT
   public:
     PlayerTimer(NuppelVideoPlayer *nvp);
-   ~PlayerTimer(void);
-
-  public slots:
-    void loop(void);
+    void PostNextEvent(void);
+    virtual bool event(QEvent *e);
+    static enum QEvent::Type kPlayerEventType;
 
   private:
     NuppelVideoPlayer *m_nvp;
-    QTimer            *m_timer;
 };
 
 class DecoderThread : public QThread
