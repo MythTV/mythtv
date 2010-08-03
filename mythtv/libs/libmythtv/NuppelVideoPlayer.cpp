@@ -93,7 +93,7 @@ static unsigned dbg_ident(const NuppelVideoPlayer*);
 QEvent::Type PlayerTimer::kPlayerEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-PlayerTimer::PlayerTimer(NuppelVideoPlayer *nvp) : m_nvp(nvp)
+PlayerTimer::PlayerTimer(NuppelVideoPlayer *nvp) : m_nvp(nvp), m_queue_size(0)
 {
     if (!m_nvp)
         VERBOSE(VB_IMPORTANT, QString("PlayerTimer has no parent."));
@@ -104,17 +104,22 @@ void PlayerTimer::PostNextEvent(void)
 {
     QEvent *event = new QEvent(kPlayerEventType);
     qApp->postEvent(this, event);
+    m_queue_size++;
 }
 
 bool PlayerTimer::event(QEvent *e)
 {
     if (e->type() == kPlayerEventType)
     {
+        // TODO this may fail if events are lost and the queue size is wrong
+        m_queue_size--;
+        while (m_queue_size < 3)
+            PostNextEvent();
+
         if (m_nvp && !m_nvp->IsErrored())
         {
             m_nvp->EventLoop();
             m_nvp->VideoLoop();
-            PostNextEvent();
         }
         return true;
     }

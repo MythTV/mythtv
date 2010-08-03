@@ -92,6 +92,7 @@ class PlayerTimer : public QObject
 
   private:
     NuppelVideoPlayer *m_nvp;
+    uint32_t           m_queue_size;
 };
 
 class DecoderThread : public QThread
