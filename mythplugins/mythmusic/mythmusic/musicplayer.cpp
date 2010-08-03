@@ -758,7 +758,7 @@ Metadata *MusicPlayer::getCurrentMetadata(void)
     if (!m_currentNode)
         return NULL;
 
-    m_currentMetadata = Metadata::getMetadataFromID(m_currentNode->getInt());
+    m_currentMetadata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
 
     return m_currentMetadata;
 }
@@ -766,10 +766,7 @@ Metadata *MusicPlayer::getCurrentMetadata(void)
 void MusicPlayer::refreshMetadata(void)
 {
     if (m_currentMetadata)
-    {
-        //delete m_currentMetadata;
         m_currentMetadata = NULL;
-    }
 
     getCurrentMetadata();
 }
