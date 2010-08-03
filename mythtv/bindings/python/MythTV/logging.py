@@ -5,6 +5,8 @@ from static import LOGLEVEL
 
 from sys import version_info, stdout
 from datetime import datetime
+from thread import allocate_lock
+from cStringIO import StringIO
 
 class MythLog( LOGLEVEL ):
     """
@@ -23,6 +25,7 @@ class MythLog( LOGLEVEL ):
 
     LEVEL = LOGLEVEL.IMPORTANT|LOGLEVEL.GENERAL
     LOGFILE = stdout
+    _lock = allocate_lock()
 
     helptext = """Verbose debug levels.
  Accepts any combination (separated by comma) of:
@@ -160,11 +163,33 @@ class MythLog( LOGLEVEL ):
                 <timestamp> <module>: <message> -- <detail>
         """
         if self._testLevel(level):
-            lstr = "%s %s: %s" % (self.time(), self.module, message)
-            if detail is not None:
-                lstr += " -- %s" % detail
-            self.LOGFILE.write(lstr+'\n')
-            self.LOGFILE.flush()
+            buff = StringIO()
+            buff.write('%s %s: ' % (self.time(), self.module))
+            pad = buff.tell()
+            linect = 0
+
+            for line in message.split('\n'):
+                if linect > 0:
+                    buff.write('\n')
+                    buff.write(' '*pad)
+                buff.write(line)
+                linect += 1
+
+            if detail:
+                if (linect > 1) or (detail.find('\n') > -1):
+                    pad += 4
+                    for line in detail.split('\n'):
+                        buff.write('\n')
+                        buff.write(' '*pad)
+                        buff.write(line)
+                else:
+                    buff.write(' -- %s' % detail)
+
+            buff.write('\n')
+
+            with self._lock:
+                self.LOGFILE.write(buff.getvalue())
+                self.LOGFILE.flush()
 
 #        if (dblevel is not None) and (self.db is not None):
 #            c = self.db.cursor(self.log)
