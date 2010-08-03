@@ -89,8 +89,7 @@ MusicCommon::~MusicCommon(void)
 
     if (m_mainvisual)
     {
-        gPlayer->removeVisual(m_mainvisual);
-
+        stopVisualizer();
         delete m_mainvisual;
         m_mainvisual = NULL;
     }
@@ -229,6 +228,9 @@ bool MusicCommon::CreateCommon(void)
         m_mainvisual->setOutput(gPlayer->getOutput());
 
         m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
+
+        if (gPlayer->isPlaying())
+            startVisualizer();
     }
 #endif
 
@@ -264,15 +266,9 @@ void MusicCommon::switchView(int view)
 #if 0
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    if (m_mainvisual)
-    {
-        m_mainvisual->setDecoder(NULL);
-        m_mainvisual->setOutput(NULL);
-        m_mainvisual->deleteMetadata();
-    }
+    stopVisualizer();
 
     gPlayer->removeListener(this);
-    gPlayer->removeVisual(m_mainvisual);
 
     switch (view)
     {
@@ -680,6 +676,22 @@ void MusicCommon::cycleVisualizer(void)
     }
 }
 
+void MusicCommon::startVisualizer(void)
+{
+    if (!m_visualizerVideo || !m_mainvisual)
+        return;
+
+    gPlayer->addVisual(m_mainvisual);
+}
+
+void MusicCommon::stopVisualizer(void )
+{
+    if (!m_visualizerVideo || !m_mainvisual)
+        return;
+
+    gPlayer->removeVisual(m_mainvisual);
+}
+
 void MusicCommon::setTrackOnLCD(Metadata *mdata)
 {
     LCD *lcd = LCD::Get();
@@ -698,6 +710,8 @@ void MusicCommon::stopAll()
     {
         lcd->switchToTime();
     }
+
+    stopVisualizer();
 
     gPlayer->stop(true);
 }
@@ -871,6 +885,8 @@ void MusicCommon::customEvent(QEvent *event)
             if (m_trackState)
                 m_trackState->DisplayState("playing");
         }
+
+        startVisualizer();
     }
     else if (event->type() == OutputEvent::Buffering)
     {
@@ -972,6 +988,8 @@ void MusicCommon::customEvent(QEvent *event)
             m_pauseButton->SetLocked(false);
         if (m_trackState)
             m_trackState->DisplayState("stopped");
+
+        stopVisualizer();
     }
     else if (event->type() == DecoderEvent::Finished)
     {

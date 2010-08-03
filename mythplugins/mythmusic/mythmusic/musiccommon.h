@@ -83,6 +83,9 @@ class MPUBLIC MusicCommon : public MythScreenType
     void updateVolume(uint volume, bool muted);
     void showSpeed(bool show);
 
+    void startVisualizer(void);
+    void stopVisualizer(void);
+
     void cycleVisualizer(void);
     void resetVisualiserTimer(void);
 

@@ -111,6 +111,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void updatePlaylistFromQuickPlaylist(QString whereClause);
     void updatePlaylistFromSmartPlaylist();
     void doUpdatePlaylist(QString whereClause);
+    void startVisualizer(void);
+    void stopVisualizer(void);
     void CycleVisualizer(void);
     void updatePlaylistFromCD(void);
     void setTrackOnLCD(Metadata *mdata);

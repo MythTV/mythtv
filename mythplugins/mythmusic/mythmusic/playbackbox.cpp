@@ -214,7 +214,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
     gPlayer->removeListener(this);
-    gPlayer->removeVisual(mainvisual);
+    stopVisualizer();
 
     if (progress)
     {
@@ -392,7 +392,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 if (exit_action == "play")
                 {
                     gPlayer->removeListener(this);
-                    gPlayer->removeVisual(mainvisual);
+                    stopVisualizer();
                     done(kDialogCodeAccepted);
                 }
                 else
@@ -430,7 +430,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 else if (res == kDialogCodeButton1)
                 {
                     gPlayer->removeListener(this);
-                    gPlayer->removeVisual(mainvisual);
+                    stopVisualizer();
                     done(kDialogCodeAccepted);
                 }
                 else
@@ -1123,7 +1123,6 @@ void PlaybackBoxMusic::checkForPlaylists()
                 else
                     setContext(2);
                 updateForeground();
-                gPlayer->addVisual(mainvisual);
                 mainvisual->setVisual(visual_modes[current_visual]);
 
                 if (curMeta)
@@ -1427,6 +1426,22 @@ void PlaybackBoxMusic::CycleVisualizer()
     }
 }
 
+void PlaybackBoxMusic::startVisualizer(void)
+{
+    if (!mainvisual)
+        return;
+
+    gPlayer->addVisual(mainvisual);
+}
+
+void PlaybackBoxMusic::stopVisualizer(void )
+{
+    if (!mainvisual)
+        return;
+
+    gPlayer->removeVisual(mainvisual);
+}
+
 void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
 {
     LCD *lcd = LCD::Get();
@@ -1446,6 +1461,8 @@ void PlaybackBoxMusic::pause(void)
 
 void PlaybackBoxMusic::stop(void)
 {
+    stopVisualizer();
+
     gPlayer->stop();
 
     QString time_string = getTimeString(maxTime, 0);
@@ -1458,6 +1475,8 @@ void PlaybackBoxMusic::stop(void)
 
 void PlaybackBoxMusic::stopAll()
 {
+    stopVisualizer();
+
     if (class LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
@@ -1901,6 +1920,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
         if (curMeta)
             updateTrackInfo(curMeta);
         statusString = tr("Playing stream.");
+        startVisualizer();
     }
     else if (event->type() == OutputEvent::Buffering)
     {
@@ -1987,6 +2007,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
     else if (event->type() == DecoderEvent::Stopped)
     {
         statusString = tr("Stream stopped.");
+        stopVisualizer();
     }
     else if (event->type() == DecoderEvent::Finished)
     {
