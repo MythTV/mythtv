@@ -361,6 +361,9 @@ void avfDecoder::deinit()
 
 void avfDecoder::run()
 {
+    if (!inited)
+        return;
+
     AVPacket pkt;
     char *s;
     int data_size, dec_len;
@@ -369,9 +372,6 @@ void avfDecoder::run()
     uint fill, total;
     // account for possible frame expansion in aobase (upmix, float conv)
     uint thresh = bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
-
-    if (!inited)
-        return;
 
     stat = DecoderEvent::Decoding;
     {
