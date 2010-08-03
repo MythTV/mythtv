@@ -113,6 +113,7 @@ bool PlayerTimer::event(QEvent *e)
     {
         // TODO this may fail if events are lost and the queue size is wrong
         m_queue_size--;
+        PostNextEvent();
         while (m_queue_size < 3)
             PostNextEvent();
 
