@@ -350,6 +350,12 @@ typedef enum {
     /* Interactive Graphics */
     BD_EVENT_MENU_PAGE_ID,           /* 0..0xfe */
     BD_EVENT_SELECTED_BUTTON_ID,     /* 0..0x1fdf, 0xffff = invalid */
+    BD_EVENT_POPUP_OFF,
+    BD_EVENT_ENABLE_BUTTON,    /* param: button id */
+    BD_EVENT_DISABLE_BUTTON,   /* param: button id */
+
+    /* still */
+    BD_EVENT_STILL,         /* 0 - off, 1 - on */
 
 } bd_event_e;
 

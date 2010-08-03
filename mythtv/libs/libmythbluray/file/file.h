@@ -48,10 +48,6 @@ extern "C" {
 
 BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode);
 
-#ifdef __cplusplus
-};
-#endif
-
 /*
  * directory access
  */
@@ -60,5 +56,9 @@ BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode
 #define dir_read(X,Y) X->read(X,Y)
 
 BD_PRIVATE extern BD_DIR_H* (*dir_open)(const char* dirname);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* FILE_H_ */

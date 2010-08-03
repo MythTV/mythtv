@@ -64,6 +64,19 @@ typedef enum {
     title_bdj,
 } BD_TITLE_TYPE;
 
+typedef struct {
+    /* current clip */
+    NAV_CLIP       *clip;
+    BD_FILE_H      *fp;
+    uint64_t       clip_size;
+    uint64_t       clip_block_pos;
+    uint64_t       clip_pos;
+
+    /* current aligned unit */
+    uint16_t       int_buf_off;
+
+} BD_STREAM;
+
 struct bluray {
 
     /* current disc */
@@ -77,16 +90,11 @@ struct bluray {
     uint64_t       s_size;
     uint64_t       s_pos;
 
-    /* current clip */
-    NAV_CLIP       *clip;
-    BD_FILE_H      *fp;
-    uint64_t       clip_size;
-    uint64_t       clip_block_pos;
-    uint64_t       clip_pos;
+    /* streams */
+    BD_STREAM      st0; /* main path */
 
-    /* current aligned unit */
+    /* buffer for bd_read(): current aligned unit of main stream (st0) */
     uint8_t        int_buf[6144];
-    uint16_t       int_buf_off;
 
     /* seamless angle change request */
     int            seamless_angle_change;
@@ -98,12 +106,16 @@ struct bluray {
     uint32_t       next_chapter_start;
 
     /* aacs */
+#ifdef DLOPEN_CRYPTO_LIBS
     void           *h_libaacs;   // library handle
+#endif
     void           *aacs;
     fptr_int       libaacs_decrypt_unit;
 
     /* BD+ */
+#ifdef DLOPEN_CRYPTO_LIBS
     void           *h_libbdplus; // library handle
+#endif
     void           *bdplus;
     fptr_int32     bdplus_seek;
     fptr_int32     bdplus_fixup;
@@ -118,6 +130,19 @@ struct bluray {
 
     void           *bdjava;
 };
+
+#ifdef DLOPEN_CRYPTO_LIBS
+#    define DL_CALL(lib,func,param,...)             \
+     do {                                           \
+          fptr_p_void fptr = dl_dlsym(lib, #func);  \
+          if (fptr) {                               \
+              fptr(param, ##__VA_ARGS__);           \
+          }                                         \
+      } while (0)
+#else
+#    define DL_CALL(lib,func,param,...)         \
+     func (param, ##__VA_ARGS__)
+#endif
 
 /*
  * Navigation mode event queue
@@ -169,69 +194,30 @@ static int _queue_event(BLURAY *bd, BD_EVENT ev)
 }
 
 /*
- *
+ * open / close
  */
 
-static int _open_m2ts(BLURAY *bd)
+static void _libaacs_close(BLURAY *bd)
 {
-    char *f_name;
-
-    f_name = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "STREAM" DIR_SEP "%s",
-                        bd->device_path, bd->clip->name);
-
-    bd->clip_pos = (uint64_t)bd->clip->start_pkt * 192;
-    bd->clip_block_pos = (bd->clip_pos / 6144) * 6144;
-
-    if (bd->fp != NULL) {
-        file_close(bd->fp);
-    }
-    if ((bd->fp = file_open(f_name, "rb"))) {
-        file_seek(bd->fp, 0, SEEK_END);
-        if ((bd->clip_size = file_tell(bd->fp))) {
-            file_seek(bd->fp, bd->clip_block_pos, SEEK_SET);
-            bd->int_buf_off = 6144;
-            X_FREE(f_name);
-
-            if (bd->bdplus) {
-#ifdef DLOPEN_CRYPTO_LIBS
-                fptr_p_void bdplus_set_title;
-                bdplus_set_title = dl_dlsym(bd->h_libbdplus, "bdplus_set_title");
-                if (bdplus_set_title)
-                    bdplus_set_title(bd->bdplus, bd->clip->clip_id);
-#else
-                bdplus_set_title(bd->bdplus, bd->clip->clip_id);
-#endif
-            }
-
-            if (bd->aacs) {
-                uint32_t title = bd_psr_read(bd->regs, PSR_TITLE_NUMBER);
-#ifdef DLOPEN_CRYPTO_LIBS
-                fptr_p_void aacs_select_title;
-                aacs_select_title = dl_dlsym(bd->h_libaacs, "aacs_select_title");
-                if (aacs_select_title)
-                    aacs_select_title(bd->aacs, title);
-#else
-                aacs_select_title(bd->aacs, title);
-#endif
-            }
-
-            bd_psr_write(bd->regs, PSR_PLAYITEM, bd->clip->ref);
-
-            return 1;
-        }
-
-        DEBUG(DBG_BLURAY, "Clip %s empty! (%p)\n", f_name, bd);
+    if (bd->aacs) {
+        DL_CALL(bd->h_libaacs, aacs_close, bd->aacs);
+        bd->aacs = NULL;
     }
 
-    DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open clip %s! (%p)\n",
-          f_name, bd);
+#ifdef DLOPEN_CRYPTO_LIBS
+    if (bd->h_libaacs) {
+        dl_dlclose(bd->h_libaacs);
+        bd->h_libaacs = NULL;
+    }
+#endif
 
-    X_FREE(f_name);
-    return 0;
+    bd->libaacs_decrypt_unit = NULL;
 }
 
 static int _libaacs_open(BLURAY *bd, const char *keyfile_path)
 {
+    _libaacs_close(bd);
+
 #ifdef DLOPEN_CRYPTO_LIBS
     if ((bd->h_libaacs = dl_dlopen("libaacs", "0"))) {
         DEBUG(DBG_BLURAY, "Downloaded libaacs (%p)\n", bd->h_libaacs);
@@ -249,11 +235,12 @@ static int _libaacs_open(BLURAY *bd, const char *keyfile_path)
             DEBUG(DBG_BLURAY, "libaacs dlsym failed!\n");
         }
         dl_dlclose(bd->h_libaacs);
+        bd->h_libaacs = NULL;
+
     } else {
         DEBUG(DBG_BLURAY, "libaacs not found!\n");
     }
 #else
-    bd->h_libaacs = NULL;
     DEBUG(DBG_BLURAY, "Using libaacs via normal linking\n");
 
     bd->libaacs_decrypt_unit = &aacs_decrypt_unit;
@@ -266,14 +253,33 @@ static int _libaacs_open(BLURAY *bd, const char *keyfile_path)
     DEBUG(DBG_BLURAY, "aacs_open() failed!\n");
 #endif
 
-    bd->h_libaacs = NULL;
     bd->libaacs_decrypt_unit = NULL;
 
     return 0;
 }
 
+static void _libbdplus_close(BLURAY *bd)
+{
+    if (bd->bdplus) {
+        DL_CALL(bd->h_libbdplus, bdplus_free, bd->bdplus);
+        bd->bdplus = NULL;
+    }
+
+#ifdef DLOPEN_CRYPTO_LIBS
+    if (bd->h_libbdplus) {
+        dl_dlclose(bd->h_libbdplus);
+        bd->h_libbdplus = NULL;
+    }
+#endif
+
+    bd->bdplus_seek  = NULL;
+    bd->bdplus_fixup = NULL;
+}
+
 static void _libbdplus_open(BLURAY *bd, const char *keyfile_path)
 {
+    _libbdplus_close(bd);
+
     // Take a quick stab to see if we want/need bdplus
     // we should fix this, and add various string functions.
     uint8_t vid[16] = {
@@ -288,22 +294,24 @@ static void _libbdplus_open(BLURAY *bd, const char *keyfile_path)
         DEBUG(DBG_BDPLUS, "attempting to load libbdplus\n");
 #ifdef DLOPEN_CRYPTO_LIBS
         if ((bd->h_libbdplus = dl_dlopen("libbdplus", "0"))) {
-            DEBUG(DBG_BLURAY, "Downloaded libbdplus (%p)\n",
-                  bd->h_libbdplus);
+            DEBUG(DBG_BLURAY, "Downloaded libbdplus (%p)\n", bd->h_libbdplus);
 
             fptr_p_void bdplus_init = dl_dlsym(bd->h_libbdplus, "bdplus_init");
             //bdplus_t *bdplus_init(path,configfile_path,*vid );
             if (bdplus_init)
                 bd->bdplus = bdplus_init(bd->device_path, keyfile_path, vid);
 
-            // Since we will call these functions a lot, we assign them
-            // now.
-            bd->bdplus_seek  = dl_dlsym(bd->h_libbdplus, "bdplus_seek");
-            bd->bdplus_fixup = dl_dlsym(bd->h_libbdplus, "bdplus_fixup");
-
+            if (bd->bdplus) {
+                // Since we will call these functions a lot, we assign them
+                // now.
+                bd->bdplus_seek  = dl_dlsym(bd->h_libbdplus, "bdplus_seek");
+                bd->bdplus_fixup = dl_dlsym(bd->h_libbdplus, "bdplus_fixup");
+            } else {
+                dl_dlclose(bd->h_libbdplus);
+                bd->h_libbdplus = NULL;
+            }
         }
 #else
-        bd->h_libbdplus = NULL;
         DEBUG(DBG_BLURAY,"Using libbdplus via normal linking\n");
 
         bd->bdplus = bdplus_init(bd->device_path, keyfile_path, vid);
@@ -359,36 +367,12 @@ void bd_close(BLURAY *bd)
 {
     bd_stop_bdj(bd);
 
-    if (bd->aacs) {
-#ifdef DLOPEN_CRYPTO_LIBS
-        fptr_p_void fptr = dl_dlsym(bd->h_libaacs, "aacs_close");
-        fptr(bd->aacs);  // FIXME: NULL
-        dl_dlclose(bd->h_libaacs);
-#else
-        aacs_close(bd->aacs);  // FIXME: NULL
-#endif
-    }
+    _libaacs_close(bd);
 
-    if (bd->bdplus) {
-#ifdef DLOPEN_CRYPTO_LIBS
-        fptr_p_void bdplus_free = dl_dlsym(bd->h_libbdplus, "bdplus_free");
-        if (bdplus_free) bdplus_free(bd->bdplus);
-#else
-        bdplus_free(bd->bdplus);
-#endif
-        bd->bdplus = NULL;
+    _libbdplus_close(bd);
 
-#ifdef DLOPEN_CRYPTO_LIBS
-        dl_dlclose(bd->h_libbdplus);
-#endif
-        bd->h_libbdplus = NULL;
-
-        bd->bdplus_seek  = NULL;
-        bd->bdplus_fixup = NULL;
-    }
-
-    if (bd->fp) {
-        file_close(bd->fp);
+    if (bd->st0.fp) {
+        file_close(bd->st0.fp);
     }
 
     if (bd->title_list != NULL) {
@@ -410,35 +394,86 @@ void bd_close(BLURAY *bd)
     X_FREE(bd);
 }
 
-static int _read_block(BLURAY *bd)
+/*
+ * clip access
+ */
+
+static int _open_m2ts(BLURAY *bd, BD_STREAM *st)
+{
+    char *f_name;
+
+    f_name = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "STREAM" DIR_SEP "%s",
+                        bd->device_path, st->clip->name);
+
+    st->clip_pos = (uint64_t)st->clip->start_pkt * 192;
+    st->clip_block_pos = (st->clip_pos / 6144) * 6144;
+
+    if (st->fp != NULL) {
+        file_close(st->fp);
+    }
+    if ((st->fp = file_open(f_name, "rb"))) {
+        file_seek(st->fp, 0, SEEK_END);
+        if ((st->clip_size = file_tell(st->fp))) {
+            file_seek(st->fp, st->clip_block_pos, SEEK_SET);
+            st->int_buf_off = 6144;
+            X_FREE(f_name);
+
+            if (bd->bdplus) {
+                DL_CALL(bd->h_libbdplus, bdplus_set_title,
+                        bd->bdplus, st->clip->clip_id);
+            }
+
+            if (bd->aacs) {
+                uint32_t title = bd_psr_read(bd->regs, PSR_TITLE_NUMBER);
+                DL_CALL(bd->h_libaacs, aacs_select_title,
+                        bd->aacs, title);
+            }
+
+            if (st == &bd->st0)
+                bd_psr_write(bd->regs, PSR_PLAYITEM, st->clip->ref);
+
+            return 1;
+        }
+
+        DEBUG(DBG_BLURAY, "Clip %s empty! (%p)\n", f_name, bd);
+    }
+
+    DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open clip %s! (%p)\n",
+          f_name, bd);
+
+    X_FREE(f_name);
+    return 0;
+}
+
+static int _read_block(BLURAY *bd, BD_STREAM *st, uint8_t *buf)
 {
     const int len = 6144;
 
-    if (bd->fp) {
+    if (st->fp) {
         DEBUG(DBG_BLURAY, "Reading unit [%d bytes] at %"PRIu64"... (%p)\n",
-              len, bd->clip_block_pos, bd);
+              len, st->clip_block_pos, bd);
 
-        if (len + bd->clip_block_pos <= bd->clip_size) {
+        if (len + st->clip_block_pos <= st->clip_size) {
             int read_len;
 
-            if ((read_len = file_read(bd->fp, bd->int_buf, len))) {
+            if ((read_len = file_read(st->fp, buf, len))) {
                 if (read_len != len)
-                    DEBUG(DBG_BLURAY | DBG_CRIT, "Read %d bytes at %"PRIu64" ; requested %d ! (%p)\n", read_len, bd->clip_block_pos, len, bd);
+                    DEBUG(DBG_BLURAY | DBG_CRIT, "Read %d bytes at %"PRIu64" ; requested %d ! (%p)\n", read_len, st->clip_block_pos, len, bd);
 
                 if (bd->libaacs_decrypt_unit) {
-                   if (!bd->libaacs_decrypt_unit(bd->aacs, bd->int_buf)) {
+                    if (!bd->libaacs_decrypt_unit(bd->aacs, buf)) {
                         DEBUG(DBG_BLURAY, "Unable decrypt unit! (%p)\n", bd);
 
                         return 0;
                     } // decrypt
                 } // aacs
 
-                bd->clip_block_pos += len;
+                st->clip_block_pos += len;
 
                 // bdplus fixup, if required.
                 if (bd->bdplus_fixup && bd->bdplus) {
                     int32_t numFixes;
-                    numFixes = bd->bdplus_fixup(bd->bdplus, len, bd->int_buf);
+                    numFixes = bd->bdplus_fixup(bd->bdplus, len, buf);
 #if 1
                     if (numFixes) {
                         DEBUG(DBG_BDPLUS,
@@ -453,7 +488,7 @@ static int _read_block(BLURAY *bd)
                 return 1;
             }
 
-            DEBUG(DBG_BLURAY | DBG_CRIT, "Read %d bytes at %"PRIu64" failed ! (%p)\n", len, bd->clip_block_pos, bd);
+            DEBUG(DBG_BLURAY | DBG_CRIT, "Read %d bytes at %"PRIu64" failed ! (%p)\n", len, st->clip_block_pos, bd);
 
             return 0;
         }
@@ -468,25 +503,30 @@ static int _read_block(BLURAY *bd)
     return 0;
 }
 
-static int64_t _seek_internal(BLURAY *bd, NAV_CLIP *clip, uint32_t title_pkt, uint32_t clip_pkt)
+/*
+ * seeking and current position
+ */
+
+static int64_t _seek_internal(BLURAY *bd, BD_STREAM *st,
+                              NAV_CLIP *clip, uint32_t title_pkt, uint32_t clip_pkt)
 {
     if (!clip)
         return -1;
 
-    if (clip->ref != bd->clip->ref) {
+    if (clip->ref != st->clip->ref) {
         // The position is in a new clip
-        bd->clip = clip;
-        if (!_open_m2ts(bd)) {
+        st->clip = clip;
+        if (!_open_m2ts(bd, st)) {
             return -1;
         }
     }
     bd->s_pos = (uint64_t)title_pkt * 192;
-    bd->clip_pos = (uint64_t)clip_pkt * 192;
-    bd->clip_block_pos = (bd->clip_pos / 6144) * 6144;
+    st->clip_pos = (uint64_t)clip_pkt * 192;
+    st->clip_block_pos = (st->clip_pos / 6144) * 6144;
 
-    file_seek(bd->fp, bd->clip_block_pos, SEEK_SET);
+    file_seek(st->fp, st->clip_block_pos, SEEK_SET);
 
-    bd->int_buf_off = 6144;
+    st->int_buf_off = 6144;
 
     /* chapter tracking */
     uint32_t current_chapter = bd_get_current_chapter(bd);
@@ -496,7 +536,7 @@ static int64_t _seek_internal(BLURAY *bd, NAV_CLIP *clip, uint32_t title_pkt, ui
     DEBUG(DBG_BLURAY, "Seek to %"PRIu64" (%p)\n",
           bd->s_pos, bd);
     if (bd->bdplus_seek && bd->bdplus)
-        bd->bdplus_seek(bd->bdplus, bd->clip_block_pos);
+        bd->bdplus_seek(bd->bdplus, st->clip_block_pos);
 
     return bd->s_pos;
 }
@@ -507,7 +547,7 @@ int64_t bd_seek_time(BLURAY *bd, uint64_t tick)
     NAV_CLIP *clip;
 
     if (bd->seamless_angle_change) {
-        bd->clip = nav_set_angle(bd->title, bd->clip, bd->request_angle);
+        bd->st0.clip = nav_set_angle(bd->title, bd->st0.clip, bd->request_angle);
         bd->seamless_angle_change = 0;
         bd_psr_write(bd->regs, PSR_ANGLE_NUMBER, bd->title->angle + 1);
     }
@@ -519,10 +559,21 @@ int64_t bd_seek_time(BLURAY *bd, uint64_t tick)
         // Find the closest access unit to the requested position
         clip = nav_time_search(bd->title, tick, &clip_pkt, &out_pkt);
 
-        return _seek_internal(bd, clip, out_pkt, clip_pkt);
+        return _seek_internal(bd, &bd->st0, clip, out_pkt, clip_pkt);
     }
 
     return bd->s_pos;
+}
+
+uint64_t bd_tell_time(BLURAY *bd)
+{
+    uint32_t clip_pkt = 0, out_pkt = 0, out_time = 0;
+
+    if (bd && bd->title) {
+        nav_packet_search(bd->title, bd->s_pos / 192, &clip_pkt, &out_pkt, &out_time);
+    }
+
+    return ((uint64_t)out_time) * 2;
 }
 
 int64_t bd_seek_chapter(BLURAY *bd, unsigned chapter)
@@ -535,7 +586,7 @@ int64_t bd_seek_chapter(BLURAY *bd, unsigned chapter)
         // Find the closest access unit to the requested position
         clip = nav_chapter_search(bd->title, chapter, &clip_pkt, &out_pkt);
 
-        return _seek_internal(bd, clip, out_pkt, clip_pkt);
+        return _seek_internal(bd, &bd->st0, clip, out_pkt, clip_pkt);
     }
 
     return bd->s_pos;
@@ -556,7 +607,7 @@ int64_t bd_chapter_pos(BLURAY *bd, unsigned chapter)
 
 uint32_t bd_get_current_chapter(BLURAY *bd)
 {
-    return nav_chapter_get_current(bd->clip, bd->clip_pos / 192);
+    return nav_chapter_get_current(bd->st0.clip, bd->st0.clip_pos / 192);
 }
 
 int64_t bd_seek_mark(BLURAY *bd, unsigned mark)
@@ -569,7 +620,7 @@ int64_t bd_seek_mark(BLURAY *bd, unsigned mark)
         // Find the closest access unit to the requested position
         clip = nav_mark_search(bd->title, mark, &clip_pkt, &out_pkt);
 
-        return _seek_internal(bd, clip, out_pkt, clip_pkt);
+        return _seek_internal(bd, &bd->st0, clip, out_pkt, clip_pkt);
     }
 
     return bd->s_pos;
@@ -581,7 +632,7 @@ int64_t bd_seek(BLURAY *bd, uint64_t pos)
     NAV_CLIP *clip;
 
     if (bd->seamless_angle_change) {
-        bd->clip = nav_set_angle(bd->title, bd->clip, bd->request_angle);
+        bd->st0.clip = nav_set_angle(bd->title, bd->st0.clip, bd->request_angle);
         bd->seamless_angle_change = 0;
         bd_psr_write(bd->regs, PSR_ANGLE_NUMBER, bd->title->angle + 1);
     }
@@ -591,22 +642,36 @@ int64_t bd_seek(BLURAY *bd, uint64_t pos)
         // Find the closest access unit to the requested position
         clip = nav_packet_search(bd->title, pkt, &clip_pkt, &out_pkt, &out_time);
 
-        return _seek_internal(bd, clip, out_pkt, clip_pkt);
+        return _seek_internal(bd, &bd->st0, clip, out_pkt, clip_pkt);
     }
 
     return bd->s_pos;
 }
 
-static int64_t _clip_seek_time(BLURAY *bd, uint64_t tick)
+uint64_t bd_get_title_size(BLURAY *bd)
+{
+    return bd ? bd->s_size : UINT64_C(0);
+}
+
+uint64_t bd_tell(BLURAY *bd)
+{
+    return bd ? bd->s_pos : INT64_C(0);
+}
+
+/*
+ * read
+ */
+
+static int64_t _clip_seek_time(BLURAY *bd, BD_STREAM *st, uint64_t tick)
 {
     uint32_t clip_pkt, out_pkt;
 
-    if (tick < bd->clip->out_time) {
+    if (tick < st->clip->out_time) {
 
         // Find the closest access unit to the requested position
-        nav_clip_time_search(bd->clip, tick, &clip_pkt, &out_pkt);
+        nav_clip_time_search(st->clip, tick, &clip_pkt, &out_pkt);
 
-        return _seek_internal(bd, bd->clip, out_pkt, clip_pkt);
+        return _seek_internal(bd, st, st->clip, out_pkt, clip_pkt);
     }
 
     return bd->s_pos;
@@ -614,9 +679,10 @@ static int64_t _clip_seek_time(BLURAY *bd, uint64_t tick)
 
 int bd_read(BLURAY *bd, unsigned char *buf, int len)
 {
+    BD_STREAM *st = &bd->st0;
     int out_len;
 
-    if (bd->fp) {
+    if (st->fp) {
         out_len = 0;
         DEBUG(DBG_BLURAY, "Reading [%d bytes] at %"PRIu64"... (%p)\n", len, bd->s_pos, bd);
 
@@ -625,66 +691,66 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
 
             unsigned int size = len;
             // Do we need to read more data?
-            clip_pkt = bd->clip_pos / 192;
+            clip_pkt = st->clip_pos / 192;
             if (bd->seamless_angle_change) {
                 if (clip_pkt >= bd->angle_change_pkt) {
-                    if (clip_pkt >= bd->clip->end_pkt) {
-                        bd->clip = nav_next_clip(bd->title, bd->clip);
-                        if (!_open_m2ts(bd)) {
+                    if (clip_pkt >= st->clip->end_pkt) {
+                        st->clip = nav_next_clip(bd->title, st->clip);
+                        if (!_open_m2ts(bd, st)) {
                             return -1;
                         }
-                        bd->s_pos = bd->clip->pos;
+                        bd->s_pos = st->clip->pos;
                     } else {
-                        bd->clip = nav_set_angle(bd->title, bd->clip, bd->request_angle);
+                        st->clip = nav_set_angle(bd->title, st->clip, bd->request_angle);
                         bd_psr_write(bd->regs, PSR_ANGLE_NUMBER, bd->title->angle + 1);
-                        _clip_seek_time(bd, bd->angle_change_time);
+                        _clip_seek_time(bd, st, bd->angle_change_time);
                     }
                     bd->seamless_angle_change = 0;
                 } else {
                     uint64_t angle_pos;
 
                     angle_pos = bd->angle_change_pkt * 192;
-                    if (angle_pos - bd->clip_pos < size)
+                    if (angle_pos - st->clip_pos < size)
                     {
-                        size = angle_pos - bd->clip_pos;
+                        size = angle_pos - st->clip_pos;
                     }
                 }
             }
-            if (bd->int_buf_off == 6144 || clip_pkt >= bd->clip->end_pkt) {
+            if (st->int_buf_off == 6144 || clip_pkt >= st->clip->end_pkt) {
 
                 // Do we need to get the next clip?
-                if (bd->clip == NULL) {
+                if (st->clip == NULL) {
                     // We previously reached the last clip.  Nothing
                     // else to read.
                     return 0;
                 }
-                if (clip_pkt >= bd->clip->end_pkt) {
-                    bd->clip = nav_next_clip(bd->title, bd->clip);
-                    if (bd->clip == NULL) {
+                if (clip_pkt >= st->clip->end_pkt) {
+                    st->clip = nav_next_clip(bd->title, st->clip);
+                    if (st->clip == NULL) {
                         DEBUG(DBG_BLURAY, "End of title (%p)\n", bd);
                         return out_len;
                     }
-                    if (!_open_m2ts(bd)) {
+                    if (!_open_m2ts(bd, st)) {
                         return -1;
                     }
                 }
-                if (_read_block(bd)) {
+                if (_read_block(bd, st, bd->int_buf)) {
 
-                    bd->int_buf_off = bd->clip_pos % 6144;
+                    st->int_buf_off = st->clip_pos % 6144;
 
                 } else {
                     return out_len;
                 }
             }
-            if (size > (unsigned int)6144 - bd->int_buf_off) {
-                size = 6144 - bd->int_buf_off;
+            if (size > (unsigned int)6144 - st->int_buf_off) {
+                size = 6144 - st->int_buf_off;
             }
-            memcpy(buf, bd->int_buf + bd->int_buf_off, size);
+            memcpy(buf, bd->int_buf + st->int_buf_off, size);
             buf += size;
             len -= size;
             out_len += size;
-            bd->clip_pos += size;
-            bd->int_buf_off += size;
+            st->clip_pos += size;
+            st->int_buf_off += size;
             bd->s_pos += size;
         }
 
@@ -704,6 +770,10 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
 
     return -1;
 }
+
+/*
+ * select title / angle
+ */
 
 static int _open_playlist(BLURAY *bd, const char *f_name)
 {
@@ -729,8 +799,8 @@ static int _open_playlist(BLURAY *bd, const char *f_name)
     bd_psr_write(bd->regs, PSR_CHAPTER, 1);
 
     // Get the initial clip of the playlist
-    bd->clip = nav_next_clip(bd->title, NULL);
-    if (_open_m2ts(bd)) {
+    bd->st0.clip = nav_next_clip(bd->title, NULL);
+    if (_open_m2ts(bd, &bd->st0)) {
         DEBUG(DBG_BLURAY, "Title %s selected! (%p)\n", f_name, bd);
         return 1;
     }
@@ -793,7 +863,7 @@ int bd_select_angle(BLURAY *bd, unsigned angle)
         DEBUG(DBG_BLURAY, "Title not yet selected! (%p)\n", bd);
         return 0;
     }
-    bd->clip = nav_set_angle(bd->title, bd->clip, angle);
+    bd->st0.clip = nav_set_angle(bd->title, bd->st0.clip, angle);
     bd_psr_write(bd->regs, PSR_ANGLE_NUMBER, bd->title->angle + 1);
 
     return 1;
@@ -809,33 +879,16 @@ void bd_seamless_angle_change(BLURAY *bd, unsigned angle)
 {
     uint32_t clip_pkt;
 
-    clip_pkt = (bd->clip_pos + 191) / 192;
-    bd->angle_change_pkt = nav_angle_change_search(bd->clip, clip_pkt,
+    clip_pkt = (bd->st0.clip_pos + 191) / 192;
+    bd->angle_change_pkt = nav_angle_change_search(bd->st0.clip, clip_pkt,
                                                    &bd->angle_change_time);
     bd->request_angle = angle;
     bd->seamless_angle_change = 1;
 }
 
-uint64_t bd_get_title_size(BLURAY *bd)
-{
-    return bd ? bd->s_size : UINT64_C(0);
-}
-
-uint64_t bd_tell(BLURAY *bd)
-{
-    return bd ? bd->s_pos : INT64_C(0);
-}
-
-uint64_t bd_tell_time(BLURAY *bd)
-{
-    uint32_t clip_pkt = 0, out_pkt = 0, out_time = 0;
-
-    if (bd && bd->title) {
-        nav_packet_search(bd->title, bd->s_pos / 192, &clip_pkt, &out_pkt, &out_time);
-    }
-
-    return ((uint64_t)out_time) * 2;
-}
+/*
+ * title lists
+ */
 
 uint32_t bd_get_titles(BLURAY *bd, uint8_t flags)
 {
@@ -917,11 +970,26 @@ static BLURAY_TITLE_INFO* _fill_title_info(NAV_TITLE* title, uint32_t title_idx,
     return title_info;
 }
 
-BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
+static BLURAY_TITLE_INFO *_get_title_info(BLURAY *bd, uint32_t title_idx, uint32_t playlist, const char *mpls_name)
 {
     NAV_TITLE *title;
     BLURAY_TITLE_INFO *title_info;
 
+    title = nav_title_open(bd->device_path, mpls_name);
+    if (title == NULL) {
+        DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
+              mpls_name, bd);
+        return NULL;
+    }
+
+    title_info = _fill_title_info(title, title_idx, playlist);
+
+    nav_title_close(title);
+    return title_info;
+}
+
+BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
+{
     if (bd->title_list == NULL) {
         DEBUG(DBG_BLURAY, "Title list not yet read! (%p)\n", bd);
         return NULL;
@@ -930,39 +998,21 @@ BLURAY_TITLE_INFO* bd_get_title_info(BLURAY *bd, uint32_t title_idx)
         DEBUG(DBG_BLURAY, "Invalid title index %d! (%p)\n", title_idx, bd);
         return NULL;
     }
-    title = nav_title_open(bd->device_path, bd->title_list->title_info[title_idx].name);
-    if (title == NULL) {
-        DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
-              bd->title_list->title_info[title_idx].name, bd);
-        return NULL;
-    }
 
-    title_info = _fill_title_info(title, title_idx, bd->title_list->title_info[title_idx].mpls_id);
-
-    nav_title_close(title);
-    return title_info;
+    return _get_title_info(bd,
+                           title_idx, bd->title_list->title_info[title_idx].mpls_id,
+                           bd->title_list->title_info[title_idx].name);
 }
 
 BLURAY_TITLE_INFO* bd_get_playlist_info(BLURAY *bd, uint32_t playlist)
 {
     char *f_name = str_printf("%05d.mpls", playlist);
-    NAV_TITLE *title;
     BLURAY_TITLE_INFO *title_info;
 
-    title = nav_title_open(bd->device_path, f_name);
-    if (title == NULL) {
-        DEBUG(DBG_BLURAY | DBG_CRIT, "Unable to open title %s! (%p)\n",
-              f_name, bd);
-        X_FREE(f_name);
-        return NULL;
-    }
+    title_info = _get_title_info(bd, 0, playlist, f_name);
 
     X_FREE(f_name);
 
-    // the title number doesn't matter in this case
-    title_info = _fill_title_info(title, 0, playlist);
-
-    nav_title_close(title);
     return title_info;
 }
 
@@ -1302,11 +1352,26 @@ static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
             DEBUG(DBG_BLURAY|DBG_CRIT, "HDMV_EVENT_PLAY_STOP: not tested !\n");
             // stop current playlist
             bd_seek(bd, bd->s_size - 1);
-            bd->clip = NULL;
+            bd->st0.clip = NULL;
             // resume suspended movie object
             bd->hdmv_suspended = 0;
             break;
 
+        case HDMV_EVENT_STILL:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_STILL, hev->param});
+            break;
+
+        case HDMV_EVENT_ENABLE_BUTTON:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_ENABLE_BUTTON, hev->param});
+            break;
+
+        case HDMV_EVENT_DISABLE_BUTTON:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_DISABLE_BUTTON, hev->param});
+            break;
+
+        case HDMV_EVENT_POPUP_OFF:
+            _queue_event(bd, (BD_EVENT){BD_EVENT_POPUP_OFF, 0});
+            break;
         case HDMV_EVENT_END:
         case HDMV_EVENT_NONE:
         default:
