@@ -27,7 +27,7 @@
 #include <fcntl.h>
 
 // Qt
-#include <QFileInfo>
+#include <QDir>
 
 // MythTV
 #include "mythcommflagplayer.h"
@@ -64,7 +64,17 @@ void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     (void)vbidev;
     (void)profile;
 
-    SetOption("videodevice", videodev);
+    QString testVideoDev = videodev;
+
+    if (videodev.toLower().startsWith("file:"))
+        testVideoDev = videodev.mid(5);
+
+    QFileInfo fi(testVideoDev);
+    if (fi.exists() && fi.isReadable() && fi.isFile() && fi.size() > 1560)
+        SetOption("videodevice", testVideoDev);
+    else
+        SetOption("videodevice", "unknown file");
+
     SetOption("tvformat",    gCoreContext->GetSetting("TVFormat"));
     SetOption("vbiformat",   gCoreContext->GetSetting("VbiFormat"));
 }
@@ -141,6 +151,28 @@ bool ImportRecorder::Open(void)
     }
 
     QString fn = curRecording->GetPathname();
+
+    // Quick-and-dirty "copy" of sample prerecorded file.
+    // Sadly, won't work on Windows.
+    //
+    QFile preRecorded(videodevice);
+    QFile copy(fn);
+    if (preRecorded.exists() && (!copy.exists() || copy.size() == 0))
+    {
+        if (copy.exists())   // always created by RecorderBase?
+        {
+            QDir targetDir(".");  // QDir::remove() needs an object
+            targetDir.remove(fn);
+        }
+
+        VERBOSE(VB_RECORD, (LOC + "Trying to link %1 to %2")
+                           .arg(videodevice).arg(fn));
+
+        if (preRecorded.link(fn))
+            VERBOSE(VB_RECORD+VB_EXTRA, LOC + "success!");
+        else
+            VERBOSE(VB_RECORD, LOC_ERR + preRecorded.errorString());
+    }
 
     if (fn.toLower().startsWith("myth://"))
     {

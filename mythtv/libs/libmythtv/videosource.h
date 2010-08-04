@@ -536,6 +536,38 @@ class HDPVRConfigurationGroup: public VerticalConfigurationGroup
     TunerCardAudioInput *audioinput;
 };
 
+class ImportConfigurationGroup: public VerticalConfigurationGroup
+{
+   Q_OBJECT
+
+  public:
+    ImportConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *info;
+    TransLabelSetting *size;
+};
+
+class DemoConfigurationGroup: public VerticalConfigurationGroup
+{
+   Q_OBJECT
+
+  public:
+    DemoConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *info;
+    TransLabelSetting *size;
+};
+
 class DVBCardNum;
 class DVBInput;
 class DVBCardName;

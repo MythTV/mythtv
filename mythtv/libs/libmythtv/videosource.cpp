@@ -39,6 +39,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "libmythupnp/httprequest.h"    // for TestMimeType()
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -964,6 +965,17 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
     }
 };
 
+class FileDevice : public PathSetting, public CaptureCardDBStorage
+{
+  public:
+    FileDevice(const CaptureCard &parent) :
+        PathSetting(this, false),
+        CaptureCardDBStorage(this, parent, "videodevice")
+    {
+        setLabel(QObject::tr("File path"));
+    };
+};
+
 class AudioDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
@@ -1635,20 +1647,51 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
     CaptureCard &parent;
 };
 
-class ImportConfigurationGroup : public VerticalConfigurationGroup
+ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent):
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent),
+    info(new TransLabelSetting()), size(new TransLabelSetting())
 {
-  public:
-    ImportConfigurationGroup(CaptureCard& a_parent):
-       VerticalConfigurationGroup(false, true, false, false),
-       parent(a_parent)
-    {
-        setUseLabel(false);
-        addChild(new SingleCardInput(parent));
-    };
+    FileDevice *device = new FileDevice(parent);
+    device->setHelpText(tr("A local file used to simulate a recording."
+                           " Leave empty to use MythEvents to trigger an"
+                           " external program to import recording files."));
+    addChild(device);
 
-  private:
-    CaptureCard &parent;
+    info->setLabel(tr("File info"));
+    addChild(info);
+
+    size->setLabel(tr("File size"));
+    addChild(size);
+
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
+
+    probeCard(device->getValue());
 };
+
+void ImportConfigurationGroup::probeCard(const QString &device)
+{
+    QString   ci, cs;
+    QFileInfo fileInfo(device);
+    if (fileInfo.exists())
+    {
+        if (fileInfo.isReadable() && (fileInfo.isFile()))
+        {
+            ci = HTTPRequest::TestMimeType(fileInfo.absoluteFilePath());
+            cs = tr("%1 MB").arg(fileInfo.size() / 1024 / 1024);
+        }
+        else
+            ci = tr("File not readable");
+    }
+    else
+    {
+        ci = tr("File %1 does not exist").arg(device);
+    }
+
+    info->setValue(ci);
+    size->setValue(cs);
+}
 
 class HDHomeRunExtra : public ConfigurationWizard
 {
@@ -1938,6 +1981,60 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
     input->fillSelections(device);
 }
 
+DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent),
+    info(new TransLabelSetting()), size(new TransLabelSetting())
+{
+    FileDevice *device = new FileDevice(parent);
+    device->setHelpText(tr("A local MPEG file used to simulate a recording."
+                           "Must be entered as file:/path/movie.mpg"));
+    device->setValue("file:/");
+    addChild(device);
+
+    info->setLabel(tr("File info"));
+    addChild(info);
+
+    size->setLabel(tr("File size"));
+    addChild(size);
+
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
+
+    probeCard(device->getValue());
+}
+
+void DemoConfigurationGroup::probeCard(const QString &device)
+{
+    if (!device.startsWith("file:", Qt::CaseInsensitive))
+    {
+        info->setValue("");
+        size->setValue("");
+        return;
+    }
+
+
+    QString   ci, cs;
+    QFileInfo fileInfo(device.mid(5));
+    if (fileInfo.exists())
+    {
+        if (fileInfo.isReadable() && (fileInfo.isFile()))
+        {
+            ci = HTTPRequest::TestMimeType(fileInfo.absoluteFilePath());
+            cs = tr("%1 MB").arg(fileInfo.size() / 1024 / 1024);
+        }
+        else
+            ci = tr("File not readable");
+    }
+    else
+    {
+        ci = tr("File does not exist");
+    }
+
+    info->setValue(ci);
+    size->setValue(cs);
+}
+
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), cardinfo(new TransLabelSetting()),
@@ -2016,7 +2113,11 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
 
+    // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
+#ifdef USING_IVTV
+    addTarget("DEMO",      new DemoConfigurationGroup(parent));
+#endif
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value)
@@ -2221,7 +2322,8 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(QObject::tr("Network recorder"), "FREEBOX");
 #endif // USING_IPTV
 
-    setting->addSelection(QObject::tr("Import recorder"), "IMPORT");
+    setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
+    setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
 }
 
 class CardID : public SelectLabelSetting, public CardInputDBStorage
