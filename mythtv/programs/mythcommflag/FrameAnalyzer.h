@@ -22,7 +22,7 @@
 #endif
 
 typedef struct VideoFrame_ VideoFrame;
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class FrameAnalyzer
 {
@@ -43,9 +43,9 @@ public:
     /* 0-based frameno => nframes */
     typedef QMap<long long, long long> FrameMap;
 
-    virtual enum analyzeFrameResult nuppelVideoPlayerInited(
-            NuppelVideoPlayer *nvp, long long nframes) {
-        (void)nvp;
+    virtual enum analyzeFrameResult MythPlayerInited(
+            MythPlayer *player, long long nframes) {
+        (void)player;
         (void)nframes;
         return ANALYZE_OK;
     };

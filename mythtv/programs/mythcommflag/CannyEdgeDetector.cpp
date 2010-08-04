@@ -2,7 +2,7 @@
 #include <cmath>
 
 // MythTV headers
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "frame.h"          // VideoFrame
 #include "mythverbose.h"
 

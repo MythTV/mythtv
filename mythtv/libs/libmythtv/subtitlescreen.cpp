@@ -13,7 +13,7 @@
 static MythFontProperties* gTextSubFont;
 static QHash<int, MythFontProperties*> gCC708Fonts;
 
-SubtitleScreen::SubtitleScreen(NuppelVideoPlayer *player, const char * name) :
+SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name) :
     MythScreenType((MythScreenType*)NULL, name),
     m_player(player),  m_subreader(NULL),   m_608reader(NULL),
     m_708reader(NULL), m_safeArea(QRect()), m_useBackground(false),

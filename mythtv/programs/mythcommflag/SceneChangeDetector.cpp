@@ -4,7 +4,7 @@
 
 // MythTV headers
 #include "mythcorecontext.h"    /* gContext */
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
@@ -134,13 +134,13 @@ void SceneChangeDetector::deleteLater(void)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-SceneChangeDetector::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+SceneChangeDetector::MythPlayerInited(MythPlayer *player,
         long long nframes)
 {
     FrameAnalyzer::analyzeFrameResult ares =
-        histogramAnalyzer->nuppelVideoPlayerInited(nvp, nframes);
+        histogramAnalyzer->MythPlayerInited(player, nframes);
 
-    fps = nvp->GetFrameRate();
+    fps = player->GetFrameRate();
 
     scdata = new SceneChangeData[nframes];
     memset(scdata, 0, nframes * sizeof(*scdata));
@@ -148,10 +148,10 @@ SceneChangeDetector::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
     scdiff = new unsigned short[nframes];
     memset(scdiff, 0, nframes * sizeof(*scdiff));
 
-    QSize video_disp_dim = nvp->GetVideoSize();
+    QSize video_disp_dim = player->GetVideoSize();
 
     VERBOSE(VB_COMMFLAG, QString(
-                "SceneChangeDetector::nuppelVideoPlayerInited %1x%2")
+                "SceneChangeDetector::MythPlayerInited %1x%2")
             .arg(video_disp_dim.width())
             .arg(video_disp_dim.height()));
 

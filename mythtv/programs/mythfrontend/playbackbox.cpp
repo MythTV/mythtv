@@ -17,7 +17,7 @@
 
 // libmythtv
 #include "tv.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "recordinginfo.h"
 #include "playgroup.h"
 #include "mythsystemevent.h"

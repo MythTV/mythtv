@@ -14,7 +14,7 @@ using namespace std;
 #include <QFileInfo>
 
 // MythTV headers
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "mythcorecontext.h"
 
 // Commercial Flagging headers
@@ -342,7 +342,7 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 #else  /* !PGM_CONVERT_GREYSCALE */
     debugdata(debugdir + "/TemplateMatcher-yuv.txt"),
 #endif /* !PGM_CONVERT_GREYSCALE */
-    nvp(NULL),
+    player(NULL),
     debug_matches(false), debug_removerunts(false),
     matches_done(false)
 {
@@ -377,29 +377,29 @@ TemplateMatcher::~TemplateMatcher(void)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
+TemplateMatcher::MythPlayerInited(MythPlayer *_player,
         long long nframes)
 {
-    nvp = _nvp;
-    fps = nvp->GetFrameRate();
+    player = _player;
+    fps = player->GetFrameRate();
 
     if (!(tmpl = templateFinder->getTemplate(&tmplrow, &tmplcol,
                     &tmplwidth, &tmplheight)))
     {
-        VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::nuppelVideoPlayerInited:"
+        VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::MythPlayerInited:"
                     " no template"));
         return ANALYZE_FATAL;
     }
 
     if (avpicture_alloc(&cropped, PIX_FMT_GRAY8, tmplwidth, tmplheight))
     {
-        VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::nuppelVideoPlayerInited "
+        VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::MythPlayerInited "
                 "avpicture_alloc cropped (%1x%2) failed").
                 arg(tmplwidth).arg(tmplheight));
         return ANALYZE_FATAL;
     }
 
-    if (pgmConverter->nuppelVideoPlayerInited(nvp))
+    if (pgmConverter->MythPlayerInited(player))
         goto free_cropped;
 
     matches = new unsigned short[nframes];
@@ -412,7 +412,7 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
         if (readMatches(debugdata, matches, nframes))
         {
             VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateMatcher::nuppelVideoPlayerInited read %1")
+                        "TemplateMatcher::MythPlayerInited read %1")
                     .arg(debugdata));
             matches_done = true;
         }

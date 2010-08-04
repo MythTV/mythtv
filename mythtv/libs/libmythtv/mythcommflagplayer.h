@@ -1,12 +1,12 @@
 #ifndef MYTHCOMMFLAGPLAYER_H
 #define MYTHCOMMFLAGPLAYER_H
 
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
-class MPUBLIC MythCommFlagPlayer : public NuppelVideoPlayer
+class MPUBLIC MythCommFlagPlayer : public MythPlayer
 {
   public:
-    MythCommFlagPlayer(bool muted = false) : NuppelVideoPlayer(muted) { }
+    MythCommFlagPlayer(bool muted = false) : MythPlayer(muted) { }
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
 };

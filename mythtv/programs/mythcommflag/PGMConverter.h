@@ -1,7 +1,7 @@
 /*
  * PGMConverter
  *
- * Object to convert a NuppelVideoPlayer frame into a greyscale image.
+ * Object to convert a MythPlayer frame into a greyscale image.
  */
 
 #ifndef __PGMCONVERTER_H__
@@ -12,7 +12,7 @@ extern "C" {
 }
 
 typedef struct VideoFrame_ VideoFrame;
-class NuppelVideoPlayer;
+class MythPlayer;
 
 /*
  * PGM_CONVERT_GREYSCALE:
@@ -33,7 +33,7 @@ public:
     PGMConverter(void);
     ~PGMConverter(void);
 
-    int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp);
+    int MythPlayerInited(const MythPlayer *player);
     const AVPicture *getImage(const VideoFrame *frame, long long frameno,
             int *pwidth, int *pheight);
     int reportTime(void);

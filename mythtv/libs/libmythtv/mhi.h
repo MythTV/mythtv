@@ -25,7 +25,6 @@ using namespace std;
 #include "dsmcc.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "NuppelVideoPlayer.h"
 #include "mythdeque.h"
 
 extern "C" {

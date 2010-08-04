@@ -11,7 +11,7 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "mythcorecontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
 #include "util.h"           /* myth_system */
@@ -687,7 +687,7 @@ writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
 };  /* namespace */
 
 TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
-        EdgeDetector *ed, NuppelVideoPlayer *nvp, int proglen,
+        EdgeDetector *ed, MythPlayer *player, int proglen,
         QString debugdir)
     : FrameAnalyzer()
     , pgmConverter(pgmc)
@@ -739,7 +739,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
      */
     sampleTime = min(proglen / 2, 20 * 60);
 
-    const float         fps = nvp->GetFrameRate();
+    const float fps = player->GetFrameRate();
 
     if (samplesNeeded > UINT_MAX)
     {
@@ -789,8 +789,7 @@ TemplateFinder::~TemplateFinder(void)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
-        long long nframes)
+TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
 {
     /*
      * Only detect edges in portions of the frame where we expect to find
@@ -801,13 +800,13 @@ TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
      *    correct): don't "pollute" the set of candidate template edges with
      *    the "content" edges in the non-template portions of the frame.
      */
-    QString tmpldims, nvpdims;
+    QString tmpldims, playerdims;
 
     (void)nframes; /* gcc */
-    QSize buf_dim = nvp->GetVideoBufferSize();
+    QSize buf_dim = player->GetVideoBufferSize();
     width  = buf_dim.width();
     height = buf_dim.height();
-    nvpdims = QString("%1x%2").arg(width).arg(height);
+    playerdims = QString("%1x%2").arg(width).arg(height);
 
     if (debug_template)
     {
@@ -820,16 +819,16 @@ TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
                     "no template";
 
             VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateFinder::nuppelVideoPlayerInited read %1: %2")
+                        "TemplateFinder::MythPlayerInited read %1: %2")
                     .arg(debugtmpl)
                     .arg(tmpldims));
         }
     }
 
-    if (pgmConverter->nuppelVideoPlayerInited(nvp))
+    if (pgmConverter->MythPlayerInited(player))
         goto free_tmpl;
 
-    if (borderDetector->nuppelVideoPlayerInited(nvp))
+    if (borderDetector->MythPlayerInited(player))
         goto free_tmpl;
 
     if (tmpl_done)
@@ -837,16 +836,16 @@ TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
         if (tmpl_valid)
         {
             VERBOSE(VB_COMMFLAG, QString(
-                        "TemplateFinder::nuppelVideoPlayerInited"
+                        "TemplateFinder::MythPlayerInited"
                         " %1 of %2 (%3)")
-                    .arg(tmpldims).arg(nvpdims).arg(debugtmpl));
+                    .arg(tmpldims).arg(playerdims).arg(debugtmpl));
         }
         return ANALYZE_FINISHED;
     }
 
-    VERBOSE(VB_COMMFLAG, QString("TemplateFinder::nuppelVideoPlayerInited"
+    VERBOSE(VB_COMMFLAG, QString("TemplateFinder::MythPlayerInited"
                 " framesize %1")
-            .arg(nvpdims));
+            .arg(playerdims));
     scores = new unsigned int[width * height];
 
     return ANALYZE_OK;

@@ -18,7 +18,7 @@ using namespace std;
 
 class RingBuffer;
 class TeletextViewer;
-class NuppelVideoPlayer;
+class MythPlayer;
 class AudioPlayer;
 
 const int kDecoderProbeBufferSize = 128 * 1024;
@@ -86,7 +86,7 @@ typedef vector<StreamInfo> sinfo_vec_t;
 class DecoderBase
 {
   public:
-    DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo);
+    DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo);
     virtual ~DecoderBase();
 
     virtual void Reset(void);
@@ -109,7 +109,7 @@ class DecoderBase
     virtual void setWatchingRecording(bool mode);
     /// Demux, preprocess and possibly decode a frame of video/audio.
     virtual bool GetFrame(DecodeType) = 0;
-    NuppelVideoPlayer *GetNVP() { return m_parent; }
+    MythPlayer *GetPlayer() { return m_parent; }
 
     virtual int GetNumChapters(void)                      { return 0; }
     virtual int GetCurrentChapter(long long framesPlayed) { return 0; }
@@ -216,7 +216,7 @@ class DecoderBase
     } PosMapEntry;
     long long GetKey(const PosMapEntry &entry) const;
 
-    NuppelVideoPlayer *m_parent;
+    MythPlayer *m_parent;
     ProgramInfo *m_playbackinfo;
     AudioPlayer *m_audio;
     RingBuffer *ringBuffer;

@@ -3,7 +3,7 @@
 
 #include "mythscreentype.h"
 #include "teletextdecoder.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 typedef enum
 {
@@ -93,7 +93,7 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
     static bool  InitialiseFont(void);
 
   public:
-    TeletextScreen(NuppelVideoPlayer *player, const char * name);
+    TeletextScreen(MythPlayer *player, const char * name);
     virtual ~TeletextScreen();
 
     // MythScreenType methods
@@ -140,10 +140,10 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
     const TeletextSubPage *FindSubPageInternal(int,int,int) const;
     const TeletextPage    *FindPageInternal(int,int) const;
 
-    NuppelVideoPlayer *m_player;
-    QRect              m_safeArea;
-    int                m_colSize;
-    int                m_rowSize;
+    MythPlayer *m_player;
+    QRect       m_safeArea;
+    int         m_colSize;
+    int         m_rowSize;
 
     QMutex m_lock;
 

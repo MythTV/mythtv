@@ -1,7 +1,7 @@
 #ifndef CUSTOMEDIT_H_
 #define CUSTOMEDIT_H_
 
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "programinfo.h"
 #include "mythscreentype.h"
 

@@ -39,10 +39,10 @@ class VideoOutputD3D : public VideoOutput
     bool hasFullScreenOSD(void) const { return true; }
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
-    void ShowPIP(VideoFrame        *frame,
-                 NuppelVideoPlayer *pipplayer,
-                 PIPLocation        loc);
-    void RemovePIP(NuppelVideoPlayer *pipplayer);
+    void ShowPIP(VideoFrame  *frame,
+                 MythPlayer  *pipplayer,
+                 PIPLocation  loc);
+    void RemovePIP(MythPlayer *pipplayer);
     bool IsPIPSupported(void) const { return true; }
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
 
@@ -62,9 +62,9 @@ class VideoOutputD3D : public VideoOutput
     bool                    m_render_valid;
     bool                    m_render_reset;
 
-    QMap<NuppelVideoPlayer*,D3D9Image*> m_pips;
-    QMap<NuppelVideoPlayer*,bool>       m_pip_ready;
-    D3D9Image                          *m_pip_active;
+    QMap<MythPlayer*,D3D9Image*> m_pips;
+    QMap<MythPlayer*,bool>       m_pip_ready;
+    D3D9Image                   *m_pip_active;
 
     MythD3D9Painter        *m_osd_painter;
 };

@@ -15,7 +15,7 @@
 #include "exitcodes.h"
 
 #include "NuppelVideoRecorder.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
 
@@ -216,7 +216,7 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     m_proginfo(pginfo),
     keyframedist(30),
     nvr(NULL),
-    nvp(NULL),
+    player(NULL),
     player_ctx(NULL),
     inRingBuffer(NULL),
     outRingBuffer(NULL),
@@ -233,7 +233,7 @@ Transcode::~Transcode()
         delete nvr;
     if (player_ctx)
     {
-        nvp          = NULL;
+        player       = NULL;
         inRingBuffer = NULL;
         delete player_ctx;
     }
@@ -374,14 +374,14 @@ int Transcode::TranscodeFile(
 
     // Input setup
     inRingBuffer = new RingBuffer(inputname, false, false);
-    nvp = new NuppelVideoPlayer();
+    player = new MythPlayer();
 
     player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
-    player_ctx->SetNVP(nvp);
-    nvp->SetNullVideo();
-    nvp->SetPlayerInfo(NULL, NULL, true, player_ctx);
+    player_ctx->SetPlayer(player);
+    player->SetNullVideo();
+    player->SetPlayerInfo(NULL, NULL, true, player_ctx);
 
     if (showprogress)
     {
@@ -390,10 +390,10 @@ int Transcode::TranscodeFile(
 
     AudioOutput *audioOutput = new AudioReencodeBuffer(FORMAT_NONE, 0);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
-    nvp->GetAudio()->SetAudioOutput(audioOutput);
-    nvp->SetTranscoding(true);
+    player->GetAudio()->SetAudioOutput(audioOutput);
+    player->SetTranscoding(true);
 
-    if (nvp->OpenFile(false) < 0)
+    if (player->OpenFile(false) < 0)
     {
         VERBOSE(VB_IMPORTANT, "Transcoding aborted, error opening file.");
         if (player_ctx)
@@ -401,7 +401,7 @@ int Transcode::TranscodeFile(
         return REENCODE_ERROR;
     }
 
-    long long total_frame_count = nvp->GetTotalFrameCount();
+    long long total_frame_count = player->GetTotalFrameCount();
     long long new_frame_count = total_frame_count;
     if (honorCutList && m_proginfo)
     {
@@ -452,13 +452,13 @@ int Transcode::TranscodeFile(
         curtime = curtime.addSecs(60);
     }
 
-    nvp->GetAudio()->ReinitAudio();
-    QString encodingType = nvp->GetEncodingType();
+    player->GetAudio()->ReinitAudio();
+    QString encodingType = player->GetEncodingType();
     bool copyvideo = false, copyaudio = false;
 
     QString vidsetting = NULL, audsetting = NULL, vidfilters = NULL;
 
-    QSize buf_size = nvp->GetVideoBufferSize();
+    QSize buf_size = player->GetVideoBufferSize();
     int video_width = buf_size.width();
     int video_height = buf_size.height();
 
@@ -468,8 +468,8 @@ int Transcode::TranscodeFile(
                "will treat it as such.");
     }
 
-    float video_aspect = nvp->GetVideoAspect();
-    float video_frame_rate = nvp->GetFrameRate();
+    float video_aspect = player->GetVideoAspect();
+    float video_frame_rate = player->GetFrameRate();
     int newWidth = video_width;
     int newHeight = video_height;
 
@@ -524,7 +524,7 @@ int Transcode::TranscodeFile(
         {
             int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
-            nvp->SetVideoFilters(vidfilters);
+            player->SetVideoFilters(vidfilters);
             newWidth = get_int_option(profile, "width");
             newHeight = get_int_option(profile, "height");
 
@@ -556,7 +556,7 @@ int Transcode::TranscodeFile(
                     .arg(newWidth).arg(newHeight));
         }
         else  // lossy and no resize
-            nvp->SetVideoFilters(vidfilters);
+            player->SetVideoFilters(vidfilters);
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
         nvr->SetOption("inpixfmt", FMT_YV12);
@@ -698,13 +698,13 @@ int Transcode::TranscodeFile(
     }
 
     if (deleteMap.size() > 0)
-        nvp->SetCutList(deleteMap);
+        player->SetCutList(deleteMap);
 
     keyframedist = 30;
-    nvp->InitForTranscode(copyaudio, copyvideo);
-    if (nvp->IsErrored())
+    player->InitForTranscode(copyaudio, copyvideo);
+    if (player->IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to initialize NuppelVideoPlayer "
+        VERBOSE(VB_IMPORTANT, "Unable to initialize MythPlayer "
                 "for Transcode");
         if (player_ctx)
             delete player_ctx;
@@ -773,7 +773,7 @@ int Transcode::TranscodeFile(
     float rateTimeConv = arb->eff_audiorate * arb->bytes_per_frame / 1000.0;
     float vidFrameTime = 1000.0 / video_frame_rate;
     int wait_recover = 0;
-    VideoOutput *videoOutput = nvp->getVideoOutput();
+    VideoOutput *videoOutput = player->getVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
     unsigned char *newFrame = new unsigned char[frame.size];
@@ -792,11 +792,11 @@ int Transcode::TranscodeFile(
     QTime flagTime;
     flagTime.start();
 
-    while (nvp->TranscodeGetNextFrame(dm_iter, did_ff, is_key, honorCutList))
+    while (player->TranscodeGetNextFrame(dm_iter, did_ff, is_key, honorCutList))
     {
         if (first_loop)
         {
-            copyaudio = nvp->GetRawAudioState();
+            copyaudio = player->GetRawAudioState();
             first_loop = false;
         }
         VideoFrame *lastDecode = videoOutput->GetLastDecodedFrame();
@@ -881,17 +881,17 @@ int Transcode::TranscodeFile(
             }
             videoOutput->DoneDisplayingFrame(lastDecode);
             audioOutput->Reset();
-            nvp->GetCC608Reader()->FlushTxtBuffers();
+            player->GetCC608Reader()->FlushTxtBuffers();
             lasttimecode = frame.timecode;
         }
         else if (copyaudio)
         {
             // Encoding from NuppelVideo to NuppelVideo with MP3 audio
             // So let's not decode/reencode audio
-            if (!nvp->GetRawAudioState())
+            if (!player->GetRawAudioState())
             {
                 // The Raw state changed during decode.  This is not good
-                VERBOSE(VB_IMPORTANT, "Transcoding aborted, NuppelVideoPlayer "
+                VERBOSE(VB_IMPORTANT, "Transcoding aborted, MythPlayer "
                         "is not in raw audio mode.");
 
                 unlink(outputname.toLocal8Bit().constData());
@@ -915,7 +915,7 @@ int Transcode::TranscodeFile(
 
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
-                    long sync_offset = nvp->UpdateStoredFrameNum(curFrameNum);
+                    long sync_offset = player->UpdateStoredFrameNum(curFrameNum);
                     nvr->UpdateSeekTable(num_keyframes, sync_offset);
                     ReencoderAddKFA(curFrameNum, lastKeyFrame, num_keyframes);
                     num_keyframes++;
@@ -934,16 +934,16 @@ int Transcode::TranscodeFile(
             lasttimecode = frame.timecode;
             frame.timecode -= timecodeOffset;
 
-            if (! nvp->WriteStoredData(outRingBuffer, (did_ff == 0),
+            if (! player->WriteStoredData(outRingBuffer, (did_ff == 0),
                                        timecodeOffset))
             {
-                if (video_aspect != nvp->GetVideoAspect())
+                if (video_aspect != player->GetVideoAspect())
                 {
-                    video_aspect = nvp->GetVideoAspect();
+                    video_aspect = player->GetVideoAspect();
                     nvr->SetNewVideoParams(video_aspect);
                 }
 
-                QSize buf_size = nvp->GetVideoBufferSize();
+                QSize buf_size = player->GetVideoBufferSize();
 
                 if (video_width != buf_size.width() ||
                     video_height != buf_size.height())
@@ -990,7 +990,7 @@ int Transcode::TranscodeFile(
                 nvr->WriteVideo(&frame, true, writekeyframe);
             }
             audioOutput->Reset();
-            nvp->GetCC608Reader()->FlushTxtBuffers();
+            player->GetCC608Reader()->FlushTxtBuffers();
         }
         else
         {
@@ -1001,14 +1001,14 @@ int Transcode::TranscodeFile(
                     (frame.timecode - lasttimecode - (int)vidFrameTime);
             }
 
-            if (video_aspect != nvp->GetVideoAspect())
+            if (video_aspect != player->GetVideoAspect())
             {
-                video_aspect = nvp->GetVideoAspect();
+                video_aspect = player->GetVideoAspect();
                 nvr->SetNewVideoParams(video_aspect);
             }
 
 
-            QSize buf_size = nvp->GetVideoBufferSize();
+            QSize buf_size = player->GetVideoBufferSize();
 
             if (video_width != buf_size.width() ||
                 video_height != buf_size.height())
@@ -1069,7 +1069,7 @@ int Transcode::TranscodeFile(
                 arb->audiobuffer_len = 0;
             }
 
-            nvp->GetCC608Reader()->TranscodeWriteText(&TranscodeWriteText,
+            player->GetCC608Reader()->TranscodeWriteText(&TranscodeWriteText,
                                                    (void *)(nvr));
 
             lasttimecode = frame.timecode;

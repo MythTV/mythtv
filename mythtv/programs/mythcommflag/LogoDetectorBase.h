@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class LogoDetectorBase : public QObject
 {
@@ -13,7 +13,7 @@ class LogoDetectorBase : public QObject
     LogoDetectorBase(unsigned int w,unsigned int h) :
         foundLogo(false), width(w),height(h) {};
 
-    virtual bool searchForLogo(NuppelVideoPlayer* nvp) = 0;
+    virtual bool searchForLogo(MythPlayer* player) = 0;
     virtual bool doesThisFrameContainTheFoundLogo(unsigned char* frame) = 0;
     virtual bool pixelInsideLogo(unsigned int x, unsigned int y) = 0;
     virtual unsigned int getRequiredAvailableBufferForSearch() = 0;

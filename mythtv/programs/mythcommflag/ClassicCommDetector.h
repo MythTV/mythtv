@@ -16,7 +16,7 @@
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class LogoDetectorBase;
 class SceneChangeDetectorBase;
 
@@ -49,7 +49,7 @@ class ClassicCommDetector : public CommDetectorBase
 
     public:
         ClassicCommDetector(SkipType commDetectMethod, bool showProgress,
-                            bool fullSpeed, NuppelVideoPlayer* nvp,
+                            bool fullSpeed, MythPlayer* player,
                             const QDateTime& startedAt_in,
                             const QDateTime& stopsAt_in,
                             const QDateTime& recordingStartedAt_in,
@@ -176,7 +176,7 @@ class ClassicCommDetector : public CommDetectorBase
         SceneChangeDetectorBase* sceneChangeDetector;
 
 protected:
-        NuppelVideoPlayer *nvp;
+        MythPlayer *player;
         QDateTime startedAt, stopsAt;
         QDateTime recordingStartedAt, recordingStopsAt;
         bool aggressiveDetection;

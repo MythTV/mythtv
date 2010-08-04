@@ -38,7 +38,7 @@ public:
 
     /* FrameAnalyzer interface. */
     const char *name(void) const { return "TemplateMatcher"; }
-    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+    enum analyzeFrameResult MythPlayerInited(MythPlayer *player,
             long long nframes);
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame);
@@ -72,7 +72,7 @@ private:
     int                     debugLevel;
     QString                 debugdir;
     QString                 debugdata;              /* filename */
-    NuppelVideoPlayer       *nvp;
+    MythPlayer             *player;
     bool                    debug_matches;
     bool                    debug_removerunts;
     bool                    matches_done;

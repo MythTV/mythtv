@@ -18,7 +18,7 @@ using namespace std;
 // MythTV headers
 #include "mythconfig.h"
 #include "nuppeldecoder.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "remoteencoder.h"
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
@@ -35,7 +35,7 @@ extern "C" {
 #define LOC QString("NVD: ")
 #define LOC_ERR QString("NVD Error: ")
 
-NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
+NuppelDecoder::NuppelDecoder(MythPlayer *parent,
                              const ProgramInfo &pginfo)
     : DecoderBase(parent, pginfo),
       rtjd(0), video_width(0), video_height(0), video_size(0),
@@ -220,7 +220,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         fileheader.aspect = 4.0 / 3;
     current_aspect = fileheader.aspect;
 
-    GetNVP()->SetVideoParams(fileheader.width, fileheader.height,
+    GetPlayer()->SetVideoParams(fileheader.width, fileheader.height,
                              fileheader.fps, fileheader.keyframedist,
                              fileheader.aspect);
 
@@ -378,7 +378,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 m_positionMapLock.unlock();
 
-                GetNVP()->SetFileLength(totalLength, totalFrames);
+                GetPlayer()->SetFileLength(totalLength, totalFrames);
 
                 delete [] seekbuf;
             }
@@ -442,7 +442,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 totalLength -= (int)(adjust / video_frame_rate);
                 totalFrames -= adjust;
-                GetNVP()->SetFileLength(totalLength, totalFrames);
+                GetPlayer()->SetFileLength(totalLength, totalFrames);
 
                 adjust = 0;
 
@@ -631,8 +631,8 @@ void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
     NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
-    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
-        nd->GetNVP()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+    if (nd && nd->GetPlayer() && nd->GetPlayer()->getVideoOutput())
+        nd->GetPlayer()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
 
     int i;
     for (i = 0; i < 4; i++)
@@ -1044,7 +1044,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         if (!ReadFrameheader(&frameheader))
         {
             ateof = true;
-            GetNVP()->SetEof();
+            GetPlayer()->SetEof();
             return false;
         }
 
@@ -1053,7 +1053,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             ((frameheader.frametype == 'Q') || (frameheader.frametype == 'K')))
         {
             ateof = true;
-            GetNVP()->SetEof();
+            GetPlayer()->SetEof();
             return false;
         }
 
@@ -1071,7 +1071,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             if (!ReadFrameheader(&frameheader))
             {
                 ateof = true;
-                GetNVP()->SetEof();
+                GetPlayer()->SetEof();
                 return false;
             }
             seeklen = 1;
@@ -1086,7 +1086,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             {
                 delete [] dummy;
                 ateof = true;
-                GetNVP()->SetEof();
+                GetPlayer()->SetEof();
                 return false;
             }
 
@@ -1145,14 +1145,14 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                         .arg(frameheader.frametype)
                         .arg(frameheader.packetlength));
                 ateof = true;
-                GetNVP()->SetEof();
+                GetPlayer()->SetEof();
                 return false;
             }
             if (ringBuffer->Read(strm, frameheader.packetlength) !=
                 frameheader.packetlength)
             {
                 ateof = true;
-                GetNVP()->SetEof();
+                GetPlayer()->SetEof();
                 return false;
             }
         }
@@ -1168,24 +1168,24 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 continue;
             }
 
-            VideoFrame *buf = GetNVP()->GetNextVideoFrame();
+            VideoFrame *buf = GetPlayer()->GetNextVideoFrame();
             if (!buf)
                 continue;
 
             ret = DecodeFrame(&frameheader, strm, buf);
             if (!ret)
             {
-                GetNVP()->DiscardVideoFrame(buf);
+                GetPlayer()->DiscardVideoFrame(buf);
                 continue;
             }
 
             buf->frameNumber = framesPlayed;
-            GetNVP()->ReleaseNextVideoFrame(buf, frameheader.timecode);
+            GetPlayer()->ReleaseNextVideoFrame(buf, frameheader.timecode);
 
             // We need to make the frame available ourselves
             // if we are not using ffmpeg/avlib.
             if (directframe)
-                GetNVP()->getVideoOutput()->DeLimboFrame(buf);
+                GetPlayer()->getVideoOutput()->DeLimboFrame(buf);
 
             decoded_video_frame = buf;
             gotvideo = 1;
@@ -1284,7 +1284,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             if (getrawframes)
                 StoreRawData(strm);
 
-            GetNVP()->GetCC608Reader()->AddTextData(strm, frameheader.packetlength,
+            GetPlayer()->GetCC608Reader()->AddTextData(strm, frameheader.packetlength,
                                   frameheader.timecode, frameheader.comptype);
         }
 
@@ -1326,7 +1326,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     fileheader.aspect = 4.0 / 3;
                 current_aspect = fileheader.aspect;
 
-                GetNVP()->SetVideoParams(fileheader.width, fileheader.height,
+                GetPlayer()->SetVideoParams(fileheader.width, fileheader.height,
                                          fileheader.fps, fileheader.keyframedist,
                                          fileheader.aspect);
             }
@@ -1353,13 +1353,13 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
         avcodec_flush_buffers(mpa_vidctx);
 
     if (discardFrames)
-        GetNVP()->DiscardVideoFrames(doFlush);
+        GetPlayer()->DiscardVideoFrames(doFlush);
 
     for (;(skipFrames > 0) && !ateof; skipFrames--)
     {
         GetFrame(kDecodeAV);
         if (decoded_video_frame)
-            GetNVP()->DiscardVideoFrame(decoded_video_frame);
+            GetPlayer()->DiscardVideoFrame(decoded_video_frame);
     }
 }
 

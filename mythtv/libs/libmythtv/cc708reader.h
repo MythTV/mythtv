@@ -9,12 +9,12 @@
 #include "compat.h"
 #include "cc708window.h"
 
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class CC708Reader
 {
   public:
-    CC708Reader(NuppelVideoPlayer *owner);
+    CC708Reader(MythPlayer *owner);
     virtual ~CC708Reader();
 
     void SetCurrentService(int service) { currentservice = service; }
@@ -93,7 +93,7 @@ class CC708Reader
     QString    osdprefix;
     QString    osdtheme;
 
-    NuppelVideoPlayer *parent;
+    MythPlayer *parent;
     bool enabled;
 };
 #endif // CC708READER_H

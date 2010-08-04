@@ -4,7 +4,7 @@
 #include <QDesktopWidget>
 
 #include "osd.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 
@@ -297,7 +297,7 @@ VideoOutput *VideoOutput::Create(
  *  see it for more details on the states a buffer can
  *  take before it becomes available for reuse.
  *
- * \see VideoBuffers, NuppelVideoPlayer
+ * \see VideoBuffers, MythPlayer
  */
 
 /**
@@ -923,7 +923,7 @@ QString VideoOutput::GetOSDRenderer(void) const
  * \brief Determines PIP Window size and Position.
  */
 QRect VideoOutput::GetPIPRect(
-    PIPLocation location, NuppelVideoPlayer *pipplayer, bool do_pixel_adj) const
+    PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
 {
     return windows[0].GetPIPRect(location, pipplayer, do_pixel_adj);
 }
@@ -997,19 +997,19 @@ void VideoOutput::ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers)
 }
 
 /**
- * \fn VideoOutput::ShowPIP(VideoFrame*,NuppelVideoPlayer*,PIPLocation)
+ * \fn VideoOutput::ShowPIP(VideoFrame*,MythPlayer*,PIPLocation)
  * \brief Composites PiP image onto a video frame.
  *
  *  Note: This only works with memory backed VideoFrames,
  *        that is not XvMC, OpenGL, VDPAU, etc.
  *
  * \param frame     Frame to composite PiP onto.
- * \param pipplayer Picture-in-Picture NVP.
+ * \param pipplayer Picture-in-Picture Player.
  * \param loc       Location of this PiP on the frame.
  */
-void VideoOutput::ShowPIP(VideoFrame        *frame,
-                          NuppelVideoPlayer *pipplayer,
-                          PIPLocation        loc)
+void VideoOutput::ShowPIP(VideoFrame  *frame,
+                          MythPlayer  *pipplayer,
+                          PIPLocation  loc)
 {
     if (!pipplayer)
         return;

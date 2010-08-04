@@ -22,7 +22,7 @@ using namespace std;
 
 class TV;
 class RemoteEncoder;
-class NuppelVideoPlayer;
+class MythPlayer;
 class RingBuffer;
 class ProgramInfo;
 class LiveTVChain;
@@ -50,13 +50,13 @@ class PlayerThread : public QThread
     Q_OBJECT
 
   public:
-    PlayerThread(NuppelVideoPlayer *nvp) : QThread(NULL), m_nvp(nvp) { }
+    PlayerThread(MythPlayer *player) : QThread(NULL), m_player(player) { }
 
   protected:
     virtual void run(void);
 
   private:
-    NuppelVideoPlayer *m_nvp;
+    MythPlayer *m_player;
 };
 
 class MPUBLIC PlayerContext
@@ -66,7 +66,7 @@ class MPUBLIC PlayerContext
     ~PlayerContext();
 
     // Actions
-    bool CreateNVP(TV *tv, QWidget *widget,
+    bool CreatePlayer(TV *tv, QWidget *widget,
                    TVState desiredState,
                    WId embedwinid, const QRect *embedBounds,
                    bool muted = false);
@@ -93,8 +93,8 @@ class MPUBLIC PlayerContext
     TVState DequeueNextState(void);
 
     void ResizePIPWindow(void);
-    bool HandleNVPSpeedChangeFFRew(void);
-    bool HandleNVPSpeedChangeEOF(void);
+    bool HandlePlayerSpeedChangeFFRew(void);
+    bool HandlePlayerSpeedChangeEOF(void);
 
     // Locking
     void LockState(void) const;
@@ -103,12 +103,12 @@ class MPUBLIC PlayerContext
     void LockPlayingInfo(const char *file, int line) const;
     void UnlockPlayingInfo(const char *file, int line) const;
 
-    void LockDeleteNVP(const char *file, int line) const;
-    void UnlockDeleteNVP(const char *file, int line) const;
+    void LockDeletePlayer(const char *file, int line) const;
+    void UnlockDeletePlayer(const char *file, int line) const;
 
     // Sets
     void SetInitialTVState(bool islivetv);
-    void SetNVP(NuppelVideoPlayer *new_nvp);
+    void SetPlayer(MythPlayer *new_player);
     void SetRecorder(RemoteEncoder *rec);
     void SetTVChain(LiveTVChain *chain);
     void SetRingBuffer(RingBuffer *buf);
@@ -117,14 +117,14 @@ class MPUBLIC PlayerContext
     void SetPseudoLiveTV(const ProgramInfo *pi, PseudoState new_state);
     void SetPIPLocation(int loc) { pipLocation = loc; }
     void SetPIPState(PIPState change) { pipState = change; }
-    void SetNVPChangingBuffers(bool val) { nvpUnsafe = val; }
+    void SetPlayerChangingBuffers(bool val) { playerUnsafe = val; }
     void SetNoHardwareDecoders(void) { nohardwaredecoders = true; }
 
     // Gets
     QRect    GetStandAlonePIPRect(void);
     PIPState GetPIPState(void) const { return pipState; }
     QString  GetPreviousChannel(void) const;
-    bool     CalcNVPSliderPosition(osdInfo &info,
+    bool     CalcPlayerSliderPosition(osdInfo &info,
                                    bool paddedFields = false) const;
     uint     GetCardID(void) const { return last_cardid; }
     QString  GetFilters(const QString &baseFilters) const;
@@ -145,25 +145,25 @@ class MPUBLIC PlayerContext
     bool IsAudioNeeded(void) const
         { return (kPIPOff  == pipState) || (kPBPLeft       == pipState); }
     bool IsNullVideoDesired(void)   const { return useNullVideo; }
-    bool IsNVPChangingBuffers(void) const { return nvpUnsafe;    }
+    bool IsPlayerChangingBuffers(void) const { return playerUnsafe; }
     bool IsEmbedding(void) const;
-    bool HasNVP(void) const;
-    bool IsNVPErrored(void) const;
-    bool IsNVPRecoverable(void) const;
-    bool IsNVPDecoderErrored(void) const;
-    bool IsNVPPlaying(void) const;
+    bool HasPlayer(void) const;
+    bool IsPlayerErrored(void) const;
+    bool IsPlayerRecoverable(void) const;
+    bool IsPlayerDecoderErrored(void) const;
+    bool IsPlayerPlaying(void) const;
     bool IsRecorderErrored(void) const;
     bool InStateChange(void) const;
     /// This is set if the player encountered some irrecoverable error.
     bool IsErrored(void) const { return errored; }
     bool IsSameProgram(const ProgramInfo &p) const;
     bool IsValidLiveTV(void) const
-        { return nvp && tvchain && recorder && buffer; }
+        { return player && tvchain && recorder && buffer; }
 
   public:
     QString             recUsage;
-    NuppelVideoPlayer  *nvp;
-    volatile bool       nvpUnsafe;
+    MythPlayer         *player;
+    volatile bool       playerUnsafe;
     RemoteEncoder      *recorder;
     LiveTVChain        *tvchain;
     RingBuffer         *buffer;
@@ -203,7 +203,7 @@ class MPUBLIC PlayerContext
     float               ts_alt;
 
     mutable QMutex      playingInfoLock;
-    mutable QMutex      deleteNVPLock;
+    mutable QMutex      deletePlayerLock;
     mutable QMutex      stateLock;
 
     // Signal info

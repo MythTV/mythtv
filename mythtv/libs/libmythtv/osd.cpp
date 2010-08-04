@@ -156,7 +156,7 @@ void ChannelEditor::sendResult(int result, bool ok)
     QCoreApplication::postEvent(m_retObject, dce);
 }
 
-OSD::OSD(NuppelVideoPlayer *player, QObject *parent)
+OSD::OSD(MythPlayer *player, QObject *parent)
   : m_parent(player), m_ParentObject(parent), m_Rect(QRect()),
     m_Effects(true),  m_FadeTime(kOSDFadeTime), m_Dialog(NULL),
     m_PulsedDialogText(QString()),            m_NextPulseUpdate(QDateTime()),

@@ -17,7 +17,7 @@ extern "C" {
 #include "avcodec.h"
 }
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class ChromaKeyOSD;
 class XvMCBufferSettings;
 class XvMCSurfaceTypes;
@@ -102,9 +102,9 @@ class VideoOutputXv : public VideoOutput
 
     void CheckFrameStates(void);
 
-    virtual QRect GetPIPRect(PIPLocation        location,
-                             NuppelVideoPlayer *pipplayer = NULL,
-                             bool               do_pixel_adj = true) const;
+    virtual QRect GetPIPRect(PIPLocation  location,
+                             MythPlayer  *pipplayer = NULL,
+                             bool         do_pixel_adj = true) const;
 
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
@@ -152,9 +152,9 @@ class VideoOutputXv : public VideoOutput
     void ShowXvMC(FrameScanType scan);
     void ShowXVideo(FrameScanType scan);
 
-    virtual void ShowPIP(VideoFrame        *frame,
-                         NuppelVideoPlayer *pipplayer,
-                         PIPLocation        loc);
+    virtual void ShowPIP(VideoFrame  *frame,
+                         MythPlayer  *pipplayer,
+                         PIPLocation  loc);
 
     void InitColorKey(bool turnoffautopaint);
 

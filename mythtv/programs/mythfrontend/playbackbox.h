@@ -31,7 +31,7 @@ class QKeyEvent;
 class QEvent;
 class QTimer;
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class RingBuffer;
 class ProgramInfo;
 

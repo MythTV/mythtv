@@ -39,12 +39,12 @@ class VideoOutputOpenGL : public VideoOutput
     void StopEmbedding(void);
     bool SetDeinterlacingEnabled(bool);
     bool SetupDeinterlace(bool i, const QString& ovrf="");
-    void ShowPIP(VideoFrame        *frame,
-                 NuppelVideoPlayer *pipplayer,
-                 PIPLocation        loc);
+    void ShowPIP(VideoFrame  *frame,
+                 MythPlayer  *pipplayer,
+                 PIPLocation  loc);
     void MoveResizeWindow(QRect new_rect);
 
-    virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
+    virtual void RemovePIP(MythPlayer *pipplayer);
     virtual bool IsPIPSupported(void) const   { return true; }
     virtual bool hasFullScreenOSD(void) const { return true; }
     virtual bool IsSyncLocked(void) const     { return true; }
@@ -60,8 +60,8 @@ class VideoOutputOpenGL : public VideoOutput
     QMutex            gl_context_lock;
     MythRenderOpenGL *gl_context;
     OpenGLVideo      *gl_videochain;
-    QMap<NuppelVideoPlayer*,OpenGLVideo*> gl_pipchains;
-    QMap<NuppelVideoPlayer*,bool>         gl_pip_ready;
+    QMap<MythPlayer*,OpenGLVideo*> gl_pipchains;
+    QMap<MythPlayer*,bool>         gl_pip_ready;
     OpenGLVideo      *gl_pipchain_active;
     WId               gl_parent_win;
     WId               gl_embed_win;

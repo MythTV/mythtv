@@ -49,12 +49,12 @@ class CC608Buffer
     vector<CC608Text*> buffers;
 };
 
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class MPUBLIC CC608Reader
 {
   public:
-    CC608Reader(NuppelVideoPlayer *parent);
+    CC608Reader(MythPlayer *parent);
    ~CC608Reader();
 
     void SetTTPageNum(int page)  { m_ccPageNum = page; }
@@ -77,7 +77,7 @@ class MPUBLIC CC608Reader
                          int scroll_yoff = 0, int scroll_ymax = 15);
     int  NumInputBuffers(bool need_to_lock = true);
 
-    NuppelVideoPlayer *m_parent;
+    MythPlayer *m_parent;
     bool     m_enabled;
     // Input buffers
     int      m_readPosition;

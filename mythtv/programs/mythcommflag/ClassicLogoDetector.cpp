@@ -6,7 +6,7 @@
 
 // MythTV headers
 #include "mythcorecontext.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 // Commercial Flagging headers
 #include "ClassicLogoDetector.h"
@@ -81,9 +81,9 @@ void ClassicLogoDetector::deleteLater(void)
     LogoDetectorBase::deleteLater();
 }
 
-bool ClassicLogoDetector::searchForLogo(NuppelVideoPlayer* nvp)
+bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 {
-    int seekIncrement = (int)(commDetectLogoSampleSpacing * nvp->GetFrameRate());
+    int seekIncrement = (int)(commDetectLogoSampleSpacing * player->GetFrameRate());
     long long seekFrame;
     int loops;
     int maxLoops = commDetectLogoSamplesNeeded;
@@ -108,20 +108,20 @@ bool ClassicLogoDetector::searchForLogo(NuppelVideoPlayer* nvp)
         memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
         memset(edgeMask, 0, sizeof(EdgeMaskEntry) * width * height);
 
-        nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
+        player->DiscardVideoFrame(player->GetRawVideoFrame(0));
 
         loops = 0;
         seekFrame = commDetector->preRoll + seekIncrement;
-        while(loops < maxLoops && !nvp->GetEof())
+        while(loops < maxLoops && !player->GetEof())
         {
-            VideoFrame* vf = nvp->GetRawVideoFrame(seekFrame);
+            VideoFrame* vf = player->GetRawVideoFrame(seekFrame);
 
             if ((loops % 50) == 0)
                 commDetector->logoDetectorBreathe();
 
             if (commDetector->m_bStop)
             {
-                nvp->DiscardVideoFrame(vf);
+                player->DiscardVideoFrame(vf);
                 delete[] edgeCounts;
                 return false;
             }
@@ -134,7 +134,7 @@ bool ClassicLogoDetector::searchForLogo(NuppelVideoPlayer* nvp)
             seekFrame += seekIncrement;
             loops++;
 
-            nvp->DiscardVideoFrame(vf);
+            player->DiscardVideoFrame(vf);
         }
 
         VERBOSE(VB_COMMFLAG, "Analyzing edge data");
@@ -262,7 +262,7 @@ bool ClassicLogoDetector::searchForLogo(NuppelVideoPlayer* nvp)
     if (!logoInfoAvailable)
         VERBOSE(VB_COMMFLAG, "No suitable logo area found.");
 
-    nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
+    player->DiscardVideoFrame(player->GetRawVideoFrame(0));
     return logoInfoAvailable;
 }
 

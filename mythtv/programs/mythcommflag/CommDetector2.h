@@ -15,7 +15,7 @@ using namespace std;
 #include "CommDetectorBase.h"
 #include "FrameAnalyzer.h"
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class TemplateFinder;
 class TemplateMatcher;
 class BlankFrameDetector;
@@ -39,7 +39,7 @@ class CommDetector2 : public CommDetectorBase
   public:
     CommDetector2(
         SkipType commDetectMethod,
-        bool showProgress, bool fullSpeed, NuppelVideoPlayer* nvp,
+        bool showProgress, bool fullSpeed, MythPlayer* player,
         int chanid, const QDateTime& startts, const QDateTime& endts,
         const QDateTime& recstartts, const QDateTime& recendts, bool useDB);
     virtual bool go(void);
@@ -60,7 +60,7 @@ class CommDetector2 : public CommDetectorBase
     enum SkipTypes          commDetectMethod;
     bool                    showProgress;
     bool                    fullSpeed;
-    NuppelVideoPlayer       *nvp;
+    MythPlayer             *player;
     QDateTime               startts, endts, recstartts, recendts;
 
     bool                    isRecording;        /* current state */

@@ -1,13 +1,13 @@
 #ifndef AUDIOPLAYER_H
 #define AUDIOPLAYER_H
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class AudioOutput;
 
 class MPUBLIC AudioPlayer
 {
   public:
-    AudioPlayer(NuppelVideoPlayer *parent, bool muted);
+    AudioPlayer(MythPlayer *parent, bool muted);
    ~AudioPlayer();
 
     void  Reset(void);
@@ -50,7 +50,7 @@ class MPUBLIC AudioPlayer
     bool GetBufferStatus(uint &fill, uint &total);
 
   private:
-    NuppelVideoPlayer *m_parent;
+    MythPlayer  *m_parent;
     AudioOutput *m_audioOutput;
     int          m_channels;
     int          m_codec;

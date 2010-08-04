@@ -4,7 +4,7 @@
 #include "programinfo.h"
 
 class CommDetectorBase;
-class NuppelVideoPlayer;
+class MythPlayer;
 class RemoteEncoder;
 class QDateTime;
 
@@ -17,7 +17,7 @@ class CommDetectorFactory
     CommDetectorBase* makeCommDetector(
         SkipType commDetectMethod,
         bool showProgress,
-        bool fullSpeed, NuppelVideoPlayer* nvp,
+        bool fullSpeed, MythPlayer* player,
         int chanid,
         const QDateTime& startedAt,
         const QDateTime& stopsAt,

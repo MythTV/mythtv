@@ -14,7 +14,7 @@ extern "C" {
 
 // MythTV headers
 #include "frame.h"          // VideoFrame
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 // Commercial Flagging headers
 #include "FrameAnalyzer.h"

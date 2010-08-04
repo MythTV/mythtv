@@ -1,8 +1,6 @@
 #ifndef DUMMYDECODER_H_
 #define DUMMYDECODER_H_
 
-
-
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
@@ -14,7 +12,7 @@ extern "C" {
 class DummyDecoder : public DecoderBase
 {
   public:
-    DummyDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo) :
+    DummyDecoder(MythPlayer *parent, const ProgramInfo &pginfo) :
         DecoderBase(parent, pginfo) {}
     virtual ~DummyDecoder() {}
 

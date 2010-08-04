@@ -35,7 +35,7 @@ static char cvt_char(char ch, int lang)
     return ch;
 }
 
-TeletextScreen::TeletextScreen(NuppelVideoPlayer *player, const char * name) :
+TeletextScreen::TeletextScreen(MythPlayer *player, const char * name) :
     MythScreenType((MythScreenType*)NULL, name),
     m_player(player),           m_safeArea(QRect()),
     m_colSize(10),              m_rowSize(10),

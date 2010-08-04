@@ -6,7 +6,7 @@ using namespace std;
 
 #include "mythconfig.h"
 
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "remoteencoder.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
@@ -20,7 +20,7 @@ using namespace std;
 #define LOC QString("Dec: ")
 #define LOC_ERR QString("Dec, Error: ")
 
-DecoderBase::DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo)
+DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
     : m_parent(parent), m_playbackinfo(new ProgramInfo(pginfo)),
       m_audio(m_parent->GetAudio()), ringBuffer(NULL),
 
@@ -357,8 +357,8 @@ bool DecoderBase::SyncPositionMap(void)
                 length = (int)((totframes * 1.0) / fps);
         }
 
-        GetNVP()->SetFileLength(length, totframes);
-        GetNVP()->SetKeyframeDistance(keyframedist);
+        GetPlayer()->SetFileLength(length, totframes);
+        GetPlayer()->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
 
         VERBOSE(VB_PLAYBACK, LOC +
@@ -514,8 +514,8 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     if (ringBuffer->isDVD() || ringBuffer->isBD() || discardFrames)
     {
         // We need to tell the NVP and VideoOutput what frame we're on.
-        GetNVP()->SetFramesPlayed(framesPlayed+1);
-        GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+        GetPlayer()->SetFramesPlayed(framesPlayed+1);
+        GetPlayer()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
     return true;
@@ -721,8 +721,8 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     if (discardFrames)
     {
         // We need to tell the NVP and VideoOutput what frame we're on.
-        GetNVP()->SetFramesPlayed(framesPlayed+1);
-        GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+        GetPlayer()->SetFramesPlayed(framesPlayed+1);
+        GetPlayer()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
     // Re-enable rawframe state if it was enabled before FF
@@ -792,7 +792,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 
 void DecoderBase::UpdateFramesPlayed(void)
 {
-    GetNVP()->SetFramesPlayed(framesPlayed);
+    GetPlayer()->SetFramesPlayed(framesPlayed);
 }
 
 void DecoderBase::FileChanged(void)
@@ -807,7 +807,7 @@ void DecoderBase::FileChanged(void)
     waitingForChange = false;
     justAfterChange = true;
 
-    GetNVP()->FileChangedCallback();
+    GetPlayer()->FileChangedCallback();
 }
 
 void DecoderBase::SetReadAdjust(long long adjust)
@@ -856,10 +856,10 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
     long long desiredTimePos;
     int ffrewSkip = 1;
     int current_speed = 0;
-    if (GetNVP())
+    if (GetPlayer())
     {
-        ffrewSkip = GetNVP()->GetFFRewSkip();
-        current_speed = (int)GetNVP()->GetNextPlaySpeed();
+        ffrewSkip = GetPlayer()->GetFFRewSkip();
+        current_speed = (int)GetPlayer()->GetNextPlaySpeed();
     }
 
     if (ffrewSkip == 1)
@@ -887,10 +887,10 @@ long long DecoderBase::BDFindPosition(long long desiredFrame)
     long long desiredTimePos;
     int ffrewSkip = 1;
     int current_speed = 0;
-    if (GetNVP())
+    if (GetPlayer())
     {
-        ffrewSkip = GetNVP()->GetFFRewSkip();
-        current_speed = (int)GetNVP()->GetNextPlaySpeed();
+        ffrewSkip = GetPlayer()->GetFFRewSkip();
+        current_speed = (int)GetPlayer()->GetNextPlaySpeed();
     }
 
     if (ffrewSkip == 1)
@@ -916,8 +916,8 @@ void DecoderBase::UpdateDVDFramesPlayed(void)
         return;
     long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
-    GetNVP()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
-    GetNVP()->SetFramesPlayed(currentpos + 1);
+    GetPlayer()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
+    GetPlayer()->SetFramesPlayed(currentpos + 1);
 }
 
 void DecoderBase::UpdateBDFramesPlayed(void)
@@ -926,8 +926,8 @@ void DecoderBase::UpdateBDFramesPlayed(void)
         return;
     long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
-    GetNVP()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
-    GetNVP()->SetFramesPlayed(currentpos + 1);
+    GetPlayer()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
+    GetPlayer()->SetFramesPlayed(currentpos + 1);
 }
 
 QStringList DecoderBase::GetTracks(uint type) const
@@ -1015,8 +1015,8 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 
     tracks[type].push_back(info);
 
-    if (GetNVP())
-        GetNVP()->TracksChanged(type);
+    if (GetPlayer())
+        GetPlayer()->TracksChanged(type);
 
     return true;
 }
@@ -1112,8 +1112,8 @@ int DecoderBase::AutoSelectTrack(uint type)
             .arg(currentTrack[type]+1)
             .arg(iso639_key_toName(lang)).arg(lang));
 
-    if (GetNVP() && (oldTrack != currentTrack[type]))
-        GetNVP()->TracksChanged(type);
+    if (GetPlayer() && (oldTrack != currentTrack[type]))
+        GetPlayer()->TracksChanged(type);
 
     return selTrack;
 }

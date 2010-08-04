@@ -15,7 +15,7 @@
 #include "mythcodecid.h"
 #include "videoouttypes.h"
 
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class VideoOutWindow
 {
@@ -99,9 +99,9 @@ class VideoOutWindow
     QRect GetVisibleOSDBounds(float&, float&, float) const;
     QRect GetTotalOSDBounds(void) const;
 
-    QRect GetPIPRect(PIPLocation        location,
-                     NuppelVideoPlayer *pipplayer    = NULL,
-                     bool               do_pixel_adj = true) const;
+    QRect GetPIPRect(PIPLocation  location,
+                     MythPlayer  *pipplayer    = NULL,
+                     bool         do_pixel_adj = true) const;
 
   protected:
     void ApplyDBScaleAndMove(void);

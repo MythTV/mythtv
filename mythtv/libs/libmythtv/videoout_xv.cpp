@@ -1,4 +1,4 @@
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 /* Based on xqcam.c by Paul Chinn <loomer@svpal.org> */
 
@@ -2528,9 +2528,9 @@ void VideoOutputXv::Show(FrameScanType scan)
     disp->Sync();
 }
 
-void VideoOutputXv::ShowPIP(VideoFrame        *frame,
-                            NuppelVideoPlayer *pipplayer,
-                            PIPLocation        loc)
+void VideoOutputXv::ShowPIP(VideoFrame  *frame,
+                            MythPlayer  *pipplayer,
+                            PIPLocation  loc)
 {
     if (VideoOutputSubType() >= XVideoMC &&
         VideoOutputSubType() <= XVideoVLD)
@@ -3418,9 +3418,9 @@ void VideoOutputXv::FlushSurface(VideoFrame* frame)
 #endif // USING_XVMC
 }
 
-QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
-                                NuppelVideoPlayer *pipplayer,
-                                bool               do_pixel_adj) const
+QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
+                                MythPlayer  *pipplayer,
+                                bool         do_pixel_adj) const
 {
     (void)do_pixel_adj;
 

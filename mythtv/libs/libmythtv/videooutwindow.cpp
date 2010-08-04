@@ -29,7 +29,7 @@
 
 #include "videooutwindow.h"
 #include "osd.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 #include "mythxdisplay.h"
@@ -790,7 +790,7 @@ void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode aspectMode)
  * \brief Determines PIP Window size and Position.
  */
 QRect VideoOutWindow::GetPIPRect(
-    PIPLocation location, NuppelVideoPlayer *pipplayer, bool do_pixel_adj) const
+    PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
 {
     QRect position;
 

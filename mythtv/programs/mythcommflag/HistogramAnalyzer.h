@@ -22,8 +22,8 @@ public:
             QString debugdir);
     ~HistogramAnalyzer();
 
-    enum FrameAnalyzer::analyzeFrameResult nuppelVideoPlayerInited(
-            NuppelVideoPlayer *nvp, long long nframes);
+    enum FrameAnalyzer::analyzeFrameResult MythPlayerInited(
+            MythPlayer *player, long long nframes);
     void setLogoState(TemplateFinder *finder);
     static const long long UNCACHED = -1;
     enum FrameAnalyzer::analyzeFrameResult analyzeFrame(const VideoFrame *frame,

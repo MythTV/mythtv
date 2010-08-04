@@ -5,7 +5,7 @@
 // MythTV headers
 #include "mythcorecontext.h"    /* gContext */
 #include "decodeencode.h"           /* for absLongLong */
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
@@ -397,18 +397,17 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-BlankFrameDetector::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
-        long long nframes)
+BlankFrameDetector::MythPlayerInited(MythPlayer *player, long long nframes)
 {
     FrameAnalyzer::analyzeFrameResult ares =
-        histogramAnalyzer->nuppelVideoPlayerInited(nvp, nframes);
+        histogramAnalyzer->MythPlayerInited(player, nframes);
 
-    fps = nvp->GetFrameRate();
+    fps = player->GetFrameRate();
 
-    QSize video_disp_dim = nvp->GetVideoSize();
+    QSize video_disp_dim = player->GetVideoSize();
 
     VERBOSE(VB_COMMFLAG, QString(
-                "BlankFrameDetector::nuppelVideoPlayerInited %1x%2")
+                "BlankFrameDetector::MythPlayerInited %1x%2")
             .arg(video_disp_dim.width())
             .arg(video_disp_dim.height()));
 

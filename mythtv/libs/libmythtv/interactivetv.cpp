@@ -15,7 +15,7 @@
 #include "mhi.h"
 #include "mythverbose.h"
 
-InteractiveTV::InteractiveTV(NuppelVideoPlayer *nvp)
+InteractiveTV::InteractiveTV(MythPlayer *nvp)
     : m_context(new MHIContext(this)), m_nvp(nvp)
 {
     Restart(0, 0, false);

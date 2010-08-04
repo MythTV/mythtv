@@ -16,7 +16,7 @@
 #include "mythconfig.h"
 
 #include "RingBuffer.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "previewgenerator.h"
 #include "tv_rec.h"
 #include "mythsocket.h"
@@ -673,14 +673,14 @@ char *PreviewGenerator::GetScreenGrab(
     PlayerContext *ctx = new PlayerContext(kPreviewGeneratorInUseID);
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
-    ctx->SetNVP(new NuppelVideoPlayer());
-    ctx->nvp->SetPlayerInfo(NULL, NULL, true, ctx);
+    ctx->SetPlayer(new MythPlayer());
+    ctx->player->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (time_in_secs)
-        retbuf = ctx->nvp->GetScreenGrab(seektime, bufferlen,
+        retbuf = ctx->player->GetScreenGrab(seektime, bufferlen,
                                     video_width, video_height, video_aspect);
     else
-        retbuf = ctx->nvp->GetScreenGrabAtFrame(
+        retbuf = ctx->player->GetScreenGrabAtFrame(
             seektime, true, bufferlen,
             video_width, video_height, video_aspect);
 

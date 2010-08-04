@@ -1,10 +1,10 @@
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "audiooutput.h"
 #include "audioplayer.h"
 
 #define LOC QString("AudioPlayer: ")
 
-AudioPlayer::AudioPlayer(NuppelVideoPlayer *parent, bool muted)
+AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),    m_audioOutput(NULL),
     m_channels(2),       m_codec(0),            m_format(FORMAT_NONE),
     m_samplerate(44100), m_stretchfactor(1.0f), m_lock(QMutex::Recursive),

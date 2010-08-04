@@ -109,7 +109,7 @@ void ImportRecorder::StartRecording(void)
         PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
         ctx->SetPlayingInfo(curRecording);
         ctx->SetRingBuffer(rb);
-        ctx->SetNVP(cfp);
+        ctx->SetPlayer(cfp);
         cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
         cfp->RebuildSeekTable(false);

@@ -6,7 +6,7 @@
 
 // MythTV headers
 #include "mythcorecontext.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 // Commercial Flagging headers
 #include "CommDetector2.h"
@@ -208,8 +208,7 @@ HistogramAnalyzer::~HistogramAnalyzer()
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
-        long long nframes)
+HistogramAnalyzer::MythPlayerInited(MythPlayer *player, long long nframes)
 {
     if (histval_done)
         return FrameAnalyzer::ANALYZE_FINISHED;
@@ -217,7 +216,7 @@ HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
     if (monochromatic)
         return FrameAnalyzer::ANALYZE_OK;
 
-    QSize buf_dim = nvp->GetVideoBufferSize();
+    QSize buf_dim = player->GetVideoBufferSize();
     unsigned int width  = buf_dim.width();
     unsigned int height = buf_dim.height();
 
@@ -232,13 +231,13 @@ HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
             QString("no logo");
 
     VERBOSE(VB_COMMFLAG, QString(
-                "HistogramAnalyzer::nuppelVideoPlayerInited %1x%2: %3")
+                "HistogramAnalyzer::MythPlayerInited %1x%2: %3")
             .arg(width).arg(height).arg(details));
 
-    if (pgmConverter->nuppelVideoPlayerInited(nvp))
+    if (pgmConverter->MythPlayerInited(player))
         return FrameAnalyzer::ANALYZE_FATAL;
 
-    if (borderDetector->nuppelVideoPlayerInited(nvp))
+    if (borderDetector->MythPlayerInited(player))
         return FrameAnalyzer::ANALYZE_FATAL;
 
     mean = new float[nframes];
@@ -270,7 +269,7 @@ HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
                     fwidth, fheight, histogram, monochromatic, nframes))
         {
             VERBOSE(VB_COMMFLAG, QString(
-                        "HistogramAnalyzer::nuppelVideoPlayerInited read %1")
+                        "HistogramAnalyzer::MythPlayerInited read %1")
                     .arg(debugdata));
             histval_done = true;
             return FrameAnalyzer::ANALYZE_FINISHED;

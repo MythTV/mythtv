@@ -5,13 +5,13 @@
 
 #include "mythverbose.h"
 #include "decoderbase.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "cc708reader.h"
 
 #define LOC QString("CC708Reader: ")
 #define CHECKENABLED if (!enabled) return;
 
-CC708Reader::CC708Reader(NuppelVideoPlayer *owner)
+CC708Reader::CC708Reader(MythPlayer *owner)
   : currentservice(1), parent(owner), enabled(false)
 {
     for (uint i=0; i<64; i++)

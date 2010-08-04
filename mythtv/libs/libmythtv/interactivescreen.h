@@ -2,12 +2,12 @@
 #define INTERACTIVESCREEN_H
 
 #include "mythscreentype.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 class InteractiveScreen : public MythScreenType
 {
   public:
-    InteractiveScreen(NuppelVideoPlayer *player, const QString &name);
+    InteractiveScreen(MythPlayer *player, const QString &name);
     virtual ~InteractiveScreen();
     virtual bool Create(void)
     {
@@ -21,8 +21,8 @@ class InteractiveScreen : public MythScreenType
     virtual void Close();
 
   private:
-    NuppelVideoPlayer *m_player;
-    QRect m_safeArea;
+    MythPlayer *m_player;
+    QRect       m_safeArea;
 };
 
 #endif // INTERACTIVESCREEN_H

@@ -78,7 +78,7 @@ class AvFormatDecoder : public DecoderBase
     friend void HandleStreamChange(void*);
   public:
     static void GetDecoders(render_opts &opts);
-    AvFormatDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo,
+    AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     bool use_null_video_out,
                     bool allow_private_decode = true,
                     bool no_hardware_decode = false);

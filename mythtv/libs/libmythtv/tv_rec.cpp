@@ -19,7 +19,6 @@ using namespace std;
 #include "recordingprofile.h"
 #include "util.h"
 #include "programinfo.h"
-#include "NuppelVideoPlayer.h"
 #include "dtvsignalmonitor.h"
 #include "mythdb.h"
 #include "jobqueue.h"

@@ -2,10 +2,10 @@ extern "C" {
 #include "vbitext/vbi.h"
 }
 
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "cc608reader.h"
 
-CC608Reader::CC608Reader(NuppelVideoPlayer *parent)
+CC608Reader::CC608Reader(MythPlayer *parent)
   : m_parent(parent),   m_enabled(false), m_readPosition(0),
     m_writePosition(0), m_maxTextSize(0), m_ccMode(CC_CC1),
     m_ccPageNum(0x888), m_outputText(""), m_outputCol(0),

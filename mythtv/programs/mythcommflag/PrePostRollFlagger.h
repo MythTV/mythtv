@@ -7,7 +7,7 @@ class PrePostRollFlagger : public ClassicCommDetector
 {
 public:
     PrePostRollFlagger(SkipType commDetectMethod, bool showProgress,
-                            bool fullSpeed, NuppelVideoPlayer* nvp,
+                            bool fullSpeed, MythPlayer* player,
                             const QDateTime& startedAt_in,
                             const QDateTime& stopsAt_in,
                             const QDateTime& recordingStartedAt_in,

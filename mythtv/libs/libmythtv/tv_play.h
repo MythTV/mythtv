@@ -41,7 +41,7 @@ using namespace std;
 class QDateTime;
 class OSD;
 class RemoteEncoder;
-class NuppelVideoPlayer;
+class MythPlayer;
 class DetectLetterbox;
 class RingBuffer;
 class ProgramInfo;
@@ -419,7 +419,7 @@ class MPUBLIC TV : public QThread
     bool SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                           const bool isDVD);
     void DoSeek(PlayerContext*, float time, const QString &mesg);
-    bool DoNVPSeek(PlayerContext*, float time);
+    bool DoPlayerSeek(PlayerContext*, float time);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
         ARBSEEK_REWIND,
@@ -490,11 +490,11 @@ class MPUBLIC TV : public QThread
     bool StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
                      TVState desiredState);
 
-    vector<long long> TeardownAllNVPs(PlayerContext*);
-    void RestartAllNVPs(PlayerContext *lctx,
-                        const vector<long long> &pos,
-                        MuteState mctx_mute);
-    void RestartMainNVP(PlayerContext *mctx);
+    vector<long long> TeardownAllPlayers(PlayerContext*);
+    void RestartAllPlayers(PlayerContext *lctx,
+                           const vector<long long> &pos,
+                           MuteState mctx_mute);
+    void RestartMainPlayer(PlayerContext *mctx);
 
     void PxPToggleView(  PlayerContext *actx, bool wantPBP);
     void PxPCreateView(  PlayerContext *actx, bool wantPBP);
@@ -505,7 +505,7 @@ class MPUBLIC TV : public QThread
 
     bool PIPAddPlayer(   PlayerContext *mctx, PlayerContext *ctx);
     bool PIPRemovePlayer(PlayerContext *mctx, PlayerContext *ctx);
-    void PBPRestartMainNVP(PlayerContext *mctx);
+    void PBPRestartMainPlayer(PlayerContext *mctx);
 
     void ToggleAutoExpire(PlayerContext*);
 
@@ -641,7 +641,7 @@ class MPUBLIC TV : public QThread
     void SetLastProgram(const ProgramInfo *rcinfo);
     ProgramInfo *GetLastProgram(void) const;
 
-    static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,
+    static bool LoadExternalSubtitles(MythPlayer *player,
                                       const QString &videoFile);
 
     static QStringList GetValidRecorderList(uint chanid);
@@ -712,7 +712,7 @@ class MPUBLIC TV : public QThread
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?
-    bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying()
+    bool endOfRecording; ///< !player->IsPlaying() && StateIsPlaying()
     bool requestDelete;  ///< User wants last video deleted
     bool allowRerecord;  ///< User wants to rerecord the last video if deleted
     bool doSmartForward;

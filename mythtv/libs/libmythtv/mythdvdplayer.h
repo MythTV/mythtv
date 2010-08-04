@@ -1,9 +1,9 @@
 #ifndef MYTHDVDPLAYER_H
 #define MYTHDVDPLAYER_H
 
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
-class MythDVDPlayer : public NuppelVideoPlayer
+class MythDVDPlayer : public MythPlayer
 {
   public:
     MythDVDPlayer(bool muted = false);

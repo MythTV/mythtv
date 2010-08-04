@@ -1,5 +1,5 @@
 #include "mythcontext.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "videooutbase.h"
 #include "videoout_vdpau.h"
 #include "videodisplayprofile.h"
@@ -1039,7 +1039,7 @@ void VideoOutputVDPAU::DeinitPIPLayer(void)
     m_pip_ready = false;
 }
 
-void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, NuppelVideoPlayer *pipplayer,
+void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
                                PIPLocation loc)
 {
     (void) frame;
@@ -1130,7 +1130,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, NuppelVideoPlayer *pipplayer,
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
-void VideoOutputVDPAU::RemovePIP(NuppelVideoPlayer *pipplayer)
+void VideoOutputVDPAU::RemovePIP(MythPlayer *pipplayer)
 {
     if (!m_pips.contains(pipplayer))
         return;

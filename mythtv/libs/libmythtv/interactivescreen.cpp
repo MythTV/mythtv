@@ -1,6 +1,6 @@
 #include "interactivescreen.h"
 
-InteractiveScreen::InteractiveScreen(NuppelVideoPlayer *player,
+InteractiveScreen::InteractiveScreen(MythPlayer *player,
                                      const QString &name) :
     MythScreenType((MythScreenType*)NULL, name),
     m_player(player),  m_safeArea(QRect())

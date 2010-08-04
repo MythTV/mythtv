@@ -6,7 +6,7 @@
 
 // MythTV headers
 #include "mythverbose.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "frame.h"          /* VideoFrame */
 
 // Commercial Flagging headers
@@ -38,7 +38,7 @@ PGMConverter::~PGMConverter(void)
 }
 
 int
-PGMConverter::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
+PGMConverter::MythPlayerInited(const MythPlayer *player)
 {
 #ifdef PGM_CONVERT_GREYSCALE
     time_reported = false;
@@ -48,22 +48,22 @@ PGMConverter::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
     if (width != -1)
         return 0;
 
-    QSize buf_dim = nvp->GetVideoBufferSize();
+    QSize buf_dim = player->GetVideoBufferSize();
     width  = buf_dim.width();
     height = buf_dim.height();
 
 #ifdef PGM_CONVERT_GREYSCALE
     if (avpicture_alloc(&pgm, PIX_FMT_GRAY8, width, height))
     {
-        VERBOSE(VB_COMMFLAG, QString("PGMConverter::nuppelVideoPlayerInited "
+        VERBOSE(VB_COMMFLAG, QString("PGMConverter::MythPlayerInited "
                 "avpicture_alloc pgm (%1x%2) failed")
                 .arg(width).arg(height));
         return -1;
     }
-    VERBOSE(VB_COMMFLAG, QString("PGMConverter::nuppelVideoPlayerInited "
+    VERBOSE(VB_COMMFLAG, QString("PGMConverter::MythPlayerInited "
                 "using true greyscale conversion"));
 #else  /* !PGM_CONVERT_GREYSCALE */
-    VERBOSE(VB_COMMFLAG, QString("PGMConverter::nuppelVideoPlayerInited "
+    VERBOSE(VB_COMMFLAG, QString("PGMConverter::MythPlayerInited "
                 "(YUV shortcut)"));
 #endif /* !PGM_CONVERT_GREYSCALE */
 

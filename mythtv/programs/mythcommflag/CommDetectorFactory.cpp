@@ -3,14 +3,14 @@
 #include "CommDetector2.h"
 #include "PrePostRollFlagger.h"
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class RemoteEncoder;
 
 CommDetectorBase*
 CommDetectorFactory::makeCommDetector(
     SkipType commDetectMethod,
     bool showProgress, bool fullSpeed,
-    NuppelVideoPlayer* nvp,
+    MythPlayer* player,
     int chanid,
     const QDateTime& startedAt,
     const QDateTime& stopsAt,
@@ -21,7 +21,7 @@ CommDetectorFactory::makeCommDetector(
     if(commDetectMethod & COMM_DETECT_PREPOSTROLL)
     {
         return new PrePostRollFlagger(commDetectMethod, showProgress, fullSpeed,
-                                      nvp, startedAt, stopsAt,
+                                      player, startedAt, stopsAt,
                                       recordingStartedAt, recordingStopsAt);
     }
 
@@ -29,12 +29,12 @@ CommDetectorFactory::makeCommDetector(
     {
         return new CommDetector2(
             commDetectMethod, showProgress, fullSpeed,
-            nvp, chanid, startedAt, stopsAt,
+            player, chanid, startedAt, stopsAt,
             recordingStartedAt, recordingStopsAt, useDB);
     }
 
     return new ClassicCommDetector(commDetectMethod, showProgress, fullSpeed,
-            nvp, startedAt, stopsAt, recordingStartedAt, recordingStopsAt);
+            player, startedAt, stopsAt, recordingStartedAt, recordingStopsAt);
 }
 
 

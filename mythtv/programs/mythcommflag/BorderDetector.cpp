@@ -39,9 +39,9 @@ BorderDetector::BorderDetector(void)
 }
 
 int
-BorderDetector::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
+BorderDetector::MythPlayerInited(const MythPlayer *player)
 {
-    (void)nvp;  /* gcc */
+    (void)player;  /* gcc */
     time_reported = false;
     memset(&analyze_time, 0, sizeof(analyze_time));
     return 0;

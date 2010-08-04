@@ -15,7 +15,7 @@ using namespace std;
 // MythTV headers
 #include "mythcontext.h"
 #include "programinfo.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 // Commercial Flagging headers
 #include "ClassicCommDetector.h"
@@ -118,7 +118,7 @@ QString FrameInfoEntry::toString(uint64_t frame, bool verbose) const
 ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
-                                         NuppelVideoPlayer* nvp_in,
+                                         MythPlayer* player_in,
                                          const QDateTime& startedAt_in,
                                          const QDateTime& stopsAt_in,
                                          const QDateTime& recordingStartedAt_in,
@@ -140,7 +140,7 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     sceneHasChanged(false),                    stationLogoPresent(false),
     lastFrameWasBlank(false),                  lastFrameWasSceneChange(false),
     decoderFoundAspectChanges(false),          sceneChangeDetector(0),
-    nvp(nvp_in),
+    player(player_in),
     startedAt(startedAt_in),                   stopsAt(stopsAt_in),
     recordingStartedAt(recordingStartedAt_in),
     recordingStopsAt(recordingStopsAt_in),     aggressiveDetection(false),
@@ -177,10 +177,10 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
 
 void ClassicCommDetector::Init()
 {
-    QSize video_disp_dim = nvp->GetVideoSize();
+    QSize video_disp_dim = player->GetVideoSize();
     width  = video_disp_dim.width();
     height = video_disp_dim.height();
-    fps = nvp->GetFrameRate();
+    fps = player->GetFrameRate();
 
     preRoll  = (long long)(max(0,recordingStartedAt.secsTo(startedAt)) * fps);
     postRoll = (long long)(max(0,stopsAt.secsTo(recordingStopsAt)) * fps);
@@ -201,7 +201,7 @@ void ClassicCommDetector::Init()
 
     VERBOSE(VB_COMMFLAG, "Commercial Detection initialized: width = " <<
             width << ", height = " << height << ", fps = " <<
-            nvp->GetFrameRate() << ", method = " << commDetectMethod);
+            player->GetFrameRate() << ", method = " << commDetectMethod);
 
     if ((width * height) > 1000000)
     {
@@ -285,7 +285,7 @@ void ClassicCommDetector::deleteLater(void)
 
 bool ClassicCommDetector::go()
 {
-    nvp->SetNullVideo();
+    player->SetNullVideo();
 
     int secsSince = 0;
     int requiredBuffer = 30;
@@ -304,7 +304,7 @@ bool ClassicCommDetector::go()
         secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
     }
 
-    if (nvp->OpenFile() < 0)
+    if (player->OpenFile() < 0)
         return false;
 
     Init();
@@ -336,13 +336,13 @@ bool ClassicCommDetector::go()
 
     aggressiveDetection = gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
 
-    if (!nvp->InitVideo())
+    if (!player->InitVideo())
     {
         VERBOSE(VB_IMPORTANT,
                 "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
-    nvp->SetCaptionsEnabled(false);
+    player->SetCaptionsEnabled(false);
 
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
@@ -354,7 +354,7 @@ bool ClassicCommDetector::go()
             cerr.flush();
         }
 
-        logoInfoAvailable = logoDetector->searchForLogo(nvp);
+        logoInfoAvailable = logoDetector->searchForLogo(player);
 
         if (showProgress)
         {
@@ -373,9 +373,9 @@ bool ClassicCommDetector::go()
     
     long long myTotalFrames;
     if (recordingStopsAt < QDateTime::currentDateTime() )
-        myTotalFrames = nvp->GetTotalFrameCount();
+        myTotalFrames = player->GetTotalFrameCount();
     else
-        myTotalFrames = (long long)(nvp->GetFrameRate() *
+        myTotalFrames = (long long)(player->GetFrameRate() *
                         (recordingStartedAt.secsTo(recordingStopsAt)));
 
     if (showProgress)
@@ -390,27 +390,27 @@ bool ClassicCommDetector::go()
  
     float flagFPS;
     long long  currentFrameNumber;
-    float aspect = nvp->GetVideoAspect();
+    float aspect = player->GetVideoAspect();
     float newAspect = aspect;
 
     SetVideoParams(aspect);
 
     emit breathe();
 
-    while (!nvp->GetEof())
+    while (!player->GetEof())
     {
         struct timeval startTime;
         if (stillRecording)
             gettimeofday(&startTime, NULL);
 
-        VideoFrame* currentFrame = nvp->GetRawVideoFrame();
+        VideoFrame* currentFrame = player->GetRawVideoFrame();
         currentFrameNumber = currentFrame->frameNumber;
 
         //Lucas: maybe we should make the nuppelvideoplayer send out a signal
         //when the aspect ratio changes.
         //In order to not change too many things at a time, I"m using basic
         //polling for now.
-        newAspect = nvp->GetVideoAspect();
+        newAspect = player->GetVideoAspect();
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);
@@ -424,7 +424,7 @@ bool ClassicCommDetector::go()
             emit breathe();
             if (m_bStop)
             {
-                nvp->DiscardVideoFrame(currentFrame);
+                player->DiscardVideoFrame(currentFrame);
                 return false;
             }
         }
@@ -534,7 +534,7 @@ bool ClassicCommDetector::go()
                 recordingStartedAt.secsTo(QDateTime::currentDateTime());
             int secondsFlagged = (int)(framesProcessed / fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
+            long usecPerFrame = (long)(1.0 / player->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, NULL);
@@ -558,7 +558,7 @@ bool ClassicCommDetector::go()
                 usleep(usecSleep);
         }
 
-        nvp->DiscardVideoFrame(currentFrame);
+        player->DiscardVideoFrame(currentFrame);
     }
 
     if (showProgress)

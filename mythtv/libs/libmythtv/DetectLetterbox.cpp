@@ -2,11 +2,11 @@
 
 // MythTV headers
 #include "DetectLetterbox.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "videoouttypes.h"
 #include "mythcorecontext.h"
 
-DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
+DetectLetterbox::DetectLetterbox(MythPlayer* const player)
 {
     int dbAdjustFill = gCoreContext->GetNumSetting("AdjustFill", 0);
     isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
@@ -17,9 +17,9 @@ DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
     detectLetterboxPossibleHalfFrame = -1;
     detectLetterboxPossibleFullFrame = -1;
     detectLetterboxConsecutiveCounter = 0;
-    detectLetterboxDetectedMode = nvp->GetAdjustFill();
+    detectLetterboxDetectedMode = player->GetAdjustFill();
     detectLetterboxLimit = gCoreContext->GetNumSetting("DetectLeterboxLimit", 75);
-    nupple_video_player = nvp;
+    m_player = player;
 }
 
 DetectLetterbox::~DetectLetterbox()
@@ -48,8 +48,8 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     //    const int fullLimit = (int) (((height - width * 9 / 16) / 2) * detectLetterboxLimit / 100);
     //    const int halfLimit = (int) (((height - width * 9 / 14) / 2) * detectLetterboxLimit / 100);
     // If the black bars is larger than this limit we switch to Half or Full Mode
-    const int fullLimit = (int) ((height * (1 - nupple_video_player->GetVideoAspect() * 9 / 16) / 2) * detectLetterboxLimit / 100);
-    const int halfLimit = (int) ((height * (1 - nupple_video_player->GetVideoAspect() * 9 / 14) / 2) * detectLetterboxLimit / 100);
+    const int fullLimit = (int) ((height * (1 - m_player->GetVideoAspect() * 9 / 16) / 2) * detectLetterboxLimit / 100);
+    const int halfLimit = (int) ((height * (1 - m_player->GetVideoAspect() * 9 / 14) / 2) * detectLetterboxLimit / 100);
 
     const int xPos[] = {width / 4, width / 2, width * 3 / 4};    // Lines to scan for black letterbox edge
     int topHits = 0, bottomHits = 0, minTop = 0, minBottom = 0, maxTop = 0, maxBottom = 0;
@@ -58,7 +58,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     if (!GetDetectLetterbox())
         return;
 
-    if (!nupple_video_player->getVideoOutput())
+    if (!m_player->getVideoOutput())
         return;
 
     switch (frame->codec) {
@@ -85,13 +85,13 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         return;
     }
 
-    if (nupple_video_player->GetVideoAspect() > 1.5)
+    if (m_player->GetVideoAspect() > 1.5)
     {
         if (detectLetterboxDetectedMode != detectLetterboxDefaultMode)
         {
             VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is "
                     "already in widescreen (aspect: %1)")
-                    .arg(nupple_video_player->GetVideoAspect()));
+                    .arg(m_player->GetVideoAspect()));
             detectLetterboxLock.lock();
             detectLetterboxConsecutiveCounter = 0;
             detectLetterboxDetectedMode = detectLetterboxDefaultMode;
@@ -104,7 +104,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         }
         VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is already "
                 "in widescreen (aspect: %1)")
-                .arg(nupple_video_player->GetVideoAspect()));
+                .arg(m_player->GetVideoAspect()));
         isDetectLetterbox = false;
         return;
     }
@@ -177,7 +177,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
     if (detectLetterboxSwitchFrame > frameNumber) // user is reversing
     {
         detectLetterboxLock.lock();
-        detectLetterboxDetectedMode = nupple_video_player->GetAdjustFill();
+        detectLetterboxDetectedMode = m_player->GetAdjustFill();
         detectLetterboxSwitchFrame = -1;
         detectLetterboxPossibleHalfFrame = -1;
         detectLetterboxPossibleFullFrame = -1;
@@ -295,13 +295,13 @@ void DetectLetterbox::SwitchTo(VideoFrame *frame)
         if (detectLetterboxSwitchFrame <= frame->frameNumber &&
             detectLetterboxConsecutiveCounter > 3)
         {
-            if (nupple_video_player->GetAdjustFill() != detectLetterboxDetectedMode)
+            if (m_player->GetAdjustFill() != detectLetterboxDetectedMode)
             {
                 VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Switched to %1 "
                         "on frame %2 (%3)").arg(detectLetterboxDetectedMode)
                         .arg(frame->frameNumber).arg(detectLetterboxSwitchFrame));
-                nupple_video_player->getVideoOutput()->ToggleAdjustFill(detectLetterboxDetectedMode);
-                nupple_video_player->ReinitOSD();
+                m_player->getVideoOutput()->ToggleAdjustFill(detectLetterboxDetectedMode);
+                m_player->ReinitOSD();
             }
             detectLetterboxSwitchFrame = -1;
         }
@@ -321,7 +321,7 @@ void DetectLetterbox::SetDetectLetterbox(bool detect)
 {
     isDetectLetterbox = detect;
     detectLetterboxSwitchFrame = -1;
-    detectLetterboxDetectedMode = nupple_video_player->GetAdjustFill();
+    detectLetterboxDetectedMode = m_player->GetAdjustFill();
     firstFrameChecked = 0;
 }
 

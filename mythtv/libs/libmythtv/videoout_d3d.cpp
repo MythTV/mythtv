@@ -13,7 +13,7 @@ using namespace std;
 #include "videodisplayprofile.h"
 #include "mythmainwindow.h"
 #include "myth_imgconvert.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 #include "mmsystem.h"
 #include "tv.h"
@@ -273,7 +273,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
             if (ok)
             {
                 m_video->Draw();
-                QMap<NuppelVideoPlayer*,D3D9Image*>::iterator it = m_pips.begin();
+                QMap<MythPlayer*,D3D9Image*>::iterator it = m_pips.begin();
                 for (; it != m_pips.end(); ++it)
                 {
                     if (m_pip_ready[it.key()])
@@ -457,7 +457,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
 }
 
 void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
-                             NuppelVideoPlayer *pipplayer,
+                             MythPlayer *pipplayer,
                              PIPLocation        loc)
 {
     if (!pipplayer)
@@ -520,7 +520,7 @@ void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
-void VideoOutputD3D::RemovePIP(NuppelVideoPlayer *pipplayer)
+void VideoOutputD3D::RemovePIP(MythPlayer *pipplayer)
 {
     if (!m_pips.contains(pipplayer))
         return;

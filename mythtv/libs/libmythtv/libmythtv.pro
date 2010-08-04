@@ -246,13 +246,13 @@ using_frontend {
     SOURCES += profilegroup.cpp
 
     # Video playback
-    HEADERS += tv_play.h                NuppelVideoPlayer.h
+    HEADERS += tv_play.h                mythplayer.h
     HEADERS += mythdvdplayer.h          audioplayer.h
     HEADERS += DVDRingBuffer.h          playercontext.h
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
     HEADERS += BDRingBuffer.h           mythbdplayer.h
-    SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
+    SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += mythdvdplayer.cpp        audioplayer.cpp
     SOURCES += DVDRingBuffer.cpp        playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp

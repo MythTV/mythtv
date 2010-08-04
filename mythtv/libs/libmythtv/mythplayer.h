@@ -1,5 +1,5 @@
-#ifndef NUPPELVIDEOPLAYER
-#define NUPPELVIDEOPLAYER
+#ifndef MYTHPLAYER_H
+#define MYTHPLAYER_H
 
 #include <sys/time.h>
 
@@ -52,7 +52,7 @@ struct SwsContext;
 class InteractiveTV;
 class NSAutoreleasePool;
 class DetectLetterbox;
-class NuppelVideoPlayer;
+class MythPlayer;
 
 typedef  void (*StatusCallback)(int, void*);
 
@@ -85,14 +85,14 @@ class PlayerTimer : public QObject
 {
     Q_OBJECT
   public:
-    PlayerTimer(NuppelVideoPlayer *nvp);
+    PlayerTimer(MythPlayer *mp);
     void PostNextEvent(void);
     virtual bool event(QEvent *e);
     static enum QEvent::Type kPlayerEventType;
 
   private:
-    NuppelVideoPlayer *m_nvp;
-    uint32_t           m_queue_size;
+    MythPlayer *m_mp;
+    uint32_t    m_queue_size;
 };
 
 class DecoderThread : public QThread
@@ -100,18 +100,18 @@ class DecoderThread : public QThread
     Q_OBJECT
 
   public:
-    DecoderThread(NuppelVideoPlayer *nvp, bool start_paused)
-      : QThread(NULL), m_nvp(nvp), m_start_paused(start_paused) { }
+    DecoderThread(MythPlayer *mp, bool start_paused)
+      : QThread(NULL), m_mp(mp), m_start_paused(start_paused) { }
 
   protected:
     virtual void run(void);
 
   private:
-    NuppelVideoPlayer *m_nvp;
-    bool               m_start_paused;
+    MythPlayer *m_mp;
+    bool        m_start_paused;
 };
 
-class MPUBLIC NuppelVideoPlayer
+class MPUBLIC MythPlayer
 {
     friend class PlayerContext;
     friend class PlayerTimer;
@@ -120,8 +120,8 @@ class MPUBLIC NuppelVideoPlayer
     friend class DecoderThread;
 
   public:
-    NuppelVideoPlayer(bool muted = false);
-   ~NuppelVideoPlayer();
+    MythPlayer(bool muted = false);
+   ~MythPlayer();
 
     // Initialization
     bool InitVideo(void);
@@ -154,8 +154,8 @@ class MPUBLIC NuppelVideoPlayer
     void SetEof(void)                         { eof = true; }
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
-    bool AddPIPPlayer(NuppelVideoPlayer *pip, PIPLocation loc, uint timeout);
-    bool RemovePIPPlayer(NuppelVideoPlayer *pip, uint timeout);
+    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
+    bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
     void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
 
     void SetTranscoding(bool value);
@@ -349,8 +349,8 @@ class MPUBLIC NuppelVideoPlayer
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     QStringList GetTracks(uint type);
     virtual int SetTrack(uint type, int trackNo);
-    int GetTrack(uint type);
-    int ChangeTrack(uint type, int dir);
+    int  GetTrack(uint type);
+    int  ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
     int  NextCaptionTrack(int mode);
     void TracksChanged(uint trackType);

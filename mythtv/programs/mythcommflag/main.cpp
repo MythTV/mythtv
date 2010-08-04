@@ -174,7 +174,7 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     PlayerContext *ctx = new PlayerContext("seektable rebuilder");
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
-    ctx->SetNVP(cfp);
+    ctx->SetPlayer(cfp);
     cfp->SetPlayerInfo(NULL, NULL, true, ctx);
     cfp->RebuildSeekTable(!quiet);
 
@@ -758,7 +758,7 @@ int FlagCommercials(
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
-    ctx->SetNVP(cfp);
+    ctx->SetPlayer(cfp);
     cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (rebuildSeekTable)

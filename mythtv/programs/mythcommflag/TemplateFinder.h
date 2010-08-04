@@ -32,12 +32,12 @@ class TemplateFinder : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     TemplateFinder(PGMConverter *pgmc, BorderDetector *bd, EdgeDetector *ed,
-            NuppelVideoPlayer *nvp, int proglen, QString debugdir);
+            MythPlayer *player, int proglen, QString debugdir);
     ~TemplateFinder(void);
 
     /* FrameAnalyzer interface. */
     const char *name(void) const { return "TemplateFinder"; }
-    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+    enum analyzeFrameResult MythPlayerInited(MythPlayer *player,
             long long nframes);
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame);

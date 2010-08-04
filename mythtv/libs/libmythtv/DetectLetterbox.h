@@ -1,15 +1,15 @@
 // -*- Mode: c++ -*-
 
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 using namespace std;
 
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class MPUBLIC DetectLetterbox
 {
 public:
-    DetectLetterbox(NuppelVideoPlayer* const nvp);
+    DetectLetterbox(MythPlayer* const player);
     ~DetectLetterbox();
     void SetDetectLetterbox(bool detect);
     bool GetDetectLetterbox();
@@ -27,7 +27,7 @@ private:
     long long detectLetterboxPossibleFullFrame;
     int detectLetterboxConsecutiveCounter;
 
-    NuppelVideoPlayer *nupple_video_player;
+    MythPlayer *m_player;
 
     int detectLetterboxLimit;
     QMutex detectLetterboxLock;

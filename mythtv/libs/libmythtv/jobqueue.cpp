@@ -19,7 +19,6 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcorecontext.h"
 #include "util.h"
-#include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"

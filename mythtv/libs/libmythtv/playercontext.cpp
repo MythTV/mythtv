@@ -5,7 +5,7 @@
 #include "mythconfig.h"
 
 #include "playercontext.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "mythdvdplayer.h"
 #include "mythbdplayer.h"
 #include "remoteencoder.h"
@@ -25,17 +25,17 @@ const uint PlayerContext::kMaxChannelHistory = 30;
 
 void PlayerThread::run(void)
 {
-    if (!m_nvp)
+    if (!m_player)
         return;
 
     VERBOSE(VB_PLAYBACK, QString("PiP thread starting"));
-    m_nvp->StartPlaying();
+    m_player->StartPlaying();
     exec();
     VERBOSE(VB_PLAYBACK, QString("PiP thread finishing"));
 }
 
 PlayerContext::PlayerContext(const QString &inUseID) :
-    recUsage(inUseID), nvp(NULL), nvpUnsafe(false), recorder(NULL),
+    recUsage(inUseID), player(NULL), playerUnsafe(false), recorder(NULL),
     tvchain(NULL), buffer(NULL), playingInfo(NULL),
     playingLen(0), nohardwaredecoders(false), last_cardid(-1), last_framerate(30.0f),
     // Fast forward state
@@ -49,7 +49,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     fftime(0), rewtime(0),
     jumptime(0), ts_normal(1.0f), ts_alt(1.5f),
     // locks
-    playingInfoLock(QMutex::Recursive), deleteNVPLock(QMutex::Recursive),
+    playingInfoLock(QMutex::Recursive), deletePlayerLock(QMutex::Recursive),
     stateLock(QMutex::Recursive),
     // pip
     pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL), pipLocation(0),
@@ -74,7 +74,7 @@ void PlayerContext::TeardownPlayer(void)
     ff_rew_speed = 0;
     ts_normal    = 1.0f;
 
-    SetNVP(NULL);
+    SetPlayer(NULL);
     SetRecorder(NULL);
     SetRingBuffer(NULL);
     SetTVChain(NULL);
@@ -132,10 +132,10 @@ void PlayerContext::SetInitialTVState(bool islivetv)
 bool PlayerContext::IsPIPSupported(void) const
 {
     bool supported = false;
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (player)
     {
-        const VideoOutput *vid = nvp->getVideoOutput();
+        const VideoOutput *vid = player->getVideoOutput();
         if (vid)
             supported = vid->IsPIPSupported();
     }
@@ -150,10 +150,10 @@ bool PlayerContext::IsPIPSupported(void) const
 bool PlayerContext::IsPBPSupported(void) const
 {
     bool supported = false;
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (player)
     {
-        const VideoOutput *vid = nvp->getVideoOutput();
+        const VideoOutput *vid = player->getVideoOutput();
         if (vid)
             supported = vid->IsPBPSupported();
     }
@@ -192,13 +192,13 @@ void PlayerContext::CreatePIPWindow(const QRect &rect, int pos,
 QRect PlayerContext::GetStandAlonePIPRect(void)
 {
     QRect rect = QRect(0, 0, 0, 0);
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (player)
     {
         rect = QRect(pipRect);
 
         float saspect = (float)rect.width() / (float)rect.height();
-        float vaspect = nvp->GetVideoAspect();
+        float vaspect = player->GetVideoAspect();
 
         // Calculate new height or width according to relative aspect ratio
         if ((int)((saspect + 0.05) * 10) > (int)((vaspect + 0.05) * 10))
@@ -224,16 +224,16 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
     if (!useNullVideo && parentWidget)
     {
         const QRect rect = QRect(pipRect);
-        ok = CreateNVP(tv, parentWidget, desiredState,
-                     parentWidget->winId(), &rect);
+        ok = CreatePlayer(tv, parentWidget, desiredState,
+                          parentWidget->winId(), &rect);
     }
 
     if (useNullVideo || !ok)
     {
-        SetNVP(NULL);
+        SetPlayer(NULL);
         useNullVideo = true;
-        ok = CreateNVP(tv, NULL, desiredState,
-                        0, NULL);
+        ok = CreatePlayer(tv, NULL, desiredState,
+                          0, NULL);
     }
 
     playerNeedsThread = false;
@@ -242,7 +242,7 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
 
 
 /**
- * \brief stop NVP but pause the ringbuffer. used in PIP/PBP swap or
+ * \brief stop player but pause the ringbuffer. used in PIP/PBP swap or
  * switching from PIP <-> PBP or enabling PBP
  */
 
@@ -255,11 +255,11 @@ void PlayerContext::PIPTeardown(void)
     }
 
     {
-        QMutexLocker locker(&deleteNVPLock);
+        QMutexLocker locker(&deletePlayerLock);
         StopPlaying();
     }
 
-    SetNVP(NULL);
+    SetPlayer(NULL);
 
     useNullVideo = false;
     parentWidget = NULL;
@@ -279,10 +279,10 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
     else
         tmpRect = QRect(rect);
 
-    LockDeleteNVP(__FILE__, __LINE__);
-    if (nvp && nvp->getVideoOutput())
-        nvp->getVideoOutput()->ResizeDisplayWindow(tmpRect, false);
-    UnlockDeleteNVP(__FILE__, __LINE__);
+    LockDeletePlayer(__FILE__, __LINE__);
+    if (player && player->getVideoOutput())
+        player->getVideoOutput()->ResizeDisplayWindow(tmpRect, false);
+    UnlockDeletePlayer(__FILE__, __LINE__);
 
     pipRect = QRect(rect);
 }
@@ -291,17 +291,17 @@ bool PlayerContext::StartEmbedding(WId wid, const QRect &embedRect)
 {
     embedWinID = 0;
 
-    LockDeleteNVP(__FILE__, __LINE__);
-    if (nvp)
+    LockDeletePlayer(__FILE__, __LINE__);
+    if (player)
     {
         embedWinID = wid;
         embedBounds = embedRect;
-        nvp->EmbedInWidget(
+        player->EmbedInWidget(
             embedRect.topLeft().x(), embedRect.topLeft().y(),
             embedRect.width(),       embedRect.height(),
             embedWinID);
     }
-    UnlockDeleteNVP(__FILE__, __LINE__);
+    UnlockDeletePlayer(__FILE__, __LINE__);
 
     return embedWinID;
 }
@@ -309,10 +309,10 @@ bool PlayerContext::StartEmbedding(WId wid, const QRect &embedRect)
 bool PlayerContext::IsEmbedding(void) const
 {
     bool ret = false;
-    LockDeleteNVP(__FILE__, __LINE__);
-    if (nvp)
-        ret = nvp->IsEmbedding();
-    UnlockDeleteNVP(__FILE__, __LINE__);
+    LockDeletePlayer(__FILE__, __LINE__);
+    if (player)
+        ret = player->IsEmbedding();
+    UnlockDeletePlayer(__FILE__, __LINE__);
     return ret;
 }
 
@@ -320,46 +320,46 @@ void PlayerContext::StopEmbedding(void)
 {
     embedWinID = 0;
 
-    LockDeleteNVP(__FILE__, __LINE__);
-    if (nvp)
-        nvp->StopEmbedding();
-    UnlockDeleteNVP(__FILE__, __LINE__);
+    LockDeletePlayer(__FILE__, __LINE__);
+    if (player)
+        player->StopEmbedding();
+    UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-bool PlayerContext::HasNVP(void) const
+bool PlayerContext::HasPlayer(void) const
 {
-    QMutexLocker locker(&deleteNVPLock);
-    return nvp;
+    QMutexLocker locker(&deletePlayerLock);
+    return player;
 }
 
-bool PlayerContext::IsNVPErrored(void) const
+bool PlayerContext::IsPlayerErrored(void) const
 {
-    QMutexLocker locker(&deleteNVPLock);
-    return nvp && nvp->IsErrored();
+    QMutexLocker locker(&deletePlayerLock);
+    return player && player->IsErrored();
 }
 
-bool PlayerContext::IsNVPRecoverable(void) const
+bool PlayerContext::IsPlayerRecoverable(void) const
 {
-    QMutexLocker locker(&deleteNVPLock);
-    return nvp && nvp->IsErrorRecoverable();
+    QMutexLocker locker(&deletePlayerLock);
+    return player && player->IsErrorRecoverable();
 }
 
-bool PlayerContext::IsNVPDecoderErrored(void) const
+bool PlayerContext::IsPlayerDecoderErrored(void) const
 {
-    QMutexLocker locker(&deleteNVPLock);
-    return nvp && nvp->IsDecoderErrored();
+    QMutexLocker locker(&deletePlayerLock);
+    return player && player->IsDecoderErrored();
 }
 
-bool PlayerContext::IsNVPPlaying(void) const
+bool PlayerContext::IsPlayerPlaying(void) const
 {
-    QMutexLocker locker(&deleteNVPLock);
-    return nvp && nvp->IsPlaying();
+    QMutexLocker locker(&deletePlayerLock);
+    return player && player->IsPlaying();
 }
 
-bool PlayerContext::HandleNVPSpeedChangeFFRew(void)
+bool PlayerContext::HandlePlayerSpeedChangeFFRew(void)
 {
-    QMutexLocker locker(&deleteNVPLock);
-    if ((ff_rew_state || ff_rew_speed) && nvp && nvp->AtNormalSpeed())
+    QMutexLocker locker(&deletePlayerLock);
+    if ((ff_rew_state || ff_rew_speed) && player && player->AtNormalSpeed())
     {
         ff_rew_speed = 0;
         ff_rew_state = 0;
@@ -369,25 +369,26 @@ bool PlayerContext::HandleNVPSpeedChangeFFRew(void)
     return false;
 }
 
-bool PlayerContext::HandleNVPSpeedChangeEOF(void)
+bool PlayerContext::HandlePlayerSpeedChangeEOF(void)
 {
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp && (nvp->GetNextPlaySpeed() != ts_normal) && nvp->AtNormalSpeed())
+    QMutexLocker locker(&deletePlayerLock);
+    if (player && (player->GetNextPlaySpeed() != ts_normal) &&
+        player->AtNormalSpeed())
     {
-        // Speed got changed in NVP since we are close to the end of file
+        // Speed got changed in player since we are close to the end of file
         ts_normal = 1.0f;
         return true;
     }
     return false;
 }
 
-bool PlayerContext::CalcNVPSliderPosition(osdInfo &info,
-                                          bool paddedFields) const
+bool PlayerContext::CalcPlayerSliderPosition(osdInfo &info,
+                                             bool paddedFields) const
 {
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (player)
     {
-        nvp->calcSliderPos(info);
+        player->calcSliderPos(info);
         return true;
     }
     return false;
@@ -398,68 +399,68 @@ bool PlayerContext::IsRecorderErrored(void) const
     return recorder && recorder->GetErrorStatus();
 }
 
-bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
-                              TVState desiredState,
-                              WId embedwinid, const QRect *embedbounds,
-                              bool muted)
+bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
+                                 TVState desiredState,
+                                 WId embedwinid, const QRect *embedbounds,
+                                 bool muted)
 {
     int exact_seeking = gCoreContext->GetNumSetting("ExactSeeking", 0);
 
-    if (HasNVP())
+    if (HasPlayer())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Attempting to setup a player, but it already exists.");
         return false;
     }
 
-    NuppelVideoPlayer *_nvp = NULL;
+    MythPlayer *player = NULL;
     if (kState_WatchingBD  == desiredState)
-        _nvp = new MythBDPlayer(muted);
+        player = new MythBDPlayer(muted);
     else if (kState_WatchingDVD == desiredState)
-        _nvp = new MythDVDPlayer(muted);
+        player = new MythDVDPlayer(muted);
     else
-        _nvp = new NuppelVideoPlayer(muted);
+        player = new MythPlayer(muted);
 
     if (nohardwaredecoders)
-        _nvp->DisableHardwareDecoders();
+        player->DisableHardwareDecoders();
 
     QString passthru_device = gCoreContext->GetNumSetting("AdvancedAudioSettings", false) &&
                               gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
                                   gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
-    _nvp->SetPlayerInfo(tv, widget, exact_seeking, this);
-    AudioPlayer *audio = _nvp->GetAudio();
+    player->SetPlayerInfo(tv, widget, exact_seeking, this);
+    AudioPlayer *audio = player->GetAudio();
     audio->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"),
                         passthru_device,
                         gCoreContext->GetNumSetting("AudioSampleRate", 44100));
     audio->SetStretchFactor(ts_normal);
-    _nvp->SetLength(playingLen);
+    player->SetLength(playingLen);
 
     if (useNullVideo)
-        _nvp->SetNullVideo();
+        player->SetNullVideo();
 
-    _nvp->SetVideoFilters((useNullVideo) ? "onefield" : "");
+    player->SetVideoFilters((useNullVideo) ? "onefield" : "");
 
     if (!IsAudioNeeded())
         audio->SetNoAudio();
     else
     {
         QString subfn = buffer->GetSubtitleFilename();
-        if (!subfn.isEmpty() && _nvp->GetSubReader())
-            _nvp->GetSubReader()->LoadExternalSubtitles(subfn);
+        if (!subfn.isEmpty() && player->GetSubReader())
+            player->GetSubReader()->LoadExternalSubtitles(subfn);
     }
 
     if ((embedwinid > 0) && embedbounds)
     {
-        _nvp->EmbedInWidget(
+        player->EmbedInWidget(
             embedbounds->x(), embedbounds->y(),
             embedbounds->width(), embedbounds->height(), embedwinid);
     }
 
     bool isWatchingRecording = (desiredState == kState_WatchingRecording);
-    _nvp->SetWatchingRecording(isWatchingRecording);
+    player->SetWatchingRecording(isWatchingRecording);
 
-    SetNVP(_nvp);
+    SetPlayer(player);
 
     if (pipState == kPIPOff || pipState == kPBPLeft)
     {
@@ -471,31 +472,31 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
         }
     }
     else if (pipState == kPBPRight)
-        nvp->SetMuted(true);
+        player->SetMuted(true);
 
     return StartPlaying(-1);
 }
 
 /** \fn PlayerContext::StartPlaying(int)
  *  \brief Starts player, must be called after StartRecorder().
- *  \param maxWait How long to wait for NuppelVideoPlayer to start playing.
+ *  \param maxWait How long to wait for MythPlayer to start playing.
  *  \return true when successful, false otherwise.
  */
 bool PlayerContext::StartPlaying(int maxWait)
 {
-    if (!nvp)
+    if (!player)
         return false;
 
     DeletePlayerThread();
     if (playerNeedsThread)
     {
-        playerThread = new PlayerThread(nvp);
+        playerThread = new PlayerThread(player);
         if (playerThread)
             playerThread->start();
     }
     else
     {
-        nvp->StartPlaying();
+        player->StartPlaying();
     }
 
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
@@ -505,10 +506,10 @@ bool PlayerContext::StartPlaying(int maxWait)
     MythTimer t;
     t.start();
 
-    while (!nvp->IsPlaying(50, true) && (t.elapsed() < maxWait))
+    while (!player->IsPlaying(50, true) && (t.elapsed() < maxWait))
         ReloadTVChain();
 
-    if (nvp->IsPlaying())
+    if (player->IsPlaying())
     {
         VERBOSE(VB_PLAYBACK, LOC + "StartPlaying(): took "<<t.elapsed()
                 <<" ms to start player.");
@@ -526,8 +527,8 @@ bool PlayerContext::StartPlaying(int maxWait)
 void PlayerContext::StopPlaying(void)
 {
     DeletePlayerThread();
-    if (nvp)
-        nvp->StopPlaying();
+    if (player)
+        player->StopPlaying();
 }
 
 void PlayerContext::DeletePlayerThread(void)
@@ -544,17 +545,17 @@ void PlayerContext::DeletePlayerThread(void)
 /** \fn PlayerContext::StartOSD(TV *tv)
  *  \brief Initializes the on screen display.
  *
- *   If the NuppelVideoPlayer already exists we grab it's OSD via
- *   NuppelVideoPlayer::GetOSD().
+ *   If the MythPlayer already exists we grab it's OSD via
+ *   MythPlayer::GetOSD().
  */
 bool PlayerContext::StartOSD(TV *tv)
 {
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (player)
     {
-        last_framerate = nvp->GetFrameRate();
+        last_framerate = player->GetFrameRate();
 
-        OSD *osd = nvp->GetOSD();
+        OSD *osd = player->GetOSD();
         if (osd)
             return true;
     }
@@ -563,11 +564,11 @@ bool PlayerContext::StartOSD(TV *tv)
 
 void PlayerContext::UpdateTVChain(void)
 {
-    QMutexLocker locker(&deleteNVPLock);
-    if (tvchain && nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (tvchain && player)
     {
         tvchain->ReloadAll();
-        nvp->CheckTVChain();
+        player->CheckTVChain();
     }
 }
 
@@ -659,25 +660,25 @@ void PlayerContext::UnlockPlayingInfo(const char *file, int line) const
 }
 
 /**
- * \brief prevent NVP from been deleted
- *        used to ensure nvp can only be deleted after
+ * \brief prevent MythPlayer from being deleted
+ *        used to ensure player can only be deleted after
  *        osd in TV() is unlocked.
  */
-void PlayerContext::LockDeleteNVP(const char *file, int line) const
+void PlayerContext::LockDeletePlayer(const char *file, int line) const
 {
-    //VERBOSE(VB_IMPORTANT, QString("LockDeleteNVP(%1,%2)")
+    //VERBOSE(VB_IMPORTANT, QString("LockDeletePlayer(%1,%2)")
     //        .arg(file).arg(line));
-    deleteNVPLock.lock();
+    deletePlayerLock.lock();
 }
 
 /**
- * \brief allow NVP to be deleted.
+ * \brief allow player to be deleted.
  */
-void PlayerContext::UnlockDeleteNVP(const char *file, int line) const
+void PlayerContext::UnlockDeletePlayer(const char *file, int line) const
 {
-    //VERBOSE(VB_IMPORTANT, QString("UnlockDeleteNVP(%1,%2)")
+    //VERBOSE(VB_IMPORTANT, QString("UnlockDeletePlayer(%1,%2)")
     //        .arg(file).arg(line));
-    deleteNVPLock.unlock();
+    deletePlayerLock.unlock();
 }
 
 void PlayerContext::LockState(void) const
@@ -814,8 +815,8 @@ QString PlayerContext::GetPlayMessage(void) const
 
     if (0)
     {
-        QMutexLocker locker(&deleteNVPLock);
-        FrameScanType scan = nvp->GetScanType();
+        QMutexLocker locker(&deletePlayerLock);
+        FrameScanType scan = player->GetScanType();
         if (is_progressive(scan) || is_interlaced(scan))
             mesg += " (" + toString(scan, true) + ")";
     }
@@ -823,15 +824,15 @@ QString PlayerContext::GetPlayMessage(void) const
     return mesg;
 }
 
-void PlayerContext::SetNVP(NuppelVideoPlayer *new_nvp)
+void PlayerContext::SetPlayer(MythPlayer *newplayer)
 {
-    QMutexLocker locker(&deleteNVPLock);
-    if (nvp)
+    QMutexLocker locker(&deletePlayerLock);
+    if (player)
     {
         StopPlaying();
-        delete nvp;
+        delete player;
     }
-    nvp = new_nvp;
+    player = newplayer;
 }
 
 void PlayerContext::SetRecorder(RemoteEncoder *rec)

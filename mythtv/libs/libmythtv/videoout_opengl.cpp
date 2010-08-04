@@ -1,11 +1,10 @@
 #include "mythcontext.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "videooutbase.h"
 #include "videoout_opengl.h"
 #include "videodisplayprofile.h"
 #include "filtermanager.h"
 #include "osd.h"
-#include "NuppelVideoPlayer.h"
 #include "mythuihelper.h"
 
 #define LOC      QString("VidOutOGL: ")
@@ -379,7 +378,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     gl_videochain->PrepareFrame(buffer->top_field_first, t,
                                 m_deinterlacing, framesPlayed);
 
-    QMap<NuppelVideoPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
+    QMap<MythPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
     for (; it != gl_pipchains.end(); ++it)
     {
         if (gl_pip_ready[it.key()])
@@ -595,9 +594,9 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool enable)
     return m_deinterlacing;
 }
 
-void VideoOutputOpenGL::ShowPIP(VideoFrame        *frame,
-                                NuppelVideoPlayer *pipplayer,
-                                PIPLocation        loc)
+void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
+                                MythPlayer  *pipplayer,
+                                PIPLocation  loc)
 {
     if (!pipplayer)
         return;
@@ -681,7 +680,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame        *frame,
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
-void VideoOutputOpenGL::RemovePIP(NuppelVideoPlayer *pipplayer)
+void VideoOutputOpenGL::RemovePIP(MythPlayer *pipplayer)
 {
     if (!gl_pipchains.contains(pipplayer))
         return;

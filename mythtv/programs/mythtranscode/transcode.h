@@ -6,7 +6,7 @@
 class PlayerContext;
 class ProgramInfo;
 class NuppelVideoRecorder;
-class NuppelVideoPlayer;
+class MythPlayer;
 class RingBuffer;
 
 typedef vector<struct kfatable_entry> KFATable;
@@ -35,7 +35,7 @@ class Transcode : public QObject
     RecordingProfile        profile;
     int                     keyframedist;
     NuppelVideoRecorder    *nvr;
-    NuppelVideoPlayer      *nvp;
+    MythPlayer             *player;
     PlayerContext          *player_ctx;
     RingBuffer             *inRingBuffer;
     RingBuffer             *outRingBuffer;

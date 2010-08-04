@@ -4,7 +4,7 @@
 class InteractiveScreen;
 class MythPainter;
 class MHIContext;
-class NuppelVideoPlayer;
+class MythPlayer;
 
 /** \class InteractiveTV
  *  \brief This is the interface between an MHEG engine and a MythTV TV object.
@@ -14,7 +14,7 @@ class InteractiveTV
 #ifdef USING_MHEG
   public:
     // Interface to Myth
-    InteractiveTV(NuppelVideoPlayer *nvp);
+    InteractiveTV(MythPlayer *nvp);
     virtual ~InteractiveTV();
 
     void Restart(uint chanid, uint cardid, bool isLive);
@@ -40,11 +40,11 @@ class InteractiveTV
     // Get the initial component tags.
     void GetInitialStreams(int &audioTag, int &videoTag);
 
-    NuppelVideoPlayer *GetNVP(void) { return m_nvp; }
+    MythPlayer *GetNVP(void) { return m_nvp; }
 
   protected:
     MHIContext        *m_context;
-    NuppelVideoPlayer *m_nvp;
+    MythPlayer *m_nvp;
 #endif
 };
 

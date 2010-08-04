@@ -13,15 +13,14 @@ extern "C" {
 #include "EdgeDetector.h"
 
 typedef struct VideoFrame_ VideoFrame;
-class NuppelVideoPlayer;
+class MythPlayer;
 
 class CannyEdgeDetector : public EdgeDetector
 {
 public:
     CannyEdgeDetector(void);
     ~CannyEdgeDetector(void);
-    int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp,
-            int width, int height);
+    int MythPlayerInited(const MythPlayer *player, int width, int height);
     virtual int setExcludeArea(int row, int col, int width, int height);
     virtual const AVPicture *detectEdges(const AVPicture *pgm, int pgmheight,
             int percentile);

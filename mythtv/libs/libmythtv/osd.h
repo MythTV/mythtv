@@ -25,7 +25,7 @@ struct AVSubtitle;
 
 #define kOSDFadeTime 1000
 
-class NuppelVideoPlayer;
+class MythPlayer;
 class TeletextScreen;
 class TeletextViewer;
 class ccText;
@@ -120,7 +120,7 @@ class MythOSDWindow : public MythScreenType
 class OSD
 {
   public:
-    OSD(NuppelVideoPlayer *player, QObject *parent);
+    OSD(MythPlayer *player, QObject *parent);
    ~OSD();
 
     bool    Init(const QRect &rect, float font_aspect);
@@ -188,7 +188,7 @@ class OSD
     void SendHideEvent(void);
 
   private:
-    NuppelVideoPlayer *m_parent;
+    MythPlayer *m_parent;
     QObject        *m_ParentObject;
     QRect           m_Rect;
     bool            m_Effects;

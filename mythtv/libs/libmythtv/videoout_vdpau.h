@@ -84,9 +84,9 @@ class VideoOutputVDPAU : public VideoOutput
     void DoneDisplayingFrame(VideoFrame *frame);
     void CheckFrameStates(void);
     virtual void ShowPIP(VideoFrame        *frame,
-                         NuppelVideoPlayer *pipplayer,
+                         MythPlayer *pipplayer,
                          PIPLocation        loc);
-    virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
+    virtual void RemovePIP(MythPlayer *pipplayer);
     bool InitPIPLayer(QSize size);
     void DeinitPIPS(void);
     void DeinitPIPLayer(void);
@@ -114,7 +114,7 @@ class VideoOutputVDPAU : public VideoOutput
     uint                 m_pip_layer;
     uint                 m_pip_surface;
     bool                 m_pip_ready;
-    QMap<NuppelVideoPlayer*,vdpauPIP> m_pips;
+    QMap<MythPlayer*,vdpauPIP> m_pips;
 
     MythVDPAUPainter    *m_osd_painter;
 

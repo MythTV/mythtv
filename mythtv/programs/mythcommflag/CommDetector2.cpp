@@ -17,7 +17,7 @@ using namespace std;
 #include "compat.h"
 #include "mythdb.h"
 #include "mythverbose.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 #include "programinfo.h"
 #include "channelutil.h"
 
@@ -76,10 +76,10 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
     usleep(sleepus);
 }
 
-bool nuppelVideoPlayerInited(FrameAnalyzerItem &pass,
+bool MythPlayerInited(FrameAnalyzerItem &pass,
                              FrameAnalyzerItem &finishedAnalyzers,
                              FrameAnalyzerItem &deadAnalyzers,
-                             NuppelVideoPlayer *nvp,
+                             MythPlayer *player,
                              long long nframes)
 {
     FrameAnalyzerItem::iterator iifa = pass.begin();
@@ -90,7 +90,7 @@ bool nuppelVideoPlayerInited(FrameAnalyzerItem &pass,
         ++jjfa;
 
         FrameAnalyzer::analyzeFrameResult ares =
-            fa->nuppelVideoPlayerInited(nvp, nframes);
+            fa->MythPlayerInited(player, nframes);
 
         if (ares == FrameAnalyzer::ANALYZE_OK ||
             ares == FrameAnalyzer::ANALYZE_ERROR)
@@ -113,7 +113,7 @@ bool nuppelVideoPlayerInited(FrameAnalyzerItem &pass,
         }
 
         VERBOSE(VB_IMPORTANT, QString("Unexpected return value from"
-                    " %1::nuppelVideoPlayerInited: %2")
+                    " %1::MythPlayerInited: %2")
                 .arg(fa->name()).arg(ares));
         return false;
     }
@@ -320,7 +320,7 @@ CommDetector2::CommDetector2(
     enum SkipTypes     commDetectMethod_in,
     bool               showProgress_in,
     bool               fullSpeed_in,
-    NuppelVideoPlayer *nvp_in,
+    MythPlayer        *player_in,
     int                chanid,
     const QDateTime   &startts_in,
     const QDateTime   &endts_in,
@@ -329,7 +329,7 @@ CommDetector2::CommDetector2(
     bool               useDB) :
     commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2)),
     showProgress(showProgress_in),  fullSpeed(fullSpeed_in),
-    nvp(nvp_in),
+    player(player_in),
     startts(startts_in),            endts(endts_in),
     recstartts(recstartts_in),      recendts(recendts_in),
     isRecording(QDateTime::currentDateTime() < recendts),
@@ -421,7 +421,7 @@ CommDetector2::CommDetector2(
         if (!logoFinder)
         {
             logoFinder = new TemplateFinder(pgmConverter, borderDetector,
-                    cannyEdgeDetector, nvp, recstartts.secsTo(recendts),
+                    cannyEdgeDetector, player, recstartts.secsTo(recendts),
                     debugdir);
             pass0.push_back(logoFinder);
         }
@@ -530,19 +530,19 @@ bool CommDetector2::go(void)
 {
     int minlag = 7; // seconds
 
-    nvp->SetNullVideo();
+    player->SetNullVideo();
 
-    if (nvp->OpenFile() < 0)
+    if (player->OpenFile() < 0)
         return false;
 
-    if (!nvp->InitVideo())
+    if (!player->InitVideo())
     {
         VERBOSE(VB_IMPORTANT,
                 "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
 
-    nvp->SetCaptionsEnabled(false);
+    player->SetCaptionsEnabled(false);
 
     QTime totalFlagTime;
     totalFlagTime.start();
@@ -550,8 +550,8 @@ bool CommDetector2::go(void)
     /* If still recording, estimate the eventual total number of frames. */
     long long nframes = isRecording ?
         (long long)roundf((recstartts.secsTo(recendts) + 5) *
-                          nvp->GetFrameRate()) :
-            nvp->GetTotalFrameCount();
+                          player->GetFrameRate()) :
+            player->GetTotalFrameCount();
     bool postprocessing = !isRecording;
 
     if (showProgress)
@@ -575,16 +575,16 @@ bool CommDetector2::go(void)
         VERBOSE(VB_COMMFLAG, QString(
                     "CommDetector2::go pass %1 of %2 (%3 frames, %4 fps)")
                 .arg(passno + 1).arg(npasses)
-                .arg(nvp->GetTotalFrameCount())
-                .arg(nvp->GetFrameRate(), 0, 'f', 2));
+                .arg(player->GetTotalFrameCount())
+                .arg(player->GetFrameRate(), 0, 'f', 2));
 
-        if (!nuppelVideoPlayerInited(
-                *currentPass, finishedAnalyzers, deadAnalyzers, nvp, nframes))
+        if (!MythPlayerInited(
+                *currentPass, finishedAnalyzers, deadAnalyzers, player, nframes))
         {
             return false;
         }
 
-        nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
+        player->DiscardVideoFrame(player->GetRawVideoFrame(0));
         long long nextFrame = -1;
         currentFrameNumber = 0;
         long long lastLoggedFrame = currentFrameNumber;
@@ -597,12 +597,12 @@ bool CommDetector2::go(void)
         clock.start();
         passTime.start();
         memset(&getframetime, 0, sizeof(getframetime));
-        while (!(*currentPass).empty() && !nvp->GetEof())
+        while (!(*currentPass).empty() && !player->GetEof())
         {
             struct timeval start, end, elapsedtv;
 
             (void)gettimeofday(&start, NULL);
-            VideoFrame *currentFrame = nvp->GetRawVideoFrame(nextFrame);
+            VideoFrame *currentFrame = player->GetRawVideoFrame(nextFrame);
             long long lastFrameNumber = currentFrameNumber;
             currentFrameNumber = currentFrame->frameNumber;
             (void)gettimeofday(&end, NULL);
@@ -625,7 +625,7 @@ bool CommDetector2::go(void)
                 emit breathe();
                 if (m_bStop)
                 {
-                    nvp->DiscardVideoFrame(currentFrame);
+                    player->DiscardVideoFrame(currentFrame);
                     return false;
                 }
             }
@@ -669,7 +669,7 @@ bool CommDetector2::go(void)
             {
                 waitForBuffer(&start, minlag,
                         recstartts.secsTo(QDateTime::currentDateTime()) -
-                        totalFlagTime.elapsed() / 1000, nvp->GetFrameRate(),
+                        totalFlagTime.elapsed() / 1000, player->GetFrameRate(),
                         fullSpeed);
             }
 
@@ -705,7 +705,7 @@ bool CommDetector2::go(void)
                 breakMapUpdateRequested = false;
             }
 
-            nvp->DiscardVideoFrame(currentFrame);
+            player->DiscardVideoFrame(currentFrame);
         }
 
         currentPass->insert(currentPass->end(),
@@ -714,7 +714,7 @@ bool CommDetector2::go(void)
         finishedAnalyzers.clear();
 
         if (postprocessing)
-            currentFrameNumber = nvp->GetTotalFrameCount() - 1;
+            currentFrameNumber = player->GetTotalFrameCount() - 1;
         if (passFinished(*currentPass, currentFrameNumber + 1, true))
             return false;
 
@@ -781,7 +781,7 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
     }
 
     /* Report results. */
-    const float fps = nvp->GetFrameRate();
+    const float fps = player->GetFrameRate();
     for (frm_dir_map_t::const_iterator iimark = marks.begin();
             iimark != marks.end();
             ++iimark)
@@ -800,7 +800,7 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
                 .arg(frameToTimestamp(markend - markstart + 1, fps)));
     }
 
-    const long long nframes = nvp->GetTotalFrameCount();
+    const long long nframes = player->GetTotalFrameCount();
     VERBOSE(VB_COMMFLAG, QString("Flagged %1 of %2 frames (%3 of %4),"
                 " %5% commercials (%6)")
             .arg(currentFrameNumber + 1).arg(nframes)

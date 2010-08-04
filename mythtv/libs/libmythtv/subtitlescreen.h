@@ -3,7 +3,7 @@
 
 #include "mythscreentype.h"
 #include "subtitlereader.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 class SubtitleScreen : public MythScreenType
 {
@@ -11,7 +11,7 @@ class SubtitleScreen : public MythScreenType
     static bool Initialise708Fonts(void);
 
   public:
-    SubtitleScreen(NuppelVideoPlayer *player, const char * name);
+    SubtitleScreen(MythPlayer *player, const char * name);
     virtual ~SubtitleScreen();
 
     void EnableSubtitles(int type);
@@ -38,7 +38,7 @@ class SubtitleScreen : public MythScreenType
                            float aspect, vector<CC708String*> &list);
     MythFontProperties* Get708Font(CC708CharacterAttribute attr);
 
-    NuppelVideoPlayer *m_player;
+    MythPlayer *m_player;
     SubtitleReader    *m_subreader;
     CC608Reader       *m_608reader;
     CC708Reader       *m_708reader;

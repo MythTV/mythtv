@@ -5,17 +5,17 @@
 // MythTV headers
 #include "mythcorecontext.h"
 #include "programinfo.h"
-#include "NuppelVideoPlayer.h"
+#include "mythplayer.h"
 
 PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,
                             bool showProgress,bool fullSpeed,
-                            NuppelVideoPlayer* nvp,
+                            MythPlayer* player,
                             const QDateTime& startedAt_in,
                             const QDateTime& stopsAt_in,
                             const QDateTime& recordingStartedAt_in,
                             const QDateTime& recordingStopsAt_in):
     ClassicCommDetector( commDetectMethod,  showProgress,  fullSpeed,
-        nvp,            startedAt_in,       stopsAt_in,
+        player,          startedAt_in,      stopsAt_in,
         recordingStartedAt_in,              recordingStopsAt_in),
         myTotalFrames(0),                   closestAfterPre(0),
         closestBeforePre(0),                closestAfterPost(0),
@@ -26,12 +26,12 @@ PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,
 void PrePostRollFlagger::Init()
 {
     ClassicCommDetector::Init();
-    nvp->SetExactSeeks(true);
+    player->SetExactSeeks(true);
 }
 
 bool PrePostRollFlagger::go()
 {
-    nvp->SetNullVideo();
+    player->SetNullVideo();
 
     int secsSince = 0;
     int requiredBuffer = 120;
@@ -51,7 +51,7 @@ bool PrePostRollFlagger::go()
         secsSince = startedAt.secsTo(QDateTime::currentDateTime());
     }
 
-    if (nvp->OpenFile() < 0)
+    if (player->OpenFile() < 0)
         return false;
 
     Init();
@@ -63,13 +63,13 @@ bool PrePostRollFlagger::go()
 
     aggressiveDetection = gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
 
-    if (!nvp->InitVideo())
+    if (!player->InitVideo())
     {
         VERBOSE(VB_IMPORTANT,
                 "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
-    nvp->SetCaptionsEnabled(false);
+    player->SetCaptionsEnabled(false);
 
     emit breathe();
     if (m_bStop)
@@ -79,9 +79,9 @@ bool PrePostRollFlagger::go()
     flagTime.start();
 
     if (recordingStopsAt < QDateTime::currentDateTime() )
-        myTotalFrames = nvp->GetTotalFrameCount();
+        myTotalFrames = player->GetTotalFrameCount();
     else
-        myTotalFrames = (long long)(nvp->GetFrameRate() *
+        myTotalFrames = (long long)(player->GetFrameRate() *
                         (recordingStartedAt.secsTo(recordingStopsAt)));
 
 
@@ -97,7 +97,7 @@ bool PrePostRollFlagger::go()
 
 
     float flagFPS;
-    float aspect = nvp->GetVideoAspect();
+    float aspect = player->GetVideoAspect();
 
     SetVideoParams(aspect);
 
@@ -158,7 +158,7 @@ bool PrePostRollFlagger::go()
             sleep(5);
         }
         stillRecording = false;
-         myTotalFrames = nvp->GetTotalFrameCount();
+         myTotalFrames = player->GetTotalFrameCount();
     }
 
     if(postRoll > 0)
@@ -226,26 +226,26 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
     else
         startFrame = 0;
 
-    nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
+    player->DiscardVideoFrame(player->GetRawVideoFrame(0));
 
     long long tmpStartFrame = startFrame;
-    nvp->SetExactSeeks(true);
-    VideoFrame* f = nvp->GetRawVideoFrame(tmpStartFrame);
-    float aspect = nvp->GetVideoAspect();
+    player->SetExactSeeks(true);
+    VideoFrame* f = player->GetRawVideoFrame(tmpStartFrame);
+    float aspect = player->GetVideoAspect();
     currentFrameNumber = f->frameNumber;
     VERBOSE(VB_COMMFLAG, QString("Starting with frame %1")
             .arg(currentFrameNumber));
-    nvp->DiscardVideoFrame(f);
+    player->DiscardVideoFrame(f);
 
     long long foundFrame = 0;
 
-    while (!nvp->GetEof())
+    while (!player->GetEof())
     {
         struct timeval startTime;
         if (stillRecording)
             gettimeofday(&startTime, NULL);
 
-        VideoFrame* currentFrame = nvp->GetRawVideoFrame();
+        VideoFrame* currentFrame = player->GetRawVideoFrame();
         currentFrameNumber = currentFrame->frameNumber;
 
         if(currentFrameNumber % 1000 == 0)
@@ -256,11 +256,11 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
         if(currentFrameNumber > stopFrame || (!findLast && foundFrame))
         {
-            nvp->DiscardVideoFrame(currentFrame);
+            player->DiscardVideoFrame(currentFrame);
             break;
         }
 
-        double newAspect = nvp->GetVideoAspect();
+        double newAspect = player->GetVideoAspect();
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);
@@ -274,7 +274,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             emit breathe();
             if (m_bStop)
             {
-                nvp->DiscardVideoFrame(currentFrame);
+                player->DiscardVideoFrame(currentFrame);
                 return false;
             }
         }
@@ -350,7 +350,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 recordingStartedAt.secsTo(QDateTime::currentDateTime());
             int secondsFlagged = (int)(framesProcessed / fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
+            long usecPerFrame = (long)(1.0 / player->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, NULL);
@@ -374,7 +374,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 usleep(usecSleep);
         }
 
-        nvp->DiscardVideoFrame(currentFrame);
+        player->DiscardVideoFrame(currentFrame);
         framesProcessed++;
     }
     return foundFrame;

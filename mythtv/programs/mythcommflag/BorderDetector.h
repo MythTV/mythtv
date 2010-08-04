@@ -13,7 +13,7 @@
 #define __BORDERDETECTOR_H__
 
 typedef struct AVPicture AVPicture;
-class NuppelVideoPlayer;
+class MythPlayer;
 class TemplateFinder;
 
 class BorderDetector
@@ -22,7 +22,7 @@ public:
     /* Ctor/dtor. */
     BorderDetector(void);
 
-    int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp);
+    int MythPlayerInited(const MythPlayer *player);
     void setLogoState(TemplateFinder *finder);
 
     static const long long UNCACHED = -1;

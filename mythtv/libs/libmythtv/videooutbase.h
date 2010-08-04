@@ -27,13 +27,13 @@ using namespace std;
 class MythPainter;
 class MythYUVAPainter;
 class MythImage;
-class NuppelVideoPlayer;
+class MythPlayer;
 class OSD;
 class FilterChain;
 class FilterManager;
 class OpenGLContextGLX;
 
-typedef QMap<NuppelVideoPlayer*,PIPLocation> PIPMap;
+typedef QMap<MythPlayer*,PIPLocation> PIPMap;
 
 extern "C" {
 struct ImgReSampleContext;
@@ -236,9 +236,9 @@ class VideoOutput
 
     /// \brief returns QRect of PIP based on PIPLocation
     virtual QRect GetPIPRect(PIPLocation location,
-                             NuppelVideoPlayer *pipplayer = NULL,
+                             MythPlayer *pipplayer = NULL,
                              bool do_pixel_adj = true) const;
-    virtual void RemovePIP(NuppelVideoPlayer *pipplayer) { }
+    virtual void RemovePIP(MythPlayer *pipplayer) { }
 
     virtual void SetPIPState(PIPState setting);
 
@@ -257,7 +257,7 @@ class VideoOutput
     void InitDisplayMeasurements(uint width, uint height, bool resize);
     virtual void ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers);
     virtual void ShowPIP(VideoFrame        *frame,
-                         NuppelVideoPlayer *pipplayer,
+                         MythPlayer *pipplayer,
                          PIPLocation        loc);
 
     virtual bool DisplayOSD(VideoFrame *frame, OSD *osd);
