@@ -454,7 +454,7 @@ class FEConnection( object ):
         self.host = host
         self.port = int(port)
         self.log = MythLog('Python Frontend Connection')
-        self.deadline = deadline
+        self._deadline = deadline
         self.connect(test)
 
     @classmethod
@@ -468,10 +468,11 @@ class FEConnection( object ):
 
     @classmethod
     def testList(cls, felist):
-        felist = [cls(addr, port, False) for addr,port in felist]
+        felist = [cls(addr, port, test=False) for addr,port in felist]
         for fe in felist:
             try:
-                fe._test(2.0)
+                t = time()
+                fe._test(t + 2.0)
             except MythError, e:
                 pass
             yield fe
@@ -492,7 +493,7 @@ class FEConnection( object ):
         if self.isConnected:
             return True
         self.socket = deadlinesocket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setdeadline(self.deadline)
+        self.socket.setdeadline(self._deadline)
         self.socket.log = self.log
         try:
             self.socket.connect((self.host, self.port))
