@@ -503,7 +503,7 @@ void DecoderHandler::createIOFactory(const QUrl &url)
     if (haveIOFactory()) 
         deleteIOFactory();
 
-    if (url.toString().startsWith('/'))
+    if (url.toString().startsWith('/') || url.toString().endsWith(".cda"))
     {
         m_io_factory = new DecoderIOFactoryFile(this);
     }
