@@ -133,9 +133,9 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
     if (!signalMonitor)
     {
-        V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
-        if (chan)
-            signalMonitor = new ChannelChangeMonitor(db_cardnum, chan);
+        // For anything else
+        if (channel)
+            signalMonitor = new ChannelChangeMonitor(db_cardnum, channel);
     }
 
     if (!signalMonitor)

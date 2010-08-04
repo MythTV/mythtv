@@ -7,14 +7,13 @@
 // MythTV headers
 #include "signalmonitor.h"
 
-class V4LChannel;
+class ChannelBase;
 
 class ChannelChangeMonitor : public SignalMonitor
 {
   public:
-    ChannelChangeMonitor(
-        int db_cardnum, V4LChannel *_channel,
-        uint64_t _flags = kSigMon_WaitForSig);
+    ChannelChangeMonitor(int db_cardnum, ChannelBase *_channel,
+                         uint64_t _flags = kSigMon_WaitForSig);
 
     virtual void UpdateValues(void);
 };

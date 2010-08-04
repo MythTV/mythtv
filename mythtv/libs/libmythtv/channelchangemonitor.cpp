@@ -6,13 +6,13 @@
 
 #include "mythcontext.h"
 #include "channelchangemonitor.h"
-#include "v4lchannel.h"
+#include "channelbase.h"
 
 #define LOC QString("ChannelChangeM: ").arg(channel->GetDevice())
 #define LOC_ERR QString("ChannelChangeM, Error: ").arg(channel->GetDevice())
 
 ChannelChangeMonitor::ChannelChangeMonitor(
-    int db_cardnum, V4LChannel *_channel, uint64_t _flags) :
+    int db_cardnum, ChannelBase *_channel, uint64_t _flags) :
     SignalMonitor(db_cardnum, _channel, _flags)
 {
 }
@@ -34,4 +34,3 @@ void ChannelChangeMonitor::UpdateValues(void)
     EmitStatus();
     SendMessageAllGood();
 }
-
