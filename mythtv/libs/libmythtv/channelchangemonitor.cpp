@@ -2,7 +2,6 @@
 
 #include <cerrno>
 #include <unistd.h>
-#include <sys/ioctl.h>
 
 #include "mythcontext.h"
 #include "channelchangemonitor.h"
