@@ -914,7 +914,7 @@ void PlaybackBoxMusic::playFirstTrack()
 {
     Q3ValueList <int> branches_to_current_node;
 
-    stop();
+    stopAll();
     wipeTrackInfo();
     branches_to_current_node.clear();
     branches_to_current_node.append(0); //  Root node
@@ -949,7 +949,7 @@ void PlaybackBoxMusic::postUpdate()
 
    constructPlaylistTree();
 
-   stop();
+   stopAll();
    wipeTrackInfo();
 
    // move to first track in list
@@ -1899,7 +1899,7 @@ void PlaybackBoxMusic::editPlaylist()
     }
     else
     {
-        stop();
+        stopAll();
         wipeTrackInfo();
         branches_to_current_node.clear();
         branches_to_current_node.append(0); //  Root node

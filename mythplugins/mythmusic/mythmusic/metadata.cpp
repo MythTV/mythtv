@@ -36,7 +36,7 @@ bool operator!=(const Metadata& a, const Metadata& b)
     return false;
 }
 
-static bool meta_less_than(const Metadata *item1, const Metadata *item2)
+bool meta_less_than(const Metadata *item1, const Metadata *item2)
 {
     return item1->compare(item2) < 0;
 }
@@ -1353,11 +1353,7 @@ MusicNode::MusicNode(const QString &a_title, const QString &tree_level)
 
 MusicNode::~MusicNode()
 {
-    while (!my_subnodes.empty())
-    {
-        delete my_subnodes.back();
-        my_subnodes.pop_back();
-    }
+    clear();
 }
 
 // static member vars

@@ -278,9 +278,13 @@ class MusicNode
     inline void addLeaf(Metadata *leaf) { my_tracks.append(leaf); }
     inline void setLeaves(MetadataPtrList leaves) { my_tracks = leaves; }
 
-    void clear(void) {
+    void clear(void) 
+    {
+        while (!my_subnodes.isEmpty())
+            delete my_subnodes.takeFirst();
+
+        // done delete the metadata since AllMusic owns it
         my_tracks.clear();
-        my_subnodes.clear();
     }
 
     static void SetStaticData(const QString &startdir, const QString &paths);
