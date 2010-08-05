@@ -1,43 +1,40 @@
-                                   MythTV 
-			        Release 0.22
+                                   MythTV
+                                Release 0.24
 
-BUILD/CONFIGURATION INSTRUCTIONS 
+NOTE
+----
+
+This README is not always kept current, the information may be outdated. For
+updated information, always see the Wiki at http://www.mythtv.org/wiki/ and
+the documentation at http://www.mythtv.org/docs/
+
+BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 The following is a list of some of the prerequisites you will need installed:
 
-   libttf - Freetype 2 is now required (it used to only be able to use 
-            freetype 1).  I _think_ any release will work, but I'm using 2.1.2.
-            This is used for the on-screen display.  Get it from your distro, 
-            or from http://freetype.sf.net
-
    libmp3lame - The shared library for the LAME mp3 encoder.  This might become
-                optional in the future, or I may switch to vorbis if they speed
-                optimize things a little more.  Compressing the audio's not
-                _really_ necessary, it just saves 500 or so MB per hour of 
-                recording.  You'll probably have to compile this one yourself,
-                so get it from http://www.mp3dev.org/ (follow the using Lame
-                link).
+                optional in the future, or we may switch to vorbis if they speed
+                optimize things a little more.
 
-   QT - Version 4.3 or greater is required.  You need it 
-        compiled threadsafe and with the MySQL bindings.  I'm using 
-        version 4.4.0.  http://www.trolltech.com
+   QT - Version 4.5 or greater is required.  You will need the MySQL bindings.
+        http://www.trolltech.com
 
    MySQL - You need this setup and working.  Version 5.0.15 or higher is
            required.  http://www.mysql.com
 
-   XMLTV - If you are outside of North America, you will need to install the
-           latest version (0.5.42 as of 2006-01-08).  This will do the work
+   XMLTV - If you are outside of North America, it's always advised to install
+           the latest version available.  This will do the work
            of actually grabbing the program information. Get it from
-           http://xmltv.sf.net
+           http://xmltv.org
 
            If XMLTV does not have a grabber for your country, then you need
-           some sort of listings grabber and will need to run the
-           mythfilldatabase program in --manual mode.
+           to create one. For information on how to do this, see the XMLTV
+           website at http://xmltv.org
 
            If you are in North America, you do not need XMLTV.  MythTV has
-           a built-in grabber which uses Zap2It as a data source.  See the
-           HOWTO for complete instructions on configuring an account.
+           a built-in grabber which uses Schedules Direct as a data source. See
+           the HOWTO for complete instructions on configuring an account.
 
 See the mythtv-HOWTO.html, .pdf or .txt file in the docs/ subdirectory or on
 http://www.mythtv.org/docs/ for in-depth instructions on installing and
@@ -52,7 +49,7 @@ Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
 You also need a video card with working Xv support (to scale and convert
 colorspaces), and a capture card.  If you're using ALSA for sound support
 (which _is_ the recommended thing to do), you should be using at least
-version 0.9.
+version 1.0.17.
 
 See the UPGRADING file for information on upgrading between releases.
 
@@ -63,8 +60,8 @@ keys.txt has a listing of all the various default key bindings.  All
 keybindings can be changed via MythWeb.
 
 If you want to check out the theme format, and perhaps make your own, just
-look at the .xml files in the /usr/local/share/mythtv/themes/[themename]
-subdirs.
+look http://www.mythtv.org/wiki/MythUI_Theme_Development and at the .xml files
+in the /usr/local/share/mythtv/themes/[themename] subdirs.
 
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
@@ -75,4 +72,5 @@ http://www.mythtv.org/mailman/listinfo/mythtv-users
 A list that's restricted to the SVN commit messages is available at:
 http://www.mythtv.org/mailman/listinfo/mythtv-commits
 
-or, just email me directly:  Isaac Richards <ijr@po.cwru.edu>
+To contact the developer's for corporate sponsorship, contract work or similarly
+formal and private matters please use the form at http://www.mythtv.org/contact/
