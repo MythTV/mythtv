@@ -288,15 +288,9 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     if (!av_pause_frame.buf)
-    {
         success = false;
-    }
     else
-    {
-        int size = av_pause_frame.width * av_pause_frame.height;
-        memset(av_pause_frame.buf, 0,   size);
-        memset(av_pause_frame.buf + size, 127, size / 2);
-    }
+        clear(&av_pause_frame, GUID_YV12_PLANAR);
 
     return success;
 }
@@ -368,9 +362,6 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     gl_context_lock.lock();
     framesPlayed = buffer->frameNumber + 1;
     gl_context_lock.unlock();
-
-    if (buffer->codec != FMT_YV12)
-        return;
 
     gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
                                               window.GetDisplayVideoRect(),
