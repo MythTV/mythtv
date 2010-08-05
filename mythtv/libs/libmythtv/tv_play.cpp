@@ -5564,7 +5564,13 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
 
 void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
 {
-    DoTogglePauseFinish(ctx, DoTogglePauseStart(ctx), showOSD);
+    bool ignore = false;
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        ignore = ctx->player->GetEditMode();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    if (!ignore)
+        DoTogglePauseFinish(ctx, DoTogglePauseStart(ctx), showOSD);
 }
 
 bool TV::DoPlayerSeek(PlayerContext *ctx, float time)

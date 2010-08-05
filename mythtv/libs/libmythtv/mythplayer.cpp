@@ -225,7 +225,7 @@ MythPlayer::MythPlayer(bool muted)
       postfilt_width(0),            postfilt_height(0),
       videoFilters(NULL),           FiltMan(new FilterManager()),
 
-      forcePositionMapSync(false),
+      forcePositionMapSync(false),  pausedBeforeEdit(false),
       // Playback (output) speed control
       decoder_lock(QMutex::Recursive),
       next_play_speed(1.0f),        next_normal_speed(true),
@@ -363,14 +363,19 @@ void MythPlayer::UnpauseBuffer(void)
     bufferPauseLock.unlock();
 }
 
-void MythPlayer::Pause(void)
+bool MythPlayer::Pause(void)
 {
     if (!pauseLock.tryLock(100))
     {
         VERBOSE(VB_PLAYBACK, LOC + "Waited 100ms to get pause lock.");
         DecoderPauseCheck();
     }
-    
+    bool already_paused = allpaused;
+    if (already_paused)
+    {
+        pauseLock.unlock();
+        return already_paused;
+    }
     next_play_speed   = 0.0;
     next_normal_speed = false;
     PauseDecoder();
@@ -387,6 +392,7 @@ void MythPlayer::Pause(void)
             framesPlayed = videoOutput->GetFramesPlayed();
     }
     pauseLock.unlock();
+    return already_paused;
 }
 
 bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
@@ -600,9 +606,7 @@ void MythPlayer::ReinitOSD(void)
                                       scaling, 1.0f);
             if (osd->Bounds() != visible)
             {
-                bool was_paused = allpaused;
-                if (!was_paused)
-                    Pause();
+                bool was_paused = Pause();
                 uint old = textDisplayMode;
                 ToggleCaptions(old);
                 osd->Reinit(visible, aspect);
@@ -3353,10 +3357,7 @@ bool MythPlayer::EnableEdit(void)
     if (!osd || deleteMap.IsFileEditing(player_ctx))
         return false;
 
-    Pause();
-    if (!videoPaused)
-        return false;
-
+    pausedBeforeEdit = Pause();
     deleteMap.SetEditing(true);
     osd->DialogQuit();
     osd->HideAll();
@@ -3373,7 +3374,8 @@ void MythPlayer::DisableEdit(void)
     deleteMap.SaveMap(totalFrames, player_ctx);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
     deleteMap.SetFileEditing(player_ctx, false);
-    Play();
+    if (!pausedBeforeEdit)
+        Play();
 }
 
 bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,

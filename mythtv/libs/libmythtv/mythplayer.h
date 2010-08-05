@@ -253,7 +253,7 @@ class MPUBLIC MythPlayer
     // Pause stuff
     bool PauseDecoder(void);
     void UnpauseDecoder(void);
-    void Pause(void);
+    bool Pause(void);
     bool Play(float speed = 1.0, bool normal = true, bool unpauseaudio = true);
 
     // Seek stuff
@@ -636,6 +636,7 @@ class MPUBLIC MythPlayer
     bool       forcePositionMapSync;
     // Manual editing
     DeleteMap  deleteMap;
+    bool       pausedBeforeEdit;
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
