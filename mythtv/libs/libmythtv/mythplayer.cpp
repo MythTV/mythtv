@@ -3376,6 +3376,8 @@ void MythPlayer::DisableEdit(void)
     deleteMap.SetFileEditing(player_ctx, false);
     if (!pausedBeforeEdit)
         Play();
+    else
+        SetOSDStatus(QObject::tr("Paused"), kOSDTimeout_None);
 }
 
 bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
