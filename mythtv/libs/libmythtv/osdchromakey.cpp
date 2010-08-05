@@ -254,7 +254,7 @@ bool ChromaKeyOSD::ProcessOSD(OSD *osd)
         return false;
 
     bool was_visible = visible;
-    QRect video_rect = videoOutput->windows[0].GetDisplayVideoRect();
+    QRect video_rect = videoOutput->window.GetDisplayVideoRect();
     QRegion dirty    = QRegion();
     QRegion vis_area = osd->Draw(painter, image, current_size, dirty);
     visible = !vis_area.isEmpty();

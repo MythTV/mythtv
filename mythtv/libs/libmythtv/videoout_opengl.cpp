@@ -113,7 +113,7 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
 
     bool success = true;
     // FIXME Mac OS X overlay does not work with preview
-    windows[0].SetAllowPreviewEPG(true);
+    window.SetAllowPreviewEPG(true);
     gl_parent_win = winid;
     gl_embed_win  = embedid;
 
@@ -162,9 +162,9 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         return false;
     }
 
-    if (input_size == windows[0].GetVideoDim())
+    if (input_size == window.GetVideoDim())
     {
-        if (windows[0].GetVideoAspect() != aspect)
+        if (window.GetVideoAspect() != aspect)
         {
             aspect_only = true;
             VideoAspectRatioChanged(aspect);
@@ -174,7 +174,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
     }
 
     TearDown();
-    QRect disp = windows[0].GetDisplayVisibleRect();
+    QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, gl_parent_win, disp.left(),  disp.top(),
              disp.width(), disp.height(), av_codec_id, gl_embed_win))
@@ -227,8 +227,8 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     if (!gl_context)
         return false;
 
-    const QRect dvr = windows[0].GetDisplayVisibleRect();
-    if (windows[0].GetPIPState() >= kPIPStandAlone)
+    const QRect dvr = window.GetDisplayVisibleRect();
+    if (window.GetPIPState() >= kPIPStandAlone)
     {
         QRect tmprect = QRect(QPoint(0,0), dvr.size());
         ResizeDisplayWindow(tmprect, true);
@@ -237,9 +237,9 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     OpenGLLocker ctx_lock(gl_context);
     gl_videochain = new OpenGLVideo();
     success = gl_videochain->Init(gl_context, db_use_picture_controls,
-                                  windows[0].GetVideoDim(), dvr,
-                                  windows[0].GetDisplayVideoRect(),
-                                  windows[0].GetVideoRect(), true,
+                                  window.GetVideoDim(), dvr,
+                                  window.GetDisplayVideoRect(),
+                                  window.GetVideoRect(), true,
                                   GetFilters(), db_letterbox_colour);
     if (success)
     {
@@ -277,8 +277,8 @@ bool VideoOutputOpenGL::CreateBuffers(void)
 
     bool success = true;
     vbuffers.Init(31, true, 1, 12, 4, 2, false);
-    success &= vbuffers.CreateBuffers(windows[0].GetVideoDim().width(),
-                                      windows[0].GetVideoDim().height());
+    success &= vbuffers.CreateBuffers(window.GetVideoDim().width(),
+                                      window.GetVideoDim().height());
 
     av_pause_frame.height = vbuffers.GetScratchFrame()->height;
     av_pause_frame.width  = vbuffers.GetScratchFrame()->width;
@@ -331,7 +331,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame, scan);
     }
 
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
     {
         gl_pipchain_active = NULL;
         ShowPIPs(frame, pipPlayers);
@@ -373,8 +373,8 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         return;
 
     gl_videochain->SetVideoRect(vsz_enabled ? vsz_desired_display_rect :
-                                              windows[0].GetDisplayVideoRect(),
-                                windows[0].GetVideoRect());
+                                              window.GetDisplayVideoRect(),
+                                window.GetVideoRect());
     gl_videochain->PrepareFrame(buffer->top_field_first, t,
                                 m_deinterlacing, framesPlayed);
 
@@ -625,7 +625,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
     }
 
     QRect position = GetPIPRect(loc, pipplayer);
-    QRect dvr = windows[0].GetDisplayVisibleRect();
+    QRect dvr = window.GetDisplayVisibleRect();
 
     gl_pip_ready[pipplayer] = false;
     OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
@@ -702,7 +702,7 @@ void VideoOutputOpenGL::MoveResizeWindow(QRect new_rect)
 
 void VideoOutputOpenGL::EmbedInWidget(int x, int y, int w, int h)
 {
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         VideoOutput::EmbedInWidget(x,y,w,h);
 
     MoveResize();
@@ -710,7 +710,7 @@ void VideoOutputOpenGL::EmbedInWidget(int x, int y, int w, int h)
 
 void VideoOutputOpenGL::StopEmbedding(void)
 {
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         return;
 
     VideoOutput::StopEmbedding();

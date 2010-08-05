@@ -198,17 +198,17 @@ VideoOutputXv::~VideoOutputXv()
     VERBOSE(VB_PLAYBACK, LOC + "dtor");
 
     const QRect tmp_display_visible_rect =
-        windows[0].GetTmpDisplayVisibleRect();
+        window.GetTmpDisplayVisibleRect();
 
-    if (windows[0].GetPIPState() == kPIPStandAlone &&
+    if (window.GetPIPState() == kPIPStandAlone &&
         !tmp_display_visible_rect.isEmpty())
     {
-        windows[0].SetDisplayVisibleRect(tmp_display_visible_rect);
+        window.SetDisplayVisibleRect(tmp_display_visible_rect);
     }
 
     if (XJ_started)
     {
-        const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+        const QRect display_visible_rect = window.GetDisplayVisibleRect();
         disp->SetForeground(disp->GetBlack());
         disp->FillRectangle(XJ_curwin, display_visible_rect);
         m_deinterlacing = false;
@@ -250,21 +250,21 @@ void VideoOutputXv::MoveResize(void)
     QMutexLocker locker(&global_lock);
     VideoOutput::MoveResize();
     if (chroma_osd)
-        windows[0].SetNeedRepaint(true);
+        window.SetNeedRepaint(true);
 }
 
 void VideoOutputXv::WindowResized(const QSize &new_size)
 {
     QMutexLocker locker(&global_lock);
 
-    windows[0].SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
+    window.SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
 
     const QSize display_dim = QSize(
         (monitor_dim.width()  * new_size.width()) / monitor_sz.width(),
         (monitor_dim.height() * new_size.height())/ monitor_sz.height());
-    windows[0].SetDisplayDim(display_dim);
+    window.SetDisplayDim(display_dim);
 
-    windows[0].SetDisplayAspect(
+    window.SetDisplayAspect(
         ((float)display_dim.width()) / display_dim.height());
 
     MoveResize();
@@ -284,8 +284,8 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     QMutexLocker locker(&global_lock);
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size     != windows[0].GetVideoDispDim();
-    bool asp_changed = aspect         != windows[0].GetVideoAspect();
+    bool res_changed = input_size     != window.GetVideoDispDim();
+    bool asp_changed = aspect         != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
     {
@@ -304,7 +304,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     bool delete_pause_frame = cid_changed;
     DeleteBuffers(VideoOutputSubType(), delete_pause_frame);
 
-    const QSize video_disp_dim = windows[0].GetVideoDispDim();
+    const QSize video_disp_dim = window.GetVideoDispDim();
     ResizeForVideo((uint) video_disp_dim.width(),
                    (uint) video_disp_dim.height());
 
@@ -725,7 +725,7 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xv, bool use_shm)
         done = InitXVideo();
 
     // only HW accel allowed for PIP and PBP
-    if (!done && windows[0].GetPIPState() > kPIPOff)
+    if (!done && window.GetPIPState() > kPIPOff)
         return done;
 
     // Fall back to shared memory, if we are allowed to use it
@@ -762,7 +762,7 @@ bool VideoOutputXv::InitXvMC()
     MythXLocker lock(disp);
     disp->StartLog();
     QString adaptor_name = QString::null;
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), video_codec_id,
                                  video_dim.width(), video_dim.height(),
                                  xv_set_defaults,
@@ -796,7 +796,7 @@ bool VideoOutputXv::InitXvMC()
             video_output_subtype = XVideoIDCT;
         if (XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD))
             video_output_subtype = XVideoVLD;
-        windows[0].SetAllowPreviewEPG(true);
+        window.SetAllowPreviewEPG(true);
     }
     else
     {
@@ -841,7 +841,7 @@ bool VideoOutputXv::InitXVideo()
     MythXLocker lock(disp);
     disp->StartLog();
     QString adaptor_name = QString::null;
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), kCodec_MPEG2,
                                  video_dim.width(), video_dim.height(),
                                  xv_set_defaults, 0, NULL, &adaptor_name);
@@ -915,7 +915,7 @@ bool VideoOutputXv::InitXVideo()
     else
     {
         video_output_subtype = XVideo;
-        windows[0].SetAllowPreviewEPG(true);
+        window.SetAllowPreviewEPG(true);
     }
 
     return ok;
@@ -949,7 +949,7 @@ bool VideoOutputXv::InitXShm()
     else
     {
         video_output_subtype = XShm;
-        windows[0].SetAllowPreviewEPG(false);
+        window.SetAllowPreviewEPG(false);
     }
 
     return ok;
@@ -983,7 +983,7 @@ bool VideoOutputXv::InitXlib()
     else
     {
         video_output_subtype = Xlib;
-        windows[0].SetAllowPreviewEPG(false);
+        window.SetAllowPreviewEPG(false);
     }
 
     return ok;
@@ -1151,7 +1151,7 @@ static QString toCommaList(const QStringList &list)
 bool VideoOutputXv::InitSetupBuffers(void)
 {
     // Figure out what video renderer to use
-    db_vdisp_profile->SetInput(windows[0].GetVideoDim());
+    db_vdisp_profile->SetInput(window.GetVideoDim());
     QStringList renderers = allowed_video_renderers(
                                 video_codec_id, disp, XJ_curwin);
     QString     renderer  = QString::null;
@@ -1195,7 +1195,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     bool use_shm    = (renderer == "xshm");
     bool ok = InitVideoBuffers(use_xv, use_shm);
 
-    if (!ok && windows[0].GetPIPState() == kPIPOff)
+    if (!ok && window.GetPIPState() == kPIPOff)
     {
         use_xv     |= (bool) renderers.contains("xv-blit");
         use_shm    |= (bool) renderers.contains("xshm");
@@ -1224,7 +1224,7 @@ bool VideoOutputXv::Init(
     WId winid, int winx, int winy, int winw, int winh,
     MythCodecID codec_id, WId embedid)
 {
-    windows[0].SetNeedRepaint(true);
+    window.SetNeedRepaint(true);
 
     XV_INIT_FATAL_ERROR_TEST(winid <= 0, "Invalid Window ID.");
 
@@ -1372,7 +1372,7 @@ bool VideoOutputXv::SetupDeinterlace(bool interlaced,
                                      const QString& overridefilter)
 {
     bool deint = VideoOutput::SetupDeinterlace(interlaced, overridefilter);
-    windows[0].SetNeedRepaint(true);
+    window.SetNeedRepaint(true);
     return deint;
 }
 
@@ -1436,7 +1436,7 @@ void VideoOutputXv::DeleteXvMCContext(MythXDisplay* disp, XvMCContext*& ctx)
 bool VideoOutputXv::CreateXvMCBuffers(void)
 {
 #ifdef USING_XVMC
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     xvmc_ctx = CreateXvMCContext(disp, xv_port,
                                  xvmc_surf_info.surface_type_id,
                                  video_dim.width(), video_dim.height());
@@ -1491,7 +1491,7 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool surface_has_vld)
     vector<void*> surfaces;
 #ifdef USING_XVMC
     uint blocks_per_macroblock = calcBPM(xvmc_chroma);
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     uint num_mv_blocks   = (((video_dim.width()  + 15) / 16) *
                             ((video_dim.height() + 15) / 16));
     uint num_data_blocks = num_mv_blocks * blocks_per_macroblock;
@@ -1578,7 +1578,7 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool surface_has_vld)
  */
 vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 {
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("CreateShmImages(%1): video_dim: %2x%3")
             .arg(num).arg(video_dim.width()).arg(video_dim.height()));
@@ -1637,8 +1637,8 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
         }
         else
         {
-            int width  = windows[0].GetDisplayVisibleRect().width()  & ~0x1;
-            int height = windows[0].GetDisplayVisibleRect().height() & ~0x1;
+            int width  = window.GetDisplayVisibleRect().width()  & ~0x1;
+            int height = window.GetDisplayVisibleRect().height() & ~0x1;
             XImage *img =
                 XShmCreateImage(d, DefaultVisual(d, disp->GetScreen()),
                                 disp->GetDepth(), ZPixmap, 0, info,
@@ -1709,8 +1709,8 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 {
     bool ok = false;
 
-    const QSize video_dim = windows[0].GetVideoDim();
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+    const QSize video_dim = window.GetVideoDim();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
 
     if (subtype > XVideo && xv_port >= 0)
         ok = CreateXvMCBuffers();
@@ -1880,14 +1880,14 @@ void VideoOutputXv::EmbedInWidget(int x, int y, int w, int h)
 {
     QMutexLocker locker(&global_lock);
 
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         VideoOutput::EmbedInWidget(x, y, w, h);
     MoveResize();
 }
 
 void VideoOutputXv::StopEmbedding(void)
 {
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         return;
 
     QMutexLocker locker(&global_lock);
@@ -2182,7 +2182,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     if (non_xv_frames_shown == 0)
         non_xv_stop_time = time(NULL) + 4;
 
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
 
     if ((!non_xv_fps) && (time(NULL) > non_xv_stop_time))
     {
@@ -2393,10 +2393,10 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     vbuffers.LockFrame(frame, "ShowXvMC");
 
     // calculate bobbing params
-    const QRect video_rect         = windows[0].GetVideoRect();
+    const QRect video_rect         = window.GetVideoRect();
     const QRect display_video_rect = (vsz_enabled && chroma_osd) ?
                                       vsz_desired_display_rect :
-                                      windows[0].GetDisplayVideoRect();
+                                      window.GetDisplayVideoRect();
     int field = 3, src_y = video_rect.top(), dest_y = display_video_rect.top();
     int xv_src_y_incr = 0, xv_dest_y_incr = 0;
     if (m_deinterlacing)
@@ -2469,10 +2469,10 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
         return;
     }
 
-    const QRect video_rect         = windows[0].GetVideoRect();
+    const QRect video_rect         = window.GetVideoRect();
     const QRect display_video_rect = (vsz_enabled && chroma_osd) ?
                                       vsz_desired_display_rect :
-                                      windows[0].GetDisplayVideoRect();
+                                      window.GetDisplayVideoRect();
     int field = 3, src_y = video_rect.top(), dest_y = display_video_rect.top(),
         xv_src_y_incr = 0, xv_dest_y_incr = 0;
     if (m_deinterlacing && (m_deintfiltername == "bobdeint"))
@@ -2514,7 +2514,7 @@ void VideoOutputXv::Show(FrameScanType scan)
         return;
     }
 
-    if ((windows[0].IsRepaintNeeded() || xv_need_bobdeint_repaint) &&
+    if ((window.IsRepaintNeeded() || xv_need_bobdeint_repaint) &&
          VideoOutputSubType() >= XVideo)
     {
         DrawUnusedRects(/* don't do a sync*/false);
@@ -2545,13 +2545,13 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
 {
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     bool use_bob   = (m_deinterlacing && m_deintfiltername == "bobdeint");
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
+    const QRect display_video_rect   = window.GetDisplayVideoRect();
     int boboff_raw = (int)round(((double)display_video_rect.height()) /
                                 456 - 0.00001);
     int boboff     = use_bob ? boboff_raw : 0;
 
-    xv_need_bobdeint_repaint |= windows[0].IsRepaintNeeded();
+    xv_need_bobdeint_repaint |= window.IsRepaintNeeded();
 
     Display *d = disp->GetDisplay();
     if (chroma_osd && chroma_osd->GetImage() && xv_need_bobdeint_repaint)
@@ -2563,7 +2563,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
         if (sync)
             disp->Sync();
 
-        windows[0].SetNeedRepaint(false);
+        window.SetNeedRepaint(false);
         xv_need_bobdeint_repaint = false;
         return;
     }
@@ -2571,9 +2571,9 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
     // This is used to avoid drawing the colorkey when embedding and
     // not using overlay. This is needed because we don't paint this
     // in the vertical retrace period when calling this from the EPG.
-    bool clrdraw = xv_colorkey || !windows[0].IsEmbedding();
+    bool clrdraw = xv_colorkey || !window.IsEmbedding();
 
-    if (xv_draw_colorkey && windows[0].IsRepaintNeeded() && clrdraw)
+    if (xv_draw_colorkey && window.IsRepaintNeeded() && clrdraw)
     {
         disp->SetForeground(xv_colorkey);
         disp->FillRectangle(XJ_curwin,
@@ -2599,7 +2599,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
                        display_visible_rect.height()));
     }
 
-    windows[0].SetNeedRepaint(false);
+    window.SetNeedRepaint(false);
     xv_need_bobdeint_repaint = false;
 
     // Set colour for masked areas
@@ -2873,11 +2873,11 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     {
         vbuffers.UnlockFrame(frame, "ProcessFrameXvMC");
         QMutexLocker locker(&global_lock);
-        if (!windows[0].IsEmbedding() && osd)
+        if (!window.IsEmbedding() && osd)
         {
             bool needrepaint = chroma_osd->ProcessOSD(osd);
-            if (!windows[0].IsRepaintNeeded() && needrepaint)
-                windows[0].SetNeedRepaint(true);
+            if (!window.IsRepaintNeeded() && needrepaint)
+                window.SetNeedRepaint(true);
         }
         return;
     }
@@ -2909,7 +2909,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     }
 
     XvMCOSD* xvmc_osd = NULL;
-    if (!windows[0].IsEmbedding() && osd)
+    if (!window.IsEmbedding() && osd)
         xvmc_osd = GetAvailableOSD();
 
     if (xvmc_osd && xvmc_osd->IsValid())
@@ -3057,15 +3057,15 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
 
     ShowPIPs(frame, pipPlayers);
 
-    if (osd && !windows[0].IsEmbedding())
+    if (osd && !window.IsEmbedding())
     {
         if (!chroma_osd)
             DisplayOSD(frame, osd);
         else
         {
             QMutexLocker locker(&global_lock);
-            windows[0].SetNeedRepaint(
-                chroma_osd->ProcessOSD(osd) || windows[0].IsRepaintNeeded());
+            window.SetNeedRepaint(
+                chroma_osd->ProcessOSD(osd) || window.IsRepaintNeeded());
         }
     }
 
@@ -3428,22 +3428,22 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
         return VideoOutput::GetPIPRect(location, pipplayer);
 
     QRect position;
-    const QSize video_disp_dim       = windows[0].GetVideoDispDim();
-    const QRect video_rect           = windows[0].GetVideoRect();
-    const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    float video_aspect               = windows[0].GetVideoAspect();
+    const QSize video_disp_dim       = window.GetVideoDispDim();
+    const QRect video_rect           = window.GetVideoRect();
+    const QRect display_video_rect   = window.GetDisplayVideoRect();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
+    float video_aspect               = window.GetVideoAspect();
     if (video_aspect < 0.01f)
         video_aspect = 1.3333f;
 
-    const float pip_size             = (float)windows[0].GetPIPSize();
+    const float pip_size             = (float)window.GetPIPSize();
     const float pipVideoAspect       = pipplayer->GetVideoAspect();
 
     // adjust for aspect override modes...
     int letterXadj = 0;
     int letterYadj = 0;
     float letterAdj = 1.0f;
-    if (windows[0].GetAspectOverride() != kAspect_Off)
+    if (window.GetAspectOverride() != kAspect_Off)
     {
         letterXadj = max(-display_video_rect.left(), 0);
         float xadj = (float)video_rect.width() / display_visible_rect.width();
@@ -3451,8 +3451,8 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation  location,
         float yadj = (float)video_rect.height() / display_visible_rect.height();
         letterYadj = max(-display_video_rect.top(), 0);
         letterYadj = (int)(letterYadj * yadj);
-        letterAdj  = windows[0].GetVideoAspect() /
-            windows[0].GetOverridenVideoAspect();
+        letterAdj  = window.GetVideoAspect() /
+            window.GetOverridenVideoAspect();
     }
     // adjust for the relative aspect ratios of pip and main video
     float aspectAdj  = pipVideoAspect / video_aspect;

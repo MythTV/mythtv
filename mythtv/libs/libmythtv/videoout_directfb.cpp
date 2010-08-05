@@ -377,7 +377,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
                 .arg(winw).arg(winh).arg(conf.width).arg(conf.height));
     }
 
-    windows[0].SetDisplayVisibleRect(
+    window.SetDisplayVisibleRect(
         QRect(winx, winy, conf.width, conf.height));
 
     // We can't query the physical dimentions of the screen so use DB..
@@ -386,12 +386,12 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     if (!display_dim.height() || !display_dim.width())
         display_dim = QSize(400, 300);
 
-    windows[0].SetDisplayAspect(
+    window.SetDisplayAspect(
         ((float)(display_dim.width())) / ((float)(display_dim.height())));
 
-    windows[0].SetDisplayDim(display_dim);
+    window.SetDisplayDim(display_dim);
 
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("output : screen pixel size %1x%2")
             .arg(display_visible_rect.width())
@@ -449,7 +449,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     }
 
     const QSize video_dim = fix_alignment(QSize(width, height));
-    windows[0].SetVideoDim(video_dim);
+    window.SetVideoDim(video_dim);
 
     // Find an output layer that supports a format we can deal with.
     // begin with the video format we have as input, fall back to others
@@ -915,7 +915,7 @@ bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
 
     desc.flags = (DFBSurfaceDescriptionFlags)
         (DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     desc.width  = video_dim.width();
     desc.height = video_dim.height();
     desc.pixelformat = data->videoLayerConfig.pixelformat;
@@ -953,8 +953,8 @@ void VideoOutputDirectfb::MoveResize(void)
 {
     VideoOutput::MoveResize();
 
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
+    const QRect display_video_rect   = window.GetDisplayVideoRect();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("MoveResize : screen size %1x%2, "
                     "proposed x : %3, y : %4, w : %5, h : %6")

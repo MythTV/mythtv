@@ -88,7 +88,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     (void) embedid;
     m_win = winid;
     QMutexLocker locker(&m_lock);
-    windows[0].SetNeedRepaint(true);
+    window.SetNeedRepaint(true);
     bool ok = VideoOutput::Init(width, height, aspect,
                                 winid, winx, winy, winw, winh,
                                 codec_id, embedid);
@@ -121,7 +121,7 @@ bool VideoOutputVDPAU::InitRender(void)
 {
     QMutexLocker locker(&m_lock);
 
-    const QSize size = windows[0].GetDisplayVisibleRect().size();
+    const QSize size = window.GetDisplayVisibleRect().size();
     const QRect rect = QRect(QPoint(0,0), size);
     m_render = new MythRenderVDPAU();
 
@@ -173,7 +173,7 @@ bool VideoOutputVDPAU::InitBuffers(void)
     QMutexLocker locker(&m_lock);
     if (!m_render)
         return false;
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
 
     vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
 
@@ -242,7 +242,7 @@ bool VideoOutputVDPAU::CreateVideoSurfaces(uint num)
         return false;
 
     bool ret = true;
-    QSize size = windows[0].GetVideoDim();
+    QSize size = window.GetVideoDim();
     for (uint i = 0; i < num; i++)
     {
         uint tmp = m_render->CreateVideoSurface(size);
@@ -288,13 +288,13 @@ void VideoOutputVDPAU::RestoreDisplay(void)
     QMutexLocker locker(&m_lock);
 
     const QRect tmp_display_visible_rect =
-        windows[0].GetTmpDisplayVisibleRect();
-    if (windows[0].GetPIPState() == kPIPStandAlone &&
+        window.GetTmpDisplayVisibleRect();
+    if (window.GetPIPState() == kPIPStandAlone &&
         !tmp_display_visible_rect.isEmpty())
     {
-        windows[0].SetDisplayVisibleRect(tmp_display_visible_rect);
+        window.SetDisplayVisibleRect(tmp_display_visible_rect);
     }
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+    const QRect display_visible_rect = window.GetDisplayVisibleRect();
 
     if (m_render)
         m_render->DrawDisplayRect(display_visible_rect);
@@ -480,17 +480,17 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
 
     m_render->WaitForFlip();
 
-    QSize size = windows[0].GetDisplayVisibleRect().size();
+    QSize size = window.GetDisplayVisibleRect().size();
     if (size != m_render->GetSize())
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unexpected display size."));
 
     if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
                               deint ? &m_reference_frames : NULL,
                               scan == kScan_Interlaced,
-                              windows[0].GetVideoRect(),
+                              window.GetVideoRect(),
                               QRect(QPoint(0,0), size),
                               vsz_enabled ? vsz_desired_display_rect :
-                                            windows[0].GetDisplayVideoRect(),
+                                            window.GetDisplayVideoRect(),
                               m_pip_ready ? m_pip_layer : 0, 0))
         VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Prepare frame failed."));
 
@@ -626,7 +626,7 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
     QMutexLocker locker(&m_lock);
     CHECK_ERROR("Show")
 
-    if (windows[0].IsRepaintNeeded())
+    if (window.IsRepaintNeeded())
         DrawUnusedRects(false);
 
     if (m_render)
@@ -657,8 +657,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&m_lock);
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size  != windows[0].GetVideoDim();
-    bool asp_changed = aspect      != windows[0].GetVideoAspect();
+    bool res_changed = input_size  != window.GetVideoDim();
+    bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
     {
@@ -672,7 +672,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     }
 
     TearDown();
-    QRect disp = windows[0].GetDisplayVisibleRect();
+    QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, m_win, disp.left(), disp.top(),
              disp.width(), disp.height(), av_codec_id, 0))
@@ -704,17 +704,17 @@ void VideoOutputVDPAU::VideoAspectRatioChanged(float aspect)
 void VideoOutputVDPAU::EmbedInWidget(int x, int y,int w, int h)
 {
     QMutexLocker locker(&m_lock);
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
     {
         VideoOutput::EmbedInWidget(x, y, w, h);
         MoveResize();
-        windows[0].SetDisplayVisibleRect(windows[0].GetTmpDisplayVisibleRect());
+        window.SetDisplayVisibleRect(window.GetTmpDisplayVisibleRect());
     }
 }
 
 void VideoOutputVDPAU::StopEmbedding(void)
 {
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         return;
     QMutexLocker locker(&m_lock);
     VideoOutput::StopEmbedding();
@@ -732,11 +732,11 @@ void VideoOutputVDPAU::MoveResizeWindow(QRect new_rect)
 void VideoOutputVDPAU::DrawUnusedRects(bool sync)
 {
     m_lock.lock();
-    if (windows[0].IsRepaintNeeded() && m_render)
+    if (window.IsRepaintNeeded() && m_render)
     {
-        const QRect dvr = windows[0].GetDisplayVisibleRect();
+        const QRect dvr = window.GetDisplayVisibleRect();
         m_render->DrawDisplayRect(dvr, true);
-        windows[0].SetNeedRepaint(false);
+        window.SetNeedRepaint(false);
         if (sync)
             m_render->SyncDisplay();
     }
@@ -800,7 +800,7 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
 
         if (m_colorspace < 0)
         {
-            QSize size = windows[0].GetVideoDim();
+            QSize size = window.GetVideoDim();
             m_colorspace = (size.width() > 720 || size.height() > 576) ?
                             VDP_COLOR_STANDARD_ITUR_BT_709 :
                             VDP_COLOR_STANDARD_ITUR_BT_601;
@@ -1060,7 +1060,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
         return;
     }
 
-    if (InitPIPLayer(windows[0].GetDisplayVisibleRect().size()))
+    if (InitPIPLayer(window.GetDisplayVisibleRect().size()))
     {
         if (m_pips.contains(pipplayer) &&
             m_pips[pipplayer].videoSize != pipVideoDim)

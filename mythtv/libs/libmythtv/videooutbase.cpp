@@ -372,8 +372,6 @@ VideoOutput::VideoOutput() :
 
     if (!gCoreContext->IsDatabaseIgnored())
         db_vdisp_profile = new VideoDisplayProfile();
-
-    windows.push_back(VideoOutWindow());
 }
 
 /**
@@ -416,13 +414,13 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     (void)embedid;
 
     video_codec_id = codec_id;
-    bool mainSuccess = windows[0].Init(
+    bool mainSuccess = window.Init(
         QSize(width, height), aspect,
         QRect(winx, winy, winw, winh),
         db_aspectoverride, db_adjustfill);
 
     if (db_vdisp_profile)
-        db_vdisp_profile->SetInput(windows[0].GetVideoDim());
+        db_vdisp_profile->SetInput(window.GetVideoDim());
 
 /*
     aspectoverride  = db_aspectoverride;
@@ -451,7 +449,7 @@ QString VideoOutput::GetFilters(void) const
 
 bool VideoOutput::IsPreferredRenderer(QSize video_size)
 {
-    if (!db_vdisp_profile || (video_size == windows[0].GetVideoDispDim()))
+    if (!db_vdisp_profile || (video_size == window.GetVideoDispDim()))
         return true;
 
     VideoDisplayProfile vdisp;
@@ -497,7 +495,7 @@ bool VideoOutput::SetDeinterlacingEnabled(bool enable)
 bool VideoOutput::SetupDeinterlace(bool interlaced,
                                    const QString& overridefilter)
 {
-    PIPState pip_state = windows[0].GetPIPState();
+    PIPState pip_state = window.GetPIPState();
 
     if (pip_state > kPIPOff && pip_state < kPBPLeft)
         return false;
@@ -548,13 +546,13 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
             {
                 int threads = db_vdisp_profile ?
                                 db_vdisp_profile->GetMaxCPUs() : 1;
-                const QSize video_dim = windows[0].GetVideoDim();
+                const QSize video_dim = window.GetVideoDim();
                 int width  = video_dim.width();
                 int height = video_dim.height();
                 m_deintFilter = m_deintFiltMan->LoadFilters(
                     m_deintfiltername, itmp, otmp,
                     width, height, btmp, threads);
-                windows[0].SetVideoDim(QSize(width, height));
+                window.SetVideoDim(QSize(width, height));
             }
         }
 
@@ -653,9 +651,7 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
  */
 void VideoOutput::VideoAspectRatioChanged(float aspect)
 {
-    vector<VideoOutWindow>::iterator it = windows.begin();
-    for (; it != windows.end(); ++it)
-        (*it).VideoAspectRatioChanged(aspect);
+    window.VideoAspectRatioChanged(aspect);
 }
 
 /**
@@ -669,12 +665,10 @@ bool VideoOutput::InputChanged(const QSize &input_size,
                                void        *codec_private,
                                bool        &aspect_only)
 {
-    vector<VideoOutWindow>::iterator it = windows.begin();
-    for (; it != windows.end(); ++it)
-        (*it).InputChanged(input_size, aspect, myth_codec_id, codec_private);
+    window.InputChanged(input_size, aspect, myth_codec_id, codec_private);
 
     if (db_vdisp_profile)
-        db_vdisp_profile->SetInput(windows[0].GetVideoDim());
+        db_vdisp_profile->SetInput(window.GetVideoDim());
     video_codec_id = myth_codec_id;
     BestDeint();
 
@@ -687,7 +681,7 @@ bool VideoOutput::InputChanged(const QSize &input_size,
 */
 void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
 {
-    windows[0].ResizeDisplayWindow(rect, save_visible_rect);
+    window.ResizeDisplayWindow(rect, save_visible_rect);
 }
 
 /**
@@ -700,7 +694,7 @@ void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
  */
 void VideoOutput::EmbedInWidget(int x, int y, int w, int h)
 {
-    windows[0].EmbedInWidget(QRect(x, y, w, h));
+    window.EmbedInWidget(QRect(x, y, w, h));
 }
 
 /**
@@ -710,7 +704,7 @@ void VideoOutput::EmbedInWidget(int x, int y, int w, int h)
  */
 void VideoOutput::StopEmbedding(void)
 {
-    windows[0].StopEmbedding();
+    window.StopEmbedding();
 }
 
 /**
@@ -747,11 +741,11 @@ QRect VideoOutput::GetVisibleOSDBounds(
 {
     if (!hasFullScreenOSD())
     {
-        return windows[0].GetVisibleOSDBounds(
+        return window.GetVisibleOSDBounds(
             visible_aspect, font_scaling, themeaspect);
     }
 
-    QRect dvr = windows[0].GetDisplayVisibleRect();
+    QRect dvr = window.GetDisplayVisibleRect();
 
     // This rounding works for I420 video...
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
@@ -772,9 +766,9 @@ QRect VideoOutput::GetVisibleOSDBounds(
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
     if (!hasFullScreenOSD())
-        return windows[0].GetTotalOSDBounds();
+        return window.GetTotalOSDBounds();
 
-    QRect dvr = windows[0].GetDisplayVisibleRect();
+    QRect dvr = window.GetDisplayVisibleRect();
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
                        dvr.height() & ~0x1);
 
@@ -784,16 +778,16 @@ QRect VideoOutput::GetTotalOSDBounds(void) const
 QRect VideoOutput::GetMHEGBounds(void)
 {
     if (!hasFullScreenOSD())
-        return windows[0].GetTotalOSDBounds();
+        return window.GetTotalOSDBounds();
 
-    QRect dvr = windows[0].GetDisplayVideoRect();
+    QRect dvr = window.GetDisplayVideoRect();
     return QRect(QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
                  QSize(dvr.width() & ~0x1, dvr.height() & ~0x1));
 }
 
 bool VideoOutput::AllowPreviewEPG(void) const
 {
-    return windows[0].IsPreviewEPGAllowed();
+    return window.IsPreviewEPGAllowed();
 }
 
 /**
@@ -808,7 +802,7 @@ bool VideoOutput::AllowPreviewEPG(void) const
  */
 void VideoOutput::MoveResize(void)
 {
-    windows[0].MoveResize();
+    window.MoveResize();
 }
 
 /**
@@ -819,7 +813,7 @@ void VideoOutput::MoveResize(void)
  */
 void VideoOutput::Zoom(ZoomDirection direction)
 {
-    windows[0].Zoom(direction);
+    window.Zoom(direction);
 }
 
 /**
@@ -831,7 +825,7 @@ void VideoOutput::Zoom(ZoomDirection direction)
  */
 void VideoOutput::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
-    windows[0].ToggleAspectOverride(aspectMode);
+    window.ToggleAspectOverride(aspectMode);
 }
 
 /**
@@ -843,7 +837,7 @@ void VideoOutput::ToggleAspectOverride(AspectOverrideMode aspectMode)
  */
 void VideoOutput::ToggleAdjustFill(AdjustFillMode adjustFill)
 {
-    windows[0].ToggleAdjustFill(adjustFill);
+    window.ToggleAdjustFill(adjustFill);
 }
 
 int VideoOutput::ChangePictureAttribute(
@@ -925,7 +919,7 @@ QString VideoOutput::GetOSDRenderer(void) const
 QRect VideoOutput::GetPIPRect(
     PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
 {
-    return windows[0].GetPIPRect(location, pipplayer, do_pixel_adj);
+    return window.GetPIPRect(location, pipplayer, do_pixel_adj);
 }
 
 /**
@@ -1014,11 +1008,11 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
     if (!pipplayer)
         return;
 
-    const float video_aspect           = windows[0].GetVideoAspect();
-    const QRect display_video_rect     = windows[0].GetDisplayVideoRect();
-    const QRect video_rect             = windows[0].GetVideoRect();
-    const QRect display_visible_rect   = windows[0].GetDisplayVisibleRect();
-    const QSize video_disp_dim         = windows[0].GetVideoDispDim();
+    const float video_aspect           = window.GetVideoAspect();
+    const QRect display_video_rect     = window.GetDisplayVideoRect();
+    const QRect video_rect             = window.GetVideoRect();
+    const QRect display_visible_rect   = window.GetDisplayVisibleRect();
+    const QSize video_disp_dim         = window.GetVideoDispDim();
 
     int pipw, piph;
     VideoFrame *pipimage       = pipplayer->GetCurrentFrame(pipw, piph);
@@ -1224,22 +1218,22 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
 
 AspectOverrideMode VideoOutput::GetAspectOverride(void) const
 {
-    return windows[0].GetAspectOverride();
+    return window.GetAspectOverride();
 }
 
 AdjustFillMode VideoOutput::GetAdjustFill(void) const
 {
-    return windows[0].GetAdjustFill();
+    return window.GetAdjustFill();
 }
 
 float VideoOutput::GetDisplayAspect(void) const
 {
-    return windows[0].GetDisplayAspect();
+    return window.GetDisplayAspect();
 }
 
 bool VideoOutput::IsVideoScalingAllowed(void) const
 {
-    return windows[0].IsVideoScalingAllowed();
+    return window.IsVideoScalingAllowed();
 }
 
 void VideoOutput::ShutdownVideoResize(void)
@@ -1282,7 +1276,7 @@ void VideoOutput::SetVideoResize(const QRect &videoRect)
  */
 void VideoOutput::SetVideoScalingAllowed(bool change)
 {
-    windows[0].SetVideoScalingAllowed(change);
+    window.SetVideoScalingAllowed(change);
 }
 
 /**
@@ -1347,7 +1341,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     if (!changed && frame->codec != FMT_YV12)
         return show;
 
-    QSize video_dim = windows[0].GetVideoDim();
+    QSize video_dim = window.GetVideoDim();
 
     QVector<QRect> vis = visible.rects();
     for (int i = 0; i < vis.size(); i++)
@@ -1452,7 +1446,7 @@ QRect VideoOutput::GetImageRect(const QRect &rect)
     float hscale, vscale, tmp;
     tmp = 0.0;
     QRect visible_osd  = GetVisibleOSDBounds(tmp, tmp, tmp);
-    QSize video_size   = windows[0].GetVideoDispDim();
+    QSize video_size   = window.GetVideoDispDim();
     int image_height   = video_size.height();
     int image_width    = (image_height > 720) ? 1920 :
                          (image_height > 576) ? 1280 : 720;
@@ -1462,8 +1456,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect)
 
     if (hasFullScreenOSD())
     {
-        QRect dvr_rec = windows[0].GetDisplayVideoRect();
-        QRect vid_rec = windows[0].GetVideoRect();
+        QRect dvr_rec = window.GetDisplayVideoRect();
+        QRect vid_rec = window.GetVideoRect();
 
         hscale = image_aspect / pixel_aspect;
         if (hscale < 0.99f || hscale > 1.01f)
@@ -1512,14 +1506,14 @@ QRect VideoOutput::GetSafeRect(void)
     QRect result;
     if (hasFullScreenOSD())
     {
-        result = windows[0].GetDisplayVideoRect()
-            .intersected(windows[0].GetDisplayVisibleRect());
+        result = window.GetDisplayVideoRect()
+            .intersected(window.GetDisplayVisibleRect());
     }
     else
     {
         float visible_aspect, font_scaling;
         float themeaspect = 16.0f/9.0f;
-        result = windows[0].GetVisibleOSDBounds(
+        result = window.GetVisibleOSDBounds(
             visible_aspect, font_scaling, themeaspect);
     }
     int safex = (int)((float)result.width()  * safeMargin);
@@ -1530,7 +1524,7 @@ QRect VideoOutput::GetSafeRect(void)
 
 void VideoOutput::SetPIPState(PIPState setting)
 {
-    windows[0].SetPIPState(setting);
+    window.SetPIPState(setting);
 }
 
 
@@ -1548,12 +1542,12 @@ static QString to_comma_list(const QStringList &list)
 
 bool VideoOutput::IsEmbedding(void)
 {
-    return windows[0].IsEmbedding();
+    return window.IsEmbedding();
 }
 
 void VideoOutput::ExposeEvent(void)
 {
-    windows[0].SetNeedRepaint(true);
+    window.SetNeedRepaint(true);
 }
 
 /**
@@ -1585,8 +1579,8 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
 
     if (!width || !height)
     {
-        width  = windows[0].GetVideoDispDim().width();
-        height = windows[0].GetVideoDispDim().height();
+        width  = window.GetVideoDispDim().width();
+        height = window.GetVideoDispDim().height();
         if (!width || !height)
             return;
     }
@@ -1598,11 +1592,11 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
-        windows[0].SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
+        window.SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
                                        display_res->GetPhysicalHeight()));
-        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
+        window.SetDisplayAspect(display_res->GetAspectRatio());
 
-        bool fullscreen = !windows[0].UsingGuiSize();
+        bool fullscreen = !window.UsingGuiSize();
 
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
@@ -1617,7 +1611,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
             QSize sz(display_res->GetWidth(), display_res->GetHeight());
             const QRect display_visible_rect =
                     QRect(GetMythMainWindow()->geometry().topLeft(), sz);
-            windows[0].SetDisplayVisibleRect(display_visible_rect);
+            window.SetDisplayVisibleRect(display_visible_rect);
             MoveResize();
             // Resize X window to fill new resolution
             MoveResizeWindow(display_visible_rect);
@@ -1638,10 +1632,10 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     // desired res, because X will mask off anything outside
     // the initial dimensions
     QSize sz1 = disp.res;
-    QSize sz2 = windows[0].GetScreenGeometry().size();
+    QSize sz2 = window.GetScreenGeometry().size();
     QSize max_size = sz1.expandedTo(sz2);
 
-    if (windows[0].UsingGuiSize())
+    if (window.UsingGuiSize())
         max_size = GetMythMainWindow()->geometry().size();
 
     if (display_res)
@@ -1661,11 +1655,11 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     // DisplayRes, this will be overridden when we call ResizeForVideo
     if (db_display_dim.isEmpty())
     {
-        windows[0].SetDisplayDim(disp.size);
+        window.SetDisplayDim(disp.size);
     }
     else
     {
-        windows[0].SetDisplayDim(db_display_dim);
+        window.SetDisplayDim(db_display_dim);
         source = "Database";
     }
 
@@ -1674,8 +1668,8 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
         ResizeForVideo(width, height);
 
     // Determine window and screen dimensions in pixels
-    QSize screen_size = windows[0].GetScreenGeometry().size();
-    QSize window_size = windows[0].GetDisplayVisibleRect().size();
+    QSize screen_size = window.GetScreenGeometry().size();
+    QSize window_size = window.GetDisplayVisibleRect().size();
 
     float pixel_aspect = (float)screen_size.width() /
                          (float)screen_size.height();
@@ -1686,14 +1680,14 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
             .arg(window_size.width()).arg(window_size.height()));
 
     // Check the display dimensions
-    QSize disp_dim = windows[0].GetDisplayDim();
+    QSize disp_dim = window.GetDisplayDim();
     float disp_aspect;
 
     // If we are using Xinerama the display dimensions can not be trusted.
     // We need to use the Xinerama monitor aspect ratio from the DB to set
     // the physical screen width. This assumes the height is correct, which
     // is more or less true in the typical side-by-side monitor setup.
-    if (windows[0].UsingXinerama())
+    if (window.UsingXinerama())
     {
         source = "Xinerama";
         disp_aspect = gCoreContext->GetFloatSettingOnHost(
@@ -1727,16 +1721,16 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     disp_dim = QSize((disp_dim.width()  * window_size.width()) / screen_size.width(),
                      (disp_dim.height() * window_size.height()) / screen_size.height());
     disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();
-    windows[0].SetDisplayDim(disp_dim);
-    windows[0].SetDisplayAspect(disp_aspect);
+    window.SetDisplayDim(disp_dim);
+    window.SetDisplayAspect(disp_aspect);
 
     // If we are using XRandR, use the aspect ratio from it
     if (display_res)
-        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
+        window.SetDisplayAspect(display_res->GetAspectRatio());
 
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
-            .arg(windows[0].GetDisplayDim().width())
-            .arg(windows[0].GetDisplayDim().height())
-            .arg(windows[0].GetDisplayAspect()));
+            .arg(window.GetDisplayDim().width())
+            .arg(window.GetDisplayDim().height())
+            .arg(window.GetDisplayAspect()));
 }

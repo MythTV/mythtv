@@ -1146,7 +1146,7 @@ void VideoOutputQuartz::ToggleAdjustFill(AdjustFillMode adjustFill)
 
     // We could change all the views, but the user probably only
     // wants the main one (window or fullscreen) to change.
-    data->views[0]->MoveResize(windows[0].GetDisplayVideoRect());
+    data->views[0]->MoveResize(window.GetDisplayVideoRect());
 }
 
 void VideoOutputQuartz::MoveResize(void)
@@ -1155,7 +1155,7 @@ void VideoOutputQuartz::MoveResize(void)
     // the user's current aspect/fill/letterbox/zoom settings.
     VideoOutput::MoveResize();
 
-    QRect newRect = windows[0].GetDisplayVideoRect();
+    QRect newRect = window.GetDisplayVideoRect();
 
     vector<VideoOutputQuartzView*>::iterator it;
     for (it = data->views.begin(); it != data->views.end(); ++it)
@@ -1182,8 +1182,8 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
             .arg(input_size.height()).arg(aspect));
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size != windows[0].GetVideoDispDim();
-    bool asp_changed = aspect != windows[0].GetVideoAspect();
+    bool res_changed = input_size != window.GetVideoDispDim();
+    bool asp_changed = aspect != window.GetVideoAspect();
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
                               aspect_only);
@@ -1199,7 +1199,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
         return true;
     }
 
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
 
     DeleteQuartzBuffers();
 
@@ -1239,7 +1239,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, codec_id, embedid);
 
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     data->srcWidth  = video_dim.width();
     data->srcHeight = video_dim.height();
     data->srcAspect = aspect;
@@ -1293,9 +1293,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     CGSize size_in_mm = CGDisplayScreenSize(data->screen);
     if ((size_in_mm.width > 0.0001f) && (size_in_mm.height > 0.0001f))
     {
-        windows[0].SetDisplayDim(QSize((uint) size_in_mm.width,
+        window.SetDisplayDim(QSize((uint) size_in_mm.width,
                                        (uint) size_in_mm.height));
-        windows[0].SetDisplayAspect(size_in_mm.width / size_in_mm.height);
+        window.SetDisplayAspect(size_in_mm.width / size_in_mm.height);
         VERBOSE(VB_PLAYBACK, QString("Screen size is %1 x %2 (mm), aspect %3")
                              .arg(size_in_mm.width).arg(size_in_mm.height)
                              .arg(size_in_mm.width / size_in_mm.height));
@@ -1317,8 +1317,8 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                           / get_int_CF(m, kCGDisplayWidth);
         float winHeight = size_in_mm.height * winh
                           / get_int_CF(m, kCGDisplayHeight);
-        windows[0].SetDisplayDim(QSize(winWidth, winHeight));
-        windows[0].SetDisplayAspect(winWidth / winHeight);
+        window.SetDisplayDim(QSize(winWidth, winHeight));
+        window.SetDisplayAspect(winWidth / winHeight);
         VERBOSE(VB_PLAYBACK, QString("Main window is %1 x %2 (mm), aspect %3")
                              .arg((int)winWidth).arg((int)winHeight)
                              .arg(winWidth / winHeight));
@@ -1422,7 +1422,7 @@ static QString toCommaList(const QStringList &list)
 
 bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
-    const QSize video_dim = windows[0].GetVideoDim();
+    const QSize video_dim = window.GetVideoDim();
     db_vdisp_profile->SetInput(video_dim);
     QStringList renderers = GetAllowedRenderers(video_codec_id, video_dim);
     QString     renderer  = QString::null;
@@ -1554,13 +1554,13 @@ void VideoOutputQuartz::EmbedInWidget(int x, int y, int w, int h)
     VERBOSE(VB_PLAYBACK, (LOC + "EmbedInWidget(x=%1, y=%2, w=%3, h=%4)")
                          .arg(x).arg(y).arg(w).arg(h));
 
-    if (windows[0].IsEmbedding())
+    if (window.IsEmbedding())
         return;
 
     VideoOutput::EmbedInWidget(x, y, w, h);
     // Base class has now calculated Aspect/Fill,
     // so copy for precision sizing of new widget:
-    QRect newArea = windows[0].GetDisplayVideoRect();
+    QRect newArea = window.GetDisplayVideoRect();
 
     x = newArea.left(), y = newArea.top(),
     w = newArea.width(), h = newArea.height();
@@ -1585,7 +1585,7 @@ void VideoOutputQuartz::StopEmbedding(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "StopEmbedding()");
 
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         return;
 
     VideoOutput::StopEmbedding();
@@ -1726,7 +1726,7 @@ void VideoOutputQuartz::ResizeForVideo(uint width, uint height)
     VideoOutput::ResizeForVideo(width, height);
 
     // Base class gives us the correct dimensions for main window/screen:
-    QRect size = windows[0].GetDisplayVideoRect();
+    QRect size = window.GetDisplayVideoRect();
 
     data->pixelLock.lock();
     vector<VideoOutputQuartzView*>::iterator it = data->views.begin();

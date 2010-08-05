@@ -279,7 +279,7 @@ class VideoOutput
 
     void SetVideoAspectRatio(float aspect);
 
-    vector<VideoOutWindow> windows;
+    VideoOutWindow window;
     QSize   db_display_dim;   ///< Screen dimensions in millimeters from DB
     typedef QMap<PictureAttribute,int> PictureSettingMap;
     PictureSettingMap  db_pict_attr; ///< Picture settings

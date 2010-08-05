@@ -114,8 +114,8 @@ void VideoOutputD3D::WindowResized(const QSize &new_size)
     // FIXME this now requires the context to be re-created
     /*
     QMutexLocker locker(&m_lock);
-    windows[0].SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
-    windows[0].SetDisplayAspect(
+    window.SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
+    window.SetDisplayAspect(
         ((float)new_size.width()) / new_size.height());
 
     MoveResize();
@@ -142,9 +142,9 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
         return false;
     }
 
-    if (input_size == windows[0].GetVideoDim())
+    if (input_size == window.GetVideoDim())
     {
-        if (windows[0].GetVideoAspect() != aspect)
+        if (window.GetVideoAspect() != aspect)
         {
             aspect_only = true;
             VideoAspectRatioChanged(aspect);
@@ -154,7 +154,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
     }
 
     TearDown();
-    QRect disp = windows[0].GetDisplayVisibleRect();
+    QRect disp = window.GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
              aspect, m_hWnd, disp.left(), disp.top(),
              disp.width(), disp.height(), av_codec_id, m_hEmbedWnd))
@@ -173,9 +173,9 @@ bool VideoOutputD3D::SetupContext()
 {
     QMutexLocker locker(&m_lock);
     DestroyContext();
-    QSize size = windows[0].GetVideoDim();
+    QSize size = window.GetVideoDim();
     m_render = new MythRenderD3D9();
-    if (!(m_render && m_render->Create(windows[0].GetDisplayVisibleRect().size(),
+    if (!(m_render && m_render->Create(window.GetDisplayVisibleRect().size(),
                                  m_hWnd)))
         return false;
 
@@ -196,7 +196,7 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     QMutexLocker locker(&m_lock);
     m_hWnd      = winid;
     m_hEmbedWnd = embedid;
-    windows[0].SetAllowPreviewEPG(true);
+    window.SetAllowPreviewEPG(true);
 
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, codec_id, embedid);
@@ -211,8 +211,8 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
-    success &= vbuffers.CreateBuffers(windows[0].GetVideoDim().width(),
-                                      windows[0].GetVideoDim().height());
+    success &= vbuffers.CreateBuffers(window.GetVideoDim().width(),
+                                      window.GetVideoDim().height());
     m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
     m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
     m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
@@ -261,10 +261,10 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     if (m_render_valid)
     {
         QRect dvr = vsz_enabled ? vsz_desired_display_rect :
-                                  windows[0].GetDisplayVideoRect();
+                                  window.GetDisplayVideoRect();
         bool ok = m_render->ClearBuffer();
         if (ok)
-            ok = m_video->UpdateVertices(dvr, windows[0].GetVideoRect(),
+            ok = m_video->UpdateVertices(dvr, window.GetVideoRect(),
                                          255, true);
 
         if (ok)
@@ -314,12 +314,12 @@ void VideoOutputD3D::Show(FrameScanType )
 
     m_render_valid = m_render->Test(m_render_reset);
     if (m_render_valid)
-        m_render->Present(windows[0].IsEmbedding() ? m_hEmbedWnd : NULL);
+        m_render->Present(window.IsEmbedding() ? m_hEmbedWnd : NULL);
 }
 
 void VideoOutputD3D::EmbedInWidget(int x, int y, int w, int h)
 {
-    if (windows[0].IsEmbedding())
+    if (window.IsEmbedding())
         return;
 
     VideoOutput::EmbedInWidget(x, y, w, h);
@@ -328,7 +328,7 @@ void VideoOutputD3D::EmbedInWidget(int x, int y, int w, int h)
 
 void VideoOutputD3D::StopEmbedding(void)
 {
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         return;
 
     VideoOutput::StopEmbedding();
@@ -437,7 +437,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame, scan);
     }
 
-    if (!windows[0].IsEmbedding())
+    if (!window.IsEmbedding())
         ShowPIPs(frame, pipPlayers);
 
     if ((!pauseframe || safepauseframe) &&
@@ -480,7 +480,7 @@ void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
     }
 
     QRect position = GetPIPRect(loc, pipplayer);
-    QRect dvr = windows[0].GetDisplayVisibleRect();
+    QRect dvr = window.GetDisplayVisibleRect();
 
     m_pip_ready[pipplayer] = false;
     D3D9Image *m_pip = m_pips[pipplayer];
