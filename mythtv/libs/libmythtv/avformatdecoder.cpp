@@ -1773,9 +1773,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (allow_private_decoders)
                     private_dec = PrivateDecoder::Create(dec,
                                                          no_hardware_decoders,
-                                                         enc->codec_id,
-                                                         enc->extradata,
-                                                         enc->extradata_size);
+                                                         enc);
 
                 // Set the default stream to the stream
                 // that is found first in the PMT

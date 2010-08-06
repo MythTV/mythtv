@@ -8,14 +8,11 @@ void PrivateDecoder::GetDecoders(render_opts &opts)
 
 PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
                                        bool no_hardware_decode,
-                                       CodecID codec_id,
-                                       void* extradata,
-                                       int extradata_size)
+                                       AVCodecContext *avctx)
 {
     PrivateDecoder *test = NULL;
     test = new PrivateDecoderMPEG2();
-    if (test && test->Init(decoder, no_hardware_decode, codec_id,
-                           extradata, extradata_size))
+    if (test && test->Init(decoder, no_hardware_decode, avctx))
         return test;
     delete test;
     return NULL;

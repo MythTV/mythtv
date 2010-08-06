@@ -28,9 +28,7 @@ class PrivateDecoderMPEG2 : public PrivateDecoder
     virtual QString GetName(void) { return "libmpeg2"; }
     virtual bool Init(const QString &decoder,
                       bool no_hardware_decode,
-                      CodecID codec_id,
-                      void* extradata,
-                      int extradata_size);
+                      AVCodecContext *avctx);
     virtual bool Reset(void);
     virtual int  GetFrame(AVCodecContext *avctx,
                           AVFrame *picture,

@@ -25,12 +25,10 @@ PrivateDecoderMPEG2::~PrivateDecoderMPEG2()
 
 bool PrivateDecoderMPEG2::Init(const QString &decoder,
                                bool no_hardware_decode,
-                               CodecID codec_id,
-                               void* extradata,
-                               int extradata_size)
+                               AVCodecContext *avctx)
 {
     if (!((decoder == "libmpeg2") &&
-        (CODEC_IS_MPEG(codec_id))))
+        (CODEC_IS_MPEG(avctx->codec_id))))
         return false;
 
     if (mpeg2dec)
