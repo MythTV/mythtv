@@ -202,12 +202,20 @@ ChannelScanSM::~ChannelScanSM(void)
     StopScanner();
     VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSMner Stopped");
 
+    ScanStreamData *sd = NULL;
+    if (GetDTVSignalMonitor())
+    {
+        sd = GetDTVSignalMonitor()->GetScanStreamData();
+    }
+
     if (signalMonitor)
     {
         signalMonitor->RemoveListener(analogSignalHandler);
         delete signalMonitor;
         signalMonitor = NULL;
     }
+
+    delete sd;
 
     if (analogSignalHandler)
     {
