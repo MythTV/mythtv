@@ -79,21 +79,16 @@ QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa OpenGL QuickTime IOKit
-    PFWKS = DVD
+    FWKS = AGL ApplicationServices Carbon Cocoa CoreFoundation CoreVideo OpenGL QuickTime IOKit
 
     using_firewire:using_backend: FWKS += IOKit
 
     # The following trick shortens the command line, but depends on
     # the shell expanding Csh-style braces. Luckily, Bash and Zsh do.
     FC = $$join(FWKS,",","{","}")
-    PFC = $$join(PFWKS,",","{","}")
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
-    QMAKE_CXXFLAGS += -F/System/Library/PrivateFrameworks/$${PFC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
-    LIBS           += -F/System/Library/PrivateFrameworks
-    LIBS           += -framework $$join(PFWKS," -framework ")
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -270,6 +265,11 @@ using_frontend {
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
     SOURCES += privatedecoder.cpp       privatedecoder_mpeg2.cpp
+
+    macx {
+        HEADERS += privatedecoder_vda.h privatedecoder_vda_defs.h
+        SOURCES += privatedecoder_vda.cpp
+    }
 
     # On screen display (video output overlay)
     using_fribidi:DEFINES += USING_FRIBIDI

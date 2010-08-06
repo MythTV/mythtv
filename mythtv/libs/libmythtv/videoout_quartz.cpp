@@ -1095,6 +1095,8 @@ void VideoOutputQuartz::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["ffmpeg"].append("quartz-blit");
     if (opts.decoders->contains("libmpeg2"))
         (*opts.safe_renderers)["libmpeg2"].append("quartz-blit");
+    if (opts.decoders->contains("vda"))
+        (*opts.safe_renderers)["vda"].append("quartz-blit");
     (*opts.render_group)["quartz"].append("quartz-blit");
     opts.priorities->insert("quartz-blit", 70);
 }
