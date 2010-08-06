@@ -11,7 +11,7 @@ void PrivateDecoderMPEG2::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["libmpeg2"].append("dummy");
 }
 
-PrivateDecoderMPEG2::PrivateDecoderMPEG2() : mpeg2dec(NULL)
+PrivateDecoderMPEG2::PrivateDecoderMPEG2() : PrivateDecoder(), mpeg2dec(NULL)
 {
 }
 
