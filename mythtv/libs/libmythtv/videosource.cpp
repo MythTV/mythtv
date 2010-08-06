@@ -1988,8 +1988,8 @@ DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent) :
 {
     FileDevice *device = new FileDevice(parent);
     device->setHelpText(tr("A local MPEG file used to simulate a recording."
-                           "Must be entered as file:/path/movie.mpg"));
-    device->setValue("file:/");
+                           " Must be entered as file:/path/movie.mpg"));
+    device->addSelection("file:/");
     addChild(device);
 
     info->setLabel(tr("File info"));
