@@ -56,7 +56,7 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
         FileOps(db=self._db).reschedule(self.recordid)
 
     def update(self, *args, **keywords):
-        DBDataWriteAI.update(*args, **keywords)
+        DBDataWriteAI.update(self, *args, **keywords)
         FileOps(db=self._db).reschedule(self.recordid, wait)
 
     def getUpcoming(self, deactivated=False):
