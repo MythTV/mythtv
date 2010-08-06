@@ -1770,15 +1770,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") already open.");
                 }
 
-                if (allow_private_decoders)
-                    private_dec = PrivateDecoder::Create(dec,
-                                                         no_hardware_decoders,
-                                                         enc);
-
                 // Set the default stream to the stream
                 // that is found first in the PMT
                 if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
                     selectedTrack[kTrackTypeVideo] = si;
+
+                if (allow_private_decoders &&
+                   (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i))
+                {
+                    private_dec = PrivateDecoder::Create(
+                                            dec, no_hardware_decoders, enc);
+                }
 
                 InitVideoCodec(ic->streams[i], enc,
                     selectedTrack[kTrackTypeVideo].av_stream_index == (int) i);
