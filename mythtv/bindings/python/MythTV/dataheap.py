@@ -51,11 +51,12 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
         FileOps(db=self._db).reschedule(self.recordid, wait)
         return self
 
-    def delete(self):
+    def delete(self, wait=False):
         DBDataWriteAI.delete(self)
-        FileOps(db=self._db).reschedule(self.recordid)
+        FileOps(db=self._db).reschedule(self.recordid, wait)
 
     def update(self, *args, **keywords):
+        wait = keywords.get('wait',False)
         DBDataWriteAI.update(self, *args, **keywords)
         FileOps(db=self._db).reschedule(self.recordid, wait)
 
