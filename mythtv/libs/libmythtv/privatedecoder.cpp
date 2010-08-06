@@ -18,17 +18,17 @@ PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
                                        bool no_hardware_decode,
                                        AVCodecContext *avctx)
 {
-    PrivateDecoder *test = NULL;
-    test = new PrivateDecoderMPEG2();
-    if (test && test->Init(decoder, no_hardware_decode, avctx))
-        return test;
-    delete test;
+    PrivateDecoderMPEG2 *mpeg2 = new PrivateDecoderMPEG2();
+    if (mpeg2 && mpeg2->Init(decoder, no_hardware_decode, avctx))
+        return mpeg2;
+    delete mpeg2;
 
 #if defined(Q_OS_MACX)
-    test = new PrivateDecoderVDA();
-    if (test && test->Init(decoder, no_hardware_decode, avctx))
-        return test;
+    PrivateDecoderVDA *vda = new PrivateDecoderVDA();
+    if (vda && vda->Init(decoder, no_hardware_decode, avctx))
+        return vda;
+    delete vda;
 #endif
-    delete test;
+
     return NULL;
 }
