@@ -270,7 +270,7 @@
 
             <textarea name="time_text" draworder="1">
                 <font>currentartist</font>
-                <area>200,120,185,35</area>
+                <area>200,120,200,35</area>
             </textarea>
 
             <blackhole name="visual_blackhole">
