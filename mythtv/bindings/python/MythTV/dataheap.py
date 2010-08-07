@@ -93,14 +93,21 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
         for key in ('chanid','title','subtitle','description','category',
                     'seriesid','programid'):
             rec[key] = program[key]
+        rec.station = program.callsign
 
         rec.startdate = program.starttime.date()
         rec.starttime = program.starttime-datetime.combine(rec.startdate, time())
         rec.enddate = program.endtime.date()
         rec.endtime = program.endtime-datetime.combine(rec.enddate, time())
 
-        rec.station = program.callsign
-        rec.type = type
+        if program.recordid:
+            rec.parentid = program.recordid
+            if program.recstatus == RECTYPE.kNotRecording:
+                rec.type = RECTYPE.kOverrideRecord
+            else:
+                rec.type = RECTYPE.kDontRecord
+        else:
+            rec.type = type
         return rec.create(wait=wait)
 
 class Recorded( DBDataWrite, CMPRecord ):
