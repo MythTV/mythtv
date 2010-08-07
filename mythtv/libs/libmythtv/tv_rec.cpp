@@ -3753,8 +3753,18 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         ProgramInfo *tmp = pseudoLiveTVRecording;
         pseudoLiveTVRecording = NULL;
 
+#if 0
+        /*
+          Without this, the wrong channel is shown during a change change
+          But with it, the channel will fail to change -- for a small set of
+          people.  Better to show the wrong thing that have the tune fail,
+          so leave this out until I can figure out what the problem is.
+          -- jpoet
+        */
+
         if (channel)
             channel->SetChanNum(channum);
+#endif
         tvchain->SetCardType("DUMMY");
 
         if (!ringBuffer)
