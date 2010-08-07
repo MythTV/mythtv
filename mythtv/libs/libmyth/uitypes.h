@@ -700,6 +700,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     void    sortTreeByString(){if (my_tree_data) my_tree_data->sortByString(); }
     void    sortTreeBySelectable(){if (my_tree_data) my_tree_data->sortBySelectable();}
     GenericTree *getCurrentNode() { return current_node; }
+    GenericTree *getActiveNode() { return active_node; }
     void    setCurrentNode(GenericTree *a_node);
     int     getActiveBin();
     void    setActiveBin(int a_bin);

@@ -1314,7 +1314,6 @@ void PlaybackBoxMusic::play()
 {
     if (gPlayer->isPlaying())
         gPlayer->stop();
-
     else if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
     {
         pause();
@@ -1330,7 +1329,11 @@ void PlaybackBoxMusic::play()
         return;
     }
 
-    gPlayer->setCurrentNode(music_tree_list->getCurrentNode());
+    if (music_tree_list->getActiveNode())
+        gPlayer->setCurrentNode(music_tree_list->getActiveNode());
+    else
+        gPlayer->setCurrentNode(music_tree_list->getCurrentNode());
+
     gPlayer->play();
 
     currentTime = 0;

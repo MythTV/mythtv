@@ -591,6 +591,12 @@ void MusicPlayer::loadPlaylist(void)
     setCurrentTrackPos(0);
 }
 
+void MusicPlayer::setCurrentNode(GenericTree *node)
+{
+    m_currentNode = node;
+    refreshMetadata();
+}
+
 GenericTree *MusicPlayer::constructPlaylist(void)
 {
     QString position;

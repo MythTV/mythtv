@@ -95,7 +95,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     GenericTree *constructPlaylist(void);
     GenericTree *getPlaylistTree() { return m_playlistTree; }
-    void         setCurrentNode(GenericTree *node) { m_currentNode = node; }
+    void         setCurrentNode(GenericTree *node);
     GenericTree *getCurrentNode(void) { return m_currentNode; }
 
     void         loadPlaylist(void);
