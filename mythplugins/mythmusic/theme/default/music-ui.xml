@@ -1508,7 +1508,7 @@
         </statetype>
 
         <textarea name="info" from="basetextarea">
-            <area>170,129,250,25</area>
+            <area>170,125,250,25</area>
         </textarea>
 
         <textarea name="time" from="basetextarea">
@@ -1518,12 +1518,20 @@
 
         <imagetype name="coverart">
             <filename>mm_nothumb.png</filename>
-            <area>22,22,144,144</area>
+            <area>22,22,143,144</area>
         </imagetype>
 
-        <progressbar name="progress" from="baseprogressbar">
-            <position>170,150</position>
-        </progressbar>
+        <progressbar name="progress">
+            <area>170,150,10,10</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <filename>mm_progress-bg.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <filename>mm_progress-fg.png</filename>
+            </imagetype>
+        </progressbar>   
     </window>
 
 </mythuitheme>
