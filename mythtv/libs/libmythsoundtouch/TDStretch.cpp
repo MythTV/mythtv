@@ -803,6 +803,14 @@ TDStretch * TDStretch::newInstance()
     uExtensions = detectCPUextensions();
 
     // Check if MMX/SSE/3DNow! instruction set extensions supported by CPU
+#ifdef ALLOW_SSE3
+    if (uExtensions & MM_SSE3)
+    {
+        // SSE support
+        return ::new TDStretchSSE3;
+    }
+    else
+#endif // ALLOW_SSE3
 #ifdef ALLOW_SSE2
     if (uExtensions & MM_SSE2)
     {

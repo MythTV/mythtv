@@ -7,7 +7,7 @@
 
 using namespace soundtouch;
 
-double TDStretchSSE2::calcCrossCorrMulti(const float *mPos, const float *cPos) const
+double TDStretchSSE3::calcCrossCorrMulti(const float *mPos, const float *cPos) const
 {
     double corr = 0;
     int count = overlapLength * channels;
@@ -49,7 +49,53 @@ double TDStretchSSE2::calcCrossCorrMulti(const float *mPos, const float *cPos) c
     return corr;
 }
 
-double TDStretchSSE2::calcCrossCorrStereo(const float *mPos, const float *cPos) const
+double TDStretchSSE2::calcCrossCorrMulti(const float *mPos, const float *cPos) const
+{
+    double corr = 0;
+    int count = overlapLength * channels;
+    int loops = count >> 4;
+    int i = loops << 4;
+    const float *mp = mPos;
+    const float *cp = cPos;
+
+    __asm__ volatile (
+        "xorpd      %%xmm7, %%xmm7      \n\t"
+        "1:                             \n\t"
+        "movups       (%1), %%xmm0      \n\t"
+        "movups     16(%1), %%xmm1      \n\t"
+        "mulps      (%2),   %%xmm0      \n\t"
+        "movups     32(%1), %%xmm2      \n\t"
+        "addps      %%xmm0, %%xmm7      \n\t"
+        "mulps      16(%2), %%xmm1      \n\t"
+        "movups     48(%1), %%xmm3      \n\t"
+        "mulps      32(%2), %%xmm2      \n\t"
+        "addps      %%xmm1, %%xmm7      \n\t"
+        "mulps      48(%2), %%xmm3      \n\t"
+        "addps      %%xmm2, %%xmm7      \n\t"
+        "add        $64,    %1          \n\t"
+        "add        $64,    %2          \n\t"
+        "addps      %%xmm3, %%xmm7      \n\t"
+        "sub        $1,     %%ecx       \n\t"
+        "jnz        1b                  \n\t"
+        "movaps     %%xmm7, %%xmm6      \n\t"
+        "shufps     $0x4e,  %%xmm7, %%xmm6  \n\t"
+        "addps      %%xmm6, %%xmm7      \n\t"
+        "cvtps2pd   %%xmm7, %%xmm7      \n\t"
+        "movapd     %%xmm7, %%xmm6      \n\t"
+        "shufpd     $0x01,  %%xmm7, %%xmm6  \n\t"
+        "addpd      %%xmm6, %%xmm7      \n\t"
+        "movsd      %%xmm7, %0          \n\t"
+        :"=m"(corr),"+r"(mp), "+r"(cp)
+        :"c"(loops)
+    );
+
+    for (; i < count; i++)
+        corr += *mp++ * *cp++;
+
+    return corr;
+}
+
+double TDStretchSSE3::calcCrossCorrStereo(const float *mPos, const float *cPos) const
 {
     double corr = 0;
     int count = overlapLength <<1;
@@ -80,6 +126,52 @@ double TDStretchSSE2::calcCrossCorrStereo(const float *mPos, const float *cPos) 
         "haddps     %%xmm7, %%xmm7      \n\t"
         "cvtps2pd   %%xmm7, %%xmm7      \n\t"
         "haddpd     %%xmm7, %%xmm7      \n\t"
+        "movsd      %%xmm7, %0          \n\t"
+        :"=m"(corr),"+r"(mp), "+r"(cp)
+        :"c"(loops)
+    );
+
+    for (; i < count; i += 2)
+        corr += (mp[i] * cp[i] + mp[i + 1] * cp[i + 1]);
+
+    return corr;
+}
+
+double TDStretchSSE2::calcCrossCorrStereo(const float *mPos, const float *cPos) const
+{
+    double corr = 0;
+    int count = overlapLength <<1;
+    int loops = count >> 4;
+    int i = loops << 4;
+    const float *mp = mPos;
+    const float *cp = cPos;
+
+    __asm__ volatile (
+        "xorpd      %%xmm7, %%xmm7      \n\t"
+        "1:                             \n\t"
+        "movups       (%1), %%xmm0      \n\t"
+        "movups     16(%1), %%xmm1      \n\t"
+        "mulps      (%2),   %%xmm0      \n\t"
+        "movups     32(%1), %%xmm2      \n\t"
+        "addps      %%xmm0, %%xmm7      \n\t"
+        "mulps      16(%2), %%xmm1      \n\t"
+        "movups     48(%1), %%xmm3      \n\t"
+        "mulps      32(%2), %%xmm2      \n\t"
+        "addps      %%xmm1, %%xmm7      \n\t"
+        "mulps      48(%2), %%xmm3      \n\t"
+        "addps      %%xmm2, %%xmm7      \n\t"
+        "add        $64,    %1          \n\t"
+        "add        $64,    %2          \n\t"
+        "addps      %%xmm3, %%xmm7      \n\t"
+        "sub        $1,     %%ecx       \n\t"
+        "jnz        1b                  \n\t"
+        "movaps     %%xmm7, %%xmm6      \n\t"
+        "shufps     $0x4e,  %%xmm7, %%xmm6  \n\t"
+        "addps      %%xmm6, %%xmm7      \n\t"
+        "cvtps2pd   %%xmm7, %%xmm7      \n\t"
+        "movapd     %%xmm7, %%xmm6      \n\t"
+        "shufpd     $0x01,  %%xmm7, %%xmm6  \n\t"
+        "addpd      %%xmm6, %%xmm7      \n\t"
         "movsd      %%xmm7, %0          \n\t"
         :"=m"(corr),"+r"(mp), "+r"(cp)
         :"c"(loops)

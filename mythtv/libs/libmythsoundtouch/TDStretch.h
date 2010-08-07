@@ -251,6 +251,19 @@ public:
 
 #endif /// ALLOW_SSE2
 
+#ifdef ALLOW_SSE3
+    /// Class that implements SSE optimized routines for float samples type.
+    class TDStretchSSE3 : public TDStretchSSE2
+    {
+    protected:
+#ifdef MULTICHANNEL
+        double calcCrossCorrMulti(const float *mixingPos, const float *compare) const;
+#endif
+        double calcCrossCorrStereo(const float *mixingPos, const float *compare) const;
+    };
+
+#endif /// ALLOW_SSE3
+
 #ifdef ALLOW_MMX
     /// Class that implements MMX optimized routines for 16bit integer samples type.
     class TDStretchMMX : public TDStretch

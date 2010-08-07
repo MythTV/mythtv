@@ -31,8 +31,8 @@ SOURCES += TDStretch.cpp
 SOURCES += cpu_detect_x86_gcc.cpp
 
 contains(ARCH_X86, yes) {
-        DEFINES += ALLOW_SSE2
-        SOURCES += sse_gcc.cpp 
+        DEFINES += ALLOW_SSE2 ALLOW_SSE3
+        SOURCES += sse_gcc.cpp
 }
 
 include ( ../libs-targetfix.pro )
