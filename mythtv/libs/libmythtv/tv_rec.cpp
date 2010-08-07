@@ -3746,6 +3746,34 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     else
         ok = true;
 
+    if (livetv || antadj)
+    {
+        // We need there to be a ringbuffer for these modes
+        bool ok;
+        ProgramInfo *tmp = pseudoLiveTVRecording;
+        pseudoLiveTVRecording = NULL;
+
+        if (channel)
+            channel->SetChanNum(channum);
+        tvchain->SetCardType("DUMMY");
+
+        if (!ringBuffer)
+            ok = CreateLiveTVRingBuffer();
+        else
+            ok = SwitchLiveTVRingBuffer(true, false);
+        pseudoLiveTVRecording = tmp;
+
+        tvchain->SetCardType(genOpt.cardtype);
+
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 1");
+            return;
+        }
+
+        has_dummy = true;
+    }
+
     if (channel && !channum.isEmpty())
     {
         if (!input.isEmpty())
@@ -3779,32 +3807,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Failed to set channel to %1.").arg(channum));
         }
-    }
-
-    if (livetv || antadj)
-    {
-        // We need there to be a ringbuffer for these modes
-        bool ok;
-        ProgramInfo *tmp = pseudoLiveTVRecording;
-        pseudoLiveTVRecording = NULL;
-
-        tvchain->SetCardType("DUMMY");
-
-        if (!ringBuffer)
-            ok = CreateLiveTVRingBuffer();
-        else
-            ok = SwitchLiveTVRingBuffer(true, false);
-        pseudoLiveTVRecording = tmp;
-
-        tvchain->SetCardType(genOpt.cardtype);
-
-        if (!ok)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 1");
-            return;
-        }
-
-        has_dummy = true;
     }
 
     // Start signal (or channel change) monitoring

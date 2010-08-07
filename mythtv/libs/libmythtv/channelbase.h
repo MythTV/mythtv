@@ -131,6 +131,8 @@ class ChannelBase
 
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { m_cardid = _cardid; }
+    // \brief Set chan name for ringbuffer
+    void SetChanNum(const QString & chan) { m_curchannelname= chan; }
 
     virtual int GetCardID(void) const;
   protected:
