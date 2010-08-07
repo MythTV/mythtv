@@ -131,6 +131,14 @@ static int mm_support(void)
             rval |= MM_MMXEXT | MM_SSE;
         if (std_caps & (1<<26))
             rval |= MM_SSE2;
+        if (ecx & 1)
+            rval |= MM_SSE3;
+        if (ecx & 0x00000200 )
+            rval |= MM_SSSE3;
+        if (ecx & 0x00080000 )
+            rval |= MM_SSE4;
+        if (ecx & 0x00100000 )
+            rval |= MM_SSE42;
     }
 
     cpuid(0x80000000, max_ext_level, ebx, ecx, edx);
