@@ -134,6 +134,8 @@ unix:!cygwin {
     HEADERS += mediamonitor-unix.h
 }
 
+linux:DEFINES += linux
+
 cygwin {
     QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
     DEFINES += _WIN32

@@ -58,6 +58,8 @@ INSTALLS += inc inc2 inc3
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
 
+linux:DEFINES += linux
+
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
