@@ -8,6 +8,8 @@ from datetime import datetime
 from thread import allocate_lock
 from cStringIO import StringIO
 
+from __future__ import with_statement
+
 class MythLog( LOGLEVEL ):
     """
     MythLog(module='pythonbindings', lstr=None, lbit=None, \
