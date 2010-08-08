@@ -89,8 +89,11 @@ static MIMETypes g_MIMETypes[] =
     { "mkv" , "video/x-mkv"                },
     { "mka" , "audio/x-matroska"           },
     { "wmv" , "video/x-ms-wmv"             },
-    // This should be application/ogg, but most clients don't understand that.
+    // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
     { "ogg" , "audio/ogg"                  },
+    { "ogv" , "video/ogg"                  },
+    { "ogx" , "application/ogg"            },
+    { "oga" , "audio/ogg"                  },
     // Similarly, this could be audio/flac or application/flac:
     { "flac", "audio/x-flac"               },
     { "m4a" , "audio/x-m4a"                },
