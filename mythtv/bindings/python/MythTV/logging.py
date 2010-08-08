@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Provides managed logging."""
 
+from __future__ import with_statement
+
 from static import LOGLEVEL
 
 from sys import version_info, stdout
 from datetime import datetime
 from thread import allocate_lock
 from cStringIO import StringIO
-
-from __future__ import with_statement
 
 class MythLog( LOGLEVEL ):
     """
