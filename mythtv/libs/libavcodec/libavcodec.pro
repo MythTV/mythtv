@@ -13,7 +13,7 @@ INCLUDEPATH = .. ../..
 
 # remove MMX define since it clashes with a libmp3lame enum
 DEFINES -= MMX
-DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
+DEFINES += HAVE_AV_CONFIG_H
 
 # Debug mode on x86 must compile without -fPIC and with -O,
 # otherwise gcc runs out of registers.

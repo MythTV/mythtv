@@ -14,7 +14,6 @@ INCLUDEPATH += UsageEnvironment/include
 LIBS += $$EXTRA_LIBS
 
 DEFINES += SOCKLEN_T=socklen_t
-DEFINES += _LARGEFILE_SOURCE=1
 
 QMAKE_CFLAGS += -fno-common
 

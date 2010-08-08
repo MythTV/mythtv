@@ -11,7 +11,7 @@ QMAKE_LFLAGS += $$LDFLAGS
 
 INCLUDEPATH = .. ../..
 
-DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
+DEFINES += HAVE_AV_CONFIG_H
 
 # Debug mode on x86 must compile without -fPIC
 # otherwise gcc runs out of registers.

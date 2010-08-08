@@ -73,7 +73,6 @@ using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT
 using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
 
-DEFINES += _LARGEFILE_SOURCE
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
 QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 

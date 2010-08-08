@@ -13,7 +13,7 @@ INCLUDEPATH += ../libmythdb
 #build position independent code since the library is linked into a shared library
 QMAKE_CFLAGS += -fPIC -DPIC
 
-DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE DLOPEN_CRYPTO_LIBS
+DEFINES += HAVE_AV_CONFIG_H DLOPEN_CRYPTO_LIBS
 
 # DEFINES += LOG_DEBUG TRACE
 
