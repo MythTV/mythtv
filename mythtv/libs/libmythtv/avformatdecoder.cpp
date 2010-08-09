@@ -1741,18 +1741,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #endif // USING_XVMC
                 }
 
-                if (!codec_is_std(video_codec_id))
-                    thread_count = 1;
-
-                VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 CPUs for decoding")
-                        .arg(HAVE_THREADS ? thread_count : 1));
-
-                if (HAVE_THREADS && thread_count > 1)
-                {
-                    avcodec_thread_init(enc, thread_count);
-                    enc->thread_count = thread_count;
-                }
-
                 if (!handled)
                 {
                     if (CODEC_IS_H264(enc->codec_id))
@@ -1780,6 +1768,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     private_dec = PrivateDecoder::Create(
                                             dec, no_hardware_decoders, enc);
+                    thread_count = 1;
+                }
+
+                if (!codec_is_std(video_codec_id))
+                    thread_count = 1;
+
+                VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 CPUs for decoding")
+                        .arg(HAVE_THREADS ? thread_count : 1));
+
+                if (HAVE_THREADS && thread_count > 1)
+                {
+                    avcodec_thread_init(enc, thread_count);
+                    enc->thread_count = thread_count;
                 }
 
                 InitVideoCodec(ic->streams[i], enc,
