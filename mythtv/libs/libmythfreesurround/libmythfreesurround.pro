@@ -6,9 +6,6 @@ CONFIG += thread staticlib warn_off
 
 INCLUDEPATH += ../libavcodec ../libmythdb .. ../..
 
-#build position independent code since the library is linked into a shared library
-QMAKE_CXXFLAGS += -fPIC -DPIC
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input

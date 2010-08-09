@@ -10,9 +10,6 @@ INCLUDEPATH += . ../../
 INCLUDEPATH += ./dvdnav
 INCLUDEPATH += ../libmythdb
 
-#build position independent code since the library is linked into a shared library
-QMAKE_CFLAGS += -fPIC -DPIC
-
 # for -ldl
 LIBS += $$EXTRA_LIBS
 

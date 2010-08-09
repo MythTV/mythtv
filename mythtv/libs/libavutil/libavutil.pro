@@ -16,7 +16,7 @@ DEFINES += HAVE_AV_CONFIG_H
 # Debug mode on x86 must compile without -fPIC
 # otherwise gcc runs out of registers.
 debug:contains(ARCH_X86_32, yes) {
-        QMAKE_CFLAGS_SHLIB = 
+        QMAKE_CFLAGS -= -fPIC -DPIC
 }
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)

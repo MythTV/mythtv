@@ -10,9 +10,6 @@ INCLUDEPATH += . ../../
 INCLUDEPATH += ./bdnav
 INCLUDEPATH += ../libmythdb
 
-#build position independent code since the library is linked into a shared library
-QMAKE_CFLAGS += -fPIC -DPIC
-
 DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS
 
 # DEFINES += LOG_DEBUG TRACE

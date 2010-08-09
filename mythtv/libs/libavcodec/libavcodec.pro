@@ -25,7 +25,7 @@ debug:contains(ARCH_X86_32, yes) {
 }
 # gcc-4.2 and newer can not compile with PIC on x86
 contains(ARCH_X86_32, yes) {
-	QMAKE_CFLAGS_SHLIB =
+        QMAKE_CFLAGS -= -fPIC -DPIC
 }
 
 !profile:QMAKE_CFLAGS_DEBUG += -O

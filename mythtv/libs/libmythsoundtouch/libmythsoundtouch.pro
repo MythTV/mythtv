@@ -7,9 +7,6 @@ CONFIG -= qt
 
 INCLUDEPATH += ../../libs/libavcodec ../..
 
-#build position independent code since the library is linked into a shared library
-QMAKE_CXXFLAGS += -fPIC -DPIC
-
 # Like libavcodec, debug mode on x86 runs out of registers on some GCCs.
 !profile:QMAKE_CXXFLAGS_DEBUG += -O
 

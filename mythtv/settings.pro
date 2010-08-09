@@ -92,9 +92,6 @@ profile:CONFIG += debug
 
 QMAKE_CXXFLAGS += $$CONFIG_DIRECTFB_CXXFLAGS
 
-QMAKE_CFLAGS_SHLIB   = -DPIC -fPIC
-QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
-
 # Allow compilation with Qt Embedded, if Qt is compiled without "-fno-rtti"
 QMAKE_CXXFLAGS -= -fno-exceptions -fno-rtti
 
