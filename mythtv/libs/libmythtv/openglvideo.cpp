@@ -178,7 +178,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
     bool use_pbo        = gl_features & kGLExtPBufObj;
     bool basic_features = gl_features & kGLExtFragProg;
     bool full_features  = basic_features && (gl_features & kGLExtFBufObj);
-    using_ycbcrtex      = !full_features && (gl_features & kGLYCbCrTex);
+    using_ycbcrtex      = !full_features && (gl_features & kGLMesaYCbCr);
 
     if (using_ycbcrtex)
         basic_features = false;
@@ -1574,7 +1574,7 @@ uint OpenGLVideo::ParseOptions(QString options)
             if (opts.contains("norect"))
                 ret -= kGLExtRect;
             if (opts.contains("noycbcr"))
-                ret -= kGLYCbCrTex;
+                ret -= kGLMesaYCbCr;
             return ret;
         }
     }

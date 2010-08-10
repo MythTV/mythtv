@@ -91,6 +91,12 @@
 #ifndef GL_YCBCR_MESA
 #define GL_YCBCR_MESA                     0x8757
 #endif
+#ifndef GL_YCBCR_422_APPLE
+#define GL_YCBCR_422_APPLE                0x85B9
+#endif
+#ifndef GL_RGB_422_APPLE
+#define GL_RGB_422_APPLE                  0x8A1F
+#endif
 #ifndef GL_UNSIGNED_SHORT_8_8_MESA
 #define GL_UNSIGNED_SHORT_8_8_MESA        0x85BA
 #endif

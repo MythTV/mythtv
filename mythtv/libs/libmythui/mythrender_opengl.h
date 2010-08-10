@@ -38,10 +38,12 @@ typedef enum
     kGLExtPBufObj  = 0x0010,
     kGLNVFence     = 0x0020,
     kGLAppleFence  = 0x0040,
-    kGLYCbCrTex    = 0x0080,
-    kGLMipMaps     = 0x0100,
-    kGLSL          = 0x0200,
-    kGLMaxFeat     = 0x0400,
+    kGLMesaYCbCr   = 0x0080,
+    kGLAppleYCbCr  = 0x0100,
+    kGLAppleRGB422 = 0x0200,
+    kGLMipMaps     = 0x0400,
+    kGLSL          = 0x0800,
+    kGLMaxFeat     = 0x1000,
 } GLFeatures;
 
 class MythGLTexture;

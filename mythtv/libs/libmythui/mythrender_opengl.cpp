@@ -1286,7 +1286,13 @@ void MythRenderOpenGL::InitFeatures(void)
         m_exts_supported += kGLAppleFence;
 
     if (m_extensions.contains("GL_MESA_ycbcr_texture"))
-        m_exts_supported += kGLYCbCrTex;
+        m_exts_supported += kGLMesaYCbCr;
+
+    if (m_extensions.contains("GL_APPLE_rgb_422"))
+        m_exts_supported += kGLAppleRGB422;
+
+    if (m_extensions.contains("GL_APPLE_ycbcr_422"))
+        m_exts_supported += kGLAppleYCbCr;
 
     if (m_extensions.contains("GL_SGIS_generate_mipmap"))
         m_exts_supported += kGLMipMaps;
