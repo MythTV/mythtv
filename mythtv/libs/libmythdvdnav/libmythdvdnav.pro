@@ -46,11 +46,6 @@ inc_dvdread.files += dvdread/nav_read.h dvdread/ifo_read.h
 INSTALLS += target inc_dvdnav inc_dvdread
 
 
-macx {
-    # Globals in static libraries need special treatment on OS X
-    QMAKE_CFLAGS += -fno-common
-}
-
 mingw:DEFINES += STDC_HEADERS
 
 include ( ../libs-targetfix.pro )

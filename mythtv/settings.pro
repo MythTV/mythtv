@@ -89,6 +89,9 @@ QMAKE_LFLAGS_SHLIB      -= -fPIC
 CXX_PP_FLAGS  = $$CPPFLAGS
 CXX_PP_FLAGS -= -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112
 
+# Globals in static libraries need special treatment on OS X
+macx: QMAKE_CFLAGS_STATIC_LIB += -fno-common
+
 # figure out compile flags based on qmake info
 QMAKE_CFLAGS   += $$OPTFLAGS $$PROFILEFLAGS $$CPPFLAGS     $$CFLAGS
 QMAKE_CXXFLAGS += $$OPTFLAGS $$PROFILEFLAGS $$CXX_PP_FLAGS $$ECXXFLAGS

@@ -15,8 +15,6 @@ LIBS += $$EXTRA_LIBS
 
 DEFINES += SOCKLEN_T=socklen_t
 
-QMAKE_CFLAGS += -fno-common
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input

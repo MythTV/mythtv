@@ -28,10 +28,6 @@ inc_bdnav.files = bluray.h bdnav/*.h hdmv/*.h file/*.h util/*.h
 
 INSTALLS += target inc_bdnav
 
-macx {
-    # Globals in static libraries need special treatment on OS X
-    QMAKE_CFLAGS += -fno-common
-}
 
 mingw:DEFINES += STDC_HEADERS
 

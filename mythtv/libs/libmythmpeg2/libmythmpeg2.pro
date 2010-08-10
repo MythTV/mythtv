@@ -5,9 +5,6 @@ TARGET = mythmpeg2-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 CONFIG -= qt
 
-#build position independent code since the library is linked into a shared library
-QMAKE_CFLAGS += -fno-common
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
