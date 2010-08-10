@@ -2854,6 +2854,8 @@ case $target_os in
     darwin)
         _restrict=__restrict__
         enable malloc_aligned
+        # Workaround compile errors from missing u_int/uint def
+        CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         enable  appleremote
         enable  backend
         enable  darwin
