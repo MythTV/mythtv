@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Using MythTV.</TITLE>
  <LINK HREF="mythtv-HOWTO-12.html" REL=next>
  <LINK HREF="mythtv-HOWTO-10.html" REL=previous>
@@ -30,9 +30,8 @@ ALT-F4 </TD><TD> exit out of the application </TD></TR><TR><TD>
 Space/Enter     </TD><TD> take action on the item under the highlight point </TD></TR><TR><TD>
 P </TD><TD> play in both "Watch a Recording" and "Delete a Recording"   </TD></TR><TR><TD>
 D </TD><TD> delete in both "Watch a Recording" and "Delete a Recording" </TD></TR><TR><TD>
-U </TD><TD> to view details for the currently selected show on the Watch&nbsp;or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;Conflicts" and search results screens </TD></TR><TR><TD>
 O </TD><TD> to list the upcoming episodes for the currently selected show&nbsp;on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;"Fix Scheduling Conflicts" or search results screens </TD></TR><TR><TD>
-I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;screens. From the Playback and Delete screens, 'I' presents&nbsp;options for recorded shows such as Auto Expire or Stop Recording.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
+I </TD><TD> to get additional information about the currently selected item.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -66,23 +65,13 @@ W </TD><TD> cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom 
 F8 </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
 CTRL-B </TD><TD> Jump to the beginning of the recording / ringbuffer </TD></TR><TR><TD>
 + </TD><TD> Switch between audio streams </TD></TR><TR><TD>
-Left </TD><TD> (if a jump amount is entered) to jump back that amount </TD></TR><TR><TD>
-Right </TD><TD> (if a jump amount is entered) to jump ahead that amount </TD></TR><TR><TD>
+Left </TD><TD> skip back the configured number of seconds (default is 5)&nbsp;If a jump amount is entered, jump back that amount (HHMM format) </TD></TR><TR><TD>
+Right </TD><TD> skip forward the configured number of seconds (default is 30)&nbsp;If a jump amount is entered, jump ahead that amount (HHMM format) </TD></TR><TR><TD>
+&lt; </TD><TD> starts sticky rewind mode&nbsp;If a jump amount is entered, jump to that position </TD></TR><TR><TD>
+&gt; </TD><TD> starts sticky fast forward mode&nbsp;If a jump amount is entered, jump that amount from the end </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>Without the stickykeys option selected</B> </TD></TR><TR><TD>
-Left </TD><TD> rewind the configured number of seconds (default is 5) </TD></TR><TR><TD>
-Right </TD><TD> fast forward the configured number of seconds (default is 30) </TD></TR><TR><TD>
-&lt; </TD><TD> starts rewind mode as if stickykeys are selected </TD></TR><TR><TD>
-> </TD><TD> starts fast forward mode as if stickykeys are selected </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>With Stickykeys option selected</B> </TD></TR><TR><TD>
-Right </TD><TD> starts fast forward mode </TD></TR><TR><TD>
-Left </TD><TD> starts rewind mode </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>In fast forward or rewind mode:</B> </TD></TR><TR><TD>
+</TD><TD> <B>In sticky fast forward or rewind mode:</B> </TD></TR><TR><TD>
 Left/Right      </TD><TD> increases the ff/rew speed </TD></TR><TR><TD>
 0 </TD><TD> plays at normal speed, but leaves the time indicator on screen </TD></TR><TR><TD>
 1 or 2 </TD><TD> plays back more slowly than normal ff/rew speed (1 is slowest) </TD></TR><TR><TD>
@@ -191,12 +180,11 @@ Home/End </TD><TD> move the highlight left or right by one day </TD></TR><TR><TD
 Ctrl+Left or &lt; </TD><TD> move the highlight left by one page </TD></TR><TR><TD>
 Ctrl+Right or &gt; </TD><TD> move the highlight right by one page </TD></TR><TR><TD>
 9, 3, 7, 1 </TD><TD> (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;Home and End </TD></TR><TR><TD>
-I </TD><TD> bring up more information about a show, and allow you to&nbsp;schedule a recording. If you select "Record this showing"&nbsp;while watching Live TV you can "Instant Record" a program. </TD></TR><TR><TD>
-Space/Enter </TD><TD> allow you resolve conflicts or change overrides. If the&nbsp;program is not already scheduled to record, it will instead act like&nbsp;pressing 'I'. </TD></TR><TR><TD>
-M </TD><TD> when on a channel will change to that channel </TD></TR><TR><TD>
+E </TD><TD> allow you to schedule a recording. If you select "Record&nbsp;this showing" while watching Live TV you can "Instant&nbsp;Record" a program. </TD></TR><TR><TD>
+Space/Enter </TD><TD> when watching LiveTV will change to that channel and exit the&nbsp;EPG if the selected show is in progress or starts within 15&nbsp;minutes; or otherwise will allow you to resolve conflicts&nbsp;or change overrides. If the program is not already scheduled&nbsp;to record, it will instead act like pressing E </TD></TR><TR><TD>
+X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
 ESC or C </TD><TD> exits without changing the channel </TD></TR><TR><TD>
 R </TD><TD> change the current item from Recording/Not-Recording.&nbsp;Successive keypresses cycle through the scheduled recording&nbsp;type list. </TD></TR><TR><TD>
-X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
 ? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
 / or 4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
 </TD></TR></TABLE>
@@ -212,7 +200,7 @@ Left </TD><TD> decreases priority value </TD></TR><TR><TD>
 1 </TD><TD> sorts by title </TD></TR><TR><TD>
 2 </TD><TD> sorts by priority </TD></TR><TR><TD>
 Home/End        </TD><TD> toggle sort priority </TD></TR><TR><TD>
-I </TD><TD> edit recording options      </TD></TR><TR><TD>
+E </TD><TD> edit recording options      </TD></TR><TR><TD>
 ESC </TD><TD> commits changes and exits
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -225,7 +213,7 @@ ESC </TD><TD> commits changes and exits
 1 </TD><TD> show all recordings </TD></TR><TR><TD>
 2 </TD><TD> show only important recordings </TD></TR><TR><TD>
 Home/End        </TD><TD> toggle show showing all/important </TD></TR><TR><TD>
-I </TD><TD> edit recording options </TD></TR><TR><TD>
+E </TD><TD> edit recording options </TD></TR><TR><TD>
 Space/Enter     </TD><TD> resolve conflict or override
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -258,8 +246,7 @@ This can be used to reduce clutter, or to segregate content if you use the
 PIN function.
 <BR><CENTER>
 <TABLE BORDER><TR><TD>
-M       </TD><TD> change the view or to set a group password </TD></TR><TR><TD>
-I       </TD><TD> move a program from one Recording Group to another
+M       </TD><TD> to change the view or to set a group password or change recording and&nbsp;storage options. Press M again to toggle between menus. </TD></TR><TR><TD>
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -312,8 +299,8 @@ functionality.  Download the MythThemes tarball from the website and untar it:</
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf myththemes-0.22.tar.bz2
-$ cd ~/myththemes-0.22
+$ tar -xjf myththemes-0.23.tar.bz2
+$ cd ~/myththemes-0.23
 $ qmake myththemes.pro
 $ su -
 # make install

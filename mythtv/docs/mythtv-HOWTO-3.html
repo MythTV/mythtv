@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Checking prerequisites.</TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
@@ -181,7 +181,7 @@ essentially raw digital form.</P>
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
 it.  See the video4linux mailing list (
-<A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
+<A HREF="http://listman.redhat.com/mailman/listinfo/video4linux-list">http://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information and for specific hardware questions.</P>
 <P>The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
 series of video capture chips; examples are the "Hauppauge WinTV Go" card and
@@ -307,22 +307,18 @@ deinterlacing, or if you have an NVIDIA card with video decode acceleration. </P
 <H3>Playback of HDTV using VDPAU</H3>
 
 <P>NVIDIA now incorporates MPEG-2 and H.264 decode acceleration in their
-binary driver; this is now officially supported in MythTV 0.22.  Use of
-VDPAU offloads the decompression and deinterlacing of video to the video GPU
-rather than the CPU of the frontend, so the CPU requirements are drastically
-lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
-1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264.</P>
+binary driver; this is now officially supported in MythTV 0.22 and above. 
+Use of VDPAU offloads the decompression and deinterlacing of video to the
+video GPU rather than the CPU of the frontend, so the CPU requirements are
+drastically lowered.  A fanless frontend using an Intel Atom CPU running a
+single-core at 1.6Ghz is sufficient to decode and deinterlace MPEG-2 and
+H.264.</P>
 
 <H3>Firewire.</H3>
 
 <P>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
 If your provider uses 5C encryption on a particular channel, you won't be
 able to get any content.</P>
-
-<H3>DBoxII or other devices running Neutrino</H3>
-
-<P>You may use the Ethernet port of an DBoxII or a similar device to capture
-MPEG-2. Your set top box has to be running the Neutrino GUI.</P>
 
 <H3>USB Capture Devices.</H3>
 
@@ -459,12 +455,12 @@ configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.  VDPAU is another new feature and it
 provides an API for offloading MPEG-2 and H.264 to the GPU.</P>
 
-
 <H3><A NAME="PVR-350"></A> Hauppauge PVR-350 </H3>
 
-<P>As of MythTV 0.22, the  TV-out and MPEG-2 decoder functions of the
-PVR-350 are no longer supported.  This functionality is currently
-unmaintained, and will be removed in MythTV 0.23.</P>
+<P>As of MythTV 0.22, the TV-out and MPEG-2 decoder functions of the PVR-350
+are no longer supported.  This functionality is currently unmaintained, and
+was removed in MythTV 0.23.  The encoder functionality will continue to
+be supported through the ivtv driver.</P>
 
 <H3>External Adapters</H3>
 

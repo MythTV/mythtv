@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-10-12, v0.22.00
+<date>2010-08-10, v0.23.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -125,11 +125,11 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.22
+This HOWTO is for MythTV v0.23
 
 Release notes for this version may be found in the MythTV Wiki at <url
-url="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22"
-name="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22">
+url="http://www.mythtv.org/wiki/Release_Notes_-_0.23"
+name="http://www.mythtv.org/wiki/Release_Notes_-_0.23">
 
 <sect1>Books about MythTV
 <p>If you would like to purchase a book specifically about MythTV:
@@ -225,8 +225,8 @@ The bug database is not a chat room, so restrict your entries to what is
 relevant.  It's also not a repository of feature requests; a feature request
 without an accompanying patch file to implement that feature will be quickly
 closed.  There is a feature wishlist on the wiki at <url
-url="http://www.mythtv.org/wiki/index.php/Feature_Wishlist"
-name="http://www.mythtv.org/wiki/index.php/Feature_Wishlist">.  There is no
+url="http://www.mythtv.org/wiki/Feature_Wishlist"
+name="http://www.mythtv.org/wiki/Feature_Wishlist">.  There is no
 guarantee that anything on the wishlist will ever get code written to
 implement it.
 
@@ -433,8 +433,8 @@ For a list of video capture cards known to work with Linux, please see
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
 it.  See the video4linux mailing list (<url
-url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
-name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
+url="http://listman.redhat.com/mailman/listinfo/video4linux-list"
+name="http://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information and for specific hardware questions.
 
 The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
@@ -559,11 +559,12 @@ deinterlacing, or if you have an NVIDIA card with video decode acceleration.
 
 <sect2>Playback of HDTV using VDPAU
 <p>NVIDIA now incorporates MPEG-2 and H.264 decode acceleration in their
-binary driver; this is now officially supported in MythTV 0.22.  Use of
-VDPAU offloads the decompression and deinterlacing of video to the video GPU
-rather than the CPU of the frontend, so the CPU requirements are drastically
-lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
-1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264.
+binary driver; this is now officially supported in MythTV 0.22 and above. 
+Use of VDPAU offloads the decompression and deinterlacing of video to the
+video GPU rather than the CPU of the frontend, so the CPU requirements are
+drastically lowered.  A fanless frontend using an Intel Atom CPU running a
+single-core at 1.6Ghz is sufficient to decode and deinterlace MPEG-2 and
+H.264.
 
 <sect3>Firewire.
 <p>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
@@ -710,11 +711,11 @@ configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.  VDPAU is another new feature and it
 provides an API for offloading MPEG-2 and H.264 to the GPU.
 
-
 <sect3>Hauppauge PVR-350 <label id="PVR-350">
-<p>As of MythTV 0.22, the  TV-out and MPEG-2 decoder functions of the
-PVR-350 are no longer supported.  This functionality is currently
-unmaintained, and will be removed in MythTV 0.23.
+<p>As of MythTV 0.22, the TV-out and MPEG-2 decoder functions of the PVR-350
+are no longer supported.  This functionality is currently unmaintained, and
+was removed in MythTV 0.23.  The encoder functionality will continue to
+be supported through the ivtv driver.
 
 <sect2>External Adapters
 <p>External adapters convert standard VGA output to a form suitable for
@@ -1028,8 +1029,8 @@ built-in to MythTV.  You <em>do not</em> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
-Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.51).
+Get XMLTV from <url url="http://sourceforge.net/projects/xmltv/files/"
+name="http://sourceforge.net/projects/xmltv/files/">.  Download the latest version (0.5.51).
 
 <sect1>Configuring the Schedules Direct service <label id="ConfigureSD">
 <p>Schedules Direct is a non-profit organization which has licensed
@@ -1059,22 +1060,22 @@ $ cd mythtv
 
 To use a release version, you can execute:
 <tscreen><verb>
-$ mkdir mythtv-release-0.22-fixes
-$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
-$ cd mythtv-release-0.22-fixes
+$ mkdir mythtv-release-0.23-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-23-fixes/ mythtv-release-0.23-fixes
+$ cd mythtv-release-0.23-fixes
 </verb></tscreen>
 
 <bf>NOTE</bf>:  Using a svn version of the code allows you to stay
-up-to-date with changes.  So, if there's an update to the 0.22 release and
+up-to-date with changes.  So, if there's an update to the 0.23 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
+mythtv-release-0.23-fixes directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
-install the updated 0.22 code.
+install the updated 0.23 code.
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.22.tar.bz2
-$ cd mythtv-0.22
+$ tar -xjf mythtv-0.23.tar.bz2
+$ cd mythtv-0.23
 $ ./configure
 </verb></tscreen>
 
@@ -1306,8 +1307,9 @@ $ su
 <img src="stop.png">
 <caption><bf>NOTE</bf>: It is good practice to set a root password for MySQL.
 Instructions for doing so can be found on MySQL's web site at <url
-url="http://dev.mysql.com/doc/mysql/en/security.html"
-name="http://dev.mysql.com/doc/mysql/en/security.html">.
+url="http://dev.mysql.com/doc/refman/5.1/en/default-privileges.html"
+name="http://dev.mysql.com/doc/refman/5.1/en/default-privileges.html">.
+
 </caption>
 </figure>
 <sect2>Modifying access to the MySQL database for multiple systems <label
@@ -1591,7 +1593,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with
 
 <tscreen><verb>
-$ cd ~/mythtv-0.22/contrib/configfiles
+$ cd ~/mythtv-0.23/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen>
 or
@@ -2252,7 +2254,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.22, the available options are:
+As of MythTV v0.23, the available options are:
 <tscreen><verb>
 $ mythbackend --help
 Valid options are:
@@ -3058,8 +3060,8 @@ can be modified by the user without re-compiling or altering the program
 functionality.  Download the MythThemes tarball from the website and untar it:
 
 <tscreen><verb>
-$ tar -xjf myththemes-0.22.tar.bz2
-$ cd ~/myththemes-0.22
+$ tar -xjf myththemes-0.23.tar.bz2
+$ cd ~/myththemes-0.23
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -4352,11 +4354,11 @@ Channel "750 CNN" at priority "-1" and HDTV broadcast priority at "+2":
 <p>
 While Input, Channel, and HDTV Priority can be used for indicating a
 preference for certain programs and inputs, there may be circumstances that
-cannot be resolved easily with these standard features. MythTV version 0.22
-includes a feature for "power priority". The Custom Priority editor in
-mythfrontend's "TV Settings" screen is similar to Custom Record, however,
-Custom Priority allows you to create specialized power priority factors to
-influence scheduling decisions.
+cannot be resolved easily with these standard features.  MythTV version 0.22
+and above includes a feature for "power priority".  The Custom Priority
+editor in mythfrontend's "TV Settings" screen is similar to Custom Record,
+however, Custom Priority allows you to create specialized power priority
+factors to influence scheduling decisions.
 
 For example, the 'program.closecaptioned' flag can be used in a
 similar way as the 'program.hdtv' flag.
@@ -4406,8 +4408,8 @@ examples that can be used or you can create your own to suit your needs.
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
-$ tar -xjf mythplugins-0.22.tar.bz2
-$ cd mythplugins-0.22
+$ tar -xjf mythplugins-0.23.tar.bz2
+$ cd mythplugins-0.23
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4451,7 +4453,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins-0.22/</tt> directory.
+already in the <tt>~/mythplugins-0.23/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4467,7 +4469,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4511,7 +4513,7 @@ installation is quite simple.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins-0.22/mythweb
+$ cd ~/mythplugins-0.23/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4573,7 +4575,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4665,7 +4667,7 @@ end
 <!-- Install instructions by Hary Wilke (harywilke at yahoo.com -->
 <p>MythGame can used as a frontend to start any emulator that your host OS
 runs. This is an example of how to set up xmame on Linux.
-<url url="http://www.mameworld.net/" name="http://www.mameworld.net/"> is
+<url url="http://mameworld.info/" name="http://mameworld.info/"> is
 an excellent resource for all things mame.
 
 Installation overview:
@@ -4688,17 +4690,17 @@ $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 <sect1>Download and Install xmame
 <p><bf>NOTE</bf>:  There may be pre-packaged versions of <bf>xmame</bf>
 available for your distribution.  Check <url
-url="http://x.mame.net/download.html"
-name="http://x.mame.net/download.html"> for the latest version.
+url="http://mamedev.org/release.html"
+name="http://mamedev.org/release.html"> for the latest version.
+Also, see <url url="http://sdlmame.wallyweek.org/" name="http://sdlmame.wallyweek.org/">
 
 Download the source to <bf>xmame</bf> from <url
-url="http://x.mame.net/download/xmame-0.103.tar.bz2"
-name="http://x.mame.net/download/xmame-0.103.tar.bz2">
+url="http://mamedev.org/release.html"
+name="http://mamedev.org/release.html">
 
 <tscreen><verb>
-$ wget http://x.mame.net/download/xmame-0.103.tar.bz2
-$ tar -xjf xmame-0.103.tar.bz2
-$ cd xmame-0.103
+$ tar -xjf filename_from_above
+$ cd xmame-version
 </verb></tscreen>
 
 Edit the Makefile with your favorite editor.  Adjust the options as required for your system.
@@ -4721,7 +4723,7 @@ $ mkdir ~/.xmame
 $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 </verb></tscreen>
 
-Because some ROMS work better with different display toolkits, or possibly
+Because some ROMs work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
 <bf>xmame</bf> binaries and to rename them to include the version number.
 MythGame allows you to match individual roms to preferred binaries.
@@ -4755,8 +4757,8 @@ Confirm that <bf>xmame</bf> works before running it inside MythTV. Place
 your ROM in the <tt>/usr/local/share/xmame/roms</tt> directory you created
 earlier.
 
-<bf>NOTE</bf>: There are three public domain ROM sets available at
-<url url="http://www.mame.net/downmisc.html" name="http://www.mame.net/downmisc.html">
+<bf>NOTE</bf>: There are public domain ROM sets available at
+<url url="http://mamedev.org/roms/" name="http://mamedev.org/roms/">
 
 Launch <bf>xmame</bf> with your game of choice.  In this example, we are using Gauntlet.
 <tscreen><verb>
@@ -4784,14 +4786,13 @@ into <tt>/usr/local/share/xmame</tt>
 - <tt>catver.ini</tt> is a catalog of categories and versions of popular mame ROMs.
 <p>Useful for keeping large libraries of ROMs organized.
 
-It may be downloaded from <url url="http://www.catver.com"
-name="http://www.catver.com"> or <url url="http://www.mameworld.net/catlist"
-name="http://www.mameworld.net/catlist">
+It may be downloaded from <url url="http://catlist.mameworld.info/"
+name="http://catlist.mameworld.info/">
 
 - Screenshots aka "snaps"
 <p>These may be downloaded from <url
-url="http://www.classicgaming.com/mame32qa/"
-name="http://www.classicgaming.com/mame32qa/">
+url="http://www.mamechannel.it/pages/snaps.php"
+name="http://www.mamechannel.it/pages/snaps.php">
 
 Screenshots are displayed when you are browsing your ROMS in <bf>mythgame</bf>.
 Unzip and place them in <tt>/usr/local/share/xmame/snaps</tt>
@@ -4802,8 +4803,8 @@ name="http://www.arcade-history.com/">
 This file fills in a bit of background about each ROM.
 
 - <tt>hiscore.dat</tt>
-<p>Download from <url url="http://www.mameworld.net/highscore/"
-name="http://www.mameworld.net/highscore/">
+<p>Download from <url url="http://highscore.mameworld.info/"
+name="http://highscore.mameworld.info/">
 
 - Cheats
 <p>Download from <url url="http://cheat.retrogames.com/"
@@ -4816,7 +4817,7 @@ section to obtain mythplugins.
 
 Switch to the mythplugins directory:
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 </verb></tscreen>
 
 Compile and install mythgame:
@@ -4961,13 +4962,8 @@ cooker and release-level software.
 <p><bf>urpmi</bf> is the simplest tool for installation of packages from the
 command line.  The difficult part is the configuration, but this has been
 made easier at the following website: <url
-url="http://addmedia.linuxfornewbies.org/"
-name="http://addmedia.linuxfornewbies.org/"> The website will allow
-you to choose a mirror site and then present the command-line configuration
-text for that mirror.  You will most likely need to add a "Contrib" mirror
-to your setup.  Once you have done that, you can proceed.  If <bf>urpmi</bf>
-prompts you about other modules that need to be installed to satisfy
-dependencies, say "Yes".
+url="http://wiki.mandriva.com/en/urpmi"
+name="http://wiki.mandriva.com/en/urpmi">
 
 <tscreen><verb>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
@@ -5038,7 +5034,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5171,7 +5167,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5223,7 +5219,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5299,7 +5295,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -5624,7 +5620,7 @@ within the control panel.
 <p>If mythfilldatabase suddenly appears to be failing, there are at least
 two things to check.
 
-First, if you are in North America, ensure that your DataDirect subscription
+First, if you are in North America, ensure that your Schedules Direct subscription
 is still valid, otherwise, check to see what version of XMLTV you're
 running and that it's the latest version.
 
@@ -5816,8 +5812,8 @@ i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
 actually due to the tuner on the video capture device being mis-detected.
 You must manually specify the tuner type in your <tt>/etc/modules.conf</tt>.
 See the video4linux mailing list (<url
-url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
-name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
+url="http://listman.redhat.com/mailman/listinfo/video4linux-list"
+name="http://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information.
 
 <sect2>Mythweb is showing a db_open error when I connect to it
@@ -6005,9 +6001,9 @@ usage is consistently exceeding 90%, frames will need to be dropped during
 peak times when more than 100% of the available CPU would be needed to
 process all of the frames.
 
-If you'd like to read more on this, go to the vcdhelp website at <url
-url="http://www.vcdhelp.com/forum/userguides/94382.php"
-name="http://www.vcdhelp.com/forum/userguides/94382.php">.
+If you'd like to read more on this, go to the VideoHelp website at <url
+url="http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions"
+name="http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions">.
 
 <sect1>MythTV GUI and X Display Sizes
 <p>MythTV is designed to be run as dedicated full screen TV application
@@ -6249,8 +6245,8 @@ of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
 is used to turn off file attribute caching.  Attribute caching for a shared
 media point causes problems; you always want to see the latest state of the
 directory and files.  See <url
-url="http://www.mythtv.org/wiki/index.php/Optimizing_Performance"
-name="http://www.mythtv.org/wiki/index.php/Optimizing_Performance"> for
+url="http://www.mythtv.org/wiki/Optimizing_Performance"
+name="http://www.mythtv.org/wiki/Optimizing_Performance"> for
 additional information regarding performance optimization.
 
 <sect1>Automatically starting mythfrontend at system boot time
@@ -6600,8 +6596,8 @@ Although RTjpeg is an option for video codec there is no reason to transcode
 <em>to</em> this format because it will produce larger files than MPEG-4 and
 the recording will take <em>more</em> CPU power to play back.  The MPEG-4
 settings are described in the documentation for the <bf>ffmpeg</bf> project
-at <url url="http://ffmpeg.sourceforge.net/ffmpeg-doc.html"
-name="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">.  It's a matter of
+at <url url="http://ffmpeg.org/ffmpeg-doc.html"
+name="http://ffmpeg.org/ffmpeg-doc.html">.  It's a matter of
 trial and error to discover which settings achieve a good compromise between
 size and quality.
 
@@ -6782,6 +6778,7 @@ to tune to a channel.
 Lower case = seen
 
 Upper Case = seen & good
+<!-- For 0.24, add: <item>t/F/T = Tune  : Tuning status (pending/failed/tuned) -->
 <itemize>
 <item>l/L = Lock  : This could be seen by PVR-250/BTTV users
 <item>a/A = PAT   : Any recording transmitted in MPEG
@@ -6794,8 +6791,8 @@ Upper Case = seen & good
 <sect1>What is the difference between the various Hauppauge PVR models?
 <p>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  (<url
-url="http://www.hauppauge.com/pages/compare_pvr.html"
-name="http://www.hauppauge.com/pages/compare_pvr.html">) Please check the
+url="http://www.hauppauge.com/site/compare/compare_pvr.html"
+name="http://www.hauppauge.com/site/compare/compare_pvr.html">) Please check the
 Hauppauge website for the most accurate information.
 
 A PVR-150 comes in a number of versions:
@@ -6923,9 +6920,12 @@ resulting in dropped frames.  Some filesystems are faster at deleting files
 than others and, for multi-gigabyte MythTV video files, these differences
 can be significant.
 
-Fortunately, there are published tests (<url
-url="http://aurora.zemris.fer.hr/filesystems/big.html"
-name="http://aurora.zemris.fer.hr/filesystems/big.html">) that provide
+Although done in 2006, there are published tests (<url
+url="http://www.debian-administration.org/articles/388"
+name="http://www.debian-administration.org/articles/388"> and <url
+url="http://linuxgazette.net/122/TWDT.html#piszcz"
+name="http://linuxgazette.net/122/TWDT.html#piszcz">
+) that provide
 insight into filesystem performance under conditions relevant to MythTV
 usage.  In addition, some limited testing (archived at <url
 url="http://www.gossamer-threads.com/lists/mythtv/users/52672"
@@ -6984,10 +6984,8 @@ even files as large as 10 gigabytes.
 later released as open source.  While not a part of the default RedHat Linux
 9 or Fedora Core installation (although it is a part of Mandriva and Fedora
 Core 2+), it can be easily installed via ATrpms.  XFS provides deletion
-speeds for large files only slightly slower than JFS.  According to the test
-results shown at (<url
-url="http://aurora.zemris.fer.hr/filesystems/big.html"
-name="http://aurora.zemris.fer.hr/filesystems/big.html">), XFS provide
+speeds for large files only slightly slower than JFS.
+XFS file systems provide
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
@@ -7124,7 +7122,7 @@ You can then press ESC until you return to the main screen.
 <!-- Revision History
 v0.22.00, 2009-10-07.  Start prepping for 0.22.  Change required minimum
 MySQL to 5.0.15.  Change Qt to 4.3.
-
+v0.23.01, 2010-08-10.  Incorporate patch file from keemllib at gmail.com
 -->
 
 <!--

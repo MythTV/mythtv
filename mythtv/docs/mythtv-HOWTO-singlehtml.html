@@ -1,14 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV</TITLE>
 </HEAD>
 <BODY>
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2009-10-12, v0.22.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2010-08-10, v0.23.01
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -212,12 +212,11 @@ necessary.</EM>
 <LI><A NAME="toc23.16">23.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.16">Can I run MythTV on my ReplayTV?</A>
 <LI><A NAME="toc23.17">23.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.17">Can a wireless connection be used between the frontend and the backend?</A>
 <LI><A NAME="toc23.18">23.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.18">How can I burn shows that I have recorded to a DVD?</A>
-<LI><A NAME="toc23.19">23.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.19">Using the DBoxII within MythTV</A>
-<LI><A NAME="toc23.20">23.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.20">What do the icons on the Watch Recordings screen mean?</A>
-<LI><A NAME="toc23.21">23.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.21">What do the letters mean when I change channels?</A>
-<LI><A NAME="toc23.22">23.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.22">What is the difference between the various Hauppauge PVR models?</A>
-<LI><A NAME="toc23.23">23.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.23">Changing channels on an external Set Top Box</A>
-<LI><A NAME="toc23.24">23.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.24">Configuring one machine to flag all commercials</A>
+<LI><A NAME="toc23.19">23.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.19">What do the icons on the Watch Recordings screen mean?</A>
+<LI><A NAME="toc23.20">23.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.20">What do the letters mean when I change channels?</A>
+<LI><A NAME="toc23.21">23.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.21">What is the difference between the various Hauppauge PVR models?</A>
+<LI><A NAME="toc23.22">23.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.22">Changing channels on an external Set Top Box</A>
+<LI><A NAME="toc23.23">23.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.23">Configuring one machine to flag all commercials</A>
 </UL>
 <P>
 <H2><A NAME="toc24">24.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s24">Example Configurations.</A></H2>
@@ -346,9 +345,9 @@ Kulagowski
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
-<P>This HOWTO is for MythTV v0.22</P>
+<P>This HOWTO is for MythTV v0.23</P>
 <P>Release notes for this version may be found in the MythTV Wiki at 
-<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22</A></P>
+<A HREF="http://www.mythtv.org/wiki/Release_Notes_-_0.23">http://www.mythtv.org/wiki/Release_Notes_-_0.23</A></P>
 
 <H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Books about MythTV</A>
 </H2>
@@ -447,7 +446,7 @@ ticketing system at
 relevant.  It's also not a repository of feature requests; a feature request
 without an accompanying patch file to implement that feature will be quickly
 closed.  There is a feature wishlist on the wiki at 
-<A HREF="http://www.mythtv.org/wiki/index.php/Feature_Wishlist">http://www.mythtv.org/wiki/index.php/Feature_Wishlist</A>.  There is no
+<A HREF="http://www.mythtv.org/wiki/Feature_Wishlist">http://www.mythtv.org/wiki/Feature_Wishlist</A>.  There is no
 guarantee that anything on the wishlist will ever get code written to
 implement it.</P>
 <P>If a developer closes out your bug, it's likely you didn't provide enough
@@ -650,7 +649,7 @@ essentially raw digital form.</P>
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
 it.  See the video4linux mailing list (
-<A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
+<A HREF="http://listman.redhat.com/mailman/listinfo/video4linux-list">http://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information and for specific hardware questions.</P>
 <P>The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
 series of video capture chips; examples are the "Hauppauge WinTV Go" card and
@@ -776,22 +775,18 @@ deinterlacing, or if you have an NVIDIA card with video decode acceleration. </P
 <H3>Playback of HDTV using VDPAU</H3>
 
 <P>NVIDIA now incorporates MPEG-2 and H.264 decode acceleration in their
-binary driver; this is now officially supported in MythTV 0.22.  Use of
-VDPAU offloads the decompression and deinterlacing of video to the video GPU
-rather than the CPU of the frontend, so the CPU requirements are drastically
-lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
-1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264.</P>
+binary driver; this is now officially supported in MythTV 0.22 and above. 
+Use of VDPAU offloads the decompression and deinterlacing of video to the
+video GPU rather than the CPU of the frontend, so the CPU requirements are
+drastically lowered.  A fanless frontend using an Intel Atom CPU running a
+single-core at 1.6Ghz is sufficient to decode and deinterlace MPEG-2 and
+H.264.</P>
 
 <H3>Firewire.</H3>
 
 <P>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
 If your provider uses 5C encryption on a particular channel, you won't be
 able to get any content.</P>
-
-<H3>DBoxII or other devices running Neutrino</H3>
-
-<P>You may use the Ethernet port of an DBoxII or a similar device to capture
-MPEG-2. Your set top box has to be running the Neutrino GUI.</P>
 
 <H3>USB Capture Devices.</H3>
 
@@ -928,12 +923,12 @@ configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.  VDPAU is another new feature and it
 provides an API for offloading MPEG-2 and H.264 to the GPU.</P>
 
-
 <H3><A NAME="PVR-350"></A> Hauppauge PVR-350 </H3>
 
-<P>As of MythTV 0.22, the  TV-out and MPEG-2 decoder functions of the
-PVR-350 are no longer supported.  This functionality is currently
-unmaintained, and will be removed in MythTV 0.23.</P>
+<P>As of MythTV 0.22, the TV-out and MPEG-2 decoder functions of the PVR-350
+are no longer supported.  This functionality is currently unmaintained, and
+was removed in MythTV 0.23.  The encoder functionality will continue to
+be supported through the ivtv driver.</P>
 
 <H3>External Adapters</H3>
 
@@ -1284,7 +1279,7 @@ built-in to MythTV.  You <EM>do not</EM> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <B>wget</B> version 1.9.1
 or higher.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.51).</P>
+<A HREF="http://sourceforge.net/projects/xmltv/files/">http://sourceforge.net/projects/xmltv/files/</A>.  Download the latest version (0.5.51).</P>
 
 <H2><A NAME="ConfigureSD"></A> <A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Configuring the Schedules Direct service </A>
 </H2>
@@ -1319,23 +1314,23 @@ $ cd mythtv
 <P>To use a release version, you can execute:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mkdir mythtv-release-0.22-fixes
-$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
-$ cd mythtv-release-0.22-fixes
+$ mkdir mythtv-release-0.23-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-23-fixes/ mythtv-release-0.23-fixes
+$ cd mythtv-release-0.23-fixes
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  Using a svn version of the code allows you to stay
-up-to-date with changes.  So, if there's an update to the 0.22 release and
+up-to-date with changes.  So, if there's an update to the 0.23 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
+mythtv-release-0.23-fixes directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
-install the updated 0.22 code.</P>
+install the updated 0.23 code.</P>
 <P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.22.tar.bz2
-$ cd mythtv-0.22
+$ tar -xjf mythtv-0.23.tar.bz2
+$ cd mythtv-0.23
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1622,7 +1617,7 @@ $ su
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>: It is good practice to set a root password for MySQL.
 Instructions for doing so can be found on MySQL's web site at 
-<A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</CAPTION>
+<A HREF="http://dev.mysql.com/doc/refman/5.1/en/default-privileges.html">http://dev.mysql.com/doc/refman/5.1/en/default-privileges.html</A>.</CAPTION>
 </FIGURE>
 </P>
 <H3><A NAME="modify_perm_mysql"></A> Modifying access to the MySQL database for multiple systems </H3>
@@ -1929,7 +1924,7 @@ interact directly with</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.22/contrib/configfiles
+$ cd ~/mythtv-0.23/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2590,7 +2585,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of MythTV v0.22, the available options are:
+<P>As of MythTV v0.23, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend --help
@@ -3081,9 +3076,8 @@ ALT-F4 </TD><TD> exit out of the application </TD></TR><TR><TD>
 Space/Enter     </TD><TD> take action on the item under the highlight point </TD></TR><TR><TD>
 P </TD><TD> play in both "Watch a Recording" and "Delete a Recording"   </TD></TR><TR><TD>
 D </TD><TD> delete in both "Watch a Recording" and "Delete a Recording" </TD></TR><TR><TD>
-U </TD><TD> to view details for the currently selected show on the Watch&nbsp;or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;Conflicts" and search results screens </TD></TR><TR><TD>
 O </TD><TD> to list the upcoming episodes for the currently selected show&nbsp;on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;"Fix Scheduling Conflicts" or search results screens </TD></TR><TR><TD>
-I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;screens. From the Playback and Delete screens, 'I' presents&nbsp;options for recorded shows such as Auto Expire or Stop Recording.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
+I </TD><TD> to get additional information about the currently selected item.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -3117,23 +3111,13 @@ W </TD><TD> cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom 
 F8 </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
 CTRL-B </TD><TD> Jump to the beginning of the recording / ringbuffer </TD></TR><TR><TD>
 + </TD><TD> Switch between audio streams </TD></TR><TR><TD>
-Left </TD><TD> (if a jump amount is entered) to jump back that amount </TD></TR><TR><TD>
-Right </TD><TD> (if a jump amount is entered) to jump ahead that amount </TD></TR><TR><TD>
+Left </TD><TD> skip back the configured number of seconds (default is 5)&nbsp;If a jump amount is entered, jump back that amount (HHMM format) </TD></TR><TR><TD>
+Right </TD><TD> skip forward the configured number of seconds (default is 30)&nbsp;If a jump amount is entered, jump ahead that amount (HHMM format) </TD></TR><TR><TD>
+&lt; </TD><TD> starts sticky rewind mode&nbsp;If a jump amount is entered, jump to that position </TD></TR><TR><TD>
+&gt; </TD><TD> starts sticky fast forward mode&nbsp;If a jump amount is entered, jump that amount from the end </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>Without the stickykeys option selected</B> </TD></TR><TR><TD>
-Left </TD><TD> rewind the configured number of seconds (default is 5) </TD></TR><TR><TD>
-Right </TD><TD> fast forward the configured number of seconds (default is 30) </TD></TR><TR><TD>
-&lt; </TD><TD> starts rewind mode as if stickykeys are selected </TD></TR><TR><TD>
-> </TD><TD> starts fast forward mode as if stickykeys are selected </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>With Stickykeys option selected</B> </TD></TR><TR><TD>
-Right </TD><TD> starts fast forward mode </TD></TR><TR><TD>
-Left </TD><TD> starts rewind mode </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>In fast forward or rewind mode:</B> </TD></TR><TR><TD>
+</TD><TD> <B>In sticky fast forward or rewind mode:</B> </TD></TR><TR><TD>
 Left/Right      </TD><TD> increases the ff/rew speed </TD></TR><TR><TD>
 0 </TD><TD> plays at normal speed, but leaves the time indicator on screen </TD></TR><TR><TD>
 1 or 2 </TD><TD> plays back more slowly than normal ff/rew speed (1 is slowest) </TD></TR><TR><TD>
@@ -3242,12 +3226,11 @@ Home/End </TD><TD> move the highlight left or right by one day </TD></TR><TR><TD
 Ctrl+Left or &lt; </TD><TD> move the highlight left by one page </TD></TR><TR><TD>
 Ctrl+Right or &gt; </TD><TD> move the highlight right by one page </TD></TR><TR><TD>
 9, 3, 7, 1 </TD><TD> (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;Home and End </TD></TR><TR><TD>
-I </TD><TD> bring up more information about a show, and allow you to&nbsp;schedule a recording. If you select "Record this showing"&nbsp;while watching Live TV you can "Instant Record" a program. </TD></TR><TR><TD>
-Space/Enter </TD><TD> allow you resolve conflicts or change overrides. If the&nbsp;program is not already scheduled to record, it will instead act like&nbsp;pressing 'I'. </TD></TR><TR><TD>
-M </TD><TD> when on a channel will change to that channel </TD></TR><TR><TD>
+E </TD><TD> allow you to schedule a recording. If you select "Record&nbsp;this showing" while watching Live TV you can "Instant&nbsp;Record" a program. </TD></TR><TR><TD>
+Space/Enter </TD><TD> when watching LiveTV will change to that channel and exit the&nbsp;EPG if the selected show is in progress or starts within 15&nbsp;minutes; or otherwise will allow you to resolve conflicts&nbsp;or change overrides. If the program is not already scheduled&nbsp;to record, it will instead act like pressing E </TD></TR><TR><TD>
+X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
 ESC or C </TD><TD> exits without changing the channel </TD></TR><TR><TD>
 R </TD><TD> change the current item from Recording/Not-Recording.&nbsp;Successive keypresses cycle through the scheduled recording&nbsp;type list. </TD></TR><TR><TD>
-X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
 ? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
 / or 4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
 </TD></TR></TABLE>
@@ -3263,7 +3246,7 @@ Left </TD><TD> decreases priority value </TD></TR><TR><TD>
 1 </TD><TD> sorts by title </TD></TR><TR><TD>
 2 </TD><TD> sorts by priority </TD></TR><TR><TD>
 Home/End        </TD><TD> toggle sort priority </TD></TR><TR><TD>
-I </TD><TD> edit recording options      </TD></TR><TR><TD>
+E </TD><TD> edit recording options      </TD></TR><TR><TD>
 ESC </TD><TD> commits changes and exits
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -3276,7 +3259,7 @@ ESC </TD><TD> commits changes and exits
 1 </TD><TD> show all recordings </TD></TR><TR><TD>
 2 </TD><TD> show only important recordings </TD></TR><TR><TD>
 Home/End        </TD><TD> toggle show showing all/important </TD></TR><TR><TD>
-I </TD><TD> edit recording options </TD></TR><TR><TD>
+E </TD><TD> edit recording options </TD></TR><TR><TD>
 Space/Enter     </TD><TD> resolve conflict or override
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -3309,8 +3292,7 @@ This can be used to reduce clutter, or to segregate content if you use the
 PIN function.
 <BR><CENTER>
 <TABLE BORDER><TR><TD>
-M       </TD><TD> change the view or to set a group password </TD></TR><TR><TD>
-I       </TD><TD> move a program from one Recording Group to another
+M       </TD><TD> to change the view or to set a group password or change recording and&nbsp;storage options. Press M again to toggle between menus. </TD></TR><TR><TD>
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -3363,8 +3345,8 @@ functionality.  Download the MythThemes tarball from the website and untar it:</
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf myththemes-0.22.tar.bz2
-$ cd ~/myththemes-0.22
+$ tar -xjf myththemes-0.23.tar.bz2
+$ cd ~/myththemes-0.23
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -4681,11 +4663,11 @@ preferred over channel 20 for this HDTV broadcast.</P>
 
 <P>While Input, Channel, and HDTV Priority can be used for indicating a
 preference for certain programs and inputs, there may be circumstances that
-cannot be resolved easily with these standard features. MythTV version 0.22
-includes a feature for "power priority". The Custom Priority editor in
-mythfrontend's "TV Settings" screen is similar to Custom Record, however,
-Custom Priority allows you to create specialized power priority factors to
-influence scheduling decisions.</P>
+cannot be resolved easily with these standard features.  MythTV version 0.22
+and above includes a feature for "power priority".  The Custom Priority
+editor in mythfrontend's "TV Settings" screen is similar to Custom Record,
+however, Custom Priority allows you to create specialized power priority
+factors to influence scheduling decisions.</P>
 <P>For example, the 'program.closecaptioned' flag can be used in a
 similar way as the 'program.hdtv' flag.</P>
 <P>
@@ -4741,8 +4723,8 @@ the tarball, untar it and run the <B>configure</B> script:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythplugins-0.22.tar.bz2
-$ cd mythplugins-0.22
+$ tar -xjf mythplugins-0.23.tar.bz2
+$ cd mythplugins-0.23
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4787,7 +4769,7 @@ MythWeather related options:
 </CODE></BLOCKQUOTE>
 </P>
 <P>The sections detailing configuration of the plugins assume that you are
-already in the <CODE>~/mythplugins-0.22/</CODE> directory.</P>
+already in the <CODE>~/mythplugins-0.23/</CODE> directory.</P>
 <P>Note that a single <B>configure</B> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
 compile a module, either because it is of no use to you, or you do not have
@@ -4802,7 +4784,7 @@ line would look like:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4856,7 +4838,7 @@ installation is quite simple.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22/mythweb
+$ cd ~/mythplugins-0.23/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4931,7 +4913,7 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, install the application:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -5029,7 +5011,7 @@ end
 
 <P>MythGame can used as a frontend to start any emulator that your host OS
 runs. This is an example of how to set up xmame on Linux.
-<A HREF="http://www.mameworld.net/">http://www.mameworld.net/</A> is
+<A HREF="http://mameworld.info/">http://mameworld.info/</A> is
 an excellent resource for all things mame.</P>
 <P>Installation overview:
 <OL>
@@ -5059,15 +5041,16 @@ $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 
 <P><B>NOTE</B>:  There may be pre-packaged versions of <B>xmame</B>
 available for your distribution.  Check 
-<A HREF="http://x.mame.net/download.html">http://x.mame.net/download.html</A> for the latest version.</P>
+<A HREF="http://mamedev.org/release.html">http://mamedev.org/release.html</A> for the latest version.
+Also, see 
+<A HREF="http://sdlmame.wallyweek.org/">http://sdlmame.wallyweek.org/</A></P>
 <P>Download the source to <B>xmame</B> from 
-<A HREF="http://x.mame.net/download/xmame-0.103.tar.bz2">http://x.mame.net/download/xmame-0.103.tar.bz2</A></P>
+<A HREF="http://mamedev.org/release.html">http://mamedev.org/release.html</A></P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://x.mame.net/download/xmame-0.103.tar.bz2
-$ tar -xjf xmame-0.103.tar.bz2
-$ cd xmame-0.103
+$ tar -xjf filename_from_above
+$ cd xmame-version
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5097,7 +5080,7 @@ $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Because some ROMS work better with different display toolkits, or possibly
+<P>Because some ROMs work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
 <B>xmame</B> binaries and to rename them to include the version number.
 MythGame allows you to match individual roms to preferred binaries.</P>
@@ -5134,8 +5117,8 @@ mameinfo_file                   /usr/local/share/xmame/mameinfo.dat
 <P>Confirm that <B>xmame</B> works before running it inside MythTV. Place
 your ROM in the <CODE>/usr/local/share/xmame/roms</CODE> directory you created
 earlier.</P>
-<P><B>NOTE</B>: There are three public domain ROM sets available at
-<A HREF="http://www.mame.net/downmisc.html">http://www.mame.net/downmisc.html</A></P>
+<P><B>NOTE</B>: There are public domain ROM sets available at
+<A HREF="http://mamedev.org/roms/">http://mamedev.org/roms/</A></P>
 <P>Launch <B>xmame</B> with your game of choice.  In this example, we are using Gauntlet.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -5168,11 +5151,10 @@ into <CODE>/usr/local/share/xmame</CODE></P>
 <P>- <CODE>catver.ini</CODE> is a catalog of categories and versions of popular mame ROMs.</P>
 <P>Useful for keeping large libraries of ROMs organized.</P>
 <P>It may be downloaded from 
-<A HREF="http://www.catver.com">http://www.catver.com</A> or 
-<A HREF="http://www.mameworld.net/catlist">http://www.mameworld.net/catlist</A></P>
+<A HREF="http://catlist.mameworld.info/">http://catlist.mameworld.info/</A></P>
 <P>- Screenshots aka "snaps"</P>
 <P>These may be downloaded from 
-<A HREF="http://www.classicgaming.com/mame32qa/">http://www.classicgaming.com/mame32qa/</A></P>
+<A HREF="http://www.mamechannel.it/pages/snaps.php">http://www.mamechannel.it/pages/snaps.php</A></P>
 <P>Screenshots are displayed when you are browsing your ROMS in <B>mythgame</B>.
 Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
 <P>- <CODE>history.dat</CODE></P>
@@ -5181,7 +5163,7 @@ Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
 This file fills in a bit of background about each ROM.</P>
 <P>- <CODE>hiscore.dat</CODE></P>
 <P>Download from 
-<A HREF="http://www.mameworld.net/highscore/">http://www.mameworld.net/highscore/</A></P>
+<A HREF="http://highscore.mameworld.info/">http://highscore.mameworld.info/</A></P>
 <P>- Cheats</P>
 <P>Download from 
 <A HREF="http://cheat.retrogames.com/">http://cheat.retrogames.com/</A></P>
@@ -5196,7 +5178,7 @@ section to obtain mythplugins.</P>
 <P>Switch to the mythplugins directory:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5366,12 +5348,7 @@ cooker and release-level software.</P>
 <P><B>urpmi</B> is the simplest tool for installation of packages from the
 command line.  The difficult part is the configuration, but this has been
 made easier at the following website: 
-<A HREF="http://addmedia.linuxfornewbies.org/">http://addmedia.linuxfornewbies.org/</A> The website will allow
-you to choose a mirror site and then present the command-line configuration
-text for that mirror.  You will most likely need to add a "Contrib" mirror
-to your setup.  Once you have done that, you can proceed.  If <B>urpmi</B>
-prompts you about other modules that need to be installed to satisfy
-dependencies, say "Yes".</P>
+<A HREF="http://wiki.mandriva.com/en/urpmi">http://wiki.mandriva.com/en/urpmi</A></P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -5459,7 +5436,7 @@ compiling MythMusic.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5583,7 +5560,7 @@ tarball.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5636,7 +5613,7 @@ that are not directly supported by MythTV.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5737,7 +5714,7 @@ section called
 tarball.  MythNews is a RSS reader.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.22
+$ cd ~/mythplugins-0.23
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -6095,7 +6072,7 @@ within the control panel.</P>
 
 <P>If mythfilldatabase suddenly appears to be failing, there are at least
 two things to check.</P>
-<P>First, if you are in North America, ensure that your DataDirect subscription
+<P>First, if you are in North America, ensure that your Schedules Direct subscription
 is still valid, otherwise, check to see what version of XMLTV you're
 running and that it's the latest version.</P>
 <P>
@@ -6284,7 +6261,7 @@ i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
 actually due to the tuner on the video capture device being mis-detected.
 You must manually specify the tuner type in your <CODE>/etc/modules.conf</CODE>.
 See the video4linux mailing list (
-<A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
+<A HREF="http://listman.redhat.com/mailman/listinfo/video4linux-list">http://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
 <H3>Mythweb is showing a db_open error when I connect to it</H3>
@@ -6483,8 +6460,8 @@ least 10% CPU idle time.  You can use system tools such as <CODE>top</CODE> or
 usage is consistently exceeding 90%, frames will need to be dropped during
 peak times when more than 100% of the available CPU would be needed to
 process all of the frames.</P>
-<P>If you'd like to read more on this, go to the vcdhelp website at 
-<A HREF="http://www.vcdhelp.com/forum/userguides/94382.php">http://www.vcdhelp.com/forum/userguides/94382.php</A>.</P>
+<P>If you'd like to read more on this, go to the VideoHelp website at 
+<A HREF="http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions">http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions</A>.</P>
 
 <H2><A NAME="ss23.4">23.4</A> <A HREF="#toc23.4">MythTV GUI and X Display Sizes</A>
 </H2>
@@ -6753,7 +6730,7 @@ of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
 is used to turn off file attribute caching.  Attribute caching for a shared
 media point causes problems; you always want to see the latest state of the
 directory and files.  See 
-<A HREF="http://www.mythtv.org/wiki/index.php/Optimizing_Performance">http://www.mythtv.org/wiki/index.php/Optimizing_Performance</A> for
+<A HREF="http://www.mythtv.org/wiki/Optimizing_Performance">http://www.mythtv.org/wiki/Optimizing_Performance</A> for
 additional information regarding performance optimization.</P>
 
 <H2><A NAME="ss23.10">23.10</A> <A HREF="#toc23.10">Automatically starting mythfrontend at system boot time</A>
@@ -7129,7 +7106,7 @@ Although RTjpeg is an option for video codec there is no reason to transcode
 the recording will take <EM>more</EM> CPU power to play back.  The MPEG-4
 settings are described in the documentation for the <B>ffmpeg</B> project
 at 
-<A HREF="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">http://ffmpeg.sourceforge.net/ffmpeg-doc.html</A>.  It's a matter of
+<A HREF="http://ffmpeg.org/ffmpeg-doc.html">http://ffmpeg.org/ffmpeg-doc.html</A>.  It's a matter of
 trial and error to discover which settings achieve a good compromise between
 size and quality.</P>
 <P>If you wish to return to the default settings, they are Bitrate: 2200-2500,
@@ -7314,37 +7291,11 @@ impact the viewing experience on the frontend.</P>
 
 <P>Use the mytharchive plugin.</P>
 
-<H2><A NAME="ss23.19">23.19</A> <A HREF="#toc23.19">Using the DBoxII within MythTV</A>
-</H2>
-
-<P>The configuration of the DBoxII for use within MythTV is tricky (as of
-May 16 2005), that's why it's covered here. Your DBoxII has to be running
-linux and the Neutrino GUI instead of the stock BetaNova firmware.  For
-further information, please refer to 
-<A HREF="http://www.tuxbox.org">http://www.tuxbox.org</A>. Additionally, you need to enable the SPTS
-mode in Neutrino.</P>
-<P>
-<UL>
-<LI>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input",
-the other values have to be adjusted according to your setup.
-The default values, except for the "DBOX2 host ip", should work fine.</LI>
-<LI>Define a new video source. It doesn't need to be configured,
-you just need to define it. MythTV grabs the EPG from the DBoxII.</LI>
-<LI>Connect the DBoxII to the newly defined input source in "input connections".</LI>
-<LI>Since channel scanning is not implemented yet, you need to define channels
-in the "Channel Editor". Make sure that you use the same value for
-"Channel Name" as on the DBoxII. You can get a list of available
-channels from the web interface of Neutrino at http://ip-of-your-box:80/.
-Associate the channel with your new video source and repeat when needed.</LI>
-</UL>
-</P>
-<P>You may leave the Setup now and proceed as usual.</P>
-
-<H2><A NAME="ss23.20">23.20</A> <A HREF="#toc23.20">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss23.19">23.19</A> <A HREF="#toc23.19">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss23.21">23.21</A> <A HREF="#toc23.21">What do the letters mean when I change channels?</A>
+<H2><A NAME="ss23.20">23.20</A> <A HREF="#toc23.20">What do the letters mean when I change channels?</A>
 </H2>
 
 <P>These letters let you know what's going on with the backend as it tries
@@ -7361,12 +7312,12 @@ to tune to a channel.</P>
 <LI>s/S = SDT   : DVB only</LI>
 </UL>
 </P>
-<H2><A NAME="ss23.22">23.22</A> <A HREF="#toc23.22">What is the difference between the various Hauppauge PVR models?</A>
+<H2><A NAME="ss23.21">23.21</A> <A HREF="#toc23.21">What is the difference between the various Hauppauge PVR models?</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  (
-<A HREF="http://www.hauppauge.com/pages/compare_pvr.html">http://www.hauppauge.com/pages/compare_pvr.html</A>) Please check the
+<A HREF="http://www.hauppauge.com/site/compare/compare_pvr.html">http://www.hauppauge.com/site/compare/compare_pvr.html</A>) Please check the
 Hauppauge website for the most accurate information.</P>
 <P>A PVR-150 comes in a number of versions:
 <UL>
@@ -7416,7 +7367,7 @@ versions of the PVR-500 should come with an adapter to allow you to connect
 a second S-Video or composite input, but this will take up a second PCI
 slot.  Early adopters may need to purchase this item separately.</P>
 
-<H2><A NAME="ss23.23">23.23</A> <A HREF="#toc23.23">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss23.22">23.22</A> <A HREF="#toc23.22">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -7437,7 +7388,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss23.24">23.24</A> <A HREF="#toc23.24">Configuring one machine to flag all commercials</A>
+<H2><A NAME="ss23.23">23.23</A> <A HREF="#toc23.23">Configuring one machine to flag all commercials</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that
@@ -7484,8 +7435,10 @@ the file takes long enough, the video capture buffer may overrun, thereby
 resulting in dropped frames.  Some filesystems are faster at deleting files
 than others and, for multi-gigabyte MythTV video files, these differences
 can be significant.</P>
-<P>Fortunately, there are published tests (
-<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>) that provide
+<P>Although done in 2006, there are published tests (
+<A HREF="http://www.debian-administration.org/articles/388">http://www.debian-administration.org/articles/388</A> and 
+<A HREF="http://linuxgazette.net/122/TWDT.html#piszcz">http://linuxgazette.net/122/TWDT.html#piszcz</A>
+) that provide
 insight into filesystem performance under conditions relevant to MythTV
 usage.  In addition, some limited testing (archived at 
 <A HREF="http://www.gossamer-threads.com/lists/mythtv/users/52672">http://www.gossamer-threads.com/lists/mythtv/users/52672</A>)
@@ -7547,9 +7500,8 @@ even files as large as 10 gigabytes.</P>
 later released as open source.  While not a part of the default RedHat Linux
 9 or Fedora Core installation (although it is a part of Mandriva and Fedora
 Core 2+), it can be easily installed via ATrpms.  XFS provides deletion
-speeds for large files only slightly slower than JFS.  According to the test
-results shown at (
-<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide
+speeds for large files only slightly slower than JFS.
+XFS file systems provide
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>

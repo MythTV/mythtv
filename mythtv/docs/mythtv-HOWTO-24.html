@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Example Configurations.</TITLE>
  <LINK HREF="mythtv-HOWTO-23.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc24" REL=contents>
@@ -29,8 +29,10 @@ the file takes long enough, the video capture buffer may overrun, thereby
 resulting in dropped frames.  Some filesystems are faster at deleting files
 than others and, for multi-gigabyte MythTV video files, these differences
 can be significant.</P>
-<P>Fortunately, there are published tests (
-<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>) that provide
+<P>Although done in 2006, there are published tests (
+<A HREF="http://www.debian-administration.org/articles/388">http://www.debian-administration.org/articles/388</A> and 
+<A HREF="http://linuxgazette.net/122/TWDT.html#piszcz">http://linuxgazette.net/122/TWDT.html#piszcz</A>
+) that provide
 insight into filesystem performance under conditions relevant to MythTV
 usage.  In addition, some limited testing (archived at 
 <A HREF="http://www.gossamer-threads.com/lists/mythtv/users/52672">http://www.gossamer-threads.com/lists/mythtv/users/52672</A>)
@@ -92,9 +94,8 @@ even files as large as 10 gigabytes.</P>
 later released as open source.  While not a part of the default RedHat Linux
 9 or Fedora Core installation (although it is a part of Mandriva and Fedora
 Core 2+), it can be easily installed via ATrpms.  XFS provides deletion
-speeds for large files only slightly slower than JFS.  According to the test
-results shown at (
-<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide
+speeds for large files only slightly slower than JFS.
+XFS file systems provide
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
