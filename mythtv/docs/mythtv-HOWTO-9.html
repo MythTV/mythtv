@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Configuring MythTV. </TITLE>
  <LINK HREF="mythtv-HOWTO-10.html" REL=next>
  <LINK HREF="mythtv-HOWTO-8.html" REL=previous>
@@ -564,17 +564,15 @@ initial set of icons and to keep them updated if your lineups change.</P>
 <P>First, you need to generate or obtain an XML file with the information for
 your stations.</P>
 <P>If you have XMLTV software installed, there is a perl script in MythTV's
-<CODE>contrib/</CODE> directory which will generate this file for you. Run the
+<CODE>contrib/icons/master_iconmap</CODE> directory which will generate this file for you. Run the
 command:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ perl mkiconmap.pl
+$ mkdir ~/.mythtv/channels
+$ ./channel_icons.pl --find-missing --rescan
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>You will be asked for your zip code and the service that you use. If there
-are no errors, the <CODE>iconmap.xml</CODE> file that you need for the next step
-will be created.</P>
 <P>If you do not have XMLTV software installed and do not want to install it
 for the sake of this minor task, there is a generic
 <CODE>contrib/master_iconmap.xml</CODE> which you can copy and use but this may

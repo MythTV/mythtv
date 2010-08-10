@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Troubleshooting.</TITLE>
  <LINK HREF="mythtv-HOWTO-23.html" REL=next>
  <LINK HREF="mythtv-HOWTO-21.html" REL=previous>
@@ -36,7 +36,7 @@ compiler is telling you that you don't have XFree86-devel installed, or that
 your distribution hasn't set it up correctly.  This needs to be fixed before
 MythTV will compile.</P>
 
-<H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</H3>
+<H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop. </H3>
 
 <P>This error happens when there's a missing link in the
 <CODE>/usr/lib/qt3/mkspecs</CODE> directory.  There are two ways to fix this
@@ -187,7 +187,7 @@ intents and purposes your computer will have crashed.</P>
 <H2><A NAME="ss22.3">22.3</A> <A HREF="mythtv-HOWTO.html#toc22.3">Installing</A>
 </H2>
 
-<H3>When trying to run mythtv-setup, you get an error like this:"mythtv-setup: error while loading shared libraries:"</H3>
+<H3>When trying to run mythtv-setup, you get an error like this: "mythtv-setup: error while loading shared libraries:"</H3>
 
 <P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
 section on modifying 
@@ -360,7 +360,7 @@ within the control panel.</P>
 
 <P>If mythfilldatabase suddenly appears to be failing, there are at least
 two things to check.</P>
-<P>First, if you are in North America, ensure that your DataDirect subscription
+<P>First, if you are in North America, ensure that your Schedules Direct subscription
 is still valid, otherwise, check to see what version of XMLTV you're
 running and that it's the latest version.</P>
 <P>
@@ -509,7 +509,7 @@ i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
 actually due to the tuner on the video capture device being mis-detected.
 You must manually specify the tuner type in your <CODE>/etc/modules.conf</CODE>.
 See the video4linux mailing list (
-<A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
+<A HREF="http://listman.redhat.com/mailman/listinfo/video4linux-list">http://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
 <H3>Mythweb is showing a db_open error when I connect to it</H3>

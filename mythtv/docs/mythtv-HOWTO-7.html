@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Configuring Sound.</TITLE>
  <LINK HREF="mythtv-HOWTO-8.html" REL=next>
  <LINK HREF="mythtv-HOWTO-6.html" REL=previous>
@@ -14,113 +14,8 @@
 <HR>
 <H2><A NAME="s7">7.</A> <A HREF="mythtv-HOWTO.html#toc7">Configuring Sound.</A></H2>
 
-<P>In the past, when analog frame buffer video capture cards were the primary
-means of obtaining video, many did not include audio capture circuitry, so a
-sound card was required to record the audio.  Now that most users will have
-a hardware capture device which multiplexes the audio and video into a
-single stream this is not as great a concern as it once was.</P>
-<P><B>NOTE</B>: This portion of the HOWTO will be removed in MythTV v0.23.</P>
-<P>See the 
-<A HREF="mythtv-HOWTO-22.html#Troubleshooting_Audio">Troubleshooting Audio</A>
-section for more information if you're having issues with sound.  Also,
-ensure that no other programs are grabbing the audio output, like
-<B>arts</B> or <B>esd</B>.</P>
-<P>You must mute the "line-in" of your sound card and also set it as the
-recording source.  Muting the line-in will ensure that you don't hear a
-time-delayed version of any live programs you may be watching if you have a
-combined frontend/backend system.</P>
-<P>There are two ways to do this.  Graphically, and from the command line.</P>
 
-<H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Graphically setting up the mixer</A>
-</H2>
-
-<H3>Mandriva and Red Hat Linux/Fedora Core</H3>
-
-<P>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandriva, or
-<PRE>
-RedHat Menu>Sound &amp; Video>Volume Control
-</PRE>
- on Red Hat/Fedora.</P>
-<P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
-labels" have "X"'s in them.  This will make it easier to find the correct
-audio source.  Click OK.</P>
-<P>On the mixer page, look for Line-In on your sound card.  You should see
-two LED's - a green one at the top, and a red one at the bottom.  The green
-one at the top is for muting; you want to make sure that the green LED is a
-dark green, meaning that it's "off".  You also want to click on the red LED
-so that it turns bright red, indicating that it's "ON"; this insures that
-the Line-in is used as the source.  Click OK, and make sure that you save
-the settings so that this is your default.</P>
-
-<H3>Using ALSA.</H3>
-
-<P>To use ALSA, you'll need to correctly setup your
-<CODE>asoundrc</CODE> file. Configuring this file is beyond the scope of this
-HOWTO.  Once ALSA is working correctly, change the output sound device in
-mythfrontend->setup->Audio from <CODE>/dev/dsp</CODE> to <CODE>ALSA:default</CODE>.
-This field may be edited to suit your ALSA requirements.</P>
-
-<H2><A NAME="ss7.2">7.2</A> <A HREF="mythtv-HOWTO.html#toc7.2">Setting the mixer from the command line</A>
-</H2>
-
-<P>If you have installed the alsa-utils package, then the <B>amixer</B>
-program can be used to setup the mixer.  The "Master" volume setting is only
-required on a frontend machine to ensure that the sound channels are unmuted
-and configured for outputting sound.  The "Line" and "Capture" controls are
-required for your sound card to actually capture audio from the external
-Line-in if it's connected to an analog frame grabber.  Not all sound cards
-have a "Capture" control, but if yours does and you don't set it then MythTV
-will not capture audio.</P>
-<P>
-<HR>
-<PRE>
-Note the spelling in the following commands.
-</PRE>
-<HR>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-$ amixer set Master,0 100%,100% unmute
-$ amixer set PCM,0 100%,100% unmute
-$ amixer set Line,0 75%,75% mute captur
-$ amixer set Capture,0 100%,100% captur
-$ su
-# alsactl store
-# exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you have multiple sound cards, then use the <CODE>-c</CODE> parameter to
-specify which card to adjust.  Note that the first card will be "0", the
-second will be "1", etc.</P>
-<P>That takes care of setting the volume correctly, and the ALSA startup script
-will restore the volume after a reboot.  If you find that your sound is
-distorted, it's possible that the levels in the above examples are too high
-for your particular hardware combination.  Try reducing the percentages by
-5-10% and checking again.  Once you're satisfied, re-run the <CODE>alsactl
-store</CODE> command.</P>
-<P>You may also use the <B>alsamixer</B> program to set the volume. If you
-are using an ALSA version after 1.0.6, use <B>alsamixer -V all</B> First,
-start <B>alsamixer</B> from the command line.  You should start out on the
-"Master" volume control slider.  Use the up and down cursor to set the
-master volume to around 75%.  Next, use the left and right cursor keys to
-move around on the screen until you find the "Line" slider.  Press SPACE to
-set it as the capture source, set the level to around 50-75% and press "M"
-to mute it.  You can now press ESC to exit out of the <B>alsamixer</B>
-program.  You can also have MythTV manage all volume and mute settings, but
-this will only affect the "Master" or PCM volume, not the capture volume.  See
-the mythfrontend setup page for options.</P>
-<P>Finally, if you've performed all of the above steps, and you still don't
-seem to have any sound, it's possible that your video capture device is
-muting the audio output.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ v4lctl -c /dev/video0 setattr mute off
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>TODO:  UPDATE FOR NEW SOUND CODE in 0.24</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-8.html">Next</A>

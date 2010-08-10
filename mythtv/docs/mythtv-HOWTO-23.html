@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Miscellaneous.</TITLE>
  <LINK HREF="mythtv-HOWTO-24.html" REL=next>
  <LINK HREF="mythtv-HOWTO-22.html" REL=previous>
@@ -111,7 +111,7 @@ $ cat vidout > video.yuv
 run a lightweight window manager, the <CODE>contrib/configfiles/</CODE> directory has an
 example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
 
-<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work?</A>
+<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work? </A>
 </H2>
 
 <P>While MythTV allows you to set various GUI and capture resolutions, not
@@ -158,8 +158,8 @@ least 10% CPU idle time.  You can use system tools such as <CODE>top</CODE> or
 usage is consistently exceeding 90%, frames will need to be dropped during
 peak times when more than 100% of the available CPU would be needed to
 process all of the frames.</P>
-<P>If you'd like to read more on this, go to the vcdhelp website at 
-<A HREF="http://www.vcdhelp.com/forum/userguides/94382.php">http://www.vcdhelp.com/forum/userguides/94382.php</A>.</P>
+<P>If you'd like to read more on this, go to the VideoHelp website at 
+<A HREF="http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions">http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions</A>.</P>
 
 <H2><A NAME="ss23.4">23.4</A> <A HREF="mythtv-HOWTO.html#toc23.4">MythTV GUI and X Display Sizes</A>
 </H2>
@@ -266,13 +266,11 @@ $ mythconverg_backup.pl --help
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>To restore: (assuming that you've 
-<A HREF="#dropdb">dropped the database</A>
-and 
-<A HREF="mythtv-HOWTO-6.html#setupdb">created a new database</A>)
+<P>To restore:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz
+$ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz \
+                         --drop_database --create_database
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -290,29 +288,7 @@ with multiple systems.  See the
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
 information.</P>
 
-<H2><A NAME="dropdb"></A> <A NAME="ss23.6">23.6</A> <A HREF="mythtv-HOWTO.html#toc23.6">Deleting the MySQL database </A>
-</H2>
-
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Performing this step will remove the entire database.
-You will lose all of your settings and will need to 
-<A HREF="mythtv-HOWTO-6.html#setupdb">re-run the mc.sql script</A> to setup the database structure before running
-the mythtv-setup program or performing a database restore.</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root
-mysql> DROP DATABASE IF EXISTS mythconverg;
-mysql> quit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="btaudio"></A> <A NAME="ss23.7">23.7</A> <A HREF="mythtv-HOWTO.html#toc23.7">btaudio </A>
+<H2><A NAME="btaudio"></A> <A NAME="ss23.6">23.6</A> <A HREF="mythtv-HOWTO.html#toc23.6">btaudio </A>
 </H2>
 
 <P>btaudio allows you to obtain the audio data from your tuner card directly
@@ -352,7 +328,7 @@ analog)</LI>
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
 
-<H2><A NAME="ss23.8">23.8</A> <A HREF="mythtv-HOWTO.html#toc23.8">Removing unwanted channels</A>
+<H2><A NAME="ss23.7">23.7</A> <A HREF="mythtv-HOWTO.html#toc23.7">Removing unwanted channels</A>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
@@ -398,7 +374,7 @@ mysql> delete from program where chanid = 1015;
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss23.9">23.9</A> <A HREF="mythtv-HOWTO.html#toc23.9">NFS</A>
+<H2><A NAME="ss23.8">23.8</A> <A HREF="mythtv-HOWTO.html#toc23.8">NFS</A>
 </H2>
 
 <P>You may want to use a central server to store your files.</P>
@@ -430,10 +406,10 @@ of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
 is used to turn off file attribute caching.  Attribute caching for a shared
 media point causes problems; you always want to see the latest state of the
 directory and files.  See 
-<A HREF="http://www.mythtv.org/wiki/index.php/Optimizing_Performance">http://www.mythtv.org/wiki/index.php/Optimizing_Performance</A> for
+<A HREF="http://www.mythtv.org/wiki/Optimizing_Performance">http://www.mythtv.org/wiki/Optimizing_Performance</A> for
 additional information regarding performance optimization.</P>
 
-<H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">Automatically starting mythfrontend at system boot time</A>
+<H2><A NAME="ss23.9">23.9</A> <A HREF="mythtv-HOWTO.html#toc23.9">Automatically starting mythfrontend at system boot time</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -472,7 +448,7 @@ session.screen0.focusModel:     SloppyFocus
  in it.</P>
 <P>
 <A NAME="mythbackend_autostart"></A> </P>
-<H2><A NAME="ss23.11">23.11</A> <A HREF="mythtv-HOWTO.html#toc23.11">Automatically starting mythbackend at system boot time</A>
+<H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">Automatically starting mythbackend at system boot time</A>
 </H2>
 
 <H3>Red Hat And Mandriva</H3>
@@ -676,7 +652,7 @@ To stop mythbackend as a daemon:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advanced_backend_config"></A> <A NAME="ss23.12">23.12</A> <A HREF="mythtv-HOWTO.html#toc23.12">Advanced Backend Configurations </A>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss23.11">23.11</A> <A HREF="mythtv-HOWTO.html#toc23.11">Advanced Backend Configurations </A>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
@@ -719,7 +695,7 @@ be used.</P>
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
 
-<H2><A NAME="ss23.13">23.13</A> <A HREF="mythtv-HOWTO.html#toc23.13">Using the transcoder</A>
+<H2><A NAME="ss23.12">23.12</A> <A HREF="mythtv-HOWTO.html#toc23.12">Using the transcoder</A>
 </H2>
 
 <P>MythTV's built-in transcoder re-encodes recordings from one codec to
@@ -806,7 +782,7 @@ Although RTjpeg is an option for video codec there is no reason to transcode
 the recording will take <EM>more</EM> CPU power to play back.  The MPEG-4
 settings are described in the documentation for the <B>ffmpeg</B> project
 at 
-<A HREF="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">http://ffmpeg.sourceforge.net/ffmpeg-doc.html</A>.  It's a matter of
+<A HREF="http://ffmpeg.org/ffmpeg-doc.html">http://ffmpeg.org/ffmpeg-doc.html</A>.  It's a matter of
 trial and error to discover which settings achieve a good compromise between
 size and quality.</P>
 <P>If you wish to return to the default settings, they are Bitrate: 2200-2500,
@@ -877,7 +853,7 @@ mysql>
 run mythtranscode from the command line and explicitly specify the transcoder
 profile.  Run <CODE>mythtranscode --help</CODE> for usage information.</P>
 
-<H2><A NAME="ss23.14">23.14</A> <A HREF="mythtv-HOWTO.html#toc23.14">Changing your hostname</A>
+<H2><A NAME="ss23.13">23.13</A> <A HREF="mythtv-HOWTO.html#toc23.13">Changing your hostname</A>
 </H2>
 
 <P>If you need to change the name of the computers used with MythTV you'll
@@ -959,10 +935,10 @@ start them from terminal consoles.
 </P>
 <P>6.  Quit and restart all frontends.</P>
 
-<H2><A NAME="ss23.15">23.15</A> <A HREF="mythtv-HOWTO.html#toc23.15">Can I run MythTV on my TiVo?</A>
+<H2><A NAME="ss23.14">23.14</A> <A HREF="mythtv-HOWTO.html#toc23.14">Can I run MythTV on my TiVo?</A>
 </H2>
 
-<H2><A NAME="ss23.16">23.16</A> <A HREF="mythtv-HOWTO.html#toc23.16">Can I run MythTV on my ReplayTV?</A>
+<H2><A NAME="ss23.15">23.15</A> <A HREF="mythtv-HOWTO.html#toc23.15">Can I run MythTV on my ReplayTV?</A>
 </H2>
 
 <P>No.</P>
@@ -973,7 +949,7 @@ for the custom hardware contained within a TiVo.  TiVo is under no
 obligation to release the source code to their <EM>application</EM>.</P>
 <P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
 Systems.</P>
-<H2><A NAME="ss23.17">23.17</A> <A HREF="mythtv-HOWTO.html#toc23.17">Can a wireless connection be used between the frontend and the backend?</A>
+<H2><A NAME="ss23.16">23.16</A> <A HREF="mythtv-HOWTO.html#toc23.16">Can a wireless connection be used between the frontend and the backend?</A>
 </H2>
 
 <P>Yes, assuming that your wireless connection has sufficient bandwidth to
@@ -986,12 +962,12 @@ modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
 wireless frontends, poor signal strength or other factors can severely
 impact the viewing experience on the frontend.</P>
 
-<H2><A NAME="ss23.18">23.18</A> <A HREF="mythtv-HOWTO.html#toc23.18">How can I burn shows that I have recorded to a DVD?</A>
+<H2><A NAME="ss23.17">23.17</A> <A HREF="mythtv-HOWTO.html#toc23.17">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
 <P>Use the mytharchive plugin.</P>
 
-<H2><A NAME="ss23.19">23.19</A> <A HREF="mythtv-HOWTO.html#toc23.19">Using the DBoxII within MythTV</A>
+<H2><A NAME="ss23.18">23.18</A> <A HREF="mythtv-HOWTO.html#toc23.18">Using the DBoxII within MythTV</A>
 </H2>
 
 <P>The configuration of the DBoxII for use within MythTV is tricky (as of
@@ -1017,11 +993,11 @@ Associate the channel with your new video source and repeat when needed.</LI>
 </P>
 <P>You may leave the Setup now and proceed as usual.</P>
 
-<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss23.19">23.19</A> <A HREF="mythtv-HOWTO.html#toc23.19">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">What do the letters mean when I change channels?</A>
+<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">What do the letters mean when I change channels?</A>
 </H2>
 
 <P>These letters let you know what's going on with the backend as it tries
@@ -1038,12 +1014,12 @@ to tune to a channel.</P>
 <LI>s/S = SDT   : DVB only</LI>
 </UL>
 </P>
-<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">What is the difference between the various Hauppauge PVR models?</A>
+<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">What is the difference between the various Hauppauge PVR models?</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  (
-<A HREF="http://www.hauppauge.com/pages/compare_pvr.html">http://www.hauppauge.com/pages/compare_pvr.html</A>) Please check the
+<A HREF="http://www.hauppauge.com/site/compare/compare_pvr.html">http://www.hauppauge.com/site/compare/compare_pvr.html</A>) Please check the
 Hauppauge website for the most accurate information.</P>
 <P>A PVR-150 comes in a number of versions:
 <UL>
@@ -1090,7 +1066,7 @@ versions of the PVR-500 should come with an adapter to allow you to connect
 a second S-Video or composite input, but this will take up a second PCI
 slot.  Early adopters may need to purchase this item separately.</P>
 
-<H2><A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -1111,7 +1087,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss23.24">23.24</A> <A HREF="mythtv-HOWTO.html#toc23.24">Configuring one machine to flag all commercials</A>
+<H2><A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">Configuring one machine to flag all commercials</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that

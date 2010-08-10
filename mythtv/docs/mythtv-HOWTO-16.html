@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: MythGame.</TITLE>
  <LINK HREF="mythtv-HOWTO-17.html" REL=next>
  <LINK HREF="mythtv-HOWTO-15.html" REL=previous>
@@ -16,7 +16,7 @@
 
 <P>MythGame can used as a frontend to start any emulator that your host OS
 runs. This is an example of how to set up xmame on Linux.
-<A HREF="http://www.mameworld.net/">http://www.mameworld.net/</A> is
+<A HREF="http://mameworld.info/">http://mameworld.info/</A> is
 an excellent resource for all things mame.</P>
 <P>Installation overview:
 <OL>
@@ -46,15 +46,16 @@ $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 
 <P><B>NOTE</B>:  There may be pre-packaged versions of <B>xmame</B>
 available for your distribution.  Check 
-<A HREF="http://x.mame.net/download.html">http://x.mame.net/download.html</A> for the latest version.</P>
+<A HREF="http://mamedev.org/release.html">http://mamedev.org/release.html</A> for the latest version.
+Also, see 
+<A HREF="http://sdlmame.wallyweek.org/">http://sdlmame.wallyweek.org/</A></P>
 <P>Download the source to <B>xmame</B> from 
-<A HREF="http://x.mame.net/download/xmame-0.103.tar.bz2">http://x.mame.net/download/xmame-0.103.tar.bz2</A></P>
+<A HREF="http://mamedev.org/release.html">http://mamedev.org/release.html</A></P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://x.mame.net/download/xmame-0.103.tar.bz2
-$ tar -xjf xmame-0.103.tar.bz2
-$ cd xmame-0.103
+$ tar -xjf filename_from_above
+$ cd xmame-version
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -84,7 +85,7 @@ $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Because some ROMS work better with different display toolkits, or possibly
+<P>Because some ROMs work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
 <B>xmame</B> binaries and to rename them to include the version number.
 MythGame allows you to match individual roms to preferred binaries.</P>
@@ -121,8 +122,8 @@ mameinfo_file                   /usr/local/share/xmame/mameinfo.dat
 <P>Confirm that <B>xmame</B> works before running it inside MythTV. Place
 your ROM in the <CODE>/usr/local/share/xmame/roms</CODE> directory you created
 earlier.</P>
-<P><B>NOTE</B>: There are three public domain ROM sets available at
-<A HREF="http://www.mame.net/downmisc.html">http://www.mame.net/downmisc.html</A></P>
+<P><B>NOTE</B>: There are public domain ROM sets available at
+<A HREF="http://mamedev.org/roms/">http://mamedev.org/roms/</A></P>
 <P>Launch <B>xmame</B> with your game of choice.  In this example, we are using Gauntlet.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -155,11 +156,10 @@ into <CODE>/usr/local/share/xmame</CODE></P>
 <P>- <CODE>catver.ini</CODE> is a catalog of categories and versions of popular mame ROMs.</P>
 <P>Useful for keeping large libraries of ROMs organized.</P>
 <P>It may be downloaded from 
-<A HREF="http://www.catver.com">http://www.catver.com</A> or 
-<A HREF="http://www.mameworld.net/catlist">http://www.mameworld.net/catlist</A></P>
+<A HREF="http://catlist.mameworld.info/">http://catlist.mameworld.info/</A></P>
 <P>- Screenshots aka "snaps"</P>
 <P>These may be downloaded from 
-<A HREF="http://www.classicgaming.com/mame32qa/">http://www.classicgaming.com/mame32qa/</A></P>
+<A HREF="http://www.mamechannel.it/pages/snaps.php">http://www.mamechannel.it/pages/snaps.php</A></P>
 <P>Screenshots are displayed when you are browsing your ROMS in <B>mythgame</B>.
 Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
 <P>- <CODE>history.dat</CODE></P>
@@ -168,7 +168,7 @@ Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
 This file fills in a bit of background about each ROM.</P>
 <P>- <CODE>hiscore.dat</CODE></P>
 <P>Download from 
-<A HREF="http://www.mameworld.net/highscore/">http://www.mameworld.net/highscore/</A></P>
+<A HREF="http://highscore.mameworld.info/">http://highscore.mameworld.info/</A></P>
 <P>- Cheats</P>
 <P>Download from 
 <A HREF="http://cheat.retrogames.com/">http://cheat.retrogames.com/</A></P>

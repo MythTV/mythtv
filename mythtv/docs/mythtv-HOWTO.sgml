@@ -125,11 +125,11 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.23
+This HOWTO is for MythTV v0.24
 
 Release notes for this version may be found in the MythTV Wiki at <url
-url="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.23"
-name="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.23">
+url="http://www.mythtv.org/wiki/Release_Notes_-_0.24"
+name="http://www.mythtv.org/wiki/Release_Notes_-_0.24">
 
 <sect1>Books about MythTV
 <p>If you would like to purchase a book specifically about MythTV:
@@ -227,8 +227,8 @@ The bug database is not a chat room, so restrict your entries to what is
 relevant.  It's also not a repository of feature requests; a feature request
 without an accompanying patch file to implement that feature will be quickly
 closed.  There is a feature wishlist on the wiki at <url
-url="http://www.mythtv.org/wiki/index.php/Feature_Wishlist"
-name="http://www.mythtv.org/wiki/index.php/Feature_Wishlist">.  There is no
+url="http://www.mythtv.org/wiki/Feature_Wishlist"
+name="http://www.mythtv.org/wiki/Feature_Wishlist">.  There is no
 guarantee that anything on the wishlist will ever get code written to
 implement it.
 
@@ -437,8 +437,8 @@ For a list of video capture cards known to work with Linux, please see
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
 it.  See the video4linux mailing list (<url
-url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
-name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
+url="http://listman.redhat.com/mailman/listinfo/video4linux-list"
+name="http://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information and for specific hardware questions.
 
 The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
@@ -927,7 +927,7 @@ The recommended solution is to download the source using
 
 When using subversion, there are some other choices that need to be made:
 <itemize>
-<item>Do you want to run the stable release of MythTV?  If yes, download from the "release-0-22-fixes" branch.
+<item>Do you want to run the stable release of MythTV?  If yes, download from the "release-0-23-fixes" branch.
 <item>Do you want to run the absolute latest developer code?  If yes, you <em>must</em>
 join the <url url="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"> and <url
@@ -942,8 +942,8 @@ built-in to MythTV.  You <em>do not</em> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
-Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.51).
+Get XMLTV from <url url="http://sourceforge.net/projects/xmltv/files/"
+name="http://sourceforge.net/projects/xmltv/files/">.  Download the latest version (0.5.51).
 
 <sect1>Configuring the Schedules Direct service <label id="ConfigureSD">
 <p>Schedules Direct is a non-profit organization which has licensed
@@ -969,7 +969,7 @@ To use the <em>release</em> version, you can execute the following.  You are
 strongly encouraged to use the release version.
 
 <tscreen><verb>
-$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-0.23
+$ svn co http://svn.mythtv.org/svn/branches/release-0-23-fixes/ mythtv-0.23
 $ cd mythtv-0.23
 </verb></tscreen>
 
@@ -1164,8 +1164,8 @@ $ su
 <img src="stop.png">
 <caption><bf>NOTE</bf>: It is good practice to set a root password for MySQL.
 Instructions for doing so can be found on MySQL's web site at <url
-url="http://www.mysql.com/doc/en/Security.html"
-name="http://www.mysql.com/doc/en/Security.html">.
+url="http://dev.mysql.com/doc/refman/5.1/en/default-privileges.html"
+name="http://dev.mysql.com/doc/refman/5.1/en/default-privileges.html">.
 </caption>
 </figure>
 <sect2>Modifying access to the MySQL database for multiple systems <label
@@ -1225,104 +1225,8 @@ configuration.
 
 <sect>Configuring Sound.
 <p>
-In the past, when analog frame buffer video capture cards were the primary
-means of obtaining video, many did not include audio capture circuitry, so a
-sound card was required to record the audio.  Now that most users will have
-a hardware capture device which multiplexes the audio and video into a
-single stream this is not as great a concern as it once was.
 
-<bf>NOTE</bf>: This portion of the HOWTO will be removed in MythTV v0.23.
-
-See the <ref id="Troubleshooting_Audio" name="Troubleshooting Audio">
-section for more information if you're having issues with sound.  Also,
-ensure that no other programs are grabbing the audio output, like
-<bf>arts</bf> or <bf>esd</bf>.
-
-You must mute the "line-in" of your sound card and also set it as the
-recording source.  Muting the line-in will ensure that you don't hear a
-time-delayed version of any live programs you may be watching if you have a
-combined frontend/backend system.
-
-There are two ways to do this.  Graphically, and from the command line.
-
-<sect1>Graphically setting up the mixer
-<sect2>Mandriva and Red Hat Linux/Fedora Core
-<p>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandriva, or
-<verb>RedHat Menu>Sound & Video>Volume Control</verb> on Red Hat/Fedora.
-
-Click on Settings->Configure  Make sure that "Tick Marks" and "Show
-labels" have "X"'s in them.  This will make it easier to find the correct
-audio source.  Click OK.
-
-On the mixer page, look for Line-In on your sound card.  You should see
-two LED's - a green one at the top, and a red one at the bottom.  The green
-one at the top is for muting; you want to make sure that the green LED is a
-dark green, meaning that it's "off".  You also want to click on the red LED
-so that it turns bright red, indicating that it's "ON"; this insures that
-the Line-in is used as the source.  Click OK, and make sure that you save
-the settings so that this is your default.
-
-<sect3>Using ALSA.
-<p>To use ALSA, you'll need to correctly setup your
-<tt>asoundrc</tt> file. Configuring this file is beyond the scope of this
-HOWTO.  Once ALSA is working correctly, change the output sound device in
-mythfrontend->setup->Audio from <tt>/dev/dsp</tt> to <tt>ALSA:default</tt>.
-This field may be edited to suit your ALSA requirements.
-
-<sect1>Setting the mixer from the command line
-<p>If you have installed the alsa-utils package, then the <bf>amixer</bf>
-program can be used to setup the mixer.  The "Master" volume setting is only
-required on a frontend machine to ensure that the sound channels are unmuted
-and configured for outputting sound.  The "Line" and "Capture" controls are
-required for your sound card to actually capture audio from the external
-Line-in if it's connected to an analog frame grabber.  Not all sound cards
-have a "Capture" control, but if yours does and you don't set it then MythTV
-will not capture audio.
-
-<code>
-Note the spelling in the following commands.
-</code>
-<tscreen><verb>
-$ amixer set Master,0 100%,100% unmute
-$ amixer set PCM,0 100%,100% unmute
-$ amixer set Line,0 75%,75% mute captur
-$ amixer set Capture,0 100%,100% captur
-$ su
-# alsactl store
-# exit
-$
-</verb></tscreen>
-
-If you have multiple sound cards, then use the <tt>-c</tt> parameter to
-specify which card to adjust.  Note that the first card will be "0", the
-second will be "1", etc.
-
-That takes care of setting the volume correctly, and the ALSA startup script
-will restore the volume after a reboot.  If you find that your sound is
-distorted, it's possible that the levels in the above examples are too high
-for your particular hardware combination.  Try reducing the percentages by
-5-10% and checking again.  Once you're satisfied, re-run the <tt>alsactl
-store</tt> command.
-
-You may also use the <bf>alsamixer</bf> program to set the volume. If you
-are using an ALSA version after 1.0.6, use <bf>alsamixer -V all</bf> First,
-start <bf>alsamixer</bf> from the command line.  You should start out on the
-"Master" volume control slider.  Use the up and down cursor to set the
-master volume to around 75%.  Next, use the left and right cursor keys to
-move around on the screen until you find the "Line" slider.  Press SPACE to
-set it as the capture source, set the level to around 50-75% and press "M"
-to mute it.  You can now press ESC to exit out of the <bf>alsamixer</bf>
-program.  You can also have MythTV manage all volume and mute settings, but
-this will only affect the "Master" or PCM volume, not the capture volume.  See
-the mythfrontend setup page for options.
-
-Finally, if you've performed all of the above steps, and you still don't
-seem to have any sound, it's possible that your video capture device is
-muting the audio output.
-
-<tscreen><verb>
-$ v4lctl -c /dev/video0 setattr mute off
-</verb></tscreen>
+TODO:  UPDATE FOR NEW SOUND CODE in 0.24
 
 <sect>Setting up a remote control.
 <p>MythTV does not have native remote control receiver and decoder software
@@ -1338,7 +1242,7 @@ You can dispense with lirc altogether by purchasing an IR keyboard and a
 learning remote control.  The IR keyboard receiver plugs into your PC and
 you would train your learning remote to emulate the various keystrokes from
 <tt>keys.txt</tt> of your IR keyboard.  Using this method removes lirc
-entirely from the picture - your remote will be sending keypresses that your
+entirely from consideration - your remote will be sending keypresses that your
 PC "sees" on the keyboard port.
 
 The "Big Picture" for lirc is that there are a few different things that fit
@@ -4379,7 +4283,7 @@ end
 <!-- Install instructions by Hary Wilke (harywilke at yahoo.com -->
 <p>MythGame can used as a frontend to start any emulator that your host OS
 runs. This is an example of how to set up xmame on Linux.
-<url url="http://www.mameworld.net/" name="http://www.mameworld.net/"> is
+<url url="http://mameworld.info/" name="http://mameworld.info/"> is
 an excellent resource for all things mame.
 
 Installation overview:
@@ -4402,17 +4306,18 @@ $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 <sect1>Download and Install xmame
 <p><bf>NOTE</bf>:  There may be pre-packaged versions of <bf>xmame</bf>
 available for your distribution.  Check <url
-url="http://x.mame.net/download.html"
-name="http://x.mame.net/download.html"> for the latest version.
+url="http://mamedev.org/release.html"
+name="http://mamedev.org/release.html"> for the latest version.
+Also, see <url url="http://sdlmame.wallyweek.org/"
+name="http://sdlmame.wallyweek.org/">
 
 Download the source to <bf>xmame</bf> from <url
-url="http://x.mame.net/download/xmame-0.103.tar.bz2"
-name="http://x.mame.net/download/xmame-0.103.tar.bz2">
+url="http://mamedev.org/release.html"
+name="http://mamedev.org/release.html">
 
 <tscreen><verb>
-$ wget http://x.mame.net/download/xmame-0.103.tar.bz2
-$ tar -xjf xmame-0.103.tar.bz2
-$ cd xmame-0.103
+$ tar -xjf filename_from_above
+$ cd xmame-version
 </verb></tscreen>
 
 Edit the Makefile with your favorite editor.  Adjust the options as required for your system.
@@ -4435,7 +4340,7 @@ $ mkdir ~/.xmame
 $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 </verb></tscreen>
 
-Because some ROMS work better with different display toolkits, or possibly
+Because some ROMs work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
 <bf>xmame</bf> binaries and to rename them to include the version number.
 MythGame allows you to match individual roms to preferred binaries.
@@ -4469,8 +4374,8 @@ Confirm that <bf>xmame</bf> works before running it inside MythTV. Place
 your ROM in the <tt>/usr/local/share/xmame/roms</tt> directory you created
 earlier.
 
-<bf>NOTE</bf>: There are three public domain ROM sets available at
-<url url="http://www.mame.net/downmisc.html" name="http://www.mame.net/downmisc.html">
+<bf>NOTE</bf>: There are public domain ROM sets available at
+<url url="http://mamedev.org/roms/" name="http://mamedev.org/roms/">
 
 Launch <bf>xmame</bf> with your game of choice.  In this example, we are using Gauntlet.
 <tscreen><verb>
@@ -4498,14 +4403,13 @@ into <tt>/usr/local/share/xmame</tt>
 - <tt>catver.ini</tt> is a catalog of categories and versions of popular mame ROMs.
 <p>Useful for keeping large libraries of ROMs organized.
 
-It may be downloaded from <url url="http://www.catver.com"
-name="http://www.catver.com"> or <url url="http://www.mameworld.net/catlist"
-name="http://www.mameworld.net/catlist">
+It may be downloaded from <url url="http://catlist.mameworld.info/"
+name="http://catlist.mameworld.info/">
 
 - Screenshots aka "snaps"
 <p>These may be downloaded from <url
-url="http://www.classicgaming.com/mame32qa/"
-name="http://www.classicgaming.com/mame32qa/">
+url="http://www.mamechannel.it/pages/snaps.php"
+name="http://www.mamechannel.it/pages/snaps.php">
 
 Screenshots are displayed when you are browsing your ROMS in <bf>mythgame</bf>.
 Unzip and place them in <tt>/usr/local/share/xmame/snaps</tt>
@@ -4516,8 +4420,8 @@ name="http://www.arcade-history.com/">
 This file fills in a bit of background about each ROM.
 
 - <tt>hiscore.dat</tt>
-<p>Download from <url url="http://www.mameworld.net/highscore/"
-name="http://www.mameworld.net/highscore/">
+<p>Download from <url url="http://highscore.mameworld.info/"
+name="http://highscore.mameworld.info/">
 
 - Cheats
 <p>Download from <url url="http://cheat.retrogames.com/"
@@ -4675,13 +4579,8 @@ cooker and release-level software.
 <p><bf>urpmi</bf> is the simplest tool for installation of packages from the
 command line.  The difficult part is the configuration, but this has been
 made easier at the following website: <url
-url="http://addmedia.linuxfornewbies.org/"
-name="http://addmedia.linuxfornewbies.org/"> The website will allow
-you to choose a mirror site and then present the command-line configuration
-text for that mirror.  You will most likely need to add a "Contrib" mirror
-to your setup.  Once you have done that, you can proceed.  If <bf>urpmi</bf>
-prompts you about other modules that need to be installed to satisfy
-dependencies, say "Yes".
+url="http://wiki.mandriva.com/en/urpmi"
+name="http://wiki.mandriva.com/en/urpmi">
 
 <tscreen><verb>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
@@ -5338,7 +5237,7 @@ within the control panel.
 <p>If mythfilldatabase suddenly appears to be failing, there are at least
 two things to check.
 
-First, if you are in North America, ensure that your DataDirect subscription
+First, if you are in North America, ensure that your Schedules Direct subscription
 is still valid, otherwise, check to see what version of XMLTV you're
 running and that it's the latest version.
 
@@ -5491,8 +5390,8 @@ i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
 actually due to the tuner on the video capture device being mis-detected.
 You must manually specify the tuner type in your <tt>/etc/modules.conf</tt>.
 See the video4linux mailing list (<url
-url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
-name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
+url="http://listman.redhat.com/mailman/listinfo/video4linux-list"
+name="http://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information.
 
 <sect2>Mythweb is showing a db_open error when I connect to it
@@ -5673,9 +5572,9 @@ usage is consistently exceeding 90%, frames will need to be dropped during
 peak times when more than 100% of the available CPU would be needed to
 process all of the frames.
 
-If you'd like to read more on this, go to the vcdhelp website at <url
-url="http://www.vcdhelp.com/forum/userguides/94382.php"
-name="http://www.vcdhelp.com/forum/userguides/94382.php">.
+If you'd like to read more on this, go to the VideoHelp website at <url
+url="http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions"
+name="http://forum.videohelp.com/threads/43902-Simply-FAQ-for-video-resolutions">.
 
 <sect1>MythTV GUI and X Display Sizes
 <p>MythTV is designed to be run as dedicated full screen TV application
@@ -5904,8 +5803,8 @@ of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
 is used to turn off file attribute caching.  Attribute caching for a shared
 media point causes problems; you always want to see the latest state of the
 directory and files.  See <url
-url="http://www.mythtv.org/wiki/index.php/Optimizing_Performance"
-name="http://www.mythtv.org/wiki/index.php/Optimizing_Performance"> for
+url="http://www.mythtv.org/wiki/Optimizing_Performance"
+name="http://www.mythtv.org/wiki/Optimizing_Performance"> for
 additional information regarding performance optimization.
 
 <sect1>Automatically starting mythfrontend at system boot time
@@ -6255,8 +6154,8 @@ Although RTjpeg is an option for video codec there is no reason to transcode
 <em>to</em> this format because it will produce larger files than MPEG-4 and
 the recording will take <em>more</em> CPU power to play back.  The MPEG-4
 settings are described in the documentation for the <bf>ffmpeg</bf> project
-at <url url="http://ffmpeg.sourceforge.net/ffmpeg-doc.html"
-name="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">.  It's a matter of
+at <url url="http://ffmpeg.org/ffmpeg-doc.html"
+name="http://ffmpeg.org/ffmpeg-doc.html">.  It's a matter of
 trial and error to discover which settings achieve a good compromise between
 size and quality.
 
@@ -6461,6 +6360,7 @@ to tune to a channel.
 Lower case = seen
 
 Upper Case = seen & good
+<!-- For 0.24, add: <item>t/F/T = Tune  : Tuning status (pending/failed/tuned) -->
 <itemize>
 <item>l/L = Lock  : This could be seen by PVR-250/BTTV users
 <item>a/A = PAT   : Any recording transmitted in MPEG
@@ -6473,8 +6373,8 @@ Upper Case = seen & good
 <sect1>What is the difference between the various Hauppauge PVR models?
 <p>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  (<url
-url="http://www.hauppauge.com/pages/compare_pvr.html"
-name="http://www.hauppauge.com/pages/compare_pvr.html">) Please check the
+url="http://www.hauppauge.com/site/compare/compare_pvr.html"
+name="http://www.hauppauge.com/site/compare/compare_pvr.html">) Please check the
 Hauppauge website for the most accurate information.
 
 A PVR-150 comes in a number of versions:
@@ -6599,9 +6499,12 @@ resulting in dropped frames.  Some filesystems are faster at deleting files
 than others and, for multi-gigabyte MythTV video files, these differences
 can be significant.
 
-Fortunately, there are published tests (<url
-url="http://aurora.zemris.fer.hr/filesystems/big.html"
-name="http://aurora.zemris.fer.hr/filesystems/big.html">) that provide
+Although done in 2006, there are published tests (<url
+url="http://www.debian-administration.org/articles/388"
+name="http://www.debian-administration.org/articles/388"> and <url
+url="http://linuxgazette.net/122/TWDT.html#piszcz"
+name="http://linuxgazette.net/122/TWDT.html#piszcz">
+) that provide
 insight into filesystem performance under conditions relevant to MythTV
 usage.  In addition, some limited testing (archived at <url
 url="http://www.gossamer-threads.com/lists/mythtv/users/52672"
@@ -6660,10 +6563,8 @@ even files as large as 10 gigabytes.
 later released as open source.  While not a part of the default RedHat Linux
 9 or Fedora Core installation (although it is a part of Mandriva and Fedora
 Core 2+), it can be easily installed via ATrpms.  XFS provides deletion
-speeds for large files only slightly slower than JFS.  According to the test
-results shown at (<url
-url="http://aurora.zemris.fer.hr/filesystems/big.html"
-name="http://aurora.zemris.fer.hr/filesystems/big.html">), XFS provide
+speeds for large files only slightly slower than JFS.
+XFS file systems provide
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
@@ -6799,6 +6700,8 @@ You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
 v0.24.00, 2010-06-25.  First version.
+v0.24.00, 2010-08-10.  Merge in changes from release-fixes docs, make other edits.
+
 -->
 
 <!--
