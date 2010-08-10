@@ -1674,6 +1674,11 @@ void ImportConfigurationGroup::probeCard(const QString &device)
 {
     QString   ci, cs;
     QFileInfo fileInfo(device);
+
+    // For convenience, ImportRecorder allows both formats:
+    if (device.toLower().startsWith("file:"))
+        fileInfo.setFile(device.mid(5));
+
     if (fileInfo.exists())
     {
         if (fileInfo.isReadable() && (fileInfo.isFile()))
