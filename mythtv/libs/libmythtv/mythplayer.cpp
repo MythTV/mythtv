@@ -3069,7 +3069,7 @@ bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
     SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
 
     uint64_t number = frames + 1;
-    uint64_t desiredFrame = framesPlayed - number;
+    uint64_t desiredFrame = (framesPlayed > number) ? framesPlayed - number : 0;
 
     if (desiredFrame < 0)
         desiredFrame = 0;
