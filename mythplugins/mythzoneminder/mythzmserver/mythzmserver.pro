@@ -12,6 +12,8 @@ INSTALLS = target
 
 LIBS = $$system(mysql_config --libs)
 
+linux: DEFINES += linux
+
 # Input
 HEADERS += zmserver.h
 
