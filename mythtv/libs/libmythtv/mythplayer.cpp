@@ -688,8 +688,8 @@ static inline QString toQString(FrameScanType scan) {
 }
 
 FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
-                                                 FrameScanType scan,
-                                                 float fps, int video_height)
+                                          FrameScanType scan,
+                                          float fps, int video_height)
 {
     QString dbg = QString("detectInterlace(") + toQString(newScan) +
         QString(", ") + toQString(scan) + QString(", ") + QString("%1").arg(fps) +
@@ -842,8 +842,8 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
-                                       int keyframedistance, float aspect,
-                                       FrameScanType scan, bool video_codec_changed)
+                                int keyframedistance, float aspect,
+                                FrameScanType scan, bool video_codec_changed)
 {
     if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
         return;
@@ -1106,8 +1106,8 @@ VideoFrame *MythPlayer::GetNextVideoFrame(bool allow_unsafe)
  *  \brief Places frame on the queue of frames ready for display.
  */
 void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
-                                              long long timecode,
-                                              bool wrap)
+                                       long long timecode,
+                                       bool wrap)
 {
     if (wrap)
         WrapTimecode(timecode, TC_VIDEO);
@@ -2789,8 +2789,7 @@ void MythPlayer::SetTranscoding(bool value)
         GetDecoder()->setTranscoding(value);
 }
 
-bool MythPlayer::AddPIPPlayer(MythPlayer *pip,
-                                     PIPLocation loc, uint timeout)
+bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
 {
     if (QThread::currentThread() != playerThread)
     {
@@ -3064,7 +3063,7 @@ void MythPlayer::ChangeSpeed(void)
 }
 
 bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
-                                 bool seeks_wanted)
+                          bool seeks_wanted)
 {
     SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
 
@@ -3241,7 +3240,7 @@ bool MythPlayer::IsNearEnd(int64_t margin)
 }
 
 bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
-                                      bool seeks_wanted)
+                               bool seeks_wanted)
 {
     SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
 
@@ -3270,7 +3269,7 @@ void MythPlayer::DoJumpToFrame(uint64_t frame)
 }
 
 void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
-                                    bool seeks_wanted)
+                             bool seeks_wanted)
 {
     if (!GetDecoder())
         return;
@@ -3325,8 +3324,8 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     needNewPauseFrame = true;
 }
 
-void MythPlayer::SetPlayerInfo(
-        TV *tv, QWidget *widget, bool frame_exact_seek, PlayerContext *ctx)
+void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget,
+                               bool frame_exact_seek, PlayerContext *ctx)
 {
     m_tv = tv;
     parentWidget = widget;
@@ -3373,7 +3372,7 @@ void MythPlayer::DisableEdit(void)
 }
 
 bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
-                                                    long long frame)
+                                             long long frame)
 {
     bool handled = false;
     bool refresh = true;
@@ -3467,7 +3466,7 @@ bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
 }
 
 bool MythPlayer::IsNearDeletePoint(int &direction, bool &cutAfter,
-                                          uint64_t &nearestMark)
+                                   uint64_t &nearestMark)
 {
     return deleteMap.IsNearDeletePoint(framesPlayed, totalFrames,
                                        (int)ceil(20 * video_frame_rate),
@@ -3599,7 +3598,7 @@ bool MythPlayer::HasTVChainNext(void) const
  *  \param ar        [out] Aspect of buffer returned
  */
 char *MythPlayer::GetScreenGrab(int secondsin, int &bufflen,
-                                       int &vw, int &vh, float &ar)
+                                int &vw, int &vh, float &ar)
 {
     long long frameNum = (long long)(secondsin * video_frame_rate);
 
@@ -3623,8 +3622,8 @@ char *MythPlayer::GetScreenGrab(int secondsin, int &bufflen,
  *  \param ar        [out] Aspect of buffer returned
  */
 char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
-                                              int &bufflen, int &vw, int &vh,
-                                              float &ar)
+                                       int &bufflen, int &vw, int &vh,
+                                       float &ar)
 {
     uint64_t       number    = 0;
     unsigned char *data      = NULL;
@@ -3721,7 +3720,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 }
 
 void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
-                                          bool absolute)
+                                   bool absolute)
 {
     if (!hasFullPositionMap)
     {
@@ -3940,7 +3939,7 @@ void MythPlayer::SetCutList(const frm_dir_map_t &newCutList)
 }
 
 bool MythPlayer::WriteStoredData(RingBuffer *outRingBuffer,
-                                        bool writevideo, long timecodeOffset)
+                                 bool writevideo, long timecodeOffset)
 {
     if (writevideo && !GetDecoder()->GetRawVideoState())
         writevideo = false;
@@ -3988,8 +3987,7 @@ int MythPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
-void MythPlayer::calcSliderPos(osdInfo &info,
-                                      bool paddedFields)
+void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 {
     bool islive = false;
     info.text.insert("description", "");
@@ -4020,8 +4018,8 @@ void MythPlayer::calcSliderPos(osdInfo &info,
 }
 
 void MythPlayer::calcSliderPosPriv(osdInfo &info, bool paddedFields,
-                                          int playbackLen, float secsplayed,
-                                          bool islive)
+                                   int playbackLen, float secsplayed,
+                                   bool islive)
 {
     playbackLen = max(playbackLen, 1);
     secsplayed  = min((float)playbackLen, max(secsplayed, 0.0f));
@@ -4245,8 +4243,8 @@ void MythPlayer::SetDecoder(DecoderBase *dec)
     }
 }
 
-bool MythPlayer::PosMapFromEnc(unsigned long long          start,
-                                      QMap<long long, long long> &posMap)
+bool MythPlayer::PosMapFromEnc(unsigned long long start,
+                               QMap<long long, long long> &posMap)
 {
     // Reads only new positionmap entries from encoder
     if (!(livetv || (player_ctx->recorder &&
