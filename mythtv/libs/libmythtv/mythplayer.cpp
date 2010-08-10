@@ -3085,7 +3085,7 @@ long long MythPlayer::CalcRWTime(long long rw) const
     bool hasliveprev = (livetv && player_ctx->tvchain &&
                         player_ctx->tvchain->HasPrev());
 
-    if (!hasliveprev || (framesPlayed > (rw + 1)))
+    if (!hasliveprev || ((int64_t)framesPlayed > (rw + 1)))
         return rw;
 
     player_ctx->tvchain->JumpToNext(false, (int)(-15.0 * video_frame_rate));
@@ -3479,9 +3479,9 @@ void MythPlayer::HandleArbSeek(bool right)
     {
         long long framenum = deleteMap.GetNearestMark(framesPlayed,
                                                       totalFrames, right);
-        if (right && (framenum > framesPlayed))
+        if (right && (framenum > (int64_t)framesPlayed))
             DoFastForward(framenum - framesPlayed, true, true);
-        else if (!right && (framesPlayed > framenum))
+        else if (!right && ((int64_t)framesPlayed > framenum))
             DoRewind(framesPlayed - framenum, true, true);
     }
     else
