@@ -3071,9 +3071,6 @@ bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
     uint64_t number = frames + 1;
     uint64_t desiredFrame = (framesPlayed > number) ? framesPlayed - number : 0;
 
-    if (desiredFrame < 0)
-        desiredFrame = 0;
-
     limitKeyRepeat = false;
     if (desiredFrame < video_frame_rate)
         limitKeyRepeat = true;
@@ -3089,16 +3086,11 @@ long long MythPlayer::CalcRWTime(long long rw) const
     bool hasliveprev = (livetv && player_ctx->tvchain &&
                         player_ctx->tvchain->HasPrev());
 
-    if (!hasliveprev)
+    if (!hasliveprev || (framesPlayed > (rw + 1)))
         return rw;
 
-    if ((framesPlayed - rw + 1) < 0)
-    {
-        player_ctx->tvchain->JumpToNext(false, (int)(-15.0 * video_frame_rate));
-        return -1;
-    }
-
-    return rw;
+    player_ctx->tvchain->JumpToNext(false, (int)(-15.0 * video_frame_rate));
+    return -1;
 }
 
 long long MythPlayer::CalcMaxFFTime(long long ff, bool setjump) const
@@ -3280,7 +3272,7 @@ void MythPlayer::DoJumpToFrame(uint64_t frame)
 void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                                     bool seeks_wanted)
 {
-    if (!GetDecoder() || frame < 0)
+    if (!GetDecoder())
         return;
 
     bool after  = exactseeks && (ffrew_skip == 1);
@@ -3488,9 +3480,9 @@ void MythPlayer::HandleArbSeek(bool right)
     {
         long long framenum = deleteMap.GetNearestMark(framesPlayed,
                                                       totalFrames, right);
-        if (right)
+        if (right && (framenum > framesPlayed))
             DoFastForward(framenum - framesPlayed, true, true);
-        else
+        else if (!right && (framesPlayed > framenum))
             DoRewind(framesPlayed - framenum, true, true);
     }
     else
