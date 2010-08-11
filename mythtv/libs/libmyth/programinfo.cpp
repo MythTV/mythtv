@@ -801,9 +801,9 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
         channame = query.value(3).toString();
     }
 
-    chanid = _chanid;
+    chanid  = _chanid;
     startts = _startts;
-    startts = _endts;
+    endts   = _endts;
 
     title = _title;
     if (title.isEmpty())
