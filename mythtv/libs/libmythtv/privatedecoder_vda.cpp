@@ -1,3 +1,6 @@
+// Based upon CDVDVideoCodecVDA from the xbmc project, originally written by
+// Scott Davilla (davilla@xbmc.org) and released under the GPLv2
+
 #include "mythverbose.h"
 #define LOC QString("VDADec: ")
 #define ERR QString("VDADec error: ")
@@ -97,28 +100,6 @@ QString vda_err_to_string(OSStatus err)
     }
     return "Unknown error";
 }
-
-/*
-bool PrivateDecoderVDA::CheckSupport(const QSize &size)
-{
-    bool supported = true;
-    int mbs = ceil((double)size.width() / 16.0f);
-    if (!((mbs == 49)  || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
-          (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128)))
-        return supported;
-
-    VERBOSE(VB_PLAYBACK, LOC +
-        QString("Checking support for video with width %1").arg(size.width()));
-
-    PrivateDecoderVDA *test = new PrivateDecoderVDA();
-    supported = test && test->Init(size);
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("Hardware decoding of this H.264 video is %1supported "
-                    "on this video card.").arg(supported ? "" : "NOT "));
-    delete test;
-    return supported;
-}
-*/
 
 void PrivateDecoderVDA::GetDecoders(render_opts &opts)
 {
@@ -295,30 +276,40 @@ int  PrivateDecoderVDA::GetFrame(AVCodecContext *avctx,
     if (!m_lib || !avctx || !pkt)
         return -1;
 
-    CFDataRef avc_demux;
-    CFDictionaryRef avc_time;
+    CFDataRef data;
+    CFDictionaryRef params;
     if (m_annexb)
     {
-        if (!RewritePacket(pkt->data, pkt->size, avc_demux))
+        if (!RewritePacket(pkt->data, pkt->size, data))
             return pkt->size;
     }
     else
-        avc_demux = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
+        data = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
 
-    CFStringRef key[2] = { CFSTR("FRAME_DTS"), CFSTR("FRAME_PTS") };
-    CFNumberRef value[2];
-    value[0] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type, &pkt->dts);
-    value[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type, &pkt->pts);
-    avc_time = CFDictionaryCreate(kCFAllocatorDefault, (const void **)&key,
-                                  (const void **)&value, 2,
-                                  &kCFTypeDictionaryKeyCallBacks,
-                                  &kCFTypeDictionaryValueCallBacks);
+    CFStringRef keys[5] = { CFSTR("FRAME_DTS"), CFSTR("FRAME_PTS"),
+                            CFSTR("FRAME_INTERLACED"), CFSTR("FRAME_TFF"),
+                            CFSTR("FRAME_REPEAT") };
+    CFNumberRef values[5];
+    values[0] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
+                               &pkt->dts);
+    values[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
+                               &pkt->pts);
+    values[2] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+                               &picture->interlaced_frame);
+    values[3] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+                               &picture->top_field_first);
+    values[4] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+                               &picture->repeat_pict);
+    params = CFDictionaryCreate(kCFAllocatorDefault, (const void **)&keys,
+                                (const void **)&values, 5,
+                                &kCFTypeDictionaryKeyCallBacks,
+                                &kCFTypeDictionaryValueCallBacks);
 
     INIT_ST
-    vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, avc_demux, avc_time);
+    vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, data, params);
     CHECK_ST
-    CFRelease(avc_demux);
-    CFRelease(avc_time);
+    CFRelease(data);
+    CFRelease(params);
 
     if (m_decoded_frames.size() <= m_num_ref_frames)
         return pkt->size;
@@ -406,14 +397,46 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
 
     int64_t dts = AV_NOPTS_VALUE;
     int64_t pts = AV_NOPTS_VALUE;
+    int8_t interlaced = 0;
+    int8_t topfirst   = 0;
+    int8_t repeatpic  = 0;
     CFNumberRef dtsref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
-                                                           CFSTR("FRAME_DTS"));
-    if (dtsref)
-        CFNumberGetValue(dtsref, kCFNumberSInt64Type, &dts);
+                                                   CFSTR("FRAME_DTS"));
     CFNumberRef ptsref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
-                                                           CFSTR("FRAME_PTS"));
+                                                   CFSTR("FRAME_PTS"));
+    CFNumberRef intref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
+                                                   CFSTR("FRAME_INTERLACED"));
+    CFNumberRef topref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
+                                                   CFSTR("FRAME_TFF"));
+    CFNumberRef repref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
+                                                   CFSTR("FRAME_REPEAT"));
+
+    if (dtsref)
+    {
+        CFNumberGetValue(dtsref, kCFNumberSInt64Type, &dts);
+        CFRelease(dtsref);
+    }
     if (ptsref)
+    {
         CFNumberGetValue(ptsref, kCFNumberSInt64Type, &pts);
+        CFRelease(ptsref);
+    }
+    if (intref)
+    {
+        CFNumberGetValue(intref, kCFNumberSInt8Type, &interlaced);
+        CFRelease(intref);
+    }
+    if (topref)
+    {
+        CFNumberGetValue(topref, kCFNumberSInt8Type, &topfirst);
+        CFRelease(topref);
+    }
+    if (repref)
+    {
+        CFNumberGetValue(repref, kCFNumberSInt8Type, &repeatpic);
+        CFRelease(repref);
+    }
+
     int64_t time =  (pts != (int64_t)AV_NOPTS_VALUE) ? pts :
                         (dts != (int64_t)AV_NOPTS_VALUE) ? dts : AV_NOPTS_VALUE;
 
@@ -439,7 +462,7 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         }
 
         VDAFrame frame(CVPixelBufferRetain(imageBuffer), format_type,
-                       pts, dts, false, false, false);
+                       pts, dts, interlaced, topfirst, repeatpic);
         if (!found)
             i = decoder->m_decoded_frames.size();
         decoder->m_decoded_frames.insert(i, frame);
