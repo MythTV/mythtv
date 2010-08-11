@@ -33,7 +33,7 @@ class VDAFrame
 {
   public:
     VDAFrame(CVPixelBufferRef buf, FourCharCode fmt, int64_t pres, int64_t dec,
-             bool interlaced, bool top_field, bool repeat)
+             int8_t interlaced, int8_t top_field, int8_t repeat)
       : buffer(buf), format(fmt), pts(pres), dts(dec),
         interlaced_frame(interlaced), top_field_first(top_field),
         repeat_pict(repeat) { }
@@ -42,9 +42,9 @@ class VDAFrame
     FourCharCode     format;
     int64_t          pts;
     int64_t          dts;
-    bool             interlaced_frame;
-    bool             top_field_first;
-    bool             repeat_pict;
+    int8_t           interlaced_frame;
+    int8_t           top_field_first;
+    int8_t           repeat_pict;
 };
 
 class PrivateDecoderVDA : public PrivateDecoder
