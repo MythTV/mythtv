@@ -435,9 +435,9 @@ class datetime( _pydatetime ):
     def fromIso(cls, isotime, sep='T'):
         match = cls._reiso.match(isotime)
         if match is None:
-            raise ValueError
+            raise ValueError("time data '%s' does not match ISO 8601 format" \
+                                % isotime)
 
-        print match.groups()
         dt = [int(a) for a in match.groups()[:6]]
         if match.group('tz'):
             if match.group('tz') == 'Z':
@@ -452,7 +452,7 @@ class datetime( _pydatetime ):
 
     @classmethod
     def fromRfc(cls, rfctime):
-        return cls.strptime(rfctime, '%a, %d %b %Y %H:%M:%S %Z')
+        return cls.strptime(rfctime, '%a, %d %b %Y %H:%M:%S %Z').strip()
 
     @classmethod
     def duck(cls, t):
@@ -465,23 +465,15 @@ class datetime( _pydatetime ):
             # existing built-in datetime
             return cls.fromIso(t.isoformat())
         except: pass
-        try:
-            # epoch time
-            return cls.fromtimestamp(t)
-        except: pass
-        try:
-            # myth time (iso time with integer characters only)
-            return cls.frommythtime(t)
-        except: pass
-        try:
-            # iso time with T spacer
-            return cls.fromIso(t)
-        except: pass
-        try:
-            # RFC822
-            return cls.fromRfc(t)
-        except: raise ValueError("time data '%s' does not match" % t +\
-                                 "supported formats")
+        for func in [cls.fromtimestamp, #epoch time
+                     cls.frommythtime, #iso time with integer characters only
+                     cls.fromIso, #iso 8601 time
+                     cls.fromRfc]: #rfc 822 time
+            try:
+                return func(t)
+            except:
+                pass
+        raise ValueError("time data '%s' does not match supported formats"%t)
 
     def mythformat(self):
         return self.strftime('%Y%m%d%H%M%S')
