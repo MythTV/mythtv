@@ -8,8 +8,15 @@ from exceptions import MythDBError
 
 from cStringIO import StringIO
 from select import select
-from time import time
+from time import time, mktime
+from datetime import datetime as _pydatetime
+from datetime import tzinfo as _pytzinfo
+from datetime import timedelta
 import socket
+import re
+
+def _donothing(*args, **kwargs):
+    pass
 
 class schemaUpdate( object ):
     # TODO: do locking and lock checking
@@ -391,3 +398,98 @@ def levenshtein(s1, s2):
         previous_row = current_row
  
     return previous_row[-1]
+
+class datetime( _pydatetime ):
+    _reiso = re.compile('(?P<year>[0-9]{4})'
+                       '-(?P<month>[0-9]{1,2})'
+                       '-(?P<day>[0-9]{1,2})'
+                        '.'
+                        '(?P<hour>[0-9]{2})'
+                       ':(?P<min>[0-9]{2})'
+                       ':(?P<sec>[0-9]{2})'
+                        '(?P<tz>Z|'
+                            '(?P<tzdirec>[-+])'
+                            '(?P<tzhour>[0-9]{1,2}?)'
+                            '(:)?'
+                            '(?P<tzmin>[0-9]{2})?'
+                        ')?')
+
+    class tzinfo( _pytzinfo):
+        def __init__(self, direc='+', hr=0, min=0):
+            if direc == '-':
+                hr = -1*int(hr)
+            self._offset = timedelta(hours=int(hr), minutes=int(min))
+        def utcoffset(self, dt): return self._offset
+        def tzname(self, dt): return ''
+        def dst(self, dt): return timedelta(0)
+
+    @classmethod
+    def fromtimestamp(cls, posix):
+        return _pydatetime.fromtimestamp(int(posix))
+
+    @classmethod
+    def frommythtime(cls, mtime):
+        return cls.strptime(str(mtime), '%Y%m%d%H%M%S')
+
+    @classmethod
+    def fromIso(cls, isotime, sep='T'):
+        match = cls._reiso.match(isotime)
+        if match is None:
+            raise ValueError
+
+        print match.groups()
+        dt = [int(a) for a in match.groups()[:6]]
+        if match.group('tz'):
+            if match.group('tz') == 'Z':
+                tz = cls.tzinfo()
+            elif match.group('tzmin'):
+                tz = cls.tzinfo(*match.group('tzdirec','tzhour','tzmin'))
+            else:
+                tz = cls.tzinfo(*match.group('tzdirec','tzhour'))
+            dt.append(0)
+            dt.append(tz)
+        return cls(*dt)
+
+    @classmethod
+    def fromRfc(cls, rfctime):
+        return cls.strptime(rfctime, '%a, %d %b %Y %H:%M:%S %Z')
+
+    @classmethod
+    def duck(cls, t):
+        try:
+            # existing modified datetime
+            t.mythformat
+            return t
+        except: pass
+        try:
+            # existing built-in datetime
+            return cls.fromIso(t.isoformat())
+        except: pass
+        try:
+            # epoch time
+            return cls.fromtimestamp(t)
+        except: pass
+        try:
+            # myth time (iso time with integer characters only)
+            return cls.frommythtime(t)
+        except: pass
+        try:
+            # iso time with T spacer
+            return cls.fromIso(t)
+        except: pass
+        try:
+            # RFC822
+            return cls.fromRfc(t)
+        except: raise ValueError("time data '%s' does not match" % t +\
+                                 "supported formats")
+
+    def mythformat(self):
+        return self.strftime('%Y%m%d%H%M%S')
+
+    def timestamp(self):
+        return int(mktime(self.timetuple()))
+
+    def rfcformat(self):
+        return self.strftime('%a, %d %b %Y %H:%M:%S %Z')
+
+

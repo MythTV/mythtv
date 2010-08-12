@@ -12,10 +12,10 @@ from logging import MythLog
 from altdict import DictData
 from connections import BEConnection
 from database import DBCache
-from utility import SplitInt, CMPRecord
+from utility import SplitInt, CMPRecord, datetime
 
 from datetime import date
-from time import mktime, strptime, sleep
+from time import sleep
 from thread import allocate_lock
 from random import randint
 from uuid import uuid4
@@ -519,7 +519,7 @@ class RecordFileTransfer( FileTransfer ):
                 join(['BACKEND_MESSAGE',
                       'UPDATE_FILE_SIZE %s %s (?P<size>[0-9]*)' %\
                          (self.chanid, \
-                          self.starttime.strftime('%Y-%m-%dT%H-%M-%S')),
+                          self.starttime.isoformat()),
                       'empty']))
             return self.re_update
         match = self.re_update(event)
@@ -603,8 +603,10 @@ class FileOps( BEEvent ):
 
     def getRecording(self, chanid, starttime):
         """FileOps.getRecording(chanid, starttime) -> Program object"""
-        res = self.backendCommand('QUERY_RECORDING TIMESLOT %d %d' \
-                        % (chanid, starttime)).split(BACKEND_SEP)
+        starttime = datetime.duck(starttime)
+        res = self.backendCommand('QUERY_RECORDING TIMESLOT %d %s' \
+                        % (chanid, starttime.mythformat()))\
+                    .split(BACKEND_SEP)
         if res[0] == 'ERROR':
             return None
         else:
@@ -768,7 +770,7 @@ class Program( DictData, RECSTATUS, CMPRecord ):
                      0,      0]
     def __str__(self):
         return u"<Program '%s','%s' at %s>" % (self.title,
-                 self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
+                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
@@ -796,11 +798,11 @@ class Program( DictData, RECSTATUS, CMPRecord ):
         for key in ('startTime','endTime','lastModified',
                                 'recStartTs','recEndTs'):
             if key in xmldat:
-                dat[key.lower()] = str(int(mktime(strptime(
-                                    xmldat[key], '%Y-%m-%dT%H:%M:%S'))))
+                dat[key.lower()] = str(datetime.fromIso(xmldat[key])\
+                                            .timestamp())
 
         raw = []
-        defs = (0,0,0,'',0)
+        defs = (0,0,0,'',0,'')
         for i in xrange(len(cls._field_order)):
             if cls._field_order[i] in dat:
                 raw.append(dat[cls._field_order[i]])
@@ -809,10 +811,9 @@ class Program( DictData, RECSTATUS, CMPRecord ):
         return cls(raw, db)
 
     @classmethod
-    def fromRecorded(cls, recorded):
-        be = FileOps(db=recorded._db)
-        return be.getRecording(recorded.chanid,
-                    int(recorded.starttime.strftime('%Y%m%d%H%M%S')))
+    def fromRecorded(cls, rec):
+        be = FileOps(db=rec._db)
+        return be.getRecording(rec.chanid, rec.starttime)
 
     def toString(self):
         """
@@ -907,7 +908,7 @@ class Program( DictData, RECSTATUS, CMPRecord ):
         for (tag, data) in (('STARTTIME','recstartts'),('ENDTIME','recendts'),
                             ('PROGSTART','starttime'),('PROGEND','endtime')):
             cmd = cmd.replace('%%%s%%' % tag, \
-                        self[data].strftime('%Y%m%d%H%M%S'))
+                        self[data].strftime.mythformat())
             cmd = cmd.replace('%%%sISO%%' % tag, \
                         self[data].isoformat())
             cmd = cmd.replace('%%%sISOUTC%%' % tag, \

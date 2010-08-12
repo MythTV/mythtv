@@ -12,14 +12,12 @@ from altdict import DictData, DictInvertCI
 from database import *
 from system import Grabber, InternetMetadata, VideoMetadata
 from mythproto import ftopen, FileOps, Program
-from utility import CMPRecord, CMPVideo, MARKUPLIST
+from utility import CMPRecord, CMPVideo, MARKUPLIST, datetime
 
 import re
 import locale
 import xml.etree.cElementTree as etree
-from time import strftime, strptime
-from datetime import date, time, datetime
-from socket import gethostname
+from datetime import date, time
 
 class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
     """
@@ -159,10 +157,16 @@ class Recorded( DBDataWrite, CMPRecord ):
         if self._wheredat is None:
             return u"<Uninitialized Recorded at %s>" % hex(id(self))
         return u"<Recorded '%s','%s' at %s>" % (self.title,
-                self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
+                self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
+
+    def __init__(self, data=None, db=None):
+        if data is not None:
+            if None not in data:
+                data = [data[0], datetime.duck(data[1])]
+        DBDataWrite.__init__(self, data, db)
 
     def _evalwheredat(self, wheredat=None):
         DBDataWrite._evalwheredat(self, wheredat)
@@ -322,10 +326,16 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
         if self._wheredat is None:
             return u"<Uninitialized RecordedProgram at %s>" % hex(id(self))
         return u"<RecordedProgram '%s','%s' at %s>" % (self.title,
-                self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
+                self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
+
+    def __init__(self, data=None, db=None):
+        if data is not None:
+            if None not in data:
+                data = [data[0], datetime.duck(data[1])]
+        DBDataWrite.__init__(self, data, db)
 
     @classmethod
     def fromRecorded(cls, recorded):
@@ -350,10 +360,16 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
         if self._wheredat is None:
             return u"<Uninitialized OldRecorded at %s>" % hex(id(self))
         return u"<OldRecorded '%s','%s' at %s>" % (self.title,
-                self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
+                self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
+
+    def __init__(self, data=None, db=None):
+        if data is not None:
+            if None not in data:
+                data = [data[0], datetime.duck(data[1])]
+        DBDataWrite.__init__(self, data, db)
 
     def setDuplicate(self, record=False):
         """
@@ -437,7 +453,7 @@ class Guide( DBData, CMPRecord ):
         if self._wheredat is None:
             return u"<Uninitialized Guide at %s>" % hex(id(self))
         return u"<Guide '%s','%s' at %s>" % (self.title,
-                self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
+                self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
@@ -464,8 +480,7 @@ class Guide( DBData, CMPRecord ):
             dat['description'] = etree[1].text.strip()
         for key in ('startTime','endTime','lastModified'):
             if key in attrib:
-                dat[key.lower()] = datetime.strptime(
-                                attrib[key],'%Y-%m-%dT%H:%M:%S')
+                dat[key.lower()] = datetime.fromIso(attrib[key])
 
         raw = []
         for key in db.tablefields[cls._table]:

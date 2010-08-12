@@ -2,10 +2,10 @@
 """Provides tweaked dict-type classes."""
 
 from exceptions import MythError
+from utility import datetime
 
 from itertools import imap, izip
-from datetime import datetime, date
-from time import mktime
+from datetime import date
 import locale
 
 class OrdDict( dict ):
@@ -96,16 +96,16 @@ class DictData( OrdDict ):
                 locale.atof,
                 bool,
                 lambda x: x,
-                lambda x: datetime.fromtimestamp(int(x)),
+                lambda x: datetime.fromtimestamp(x),
                 lambda x: date(*[int(y) for y in x.split('-')]),
-                lambda x: datetime.strptime(x, '%a, %d %b %Y %H:%M:%S %Z')]
+                lambda x: datetime.fromRfc(x)]
     _inv_trans = [  str,
                     lambda x: locale.format("%0.6f", x),
                     lambda x: str(int(x)),
                     lambda x: x,
-                    lambda x: str(int(mktime(x.timetuple()))),
+                    lambda x: str(x.timestamp()),
                     lambda x: x.isoformat(),
-                    lambda x: x.strftime('%a, %d %b %Y %H:%M:%S %Z')]
+                    lambda x: x.rfcformat()]
                     
     def __setattr__(self, name, value):
         if name in self._localvars:

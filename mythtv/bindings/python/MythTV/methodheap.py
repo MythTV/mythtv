@@ -10,7 +10,7 @@ from static import *
 from exceptions import *
 from logging import MythLog
 from connections import FEConnection, XMLConnection
-from utility import databaseSearch
+from utility import databaseSearch, datetime
 from database import DBCache
 from system import SystemEvent
 from mythproto import BEEvent, FileOps, Program
@@ -188,8 +188,10 @@ class MythBE( FileOps ):
         """
         Returns a Program object matching the channel id and start time
         """
+        starttime = datetime.duck(starttime)
         res = self.backendCommand('QUERY_RECORDING TIMESLOT %d %d' \
-                        % (chanid, starttime)).split(BACKEND_SEP)
+                        % (chanid, starttime.mythformat()))\
+                    .split(BACKEND_SEP)
         if res[0] == 'ERROR':
             return None
         else:
@@ -548,11 +550,21 @@ class MythDB( DBCache ):
                     ('people','recordedcredits',('person',)))
 
         # local table matches
-        if key in ('title','subtitle','chanid','starttime','progstart',
+        if key in ('title','subtitle','chanid',
                         'category','hostname','autoexpire','commflagged',
                         'stars','recgroup','playgroup','duplicate',
                         'transcoded','watched','storagegroup','basename'):
             return ('recorded.%s=%%s' % key, value, 0)
+
+        # time matches
+        if key in ('starttime','endtime','progstart','progend'):
+            return ('recorded.%s=%%s' % key, datetime.duck(value), 0)
+
+        if key == 'olderthan':
+            return ('recorded.starttime>%s', datetime.duck(value), 0)
+        if key == 'newerthan':
+            return ('recorded.starttime<%s', datetime.duck(value), 0)
+
 
         # recordedprogram matches
         if key in ('category_type','airdate','stereo','subtitled','hdtv',
@@ -583,10 +595,13 @@ class MythDB( DBCache ):
 
         if init:
             return ('oldrecorded', OldRecorded, ())
-        if key in ('title','subtitle','chanid','starttime','endtime',
+        if key in ('title','subtitle','chanid',
                         'category','seriesid','programid','station',
                         'duplicate','generic','recstatus'):
             return ('oldrecorded.%s=%%s' % key, value, 0)
+                # time matches
+        if key in ('starttime','endtime'):
+            return ('oldrecorded.%s=%%s' % key, datetime.duck(value), 0)
         return None
 
     @databaseSearch
@@ -601,16 +616,19 @@ class MythDB( DBCache ):
         if init:
             return ('jobqueue', Job, (),
                     ('recorded','jobqueue',('chanid','starttime')))
-        if key in ('chanid','starttime','type','status','hostname'):
+        if key in ('chanid','type','status','hostname'):
             return ('jobqueue.%s=%%s' % key, value, 0)
         if key in ('title','subtitle'):
             return ('recorded.%s=%%s' % key, value, 1)
         if key == 'flags':
             return ('jobqueue.flags&%s', value, 0)
+
+        if key == 'starttime':
+            return ('jobqueue.starttime=%s', datetime.duck(value), 0)
         if key == 'olderthan':
-            return ('jobqueue.inserttime>%s', value, 0)
+            return ('jobqueue.inserttime>%s', datetime.duck(value), 0)
         if key == 'newerthan':
-            return ('jobqueue.inserttime<%s', value, 0)
+            return ('jobqueue.inserttime<%s', datetime.duck(value), 0)
         return None
 
     @databaseSearch
@@ -629,24 +647,26 @@ class MythDB( DBCache ):
             return ('program', Guide, (),
                     ('credits','program',('chanid','starttime')),
                     ('people','credits',('person',)))
-        if key in ('chanid','starttime','endtime','title','subtitle',
+        if key in ('chanid','title','subtitle',
                         'category','airdate','stars','previouslyshown','stereo',
                         'subtitled','hdtv','closecaptioned','partnumber',
                         'parttotal','seriesid','originalairdate','showtype',
                         'syndicatedepisodenumber','programid','generic'):
             return ('%s=%%s' % key, value, 0)
+        if key in ('starttime','endtime'):
+            return ('%s=%%s' % key, datetime.duck(value), 0)
         if key == 'ondate':
             return ('DATE(starttime)=%s', value, 0)
         if key == 'cast':
             return ('people.name', 'credits', 2, 0)
         if key == 'startbefore':
-            return ('starttime<%s', value, 0)
+            return ('starttime<%s', datetime.duck(value), 0)
         if key == 'startafter':
-            return ('starttime>%s', value, 0)
+            return ('starttime>%s', datetime.duck(value), 0)
         if key == 'endbefore':
-            return ('endtime<%s', value, 0)
+            return ('endtime<%s', datetime.duck(value), 0)
         if key == 'endafter':
-            return ('endtime>%s', value, 0)
+            return ('endtime>%s', datetime.duck(value), 0)
         return None
 
     @databaseSearch
@@ -686,7 +706,7 @@ class MythDB( DBCache ):
                         'language','podcast','downloadable', 'description'):
             return ('%s=%%s' % key, value, 0)
         if key == 'ondate':
-            return ('DATE(starttime)=%s', value, 0)
+            return ('DATE(date)=%s', value, 0)
         if key == 'olderthan':
             return ('date>%s', value, 0)
         if key == 'newerthan':
@@ -744,11 +764,12 @@ class MythXML( XMLConnection ):
     Provides convenient methods to access the backend XML server.
     """
     def __init__(self, backend=None, port=None, db=None):
-        self.db = DBCache(db)
         if backend and port:
-            XMLConnection.__init__(backend, port)
+            XMLConnection.__init__(self, backend, port)
+            self.db = db
             return
 
+        self.db = DBCache(db)
         self.log = MythLog('Python XML Connection')
         if backend is None:
             # use master backend
@@ -818,6 +839,8 @@ class MythXML( XMLConnection ):
         """
         Returns a list of Guide objects corresponding to the given time period.
         """
+        starttime = datetime.duck(starttime)
+        endtime = datetime.duck(endtime)
         args = {'StartTime':starttime.isoformat().rsplit('.',1)[0],
                 'EndTime':endtime.isoformat().rsplit('.',1)[0], 
                 'StartChanId':startchan, 'Details':1}
@@ -836,7 +859,8 @@ class MythXML( XMLConnection ):
         """
         Returns a Program object for the matching show.
         """
-        args = {'ChanId': chanid, 'StartTime': starttime}
+        starttime = datetime.duck(starttime)
+        args = {'ChanId': chanid, 'StartTime': starttime.isoformat()}
         tree = self._queryTree('GetProgramDetails', **args)
         prog = tree.find('ProgramDetails').find('Program')
         return Program.fromEtree(prog, self.db)
@@ -865,6 +889,16 @@ class MythXML( XMLConnection ):
         for grabber in self._queryTree('GetInternetSources').\
                         find('InternetContent').findall('grabber'):
             yield InternetSource.fromEtree(grabber, self)
+
+    def getPreviewImage(self, chanid, starttime, width=None, \
+                                                 height=None, secsin=None):
+        starttime = datetime.duck(starttime)
+        args = {'ChanId':chanid, 'StartTime':starttime.isoformat()}
+        if width: args['Width'] = width
+        if height: args['Height'] = height
+        if secsin: args['SecsIn'] = secsin
+
+        return self._query('GetPreviewImage', **args)
 
 class MythVideo( VideoSchema, DBCache ):
     """
