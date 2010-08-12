@@ -156,7 +156,7 @@ bool ThreadedFileWriter::Open(void)
         fd = fileno(stdout);
     else
     {
-        QByteArray fname = filename.toAscii();
+        QByteArray fname = filename.toLocal8Bit();
         fd = open(fname.constData(), flags, mode);
     }
 
