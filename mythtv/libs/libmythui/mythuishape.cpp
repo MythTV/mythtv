@@ -88,6 +88,8 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             DrawRect(area, m_fillBrush, m_linePen);
         else if (m_type == "roundbox")
             DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen);
+        else if (m_type == "ellipse")
+            DrawEllipse(area, m_fillBrush, m_linePen);
     }
 
     if (m_image)
@@ -169,6 +171,36 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     m_image->Assign(image);
 }
 
+void MythUIShape::DrawEllipse(const QRect &area,const QBrush &fillBrush,
+                              const QPen &linePen)
+{
+    if (m_image)
+    {
+        m_image->DownRef();
+        m_image = NULL;
+    }
+
+    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
+    image.fill(0x00000000);
+    QPainter painter(&image);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    painter.setPen(linePen);
+    painter.setBrush(fillBrush);
+    
+    int lineWidth = linePen.width();
+    QRect r(lineWidth, lineWidth,
+            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+    painter.drawEllipse(r);
+
+    painter.end();
+
+    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->UpRef();
+    m_image->Assign(image);
+}
+
 /**
  *  \copydoc MythUIType::ParseElement()
  */
@@ -178,7 +210,7 @@ bool MythUIShape::ParseElement(
     if (element.tagName() == "type")
     {
         QString type = getFirstText(element);
-        if (type == "box" || type == "roundbox") // Validate input
+        if (type == "box" || type == "roundbox" || type == "ellipse") // Validate input
             m_type = type;
     }
     else if (element.tagName() == "fill")

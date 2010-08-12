@@ -37,6 +37,8 @@ class MPUBLIC MythUIShape : public MythUIType
                   const QPen &linePen);
     void DrawRoundRect(const QRect &area, int radius, const QBrush &fillBrush,
                        const QPen &linePen);
+    void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+                     const QPen &linePen);
   private:
     MythImage     *m_image;
     QString        m_type;
