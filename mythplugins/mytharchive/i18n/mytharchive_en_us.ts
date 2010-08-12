@@ -215,37 +215,37 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="294"/>
+        <location filename="../mytharchive/main.cpp" line="295"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Toggle use cut list state for selected program</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="297"/>
+        <location filename="../mytharchive/main.cpp" line="298"/>
         <source>Create DVD</source>
         <translation>Create DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="299"/>
+        <location filename="../mytharchive/main.cpp" line="300"/>
         <source>Create Archive</source>
         <translation>Create Archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="301"/>
+        <location filename="../mytharchive/main.cpp" line="302"/>
         <source>Import Archive</source>
         <translation>Import Archive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="303"/>
+        <location filename="../mytharchive/main.cpp" line="304"/>
         <source>View Archive Log</source>
         <translation>View Archive Log</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="305"/>
+        <location filename="../mytharchive/main.cpp" line="306"/>
         <source>Play Created DVD</source>
         <translation>Play Created DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="307"/>
+        <location filename="../mytharchive/main.cpp" line="308"/>
         <source>Burn DVD</source>
         <translation>Burn DVD</translation>
     </message>
@@ -494,13 +494,21 @@
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="285"/>
-        <source>tcrequant command</source>
-        <translation>tcrequant command</translation>
+        <source>M2VRequantiser command</source>
+        <translation>M2VRequantiser command</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="287"/>
+        <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
+        <translation>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</translation>
+    </message>
+    <message>
+        <source>tcrequant command</source>
+        <translation type="obsolete">tcrequant command</translation>
+    </message>
+    <message>
         <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</translation>
+        <translation type="obsolete">Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="294"/>
@@ -568,7 +576,7 @@
         <translation>MythArchive External Commands (2)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="74"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="75"/>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Cannot find the MythArchive work directory.
@@ -592,19 +600,19 @@ This may take a few minutes.</source>
 This may take a few minutes.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="89"/>
+        <location filename="../mytharchive/main.cpp" line="90"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="206"/>
+        <location filename="../mytharchive/main.cpp" line="207"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>Last run did not create a playable DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="212"/>
+        <location filename="../mytharchive/main.cpp" line="213"/>
         <source>Last run failed to create a DVD.</source>
         <translation>Last run failed to create a DVD.</translation>
     </message>
@@ -658,8 +666,8 @@ Place a blank DVD in the drive and select an option below.</translation>
     <name>RecordingSelector</name>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="99"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="399"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="469"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="403"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="475"/>
         <source>All Recordings</source>
         <translation>All Recordings</translation>
     </message>
@@ -697,42 +705,42 @@ Place a blank DVD in the drive and select an option below.</translation>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="29"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
         <source>Single Layer DVD</source>
         <translation>Single Layer DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="30"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="31"/>
         <source>Single Layer DVD (4482Mb)</source>
         <translation>Single Layer DVD (4482Mb)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="33"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
         <source>Dual Layer DVD</source>
         <translation>Dual Layer DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="34"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
         <source>Dual Layer DVD (8964Mb)</source>
         <translation>Dual Layer DVD (8964Mb)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="37"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>DVD +/- RW</source>
         <translation>DVD +/- RW</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="38"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
         <source>Rewritable DVD</source>
         <translation>Rewritable DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="41"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="42"/>
+        <location filename="../mytharchive/archiveutil.cpp" line="43"/>
         <source>Any file accessable from your filesystem.</source>
         <translation>Any file accessable from your filesystem.</translation>
     </message>
@@ -887,8 +895,9 @@ Place a blank DVD in the drive and select an option below.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
-        <source>0.00Gb</source>
-        <translation>0.00Gb</translation>
+        <source>0.00 GB</source>
+        <oldsource>0.00Gb</oldsource>
+        <translation>0.00 GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
@@ -922,8 +931,9 @@ Place a blank DVD in the drive and select an option below.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
-        <source>x.xx Gb</source>
-        <translation>x.xx Gb</translation>
+        <source>x.xx GB</source>
+        <oldsource>x.xx Gb</oldsource>
+        <translation>x.xx GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -942,8 +952,9 @@ Place a blank DVD in the drive and select an option below.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
-        <source>12.34GB</source>
-        <translation>12.34GB</translation>
+        <source>12.34 GB</source>
+        <oldsource>12.34GB</oldsource>
+        <translation>12.34 GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
@@ -1077,8 +1088,9 @@ Place a blank DVD in the drive and select an option below.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
-        <source>xxxxx mb</source>
-        <translation>xxxxx mb</translation>
+        <source>xxxxx MB</source>
+        <oldsource>xxxxx mb</oldsource>
+        <translation>xxxxx MB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="69"/>
@@ -1214,22 +1226,22 @@ Place a blank DVD in the drive and select an option below.</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="887"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="904"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="894"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="911"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Exit, Save Thumbnails</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="895"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="912"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Exit, Don&apos;t Save Thumbnails</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="896"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="913"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
