@@ -35,8 +35,8 @@ class MythDownloadInfo
     MythDownloadInfo() :
         m_request(NULL),         m_reply(NULL),       m_data(NULL),
         m_caller(NULL),          m_post(false),       m_reload(false),
-        m_preferCache(false),    m_syncMode(false),   m_done(false),
-        m_bytesReceived(0),      m_bytesTotal(0),
+        m_preferCache(false),    m_syncMode(false),   m_processReply(true),
+        m_done(false),           m_bytesReceived(0),  m_bytesTotal(0),
         m_lastStat(QDateTime::currentDateTime()),
         m_errorCode(QNetworkReply::NoError)
     {
@@ -46,7 +46,7 @@ class MythDownloadInfo
     {
         if (m_request)
             delete m_request;
-        if (m_reply)
+        if (m_reply && m_processReply)
             m_reply->deleteLater();
     }
 
@@ -68,6 +68,7 @@ class MythDownloadInfo
     bool             m_reload;
     bool             m_preferCache;
     bool             m_syncMode;
+    bool             m_processReply;
     bool             m_done;
     qint64           m_bytesReceived;
     qint64           m_bytesTotal;
@@ -380,6 +381,38 @@ bool MythDownloadManager::download(const QString &url, QByteArray *data,
                                    const bool reload)
 {
     return processItem(url, NULL, QString(), data, false, reload);
+}
+
+/** \fn MythDownloadManager::download(const QString &url,
+                                      const bool reload)
+ *  \brief Downloads a URI to a QByteArray in blocking mode.
+ *  \param url      URI to download.
+ *  \param reload   Whether to force reloading of the URL or not
+ *  \return true if download was successful, false otherwise.
+ */
+QNetworkReply *MythDownloadManager::download(const QString &url,
+                                             const bool reload)
+{
+    MythDownloadInfo *dlInfo = new MythDownloadInfo;
+
+    dlInfo->m_url          = url;
+    dlInfo->m_reload       = reload;
+    dlInfo->m_syncMode     = true;
+    dlInfo->m_processReply = false;
+
+    bool ok = downloadNow(dlInfo, false);
+
+    QNetworkReply *reply = dlInfo->m_reply;
+
+    if (reply)
+        dlInfo->m_reply = NULL;
+
+    delete dlInfo;
+
+    if (ok && reply)
+        return reply;
+
+    return NULL;
 }
 
 /** \fn MythDownloadManager::download(QNetworkRequest &req, QByteArray *data)
@@ -749,7 +782,10 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         dlInfo->m_redirectedTo.clear();
 
         int dataSize = -1;
-        if (reply)
+
+        // If we downloaded via the QNetworkAccessManager
+        // AND the caller isn't handling the reply directly
+        if (reply && dlInfo->m_processReply)
         {
             bool append = (!dlInfo->m_syncMode && dlInfo->m_caller);
             QByteArray data = reply->readAll();
@@ -774,7 +810,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                 saveFile(dlInfo->m_outFile, data, append);
             }
         }
-        else
+        else if (!reply)  // If we downloaded via RemoteFile
         {
             if (dlInfo->m_data)
             {
@@ -787,6 +823,8 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             dlInfo->m_bytesReceived += dataSize;
             dlInfo->m_bytesTotal = dlInfo->m_bytesReceived;
         }
+        // else we downloaded via QNetworkAccessManager
+        // AND the caller is handling the reply
 
         m_downloadInfos.remove(dlInfo->m_url);
         if (reply)

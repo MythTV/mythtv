@@ -39,6 +39,7 @@ class MPUBLIC MythDownloadManager : public QThread
                   const bool reload = false);
     bool download(const QString &url, QByteArray *data,
                   const bool reload = false);
+    QNetworkReply *download(const QString &url, const bool reload = false);
     bool download(QNetworkRequest *req, QByteArray *data);
 
     // Methods to POST to a URL
