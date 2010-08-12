@@ -1274,9 +1274,14 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
     addSelection("DCT-6200");
     addSelection("DCT-6212");
     addSelection("DCT-6216");
+    addSelection("QIP-6200");
+    addSelection("QIP-7100");
+    addSelection("PACE-550");
+    addSelection("PACE-779");
     addSelection("SA3250HD");
     addSelection("SA4200HD");
     addSelection("SA4250HDC");
+    addSelection("SA8300HD");
     QString help = QObject::tr(
         "Choose the model that most closely resembles your set top box. "
         "Depending on firmware revision SA4200HD may work better for a "

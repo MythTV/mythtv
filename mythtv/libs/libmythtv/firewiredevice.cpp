@@ -228,6 +228,8 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
     // same commands work for it as the Motorola.
     bool is_mot = ((panel_model.toUpper().left(4) == "DCT-") ||
                    (panel_model.toUpper().left(4) == "DCH-") ||
+                   (panel_model.toUpper().left(4) == "DCX-") ||
+                   (panel_model.toUpper().left(4) == "QIP-") ||
                    (panel_model.toUpper().left(5) == "PACE-"));
 
     if (is_mot && !alt_method)
