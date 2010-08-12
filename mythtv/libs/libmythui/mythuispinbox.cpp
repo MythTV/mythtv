@@ -32,13 +32,13 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
         return;
 
     m_moveAmount = pageMultiple;
-    
+
     bool reverse = false;
     int value = low;
-    
+
     if (low > high)
         reverse = true;
-    
+
     Reset();
 
     while ((reverse && (value >= high)) ||
@@ -56,17 +56,18 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
                 temp = m_positiveTemplate;
 
             if (!temp.isEmpty())
-                text = qApp->translate("ThemeUI", qPrintable(temp), "",
-                                   QCoreApplication::CodecForTr, qAbs(value));
+                text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
+                                       QCoreApplication::UnicodeUTF8,
+                                       qAbs(value));
         }
 
         if (text.isEmpty())
             text = QString::number(value);
-        
+
         new MythUIButtonListItem(this, text, qVariantFromValue(value));
         if (reverse)
             value = value - step;
-        else    
+        else
             value = value + step;
     }
 
@@ -77,7 +78,7 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
  *  \copydoc MythUIType::ParseElement()
  */
 bool MythUISpinBox::ParseElement(
-    const QString &filename, QDomElement &element, bool showWarnings)    
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "template")
     {
@@ -149,6 +150,6 @@ void MythUISpinBox::CopyFrom(MythUIType *base)
     m_negativeTemplate = spinbox->m_negativeTemplate;
     m_zeroTemplate = spinbox->m_zeroTemplate;
     m_positiveTemplate = spinbox->m_positiveTemplate;
-    
+
     MythUIButtonList::CopyFrom(base);
 }
