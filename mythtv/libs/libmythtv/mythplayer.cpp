@@ -3085,7 +3085,7 @@ long long MythPlayer::CalcRWTime(long long rw) const
     bool hasliveprev = (livetv && player_ctx->tvchain &&
                         player_ctx->tvchain->HasPrev());
 
-    if (!hasliveprev || ((int64_t)framesPlayed > (rw + 1)))
+    if (!hasliveprev || ((int64_t)framesPlayed > (rw - 1)))
         return rw;
 
     player_ctx->tvchain->JumpToNext(false, (int)(-15.0 * video_frame_rate));
