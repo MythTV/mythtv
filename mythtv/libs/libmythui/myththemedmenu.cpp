@@ -462,7 +462,8 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     text = qApp->translate("ThemeUI",
-                                            qPrintable(getFirstText(info)));
+                                           getFirstText(info).toUtf8(), NULL,
+                                           QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
                          GetMythUI()->GetLanguageAndVariant())
@@ -481,7 +482,8 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     alttext = qApp->translate("ThemeUI",
-                                            qPrintable(getFirstText(info)));
+                                              getFirstText(info).toUtf8(), NULL,
+                                              QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
                          GetMythUI()->GetLanguageAndVariant())
@@ -526,7 +528,9 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     description = qApp->translate("ThemeUI",
-                                            qPrintable(getFirstText(info)));
+                                                  getFirstText(info).toUtf8(),
+                                                  NULL,
+                                                  QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
                          GetMythUI()->GetLanguageAndVariant())
@@ -771,7 +775,7 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
 bool MythThemedMenu::handleAction(const QString &action, const QString &password)
 {
     MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
-    
+
     if (((password == "SetupPinCode") &&
          GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0)) ||
          (!password.isEmpty() && password != "SetupPinCode"))
@@ -891,7 +895,7 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
     // Password empty? Then skip asking for it
     if (password.isEmpty())
         return true;
-    
+
     if (last_time_stamp.length() < 1)
     {
         VERBOSE(VB_IMPORTANT,
@@ -910,7 +914,7 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
             return true;
         }
     }
-    
+
     VERBOSE(VB_GENERAL, QString("Using Password: %1").arg(password_setting));
 
     QString text = tr("Enter password:");
