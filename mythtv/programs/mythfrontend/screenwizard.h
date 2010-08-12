@@ -1,5 +1,5 @@
-#ifndef MYTHAPPEARANCE_H
-#define MYTHAPPEARANCE_H
+#ifndef SCREENWIZARD_H
+#define SCREENWIZARD_H
 
 #include <QStringList>
 #include <QString>
@@ -11,14 +11,14 @@
 #include "mythdialogbox.h"
 
 class XMLParse;
-class MythAppearance : public MythScreenType
+class ScreenWizard : public MythScreenType
 {
     Q_OBJECT
 
   public:
 
-    MythAppearance(MythScreenStack *parent, const char *name);
-    ~MythAppearance();
+    ScreenWizard(MythScreenStack *parent, const char *name);
+    ~ScreenWizard();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

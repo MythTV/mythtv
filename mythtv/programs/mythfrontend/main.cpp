@@ -60,7 +60,7 @@ using namespace std;
 #include "myththemedmenu.h"
 #include "mediarenderer.h"
 #include "mythmainwindow.h"
-#include "mythappearance.h"
+#include "screenwizard.h"
 #include "mythcontrols.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
@@ -182,13 +182,13 @@ void startAppearWiz(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythAppearance *mythappearance = new MythAppearance(mainStack,
-                                                        "mythappearance");
+    ScreenWizard *screenwizard = new ScreenWizard(mainStack,
+                                                        "screenwizard");
 
-    if (mythappearance->Create())
-        mainStack->AddScreen(mythappearance);
+    if (screenwizard->Create())
+        mainStack->AddScreen(screenwizard);
     else
-        delete mythappearance;
+        delete screenwizard;
 }
 
 

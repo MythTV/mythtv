@@ -1,5 +1,5 @@
 
-#include "mythappearance.h"
+#include "screenwizard.h"
 
 /* QT includes */
 #include <QStringList>
@@ -9,14 +9,13 @@
 /* MythTV includes */
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
-#include "myththemebase.h"
 #include "mythuihelper.h"
 #include "mythverbose.h"
 
 using namespace std;
 
 
-MythAppearance::MythAppearance(MythScreenStack *parent, const char *name) :
+ScreenWizard::ScreenWizard(MythScreenStack *parent, const char *name) :
     MythScreenType(parent, name),
     m_x_offset(0),           m_y_offset(0),
     m_whicharrow(true),
@@ -40,10 +39,10 @@ MythAppearance::MythAppearance(MythScreenStack *parent, const char *name) :
     getScreenInfo();
 }
 
-MythAppearance::~MythAppearance() {}
+ScreenWizard::~ScreenWizard() {}
 
 
-bool MythAppearance::Create()
+bool ScreenWizard::Create()
 {
     bool foundtheme = false;
 
@@ -62,7 +61,7 @@ bool MythAppearance::Create()
     if (!m_topleftarrow || !m_bottomrightarrow || !m_size || !m_offsets ||
         !m_changeamount)
     {
-        VERBOSE(VB_IMPORTANT, "MythAppearance, Error: "
+        VERBOSE(VB_IMPORTANT, "ScreenWizard, Error: "
                 "Could not instantiate, please check appear-ui.xml for errors");
         return false;
     }
@@ -82,7 +81,7 @@ bool MythAppearance::Create()
     return true;
 }
 
-void MythAppearance::setContext(int context)
+void ScreenWizard::setContext(int context)
 {
 
     if (context == 1)
@@ -98,13 +97,13 @@ void MythAppearance::setContext(int context)
 
 }
 
-void MythAppearance::getSettings()
+void ScreenWizard::getSettings()
 {
     float m_wmult = 0, m_hmult = 0;
     GetMythUI()->GetScreenSettings(m_screenwidth, m_wmult, m_screenheight, m_hmult);
 }
 
-void MythAppearance::getScreenInfo()
+void ScreenWizard::getScreenInfo()
 {
     m_xoffset_old = gCoreContext->GetNumSetting("GuiOffsetX", 0);
     m_yoffset_old = gCoreContext->GetNumSetting("GuiOffsetY", 0);
@@ -113,7 +112,7 @@ void MythAppearance::getScreenInfo()
 }
 
 
-bool MythAppearance::keyPressEvent(QKeyEvent *event)
+bool ScreenWizard::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
@@ -150,7 +149,7 @@ bool MythAppearance::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythAppearance::swapArrows()
+void ScreenWizard::swapArrows()
 {
     if (m_whicharrow)
     {
@@ -168,7 +167,7 @@ void MythAppearance::swapArrows()
     updateScreen();
 }
 
-void MythAppearance::moveUp()
+void ScreenWizard::moveUp()
 {
     if (m_whicharrow) // do the top left arrow
     {
@@ -187,7 +186,7 @@ void MythAppearance::moveUp()
     anythingChanged();
 }
 
-void MythAppearance::moveLeft()
+void ScreenWizard::moveLeft()
 {
     if (m_whicharrow) // do the top left arrow
     {
@@ -206,7 +205,7 @@ void MythAppearance::moveLeft()
     anythingChanged();
 }
 
-void MythAppearance::moveDown()
+void ScreenWizard::moveDown()
 {
     if (m_whicharrow) // do the top left arrow
     {
@@ -227,7 +226,7 @@ void MythAppearance::moveDown()
     anythingChanged();
 }
 
-void MythAppearance::moveRight()
+void ScreenWizard::moveRight()
 {
     if (m_whicharrow) // do the top left arrow
     {
@@ -246,7 +245,7 @@ void MythAppearance::moveRight()
     anythingChanged();
 }
 
-void MythAppearance::updateScreen()
+void ScreenWizard::updateScreen()
 {
     m_xsize = (m_bottomrightarrow_x - m_topleftarrow_x + m_arrowsize_x);
     m_ysize = (m_bottomrightarrow_y - m_topleftarrow_y + m_arrowsize_y);
@@ -260,7 +259,7 @@ void MythAppearance::updateScreen()
 
 }
 
-void MythAppearance::doMenu()
+void ScreenWizard::doMenu()
 {
     if (m_menuPopup)
         return;
@@ -293,13 +292,13 @@ void MythAppearance::doMenu()
     }
 }
 
-void MythAppearance::slotSaveSettings()
+void ScreenWizard::slotSaveSettings()
 {
         VERBOSE(VB_IMPORTANT, "Updating screen size settings");
         updateSettings();
 }
 
-void MythAppearance::slotChangeCoarseFine()
+void ScreenWizard::slotChangeCoarseFine()
 {
     if (m_coarsefine)
     {
@@ -315,7 +314,7 @@ void MythAppearance::slotChangeCoarseFine()
     updateScreen();
 }
 
-void MythAppearance::updateSettings()
+void ScreenWizard::updateSettings()
 {
     gCoreContext->SaveSetting("GuiOffsetX", m_xoffset);
     gCoreContext->SaveSetting("GuiOffsetY", m_yoffset);
@@ -325,7 +324,7 @@ void MythAppearance::updateSettings()
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
-void MythAppearance::slotResetSettings()
+void ScreenWizard::slotResetSettings()
 {
      gCoreContext->SaveSetting("GuiOffsetX", 0);
      gCoreContext->SaveSetting("GuiOffsetY", 0);
@@ -335,7 +334,7 @@ void MythAppearance::slotResetSettings()
      GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
-void MythAppearance::anythingChanged()
+void ScreenWizard::anythingChanged()
 {
     if (m_xsize != m_screenwidth)
         m_changed = true;
@@ -348,7 +347,7 @@ void MythAppearance::anythingChanged()
     else m_changed = false;
 }
 
-void MythAppearance::customEvent(QEvent *event)
+void ScreenWizard::customEvent(QEvent *event)
 {
 
     if (event->type() == DialogCompletionEvent::kEventType)
