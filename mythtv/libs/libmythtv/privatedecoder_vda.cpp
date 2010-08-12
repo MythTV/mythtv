@@ -188,23 +188,24 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     }
 
     CFMutableDictionaryRef destinationImageBufferAttributes =
-        CFDictionaryCreateMutable(kCFAllocatorDefault, 2,
+        CFDictionaryCreateMutable(kCFAllocatorDefault, 1,
                                   &kCFTypeDictionaryKeyCallBacks,
                                   &kCFTypeDictionaryValueCallBacks);
     OSType cvPixelFormatType = kCVPixelFormatType_422YpCbCr8;
     CFNumberRef pixelFormat  = CFNumberCreate(kCFAllocatorDefault,
                                               kCFNumberSInt32Type,
                                               &cvPixelFormatType);
-    CFDictionaryRef emptyDictionary =
-        CFDictionaryCreate(kCFAllocatorDefault, NULL, NULL, 0,
-                           &kCFTypeDictionaryKeyCallBacks,
-                           &kCFTypeDictionaryValueCallBacks);
     CFDictionarySetValue(destinationImageBufferAttributes,
                          kCVPixelBufferPixelFormatTypeKey,
                          pixelFormat);
-    CFDictionarySetValue(destinationImageBufferAttributes,
-                         kCVPixelBufferIOSurfacePropertiesKey,
-                         emptyDictionary);
+
+    //CFDictionaryRef emptyDictionary =
+    //    CFDictionaryCreate(kCFAllocatorDefault, NULL, NULL, 0,
+    //                       &kCFTypeDictionaryKeyCallBacks,
+    //                       &kCFTypeDictionaryValueCallBacks);
+    //CFDictionarySetValue(destinationImageBufferAttributes,
+    //                     kCVPixelBufferIOSurfacePropertiesKey,
+    //                     emptyDictionary);
 
     CFMutableDictionaryRef decoderConfig =
                             CFDictionaryCreateMutable(
@@ -234,7 +235,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     CHECK_ST;
     CFRelease(decoderConfig);
     CFRelease(destinationImageBufferAttributes);
-    CFRelease(emptyDictionary);
+    //CFRelease(emptyDictionary);
     if (ok)
     {
         VERBOSE(VB_PLAYBACK, LOC +
