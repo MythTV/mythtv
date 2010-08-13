@@ -254,6 +254,13 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     else
     {
         VERBOSE(VB_IMPORTANT, QString("GetEntryAt(%1) failed.").arg(at));
+        if (at == -1)
+            VERBOSE(VB_IMPORTANT, QString("It appears that your backend may "
+                    "be misconfigured.  Check your backend logs to determine "
+                    "whether your capture cards, lineups, channels, or storage "
+                    "configuration are reporting errors.  This issue is commonly "
+                    "caused by failing to complete all setup steps properly.  You "
+                    "may wish to review the documentation for mythtv-setup."));
         entry.chanid = 0;
         entry.starttime.setTime_t(0);
     }
