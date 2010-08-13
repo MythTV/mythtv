@@ -1,176 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
 <mythmenu name="SEARCH">
 
     <button>
         <type>TV_SEARCH_TITLES</type>
         <text>Titles</text>
-        <text lang="IT">Titoli</text>
-        <text lang="DE">nach Titel</text>
-        <text lang="SV">Titel</text>
-        <text lang="JA">タイトル</text>
-        <text lang="NL">Titels</text>
-        <text lang="FI">Nimikkeet</text>
-        <text lang="ZH_TW">標題</text>
-        <text lang="SL">Naslovi</text>
-        <text lang="ET">Pealkirjad</text>
-        <text lang="PT">Por Títulos</text>
-        <text lang="ES">Títulos</text>
-        <text lang="RU">Заголовки</text>
-        <text lang="PL">Tytuły</text>
-        <text lang="HU">Címek</text>
         <description>Find a program based on title</description>
-        <description lang="DE">Alle Sendungen mit einem bestimmten Titel finden</description>
         <action>TV_SEARCH_TITLE</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_KEYWORDS</type>
         <text>Keywords</text>
-        <text lang="IT">Parole Chiavi</text>
-        <text lang="DE">nach Inhalt</text>
-        <text lang="SV">Nyckelord</text>
-        <text lang="NL">Beschrijving</text>     
-        <text lang="JA">キーワード</text>
-        <text lang="FI">Avainsanat</text>
-        <text lang="ZH_TW">關鍵字</text>
-        <text lang="SL">Ključne besede</text>
-        <text lang="ET">Võtmesõnad</text>
-        <text lang="PT">Por Palavras-Chave</text>
-        <text lang="ES">Palabras</text>
-        <text lang="RU">Ключевые слова</text>
-        <text lang="PL">Słowa kluczowe</text>
-        <text lang="HU">Kulcsszavak</text>
         <description>Find a program matching a keyword</description>
-        <description lang="DE">Alle Sendungen mit einem Schlüsselwort finden</description>
         <action>TV_SEARCH_KEYWORD</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_PEOPLE</type>
         <text>People</text>
-        <text lang="IT">Persone</text>
-        <text lang="SV">Person</text>
-        <text lang="JA">人</text>
-        <text lang="DE">nach Personen</text>
-        <text lang="FI">Ihmiset</text>
-        <text lang="SL">Osebe</text>
-        <text lang="ET">Inimesed</text>
-        <text lang="PT">Por Pessoas</text>
-        <text lang="ES">Personas</text>
-        <text lang="NL">Personen</text>
-        <text lang="RU">Действующие лица</text>
-        <text lang="PL">Osoby</text>
-        <text lang="HU">Személyek</text>
         <description>Find a program including a given person</description>
-        <description lang="DE">Alle Sendungen mit einer bestimmten Person finden</description>
         <action>TV_SEARCH_PEOPLE</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_POWER</type>
         <text>Advanced</text>
-        <text lang="IT">Avanzato</text>
-        <text lang="SV">Avancerad</text>
-        <text lang="JA">アドバンスト</text>
-        <text lang="DE">Erweiterte Suche</text>
-        <text lang="FI">Lisävalinnat</text>
-        <text lang="SL">Napredno</text>
-        <text lang="ET">Muud valikud</text>
-        <text lang="PT">Pesquisa Avançada</text>
-        <text lang="ES">Avanzada</text>
-        <text lang="NL">Geavanceerd</text>
-        <text lang="RU">Дополнительно</text>
-        <text lang="PL">Zaawansowane</text>
-        <text lang="HU">Továbbiak</text>
-        <alttext lang="ET">Muud</alttext>
         <description>Combine more than one word search</description>
-        <description lang="DE">Mehrere Suchanfragen kombinieren</description>
         <action>TV_SEARCH_POWER</action>
     </button>
 
     <button>
         <type>TV_SEARCH_NEW_TITLES</type>
         <text>New Titles</text>
-        <text lang="IT">Titoli Nuovi</text>
-        <text lang="DE">Neue Sendungen</text>
-        <text lang="SV">Nya titlar</text>
-        <text lang="JA">新タイトル</text>
-        <text lang="NL">Nieuwe Titels</text>
-        <text lang="FI">Uudet Ohjelmat</text>
-        <text lang="ZH_TW">新標題</text>
-        <text lang="SL">Novi naslovi</text>
-        <text lang="PT">Por Novos Títulos</text>
-        <text lang="ET">Uued saated</text>
-        <text lang="ES">Nuevos Títulos</text>
-        <text lang="RU">Новые заголовки</text>
-        <text lang="PL">Nowe tytuły</text>
-        <text lang="HU">Új címek</text>
         <description>Pick a program to record for a list of new titles</description>
-        <description lang="DE">Wählen Sie eine Sendung aus verschiedenen Listen</description>
         <action>TV_SEARCH_NEW</action>
     </button>
 
     <button>
         <type>TV_SEARCH_MOVIES</type>
         <text>Movies</text>
-        <text lang="IT">Films</text>
-        <text lang="EN_GB">Films</text>
-        <text lang="DE">Spielfilme</text>
-        <text lang="SV">Filmer</text>
-        <text lang="JA">映画</text>
-        <text lang="NL">Films</text>
-        <text lang="FI">Elokuvat</text>
-        <text lang="ZH_TW">電影</text>
-        <text lang="SL">Filmi</text>
-        <text lang="PT">Por Filmes</text>
-        <text lang="ET">Filmid</text>
-        <text lang="ES">Películas</text>
-        <text lang="RU">Фильмы</text>
-        <text lang="PL">Filmy</text>
-        <text lang="HU">Filmek</text>
         <description>Pick a movie to record</description>
-        <description lang="DE">Wählen Sie einen Film zum aufnehmen</description>
         <action>TV_SEARCH_MOVIE</action>
     </button>
 
     <button>
         <type>TV_SEARCH_CATEGORIES</type>
         <text>Categories</text>
-        <text lang="IT">Categorie</text>
-        <text lang="DE">Kategorien</text>
-        <text lang="SV">Kategori</text>
-        <text lang="JA">カテゴリー</text>
-        <text lang="NL">Categorie</text>
-        <text lang="FI">Kategoriat</text>
-        <text lang="ZH_TW">種類</text>
-        <text lang="SL">Kategorije</text>
-        <text lang="PT">Por Categorias</text>
-        <text lang="ET">Kategooriad</text>
-        <text lang="ES">Categorías</text>
-        <text lang="RU">Категории</text>
-        <text lang="PL">Kategorie</text>
-        <text lang="HU">Kategóriák</text>
         <description>Pick a program based on category</description>
-        <description lang="DE">Wählen Sie eine Sendung nach Genre</description>
         <action>TV_SEARCH_CATEGORY</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_CHANNELS</type>
         <text>Channels</text>
-        <text lang="IT">Canali</text>
-        <text lang="DE">Sender</text>
-        <text lang="SV">Kanal</text>
-        <text lang="NL">Zender</text>
-        <text lang="JA">チャンネル</text>
-        <text lang="FI">Kanavat</text>
-        <text lang="ZH_TW">電視台</text>
-        <text lang="SL">Kanali</text>
-        <text lang="PT">Por Canais</text>
-        <text lang="ET">Kanalid</text>
-        <text lang="ES">Canales</text>
-        <text lang="RU">Каналы</text>
-        <text lang="PL">Kanały</text>
-        <text lang="HU">Csatornák</text>
         <description>Pick a program on a given channel</description>
         <action>TV_SEARCH_CHANNEL</action>
     </button>
@@ -178,33 +60,14 @@
     <button>
         <type>TV_SEARCH_TIMES</type>
         <text>Time</text>
-        <text lang="IT">Ora</text>
-        <text lang="NL">Tijdstip</text>
-        <text lang="SV">Tid</text>
-        <text lang="JA">時間</text>
-        <text lang="DE">Sendezeit</text>
-        <text lang="FI">Aika</text>
-        <text lang="ZH_TW">時間</text>
-        <text lang="SL">Čas</text>
-        <text lang="PT">Por Data e Hora</text>
-        <text lang="ET">Aeg</text>
-        <text lang="ES">Horas</text>
-        <text lang="RU">Время</text>
-        <text lang="PL">Czas</text>
-        <text lang="HU">Óra</text>
         <description>Pick a program based on time</description>
-        <description lang="DE">Wählen Sie eine Sendung nach ihrer Sendezeit</description>
         <action>TV_SEARCH_TIME</action>
     </button>
 
     <button>
         <type>TV_SEARCH_STORED</type>
         <text>Stored Searches</text>
-        <text lang="SL">Shranjena iskanja</text>
-        <text lang="PL">Znaleziony zapamiętany</text>
-        <text lang="HU">Tárolt keresések</text>
         <description>Results of searches you have saved</description>
-        <description lang="DE">ältere Suchabfragen</description>
         <action>TV_SEARCH_STORED</action>
     </button>
 

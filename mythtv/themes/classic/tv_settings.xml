@@ -1,169 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
 <mythmenu name="TVSETUP">
+
     <button>
         <type>TV_SETTINGS_GENERAL</type>
         <text>General</text>
-        <text lang="IT">Generale</text>
-        <text lang="ES">General</text>
-        <text lang="CA">General</text>
-        <text lang="NL">Algemeen</text>
-        <text lang="DE">Allgemeines</text>
-        <text lang="PT">Configurações Gerais</text>
-        <text lang="SV">Allmänt</text>
-        <text lang="JA">一般</text>
-        <text lang="SL">Splošno</text>
-        <text lang="ET">Üldine</text>
-        <text lang="RU">Общие</text>
-        <text lang="PL">Ogólne</text>
-        <text lang="HU">Általános</text>
         <description>TV navigation and recording preferences</description>
-        <description lang="DE">TV-Navigation und Aufnahme-Voreinstellungen</description>
         <action>SETTINGS GENERAL</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_PROGRAM_GUIDE</type>
         <text>Program Guide</text>
-        <text lang="EN_GB">Programme Guide</text>
-        <text lang="IT">Guida Programmi</text>
-        <text lang="ES">Guía de Programas</text>
-        <text lang="CA">Guia de programes</text>
-        <text lang="NL">Programmagids</text>
-        <text lang="DE">Programmübersicht</text>
-        <text lang="PT">Config. Guia de Progr.</text>
-        <text lang="SV">Programguide</text>
-        <text lang="JA">番組ガイド</text>
-        <text lang="SL">Programski vodič</text>
-        <text lang="ET">Telekava</text>
-        <text lang="RU">Программа передач</text>
-        <text lang="PL">Przewodnik programowy</text>
-        <text lang="HU">Műsorújság</text>
-        <alttext lang="DE">EPG</alttext>
-        <alttext lang="ET">Kava</alttext>
-        <alttext lang="RU">Программа</alttext>
-        <alttext lang="PL">Program TV</alttext>
         <description>Guide appearance and behavior</description>
-        <description lang="DE">Einstellungen für das EPG</description>
         <action>SETTINGS EPG</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_PLAYBACK</type>
         <text>Playback</text>
-        <text lang="IT">Riproduzione</text>
-        <text lang="ES">Reproducción</text>
-        <text lang="CA">Reproducció</text>
-        <text lang="NL">Afspelen</text>
-        <text lang="DE">Wiedergabe</text>
-        <text lang="PT">Config. Visualização</text>
-        <text lang="SV">Uppspelning</text>
-        <text lang="JA">再生</text>
-        <text lang="SL">Predvajanje</text>
-        <text lang="ET">Mahamängimine</text>
-        <text lang="RU">Воспроизведение</text>
-        <text lang="PL">Odtwarzanie</text>
-        <text lang="HU">Lejátszás</text>
         <description>Settings for viewing and playing TV</description>
-        <description lang="DE">Einstellungen zur TV-Wiedergabe</description>
         <action>SETTINGS PLAYBACK</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_PLAYBACK_OSD</type>
         <text>Playback OSD</text>
-        <text lang="DE">Wiedergabe-OSD</text>
-        <text lang="HU">OSD</text>
         <description>Theme and settings for OSD</description>
-        <description lang="DE">Einstellungen für das On-Screen-Display</description>
         <action>SETTINGS OSD</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
         <text>OSD Menu Editor</text>
-        <text lang="HU">OSD menu szerkesztő</text>
-        <text lang="DE">OSD-Menü anpassen</text>
-        <description lang="DE">Welche Menüpunkte sollen im OSD-Menü erscheinen?</description>
         <action>OSDMENUEDITOR</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
         <text>Playback Groups</text>
-        <text lang="IT">Gruppi di Riproduzione</text>
-        <text lang="SV">Uppspelningsgrupper</text>
-        <text lang="PT">Grupos de Visualização</text>
-        <text lang="ET">Esitlusgrupid</text>
-        <text lang="ES">Grupos Reproducción</text>
-        <text lang="NL">Afspeelgroepen</text>
-        <text lang="JA">プレイバックグループ</text>
-        <text lang="RU">Группы воспроизведения</text>
-        <text lang="PL">Grupy odtwarzania</text>
-        <text lang="HU">Lejátszási csoport</text>
-        <text lang="DE">Wiedergabegruppen</text>
-        <alttext lang="RU">Группы</alttext>
-        <alttext lang="PL">Grupy</alttext>
         <description>Adjust settings for different playback styles</description>
-        <description lang="DE">Einstellungen für die Wiedergabegruppen</description>
         <action>SETTINGS PLAYGROUP</action>
     </button>
 
     <button>
       <type>TV_SETTINGS_CHANNEL_GROUP</type>
       <text>Channel Groups</text>
-      <text lang="HU">Csatorna csoport</text>
-      <text lang="DE">Sendergruppen</text>
-      <description lang="DE">Einstellungen für die Sendergruppen</description>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_RECORDING_PROFILES</type>
         <text>Recording Profiles</text>
-        <text lang="IT">Registrazione</text>
-        <text lang="ES">Grabación</text>
-        <text lang="CA">Gravació</text>
-        <text lang="NL">Opnameprofielen</text>
-        <text lang="DE">Aufnahmeprofile</text>
-        <text lang="PT">Perfis de Gravação</text>
-        <text lang="SV">Inspelningsprofiler</text>
-        <text lang="JA">録画プロファイル</text>
-        <text lang="SL">Snemalni profili</text>
-        <text lang="ET">Salvestamisprofiilid</text>
-        <text lang="RU">Профили записи</text>
-        <text lang="PL">Profile nagrywania</text>
-        <text lang="HU">Felvételek profiljai</text>
-        <alttext lang="SV">Inspelning</alttext>
-        <alttext lang="DE">Profile</alttext>
-        <alttext lang="ET">Profiilid</alttext>
-        <alttext lang="PT">Perfis</alttext>
-        <alttext lang="RU">Профили</alttext>
-        <alttext lang="PL">Profile</alttext>
-        <description> </description>
-        <description lang="DE"></description>
         <action>SETTINGS RECORDING</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_RECPRIORITIES</type>
         <text>Recording Priorities</text>
-        <text lang="IT">Priorità</text>
-        <text lang="DE">Prioritäten</text>
-        <text lang="PT">Prioridades de Gravação</text>
-        <text lang="SV">Inspelningsprioriteter</text>
-        <text lang="JA">録画優先順位</text>
-        <text lang="SL">Snemalne prioritete</text>
-        <text lang="ET">Salvestamisprioriteedid</text>
-        <text lang="ES">Prioridades</text>
-        <text lang="NL">Opnameprioriteiten</text>
-        <text lang="RU">Приоритеты записей</text>
-        <text lang="PL">Priorytety nagrywania</text>
-        <text lang="HU">Felvételi prioritások</text>
-        <alttext lang="ET">Prioriteedid</alttext>
-        <alttext lang="PT">Prioridades</alttext>
-        <alttext lang="RU">Приоритеты</alttext>
-        <alttext lang="PL">Priorytety</alttext>
         <description>Global recording priority and scheduling</description>
-        <description lang="DE">Aufnahmeprioritäten und Planung</description>
         <action>MENU recpriorities_settings.xml</action>
     </button>
 
