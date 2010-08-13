@@ -54,6 +54,7 @@ using namespace std;
 #endif
 
 QMutex XMLTVFindGrabbers::list_lock;
+static const uint kDefaultMultirecCount = 2;
 
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
@@ -132,7 +133,7 @@ class InstanceCount : public TransSpinBoxSetting
                 "programs on a multiplex, if this is set to a value greater "
                 "than one MythTV can sometimes take advantage of this."));
         uint cnt = parent.GetInstanceCount();
-        cnt = (!cnt) ? (uint) 2 : ((cnt < 1) ? 1 : cnt);
+        cnt = (!cnt) ? kDefaultMultirecCount : ((cnt < 1) ? 1 : cnt);
         setValue(cnt);
     };
 };
@@ -2227,24 +2228,17 @@ void CaptureCard::Save(void)
     if (!CardUtil::IsTunerSharingCapable(type))
         return;
 
-    if (!init_cardid)
-    {
-        QString dev = CardUtil::GetVideoDevice(cardid);
-        vector<uint> cardids = CardUtil::GetCardIDs(dev, type);
-        if (cardids.size() > 1)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "A card using this video device already exists!");
-            CardUtil::DeleteCard(cardid);
-        }
-        return;
-    }
-
     vector<uint> cardids = CardUtil::GetCardIDs(init_dev, type);
 
     if (!instance_count)
-        instance_count = max((size_t)0, cardids.size()) + 1;
+    {
+        instance_count = (init_cardid) ?
+            max((size_t)1, cardids.size()) : kDefaultMultirecCount;
+    }
     uint cloneCount = instance_count - 1;
+
+    if (!init_cardid)
+        init_cardid = cardid;
 
     // Delete old clone cards as required.
     for (uint i = cardids.size() - 1; (i > cloneCount) && cardids.size(); i--)
