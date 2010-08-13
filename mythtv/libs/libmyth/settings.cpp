@@ -643,7 +643,7 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     for(unsigned int i = 0 ; i < labels.size() ; ++i)
         cbwidget->insertItem(labels[i]);
 
-    cbwidget->setMaxCount(cbwidget->count() + rw);
+    resetMaxCount(cbwidget->count());
 
     if (isSet)
         cbwidget->setCurrentIndex(current);
@@ -735,6 +735,7 @@ void ComboBoxSetting::addSelection(
 {
     if ((findSelection(label, value) < 0) && cbwidget)
     {
+        resetMaxCount(cbwidget->count()+1);
         cbwidget->insertItem(label);
     }
 
@@ -757,6 +758,7 @@ bool ComboBoxSetting::removeSelection(const QString &label, QString value)
             cbwidget->removeItem(i);
             if (isSet)
                 cbwidget->setCurrentIndex(current);
+            resetMaxCount(cbwidget->count());
             return true;
         }
     }
