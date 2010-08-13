@@ -1,56 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="MAIN">
 
     <button>
         <type>TV_WATCH_RECORDINGS</type>
         <text>Watch Recordings</text>
-        <text lang="IT">Guarda Registrazioni</text>
-        <text lang="ES">Ver Grabaciones</text>
-        <text lang="NL">Opnames Bekijken</text>
-        <text lang="DE">Aufnahmen ansehen</text>
-        <text lang="IS">Horfa á upptökur</text>
-        <text lang="PT">Ver Gravações de TV</text>
-        <text lang="SV">Visa inspelningar</text>
-        <text lang="JA">録画再生</text>
-        <text lang="FI">Katso Tallenteita</text>
-        <text lang="ZH_TW">觀看預錄節目</text>
-        <text lang="SL">Gledanje snemanj</text>
-        <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="RU">Смотреть записи</text>
-        <text lang="PL">Oglądanie nagrań</text>
-        <text lang="HE">צפיה בהקלטות</text>
-        <alttext lang="SV">Inspelningar</alttext>
-        <alttext lang="ET">Salvestised</alttext>
-        <alttext lang="RU">Записи</alttext>
-        <alttext lang="PL">Nagrania</alttext>
         <description>Play recordings</description>
-        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
     <button>
         <type>VIDEO_BROWSER</type>
         <text>Watch Videos</text>
-        <text lang="IT">Guarda Video</text>
-        <text lang="ES">Ver Videos</text>
-        <text lang="DE">Videos ansehen</text>
-        <text lang="IS">Horfa á myndir</text>
-        <text lang="PT">Ver Filmes</text>
-        <text lang="SV">Visa filmer</text>
-        <text lang="NL">Films Bekijken</text>
-        <text lang="JA">ビデオブラウズ</text>
-        <text lang="FI">Katso Videoita</text>
-        <text lang="ZH_TW">播放電影</text>
-        <text lang="SL">Gledanje filmov</text>
-        <text lang="ET">Video vaatamine</text>
-        <text lang="RU">Смотреть фильмы</text>
-        <text lang="PL">Oglądanie filmów</text>
-        <text lang="HE">צפיה בוידאו</text>
-        <alttext lang="SV">Filmer</alttext>
-        <alttext lang="ET">Video</alttext>
-        <alttext lang="RU">Фильмы</alttext>
-        <alttext lang="PL">Filmy</alttext>
         <description>Play videos</description>
-        <description lang="DE"></description>
         <action>JUMP MythVideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -58,23 +19,7 @@
     <button>
         <type>DVD_PLAY</type>
         <text>Watch A DVD</text>
-        <text lang="IT">Riproduci DVD</text>
-        <text lang="PT">Ver DVD</text>
-        <text lang="IS">Spila DVD</text>
-        <text lang="DE">DVD abspielen</text>
-        <text lang="SV">Spela DVD</text>
-        <text lang="ES">Ver DVD</text>
-        <text lang="NL">DVD Afspelen</text>
-        <text lang="JA">DVD再生</text>
-        <text lang="FI">Katso DVD</text>
-        <text lang="ZH_TW">播放DVD</text>
-        <text lang="SL">Predvajaj DVD</text>
-        <text lang="ET">Mängi DVD-d</text>
-        <text lang="RU">Смотреть DVD</text>
-        <text lang="PL">Oglądanie DVD</text>
-        <text lang="HE">נגן DVD</text>
         <description>Play the video on a movie DVD</description>
-        <description lang="DE">Einen Spielfim auf DVD ansehen</description>
         <action>JUMP Play DVD</action>
         <depends>mythvideo</depends>
     </button>
@@ -82,24 +27,7 @@
     <button>
         <type>TV_WATCH_TV</type>
         <text>Watch Live TV</text>
-        <text lang="IT">Guarda la TV</text>
-        <text lang="ES">Ver la TV</text>
-        <text lang="NL">TV Kijken</text>
-        <text lang="DE">Fernsehen</text>
-        <text lang="IS">Horfa á sjónvarp</text>
-        <text lang="PT">Ver Televisão</text>
-        <text lang="SV">Se på TV</text>
-        <text lang="JA">TV放送</text>
-        <text lang="FI">Katso Televisiota</text>
-        <text lang="ZH_TW">觀看電視</text>
-        <text lang="SL">Glej TV</text>
-        <text lang="ET">Vaata telerit</text>
-        <text lang="RU">Смотреть ТВ</text>
-        <text lang="AR">شاهد التلفاز</text>
-        <text lang="PL">Oglądanie TV</text>
-        <text lang="HE">צפיה בטלויזיה</text>
         <description>Watch live television</description>
-        <description lang="DE">Jetzt Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -122,7 +50,6 @@
     <button>
         <type>STREAM</type>
         <text>Watch Online Streams</text>
-        <text lang="HE">נגן מדיה מכוונת</text>
         <description></description>
         <action>PLUGIN mythstream</action>
         <depends>mythstream</depends>
@@ -131,23 +58,7 @@
     <button>
         <type>MUSIC_PLAY</type>
         <text>Listen to Music</text>
-        <text lang="IT">Esegui Brani Musicali</text>
-        <text lang="ES">Escuchar Música</text>
-        <text lang="DE">Musik hören</text>
-        <text lang="IS">Spila tónlist</text>
-        <text lang="NL">Muziek Afspelen</text>
-        <text lang="PT">Tocar Músicas</text>
-        <text lang="SV">Spela musik</text>
-        <text lang="JA">ミュージック再生</text>
-        <text lang="FI">Kuuntele Musiikkia</text>
-        <text lang="ZH_TW">播放音樂</text>
-        <text lang="SL">Predvajanje glasbe</text>
-        <text lang="ET">Kuula muusikat</text>
-        <text lang="RU">Слушать музыку</text>
-        <text lang="PL">Odtwarzaj muzykę</text>
-        <text lang="HE">האזנה למוסיקה</text>
         <description></description>
-        <description lang="DE"></description>
         <action>JUMP Play music</action>
         <depends>mythmusic</depends>
     </button>
@@ -156,16 +67,13 @@
         <type>MENU_PLUGINS</type>
         <text>Plugins</text>
         <description>Other Plugins</description>
-        <description lang="DE">Weitere Plugins</description>
         <action>MENU plugin_menu.xml</action>
     </button>
 
     <button>
         <type>MENU_ADVANCED</type>
         <text>Advanced</text>
-        <text lang="DE">Erweitert</text>
         <description>Advanced Options</description>
-        <description lang="DE">Weitere Optionen</description>
         <action>MENU advanced.xml</action>
     </button>
 

@@ -1,92 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="MANAGE_RECORDINGS">
 
     <button>
         <type>TV_SCHEDULE_RECORDINGS</type>
         <text>Schedule Recordings</text>
-        <text lang="IT">Programma una registrazione</text>
-        <text lang="ES">Programar Grabaciones</text>
-        <text lang="NL">Opnames Plannen</text>
-        <text lang="DE">Aufnahmen planen</text>
-        <text lang="IS">Stilla upptöku</text>
-        <text lang="PT">Programar Gravações</text>
-        <text lang="SV">Schemalägg inspelningar</text>
-        <text lang="JA">録画予約</text>
-        <text lang="FI">Ajasta Tallennuksia</text>
-        <text lang="ZH_TW">預設錄影</text>
-        <text lang="SL">Planiranje snemanj</text>
-        <text lang="ET">Salvestamiste plaanimine</text>
-        <text lang="RU">Расписание записей</text>
-        <text lang="PL">Harmonogram nagrań</text>
-        <text lang="HE">תיזמון הקלטות</text>
-        <alttext lang="SV">Schemalägg</alttext>
-        <alttext lang="DE">Planung</alttext>
-        <alttext lang="ET">Plaanimine</alttext>
-        <alttext lang="RU">Расписание</alttext>
-        <alttext lang="PL">Harmonogram</alttext>
         <description>Pick shows to record</description>
-        <description lang="DE">Welche Sendung möchten Sie aufnehmen?</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
     <button>
         <type>TV_RECORDING_RULES</type>
         <text>Recording Rules</text>
-        <text lang="DE">Aufnahmeregeln</text>
         <alttext>Manage Rules</alttext>
         <description>Edit or delete any recording rule</description>
-        <description lang="DE">Bearbeiten/Löschen der Aufnahmeregeln</description>
         <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
 
     <button>
         <type>TV_UPCOMING_RECORDINGS</type>
         <text>Upcoming Recordings</text>
-        <text lang="IT">Correggi i conflitti</text>
-        <text lang="ES">Resolver Conflictos</text>
-        <text lang="NL">Geplande Opnames</text>
-        <text lang="DE">Aufnahmeplan</text>
-        <text lang="IS">Komandi upptökur</text>
-        <text lang="PT">Resolver Conflitos</text>
-        <text lang="SV">Kommande inspelningar</text>
-        <text lang="JA">これからの録画</text>
-        <text lang="FI">Tulevat Tallennukset</text>
-        <text lang="ZH_TW">修正預設錄影衝突</text>
-        <text lang="SL">Prihajajoča snemanja</text>
-        <text lang="ET">Tulevased salvestamised</text>
-        <text lang="RU">Будущие записи</text>
-        <text lang="PL">Zaplanowane nagrania</text>
-        <text lang="HE">ההקלטות הבאות</text>
-        <alttext lang="SV">Kommande</alttext>
         <description>See what will be recorded next</description>
-        <description lang="DE">Was wird als nächstes aufgenommen?</description>
         <action>TV_FIX_CONFLICTS</action>
     </button>
 
     <button>
         <type>TV_DELETE</type>
         <text>Delete Recordings</text>
-        <text lang="IT">Elimina una registrazione</text>
-        <text lang="ES">Borrar Grabaciones</text>
-        <text lang="NL">Opnames Verwijderen</text>
-        <text lang="DE">Aufnahmen löschen</text>
-        <text lang="IS">Eyða upptöku</text>
-        <text lang="PT">Apagar Gravações</text>
-        <text lang="SV">Radera inspelningar</text>
-        <text lang="JA">録画削除</text>
-        <text lang="FI">Poista Tallenteita</text>
-        <text lang="ZH_TW">刪除錄影</text>
-        <text lang="SL">Brisanje snemanj</text>
-        <text lang="ET">Salvestiste kustutamine</text>
-        <text lang="RU">Удалить записи</text>
-        <text lang="PL">Kasowanie nagrań</text>
-        <text lang="HE">מחיקת הקלטות</text>
-        <alttext lang="SV">Radera</alttext>
-        <alttext lang="DE">Löschen</alttext>
-        <alttext lang="ET">Kustutamine</alttext>
-        <alttext lang="RU">Удалить</alttext>
-        <alttext lang="PL">Kasowanie</alttext>
         <description>Remove television recordings</description>
-        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
         <dependswindow xmlfile="recordings-ui.xml">deleterecordings</dependswindow>
     </button>
@@ -94,45 +34,14 @@
     <button>
         <type>TV_PREVIOUS</type>
         <text>Previously Recorded</text>
-        <text lang="SV">Tidigare inspelningar</text>
-        <text lang="JA">録画履歴</text>
-        <text lang="DE">Alte Aufnahmen</text>
-        <text lang="IS">Fyrri upptökur</text>
-        <text lang="NL">Vorige Opnames</text>     
-        <text lang="FI">Aiemmin Tallennetut</text>
-        <text lang="ZH_TW">以前的錄影</text>
-        <text lang="SL">Že posneto</text>
-        <text lang="ET">Varem salvestatud</text>
-        <text lang="ES">Grabados Anteriormente</text>
-        <text lang="PT">Gravações Feitas</text>
-        <text lang="RU">Ранее записанное</text>
-        <text lang="PL">Poprzednio nagrane</text>
-        <text lang="HE">הוקלט מקודם</text>
-        <alttext lang="SV">Tidigare</alttext>
         <description>See what you have recorded before</description>
-        <description lang="DE">Was Sie bisher aufgenommen haben</description>
         <action>TV_PREVIOUS</action>
     </button>
 
     <button>
         <type>TV_RECPRIORITIES</type>
         <text>Set Priorities</text>
-        <text lang="DE">Prioritäten</text>
-        <text lang="IS">Setja forgang</text>
-        <text lang="NL">Prioriteiten Instellen</text>
-        <text lang="SV">Prioriteter</text>
-        <text lang="JA">録画優先順位</text>
-        <text lang="FI">Aseta Prioriteetteja</text>
-        <text lang="ZH_TW">錄影優先次序</text>
-        <text lang="SL">Nastavitve prioritet</text>
-        <text lang="ET">Prioriteetide muutmine</text>
-        <text lang="ES">Fijar Prioridades</text>
-        <text lang="PT">Definir Prioridades</text>
-        <text lang="RU">Установка приоритетов</text>
-        <text lang="PL">Ustaw priorytety</text>
-        <text lang="HE">הגדרת קדימויות</text>
         <description>Prioritize some shows over others</description>
-        <description lang="DE">Welche Aufnahme ist Ihnen am wichtigsten?</description>
         <action>TV_SET_RECPRIORITIES</action>
     </button>
 

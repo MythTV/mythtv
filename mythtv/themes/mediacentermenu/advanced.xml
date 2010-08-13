@@ -1,57 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="ADVANCED">
 
     <button>
         <type>MENU_MANAGE_RECORDINGS</type>
         <text>Manage Recordings</text>
-        <text lang="IT">Programma Registrazioni</text>
-        <text lang="ES">Programar Grabaciones</text>
-        <text lang="NL">Opnames Beheren</text>
-        <text lang="DE">Aufnahmen verwalten</text>
-        <text lang="IS">Upptaka útsendinga</text>
-        <text lang="PT">Gerir Gravações</text>
-        <text lang="SV">Hantera inspelningar</text>
-        <text lang="JA">録画予約</text>
-        <text lang="FI">Hallitse Tallennuksia</text>
-        <text lang="ZH_TW">管理電視錄影</text>
-        <text lang="SL">Posnetki</text>
-        <text lang="ET">Salvestamine</text>
-        <text lang="RU">Управление записями</text>
-        <text lang="AR">أدر التسجيلات</text>
-        <text lang="PL">Zarządzaj nagraniami</text>
-        <text lang="HE">ניהול הקלטות</text>
-        <alttext lang="DE">Verwaltung</alttext>
-        <alttext lang="SV">Hantera</alttext>
-        <alttext lang="ES">Programar</alttext>
-        <alttext lang="PT">Programação</alttext>
-        <alttext lang="RU">Записи</alttext>
-        <alttext lang="AR">التسجيلات</alttext>
         <description>Pick and prioritize shows to record</description>
-        <description lang="DE">Planen Sie Ihre Aufnahmen</description>
         <action>MENU manage_recordings.xml</action>
     </button>
 
     <button>
         <type>MENU_OPTICAL_DISKS</type>
         <text>Optical Disks</text>
-        <text lang="IT">CD/DVD</text>
-        <text lang="DE">CD/DVD</text>
-        <text lang="IS">Geisladiskar</text>
-        <text lang="NL">DVD/CD</text>
-        <text lang="SV">Optiska diskar</text>
-        <text lang="JA">オプティカルディスク</text>
-        <text lang="FI">DVD ja CD</text>
-        <text lang="ZH_TW">光碟</text>
-        <text lang="SL">CD/DVD</text>
-        <text lang="ET">DVD ja CD</text>
-        <text lang="ES">CD/DVD</text>
-        <text lang="EN_GB">CD/DVD</text>
-        <text lang="PT">CD/DVD</text>
-        <text lang="RU">CD/DVD</text>
-        <text lang="AR">تشغيل إسطوانات</text>
-        <text lang="PL">Dyski optyczne</text>
-        <text lang="HE">דיסקים אופטים</text>
         <description>Play or import audio or video CDs or DVDs</description>
-        <description lang="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
@@ -59,46 +19,14 @@
     <button>
         <type>TV_STATUS</type>
         <text>System Status</text>
-        <text lang="IT">Stato del Sistema</text>
-        <text lang="DE">Systemstatus</text>
-        <text lang="IS">Staða kerfis</text>
-        <text lang="NL">Systeemstatus</text>
-        <text lang="SV">Systemstatus</text>
-        <text lang="JA">システムステータス</text>
-        <text lang="FI">Systeemin Tila</text>
-        <text lang="ZH_TW">系統狀態</text>
-        <text lang="SL">Status sistema</text>
-        <text lang="ET">Süsteemi olek</text>
-        <text lang="ES">Estado Sistema</text>
-        <text lang="PT">Estado do Sistema</text>
-        <text lang="RU">Состояние системы</text>
-        <text lang="PL">Status systemu</text>
-        <text lang="HE">מצב מערכת</text>
         <description>What your system is doing right now</description>
-        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 
     <button>
         <type>MUSIC_PLAYLIST</type>
         <text>Music Tools</text>
-        <text lang="IT">Opzioni Musica</text>
-        <text lang="DE">Musik verwalten</text>
-        <text lang="IS">Tónlistartól</text>
-        <text lang="NL">Muziek Beheren</text>
-        <text lang="SV">Musikverktyg</text>
-        <text lang="JA">ミュージックツール</text>
-        <text lang="FI">Musiikkityökalut</text>
-        <text lang="ZH_TW">音樂工具</text>
-        <text lang="SL">Glasbena orodja</text>
-        <text lang="ET">Muusikatööriistad</text>
-        <text lang="ES">Gestionar Música</text>
-        <text lang="PT">Gerir Música</text>
-        <text lang="RU">Работа с музыкой</text>
-        <text lang="PL">Narzędzia muzyczne</text>
-        <text lang="HE">כלי מוסיקה</text>
         <description>Select, import, or play music</description>
-        <description lang="DE">Musik auswählen, importieren oder hören</description>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -106,45 +34,14 @@
     <button>
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
-        <text lang="IT">Modifica Tasti</text>
-        <text lang="IS">Stilla takka</text>
-        <text lang="DE">Tastenbelegung ändern</text>
-        <text lang="FI">Muokkaa Näppäimiä</text>
-        <text lang="SV">Ändra knappar</text>
-        <text lang="ES">Editar Teclas</text>
-        <text lang="PT">Configurar Teclas</text>
-        <text lang="ET">Klahvide muutmine</text>
-        <text lang="NL">Toetsen Aanpassen</text>
-        <text lang="JA">キー設定</text>
-        <text lang="RU">Редактировать клавиши</text>
-        <text lang="SL">Urejanje tipk</text>
-        <text lang="PL">Edytuj klawisze</text>
-        <text lang="HE">עריכת מקשים</text>
         <description>Change MythTV key bindings.</description>
-        <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
     </button>
 
     <button>
         <type>SETUP_MENU</type>
         <text>Setup</text>
-        <text lang="IT">Impostazioni</text>
-        <text lang="ES">Configurar</text>
-        <text lang="DE">Konfiguration</text>
-        <text lang="IS">Stillingar</text>
-        <text lang="NL">Configuratie</text>
-        <text lang="PT">Configurações</text>
-        <text lang="SV">Inställningar</text>
-        <text lang="JA">設定</text>
-        <text lang="FI">Asetukset</text>
-        <text lang="ZH_TW">設定</text>
-        <text lang="SL">Nastavitve</text>
-        <text lang="ET">Sätted</text>
-        <text lang="RU">Настройки</text>
-        <text lang="PL">Ustawienia</text>
-        <text lang="HE">הגדרה</text>
         <description>Configure MythTV and plugins</description>
-        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU main_settings.xml</action>
         <password>SetupPinCode</password>
     </button>

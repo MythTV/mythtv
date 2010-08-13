@@ -1,23 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="MAIN">
 
     <button>
         <type>TV_WATCH_RECORDINGS</type>
         <text>Watch Recordings</text>
-        <text lang="IT">Guarda Registrazioni</text>
-        <text lang="ES">Ver Grabaciones</text>
-        <text lang="CA">Veure Gravacions</text>
-        <text lang="NL">Opnames Bekijken</text>
-        <text lang="DE">Aufnahmen ansehen</text>
-        <text lang="PT">Ver Gravações da TV</text>
-        <text lang="SV">Visa inspelningar</text>
-        <text lang="JA">録画再生</text>
-        <text lang="SL">Predvajanje snemanj</text>
-        <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="RU">Просмотр записей</text>
-        <text lang="HU">Felvételek lejátszása</text>
-        <alttext lang="DE">Wiedergabe</alttext>
-        <alttext lang="ET">Salvestised</alttext>
-        <alttext lang="SV">Inspelningar</alttext>
         <description>Play Recordings</description>
         <action>TV_WATCH_RECORDING</action>
     </button>
@@ -25,146 +11,36 @@
     <button>
         <type>TV_CONFLICTS</type>
         <text>Upcoming Recordings</text>
-        <text lang="IT">Correggi i conflitti</text>
-        <text lang="ES">Resolver Conflictos</text>
-        <text lang="CA">Resoldre Conflictes</text>
-        <text lang="NL">Geplande Opnames</text>
-        <text lang="DE">Aufnahmeplan</text>
-        <text lang="PT">Resolver Conflitos</text>
-        <text lang="SV">Kommande</text>
-        <text lang="JA">これからの録画</text>
-        <text lang="FI">Tulevat Tallennukset</text>
-        <text lang="ZH_TW">修正預設錄影衝突</text>
-        <text lang="SL">Prihajajoča snemanja</text>
-        <text lang="ET">Tulevased salvestamised</text>
-        <text lang="RU">Будущие записи</text>
-        <text lang="HU">Ütemezett felvételek</text>
-        <alttext lang="SV">Kommande</alttext>
-        <alttext lang="ET">Tulevased</alttext>
         <description>See what will be recorded next</description>
-        <description lang="DE">Was wird als nächstes aufgenommen?</description>
         <action>TV_FIX_CONFLICTS</action>
     </button>
 
     <button>
         <type>TV_SCHEDULE_RECORDINGS</type>
         <text>Schedule Recordings</text>
-        <text lang="IT">Pianifica Registrazioni</text>
-        <text lang="ES">Programar Grabaciones</text>
-        <text lang="CA">Programar Gravacions</text>
-        <text lang="NL">Opnames Plannen</text>
-        <text lang="DE">Aufnahmen planen</text>
-        <text lang="PT">Programar Gravações</text>
-        <text lang="SV">Schemalägg</text>
-        <text lang="JA">録画予約</text>
-        <text lang="SL">Plan snemanj</text>
-        <text lang="ET">Salvestamise plaanimine</text>
-        <text lang="RU">Расписание записей</text>
-        <text lang="HU">Felvétel ütemezése</text>
-        <alttext>Schedule</alttext>
-        <alttext lang="IT">Pianifica</alttext>
-        <alttext lang="ES">Temporizadores</alttext>
-        <alttext lang="CA">Temporitzadors</alttext>
-        <alttext lang="NL">Planning</alttext>
-        <alttext lang="PT">Programar</alttext>
-        <alttext lang="SV">Schemalägg</alttext>
-        <alttext lang="JA">予約</alttext>
-        <alttext lang="IT">Programmazione</alttext>
-        <alttext lang="DE">Planung</alttext>
-        <alttext lang="SL">Planiranje</alttext>
-        <alttext lang="ET">Plaanimine</alttext>
-        <alttext lang="RU">Расписание</alttext>
         <description>Pick shows to record</description>
-        <description lang="DE">Eine neue Aufnahme planen</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
     <button>
         <type>TV_RECPRIORITIES</type>
         <text>Recording Priorities</text>
-        <text lang="DE">Aufnahmeprioritäten</text>
-        <text lang="NL">Opname Prioriteiten</text>    
-        <text lang="SV">Inspelningsprioriteter</text>
-        <text lang="JA">録画優先順位</text>
-        <text lang="SL">Snemalne prirotete</text>
-        <text lang="ET">Salvestamisprioriteedid</text>
-        <text lang="PT">Prioridades de Gravações</text>
-        <text lang="ES">Prioridades Grabaciones</text>
-        <text lang="RU">Приоритеты записей</text>
-        <text lang="HU">Felvételi prioritás</text>
-        <alttext>Priorities</alttext>
-        <alttext lang="IT">Priorità</alttext>
-        <alttext lang="SV">Prioriteter</alttext>
-        <alttext lang="NL">Prioriteiten</alttext>
-        <alttext lang="DE">Prioritäten</alttext>
-        <alttext lang="SL">Prioritete</alttext>
-        <alttext lang="ET">Prioriteedid</alttext>
-        <alttext lang="PT">Prioridades</alttext>
-        <alttext lang="ES">Prioridades</alttext>
-        <alttext lang="RU">Приоритеты</alttext>
         <description>Prioritize some shows over others</description>
-        <description lang="DE">Welche Aufnahme ist Ihnen am wichtigsten?</description>
         <action>TV_SET_RECPRIORITIES</action>
     </button>
 
     <button>
         <type>TV_STATUS</type>
         <text>System Status</text>
-        <text lang="IT">Stato del Sistema</text>
-        <text lang="DE">Systemstatus</text>
-        <text lang="SV">Systemstatus</text>
-        <text lang="JA">システムステータス</text>
-        <text lang="SL">Status sistema</text>
-        <text lang="ET">Süsteemi olek</text>
-        <text lang="PT">Estado do Sistema</text>
-        <text lang="ES">Estado Sistema</text>
-        <text lang="NL">Systeemstatus</text>
-        <text lang="RU">Состояние системы</text>
-        <text lang="HU">Rendszer állapot</text>
         <description>What your system is doing right now</description>
-        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 
     <button>
         <type>MENU_UTILITIES_SETUP</type>
         <text>Utilities / Setup</text>
-        <text lang="IT">Impostazioni</text>
-        <text lang="ES">Utilidades/Configurar</text>
-        <text lang="CA">Configurar</text>
-        <text lang="DE">Zubehör / Konfiguration</text>
-        <text lang="NL">Beheer / Instellingen</text>
-        <text lang="PT">Utensílios</text>
-        <text lang="SV">Verktyg / Inställningar</text>
-        <text lang="JA">設定</text>
-        <text lang="FI">Oheis/Asetukset</text>
-        <text lang="ZH_TW">工具/設定</text>
-        <text lang="SL">Nastavitve</text>
-        <text lang="ET">Utiliidid / sätted</text>
-        <text lang="RU">Утилиты / Настройки</text>
-        <text lang="HU">Eszközök / Beállítások</text>
-        <alttext lang="DE">Verschiedenes</alttext>
-        <alttext lang="SV">Inställningar</alttext>
-        <alttext lang="NL">Beheer</alttext>
-        <alttext lang="ET">Sätted</alttext>
-        <alttext lang="RU">Настройки</alttext>
         <description>Settings for TV, Images, Music, Video, Weather, etc.</description>
-        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU util_menu.xml</action>
     </button>
-
-    <!-- <button>
-        <type>SHUTDOWN</type>
-        <text>Shutdown</text>
-        <text lang="ET">Seiskamine</text>
-        <text lang="SV">Avstängning</text>
-        <text lang="DE">Beenden</text>
-        <text lang="ET">Seiska</text>
-        <text lang="PT">Desligar</text>
-        <text lang="NL">Afsluiten</text>
-        <text lang="RU">Завершение работы</text>
-        <text lang="HU">Kikapcsolás</text>
-        <action>SHUTDOWN</action>
-    </button> -->
 
 </mythmenu>
