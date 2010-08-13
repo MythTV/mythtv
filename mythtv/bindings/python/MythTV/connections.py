@@ -449,6 +449,15 @@ class FEConnection( object ):
     This is the basic frontend connection object.
     You probably dont want to use this directly.
     """
+    _res_handler = {'jump':  lambda r: r=='OK',
+                    'key':   lambda r: r=='OK',
+                    'query': lambda r: r,
+                    'play':  lambda r: r=='OK'}
+    _res_help = {'jump':  re.compile('(\w+)[ ]+- ([\w /,]+)'),
+                 'key':   lambda r: r.split('\r\n')[4].split(', '),
+                 'query': re.compile('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)'),
+                 'play':  re.compile('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)')}
+
     def __init__(self, host, port, deadline=10.0, test=True):
         self.isConnected = False
         self.host = host
@@ -517,10 +526,19 @@ class FEConnection( object ):
             self.isConnected = False
             raise MythFEError(MythError.FE_ANNOUNCE, self.host, self.port)
 
-    def send(self,command):
+    def send(self, mode, command=None):
         if not self.isConnected:
             self.connect()
-        self.socket.send("%s\n" % command)
+        if command is None:
+            self.socket.send("help %s\n" % mode)
+            res = self.recv()
+            try:
+                return self._res_help[mode].findall(res)
+            except:
+                return self._res_help[mode](res)
+        else:
+            self.socket.send("%s %s\n" % (mode, command))
+            return self._res_handler[mode](self.recv())
 
     def recv(self, deadline=None):
         prompt = re.compile('([\r\n.]*)\r\n# ')

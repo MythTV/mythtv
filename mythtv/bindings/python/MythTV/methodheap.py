@@ -16,6 +16,7 @@ from system import SystemEvent
 from mythproto import BEEvent, FileOps, Program
 from dataheap import *
 
+from datetime import timedelta
 import re
 
 class MythBE( FileOps ):
@@ -443,71 +444,35 @@ class MythSystemEvent( BEEvent ):
         SystemEvent(event['event'], inst.db).command(event)
 
 class Frontend( FEConnection ):
-    def sendJump(self,jumppoint):
-        """
-        Sends jumppoint to frontend
-        """
-        self.send("jump %s" % jumppoint)
-        if self.recv() == 'OK':
-            return 0
-        else:
-            return 1
+    def sendJump(self,jumppoint): return self.send('jump', jumppoint)
+    def getJump(self): return self.send('jump')
+    def sendKey(self,key): return self.send('key', key)
+    def getKey(self): return self.send('key')
+    def sendQuery(self,query): return self.send('query', query)
+    def getQuery(self): return self.send('query')
+    def sendPlay(self,play): return self.send('play', play)
+    def getPlay(self): return self.send('play')
 
-    def getJump(self):
-        """
-        Returns a tuple containing available jumppoints
-        """
-        self.send("help jump")
-        return re.findall('(\w+)[ ]+- ([\w /,]+)',self.recv())
+    def play(self, media):
+        """Plays selected media on frontend."""
+        return media._playOnFe(self)
 
-    def sendKey(self,key):
-        """
-        Sends keycode to connected frontend
-        """
-        self.send("key %s" % key)
-        if self.recv() == 'OK':
-            return 0
-        else:
-            return 1
+    def getLoad(self):
+        """Returns tuple of 1/5/15 load averages."""
+        return tuple([float(l) for l in self.sendQuery('load').split()])
 
-    def getKey(self):
-        """
-        Returns a tuple containing available special keys
-        """
-        self.send("help key")
-        return self.recv().split('\r\n')[4].split(', ')
+    def getUptime(self):
+        """Returns timedelta of uptime."""
+        return timedelta(0, int(self.sendQuery('uptime')))
 
-    def sendQuery(self,query):
-        """
-        Returns query from connected frontend
-        """
-        self.send("query %s" % query)
-        return self.recv()
+    def getTime(self):
+        """Returns current time on frontend."""
+        return datetime.fromIso(self.sendQuery('time'))
 
-    def getQuery(self):
-        """
-        Returns a tuple containing available queries
-        """
-        self.send("help query")
-        return re.findall('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)', self.recv())
-
-    def sendPlay(self,play):
-        """
-        Send playback command to connected frontend
-        """
-        self.send("play %s" % play)
-        if self.recv() == 'OK':
-            return 0
-        else:
-            return 1
-
-    def getPlay(self):
-        """
-        Returns a tuple containing available playback commands
-        """
-        self.send("help play")
-        return re.findall('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)',
-                        self.recv())
+    def getMemory(self):
+        """Returns free and total, physical and swap memory."""
+        return dict(zip(('totalmem','freemem','totalswap','freeswap'),
+                    [int(m) for m in self.sendQuery('memstats').split()]))
 
 class MythDB( DBCache ):
     __doc__ = DBCache.__doc__+"""

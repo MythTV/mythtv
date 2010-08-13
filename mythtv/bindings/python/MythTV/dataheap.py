@@ -301,6 +301,10 @@ class Recorded( DBDataWrite, CMPRecord ):
             self.markup._populate(data=state['markup'])
             self.rating._populate(data=state['rating'])
 
+    def _playOnFe(self, fe):
+        return fe.send('play','program %d %s' % \
+                    (self.chanid, self.starttime.isoformat()))
+
 class RecordedProgram( DBDataWrite, CMPRecord ):
 
     """
@@ -835,7 +839,10 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         vid.title, vid.season, vid.episode, vid.subtitle = \
                         vid.parseFilename()
         return vid
-        
+
+    def _playOnFe(self, fe):
+        return fe.send('play','filename myth://Videos@%s/%s' % 
+                    (self.host, self.filename))
 
 class VideoGrabber( Grabber ):
     """

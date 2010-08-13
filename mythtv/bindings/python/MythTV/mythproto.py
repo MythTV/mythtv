@@ -924,6 +924,10 @@ class Program( DictData, RECSTATUS, CMPRecord ):
                     (self.chanid, self.recstartts),db=self._db).reactivate))
         return cmd
 
+    def _playOnFe(self, fe):
+        return fe.send('play','program %d %s' % \
+                    (self.chanid, self.recstartts.isoformat()))
+
 
 class EventLock( BEEvent ):
     def __init__(self, regex, backend=None, db=None):
