@@ -26,6 +26,13 @@
     </button>
 
     <button>
+       <type>WEATHER</type>
+        <text>Weather Station</text>
+        <action>PLUGIN mythwstation</action>
+        <depends>mythwstation</depends>
+    </button>
+
+    <button>
         <type>WEBPAGE</type>
         <text>Web</text>
         <description>Browse the web</description>
