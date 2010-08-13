@@ -4,76 +4,20 @@
     <button>
         <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
         <text>Set Recording Priorities</text>
-        <text lang="IT">Priorità Registrazione</text>
-        <text lang="DE">Aufnahmen</text>
-        <text lang="SV">Inspelningsprioriteter</text>
-        <text lang="FI">Tallennusprioriteetit</text>
-        <text lang="JA">録画優先順位設定</text>
-        <text lang="SL">Prioritete snemanj</text>
-        <text lang="ET">Salvestamisprioriteetide määramine</text>
-        <text lang="ES">Prioridades Grabación</text>
-        <text lang="PT">Definir Prioridades de Gravação</text>
-        <text lang="NL">Opnameprioriteiten Instellen</text>
-        <text lang="RU">Установить приоритеты записей</text>
-        <text lang="PL">Ustaw priorytety nagrań</text>
-        <text lang="HE">הגדרת קדימויות הקלטה</text>
-        <text lang="HU">Felvételi prioritások beállításai</text>
-        <alttext>Recording Priorities</alttext>
-        <alttext lang="IT">Priorità</alttext>
-        <alttext lang="DE">Aufnahmen</alttext>
-        <alttext lang="SV">Inspelning</alttext>
-        <alttext lang="JA">録画優先順位</alttext>
-        <alttext lang="SL">Snemalne prioritete</alttext>
-        <alttext lang="ET">Salvestamisprioriteedid</alttext>
-        <alttext lang="PT">Prioridades de Gravação</alttext>
-        <alttext lang="RU">Записи</alttext>
-        <alttext lang="PL">Nagrania</alttext>
         <description>Settings to prioritize some shows over others</description>
-        <description lang="DE">Einstellungen um bestimmte Sendungen zu bevorzugen</description>
         <action>SETTINGS GENERALRECPRIORITIES</action>
     </button>
 
     <button>
         <type>TV_RECPRIORITIES_CHANNEL</type>
         <text>Set Channel Recording Priorities</text>
-        <text lang="IT">Priorità Canali</text>
-        <text lang="DE">Sender</text>
-        <text lang="SV">Kanalprioriteter</text>
-        <text lang="JA">チャンネル録画優先順位設定</text>
-        <text lang="FI">Kanavaprioriteetit</text>
-        <text lang="NL">Prioriteit per Zender</text>
-        <text lang="ZH_TW">電視台錄影優先次序</text>
-        <text lang="SL">Prioritete kanalov</text>
-        <text lang="ET">Kanaliprioriteetide määramine</text>
-        <text lang="ES">Prioridad Canales</text>
-        <text lang="PT">Definir Prioridades de Gravação de Canais</text>
-        <text lang="RU">Установить приоритеты каналов</text>
-        <text lang="PL">Ustaw priorytety kanałów</text>
-        <text lang="HE">הגדרת קדימויות הקלטת ערוץ</text>
-        <text lang="HU">Csatorna felvételi prioritások beállítása</text>
-        <alttext>Channel Priorities</alttext>
-        <alttext lang="IT">Canali</alttext>
-        <alttext lang="JA">チャンネル優先順位</alttext>
-        <alttext lang="DE">Sender</alttext>
-        <alttext lang="SV">Kanal</alttext>
-        <alttext lang="NL">Zenderprioriteit</alttext>     
-        <alttext lang="SL">Prioritete kanalov</alttext>
-        <alttext lang="ET">Kanaliprioriteedid</alttext>
-        <alttext lang="PT">Prioridades de Gravação de Canais</alttext>
-        <alttext lang="RU">Каналы</alttext>
-        <alttext lang="PL">Kanały</alttext>
         <description>Prioritize some channels over others</description>
-        <description lang="DE">Einstellungen um bestimmte Sender zu bevorzugen</description>
         <action>SETTINGS CHANNELRECPRIORITIES</action>
     </button>
 
     <button>
         <type>TV_RECPRIORITIES_CUSTOM</type>
         <text>Custom Priority</text>
-        <text lang="IT">Personalizzate</text>
-        <text lang="SL">Poljubne prioritete</text>
-        <text lang="FI">Muokatut Prioriteetit</text>
-        <text lang="HU">Egyéni prioritások</text>
         <alttext>Custom Priority</alttext>
         <description>Prioritize some recordings over others</description>
         <action>SETTINGS CUSTOMPRIORITY</action>

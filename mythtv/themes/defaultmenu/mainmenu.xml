@@ -4,122 +4,28 @@
     <button>
         <type>MENU_MEDIA_LIBRARY</type>
         <text>Media Library</text>
-        <text lang="IT">Multimedia</text>
-        <text lang="DE">Mediathek</text>
-        <text lang="IS">Margmiðlunarsafn</text>
-        <text lang="NL">Mediatheek</text>    
-        <text lang="SV">Mediabibliotek</text>
-        <text lang="JA">メディアライブラリ</text>
-        <text lang="FI">Mediakirjasto</text>
-        <text lang="ZH_TW">媒體館</text>
-        <text lang="SL">Media</text>
-        <text lang="ET">Meediakataloog</text>
-        <text lang="ES">Mediateca</text>
-        <text lang="PT">Galeria Multimédia</text>
-        <text lang="RU">Мультимедиа</text>
-        <text lang="AR">مكتبة الوسائط</text>
-        <text lang="PL">Biblioteka media***</text>
-        <text lang="HE">ספרית המדיה</text>
-        <text lang="HU">Média könyvtár</text>
-        <alttext lang="SV">Bibliotek</alttext>
-        <alttext lang="ET">Kataloog</alttext>
-        <alttext lang="PT">Galeria</alttext>
-        <alttext lang="PL">Galeria</alttext>
-        <alttext lang="AR">المكتبة</alttext>
         <action>MENU library.xml</action>
         <description>Play any of your media</description>
-        <description lang="DE">Musik hören, Videos ansehen usw.</description>
     </button>
-  
+
     <button>
         <type>MENU_MANAGE_RECORDINGS</type>
         <text>Manage Recordings</text>
-        <text lang="IT">Programma Registrazioni</text>
-        <text lang="ES">Programar Grabaciones</text>
-        <text lang="NL">Opnames Beheren</text>
-        <text lang="DE">Aufnahmen verwalten</text>
-        <text lang="IS">Upptaka útsendinga</text>
-        <text lang="PT">Gerir Gravações</text>
-        <text lang="SV">Hantera inspelningar</text>
-        <text lang="JA">録画予約</text>
-        <text lang="FI">Hallitse Tallennuksia</text>
-        <text lang="ZH_TW">管理電視錄影</text>
-        <text lang="SL">Posnetki</text>
-        <text lang="ET">Salvestamine</text>
-        <text lang="RU">Управление записями</text>
-        <text lang="AR">أدر التسجيلات</text>
-        <text lang="PL">Zarządzaj nagraniami</text>
-        <text lang="HE">ניהול הקלטות</text>
-        <text lang="HU">Felvételek kezelése</text>
-        <alttext lang="DE">Verwaltung</alttext>
-        <alttext lang="SV">Hantera</alttext>
-        <alttext lang="ES">Programar</alttext>
-        <alttext lang="PT">Programação</alttext>
-        <alttext lang="RU">Записи</alttext>
-        <alttext lang="AR">التسجيلات</alttext>
         <description>Pick and prioritize recordings</description>
-        <description lang="DE">Planen Sie Ihre Aufnahmen</description>
         <action>MENU manage_recordings.xml</action>
     </button>
 
     <button>
         <type>MENU_INFO_CENTER</type>
         <text>Information Center</text>
-        <text lang="IT">Centro Informazioni</text>
-        <text lang="DE">Informationen</text>
-        <text lang="IS">Upplýsinga miðstöð</text>
-        <text lang="NL">Informatie Centrale</text>
-        <text lang="SV">Informationscenter</text>
-        <text lang="JA">インフォメーションセンター</text>
-        <text lang="FI">Tiedotepalvelu</text>
-        <text lang="ZH_TW">資訊中心</text>
-        <text lang="SL">Info center</text>
-        <text lang="ET">Infokeskus</text>
-        <text lang="ES">Centro de Información</text>
-        <text lang="EN_GB">Information Centre</text>
-        <text lang="PT">Centro de Informação</text>
-        <text lang="PL">Centrum informacyjne</text>
-        <text lang="RU">Центр информации</text>
-        <text lang="AR">مركز المعلومات</text>
-        <text lang="HE">מרכז מידע</text>
-        <text lang="HU">Információk</text>
-        <alttext lang="ES">Información</alttext>
-        <alttext lang="DE">Infocenter</alttext>
-        <alttext lang="SV">Infocenter</alttext>
-        <alttext lang="ET">Info</alttext>
-        <alttext lang="PT">Informação</alttext>
-        <alttext lang="PL">Informacja</alttext>
-        <alttext lang="NL">Infocenter</alttext>
-        <alttext lang="RU">Информация</alttext>
-        <alttext lang="AR">معلومات</alttext>
         <description>Information and Communications</description>
-        <description lang="DE">Informationen &amp; Kommunikation</description>
         <action>MENU info_menu.xml</action>
     </button>
 
     <button>
         <type>MENU_OPTICAL_DISKS</type>
         <text>Optical Disks</text>
-        <text lang="IT">CD/DVD</text>
-        <text lang="DE">CD/DVD</text>
-        <text lang="IS">Geisladiskar</text>
-        <text lang="NL">DVD/CD</text>
-        <text lang="SV">Optiska skivor</text>
-        <text lang="JA">オプティカルディスク</text>
-        <text lang="FI">DVD ja CD</text>
-        <text lang="ZH_TW">光碟</text>
-        <text lang="SL">CD/DVD</text>
-        <text lang="ET">DVD ja CD</text>
-        <text lang="ES">CD/DVD</text>
-        <text lang="EN_GB">CD/DVD</text>
-        <text lang="PT">CD/DVD</text>
-        <text lang="RU">CD/DVD</text>
-        <text lang="AR">تشغيل إسطوانات</text>
-        <text lang="PL">Dyski optyczne</text>
-        <text lang="HE">דיסקים אופטים</text>
-        <text lang="HU">CD/DVD</text>
         <description>Play or import CDs and DVDs</description>
-        <description lang="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
@@ -127,72 +33,15 @@
     <button>
         <type>TV_WATCH_TV</type>
         <text>Watch TV</text>
-        <text lang="IT">Guarda la TV</text>
-        <text lang="ES">Ver la TV</text>
-        <text lang="NL">TV Kijken</text>
-        <text lang="DE">Fernsehen</text>
-        <text lang="IS">Horfa á sjónvarp</text>
-        <text lang="PT">Ver Televisão</text>
-        <text lang="SV">Se på TV</text>
-        <text lang="JA">TV放送</text>
-        <text lang="FI">Katso Televisiota</text>
-        <text lang="ZH_TW">觀看電視</text>
-        <text lang="SL">Glej TV</text>
-        <text lang="ET">Vaata telerit</text>
-        <text lang="RU">Смотреть ТВ</text>
-        <text lang="AR">شاهد التلفاز</text>
-        <text lang="PL">Oglądanie TV</text>
-        <text lang="HE">צפיה בטלויזיה</text>
-        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
-        <description lang="DE">Jetzt Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
     <button>
         <type>MENU_UTILITIES_SETUP</type>
         <text>Utilities / Setup</text>
-        <text lang="IT">Impostazioni</text>
-        <text lang="ES">Configuración</text>
-        <text lang="DE">Zubehör / Konfiguration</text>
-        <text lang="IS">Uppsetning</text>
-        <text lang="NL">Configuratie</text>
-        <text lang="PT">Utensílios</text>
-        <text lang="SV">Verktyg / Inställningar</text>
-        <text lang="JA">設定</text>
-        <text lang="FI">Oheis/Asetukset</text>
-        <text lang="ZH_TW">工具/設定</text>
-        <text lang="SL">Nastavitve</text>
-        <text lang="ET">Utiliidid / sätted</text>
-        <text lang="RU">Утилиты / Настройки</text>
-        <text lang="AR">تضبيطات</text>
-        <text lang="PL">Narzędzia / ustawienia</text>
-        <text lang="HE">עזרים / הגדרות</text>
-        <text lang="HU">Eszközök / Beállítások</text>
-        <alttext lang="DE">Verschiedenes</alttext>
-        <alttext lang="SV">Inställningar</alttext>
-        <alttext lang="ET">Sätted</alttext>
-        <alttext lang="RU">Настройки</alttext>
-        <alttext lang="AR">تضبيطات</alttext>
         <description>Configure MythTV and plugins</description>
-        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU util_menu.xml</action>
     </button>
-
-    <!-- <button>
-        <type>SHUTDOWN</type>
-        <text>Shutdown</text>
-        <text lang="SV">Avstängning</text>
-        <text lang="NL">Uitschakelen</text>
-        <text lang="DE">Beenden</text>
-        <text lang="ET">Seiska</text>
-        <text lang="PT">Gravações</text>
-        <text lang="NL">Afsluiten</text>
-        <text lang="RU">Завершение работы</text>
-        <text lang="PL">Zamknij system</text>
-        <text lang="HE">כיבוי</text>
-        <text lang="HU">Leállítás</text>
-        <action>SHUTDOWN</action>
-    </button> -->
 
 </mythmenu>

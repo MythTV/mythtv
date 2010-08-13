@@ -4,56 +4,14 @@
     <button>
         <type>TV_WATCH_RECORDINGS</type>
         <text>Watch Recordings</text>
-        <text lang="IT">Guarda Registrazioni</text>
-        <text lang="ES">Ver Grabaciones</text>
-        <text lang="NL">Opnames Bekijken</text>
-        <text lang="DE">Aufnahmen ansehen</text>
-        <text lang="IS">Horfa á upptökur</text>
-        <text lang="PT">Ver Gravações de TV</text>
-        <text lang="SV">Visa inspelningar</text>
-        <text lang="JA">録画再生</text>
-        <text lang="FI">Katso Tallenteita</text>
-        <text lang="ZH_TW">觀看預錄節目</text>
-        <text lang="SL">Gledanje snemanj</text>
-        <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="RU">Смотреть записи</text>
-        <text lang="PL">Oglądanie nagrań</text>
-        <text lang="HE">צפיה בהקלטות</text>
-        <text lang="HU">Felvételek lejátszása</text>
-        <alttext lang="SV">Inspelningar</alttext>
-        <alttext lang="ET">Salvestised</alttext>
-        <alttext lang="RU">Записи</alttext>
-        <alttext lang="PL">Nagrania</alttext>
         <description>Browse your recordings</description>
-        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
     <button>
         <type>VIDEO_BROWSER</type>
         <text>Watch Videos</text>
-        <text lang="IT">Guarda Video</text>
-        <text lang="ES">Ver Videos</text>
-        <text lang="DE">Videos ansehen</text>
-        <text lang="IS">Horfa á myndir</text>
-        <text lang="PT">Ver Filmes</text>
-        <text lang="SV">Visa filmer</text>
-        <text lang="NL">Films Bekijken</text>
-        <text lang="JA">ビデオブラウズ</text>
-        <text lang="FI">Katso Videoita</text>
-        <text lang="ZH_TW">播放電影</text>
-        <text lang="SL">Gledanje filmov</text>
-        <text lang="ET">Video vaatamine</text>
-        <text lang="RU">Смотреть фильмы</text>
-        <text lang="PL">Oglądanie filmów</text>
-        <text lang="HE">צפיה בוידאו</text>
-        <text lang="HU">Video lejátszása</text>
-        <alttext lang="SV">Filmer</alttext>
-        <alttext lang="ET">Video</alttext>
-        <alttext lang="RU">Фильмы</alttext>
-        <alttext lang="PL">Filmy</alttext>
         <description>Browse your video library</description>
-        <description lang="DE"></description>
         <action>JUMP MythVideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -61,54 +19,9 @@
     <button>
         <type>MUSIC_PLAY</type>
         <text>Listen to Music</text>
-        <text lang="IT">Esegui Brani Musicali</text>
-        <text lang="ES">Escuchar Música</text>
-        <text lang="DE">Musik hören</text>
-        <text lang="IS">Spila tónlist</text>
-        <text lang="NL">Muziek Afspelen</text>
-        <text lang="PT">Tocar Músicas</text>
-        <text lang="SV">Spela musik</text>
-        <text lang="JA">ミュージック再生</text>
-        <text lang="FI">Kuuntele Musiikkia</text>
-        <text lang="ZH_TW">播放音樂</text>
-        <text lang="SL">Predvajanje glasbe</text>
-        <text lang="ET">Kuula muusikat</text>
-        <text lang="RU">Слушать музыку</text>
-        <text lang="PL">Odtwarzaj muzykę</text>
-        <text lang="HE">האזנה למוסיקה</text>
-        <text lang="HU">Zene lejátszás</text>
         <description>Browse your music library</description>
-        <description lang="DE"></description>
         <action>JUMP Play music</action>
         <depends>mythmusic</depends>
-    </button>
-  
-    <button>
-        <type>FM</type>
-        <text>Listen to the radio</text>
-        <text lang="IT">Ascolta la Radio</text>
-        <text lang="SV">Lyssna på radio</text>
-        <text lang="NL">Radio Luisteren</text>
-        <text lang="JA">ラジオ放送</text>
-        <text lang="DE">Radio hören</text>
-        <text lang="FI">Kuuntele Radiota</text>
-        <text lang="IS">Hlusta á útvarp</text>
-        <text lang="SL">Poslušanje radia</text>
-        <text lang="ET">Kuula raadiot</text>
-        <text lang="ES">Escuchar Radio</text>
-        <text lang="PT">Ouvir Rádio</text>
-        <text lang="RU">Слушать радио</text>
-        <text lang="PL">Słuchaj radia</text>
-        <text lang="HE">האזנה לרדיו</text>
-        <text lang="HU">Rádióhallgatás</text>
-        <alttext lang="SV">Radio</alttext>
-        <alttext lang="PT">Rádio</alttext>
-        <alttext lang="ET">Raadio</alttext>
-        <alttext lang="RU">Радио</alttext>
-        <description></description>
-        <description lang="DE"></description>
-        <action>PLUGIN mythFM</action>
-        <depends>mythFM mythfm</depends>
     </button>
 
     <button>
@@ -130,11 +43,7 @@
     <button>
         <type>STREAM</type>
         <text>Play Online Streams</text>
-        <text lang="DE">Internetstreams</text>
-        <text lang="HE">נגן מדיה מכוונת</text>
-        <text lang="HU">Online folyam lejátszása</text>
         <description></description>
-        <description lang="DE"></description>
         <action>PLUGIN mythstream</action>
         <depends>mythstream</depends>
     </button>
@@ -142,49 +51,15 @@
     <button>
         <type>IMAGES</type>
         <text>Image Gallery</text>
-        <text lang="IT">Immagini</text>
-        <text lang="ES">Fotos</text>
-        <text lang="NL">Foto's</text>
-        <text lang="DE">Bilder ansehen</text>
-        <text lang="IS">Ljósmyndir</text>
-        <text lang="PT">Ver Fotos</text>
-        <text lang="SV">Visa bilder</text>
-        <text lang="JA">イメージ</text>
-        <text lang="FI">Kuvagalleria</text>
-        <text lang="ZH_TW">照相館</text>
-        <text lang="SL">Gledanje slik</text>
-        <text lang="ET">Pildialbum</text>
-        <text lang="RU">Изображения</text>
-        <text lang="PL">Galeria zdjęć</text>
-        <text lang="HE">גלרית תמונות</text>
-        <text lang="HU">Kép galéria</text>
         <description>Look at Pictures</description>
-        <description lang="DE"></description>
         <action>PLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
-  
+
     <button>
         <type>GAME</type>
         <text>Play Games</text>
-        <text lang="IT">Giochi</text>
-        <text lang="ES">Juegos</text>
-        <text lang="NL">Spelen</text>
-        <text lang="DE">Spielen</text>
-        <text lang="IS">Spila leiki</text>
-        <text lang="PT">Jogar</text>
-        <text lang="SV">Spela spel</text>
-        <text lang="JA">ゲーム</text>
-        <text lang="FI">Pelit</text>
-        <text lang="ZH_TW">遊戲</text>
-        <text lang="SL">Igranje iger</text>
-        <text lang="ET">Mängud</text>
-        <text lang="RU">Играть в игры</text>
-        <text lang="PL">Graj w gry</text>
-        <text lang="HE">לשחק משחקים</text>
-        <text lang="HU">Játékok</text>
         <description>Play video games</description>
-        <description lang="DE">Videospiele spielen</description>
         <action>PLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>

@@ -4,25 +4,7 @@
     <button>
         <type>SETTINGS_MUSIC</type>
         <text>Music Settings</text>
-        <text lang="IT">Impostazioni Musica</text>
-        <text lang="ES">Configurar Música</text>
-        <text lang="CA">Configurar Música</text>
-        <text lang="DE">Musik</text>
-        <text lang="IS">Stillingar tónlistar</text>
-        <text lang="NL">Muziek Instellingen</text>
-        <text lang="PT">Configurar Música</text>
-        <text lang="SV">Musik</text>
-        <text lang="JA">ミュージック設定</text>
-        <text lang="FI">Musiikkiasetukset</text>
-        <text lang="ZH_TW">音樂設定</text>
-        <text lang="SL">Glasbene nastavitve</text>
-        <text lang="ET">Muusika sätted</text>
-        <text lang="RU">Настройки музыки</text>
-        <text lang="PL">Ustaw muzykę</text>
-        <text lang="HE">הגדרות מוסיקה</text>
-        <text lang="HU">Zenei beállítások</text>
         <description>Configure playback and CD ripping</description>
-        <description lang="DE">CD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -30,25 +12,7 @@
     <button>
         <type>SETTINGS_VIDEO</type>
         <text>Videos Settings</text>
-        <text lang="IT">Impostazioni Video</text>
-        <text lang="ES">Configurar Videos</text>
-        <text lang="CA">Configurar Videos</text>
-        <text lang="DE">Videos</text>
-        <text lang="IS">Stillingar kvikmynda</text>
-        <text lang="NL">Films Instellingen</text>
-        <text lang="PT">Configurar Filmes</text>
-        <text lang="SV">Video</text>
-        <text lang="JA">ビデオ設定</text>
-        <text lang="FI">Videoasetukset</text>
-        <text lang="ZH_TW">電影設定</text>
-        <text lang="SL">Video nastavitve</text>
-        <text lang="ET">Video sätted</text>
-        <text lang="RU">Настройки фильмов</text>
-        <text lang="PL">Ustaw filmy</text>
-        <text lang="HE">הגדרות וידאו</text>
-        <text lang="HU">Video bellítások</text>
         <description>Configure playback and DVD ripping</description>
-        <description lang="DE">DVD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythvideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -56,25 +20,7 @@
     <button>
         <type>SETTINGS_IMAGES</type>
         <text>Images Settings</text>
-        <text lang="IT">Impostazioni Immagini</text>
-        <text lang="ES">Configurar Fotos</text>
-        <text lang="CA">Configurar Imatges</text>
-        <text lang="DE">Bilder</text>
-        <text lang="IS">Stillingar ljósmynda</text>
-        <text lang="NL">Foto's Instellingen</text>
-        <text lang="PT">Configurar Fotos</text>
-        <text lang="SV">Bilder</text>
-        <text lang="JA">イメージ設定</text>
-        <text lang="FI">Kuva-asetukset</text>
-        <text lang="ZH_TW">照相館設定</text>
-        <text lang="SL">Nastavitve slik</text>
-        <text lang="ET">Galerii sätted</text>
-        <text lang="RU">Настройки изображений</text>
-        <text lang="PL">Ustaw zdjęcia</text>
-        <text lang="HE">הגדרות תמונות</text>
-        <text lang="HU">Galéria Beállítások</text>
         <description>Configure display of image gallery</description>
-        <description lang="DE">Bildergallerie einrichten</description>
         <action>CONFIGPLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
@@ -82,62 +28,15 @@
     <button>
         <type>SETTINGS_GAME</type>
         <text>Game Settings</text>
-        <text lang="IT">Impostazioni Giochi</text>
-        <text lang="ES">Configurar Juegos</text>
-        <text lang="CA">Configurar Jocs</text>
-        <text lang="DE">Spiele</text>
-        <text lang="IS">Stillingar leikja</text>
-        <text lang="NL">Spelen Instellingen</text>
-        <text lang="PT">Configurar Jogos</text>
-        <text lang="SV">Spel</text>
-        <text lang="JA">ゲーム設定</text>
-        <text lang="FI">Peliasetukset</text>
-        <text lang="ZH_TW">遊戲設定</text>
-        <text lang="SL">Nastavitve iger</text>
-        <text lang="ET">Mängude sätted</text>
-        <text lang="RU">Настройки игр</text>
-        <text lang="PL">Ustaw gry</text>
-        <text lang="HE">הגדרות משחק</text>
-        <text lang="HU">Játék beállítások</text>
         <description>Configure playback of games</description>
-        <description lang="DE">Videospiele einrichten</description>
         <action>CONFIGPLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>
 
     <button>
-        <type>SETTINGS_FM</type>
-        <text>Radio Settings</text>
-        <text lang="IT">Impostazioni Radio</text>
-        <text lang="SV">Radio</text>
-        <text lang="JA">ラジオ設定</text>
-        <text lang="DE">Radio</text>
-        <text lang="IS">Stillingar útvarps</text>
-        <text lang="FI">Radioasetukset</text>
-        <text lang="SL">Radio nastavitve</text>
-        <text lang="ET">Raadio sätted</text>
-        <text lang="ES">Configurar Radio</text>
-        <text lang="PT">Configurar Rádio</text>
-        <text lang="NL">Radio Instellingen</text>
-        <text lang="RU">Настройки радио</text>
-        <text lang="PL">Ustaw radio</text>
-        <text lang="HE">הגדרות רדיו</text>
-        <text lang="HU">Rádió beállítások</text>
-        <description></description>
-        <description lang="DE">Radio einrichten</description>
-        <action>CONFIGPLUGIN mythfm</action>
-        <depends>mythfm</depends>
-    </button>
-  
-    <button>
         <type>SETTINGS_STREAM</type>
         <text>MythStream Settings</text>
-        <text lang="SL">Nastavitve Mythstream</text>
-        <text lang="HE">הגדרות MythStream</text>
-        <text lang="HU">Online folyam beállítások</text>
-        <text lang="DE">MythStream</text>
         <description></description>
-        <description lang="DE">MythStream einrichten</description>
         <action>CONFIGPLUGIN mythstream</action>
         <depends>mythstream</depends>
     </button>
@@ -145,19 +44,7 @@
     <button>
         <type>SETTINGS_ARCHIVE</type>
         <text>Archive Files Settings</text>
-        <text lang="IT">Impostazioni Archivia Files</text>
-        <text lang="ET">Arhiveerimise sätted</text>
-        <text lang="SV">Filarkivering</text>
-        <text lang="ES">Archivado Ficheros</text>
-        <text lang="RU">Настройки архива</text>
-        <text lang="SL">Nastavitve arhiviranja</text>
-        <text lang="PL">Ustaw pliki archiwum</text>
-        <text lang="HE">הגדרות ארכיון קבצים</text>
-        <text lang="FI">Arkistointiasetukset</text>
-        <text lang="DE">Archivieren</text>
-        <text lang="HU">Archíválási beállítások</text>
         <description>Configure how to archive video to DVD</description>
-        <description lang="DE">Archivieren auf DVD einrichten</description>
         <action>CONFIGPLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>

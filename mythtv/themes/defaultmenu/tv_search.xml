@@ -4,110 +4,35 @@
     <button>
         <type>TV_SEARCH_TITLES</type>
         <text>Titles</text>
-        <text lang="IT">Titoli</text>
-        <text lang="DE">nach Titel</text>
-        <text lang="IS">Titlar</text>
-        <text lang="SV">Titel</text>
-        <text lang="JA">タイトル</text>
-        <text lang="NL">Titels</text>
-        <text lang="FI">Nimikkeet</text>
-        <text lang="ZH_TW">標題</text>
-        <text lang="SL">Naslovi</text>
-        <text lang="ET">Pealkirjad</text>
-        <text lang="ES">Títulos</text>
-        <text lang="PT">Por Títulos</text>
-        <text lang="RU">Заголовки</text>
-        <text lang="PL">Tytuły</text>
-        <text lang="HE">כותרים</text>
-        <text lang="HU">Címek</text>
         <description>Find a program based on title</description>
-        <description lang="DE">Alle Sendungen mit einem bestimmten Titel finden</description>
         <action>TV_SEARCH_TITLE</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_KEYWORDS</type>
         <text>Keywords</text>
-        <text lang="IT">Parole Chiavi</text>
-        <text lang="DE">nach Inhalt</text>
-        <text lang="IS">Leitarorð</text>
-        <text lang="SV">Nyckelord</text>
-        <text lang="NL">Beschrijving</text>     
-        <text lang="JA">キーワード</text>
-        <text lang="FI">Avainsanat</text>
-        <text lang="ZH_TW">關鍵字</text>
-        <text lang="SL">Ključne besede</text>
-        <text lang="ET">Võtmesõnad</text>
-        <text lang="ES">Claves</text>
-        <text lang="PT">Por Palavras-Chave</text>
-        <text lang="RU">Ключевые слова</text>
-        <text lang="PL">Słowa kluczowe</text>
-        <text lang="HE">מילות מפתח</text>
-        <text lang="HU">Kulcsszavak</text>
         <description>Find a program matching a keyword</description>
-        <description lang="DE">Alle Sendungen mit einem Schlüsselwort finden</description>
         <action>TV_SEARCH_KEYWORD</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_PEOPLE</type>
         <text>People</text>
-        <text lang="IT">Persone</text>
-        <text lang="SV">Person</text>
-        <text lang="NL">Personen</text>    
-        <text lang="JA">人</text>
-        <text lang="DE">nach Personen</text>
-        <text lang="IS">Manneskjum</text>
-        <text lang="FI">Ihmiset</text>
-        <text lang="SL">Osebe</text>
-        <text lang="ET">Inimesed</text>
-        <text lang="ES">Personas</text>
-        <text lang="PT">Por Pessoas</text>
-        <text lang="RU">Действующие лица</text>
-        <text lang="PL">Osoby</text>
-        <text lang="HE">אנשים</text>
-        <text lang="HU">Személyek</text>
         <description>Find a program including a given person</description>
-        <description lang="DE">Alle Sendungen mit einer bestimmten Person finden</description>
         <action>TV_SEARCH_PEOPLE</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_POWER</type>
         <text>Advanced</text>
-        <text lang="IT">Avanzato</text>
-        <text lang="SV">Avancerad</text>
-        <text lang="NL">Geavanceerd</text>     
-        <text lang="IS">Frekari</text>
-        <text lang="JA">アドバンスト</text>
-        <text lang="DE">Erweiterte Suche</text>
-        <text lang="FI">Lisävalinnat</text>
-        <text lang="SL">Napredno</text>
-        <text lang="ET">Muud valikud</text>
-        <text lang="ES">Avanzada</text>
-        <text lang="PT">Pesquisa Avançada</text>
-        <text lang="RU">Дополнительно</text>
-        <text lang="PL">Zaawansowane</text>
-        <text lang="HE">מתקדם</text>
-        <text lang="HU">Továbbiak</text>
-        <alttext lang="DE">Erweitert</alttext>
-        <alttext lang="ET">Muud</alttext>
-        <alttext lang="PT">Avançada</alttext>
         <description>Combine more than one word search</description>
-        <description lang="DE">Mehrere Suchanfragen kombinieren</description>
         <action>TV_SEARCH_POWER</action>
     </button>
 
     <button>
         <type>TV_SEARCH_STORED</type>
         <text>Stored Searches</text>
-        <text lang="SL">Shranjena iskanja</text>
-        <text lang="HE">חיפושים שמורים</text>
-        <text lang="FI">Tallennetut Haut</text>
-        <text lang="DE">Gespeicherte Suche</text>
-        <text lang="HU">Tárolt keresések</text>
         <description>Results of searches you have saved</description>
-        <description lang="DE">ältere Suchabfragen</description>
         <action>TV_SEARCH_STORED</action>
     </button>
 

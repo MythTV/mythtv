@@ -4,24 +4,7 @@
     <button>
         <type>DVD_PLAY</type>
         <text>Play DVD</text>
-        <text lang="IT">Riproduci DVD</text>
-        <text lang="PT">Ver DVD</text>
-        <text lang="IS">Spila DVD</text>
-        <text lang="DE">DVD abspielen</text>
-        <text lang="SV">Spela DVD</text>
-        <text lang="ES">Ver DVD</text>
-        <text lang="NL">DVD Afspelen</text>
-        <text lang="JA">DVD再生</text>
-        <text lang="FI">Katso DVD</text>
-        <text lang="ZH_TW">播放DVD</text>
-        <text lang="SL">Predvajaj DVD</text>
-        <text lang="ET">Mängi DVD-d</text>
-        <text lang="RU">Смотреть DVD</text>
-        <text lang="PL">Oglądanie DVD</text>
-        <text lang="HE">נגן DVD</text>
-        <text lang="HU">DVD lejátszása</text>
         <description>Play a film on DVD</description>
-        <description lang="DE">Einen Spielfim auf DVD ansehen</description>
         <action>JUMP Play DVD</action>
         <depends>mythvideo</depends>
     </button>
@@ -29,24 +12,7 @@
     <button>
         <type>VCD_PLAY</type>
         <text>Play VCD</text>
-        <text lang="IT">Riproduci VCD</text>
-        <text lang="PT">Ver VCD</text>
-        <text lang="DE">VCD abspielen</text>
-        <text lang="IS">Spila VCD</text>
-        <text lang="SV">Spela VCD</text>
-        <text lang="ES">Ver VCD</text>
-        <text lang="NL">VCD Afspelen</text>
-        <text lang="JA">VCD再生</text>
-        <text lang="FI">Toista VCD</text>
-        <text lang="ZH_TW">播放VCD</text>
-        <text lang="SL">Predvajaj VCD</text>
-        <text lang="ET">Mängi VCD-d</text>
-        <text lang="RU">Смотреть VCD</text>
-        <text lang="PL">Oglądanie VCD</text>
-        <text lang="HE">נגן VCD</text>
-        <text lang="HU">VCD lejátszása</text>
         <description>Play the video on a VCD</description>
-        <description lang="DE">Ein Video auf einer VCD ansehen</description>
         <action>JUMP Play VCD</action>
         <depends>mythvideo</depends>
     </button>
@@ -54,24 +20,7 @@
     <button>
         <type>DVD_RIP</type>
         <text>Import DVD</text>
-        <text lang="IT">Importa DVD</text>
-        <text lang="ES">Importar DVD</text>
-        <text lang="DE">DVD importieren</text>
-        <text lang="IS">Hlaða inn DVD</text>
-        <text lang="NL">DVD Importeren</text>
-        <text lang="PT">Importar DVD p/ Disco</text>
-        <text lang="SV">Importera DVD</text>
-        <text lang="JA">DVD取込</text>
-        <text lang="FI">Kopioi DVD</text>
-        <text lang="ZH_TW">輸入DVD</text>
-        <text lang="SL">DVD rip</text>
-        <text lang="ET">DVD rippimine</text>
-        <text lang="RU">Импортировать DVD</text>
-        <text lang="PL">Importowanie DVD</text>
-        <text lang="HE">יבא DVD</text>
-        <text lang="HU">DVD rippelés</text>
         <description>Import video from a movie DVD</description>
-        <description lang="DE">Einen Film von DVD importieren</description>
         <action>JUMP Rip DVD</action>
         <depends>mythvideo</depends>
     </button>
@@ -79,20 +28,7 @@
     <button>
         <type>ARCHIVE</type>
         <text>Archive Files</text>
-        <text lang="FI">Arkistoi</text>
-        <text lang="IT">Archivia Files</text>
-        <text lang="SV">Arkivera filer</text>
-        <text lang="ES">Archivar Ficheros</text>
-        <text lang="RU">Архивировать файлы</text>
-        <text lang="HE">ארכב קבצים</text>
-        <text lang="ET">Arhiveerimine</text>
-        <text lang="DE">Dateien archivieren</text>
-        <text lang="SL">Arhiviranje datotek</text>
-        <text lang="PL">Archiwalne pliki</text>
-        <text lang="HE">צרוב CD/DVD</text>
-        <text lang="HU">Archívált fájlok</text>
         <description>Write video to a data DVD</description>
-        <description lang="DE">Ein Video auf Daten-DVD brennen</description>
         <action>PLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>
@@ -100,25 +36,7 @@
     <button>
         <type>MUSIC_RIP</type>
         <text>Import CD</text>
-        <text lang="IT">Importa CD</text>
-        <text lang="ES">Importar CD</text>
-        <text lang="DE">CD importieren</text>
-        <text lang="IS">Hlaða inn hljóðdisk</text>
-        <text lang="NL">CD Importeren</text>
-        <text lang="PT">Importar CD p/ Disco</text>
-        <text lang="SV">Importera CD</text>
-        <text lang="JA">CD取込</text>
-        <text lang="FI">Kopioi CD</text>
-        <text lang="ZH_TW">輸入音樂CD</text>
-        <text lang="SL">CD rip</text>
-        <text lang="ET">CD rippimine</text>
-        <text lang="RU">Импортировать CD</text>
-        <text lang="HE">יבא CD</text>
-        <text lang="ET">Meedia väljastamine</text>
-        <text lang="PL">Importowanie CD</text>
-        <text lang="HU">Zenei CD rippelés</text>
         <description>Import music from an audio CD</description>
-        <description lang="DE">Musik von einer Audio-CD importieren</description>
         <action>JUMP Rip CD</action>
         <depends>mythmusic</depends>
     </button>
@@ -126,18 +44,7 @@
     <button>
         <type>EJECT</type>
         <text>Eject media</text>
-        <text lang="IT">Espelli Media</text>
-        <text lang="SV">Mata ut</text>
-        <text lang="ES">Expulsar medios</text>
-        <text lang="RU">Достать диск</text>
-        <text lang="SL">Izvrzi plošček</text>
-        <text lang="PL">Wysuń tackę</text>
-        <text lang="HE">הוצא מדיה</text>
-        <text lang="FI">Poista Media</text>
-        <text lang="DE">Medien auswerfen</text>
-        <text lang="HU">Tálca kiadása</text>
         <description>Eject CD or DVD from drive</description>
-        <description lang="DE">CD/DVD-Schublade öffnen</description>
         <action>EJECT</action>
     </button>
 

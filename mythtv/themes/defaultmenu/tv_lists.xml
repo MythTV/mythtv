@@ -4,121 +4,35 @@
     <button>
         <type>TV_SEARCH_NEW_TITLES</type>
         <text>New Titles</text>
-        <text lang="IT">Nuovi Titoli</text>
-        <text lang="DE">Neue Sendungen</text>
-        <text lang="IS">Nýjir titlar</text>
-        <text lang="SV">Nya titlar</text>
-        <text lang="JA">新タイトル</text>
-        <text lang="NL">Nieuwe Titels</text>
-        <text lang="FI">Uudet Ohjelmat</text>
-        <text lang="ZH_TW">新標題</text>
-        <text lang="SL">Novi naslovi</text>
-        <text lang="ET">Uued pealkirjad</text>
-        <text lang="ES">Títulos Nuevos</text>
-        <text lang="PT">Por Novos Títulos</text>
-        <text lang="RU">Новые заголовки</text>
-        <text lang="PL">Nowe tytuły</text>
-        <text lang="HE">כותרים חדשים</text>
-        <text lang="HU">Új címek</text>
         <description>Pick a program to record for a list of new titles</description>
-        <description lang="DE">Wählen Sie eine Sendung aus verschiedenen Listen</description>
         <action>TV_SEARCH_NEW</action>
     </button>
 
     <button>
         <type>TV_SEARCH_MOVIES</type>
         <text>Movies</text>
-        <text lang="IT">Films</text>
-        <text lang="DE">Spielfilme</text>
-        <text lang="IS">Myndir</text>
-        <text lang="SV">Filmer</text>
-        <text lang="JA">映画</text>
-        <text lang="NL">Films</text>
-        <text lang="FI">Elokuvat</text>
-        <text lang="ZH_TW">電影</text>
-        <text lang="SL">Filmi</text>
-        <text lang="ET">Filmid</text>
-        <text lang="ES">Películas</text>
-        <text lang="EN_GB">Films</text>
-        <text lang="PT">Por Filme</text>
-        <text lang="RU">Фильмы</text>
-        <text lang="PL">Filmy</text>
-        <text lang="HE">סרטים</text>
-        <text lang="HU">Filmek</text>
         <description>Pick a movie to record</description>
-        <description lang="DE">Wählen Sie einen Film zum aufnehmen</description>
         <action>TV_SEARCH_MOVIE</action>
     </button>
 
     <button>
         <type>TV_SEARCH_CATEGORIES</type>
         <text>Categories</text>
-        <text lang="IT">Categorie</text>
-        <text lang="DE">Kategorien</text>
-        <text lang="IS">Flokkar</text>
-        <text lang="SV">Kategori</text>
-        <text lang="JA">カテゴリー</text>
-        <text lang="NL">Categorie</text>
-        <text lang="FI">Kategoriat</text>
-        <text lang="ZH_TW">種類</text>
-        <text lang="SL">Kategorije</text>
-        <text lang="ET">Kategooriad</text>
-        <text lang="ES">Categorías</text>
-        <text lang="PT">Por Categoria</text>
-        <text lang="RU">Категории</text>
-        <text lang="PL">Kategorie</text>
-        <text lang="HE">קטגוריות</text>
-        <text lang="HU">Kategóriák</text>
         <description>Pick a program based on category</description>
-        <description lang="DE">Wählen Sie eine Sendung nach Genre</description>
         <action>TV_SEARCH_CATEGORY</action>
     </button>
-  
+
     <button>
         <type>TV_SEARCH_CHANNELS</type>
         <text>Channels</text>
-        <text lang="IT">Canali</text>
-        <text lang="DE">Sender</text>
-        <text lang="IS">Stöðvar</text>
-        <text lang="SV">Kanal</text>
-        <text lang="NL">Zenders</text>
-        <text lang="JA">チャンネル</text>
-        <text lang="FI">Kanavat</text>
-        <text lang="ZH_TW">電視台</text>
-        <text lang="SL">Kanali</text>
-        <text lang="ET">Kanalid</text>
-        <text lang="ES">Canales</text>
-        <text lang="PT">Por Canal</text>
-        <text lang="RU">Каналы</text>
-        <text lang="PL">Kanały</text>
-        <text lang="HE">ערוצים</text>
-        <text lang="HU">Csatornák</text>
         <description>Pick a program on a given channel</description>
-        <description lang="DE">Wählen Sie eine Sendung auf einem best. Sender</description>
         <action>TV_SEARCH_CHANNEL</action>
     </button>
 
     <button>
         <type>TV_SEARCH_TIMES</type>
         <text>Time</text>
-        <text lang="IT">Ora</text>
-        <text lang="NL">Tijdstip</text>
-        <text lang="SV">Tid</text>
-        <text lang="JA">時間</text>
-        <text lang="DE">Sendezeit</text>
-        <text lang="IS">Tími</text>
-        <text lang="FI">Aika</text>
-        <text lang="ZH_TW">時間</text>
-        <text lang="SL">Čas</text>
-        <text lang="ET">Aeg</text>
-        <text lang="ES">Hora</text>
-        <text lang="PT">Por Data e Hora</text>
-        <text lang="RU">Время</text>
-        <text lang="PL">Czas</text>
-        <text lang="HE">זמן</text>
-        <text lang="HU">Óra</text>
         <description>Pick a program based on time</description>
-        <description lang="DE">Wählen Sie eine Sendung nach ihrer Sendezeit</description>
         <action>TV_SEARCH_TIME</action>
     </button>
 

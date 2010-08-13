@@ -4,24 +4,7 @@
     <button>
         <type>MUSIC_PLAYLIST</type>
         <text>Music Tools</text>
-        <text lang="IT">Opzioni Musica</text>
-        <text lang="DE">Musik verwalten</text>
-        <text lang="IS">Tónlistartól</text>
-        <text lang="NL">Muziek Beheren</text>
-        <text lang="SV">Musikverktyg</text>
-        <text lang="JA">ミュージックツール</text>
-        <text lang="FI">Musiikkityökalut</text>
-        <text lang="ZH_TW">音樂工具</text>
-        <text lang="SL">Glasbena orodja</text>
-        <text lang="ET">Muusikatööriistad</text>
-        <text lang="ES">Gestionar Música</text>
-        <text lang="PT">Gerir Música</text>
-        <text lang="RU">Работа с музыкой</text>
-        <text lang="PL">Narzędzia muzyczne</text>
-        <text lang="HE">כלי מוסיקה</text>
-        <text lang="HU">Zenei eszközök</text>
         <description>Select, import, or play music</description>
-        <description lang="DE">Musik auswählen, importieren oder hören</description>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -29,47 +12,14 @@
     <button>
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
-        <text lang="IT">Modifica Tasti</text>
-        <text lang="IS">Stilla takka</text>
-        <text lang="DE">Tastenbelegung ändern</text>
-        <text lang="FI">Muokkaa Näppäimiä</text>
-        <text lang="SV">Ändra knappar</text>
-        <text lang="ES">Editar Teclas</text>
-        <text lang="PT">Configurar Teclas</text>
-        <text lang="ET">Klahvide muutmine</text>
-        <text lang="NL">Toetsen Aanpassen</text>
-        <text lang="JA">キー設定</text>
-        <text lang="RU">Редактировать клавиши</text>
-        <text lang="SL">Urejanje tipk</text>
-        <text lang="PL">Edytuj klawisze</text>
-        <text lang="HE">עריכת מקשים</text>
-        <text lang="HU">Billentyűzet beállítások</text>
         <description>Change MythTV key bindings.</description>
-        <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
     </button>
 
     <button>
         <type>SETUP_MENU</type>
         <text>Setup</text>
-        <text lang="IT">Impostazioni</text>
-        <text lang="ES">Configurar</text>
-        <text lang="DE">Konfiguration</text>
-        <text lang="IS">Stillingar</text>
-        <text lang="NL">Configuratie</text>
-        <text lang="PT">Configurações</text>
-        <text lang="SV">Inställningar</text>
-        <text lang="JA">設定</text>
-        <text lang="FI">Asetukset</text>
-        <text lang="ZH_TW">設定</text>
-        <text lang="SL">Nastavitve</text>
-        <text lang="ET">Sätted</text>
-        <text lang="RU">Настройки</text>
-        <text lang="PL">Ustawienia</text>
-        <text lang="HE">הגדרה</text>
-        <text lang="HU">Beállítások</text>
         <description>Configure MythTV and plugins</description>
-        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU main_settings.xml</action>
         <password>SetupPinCode</password>
     </button>
