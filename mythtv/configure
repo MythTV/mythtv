@@ -4612,7 +4612,7 @@ ln -s $MYTH_CONFIG_MAK config.mak
 if [ -e libs/libmyth/mythconfig.mak ] ; then
     rm -f libs/libmyth/mythconfig.mak
 fi
-if [ -e /libs/libmyth/mythconfig.h ] ; then
+if [ -e libs/libmyth/mythconfig.h ] ; then
     rm -f libs/libmyth/mythconfig.h
 fi
 
