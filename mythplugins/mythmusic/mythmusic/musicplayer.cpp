@@ -260,11 +260,12 @@ void MusicPlayer::pause(void)
 
 void MusicPlayer::play(void)
 {
-    stopDecoder();
-
     Metadata *meta = getCurrentMetadata();
     if (!meta)
         return;
+
+    stopDecoder();
+
 
     if (!m_output)
         openOutputDevice();
@@ -285,6 +286,7 @@ void MusicPlayer::stopDecoder(void)
         if (m_currentMetadata->hasChanged())
             m_currentMetadata->persist();
     }
+
     m_currentMetadata = NULL;
 }
 
@@ -431,12 +433,14 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderEvent::Decoding)
     {
-        m_displayMetadata = *getCurrentMetadata();
+        if (getCurrentMetadata())
+            m_displayMetadata = *getCurrentMetadata();
     }
     else if (event->type() == DecoderHandlerEvent::Info)
     {
         DecoderHandlerEvent *dxe = (DecoderHandlerEvent*)event;
-        m_displayMetadata = *getCurrentMetadata();
+        if (getCurrentMetadata())
+            m_displayMetadata = *getCurrentMetadata();
         m_displayMetadata.setArtist("");
         m_displayMetadata.setTitle(*dxe->getMessage());
     }
@@ -1040,6 +1044,6 @@ void MusicPlayer::decoderHandlerReady(void)
     }
 
     // tell any listeners we've started playing a new track
-    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentNode->getInt());
+    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentNode ? m_currentNode->getInt() : -1);
     dispatch(me);
 }
