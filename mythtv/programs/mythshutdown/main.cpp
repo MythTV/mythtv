@@ -185,7 +185,7 @@ int unlockShutdown()
  *  also have different names by default on different operating
  *  systems, and this function is POSIX only use of this function
  *  is discouraged.
- * 
+ *
  *  Warning: This function should never be passed a value
  *  which is not specified explicitly in the code, it does
  *  no checking for shell script injection.
@@ -243,7 +243,7 @@ int getStatus(bool bWantRecStatus)
 
     if (isRunning("mythcommflag"))
     {
-        VERBOSE(VB_IMPORTANT, "Commercial Flagging in progress...");
+        VERBOSE(VB_IMPORTANT, "Commercial Detection in progress...");
         res += 2;
     }
 
@@ -277,14 +277,14 @@ int getStatus(bool bWantRecStatus)
         int port = gCoreContext->GetNumSetting("MTDPort", 2442);
         QAbstractSocket *connection = new QTcpSocket();
         connection->connectToHost(QString("localhost"), port);
-        if (!connection->waitForConnected(1000)) 
+        if (!connection->waitForConnected(1000))
         {
             VERBOSE(VB_IMPORTANT, "Could not connect to mtd");
         }
         else
         {
             connection->write(QByteArray("status\n"));
-            if (connection->waitForBytesWritten(1000) && connection->waitForReadyRead(1000)) 
+            if (connection->waitForBytesWritten(1000) && connection->waitForReadyRead(1000))
             {
                 VERBOSE(VB_NETWORK, "MTD status:");
                 QString status = connection->readLine();
@@ -803,7 +803,7 @@ void showUsage()
     cout << "                        255 - Setup is running\n";
     cout << "-v/--verbose debug-level (Use '-v help' for level info\n";
     cout << "-h/--help                (shows this usage)\n";
-    cout << "\n";                      
+    cout << "\n";
 }
 
 int main(int argc, char **argv)

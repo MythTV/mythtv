@@ -442,7 +442,7 @@ void StatusBox::customEvent(QEvent *event)
             if ((buttonnum == 0) && rec->QueryIsDeleteCandidate())
             {
                 RemoteDeleteRecording(
-                    rec->GetChanID(), rec->GetRecordingStartTime(), 
+                    rec->GetChanID(), rec->GetRecordingStartTime(),
                     false, false);
             }
             else if (buttonnum == 1)
@@ -858,7 +858,7 @@ void StatusBox::doJobQueueStatus()
         m_iconState->DisplayState("jobqueue");
     m_logList->Reset();
     m_helpText->SetText(tr("Job Queue shows any jobs currently in Myth's Job "
-                           "Queue such as a commercial flagging job."));
+                           "Queue such as a commercial detection job."));
 
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
