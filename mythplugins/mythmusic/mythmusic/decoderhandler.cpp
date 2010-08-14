@@ -125,7 +125,7 @@ void DecoderIOFactoryFile::start(void)
     QString sourcename = getMetadata().Filename();
     VERBOSE(VB_PLAYBACK, QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
     m_input = new QFile(sourcename);
-    doConnectDecoder(getUrl());
+    doConnectDecoder(getUrl().toLocalFile());
 }
 
 DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent) : DecoderIOFactory(parent)
@@ -266,7 +266,12 @@ void DecoderHandler::start(Metadata *mdata)
     m_playlist_pos = -1;
     m_redirects = 0;
 
-    QUrl url(mdata->Filename());
+    QUrl url;
+    if (mdata->Filename().startsWith('/'))
+        url = QUrl::fromLocalFile(mdata->Filename());
+    else
+        url.setUrl(mdata->Filename());
+
     bool result = createPlaylist(url);
     if (m_state == LOADING && result)
     {
@@ -321,7 +326,12 @@ bool DecoderHandler::next(void)
     }
 
     PlayListFileEntry *entry = m_playlist.get(m_playlist_pos);
-    QUrl url(entry->File());
+
+    QUrl url;
+    if (entry->File().startsWith('/'))
+        url = QUrl::fromLocalFile(entry->File());
+    else
+        url.setUrl(entry->File());
 
     VERBOSE(VB_PLAYBACK, QString("Now playing '%1'").arg(url.toString()));
 
@@ -388,7 +398,7 @@ bool DecoderHandler::createPlaylist(const QUrl &url)
 
     if (extension == ".pls" || extension == ".m3u")
     {
-        if (url.toString().startsWith('/'))
+        if (url.scheme() == "file" || url.toString().startsWith('/'))
             return createPlaylistFromFile(url);
         else
             return createPlaylistFromRemoteUrl(url);
@@ -402,7 +412,7 @@ bool DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
     PlayListFileEntry *entry = new PlayListFileEntry;
 
     if (url.scheme() == "file" || url.toString().startsWith('/'))
-        entry->setFile(QFileInfo(url.path()).absolutePath() + '/' + QFileInfo(url.path()).fileName());
+        entry->setFile(url.toLocalFile());
     else
         entry->setFile(url.toString());
 
@@ -503,10 +513,8 @@ void DecoderHandler::createIOFactory(const QUrl &url)
     if (haveIOFactory()) 
         deleteIOFactory();
 
-    if (url.toString().startsWith('/') || url.toString().endsWith(".cda"))
-    {
+    if (url.scheme() == "file" || url.toString().startsWith('/') || url.toString().endsWith(".cda"))
         m_io_factory = new DecoderIOFactoryFile(this);
-    }
     else if (m_meta && m_meta->Format() == "cast")
         m_io_factory = new DecoderIOFactoryShoutCast(this);
     else
