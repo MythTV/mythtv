@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_GB">
+<TS version="2.0" language="en_GB" sourcelanguage="en_US">
 <context>
     <name>BackendConnectionManager</name>
     <message>
@@ -1402,14 +1402,14 @@
         <source>You don&apos;t have any channels defined in the database.
 			The program guide will have nothing to show you.</source>
         <translation>You don&apos;t have any channels defined in the database.
-			The program guide will have nothing to show you.</translation>
+			The programme guide will have nothing to show you.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="183"/>
         <source>Channel group &apos;%1&apos; doesn&apos;t have any channels defined.
 			The program guide will have nothing to show you.</source>
         <translation>Channel group &apos;%1&apos; doesn&apos;t have any channels defined.
-			The program guide will have nothing to show you.</translation>
+			The programme guide will have nothing to show you.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="588"/>
@@ -1771,7 +1771,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2104"/>
         <source>Commercial Detection Starting</source>
-        <translation>Commercial Detection Starting</translation>
+        <translation>Advert Detection Starting</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2139"/>
@@ -2702,7 +2702,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="706"/>
         <source>Cycle Commercial Skip mode</source>
-        <translation>Cycle Commercial Skip mode</translation>
+        <translation>Cycle Advert Skip mode</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="712"/>
@@ -2801,7 +2801,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="754"/>
         <source>Load cut list from commercial skips</source>
-        <translation>Load cut list from commercial skips</translation>
+        <translation>Load cut list from advert skips</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="756"/>
@@ -4175,13 +4175,13 @@ Are you sure you want to delete:</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2588"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2779"/>
         <source>Begin Commercial Detection</source>
-        <translation>Begin Commercial Detection</translation>
+        <translation>Begin Advert Detection</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2591"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2779"/>
         <source>Stop Commercial Detection</source>
-        <translation>Stop Commercial Detection</translation>
+        <translation>Stop Advert Detection</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2744"/>
@@ -4799,7 +4799,7 @@ Are you sure you want to delete:</translation>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="358"/>
         <source>Pick the first letter of the program name, then press SELECT or the right arrow.</source>
-        <translation>Pick the first letter of the program name, then press SELECT or the right arrow.</translation>
+        <translation>Pick the first letter of the programme name, then press SELECT or the right arrow.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="367"/>
@@ -5521,7 +5521,7 @@ Are you sure you want to delete:</translation>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="254"/>
         <source>Commercial Detection Method</source>
-        <translation>Commercial Detection Method</translation>
+        <translation>Advert Detection Method</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="276"/>
@@ -5531,7 +5531,7 @@ Are you sure you want to delete:</translation>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="288"/>
         <source>If enabled, guide information for this channel will be updated using &apos;Over-the-Air&apos; program listings.</source>
-        <translation>If enabled, guide information for this channel will be updated using &apos;Over-the-Air&apos; program listings.</translation>
+        <translation>If enabled, guide information for this channel will be updated using &apos;Over-the-Air&apos; programme listings.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="483"/>
@@ -7221,7 +7221,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11646"/>
         <source>Can not delete program</source>
-        <translation>Can not delete program</translation>
+        <translation>Can not delete programme</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11652"/>
@@ -8185,7 +8185,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3312"/>
         <source>The program guide starts on this channel if it is run from outside of Live TV mode.</source>
-        <translation>The program guide starts on this channel if it is run from outside of Live TV mode.</translation>
+        <translation>The programme guide starts on this channel if it is run from outside of Live TV mode.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3320"/>
@@ -8205,7 +8205,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3415"/>
         <source>Your #%1 preferred language for Program Guide data and captions.</source>
-        <translation>Your #%1 preferred language for Program Guide data and captions.</translation>
+        <translation>Your #%1 preferred language for Programme Guide data and captions.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3433"/>
@@ -8576,7 +8576,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="696"/>
         <source>If enabled, use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation>If enabled, use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</translation>
+        <translation>If enabled, use the name of the display filter currently applied in place of the term &quot;All Programmes&quot; in the playback screen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="716"/>
@@ -8586,27 +8586,27 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="737"/>
         <source>Commercial detection method</source>
-        <translation>Commercial detection method</translation>
+        <translation>Advert detection method</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="752"/>
         <source>Automatically skip commercials</source>
-        <translation>Automatically skip commercials</translation>
+        <translation>Automatically skip adverts</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="756"/>
         <source>Automatically skip commercial breaks that have been flagged during automatic commercial detection or by the mythcommflag program, or just notify that a commercial has been detected.</source>
-        <translation>Automatically skip commercial breaks that have been flagged during automatic commercial detection or by the mythcommflag program, or just notify that a commercial has been detected.</translation>
+        <translation>Automatically skip advert breaks that have been flagged during automatic advert detection or by the mythcommflag program, or just notify that a advert has been detected.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="766"/>
         <source>Run commercial detection</source>
-        <translation>Run commercial detection</translation>
+        <translation>Run advert detection</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="768"/>
         <source>This is the default value used for the automatic commercial detection setting when a new scheduled recording is created.</source>
-        <translation>This is the default value used for the automatic commercial detection setting when a new scheduled recording is created.</translation>
+        <translation>This is the default value used for the automatic advert detection setting when a new scheduled recording is created.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="779"/>
@@ -8636,52 +8636,52 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="827"/>
         <source>Strict commercial detection</source>
-        <translation>Strict commercial detection</translation>
+        <translation>Strict advert detection</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="829"/>
         <source>Enable stricter commercial detection code. Disable if some commercials are not being detected.</source>
-        <translation>Enable stricter commercial detection code. Disable if some commercials are not being detected.</translation>
+        <translation>Enable stricter advert detection code. Disable if some commercials are not being detected.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="839"/>
         <source>When using blank frame detection and automatic flagging, enable this option to include blank frames following commercial breaks as part of the commercial break.</source>
-        <translation>When using blank frame detection and automatic flagging, enable this option to include blank frames following commercial breaks as part of the commercial break.</translation>
+        <translation>When using blank frame detection and automatic flagging, enable this option to include blank frames following advert breaks as part of the advert break.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="849"/>
         <source>Commercial skip automatic rewind amount (secs)</source>
-        <translation>Commercial skip automatic rewind amount (secs)</translation>
+        <translation>Advert skip automatic rewind amount (secs)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="850"/>
         <source>MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation>MythTV will automatically rewind this many seconds after performing a commercial skip.</translation>
+        <translation>MythTV will automatically rewind this many seconds after performing an advert skip.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="859"/>
         <source>Commercial skip notify amount (secs)</source>
-        <translation>Commercial skip notify amount (secs)</translation>
+        <translation>Advert skip notify amount (secs)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="860"/>
         <source>MythTV will act like a commercial begins this many seconds early. This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation>MythTV will act like a commercial begins this many seconds early. This can be useful when commercial notification is used in place of automatic skipping.</translation>
+        <translation>MythTV will act like a advert begins this many seconds early. This can be useful when advert notification is used in place of automatic skipping.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="871"/>
         <source>Maximum commercial skip (secs)</source>
-        <translation>Maximum commercial skip (secs)</translation>
+        <translation>Maximum advert skip (secs)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="872"/>
         <source>MythTV will discourage long manual commercial skips. Skips which are longer than this will require the user to hit the SKIP key twice. Automatic commercial skipping is not affected by this limit.</source>
-        <translation>MythTV will discourage long manual commercial skips. Skips which are longer than this will require the user to hit the SKIP key twice. Automatic commercial skipping is not affected by this limit.</translation>
+        <translation>MythTV will discourage long manual advert skips. Skips which are longer than this will require the user to hit the SKIP key twice. Automatic advert skipping is not affected by this limit.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="883"/>
         <source>Merge short commercial breaks (secs)</source>
-        <translation>Merge short commercial breaks (secs)</translation>
+        <translation>Merge short advert breaks (secs)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="895"/>
@@ -8751,7 +8751,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="977"/>
         <source>If enabled, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation>If enabled, programs that have been marked as watched will be expired before programs that have not been watched.</translation>
+        <translation>If enabled, programmes that have been marked as watched will be expired before programmes that have not been watched.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="986"/>
@@ -8761,7 +8761,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="987"/>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</source>
-        <translation>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</translation>
+        <translation>The number of days bonus a programme gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="997"/>
@@ -8801,7 +8801,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1037"/>
         <source>If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</source>
-        <translation>If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</translation>
+        <translation>If enabled, programmes that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1046"/>
@@ -8931,12 +8931,12 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2159"/>
         <source>Jump to program OSD</source>
-        <translation>Jump to program OSD</translation>
+        <translation>Jump to programme OSD</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2161"/>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</source>
-        <translation>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</translation>
+        <translation>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Programme&apos; is activated. If enabled, the recordings are shown in the OSD</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2173"/>
@@ -8946,7 +8946,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2175"/>
         <source>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
-        <translation>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</translation>
+        <translation>If enabled, TV playback continues when the TV window is embedded in the upcoming programme list or recorded list. The default is to pause the recorded show when embedded.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2188"/>
@@ -9041,7 +9041,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2396"/>
         <source>Letterboxing color</source>
-        <translation>Letterboxing color</translation>
+        <translation>Letterboxing colour</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2411"/>
@@ -9586,7 +9586,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="60"/>
         <source>Mythwelcome will automatically start mythfrontend if it is determined that it was not started to record a program.</source>
-        <translation>Mythwelcome will automatically start mythfrontend if it is determined that it was not started to record a program.</translation>
+        <translation>Mythwelcome will automatically start mythfrontend if it is determined that it was not started to record a programme.</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="69"/>
@@ -10641,12 +10641,12 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2995"/>
         <source>Display genre colors</source>
-        <translation>Display genre colors</translation>
+        <translation>Display genre colours</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2996"/>
         <source>Colorize program guide using genre colors (not available for all grabbers).</source>
-        <translation>Colorize program guide using genre colors (not available for all grabbers).</translation>
+        <translation>Colourise programme guide using genre colours (not available for all grabbers).</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3038"/>
@@ -10666,7 +10666,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3075"/>
         <source>Move higher priority programs to other cards and showings when resolving conflicts. This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation>Move higher priority programs to other cards and showings when resolving conflicts. This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</translation>
+        <translation>Move higher priority programmes to other cards and showings when resolving conflicts. This can be used to record lower priority programmes that would otherwise not be recorded, but risks missing a higher priority programme if the schedule changes.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3087"/>
@@ -11045,7 +11045,7 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="301"/>
         <source>If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves &apos;Over-the-Air&apos;.</source>
-        <translation>If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves &apos;Over-the-Air&apos;.</translation>
+        <translation>If enabled, programme guide data for channels on this source will be updated with data provided by the channels themselves &apos;Over-the-Air&apos;.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="749"/>
@@ -12843,7 +12843,7 @@ name can not be blank.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="113"/>
         <source>Select the appropriate frequency table for your system. If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
-        <translation>Select the appropriate frequency table for your system. If you have an antenna, use a &quot;-bcast&quot; frequency.</translation>
+        <translation>Select the appropriate frequency table for your system. If you have an aerial, use a &quot;-bcast&quot; frequency.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="124"/>
@@ -13103,22 +13103,22 @@ name can not be blank.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="600"/>
         <source>Run transcode jobs before auto commercial detection</source>
-        <translation>Run transcode jobs before auto commercial detection</translation>
+        <translation>Run transcode jobs before auto advert detection</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="603"/>
         <source>If enabled, and if both auto-transcode and commercial detection are turned ON for a recording, transcoding will run first; otherwise, commercial detection runs first.</source>
-        <translation>If enabled, and if both auto-transcode and commercial detection are turned ON for a recording, transcoding will run first; otherwise, commercial detection runs first.</translation>
+        <translation>If enabled, and if both auto-transcode and advert detection are turned ON for a recording, transcoding will run first; otherwise, advert detection runs first.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="613"/>
         <source>Start auto-commercial-detection jobs when the recording starts</source>
-        <translation>Start auto-commercial-detection jobs when the recording starts</translation>
+        <translation>Start auto-advert-detection jobs when the recording starts</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="616"/>
         <source>If enabled, and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts. NOT recommended on underpowered systems.</source>
-        <translation>If enabled, and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts. NOT recommended on underpowered systems.</translation>
+        <translation>If enabled, and Auto Advert Detection is ON for a recording, the flagging job will be started as soon as the recording starts. NOT recommended on underpowered systems.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="626"/>
@@ -13138,7 +13138,7 @@ name can not be blank.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="646"/>
         <source>Allow commercial-detection jobs</source>
-        <translation>Allow commercial-detection jobs</translation>
+        <translation>Allow advert-detection jobs</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="648"/>
@@ -13155,12 +13155,12 @@ name can not be blank.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="676"/>
         <source>Commercial-detection command</source>
-        <translation>Commercial-detection command</translation>
+        <translation>Advert-detection command</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="678"/>
         <source>The program used to detect commercials in a recording. The default is &apos;mythcommflag&apos; if this setting is empty.</source>
-        <translation>The program used to detect commercials in a recording. The default is &apos;mythcommflag&apos; if this setting is empty.</translation>
+        <translation>The program used to detect adverts in a recording. The default is &apos;mythcommflag&apos; if this setting is empty.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="709"/>
@@ -13930,7 +13930,7 @@ You may have to use the eject button under its tray.</translation>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2444"/>
         <source>Commercial Detection</source>
-        <translation>Commercial Detection</translation>
+        <translation>Advert Detection</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2448"/>
@@ -14450,7 +14450,7 @@ You may have to use the eject button under its tray.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2247"/>
         <source>Customize exit menu options</source>
-        <translation>Customize exit menu options</translation>
+        <translation>Customise exit menu options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2277"/>
@@ -17355,7 +17355,7 @@ Select a Current Recording</translation>
     <message>
         <location filename="../themes/themestrings.h" line="414"/>
         <source>Select local movie theaters</source>
-        <translation>Select local film theaters</translation>
+        <translation>Select local cinemas</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="415"/>
@@ -17430,7 +17430,7 @@ Select a Current Recording</translation>
     <message>
         <location filename="../themes/themestrings.h" line="426"/>
         <source>Prioritize some shows over others</source>
-        <translation>Prioritize some shows over others</translation>
+        <translation>Prioritise some shows over others</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="169"/>
@@ -17971,7 +17971,7 @@ When you have completed your configuration, press &quot;OK&quot; to search.</tra
     <message>
         <location filename="../themes/themestrings.h" line="152"/>
         <source>Automatically Commercial Flag Recordings</source>
-        <translation>Automatically Commercial Flag Recordings</translation>
+        <translation>Automatically Advert Flag Recordings</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="153"/>
@@ -17998,7 +17998,7 @@ When you have completed your configuration, press &quot;OK&quot; to search.</tra
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information.
 
 Finally, you can test, immediately activate, store, or cancel your rule.</source>
-        <translation>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information.
+        <translation>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own programme information.
 
 Finally, you can test, immediately activate, store, or cancel your rule.</translation>
     </message>
@@ -18111,7 +18111,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</transl
         <location filename="../themes/themestrings.h" line="213"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
-        <translation>You Haven&apos;t Scheduled Any Programs To Be Recorded
+        <translation>You Haven&apos;t Scheduled Any Programmes To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos; </translation>
     </message>
     <message>
@@ -20868,7 +20868,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</transl
     <message>
         <location filename="../libs/libmythdb/unzip.cpp" line="246"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Failed to initialize or load zlib library.</translation>
+        <translation>Failed to initialise or load zlib library.</translation>
     </message>
     <message>
         <location filename="../libs/libmythdb/unzip.cpp" line="247"/>
