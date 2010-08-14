@@ -25,7 +25,7 @@ class MPUBLIC MythPainter
     virtual bool SupportsAnimation(void) = 0;
     virtual bool SupportsAlpha(void) = 0;
     virtual bool SupportsClipping(void) = 0;
-
+    virtual void FreeResources(void) { }
     virtual void Begin(QPaintDevice *parent) { m_Parent = parent; }
     virtual void End() { m_Parent = NULL; }
 

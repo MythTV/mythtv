@@ -23,7 +23,7 @@ class MPUBLIC MythOpenGLPainter : public MythPainter
     virtual bool SupportsAnimation(void) { return true;              }
     virtual bool SupportsAlpha(void)     { return true;              }
     virtual bool SupportsClipping(void)  { return false;             }
-
+    virtual void FreeResources(void);
     virtual void Begin(QPaintDevice *parent);
     virtual void End();
 
@@ -44,6 +44,8 @@ class MPUBLIC MythOpenGLPainter : public MythPainter
 
   protected:
     void       ExpireImages(uint max = 0);
+    void       ClearCache(void);
+    void       DeleteTextures(void);
     int        GetTextureFromCache(MythImage *im);
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font);

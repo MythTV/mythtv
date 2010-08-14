@@ -59,8 +59,7 @@ bool MythVDPAUPainter::InitVDPAU(QPaintDevice *parent)
 void MythVDPAUPainter::Teardown(void)
 {
     ExpireImages();
-    ClearCache();
-    DeleteBitmaps();
+    FreeResources();
 
     m_ImageBitmapMap.clear();
     m_StringToImageMap.clear();
@@ -75,6 +74,12 @@ void MythVDPAUPainter::Teardown(void)
         m_created_render = true;
         m_render = NULL;
     }
+}
+
+void MythVDPAUPainter::FreeResources(void)
+{
+    ClearCache();
+    DeleteBitmaps();
 }
 
 void MythVDPAUPainter::Begin(QPaintDevice *parent)

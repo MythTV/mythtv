@@ -69,6 +69,12 @@ void MythD3D9Painter::Teardown(void)
     }
 }
 
+void MythD3D9Painter::FreeResources(void)
+{
+    ClearCache();
+    DeleteBitmaps();
+}
+
 void MythD3D9Painter::Begin(QPaintDevice *parent)
 {
     if (!m_render)

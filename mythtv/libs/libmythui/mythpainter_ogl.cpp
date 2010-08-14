@@ -37,18 +37,42 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
 MythOpenGLPainter::~MythOpenGLPainter()
 {
     ExpireImages(0);
-    if (realRender)
+    FreeResources();
+}
+
+void MythOpenGLPainter::FreeResources(void)
+{
+    ClearCache();
+    DeleteTextures();
+}
+
+void MythOpenGLPainter::DeleteTextures(void)
+{
+    if (!realRender || m_textureDeleteList.empty())
+        return;
+
+    QMutexLocker locker(&m_textureDeleteLock);
+    while (!m_textureDeleteList.empty())
     {
-        realRender->makeCurrent();
-        QMutableMapIterator<MythImage *, unsigned int> i(m_ImageIntMap);
-        while (i.hasNext())
-        {
-            i.next();
-            realRender->DeleteTexture(i.value());
-            i.remove();
-        }
-        realRender->doneCurrent();
+        realRender->DeleteTexture(m_textureDeleteList.front());
+        m_textureDeleteList.pop_front();
     }
+    realRender->Flush(true);
+}
+
+void MythOpenGLPainter::ClearCache(void)
+{
+    VERBOSE(VB_GENERAL, "Clearing OpenGL painter cache.");
+
+    QMutexLocker locker(&m_textureDeleteLock);
+    QMapIterator<MythImage *, unsigned int> it(m_ImageIntMap);
+    while (it.hasNext())
+    {
+        it.next();
+        m_textureDeleteList.push_back(m_ImageIntMap[it.key()]);
+        m_ImageExpireList.remove(it.key());
+    }
+    m_ImageIntMap.clear();
 }
 
 void MythOpenGLPainter::Begin(QPaintDevice *parent)
@@ -74,16 +98,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
         }
     }
 
+    DeleteTextures();
     realRender->makeCurrent();
-
-    {
-        QMutexLocker locker(&m_textureDeleteLock);
-        while (!m_textureDeleteList.empty())
-        {
-            realRender->DeleteTexture(m_textureDeleteList.front());
-            m_textureDeleteList.pop_front();
-        }
-    }
 
     if (target || swapControl)
     {

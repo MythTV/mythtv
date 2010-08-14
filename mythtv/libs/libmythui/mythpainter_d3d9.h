@@ -21,7 +21,7 @@ class MythD3D9Painter : public MythPainter
     virtual bool SupportsAnimation(void) { return true;             }
     virtual bool SupportsAlpha(void)     { return true;             }
     virtual bool SupportsClipping(void)  { return false;            }
-
+    virtual void FreeResources(void);
     virtual void Begin(QPaintDevice *parent);
     virtual void End();
 

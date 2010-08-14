@@ -85,6 +85,12 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
                             int winx, int winy, int winw, int winh,
                             MythCodecID codec_id, WId embedid)
 {
+    // Attempt to free up as much video memory as possible
+    // only works when using the VDPAU painter for the UI
+    MythPainter *painter = GetMythPainter();
+    if (painter)
+        painter->FreeResources();
+
     (void) embedid;
     m_win = winid;
     QMutexLocker locker(&m_lock);

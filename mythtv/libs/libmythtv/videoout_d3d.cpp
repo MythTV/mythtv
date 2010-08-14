@@ -193,6 +193,10 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
                           WId winid, int winx, int winy, int winw,
                           int winh, MythCodecID codec_id, WId embedid)
 {
+    MythPainter *painter = GetMythPainter();
+    if (painter)
+        painter->FreeResources();
+
     QMutexLocker locker(&m_lock);
     m_hWnd      = winid;
     m_hEmbedWnd = embedid;
