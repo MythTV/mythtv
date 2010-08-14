@@ -30,12 +30,6 @@
     </button>
 
     <button>
-        <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
-        <text>OSD Menu Editor</text>
-        <action>OSDMENUEDITOR</action>
-    </button>
-
-    <button>
         <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
         <text>Playback Groups</text>
         <description>Adjust settings for different playback styles</description>
