@@ -103,7 +103,7 @@ QString formattedFieldValue(const QVariant &value)
         field.setValue(value);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString result = query.driver()->formatValue(&field);
+    QString result = QString::fromUtf8(query.driver()->formatValue(&field));
     return result;
 }
 
