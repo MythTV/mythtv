@@ -51,7 +51,6 @@ class OSDListTreeType;
 class OSDGenericTree;
 class PlayerContext;
 class UDPNotifyOSDSet;
-class TVOSDMenuEntryList;
 class TvPlayWindow;
 class TV;
 class OSDListTreeItemEnteredEvent;
@@ -575,52 +574,35 @@ class MPUBLIC TV : public QThread
     bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
 
     // Menu dialog
-    void ShowOSDJumpRec(PlayerContext* ctx, const QString category = "",
-                        int level = 0, const QString selected = "");
     void ShowOSDMenu(const PlayerContext*, const QString category = "",
-                     int level = 0, const QString selected = "");
+                     const QString selected = "");
 
-    QString FillOSDMenu(const PlayerContext*, OSD *osd, QString category,
-                        const QString selected, int level);
-    QString FillOSDMenuTranscode(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuCommskip(   const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuExpire(     const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuSchedule(   const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuAVChapter(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuAVTitle(    const PlayerContext *, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuPxP(        const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuSwitchInput(const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuSwitchSrc(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuJumpRec(    const PlayerContext*, OSD *osd,
-                                   bool select, int level);
-    QString FillOSDMenuVidAspect(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuVideoScan(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuAdjustFill( const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuAdjustPic(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuTimeStretch(const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuSleepMode(  const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuTracks(     const PlayerContext*, OSD *osd,
-                                   bool select, int level, uint type) const;
-    QString FillOSDMenuChanGroups( const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-    QString FillOSDMenuTextSubs(   const PlayerContext*, OSD *osd,
-                                   bool select, int level) const;
-
+    void FillOSDMenuAudio    (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuVideo    (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuNavigate (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuJobs     (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuPlayback (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuSchedule (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuSource   (const PlayerContext *ctx, OSD *osd,
+                              QString category, const QString selected,
+                              QString &currenttext, QString &backaction);
+    void FillOSDMenuJumpRec  (PlayerContext* ctx, const QString category = "",
+                              int level = 0, const QString selected = "");
     void UpdateLCD(void);
     bool HandleLCDTimerEvent(void);
     void ShowLCDChannelInfo(const PlayerContext*);
@@ -806,7 +788,6 @@ class MPUBLIC TV : public QThread
 
     // OSD info
     QMap<OSD*,const PlayerContext*> osd_lctx;
-    TVOSDMenuEntryList *osdMenuEntries;
 
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.

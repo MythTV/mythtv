@@ -99,27 +99,4 @@
 
     </window>
 
-    <window name="osdmenueditor">
-
-        <textarea name="title" from="basetextarea">
-            <font>baselarge</font>
-            <area>0,20,1000,40</area>
-            <value>OSD Menu Editor</value>
-            <align>center</align>
-        </textarea>
-
-        <buttonlist name="states" from="basebuttonlist">
-            <area>60,100,300,300</area>
-            <showarrow>no</showarrow>
-        </buttonlist>
-
-        <buttonlist name="categories" from="basebuttonlist">
-            <area>402,100,500,500</area>
-        </buttonlist>
-
-        <button name="done" from="basebutton">
-            <position>500,620</position>
-            <value>Done</value>
-        </button>
-    </window>
 </mythuitheme>

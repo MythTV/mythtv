@@ -273,10 +273,10 @@ using_frontend {
     # On screen display (video output overlay)
     using_fribidi:DEFINES += USING_FRIBIDI
     HEADERS += osd.h                    teletextscreen.h
-    HEADERS += udpnotify.h              tvosdmenuentry.h
+    HEADERS += udpnotify.h
     HEADERS += subtitlescreen.h         interactivescreen.h
     SOURCES += osd.cpp                  teletextscreen.cpp
-    SOURCES += udpnotify.cpp            tvosdmenuentry.cpp
+    SOURCES += udpnotify.cpp
     SOURCES += subtitlescreen.cpp       interactivescreen.cpp
 
     # Video output
