@@ -1476,7 +1476,8 @@ void TVRec::RunTV(void)
                 {
                     m_switchingBuffer = true;
 
-                    SwitchLiveTVRingBuffer(false, true);
+                    SwitchLiveTVRingBuffer(channel->GetCurrentName(),
+                                           false, true);
 
                     QDateTime starttime; starttime.setTime_t(0);
                     if (curRecording)
@@ -3691,11 +3692,18 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
-    DTVChannel *dtvchan = GetDTVChannel();
+    if (!channel)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "TuningFrequency called without a valid channel object");
+        return;
+    }
 
+    DTVChannel *dtvchan = GetDTVChannel();
     bool livetv = request.flags & kFlagLiveTV;
     bool antadj = request.flags & kFlagAntennaAdjust;
     bool has_dummy = false;
+    bool ok = true;
 
     if (dtvchan)
     {
@@ -3705,22 +3713,22 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             mpeg = GetDTVRecorder()->GetStreamData();
 
         const QString tuningmode = (HasFlags(kFlagEITScannerRunning)) ?
-            dtvchan->GetSIStandard() :
-            dtvchan->GetSuggestedTuningMode(
-                kState_WatchingLiveTV == internalState);
+                                   dtvchan->GetSIStandard() :
+                                   dtvchan->GetSuggestedTuningMode
+                                   (kState_WatchingLiveTV == internalState);
 
         dtvchan->SetTuningMode(tuningmode);
 
         if (request.minorChan && (tuningmode == "atsc"))
         {
-            channel->SelectChannel(request.channel);
+            channel->SelectChannel(request.channel, false);
             ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
             if (atsc)
                 atsc->SetDesiredChannel(request.majorChan, request.minorChan);
         }
         else if (request.progNum >= 0)
         {
-            channel->SelectChannel(request.channel);
+            channel->SelectChannel(request.channel, false);
             if (mpeg)
                 mpeg->SetDesiredProgram(request.progNum);
         }
@@ -3740,37 +3748,20 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     QString input   = request.input;
     QString channum = request.channel;
 
-    bool ok = false;
-    if (channel)
-        channel->Open();
-    else
-        ok = true;
+    channel->Open();
 
     if (livetv || antadj)
     {
         // We need there to be a ringbuffer for these modes
-        bool ok;
         ProgramInfo *tmp = pseudoLiveTVRecording;
         pseudoLiveTVRecording = NULL;
 
-#if 0
-        /*
-          Without this, the wrong channel is shown during a change change
-          But with it, the channel will fail to change -- for a small set of
-          people.  Better to show the wrong thing that have the tune fail,
-          so leave this out until I can figure out what the problem is.
-          -- jpoet
-        */
-
-        if (channel)
-            channel->SetChanNum(channum);
-#endif
         tvchain->SetCardType("DUMMY");
 
         if (!ringBuffer)
             ok = CreateLiveTVRingBuffer();
         else
-            ok = SwitchLiveTVRingBuffer(true, false);
+            ok = SwitchLiveTVRingBuffer(channum, true, false);
         pseudoLiveTVRecording = tmp;
 
         tvchain->SetCardType(genOpt.cardtype);
@@ -3784,13 +3775,13 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         has_dummy = true;
     }
 
-    if (channel && !channum.isEmpty())
+    if (!channum.isEmpty())
     {
         if (!input.isEmpty())
             ok = channel->SelectInput(input, channum, true);
         else
         {
-            channel->SelectChannel(channum);
+            channel->SelectChannel(channum, true);
             ok = true;
         }
     }
@@ -4009,7 +4000,8 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
             SetFlags(kFlagRingBufferReady);
         }
         else
-            ok = SwitchLiveTVRingBuffer(true, !had_dummyrec && recorder);
+            ok = SwitchLiveTVRingBuffer(channel->GetCurrentName(),
+                                        true, !had_dummyrec && recorder);
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 2");
@@ -4160,7 +4152,7 @@ void TVRec::TuningRestartRecorder(void)
         }
     }
 
-    SwitchLiveTVRingBuffer(true, !had_dummyrec);
+    SwitchLiveTVRingBuffer(channel->GetCurrentName(), true, !had_dummyrec);
 
     if (had_dummyrec)
     {
@@ -4330,7 +4322,9 @@ void TVRec::SetNextLiveTVDir(QString dir)
 }
 
 bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
-                                          RingBuffer **rb)
+                                          RingBuffer **rb,
+                                          const QString & channum,
+                                          int inputID)
 {
     VERBOSE(VB_RECORD, LOC + "GetProgramRingBufferForLiveTV()");
     if (!channel || !tvchain || !pginfo || !rb)
@@ -4344,8 +4338,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     MythEvent me(QString("QUERY_NEXT_LIVETV_DIR %1").arg(cardid));
     gCoreContext->dispatch(me);
 
-    uint    sourceid = channel->GetCurrentSourceID();
-    QString channum  = channel->GetCurrentName();
+    uint    sourceid = channel->GetSourceID(inputID);
     int     chanid   = ChannelUtil::GetChanID(sourceid, channum);
 
     if (chanid < 0)
@@ -4429,7 +4422,9 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     RecordingInfo *pginfo = NULL;
     RingBuffer *rb = NULL;
 
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb))
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb,
+                                       channel->GetCurrentName(),
+                                       channel->GetCurrentInputNum()))
     {
         ClearFlags(kFlagPendingActions);
         ChangeState(kState_None);
@@ -4458,15 +4453,27 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     return true;
 }
 
-bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
+bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
+                                   bool discont, bool set_rec)
 {
     VERBOSE(VB_RECORD, LOC + "SwitchLiveTVRingBuffer(discont "
             <<discont<<", set_rec "<<set_rec<<")");
 
     RecordingInfo *pginfo = NULL;
-    RingBuffer *rb = NULL;
+    RingBuffer    *rb = NULL;
+    QString        inputName;
+    int            inputID = -1;
 
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb))
+    if (!channel->CheckChannel(channum, inputName))
+    {
+        ChangeState(kState_None);
+        return false;
+    }
+
+    inputID = inputName.isEmpty() ?
+      channel->GetCurrentInputNum() : channel->GetInputByName(inputName);
+
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
     {
         ChangeState(kState_None);
         return false;

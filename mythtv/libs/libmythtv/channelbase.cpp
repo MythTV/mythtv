@@ -73,18 +73,24 @@ void ChannelBase::TeardownAll(void)
     }
 }
 
-void ChannelBase::SelectChannel(const QString & chan)
+void ChannelBase::SelectChannel(const QString & chan, bool use_sm)
 {
     VERBOSE(VB_CHANNEL, LOC + "SelectChannel " + chan);
+
     TeardownAll();
 
-    m_thread_lock.lock();
-    m_abort_change = false;
-    m_tuneStatus = changePending;
-    m_thread_lock.unlock();
+    if (use_sm)
+    {
+        m_thread_lock.lock();
+        m_abort_change = false;
+        m_tuneStatus = changePending;
+        m_thread_lock.unlock();
 
-    m_curchannelname = m_tuneThread.channel = chan;
-    m_tuneThread.start();
+        m_curchannelname = m_tuneThread.channel = chan;
+        m_tuneThread.start();
+    }
+    else
+        SetChannelByString(chan);
 }
 
 /*
@@ -133,7 +139,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
         ok = inputname.isEmpty() ? false : IsTunable(inputname, startchannel);
     else if (inputname.isEmpty())
     {
-        SelectChannel(startchannel);
+        SelectChannel(startchannel, false);
         ok = Wait();
     }
     else
@@ -432,10 +438,7 @@ bool ChannelBase::SelectInput(const QString &inputname, const QString &chan,
     {
         if (!SwitchToInput(input, false))
             return false;
-        if (use_sm)
-            SelectChannel(chan);
-        else
-            return SetChannelByString(chan);
+        SelectChannel(chan, use_sm);
     }
     else
     {
@@ -460,7 +463,7 @@ bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
     // input switching code would go here
 
     if (setstarting)
-        SelectChannel((*it)->startChanNum);
+        SelectChannel((*it)->startChanNum, true);
 
     return true;
 }
@@ -914,9 +917,11 @@ bool ChannelBase::InitializeInputs(void)
     ChannelUtil::SortChannels(m_allchannels, order);
     ChannelUtil::EliminateDuplicateChanNum(m_allchannels);
 
-    // Set initial input to first connected input
-    m_currentInputID = -1;
-    m_currentInputID = GetNextInputNum();
+    m_currentInputID = GetDefaultInput(cardid);
+
+    // In case that defaultinput is not set
+    if (m_currentInputID == -1)
+        m_currentInputID = GetNextInputNum();
 
     // print em
     InputMap::const_iterator it;
@@ -981,6 +986,33 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
         if (!query.exec() || !query.isActive())
             MythDB::DBError("StoreInputChannels", query);
     }
+}
+
+/** \fn ChannelBase::GetDefaultInput(uint)
+ *  \brief Gets the default input for the cardid
+ *  \param cardid ChannelBase::GetCardID()
+ */
+int ChannelBase::GetDefaultInput(uint cardid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT defaultinput "
+        "FROM capturecard "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("GetDefaultInput", query);
+        return -1;
+    }
+    else if (query.size() > 0)
+    {
+        query.next();
+        // Set initial input to first connected input
+        return GetInputByName(query.value(0).toString());
+    }
+    return -1;
 }
 
 /** \fn ChannelBase::StoreDefaultInput(uint, const QString&)

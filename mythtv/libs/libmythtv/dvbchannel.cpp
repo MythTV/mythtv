@@ -402,10 +402,7 @@ bool DVBChannel::SelectInput(const QString &inputname, const QString &chan,
     if (input >= 0)
     {
         nextInputID = input;
-        if (use_sm)
-            SelectChannel(chan);
-        else
-            return SetChannelByString(chan);
+        SelectChannel(chan, use_sm);
     }
     else
     {

@@ -51,7 +51,7 @@ class ChannelBase
     virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
     virtual bool IsTunable(const QString &input, const QString &channum) const;
 
-    virtual void SelectChannel(const QString & chan);
+    virtual void SelectChannel(const QString & chan, bool use_sm);
 
     Status GetStatus(void);
     Status Wait(void);
@@ -89,6 +89,8 @@ class ChannelBase
         { return m_inputs[GetNextInputNum()]->startChanNum; }
     virtual uint GetCurrentSourceID(void) const
         { return m_inputs[GetCurrentInputNum()]->sourceid; }
+    virtual uint GetSourceID(int inputID) const
+        { return m_inputs[inputID]->sourceid; }
     virtual uint GetInputCardID(int inputNum) const;
     virtual DBChanList GetChannels(int inputNum) const;
     virtual DBChanList GetChannels(const QString &inputname) const;
@@ -147,6 +149,7 @@ class ChannelBase
     virtual bool ChangeExternalChannel(const QString &newchan);
     static void StoreInputChannels(const InputMap&);
     static void StoreDefaultInput(uint cardid, const QString &input);
+    int GetDefaultInput(uint cardid);
     void ClearInputMap(void);
 
     bool Aborted();
