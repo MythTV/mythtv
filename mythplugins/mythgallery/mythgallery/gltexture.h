@@ -27,6 +27,9 @@
 #include <QtOpenGL>
 #include <QSize>
 
+// MythGallery headers
+#include "galleryutil.h"
+
 class ThumbItem;
 
 class GLTexture
@@ -50,7 +53,7 @@ class GLTexture
         { width = sz.width(); height = sz.height(); }
     void SetScale(float x, float y)
         { cx = x; cy = y; }
-    void ScaleTo(const QSize &dest, bool scaleMax);
+    void ScaleTo(const QSize &dest, ScaleMax scaleMax);
     void SetAngle(int newangle) { angle = newangle; }
 
     // Gets

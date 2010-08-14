@@ -36,6 +36,7 @@ using namespace std;
 // MythTV plugin headers
 #include <mythdialogs.h>
 
+#include "galleryutil.h"
 #include "imageview.h"
 #include "iconview.h"
 #include "sequence.h"
@@ -109,7 +110,7 @@ class SingleView : public MythDialog, public ImageView
     QImage        m_image;
     int           m_angle;
     QPoint        m_source_loc;
-    bool          m_scaleMax;
+    ScaleMax      m_scaleMax;
 
     // Info variables
     QPixmap      *m_info_pixmap;

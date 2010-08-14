@@ -450,7 +450,7 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     return false;
 }
 
-QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMax)
+QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax scaleMax)
 {
     QSize sz = src;
 
@@ -462,10 +462,12 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMa
     if ((sz.width() > 0) && (sz.height() > 0))
         imageAspect = (double)sz.width() / (double)sz.height();
 
-    int scaleWidth;
-    int scaleHeight;
-    if (scaleMax)
+    int scaleWidth = sz.width();
+    int scaleHeight = sz.height();
+
+    switch (scaleMax)
     {
+    case kScaleToFill:
         // scale-max to dest width for most images
         scaleWidth = dest.width();
         scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
@@ -475,9 +477,15 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMa
             scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
             scaleHeight = dest.height();
         }
-    }
-    else
-    {
+        break;
+
+    case kReduceToFit:
+        // Reduce to fit (but never enlarge)
+        if (scaleWidth <= dest.width() && scaleHeight <= dest.height())
+            break;
+        // Fall through
+
+    case kScaleToFit:
         // scale-min to dest height for most images
         scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
         scaleHeight = dest.height();
@@ -487,9 +495,14 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMa
             scaleWidth = dest.width();
             scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
         }
+        break;
+
+    default:
+        break;
     }
 
-    sz.scale(scaleWidth, scaleHeight, Qt::IgnoreAspectRatio);
+    if (scaleWidth != sz.width() || scaleHeight != sz.height())
+        sz.scale(scaleWidth, scaleHeight, Qt::KeepAspectRatio);
     return sz;
 }
 

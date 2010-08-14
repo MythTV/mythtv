@@ -107,7 +107,7 @@ class GLSingleView : public QGLWidget, public ImageView
     // General
     float         m_source_x;
     float         m_source_y;
-    bool          m_scaleMax;
+    ScaleMax      m_scaleMax;
 
     // Texture variables (for display and effects)
     int           m_texMaxDim;

@@ -24,6 +24,13 @@
 
 #include "iconview.h"
 
+typedef enum {
+  kScaleToFit,
+  kScaleToFill,
+  kReduceToFit,
+  kScaleMaxCount        // must be last
+} ScaleMax;
+
 class GalleryUtil
 {
  public:
@@ -41,7 +48,7 @@ class GalleryUtil
                               int sortorder, bool recurse,
                               ThumbHash *itemHash, ThumbGenerator *thumbGen);
 
-    static QSize ScaleToDest(const QSize &sz, const QSize &dest, bool scaleMax);
+    static QSize ScaleToDest(const QSize &sz, const QSize &dest, ScaleMax scaleMax);
 
     static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
         { if (move) return Move(src, dst); else return Copy(src, dst); }

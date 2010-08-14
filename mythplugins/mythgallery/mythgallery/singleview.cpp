@@ -59,7 +59,7 @@ SingleView::SingleView(
       m_pixmap(NULL),
       m_angle(0),
       m_source_loc(0,0),
-      m_scaleMax(false),
+      m_scaleMax(kScaleToFit),
 
       // Info variables
       m_info_pixmap(NULL),
@@ -91,7 +91,7 @@ SingleView::SingleView(
       m_effect_milti_circle_out_points(4),
       m_effect_circle_out_points(4)
 {
-    m_scaleMax = (gCoreContext->GetNumSetting("GalleryScaleMax", 0) > 0);
+    m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
     m_slideshow_timer = new QTimer(this);
     RegisterEffects();
@@ -173,7 +173,7 @@ SingleView::~SingleView()
     }
 
     // save the current m_scaleMax setting so we can restore it later
-    gCoreContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
+    gCoreContext->SaveSetting("GalleryScaleMax", m_scaleMax);
 }
 
 void SingleView::paintEvent(QPaintEvent *)
@@ -514,7 +514,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "FULLSCREEN")
         {
-            m_scaleMax = !m_scaleMax;
+            m_scaleMax = (ScaleMax) ((m_scaleMax + 1) % kScaleMaxCount);
             m_source_loc = QPoint(0, 0);
             SetZoom(1.0f);
         }

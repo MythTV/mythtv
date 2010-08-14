@@ -76,7 +76,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       // General
       m_source_x(0.0f),
       m_source_y(0.0f),
-      m_scaleMax(false),
+      m_scaleMax(kScaleToFit),
 
       // Texture variables (for display and effects)
       m_texMaxDim(512),
@@ -97,7 +97,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       m_effect_cube_yrot(0.0f),
       m_effect_cube_zrot(0.0f)
 {
-    m_scaleMax = (gCoreContext->GetNumSetting("GalleryScaleMax", 0) > 0);
+    m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
 
     m_slideshow_timer = new QTimer(this);
     RegisterEffects();
@@ -140,7 +140,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
 GLSingleView::~GLSingleView()
 {
     // save the current m_scaleMax setting so we can restore it later
-    gCoreContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
+    gCoreContext->SaveSetting("GalleryScaleMax", m_scaleMax);
     CleanUp();
 }
 
@@ -458,7 +458,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "FULLSCREEN")
         {
-            m_scaleMax = !m_scaleMax;
+            m_scaleMax = (ScaleMax) ((m_scaleMax + 1) % kScaleMaxCount);
             m_source_x = 0;
             m_source_y = 0;
             SetZoom(1.0f);
