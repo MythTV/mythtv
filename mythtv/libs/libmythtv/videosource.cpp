@@ -2213,10 +2213,6 @@ void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
 
-    QString init_dev = QString::null;
-    if (init_cardid)
-        init_dev = CardUtil::GetVideoDevice(init_cardid);
-
     ////////
 
     ConfigurationWizard::Save();
@@ -2228,6 +2224,13 @@ void CaptureCard::Save(void)
     if (!CardUtil::IsTunerSharingCapable(type))
         return;
 
+    QString init_dev = CardUtil::GetVideoDevice(cardid);
+    if (init_dev.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Can not clone card #%1 with empty"
+                                      " videodevice").arg(cardid));
+        return;
+    }
     vector<uint> cardids = CardUtil::GetCardIDs(init_dev, type);
 
     if (!instance_count)
