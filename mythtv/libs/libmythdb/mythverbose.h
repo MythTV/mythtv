@@ -57,7 +57,7 @@
     F(VB_NETWORK,   0x00000100, "network",                                    \
                              1, "Network protocol related messages")          \
     F(VB_COMMFLAG,  0x00000200, "commflag",                                   \
-                             1, "Commercial Flagging related messages")       \
+                             1, "Commercial detection related messages")      \
     F(VB_AUDIO,     0x00000400, "audio",                                      \
                              1, "Audio related messages")                     \
     F(VB_LIBAV,     0x00000800, "libav",                                      \
