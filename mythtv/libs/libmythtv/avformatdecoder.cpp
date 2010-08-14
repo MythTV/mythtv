@@ -70,6 +70,8 @@ extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, u
 
 #define MAX_AC3_FRAME_SIZE 6144
 
+#define USE_REORDERED_OPAQUE 0
+
 static const float eps = 1E-5;
 
 static const int max_video_queue_size = 180;
@@ -2948,6 +2950,22 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         return false;
     }
 
+#if USE_REORDERED_OPAQUE
+    if (pkt->dts == AV_NOPTS_VALUE &&
+        mpa_pic.reordered_opaque != AV_NOPTS_VALUE)
+    {
+        pts = (long long)mpa_pic.reordered_opaque;
+    }
+    else if (pkt->dts != AV_NOPTS_VALUE)
+    {
+        pts = (long long)pkt->dts;
+    }
+    else
+    {
+        pts = 0;
+    }
+    pts = (long long)(av_q2d(curstream->time_base) * pts * 1000);
+#endif
 
     long long temppts = pts;
 
