@@ -3024,7 +3024,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("video timecode %1 %2 %3 %4").arg(pkt->pts).arg(pkt->dts)
+            QString("video timecode %1 %2 %3 %4 %5").arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
             .arg(temppts).arg(lastvpts));
 
 /* XXX: Broken.
