@@ -2200,6 +2200,8 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 
     pic->age = 256 * 256 * 256 * 64;
 
+    pic->reordered_opaque = c->reordered_opaque;
+
     return 0;
 }
 
@@ -2275,6 +2277,8 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     render->next_free_data_block_num = 0;
 #endif
 
+    pic->reordered_opaque = c->reordered_opaque;
+
     return 0;
 }
 
@@ -2345,6 +2349,8 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     render->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE;
 #endif
+
+    pic->reordered_opaque = c->reordered_opaque;
 
     return 0;
 }
@@ -2865,6 +2871,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
     else
     {
+        context->reordered_opaque = pkt->pts;
         ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
         // Reparse it to not drop the DVD still frame
         if (decodeStillFrame)
