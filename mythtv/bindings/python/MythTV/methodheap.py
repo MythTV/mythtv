@@ -17,6 +17,7 @@ from mythproto import BEEvent, FileOps, Program
 from dataheap import *
 
 from datetime import timedelta
+from weakref import proxy
 import re
 
 class MythBE( FileOps ):
@@ -444,10 +445,98 @@ class MythSystemEvent( BEEvent ):
         SystemEvent(event['event'], inst.db).command(event)
 
 class Frontend( FEConnection ):
-    def sendJump(self,jumppoint): return self.send('jump', jumppoint)
-    def getJump(self): return self.send('jump')
-    def sendKey(self,key): return self.send('key', key)
-    def getKey(self): return self.send('key')
+    class _Jump( object ):
+        def __str__(self):  return str(self.list())
+        def __repr__(self): return str(self)
+
+        def __init__(self, parent):
+            self._parent = proxy(parent)
+            self._populated = False
+            self._points = {}
+
+        def _populate(self):
+            if not self._populated:
+                self._points = dict(self._parent.send('jump'))
+                self._populated = True
+
+        def __getitem__(self, key):
+            self._populate()
+            if key in self._points:
+                return self._parent.send('jump', key)
+            else:
+                return False
+
+        def __getattr__(self, key):
+            if key in self.__dict__:
+                return self.__dict__[key]
+            return self.__getitem__(key)
+
+        def dict(self):
+            self._populate()
+            return self._points
+
+        def list(self):
+            self._populate()
+            return self._points.items()
+
+    class _Key( object ):
+        _keymap = { 9:'tab',        10:'enter',     27:'escape',
+                    32:'space',     92:'backslash', 127:'backspace',
+                    258:'down',     259:'up',       260:'left',
+                    261:'right',    265:'f1',       266:'f2',
+                    267:'f3',       268:'f4',       269:'f5',
+                    270:'f6',       271:'f7',       272:'f8',
+                    273:'f9',       274:'f10',      275:'f11',
+                    276:'f12',      330:'delete',   331:'insert',
+                    338:'pagedown', 339:'pageup'}
+
+        def __str__(self):  return str(self.list())
+        def __repr__(self): return str(self)
+
+        def __init__(self, parent):
+            self._parent = proxy(parent)
+            self._populated = False
+            self._keys = []
+
+        def _populate(self):
+            if not self._populated:
+                self._keys = self._parent.send('key')
+                self._populated = True
+
+        def __getitem__(self, key):
+            self._populate()
+            if key in self._keys:
+                return self._parent.send('key', key)
+            else:
+                try:
+                    key = int(key)
+                    if key in self._keymap:
+                        return self._parent.send('key', self._keymap[key])
+                    else:
+                        return self._parent.send('key', chr(key))
+                except ValueError:
+                    pass
+            return False
+
+        def __getattr__(self, key):
+            if key in self.__dict__:
+                return self.__dict__[key]
+            return self.__getitem__(key)
+
+        def list(self):
+            self._populate()
+            return self._keys
+
+    def __init__(self, *args, **kwargs):
+        FEConnection.__init__(self, *args, **kwargs)
+        self.jump = self._Jump(self)
+        self.key = self._Key(self)
+
+    def sendJump(self,jumppoint): return self.jump[jumppoint]
+    def getJump(self): return self.jump.list()
+    def sendKey(self,key): return self.key[key]
+    def getKey(self): return self.key.list()
+
     def sendQuery(self,query): return self.send('query', query)
     def getQuery(self): return self.send('query')
     def sendPlay(self,play): return self.send('play', play)
