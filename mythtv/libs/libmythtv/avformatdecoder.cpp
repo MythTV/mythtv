@@ -2840,7 +2840,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     long long pts = 0;
     AVCodecContext *context = curstream->codec;
     AVFrame mpa_pic;
-    bzero(&mpa_pic, sizeof(AVFrame));
+    avcodec_get_frame_defaults(&mpa_pic);
 
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
