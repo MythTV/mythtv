@@ -73,6 +73,7 @@ using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR
 using_opengl:QT += opengl
+using_opengl:DEFINES += USING_OPENGL
 using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
 using_vdpau:DEFINES += USING_VDPAU
