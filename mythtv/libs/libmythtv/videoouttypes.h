@@ -109,6 +109,16 @@ typedef enum VideoErrorState
     kError_Switch_Renderer = 0x04, // Current renderer is not preferred choice
 } VideoErrorState;
 
+typedef enum AVSpecialDecode
+{
+    kAVSpecialDecode_None           = 0x00,
+    kAVSpecialDecode_LowRes         = 0x01,
+    kAVSpecialDecode_SingleThreaded = 0x02,
+    kAVSpecialDecode_FewBlocks      = 0x04,
+    kAVSpecialDecode_NoLoopFilter   = 0x08,
+    kAVSpecialDecode_NoDecode       = 0x10,
+} AVSpecialDecode;
+
 inline bool is_interlaced(FrameScanType scan)
 {
     return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);

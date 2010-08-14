@@ -172,6 +172,7 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
     PlayerContext *ctx = new PlayerContext("seektable rebuilder");
+    ctx->SetSpecialDecode(kAVSpecialDecode_NoDecode);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
@@ -756,6 +757,21 @@ int FlagCommercials(
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
 
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
+
+    AVSpecialDecode sp = (AVSpecialDecode)
+        (kAVSpecialDecode_LowRes         |
+         kAVSpecialDecode_SingleThreaded |
+         kAVSpecialDecode_NoLoopFilter);
+
+    /* blank detector needs to be only sample center for this optimization. */
+    if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
+        (COMM_DETECT_2_BLANK == commDetectMethod))
+    {
+        sp = (AVSpecialDecode) (sp | kAVSpecialDecode_FewBlocks);
+    }
+
+    ctx->SetSpecialDecode(sp);
+
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);

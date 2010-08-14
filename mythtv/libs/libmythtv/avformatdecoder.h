@@ -2,6 +2,7 @@
 #define AVFORMATDECODER_H_
 
 #include <QString>
+#include <QMap>
 #include <QList>
 
 #include "programinfo.h"
@@ -81,7 +82,8 @@ class AvFormatDecoder : public DecoderBase
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     bool use_null_video_out,
                     bool allow_private_decode = true,
-                    bool no_hardware_decode = false);
+                    bool no_hardware_decode = false,
+                    AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
    ~AvFormatDecoder();
 
     void CloseCodecs();
@@ -267,6 +269,7 @@ class AvFormatDecoder : public DecoderBase
     MythCodecID video_codec_id;
     bool no_hardware_decoders;
     bool allow_private_decoders;
+    AVSpecialDecode special_decode;
 
     int maxkeyframedist;
 

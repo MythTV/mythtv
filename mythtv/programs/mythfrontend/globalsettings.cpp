@@ -746,6 +746,16 @@ static GlobalComboBox *CommercialSkipMethod()
     return bc;
 }
 
+static GlobalCheckBox *CommFlagFast()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("CommFlagFast");
+    gc->setLabel(QObject::tr("Enable experimental speedup of commercial detection"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If enabled, experimental commercial detection "
+                    "speedups will be enabled."));
+    return gc;
+}
+
 static HostComboBox *AutoCommercialSkip()
 {
     HostComboBox *gc = new HostComboBox("AutoCommercialSkip");
@@ -4314,6 +4324,7 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
     jobs->setLabel(QObject::tr("General (Jobs)"));
     jobs->addChild(CommercialSkipMethod());
+    jobs->addChild(CommFlagFast());
     jobs->addChild(AggressiveCommDetect());
     jobs->addChild(DefaultTranscoder());
     jobs->addChild(DeferAutoTranscodeDays());

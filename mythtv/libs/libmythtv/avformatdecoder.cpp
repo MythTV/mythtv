@@ -86,6 +86,30 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate,
                              int *nblks, int *sfreq);
 static int encode_frame(bool dts, unsigned char* data, int len,
                         short *samples, int &samples_size);
+static QSize get_video_dim(const AVCodecContext &ctx)
+{
+    return QSize(ctx.width >> ctx.lowres, ctx.height >> ctx.lowres);
+}
+static float get_aspect(const AVCodecContext &ctx)
+{
+    float aspect_ratio = 0.0f;
+
+    if (ctx.sample_aspect_ratio.num && ctx.height)
+    {
+        aspect_ratio = av_q2d(ctx.sample_aspect_ratio) * (float) ctx.width;
+        aspect_ratio /= (float) ctx.height;
+    }
+
+    if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
+    {
+        if (ctx.height)
+            aspect_ratio = (float)ctx.width / (float)ctx.height;
+        else
+            aspect_ratio = 4.0f / 3.0f;
+    }
+
+    return aspect_ratio;
+}
 
 int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -218,7 +242,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  bool use_null_videoout,
                                  bool allow_private_decode,
-                                 bool no_hardware_decode)
+                                 bool no_hardware_decode,
+                                 AVSpecialDecode special_decoding)
     : DecoderBase(parent, pginfo),
       private_dec(NULL),
       is_db_ignored(gCoreContext->IsDatabaseIgnored()),
@@ -238,6 +263,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
       allow_private_decoders(allow_private_decode),
+      special_decode(special_decoding),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
@@ -279,6 +305,12 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
         CC708Window::forceWhiteOnBlackText = true;
 
     no_dts_hack = false;
+
+    int x = gCoreContext->GetNumSetting("CommFlagFast", 0);
+    VERBOSE(VB_IMPORTANT, "CommFlagFast: " << x);
+    if (x == 0)
+        special_decode = (AVSpecialDecode)0;
+    VERBOSE(VB_IMPORTANT, "special_decode: " << special_decode);
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -1131,31 +1163,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             <<") type ("<<codec_type_string(enc->codec_type)
             <<").");
 
-    float aspect_ratio = 0.0;
-
     if (ringBuffer && ringBuffer->isDVD())
         directrendering = false;
-
-    if (selectedStream)
-    {
-        fps = normalized_fps(stream, enc);
-
-        if (enc->sample_aspect_ratio.num)
-            aspect_ratio = av_q2d(enc->sample_aspect_ratio);
-        else if (stream->sample_aspect_ratio.num)
-            aspect_ratio = av_q2d(stream->sample_aspect_ratio);
-        else
-            aspect_ratio = 1.0f;
-
-        if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
-            aspect_ratio = 1.0f;
-
-        aspect_ratio *= (float)enc->width / (float)enc->height;
-
-        current_width  = enc->width;
-        current_height = enc->height;
-        current_aspect = aspect_ratio;
-    }
 
     enc->opaque = (void *)this;
     enc->get_buffer = get_avf_buffer;
@@ -1218,23 +1227,61 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 .arg(codec_id_string(enc->codec_id)));
     }
 
+    if (special_decode)
+    {
+        if (special_decode & kAVSpecialDecode_SingleThreaded)
+            enc->thread_count = 1;
+
+        enc->flags |= CODEC_FLAG2_FAST;
+
+        if ((CODEC_ID_MPEG2VIDEO == codec->id) ||
+            (CODEC_ID_MPEG1VIDEO == codec->id))
+        {
+            if (special_decode & kAVSpecialDecode_FewBlocks)
+            {
+                uint total_blocks = (enc->height+15) / 16;
+                enc->skip_top     = (total_blocks+3) / 4;
+                enc->skip_bottom  = (total_blocks+3) / 4;
+            }
+
+            if (special_decode & kAVSpecialDecode_LowRes)
+                enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
+        }
+        else if (CODEC_ID_H264 == codec->id)
+        {
+            if (special_decode & kAVSpecialDecode_NoLoopFilter)
+            {
+                enc->flags &= ~CODEC_FLAG_LOOP_FILTER;
+                enc->skip_loop_filter = AVDISCARD_ALL;
+            }
+        }
+
+        if (special_decode & kAVSpecialDecode_NoDecode)
+        {
+            enc->skip_idct = AVDISCARD_ALL;
+        }
+    }
+
     if (selectedStream)
     {
-        uint width  = enc->width;
-        uint height = enc->height;
+        fps = normalized_fps(stream, enc);
+        QSize dim    = get_video_dim(*enc);
+        int   width  = current_width  = dim.width();
+        int   height = current_height = dim.height();
+        float aspect = current_aspect = get_aspect(*enc);
 
-        if (width == 0 && height == 0)
+        if (!width || !height)
         {
             VERBOSE(VB_PLAYBACK, LOC + "InitVideoCodec "
                     "invalid dimensions, resetting decoder.");
-            width = 640;
+            width  = 640;
             height = 480;
-            fps = 29.97;
-            aspect_ratio = 4.0 / 3;
+            fps    = 29.97f;
+            aspect = 4.0f / 3.0f;
         }
 
         GetPlayer()->SetVideoParams(width, height, fps,
-                                 keyframedist, aspect_ratio, kScan_Detect,
+                                 keyframedist, aspect, kScan_Detect,
                                  dvd_video_codec_changed);
         if (LCD *lcd = LCD::Get())
         {
@@ -1648,8 +1695,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 private_dec = NULL;
                 m_h264_parser->Reset();
 
-                uint width  = max(enc->width, 16);
-                uint height = max(enc->height, 16);
+                QSize dim = get_video_dim(*enc);
+                uint width  = max(dim.width(),  16);
+                uint height = max(dim.height(), 16);
                 QString dec = "ffmpeg";
                 uint thread_count = 1;
 
@@ -2639,12 +2687,12 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(
                 const_cast<uint8_t*>(bufptr));
 
-            uint  width  = seq->width();
-            uint  height = seq->height();
+            uint  width  = seq->width()  >> context->lowres;
+            uint  height = seq->height() >> context->lowres;
             float aspect = seq->aspect(context->sub_id == 1);
             float seqFPS = seq->fps();
 
-            bool changed = (seqFPS > fps+0.01) || (seqFPS < fps-0.01);
+            bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
             changed |= (width  != (uint)current_width );
             changed |= (height != (uint)current_height);
             changed |= fabs(aspect - current_aspect) > eps;
@@ -2669,7 +2717,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 // fps debugging info
                 float avFPS = normalized_fps(stream, context);
-                if ((seqFPS > avFPS+0.01) || (seqFPS < avFPS-0.01))
+                if ((seqFPS > avFPS+0.01f) || (seqFPS < avFPS-0.01f))
                 {
                     VERBOSE(VB_PLAYBACK, LOC +
                             QString("avFPS(%1) != seqFPS(%2)")
@@ -2743,21 +2791,13 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             continue;
         }
 
-        float aspect_ratio;
-        if (context->sample_aspect_ratio.num == 0)
-            aspect_ratio = 0.0f;
-        else
-            aspect_ratio = av_q2d(context->sample_aspect_ratio) *
-                context->width / context->height;
-
-        if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
-            aspect_ratio = (float)context->width / context->height;
-
-        uint  width  = context->width;
-        uint  height = context->height;
+        float aspect_ratio = get_aspect(*context);
+        QSize dim    = get_video_dim(*context);
+        uint  width  = dim.width();
+        uint  height = dim.height();
         float seqFPS = normalized_fps(stream, context);
 
-        bool changed = (seqFPS > fps+0.01) || (seqFPS < fps-0.01);
+        bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
         changed |= (width  != (uint)current_width );
         changed |= (height != (uint)current_height);
         changed |= fabs(aspect_ratio - current_aspect) > eps;
@@ -2779,7 +2819,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             // fps debugging info
             float avFPS = normalized_fps(stream, context);
-            if ((seqFPS > avFPS+0.01) || (seqFPS < avFPS-0.01))
+            if ((seqFPS > avFPS+0.01f) || (seqFPS < avFPS-0.01f))
             {
                 VERBOSE(VB_PLAYBACK, LOC +
                         QString("avFPS(%1) != seqFPS(%2)")
@@ -2919,6 +2959,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         tmppicture.linesize[1] = picframe->pitches[1];
         tmppicture.linesize[2] = picframe->pitches[2];
 
+        QSize dim = get_video_dim(*context);
         sws_ctx = sws_getCachedContext(sws_ctx, context->width,
                                        context->height, context->pix_fmt,
                                        context->width, context->height,
@@ -2929,7 +2970,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate sws context");
             return false;
         }
-        sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize, 0, context->height,
+        sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize, 0, dim.height(),
                   tmppicture.data, tmppicture.linesize);
 
 

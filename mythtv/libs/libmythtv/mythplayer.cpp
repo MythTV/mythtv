@@ -956,7 +956,8 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
                           (player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP());
             SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
                                            using_null_videoout,
-                                           allow_libmpeg2, noaccel));
+                                           allow_libmpeg2, noaccel,
+                                           player_ctx->GetSpecialDecode()));
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         if (GetDecoder())
