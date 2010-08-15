@@ -1,7 +1,6 @@
 #include <unistd.h>      // for isatty() on Windows
 
 #include "dialogbox.h"
-#include "langsettings.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "util.h"
@@ -69,7 +68,7 @@ SchemaUpgradeWizard::Get(const QString &DBSchemaSetting,
 
 /**
  * Delete any current "busy" popup, create new one.
- * 
+ *
  * Wish there was a way to change the message on existing popup.
  */
 void SchemaUpgradeWizard::BusyPopup(const QString &message)

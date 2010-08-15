@@ -49,8 +49,7 @@ class MPUBLIC OutputEvent : public MythEvent
 
     ~OutputEvent()
     {
-        if (error_msg)
-            delete error_msg;
+        delete error_msg;
     }
 
     const QString *errorMessage() const { return error_msg; }
