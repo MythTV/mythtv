@@ -387,7 +387,13 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             showEditMetadataDialog();
         else if (action == "ESCAPE" && visualizer_status != 2)
         {
-            if (!gPlayer->isPlaying() || m_parent->IsExitingToMain())
+            if (!gPlayer->isPlaying())
+            {
+                gPlayer->savePosition();
+                stopAll();
+                done(kDialogCodeAccepted);
+            }
+            else if (m_parent->IsExitingToMain())
             {
                 if (exit_action == "play")
                 {
