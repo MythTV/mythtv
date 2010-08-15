@@ -6,6 +6,7 @@
 #include "metadata.h"
 
 // Taglib
+#include <id3v1tag.h>
 #include <id3v2tag.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>

@@ -134,6 +134,28 @@ Metadata *MetaIOID3::read(QString filename)
         delete mpegfile;
         return NULL;
     }
+
+    // if there is no ID3v2 tag, try to read the ID3v1 tag and copy it to the ID3v2 tag structure
+    if (tag->isEmpty())
+    {
+        TagLib::ID3v1::Tag *tag_v1 = mpegfile->ID3v1Tag();
+
+        if (!tag_v1)
+        {
+            delete mpegfile;
+            return NULL;
+        }
+
+        if (!tag_v1->isEmpty())
+        {
+            tag->setTitle(tag_v1->title());
+            tag->setArtist(tag_v1->artist());
+            tag->setAlbum(tag_v1->album());
+            tag->setTrack(tag_v1->track());
+            tag->setYear(tag_v1->year());
+            tag->setGenre(tag_v1->genre());
+        }
+    }
     
     Metadata *metadata = new Metadata(filename);
     
