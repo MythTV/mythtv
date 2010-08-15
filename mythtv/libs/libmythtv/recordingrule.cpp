@@ -413,7 +413,7 @@ bool RecordingRule::Delete(bool sendSig)
     return true;
 }
 
-void RecordingRule::ToMap(QHash<QString, QString> &infoMap) const
+void RecordingRule::ToMap(InfoMap &infoMap) const
 {
     QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");

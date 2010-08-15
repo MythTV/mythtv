@@ -13,6 +13,7 @@
 #include "programinfo.h"
 
 // libmythtv
+#include "programtypes.h"
 #include "recordingtypes.h"
 #include "recordingprofile.h"
 
@@ -47,8 +48,8 @@ class MPUBLIC RecordingRule
 
     bool IsLoaded() const { return m_loaded; }
     void UseTempTable(bool usetemp, QString table = "record_tmp");
-    
-    void ToMap(QHash<QString, QString> &infoMap) const;
+
+    void ToMap(InfoMap &infoMap) const;
 
     AutoExpireType GetAutoExpire(void) const
         { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }
@@ -121,17 +122,17 @@ class MPUBLIC RecordingRule
     int m_tempID;
 
     // Is this an override rule? Purely for the benefit of the UI, we display
-    // different options for override rules 
+    // different options for override rules
     bool m_isOverride;
-    
+
   private:
     // Populate variables from a ProgramInfo object
     void AssignProgramInfo();
-      
+
     // Pointer for ProgramInfo, exists only if we loaded from ProgramInfo in
     // the first place
     const ProgramInfo *m_progInfo;
-    
+
     // Internal strings for insertion into the RuleMap and display in the UI
     QString m_searchTypeString;
     QString m_searchFor;
