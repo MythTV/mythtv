@@ -374,7 +374,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_x  = max(m_source_x, -m_zoom + 1.0f);
             }
         }
-        else if (action == "SCROLLUP")
+        else if (action == "SCROLLDOWN")
         {
             if (m_zoom > 1.0f && m_source_y <  m_zoom - 1.0f)
             {
@@ -382,7 +382,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 m_source_y  = min(m_source_y,  m_zoom - 1.0f);
             }
         }
-        else if (action == "SCROLLDOWN")
+        else if (action == "SCROLLUP")
         {
             if (m_zoom > 1.0f && m_source_y > -m_zoom + 1.0f)
             {

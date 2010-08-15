@@ -433,7 +433,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                                   m_pixmap->width() - screenwidth));
             }
         }
-        else if (action == "SCROLLUP")
+        else if (action == "SCROLLDOWN")
         {
             if (m_zoom > 1.0f && m_pixmap)
             {
@@ -442,7 +442,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
                                   m_pixmap->height() - screenheight));
             }
         }
-        else if (action == "SCROLLDOWN")
+        else if (action == "SCROLLUP")
         {
             if (m_zoom > 1.0f)
             {
