@@ -225,6 +225,8 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 long long displayfor = subtitle.end_display_time -
                                        subtitle.start_display_time;
                 displayfor = (displayfor < 50) ? 50 : displayfor;
+                if (displayfor == 0)
+                    displayfor = 60000;
                 long long late = currentFrame->timecode -
                                  subtitle.start_display_time;
                 MythUIImage *uiimage = NULL;
@@ -247,7 +249,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 {
                     VERBOSE(VB_PLAYBACK, LOC +
                         QString("Display AV sub for %1 ms").arg(displayfor));
-                    if (late > 0)
+                    if (late > 50)
                         VERBOSE(VB_PLAYBACK, LOC +
                             QString("AV Sub was %1 ms late").arg(late));
                 }
