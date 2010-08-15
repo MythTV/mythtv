@@ -346,7 +346,7 @@ static CodeToNameMap gEnglishCountryMap;
 CodeToNameMap GetISO3166EnglishCountryMap(void)
 {
     if (gEnglishCountryMap.empty())
-        gEnglishCountryMap = createCountryMap();
+        gEnglishCountryMap = createEnglishCountryMap();
 
     return gEnglishCountryMap;
 }
