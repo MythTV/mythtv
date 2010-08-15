@@ -112,10 +112,17 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
     if (!widget)
         return false;
 
+    MythUIText *helpText = dynamic_cast<MythUIText *>(GetChild("helptext"));
+    if (helpText)
+        helpText->Reset();
+
     if (m_CurrentFocusWidget)
         m_CurrentFocusWidget->LoseFocus();
     m_CurrentFocusWidget = widget;
     m_CurrentFocusWidget->TakeFocus();
+
+    if (helpText)
+        helpText->SetText(m_CurrentFocusWidget->GetHelpText());
 
     return true;
 }
@@ -421,7 +428,7 @@ bool MythScreenType::gestureEvent(MythGestureEvent *event)
             default :
                 break;
         }
-            
+
     }
 
     if (!handled)
@@ -500,7 +507,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
  * \copydoc MythUIType::CreateCopy()
  *
  * Do not use.
- * 
+ *
  */
 void MythScreenType::CreateCopy(MythUIType *)
 {
