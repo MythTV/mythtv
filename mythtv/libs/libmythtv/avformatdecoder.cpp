@@ -2988,12 +2988,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         return false;
     }
 
-    if ((use_reordered_opaque || pkt->dts == AV_NOPTS_VALUE) &&
-        mpa_pic.reordered_opaque != AV_NOPTS_VALUE)
+    if ((use_reordered_opaque || pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
+        mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
         pts = (long long)mpa_pic.reordered_opaque;
     }
-    else if (pkt->dts != AV_NOPTS_VALUE)
+    else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
         pts = (long long)pkt->dts;
     }
