@@ -32,6 +32,10 @@
 #include "galleryutil.h"
 #include "thumbgenerator.h"
 
+#ifdef DCRAW_SUPPORT
+#include "../dcrawplugin/dcrawformats.h"
+#endif // DCRAW_SUPPORT
+
 #ifdef EXIF_SUPPORT
 #include <libexif/exif-data.h>
 #include <libexif/exif-entry.h>
@@ -57,6 +61,11 @@ QStringList GalleryUtil::GetImageFilter(void)
     filt.push_back("*.tiff");
     filt.push_back("*.bmp");
     filt.push_back("*.gif");
+
+#ifdef DCRAW_SUPPORT
+    filt << DcrawFormats::getFilters();
+#endif // DCRAW_SUPPORT
+
     return filt;
 }
 

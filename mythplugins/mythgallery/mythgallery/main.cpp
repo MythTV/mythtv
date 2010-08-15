@@ -3,6 +3,7 @@
 
 // qt
 #include <QDir>
+#include <QtPlugin>
 
 // myth
 #include <mythcontext.h>
@@ -12,9 +13,14 @@
 #include <mythpluginapi.h>
 
 // mythgallery
+#include "config.h"
 #include "iconview.h"
 #include "gallerysettings.h"
 #include "dbcheck.h"
+
+#ifdef DCRAW_SUPPORT
+Q_IMPORT_PLUGIN(dcrawplugin)
+#endif // DCRAW_SUPPORT
 
 static int run(MythMediaDevice *dev = NULL)
 {
