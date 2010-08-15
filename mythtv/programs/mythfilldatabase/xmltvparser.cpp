@@ -413,8 +413,10 @@ ProgInfo *XMLTVParser::parseProgram(
                 pginfo->previouslyshown = true;
 
                 QString prevdate = info.attribute("start");
-                fromXMLTVDate(prevdate, pginfo->originalairdate,
+                QDateTime date;
+                fromXMLTVDate(prevdate, date,
                               localTimezoneOffset);
+                pginfo->originalairdate = date.date();
             }
             else if (info.tagName() == "credits")
             {
