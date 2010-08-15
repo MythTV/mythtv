@@ -489,6 +489,7 @@ class Frontend( FEConnection ):
                     273:'f9',       274:'f10',      275:'f11',
                     276:'f12',      330:'delete',   331:'insert',
                     338:'pagedown', 339:'pageup'}
+        _alnum = [chr(i) for i in range(48,58)+range(65,91)+range(97,123)]
 
         def __str__(self):  return str(self.list())
         def __repr__(self): return str(self)
@@ -503,25 +504,35 @@ class Frontend( FEConnection ):
                 self._keys = self._parent.send('key')
                 self._populated = True
 
+        def _sendLiteral(self, key):
+            if (key in self._keys) or (key in self._alnum):
+                return self._parent.send('key', key)
+            return False
+
+        def _sendOrdinal(self, key):
+            try:
+                key = int(key)
+                if key in self._keymap:
+                    key = self._keymap[key]
+                else:
+                    key = chr(key)
+                return self._sendLiteral(key)
+            except ValueError:
+                return False
+
         def __getitem__(self, key):
             self._populate()
-            if key in self._keys:
-                return self._parent.send('key', key)
+            if self._sendOrdinal(key):
+                return True
+            elif self._sendLiteral(key):
+                return True
             else:
-                try:
-                    key = int(key)
-                    if key in self._keymap:
-                        return self._parent.send('key', self._keymap[key])
-                    else:
-                        return self._parent.send('key', chr(key))
-                except ValueError:
-                    pass
-            return False
+                return False
 
         def __getattr__(self, key):
             if key in self.__dict__:
                 return self.__dict__[key]
-            return self.__getitem__(key)
+            return self._sendLiteral(key)
 
         def list(self):
             self._populate()
