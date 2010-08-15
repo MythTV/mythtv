@@ -120,6 +120,7 @@ TVRec::TVRec(int capturecardnum)
       cardid(capturecardnum), ispip(false),
       // State variables
       stateChangeLock(QMutex::Recursive),
+      pendingRecLock(QMutex::Recursive),
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false), pauseNotify(true),
       stateFlags(0), lastTuningRequest(0),
@@ -462,7 +463,9 @@ void TVRec::CancelNextRecording(bool cancel)
             VERBOSE(VB_RECORD, LOC +
                     "CancelNextRecording -- cardid "<<cardids[i]);
 
+            pendlock.unlock();
             RemoteRecordPending(cardids[i], (*it).info, -1, false);
+            pendlock.relock();
         }
 
         VERBOSE(VB_RECORD, LOC + "CancelNextRecording -- cardid "<<cardid);
