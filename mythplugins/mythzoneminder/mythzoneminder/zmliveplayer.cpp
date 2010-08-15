@@ -22,10 +22,10 @@
 #include <QKeyEvent>
 
 // myth
-#include "mythtv/mythcontext.h"
+#include <mythcontext.h>
 #include <mythuihelper.h>
 #include <mythmainwindow.h>
-
+#include <mythdialogbox.h>
 
 // zoneminder
 #include "zmliveplayer.h"
@@ -64,9 +64,11 @@ bool ZMLivePlayer::Create(void)
     if (!foundtheme)
         return false;
 
-    hideAll();
+    if (!hideAll())
+        return false;
 
-    initMonitorLayout();
+    if (!initMonitorLayout())
+        return false;
 
     return true;
 }
@@ -81,7 +83,7 @@ MythUIType* ZMLivePlayer::GetMythUIType(const QString &name, bool optional)
     return type;
 }
 
-void ZMLivePlayer::hideAll(void)
+bool ZMLivePlayer::hideAll(void)
 {
     try
     {
@@ -110,22 +112,26 @@ void ZMLivePlayer::hideAll(void)
     {
         VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
                                       .arg(name));
-        Close();
+        return false;
     }
+
+    return true;
 }
 
-void ZMLivePlayer::initMonitorLayout()
+bool ZMLivePlayer::initMonitorLayout()
 {
     // if we haven't got any monitors there's not much we can do so bail out!
     if (m_monitors->size() == 0)
     {
         VERBOSE(VB_IMPORTANT, "Cannot find any monitors. Bailing out!");
-        Close();
-        return;
+        ShowOkPopup(tr("Can't show live view.\nYou don't have any monitors defined!"));
+        return false;
     }
 
     setMonitorLayout(gCoreContext->GetNumSetting("ZoneMinderLiveLayout", 1), true);
     m_frameTimer->start(FRAME_UPDATE_TIME);
+
+    return true;
 }
 
 ZMLivePlayer::~ZMLivePlayer()

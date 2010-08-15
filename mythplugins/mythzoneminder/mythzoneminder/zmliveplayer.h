@@ -69,18 +69,19 @@ class ZMLivePlayer : public MythScreenType
     ~ZMLivePlayer();
 
     bool Create(void);
+
     bool keyPressEvent(QKeyEvent *);
 
     void setMonitorLayout(int layout, bool restore = false);
 
   private slots:
     void updateFrame(void);
-    void initMonitorLayout(void);
+    bool initMonitorLayout(void);
     void getMonitorList(void);
 
   private:
     MythUIType* GetMythUIType(const QString &name, bool optional = false);
-    void hideAll();
+    bool hideAll();
     void stopPlayers(void);
     void changePlayerMonitor(int playerNo);
 
