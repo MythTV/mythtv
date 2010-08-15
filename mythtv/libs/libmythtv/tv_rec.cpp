@@ -4346,16 +4346,17 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
 
     if (chanid < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                "Channel: \'%1\' was not found in the database.\n"
-                "\t\t\tMost likely, your DefaultTVChannel setting is wrong.\n"
-                "\t\t\tCould not start livetv.").arg(channum));
-
         // Test setups might have zero channels
         if (genOpt.cardtype == "IMPORT")
             chanid = 9999;
         else
+        {
+            VERBOSE(VB_IMPORTANT, (LOC_ERR +
+                "Channel: \'%1\' was not found in the database.\n"
+                "\t\t\tMost likely, your DefaultTVChannel setting is wrong.\n"
+                "\t\t\tCould not start livetv.").arg(channum));
             return false;
+        }
     }
 
     int hoursMax = gCoreContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
