@@ -362,6 +362,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
     int height = font.height();
     int y = m_safeArea.height() - (height * wrappedsubs.size());
     int centre = m_safeArea.width() / 2;
+    QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
     foreach (QString subtitle, wrappedsubs)
     {
         if (subtitle.isEmpty())
@@ -369,6 +370,14 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         int width = font.width(subtitle);
         int x = centre - (width / 2);
         QRect rect(x, y, width, height);
+
+        if (m_useBackground)
+        {
+            MythUIShape *shape = new MythUIShape(this,
+                QString("tsubbg%1%2").arg(x).arg(y));
+            shape->SetFillBrush(bgfill);
+            shape->SetArea(MythRect(rect));
+        }
         MythUIText* text = new MythUIText(subtitle, *gTextSubFont, rect,
                                 rect, this,QString("tsub%1%2").arg(x).arg(y));
         if (text)
