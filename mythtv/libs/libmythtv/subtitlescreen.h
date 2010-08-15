@@ -46,7 +46,7 @@ class SubtitleScreen : public MythScreenType
     bool               m_useBackground;
     QRegExp            m_removeHTML;
     int                m_subtitleType;
-    QHash<MythUIType*, QDateTime> m_expireTimes;
+    QHash<MythUIType*, long long> m_expireTimes;
     int                m_708fontSizes[3];
     int                m_708fontZoom;
     bool               m_refreshArea;

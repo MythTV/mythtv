@@ -110,8 +110,10 @@ void SubtitleScreen::ClearDisplayedSubtitles(void)
 
 void SubtitleScreen::ExpireSubtitles(void)
 {
-    QDateTime now = QDateTime::currentDateTime();
-    QMutableHashIterator<MythUIType*, QDateTime> it(m_expireTimes);
+    VideoOutput    *videoOut = m_player->getVideoOutput();
+    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : NULL;
+    long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
+    QMutableHashIterator<MythUIType*, long long> it(m_expireTimes);
     while (it.hasNext())
     {
         it.next();
@@ -240,9 +242,8 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                         m_refreshArea = true;
                         uiimage->SetImage(image);
                         uiimage->SetArea(MythRect(scaled));
-                        QDateTime expires =
-                            QDateTime::currentDateTime().addMSecs(displayfor);
-                        m_expireTimes.insert(uiimage, expires);
+                        m_expireTimes.insert(uiimage,
+                                     currentFrame->timecode + displayfor);
                     }
                 }
                 if (uiimage)
