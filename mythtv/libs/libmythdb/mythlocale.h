@@ -4,10 +4,12 @@
 // QT
 #include <QString>
 #include <QMap>
+#include <QLocale>
 
 // Libmythdb
+#include "iso3166.h"
+#include "iso639.h"
 #include "mythexp.h"
-#include <QLocale>
 
 class MPUBLIC MythLocale
 {

@@ -75,6 +75,7 @@ class MythCoreContextPrivate : public QObject
     QThread *m_UIThread;
 
     MythLocale *m_locale;
+    QString language;
 
     QMutex                 m_privMutex;
     queue<MythPrivRequest> m_privRequests;
@@ -1123,6 +1124,35 @@ MythDB *MythCoreContext::GetDB(void)
 const MythLocale *MythCoreContext::GetLocale(void)
 {
     return d->m_locale;
+}
+
+/**
+ *  \brief Returns two character ISO-639 language descriptor for UI language.
+ *  \sa iso639_get_language_list()
+ */
+QString MythCoreContext::GetLanguage(void)
+{
+    return GetLanguageAndVariant().left(2);
+}
+
+/**
+ *  \brief Returns the user-set language and variant.
+ *
+ *   The string has the form ll or ll_vv, where ll is the two character
+ *   ISO-639 language code, and vv (which may not exist) is the variant.
+ *   Examples include en_AU, en_CA, en_GB, en_US, fr_CH, fr_DE, pt_BR, pt_PT.
+ */
+QString MythCoreContext::GetLanguageAndVariant(void)
+{
+    if (d->language.isEmpty())
+        d->language = GetSetting("Language", "EN_US").toLower();
+
+    return d->language;
+}
+
+void MythCoreContext::ResetLanguage(void)
+{
+    d->language.clear();
 }
 
 void MythCoreContext::SaveLocaleDefaults(void)

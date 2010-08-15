@@ -5,6 +5,7 @@
 #include <vector>
 using namespace std;
 
+#include <QString>
 #include <QStringList>
 #include <QMap>
 
@@ -24,20 +25,22 @@ extern MPUBLIC QMap<int, QString> _iso639_key_to_english_name;
  *   during playback, and for selecting which languages to collect
  *   EIT program guide information in.
  *
- *   In many contexts, such as with themes, these language codes can
+ *   In many contexts, such as with translations, these language codes can
  *   be appended with an underscore and a 2 digit IETF region code.
  *   So for Brazilian Portugese you could use: "por_BR", or "pt_BR".
  *   Or, you could specify just the language, Portugese: "por", or "pt".
+ *
+ **  \sa iso639.h
  */
 
 /// Converts a 2 or 3 character iso639 string to a language name in English.
-QString     iso639_str_toName(const unsigned char *iso639);
+MPUBLIC QString     iso639_str_toName(const unsigned char *iso639);
 /// Converts a canonical key to language name in English
-QString     iso639_key_toName(int iso639_2);
-void        iso639_clear_language_list(void);
-QStringList iso639_get_language_list(void);
-vector<int> iso639_get_language_key_list(void);
-int         iso639_key_to_canonical_key(int iso639_2);
+MPUBLIC QString     iso639_key_toName(int iso639_2);
+MPUBLIC void        iso639_clear_language_list(void);
+MPUBLIC QStringList iso639_get_language_list(void);
+MPUBLIC vector<int> iso639_get_language_key_list(void);
+MPUBLIC int         iso639_key_to_canonical_key(int iso639_2);
 MPUBLIC QString     iso639_str2_to_str3(const QString &str2);
 
 static inline QString iso639_key_to_str3(int code)
@@ -91,5 +94,9 @@ static inline QString iso639_str_to_canonoical_str(const QString &str3)
     int can =  iso639_key_to_canonical_key(key);
     return iso639_key_to_str3(can);
 }
+
+typedef QMap<QString, QString> CodeToNameMap;
+
+MPUBLIC QString GetISO639LanguageName(QString iso639Code);
 
 #endif // _ISO_639_2_H_

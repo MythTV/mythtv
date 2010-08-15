@@ -1,5 +1,5 @@
 include ( ../../settings.pro )
-  
+
 QT += network xml sql
 
 TEMPLATE = lib
@@ -152,7 +152,6 @@ HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
 HEADERS += recordingrule.h          programdetail.h
-HEADERS += iso639.h
 HEADERS += mythsystemevent.h
 
 SOURCES += recordinginfo.cpp
@@ -176,7 +175,6 @@ SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
 SOURCES += recordingrule.cpp        programdetail.cpp
-SOURCES += iso639.cpp
 SOURCES += mythsystemevent.cpp
 
 # DiSEqC

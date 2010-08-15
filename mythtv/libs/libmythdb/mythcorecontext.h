@@ -166,6 +166,9 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
 
     const MythLocale *GetLocale(void);
     void SaveLocaleDefaults(void);
+    QString GetLanguage(void);
+    QString GetLanguageAndVariant(void);
+    void ResetLanguage(void);
 
   private:
     MythCoreContextPrivate *d;

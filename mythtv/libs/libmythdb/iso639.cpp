@@ -3,7 +3,6 @@
 
 #include "iso639.h"
 #include "mythcorecontext.h"
-#include "mythuihelper.h"
 
 QMap<int, QString>    _iso639_key_to_english_name;
 static QMap<int, int> _iso639_key2_to_key3;
@@ -43,7 +42,7 @@ QStringList iso639_get_language_list(void)
         if (_languages.empty())
         {
             QString s3 = iso639_str2_to_str3(
-                GetMythUI()->GetLanguage().toLower());
+                                        gCoreContext->GetLanguage().toLower());
             if (!s3.isEmpty())
                 _languages << s3;
         }
@@ -336,7 +335,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("gre")] = QString("Greek, Modern (1453-)"); // ell
   names[iso639_str3_to_key("grn")] = QString("Guarani");
   names[iso639_str3_to_key("guj")] = QString("Gujarati");
-  names[iso639_str3_to_key("gwi")] = QString("Gwich�in");
+  names[iso639_str3_to_key("gwi")] = QString("Gwich�in");
   names[iso639_str3_to_key("hai")] = QString("Haida");
   names[iso639_str3_to_key("hat")] = QString("Haitian; Haitian Creole");
   names[iso639_str3_to_key("hau")] = QString("Hausa");
@@ -479,7 +478,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("nic")] = QString("Niger-Kordofanian (Other)");
   names[iso639_str3_to_key("niu")] = QString("Niuean");
   names[iso639_str3_to_key("nno")] = QString("Norwegian Nynorsk");
-  names[iso639_str3_to_key("nob")] = QString("Norwegian Bokm�l");
+  names[iso639_str3_to_key("nob")] = QString("Norwegian Bokm�l");
   names[iso639_str3_to_key("nog")] = QString("Nogai");
   names[iso639_str3_to_key("non")] = QString("Old Norse");
   names[iso639_str3_to_key("nor")] = QString("Norwegian");
@@ -491,7 +490,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("nyn")] = QString("Nyankole");
   names[iso639_str3_to_key("nyo")] = QString("Nyoro");
   names[iso639_str3_to_key("nzi")] = QString("Nzima");
-  names[iso639_str3_to_key("oci")] = QString("Occitan (post 1500); Proven�al");
+  names[iso639_str3_to_key("oci")] = QString("Occitan (post 1500); Proven�al");
   names[iso639_str3_to_key("oji")] = QString("Ojibwa");
   names[iso639_str3_to_key("ori")] = QString("Oriya");
   names[iso639_str3_to_key("orm")] = QString("Oromo");
@@ -515,7 +514,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("pon")] = QString("Pohnpeian");
   names[iso639_str3_to_key("por")] = QString("Portuguese");
   names[iso639_str3_to_key("pra")] = QString("Prakrit languages");
-  names[iso639_str3_to_key("pro")] = QString("Old Proven�al  (to 1500)");
+  names[iso639_str3_to_key("pro")] = QString("Old Proven�al  (to 1500)");
   names[iso639_str3_to_key("pus")] = QString("Pushto");
   names[iso639_str3_to_key("qaa")] = QString("Reserved for local use");
   names[iso639_str3_to_key("qtz")] = QString("Reserved for local use");
@@ -623,7 +622,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("vai")] = QString("Vai");
   names[iso639_str3_to_key("ven")] = QString("Venda");
   names[iso639_str3_to_key("vie")] = QString("Vietnamese");
-  names[iso639_str3_to_key("vol")] = QString("Volap�k");
+  names[iso639_str3_to_key("vol")] = QString("Volap�k");
   names[iso639_str3_to_key("vot")] = QString("Votic");
   names[iso639_str3_to_key("wak")] = QString("Wakashan languages");
   names[iso639_str3_to_key("wal")] = QString("Walamo");
@@ -861,4 +860,100 @@ static int createCode2ToCode3Map(QMap<int, int>& codemap) {
   codemap[iso639_str2_to_key2("za")] = iso639_str3_to_key("zha");
   codemap[iso639_str2_to_key2("zu")] = iso639_str3_to_key("zul");
   return 0;
+}
+
+/*
+    The following has yet to be integrated with the preceeding code in a
+    meaningful way but it is stored here because it provides ISO639 related
+    functionality.
+*/
+
+static CodeToNameMap createLanguageMap(void)
+{
+    CodeToNameMap map;
+    map["af"] = QString::fromUtf8("Afrikaans");
+    map["am"] = QString::fromUtf8("አማርኛ");
+    map["ar"] = QString::fromUtf8("العربية");
+    map["as"] = QString::fromUtf8("অসমীয়া");
+    map["az"] = QString::fromUtf8("Azərbaycan türkçəsi");
+    map["be"] = QString::fromUtf8("Беларуская");
+    map["bg"] = QString::fromUtf8("Български");
+    map["bn"] = QString::fromUtf8("বাংলা");
+    map["br"] = QString::fromUtf8("Brezhoneg");
+    map["bs"] = QString::fromUtf8("Rumunjki");
+    map["ca"] = QString::fromUtf8("català; valencià");
+    map["cs"] = QString::fromUtf8("čeština");
+    map["cy"] = QString::fromUtf8("Cymraeg");
+    map["da"] = QString::fromUtf8("Dansk");
+    map["de"] = QString::fromUtf8("Deutsch");
+    map["el"] = QString::fromUtf8("Ελληνικά, Σύγχρονα");
+    map["en"] = QString::fromUtf8("English");
+    map["eo"] = QString::fromUtf8("Esperanto");
+    map["es"] = QString::fromUtf8("Español; Castellano");
+    map["et"] = QString::fromUtf8("Eesti");
+    map["eu"] = QString::fromUtf8("Euskara");
+    map["fa"] = QString::fromUtf8("فارسی");
+    map["fi"] = QString::fromUtf8("suomi");
+    map["fr"] = QString::fromUtf8("Français");
+    map["ga"] = QString::fromUtf8("Gaeilge");
+    map["gl"] = QString::fromUtf8("Galego");
+    map["gu"] = QString::fromUtf8("ગુજરાતી");
+    map["he"] = QString::fromUtf8("עברית");
+    map["hi"] = QString::fromUtf8("हिंदी");
+    map["hr"] = QString::fromUtf8("Hrvatski");
+    map["hu"] = QString::fromUtf8("magyar");
+    map["id"] = QString::fromUtf8("Bahasa Indonesia");
+    map["is"] = QString::fromUtf8("Íslenska");
+    map["it"] = QString::fromUtf8("Italiano");
+    map["ja"] = QString::fromUtf8("日本語");
+    map["kn"] = QString::fromUtf8("ಕನ್ನಡ");
+    map["ko"] = QString::fromUtf8("한국어");
+    map["lt"] = QString::fromUtf8("Lietuvių");
+    map["lv"] = QString::fromUtf8("Latviešu");
+    map["mi"] = QString::fromUtf8("Reo Māori");
+    map["mk"] = QString::fromUtf8("Македонски");
+    map["ml"] = QString::fromUtf8("മലയാളം");
+    map["mn"] = QString::fromUtf8("Монгол");
+    map["mr"] = QString::fromUtf8("मराठी");
+    map["ms"] = QString::fromUtf8("Bahasa Melayu");
+    map["mt"] = QString::fromUtf8("Malti");
+    map["nb"] = QString::fromUtf8("Norsk, bokmål");
+    map["nl"] = QString::fromUtf8("Nederlands");
+    map["nn"] = QString::fromUtf8("Norsk (nynorsk)");
+    map["oc"] = QString::fromUtf8("Occitan (aprèp 1500)");
+    map["or"] = QString::fromUtf8("ଓଡିଆ");
+    map["pa"] = QString::fromUtf8("ਪੰਜਾਬੀ");
+    map["pl"] = QString::fromUtf8("polski");
+    map["pt"] = QString::fromUtf8("Português");
+    map["ro"] = QString::fromUtf8("Română");
+    map["ru"] = QString::fromUtf8("русский");
+    map["rw"] = QString::fromUtf8("Ikinyarwanda");
+    map["sk"] = QString::fromUtf8("slovenčina");
+    map["sl"] = QString::fromUtf8("slovenščina");
+    map["sr"] = QString::fromUtf8("српски");
+    map["sv"] = QString::fromUtf8("Svenska");
+    map["ta"] = QString::fromUtf8("தமிழ்");
+    map["te"] = QString::fromUtf8("తెలుగు");
+    map["th"] = QString::fromUtf8("ไทย");
+    map["ti"] = QString::fromUtf8("ትግርኛ");
+    map["tr"] = QString::fromUtf8("Türkçe");
+    map["tt"] = QString::fromUtf8("Tatarça");
+    map["uk"] = QString::fromUtf8("українська");
+    map["ve"] = QString::fromUtf8("Venda");
+    map["vi"] = QString::fromUtf8("Tiếng Việt");
+    map["wa"] = QString::fromUtf8("Walon");
+    map["xh"] = QString::fromUtf8("isiXhosa");
+    map["zh"] = QString::fromUtf8("漢語");
+    map["zu"] = QString::fromUtf8("Isi-Zulu");
+    return map;
+}
+
+static CodeToNameMap gLanguageMap;
+
+QString GetISO639LanguageName(QString iso639Code)
+{
+    if (gLanguageMap.isEmpty())
+        gLanguageMap = createLanguageMap();
+
+    return gLanguageMap[iso639Code];
 }
