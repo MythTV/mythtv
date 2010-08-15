@@ -470,8 +470,26 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 handled = false;
         }
 
-        if (action == "ESCAPE")
-            handled = HandleEscape();
+        if (action == "ESCAPE") 
+        {
+            if (!GetMythMainWindow()->IsExitingToMain()) 
+            {
+                handled = HandleEscape();
+            } 
+            else 
+            {
+                while (true) 
+                {
+                    QDir currentDir(m_currDir);
+                    QDir rootDir(m_galleryDir);
+                    if (currentDir != rootDir) 
+                        HandleSubDirEscape(m_galleryDir);
+                    else 
+                        break;
+                }
+                handled = HandleEscape();
+            }
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
