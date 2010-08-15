@@ -407,7 +407,7 @@ OSStatus RenderCallbackAnalog(void                       *inRefCon,
     (void)inBusNumber;
     (void)inNumberFrames;
 
-    AudioOutputCA *inst = ((CoreAudioData *)inRefCon)->mCA;
+    AudioOutputCA *inst = (static_cast<CoreAudioData *>(inRefCon))->mCA;
 
     if (!inst->RenderAudio((unsigned char *)(ioData->mBuffers[0].mData),
                            ioData->mBuffers[0].mDataByteSize,
@@ -451,7 +451,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
                                     const AudioTimeStamp *inOutputTime,
                                     void                 *inRefCon)
 {
-    CoreAudioData    *d = (CoreAudioData *)inRefCon;
+    CoreAudioData    *d = static_cast<CoreAudioData *>(inRefCon);
     AudioOutputCA    *a = d->mCA;
     int           index = d->mStreamIndex;
 

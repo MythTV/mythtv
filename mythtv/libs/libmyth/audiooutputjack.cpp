@@ -328,7 +328,7 @@ void AudioOutputJACK::DeinterleaveAudio(float *aubuf, float **bufs, int nframes,
 */
 int AudioOutputJACK::_JackCallback(jack_nframes_t nframes, void *arg)
 {
-    AudioOutputJACK *aoj = (AudioOutputJACK*) arg;
+    AudioOutputJACK *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackCallback(nframes);
 }
 
@@ -418,7 +418,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
 */
 int AudioOutputJACK::_JackXRunCallback(void *arg)
 {
-    AudioOutputJACK *aoj = (AudioOutputJACK*) arg;
+    AudioOutputJACK *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackXRunCallback();
 }
 
@@ -446,7 +446,7 @@ int AudioOutputJACK::JackXRunCallback(void)
 */
 int AudioOutputJACK::_JackGraphOrderCallback(void *arg)
 {
-    AudioOutputJACK *aoj = (AudioOutputJACK*) arg;
+    AudioOutputJACK *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackGraphOrderCallback();
 }
 
@@ -606,10 +606,9 @@ bool AudioOutputJACK::_jack_connect_ports(const char** matching_ports)
 
 void AudioOutputJACK::_jack_client_close(jack_client_t **client)
 {
-    int err = -1;
     if (*client)
     {
-        err = jack_client_close(*client);
+        int err = jack_client_close(*client);
         if (err != 0)
             JERROR(QString("Error closing Jack output device. Error: %1")
                                 .arg(err));

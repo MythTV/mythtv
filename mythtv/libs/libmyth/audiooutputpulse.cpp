@@ -385,8 +385,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     int chk = pa_context_connect(
         pcontext, pulse_host, (pa_context_flags_t)0, NULL);
 
-    if (pulse_host)
-        delete(pulse_host);
+    delete(pulse_host);
 
     if (chk < 0)
     {
@@ -455,7 +454,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
     if (!pulse_host && strcmp(host,"default") != 0)
     {
         char *env_pulse_host = getenv("PULSE_SERVER");
-        if (env_pulse_host && strlen(env_pulse_host) > 0)
+        if (env_pulse_host && (*env_pulse_host != '\0'))
         {
             int host_len = strlen(env_pulse_host) + 1;
 

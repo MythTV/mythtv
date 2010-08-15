@@ -279,7 +279,6 @@ int AudioOutputOSS::GetBufferedOnSoundcard(void) const
 void AudioOutputOSS::VolumeInit()
 {
     mixerfd = -1;
-    int volume = 0;
 
     QString device = gCoreContext->GetSetting("MixerDevice", "/dev/mixer");
     if (device.toLower() == "software")
@@ -304,7 +303,7 @@ void AudioOutputOSS::VolumeInit()
     if (set_initial_vol)
     {
         int tmpVol;
-        volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
+        int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)

@@ -137,10 +137,9 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
     if (channels_in <= channels_out)
         return -1;
 
-    float tmp;
-
     if (channels_out == 2)
     {
+        float tmp;
         int index = channels_in - 1;
         for (int n=0; n < frames; n++)
         {

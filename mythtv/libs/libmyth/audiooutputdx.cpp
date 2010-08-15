@@ -131,9 +131,10 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
                                                   LPVOID lpContext)
 {
     const QString enum_desc = lpcstrDesc;
-    const QString cfg_desc  = ((AudioOutputDXPrivate*)lpContext)->device_name;
-    const int device_num    = ((AudioOutputDXPrivate*)lpContext)->device_num;
-    const int device_count  = ((AudioOutputDXPrivate*)lpContext)->device_count;
+    AudioOutputDXPrivate *context = static_cast<AudioOutputDXPrivate*>(lpContext);
+    const QString cfg_desc  = context->device_name;
+    const int device_num    = context->device_num;
+    const int device_count  = context->device_count;
 
     VBAUDIO(QString("Device %1:" + enum_desc).arg(device_count));
 
@@ -141,14 +142,14 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
         (device_num == 0 && !cfg_desc.isEmpty() &&
         enum_desc.startsWith(cfg_desc, Qt::CaseInsensitive))) && lpGuid)
     {
-        ((AudioOutputDXPrivate*)lpContext)->deviceGUID  = *lpGuid;
-        ((AudioOutputDXPrivate*)lpContext)->chosenGUID  =
-            &(((AudioOutputDXPrivate*)lpContext)->deviceGUID);
-        ((AudioOutputDXPrivate*)lpContext)->device_name = enum_desc;
-        ((AudioOutputDXPrivate*)lpContext)->device_num  = device_count;
+        context->deviceGUID  = *lpGuid;
+        context->chosenGUID  =
+            &(context->deviceGUID);
+        context->device_name = enum_desc;
+        context->device_num  = device_count;
     }
 
-    ((AudioOutputDXPrivate*)lpContext)->device_count++;
+    context->device_count++;
     return 1;
 }
 
