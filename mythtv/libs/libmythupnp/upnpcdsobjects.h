@@ -57,6 +57,7 @@ class Property
         QString  m_sNameSpace;
         bool     m_bRequired;
         QString  m_sValue;
+        NameValues      m_lstAttributes;
 
     public:
 
@@ -69,6 +70,12 @@ class Property
             m_sNameSpace = sNameSpace;
             m_bRequired  = bRequired;
             m_sValue     = sValue;
+        }
+
+        void AddAttribute( const QString &sName, 
+                           const QString &sValue )
+        {
+            m_lstAttributes.push_back(NameValue(sName, sValue));
         }
 };
 
@@ -179,6 +186,7 @@ class CDSObject
         virtual      ~CDSObject();
 
         Property     *AddProperty( Property *pProp  );
+        Property     *GetProperty( QString sName );
         CDSObject    *AddChild   ( CDSObject   *pChild );
 
         ContainerClass *AddSearchClass( ContainerClass *pClass );

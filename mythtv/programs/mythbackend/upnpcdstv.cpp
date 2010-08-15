@@ -326,6 +326,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     pItem->SetPropValue( "artist"        , "[Unknown Author]" );
     pItem->SetPropValue( "album"         , "[Unknown Series]" );
     pItem->SetPropValue( "actor"         , "[Unknown Author]" );
+    pItem->SetPropValue( "date"          , dtStartTime.toString(Qt::ISODate));
 
     pResults->Add( pItem );
 
@@ -385,10 +386,18 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     // Add Preview URI as albumArt
     // ----------------------------------------------------------------------
 
-    sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
-                                          .arg( sURIParams );
+    sURI = QString( "%1GetPreviewImage%2%3").arg( sURIBase   )
+                                            .arg( sURIParams )
+                                            .arg( "&amp;Width=160" ); 
 
     pItem->SetPropValue( "albumArtURI", sURI );
+    Property *pProp = pItem->GetProperty("albumArtURI");
+    if (pProp)
+    {
+        pProp->AddAttribute("dlna:profileID", "PNG_TN");
+        pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+    
+    }
 
 }
 

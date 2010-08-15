@@ -97,6 +97,19 @@ Property *CDSObject::AddProperty( Property *pProp )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+Property *CDSObject::GetProperty( QString sName )
+{
+    Properties::iterator it = m_properties.find(sName);
+    if (it !=  m_properties.end() && *it)
+        return (*it);
+
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void CDSObject::SetPropValue( QString sName, QString sValue )
 {
     Properties::iterator it = m_properties.find(sName);
@@ -244,7 +257,13 @@ void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
             if (pProp->m_bRequired || !bFilter 
                 || ( filter.indexOf( sName ) != -1))
             {
-                os << "<"  << sName << ">";
+                os << "<"  << sName;
+
+                    NameValues::const_iterator nit = pProp->m_lstAttributes.begin();
+                    for (; nit != pProp->m_lstAttributes.end(); ++ nit)
+                        os << " " <<(*nit).sName << "=\"" << (*nit).sValue << "\"";
+
+                os << ">";
                 os << pProp->m_sValue;
                 os << "</" << sName << ">";
             }
