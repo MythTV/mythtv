@@ -392,7 +392,7 @@ ProgInfo *XMLTVParser::parseProgram(
                     if (0.0 < den.toFloat())
                         rating = num.toFloat()/den.toFloat();
                 }
-                
+
                 pginfo->stars.setNum(rating);
             }
             else if (info.tagName() == "rating")
@@ -413,8 +413,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 pginfo->previouslyshown = true;
 
                 QString prevdate = info.attribute("start");
-                pginfo->originalairdate =
-                    QDate::fromString(prevdate, Qt::ISODate);
+                pginfo->originalairdate = fromXMLTVDate(prevdate);
             }
             else if (info.tagName() == "credits")
             {
