@@ -141,7 +141,6 @@ static CodeToNameMap createEnglishCountryMap(void)
     map["CN"] = QString::fromUtf8("China");
     map["CO"] = QString::fromUtf8("Colombia");
     map["CR"] = QString::fromUtf8("Costa Rica");
-    map["CS"] = QString::fromUtf8("Serbia and Montenegro");
     map["CU"] = QString::fromUtf8("Cuba");
     map["CV"] = QString::fromUtf8("Cape Verde");
     map["CX"] = QString::fromUtf8("Christmas Island");
@@ -166,7 +165,6 @@ static CodeToNameMap createEnglishCountryMap(void)
     map["FM"] = QString::fromUtf8("Micronesia, Federated States of");
     map["FO"] = QString::fromUtf8("Faroe Islands");
     map["FR"] = QString::fromUtf8("France");
-    map["FX"] = QString::fromUtf8("France, Metropolitan");
     map["GA"] = QString::fromUtf8("Gabon");
     map["GB"] = QString::fromUtf8("United Kingdom");
     map["GD"] = QString::fromUtf8("Grenada");
