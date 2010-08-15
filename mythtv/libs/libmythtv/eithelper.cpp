@@ -447,7 +447,8 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     {
         ContentDescriptor content(content_data);
         // fix events without real content data
-        if (content.Nibble(0)==0x00){
+        if (content.Nibble(0)==0x00)
+        {
             if(content.UserNibble(0)==0x1)
             {
                 category_type = kCategoryMovie;

@@ -3,7 +3,6 @@
 
 // MythTV
 #include "mythmainwindow.h"
-#include "myththemebase.h"
 #include "mythverbose.h"
 
 #include "tv_play_win.h"
