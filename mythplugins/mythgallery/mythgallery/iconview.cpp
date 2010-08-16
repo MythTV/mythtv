@@ -191,11 +191,17 @@ bool IconView::Create(void)
     BuildFocusList();
 
     // TODO Not accurate, the image may be smaller than the button
-    uint buttonwidth = m_imageList->ItemWidth();
-    uint buttonheight = m_imageList->ItemHeight();
+    int thumbWidth  = m_imageList->ItemWidth();
+    int thumbHeight = m_imageList->ItemHeight();
+    if (m_selectedImage && (m_selectedImage->GetArea().width()  > thumbWidth ||
+                            m_selectedImage->GetArea().height() > thumbHeight))
+    {
+       thumbWidth  = m_selectedImage->GetArea().width();
+       thumbHeight = m_selectedImage->GetArea().height();
+    }
 
     if (m_thumbGen)
-        m_thumbGen->setSize((int)buttonwidth, (int)buttonheight);
+        m_thumbGen->setSize(thumbWidth, thumbHeight);
 
     SetupMediaMonitor();
 
@@ -266,6 +272,7 @@ void IconView::LoadDirectory(const QString &dir)
         m_noImagesText->SetVisible((m_itemList.size() == 0));
 
     UpdateText(m_imageList->GetItemCurrent());
+    UpdateImage(m_imageList->GetItemCurrent());
 }
 
 void IconView::LoadThumbnail(ThumbItem *item)
@@ -739,6 +746,9 @@ void IconView::customEvent(QEvent *event)
             MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
             if (QFile(thumbitem->GetImageFilename()).exists())
                 item->SetImage(thumbitem->GetImageFilename());
+ 
+            if (m_imageList->GetCurrentPos() == pos)
+                UpdateImage(item);
         }
         delete td;
     }
