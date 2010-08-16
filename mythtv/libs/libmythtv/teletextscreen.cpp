@@ -1154,10 +1154,13 @@ const TeletextSubPage *TeletextScreen::FindSubPageInternal(
 bool TeletextScreen::InitialiseFont(void)
 {
     static bool initialised = false;
+    QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
     if (initialised)
-        return gTTFont;
-
-    QString font = gCoreContext->GetSetting("OSDCCFont");
+    {
+        if (gTTFont->face().family() == font)
+            return true;
+        delete gTTFont;
+    }
 
     MythFontProperties *mythfont = new MythFontProperties();
     if (mythfont)
@@ -1171,6 +1174,6 @@ bool TeletextScreen::InitialiseFont(void)
         return false;
 
     initialised = true;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded Teletext font"));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded main subtitle font '%1'"));
     return true;
 }

@@ -808,10 +808,13 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
 bool SubtitleScreen::InitialiseFont(void)
 {
     static bool initialised = false;
+    QString font = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
     if (initialised)
-        return gTextSubFont;
-
-    QString font = "FreeMono";
+    {
+        if (gTextSubFont->face().family() == font)
+            return gTextSubFont;
+        delete gTextSubFont;
+    }
 
     MythFontProperties *mythfont = new MythFontProperties();
     if (mythfont)
@@ -825,7 +828,8 @@ bool SubtitleScreen::InitialiseFont(void)
         return false;
 
     initialised = true;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded main subtitle font"));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded main subtitle font '%1'")
+        .arg(font));
     return true;
 }
 

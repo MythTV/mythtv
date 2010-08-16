@@ -17,6 +17,7 @@
 #include <QDir>
 #include <QImage>
 #include <QTextCodec>
+#include <QFontDatabase>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -1932,6 +1933,23 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     gs->setHelpText(QObject::tr("Use this to enlarge or shrink captions."));
 
     return gs;
+}
+
+static HostComboBox *SubtitleFont()
+{
+    HostComboBox *hcb = new HostComboBox("OSDSubFont");
+    QFontDatabase db;
+    QStringList fonts = db.families();
+    QStringList hide  = db.families(QFontDatabase::Symbol);
+
+    hcb->setLabel(QObject::tr("Subtitle Font"));
+    hcb->setHelpText(QObject::tr("The font to use for text based subtitles."));
+    foreach (QString font, fonts)
+    {
+        if (!hide.contains(font))
+            hcb->addSelection(font, font, font.toLower() == "freesans");
+    }
+    return hcb;
 }
 
 static HostComboBox *SubtitleCodec()
@@ -4265,6 +4283,7 @@ OSDSettings::OSDSettings()
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
+    osd->addChild(SubtitleFont());
     osd->addChild(SubtitleCodec());
     osd->addChild(UDPNotifyPort());
     addChild(osd);
