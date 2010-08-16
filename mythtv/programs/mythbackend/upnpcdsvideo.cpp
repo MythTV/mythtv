@@ -31,7 +31,7 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
             "FROM upnpmedia "
             "%1 "
             "ORDER BY title",
-        "" }
+        "", "title" }
 
 };
 

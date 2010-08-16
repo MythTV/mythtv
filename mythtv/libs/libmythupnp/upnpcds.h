@@ -151,6 +151,7 @@ typedef struct
     const char *column;
     const char *sql;
     const char *where;
+    const char *orderColumn;
 
 } UPnpCDSRootInfo;
          

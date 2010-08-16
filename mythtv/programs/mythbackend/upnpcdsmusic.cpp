@@ -53,7 +53,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "FROM music_songs song "
             "%1 "
             "ORDER BY name",
-        "" },
+        "", "" },
 
 /*
 This is currently broken... need to handle list of items with single parent (like 'All Music')
