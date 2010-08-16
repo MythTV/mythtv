@@ -351,9 +351,11 @@ class MythBE( FileOps ):
     def getLastGuideData(self):
         """
         Returns the last dat for which guide data is available
-        On error, 0000-00-00 00:00 is returned
         """
-        return self.backendCommand('QUERY_GUIDEDATATHROUGH')
+        try:
+            return datetime.duck(self.backendCommand('QUERY_GUIDEDATATHROUGH'))
+        except ValueError:
+            return None
 
 class BEEventMonitor( BEEvent ):
     def _listhandlers(self):

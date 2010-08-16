@@ -406,7 +406,7 @@ class datetime( _pydatetime ):
                         '.'
                         '(?P<hour>[0-9]{2})'
                        ':(?P<min>[0-9]{2})'
-                       ':(?P<sec>[0-9]{2})'
+                       '(:(?P<sec>[0-9]{2}))?'
                         '(?P<tz>Z|'
                             '(?P<tzdirec>[-+])'
                             '(?P<tzhour>[0-9]{1,2}?)'
@@ -438,7 +438,11 @@ class datetime( _pydatetime ):
             raise ValueError("time data '%s' does not match ISO 8601 format" \
                                 % isotime)
 
-        dt = [int(a) for a in match.groups()[:6]]
+        dt = [int(a) for a in match.groups()[:5]]
+        if match.group('sec') is not None:
+            dt.append(int(match.group('sec')))
+        else:
+            dt.append(0)
         if match.group('tz'):
             if match.group('tz') == 'Z':
                 tz = cls.tzinfo()
