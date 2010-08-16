@@ -1,42 +1,57 @@
-#ifndef LANGSETTINGS_H
-#define LANGSETTINGS_H
+#ifndef LANGSETTINGS_H_
+#define LANGSETTINGS_H_
 
-#include "settings.h"
+// QT headers
+#include <QObject>
+#include <QTranslator>
 
-class MPUBLIC LanguageSettings
+// MythDB headers
+#include "mythexp.h"
+
+// MythUI headers
+#include "mythscreentype.h"
+#include "mythscreenstack.h"
+
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIButton;
+class MythUIText;
+
+class MPUBLIC LanguageSelection : public MythScreenType
 {
-  public:
-    /// Load a QTranslator for the user's preferred
-    /// language. The module_name indicates
-    /// which .qm file to load.
-    static void load(QString module_name);
+    Q_OBJECT
 
-    /// Remove a QTranslator previously installed
-    /// using load().
-    static void unload(QString module_name);
+  public:
+    LanguageSelection(MythScreenStack *parent, bool exitOnFinish = false);
+   ~LanguageSelection(void);
 
     /// Ask the user for the language to use. If a
     /// language was already specified at the last
     /// load(), it will not ask unless force is set.
-    static void prompt(bool force = false);
+    static bool prompt(bool force = false);
 
-    /// Reload all active translators based on the
-    /// current language setting. Call this after changing
-    /// the language pref in the database.
-    static void reload();
+    bool Create(void);
+    void Load(void);
 
-    /// List the languages supported by Myth.
-    /// The list will always be an even number of items;
-    /// the language name precedes its language code.
-    static QStringList getLanguages();
+  private slots:
+    //void LanguageClicked(MythUIButtonListItem *item);
+    //void CountryClicked(MythUIButtonListItem *item);
+    void Close(void);
+    void Save(void);
 
-    /// Fill out a settings widget with the supported
-    /// language settings. Convenience wrapper around
-    /// getLanguages() functionality.
-    static void fillSelections(SelectSetting *widget);
+  private:
+    void LanguageChanged(void);
 
-  protected:
-    static class LanguageSettingsPrivate d;
+    MythUIButtonList *m_languageList;
+    MythUIButtonList *m_countryList;
+    MythUIButton *m_saveButton;
+    MythUIButton *m_cancelButton;
+
+    bool m_exitOnFinish;
+    bool m_loaded;
+    static bool m_languageChanged;
+    QString m_language;
+    QString m_country;
 };
 
 #endif

@@ -38,33 +38,39 @@ MythTranslationPrivate MythTranslation::d;
 void MythTranslation::load(const QString &module_name)
 {
     d.Init();
-    if (!d.m_language.isEmpty())
+
+    // unload any previous version
+    unload(module_name);
+
+    // install translator
+    QString lang  = d.m_language.toLower();
+
+    if (d.m_language.isEmpty())
     {
-        // unload any previous version
-        unload(module_name);
+        lang = "en_us";
+    }
 
-        // install translator
-        QString lang  = d.m_language.toLower();
+    if (lang == "en")
+    {
+        gCoreContext->SetSetting("Language", "EN_US");
+        gCoreContext->SaveSetting("Language", "EN_US");
+        lang = "en_us";
+    }
 
-        if (lang == "en")
-        {
-            gCoreContext->SetSetting("Language", "EN_US");
-            gCoreContext->SaveSetting("Language", "EN_US");
-            lang = "en_us";
-        }
-
-        QTranslator *trans = new QTranslator(0);
-        if (trans->load(GetTranslationsDir() + module_name
-                        + "_" + lang + ".qm", "."))
-        {
-            qApp->installTranslator(trans);
-            d.m_translators[module_name] = trans;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, "Cannot load language " + lang
-                                  + " for module " + module_name);
-        }
+    QTranslator *trans = new QTranslator(0);
+    if (trans->load(GetTranslationsDir() + module_name
+                    + "_" + lang + ".qm", "."))
+    {
+        VERBOSE(VB_GENERAL, QString("Loading %1 translation for module %2")
+                                    .arg(lang).arg(module_name));
+        qApp->installTranslator(trans);
+        d.m_translators[module_name] = trans;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error Loading %1 translation for "
+                                        "module %2").arg(lang)
+                                        .arg(module_name));
     }
 }
 
@@ -92,6 +98,9 @@ bool MythTranslation::LanguageChanged(void)
 
 void MythTranslation::reload()
 {
+//    if (!d.m_loaded)
+//        return;
+
     // Update our translators if necessary.
     // We need two loops, as the QMap wasn't happy with
     // me changing its contents during my iteration.
@@ -110,10 +119,9 @@ void MythTranslation::reload()
     }
 }
 
-
-QStringList MythTranslation::getLanguages(void)
+QMap<QString, QString> MythTranslation::getLanguages(void)
 {
-    QStringList langs;
+    QMap<QString, QString> langs;
 
     QDir translationDir(GetTranslationsDir());
     translationDir.setNameFilters(QStringList("mythfrontend_*.qm"));
@@ -145,8 +153,7 @@ QStringList MythTranslation::getLanguages(void)
             language.append(QString(" (%1)").arg(country));
         }
 
-        langs.append(language);
-        langs.append(languageCode);
+        langs[languageCode] = language;
     }
 
     return langs;

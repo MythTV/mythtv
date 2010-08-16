@@ -1208,6 +1208,20 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     g_pUPnp  = new MediaRenderer();
 
+    // Override settings as early as possible to cover bootstrapped screens
+    // such as the language prompt
+    settingsOverride = cmdline.GetSettingsOverride();
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(*it));
+            gCoreContext->OverrideSettingForSession(it.key(), *it);
+        }
+    }
+
     if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
@@ -1271,7 +1285,6 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
-    settingsOverride = cmdline.GetSettingsOverride();
 
     QStringList settingsQuery = cmdline.GetSettingsQuery();
     if (!settingsQuery.empty())
@@ -1299,24 +1312,13 @@ int main(int argc, char **argv)
         as.Save();
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("update settings set data='EN' "
+        query.prepare("update settings set data='en_US' "
                       "WHERE hostname = :HOSTNAME and value='Language' ;");
         query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("Updating language", query);
 
         return FRONTEND_EXIT_OK;
-    }
-
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
-            gCoreContext->OverrideSettingForSession(it.key(), *it);
-        }
     }
 
     // Create priveleged thread, then drop privs
@@ -1361,8 +1363,6 @@ int main(int argc, char **argv)
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
-    LanguageSettings::prompt();
-
     if (!UpgradeTVDatabaseSchema(upgradeAllowed))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1377,6 +1377,12 @@ int main(int argc, char **argv)
     mainWindow->ResetKeys();
 
     InitJumpPoints();
+
+    // We must reload the translation after a language change and this
+    // also means clearing the cached/loaded theme strings, so reload the
+    // theme which also triggers a translation reload
+    if (LanguageSelection::prompt())
+        GetMythMainWindow()->JumpTo("Reload Theme");
 
     internal_media_init();
 

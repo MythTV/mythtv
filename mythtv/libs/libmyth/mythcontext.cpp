@@ -16,12 +16,12 @@ using namespace std;
 #include "oldsettings.h"
 #include "util.h"
 #include "remotefile.h"
-#include "dialogbox.h"
 #include "mythdialogs.h"
 #include "mythplugin.h"
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
+#include "mythtranslation.h"
 #include "mythxdisplay.h"
 #include "mythevent.h"
 #include "dbutil.h"
@@ -268,8 +268,8 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     if (languagePrompt)
     {
         // ask user for language settings
-        LanguageSettings::prompt();
-        LanguageSettings::load("mythfrontend");
+        LanguageSelection::prompt();
+        MythTranslation::load("mythfrontend");
     }
 }
 

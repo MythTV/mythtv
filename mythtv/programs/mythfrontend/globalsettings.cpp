@@ -3393,7 +3393,9 @@ static HostComboBox *MythLanguage()
     HostComboBox *gc = new HostComboBox("Language");
     gc->setLabel(QObject::tr("Language"));
 
-    QStringList langs = MythTranslation::getLanguages();
+    QMap<QString, QString> langMap = MythTranslation::getLanguages();
+    QStringList langs = langMap.values();
+    langs.sort();
     QString langCode = gCoreContext->GetSetting("Language");
     if (langCode.isEmpty())
         langCode = "en_us";
@@ -3401,7 +3403,7 @@ static HostComboBox *MythLanguage()
     for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
     {
         QString label = *it;
-        QString value = *(++it);
+        QString value = langMap.key(label);
         gc->addSelection(label, value, (value == langCode));
     }
 

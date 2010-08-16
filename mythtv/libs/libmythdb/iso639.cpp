@@ -950,10 +950,17 @@ static CodeToNameMap createLanguageMap(void)
 
 static CodeToNameMap gLanguageMap;
 
-QString GetISO639LanguageName(QString iso639Code)
+QString GetISO639LanguageName(QString iso639_1)
 {
     if (gLanguageMap.isEmpty())
         gLanguageMap = createLanguageMap();
 
-    return gLanguageMap[iso639Code];
+    return gLanguageMap[iso639_1];
+}
+
+QString GetISO639EnglishLanguageName(QString iso639_1)
+{
+    QString iso639_2 = iso639_str2_to_str3(iso639_1);
+    int key2 = iso639_str3_to_key(iso639_2);
+    return iso639_key_toName(key2);
 }

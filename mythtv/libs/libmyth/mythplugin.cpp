@@ -11,7 +11,7 @@
 // MythTV includes
 #include "mythplugin.h"
 #include "mythcontext.h"
-#include "langsettings.h"
+#include "mythtranslation.h"
 
 #include "mythdirs.h"
 #include "mythversion.h"
@@ -187,7 +187,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
         return false;
     }
 
-    LanguageSettings::load(plugname);
+    MythTranslation::load(plugname);
 
     switch (m_dict[newname]->type())
     {

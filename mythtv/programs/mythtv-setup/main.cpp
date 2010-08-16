@@ -583,7 +583,7 @@ int main(int argc, char *argv[])
     mainWindow->Init();
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
-    LanguageSettings::prompt();
+    LanguageSelection::prompt();
     MythTranslation::load("mythfrontend");
 
     if (!DBUtil::CheckTables(true))

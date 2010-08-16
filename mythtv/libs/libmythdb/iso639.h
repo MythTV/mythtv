@@ -98,5 +98,6 @@ static inline QString iso639_str_to_canonoical_str(const QString &str3)
 typedef QMap<QString, QString> CodeToNameMap;
 
 MPUBLIC QString GetISO639LanguageName(QString iso639Code);
+MPUBLIC QString GetISO639EnglishLanguageName(QString iso639Code);
 
 #endif // _ISO_639_2_H_

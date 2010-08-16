@@ -1,20 +1,17 @@
 #ifndef MYTHTRANSLATION_H_
 #define MYTHTRANSLATION_H_
 
-
 #include <QTranslator>
 #include <QString>
 #include <QMap>
 
 #include "mythexp.h"
 
-class QStringList;
-
 class MPUBLIC MythTranslation
 {
 
   public:
-    static QStringList getLanguages(void);
+    static QMap<QString, QString> getLanguages(void);
 
     /// Load a QTranslator for the user's preferred
     /// language. The module_name indicates

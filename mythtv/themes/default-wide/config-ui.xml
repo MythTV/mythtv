@@ -98,4 +98,93 @@
 
     </window>
 
+    <window name="languageselection">
+
+        <textarea name="countrylabel">
+            <font>baselarge</font>
+            <area>40,20,510,40</area>
+            <value>Country</value>
+            <align>allcenter</align>
+        </textarea>
+
+        <buttonlist name="countries" from="basebuttonlist">
+            <area>40,80,530,530</area>
+            <scrollstyle>center</scrollstyle>
+            <spacing>2</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,55</area>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                        </fill>
+                    </shape>
+                    <imagetype name="buttonimage">
+                        <area>5,7,60,40</area>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>70,0,90%,30</area>
+                        <font>basemedium</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                    <textarea name="nativecountry">
+                        <area>70,30,90%,20</area>
+                        <font>basesmallgrey</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <helptext>Select the country in which you currently reside</helptext>
+        </buttonlist>
+
+        <textarea name="languagelabel" from="countrylabel">
+            <position>640,20</position>
+            <value>Language</value>
+        </textarea>
+
+        <buttonlist name="languages" from="basebuttonlist">
+            <area>640,80,530,530</area>
+            <spacing>4</spacing>
+            <scrollstyle>center</scrollstyle>
+            <helptext>Select your preferred language</helptext>
+        </buttonlist>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>200,630,880,60</area>
+            <align>allcenter</align>
+            <multiline>true</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>990,630</position>
+            <value>Save</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>40,630</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
+
 </mythuitheme>

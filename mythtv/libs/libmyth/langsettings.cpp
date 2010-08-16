@@ -1,217 +1,169 @@
+
 #include "langsettings.h"
 
-#include <QTranslator>
+// qt
+#include <QApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QApplication>
 
+// libmythdb
 #include "mythcorecontext.h"
 #include "mythstorage.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
 #include "mythlocale.h"
+#include "mythtranslation.h"
 
-// LangEditor provides the GUI for the prompt() routine.
-#include <mythscreentype.h>
+// libmythui
+#include "mythuibuttonlist.h"
+#include "mythuibutton.h"
+#include "mythmainwindow.h"
 
-class LangEditorSetting : public ListBoxSetting, public Storage
+LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
+                 :MythScreenType(parent, "LanguageSelection"),
+                  m_exitOnFinish(exitOnFinish), m_loaded(false)
 {
-  public:
-    LangEditorSetting() : ListBoxSetting(this)
-    {
-        setLabel(QObject::tr("Select your preferred language"));
-    };
-
-    virtual void Load(void)
-    {
-        LanguageSettings::fillSelections(this);
-    }
-
-    virtual void Save(void)
-    {
-        gCoreContext->SetSetting("Language", getValue());
-        gCoreContext->SaveSetting("Language", getValue());
-        LanguageSettings::reload();
-    }
-
-    virtual void Save(QString /*destination*/) { }
-};
-
-// LanguageSettingsPrivate holds our persistent data.
-// It's a singleton class, instantiated in the static
-// member variable d of LanguageSettings.
-
-typedef QMap<QString, QTranslator*> TransMap;
-
-class LanguageSettingsPrivate
-{
-  public:
-    LanguageSettingsPrivate():
-        m_loaded(false),
-        m_language("")    { };
-
-    void Init(void)
-    {
-        if (!m_loaded)
-        {
-            m_loaded = "loaded";
-            m_language = gCoreContext->GetSetting("Language");
-        }
-    };
-
-    bool LanguageChanged(void)
-    {
-        QString cur_language = gCoreContext->GetSetting("Language");
-        bool ret = false;
-        if (!cur_language.isEmpty() &&
-            cur_language.compare(m_language))
-            ret = true;
-        m_language = cur_language;
-        return ret;
-    };
-
-    bool m_loaded;
-    QString m_language;
-    TransMap m_translators;
- };
-
-LanguageSettingsPrivate LanguageSettings::d;
-
-void LanguageSettings::load(QString module_name)
-{
-    d.Init();
-    if (!d.m_language.isEmpty())
-    {
-        // unload any previous version
-        unload(module_name);
-
-        // install translator
-        QString      lang  = d.m_language.toLower();
-
-        if (lang == "en")
-        {
-            gCoreContext->SetSetting("Language", "EN_US");
-            gCoreContext->SaveSetting("Language", "EN_US");
-            lang = "en_us";
-        }
-
-        QTranslator *trans = new QTranslator(0);
-        if (trans->load(GetTranslationsDir() + module_name
-                        + "_" + lang + ".qm", "."))
-        {
-            qApp->installTranslator(trans);
-            d.m_translators[module_name] = trans;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, "Cannot load language " + lang
-                                  + " for module " + module_name);
-        }
-    }
+    m_language = gCoreContext->GetSetting("Language");
+    m_country = gCoreContext->GetSetting("Country");
 }
 
-void LanguageSettings::unload(QString module_name)
+LanguageSelection::~LanguageSelection()
 {
-    TransMap::Iterator it = d.m_translators.find(module_name);
-    if (it != d.m_translators.end())
-    {
-        // found translator, remove it from qApp and our map
-        qApp->removeTranslator(*it);
-        delete *it;
-        d.m_translators.erase(it);
-    }
 }
 
-void LanguageSettings::prompt(bool force)
+bool LanguageSelection::Create(void)
 {
-    d.Init();
-    // Ask for language if we don't already know.
-    if (force || d.m_language.isEmpty())
+    if (!LoadWindowFromXML("config-ui.xml", "languageselection", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_languageList, "languages", &err);
+    UIUtilE::Assign(this, m_countryList, "countries", &err);
+    UIUtilE::Assign(this, m_saveButton, "save", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
+
+    if (err)
     {
-        ConfigurationDialog langEdit;
-        langEdit.addChild(new LangEditorSetting());
-        langEdit.exec();
-    }
-    // Always update the database, even if there's
-    // no change -- during bootstrapping, we don't
-    // actually get to write to the database until
-    // a later run, so do it every time.
-    gCoreContext->SaveSetting("Language", d.m_language);
-}
-
-void LanguageSettings::reload(void)
-{
-    // Update our translators if necessary.
-    // We need two loops, as the QMap wasn't happy with
-    // me changing its contents during my iteration.
-    if (d.LanguageChanged())
-    {
-        QStringList keys;
-        for (TransMap::Iterator it = d.m_translators.begin();
-             it != d.m_translators.end();
-             ++it)
-            keys.append(it.key());
-
-        for (QStringList::Iterator it = keys.begin();
-             it != keys.end();
-             ++it)
-            load(*it);
-    }
-}
-
-QStringList LanguageSettings::getLanguages(void)
-{
-    QStringList langs;
-
-    QDir translationDir(GetTranslationsDir());
-    translationDir.setNameFilters(QStringList("mythfrontend_*.qm"));
-    translationDir.setFilter(QDir::Files);
-    QFileInfoList translationFiles = translationDir.entryInfoList();
-    QFileInfoList::const_iterator it;
-    for (it = translationFiles.constBegin(); it != translationFiles.constEnd();
-         ++it)
-    {
-        // We write the names incorrectly as all lowercase, so fix this before
-        // sending to QLocale
-        QString languageCode = (*it).baseName().section('_', 1, 1);
-        QString countryCode = (*it).baseName().section('_', 2, 2);
-        if (!countryCode.isEmpty())
-            languageCode = QString("%1_%2").arg(languageCode)
-                                           .arg(countryCode.toUpper());
-
-        MythLocale locale(languageCode);
-        QString language = locale.GetNativeLanguage();
-        if (language.isEmpty())
-            language = locale.GetLanguage(); // Fall back to English
-
-        if (!countryCode.isEmpty())
-        {
-            QString country = locale.GetNativeCountry();
-            if (country.isEmpty())
-                country = locale.GetCountry(); // Fall back to English
-
-            language.append(QString(" (%1)").arg(country));
-        }
-
-        langs.append(language);
-        langs.append(languageCode);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'languageselection'");
+        return false;
     }
 
-    return langs;
+//     connect(m_countryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+//             SLOT(LocaleClicked(MythUIButtonListItem*)));
+//     connect(m_languageList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+//             SLOT(LanguageClicked(MythUIButtonListItem*)));
+    connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+
+    m_languageList->SetLCDTitles(tr("Preferred language"), "");
+    m_countryList->SetLCDTitles(tr("Your location"), "");
+
+    BuildFocusList();
+
+    return true;
 }
 
-void LanguageSettings::fillSelections(SelectSetting *widget)
+void LanguageSelection::Load(void)
 {
-    QStringList langs = LanguageSettings::getLanguages();
     QString langCode = gCoreContext->GetLocale()->GetLanguageCode();
-    if (langCode.isEmpty())
-        langCode = "en_us";
-    widget->clearSelections();
+    QString localeCode = gCoreContext->GetLocale()->GetLocaleCode();
+    QString countryCode = gCoreContext->GetLocale()->GetCountryCode();
+
+    VERBOSE(VB_GENERAL, QString("System Locale (%1), Country (%2), Language "
+                                "(%3)").arg(localeCode).arg(countryCode)
+                                .arg(langCode));
+
+    CodeToNameMap langMap = MythTranslation::getLanguages();
+    QStringList langs = langMap.values();
+    langs.sort();
+    MythUIButtonListItem *item;
     for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
     {
-        QString label = *it;
-        QString value = *(++it);
-        widget->addSelection(label, value, (value == langCode));
+        QString nativeLang = *it;
+        QString code = langMap.key(nativeLang); // Slow, but map is small
+        item = new MythUIButtonListItem(m_languageList, nativeLang);
+        item->SetText(nativeLang, "nativelanguage");
+        item->SetData(code);
+
+         // We have to compare against locale for languages like en_GB
+        if (code == m_language || code == langCode || code == localeCode)
+            m_languageList->SetItemCurrent(item);
+    }
+
+    CodeToNameMap localesMap = GetISO3166EnglishCountryMap();
+    QStringList locales = localesMap.values();
+    locales.sort();
+    for (QStringList::Iterator it = locales.begin(); it != locales.end();
+         ++it)
+    {
+        QString country = *it;
+        QString code = localesMap.key(country); // Slow, but map is small
+        QString nativeCountry = GetISO3166CountryName(code);
+        item = new MythUIButtonListItem(m_countryList, country);
+        item->SetData(code);
+        item->SetText(country, "country");
+        item->SetText(nativeCountry, "nativecountry");
+        item->SetImage(QString("locale/%1.png").arg(code.toLower()));
+
+        if (code == m_country || code == countryCode)
+            m_countryList->SetItemCurrent(item);
     }
 }
 
+bool LanguageSelection::m_languageChanged = false;
+
+bool LanguageSelection::prompt(bool force)
+{
+    m_languageChanged = false;
+    QString language = gCoreContext->GetSetting("Language", "");
+    // Ask for language if we don't already know.
+    if (force || language.isEmpty())
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        if (!mainStack)
+            return false;
+
+        LanguageSelection *langSettings = new LanguageSelection(mainStack,
+                                                                true);
+
+        if (langSettings->Create())
+        {
+            mainStack->AddScreen(langSettings, false);
+            qApp->exec();
+            mainStack->PopScreen(langSettings, false);
+        }
+        else
+            delete langSettings;
+    }
+
+    return m_languageChanged;
+}
+
+void LanguageSelection::Save(void)
+{
+    MythUIButtonListItem *item = m_languageList->GetItemCurrent();
+
+    QString langCode = item->GetData().toString();
+    gCoreContext->SetSetting("Language", langCode);
+    gCoreContext->SaveSetting("Language", langCode);
+
+    item = m_countryList->GetItemCurrent();
+
+    QString countryCode = item->GetData().toString();
+    gCoreContext->SetSetting("Country", countryCode);
+    gCoreContext->SaveSetting("Country", countryCode);
+
+    if (m_language != langCode)
+        m_languageChanged = true;
+
+    Close();
+}
+
+void LanguageSelection::Close(void)
+{
+    if (m_exitOnFinish)
+        qApp->quit();
+    else
+        MythScreenType::Close();
+}
