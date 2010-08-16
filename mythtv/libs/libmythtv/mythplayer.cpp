@@ -1534,26 +1534,23 @@ void MythPlayer::ChangeCaptionTrack(int dir)
 
 int MythPlayer::NextCaptionTrack(int mode)
 {
-    // PAL  : Text->AVSubs->Teletext->NUV->None
-    // NTSC : Text->708->608->AVSubs->None or Text->608->708->AVSubs->None
-    // Other: Text->AVSubs->None
-    bool pal       = (vbimode == VBIMode::PAL_TT);
-    bool ntsc      = (vbimode == VBIMode::NTSC_CC);
-    int  nextmode  = kDisplayNone;
+    // Text->708/608->608/708->AVSubs->Teletext->NUV->None
+    // NUV only offerred if PAL
+    bool pal      = (vbimode == VBIMode::PAL_TT);
+    int  nextmode = kDisplayNone;
 
     if (kDisplayTextSubtitle == mode)
-        nextmode = ntsc ? (db_prefer708 ? kDisplayCC708 : kDisplayCC608) :
-                          kDisplayAVSubtitle;
+        nextmode = db_prefer708 ? kDisplayCC708 : kDisplayCC608;
+    else if (kDisplayCC708 == mode)
+        nextmode = db_prefer708 ? kDisplayCC608 : kDisplayAVSubtitle;
+    else if (kDisplayCC608 == mode)
+        nextmode = db_prefer708 ? kDisplayAVSubtitle : kDisplayCC708;
     else if (kDisplayAVSubtitle == mode)
-        nextmode = pal ? kDisplayTeletextCaptions : kDisplayNone;
-    else if ((kDisplayTeletextCaptions == mode) && pal)
-        nextmode = kDisplayNUVTeletextCaptions;
+        nextmode = kDisplayTeletextCaptions;
+    else if (kDisplayTeletextCaptions == mode)
+        nextmode = pal ? kDisplayNUVTeletextCaptions : kDisplayNone;
     else if ((kDisplayNUVTeletextCaptions == mode) && pal)
         nextmode = kDisplayNone;
-    else if ((kDisplayCC708 == mode) && ntsc)
-        nextmode = db_prefer708 ? kDisplayCC608 : kDisplayAVSubtitle;
-    else if ((kDisplayCC608 == mode) && ntsc)
-        nextmode = db_prefer708 ? kDisplayAVSubtitle : kDisplayCC708;
     else if (kDisplayNone == mode)
         nextmode = kDisplayTextSubtitle;
 
