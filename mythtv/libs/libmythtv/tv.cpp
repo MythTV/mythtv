@@ -66,7 +66,7 @@ QString StateToPublicString(TVState state)
             str =  QObject::tr("DVD");
             break;
         case kState_WatchingBD:
-            str =  QObject::tr("BD");
+            str =  QObject::tr("Blu-ray");
             break;
         case kState_RecordingOnly:
         case kState_Error:
