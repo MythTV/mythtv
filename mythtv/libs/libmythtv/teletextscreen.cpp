@@ -1174,6 +1174,7 @@ bool TeletextScreen::InitialiseFont(void)
         return false;
 
     initialised = true;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded main subtitle font '%1'"));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Loaded main subtitle font '%1'")
+        .arg(font));
     return true;
 }
