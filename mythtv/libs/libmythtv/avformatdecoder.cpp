@@ -1539,22 +1539,23 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             for (uint k = 0; k < td.StreamCount(); k++)
             {
                 int type = td.TeletextType(k);
-                if (type != 2)
-                    continue;
-
                 int language = td.CanonicalLanguageKey(k);
                 int magazine = td.TeletextMagazineNum(k)?:8;
                 int pagenum  = td.TeletextPageNum(k);
                 int lang_idx = (magazine << 8) | pagenum;
-
                 StreamInfo si(av_index, language, lang_idx, 0);
-                tracks[kTrackTypeTeletextCaptions].push_back(si);
-
-                VERBOSE(VB_PLAYBACK, LOC + QString(
-                            "Teletext caption #%1 is in the %2 language "
-                            "on page %3 %4.")
-                        .arg(k).arg(iso639_key_toName(language))
-                        .arg(magazine).arg(pagenum));
+                if (type == 2 || type == 1)
+                {
+                    TrackType track = (type == 2) ? kTrackTypeTeletextCaptions :
+                                                    kTrackTypeTeletextMenu;
+                    tracks[track].push_back(si);
+                    VERBOSE(VB_PLAYBACK, LOC + QString(
+                                "Teletext stream #%1 (%2) is in the %3 language"
+                                " on page %4 %5.")
+                            .arg(k).arg((type == 1) ? "Caption" : "Menu")
+                            .arg(iso639_key_toName(language))
+                            .arg(magazine).arg(pagenum));
+                }
             }
         }
 
@@ -1639,6 +1640,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
     tracks[kTrackTypeTeletextCaptions].clear();
+    tracks[kTrackTypeTeletextMenu].clear();
     tracks[kTrackTypeVideo].clear();
     selectedTrack[kTrackTypeVideo].av_stream_index = -1;
 

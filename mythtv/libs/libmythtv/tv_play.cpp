@@ -10223,6 +10223,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     QStringList cc708_tracks;
     QStringList cc608_tracks;
     QStringList ttx_tracks;
+    QStringList ttm_tracks;
     uint av_curtrack    = ~0;
     uint cc708_curtrack = ~0;
     uint cc608_curtrack = ~0;
@@ -10237,6 +10238,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         cc708_tracks = ctx->player->GetTracks(kTrackTypeCC708);
         cc608_tracks = ctx->player->GetTracks(kTrackTypeCC608);
         ttx_tracks   = ctx->player->GetTracks(kTrackTypeTeletextCaptions);
+        ttm_tracks   = ctx->player->GetTracks(kTrackTypeTeletextMenu);
         if (!av_tracks.empty())
             av_curtrack = (uint) ctx->player->GetTrack(kTrackTypeSubtitle);
         if (!cc708_tracks.empty())
@@ -10253,7 +10255,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
 
     if (category == "MAIN")
     {
-        if (have_subs || VBIMode::PAL_TT == vbimode)
+        if (have_subs || !ttm_tracks.empty())
         {
             osd->DialogAddButton(tr("Subtitles"),
                                  "DIALOG_MENU_SUBTITLES_0",
@@ -10297,7 +10299,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
                                  "DIALOG_MENU_TTXSUBTITLES_0",
                                  true, selected == "TTXSUBTITLES");
         }
-        if (VBIMode::PAL_TT == vbimode)
+        if (!ttm_tracks.empty())
             osd->DialogAddButton(tr("Toggle Teletext Menu"), "TOGGLETTM");
     }
     else if (category == "AVSUBTITLES")

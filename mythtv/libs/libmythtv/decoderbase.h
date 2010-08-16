@@ -32,9 +32,9 @@ typedef enum TrackTypes
     kTrackTypeCC608,
     kTrackTypeCC708,
     kTrackTypeTeletextCaptions,
+    kTrackTypeTeletextMenu,
     kTrackTypeCount,
 
-    kTrackTypeTeletextMenu,
     kTrackTypeTextSubtitle,
 } TrackType;
 QString toString(TrackType type);
