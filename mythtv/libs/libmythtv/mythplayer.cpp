@@ -1293,17 +1293,19 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
                                      GetTrack(kTrackTypeTeletextCaptions));
         DisableTeletext();
     }
+    int preserve = textDisplayMode & (kDisplayCC608 | kDisplayTextSubtitle |
+                                      kDisplayAVSubtitle | kDisplayCC708);
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode))
     {
         int type = toTrackType(mode);
         msg += decoder->GetTrackDesc(type, GetTrack(type));
-        osd->EnableSubtitles(kDisplayNone);
+        osd->EnableSubtitles(preserve);
     }
     if (kDisplayTextSubtitle & mode)
     {
         msg += QObject::tr("Text subtitles");
-        osd->EnableSubtitles(kDisplayNone);
+        osd->EnableSubtitles(preserve);
     }
     if (!msg.isEmpty() && osd_msg)
     {
@@ -1408,21 +1410,22 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         return;
     }
     int mode = NextCaptionTrack(kDisplayNone);
-    if ((kDisplayNone == mode) && osd_msg)
+    if (origMode != mode)
     {
-        SetOSDMessage(QObject::tr(
-            "No captions", "CC/Teletext/Subtitle text not available"),
-            kOSDTimeout_Med);
-    }
-    else if (mode)
-    {
-        EnableCaptions(mode, osd_msg);
-    }
-
-    // Reset captions, disable old captions on change
-    ResetCaptions();
-    if (origMode != textDisplayMode)
         DisableCaptions(origMode, false);
+
+        if ((kDisplayNone == mode) && osd_msg)
+        {
+            SetOSDMessage(QObject::tr(
+                "No captions", "CC/Teletext/Subtitle text not available"),
+                kOSDTimeout_Med);
+        }
+        else if (mode)
+        {
+            EnableCaptions(mode, osd_msg);
+        }
+        ResetCaptions();
+    }
 }
 
 QStringList MythPlayer::GetTracks(uint type)
