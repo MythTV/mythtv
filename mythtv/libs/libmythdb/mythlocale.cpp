@@ -21,12 +21,13 @@ MythLocale::MythLocale(QString localeName)
     else
         locale = QLocale::system();
 
+    if (locale.name().isEmpty() || locale.name() == "C")
+        locale = QLocale("en_US");
+
     m_localeCode = locale.name();
     m_country = locale.country();
     m_language = locale.language();
 
-    if (m_localeCode.isEmpty())
-        m_localeCode = "en_us";
 }
 
 QString MythLocale::GetCountryCode(void) const
