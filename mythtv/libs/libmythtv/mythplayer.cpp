@@ -1380,6 +1380,7 @@ TeletextViewer* MythPlayer::GetTeletextViewer(void)
 {
     if (GetOSD())
         return (TeletextViewer*)osd->InitTeletext();
+    return NULL;
 }
 
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
