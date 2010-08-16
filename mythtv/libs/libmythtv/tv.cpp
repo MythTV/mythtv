@@ -9,7 +9,7 @@ using namespace std;
  *  \brief Returns a human readable QString representing a TVState.
  *  \param state State to print.
  */
-QString StateToString(TVState state, bool brief)
+QString StateToString(TVState state)
 {
     QString statestr = QString("Unknown(%1)").arg((int)state);
     switch (state) {
@@ -22,10 +22,13 @@ QString StateToString(TVState state, bool brief)
             statestr = "WatchingPreRecorded";
             break;
         case kState_WatchingVideo:
-            statestr = (brief) ? "Video" : "WatchingVideo";
+            statestr = "WatchingVideo";
             break;
         case kState_WatchingDVD:
-            statestr = (brief) ? "DVD" : "WatchingDVD";
+            statestr = "WatchingDVD";
+            break;
+        case kState_WatchingBD:
+            statestr = "WatchingBD";
             break;
         case kState_WatchingRecording:
             statestr = "WatchingRecording";
@@ -37,6 +40,43 @@ QString StateToString(TVState state, bool brief)
     }
     statestr.detach();
     return statestr;
+}
+
+/**
+ *  \brief Returns a translatable QString representing a TVState.
+ *  \param state State to print.
+ */
+QString StateToPublicString(TVState state)
+{
+    QString str = QString();
+    switch (state) {
+        case kState_WatchingLiveTV:
+            str = QObject::tr("Live TV");
+            break;
+        case kState_WatchingPreRecorded:
+            str =  QObject::tr("Prerecorded");
+            break;
+        case kState_WatchingRecording:
+            str =  QObject::tr("Recording");
+            break;
+        case kState_WatchingVideo:
+            str =  QObject::tr("Video");
+            break;
+        case kState_WatchingDVD:
+            str =  QObject::tr("DVD");
+            break;
+        case kState_WatchingBD:
+            str =  QObject::tr("BD");
+            break;
+        case kState_RecordingOnly:
+        case kState_Error:
+        case kState_None:
+        case kState_ChangingState:
+        default:
+            break;
+    }
+    str.detach();
+    return str;
 }
 
 QString toTypeString(PictureAdjustType type)

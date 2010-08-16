@@ -739,6 +739,7 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
     if (playingInfo)
     {
         playingInfo->ToMap(infoMap);
+        infoMap["tvstate"]  = StateToPublicString(playingState);
         infoMap["iconpath"] = ChannelUtil::GetIcon(playingInfo->GetChanID());
         if (playingInfo->IsVideoFile() &&
             playingInfo->GetPathname() != playingInfo->GetBasename())

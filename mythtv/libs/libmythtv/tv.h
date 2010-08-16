@@ -72,7 +72,8 @@ typedef enum
     kState_ChangingState,
 } TVState;
 
-QString StateToString(TVState state, bool brief = false);
+QString StateToString(TVState state);
+QString StateToPublicString(TVState state);
 
 /** \brief SleepStatus is an enumeration of the awake/sleep status of a slave.
  */
