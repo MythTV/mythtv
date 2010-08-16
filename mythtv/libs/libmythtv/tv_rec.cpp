@@ -182,6 +182,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
 #endif
     }
     else if ((genOpt.cardtype == "IMPORT") ||
+             (genOpt.cardtype == "DEMO") ||
              (genOpt.cardtype == "MPEG" &&
               genOpt.videodev.toLower().left(5) == "file:"))
     {
@@ -1037,6 +1038,14 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "IMPORT")
     {
         recorder = new ImportRecorder(this);
+    }
+    else if (genOpt.cardtype == "DEMO")
+    {
+#ifdef USING_IVTV
+        recorder = new MpegRecorder(this);
+#else
+        recorder = new ImportRecorder(this);
+#endif
     }
     else
     {
@@ -2087,7 +2096,7 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
         return false;
 
     // nothing to monitor here either (DummyChannel)
-    if (genOpt.cardtype == "IMPORT")
+    if (genOpt.cardtype == "IMPORT" || genOpt.cardtype == "DEMO")
         return false;
 
     // make sure statics are initialized
@@ -4351,7 +4360,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     if (chanid < 0)
     {
         // Test setups might have zero channels
-        if (genOpt.cardtype == "IMPORT")
+        if (genOpt.cardtype == "IMPORT" || genOpt.cardtype == "DEMO")
             chanid = 9999;
         else
         {

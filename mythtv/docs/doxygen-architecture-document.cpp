@@ -253,8 +253,8 @@ These tools are in the packaging repository:
 <dl>
   <dt>osx-packager.pl   <dd>Downloads and builds all dependencies, then the
                             source, of %MythTV and all the official plugins,
-                            on Mac OS 10.3 thru 10.5
-  <dt>win32-packager.pl <dd>Similar tool for Windows XP and Vista
+                            on Mac OS (10.3?, 10.4?,) 10.5 and 10.6
+  <dt>win32-packager.pl <dd>Similar tool for Windows XP, Vista and 7
 </dl>
  */
 
@@ -987,17 +987,19 @@ mythavtest dvd:\\/path/to/dvd.iso
 
 Without an argument, this tool also exercises the "Live TV" recording chain.
 This can even be done on a machine without any tuner cards by creating a dummy
-MpegRecorder which loops through a sample MPEG file.
+recorder which loops through a sample file, like a previously recorded MPEG.
+Simply add an "Import Test Recorder" or "Demo test recorder" card in
+mythtv-setup and fill in the file pathname.
 
-On a machine that supports V4L, just add an IVTV type card in mythtv-setup,
-with the device set to something like "file:/path/to/some/mpeg/file.mpg".
-You also need to attach the card to a video source.
+The DEMO card creates an MpegRecorder, which supports looped "recording" and
+performs rate-limiting, but only supports MPEG files. The IMPORT card creates
+an ImportRecorder, which supports many AV file types, but due to seek table
+processing delay, should only be used with small files. The latter can also
+be used without a fixed file - external programs can monitor the backend
+for recording events, and move/create a recording file in-situ.
 
-On non-V4L machines, you currently need to manually create entries
-in the capturecard and cardinput tables.
-videodevice=file:/path/file.mpg, cardtype=MPEG, inputname=MPEG2TS.
-On such machines, you also need to have built the backend with --enable-hdpvr
-
+On non-V4L machines (Mac OS X, Windows, Unix BSD?), the MpegRecorder isn't
+currently supported, so the ImportRecorder is substituted for DEMO cards.
 */
 
 /** \defgroup db_schema    MythTV Database Schema
