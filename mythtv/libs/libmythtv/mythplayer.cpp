@@ -207,7 +207,7 @@ MythPlayer::MythPlayer(bool muted)
       vbimode(VBIMode::None),
       ttPageNum(0x888),
       // Support for captions, teletext, etc. decoded by libav
-      textDesired(false),
+      textDesired(false), tracksChanged(false), initTeletext(false),
       // CC608/708
       db_prefer708(true), cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
@@ -610,9 +610,7 @@ void MythPlayer::ReinitOSD(void)
                 uint old = textDisplayMode;
                 ToggleCaptions(old);
                 osd->Reinit(visible, aspect);
-                TeletextViewer* tt_view = GetTeletextViewer();
-                if (tt_view && decoder)
-                    decoder->SetTeletextDecoderViewer(tt_view);
+                SetupTeletextViewer();
                 EnableCaptions(old, false);
                 if (!was_paused)
                     Play();
@@ -1376,15 +1374,28 @@ bool MythPlayer::ToggleCaptions(uint type)
     return textDisplayMode;
 }
 
-TeletextViewer* MythPlayer::GetTeletextViewer(void)
+void MythPlayer::SetupTeletextViewer(void)
 {
+    if (QThread::currentThread() != playerThread)
+    {
+        initTeletext = true;
+        return;
+    }
+
     if (GetOSD())
-        return (TeletextViewer*)osd->InitTeletext();
-    return NULL;
+    {
+        TeletextViewer* ttview =  (TeletextViewer*)osd->InitTeletext();
+        if (ttview && GetDecoder())
+        {
+            initTeletext = false;
+            GetDecoder()->SetTeletextDecoderViewer(ttview);
+        }
+    }
 }
 
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 {
+    tracksChanged = false;
     uint origMode = textDisplayMode;
 
     textDesired = enable;
@@ -1467,7 +1478,7 @@ void MythPlayer::TracksChanged(uint trackType)
     if (trackType >= kTrackTypeSubtitle &&
         trackType <= kTrackTypeTeletextCaptions && textDesired)
     {
-        SetCaptionsEnabled(true, false);
+        tracksChanged = true;
     }
 }
 
@@ -1944,10 +1955,8 @@ void MythPlayer::VideoStart(void)
         videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0f);
         osd->Init(visible, aspect);
         videoOutput->InitOSD(osd);
+        SetupTeletextViewer();
         osd->EnableSubtitles(kDisplayNone);
-        TeletextViewer* tt_view = GetTeletextViewer();
-        if (tt_view)
-            decoder->SetTeletextDecoderViewer(tt_view);
 
 #ifdef USING_MHEG
         if (GetInteractiveTV())
@@ -2410,6 +2419,14 @@ void MythPlayer::EventLoop(void)
     // recreate the osd if a reinit was triggered by another thread
     if (reinit_osd)
         ReinitOSD();
+
+    // reselect subtitle tracks if triggered by the decoder
+    if (tracksChanged)
+        SetCaptionsEnabled(true, false);
+
+    // (re)initialise the teletext viewer
+    if (initTeletext)
+        SetupTeletextViewer();
 
     // Refresh the programinfo in use status
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

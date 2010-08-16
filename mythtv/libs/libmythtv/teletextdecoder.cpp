@@ -51,7 +51,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     uint magazine, packet, header;
 
     if (!m_teletextviewer && m_player)
-        m_teletextviewer = m_player->GetTeletextViewer();
+    {
+        m_player->SetupTeletextViewer();
+        return;
+    }
 
     if (!m_teletextviewer)
     {

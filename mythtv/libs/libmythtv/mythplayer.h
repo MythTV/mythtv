@@ -335,7 +335,7 @@ class MPUBLIC MythPlayer
     CC708Reader* GetCC708Reader(void)  { return &cc708; }
     CC608Reader* GetCC608Reader(void)  { return &cc608; }
     SubtitleReader* GetSubReader(void) { return &subReader; }
-    TeletextViewer* GetTeletextViewer(void);
+    void SetupTeletextViewer(void);
     bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
 
     // Teletext Menu and non-NUV teletext decoder
@@ -599,6 +599,8 @@ class MPUBLIC MythPlayer
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      textDesired;
+    bool      tracksChanged;
+    bool      initTeletext;
 
     // CC608/708
     bool db_prefer708;
