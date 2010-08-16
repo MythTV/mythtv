@@ -2086,6 +2086,10 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
     if (!channel)
         return false;
 
+    // nothing to monitor here either (DummyChannel)
+    if (genOpt.cardtype == "IMPORT")
+        return false;
+
     // make sure statics are initialized
     SignalMonitorValue::Init();
 
