@@ -17,7 +17,7 @@ using namespace std;
 
 static void init_xds_program_type(QString xds_program_type[96]);
 
-CC608Decoder::CC608Decoder(CC608Reader *ccr)
+CC608Decoder::CC608Decoder(CC608Input *ccr)
     : reader(ccr),                  ignore_time_code(false),
       rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
       vps_l(0),

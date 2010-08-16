@@ -45,7 +45,7 @@ class FilterManager;
 class FilterChain;
 class AudioInput;
 
-class MPUBLIC NuppelVideoRecorder : public RecorderBase
+class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
 {
  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
@@ -286,7 +286,6 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase
     int volume;
 
     CC608Decoder *ccd;
-    CC608Reader   ccr;
 
     bool go7007;
     bool resetcapture;

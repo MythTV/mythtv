@@ -13,8 +13,15 @@ using namespace std;
 #include <QMutex>
 #include <QChar>
 
-#include "cc608reader.h"
 #include "format.h"
+
+class CC608Input
+{
+  public:
+    virtual ~CC608Input() { }
+    virtual void AddTextData(unsigned char *buf, int len,
+                             long long timecode, char type) = 0;
+};
 
 enum
 {
@@ -34,7 +41,7 @@ enum
 class CC608Decoder
 {
   public:
-    CC608Decoder(CC608Reader *ccr);
+    CC608Decoder(CC608Input *ccr);
     ~CC608Decoder();
 
     void FormatCC(int tc, int code1, int code2);
@@ -72,7 +79,7 @@ class CC608Decoder
     void XDSPacketParse(const vector<unsigned char> &xds_buf);
     bool XDSPacketCRC(const vector<unsigned char> &xds_buf);
 
-    CC608Reader *reader;
+    CC608Input *reader;
 
     bool ignore_time_code;
 

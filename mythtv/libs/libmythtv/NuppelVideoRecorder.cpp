@@ -70,7 +70,7 @@ extern "C" {
 #define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
-    : RecorderBase(rec), audio_device(NULL), ccr(NULL)
+    : RecorderBase(rec), audio_device(NULL)
 {
     channelObj = channel;
 
@@ -180,8 +180,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
 
     volume = 100;
 
-    ccr.SetEnabled(true);
-    ccd = new CC608Decoder(&ccr);
+    ccd = new CC608Decoder(this);
 
     go7007 = false;
     resetcapture = false;

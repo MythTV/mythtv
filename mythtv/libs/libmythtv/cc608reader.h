@@ -3,6 +3,8 @@
 
 #include <QMutex>
 
+#include "cc608decoder.h"
+
 #include "mythexp.h"
 
 #define MAXTBUFFER 60
@@ -51,7 +53,7 @@ class CC608Buffer
 
 class MythPlayer;
 
-class MPUBLIC CC608Reader
+class MPUBLIC CC608Reader : public CC608Input
 {
   public:
     CC608Reader(MythPlayer *parent);
