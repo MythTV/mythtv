@@ -610,7 +610,7 @@ void MythPlayer::ReinitOSD(void)
                 uint old = textDisplayMode;
                 ToggleCaptions(old);
                 osd->Reinit(visible, aspect);
-                TeletextViewer* tt_view = (TeletextViewer*)osd->InitTeletext();
+                TeletextViewer* tt_view = GetTeletextViewer();
                 if (tt_view && decoder)
                     decoder->SetTeletextDecoderViewer(tt_view);
                 EnableCaptions(old, false);
@@ -1376,6 +1376,12 @@ bool MythPlayer::ToggleCaptions(uint type)
     return textDisplayMode;
 }
 
+TeletextViewer* MythPlayer::GetTeletextViewer(void)
+{
+    if (GetOSD())
+        return (TeletextViewer*)osd->InitTeletext();
+}
+
 void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 {
     uint origMode = textDisplayMode;
@@ -1941,7 +1947,7 @@ void MythPlayer::VideoStart(void)
         osd->Init(visible, aspect);
         videoOutput->InitOSD(osd);
         osd->EnableSubtitles(kDisplayNone);
-        TeletextViewer* tt_view = (TeletextViewer*)osd->InitTeletext();
+        TeletextViewer* tt_view = GetTeletextViewer();
         if (tt_view)
             decoder->SetTeletextDecoderViewer(tt_view);
 

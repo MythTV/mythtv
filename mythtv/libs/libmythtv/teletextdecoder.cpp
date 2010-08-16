@@ -32,6 +32,7 @@ using namespace std;
 #include "osd.h"
 #include "teletextdecoder.h"
 #include "vbilut.h"
+#include "mythplayer.h"
 #include "mythverbose.h"
 
 /******************************************************************/
@@ -48,6 +49,9 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 {
     int err = 0, latin1 = -1, zahl1, pagenum, subpagenum, lang, flags;
     uint magazine, packet, header;
+
+    if (!m_teletextviewer && m_player)
+        m_teletextviewer = m_player->GetTeletextViewer();
 
     if (!m_teletextviewer)
     {

@@ -268,7 +268,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Closed Caption & Teletext decoders
       ccd608(new CC608Decoder(parent->GetCC608Reader())),
       ccd708(new CC708Decoder(parent->GetCC708Reader())),
-      ttd(new TeletextDecoder()),   subReader(parent->GetSubReader()),
+      ttd(new TeletextDecoder(parent)), subReader(parent->GetSubReader()),
       // Interactive TV
       itv(NULL),
       // Audio

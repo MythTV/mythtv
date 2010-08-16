@@ -335,6 +335,7 @@ class MPUBLIC MythPlayer
     CC708Reader* GetCC708Reader(void)  { return &cc708; }
     CC608Reader* GetCC608Reader(void)  { return &cc608; }
     SubtitleReader* GetSubReader(void) { return &subReader; }
+    TeletextViewer* GetTeletextViewer(void);
     bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
 
     // Teletext Menu and non-NUV teletext decoder

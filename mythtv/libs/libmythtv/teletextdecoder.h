@@ -21,10 +21,13 @@ class TeletextViewer
                                  const uint8_t* buf, int vbimode) = 0;
 };
 
+class MythPlayer;
+
 class TeletextDecoder
 {
   public:
-    TeletextDecoder() :  m_teletextviewer(NULL), m_decodertype(-1) {}
+    TeletextDecoder(MythPlayer *player)
+      : m_player(player), m_teletextviewer(NULL), m_decodertype(-1) {}
     virtual ~TeletextDecoder() {}
 
     /// Sets the TeletextViewer which will get the text from this decoder.
@@ -44,6 +47,7 @@ class TeletextDecoder
 
   private:
 
+    MythPlayer     *m_player;
     TeletextViewer *m_teletextviewer;
     int             m_decodertype;
 };
