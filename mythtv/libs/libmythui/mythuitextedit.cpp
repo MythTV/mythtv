@@ -240,7 +240,7 @@ void MythUITextEdit::InsertText(const QString &text)
     {
         InsertCharacter(text.data()[i]);
     }
-    
+
     emit valueChanged();
 }
 
@@ -287,7 +287,7 @@ void MythUITextEdit::RemoveCharacter(int position)
 
 bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
 {
-    if (!m_Text || !m_cursorImage)
+    if (!m_Text || !m_Text->GetFontProperties() || !m_cursorImage)
         return false;
 
     QFontMetrics fm(m_Text->GetFontProperties()->face());
@@ -400,7 +400,7 @@ void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
     QClipboard *clipboard = QApplication::clipboard();
     if (!clipboard->supportsSelection())
         mode = QClipboard::Clipboard;
-        
+
     if (clipboard)
         InsertText(clipboard->text(mode));
 }
@@ -416,7 +416,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 
     if (!handled && InsertCharacter(e->text()))
         handled = true;
-    
+
     for (int i = 0; i < actions.size() && !handled; i++)
     {
 
