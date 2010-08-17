@@ -65,7 +65,7 @@ class MSearch( object ):
                 if len(fields) == 2:
                     sdict[fields[0].strip().lower()] = fields[1].strip()
 
-            if 'st' not in sdict:
+            if ('st' not in sdict) or ('location' not in sdict):
                 continue
 
             if filter:
