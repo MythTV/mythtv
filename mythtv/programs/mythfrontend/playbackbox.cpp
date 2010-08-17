@@ -4442,24 +4442,28 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
 
     QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
-    if (groupname != pginfo->GetTitle())
+    if (groupname == pginfo->GetTitle().toLower() &&
+        newTitle != groupname)
+    {
+        m_recordingList->RemoveItem(item);
+    }
+    else
     {
         QString tempSubTitle = newTitle;
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
 
-        RecordingInfo ri(*pginfo);
-        ri.ApplyRecordRecTitleChange(newTitle, newSubtitle);
-        *pginfo = ri;
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
 
         UpdateUIListItem(item, true);
     }
-    else
-        m_recordingList->RemoveItem(item);
+
+    RecordingInfo ri(*pginfo);
+    ri.ApplyRecordRecTitleChange(newTitle, newSubtitle);
+    *pginfo = ri;
 }
 
 void PlaybackBox::setRecGroup(QString newRecGroup)
