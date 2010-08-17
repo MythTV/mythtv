@@ -17,6 +17,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "x11colors.h"
 #include "mythverbose.h"
+#include "mythimage.h"
 #include "mythuitype.h"
 #include "mythmainwindow.h"
 #include "mythdb.h"
