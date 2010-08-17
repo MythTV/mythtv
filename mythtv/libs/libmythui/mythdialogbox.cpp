@@ -3,7 +3,6 @@
 
 #include <QCoreApplication>
 #include <QFileInfo>
-#include <QImageReader>
 #include <QString>
 #include <QStringList>
 #include <QTimer>
