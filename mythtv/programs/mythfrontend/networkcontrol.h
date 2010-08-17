@@ -121,6 +121,7 @@ class NetworkControl : public QTcpServer
 
     QString listRecordings(QString chanid = "", QString starttime = "");
     QString listSchedule(const QString& chanID = "") const;
+    QString listChannels(const uint start, const uint limit) const;
     QString saveScreenshot(NetworkCommand *nc);
 
     void processNetworkControlCommand(NetworkCommand *nc);

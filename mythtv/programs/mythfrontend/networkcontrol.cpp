@@ -856,6 +856,17 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
     else if (is_abbrev("recordings", nc->getArg(1)))
         return listRecordings();
+    else if (is_abbrev("channels", nc->getArg(1)))
+    {
+        if (nc->getArgCount() == 2)
+            return listChannels(0, 0);  // give us all you can
+        else if (nc->getArgCount() == 4)
+            return listChannels(nc->getArg(2).toLower().toUInt(),
+                                nc->getArg(3).toLower().toUInt());
+        else
+            return QString("ERROR: See 'help %1' for usage information "
+                           "(parameters mismatch)").arg(nc->getArg(0));
+    }
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
@@ -999,7 +1010,9 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query time            - Query current time on frontend\r\n"
             "query uptime          - Query machine uptime\r\n"
             "query verbose         - Get current VERBOSE filter\r\n"
-            "query version         - Query Frontend version details\r\n";
+            "query version         - Query Frontend version details\r\n"
+            "query channels        - Query available channels\r\n"
+            "query channels START LIMIT - Query available channels from START and limit results to LIMIT lines\r\n";
     }
     else if (is_abbrev("set", command))
     {
@@ -1245,6 +1258,57 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     }
     else
         result = "ERROR: Unable to retrieve recordings list.";
+
+    return result;
+}
+
+QString NetworkControl::listChannels(const uint start, const uint limit) const
+{
+    QString result;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryStr;
+    uint cnt;
+    uint maxcnt;
+    uint sqlStart = start;
+
+    // sql starts at zero, we want to start at 1
+    if (sqlStart > 0)
+        sqlStart--;
+
+    queryStr = "select chanid, callsign, name from channel where visible=1";
+    queryStr += " ORDER BY callsign";
+    
+    if (limit > 0)  // only if a limit is specified, we limit the results
+    {
+      QString limitStr = QString(" LIMIT %1,%2").arg(sqlStart).arg(limit);
+      queryStr += limitStr;
+    }
+    
+    query.prepare(queryStr);
+    if (!query.exec())
+    {
+        result = "ERROR: Unable to retrieve channel list.";
+        return result;
+    }
+
+    maxcnt = query.size();
+    cnt = 0;
+    if (maxcnt == 0)    // Feedback we have no usefull information
+    {
+        result += QString("0:0 0 \"Invalid\" \"Invalid\"");
+        return result;
+    }
+
+    while (query.next())
+    {
+        // Feedback is as follow:
+        // <current line count>:<max line count to expect> <channelid> <callsign name> <channel name>\r\n
+        cnt++;
+        result += QString("%1:%2 %3 \"%4\" \"%5\"\r\n")
+                          .arg(cnt).arg(maxcnt).arg(query.value(0).toInt())
+                          .arg(query.value(1).toString())
+                          .arg(query.value(2).toString());
+    }
 
     return result;
 }
