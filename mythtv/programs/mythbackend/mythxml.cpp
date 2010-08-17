@@ -32,6 +32,7 @@
 #include "mythconfig.h"
 #include "programinfo.h"
 #include "channelutil.h"
+#include "storagegroup.h"
 
 #include "rssparse.h"
 #include "netutils.h"
@@ -112,6 +113,9 @@ MythXMLMethod MythXML::GetMethod( const QString &sURI )
     if (sURI == "GetRecorded"           ) return MXML_GetRecorded;
     if (sURI == "GetExpiring"           ) return MXML_GetExpiring;
     if (sURI == "GetPreviewImage"       ) return MXML_GetPreviewImage;
+    if (sURI == "GetFile"               ) return MXML_GetFile;
+    if (sURI == "GetFileList"           ) return MXML_GetFileList;
+    if (sURI == "GetFileLinks"          ) return MXML_GetFileLinks;
     if (sURI == "GetRecording"          ) return MXML_GetRecording;
     if (sURI == "GetVideo"              ) return MXML_GetVideo;
     if (sURI == "GetMusic"              ) return MXML_GetMusic;
@@ -200,6 +204,15 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
                     GetPreviewImage( pRequest );
                     return true;
 
+                case MXML_GetFile              :
+                    GetFile        ( pThread, pRequest );
+                    return true;
+                case MXML_GetFileList          :
+                    GetFileList    ( pThread, pRequest, false );
+                    return true;
+                case MXML_GetFileLinks         :
+                    GetFileList    ( pThread, pRequest, true );
+                    return true;
                 case MXML_GetRecording         :
                     GetRecording   ( pThread, pRequest );
                     return true;
@@ -1210,6 +1223,142 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
+
+void MythXML::GetFile( HttpWorkerThread *pThread,
+                       HTTPRequest      *pRequest )
+{
+    pRequest->m_eResponseType   = ResponseTypeHTML;
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
+    pRequest->m_nResponseStatus = 404;
+
+    QString sStorageGroup = pRequest->m_mapParams[ "StorageGroup" ];
+    QString sFileName     = pRequest->m_mapParams[ "FileName"     ];
+
+    if (sStorageGroup.isEmpty())
+    {
+        VERBOSE( VB_UPNP, "MythXML::GetFile - StorageGroup missing.");
+        return;
+    }
+
+    if (sFileName.isEmpty())
+    {
+        VERBOSE( VB_UPNP, "MythXML::GetFile - FileName missing.");
+        return;
+    }
+
+    // ----------------------------------------------------------------------
+    // Check to see if this is another request for the same file...
+    // ----------------------------------------------------------------------
+
+    ThreadData *pData = static_cast<ThreadData *>(pThread->GetWorkerData());
+
+    if (pData != NULL)
+    {
+        if ((pData->m_eType == ThreadData::DT_File) &&
+            (pData->IsSameFile( sStorageGroup, sFileName )))
+        {
+            pRequest->m_sFileName = pData->m_sFileName;
+        }
+        else
+           pData = NULL;
+    }
+
+    // ----------------------------------------------------------------------
+    // New request if pData == NULL
+    // ----------------------------------------------------------------------
+
+    if (pData == NULL)
+    {
+        // ------------------------------------------------------------------
+        // Search for the filename
+        // ------------------------------------------------------------------
+        StorageGroup sgroup(sStorageGroup);
+        pRequest->m_sFileName = sgroup.FindRecordingFile(sFileName);
+
+        if (pRequest->m_sFileName.isEmpty())
+        {
+            VERBOSE( VB_UPNP, QString("MythXML::GetFile - Unable to find "
+                                      "%1.").arg(sFileName));
+            return;
+        }
+
+        // ------------------------------------------------------------------
+        // Store File information in WorkerThread Storage
+        // for next request (cache)
+        // ------------------------------------------------------------------
+
+        pData = new ThreadData( ThreadData::DT_File );
+        pData->SetFileData( sStorageGroup, sFileName, pRequest->m_sFileName );
+        pThread->SetWorkerData( pData );
+    }
+
+    // ----------------------------------------------------------------------
+    // check to see if the file (still) exists
+    // ----------------------------------------------------------------------
+
+    if (QFile::exists( pRequest->m_sFileName ))
+    {
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+    }
+}
+
+void MythXML::GetFileList( HttpWorkerThread *pThread,
+                           HTTPRequest      *pRequest,
+                           bool              bShowLinks )
+{
+    pRequest->m_eResponseType   = ResponseTypeHTML;
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 60";
+    pRequest->m_nResponseStatus = 404;
+
+    QString sStorageGroup = pRequest->m_mapParams[ "StorageGroup" ];
+
+    if (sStorageGroup.isEmpty())
+    {
+        VERBOSE( VB_UPNP, "MythXML::GetFileList - StorageGroup missing.");
+        return;
+    }
+
+    QStringList sStorageGroupDirs;
+    QString hostname = gCoreContext->GetHostName();
+    
+    if (StorageGroup::FindDirs(sStorageGroup, hostname, &sStorageGroupDirs))
+    {
+        pRequest->m_nResponseStatus = 200;
+        pRequest->m_response
+            << "<html><head><title>File List for " << sStorageGroup
+            << "</title></head><body>";
+
+        QStringList::iterator it = sStorageGroupDirs.begin();
+        for ( ; it != sStorageGroupDirs.end(); ++it)
+        {
+            QDir dir(*it);
+            dir.setFilter(QDir::Files);
+            dir.setSorting(QDir::Name | QDir::IgnoreCase);
+
+            QFileInfoList fileList = dir.entryInfoList();
+            QFileInfoList::iterator fit = fileList.begin();
+            for ( ; fit != fileList.end(); ++fit )
+            {
+                if (bShowLinks)
+                {
+                    pRequest->m_response
+                        << "<a href='/Myth/GetFile?StorageGroup="
+                        << sStorageGroup << "&FileName=" << (*fit).fileName()
+                        << "'>" << (*fit).fileName() << "</a><br>\n";
+                }
+                else
+                {
+                    pRequest->m_response << (*fit).fileName() << "\n";
+                }
+            }
+        }
+
+        pRequest->m_response << "</body><html>";
+    }
+}
 
 void MythXML::GetRecording( HttpWorkerThread *pThread,
                             HTTPRequest      *pRequest )

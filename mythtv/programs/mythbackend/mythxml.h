@@ -53,7 +53,11 @@ typedef enum
     MXML_GetAlbumArt            = 16,
     MXML_GetVideoArt            = 17,
     MXML_GetInternetSearch      = 18,
-    MXML_GetInternetSources     = 19
+    MXML_GetInternetSources     = 19,
+
+    MXML_GetFile                = 20,
+    MXML_GetFileList            = 21,
+    MXML_GetFileLinks           = 22,
 
 } MythXMLMethod;
 
@@ -106,6 +110,12 @@ class MythXML : public Eventing
 
         void    GetExpiring    ( HTTPRequest *pRequest );
 
+        void    GetFile        ( HttpWorkerThread *pThread,
+                                 HTTPRequest      *pRequest );
+        void    GetFileList    ( HttpWorkerThread *pThread,
+                                 HTTPRequest      *pRequest,
+                                 bool              bShowLinks );
+
         void    GetRecording   ( HttpWorkerThread *pThread,
                                  HTTPRequest      *pRequest );
 
@@ -156,9 +166,10 @@ class ThreadData : public HttpWorkerData
         typedef enum
         {
             DT_Unknown   = 0,
-            DT_Recording = 1,
-            DT_Music     = 2,
-            DT_Video     = 3
+            DT_File      = 1,
+            DT_Recording = 2,
+            DT_Music     = 3,
+            DT_Video     = 4
 
 
         } ThreadDataType;
@@ -166,14 +177,21 @@ class ThreadData : public HttpWorkerData
 
         ThreadDataType  m_eType;
 
+        QString         m_sStorageGroup;
         QString         m_sChanId;
         QString         m_sStartTime;
+        QString         m_sBaseFileName;
         QString         m_sFileName;
         QString         m_sVideoID;
 
         int             m_nTrackNumber;
 
     public:
+
+        ThreadData( ThreadDataType  eType )
+        {
+            m_eType = eType;
+        }
 
         ThreadData( long nTrackNumber, const QString &sFileName )
         {
@@ -205,6 +223,22 @@ class ThreadData : public HttpWorkerData
 
         virtual ~ThreadData()
         {
+        }
+
+        void SetFileData( const QString &sStorageGroup,
+                          const QString &sStorageGroupFile,
+                          const QString &sFileName )
+        {
+            m_sStorageGroup = sStorageGroup;
+            m_sBaseFileName = sStorageGroupFile;
+            m_sFileName     = sFileName;
+        }
+
+        bool IsSameFile( const QString &sStorageGroup,
+                         const QString &sFileName )
+        {
+            return( (sStorageGroup == m_sStorageGroup) &&
+                    (sFileName     == m_sFileName) );
         }
 
         bool IsSameRecording( const QString &sChanId,
