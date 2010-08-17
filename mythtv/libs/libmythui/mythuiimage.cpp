@@ -28,8 +28,6 @@
 
 class ImageLoadThread;
 
-const int kImageLoadEventType = 35112;
-
 #define LOC      QString("MythUIImage(0x%1): ").arg((uintptr_t)this,0,16)
 #define LOC_ERR  QString("MythUIImage(0x%1) Error: ").arg((uintptr_t)this,0,16)
 #define LOC_WARN QString("MythUIImage(0x%1) Warning: ") \
@@ -44,7 +42,7 @@ class ImageLoadEvent : public QEvent
     ImageLoadEvent(MythUIImage *parent, MythImage *image,
                    const QString &basefile, const QString &filename,
                    int number)
-                 : QEvent((QEvent::Type)kImageLoadEventType),
+                 : QEvent(kEventType),
                    m_parent(parent), m_image(image), m_basefile(basefile),
                    m_filename(filename), m_number(number) { }
 
@@ -54,6 +52,8 @@ class ImageLoadEvent : public QEvent
     const QString GetFilename() const { return m_filename; }
     const int GetNumber() const { return m_number; }
 
+    static Type kEventType;
+
   private:
     MythUIImage     *m_parent;
     MythImage       *m_image;
@@ -61,6 +61,9 @@ class ImageLoadEvent : public QEvent
     QString          m_filename;
     int              m_number;
 };
+
+QEvent::Type ImageLoadEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
 
 /*!
 * \class ImageLoadThread
@@ -1183,7 +1186,7 @@ void MythUIImage::LoadNow(void)
 */
 void MythUIImage::customEvent(QEvent *event)
 {
-    if (event->type() == kImageLoadEventType)
+    if (event->type() == ImageLoadEvent::kEventType)
     {
         ImageLoadEvent *le = dynamic_cast<ImageLoadEvent*>(event);
 
