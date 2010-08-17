@@ -307,8 +307,6 @@ package MythTV::Recording;
         my $program = find_program('mplayer');
     # Nothing found?  Die
         die "You need mplayer to use this script on mpeg-based files.\n\n" unless ($program);
-    # Set the is_mpeg flag
-        $info{'is_mpeg'} = 1;
     # Grab the info we want from mplayer (go uber-verbose to override --really-quiet)
         my $idargs = "-v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 1 -identify";
         my $data = `$program $idargs '$file' 2>/dev/null`;
@@ -324,6 +322,14 @@ package MythTV::Recording;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=0*([1-9]\d*(?:[\.\,]\d+)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=0*([1-9]\d*(?:\.\d+)?)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_DEMUXER=(\w+)/mi;
+
+    # Set the is_mpeg flag
+        if ($info{'video_type'} eq "H264") {
+            $info{'is_h264'} = 1;
+        }
+        else {
+            $info{'is_mpeg'} = 1;
+        }
 
     # Mplayer can't find the needed details.  Let's try again, forcing the use
     # of the ffmpeg lavf demuxer
