@@ -18,7 +18,6 @@ using namespace std;
 #include "x11colors.h"
 #include "mythverbose.h"
 #include "mythuitype.h"
-#include "mythimage.h"
 #include "mythmainwindow.h"
 #include "mythdb.h"
 
@@ -187,7 +186,7 @@ bool MythUIGuideGrid::ParseElement(
         if (font)
             m_font = font;
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown font: " + fontname); 
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown font: " + fontname);
     }
     else if (element.tagName() == "recordstatus")
     {
@@ -342,7 +341,7 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
         else if (status == 2)
             lineColor = m_conflictingColor;
 
-        p->DrawRoundRect(area, 10, m_drawSelFill, fillColor, 
+        p->DrawRoundRect(area, 10, m_drawSelFill, fillColor,
                          m_drawSelLine, 2, lineColor);
     }
     else if (m_selType == "highlight")
@@ -391,7 +390,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
         {
             if (m_verticalLayout)
             {
-                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2), 
+                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2),
                              area.top() , m_arrowImages[2], alphaMod);
             }
             else
@@ -417,10 +416,10 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
     }
 
     // draw recording status
-    if (data->recType != 0)
+    if (data->recType != 0 && m_recImages[data->recType])
     {
         p->DrawImage(area.right() - m_recImages[data->recType]->width(),
-                     area.bottom() - m_recImages[data->recType]->height(), 
+                     area.bottom() - m_recImages[data->recType]->height(),
                      m_recImages[data->recType], alphaMod);
     }
 }
