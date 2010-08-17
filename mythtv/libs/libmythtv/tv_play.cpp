@@ -4629,6 +4629,46 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             DoSeek(ctx, rel_frame, tr("Jump To"));
         }
     }
+    else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
+    {
+        QRegExp re = QRegExp("(\\d+)%");
+        if (tokens[2].contains(re))
+        {
+            QStringList matches = re.capturedTexts();
+
+            VERBOSE(VB_IMPORTANT, QString("Set Volume to %1%").arg(matches[1]));
+
+            bool ok = false;
+
+            int vol = matches[1].toInt(&ok);
+
+            if (!ok)
+                return;
+
+            if ( 0 <= vol && vol <= 100)
+            {
+                ctx->LockDeletePlayer(__FILE__, __LINE__);
+                if (!ctx->player)
+                {
+                    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+                    return;
+                } 
+
+                vol -= ctx->player->GetVolume();
+                vol = ctx->player->AdjustVolume(vol);
+                ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+                if (!browsemode && !editmode)
+                {
+                    UpdateOSDStatus(ctx, tr("Adjust Volume"), tr("Volume"),
+                                    QString::number(vol),
+                                    kOSDFunctionalType_PictureAdjust, "%", vol * 10,
+                                    kOSDTimeout_Med);
+                    SetUpdateOSDPosition(false);
+                }
+            }
+        }
+    }
     else if (tokens.size() >= 3 && tokens[1] == "QUERY")
     {
         if (tokens[2] == "POSITION")
@@ -4713,6 +4753,15 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
             QString message = QString("NETWORK_CONTROL ANSWER %1")
                                 .arg(infoStr);
+            MythEvent me(message);
+            gCoreContext->dispatch(me);
+        }
+        else if (tokens[2] == "VOLUME")
+        {
+            QString infoStr = QString("%1%").arg(ctx->player->GetVolume());
+
+            QString message = QString("NETWORK_CONTROL ANSWER %1")
+                .arg(infoStr);
             MythEvent me(message);
             gCoreContext->dispatch(me);
         }

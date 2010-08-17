@@ -731,6 +731,18 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     }
     else if (is_abbrev("stop", nc->getArg(1), 2))
         message = QString("NETWORK_CONTROL STOP");
+    else if (is_abbrev("volume", nc->getArg(1), 2))
+    {
+        if ((nc->getArgCount() < 3) ||
+            (!nc->getArg(2).toLower().contains(QRegExp("^\\d+%?$"))))
+        {
+            return QString("ERROR: See 'help %1' for usage information")
+                           .arg(nc->getArg(0));
+        }
+
+        message = QString("NETWORK_CONTROL VOLUME %1")
+                          .arg(nc->getArg(2).toLower());
+    }
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
@@ -846,6 +858,32 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
                           .arg(totalMB).arg(freeMB).arg(totalVM).arg(freeVM);
         else
             str = QString("Could not determine memory stats.");
+        return str;
+    }
+    else if (is_abbrev("volume", nc->getArg(1)))
+    {
+        QString str = "0%";
+
+        QString location = GetMythUI()->GetCurrentLocation(false, false);
+
+        if (location != "Playback")
+            return str;
+
+        gotAnswer = false;
+        QString message = QString("NETWORK_CONTROL QUERY VOLUME");
+        MythEvent me(message);
+        gCoreContext->dispatch(me);
+        
+        QTime timer;
+        timer.start();
+        while (timer.elapsed() < 2000  && !gotAnswer)
+            usleep(10000);
+    
+        if (gotAnswer)
+            str = answer;
+        else
+            str = "ERROR: Timed out waiting for reply from player";
+
         return str;
     }
     else if ((nc->getArgCount() == 4) &&
@@ -967,6 +1005,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     else if (is_abbrev("play", command))
     {
         helpText +=
+            "play volume NUMBER%   - Change volume to given percentage value\r\n"
             "play channel up       - Change channel Up\r\n"
             "play channel down     - Change channel Down\r\n"
             "play channel NUMBER   - Change to a specific channel number\r\n"
@@ -1000,6 +1039,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
     {
         helpText +=
             "query location        - Query current screen or location\r\n"
+            "query volume          - Query the current playback volume\r\n"
             "query recordings      - List currently available recordings\r\n"
             "query recording CHANID STARTTIME\r\n"
             "                      - List info about the specified program\r\n"
