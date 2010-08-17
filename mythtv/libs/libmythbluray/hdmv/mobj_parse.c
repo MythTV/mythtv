@@ -50,10 +50,33 @@ static int _mobj_parse_header(BITSTREAM *bs, int *extension_data_start)
     return 1;
 }
 
+void mobj_parse_cmd(uint8_t *buf, MOBJ_CMD *cmd)
+{
+    BITBUFFER bb;
+    bb_init(&bb, buf, 12);
+
+    cmd->insn.op_cnt     = bb_read(&bb, 3);
+    cmd->insn.grp        = bb_read(&bb, 2);
+    cmd->insn.sub_grp    = bb_read(&bb, 3);
+
+    cmd->insn.imm_op1    = bb_read(&bb, 1);
+    cmd->insn.imm_op2    = bb_read(&bb, 1);
+    bb_skip(&bb, 2);    /* reserved */
+    cmd->insn.branch_opt = bb_read(&bb, 4);
+
+    bb_skip(&bb, 4);    /* reserved */
+    cmd->insn.cmp_opt    = bb_read(&bb, 4);
+
+    bb_skip(&bb, 3);    /* reserved */
+    cmd->insn.set_opt    = bb_read(&bb, 5);
+
+    cmd->dst = bb_read(&bb, 32);
+    cmd->src = bb_read(&bb, 32);
+}
+
 static int _mobj_parse_object(BITSTREAM *bs, MOBJ_OBJECT *obj)
 {
-    uint16_t num_cmds;
-    int      i;
+    int i;
 
     obj->resume_intention_flag = bs_read(bs, 1);
     obj->menu_call_mask = bs_read(bs, 1);
@@ -61,32 +84,13 @@ static int _mobj_parse_object(BITSTREAM *bs, MOBJ_OBJECT *obj)
 
     bs_skip(bs, 13); /* padding */
 
-    num_cmds = bs_read(bs, 16);
-
-    obj->cmds = calloc(num_cmds, sizeof(MOBJ_CMD));
-    obj->num_cmds = num_cmds;
+    obj->num_cmds = bs_read(bs, 16);
+    obj->cmds     = calloc(obj->num_cmds, sizeof(MOBJ_CMD));
 
     for (i = 0; i < obj->num_cmds; i++) {
-
-        HDMV_INSN *insn = &obj->cmds[i].insn;
-
-        insn->op_cnt     = bs_read(bs, 3);
-        insn->grp        = bs_read(bs, 2);
-        insn->sub_grp    = bs_read(bs, 3);
-
-        insn->imm_op1    = bs_read(bs, 1);
-        insn->imm_op2    = bs_read(bs, 1);
-        bs_skip(bs, 2);    /* reserved */
-        insn->branch_opt = bs_read(bs, 4);
-
-        bs_skip(bs, 4);    /* reserved */
-        insn->cmp_opt    = bs_read(bs, 4);
-
-        bs_skip(bs, 3);    /* reserved */
-        insn->set_opt    = bs_read(bs, 5);
-
-        obj->cmds[i].dst = bs_read(bs, 32);
-        obj->cmds[i].src = bs_read(bs, 32);
+        uint8_t buf[12];
+        bs_read_bytes(bs, buf, 12);
+        mobj_parse_cmd(buf, &obj->cmds[i]);
     }
 
     return 1;

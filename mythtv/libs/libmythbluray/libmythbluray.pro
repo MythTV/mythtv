@@ -17,10 +17,10 @@ DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
-HEADERS += bluray.h register.h bdnav/*.h hdmv/*.h util/*.h file/*.h
+HEADERS += bluray.h register.h bdnav/*.h hdmv/*.h util/*.h file/*.h decoders/*.h
 #HEADERS += bdj/*.h
 
-SOURCES += bluray.c register.c bdnav/*.c hdmv/*.c file/*.c util/*.c
+SOURCES += bluray.c register.c bdnav/*.c hdmv/*.c file/*.c util/*.c decoders/*.c
 #SOURCES += bdj/*.c
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bluray

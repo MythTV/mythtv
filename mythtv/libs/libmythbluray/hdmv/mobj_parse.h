@@ -41,7 +41,7 @@ typedef struct {
   uint8_t set_opt    : 5;  /* set option */
 } HDMV_INSN;
 
-typedef struct {
+typedef struct bd_mobj_cmd_s {
     HDMV_INSN insn;
     uint32_t  dst;
     uint32_t  src;
@@ -63,6 +63,7 @@ typedef struct {
 
 
 BD_PRIVATE MOBJ_OBJECTS* mobj_parse(const char *path); /* parse MovieObject.bdmv */
+BD_PRIVATE void          mobj_parse_cmd(uint8_t *buf, MOBJ_CMD *cmd);
 BD_PRIVATE void          mobj_free(MOBJ_OBJECTS *index);
 
 BD_PRIVATE int mobj_sprint_cmd(char *buf, MOBJ_CMD *cmd); /* print MOBJ_CMD to string. buf is expected to be 256 bytes. */

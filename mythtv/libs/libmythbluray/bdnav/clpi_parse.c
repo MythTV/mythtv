@@ -350,6 +350,13 @@ clpi_lookup_spn(CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id)
     int start, end;
     int ref;
 
+    if (cpi->num_stream_pid < 1 || !cpi->entry) {
+        if (before) {
+            return 0;
+        }
+        return cl->clip.num_source_packets;
+    }
+
     // Assumes that there is only one pid of interest
     entry = &cpi->entry[0];
 

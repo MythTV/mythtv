@@ -98,6 +98,13 @@ struct nav_clip_list_s
     NAV_CLIP *clip;
 };
 
+typedef struct nav_sub_path_s NAV_SUB_PATH;
+struct nav_sub_path_s
+{
+    uint8_t       type;
+    NAV_CLIP_LIST clip_list;
+};
+
 struct nav_title_s {
     char          *root;
     char          name[11];
@@ -106,6 +113,9 @@ struct nav_title_s {
     NAV_CLIP_LIST clip_list;
     NAV_MARK_LIST chap_list;
     NAV_MARK_LIST mark_list;
+
+    unsigned      sub_path_count;
+    NAV_SUB_PATH  *sub_path;
 
     uint32_t      packets;
     uint32_t      duration;

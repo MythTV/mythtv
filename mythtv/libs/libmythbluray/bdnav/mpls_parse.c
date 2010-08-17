@@ -45,45 +45,56 @@ _human_readable_sig(char *sig, uint32_t s1, uint32_t s2)
     sig[8] = 0;
 }
 
-static int
-_parse_uo(BITSTREAM *bits, MPLS_UO *uo)
+int
+mpls_parse_uo(uint8_t *buf, BD_UO_MASK *uo)
 {
-    uo->menu_call                       = bs_read(bits, 1);
-    uo->title_search                    = bs_read(bits, 1);
-    uo->chapter_search                  = bs_read(bits, 1);
-    uo->time_search                     = bs_read(bits, 1);
-    uo->skip_to_next_point              = bs_read(bits, 1);
-    uo->skip_to_prev_point              = bs_read(bits, 1);
-    uo->play_firstplay                  = bs_read(bits, 1);
-    uo->stop                            = bs_read(bits, 1);
-    uo->pause_on                        = bs_read(bits, 1);
-    uo->pause_off                       = bs_read(bits, 1);
-    uo->still                           = bs_read(bits, 1);
-    uo->forward                         = bs_read(bits, 1);
-    uo->backward                        = bs_read(bits, 1);
-    uo->resume                          = bs_read(bits, 1);
-    uo->move_up                         = bs_read(bits, 1);
-    uo->move_down                       = bs_read(bits, 1);
-    uo->move_left                       = bs_read(bits, 1);
-    uo->move_right                      = bs_read(bits, 1);
-    uo->select                          = bs_read(bits, 1);
-    uo->activate                        = bs_read(bits, 1);
-    uo->select_and_activate             = bs_read(bits, 1);
-    uo->primary_audio_change            = bs_read(bits, 1);
-    bs_skip(bits, 1);
-    uo->angle_change                    = bs_read(bits, 1);
-    uo->popup_on                        = bs_read(bits, 1);
-    uo->popup_off                       = bs_read(bits, 1);
-    uo->pg_enable_disable               = bs_read(bits, 1);
-    uo->pg_change                       = bs_read(bits, 1);
-    uo->secondary_video_enable_disable  = bs_read(bits, 1);
-    uo->secondary_video_change          = bs_read(bits, 1);
-    uo->secondary_audio_enable_disable  = bs_read(bits, 1);
-    uo->secondary_audio_change          = bs_read(bits, 1);
-    bs_skip(bits, 1);
-    uo->pip_pg_change                   = bs_read(bits, 1);
-    bs_skip(bits, 30);
+    BITBUFFER bb;
+    bb_init(&bb, buf, 8);
+
+    uo->menu_call                       = bb_read(&bb, 1);
+    uo->title_search                    = bb_read(&bb, 1);
+    uo->chapter_search                  = bb_read(&bb, 1);
+    uo->time_search                     = bb_read(&bb, 1);
+    uo->skip_to_next_point              = bb_read(&bb, 1);
+    uo->skip_to_prev_point              = bb_read(&bb, 1);
+    uo->play_firstplay                  = bb_read(&bb, 1);
+    uo->stop                            = bb_read(&bb, 1);
+    uo->pause_on                        = bb_read(&bb, 1);
+    uo->pause_off                       = bb_read(&bb, 1);
+    uo->still                           = bb_read(&bb, 1);
+    uo->forward                         = bb_read(&bb, 1);
+    uo->backward                        = bb_read(&bb, 1);
+    uo->resume                          = bb_read(&bb, 1);
+    uo->move_up                         = bb_read(&bb, 1);
+    uo->move_down                       = bb_read(&bb, 1);
+    uo->move_left                       = bb_read(&bb, 1);
+    uo->move_right                      = bb_read(&bb, 1);
+    uo->select                          = bb_read(&bb, 1);
+    uo->activate                        = bb_read(&bb, 1);
+    uo->select_and_activate             = bb_read(&bb, 1);
+    uo->primary_audio_change            = bb_read(&bb, 1);
+    bb_skip(&bb, 1);
+    uo->angle_change                    = bb_read(&bb, 1);
+    uo->popup_on                        = bb_read(&bb, 1);
+    uo->popup_off                       = bb_read(&bb, 1);
+    uo->pg_enable_disable               = bb_read(&bb, 1);
+    uo->pg_change                       = bb_read(&bb, 1);
+    uo->secondary_video_enable_disable  = bb_read(&bb, 1);
+    uo->secondary_video_change          = bb_read(&bb, 1);
+    uo->secondary_audio_enable_disable  = bb_read(&bb, 1);
+    uo->secondary_audio_change          = bb_read(&bb, 1);
+    bb_skip(&bb, 1);
+    uo->pip_pg_change                   = bb_read(&bb, 1);
+    bb_skip(&bb, 30);
     return 1;
+}
+
+static int
+_parse_uo(BITSTREAM *bits, BD_UO_MASK *uo)
+{
+    uint8_t buf[8];
+    bs_read_bytes(bits, buf, 8);
+    return mpls_parse_uo(buf, uo);
 }
 
 static int
