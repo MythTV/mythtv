@@ -13,7 +13,7 @@ from connections import FEConnection, XMLConnection
 from utility import databaseSearch, datetime
 from database import DBCache
 from system import SystemEvent
-from mythproto import BEEvent, FileOps, Program
+from mythproto import BEEvent, FileOps, Program, FreeSpace
 from dataheap import *
 
 from datetime import timedelta
@@ -231,32 +231,31 @@ class MythBE( FileOps ):
         if all:
             command = 'QUERY_FREE_SPACE_LIST'
         res = self.backendCommand(command).split(BACKEND_SEP)
-        dirs = []
-        for i in xrange(len(res)/10):
-            dirs.append(FreeSpace(res[i*10:i*10+10]))
-        return dirs
+        l = len(FreeSpace._field_order)
+        for i in xrange(len(res)/l):
+            yield FreeSpace(res[i*l:i*l+l])
 
     def getFreeSpaceSummary(self):
         """
         Returns a tuple of total space (in KB) and used space (in KB)
         """
-        res = self.backendCommand('QUERY_FREE_SPACE_SUMMARY')\
-                    .split(BACKEND_SEP)
-        return (self.joinInt(int(res[0]),int(res[1])),
-                self.joinInt(int(res[2]),int(res[3])))
+        res = [int(r) for r in self.backendCommand('QUERY_FREE_SPACE_SUMMARY')\
+                                   .split(BACKEND_SEP)]
+        return (self.joinInt(res[0],res[1]),
+                self.joinInt(res[2],res[3]))
 
     def getLoad(self):
         """
         Returns a tuple of the 1, 5, and 15 minute load averages
         """
-        res = self.backendCommand('QUERY_LOAD').split(BACKEND_SEP)
-        return (float(res[0]),float(res[1]),float(res[2]))
+        return [float(r) for r in self.backendCommand('QUERY_LOAD')\
+                                      .split(BACKEND_SEP)]
 
     def getUptime(self):
         """
         Returns machine uptime in seconds
         """
-        return self.backendCommand('QUERY_UPTIME')
+        return timedelta(0, int(self.backendCommand('QUERY_UPTIME')))
 
     def walkSG(self, host, sg, top=None):
         """

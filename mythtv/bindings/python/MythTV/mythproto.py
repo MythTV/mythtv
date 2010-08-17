@@ -717,7 +717,7 @@ class FileOps( BEEvent ):
         return sorted(self._getPrograms(query, recstatus, recordid, header),\
                       key=lambda p: p.starttime)
 
-class FreeSpace( DictData ):
+class FreeSpace( DictData, SplitInt ):
     """Represents a FreeSpace entry."""
     _field_order = [ 'host',         'path',     'islocal',
                     'disknumber',   'sgroupid', 'blocksize',
