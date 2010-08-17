@@ -1,10 +1,14 @@
 #include <QFontMetrics>
+#include <QPainter>
 
 #include "mythverbose.h"
 #include "mythfontproperties.h"
 #include "mythuitext.h"
 #include "mythuishape.h"
 #include "vbilut.h"
+#include "mythimage.h"
+#include "mythuiimage.h"
+#include "mythpainter.h"
 #include "teletextscreen.h"
 
 #define LOC QString("Teletext: ")
@@ -62,6 +66,7 @@ TeletextScreen::TeletextScreen(MythPlayer *player, const char * name) :
 
 TeletextScreen::~TeletextScreen()
 {
+    CleanUp();
 }
 
 bool TeletextScreen::Create(void)
@@ -69,8 +74,62 @@ bool TeletextScreen::Create(void)
     return m_player;
 }
 
+void TeletextScreen::CleanUp(void)
+{
+    DeleteAllChildren();
+    for (int i = 0; i < m_rowImages.size(); i++)
+        delete m_rowImages.value(i);
+    m_rowImages.clear();
+}
+
+QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
+{
+    int y   = row & ~1;
+    rect.translate(0, -(y * m_rowSize));
+    if (!m_rowImages.contains(y))
+    {
+        QImage* img = new QImage(m_safeArea.width(), m_rowSize * 2,
+                                 QImage::Format_ARGB32);
+        if (img)
+        {
+            img->fill(0);
+            m_rowImages.insert(y, img);
+        }
+        else
+            return NULL;
+    }
+    return m_rowImages.value(y);
+}
+
 void TeletextScreen::OptimiseDisplayedArea(void)
 {
+    VideoOutput *vo = m_player->getVideoOutput();
+    if (!vo)
+        return;
+    MythPainter *osd_painter = vo->GetOSDPainter();
+    if (!osd_painter)
+        return;
+
+    QHashIterator<int, QImage*> it(m_rowImages);
+    while (it.hasNext())
+    {
+        it.next();
+        MythImage* image = osd_painter->GetFormatImage();
+        if (!image || !it.value())
+            continue;
+
+        int row = it.key();
+        image->Assign(*(it.value()));
+        MythUIImage *uiimage = new MythUIImage(this, QString("ttrow%1")
+                                                        .arg(row));
+        if (uiimage)
+        {
+            uiimage->SetImage(image);
+            uiimage->SetArea(MythRect(0, row * m_rowSize,
+                                      m_safeArea.width(), m_rowSize * 2));
+        }
+    }
+
     QRegion visible;
     QListIterator<MythUIType *> i(m_ChildrenList);
     while (i.hasNext())
@@ -123,7 +182,7 @@ void TeletextScreen::Pulse(void)
 
     QMutexLocker locker(&m_lock);
 
-    DeleteAllChildren();
+    CleanUp();
 
     const TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage);
 
@@ -367,7 +426,7 @@ void TeletextScreen::SetDisplaying(bool display)
 {
     m_displaying = display;
     if (!m_displaying)
-        DeleteAllChildren();
+        CleanUp();
 }
 
 void TeletextScreen::Reset(void)
@@ -848,7 +907,10 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
 {
     QString line = ch;
+    if (line == " ")
+        return;
 
+    int row = y;
     x *= m_colSize;
     y *= m_rowSize;
     int height = m_rowSize * (doubleheight ? 2 : 1);
@@ -863,11 +925,31 @@ void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
         gTTFont->GetFace()->setStretch(50);
     }
 
-    QString name = QString("ttchar%1%2%3").arg(x).arg(y).arg(line);
-    MythUIText *txt = new MythUIText(line, *gTTFont, rect,
-                                     rect, this, name);
-    if (txt)
-        txt->SetJustification(Qt::AlignCenter);
+    QImage* image = GetRowImage(row, rect);
+    if (image)
+    {
+        QPainter painter(image);
+        painter.setFont(gTTFont->face());
+        painter.setPen(gTTFont->color());
+        painter.drawText(rect, Qt::AlignCenter, line);
+        painter.end();
+    }
+
+    if (row & 1)
+    {
+        row++;
+        rect = QRect(x, y + m_rowSize, m_colSize, height);
+        rect.translate(0, -m_rowSize);
+        image = GetRowImage(row, rect);
+        if (image)
+        {
+            QPainter painter(image);
+            painter.setFont(gTTFont->face());
+            painter.setPen(gTTFont->color());
+            painter.drawText(rect, Qt::AlignCenter, line);
+            painter.end();
+        }
+    }
 
     if (doubleheight)
     {
@@ -878,23 +960,29 @@ void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
 
 void TeletextScreen::DrawBackground(int x, int y)
 {
+    int row = y;
     x *= m_colSize;
     y *= m_rowSize;
-    DrawRect(QRect(x, y, m_colSize, m_rowSize));
+    DrawRect(row, QRect(x, y, m_colSize, m_rowSize));
 }
 
-void TeletextScreen::DrawRect(QRect rect)
+void TeletextScreen::DrawRect(int row, QRect rect)
 {
-    QString name = QString("ttbg%1%2%3%4")
-        .arg(rect.left()).arg(rect.top()).arg(rect.width()).arg(rect.height());
+    QImage* image = GetRowImage(row, rect);
+    if (!image)
+        return;
+
     QBrush bgfill = QBrush(m_bgColor, Qt::SolidPattern);
-    MythUIShape *shape = new MythUIShape(this, name);
-    shape->SetArea(MythRect(rect));
-    shape->SetFillBrush(bgfill);
+    QPainter painter(image);
+    painter.setBrush(QBrush(bgfill));
+    painter.setPen(QPen(Qt::NoPen));
+    painter.drawRect(rect);
+    painter.end();
 }
 
 void TeletextScreen::DrawMosaic(int x, int y, int code, int doubleheight)
 {
+    int row = y;
     x *= m_colSize;
     y *= m_rowSize;
 
@@ -903,17 +991,17 @@ void TeletextScreen::DrawMosaic(int x, int y, int code, int doubleheight)
     dy = (doubleheight) ? (2 * dy) : dy;
 
     if (code & 0x10)
-        DrawRect(QRect(x,      y + 2*dy, dx, dy));
+        DrawRect(row, QRect(x,      y + 2*dy, dx, dy));
     if (code & 0x40)
-        DrawRect(QRect(x + dx, y + 2*dy, dx, dy));
+        DrawRect(row, QRect(x + dx, y + 2*dy, dx, dy));
     if (code & 0x01)
-        DrawRect(QRect(x,      y,        dx, dy));
+        DrawRect(row, QRect(x,      y,        dx, dy));
     if (code & 0x02)
-        DrawRect(QRect(x + dx, y,        dx, dy));
+        DrawRect(row, QRect(x + dx, y,        dx, dy));
     if (code & 0x04)
-        DrawRect(QRect(x,      y + dy,   dx, dy));
+        DrawRect(row, QRect(x,      y + dy,   dx, dy));
     if (code & 0x08)
-        DrawRect(QRect(x + dx, y + dy,   dx, dy));
+        DrawRect(row, QRect(x + dx, y + dy,   dx, dy));
 }
 
 void TeletextScreen::DrawStatus(void)

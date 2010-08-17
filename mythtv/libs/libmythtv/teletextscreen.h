@@ -111,11 +111,13 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
                                  const uint8_t* buf, int vbimode);
 
   private:
+    void CleanUp();
     void OptimiseDisplayedArea(void);
+    QImage* GetRowImage(int row, QRect &rect);
     void SetForegroundColor(int color);
     void SetBackgroundColor(int color);
     void DrawBackground(int x, int y);
-    void DrawRect(const QRect);
+    void DrawRect(int row, const QRect);
     void DrawCharacter(int x, int y, QChar ch, int doubleheight = 0);
     void DrawMosaic(int x, int y, int code, int doubleheight);
     void DrawLine(const uint8_t *page, uint row, int lang);
@@ -166,6 +168,7 @@ class TeletextScreen: public MythScreenType, public TeletextViewer
     mutable bool m_page_changed;
     TeletextMagazine m_magazines[8];
     unsigned char    m_bitswap[256];
+    QHash<int, QImage*> m_rowImages;
 
   public:
     static const QColor kColorBlack;
