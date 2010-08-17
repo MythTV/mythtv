@@ -101,7 +101,7 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             srcRect = m_cropRect.toQRect();
         else
             srcRect = m_image->rect();
-        p->DrawImage(dest, m_image, srcRect, alphaMod);
+        p->DrawImage(dest, m_image, srcRect, CalcAlpha(alphaMod));
     }
 }
 
