@@ -148,7 +148,7 @@ void MythUIType::DeleteChild(const QString &name)
         MythUIType *type = it.value();
         if (type->objectName() == name)
         {
-            type->deleteLater();
+            delete type;
             it.remove();
             return;
         }
@@ -170,7 +170,7 @@ void MythUIType::DeleteChild(MythUIType *child)
         MythUIType *type = it.value();
         if (type == child)
         {
-            type->deleteLater();
+            delete type;
             it.remove();
             child = NULL;
             return;
@@ -193,9 +193,7 @@ void MythUIType::DeleteAllChildren(void)
 {
     QList<MythUIType*>::iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
-    {
-        (*it)->deleteLater();
-    }
+        delete *it;
 
     m_ChildrenList.clear();
 }
