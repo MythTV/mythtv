@@ -127,15 +127,20 @@ bool MythBDPlayer::SwitchTitle(int title)
 
     Pause();
 
-    bool ok = static_cast<bool>(player_ctx->buffer->BD()->SwitchTitle(title));
-
-    if (ok)
+    bool ok = false;
+    if (player_ctx->buffer->BD()->SwitchTitle(title))
     {
-        ResetPlaying();
-        forcePositionMapSync = true;
+        ResetCaptions();
+        if (OpenFile() != 0)
+        {
+            ok = false;
+            SetErrored(QObject::tr("Failed to switch title."));
+        }
+        else
+            forcePositionMapSync = true;
     }
+    
     Play();
-
     return ok;
 }
 
