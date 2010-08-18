@@ -133,13 +133,15 @@ bool MythBDPlayer::SwitchTitle(int title)
         ResetCaptions();
         if (OpenFile() != 0)
         {
-            ok = false;
             SetErrored(QObject::tr("Failed to switch title."));
         }
         else
+        {
+            ok = true;
             forcePositionMapSync = true;
+        }
     }
-    
+
     Play();
     return ok;
 }
