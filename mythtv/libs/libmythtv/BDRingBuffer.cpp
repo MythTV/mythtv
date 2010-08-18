@@ -45,66 +45,66 @@ uint64_t BDRingBufferPriv::Seek(uint64_t pos)
 
 void BDRingBufferPriv::GetDescForPos(QString &desc) const
 {
-        desc = QObject::tr("Title %1 chapter %2").arg(m_currentTitleInfo->idx)
-                   .arg(m_currentTitleInfo->chapters->idx);
+    desc = QObject::tr("Title %1 chapter %2")
+                       .arg(m_currentTitleInfo->idx)
+                       .arg(m_currentTitleInfo->chapters->idx);
 }
 
 bool BDRingBufferPriv::OpenFile(const QString &filename)
 {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
-                .arg(filename.toLatin1().data()));
-
-        QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
-        QByteArray keyarray = keyfile.toAscii();
-        const char *keyfilepath = keyarray.data();
-
-        bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
-
-        VERBOSE(VB_IMPORTANT, LOC + QString("Using %1 as keyfile...")
-                .arg(QString(keyfilepath)));
-        if (!bdnav)
-            return false;
-
-        // Return an index of relevant titles (excludes dupe clips + titles)
-        m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
-        m_mainTitle = 0;
-        m_currentTitleLength = 0;
-        m_titlesize = 0;
-        m_currentTime = 0;
-        m_currentTitleInfo = NULL;
-        m_currentTitleAngleCount = 0;
-        m_currentAngle = 0;
-
-        VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
-                .arg(m_numTitles));
-
-        // Loop through the relevant titles and find the longest
-        uint64_t titleLength = 0;
-        uint64_t margin      = 90000 << 4; // approx 30s
-        BLURAY_TITLE_INFO *titleInfo = NULL;
-        for( unsigned i=0; i < m_numTitles; ++i)
+    VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
+            .arg(filename.toLatin1().data()));
+    
+    QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
+    QByteArray keyarray = keyfile.toAscii();
+    const char *keyfilepath = keyarray.data();
+    
+    bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
+    
+    VERBOSE(VB_IMPORTANT, LOC + QString("Using %1 as keyfile...")
+            .arg(QString(keyfilepath)));
+    if (!bdnav)
+        return false;
+    
+    // Return an index of relevant titles (excludes dupe clips + titles)
+    m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
+    m_mainTitle = 0;
+    m_currentTitleLength = 0;
+    m_titlesize = 0;
+    m_currentTime = 0;
+    m_currentTitleInfo = NULL;
+    m_currentTitleAngleCount = 0;
+    m_currentAngle = 0;
+    
+    VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
+            .arg(m_numTitles));
+    
+    // Loop through the relevant titles and find the longest
+    uint64_t titleLength = 0;
+    uint64_t margin      = 90000 << 4; // approx 30s
+    BLURAY_TITLE_INFO *titleInfo = NULL;
+    for( unsigned i = 0; i < m_numTitles; ++i)
+    {
+        titleInfo = bd_get_title_info(bdnav, i);
+        if (titleLength == 0 ||
+            (titleInfo->duration > (titleLength + margin)))
         {
-            titleInfo = bd_get_title_info(bdnav, i);
-            if (titleLength == 0 ||
-               (titleInfo->duration > (titleLength + margin)))
-            {
-                m_mainTitle = titleInfo->idx;
-                titleLength = titleInfo->duration;
-            }
+            m_mainTitle = titleInfo->idx;
+            titleLength = titleInfo->duration;
         }
-
-        // Now that we've settled on which index the main title is, get info.
-        SwitchTitle(m_mainTitle);
-
-        return true;
+    }
+    
+    // Now that we've settled on which index the main title is, get info.
+    SwitchTitle(m_mainTitle);
+    
+    return true;
 }
 
 uint64_t BDRingBufferPriv::GetReadPosition(void)
 {
     if (bdnav)
         return bd_tell(bdnav);
-    else
-        return 0;
+    return 0;
 }
 
 uint32_t BDRingBufferPriv::GetNumChapters(void)
@@ -134,75 +134,71 @@ int BDRingBufferPriv::GetCurrentTitle(void) const
 {
     if (m_currentTitleInfo)
         return m_currentTitleInfo->idx;
-    else
-        return -1;
+    return -1;
 }
 
 int BDRingBufferPriv::GetTitleDuration(int title) const
 {
     int numTitles = GetNumTitles();
 
-    if (numTitles > 0 && title >= 0 && title < numTitles)
-    {
-        BLURAY_TITLE_INFO *info = bd_get_title_info(bdnav, title);
-        if (!info)
-            return 0;
-        int duration = ((info->duration) / 90000.0f);
-        bd_free_title_info(info);
-        return duration;
-    }
-    else
+    if (!(numTitles > 0 && title >= 0 && title < numTitles))
         return 0;
+
+    BLURAY_TITLE_INFO *info = bd_get_title_info(bdnav, title);
+    if (!info)
+        return 0;
+
+    int duration = ((info->duration) / 90000.0f);
+    bd_free_title_info(info);
+    return duration;
 }
 
 bool BDRingBufferPriv::SwitchTitle(uint title)
 {
-    if (bdnav)
-    {
-        if (m_currentTitleInfo)
-            bd_free_title_info(m_currentTitleInfo);
-
-        m_currentTitleInfo = bd_get_title_info(bdnav, title);
-
-        if (!m_currentTitleInfo)
-            return false;
-
-        m_currentTitleLength = m_currentTitleInfo->duration;
-        m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
-        m_currentAngle = 0;
-        bd_select_title(bdnav, title);
-        uint32_t chapter_count = m_currentTitleInfo->chapter_count;
-        VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
-                                            "Duration: %2 (%3 mins) "
-                                            "Number of Chapters: %4 Number of Angles: %5")
-                                            .arg(title)
-                                            .arg(m_currentTitleLength)
-                                            .arg(m_currentTitleLength / (90000 * 60))
-                                            .arg(chapter_count)
-                                            .arg(m_currentTitleAngleCount));
-        VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
-        if (chapter_count)
-        {
-            for (uint i = 0; i < chapter_count; i++)
-            {
-                uint64_t total_secs = GetChapterStartTime(i);
-                uint64_t framenum   = GetChapterStartFrame(i);
-                int hours = (int)total_secs / 60 / 60;
-                int minutes = ((int)total_secs / 60) - (hours * 60);
-                double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
-                VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
-                        .arg(QString().sprintf("%02d", i + 1))
-                        .arg(QString().sprintf("%02d", hours))
-                        .arg(QString().sprintf("%02d", minutes))
-                        .arg(QString().sprintf("%06.3f", secs))
-                        .arg(framenum));
-            }
-        }
-        m_titlesize = bd_get_title_size(bdnav);
-        return true;
-    }
-    else
+    if (!bdnav)
         return false;
+
+    if (m_currentTitleInfo)
+        bd_free_title_info(m_currentTitleInfo);
+
+    m_currentTitleInfo = bd_get_title_info(bdnav, title);
+
+    if (!m_currentTitleInfo)
+        return false;
+
+    m_currentTitleLength = m_currentTitleInfo->duration;
+    m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
+    m_currentAngle = 0;
+    bd_select_title(bdnav, title);
+    uint32_t chapter_count = m_currentTitleInfo->chapter_count;
+    VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
+                                        "Duration: %2 (%3 mins) "
+                                        "Number of Chapters: %4 Number of Angles: %5")
+                                        .arg(title)
+                                        .arg(m_currentTitleLength)
+                                        .arg(m_currentTitleLength / (90000 * 60))
+                                        .arg(chapter_count)
+                                        .arg(m_currentTitleAngleCount));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
+    if (chapter_count)
+    {
+        for (uint i = 0; i < chapter_count; i++)
+        {
+            uint64_t total_secs = GetChapterStartTime(i);
+            uint64_t framenum   = GetChapterStartFrame(i);
+            int hours = (int)total_secs / 60 / 60;
+            int minutes = ((int)total_secs / 60) - (hours * 60);
+            double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
+            VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
+                    .arg(QString().sprintf("%02d", i + 1))
+                    .arg(QString().sprintf("%02d", hours))
+                    .arg(QString().sprintf("%02d", minutes))
+                    .arg(QString().sprintf("%06.3f", secs))
+                    .arg(framenum));
+        }
+    }
+    m_titlesize = bd_get_title_size(bdnav);
+    return true;
 }
 
 bool BDRingBufferPriv::SwitchAngle(uint angle)
@@ -220,8 +216,7 @@ uint64_t BDRingBufferPriv::GetTotalReadPosition(void)
 {
     if (bdnav)
         return bd_get_title_size(bdnav);
-    else
-        return 0;
+    return 0;
 }
 
 int BDRingBufferPriv::safe_read(void *data, unsigned sz)
@@ -262,8 +257,7 @@ double BDRingBufferPriv::GetFrameRate(void)
                 break;
         }
     }
-    else
-        return 0;
+    return 0;
 }
 
 int BDRingBufferPriv::GetAudioLanguage(uint streamID)
@@ -283,28 +277,25 @@ int BDRingBufferPriv::GetAudioLanguage(uint streamID)
 
 int BDRingBufferPriv::GetSubtitleLanguage(uint streamID)
 {
-    if (m_currentTitleInfo)
-    {
-        int pgCount = m_currentTitleInfo->clips->pg_stream_count;
-        uint subCount = 0;
-        for (int i = 0; i < pgCount; ++i)
-        {
-            if (m_currentTitleInfo->clips->pg_streams[i].coding_type >= 0x90 &&
-                m_currentTitleInfo->clips->pg_streams[i].coding_type <= 0x92)
-            {
-                if (streamID == subCount)
-                {
+    if (!m_currentTitleInfo)
+        return iso639_str3_to_key("und");
 
-                    uint8_t lang[4] = { 0, 0, 0, 0 };
-                    memcpy(lang, m_currentTitleInfo->clips->pg_streams[streamID].lang, 4);
-                    int code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
-                    VERBOSE(VB_IMPORTANT, QString("Subtitle Lang: %1 Code: %2").arg(code).arg(iso639_key_to_str3(code)));
-                    return code;
-                }
-                subCount++;
+    int pgCount = m_currentTitleInfo->clips->pg_stream_count;
+    uint subCount = 0;
+    for (int i = 0; i < pgCount; ++i)
+    {
+        if (m_currentTitleInfo->clips->pg_streams[i].coding_type >= 0x90 &&
+            m_currentTitleInfo->clips->pg_streams[i].coding_type <= 0x92)
+        {
+            if (streamID == subCount)
+            {
+                uint8_t lang[4] = { 0, 0, 0, 0 };
+                memcpy(lang, m_currentTitleInfo->clips->pg_streams[streamID].lang, 4);
+                int code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+                VERBOSE(VB_IMPORTANT, QString("Subtitle Lang: %1 Code: %2").arg(code).arg(iso639_key_to_str3(code)));
+                return code;
             }
+            subCount++;
         }
     }
-
-    return iso639_str3_to_key("und");
 }
