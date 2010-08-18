@@ -80,11 +80,13 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
 
         // Loop through the relevant titles and find the longest
         uint64_t titleLength = 0;
+        uint64_t margin      = 90000 << 4; // approx 30s
         BLURAY_TITLE_INFO *titleInfo = NULL;
         for( unsigned i=0; i < m_numTitles; ++i)
         {
             titleInfo = bd_get_title_info(bdnav, i);
-            if (titleLength == 0 || titleInfo->duration > titleLength)
+            if (titleLength == 0 ||
+               (titleInfo->duration > (titleLength + margin)))
             {
                 m_mainTitle = titleInfo->idx;
                 titleLength = titleInfo->duration;
