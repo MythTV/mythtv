@@ -6944,14 +6944,8 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
         return;
     }
     bool is_status_disp          = osd->IsWindowVisible("osd_status");
-    bool has_prog_info_small     = osd->HasWindow("program_info_small");
-    bool is_prog_info_small_disp = osd->IsWindowVisible("program_info_small");
     bool has_prog_info           = osd->HasWindow("program_info");
     bool is_prog_info_disp       = osd->IsWindowVisible("program_info");
-    bool has_prog_video          = osd->HasWindow("program_info_video");
-    bool has_prog_small_video    = osd->HasWindow("program_info_small_video");
-    bool has_prog_rec            = osd->HasWindow("program_info_recording");
-    bool has_prog_small_rec      = osd->HasWindow("program_info_small_recording");
 
     ReturnOSDLock(ctx, osd);
 
@@ -6960,71 +6954,24 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     QString title = ctx->playingInfo->GetTitle();
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    bool is_dvd = (ctx->buffer && ctx->buffer->isDVD()) ||
-        ctx->playingInfo->IsVideoDVD();
-    bool is_video     = ctx->playingInfo->IsVideo();
-    bool is_recording = StateIsPlaying(ctx->GetState()) && !is_video;
-
-    if (is_dvd && desc.isEmpty() && title.isEmpty())
+    if (is_status_disp)
     {
-        // DVD toggles between status and nothing
-        if (is_status_disp)
-            hideAll = true;
-        else
-            showStatus = true;
-    }
-    else if (is_status_disp)
-    {
-        if (is_video && has_prog_small_video)
-            UpdateOSDProgInfo(ctx, "program_info_small_video");
-        else if (is_video && has_prog_video)
-            UpdateOSDProgInfo(ctx, "program_info_video");
-        else if (is_recording && has_prog_small_rec)
-            UpdateOSDProgInfo(ctx, "program_info_small_recording");
-        else if (is_recording && has_prog_rec)
-            UpdateOSDProgInfo(ctx, "program_info_recording");
-        else if (has_prog_info_small)
-            UpdateOSDProgInfo(ctx, "program_info_small");
-        else
-            UpdateOSDProgInfo(ctx, "program_info");
-    }
-    else if (is_prog_info_small_disp)
-    {
-        // If small is displaying, show long if we have it, else hide info
-        if (is_video && has_prog_video)
-            UpdateOSDProgInfo(ctx, "program_info_video");
-        if (is_recording && has_prog_rec)
-            UpdateOSDProgInfo(ctx, "program_info_recording");
-        else if (has_prog_info)
+        if (has_prog_info)
             UpdateOSDProgInfo(ctx, "program_info");
         else
             hideAll = true;
     }
     else if (is_prog_info_disp)
     {
-        // If long is displaying, hide info
         hideAll = true;
     }
     else if (includeStatusOSD)
     {
-        // If no program_info displaying, show status if we want it
         showStatus = true;
     }
     else
     {
-        // No status desired? Nothing is up, Display small if we have,
-        // else display long
-        if (is_video && has_prog_small_video)
-            UpdateOSDProgInfo(ctx, "program_info_small_video");
-        if (is_video && has_prog_video)
-            UpdateOSDProgInfo(ctx, "program_info_video");
-        if (is_recording && has_prog_small_rec)
-            UpdateOSDProgInfo(ctx, "program_info_small_recording");
-        if (is_recording && has_prog_rec)
-            UpdateOSDProgInfo(ctx, "program_info_recording");
-        else if (has_prog_info_small)
-            UpdateOSDProgInfo(ctx, "program_info_small");
-        else
+        if (has_prog_info)
             UpdateOSDProgInfo(ctx, "program_info");
     }
 
