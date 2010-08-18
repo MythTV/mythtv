@@ -435,9 +435,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
 
     fillRecGroupPasswordCache();
 
-    if (!m_player)
-        m_recGroupPassword = getRecGroupPassword(m_recGroup);
-
     // misc setup
     gCoreContext->addListener(this);
 
@@ -525,10 +522,10 @@ void PlaybackBox::Init()
     m_recordingList->SetLCDTitles(tr("Recordings"),
                                   "titlesubtitle|shortdate|starttime");
 
-    if (!m_player && !m_recGroupPassword.isEmpty())
-        displayRecGroup(m_recGroup);
-    else if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+    if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
         showGroupFilter();
+    else if (!m_player)
+        displayRecGroup(m_recGroup);
     else
     {
         UpdateUILists();
@@ -1460,7 +1457,7 @@ bool PlaybackBox::UpdateUILists(void)
                    (p->GetRecordingGroup() != "Deleted")) ||
                   (p->GetRecordingGroup() == "LiveTV" &&
                    (m_viewMask & VIEW_LIVETVGRP))) &&
-                 (m_recGroupPassword == m_curGroupPassword)) ||
+                 (m_recGroupPwCache[m_recGroup] == m_curGroupPassword)) ||
                 ((m_recGroupType[m_recGroup] == "category") &&
                  ((p->GetCategory() == m_recGroup ) ||
                   ((p->GetCategory().isEmpty()) &&
@@ -4209,7 +4206,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
     else if (newRecGroup == ProgramInfo::i18n("Deleted"))
         newRecGroup = "Deleted";
 
-    m_curGroupPassword = m_recGroupPassword;
+    m_curGroupPassword = m_recGroupPwCache[recGroup];
 
     m_recGroup = newRecGroup;
 
@@ -4620,7 +4617,7 @@ void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
         }
     }
 
-    m_recGroupPassword = newPassword;
+    m_recGroupPwCache[m_recGroup] = newPassword;
 }
 
 ///////////////////////////////////////////////////
