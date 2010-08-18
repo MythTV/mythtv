@@ -168,9 +168,7 @@ bool MythBDPlayer::SwitchAngle(int angle)
     if (angle >= (int)total)
         angle = 0;
 
-    bool ok = static_cast<bool>(player_ctx->buffer->BD()->SwitchAngle(angle));
-
-    return ok;
+    return player_ctx->buffer->BD()->SwitchAngle(angle);
 }
 
 bool MythBDPlayer::NextAngle(void)

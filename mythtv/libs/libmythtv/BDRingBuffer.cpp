@@ -205,16 +205,13 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
 
 bool BDRingBufferPriv::SwitchAngle(uint angle)
 {
-    if (bdnav)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + QString("Switching to Angle %1...")
-                .arg(angle));
-        bd_seamless_angle_change(bdnav, angle);
-        m_currentAngle = angle;
-        return true;
-    }
-    else
+    if (!bdnav)
         return false;
+
+    VERBOSE(VB_IMPORTANT, LOC + QString("Switching to Angle %1...").arg(angle));
+    bd_seamless_angle_change(bdnav, angle);
+    m_currentAngle = angle;
+    return true;
 }
 
 uint64_t BDRingBufferPriv::GetTotalReadPosition(void)
