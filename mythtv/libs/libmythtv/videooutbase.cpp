@@ -1503,19 +1503,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect)
 QRect VideoOutput::GetSafeRect(void)
 {
     static const float safeMargin = 0.05f;
-    QRect result;
-    if (hasFullScreenOSD())
-    {
-        result = window.GetDisplayVideoRect()
-            .intersected(window.GetDisplayVisibleRect());
-    }
-    else
-    {
-        float visible_aspect, font_scaling;
-        float themeaspect = 16.0f/9.0f;
-        result = window.GetVisibleOSDBounds(
-            visible_aspect, font_scaling, themeaspect);
-    }
+    float dummy;
+    QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0f);
     int safex = (int)((float)result.width()  * safeMargin);
     int safey = (int)((float)result.height() * safeMargin);
     return QRect(result.left() + safex, result.top() + safey,
