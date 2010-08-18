@@ -53,7 +53,8 @@ MythImage::MythImage(MythPainter *parent)
 
 MythImage::~MythImage()
 {
-    m_Parent->DeleteFormatImage(this);
+    if (m_Parent)
+        m_Parent->DeleteFormatImage(this);
 }
 
 void MythImage::UpRef(void)
