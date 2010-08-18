@@ -298,4 +298,5 @@ int BDRingBufferPriv::GetSubtitleLanguage(uint streamID)
             subCount++;
         }
     }
+    return iso639_str3_to_key("und");
 }
