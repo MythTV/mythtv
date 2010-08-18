@@ -34,6 +34,8 @@ class MPUBLIC DVDRingBufferPriv
     // gets
     int  GetTitle(void) const { return m_title;        }
     int  GetPart(void)  const { return m_part;         }
+    int  GetCurrentAngle(void) const { return m_currentAngle;           };
+    int  GetNumAngles(void)          { return m_currentTitleAngleCount; };
     bool IsInMenu(bool update = false);
     bool IsOpen(void)   const { return m_dvdnav;       }
     long long GetReadPosition(void);
@@ -108,6 +110,7 @@ class MPUBLIC DVDRingBufferPriv
     void JumpToTitle(bool change) { m_jumptotitle = change; }
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);
+    bool SwitchAngle(uint angle);
 
     void SetParent(MythDVDPlayer *p) { m_parent = p; }
 
@@ -130,6 +133,8 @@ class MPUBLIC DVDRingBufferPriv
     int32_t        m_title;
     int32_t        m_titleParts;
     bool           m_gotStop;
+    int            m_currentAngle;
+    int            m_currentTitleAngleCount;
 
     bool           m_cellHasStillFrame;
     bool           m_audioStreamsChanged;

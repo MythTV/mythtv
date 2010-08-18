@@ -38,7 +38,8 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_currentpos(0),
       m_lastNav(NULL),    m_part(0),
       m_title(0),         m_titleParts(0),
-      m_gotStop(false),
+      m_gotStop(false),   m_currentAngle(0),
+      m_currentTitleAngleCount(0),
       m_cellHasStillFrame(false), m_audioStreamsChanged(false),
       m_dvdWaiting(false),
       m_titleLength(0), m_hl_button(0, 0, 0, 0),
@@ -187,6 +188,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
 
         int32_t numTitles  = 0;
         m_titleParts = 0;
+
         dvdnav_title_play(m_dvdnav, 0);
         dvdRet = dvdnav_get_number_of_titles(m_dvdnav, &numTitles);
         if (numTitles == 0 )
@@ -220,6 +222,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
         dvdnav_get_title_string(m_dvdnav, &m_dvdname);
         dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);
+        dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
         SetDVDSpeed();
         VERBOSE(VB_PLAYBACK, QString("DVD Serial Number %1").arg(m_serialnumber));
         return true;
@@ -1498,3 +1501,20 @@ int DVDRingBufferPriv::find_smallest_bounding_rectangle(AVSubtitle *s)
     s->rects[0]->y += y1;
     return 1;
 }
+
+bool DVDRingBufferPriv::SwitchAngle(uint angle)
+{
+    if (!m_dvdnav)
+        return false;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("Switching to Angle %1...")
+            .arg(angle));
+    dvdnav_status_t status = dvdnav_angle_change(m_dvdnav, (int32_t)angle);
+    if (status == DVDNAV_STATUS_OK)
+    {
+        m_currentAngle = angle;
+        return true;
+    }
+    return false;
+}
+

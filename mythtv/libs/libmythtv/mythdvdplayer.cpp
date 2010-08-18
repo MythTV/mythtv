@@ -465,3 +465,40 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
+
+int MythDVDPlayer::GetNumAngles(void) const
+{
+    if (player_ctx->buffer->DVD() && player_ctx->buffer->DVD()->IsOpen())
+        return player_ctx->buffer->DVD()->GetNumAngles();
+    return 0;
+}
+
+int MythDVDPlayer::GetCurrentAngle(void) const
+{
+    if (player_ctx->buffer->DVD() && player_ctx->buffer->DVD()->IsOpen())
+        return player_ctx->buffer->DVD()->GetCurrentAngle();
+    return -1; 
+}
+
+QString MythDVDPlayer::GetAngleName(int angle) const
+{
+    if (angle >= 0 && angle < GetNumAngles())
+    {
+        QString name = QObject::tr("Angle %1").arg(angle+1);
+        return name;
+    }
+    return QString();
+}
+
+bool MythDVDPlayer::SwitchAngle(int angle)
+{
+    uint total = GetNumAngles();
+    if (!total || angle == GetCurrentAngle())
+        return false;
+
+    if (angle >= (int)total)
+        angle = 0;
+
+    return player_ctx->buffer->DVD()->SwitchAngle(angle);
+}
+

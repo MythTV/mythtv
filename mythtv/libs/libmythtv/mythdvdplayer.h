@@ -46,6 +46,11 @@ class MythDVDPlayer : public MythPlayer
 
     void HideDVDButton(bool hide) { hidedvdbutton = hide; }
 
+    virtual int GetNumAngles(void) const;
+    virtual int GetCurrentAngle(void) const;
+    virtual QString GetAngleName(int angle) const;
+    virtual bool SwitchAngle(int angle);
+
   private:
     void SetDVDBookmark(uint64_t frame);
     void DisplayDVDButton(void);
