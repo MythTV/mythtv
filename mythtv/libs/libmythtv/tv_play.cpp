@@ -6044,6 +6044,36 @@ int TV::GetCurrentTitle(const PlayerContext *ctx) const
     return currentTitle;
 }
 
+int TV::GetNumAngles(const PlayerContext *ctx) const
+{
+    int num_angles = 0;
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        num_angles = ctx->player->GetNumAngles();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    return num_angles;
+}
+
+int TV::GetCurrentAngle(const PlayerContext *ctx) const
+{
+    int currentAngle = 0;
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        currentAngle = ctx->player->GetCurrentAngle();
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    return currentAngle;
+}
+
+QString TV::GetAngleName(const PlayerContext *ctx, int angle) const
+{
+    QString name;
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        name = ctx->player->GetAngleName(angle);
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    return name;
+}
+
 int TV::GetTitleDuration(const PlayerContext *ctx, int title) const
 {
     int seconds = 0;
@@ -6083,6 +6113,25 @@ void TV::DoSwitchTitle(PlayerContext *ctx, int title)
     {
         ctx->player->SwitchTitle(title);
     }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
+void TV::DoSwitchAngle(PlayerContext *ctx, int angle)
+{
+    NormalSpeed(ctx);
+    StopFFRew(ctx);
+
+    PauseAudioUntilBuffered(ctx);
+
+    osdInfo info;
+    ctx->CalcPlayerSliderPosition(info);
+    info.text["description"] = tr("Switch Angle");
+    info.text["title"]       = tr("Switching");
+    UpdateOSDStatus(ctx, info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (ctx->player)
+        ctx->player->SwitchAngle(angle);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
@@ -9936,6 +9985,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             int title = action.right(3).toInt();
             DoSwitchTitle(actx, title);
         }
+        else if (action.left(13) == "SWITCHTOANGLE")
+        {
+            int angle = action.right(3).toInt();
+            DoSwitchAngle(actx, angle);
+        }
         else if (action == "EDIT")
             StartProgramEditMode(actx);
         else if (action == "TOGGLEAUTOEXPIRE")
@@ -10356,6 +10410,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
 {
     int num_chapters  = GetNumChapters(ctx);
     int num_titles    = GetNumTitles(ctx);
+    int num_angles    = GetNumAngles(ctx);
     TVState state     = ctx->GetState();
     bool isdvd        = state == kState_WatchingDVD;
     bool islivetv     = StateIsLiveTV(state);
@@ -10372,7 +10427,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
     }
 
     bool show = isdvd || num_chapters || num_titles || previouschan ||
-                isrecording;
+                isrecording || num_angles;
     if (category == "MAIN")
     {
         if (show)
@@ -10405,6 +10460,11 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
         {
             osd->DialogAddButton(tr("Chapter"), "DIALOG_MENU_AVCHAPTER_0",
                                  true, selected == "AVCHAPTER");
+        }
+        if (num_angles > 1)
+        {
+            osd->DialogAddButton(tr("Angle"), "DIALOG_MENU_AVANGLE_0",
+                                 true, selected == "AVANGLE");
         }
         if (num_titles)
         {
@@ -10452,6 +10512,20 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
             QString desc = GetTitleName(ctx, i);
             osd->DialogAddButton(desc, QString("JUMPTOTITLE%1").arg(titleIdx),
                                  false, current_title == i);
+        }
+    }
+    else if (category == "AVANGLE")
+    {
+        backaction = "NAVIGATE";
+        currenttext = tr("Angle");
+        int current_angle = GetCurrentAngle(ctx);
+
+        for (int i = 0; i < num_angles; i++)
+        {
+            QString angleIdx = QString("%1").arg(i, 3, 10, QChar(48));
+            QString desc = GetAngleName(ctx, i);
+            osd->DialogAddButton(desc, QString("SWITCHTOANGLE%1").arg(angleIdx),
+                                 false, current_angle == i);
         }
     }
     else if (category == "COMMSKIP")

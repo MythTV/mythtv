@@ -448,6 +448,10 @@ class MPUBLIC TV : public QThread
     int  GetTitleDuration(const PlayerContext *ctx, int title) const;
     QString GetTitleName(const PlayerContext *ctx, int title) const;
     void DoSwitchTitle(PlayerContext*, int title);
+    int  GetNumAngles(const PlayerContext *ctx) const;
+    int  GetCurrentAngle(const PlayerContext *ctx) const;
+    QString GetAngleName(const PlayerContext *ctx, int angle) const;
+    void DoSwitchAngle(PlayerContext*, int angle);
     void DoJumpChapter(PlayerContext*, int direction);
     void DoSkipCommercials(PlayerContext*, int direction);
 

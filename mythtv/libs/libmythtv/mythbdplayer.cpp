@@ -61,11 +61,25 @@ int MythBDPlayer::GetNumTitles(void) const
     return 0;
 }
 
+int MythBDPlayer::GetNumAngles(void) const
+{
+    if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
+        return player_ctx->buffer->BD()->GetNumAngles();
+    return 0;
+}
+
 int MythBDPlayer::GetCurrentTitle(void) const
 {
     if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
         return player_ctx->buffer->BD()->GetCurrentTitle();
     return -1;
+}
+
+int MythBDPlayer::GetCurrentAngle(void) const
+{
+    if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
+        return player_ctx->buffer->BD()->GetCurrentAngle();
+    return -1; 
 }
 
 int MythBDPlayer::GetTitleDuration(int title) const
@@ -90,6 +104,16 @@ QString MythBDPlayer::GetTitleName(int title) const
         QString name = QString("%1 (%2:%3:%4)").arg(title+1)
                 .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
                 .arg(secs, 2, 10, QChar(48));
+        return name;
+    }
+    return QString();
+}
+
+QString MythBDPlayer::GetAngleName(int angle) const
+{
+    if (angle >= 0 && angle < GetNumAngles())
+    {
+        QString name = QObject::tr("Angle %1").arg(angle+1);
         return name;
     }
     return QString();
@@ -134,3 +158,44 @@ bool MythBDPlayer::PrevTitle(void)
 
     return SwitchTitle(prev);
 }
+
+bool MythBDPlayer::SwitchAngle(int angle)
+{
+    uint total = GetNumAngles();
+    if (!total || angle == GetCurrentAngle())
+        return false;
+
+    if (angle >= (int)total)
+        angle = 0;
+
+    bool ok = static_cast<bool>(player_ctx->buffer->BD()->SwitchAngle(angle));
+
+    return ok;
+}
+
+bool MythBDPlayer::NextAngle(void)
+{
+    uint total = GetNumAngles();
+    int next = GetCurrentAngle() + 1;
+    if (!total)
+        return false;
+
+    if (next >= (int)total)
+        next = 0;
+
+    return SwitchAngle(next);
+}
+
+bool MythBDPlayer::PrevAngle(void)
+{
+    uint total = GetNumAngles();
+    int prev = GetCurrentAngle() - 1;
+    if (!total || total == 1)
+        return false;
+
+    if (prev < 0)
+        prev = total;
+
+    return SwitchAngle(prev);
+}
+

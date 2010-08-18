@@ -269,6 +269,11 @@ class MPUBLIC MythPlayer
     virtual bool NextTitle(void) { return false; }
     virtual bool PrevTitle(void) { return false; }
 
+    // Angle stuff
+    virtual bool SwitchAngle(int title) { return false; }
+    virtual bool NextAngle(void) { return false; }
+    virtual bool PrevAngle(void) { return false; }
+
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)
         { commBreakMap.SetAutoCommercialSkip(autoskip, framesPlayed); }
@@ -388,6 +393,11 @@ class MPUBLIC MythPlayer
     virtual int GetCurrentTitle(void) const { return 0; }
     virtual int GetTitleDuration(int title) const { return 0; }
     virtual QString GetTitleName(int title) const { return QString(); }
+
+    // Angle public stuff
+    virtual int GetNumAngles(void) const { return 0; }
+    virtual int GetCurrentAngle(void) const { return 0; }
+    virtual QString GetAngleName(int title) const { return QString(); }
 
     // DVD public stuff
     virtual void ChangeDVDTrack(bool ffw)       { (void) ffw;       }

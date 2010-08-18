@@ -72,6 +72,8 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
         m_titlesize = 0;
         m_currentTime = 0;
         m_currentTitleInfo = NULL;
+        m_currentTitleAngleCount = 0;
+        m_currentAngle = 0;
 
         VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
                 .arg(m_numTitles));
@@ -164,15 +166,18 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
             return false;
 
         m_currentTitleLength = m_currentTitleInfo->duration;
+        m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
+        m_currentAngle = 0;
         bd_select_title(bdnav, title);
         uint32_t chapter_count = m_currentTitleInfo->chapter_count;
         VERBOSE(VB_IMPORTANT, LOC + QString("Selected title: index %1. "
                                             "Duration: %2 (%3 mins) "
-                                            "Number of Chapters: %4")
+                                            "Number of Chapters: %4 Number of Angles: %5")
                                             .arg(title)
                                             .arg(m_currentTitleLength)
                                             .arg(m_currentTitleLength / (90000 * 60))
-                                            .arg(chapter_count));
+                                            .arg(chapter_count)
+                                            .arg(m_currentTitleAngleCount));
         VERBOSE(VB_PLAYBACK, LOC + QString("Frame Rate: %1").arg(GetFrameRate()));
         if (chapter_count)
         {
@@ -192,6 +197,20 @@ bool BDRingBufferPriv::SwitchTitle(uint title)
             }
         }
         m_titlesize = bd_get_title_size(bdnav);
+        return true;
+    }
+    else
+        return false;
+}
+
+bool BDRingBufferPriv::SwitchAngle(uint angle)
+{
+    if (bdnav)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + QString("Switching to Angle %1...")
+                .arg(angle));
+        bd_seamless_angle_change(bdnav, angle);
+        m_currentAngle = angle;
         return true;
     }
     else

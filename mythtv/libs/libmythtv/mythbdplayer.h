@@ -13,12 +13,18 @@ class MythBDPlayer : public MythPlayer
     virtual int64_t GetChapter(int chapter);
 
     virtual int GetNumTitles(void) const;
+    virtual int GetNumAngles(void) const;
     virtual int GetCurrentTitle(void) const;
+    virtual int GetCurrentAngle(void) const;
     virtual int GetTitleDuration(int title) const;
     virtual QString GetTitleName(int title) const;
+    virtual QString GetAngleName(int angle) const;
     virtual bool SwitchTitle(int title);
     virtual bool PrevTitle(void);
     virtual bool NextTitle(void);
+    virtual bool SwitchAngle(int angle);
+    virtual bool PrevAngle(void);
+    virtual bool NextAngle(void);
 };
 
 #endif // MYTHBDPLAYER_H
