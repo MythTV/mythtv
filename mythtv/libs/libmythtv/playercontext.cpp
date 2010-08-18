@@ -753,6 +753,8 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
             infoMap["screenshotpath"] = VideoMetaDataUtil::GetArtPath(
                 playingInfo->GetPathname(), "Screenshots");
         }
+        if (player)
+            infoMap["videocodec"] = player->GetEncodingType();
         infoMap.detach();
         loaded = true;
     }

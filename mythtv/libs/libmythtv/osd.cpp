@@ -358,6 +358,12 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
         if (state)
             state->DisplayState(map["tvstate"]);
     }
+    if (map.contains("videocodec"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("videocodec"));
+        if (state)
+            state->DisplayState(map["videocodec"]);
+    }
     if (map.contains("chanid"))
     {
         MythUIImage *icon = dynamic_cast<MythUIImage *> (win->GetChild("iconpath"));
