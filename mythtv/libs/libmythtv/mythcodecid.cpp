@@ -321,6 +321,16 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H264_VAAPI:
             return "H.264";
 
+        case kCodec_VC1:
+        case kCodec_VC1_VDPAU:
+        case kCodec_VC1_VAAPI:
+            return "VC-1";
+
+        case kCodec_WMV3:
+        case kCodec_WMV3_VDPAU:
+        case kCodec_WMV3_VAAPI:
+            return "WMV3";
+
         case kCodec_NONE:
         case kCodec_NORMAL_END:
         case kCodec_STD_XVMC_END:
