@@ -54,18 +54,18 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
 {
     VERBOSE(VB_IMPORTANT, LOC + QString("Opened BDRingBuffer device at %1")
             .arg(filename.toLatin1().data()));
-    
+
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
     QByteArray keyarray = keyfile.toAscii();
     const char *keyfilepath = keyarray.data();
-    
+
     bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
-    
+
     VERBOSE(VB_IMPORTANT, LOC + QString("Using %1 as keyfile...")
             .arg(QString(keyfilepath)));
     if (!bdnav)
         return false;
-    
+
     // Return an index of relevant titles (excludes dupe clips + titles)
     m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
     m_mainTitle = 0;
@@ -75,10 +75,10 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     m_currentTitleInfo = NULL;
     m_currentTitleAngleCount = 0;
     m_currentAngle = 0;
-    
+
     VERBOSE(VB_IMPORTANT, LOC + QString("Found %1 relevant titles.")
             .arg(m_numTitles));
-    
+
     // Loop through the relevant titles and find the longest
     uint64_t titleLength = 0;
     uint64_t margin      = 90000 << 4; // approx 30s
@@ -93,10 +93,10 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
             titleLength = titleInfo->duration;
         }
     }
-    
+
     // Now that we've settled on which index the main title is, get info.
     SwitchTitle(m_mainTitle);
-    
+
     return true;
 }
 
