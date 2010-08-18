@@ -4255,9 +4255,6 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
             m_recGroupPwCache[recgroup] = query.value(1).toString();
         }
     }
-
-    m_recGroupPwCache["All Programs"] =
-                                gCoreContext->GetSetting("AllRecGroupPassword", "");
 }
 
 /// \brief Used to change the recording group of a program or playlist.
@@ -4587,34 +4584,27 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
 
 void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
 {
-    if (m_recGroup == "All Programs")
-    {
-        gCoreContext->SaveSetting("AllRecGroupPassword", newPassword);
-    }
-    else
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query(MSqlQuery::InitCon());
 
-        query.prepare("DELETE FROM recgrouppassword "
-                           "WHERE recgroup = :RECGROUP ;");
+    query.prepare("DELETE FROM recgrouppassword "
+                        "WHERE recgroup = :RECGROUP ;");
+    query.bindValue(":RECGROUP", m_recGroup);
+
+    if (!query.exec())
+        MythDB::DBError("PlaybackBox::SetRecGroupPassword -- delete",
+                        query);
+
+    if (!newPassword.isEmpty())
+    {
+        query.prepare("INSERT INTO recgrouppassword "
+                        "(recgroup, password) VALUES "
+                        "( :RECGROUP , :PASSWD )");
         query.bindValue(":RECGROUP", m_recGroup);
+        query.bindValue(":PASSWD", newPassword);
 
         if (!query.exec())
-            MythDB::DBError("PlaybackBox::SetRecGroupPassword -- delete",
+            MythDB::DBError("PlaybackBox::SetRecGroupPassword -- insert",
                             query);
-
-        if (!newPassword.isEmpty())
-        {
-            query.prepare("INSERT INTO recgrouppassword "
-                          "(recgroup, password) VALUES "
-                          "( :RECGROUP , :PASSWD )");
-            query.bindValue(":RECGROUP", m_recGroup);
-            query.bindValue(":PASSWD", newPassword);
-
-            if (!query.exec())
-                MythDB::DBError("PlaybackBox::SetRecGroupPassword -- insert",
-                                query);
-        }
     }
 
     m_recGroupPwCache[m_recGroup] = newPassword;

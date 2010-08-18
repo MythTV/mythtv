@@ -19,7 +19,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/static.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1262";
+const QString currentDatabaseVersion = "1263";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5476,6 +5476,17 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1262", dbver))
+            return false;
+    }
+
+    if (dbver == "1262")
+    {
+        const char *updates[] = {
+"INSERT INTO recgrouppassword (recgroup, password) SELECT 'All Programs',data FROM settings WHERE value='AllRecGroupPassword' LIMIT 1;",
+"DELETE FROM settings WHERE value='AllRecGroupPassword';",
+NULL
+};
+        if (!performActualUpdate(updates, "1263", dbver))
             return false;
     }
 

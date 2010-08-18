@@ -3408,20 +3408,13 @@ QString ProgramInfo::QueryRecordingGroupPassword(const QString &group)
 {
     QString result;
 
-    if (group == "All Programs")
-    {
-        result = gCoreContext->GetSetting("AllRecGroupPassword");
-    }
-    else
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT password FROM recgrouppassword "
-                      "WHERE recgroup = :GROUP");
-        query.bindValue(":GROUP", group);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT password FROM recgrouppassword "
+                    "WHERE recgroup = :GROUP");
+    query.bindValue(":GROUP", group);
 
-        if (query.exec() && query.next())
-            result = query.value(0).toString();
-    }
+    if (query.exec() && query.next())
+        result = query.value(0).toString();
 
     return(result);
 }

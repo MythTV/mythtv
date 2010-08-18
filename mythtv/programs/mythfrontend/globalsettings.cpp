@@ -618,16 +618,6 @@ static HostComboBox *PIPLocationComboBox()
     return gc;
 }
 
-static GlobalLineEdit *AllRecGroupPassword()
-{
-    GlobalLineEdit *be = new GlobalLineEdit("AllRecGroupPassword");
-    be->setLabel(QObject::tr("Password required to view all recordings"));
-    be->setValue("");
-    be->setHelpText(QObject::tr("If given, a password must be entered to "
-                    "view the complete list of all recordings."));
-    return be;
-}
-
 static HostComboBox *DisplayRecGroup()
 {
     HostComboBox *gc = new HostComboBox("DisplayRecGroup");
@@ -2233,30 +2223,30 @@ static HostSpinBox *LiveTVIdleTimeout()
     return gs;
 }
 
-static HostCheckBox *PlaybackPreview()
-{
-    HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
-    gc->setLabel(QObject::tr("Display live preview of recordings"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, a preview of the recording "
-                    "will play in a small window on the \"Watch a "
-                    "Recording\" menu."));
-    return gc;
-}
-
-static HostCheckBox *HWAccelPlaybackPreview()
-{
-    HostCheckBox *gc = new HostCheckBox("HWAccelPlaybackPreview");
-    gc->setLabel(QObject::tr("Use HW Acceleration for live recording preview"));
-    gc->setValue(false);
-    gc->setHelpText(
-        QObject::tr(
-            "If enabled, live recording preview will use hardware "
-            "acceleration. The video renderer used is determined by the "
-            "selected CPU profile. Disable if playback is sluggish or "
-            "causes high CPU load"));
-    return gc;
-}
+// static HostCheckBox *PlaybackPreview()
+// {
+//     HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
+//     gc->setLabel(QObject::tr("Display live preview of recordings"));
+//     gc->setValue(true);
+//     gc->setHelpText(QObject::tr("If enabled, a preview of the recording "
+//                     "will play in a small window on the \"Watch a "
+//                     "Recording\" menu."));
+//     return gc;
+// }
+//
+// static HostCheckBox *HWAccelPlaybackPreview()
+// {
+//     HostCheckBox *gc = new HostCheckBox("HWAccelPlaybackPreview");
+//     gc->setLabel(QObject::tr("Use HW Acceleration for live recording preview"));
+//     gc->setValue(false);
+//     gc->setHelpText(
+//         QObject::tr(
+//             "If enabled, live recording preview will use hardware "
+//             "acceleration. The video renderer used is determined by the "
+//             "selected CPU profile. Disable if playback is sluggish or "
+//             "causes high CPU load"));
+//     return gc;
+// }
 
 static HostCheckBox *UseVirtualKeyboard()
 {
@@ -4218,7 +4208,6 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* pbox2 = new VerticalConfigurationGroup(false);
     pbox2->setLabel(QObject::tr("Recording Groups") +
                     QString(" (%1/%2)").arg(++i).arg(total));
-    pbox2->addChild(AllRecGroupPassword());
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
