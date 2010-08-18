@@ -14,6 +14,7 @@
 #include "mythuitext.h"
 #include "mythuibutton.h"
 #include "mythuieditbar.h"
+#include "mythuistatetype.h"
 
 // libmythtv
 #include "channelutil.h"
@@ -351,6 +352,12 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
     if (!win)
         return;
 
+    if (map.contains("tvstate"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("tvstate"));
+        if (state)
+            state->DisplayState(map["tvstate"]);
+    }
     if (map.contains("chanid"))
     {
         MythUIImage *icon = dynamic_cast<MythUIImage *> (win->GetChild("iconpath"));

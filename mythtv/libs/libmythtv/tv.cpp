@@ -13,8 +13,12 @@ QString StateToString(TVState state)
 {
     QString statestr = QString("Unknown(%1)").arg((int)state);
     switch (state) {
-        case kState_Error: statestr = "Error"; break;
-        case kState_None: statestr = "None"; break;
+        case kState_Error:
+            statestr = "Error";
+            break;
+        case kState_None:
+            statestr = "None";
+            break;
         case kState_WatchingLiveTV:
             statestr = "WatchingLiveTV";
             break;
@@ -36,47 +40,12 @@ QString StateToString(TVState state)
         case kState_RecordingOnly:
             statestr = "RecordingOnly";
             break;
-        case kState_ChangingState: statestr = "ChangingState"; break;
+        case kState_ChangingState:
+            statestr = "ChangingState";
+            break;
     }
     statestr.detach();
     return statestr;
-}
-
-/**
- *  \brief Returns a translatable QString representing a TVState.
- *  \param state State to print.
- */
-QString StateToPublicString(TVState state)
-{
-    QString str = QString();
-    switch (state) {
-        case kState_WatchingLiveTV:
-            str = QObject::tr("Live TV");
-            break;
-        case kState_WatchingPreRecorded:
-            str =  QObject::tr("Prerecorded");
-            break;
-        case kState_WatchingRecording:
-            str =  QObject::tr("Recording");
-            break;
-        case kState_WatchingVideo:
-            str =  QObject::tr("Video");
-            break;
-        case kState_WatchingDVD:
-            str =  QObject::tr("DVD");
-            break;
-        case kState_WatchingBD:
-            str =  QObject::tr("Blu-ray");
-            break;
-        case kState_RecordingOnly:
-        case kState_Error:
-        case kState_None:
-        case kState_ChangingState:
-        default:
-            break;
-    }
-    str.detach();
-    return str;
 }
 
 QString toTypeString(PictureAdjustType type)
