@@ -79,7 +79,7 @@ Common MythArchive window definitions
         <textarea name="freespace_text" from="basetextarea">
             <area>235,280,200,50</area>
             <font>description</font>
-            <value>0.00Gb</value>
+            <value>0.00 GB</value>
         </textarea>
 
         <shape name="bottombackground" from="basebackground">
