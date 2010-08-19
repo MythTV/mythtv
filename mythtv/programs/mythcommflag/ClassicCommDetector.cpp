@@ -730,8 +730,10 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     unsigned char pixel;
     int blankPixelsChecked = 0;
     long long totBrightness = 0;
-    unsigned char *rowMax;
-    unsigned char *colMax;
+    unsigned char *rowMax = new unsigned char[height];
+    unsigned char *colMax = new unsigned char[width];
+    memset(rowMax, 0, sizeof(*rowMax)*height);
+    memset(colMax, 0, sizeof(*colMax)*width);
     int topDarkRow = commDetectBorder;
     int bottomDarkRow = height - commDetectBorder - 1;
     int leftDarkCol = commDetectBorder;
@@ -786,14 +788,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     frameInfo[curFrameNumber] = fInfo;
 
     if (commDetectMethod & COMM_DETECT_BLANKS)
-    {
-        rowMax = new unsigned char[height];
-        colMax = new unsigned char[width];
-        memset(rowMax, 0, sizeof(*rowMax)*height);
-        memset(colMax, 0, sizeof(*colMax)*width);
-
         frameIsBlank = false;
-    }
 
     if (commDetectMethod & COMM_DETECT_SCENE)
     {
