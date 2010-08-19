@@ -70,7 +70,7 @@ extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, u
 
 #define MAX_AC3_FRAME_SIZE 6144
 
-static const bool use_reordered_opaque = false;
+static const bool force_reordered_opaque = false;
 
 static const float eps = 1E-5;
 
@@ -259,6 +259,10 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       start_code_state(0xffffffff),
       lastvpts(0),                  lastapts(0),
       lastccptsu(0),
+      faulty_pts(0),                faulty_dts(0),
+      last_pts_for_fault_detection(0),
+      last_dts_for_fault_detection(0),
+      pts_detected(false),
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
@@ -647,6 +651,11 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         lastapts = 0;
         lastvpts = 0;
         lastccptsu = 0;
+        faulty_pts = faulty_dts = 0;
+        last_pts_for_fault_detection = 0;
+        last_dts_for_fault_detection = 0;
+        pts_detected = false;
+
         av_read_frame_flush(ic);
 
         // Only reset the internal state if we're using our seeking,
@@ -2717,6 +2726,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 gopset = false;
                 prevgoppos = 0;
                 lastapts = lastvpts = lastccptsu = 0;
+                faulty_pts = faulty_dts = 0;
+                last_pts_for_fault_detection = 0;
+                last_dts_for_fault_detection = 0;
+                pts_detected = false;
 
                 // fps debugging info
                 float avFPS = normalized_fps(stream, context);
@@ -2819,6 +2832,10 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             gopset = false;
             prevgoppos = 0;
             lastapts = lastvpts = lastccptsu = 0;
+            faulty_pts = faulty_dts = 0;
+            last_pts_for_fault_detection = 0;
+            last_dts_for_fault_detection = 0;
+            pts_detected = false;
 
             // fps debugging info
             float avFPS = normalized_fps(stream, context);
@@ -2991,12 +3008,31 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         return false;
     }
 
-    if ((use_reordered_opaque || pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
+    // Detect faulty video timestamps using logic from ffplay.
+    if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+    {
+        faulty_dts += (pkt->dts <= last_dts_for_fault_detection);
+        last_dts_for_fault_detection = pkt->dts;
+    }
+    if (mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+    {
+        faulty_pts += (mpa_pic.reordered_opaque <= last_pts_for_fault_detection);
+        last_pts_for_fault_detection = mpa_pic.reordered_opaque;
+        pts_detected = true;
+    }
+
+    // Select reordered_opaque (PTS) timestamps if they are less faulty or the
+    // the DTS timestamp is missing. Also use fixups for missing PTS instead of
+    // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is 
+    // more faulty or never detected.
+    if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
+        pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
         mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
         pts = (long long)mpa_pic.reordered_opaque;
     }
-    else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+    else if ((faulty_dts < faulty_pts || !pts_detected) &&
+             pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
         pts = (long long)pkt->dts;
     }
@@ -3005,7 +3041,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     long long temppts = pts;
 
     // Validate the video pts against the last pts. If it's
-    // a little bit smaller, equal or not available, compute
+    // a little bit smaller, equal or missing, compute
     // it from the last. Otherwise assume a wraparound.
     if (!ringBuffer->isDVD() &&
         temppts <= lastvpts &&

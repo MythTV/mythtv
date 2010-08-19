@@ -270,6 +270,12 @@ class AvFormatDecoder : public DecoderBase
     long long lastapts;
     long long lastccptsu;
 
+    int64_t faulty_pts;
+    int64_t faulty_dts;
+    int64_t last_pts_for_fault_detection;
+    int64_t last_dts_for_fault_detection;
+    bool pts_detected;
+
     bool using_null_videoout;
     MythCodecID video_codec_id;
     bool no_hardware_decoders;
