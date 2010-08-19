@@ -17,8 +17,8 @@ class MPUBLIC AudioPlayer
     void  SetAudioInfo(const QString &main_device,
                        const QString &passthru_device,
                        uint           samplerate);
-    void  SetAudioParams(AudioFormat format, int channels, int codec,
-                         int samplerate, bool passthru);
+    void  SetAudioParams(AudioFormat format, int orig_channels, int channels,
+                         int codec, int samplerate, bool passthru);
     void  SetEffDsp(int dsprate);
 
     void  CheckFormat(void);
@@ -29,8 +29,9 @@ class MPUBLIC AudioPlayer
     bool  Pause(bool pause);
     bool  IsPaused(void);
     void  PauseAudioUntilBuffered(void);
-    int   GetCodec(void)       { return m_codec;    }
-    int   GetNumChannels(void) { return m_channels; }
+    int   GetCodec(void)        { return m_codec;         }
+    int   GetNumChannels(void)  { return m_channels;      }
+    int   GetOrigChannels(void) { return m_orig_channels; }
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
     float GetStretchFactor(void) { return m_stretchfactor;   }
@@ -55,6 +56,7 @@ class MPUBLIC AudioPlayer
     MythPlayer  *m_parent;
     AudioOutput *m_audioOutput;
     int          m_channels;
+    int          m_orig_channels;
     int          m_codec;
     AudioFormat  m_format;
     int          m_samplerate;

@@ -55,16 +55,16 @@ class StreamInfo
         av_stream_index(-1), av_substream_index(-1),
         language(-2), language_index(0),
         stream_id(-1), easy_reader(false),
-        wide_aspect_ratio(false) {}
-    StreamInfo(int a, int b, uint c, int d, bool e = false, bool f = false) :
+        wide_aspect_ratio(false), orig_num_channels(2) {}
+    StreamInfo(int a, int b, uint c, int d, int e, bool f = false, bool g = false) :
         av_stream_index(a), av_substream_index(-1),
         language(b), language_index(c), stream_id(d),
-        easy_reader(e), wide_aspect_ratio(f) {}
-    StreamInfo(int a, int b, uint c, int d, int e,
-               bool f = false, bool g = false) :
+        easy_reader(f), wide_aspect_ratio(g), orig_num_channels(e) {}
+    StreamInfo(int a, int b, uint c, int d, int e, int f,
+               bool g = false, bool h = false) :
         av_stream_index(a), av_substream_index(e),
         language(b), language_index(c), stream_id(d),
-        easy_reader(f), wide_aspect_ratio(g) {}
+        easy_reader(g), wide_aspect_ratio(h), orig_num_channels(f) {}
 
   public:
     int  av_stream_index;
@@ -75,6 +75,7 @@ class StreamInfo
     int  stream_id;
     bool easy_reader;
     bool wide_aspect_ratio;
+    int  orig_num_channels;
 
     bool operator<(const StreamInfo& b) const
     {

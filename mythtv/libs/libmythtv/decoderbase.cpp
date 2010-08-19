@@ -49,9 +49,9 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       languagePreference(iso639_get_language_key_list())
 {
     ResetTracks();
-    tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0));
-    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1));
-    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3));
+    tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0, 0));
+    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1, 0));
+    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3, 0));
 }
 
 DecoderBase::~DecoderBase()

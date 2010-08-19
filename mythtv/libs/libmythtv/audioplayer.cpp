@@ -5,8 +5,8 @@
 #define LOC QString("AudioPlayer: ")
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
-  : m_parent(parent),    m_audioOutput(NULL),
-    m_channels(2),       m_codec(0),            m_format(FORMAT_NONE),
+  : m_parent(parent),    m_audioOutput(NULL),   m_channels(2),
+    m_orig_channels(2),  m_codec(0),            m_format(FORMAT_NONE),
     m_samplerate(44100), m_stretchfactor(1.0f), m_lock(QMutex::Recursive),
     m_muted_on_creation(muted), m_main_device(QString::null),
     m_passthru_device(QString::null),
@@ -181,14 +181,16 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
     m_samplerate = (int)samplerate;
 }
 
-void AudioPlayer::SetAudioParams(AudioFormat format, int channels, int codec,
+void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
+                                 int channels, int codec,
                                  int samplerate, bool passthru)
 {
-    m_format     = format;
-    m_channels   = channels;
-    m_codec      = codec;
-    m_samplerate = samplerate;
-    m_passthru   = passthru;
+    m_format        = format;
+    m_orig_channels = orig_channels;
+    m_channels      = channels;
+    m_codec         = codec;
+    m_samplerate    = samplerate;
+    m_passthru      = passthru;
 }
 
 void AudioPlayer::SetEffDsp(int dsprate)

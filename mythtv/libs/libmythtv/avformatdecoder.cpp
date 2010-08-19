@@ -1440,7 +1440,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
             else
             {
                 int line21 = csd.Line21Field(k) ? 3 : 1;
-                StreamInfo si(av_index, lang, 0/*lang_idx*/, line21);
+                StreamInfo si(av_index, lang, 0/*lang_idx*/, line21, 0);
                 ccX08_in_pmt[line21-1] = true;
                 pmt_tracks.push_back(si);
                 pmt_track_types.push_back(kTrackTypeCC608);
@@ -1543,7 +1543,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
                 int magazine = td.TeletextMagazineNum(k)?:8;
                 int pagenum  = td.TeletextPageNum(k);
                 int lang_idx = (magazine << 8) | pagenum;
-                StreamInfo si(av_index, language, lang_idx, 0);
+                StreamInfo si(av_index, language, lang_idx, 0, 0);
                 if (type == 2 || type == 1)
                 {
                     TrackType track = (type == 2) ? kTrackTypeTeletextCaptions :
@@ -1687,7 +1687,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     enc->bit_rate = 500000;
                 // HACK -- end
 
-                StreamInfo si(i, 0, 0, 0);
+                StreamInfo si(i, 0, 0, 0, 0);
                 tracks[kTrackTypeVideo].push_back(si);
                 bitrate += enc->bit_rate;
                 if (novideo)
@@ -2005,7 +2005,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             subtitleStreamCount++;
 
             tracks[kTrackTypeSubtitle].push_back(
-                StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
+                StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 0));
 
             VERBOSE(VB_PLAYBACK, LOC + QString(
                         "Subtitle track #%1 is A/V stream #%2 "
@@ -2029,16 +2029,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
             }
 
+            int channels  = ic->streams[i]->codec->channels;
             int lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {
                 tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 0));
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, channels, false));
                 lang_indx = lang_aud_cnt[lang]++;
                 tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 1));
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, channels, true));
             }
             else
             {
@@ -2049,7 +2050,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     logical_stream_id = ic->streams[i]->id;
 
                 tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(i, lang, lang_indx, logical_stream_id));
+                    StreamInfo(i, lang, lang_indx, logical_stream_id, channels));
             }
 
             VERBOSE(VB_AUDIO, LOC + QString(
@@ -2126,7 +2127,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // waiting on audio.
     if (m_audio->HasAudioIn() && tracks[kTrackTypeAudio].empty())
     {
-        m_audio->SetAudioParams(FORMAT_NONE, -1, CODEC_ID_NONE, -1, false);
+        m_audio->SetAudioParams(FORMAT_NONE, -1, -1, CODEC_ID_NONE, -1, false);
         m_audio->ReinitAudio();
         if (ringBuffer && ringBuffer->isDVD())
             audioIn = AudioInfo();
@@ -3346,7 +3347,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
         if (ringBuffer->isDVD())
             channels = ringBuffer->DVD()->GetNumAudioChannels(trackNo);
         else if (s->codec->channels)
-            channels = s->codec->channels;
+            channels = tracks[kTrackTypeAudio][trackNo].orig_num_channels;
 
         if (channels == 0)
             msg += QString(" ?ch");
@@ -3412,7 +3413,7 @@ bool AvFormatDecoder::SetVideoByComponentTag(int tag)
         {
             if (s->component_tag == tag)
             {
-                StreamInfo si(i, 0, 0, 0);
+                StreamInfo si(i, 0, 0, 0, 0);
                 selectedTrack[kTrackTypeVideo] = si;
                 return true;
             }
@@ -3838,7 +3839,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             if (ctx->sample_rate != audioOut.sample_rate ||
                 ctx->channels    != audioOut.channels)
             {
-                VERBOSE(VB_IMPORTANT, "audio stream changed");
+                VERBOSE(VB_IMPORTANT, LOC + "Audio stream changed");
                 currentTrack[kTrackTypeAudio] = -1;
                 selectedTrack[kTrackTypeAudio].av_stream_index = -1;
                 audIdx = -1;
@@ -4465,6 +4466,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AVCodecContext *ctx = NULL;
     AudioInfo old_in    = audioIn;
     bool using_passthru = false;
+    int  orig_channels  = 2;
 
     if ((currentTrack[kTrackTypeAudio] >= 0) && ic &&
         (selectedTrack[kTrackTypeAudio].av_stream_index <=
@@ -4475,7 +4477,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream);
         assert(curstream->codec);
         ctx = curstream->codec;
-
+        orig_channels = selectedTrack[kTrackTypeAudio].orig_num_channels;
         AudioFormat fmt;
 
         switch (ctx->sample_fmt)
@@ -4518,7 +4520,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         }
 
         info = AudioInfo(ctx->codec_id, fmt, ctx->sample_rate,
-                         ctx->channels, using_passthru);
+                         ctx->channels, using_passthru, orig_channels);
     }
 
     if (!ctx)
@@ -4541,7 +4543,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (audioOut.sample_rate > 0)
         m_audio->SetEffDsp(audioOut.sample_rate * 100);
-    m_audio->SetAudioParams(audioOut.format, ctx->request_channels,
+    m_audio->SetAudioParams(audioOut.format, orig_channels, ctx->request_channels,
                             audioOut.codec_id, audioOut.sample_rate,
                             audioOut.do_passthru);
     m_audio->ReinitAudio();

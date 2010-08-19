@@ -40,13 +40,16 @@ class AudioInfo
   public:
     AudioInfo() :
         codec_id(CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
-        sample_rate(-1), channels(-1), do_passthru(false)
+        sample_rate(-1), channels(-1), do_passthru(false),
+        original_channels(-1)
     {;}
 
-    AudioInfo(CodecID id, AudioFormat fmt, int sr, int ch, bool passthru) :
+    AudioInfo(CodecID id, AudioFormat fmt, int sr, int ch, bool passthru,
+              int original_ch) :
         codec_id(id), format(fmt),
         sample_size(ch * AudioOutputSettings::SampleSize(fmt)),
-        sample_rate(sr), channels(ch), do_passthru(passthru)
+        sample_rate(sr), channels(ch), do_passthru(passthru),
+        original_channels(original_ch)
     {
     }
 
@@ -54,12 +57,14 @@ class AudioInfo
     AudioFormat format;
     int sample_size, sample_rate, channels;
     bool do_passthru;
+    int original_channels;
 
     bool operator==(const AudioInfo &o) const
     {
         return (codec_id==o.codec_id        && channels==o.channels       &&
                 sample_size==o.sample_size  && sample_rate==o.sample_rate &&
-                format==o.format            && do_passthru==o.do_passthru);
+                format==o.format            && do_passthru==o.do_passthru &&
+                original_channels==o.original_channels);
     }
     QString toString() const
     {

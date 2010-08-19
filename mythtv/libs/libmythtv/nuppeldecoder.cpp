@@ -177,7 +177,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     ringBuffer = rbuffer;
     disablevideo = novideo;
     tracks[kTrackTypeVideo].clear();
-    StreamInfo si(0, 0, 0, 0);
+    StreamInfo si(0, 0, 0, 0, 0);
     tracks[kTrackTypeVideo].push_back(si);
     selectedTrack[kTrackTypeVideo] = si;
 
@@ -516,6 +516,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
 
         m_audio->SetAudioParams(format, extradata.audio_channels,
+                                extradata.audio_channels,
                                 CODEC_ID_NONE, extradata.audio_sample_rate,
                                 false /* AC3/DTS pass through */);
         m_audio->ReinitAudio();

@@ -3867,7 +3867,7 @@ QString MythPlayer::GetEncodingType(void) const
 void MythPlayer::GetCodecDescription(InfoMap &infoMap)
 {
     infoMap["audiocodec"]    = codec_id_string((CodecID)audio.GetCodec());
-    infoMap["audiochannels"] = QString::number(audio.GetNumChannels());
+    infoMap["audiochannels"] = QString::number(audio.GetOrigChannels());
 
     int width  = video_disp_dim.width();
     int height = video_disp_dim.height();
