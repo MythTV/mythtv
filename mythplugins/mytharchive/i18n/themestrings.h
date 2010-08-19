@@ -29,7 +29,7 @@ void strings_null() {
     ThemeUI::tr("Exit");
     ThemeUI::tr("description goes here.");
     ThemeUI::tr("Find");
-    ThemeUI::tr("0.00Gb");
+    ThemeUI::tr("0.00 GB");
     ThemeUI::tr("Force Overwrite of DVD-RW Media");
     ThemeUI::tr("Select Recordings");
     ThemeUI::tr("Show Recordings");
@@ -41,7 +41,7 @@ void strings_null() {
     ThemeUI::tr("Video Category");
     ThemeUI::tr("x.xx Gb");
     ThemeUI::tr("Change Encoding Profile");
-    ThemeUI::tr("12.34GB");
+    ThemeUI::tr("12.34 GB");
     ThemeUI::tr("DVD Menu Theme");
     ThemeUI::tr("Choose the appearance of your DVD.");
     ThemeUI::tr("Theme:");
@@ -67,7 +67,6 @@ void strings_null() {
     ThemeUI::tr("Seek Amount");
     ThemeUI::tr("Frame");
     ThemeUI::tr("Save");
-    ThemeUI::tr("12.34 GB");
     ThemeUI::tr("Select a theme");
     ThemeUI::tr("xxxxx MB");
     ThemeUI::tr("0 MB");

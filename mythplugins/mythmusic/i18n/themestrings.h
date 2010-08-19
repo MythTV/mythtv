@@ -50,7 +50,6 @@ void strings_null() {
     ThemeUI::tr("Switch Titles");
     ThemeUI::tr("Scan CD");
     ThemeUI::tr("Rip CD");
-    ThemeUI::tr("Please Wait ...");
     ThemeUI::tr("Metadata");
     ThemeUI::tr("Import Files");
     ThemeUI::tr("Scan");

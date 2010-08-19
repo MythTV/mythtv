@@ -7,7 +7,7 @@ void strings_null() {
     ThemeUI::tr("description goes here.");
     ThemeUI::tr("Find");
     ThemeUI::tr("Free Space:");
-    ThemeUI::tr("0.00Gb");
+    ThemeUI::tr("0.00 GB");
     ThemeUI::tr("Make ISO Image");
     ThemeUI::tr("Burn to DVD");
     ThemeUI::tr("Force Overwrite of DVD-RW Media");
@@ -163,7 +163,6 @@ void strings_null() {
     ThemeUI::tr("Destination:");
     ThemeUI::tr("Image Type:");
     ThemeUI::tr("Copy");
-    ThemeUI::tr("Please Wait ...");
     ThemeUI::tr("Volume");
     ThemeUI::tr("0%");
     ThemeUI::tr("Length:");
@@ -446,7 +445,6 @@ void strings_null() {
     ThemeUI::tr("Filter:");
     ThemeUI::tr("Select the file you wish to use.");
     ThemeUI::tr("See logs from your archive runs.");
-    ThemeUI::tr("12.34GB");
     ThemeUI::tr("Choose the appearance of your DVD.");
     ThemeUI::tr("Theme:");
     ThemeUI::tr("Select the recordings and videos you wish to save.");
