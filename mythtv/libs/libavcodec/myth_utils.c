@@ -138,6 +138,7 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_PCM_U24BE:        return "PCM_U24BE";
         case CODEC_ID_PCM_S24DAUD:      return "PCM_S24DAUD";
         case CODEC_ID_PCM_DVD:          return "PCM_DVD";
+        case CODEC_ID_PCM_BLURAY:       return "PCM_BLURAY";
 
             /* various adpcm codecs */
         case CODEC_ID_ADPCM_IMA_QT:     return "ADPCM_IMA_QT";
