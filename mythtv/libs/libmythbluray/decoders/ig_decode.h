@@ -35,10 +35,10 @@ extern "C" {
  * segment
  */
 
-BD_PRIVATE int  ig_decode_interactive(BITBUFFER *bb, BD_PG_INTERACTIVE *p);
+BD_PRIVATE int  ig_decode_interactive(BITBUFFER *bb, BD_IG_INTERACTIVE *p);
 
-BD_PRIVATE void ig_clean_interactive(BD_PG_INTERACTIVE *p);
-BD_PRIVATE void ig_free_interactive(BD_PG_INTERACTIVE **p);
+BD_PRIVATE void ig_clean_interactive(BD_IG_INTERACTIVE *p);
+BD_PRIVATE void ig_free_interactive(BD_IG_INTERACTIVE **p);
 
 
 #endif // _IG_DECODE_H_

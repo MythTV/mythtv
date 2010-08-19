@@ -73,6 +73,8 @@ typedef struct {
 } BD_PG_PALETTE_ENTRY;
 
 typedef struct {
+    int64_t pts;
+
     uint8_t id;
     uint8_t version;
 
@@ -85,6 +87,8 @@ typedef struct {
 } BD_PG_RLE_ELEM;
 
 typedef struct {
+    int64_t pts;
+
     uint16_t id;
     uint8_t  version;
 

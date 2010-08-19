@@ -314,7 +314,7 @@ static int64_t _seek_stream(BLURAY *bd, BD_STREAM *st,
     if (!clip)
         return -1;
 
-    if (!st->fp || clip->ref != st->clip->ref) {
+    if (!st->fp || !st->clip || clip->ref != st->clip->ref) {
         // The position is in a new clip
         st->clip = clip;
         if (!_open_m2ts(bd, st)) {
@@ -734,8 +734,7 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
                         }
                         bd->s_pos = st->clip->pos;
                     } else {
-                        st->clip = nav_set_angle(bd->title, st->clip, bd->request_angle);
-                        bd_psr_write(bd->regs, PSR_ANGLE_NUMBER, bd->title->angle + 1);
+                        _change_angle(bd);
                         _clip_seek_time(bd, bd->angle_change_time);
                     }
                     bd->seamless_angle_change = 0;
@@ -1269,7 +1268,7 @@ static int _play_hdmv(BLURAY *bd, unsigned id_ref)
     }
     bd->hdmv_suspended = 0;
 
-    return hdmv_vm_select_object(bd->hdmv_vm, id_ref, NULL);
+    return hdmv_vm_select_object(bd->hdmv_vm, id_ref);
 }
 
 #define TITLE_FIRST_PLAY 0xffff   /* 10.4.3.2 (E) */

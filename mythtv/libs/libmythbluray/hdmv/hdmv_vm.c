@@ -240,6 +240,11 @@ void hdmv_vm_free(HDMV_VM *p)
 {
     mobj_free(p->movie_objects);
 
+    if (p->ig_object) {
+        X_FREE(p->ig_object->cmds);
+        X_FREE(p->ig_object);
+    }
+
     X_FREE(p);
 }
 
@@ -834,8 +839,10 @@ static int _hdmv_step(HDMV_VM *p)
  * interface
  */
 
-int hdmv_vm_select_object(HDMV_VM *p, int object, void *ig_object)
+int hdmv_vm_select_object(HDMV_VM *p, int object)
 {
+    p->object = NULL;
+
     if (object >= 0) {
         if (object >= p->movie_objects->num_objects) {
             DEBUG(DBG_HDMV|DBG_CRIT, "hdmv_vm_select_program(): invalid object reference (%d) !\n", object);
@@ -844,7 +851,25 @@ int hdmv_vm_select_object(HDMV_VM *p, int object, void *ig_object)
         p->pc     = 0;
         p->object = &p->movie_objects->objects[object];
     }
-    if (ig_object) {
+
+    return 0;
+}
+
+int hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds)
+{
+    p->object = NULL;
+
+    if (p->ig_object) {
+        X_FREE(p->ig_object->cmds);
+        X_FREE(p->ig_object);
+    }
+
+    if (nav_cmds && num_nav_cmds > 0) {
+        MOBJ_OBJECT *ig_object = calloc(1, sizeof(MOBJ_OBJECT));
+        ig_object->num_cmds = num_nav_cmds;
+        ig_object->cmds     = calloc(num_nav_cmds, sizeof(MOBJ_CMD));
+        memcpy(ig_object->cmds, nav_cmds, num_nav_cmds * sizeof(MOBJ_CMD));
+
 #if 0
         /* ??? */
         if (!p->ig_object && p->object) {
