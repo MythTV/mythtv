@@ -401,25 +401,6 @@ VideoOutput::~VideoOutput()
         display_res->Unlock();
 }
 
-void VideoOutput::GetVideoMetadata(InfoMap &infoMap, FrameScanType scan)
-{
-    int width  = window.GetVideoDispDim().width();
-    int height = window.GetVideoDispDim().height();
-    infoMap["videowidth"]     = QString::number(width);
-    infoMap["videoheight"]    = QString::number(height);
-    infoMap["videoframerate"] = QString::number(1000000 / video_prate, 'f', 2);
-    if (height < 480)
-        return;
-
-    bool interlaced = is_interlaced(scan);
-    if (height == 480 || height == 576)
-        infoMap["videodescrip"] = "SD";
-    else if (height == 720 && !interlaced)
-        infoMap["videodescrip"] = "HD_720_P";
-    else if (height == 1080)
-        infoMap["videodescrip"] = interlaced ? "HD_1080_I" : "HD_1080_P";
-}
-
 /**
  * \fn VideoOutput::Init(int,int,float,WId,int,int,int,int,WId)
  * \brief Performs most of the initialization for VideoOutput.

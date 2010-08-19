@@ -209,9 +209,7 @@ class MPUBLIC MythPlayer
     bool      IsDecoderErrored(void)   const
         { return (errorType & kError_Decode); }
     QString   GetEncodingType(void) const;
-    QString   GetAudioCodec(void);
-    int       GetNumAudioChannels(void)      { return audio.GetNumChannels(); }
-    void      GetVideoMetadata(InfoMap &infoMap);
+    void      GetCodecDescription(InfoMap &infoMap);
     QString   GetXDS(const QString &key) const;
     PIPLocation GetNextPIPLocation(void) const;
 

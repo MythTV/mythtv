@@ -3864,9 +3864,28 @@ QString MythPlayer::GetEncodingType(void) const
     return get_encoding_type(GetDecoder()->GetVideoCodecID());
 }
 
-QString MythPlayer::GetAudioCodec(void)
+void MythPlayer::GetCodecDescription(InfoMap &infoMap)
 {
-    return codec_id_string((CodecID)audio.GetCodec());
+    infoMap["audiocodec"]    = codec_id_string((CodecID)audio.GetCodec());
+    infoMap["audiochannels"] = QString::number(audio.GetNumChannels());
+
+    int width  = video_disp_dim.width();
+    int height = video_disp_dim.height();
+    infoMap["videocodec"]     = GetEncodingType();
+    infoMap["videowidth"]     = QString::number(width);
+    infoMap["videoheight"]    = QString::number(height);
+    infoMap["videoframerate"] = QString::number(1000000 / video_frame_rate, 'f', 2);
+
+    if (height < 480)
+        return;
+
+    bool interlaced = is_interlaced(m_scan);
+    if (height == 480 || height == 576)
+        infoMap["videodescrip"] = "SD";
+    else if (height == 720 && !interlaced)
+        infoMap["videodescrip"] = "HD_720_P";
+    else if (height == 1080 || height == 1088)
+        infoMap["videodescrip"] = interlaced ? "HD_1080_I" : "HD_1080_P";
 }
 
 bool MythPlayer::GetRawAudioState(void) const

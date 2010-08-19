@@ -754,15 +754,8 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
                 playingInfo->GetPathname(), "Screenshots");
         }
         if (player)
-        {
-            infoMap["videocodec"] = player->GetEncodingType();
-            infoMap["audiocodec"] = player->GetAudioCodec();
-            int audiochannels = player->GetNumAudioChannels();
-            infoMap["audiochannels"] = QString::number(audiochannels);
-            if (player->getVideoOutput())
-                player->getVideoOutput()->GetVideoMetadata(infoMap,
-                                                           player->GetScanType());
-        }
+            player->GetCodecDescription(infoMap);
+
         infoMap.detach();
         loaded = true;
     }
