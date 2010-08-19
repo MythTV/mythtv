@@ -111,7 +111,7 @@ namespace
     }
 
     bool scan_sg_dir(const QString &start_path, const QString &host,
-                     const QString &base_path, DirectoryHandler *handler, 
+                     const QString &base_path, DirectoryHandler *handler,
 		             const ext_lookup &ext_settings)
     {
         QString path = start_path;
@@ -152,7 +152,9 @@ namespace
             if ((type != "dir") &&
                 ext_settings.extension_ignored(fi.suffix())) continue;
 
-            if (type == "dir")
+            if (type == "dir" &&
+                !fileName.endsWith("VIDEO_TS") &&
+                !fileName.endsWith("BDMV"))
             {
                 //VERBOSE(VB_GENERAL, QString(" -- Dir : %1").arg(fileName));
                 DirectoryHandler *dh =
@@ -162,19 +164,41 @@ namespace
                 // Same as a nomal scan_dir we don't care if we can't read subdirectories
                 // so ignore the results and continue. As long as we reached it once
                 // to make it this far than we know he SG/Path exists
-                (void) scan_sg_dir(start_path + "/" + fileName, host, base_path, 
+                (void) scan_sg_dir(start_path + "/" + fileName, host, base_path,
                              dh, ext_settings);
             }
             else
             {
-                QString URL = QString("%1/%2").arg(path).arg(fileName);
+                QString suffix;
+                QString URL;
+
+                if (fileName.endsWith("VIDEO_TS") || fileName.endsWith("BDMV"))
+                {
+                    if (path.startsWith("/"))
+                        path = path.right(path.length() - 1);
+                    if (path.endsWith("/"))
+                        path = path.left(path.length() - 1);
+                    QStringList upDirs = path.split("/");
+                    if (upDirs.count() > 1)
+                        fileName = upDirs.takeLast();
+                    else
+                        fileName = path;
+                    suffix = "";
+                    URL = path;
+                }
+                else
+                {
+                    suffix = fi.suffix();
+                    URL = QString("%1/%2").arg(path).arg(fileName);
+                }
+
                 URL.replace("//","/");
 
                 if (URL.startsWith("/"))
                     URL = URL.right(URL.length() - 1);
-                //VERBOSE(VB_GENERAL, QString(" -- File :mythtv: %1 : %2 : %3 :")
-                //                            .arg(URL).arg(start_path).arg(path));
-                
+                //VERBOSE(VB_GENERAL, QString(" -- File Filename: %1 URL: %2 Suffix: %3 Host: %4")
+                //                            .arg(fileName).arg(URL).arg(suffix).arg(QString(host)));
+
                 handler->handleFile(fileName, URL, fi.suffix(), QString(host));
             }
         }
