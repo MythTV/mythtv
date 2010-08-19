@@ -1,7 +1,7 @@
 #!/bin/bash
 TS=`pwd`/themestrings
 MYTHTHEMES=`ls ../myththemes/ --file-type |grep "/$"`
-XMLPLUGINS="browser-ui.xml dvd-ui.xml gallery-ui.xml game-ui.xml movies-ui.xml \
+XMLPLUGINS="browser-ui.xml dvd-ui.xml gallery-ui.xml game-ui.xml \
          music-ui.xml mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
          news-ui.xml video-ui.xml zoneminder-ui.xml weather-ui.xml"
 
@@ -65,7 +65,6 @@ updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml
 updateplugin mythbrowser browser-ui.xml
 updateplugin mythgallery gallery-ui.xml
 updateplugin mythgame game-ui.xml
-updateplugin mythmovies movies-ui.xml
 updateplugin mythmusic music-ui.xml
 updateplugin mythnetvision netvision-ui.xml
 updateplugin mythnews news-ui.xml
