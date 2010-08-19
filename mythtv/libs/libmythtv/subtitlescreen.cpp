@@ -226,9 +226,9 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
                 long long displayfor = subtitle.end_display_time -
                                        subtitle.start_display_time;
-                displayfor = (displayfor < 50) ? 50 : displayfor;
                 if (displayfor == 0)
                     displayfor = 60000;
+                displayfor = (displayfor < 50) ? 50 : displayfor;
                 long long late = currentFrame->timecode -
                                  subtitle.start_display_time;
                 MythUIImage *uiimage = NULL;
