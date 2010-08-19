@@ -377,7 +377,7 @@ clpi_lookup_spn(CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id)
     }
     pts = ((uint64_t)(entry->coarse[ii].pts_ep & ~0x01) << 18) +
           ((uint64_t)entry->fine[ref].pts_ep << 8);
-    if (pts > timestamp) {
+    if (pts > timestamp && ii) {
         // The starting point and desired PTS is in the previous coarse entry
         ii--;
         coarse_pts = (uint32_t)(entry->coarse[ii].pts_ep & ~0x01) << 18;
