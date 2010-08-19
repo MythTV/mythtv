@@ -144,14 +144,14 @@ QString UPnpCDSMusic::GetTableName( QString sColumn )
 
 QString UPnpCDSMusic::GetItemListSQL( QString /* sColumn */ )
 {
-    return "SELECT song.song_id as intid, artist.artist_name as artist, "         \
-               "album.album_name as album, song.name as title, "                  \
-               "genre.genre, song.year, song.track as tracknum, "                 \
-               "song.description, song.filename, song.length "                    \
-            "FROM music_songs song "                                              \
-               " join music_artists artist on artist.artist_id = song.artist_id " \
-               " join music_albums album on album.album_id = song.album_id "      \
-               " join music_genres genre on  genre.genre_id = song.genre_id ";
+    return "SELECT song.song_id as intid, artist.artist_name as artist, "     \
+           "album.album_name as album, song.name as title, "                  \
+           "genre.genre, song.year, song.track as tracknum, "                 \
+           "song.description, song.filename, song.length "                    \
+           "FROM music_songs song "                                           \
+           " join music_artists artist on artist.artist_id = song.artist_id " \
+           " join music_albums album on album.album_id = song.album_id "      \
+           " join music_genres genre on  genre.genre_id = song.genre_id ";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ void UPnpCDSMusic::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 
     query.prepare( sSQL );
 
-    query.bindValue(":ID"   , (int)nId    );
+    query.bindValue( ":ID", (int)nId );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -182,7 +182,8 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 
     // Xbox360 compatibility code.
 
-    if (pRequest->m_sContainerID == "7")
+    if (pRequest->m_eClient == CDS_ClientXBox && 
+        pRequest->m_sContainerID == "7")
     {
         pRequest->m_sObjectId = "Music";
 
@@ -191,7 +192,8 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
+    if ((pRequest->m_sObjectId.isEmpty()) && 
+        (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     VERBOSE( VB_UPNP, "UPnpCDSMusic::IsBrowseRequestForUs - Not sure... Calling base class." );
@@ -211,7 +213,8 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
     // XBox 360 compatibility code
 
-    if (pRequest->m_sContainerID == "7")
+    if (pRequest->m_eClient == CDS_ClientXBox && 
+        pRequest->m_sContainerID == "7")
     {
         pRequest->m_sObjectId       = "Music/1";
         pRequest->m_sSearchCriteria = "object.container.album.musicAlbum";
@@ -233,7 +236,8 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
+    if ((pRequest->m_sObjectId.isEmpty()) && 
+        (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Don't know, calling base class." );
@@ -245,7 +249,8 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSMusic::AddItem( const QString           &sObjectId,
+void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest, 
+                            const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
                             bool                     bAddRef,
                             MSqlQuery               &query )
@@ -303,8 +308,7 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
                             .arg( nId );
 
 
-    QString sId        = QString( "%1/item%2")
-                            .arg( sObjectId )
+    QString sId        = QString( "Music/1/item%1")
                             .arg( sURIParams );
 
     CDSObject *pItem   = CDSObject::CreateMusicTrack( sId,
@@ -374,3 +378,4 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     pRes->AddAttribute( "duration"  , sDur      );
 }
 
+// vim:ts=4:sw=4:ai:et:si:sts=4

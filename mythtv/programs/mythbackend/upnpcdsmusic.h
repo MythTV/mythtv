@@ -39,7 +39,8 @@ class UPnpCDSMusic : public UPnpCDSExtension
         virtual void             BuildItemQuery( MSqlQuery        &query,
                                                  const QStringMap &mapParams );
 
-        virtual void             AddItem( const QString           &sObjectId,
+        virtual void             AddItem( const UPnpCDSRequest    *pRequest, 
+                                          const QString           &sObjectId,
                                           UPnpCDSExtensionResults *pResults,
                                           bool                     bAddRef,
                                           MSqlQuery               &query );

@@ -188,6 +188,68 @@ bool UPnpCDS::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
 }
 
+static UPnpCDSClientException clientExceptions[] = {
+    // Windows Media Player version 12
+    { CDS_ClientWMP,        "Windows-Media-Player" },
+    // Windows Media Player version < 12
+    { CDS_ClientWMP,        "Mozilla/4.0 (compatible; UPnP/1.0; Windows 9x" },
+    // XBMC
+    { CDS_ClientXBMC,       "Platinum" },
+    // XBox 360
+    { CDS_ClientXBox,       "Xbox" },
+};
+static uint clientExceptionCount = sizeof(clientExceptions) / 
+                                   sizeof(clientExceptions[0]);
+
+void UPnpCDS::DetermineClient( HTTPRequest *pRequest, UPnpCDSRequest *pCDSRequest )
+{
+    QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
+
+    pCDSRequest->m_eClient = CDS_ClientDefault;
+    pCDSRequest->m_nClientVersion = 0;
+
+    // Do we know this client string?
+    for ( uint i = 0; i < clientExceptionCount; i++ )
+    {
+        UPnpCDSClientException *except = &clientExceptions[i];
+
+        int idx = sUserAgent.indexOf(except->sClientId);
+        if (idx != -1)
+        {
+            pCDSRequest->m_eClient = except->nClientType;;
+
+            // Now find the version number
+            QString version = 
+               sUserAgent.mid( idx + except->sClientId.length() + 1 ).trimmed();
+            idx = version.indexOf( '.' );
+            if (idx != -1)
+            {
+                idx = version.indexOf( '.', idx + 1 );
+            }
+            if (idx != -1)
+            {
+                version = version.left( idx );
+            }
+            idx = version.indexOf( ' ' );
+            if (idx != -1)
+            {
+                version = version.left( idx );
+            }
+
+            pCDSRequest->m_nClientVersion = version.toDouble();
+
+            break;
+        }
+    }
+
+    VERBOSE(VB_UPNP, QString("UPnpCDS::DetermineClient User-Agent:%1 Indentified as %2 version %3")
+                     .arg(sUserAgent)
+                     .arg(pCDSRequest->m_eClient)
+                     .arg(pCDSRequest->m_nClientVersion) );
+
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -197,6 +259,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     UPnpCDSExtensionResults *pResult  = NULL;
     UPnpCDSRequest           request;
 
+    DetermineClient( pRequest, &request );
     request.m_sObjectId         = pRequest->m_mapParams[ "ObjectID"      ];
     request.m_sContainerID      = pRequest->m_mapParams[ "ContainerID"   ];
     request.m_sParentId         = "0";
@@ -235,8 +298,8 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
 
     VERBOSE(VB_UPNP, QString("UPnpCDS::HandleBrowse ObjectID=%1, ContainerId=%2")
-		             .arg(request.m_sObjectId)
-		             .arg(request.m_sContainerID));
+                     .arg(request.m_sObjectId)
+                     .arg(request.m_sContainerID));
 
     if (request.m_sObjectId == "0")
     {
@@ -281,7 +344,8 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 short nCount = Min( nTotalMatches, request.m_nRequestedCount );
 
                 UPnpCDSRequest       childRequest;
-
+                
+                DetermineClient( pRequest, &request );
                 childRequest.m_sParentId         = "0";
                 childRequest.m_eBrowseFlag       = CDS_BrowseMetadata;
                 childRequest.m_sFilter           = "";
@@ -389,6 +453,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     short         nUpdateID       = 0;
     QString       sResultXML;
 
+    DetermineClient( pRequest, &request );
     request.m_sObjectId         = pRequest->m_mapParams[ "ObjectID"      ];
     request.m_sContainerID      = pRequest->m_mapParams[ "ContainerID"   ];
     request.m_sFilter           = pRequest->m_mapParams[ "Filter"        ];
@@ -754,7 +819,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessRoot( UPnpCDSRequest          
 
         case CDS_BrowseDirectChildren:
         {
-		VERBOSE(VB_UPNP, "CDS_BrowseDirectChildren");
+        VERBOSE(VB_UPNP, "CDS_BrowseDirectChildren");
             pResults->m_nUpdateID     = 1;
             pResults->m_nTotalMatches = nRootCount ;
             
@@ -874,7 +939,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem(
    // VERBOSE(VB_UPNP, QString("UPnpCDSExtension::ProcessItem : %1").arg(idPath
     switch( pRequest->m_eBrowseFlag )
     {
-	case CDS_BrowseMetadata:
+    case CDS_BrowseMetadata:
         {
             // --------------------------------------------------------------
             // Return 1 Item
@@ -896,7 +961,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem(
                 {
                     pRequest->m_sObjectId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
 
-                    AddItem( pRequest->m_sObjectId, pResults, false, query );
+                    AddItem( pRequest, pRequest->m_sObjectId, pResults, false, query );
                     pResults->m_nTotalMatches = 1;
                 }
             }
@@ -988,7 +1053,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
 
             case CDS_BrowseDirectChildren:
             {
-		
+        
                 CreateItems( pRequest, pResults, nNodeIdx, sKey, true );
 
                 break;
@@ -1229,8 +1294,10 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
         if (query.exec())
         {
             while(query.next()) 
-                AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
+                AddItem( pRequest, pRequest->m_sObjectId, pResults, bAddRef, query );
 
         }
     }
 }
+
+// vim:ts=4:sw=4:ai:et:si:sts=4

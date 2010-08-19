@@ -25,6 +25,7 @@
 #define UPnpCDS_H_
 
 #include <QList>
+#include <QMap>
 #include <QObject>
 
 #include "upnp.h"
@@ -54,6 +55,21 @@ typedef enum
 
 } UPnpCDSBrowseFlag;
 
+typedef enum
+{
+    CDS_ClientDefault         = 0,      // (no special attention required)
+    CDS_ClientWMP             = 1,      // Windows Media Player
+    CDS_ClientXBMC            = 2,      // XBMC
+    CDS_ClientMP101           = 3,      // Netgear MP101
+    CDS_ClientXBox            = 4,      // XBox 360
+} UPnpCDSClient;
+
+typedef struct
+{
+    UPnpCDSClient   nClientType;
+    QString         sClientId;
+} UPnpCDSClientException;
+
 //////////////////////////////////////////////////////////////////////////////
 
 class UPNP_PUBLIC UPnpCDSRequest
@@ -79,11 +95,17 @@ class UPNP_PUBLIC UPnpCDSRequest
         QStringList       m_sSearchList;
         QString           m_sSearchClass;
 
+        // The device performing the request
+        UPnpCDSClient     m_eClient;
+        double            m_nClientVersion;
+
     public:
 
         UPnpCDSRequest() : m_nStartingIndex ( 0 ),
                            m_nRequestedCount( 0 ),
-                           m_eBrowseFlag( CDS_BrowseUnknown )
+                           m_eBrowseFlag( CDS_BrowseUnknown ),
+                           m_eClient( CDS_ClientDefault ),
+                           m_nClientVersion( 0 )
         {
         }
 };
@@ -183,7 +205,8 @@ class UPNP_PUBLIC UPnpCDSExtension
         virtual QString          GetItemListSQL( QString sColumn = "" ) = 0;
         virtual void             BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams ) = 0;
 
-        virtual void       AddItem( const QString           &sObjectId,
+        virtual void       AddItem( const UPnpCDSRequest    *pRequest,
+                                    const QString           &sObjectId,
                                     UPnpCDSExtensionResults *pResults,
                                     bool                     bAddRef,
                                     MSqlQuery               &query )  = 0;
@@ -246,6 +269,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         void            HandleGetSearchCapabilities( HTTPRequest *pRequest );
         void            HandleGetSortCapabilities  ( HTTPRequest *pRequest );
         void            HandleGetSystemUpdateID    ( HTTPRequest *pRequest );
+        void            DetermineClient            ( HTTPRequest *pRequest, UPnpCDSRequest *pCDSRequest );
 
     protected:
 
@@ -269,3 +293,5 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
 };
 
 #endif
+
+// vim:ts=4:sw=4:ai:et:si:sts=4

@@ -180,10 +180,27 @@ bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // See if we need to modify the request for compatibility
     // ----------------------------------------------------------------------
 
-    // WMP11 compatibility code
+    // ----------------------------------------------------------------------
+    // Xbox360 compatibility code.
+    // ----------------------------------------------------------------------
 
-    if (( pRequest->m_sObjectId                  == "13") &&
-        ( gCoreContext->GetSetting("UPnP/WMPSource") !=  "1") )
+    if (pRequest->m_eClient == CDS_ClientXBox && 
+        pRequest->m_sContainerID == "15" &&
+        gCoreContext->GetSetting("UPnP/WMPSource") != "1") 
+    {
+        pRequest->m_sObjectId = "Videos/0";
+
+        VERBOSE( VB_UPNP, "UPnpCDSTv::IsBrowseRequestForUs - Yes ContainerID == 15" );
+        return true;
+    }
+
+    // ----------------------------------------------------------------------
+    // WMP11 compatibility code
+    // ----------------------------------------------------------------------
+    if (pRequest->m_eClient == CDS_ClientWMP && 
+        pRequest->m_nClientVersion < 12.0 && 
+        pRequest->m_sContainerID == "13" &&
+        gCoreContext->GetSetting("UPnP/WMPSource") != "1")
     {
         pRequest->m_sObjectId = "RecTv/0";
 
@@ -210,7 +227,20 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // XBox 360 compatibility code
     // ----------------------------------------------------------------------
 
-    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
+    if (pRequest->m_eClient == CDS_ClientXBox && 
+        pRequest->m_sContainerID == "15" &&
+        gCoreContext->GetSetting("UPnP/WMPSource") !=  "1") 
+    {
+        pRequest->m_sObjectId = "Videos/0";
+
+        VERBOSE( VB_UPNP, "UPnpCDSTv::IsSearchRequestForUs... Yes." );
+
+        return true;
+    }
+
+
+    if ((pRequest->m_sObjectId.isEmpty()) && 
+        (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     // ----------------------------------------------------------------------
@@ -219,14 +249,21 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
     // ----------------------------------------------------------------------
     // WMP11 compatibility code
+    //
+    // In this mode browsing for "Videos" is forced to either RecordedTV (us)
+    // or Videos (handled by upnpcdsvideo)
+    //
     // ----------------------------------------------------------------------
 
-    if ( bOurs && ( pRequest->m_sObjectId == "0" ))
+    if ( bOurs && pRequest->m_eClient == CDS_ClientWMP && 
+         pRequest->m_nClientVersion < 12.0)
     {
-        if ( gCoreContext->GetSetting("UPnP/WMPSource") != "1") // GetBoolSetting()?
+        // GetBoolSetting()?
+        if ( gCoreContext->GetSetting("UPnP/WMPSource") != "1")
         {
             pRequest->m_sObjectId = "RecTv/0";
-            pRequest->m_sParentId = '8';        // -=>TODO: Not sure why this was added
+            // -=>TODO: Not sure why this was added
+            pRequest->m_sParentId = '8';        
         }
         else
             bOurs = false;
@@ -239,7 +276,8 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSTv::AddItem( const QString           &sObjectId,
+void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest, 
+                         const QString           &sObjectId,
                          UPnpCDSExtensionResults *pResults,
                          bool                     bAddRef,
                          MSqlQuery               &query )
@@ -284,8 +322,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
                             .arg( nChanid )
                             .arg( dtStartTime.toString(Qt::ISODate));
 
-    QString sId        = QString( "%1/item%2")
-                            .arg( sObjectId )
+    QString sId        = QString( "RecTv/0/item%1")
                             .arg( sURIParams );
 
     CDSObject *pItem   = CDSObject::CreateVideoItem( sId,
@@ -344,6 +381,14 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
         sMimeType = HTTPRequest::TestMimeType( sBaseName );
 
 
+    // If we are dealing with Window Media Player 12 (i.e. Windows 7)
+    // then fake the Mime type to place the recorded TV in the
+    // recorded TV section.
+    if (pRequest->m_eClient == CDS_ClientWMP && pRequest->m_nClientVersion >= 12.0)
+    {
+        sMimeType = "video/x-ms-dvr";
+    }
+
     // DLNA string below is temp fix for ps3 seeking.
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
@@ -401,3 +446,4 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
 
 }
 
+// vim:ts=4:sw=4:ai:et:si:sts=4

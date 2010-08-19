@@ -375,10 +375,10 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
             // Adjust ranges that are too long.  
 
-            if (llEnd > llSize) 
-                llEnd = llSize; 
+            if (llEnd >= llSize) 
+                llEnd = llSize-1; 
 
-            if ((llSize >= llStart) && (llSize >= llEnd) && (llEnd >= llStart))
+            if ((llSize > llStart) && (llSize > llEnd) && (llEnd > llStart))
             {
                 if (bRange)
                 {

@@ -77,7 +77,7 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
     return "SELECT intid, title, filepath, " \
-       "itemtype, itemproperties, parentid, "\
+           "itemtype, itemproperties, parentid, "\
            "coverart FROM upnpmedia WHERE class = 'VIDEO'";
 }
 
@@ -111,7 +111,9 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // Xbox360 compatibility code.
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_sContainerID == "15")
+    if (pRequest->m_eClient == CDS_ClientXBox && 
+        pRequest->m_sContainerID == "15" &&
+        gCoreContext->GetSetting("UPnP/WMPSource") == "1") 
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -119,15 +121,22 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
+    if ((pRequest->m_sObjectId.isEmpty()) && 
+        (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     // ----------------------------------------------------------------------
     // WMP11 compatibility code
+    //
+    // In this mode browsing for "Videos" is forced to either Videos (us)
+    // or RecordedTV (handled by upnpcdstv)
+    //
     // ----------------------------------------------------------------------
 
-    if (( pRequest->m_sObjectId                  == "13") &&
-        ( gCoreContext->GetSetting("UPnP/WMPSource") ==  "1"))
+    if (pRequest->m_eClient == CDS_ClientWMP && 
+        pRequest->m_sContainerID == "13" &&
+        pRequest->m_nClientVersion < 12.0 &&
+        gCoreContext->GetSetting("UPnP/WMPSource") == "1")
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -154,7 +163,10 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // XBox 360 compatibility code
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_sContainerID == "15")
+
+    if (pRequest->m_eClient == CDS_ClientXBox && 
+        pRequest->m_sContainerID == "15" &&
+        gCoreContext->GetSetting("UPnP/WMPSource") == "1") 
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -163,7 +175,8 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
+    if ((pRequest->m_sObjectId.isEmpty()) && 
+        (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     // ----------------------------------------------------------------------
@@ -174,13 +187,14 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // WMP11 compatibility code
     // ----------------------------------------------------------------------
 
-    if (  bOurs && ( pRequest->m_sObjectId == "0"))
+    if ( bOurs && pRequest->m_eClient == CDS_ClientWMP && 
+         pRequest->m_nClientVersion < 12.0 )
     {
-
-        if ( gCoreContext->GetSetting("UPnP/WMPSource") == "1") // GetBoolSetting()?
+        if ( gCoreContext->GetSetting("UPnP/WMPSource") == "1")
         {
             pRequest->m_sObjectId = "Videos/0";
-            pRequest->m_sParentId = '8';        // -=>TODO: Not sure why this was added.
+            // -=>TODO: Not sure why this was added.
+            pRequest->m_sParentId = "8"; 
         }
         else
             bOurs = false;
@@ -253,7 +267,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRe
 
                 if (query.exec() && query.next())
                 {
-                        AddItem( pRequest->m_sParentId, pResults, false, query );
+                        AddItem( pRequest, pRequest->m_sParentId, pResults, false, query );
                         pResults->m_nTotalMatches = 1;
                 }
             }
@@ -364,7 +378,7 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
         if (query.exec())
         {
             while(query.next())
-                AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
+                AddItem( pRequest, pRequest->m_sObjectId, pResults, bAddRef, query );
 
         }
     }
@@ -374,7 +388,8 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSVideo::AddItem( const QString           &sObjectId,
+void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
+                            const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
                             bool                     bAddRef,
                             MSqlQuery               &query )
@@ -484,3 +499,5 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     pRes->AddAttribute( "duration"  , "0:01:00.000"      );
 
 }
+
+// vim:ts=4:sw=4:ai:et:si:sts=4
