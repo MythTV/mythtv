@@ -1,5 +1,7 @@
 void strings_null() {
     ThemeUI::tr("Games");
+    ThemeUI::tr("Released %1");
+    ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("Cancel");
     ThemeUI::tr("Play");
     ThemeUI::tr("Edit Metadata");
@@ -18,6 +20,7 @@ void strings_null() {
     ThemeUI::tr("Click here to search existing screenshots...");
     ThemeUI::tr("Click here to search existing fanart...");
     ThemeUI::tr("Done");
+    ThemeUI::tr("Play Games");
     ThemeUI::tr("System:");
     ThemeUI::tr("Favorite:");
     ThemeUI::tr("No");

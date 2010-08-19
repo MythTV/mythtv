@@ -1,4 +1,5 @@
 void strings_null() {
+    ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("No search scripts found!  This usually indicates missing prerequisites.");
     ThemeUI::tr("Page %1");
     ThemeUI::tr("Search:");
@@ -14,11 +15,12 @@ void strings_null() {
     ThemeUI::tr("Save");
     ThemeUI::tr("Cancel");
     ThemeUI::tr("You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose \"Scan/Manage Subscriptions,\" then \"Manage Site Subscriptions.\"");
-    ThemeUI::tr("Manage Tree Subscriptions");
-    ThemeUI::tr("Choose the sites you wish to browse.");
+    ThemeUI::tr("Manage Subscriptions");
+    ThemeUI::tr("Choose the sites you wish to browse/search.");
     ThemeUI::tr("New Site");
     ThemeUI::tr("Edit Site");
     ThemeUI::tr("Unsubscribe");
+    ThemeUI::tr("Search Net Videos");
     ThemeUI::tr("Search Term:");
     ThemeUI::tr("Size: %1");
     ThemeUI::tr("Description: %1");
@@ -34,6 +36,7 @@ void strings_null() {
     ThemeUI::tr("Feed Author:");
     ThemeUI::tr("Download this feed automatically");
     ThemeUI::tr("Choose Image");
+    ThemeUI::tr("Browse Net Videos");
     ThemeUI::tr("Posted: %1");
     ThemeUI::tr("Runtime");
     ThemeUI::tr("Author");

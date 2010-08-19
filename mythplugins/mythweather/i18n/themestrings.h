@@ -1,4 +1,5 @@
 void strings_null() {
+    ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("Humidity");
     ThemeUI::tr("Pressure");
     ThemeUI::tr("Wind(Gust)");
@@ -25,18 +26,20 @@ void strings_null() {
     ThemeUI::tr("Finish");
     ThemeUI::tr("Search");
     ThemeUI::tr("Enter Current Location");
-    ThemeUI::tr("As of");
     ThemeUI::tr("Low");
     ThemeUI::tr("High");
     ThemeUI::tr("Weather Alerts");
     ThemeUI::tr("Temp");
+    ThemeUI::tr("Precip");
+    ThemeUI::tr("Global Settings");
     ThemeUI::tr("Retrieve data in the background:");
-    ThemeUI::tr("Weather Location Search");
+    ThemeUI::tr("Weather Screen Setup");
+    ThemeUI::tr("Weather Source Setup");
+    ThemeUI::tr("Source");
     ThemeUI::tr("Enter your current location, nearest large town or city. In some countries postal codes are also supported.");
     ThemeUI::tr("Enter Location:");
+    ThemeUI::tr("Weather Location Search");
     ThemeUI::tr("Weather");
-    ThemeUI::tr("Precip");
-    ThemeUI::tr("Severe Weather Alerts");
     ThemeUI::tr("Global Setup");
     ThemeUI::tr("Screen Setup");
     ThemeUI::tr("Source Setup");
@@ -47,7 +50,6 @@ void strings_null() {
     ThemeUI::tr("Wind Direction:");
     ThemeUI::tr("Visibility:");
     ThemeUI::tr("Feels Like:");
-    ThemeUI::tr("Global Settings");
     ThemeUI::tr("General weather plugin options");
     ThemeUI::tr("Screen Settings");
     ThemeUI::tr("Choose which weather forecasts to display");
