@@ -364,6 +364,24 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
         if (state)
             state->DisplayState(map["videocodec"]);
     }
+    if (map.contains("videodescrip"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("videodescrip"));
+        if (state)
+            state->DisplayState(map["videodescrip"]);
+    }
+    if (map.contains("audiocodec"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("audiocodec"));
+        if (state)
+            state->DisplayState(map["audiocodec"]);
+    }
+    if (map.contains("audiochannels"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("audiochannels"));
+        if (state)
+            state->DisplayState(map["audiochannels"]);
+    }
     if (map.contains("chanid"))
     {
         MythUIImage *icon = dynamic_cast<MythUIImage *> (win->GetChild("iconpath"));

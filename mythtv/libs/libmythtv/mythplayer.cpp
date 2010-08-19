@@ -3864,6 +3864,11 @@ QString MythPlayer::GetEncodingType(void) const
     return get_encoding_type(GetDecoder()->GetVideoCodecID());
 }
 
+QString MythPlayer::GetAudioCodec(void)
+{
+    return codec_id_string((CodecID)audio.GetCodec());
+}
+
 bool MythPlayer::GetRawAudioState(void) const
 {
     return GetDecoder()->GetRawAudioState();

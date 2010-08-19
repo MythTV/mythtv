@@ -34,6 +34,7 @@ class FilterManager;
 class OpenGLContextGLX;
 
 typedef QMap<MythPlayer*,PIPLocation> PIPMap;
+typedef QHash<QString,QString> InfoMap;
 
 extern "C" {
 struct ImgReSampleContext;
@@ -57,6 +58,7 @@ class VideoOutput
     VideoOutput();
     virtual ~VideoOutput();
 
+    void         GetVideoMetadata(InfoMap &map, FrameScanType scan);
     virtual bool Init(int width, int height, float aspect,
                       WId winid, int winx, int winy, int winw,
                       int winh, MythCodecID codec_id, WId embedid = 0);

@@ -29,6 +29,8 @@ class MPUBLIC AudioPlayer
     bool  Pause(bool pause);
     bool  IsPaused(void);
     void  PauseAudioUntilBuffered(void);
+    int   GetCodec(void)       { return m_codec;    }
+    int   GetNumChannels(void) { return m_channels; }
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
     float GetStretchFactor(void) { return m_stretchfactor;   }
