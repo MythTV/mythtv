@@ -651,10 +651,10 @@ void ProgramRecPriority::showMenu(void)
 void ProgramRecPriority::showSortMenu(void)
 {
     QString label = tr("Sort Options");
-    
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
-    
+
     if (menuPopup->Create())
     {
         menuPopup->SetReturnEvent(this, "sortmenu");
@@ -817,11 +817,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
                 {
                     MythUIButtonListItem *item = m_programList->GetItemCurrent();
                     if (record->Delete() && item)
-                    {
                         RemoveItemFromList(item);
-                        countMatches();
-                        UpdateList();
-                    }
                     else
                         VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
                 }
@@ -843,7 +839,7 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item)
 
     if (!pgRecInfo)
         return;
-    
+
     RecordingRule *record = new RecordingRule();
     record->m_recordID = pgRecInfo->GetRecordingRuleID();
     if (record->m_searchType == kNoSearch)
@@ -867,7 +863,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
     MythUIButtonListItem *item = m_programList->GetItemCurrent();
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
-                        
+
     if (!pgRecInfo)
         return;
 
@@ -1438,10 +1434,10 @@ void ProgramRecPriority::UpdateList()
             state = "disabled";
         else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "error";
-        else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
-            state = "running";
         else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "normal";
+        else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
+            state = "running";
 
         InfoMap infoMap;
         progInfo->ToMap(infoMap);
@@ -1688,8 +1684,7 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
             break;
         }
     }
-
-    SortList();
+    m_programList->RemoveItem(item);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
