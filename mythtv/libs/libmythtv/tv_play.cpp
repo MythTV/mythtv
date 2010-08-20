@@ -628,6 +628,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLETTM", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Teletext Menu"), "");
     REG_KEY("TV Playback", "TOGGLETEXT", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle External Subtitles"), "");
+    REG_KEY("TV Playback", "TOGGLERAWTEXT", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Text Subtitles"), "");
 
     REG_KEY("TV Playback", "SELECTAUDIO_0", QT_TRANSLATE_NOOP("MythControls",
@@ -638,6 +640,8 @@ void TV::InitKeys(void)
             "Display subtitle 1"), "");
     REG_KEY("TV Playback", "SELECTSUBTITLE_1",QT_TRANSLATE_NOOP("MythControls",
             "Display subtitle 2"), "");
+    REG_KEY("TV Playback", "SELECTRAWTEXT_0",QT_TRANSLATE_NOOP("MythControls",
+            "Display Text Subtitle 1"), "");
     REG_KEY("TV Playback", "SELECTCC608_0", QT_TRANSLATE_NOOP("MythControls",
             "Display VBI CC1"), "");
     REG_KEY("TV Playback", "SELECTCC608_1", QT_TRANSLATE_NOOP("MythControls",
@@ -663,6 +667,10 @@ void TV::InitKeys(void)
             "Next subtitle track"), "");
     REG_KEY("TV Playback", "PREVSUBTITLE", QT_TRANSLATE_NOOP("MythControls",
             "Previous subtitle track"), "");
+    REG_KEY("TV Playback", "NEXTRAWTEXT", QT_TRANSLATE_NOOP("MythControls",
+            "Next Text track"), "");
+    REG_KEY("TV Playback", "PREVRAWTEXT", QT_TRANSLATE_NOOP("MythControls",
+            "Previous Text track"), "");
     REG_KEY("TV Playback", "NEXTCC608", QT_TRANSLATE_NOOP("MythControls",
             "Next VBI CC track"), "");
     REG_KEY("TV Playback", "PREVCC608", QT_TRANSLATE_NOOP("MythControls",
@@ -3450,12 +3458,11 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
     else if (action.left(6) == "SELECT")
     {
         int type = to_track_type(action.mid(6));
-        int mid  = (kTrackTypeSubtitle == type) ? 15 :
-                   (kTrackTypeTeletextCaptions == type) ? 10 : 12;
+        int num = action.section("_", -1).toInt();
         if (type >= kTrackTypeAudio)
         {
             handled = true;
-            ctx->player->SetTrack(type, action.mid(mid).toInt());
+            ctx->player->SetTrack(type, num);
         }
     }
     else if (action.left(4) == "NEXT" || action.left(4) == "PREV")

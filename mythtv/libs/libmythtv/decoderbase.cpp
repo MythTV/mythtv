@@ -1163,6 +1163,8 @@ int to_track_type(const QString &str)
         ret = kTrackTypeTeletextMenu;
     else if (str.left(3) == "TFL")
         ret = kTrackTypeTextSubtitle;
+    else if (str.left(7) == "RAWTEXT")
+        ret = kTrackTypeRawText;
     return ret;
 }
 
