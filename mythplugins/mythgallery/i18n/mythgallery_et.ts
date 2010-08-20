@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="239"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="240"/>
         <source>Press SELECT to play again</source>
         <translation>Klõpsa VALIK uuesti esitamiseks</translation>
     </message>
@@ -12,193 +12,203 @@
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="532"/>
+        <location filename="../mythgallery/iconview.cpp" line="559"/>
         <source>Error</source>
         <translation>Viga</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="851"/>
+        <location filename="../mythgallery/iconview.cpp" line="886"/>
         <source>SlideShow</source>
         <translation>Slaidiprogramm</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="852"/>
+        <location filename="../mythgallery/iconview.cpp" line="887"/>
         <source>Random</source>
         <translation>Juhuslik</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="881"/>
+        <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Rotate CW</source>
         <translation>Pööra päripäeva</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="882"/>
+        <location filename="../mythgallery/iconview.cpp" line="917"/>
         <source>Rotate CCW</source>
         <translation>Pööra vastupäeva</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="916"/>
+        <location filename="../mythgallery/iconview.cpp" line="953"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="913"/>
+        <location filename="../mythgallery/iconview.cpp" line="950"/>
         <source>Import</source>
         <translation>Impordi</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="856"/>
+        <location filename="../mythgallery/iconview.cpp" line="891"/>
         <source>Settings</source>
         <translation>Sätted</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="128"/>
+        <location filename="../mythgallery/iconview.cpp" line="131"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>MythGallery kataloog &quot;%1&quot; puudub või pole loetav.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="533"/>
+        <location filename="../mythgallery/iconview.cpp" line="560"/>
         <source>The selected device is no longer available</source>
         <translation>Valitud seade pole enam saadaval</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="896"/>
+        <location filename="../mythgallery/iconview.cpp" line="934"/>
         <source>Clear Marked</source>
-        <translation>Märgitu kustutamine</translation>
+        <translation>Kustuta valitud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="897"/>
+        <location filename="../mythgallery/iconview.cpp" line="933"/>
         <source>Select All</source>
         <translation>Vali kõik</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="911"/>
+        <location filename="../mythgallery/iconview.cpp" line="948"/>
         <source>Show Devices</source>
         <translation>Seadmete näitamine</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="914"/>
+        <location filename="../mythgallery/iconview.cpp" line="951"/>
         <source>Copy here</source>
         <translation>Kopeeri siia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="915"/>
+        <location filename="../mythgallery/iconview.cpp" line="952"/>
         <source>Move here</source>
         <translation>Liiguta siia</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="917"/>
+        <location filename="../mythgallery/iconview.cpp" line="954"/>
         <source>Create Dir</source>
         <translation>Loo kataloog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="968"/>
+        <location filename="../mythgallery/iconview.cpp" line="1005"/>
         <source>Delete Current File or Folder</source>
         <translation>Kustuta käesolev fail või kaust</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="970"/>
+        <location filename="../mythgallery/iconview.cpp" line="1007"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Ühe kataloogi kustutamine koos kõigi failide ja alamkataloogidega.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="971"/>
+        <location filename="../mythgallery/iconview.cpp" line="1008"/>
         <source>Deleting 1 image.</source>
         <translation>Ühe pildi kustutamine.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1167"/>
+        <location filename="../mythgallery/iconview.cpp" line="1204"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>%1 kataloogi kustutamine koos kõigi failide ja alamkataloogidega.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1214"/>
+        <location filename="../mythgallery/iconview.cpp" line="1267"/>
         <source>New Folder</source>
         <translation>Uus kaust</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1216"/>
+        <location filename="../mythgallery/iconview.cpp" line="1269"/>
         <source>Create New Folder</source>
         <translation>Loo uus kaust</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1332"/>
+        <location filename="../mythgallery/iconview.cpp" line="1385"/>
         <source>Moving marked images...</source>
-        <translation>Märgitud piltide liigutamine...</translation>
+        <translation>Valitud piltide liigutamine...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1332"/>
+        <location filename="../mythgallery/iconview.cpp" line="1385"/>
         <source>Copying marked images...</source>
-        <translation>Märgitud piltide kopeerimine...</translation>
+        <translation>Valiitud piltide kopeerimine...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="918"/>
-        <location filename="../mythgallery/iconview.cpp" line="1245"/>
+        <location filename="../mythgallery/iconview.cpp" line="955"/>
+        <location filename="../mythgallery/iconview.cpp" line="1298"/>
         <source>Rename</source>
         <translation>Nimeta ümber</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="184"/>
+        <location filename="../mythgallery/iconview.cpp" line="187"/>
         <source>No images found in this directory.</source>
         <translation>Kaustas pole pilte.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="375"/>
+        <location filename="../mythgallery/iconview.cpp" line="384"/>
         <source>%1 of %2</source>
         <translation>%1 %2-st</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="386"/>
+        <location filename="../mythgallery/iconview.cpp" line="395"/>
         <source>Gallery Home</source>
         <translation>Albumi avaleht</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="838"/>
+        <location filename="../mythgallery/iconview.cpp" line="873"/>
         <source>Gallery Options</source>
         <translation>Albumi valikud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="853"/>
+        <location filename="../mythgallery/iconview.cpp" line="888"/>
         <source>Meta Data Menu</source>
         <translation>Info menüü</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="854"/>
+        <location filename="../mythgallery/iconview.cpp" line="889"/>
         <source>Marking Menu</source>
         <translation>Märkimise menüü</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="855"/>
+        <location filename="../mythgallery/iconview.cpp" line="890"/>
         <source>File Menu</source>
         <translation>Faili menüü</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="872"/>
+        <location filename="../mythgallery/iconview.cpp" line="907"/>
         <source>Metadata Options</source>
         <translation>Info valikud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="887"/>
+        <location filename="../mythgallery/iconview.cpp" line="922"/>
         <source>Marking Options</source>
         <translation>Märkimise valikud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="902"/>
+        <location filename="../mythgallery/iconview.cpp" line="931"/>
+        <source>Select One</source>
+        <translation>Vali üks</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="932"/>
+        <source>Clear One Marked</source>
+        <translation>Kustuta üks valituist</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="939"/>
         <source>File Options</source>
         <translation>Faili valikud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="912"/>
+        <location filename="../mythgallery/iconview.cpp" line="949"/>
         <source>Eject</source>
         <translation>Väljasta</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1271"/>
+        <location filename="../mythgallery/iconview.cpp" line="1324"/>
         <source>Failed to rename directory</source>
         <translation>Viga kausta ümber nimetamisel</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1273"/>
+        <location filename="../mythgallery/iconview.cpp" line="1326"/>
         <source>Failed to rename file</source>
         <translation>Viga faili ümber nimetamisel</translation>
     </message>
@@ -206,112 +216,112 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="63"/>
+        <location filename="../mythgallery/main.cpp" line="69"/>
         <source>Image viewer / slideshow</source>
         <translation>Pildi vaataja/slaidiseanss</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="66"/>
+        <location filename="../mythgallery/main.cpp" line="72"/>
         <source>Start/Stop Slideshow</source>
         <translation>Käivita/lõpeta slaidiseanss</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="68"/>
+        <location filename="../mythgallery/main.cpp" line="74"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Esimene pilt pisipildi vaates</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="70"/>
+        <location filename="../mythgallery/main.cpp" line="76"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Viimane pilt pisipildi vaates</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="72"/>
+        <location filename="../mythgallery/main.cpp" line="78"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Käivita slaidiseanss pisipildi vaates</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="74"/>
+        <location filename="../mythgallery/main.cpp" line="80"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Käivita juhuslik slaidiseanss pisipildi vaates</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="77"/>
+        <location filename="../mythgallery/main.cpp" line="83"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Pööra pilti 90 kraadi paremale</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="79"/>
+        <location filename="../mythgallery/main.cpp" line="85"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Pööra pilti 90 kraadi vasakule</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="81"/>
+        <location filename="../mythgallery/main.cpp" line="87"/>
         <source>Zoom image out</source>
         <translation>Vähenda</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="83"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
         <source>Zoom image in</source>
         <translation>Suurenda</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="85"/>
+        <location filename="../mythgallery/main.cpp" line="91"/>
         <source>Scroll image up</source>
         <translation>Keri pilti üles</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="87"/>
+        <location filename="../mythgallery/main.cpp" line="93"/>
         <source>Scroll image left</source>
         <translation>Keri pilti vasakule</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
+        <location filename="../mythgallery/main.cpp" line="95"/>
         <source>Scroll image right</source>
         <translation>Keri pilti paremale</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="91"/>
+        <location filename="../mythgallery/main.cpp" line="97"/>
         <source>Scroll image down</source>
         <translation>Keri pilti alla</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="93"/>
+        <location filename="../mythgallery/main.cpp" line="99"/>
         <source>Recenter image</source>
         <translation>Joondu pildi keskele</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="95"/>
+        <location filename="../mythgallery/main.cpp" line="101"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Pildi täissuurus</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="97"/>
+        <location filename="../mythgallery/main.cpp" line="103"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Pildi ülemine vasak nurk</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="99"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Pildi alumine parem nurk</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="101"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Mark image</source>
-        <translation>Märgi pilt</translation>
+        <translation>Vali pilt</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="103"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Vaheta mahutamiseks täisekraan/skaleerimine</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>MythGallery meedia haldur 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="108"/>
+        <location filename="../mythgallery/main.cpp" line="114"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>MythGallery meedia haldur 2/2</translation>
     </message>
@@ -454,7 +464,7 @@
         <translation>MythGallery sätted (üldine)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="39"/>
+        <location filename="../mythgallery/main.cpp" line="45"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
@@ -522,9 +532,32 @@ Vaata kas kaust on olemas, loetav ja seades on seadistuste lehel õiged.</transl
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="222"/>
+        <location filename="../mythgallery/singleview.cpp" line="220"/>
         <source>Press SELECT to play again</source>
         <translation>Klõpsa VALIK uuesti esitamiseks</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>No images are present in the pictures folder.</source>
+        <translation>Piltide kaustas pole pilte.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Image Gallery</source>
+        <translation>Album</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>SELECT: View</source>
+        <translation>VALIK: vaade</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>MENU: Activate Menu</source>
+        <translation>MENÜÜ: Aktiveeri menüü</translation>
     </message>
 </context>
 </TS>
