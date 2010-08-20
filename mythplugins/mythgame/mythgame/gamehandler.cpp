@@ -79,7 +79,7 @@ void GameHandler::updateSettings(GameHandler *handler)
         handler->gameplayerid = query.value(4).toInt();
         handler->gametype = query.value(5).toString();
         handler->validextensions = query.value(6).toString().trimmed()
-                                        .remove(" ").split(",");
+                                        .remove(" ").split(",", QString::SkipEmptyParts);
         handler->spandisks = query.value(7).toInt();
     }
 }
