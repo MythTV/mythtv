@@ -1136,6 +1136,8 @@ QString toString(TrackType type)
         str = QObject::tr("TT CC", "Teletext closed captions");
     else if (kTrackTypeTeletextMenu == type)
         str = QObject::tr("TT Menu", "Teletext Menu");
+    else if (kTrackTypeRawText == type)
+        str = QObject::tr("Text", "Text stream");
     else if (kTrackTypeTextSubtitle == type)
         str = QObject::tr("TXT File", "Text File");
     return str;

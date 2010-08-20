@@ -33,6 +33,7 @@ typedef enum TrackTypes
     kTrackTypeCC708,
     kTrackTypeTeletextCaptions,
     kTrackTypeTeletextMenu,
+    kTrackTypeRawText,
     kTrackTypeCount,
 
     kTrackTypeTextSubtitle,

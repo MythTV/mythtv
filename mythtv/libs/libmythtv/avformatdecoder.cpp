@@ -1574,6 +1574,21 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     }
 }
 
+void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
+{
+    AVMetadataTag *metatag = av_metadata_get(ic->streams[av_stream_index]->metadata,
+                                             "language", NULL, 0);
+    int lang = metatag ? get_canonical_lang(metatag->value) :
+                         iso639_str3_to_key("und");
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("Text Subtitle track #%1 is A/V stream #%2 "
+                    "and is in the %3 language(%4).")
+                    .arg(tracks[kTrackTypeRawText].size()).arg(av_stream_index)
+                    .arg(iso639_key_toName(lang)).arg(lang));
+    StreamInfo si(av_stream_index, lang, 0, 0, 0);
+    tracks[kTrackTypeRawText].push_back(si);                    
+}
+
 /** \fn AvFormatDecoder::ScanDSMCCStreams(void)
  *  \brief Check to see whether there is a Network Boot Ifo sub-descriptor in the PMT which
  *         requires the MHEG application to reboot.
@@ -1650,6 +1665,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     tracks[kTrackTypeSubtitle].clear();
     tracks[kTrackTypeTeletextCaptions].clear();
     tracks[kTrackTypeTeletextMenu].clear();
+    tracks[kTrackTypeRawText].clear();
     tracks[kTrackTypeVideo].clear();
     selectedTrack[kTrackTypeVideo].av_stream_index = -1;
 
@@ -1891,7 +1907,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             {
                 if (enc->codec_id == CODEC_ID_DVB_TELETEXT)
                     ScanTeletextCaptions(i);
+                if (enc->codec_id == CODEC_ID_TEXT)
+                    ScanRawTextCaptions(i);
                 bitrate += enc->bit_rate;
+
                 VERBOSE(VB_PLAYBACK, LOC + QString("subtitle codec (%1)")
                         .arg(codec_type_string(enc->codec_type)));
                 break;
@@ -1918,9 +1937,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             enc->codec_type != CODEC_TYPE_SUBTITLE)
             continue;
 
-        // skip DVB teletext, there is no libavcodec decoder
+        // skip DVB teletext and text subs, there is no libavcodec decoder
         if (enc->codec_type == CODEC_TYPE_SUBTITLE &&
-            enc->codec_id   == CODEC_ID_DVB_TELETEXT)
+           (enc->codec_id   == CODEC_ID_DVB_TELETEXT ||
+            enc->codec_id   == CODEC_ID_TEXT))
             continue;
 
         VERBOSE(VB_PLAYBACK, LOC + QString("Looking for decoder for %1")
@@ -4251,6 +4271,13 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 delete pkt;
                 return false;
             }
+        }
+
+        if (codec_type == CODEC_TYPE_SUBTITLE &&
+            curstream->codec->codec_id == CODEC_ID_TEXT)
+        {
+            av_free_packet(pkt);
+            continue;
         }
 
         if (codec_type == CODEC_TYPE_SUBTITLE &&

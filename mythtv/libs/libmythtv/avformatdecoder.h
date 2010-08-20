@@ -169,6 +169,7 @@ class AvFormatDecoder : public DecoderBase
     void UpdateATSCCaptionTracks(void);
     void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
     void ScanTeletextCaptions(int av_stream_index);
+    void ScanRawTextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
     int AutoSelectAudioTrack(void);
 

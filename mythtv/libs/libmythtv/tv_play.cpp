@@ -10274,10 +10274,12 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     QStringList cc608_tracks;
     QStringList ttx_tracks;
     QStringList ttm_tracks;
+    QStringList text_tracks;
     uint av_curtrack    = ~0;
     uint cc708_curtrack = ~0;
     uint cc608_curtrack = ~0;
     uint ttx_curtrack   = ~0;
+    uint text_curtrack  = ~0;
     bool havetext = false;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
@@ -10289,6 +10291,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         cc608_tracks = ctx->player->GetTracks(kTrackTypeCC608);
         ttx_tracks   = ctx->player->GetTracks(kTrackTypeTeletextCaptions);
         ttm_tracks   = ctx->player->GetTracks(kTrackTypeTeletextMenu);
+        text_tracks  = ctx->player->GetTracks(kTrackTypeRawText);
         if (!av_tracks.empty())
             av_curtrack = (uint) ctx->player->GetTrack(kTrackTypeSubtitle);
         if (!cc708_tracks.empty())
@@ -10297,11 +10300,14 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
             cc608_curtrack = (uint) ctx->player->GetTrack(kTrackTypeCC608);
         if (!ttx_tracks.empty())
             ttx_curtrack = (uint) ctx->player->GetTrack(kTrackTypeTeletextCaptions);
+        if (!text_tracks.empty())
+            text_curtrack = (uint) ctx->player->GetTrack(kTrackTypeRawText);
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     bool have_subs = !av_tracks.empty() || havetext || !cc708_tracks.empty() ||
-                     !cc608_tracks.empty() || !ttx_tracks.empty();
+                     !cc608_tracks.empty() || !ttx_tracks.empty() ||
+                     !text_tracks.empty();
 
     if (category == "MAIN")
     {
@@ -10325,7 +10331,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
                                  "DIALOG_MENU_AVSUBTITLES_0",
                                  true, selected == "AVSUBTITLES");
         }
-        if (havetext)
+        if (havetext || !text_tracks.empty())
         {
             osd->DialogAddButton(tr("Text Subtitles"),
                                  "DIALOG_MENU_TEXTSUBTITLES_0",
@@ -10367,7 +10373,17 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
     {
         backaction = "SUBTITLES";
         currenttext = tr("Text Subtitles");
-        osd->DialogAddButton(tr("Toggle Text Subtitles"), "TOGGLETEXT");
+        if (havetext)
+            osd->DialogAddButton(tr("Toggle External Subtitles"), "TOGGLETEXT");
+        if (!text_tracks.empty())
+        {
+            for (uint i = 0; i < (uint)text_tracks.size(); i++)
+            {
+                osd->DialogAddButton(text_tracks[i],
+                                     "SELECTRAWTEXT_" + QString::number(i),
+                                     false, i == text_curtrack);
+            }
+        }
     }
     else if (category == "708SUBTITLES")
     {
