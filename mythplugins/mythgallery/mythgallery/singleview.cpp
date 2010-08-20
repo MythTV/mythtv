@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 /* ============================================================
  * File  : singleview.cpp
- * Description : 
+ * Description :
  *
  * Copyright 2004-2006 Renchi Raju, Daniel Kristjansson
  *
@@ -10,12 +10,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 // ANSI C headers
@@ -101,7 +101,7 @@ SingleView::SingleView(
     QString transType = gCoreContext->GetSetting("SlideshowTransition");
     if (!transType.isEmpty() && m_effect_map.contains(transType))
         m_effect_method = m_effect_map[transType];
-    
+
     if (m_effect_method.isEmpty() || transType == "random")
     {
         m_effect_method = GetRandomEffect();
@@ -306,6 +306,7 @@ void SingleView::paintEvent(QPaintEvent *)
                 QPainter ip(&pix);
                 ip.drawPixmap(QPoint(screenwidth / 10, screenheight / 10),
                               *m_info_pixmap, QRect(0,0,-1,-1));
+                ip.end();
 
                 QPainter p(&pix);
                 p.initFrom(this);
@@ -332,6 +333,7 @@ void SingleView::paintEvent(QPaintEvent *)
 
         QPainter p(this);
         p.drawPixmap(QPoint(0,0), pix, QRect(0,0,-1,-1));
+        p.end();
     }
     else if (!m_effect_method.isEmpty())
         RunEffect(m_effect_method);
@@ -385,7 +387,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             {
                 SetZoom(m_zoom - 0.5f);
                 if (m_zoom > 1.0)
-                { 
+                {
                     m_source_loc.setY(m_source_loc.y() - (screenheight / 4));
                     m_source_loc.setX(m_source_loc.x() - (screenwidth / 4));
                     CheckPosition();
@@ -429,7 +431,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom > 1.0f && m_pixmap)
             {
                 m_source_loc.setX(m_source_loc.x() + scrollX);
-                m_source_loc.setX(min(m_source_loc.x(), 
+                m_source_loc.setX(min(m_source_loc.x(),
                                   m_pixmap->width() - screenwidth));
             }
         }
@@ -518,7 +520,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             m_source_loc = QPoint(0, 0);
             SetZoom(1.0f);
         }
-        else 
+        else
         {
             handled = false;
         }
@@ -661,7 +663,7 @@ void SingleView::Rotate(int angle)
     ThumbItem *item = m_itemList.at(m_pos);
     if (item)
         item->SetRotationAngle(m_angle);
-    
+
     if (m_image.isNull())
         return;
 
@@ -705,9 +707,9 @@ QPixmap *SingleView::CreateBackground(const QSize &sz)
 {
     QImage img(sz.width(), sz.height(), QImage::Format_ARGB32);
 
-    for (int y = 0; y < img.height(); y++) 
+    for (int y = 0; y < img.height(); y++)
     {
-        for (int x = 0; x < img.width(); x++) 
+        for (int x = 0; x < img.width(); x++)
         {
             uint *p = (uint *)img.scanLine(y) + x;
             *p = qRgba(0, 0, 0, 150);
@@ -783,7 +785,7 @@ void SingleView::StartPainter(void)
 
 void SingleView::CreateEffectPixmap(void)
 {
-    if (!m_effect_pixmap) 
+    if (!m_effect_pixmap)
         m_effect_pixmap = new QPixmap(screenwidth, screenheight);
 
     m_effect_pixmap->fill(this, 0, 0);
@@ -794,6 +796,7 @@ void SingleView::CreateEffectPixmap(void)
                        (m_effect_pixmap->height() - m_pixmap->height()) >> 1);
         QPainter p(m_effect_pixmap);
         p.drawPixmap(src_loc, *m_pixmap, QRect(0, 0, -1, -1));
+        p.end();
     }
 }
 
@@ -848,6 +851,7 @@ void SingleView::EffectChessboard(void)
         painter.drawPixmap(src0, *m_effect_pixmap, dst0);
         painter.drawPixmap(src1, *m_effect_pixmap, dst0);
     }
+    painter.end();
 
     m_slideshow_frame_delay_state = m_effect_framerate;
 
@@ -891,6 +895,7 @@ void SingleView::EffectSweep(void)
             p.drawPixmap(QPoint(x, 0), *m_effect_pixmap,
                          QRect(x, 0, w, m_effect_bounds.height()));
         }
+        p.end();
 
         m_effect_bounds.moveLeft(m_effect_bounds.x() + m_effect_delta0.x());
     }
@@ -916,6 +921,7 @@ void SingleView::EffectSweep(void)
             p.drawPixmap(QPoint(0, y), *m_effect_pixmap,
                          QRect(0, y, m_effect_bounds.width(), h));
         }
+        p.end();
 
         m_effect_bounds.moveTop(m_effect_bounds.y() + m_effect_delta0.y());
     }
@@ -954,6 +960,7 @@ void SingleView::EffectGrowing(void)
 
     p.drawPixmap(m_effect_bounds.topLeft(),
                  *m_effect_pixmap, QRect(m_effect_bounds.topLeft(), dst_sz));
+    p.end();
 
     m_slideshow_frame_delay_state = 20;
     m_effect_current_frame     = 1;
@@ -983,9 +990,10 @@ void SingleView::EffectHorizLines(void)
         p.drawPixmap(QPoint(0, y), *m_effect_pixmap,
                      QRect(0, y, m_effect_bounds.width(), 1));
     }
+    p.end();
 
     m_effect_i++;
-    
+
     if (iyPos[m_effect_i] >= 0)
     {
         m_slideshow_frame_delay_state = 160;
@@ -997,7 +1005,7 @@ void SingleView::EffectHorizLines(void)
         m_effect_running = false;
         update();
         return;
-    }        
+    }
 }
 
 void SingleView::EffectVertLines(void)
@@ -1024,9 +1032,10 @@ void SingleView::EffectVertLines(void)
         p.drawPixmap(QPoint(x, 0), *m_effect_pixmap,
                      QRect(x, 0, 1, m_effect_bounds.height()));
     }
+    p.end();
 
     m_effect_i++;
-    
+
     if (ixPos[m_effect_i] >= 0)
     {
         m_slideshow_frame_delay_state = 160;
@@ -1038,7 +1047,7 @@ void SingleView::EffectVertLines(void)
         m_effect_running = false;
         update();
         return;
-    }        
+    }
 }
 
 void SingleView::EffectMeltdown(void)
@@ -1069,6 +1078,7 @@ void SingleView::EffectMeltdown(void)
 
         m_effect_meltdown_y_disp[i] += m_effect_delta0.y();
     }
+    p.end();
 
     if (done)
     {
@@ -1143,6 +1153,7 @@ void SingleView::EffectIncomingEdges(void)
         p.drawPixmap(x1, y1, *m_effect_pixmap, x1, y1,
                      m_effect_bounds.x(), m_effect_bounds.y());
     }
+    p.end();
 
     m_slideshow_frame_delay_state = 20;
     m_effect_current_frame     = 1;
@@ -1164,7 +1175,7 @@ void SingleView::EffectMultiCircleOut(void)
         m_effect_milti_circle_out_points.setPoint(
             3, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
 
-        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f + 
+        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f +
                            sq(m_effect_bounds.height()) * 0.5f);
         m_effect_i = (rand() & 0xf) + 2;
         m_effect_multi_circle_out_delta_alpha = M_PI * 2 / m_effect_i;
@@ -1265,6 +1276,7 @@ void SingleView::EffectSpiralIn(void)
     p.drawPixmap(m_effect_bounds.x(), m_effect_bounds.y(), *m_effect_pixmap,
            m_effect_bounds.x(), m_effect_bounds.y(),
            m_effect_delta1.x(), m_effect_delta1.y());
+    p.end();
 
     m_effect_bounds.moveTopLeft(m_effect_bounds.topLeft() + m_effect_delta0);
     m_effect_j--;
@@ -1294,7 +1306,7 @@ void SingleView::EffectCircleOut(void)
     if (m_effect_alpha < 0)
     {
         m_effect_painter->end();
-        
+
         m_slideshow_frame_delay_state = -1;
         m_effect_running = false;
         update();
@@ -1372,6 +1384,7 @@ void SingleView::EffectNoise(void)
         y = (rand() % h) << fact;
         p.drawPixmap(QPoint(x, y), *m_effect_pixmap, QRect(x, y, sz, sz));
     }
+    p.end();
 
     m_slideshow_frame_delay_state = -1;
     m_effect_running = false;
@@ -1424,7 +1437,7 @@ void SingleView::SlideTimeout(void)
                     m_slideshow_frame_delay_state = 10;
                     m_effect_current_frame = 0;
                 }
-            }   
+            }
             m_info_show_short = false;
         }
     }
@@ -1437,7 +1450,7 @@ void SingleView::SlideTimeout(void)
         m_slideshow_timer->setSingleShot(true);
         m_slideshow_timer->start(m_slideshow_frame_delay_state);
 
-        // If transitioning to/from a movie, no effect is running so 
+        // If transitioning to/from a movie, no effect is running so
         // next timeout should trigger proper immage delay.
         if (wasMovie || isMovie)
         {
@@ -1452,4 +1465,5 @@ void SingleView::CaptionTimeout(void)
     QPainter p(this);
     p.drawPixmap(QPoint(0, screenheight - 100),
                  *m_caption_restore_pixmap, QRect(0,0,-1,-1));
+    p.end();
 }
