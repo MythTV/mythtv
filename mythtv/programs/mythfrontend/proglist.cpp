@@ -972,36 +972,14 @@ void ProgLister::FillViewList(const QString &view)
         m_viewTextList.push_back(tr("All"));
         m_viewList.push_back("= 0.0");
         m_viewTextList.push_back(tr("Unrated"));
-        m_viewList.push_back(">= 1.0");
-        m_viewTextList.push_back("****");
-        m_viewList.push_back(">= 0.875");
-        m_viewTextList.push_back("***/");
-        m_viewList.push_back(">= 0.75 AND program.stars < 0.875");
-        m_viewTextList.push_back("***");
-        m_viewList.push_back(">= 0.625 AND program.stars < 0.75");
-        m_viewTextList.push_back("**/");
-        m_viewList.push_back(">= 0.5 AND program.stars < 0.625");
-        m_viewTextList.push_back("**");
-        m_viewList.push_back(">= 0.375 AND program.stars < 0.5");
-        m_viewTextList.push_back("*/");
-        m_viewList.push_back(">= 0.25 AND program.stars < 0.375");
-        m_viewTextList.push_back("*");
-        m_viewList.push_back(">= 0.125 AND program.stars < 0.25");
-        m_viewTextList.push_back("/");
-        m_viewList.push_back(">= 0.875");
-        m_viewTextList.push_back(tr("At least ***/"));
-        m_viewList.push_back(">= 0.75");
-        m_viewTextList.push_back(tr("At least ***"));
-        m_viewList.push_back(">= 0.625");
-        m_viewTextList.push_back(tr("At least **/"));
-        m_viewList.push_back(">= 0.5");
-        m_viewTextList.push_back(tr("At least **"));
-        m_viewList.push_back(">= 0.375");
-        m_viewTextList.push_back(tr("At least */"));
-        m_viewList.push_back(">= 0.25");
-        m_viewTextList.push_back(tr("At least *"));
-        m_viewList.push_back(">= 0.125");
-        m_viewTextList.push_back(tr("At least /"));
+        m_viewList.push_back(QString("= 10.0"));
+        m_viewTextList.push_back(tr("%n star(s)", NULL, 10));
+        for (int i = 9; i > 0; i--)
+        {
+            float stars = i / 10.0;
+            m_viewList.push_back(QString(">= %1").arg(stars));
+            m_viewTextList.push_back(tr("%n star(s) and above", NULL, i));
+        }
 
         if (!view.isEmpty())
             m_curView = m_viewList.indexOf(view);

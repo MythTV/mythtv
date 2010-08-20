@@ -258,7 +258,7 @@ class MPUBLIC ProgramInfo
     void ToStringList(QStringList &list) const;
     virtual void ToMap(QHash<QString, QString> &progMap,
                        bool showrerecord = false,
-                       uint star_range = 4) const;
+                       uint star_range = 10) const;
     virtual void SubstituteMatches(QString &str);
 
     // Used for scheduling recordings
@@ -358,7 +358,7 @@ class MPUBLIC ProgramInfo
     {
         return ((year) ? year :
                 (originalAirDate.isValid()) ? originalAirDate.year() : 0);
-    }          
+    }
     QDate   GetOriginalAirDate(void)      const { return originalAirDate; }
     QDateTime GetLastModifiedTime(void)   const { return lastmodified; }
     QString GetLastModifiedTime(MythDateFormat fmt) const
