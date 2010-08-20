@@ -17,6 +17,14 @@ class AVSubtitles
     QMutex lock;
 };
 
+class RawTextSubs
+{
+  public:
+    QStringList buffers;
+    uint64_t    duration;
+    QMutex      lock;
+};
+
 class SubtitleReader
 {
   public:
@@ -25,6 +33,7 @@ class SubtitleReader
 
     void EnableAVSubtitles(bool enable);
     void EnableTextSubtitles(bool enable);
+    void EnableRawTextSubtitles(bool enable);
 
     AVSubtitles* GetAVSubtitles(void) { return &m_AVSubtitles; }
     void AddAVSubtitle(const AVSubtitle& subtitle);
@@ -35,11 +44,17 @@ class SubtitleReader
     bool HasTextSubtitles(void);
     bool LoadExternalSubtitles(const QString &videoFile);
 
+    QStringList GetRawTextSubtitles(uint64_t &duration);
+    void AddRawTextSubtitle(QStringList list, uint64_t duration);
+    void ClearRawTextSubtitles(void);
+
   private:
     AVSubtitles   m_AVSubtitles;
     bool          m_AVSubtitlesEnabled;
     TextSubtitles m_TextSubtitles;
     bool          m_TextSubtitlesEnabled;
+    RawTextSubs   m_RawTextSubtitles;
+    bool          m_RawTextSubtitlesEnabled;
 };
 
 #endif // SUBTITLEREADER_H

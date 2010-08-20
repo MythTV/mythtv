@@ -30,6 +30,10 @@ class SubtitleScreen : public MythScreenType
     void OptimiseDisplayedArea(void);
     void DisplayAVSubtitles(void);
     void DisplayTextSubtitles(void);
+    void DisplayRawTextSubtitles(void);
+    void OptimiseTextSubs(QStringList &list);
+    void DrawTextSubtitles(QStringList &wrappedsubs, uint64_t start,
+                           uint64_t duration);
     void DisplayCC608Subtitles(void);
     void DisplayCC708Subtitles(void);
     void AddScaledImage(QImage &img, QRect &pos);

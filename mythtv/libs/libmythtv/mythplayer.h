@@ -69,16 +69,17 @@ enum TCTypes
 // Caption Display modes
 enum
 {
-    kDisplayNone                = 0x00,
-    kDisplayNUVTeletextCaptions = 0x01,
-    kDisplayTeletextCaptions    = 0x02,
-    kDisplayAVSubtitle          = 0x04,
-    kDisplayCC608               = 0x08,
-    kDisplayCC708               = 0x10,
-    kDisplayTextSubtitle        = 0x20,
-    kDisplayDVDButton           = 0x40,
-    kDisplayAllCaptions         = 0x7f,
-    kDisplayTeletextMenu        = 0x80,
+    kDisplayNone                = 0x000,
+    kDisplayNUVTeletextCaptions = 0x001,
+    kDisplayTeletextCaptions    = 0x002,
+    kDisplayAVSubtitle          = 0x004,
+    kDisplayCC608               = 0x008,
+    kDisplayCC708               = 0x010,
+    kDisplayTextSubtitle        = 0x020,
+    kDisplayDVDButton           = 0x040,
+    kDisplayRawTextSubtitle     = 0x080,
+    kDisplayAllCaptions         = 0x0ff,
+    kDisplayTeletextMenu        = 0x100,
 };
 
 class PlayerTimer : public QObject

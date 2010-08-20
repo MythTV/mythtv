@@ -38,6 +38,7 @@ void SubtitleScreen::EnableSubtitles(int type)
     {
         m_subreader->EnableAVSubtitles(kDisplayAVSubtitle == m_subtitleType);
         m_subreader->EnableTextSubtitles(kDisplayTextSubtitle == m_subtitleType);
+        m_subreader->EnableRawTextSubtitles(kDisplayRawTextSubtitle == m_subtitleType);
     }
     if (m_608reader)
         m_608reader->SetEnabled(kDisplayCC608 == m_subtitleType);
@@ -78,6 +79,8 @@ void SubtitleScreen::Pulse(void)
         DisplayCC608Subtitles();
     else if (kDisplayCC708 == m_subtitleType)
         DisplayCC708Subtitles();
+    else if (kDisplayRawTextSubtitle == m_subtitleType)
+        DisplayRawTextSubtitles();
 
     OptimiseDisplayedArea();
     m_refreshArea = false;
@@ -93,6 +96,8 @@ void SubtitleScreen::ClearNonDisplayedSubtitles(void)
 {
     if (m_subreader && (kDisplayAVSubtitle == m_subtitleType))
         m_subreader->ClearAVSubtitles();
+    if (m_subreader && (kDisplayRawTextSubtitle == m_subtitleType))
+        m_subreader->ClearRawTextSubtitles();
     if (m_608reader && (kDisplayCC608 == m_subtitleType))
         m_608reader->ClearBuffers(true, true);
     if (m_708reader && (kDisplayCC708 == m_subtitleType))
@@ -332,7 +337,48 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         return;
     }
 
-    // wrap text that is wider than the safe area
+    OptimiseTextSubs(rawsubs);
+    subs->Unlock();
+    DrawTextSubtitles(rawsubs, 0, 0);
+}
+
+void SubtitleScreen::DisplayRawTextSubtitles(void)
+{
+    if (!InitialiseFont() || !m_player || !m_subreader)
+        return;
+
+    uint64_t duration;
+    QStringList subs = m_subreader->GetRawTextSubtitles(duration);
+    if (subs.empty())
+        return;
+
+    VideoOutput *vo = m_player->getVideoOutput();
+    if (vo)
+    {
+        QRect oldsafe = m_safeArea;
+        m_safeArea = m_player->getVideoOutput()->GetSafeRect();
+        if (oldsafe != m_safeArea)
+        {
+            gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / 18);
+            gTextSubFont->SetColor(Qt::white);
+            gTextSubFont->SetOutline(true, Qt::black, 2, 255);
+        }
+    }
+    else
+        return;
+
+    VideoFrame *currentFrame = vo->GetLastShownFrame();
+    if (!currentFrame)
+        return;
+
+    // delete old subs that may still be on screen
+    DeleteAllChildren();
+    OptimiseTextSubs(subs);
+    DrawTextSubtitles(subs, currentFrame->timecode, duration);
+}
+
+void SubtitleScreen::OptimiseTextSubs(QStringList &rawsubs)
+{
     QFontMetrics font(*(gTextSubFont->GetFace()));
     int maxwidth = m_safeArea.width();
     QStringList wrappedsubs;
@@ -358,8 +404,13 @@ void SubtitleScreen::DisplayTextSubtitles(void)
             wrappedsubs.append(nextline);
         i++;
     }
-    subs->Unlock();
+    rawsubs = wrappedsubs;
+}
 
+void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
+                                       uint64_t start, uint64_t duration)
+{
+    QFontMetrics font(*(gTextSubFont->GetFace()));
     int height = font.height();
     int y = m_safeArea.height() - (height * wrappedsubs.size());
     int centre = m_safeArea.width() / 2;
@@ -378,6 +429,8 @@ void SubtitleScreen::DisplayTextSubtitles(void)
                 QString("tsubbg%1%2").arg(x).arg(y));
             shape->SetFillBrush(bgfill);
             shape->SetArea(MythRect(rect));
+            if (duration > 0)
+                m_expireTimes.insert(shape, start + duration);
         }
         MythUIText* text = new MythUIText(subtitle, *gTextSubFont, rect,
                                 rect, this,QString("tsub%1%2").arg(x).arg(y));
@@ -386,6 +439,13 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         y += height;
         VERBOSE(VB_PLAYBACK, LOC + subtitle);
         m_refreshArea = true;
+
+        if (duration > 0)
+        {
+            m_expireTimes.insert(text, start + duration);
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("Display text subtitle for %1 ms").arg(duration));
+        }
     }
 }
 

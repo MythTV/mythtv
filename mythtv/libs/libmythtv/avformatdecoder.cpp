@@ -8,6 +8,8 @@
 #include <iostream>
 using namespace std;
 
+#include <QTextCodec>
+
 // MythTV headers
 #include "mythconfig.h"
 #include "avformatdecoder.h"
@@ -3333,6 +3335,22 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
+bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
+{
+    if (!subReader ||
+        selectedTrack[kTrackTypeRawText].av_stream_index != pkt->stream_index)
+    {
+        return false;
+    }
+
+    QTextCodec *codec = QTextCodec::codecForName("utf-8");
+    QTextDecoder *dec = codec->makeDecoder();
+    QString text      = dec->toUnicode((const char*)pkt->data, pkt->size);
+    QStringList list  = text.split('\n', QString::SkipEmptyParts);
+    delete dec;
+    subReader->AddRawTextSubtitle(list, pkt->convergence_duration);
+}
+
 bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
                                         DecodeType decodetype)
 {
@@ -4276,6 +4294,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (codec_type == CODEC_TYPE_SUBTITLE &&
             curstream->codec->codec_id == CODEC_ID_TEXT)
         {
+            ProcessRawTextPacket(pkt);
             av_free_packet(pkt);
             continue;
         }

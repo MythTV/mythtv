@@ -1,7 +1,8 @@
 #include "subtitlereader.h"
 
 SubtitleReader::SubtitleReader()
-  : m_AVSubtitlesEnabled(false), m_TextSubtitlesEnabled(false)
+  : m_AVSubtitlesEnabled(false), m_TextSubtitlesEnabled(false),
+    m_RawTextSubtitlesEnabled(false)
 {
 }
 
@@ -9,6 +10,7 @@ SubtitleReader::~SubtitleReader()
 {
     ClearAVSubtitles();
     m_TextSubtitles.Clear();
+    ClearRawTextSubtitles();
 }
 
 void SubtitleReader::EnableAVSubtitles(bool enable)
@@ -19,6 +21,11 @@ void SubtitleReader::EnableAVSubtitles(bool enable)
 void SubtitleReader::EnableTextSubtitles(bool enable)
 {
     m_TextSubtitlesEnabled = enable;
+}
+
+void SubtitleReader::EnableRawTextSubtitles(bool enable)
+{
+    m_RawTextSubtitlesEnabled = enable;
 }
 
 void SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle)
@@ -65,4 +72,34 @@ bool SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName)
 bool SubtitleReader::HasTextSubtitles(void)
 {
     return m_TextSubtitles.GetSubtitleCount() > 0;
+}
+
+QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)
+{
+    QMutexLocker lock(&m_RawTextSubtitles.lock);
+    if (m_RawTextSubtitles.buffers.empty())
+        return QStringList();
+
+    duration = m_RawTextSubtitles.duration;
+    QStringList result = m_RawTextSubtitles.buffers;
+    result.detach();
+    m_RawTextSubtitles.buffers.clear();
+    return result;
+}
+
+void SubtitleReader::AddRawTextSubtitle(QStringList list, uint64_t duration)
+{
+    if (!m_RawTextSubtitlesEnabled || list.empty())
+        return;
+
+    QMutexLocker lock(&m_RawTextSubtitles.lock);
+    m_RawTextSubtitles.buffers.clear();
+    m_RawTextSubtitles.buffers = list;
+    m_RawTextSubtitles.duration = duration;
+}
+
+void SubtitleReader::ClearRawTextSubtitles(void)
+{
+    QMutexLocker lock(&m_RawTextSubtitles.lock);
+    m_RawTextSubtitles.buffers.clear();
 }

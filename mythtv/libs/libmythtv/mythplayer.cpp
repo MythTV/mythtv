@@ -144,6 +144,7 @@ static const int toCaptionType(int type)
     if (kTrackTypeSubtitle == type)         return kDisplayAVSubtitle;
     if (kTrackTypeTeletextCaptions == type) return kDisplayTeletextCaptions;
     if (kTrackTypeTextSubtitle == type)     return kDisplayTextSubtitle;
+    if (kTrackTypeRawText == type)          return kDisplayRawTextSubtitle;
     return 0;
 }
 
@@ -154,6 +155,7 @@ static const int toTrackType(int type)
     if (kDisplayAVSubtitle == type)       return kTrackTypeSubtitle;
     if (kDisplayTeletextCaptions == type) return kTrackTypeTeletextCaptions;
     if (kDisplayTextSubtitle == type)     return kTrackTypeTextSubtitle;
+    if (kDisplayRawTextSubtitle == type)  return kTrackTypeRawText;
     return 0;
 }
 
@@ -1268,10 +1270,11 @@ bool MythPlayer::HandleTeletextAction(const QString &action)
 
 void MythPlayer::ResetCaptions(void)
 {
-    if (GetOSD() && ((textDisplayMode & kDisplayAVSubtitle)   ||
-                     (textDisplayMode & kDisplayTextSubtitle) ||
-                     (textDisplayMode & kDisplayDVDButton)    ||
-                     (textDisplayMode & kDisplayCC608)        ||
+    if (GetOSD() && ((textDisplayMode & kDisplayAVSubtitle)      ||
+                     (textDisplayMode & kDisplayTextSubtitle)    ||
+                     (textDisplayMode & kDisplayRawTextSubtitle) ||
+                     (textDisplayMode & kDisplayDVDButton)       ||
+                     (textDisplayMode & kDisplayCC608)           ||
                      (textDisplayMode & kDisplayCC708)))
         GetOSD()->ClearSubtitles();
 }
@@ -1294,9 +1297,10 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
         DisableTeletext();
     }
     int preserve = textDisplayMode & (kDisplayCC608 | kDisplayTextSubtitle |
-                                      kDisplayAVSubtitle | kDisplayCC708);
+                                      kDisplayAVSubtitle | kDisplayCC708 |
+                                      kDisplayRawTextSubtitle);
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
-        (kDisplayAVSubtitle & mode))
+        (kDisplayAVSubtitle & mode) || (kDisplayRawTextSubtitle & mode))
     {
         int type = toTrackType(mode);
         msg += decoder->GetTrackDesc(type, GetTrack(type));
@@ -1319,7 +1323,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QString msg = "";
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
-        (kDisplayAVSubtitle & mode))
+        (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
         int type = toTrackType(mode);
         msg += decoder->GetTrackDesc(type, GetTrack(type));
@@ -1549,12 +1553,14 @@ void MythPlayer::ChangeCaptionTrack(int dir)
 
 int MythPlayer::NextCaptionTrack(int mode)
 {
-    // Text->708/608->608/708->AVSubs->Teletext->NUV->None
+    // Text->TextStream->708/608->608/708->AVSubs->Teletext->NUV->None
     // NUV only offerred if PAL
     bool pal      = (vbimode == VBIMode::PAL_TT);
     int  nextmode = kDisplayNone;
 
     if (kDisplayTextSubtitle == mode)
+        nextmode = kDisplayRawTextSubtitle;
+    if (kDisplayRawTextSubtitle == mode)
         nextmode = db_prefer708 ? kDisplayCC708 : kDisplayCC608;
     else if (kDisplayCC708 == mode)
         nextmode = db_prefer708 ? kDisplayCC608 : kDisplayAVSubtitle;
