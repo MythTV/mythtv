@@ -218,6 +218,11 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
         ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
 }
 
+static uint frameRateMap[16] = {
+    0, 23796, 24000, 25000, 29970, 30000, 50000, 59940, 60000, 
+    0, 0, 0, 0, 0, 0, 0 
+};
+
 /** \fn DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
  *  \brief Locates the keyframes and saves them to the position map.
  *
@@ -305,8 +310,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                 height = ((bufptr[1] & 0xf) << 8) | bufptr[2];
                 width = (bufptr[0] <<4) | (bufptr[1]>>4);
 
-                frameRate = (bufptr[3] & 0x0000000f);
-//                VERBOSE(VB_GENERAL, QString("dtvrecorder: frame rate = %1").arg(frameRate));
+                frameRate = frameRateMap[(bufptr[3] & 0x0000000f)];
             }
         }
     }
@@ -351,6 +355,8 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     if (frameRate && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
+        VERBOSE(VB_GENERAL, QString("dtvrecorder: frame rate = %1")
+                .arg(frameRate));
         FrameRateChange(frameRate, _frames_written_count);
     }
 
