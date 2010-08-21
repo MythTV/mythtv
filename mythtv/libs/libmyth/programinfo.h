@@ -499,6 +499,7 @@ class MPUBLIC ProgramInfo
     bool        QueryTuningInfo(QString &channum, QString &input) const;
     uint        QueryAverageWidth(void) const;
     uint        QueryAverageHeight(void) const;
+    uint        QueryAverageFrameRate(void) const;
     QString     QueryRecordingGroup(void) const;
     bool        QueryMarkupFlag(MarkTypes type) const;
     uint        QueryTranscoderID(void) const;
@@ -518,6 +519,7 @@ class MPUBLIC ProgramInfo
     bool SaveBasename(const QString &basename);
     void SaveAspect(uint64_t frame, MarkTypes type, uint customAspect);
     void SaveResolution(uint64_t frame, uint width, uint height);
+    void SaveFrameRate(uint64_t frame, uint framerate);
     void SaveResolutionProperty(VideoProperty vid_flags);
     void SaveMarkupFlag(MarkTypes type) const;
     void ClearMarkupFlag(MarkTypes type) const { ClearMarkupMap(type); }

@@ -59,6 +59,7 @@ typedef enum {
     MARK_ASPECT_CUSTOM = 14,
     MARK_VIDEO_WIDTH   = 30,
     MARK_VIDEO_HEIGHT  = 31,
+    MARK_VIDEO_RATE    = 32,
 } MarkTypes;
 MPUBLIC QString toString(MarkTypes type);
 

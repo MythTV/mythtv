@@ -709,7 +709,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname) :
     uint _chanid;
     QDateTime _recstartts;
     if (ExtractKeyFromPathname(_pathname, _chanid, _recstartts) &&
-        LoadProgramFromRecorded(_chanid, recstartts))
+        LoadProgramFromRecorded(_chanid, _recstartts))
     {
         return;
     }
@@ -3232,6 +3232,31 @@ void ProgramInfo::SaveAspect(
         MythDB::DBError("aspect ratio change insert", query);
 }
 
+/// \brief Store the Frame Rate at frame in the recordedmarkup table
+/// \note  All frames until the next one with a stored frame rate
+///        are assumed to have the same frame rate
+void ProgramInfo::SaveFrameRate(uint64_t frame, uint framerate)
+{
+    if (!IsRecording())
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":MARK", (quint64)frame);
+    query.bindValue(":TYPE", MARK_VIDEO_RATE);
+    query.bindValue(":DATA", framerate);
+
+    if (!query.exec())
+        MythDB::DBError("Frame rate insert", query);
+}
+
+
 /// \brief Store the Resolution at frame in the recordedmarkup table
 /// \note  All frames until the next one with a stored resolution
 ///        are assumed to have the same resolution
@@ -3320,6 +3345,15 @@ uint ProgramInfo::QueryAverageHeight(void) const
 uint ProgramInfo::QueryAverageWidth(void) const
 {
     return load_markup_datum(MARK_VIDEO_WIDTH, chanid, recstartts);
+}
+
+/** \brief If present in recording this loads average frame rate of the
+ *         main video stream from database's stream markup table.
+ *  \note Saves loaded value for future reference by GetFrameRate().
+ */
+uint ProgramInfo::QueryAverageFrameRate(void) const
+{
+    return load_markup_datum(MARK_VIDEO_RATE, chanid, recstartts);
 }
 
 void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)

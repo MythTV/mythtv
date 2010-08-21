@@ -253,6 +253,10 @@ class MPUBLIC RecorderBase
      */
     void ResolutionChange(uint width, uint height, long long frame);
 
+    /** \brief Note a change in video frame rate in the recordedmark table
+     */
+    void FrameRateChange(uint framerate, long long frame);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
@@ -271,6 +275,7 @@ class MPUBLIC RecorderBase
 
     uint           m_videoHeight;
     uint           m_videoWidth;
+    double         m_frameRate;
 
     ProgramInfo   *curRecording;
 

@@ -138,6 +138,9 @@ void H264Parser::Reset(void)
     frame_crop_top_offset = frame_crop_bottom_offset = 0;
     aspect_ratio_idc = 0;
     sar_width = sar_height = 0;
+    unitsInTick = 0;
+    timeScale = 0;
+    fixedRate = 0;
 
     AU_offset = frame_start_offset = keyframe_start_offset = 0;
     on_frame = on_key_frame = false;
@@ -980,6 +983,45 @@ void H264Parser::vui_parameters(GetBitContext * gb)
     }
     else
         sar_width = sar_height = 0;
+
+    if (get_bits1(gb)) //overscan_info_present_flag
+        get_bits1(gb); //overscan_appropriate_flag
+
+    if (get_bits1(gb)) //video_signal_type_present_flag
+    {
+        get_bits(gb, 3); //video_format
+        get_bits1(gb);   //video_full_range_flag
+        if (get_bits1(gb)) // colour_description_present_flag
+        {
+            get_bits(gb, 8); // colour_primaries
+            get_bits(gb, 8); // transfer_characteristics
+            get_bits(gb, 8); // matrix_coefficients
+        }
+    }
+
+    if (get_bits1(gb)) //chroma_loc_info_present_flag
+    {
+        get_ue_golomb(gb); //chroma_sample_loc_type_top_field ue(v)
+        get_ue_golomb(gb); //chroma_sample_loc_type_bottom_field ue(v)
+    }
+
+    if (get_bits1(gb)) //timing_info_present_flag
+    {
+        unitsInTick = get_bits_long(gb, 32); //num_units_in_tick
+        timeScale = get_bits_long(gb, 32);   //time_scale
+        fixedRate = get_bits1(gb);
+    }
+}
+
+uint H264Parser::frameRate(void) const
+{
+    uint64_t	num;
+    uint64_t    fps;
+
+    num   = 500 * (uint64_t)timeScale; /* 1000 * 0.5 */
+    fps   = ( unitsInTick != 0 ? num / unitsInTick : 0 );
+
+    return (uint)fps;
 }
 
 uint H264Parser::aspectRatio(void) const
