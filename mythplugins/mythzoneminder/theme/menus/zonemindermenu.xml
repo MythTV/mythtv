@@ -3,21 +3,18 @@
    <button>
       <type>ZM_CONSOLE</type>
       <text>Show Console</text>
-      <text lang="PL">Pokaż konsolę</text>
       <action>ZM_CONSOLE</action>
    </button>
 
    <button>
       <type>ZM_LIVE_VIEWER</type>
       <text>Show Live View</text>
-      <text lang="PL">Pokaż na żywo</text>
       <action>ZM_LIVE_VIEWER</action>
    </button>
 
    <button>
        <type>ZM_EVENT_VIEWER</type>
        <text>Show Events</text>
-       <text lang="PL">Pokaż zdarzenia</text>
        <action>ZM_EVENT_VIEWER</action>
    </button>
 

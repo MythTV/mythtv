@@ -3,20 +3,6 @@
    <button>
       <type>VIDEO_SETTINGS_GENERAL</type>
       <text>General Settings</text>
-      <text lang="ES">Opciones Generales</text>
-      <text lang="CA">Opcions Generals</text>
-      <text lang="DE">Grundeinstellungen</text>
-      <text lang="PT">Configurações Gerais</text>
-      <text lang="SV">Generellt</text>
-      <text lang="NL">Algemene Instellingen</text>
-      <text lang="JA">全般設定</text>
-      <text lang="IT">Generale</text>
-      <text lang="SL">Splošne nastavitve</text>
-      <text lang="FI">Yleiset Asetukset</text>
-      <text lang="ET">Üldised sätted</text>
-      <text lang="RU">Общие настройки</text>
-      <text lang="PL">Ustawienia ogólne</text>
-      <text lang="NB">Generelle innstillinger</text>
       <action>SETTINGS_GENERAL</action>
       <description>File Paths and general options</description>
    </button>
@@ -24,20 +10,6 @@
    <button>
       <type>VIDEO_SETTINGS_PLAYER</type>
       <text>Player Settings</text>
-      <text lang="ES">Opciones de reproducción</text>
-      <text lang="CA">Opcions de reproducció</text>
-      <text lang="DE">Wiedergabe</text>
-      <text lang="PT">Configurar Leitura</text>
-      <text lang="SV">Uppspelning</text>
-      <text lang="NL">Weergave Instellingen</text>
-      <text lang="JA">プレイヤー設定</text>
-      <text lang="IT">Player</text>
-      <text lang="SL">Nastavitve predvajalnika</text>
-      <text lang="FI">Toistoasetukset</text>
-      <text lang="ET">Mängija sätted</text>
-      <text lang="RU">Настройки проигрывателя</text>
-      <text lang="PL">Ustaw odtwarzacz</text>
-      <text lang="NB"> Innstillinger for avpiller</text>
       <action>SETTINGS_PLAYER</action>
       <description>Player Applications and DVD/VCD Drives</description>
    </button>
@@ -52,20 +24,6 @@
    <button>
       <type>VIDEO_FILE_TYPES</type>
       <text>File Types</text>
-      <text lang="PT">Tipos de Ficheiros</text>
-      <text lang="SV">Filtyper</text>
-      <text lang="cA">Tipus d'arxius</text>
-      <text lang="DE">Dateitypen</text>
-      <text lang="ES">Tipos de archivos</text>
-      <text lang="NL">Bestandstypes</text>
-      <text lang="JA">ファイルタイプ</text>
-      <text lang="IT">Tipi di file</text>
-      <text lang="SL">Tipi datotek</text>
-      <text lang="FI">Tiedostotyypit</text>
-      <text lang="ET">Failitüübid</text>
-      <text lang="RU">Типы файлов</text>
-      <text lang="PL">Typy plików</text>
-      <text lang="NB">Filtyper</text>
       <action>SETTINGS_ASSOCIATIONS</action>
       <description>Associate new file extensions</description>
    </button>
@@ -74,18 +32,6 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip Settings</text>
-      <text lang="PT">Conf. Importação DVDs</text>
-      <text lang="DE">Import</text>
-      <text lang="SV">Inställningar för kopiering</text>
-      <text lang="ES">Opciones de "ripear"</text>
-      <text lang="CA">Opcions de volcat</text>
-      <text lang="NL">DVD RIP instellingen</text>
-      <text lang="JA">再生設定</text>
-      <text lang="FI">Aseta DVD-Kopionti</text>
-      <text lang="ET">Rippimise sätted</text>
-      <text lang="RU">Настройки импорта</text>
-      <text lang="PL">Ustaw zrzucanie DVD</text>
-      <text lang="NB">Innstillinger for import</text>
       <action>DVD_SETTINGS_RIP</action>
       <description>DVD Rip and Transcode options</description>
    </button>

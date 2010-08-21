@@ -3,33 +3,18 @@
    <button>
       <type>ARCHIVE_LAST_LOG</type>
       <text>Show Log Viewer</text>
-      <text lang="SL">Pregled dnevnika</text>
-      <text lang="PL">Przeglądanie logów</text>
-      <text lang="FI">Näytä Loki</text>
-      <text lang="NB">Vis loggbok</text>
-      <text lang="DE">Protokoll ansehen</text>
       <action>ARCHIVE_LAST_LOG</action>
    </button>
 
    <button>
        <type>ARCHIVE_TEST_DVD</type>
        <text>Play Created DVD</text>
-       <text lang="SL">Predvajaj ustvarjen DVD</text>
-       <text lang="PL">Testuj DVD</text>
-       <text lang="FI">Toista Luotu DVD</text>
-       <text lang="NB">Test DVD som er laget</text>
-       <text lang="DE">erstellte DVD abspielen</text>
        <action>ARCHIVE_TEST_DVD</action>
    </button>
 
    <button>
        <type>ARCHIVE_BURN_DVD</type>
        <text>Burn DVD</text>
-       <text lang="SL">Zapeči DVD</text>
-       <text lang="PL">Wypal DVD</text>
-       <text lang="FI">Polta DVD</text>
-       <text lang="NB">Brenn DVD</text>
-       <text lang="DE">DVD brennen</text>
        <action>ARCHIVE_BURN_DVD</action>
    </button>
 

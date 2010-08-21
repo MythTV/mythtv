@@ -3,20 +3,6 @@
    <button>
       <type>MUSIC_SETTINGS_GENERAL</type>
       <text>General Settings</text>
-      <text lang="IT">Impostazioni generali</text>
-      <text lang="ES">Opciones Generales</text>
-      <text lang="CA">Opcions Generals</text>
-      <text lang="DE">Grundeinstellungen</text>
-      <text lang="NL">Algemeen</text>
-      <text lang="PT">Configurações Gerais</text>
-      <text lang="SV">Generellt</text>
-      <text lang="JA">全般設定</text>
-      <text lang="FI">Yleiset Asetukset</text>
-      <text lang="SL">Splošne nastavitve</text>
-      <text lang="ET">Üldised sätted</text>
-      <text lang="RU">Общие настройки</text>
-      <text lang="PL">Ustawienia ogólne</text>
-      <text lang="NB">Generelle innstillinger</text>
       <action>MUSIC_SET_GENERAL</action>
       <description>Music folders and general options</description>
    </button>
@@ -24,20 +10,6 @@
    <button>
       <type>MUSIC_SETTINGS_PLAYER</type>
       <text>Player Settings</text>
-      <text lang="IT">Opzioni di lettura</text>
-      <text lang="ES">Opciones de Reproducción</text>
-      <text lang="CA">Opcions de reproducció</text>
-      <text lang="DE">Wiedergabe</text>
-      <text lang="NL">Afspelen</text>
-      <text lang="PT">Conf. Leitura de Música</text>
-      <text lang="SV">Uppspelning</text>
-      <text lang="JA">プレイヤー設定</text>
-      <text lang="FI">Soittoasetukset</text>
-      <text lang="SL">Nastavitve predvajanja</text>
-      <text lang="ET">Mängija sätted</text>
-      <text lang="RU">Настройки проигрывателя</text>
-      <text lang="PL">Ustaw odtwarzacz</text>
-      <text lang="NB">Innstillinger for avspiller</text>
       <action>MUSIC_SET_PLAYER</action>
       <description>Music playback options</description>
    </button>
@@ -45,18 +17,6 @@
    <button>
       <type>MUSIC_SETTINGS_RIP</type>
       <text>Ripper Settings</text>
-      <text lang="DE">CD Import</text>
-      <text lang="PT">Conf. Importação de CDs</text>
-      <text lang="SV">Kopiering</text>
-      <text lang="CA">Configuració de volcat</text>
-      <text lang="ES">Configuración del ripper</text>
-      <text lang="JA">リッパー設定</text>
-      <text lang="FI">Tuontiasetukset</text>
-      <text lang="SL">Nastavitve ripanja</text>
-      <text lang="ET">Rippija sätted</text>
-      <text lang="RU">Настройки импорта</text>
-      <text lang="PL">Ustaw zrzucanie CD</text>
-      <text lang="NB">Innstiller for importering</text>
       <action>MUSIC_SET_RIPPER</action>
       <description>CD copying options</description>
    </button>

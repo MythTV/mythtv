@@ -3,19 +3,6 @@
    <button>
       <type>GAME_SETTINGS_GENERAL</type>
       <text>General Settings</text>
-      <text lang="IT">Impostazioni generali</text>
-      <text lang="ES">Opciones Generales</text>
-      <text lang="CA">Opcions Generals</text>
-      <text lang="DE">Grundeinstellungen</text>
-      <text lang="NL">Algemeen</text>
-      <text lang="PT">Configurações Gerais</text>
-      <text lang="SV">Generella inställningar</text>
-      <text lang="SL">Splošne nastavitve</text>
-      <text lang="FI">Yleiset Asetukset</text>
-      <text lang="ET">Üldised sätted</text>
-      <text lang="NB">Generelle innstillinger</text>
-      <text lang="RU">Настройки игр</text>
-      <text lang="PL">Ustawienia ogólne</text>
       <action>GAME_SETTINGS</action>
       <description>Game folders and general options</description>
    </button>
@@ -23,19 +10,6 @@
    <button>
       <type>GAME_SETTINGS_PLAYERS</type>
       <text>Game Players</text>
-      <text lang="IT">Impostazioni generali</text>
-      <text lang="ES">Opciones Reproductores</text>
-      <text lang="CA">Opcions Generals</text>
-      <text lang="DE">Grundeinstellungen</text>
-      <text lang="NL">Algemeen</text>
-      <text lang="PT">Jogadores</text>
-      <text lang="SV">Generella inställningar</text>
-      <text lang="SL">Igralci</text>
-      <text lang="FI">Emulaattorit</text>
-      <text lang="ET">Mängijad</text>
-      <text lang="NB">Spillere</text>
-      <text lang="RU">Игроки</text>
-      <text lang="PL">Gracze</text>
       <action>GAME_PLAYERS</action>
       <description>Configure an emulator</description>
    </button>
@@ -43,16 +17,6 @@
    <button>
       <type>GAME_SCAN</type>
       <text>Scan for Games</text>
-      <text lang="PT">Refrescar Lista de Jogos</text>
-      <text lang="SV">Sök efter spel</text>
-      <text lang="DE">Nach Spielen suchen</text>
-      <text lang="SL">Iskanje iger</text>
-      <text lang="FI">Etsi Pelejä</text>
-      <text lang="ES">Buscar Juegos</text>
-      <text lang="ET">Mängude skaneerimine</text>
-      <text lang="NB">Leit etter spill</text>
-      <text lang="RU">Искать игры</text>
-      <text lang="PL">Wyszukaj gry</text>
       <action>SEARCH_FOR_GAMES</action>
       <description>Add games to your library</description>
    </button>
@@ -60,19 +24,6 @@
    <button>
        <type>GAME_CLEAR_DATA</type>
       <text>Clear Game Data</text>
-      <text lang="IT">Impostazioni generali</text>
-      <text lang="ES">Borrar Datos</text>
-      <text lang="CA">Opcions Generals</text>
-      <text lang="DE">Grundeinstellungen</text>
-      <text lang="NL">Algemeen</text>
-      <text lang="PT">Apagar Dados de Jogos</text>
-      <text lang="SV">Generella inställningar</text>
-      <text lang="SL">Odstranjevanje iger</text>
-      <text lang="FI">Tyhjennä Tietueet</text>
-      <text lang="ET">Mänguandmete puhastamine</text>
-      <text lang="NB">Tøm spilldata</text>
-      <text lang="RU">Очистить данные игр</text>
-      <text lang="PL">Wyczyść dane gry</text>
       <action>CLEAR_GAME_DATA</action>
       <description>Empty your game library</description>
    </button>
