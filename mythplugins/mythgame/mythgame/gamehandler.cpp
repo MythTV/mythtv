@@ -835,6 +835,9 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
     }
     QString exec = handler->SystemCmdLine();
 
+    if (exec.isEmpty())
+        return;
+
     if (handler->GameType() != "PC")
     {
         QString arg = "\"" + romdata->Rompath() +
