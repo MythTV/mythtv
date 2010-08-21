@@ -963,7 +963,7 @@ void EITFixUp::FixAUStar(DBEventEIT &event) const
  */
 void EITFixUp::FixMCA(DBEventEIT &event) const
 {
-    const uint SUBTITLE_PCT     = 60; //% of description to allow subtitle to
+    const uint SUBTITLE_PCT     = 60; // % of description to allow subtitle to
     const uint SUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
     bool       dd               = false;
     int        position;
@@ -1174,7 +1174,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
     }
 
     int position;
-    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
+    const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
     const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
 
     if ((position = tmpExp1.indexIn(event.description)) != -1)
