@@ -604,7 +604,7 @@ class FileOps( BEEvent ):
     def getRecording(self, chanid, starttime):
         """FileOps.getRecording(chanid, starttime) -> Program object"""
         starttime = datetime.duck(starttime)
-        res = self.backendCommand('QUERY_RECORDING TIMESLOT %d %s' \
+        res = self.backendCommand('QUERY_RECORDING TIMESLOT %s %s' \
                         % (chanid, starttime.mythformat()))\
                     .split(BACKEND_SEP)
         if res[0] == 'ERROR':

@@ -424,8 +424,8 @@ class datetime( _pydatetime ):
         def dst(self, dt): return timedelta(0)
 
     @classmethod
-    def fromtimestamp(cls, posix):
-        return _pydatetime.fromtimestamp(int(posix))
+    def fromTimestamp(cls, posix):
+        return cls.fromtimestamp(float(posix))
 
     @classmethod
     def frommythtime(cls, mtime):
@@ -435,7 +435,7 @@ class datetime( _pydatetime ):
     def fromIso(cls, isotime, sep='T'):
         match = cls._reiso.match(isotime)
         if match is None:
-            raise ValueError("time data '%s' does not match ISO 8601 format" \
+            raise TypeError("time data '%s' does not match ISO 8601 format" \
                                 % isotime)
 
         dt = [int(a) for a in match.groups()[:5]]
@@ -469,7 +469,7 @@ class datetime( _pydatetime ):
             # existing built-in datetime
             return cls.fromIso(t.isoformat())
         except: pass
-        for func in [cls.fromtimestamp, #epoch time
+        for func in [cls.fromTimestamp, #epoch time
                      cls.frommythtime, #iso time with integer characters only
                      cls.fromIso, #iso 8601 time
                      cls.fromRfc]: #rfc 822 time
@@ -477,7 +477,7 @@ class datetime( _pydatetime ):
                 return func(t)
             except:
                 pass
-        raise ValueError("time data '%s' does not match supported formats"%t)
+        raise TypeError("time data '%s' does not match supported formats"%t)
 
     def mythformat(self):
         return self.strftime('%Y%m%d%H%M%S')
@@ -487,5 +487,4 @@ class datetime( _pydatetime ):
 
     def rfcformat(self):
         return self.strftime('%a, %d %b %Y %H:%M:%S %Z')
-
 

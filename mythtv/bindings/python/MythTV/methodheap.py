@@ -186,19 +186,6 @@ class MythBE( FileOps ):
         else:
             return False
 
-    def getRecording(self, chanid, starttime):
-        """
-        Returns a Program object matching the channel id and start time
-        """
-        starttime = datetime.duck(starttime)
-        res = self.backendCommand('QUERY_RECORDING TIMESLOT %d %d' \
-                        % (chanid, starttime.mythformat()))\
-                    .split(BACKEND_SEP)
-        if res[0] == 'ERROR':
-            return None
-        else:
-            return Program(res[1:], db=self.db)
-
     def getRecordings(self):
         """
         Returns a list of all Program objects which have already recorded
