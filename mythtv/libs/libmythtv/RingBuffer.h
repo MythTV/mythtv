@@ -3,10 +3,10 @@
 #ifndef RINGBUFFER
 #define RINGBUFFER
 
-#include <pthread.h>
-
+#include <QReadWriteLock>
 #include <QWaitCondition>
 #include <QString>
+#include <QThread>
 #include <QMutex>
 
 #include "mythconfig.h"
@@ -18,13 +18,12 @@ extern "C" {
 #include "mythexp.h"
 
 class RemoteFile;
-class RemoteEncoder;
 class ThreadedFileWriter;
 class DVDRingBufferPriv;
 class BDRingBufferPriv;
 class LiveTVChain;
 
-class MPUBLIC RingBuffer
+class MPUBLIC RingBuffer : protected QThread
 {
   public:
     RingBuffer(const QString &lfilename, bool write,
@@ -107,10 +106,7 @@ class MPUBLIC RingBuffer
     void SetTimeout(bool fast) { oldfile = fast; }
 
   protected:
-    static void *StartReader(void *type);
-    void ReadAheadThread(void);
-
-  private:
+    void run(void); // QThread
     void CalcReadAheadThresh(void);
     int safe_read_bd(void *data, uint sz);
     int safe_read_dvd(void *data, uint sz);
@@ -127,72 +123,76 @@ class MPUBLIC RingBuffer
     void KillReadAheadThread(void);
 
   private:
-    QString filename;
-    QString subtitlefilename;
+    // NR == trivial risk, not protected, but only modified in single thread
+    // LR == low risk, not protected, but only modified on Open,Close,ctor,dtor
+    // HR == high risk, likely to cause unexpected behaviour
+    // MR == medium risk, unsafe methods unlikely to be called at wrong moment
 
-    ThreadedFileWriter *tfw;
-    int fd2;
+    QString filename;             // not protected by a lock LR
+    QString subtitlefilename;     // not protected by a lock LR
 
-    bool writemode;
+    ThreadedFileWriter *tfw;      // not protected by a lock LR
+    int fd2;                      // not protected by a lock LR
 
-    long long readpos;
-    long long writepos;
+    bool writemode;               // not protected by a lock LR
 
-    bool stopreads;
+    long long readpos;            // not protected by a lock HR
+    long long writepos;           // not protected by a lock HR
 
-    mutable pthread_rwlock_t rwlock;
+    bool stopreads;               // not protected by a lock HR
 
-    int recorder_num;
-    RemoteEncoder *remoteencoder;
-    RemoteFile *remotefile;
+    mutable QReadWriteLock rwlock;
 
+    RemoteFile *remotefile;       // not protected by a lock LR
+
+    // this lock does not consistently protect anything,
+    // but seems to be intented to protect rbrpos & rbwpos
     mutable QMutex readAheadLock;
-    pthread_t reader;
 
-    bool startreadahead;
-    char *readAheadBuffer;
-    bool readaheadrunning;
-    bool readaheadpaused;
-    bool pausereadthread;
-    int rbrpos;
-    int rbwpos;
-    long long internalreadpos;
-    bool ateof;
-    bool readsallowed;
-    volatile bool wantseek;
-    bool setswitchtonext;
+    bool startreadahead;          // not protected by a lock HR
+    char *readAheadBuffer;        // not protected by a lock MR
+    bool readaheadrunning;        // not protected by a lock HR
+    bool readaheadpaused;         // not protected by a lock HR
+    bool pausereadthread;         // not protected by a lock HR
+    int rbrpos;                   // not protected by a lock HR
+    int rbwpos;                   // not protected by a lock HR
+    long long internalreadpos;    // not protected by a lock HR
+    bool ateof;                   // not protected by a lock HR
+    bool readsallowed;            // not protected by a lock HR
+    volatile bool wantseek;       // not protected by a lock HR
+    bool setswitchtonext;         // protected by rwlock
 
-    uint           rawbitrate;
-    float          playspeed;
-    int            fill_threshold;
-    int            fill_min;
-    int            readblocksize;
+    uint           rawbitrate;    // protected by rwlock
+    float          playspeed;     // protected by rwlock
+    int            fill_threshold;// not protected by a lock HR
+    int            fill_min;      // protected by rwlock
+    int            readblocksize; // protected by rwlock
 
-    QWaitCondition pauseWait;
+    QWaitCondition pauseWait;     // not protected by a lock HR
 
-    int wanttoread;
-    QWaitCondition availWait;
+    int wanttoread;               // not protected by a lock HR
+    QWaitCondition availWait;     // protected by availWaitMutex
     QMutex availWaitMutex;
 
-    QWaitCondition readsAllowedWait;
+    QWaitCondition readsAllowedWait;// protected by readsAllowedWaitMutex
     QMutex readsAllowedWaitMutex;
 
-    int numfailures;
+    int numfailures;              // not protected by a lock MR
 
-    bool commserror;
+    bool commserror;              // not protected by a lock MR
 
-    DVDRingBufferPriv *dvdPriv;
-    BDRingBufferPriv  *bdPriv;
+    DVDRingBufferPriv *dvdPriv;   // not protected by a lock LR
+    BDRingBufferPriv  *bdPriv;    // not protected by a lock LR
 
-    bool oldfile;
+    bool oldfile;                 // not protected by a lock LR
 
-    LiveTVChain *livetvchain;
-    bool ignoreliveeof;
+    LiveTVChain *livetvchain;     // not protected by a lock HR
+    bool ignoreliveeof;           // not protected by a lock HR
 
-    long long readAdjust;
+    long long readAdjust;         // not protected by a lock HR
 
     /// Condition to signal that the read ahead thread is running
-    QWaitCondition readAheadRunningCond;
+    QWaitCondition readAheadRunningCond;//protected by readAheadRunningCondLock
     QMutex readAheadRunningCondLock;
 
   public:
