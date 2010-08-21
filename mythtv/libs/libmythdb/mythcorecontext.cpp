@@ -13,6 +13,7 @@
 #include <algorithm>
 using namespace std;
 
+#include "mythconfig.h"       // for CONFIG_DARWIN
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystem.h"
