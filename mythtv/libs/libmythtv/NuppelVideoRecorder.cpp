@@ -610,6 +610,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
         return false;
     }
 
+
     return true;
 }
 
@@ -626,6 +627,68 @@ void NuppelVideoRecorder::SetupRTjpeg(void)
     rtjc->SetQuality(&Q);
     setval = 2;
     rtjc->SetIntra(&setval, &M1, &M2);
+}
+
+
+void NuppelVideoRecorder::UpdateResolutions(void)
+{
+    int tot_height = (int)(height * height_multiplier);
+    double aspectnum = w_out / (double)tot_height;
+    uint aspect;
+
+    if (aspectnum == 0.0)
+        aspect = 0;
+    else if (fabs(aspectnum - 1.3333333333333333) < 0.001)
+        aspect = 2;
+    else if (fabs(aspectnum - 1.7777777777777777) < 0.001)
+        aspect = 3;
+    else if (fabs(aspectnum - 2.21) < 0.001)
+        aspect = 4;
+    else
+        aspect = aspectnum * 1000000;
+
+    if ((aspect > 0) && (aspect != m_videoAspect))
+    {
+        m_videoAspect = aspect;
+        AspectChange((AspectRatio)aspect, 0);
+    }
+
+    if (w_out && tot_height && 
+        (tot_height != m_videoHeight || m_videoWidth != w_out))
+    {
+        m_videoHeight = tot_height;
+        m_videoWidth = w_out;
+        ResolutionChange(w_out, tot_height, 0);
+    }
+
+    int den = (int)ceil(video_frame_rate * 100 * framerate_multiplier);
+    int num = 100;
+
+    // avcodec needs specific settings for mpeg2 compression
+    switch (den)
+    {
+        case 2397:
+        case 2398: den = 24000;
+                   num = 1001;
+                   break;
+        case 2997:
+        case 2998: den = 30000;
+                   num = 1001;
+                   break;
+        case 5994:
+        case 5995: den = 60000;
+                   num = 1001;
+                   break;
+    }
+
+    uint frameRate = (den * 1000) / num;
+    if (frameRate && frameRate != m_frameRate)
+    {
+        m_frameRate = frameRate;
+        VERBOSE(VB_GENERAL, QString("NVR: frame rate = %1")
+                .arg(frameRate));
+        FrameRateChange(frameRate, 0);
+    }
 }
 
 void NuppelVideoRecorder::Initialize(void)
@@ -1028,6 +1091,8 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (!useavcodec)
         SetupRTjpeg();
+
+    UpdateResolutions();
 
     if (CreateNuppelFile() != 0)
     {

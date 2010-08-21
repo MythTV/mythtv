@@ -141,6 +141,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
     void FormatCC(struct cc *cc);
     void AddTextData(unsigned char *buf, int len,
                      long long timecode, char type);
+    void UpdateResolutions(void);
     
     bool encoding;
     
