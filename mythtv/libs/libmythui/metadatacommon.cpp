@@ -175,9 +175,10 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["releasedate"] = m_releasedate.toString(dateformat);
     metadataMap["lastupdated"] = m_lastupdated.toString(dateformat);
 
-    metadataMap["runtime"] = QString::number(m_runtime) + tr(" Minutes");
+    metadataMap["runtime"] = QString::number(m_runtime) +
+                                      QObject::tr(" Minutes");
     metadataMap["runtimesecs"] = QString::number(m_runtimesecs) +
-                                     tr(" Seconds");
+                                          QObject::tr(" Seconds");
     metadataMap["inetref"] = m_inetref;
     metadataMap["tmsref"] = m_tmsref;
     metadataMap["imdb"] = m_imdb;
