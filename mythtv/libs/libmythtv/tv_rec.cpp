@@ -3774,7 +3774,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         tvchain->SetCardType("DUMMY");
 
         if (!ringBuffer)
-            ok = CreateLiveTVRingBuffer();
+            ok = CreateLiveTVRingBuffer(channum);
         else
             ok = SwitchLiveTVRingBuffer(channum, true, false);
         pseudoLiveTVRecording = tmp;
@@ -4023,7 +4023,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         bool ok;
         if (!ringBuffer)
         {
-            ok = CreateLiveTVRingBuffer();
+            ok = CreateLiveTVRingBuffer(channel->GetCurrentName());
             SetFlags(kFlagRingBufferReady);
         }
         else
@@ -4444,19 +4444,31 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     return true;
 }
 
-bool TVRec::CreateLiveTVRingBuffer(void)
+bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
 {
-    VERBOSE(VB_RECORD, LOC + "CreateLiveTVRingBuffer()");
-    RecordingInfo *pginfo = NULL;
-    RingBuffer *rb = NULL;
+    VERBOSE(VB_RECORD, LOC + QString("CreateLiveTVRingBuffer(%1)")
+            .arg(channum));
 
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb,
-                                       channel->GetCurrentName(),
-                                       channel->GetCurrentInputNum()))
+    RecordingInfo *pginfo = NULL;
+    RingBuffer    *rb = NULL;
+    QString        inputName;
+    int            inputID = -1;
+
+    if (!channel->CheckChannel(channum, inputName))
+    {
+        ChangeState(kState_None);
+        return false;
+    }
+
+    inputID = inputName.isEmpty() ?
+      channel->GetCurrentInputNum() : channel->GetInputByName(inputName);
+
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
     {
         ClearFlags(kFlagPendingActions);
         ChangeState(kState_None);
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateLiveTVRingBuffer() failed");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("CreateLiveTVRingBuffer(%1) failed").arg(channum));
         return false;
     }
 
