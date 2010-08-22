@@ -51,7 +51,6 @@
 #include "mythsystemevent.h"
 #include "main_helpers.h"
 #include "backendcontext.h"
-#include "dbutil.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -661,18 +660,6 @@ int run_backend(const MythCommandLineParser &cmdline)
     if (!setup_context(cmdline))
         return BACKEND_EXIT_NO_MYTHCONTEXT;
 
-    bool ismaster = gCoreContext->IsMasterHost();
-
-    if (ismaster)
-    {
-        if (!DBUtil::CheckTables(true))
-        {
-            VERBOSE(VB_IMPORTANT, "Error checking database tables. Please "
-                    "run optimize_mythdb.pl or mysqlcheck --repair.");;
-            return BACKEND_EXIT_DB_ERROR;
-        }
-    }
-
     if (!UpgradeTVDatabaseSchema(true, true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
@@ -680,6 +667,8 @@ int run_backend(const MythCommandLineParser &cmdline)
     }
 
     ///////////////////////////////////////////
+
+    bool ismaster = gCoreContext->IsMasterHost();
 
     g_pUPnp = new MediaServer(ismaster, !cmdline.IsUPnPEnabled() );
 
