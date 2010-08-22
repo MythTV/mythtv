@@ -2071,12 +2071,11 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
 }
 
 /** \fn TVRec::SetupSignalMonitor(bool,bool)
- *  \brief This creates a SignalMonitor instance if one is needed and
+ *  \brief This creates a SignalMonitor instance and
  *         begins signal monitoring.
  *
- *   If the channel exists and the cardtype is "DVB" or "HDHomeRun"
- *   a SignalMonitor instance is created and SignalMonitor::Start()
- *   is called to start the signal monitoring thread.
+ *   If the channel exists a SignalMonitor instance is created and
+ *   SignalMonitor::Start() is called to start the signal monitoring thread.
  *
  *  \param tablemon If set we enable table monitoring
  *  \param notify   If set we notify the frontend of the signal values
@@ -3500,7 +3499,7 @@ void TVRec::HandleTuning(void)
     if (tuningRequests.size())
     {
         TuningRequest request = tuningRequests.front();
-        VERBOSE(VB_RECORD, LOC + "Request: "<<request.toString());
+        VERBOSE(VB_RECORD, LOC + "HandleTuning Request: "<<request.toString());
 
         QString input;
         request.channel = TuningGetChanNum(request, input);
@@ -3844,8 +3843,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         ClearFlags(kFlagWaitingForSignal);
         error = true;
     }
-
-    if (signalMonitor)
+    else if (signalMonitor)
     {
         SetFlags(kFlagSignalMonitorRunning);
         ClearFlags(kFlagWaitingForSignal);
@@ -3888,7 +3886,20 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
     if (signalMonitor->IsAllGood())
         VERBOSE(VB_RECORD, LOC + "Got good signal");
-    else if (!signalMonitor->IsErrored())
+    else if (signalMonitor->IsErrored())
+    {
+        VERBOSE(VB_RECORD, LOC_ERR + "SignalMonitor failed");
+        ClearFlags(kFlagNeedToStartRecorder);
+        if (curRecording)
+            curRecording->SetRecordingStatus(rsFailed);
+
+        if (HasFlags(kFlagEITScannerRunning))
+        {
+            scanner->StopActiveScan();
+            ClearFlags(kFlagEITScannerRunning);
+        }
+    }
+    else
         return NULL;
 
     // grab useful data from DTV signal monitor before we kill it...

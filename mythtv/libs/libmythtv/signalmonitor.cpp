@@ -492,7 +492,9 @@ bool SignalMonitor::IsChannelTuned(void)
         channelTuned.SetValue(1);
         break;
       case ChannelBase::changeFailed:
+        VERBOSE(VB_IMPORTANT, "SignalMonitor: channel change failed");
         channelTuned.SetValue(2);
+        error = QObject::tr("Error: channel change failed");
         break;
       case ChannelBase::changeSuccess:
         channelTuned.SetValue(3);
