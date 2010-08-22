@@ -449,6 +449,40 @@ void MusicPlayer::customEvent(QEvent *event)
         DecoderHandlerEvent *dxe = (DecoderHandlerEvent*)event;
         m_displayMetadata = *dxe->getMetadata();
     }
+    else if (event->type() == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent*) event;
+        if (me->Message().left(14) == "PLAYBACK_START")
+        {
+            m_wasPlaying = m_isPlaying;
+            QString hostname = me->Message().mid(15);
+
+            if (hostname == gCoreContext->GetHostName())
+            {
+                if (m_isPlaying)
+                    savePosition();
+                stop(true);
+            }
+        }
+
+        if (me->Message().left(12) == "PLAYBACK_END")
+        {
+            if (m_wasPlaying)
+            {
+                QString hostname = me->Message().mid(13);
+                if (hostname == gCoreContext->GetHostName())
+                {
+                    play();
+                    seek(gCoreContext->GetNumSetting(
+                                "MusicBookmarkPosition", 0));
+                    gCoreContext->SaveSetting("MusicBookmark", "");
+                    gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
+                }
+
+                m_wasPlaying = false;
+            }
+        }
+    }
 
     if (m_isAutoplay)
     {
@@ -484,40 +518,6 @@ void MusicPlayer::customEvent(QEvent *event)
                 GetMythMainWindow(), "Decoder Error",
                 QString("MythMusic has encountered the following error:\n%1")
                 .arg(*dxe->errorMessage()));
-        }
-        else if (event->type() == MythEvent::MythEventMessage)
-        {
-            MythEvent *me = (MythEvent*) event;
-            if (me->Message().left(14) == "PLAYBACK_START")
-            {
-                m_wasPlaying = m_isPlaying;
-                QString hostname = me->Message().mid(15);
-
-                if (hostname == gCoreContext->GetHostName())
-                {
-                    if (m_isPlaying)
-                        savePosition();
-                    stop(true);
-                }
-            }
-
-            if (me->Message().left(12) == "PLAYBACK_END")
-            {
-                if (m_wasPlaying)
-                {
-                    QString hostname = me->Message().mid(13);
-                    if (hostname == gCoreContext->GetHostName())
-                    {
-                        play();
-                        seek(gCoreContext->GetNumSetting(
-                                 "MusicBookmarkPosition", 0));
-                        gCoreContext->SaveSetting("MusicBookmark", "");
-                        gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
-                    }
-
-                    m_wasPlaying = false;
-                }
-            }
         }
     }
 
