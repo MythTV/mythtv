@@ -760,7 +760,7 @@ void AvFormatDecoder::Reset()
         fmt->flags |= AVFMT_NOFILE;
 
         CloseContext();
-        ic = av_alloc_format_context();
+        ic = avformat_alloc_context();
         if (!ic)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -912,7 +912,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags |= AVFMT_NOFILE;
 
-    ic = av_alloc_format_context();
+    ic = avformat_alloc_context();
     if (!ic)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +

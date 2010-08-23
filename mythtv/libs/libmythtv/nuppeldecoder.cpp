@@ -813,6 +813,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     int r;
     lzo_uint out_len;
     int compoff = 0;
+    AVPacket pkt;
 
     unsigned char *outbuf = frame->buf;
     directframe = frame;
@@ -888,14 +889,16 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             InitAVCodecVideo(frameheader->comptype - '3');
 
         AVFrame mpa_pic;
+        av_init_packet(&pkt);
+        pkt.data = lstrm;
+        pkt.size = frameheader->packetlength + FF_INPUT_BUFFER_PADDING_SIZE;
 
         {
             QMutexLocker locker(avcodeclock);
             // if directrendering, writes into buf
             int gotpicture = 0;
-            int ret = avcodec_decode_video(mpa_vidctx, &mpa_pic, &gotpicture,
-                                           lstrm, frameheader->packetlength
-                                           + FF_INPUT_BUFFER_PADDING_SIZE);
+            int ret = avcodec_decode_video2(mpa_vidctx, &mpa_pic, &gotpicture,
+                                            &pkt);
             directframe = NULL;
             if (ret < 0)
             {
@@ -1031,6 +1034,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
     bool gotvideo = false;
     bool ret = false;
     int seeklen = 0;
+    AVPacket pkt;
 
     decoded_video_frame = NULL;
 
@@ -1237,25 +1241,26 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     }
                 }
 
-                int packetlen = frameheader.packetlength;
+                av_init_packet(&pkt);
+                pkt.data = strm;
+                pkt.size = frameheader.packetlength;
                 int ret = 0;
                 int data_size;
-                unsigned char *ptr = strm;
 
                 QMutexLocker locker(avcodeclock);
 
-                while (packetlen > 0)
+                while (pkt.data > 0)
                 {
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    ret = avcodec_decode_audio2(mpa_audctx, audioSamples,
-                                                &data_size, ptr, packetlen);
+                    ret = avcodec_decode_audio3(mpa_audctx, audioSamples,
+                                                &data_size, &pkt);
 
                     if (data_size)
                         m_audio->AddAudioData((char *)audioSamples, data_size,
                                               frameheader.timecode);
 
-                    packetlen -= ret;
-                    ptr += ret;
+                    pkt.size -= ret;
+                    pkt.data += ret;
                 }
             }
             else

@@ -1451,7 +1451,8 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
 {
     AVCodecContext *c = NULL;
     AVFrame *picture = NULL;
-    uint8_t *buff = NULL, *buffPtr;
+    AVPacket pkt;
+    uint8_t *buff;
     int gotPicture = 0, len;
     m_image = QImage();
 
@@ -1466,28 +1467,28 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     if (avcodec_open(c, codec) < 0)
         goto Close;
 
-    // Copy the data into a new buffer with sufficient padding.
-    buff = (uint8_t *)malloc(length + FF_INPUT_BUFFER_PADDING_SIZE);
-    if (!buff)
+    // Copy the data into AVPacket
+    if (av_new_packet(&pkt, length) < 0)
         goto Close;
 
-    memcpy(buff, data, length);
-    memset(buff + length, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-    buffPtr = buff;
+    memcpy(pkt.data, data, length);
+    buff = pkt.data;
 
-    while (length > 0 && ! gotPicture)
+    while (pkt.size > 0 && ! gotPicture)
     {
-        len = avcodec_decode_video(c, picture, &gotPicture, buffPtr, length);
+        len = avcodec_decode_video2(c, picture, &gotPicture, &pkt);
         if (len < 0) // Error
             goto Close;
-        length -= len;
-        buffPtr += len;
+        pkt.data += len;
+        pkt.size -= len;
     }
 
     if (!gotPicture)
     {
+        pkt.data = NULL;
+        pkt.size = 0;
         // Process any buffered data
-        if (avcodec_decode_video(c, picture, &gotPicture, NULL, 0) < 0)
+        if (avcodec_decode_video2(c, picture, &gotPicture, &pkt) < 0)
             goto Close;
     }
 
@@ -1529,7 +1530,8 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     }
 
 Close:
-    free(buff);
+    pkt.data = buff;
+    av_free_packet(&pkt);
     avcodec_close(c);
     av_free(c);
     av_free(picture);
