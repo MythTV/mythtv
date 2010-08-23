@@ -497,6 +497,12 @@ int main(int argc, char *argv[])
         {
             cerr << "Deprecated option '" << a.argv()[argpos] << "'" << endl;
         }
+#ifdef Q_WS_MACX
+        else if (!strncmp(argv[argpos],"-psn_",5))
+        {
+            cerr << "Ignoring Process Serial Number from command line\n";
+        }
+#endif
         else
         {
             fprintf(stderr, "illegal option: '%s' (use --help)\n",
