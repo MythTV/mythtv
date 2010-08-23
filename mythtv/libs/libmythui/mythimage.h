@@ -6,13 +6,26 @@
 #include <QImage>
 #include <QMutex>
 #include <QPixmap>
+#include <QImageReader>
 
 #include "mythpainter.h"
 
 enum ReflectAxis {ReflectHorizontal, ReflectVertical};
 enum FillDirection {FillLeftToRight, FillTopToBottom};
 
+class QNetworkReply;
 class MythUIHelper;
+
+class MPUBLIC MythImageReader: public QImageReader
+{
+  public:
+    MythImageReader(const QString &fileName);
+   ~MythImageReader();
+
+  private:
+    QString        m_fileName;
+    QNetworkReply *m_networkReply;
+};
 
 class MPUBLIC MythImage : public QImage
 {
@@ -39,6 +52,7 @@ class MPUBLIC MythImage : public QImage
     // *NOTE* *DELETES* img!
     static MythImage *FromQImage(QImage **img);
 
+    bool Load(MythImageReader &reader);
     bool Load(const QString &filename, bool scale = true);
 
     void Resize(const QSize &newSize, bool preserveAspect = false);

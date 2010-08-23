@@ -48,6 +48,7 @@ class MPUBLIC MythUIImage : public MythUIType
     void SetImages(QVector<MythImage *> &images);
 
     void SetDelay(int delayms);
+    void SetDelays(QVector<int> delays);
 
     void Reset(void);
     bool Load(bool allowLoadInBackground = true);
@@ -64,8 +65,10 @@ class MPUBLIC MythUIImage : public MythUIType
 
     void Init(void);
     void Clear(void);
-    MythImage* LoadImage(const QString &imFile, int imageNumber,
+    MythImage* LoadImage(MythImageReader &imageReader, const QString &imFile,
                          QSize bForceSize);
+    bool LoadAnimatedImage(MythImageReader &imageReader, const QString &imFile,
+                           QSize bForceSize);
     void customEvent(QEvent *event);
 
     virtual bool ParseElement(
@@ -88,6 +91,7 @@ class MPUBLIC MythUIImage : public MythUIType
     QString m_OrigFilename;
 
     QHash<int, MythImage *> m_Images;
+    QHash<int, int>         m_Delays;
     QMutex                  m_ImagesLock;
 
     static QHash<QString, MythUIImage *> m_loadingImages;

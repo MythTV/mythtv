@@ -6,8 +6,10 @@
 #include <stdint.h>
 
 // QT headers
+#include <QImageReader>
 #include <QPainter>
 #include <QMatrix>
+#include <QNetworkReply>
 #include <QRgb>
 
 // Mythdb headers
@@ -258,6 +260,26 @@ MythImage *MythImage::FromQImage(QImage **img)
     return ret;
 }
 
+bool MythImage::Load(MythImageReader &reader)
+{
+    if (!reader.canRead())
+        return false;
+
+    QImage *im = new QImage;
+
+    if (im && reader.read(im))
+    {
+        Assign(*im);
+        delete im;
+        return true;
+    }
+
+    if (im)
+        delete im;
+
+    return false;
+}
+
 // FIXME: Get rid of LoadScaleImage
 bool MythImage::Load(const QString &filename, bool scale)
 {
@@ -400,6 +422,34 @@ void MythImage::ConvertToYUV(void)
 
             data[j] = qRgba(r1, g1, b1, a);
         }
+    }
+}
+
+MythImageReader::MythImageReader(const QString &fileName)
+  : QImageReader(),
+    m_fileName(fileName), m_networkReply(NULL)
+{
+    if ((m_fileName.startsWith("http://")) ||
+        (m_fileName.startsWith("https://")) ||
+        (m_fileName.startsWith("ftp://")))
+    {
+        m_networkReply = GetMythDownloadManager()->download(m_fileName);
+        if (m_networkReply)
+            setDevice(m_networkReply);
+    }
+    else
+    {
+        setFileName(m_fileName);
+    }
+}
+
+MythImageReader::~MythImageReader()
+{
+    if (m_networkReply)
+    {
+        setDevice(NULL);
+        m_networkReply->deleteLater();
+        m_networkReply = NULL;
     }
 }
 
