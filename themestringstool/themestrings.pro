@@ -1,4 +1,4 @@
-include ( ../settings.pro )
+include ( ../mythtv/settings.pro )
 
 QMAKE_STRIP = echo
 

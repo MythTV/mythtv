@@ -1,11 +1,36 @@
 #!/bin/bash
+#
+# This script uses the themestringstool to automate the themestrings generation,
+# by redirecting themestrings from the plugins into the themestrings.h files of
+# the plugins, instead of simply putting all of them into the themestrings.h
+# file in mythfrontend.
+#
+# It should be sufficient to run this script once without any arguments, to
+# update all themestrings for mythfrontend and the plugins.
+#
+
 TS=`pwd`/themestrings
 MYTHTHEMES=`ls ../myththemes/ --file-type |grep "/$"`
 XMLPLUGINS="browser-ui.xml dvd-ui.xml gallery-ui.xml game-ui.xml \
          music-ui.xml mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
          news-ui.xml video-ui.xml zoneminder-ui.xml weather-ui.xml"
 
-# mythtv: Exclude mythplugins directory and myththemes files related to plugins
+if [ ! -e ${TS} ]; then
+    echo ""
+    echo "ERROR: The executable ${TS} doesn't exist, have you compiled it yet?"
+    echo ""
+    exit 1
+fi
+
+if [ `id -u` -eq 0 ]; then
+    echo ""
+    echo "ERROR: You need to run this script as a regular user, you cannot run it with root/sudo."
+    echo ""
+    exit 1
+fi
+
+# Exclude mythplugins directory and myththemes files related to plugins as
+# we don't want these strings added to mythfrontend.
 pushd ..
     chmod a-x mythplugins
     for I in ${MYTHTHEMES}; do
@@ -58,9 +83,6 @@ function updateplugin {
     popd > /dev/null
 }
 
-# exclude mythweather us_nws strings
-chmod a-r ../mythplugins/mythweather/mythweather/scripts/us_nws/maps.xml
-
 updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml
 updateplugin mythbrowser browser-ui.xml
 updateplugin mythgallery gallery-ui.xml
@@ -70,11 +92,9 @@ updateplugin mythnetvision netvision-ui.xml
 updateplugin mythnews news-ui.xml
 updateplugin mythvideo dvd-ui.xml video-ui.xml
 updateplugin mythweather weather-ui.xml
-updateplugin mythzoneminder zoneminder-ui.xml  #zoneminder-ui.xml doesn't exist at the moment, but it's included for future use
-
-chmod a+r ../mythplugins/mythweather/mythweather/scripts/us_nws/maps.xml
+#updateplugin mythzoneminder zoneminder-ui.xml  #zoneminder-ui.xml doesn't exist at the moment, but it's included for future use
 
 pushd .. > /dev/null
     svn st
-    emacs `svn st | grep "^M" | sed -e "s/^M//"` &
+#    emacs `svn st | grep "^M" | sed -e "s/^M//"` &
 popd > /dev/null
