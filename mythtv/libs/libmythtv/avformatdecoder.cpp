@@ -3043,13 +3043,20 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         pts_detected = true;
     }
 
+    // Explicity use DTS for DVD since they should always be valid for every
+    // frame and fixups aren't enabled for DVD.
     // Select reordered_opaque (PTS) timestamps if they are less faulty or the
     // the DTS timestamp is missing. Also use fixups for missing PTS instead of
     // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is 
     // more faulty or never detected.
-    if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
-        pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
-        mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+    if (ringBuffer->isDVD())
+    {
+        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            pts = (long long)pkt->dts;
+    }
+    else if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
+             pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
+             mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
     {
         pts = (long long)mpa_pic.reordered_opaque;
     }
