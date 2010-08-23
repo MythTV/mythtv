@@ -278,7 +278,6 @@ using_frontend {
     }
 
     # On screen display (video output overlay)
-    using_fribidi:DEFINES += USING_FRIBIDI
     HEADERS += osd.h                    teletextscreen.h
     HEADERS += udpnotify.h
     HEADERS += subtitlescreen.h         interactivescreen.h

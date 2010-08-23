@@ -1286,7 +1286,6 @@ MYTHTV_CONFIG_LIST='
     disable_mmx_for_debugging
     dvb
     firewire
-    fribidi
     frontend
     hdhomerun
     hdpvr
@@ -3741,30 +3740,6 @@ enabled freetype2 ||
 
 
 ##########################################
-# fribidi check
-
-disable fribidi
-FRIBIDI_CONFIG="pkg-config fribidi"
-if test x`which pkg-config 2>/dev/null` != x"" ; then
-   if `pkg-config --atleast-version 0.19 fribidi` ; then
-       check_cc `${FRIBIDI_CONFIG} --cflags` `${FRIBIDI_CONFIG} --libs` << EOF && enable fribidi
-#include <stdio.h>
-#include <fribidi/fribidi.h>
-int main()
-{
-    if (fribidi_parse_charset("UTF-8") != FRIBIDI_CHAR_SET_UTF8)
-    {
-        printf("Fribidi headers are not consistents with the library!\n");
-        return 1;
-    }
-    return 0;
-}
-EOF
-    else
-        disable fribidi
-    fi
-fi
-##########################################
 SDL_CONFIG="${cross_prefix}sdl-config"
 if "${SDL_CONFIG}" --version > /dev/null 2>&1; then
     sdl_cflags=$("${SDL_CONFIG}" --cflags)
@@ -4441,7 +4416,6 @@ fi
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
   fi
-  echo "Fribidi formatting        ${fribidi}"
   echo "MHEG support              ${mheg}"
   echo
 fi
@@ -4586,11 +4560,6 @@ fi
 if enabled freetype2; then
     echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
     echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled fribidi; then
-    echo "FRIBIDI_LIBS=`${FRIBIDI_CONFIG} --libs`" >> $MYTH_CONFIG_MAK
-    echo "FRIBIDI_CFLAGS=`${FRIBIDI_CONFIG} --cflags`" >> $MYTH_CONFIG_MAK
 fi
 
 if test $target_os = darwin; then
