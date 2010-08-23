@@ -1851,14 +1851,13 @@ nm_opts='-g'
 
 # machine
 arch_default=$(uname -m)
-arch_raw="$arch"
 cpu="generic"
 processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
 
 if test -f /proc/cpuinfo ; then
-    if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
+    if test x"$processor" = x"" -o x"$processor" = x"$arch_default" -o \
             x"$processor" = x"unknown" ; then
         processor=`cat /proc/cpuinfo | grep "model name" | head -n 1`
     fi
@@ -2089,7 +2088,7 @@ for opt do
     ;;
     --extra-libs=*) add_extralibs $optval
     ;;
-    --arch=*) arch=$optval && arch_raw=$optval && enable cpu_override
+    --arch=*) arch=$optval && enable cpu_override
     ;;
     --cpu=*) cpu=$optval && enable cpu_override
     ;;
@@ -2204,11 +2203,14 @@ else
     shlibdir_default="${prefix_default}/${libdir_name}"
 fi
 
-if enabled cpu_override || test x"$tune" != x"generic" && enabled proc_opt; then
+if enabled_any cpu_override croos_compile || test x"$tune" != x"generic" &&
+    enabled proc_opt; then
     echo "Warning! --enable-proc-opt shouldn't be used with --arch, --cpu or --tune"
     echo "Disabling it now."
     disable proc_opt
 fi
+
+enabled proc_opt && cpu="host"
 
 disabled logging && logfile=/dev/null
 
@@ -2500,6 +2502,11 @@ if test "$cpu" = host; then
         ;;
     esac
 
+    if test "${cpu:-host}" = host ; then
+        enable proc_opt_old
+        cpu="$arch"
+    fi
+
     test "${cpu:-host}" = host && die "--cpu=host not supported with compiler $cc"
 fi
 
@@ -2549,7 +2556,7 @@ enable $arch
 
 
 # if no tune setting and we know cpu class look at $processor
-if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
+if enabled proc_opt_old; then
 # first try to tune based on processor info
 # Intel i7 processors (EMT64T capable)
    if expr "$processor" : ".*Intel(R).*Core(TM) i7 CPU.*" > /dev/null ; then
@@ -2694,27 +2701,9 @@ if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
    elif expr "$processor" : ".*VIA Samuel" > /dev/null ; then
        cpu="c3"
        enable small
-# if no known processor info, tune base on arch_raw info
-   elif test x"$arch_raw" = x"i686" -a x"$mmx" = x"yes" ; then
-       cpu="pentium2"
-       proc_error_msg="yes"
-   elif test x"$arch_raw" = x"i686" -a x"$mmx" = x"no" ; then
-       cpu="pentiumpro"
-       proc_error_msg="yes"
-   elif test x"$arch_raw" = x"i586" -a x"$mmx" = x"yes" ; then
-       cpu="pentium-mmx"
-       proc_error_msg="yes"
-   elif test x"$arch_raw" = x"i586" -a x"$mmx" = x"no" ; then
-       cpu="i586"
-       proc_error_msg="yes"
-   elif test x"$arch_raw" = x"i486"; then
-       cpu="i486"
-       proc_error_msg="yes"
-   elif test x"$arch_raw" = x"i386"; then
-       cpu="i386"
-       proc_error_msg="yes"
+# if no known processor info, tune base on uname -m info
    else
-       proc_error_msg="yes"
+       enable proc_error_msg
    fi
 fi
 
@@ -3037,7 +3026,6 @@ EOF
             enable disable_mmx_for_debugging   # prevent later call to die
         fi
         disable opengl_vsync
-        enable  proc_opt
         disable v4l
         disable x11
         # Workaround compile errors from missing gmtime_r/localtime_r/uint def
@@ -3230,29 +3218,6 @@ die_license_disabled version3 libopencore_amrwb
 enabled version3 && { enabled gpl && enable gplv3 || enable lgplv3; }
 
 check_deps $ARCH_EXT_LIST
-
-# compute mmx state
-if enabled x86 && ! disabled mmx ; then
-    if enabled x86_64; then
-        enable mmx
-    elif test $cpu != "generic"; then
-        is_x86_mmx "$cpu" && enable mmx
-    elif expr "$processor_flags" : ".*mmx" > /dev/null ; then
-            enable mmx
-    else
-        is_x86_mmx "$arch_raw" && enable mmx
-    fi
-fi
-
-# compute cmov state
-if test $cpu = "generic"; then
-    if expr "$processor_flags" : ".*cmov" > /dev/null ; then
-        enable cmov
-    else
-        disable cmov
-    fi
-fi
-
 
 is_qmake4(){
     $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
@@ -4215,8 +4180,6 @@ if enabled cpu_override && test x"$cpu" != x"generic"; then
     echo "CPU                       $arch $subarch ($cpu)"
 elif test x"$processor" != x"" ; then
     echo "CPU                       $arch $subarch ($processor)"
-elif test x"$arch_raw" != x"" ; then
-    echo "CPU                       $arch $subarch ($arch_raw)"
 else
     echo "CPU                       $arch $subarch"
 fi
