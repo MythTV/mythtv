@@ -3,7 +3,7 @@ include (../settings.pro)
 TEMPLATE = subdirs
 
 # Libraries without dependencies
-SUBDIRS += libavutil libmythsamplerate
+SUBDIRS += libmythsamplerate
 SUBDIRS += libmythsoundtouch libmythdvdnav
 SUBDIRS += libmythbluray libmythfreesurround libmythdb
 
@@ -14,18 +14,12 @@ using_x11:SUBDIRS += libmythnvctrl
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
 # Libraries with dependencies
-SUBDIRS += libmythui libmyth libmythupnp libmythtv libavcodec libavformat libswscale
-SUBDIRS += libpostproc
+SUBDIRS += libmythui libmyth libmythupnp libmythtv
 
 libmythui.depends = libmythdb
 libmythupnp.depends = libmythdb
-libmyth.depends = libavcodec libmythdb libmythui libmythupnp
+libmyth.depends =  libmythdb libmythui libmythupnp
 libmyth.depends += libmythsamplerate libmythsoundtouch libmythfreesurround
-
-libpostprocess.depends = libavutil
-libavcodec.depends = libavutil
-libavformat.depends = libavcodec libavutil
-libswscale.depends = libavutil
 
 LIBMYTHTVDEPS = $$SUBDIRS
 LIBMYTHTVDEPS -= libmythtv

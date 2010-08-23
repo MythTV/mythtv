@@ -8,7 +8,7 @@
 #define __CANNYEDGEDETECTOR_H__
 
 extern "C" {
-#include "avcodec.h"    /* AVPicture */
+#include "libavcodec/avcodec.h"    /* AVPicture */
 }
 #include "EdgeDetector.h"
 

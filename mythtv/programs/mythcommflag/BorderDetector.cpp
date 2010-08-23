@@ -1,7 +1,7 @@
 #include <sys/time.h>
 
 extern "C" {
-#include "avcodec.h"        /* AVPicture */
+#include "libavcodec/avcodec.h"        /* AVPicture */
 }
 #include "mythcorecontext.h"    /* gContext */
 #include "compat.h"

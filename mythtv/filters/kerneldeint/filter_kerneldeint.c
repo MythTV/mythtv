@@ -25,7 +25,7 @@
 #define CLAMP(A,L,U) ((A)>(U)?(U):((A)<(L)?(L):(A)))
 
 #if HAVE_MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 #define THRESHOLD 12
 static const mmx_t mm_lthr = { w:{ -THRESHOLD, -THRESHOLD,
                                    -THRESHOLD, -THRESHOLD} };
@@ -417,7 +417,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
 #endif
 }
 
-void *KernelThread(void *args)
+static void *KernelThread(void *args)
 {
     ThisFilter *filter = (ThisFilter*)args;
 
@@ -510,7 +510,7 @@ static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
     return 0;
 }
 
-void CleanupKernelDeintFilter(VideoFilter *f)
+static void CleanupKernelDeintFilter(VideoFilter *f)
 {
     ThisFilter *filter = (ThisFilter *) f;
 
@@ -533,10 +533,10 @@ void CleanupKernelDeintFilter(VideoFilter *f)
     }
 }
 
-VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
-                                  VideoFrameType outpixfmt,
-                                  int *width, int *height,
-                                  char *options, int threads)
+static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
+                                         VideoFrameType outpixfmt,
+                                         int *width, int *height,
+                                         char *options, int threads)
 {
     ThisFilter *filter;
     (void) options;

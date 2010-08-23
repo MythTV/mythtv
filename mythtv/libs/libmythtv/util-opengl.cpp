@@ -6,7 +6,7 @@
 
 #ifdef MMX
 extern "C" {
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 }
 
 static inline void mmx_pack_alpha_high(uint8_t *a1, uint8_t *a2,

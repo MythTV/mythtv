@@ -423,7 +423,8 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 
 	return dsize;
 }
-void dummy_print(dummy_buffer *dbuf)
+
+static void dummy_print(dummy_buffer *dbuf)
 {
    int i;
    uint64_t rtime;

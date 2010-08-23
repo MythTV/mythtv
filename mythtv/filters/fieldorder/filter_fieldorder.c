@@ -181,7 +181,7 @@ static int FieldorderDeint (VideoFilter * f, VideoFrame * frame, int field)
 }
 
 
-void CleanupFieldorderDeintFilter (VideoFilter * filter)
+static void CleanupFieldorderDeintFilter(VideoFilter * filter)
 {
     int i;
     ThisFilter* f = (ThisFilter*)filter;
@@ -193,8 +193,10 @@ void CleanupFieldorderDeintFilter (VideoFilter * filter)
     }
 }
 
-VideoFilter * FieldorderDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-    int *width, int *height, char *options)
+static VideoFilter * FieldorderDeintFilter(VideoFrameType inpixfmt,
+                                           VideoFrameType outpixfmt,
+                                           int *width, int *height,
+                                           char *options)
 {
     ThisFilter *filter;
     (void) height;

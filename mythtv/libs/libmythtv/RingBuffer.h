@@ -12,7 +12,7 @@
 #include "mythconfig.h"
 
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 #include "mythexp.h"

@@ -9,7 +9,7 @@ using namespace std;
 
 // avlib/ffmpeg headers
 extern "C" {
-#include "avcodec.h"        // AVPicture
+#include "libavcodec/avcodec.h"        // AVPicture
 }
 
 // MythTV headers

@@ -7,6 +7,18 @@
 
 // libav headers
 extern "C" {
+#include "libavutil/mem.h" // for av_free
+
+// copied from libavutil/internal.h
+#include "libavutil/common.h" // for AV_GCC_VERSION_AT_LEAST()
+#ifndef av_alias
+#if HAVE_ATTRIBUTE_MAY_ALIAS && (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(3,3)
+#   define av_alias __attribute__((may_alias))
+#else
+#   define av_alias
+#endif
+#endif
+
 #include "libavcodec/avcodec.h"
 #if CONFIG_AC3_DECODER
 #include "libavcodec/ac3.h"
@@ -63,7 +75,7 @@ bool AudioOutputDigitalEncoder::Init(
     int ret;
 
     VERBOSE(VB_AUDIO, LOC + QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
-            .arg(codec_id_string(codec_id))
+            .arg(ff_codec_id_string(codec_id))
             .arg(bitrate)
             .arg(samplerate)
             .arg(channels));

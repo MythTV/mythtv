@@ -3,7 +3,7 @@
 
 extern "C"
 {
-#include "libs/libavcodec/avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 QString toString(MythCodecID codecid)

@@ -15,21 +15,22 @@ HEADERS += avi.h element.h mpg_common.h multiplex.h ringbuffer.h
 HEADERS += ts.h replex.h pes.h
 
 INCLUDEPATH += replex
-INCLUDEPATH += ../../../libs/libavcodec ../../../libs/libavformat
-INCLUDEPATH += ../../../libs/libavutil  ../../../libs
+INCLUDEPATH += ../../../external/FFmpeg
+INCLUDEPATH += ../../../libs
 
-LIBS += -L../../../libs/libavutil -L../../../libs/libavcodec -L../../../libs/libavformat
-LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION -lmythavutil-$$LIBVERSION
+LIBS += -L../../../external/FFmpeg/libavutil -L../../../external/FFmpeg/libavcodec -L../../../external/FFmpeg/libavcore -L../../../external/FFmpeg/libavformat
+LIBS += -lmythavformat -lmythavcodec -lmythavcore -lmythavutil
 LIBS += $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
 }
 
-TARGETDEPS += ../../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../../external/FFmpeg/libavutil/$$avLibName(avutil)
+TARGETDEPS += ../../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+TARGETDEPS += ../../../external/FFmpeg/libavcore/$$avLibName(avcore)
+TARGETDEPS += ../../../external/FFmpeg/libavformat/$$avLibName(avformat)
 
-DEPENDPATH += ../../../libs/libavutil ../../../libs/libavformat ../../../libs/libsavcodec
+DEPENDPATH += ../../../external/FFmpeg
 
 CONFIG  -= qt

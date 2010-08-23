@@ -13,9 +13,7 @@
  * $Id$
  *****************************************************************************/
 
-#ifndef MKTAG
-#define MKTAG(a,b,c,d) (a | (b << 8) | (c << 16) | (d << 24))
-#endif
+#include "libavutil/common.h" // for MKTAG
 
 /* Probably not thread safe */
 static inline char * fourcc_str(int i)

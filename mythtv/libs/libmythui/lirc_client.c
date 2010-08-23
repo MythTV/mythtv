@@ -1656,6 +1656,7 @@ static int lirc_iscode(struct lirc_config_entry *scan, char *remote,
 	return(0);
 }
 
+#if 0
 char *lirc_ir2char(const struct lirc_state *state,struct lirc_config *config,char *code)
 {
 	static int warning=1;
@@ -1670,6 +1671,7 @@ char *lirc_ir2char(const struct lirc_state *state,struct lirc_config *config,cha
 	if(lirc_code2char(state,config,code,&string)==-1) return(NULL);
 	return(string);
 }
+#endif
 
 int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,char *code,char **string)
 {
@@ -1799,6 +1801,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 
 #define PACKET_SIZE 100
 
+#if 0
 char *lirc_nextir(struct lirc_state *state)
 {
 	static int warning=1;
@@ -1815,7 +1818,7 @@ char *lirc_nextir(struct lirc_state *state)
 	if(ret==-1) return(NULL);
 	return(code);
 }
-
+#endif
 
 int lirc_nextcode(struct lirc_state *state, char **code)
 {

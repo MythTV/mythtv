@@ -48,15 +48,16 @@ extern "C" {
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
 extern "C" {
-#include "vdpau.h"
+#include "libavcodec/vdpau.h"
 }
 #endif // USING_VDPAU
 
 extern "C" {
-#include "avutil.h"
-#include "ac3_parser.h"
+#include "libavutil/avutil.h"
+#include "libavcodec/ac3_parser.h"
 extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
-#include "avio.h"
+extern void ff_read_frame_flush(AVFormatContext *s);
+#include "libavformat/avio.h"
 #include "libswscale/swscale.h"
 #if CONFIG_LIBMPEG2EXTERNAL
 #include <mpeg2dec/mpeg2.h>
@@ -658,7 +659,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         last_dts_for_fault_detection = 0;
         pts_detected = false;
 
-        av_read_frame_flush(ic);
+        ff_read_frame_flush(ic);
 
         // Only reset the internal state if we're using our seeking,
         // not when using libavformat's seeking
@@ -1170,8 +1171,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 {
     VERBOSE(VB_PLAYBACK, LOC
             <<"InitVideoCodec() "<<enc<<" "
-            <<"id("<<codec_id_string(enc->codec_id)
-            <<") type ("<<codec_type_string(enc->codec_type)
+            <<"id("<<ff_codec_id_string(enc->codec_id)
+            <<") type ("<<ff_codec_type_string(enc->codec_type)
             <<").");
 
     if (ringBuffer && ringBuffer->isDVD())
@@ -1235,7 +1236,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Using software scaling to convert pixel format %1 for "
                         "codec %2").arg(enc->pix_fmt)
-                .arg(codec_id_string(enc->codec_id)));
+                .arg(ff_codec_id_string(enc->codec_id)));
     }
 
     if (special_decode)
@@ -1690,8 +1691,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 QString("Stream #%1, has id 0x%2 codec id %3, "
                         "type %4, bitrate %5 at ")
                 .arg(i).arg((int)ic->streams[i]->id, 0, 16)
-                .arg(codec_id_string(enc->codec_id))
-                .arg(codec_type_string(enc->codec_type))
+                .arg(ff_codec_id_string(enc->codec_id))
+                .arg(ff_codec_type_string(enc->codec_type))
                 .arg(enc->bit_rate)
                 <<((void*)ic->streams[i]));
 
@@ -1832,8 +1833,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     VERBOSE(VB_IMPORTANT, LOC
                             <<"Warning, video codec "<<enc<<" "
-                            <<"id("<<codec_id_string(enc->codec_id)
-                            <<") type ("<<codec_type_string(enc->codec_type)
+                            <<"id("<<ff_codec_id_string(enc->codec_id)
+                            <<") type ("<<ff_codec_type_string(enc->codec_type)
                             <<") already open.");
                 }
 
@@ -1880,13 +1881,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     VERBOSE(VB_IMPORTANT, LOC
                             <<"Warning, audio codec "<<enc
-                            <<" id("<<codec_id_string(enc->codec_id)
-                            <<") type ("<<codec_type_string(enc->codec_type)
+                            <<" id("<<ff_codec_id_string(enc->codec_id)
+                            <<") type ("<<ff_codec_type_string(enc->codec_type)
                             <<") already open, leaving it alone.");
                 }
                 //assert(enc->codec_id);
                 VERBOSE(VB_GENERAL, LOC + QString("codec %1 has %2 channels")
-                        .arg(codec_id_string(enc->codec_id))
+                        .arg(ff_codec_id_string(enc->codec_id))
                         .arg(enc->channels));
 
 #if 0
@@ -1914,7 +1915,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 bitrate += enc->bit_rate;
 
                 VERBOSE(VB_PLAYBACK, LOC + QString("subtitle codec (%1)")
-                        .arg(codec_type_string(enc->codec_type)));
+                        .arg(ff_codec_type_string(enc->codec_type)));
                 break;
             }
             case CODEC_TYPE_DATA:
@@ -1922,14 +1923,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 ScanTeletextCaptions(i);
                 bitrate += enc->bit_rate;
                 VERBOSE(VB_PLAYBACK, LOC + QString("data codec (%1)")
-                        .arg(codec_type_string(enc->codec_type)));
+                        .arg(ff_codec_type_string(enc->codec_type)));
                 break;
             }
             default:
             {
                 bitrate += enc->bit_rate;
                 VERBOSE(VB_PLAYBACK, LOC + QString("Unknown codec type (%1)")
-                        .arg(codec_type_string(enc->codec_type)));
+                        .arg(ff_codec_type_string(enc->codec_type)));
                 break;
             }
         }
@@ -1946,7 +1947,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             continue;
 
         VERBOSE(VB_PLAYBACK, LOC + QString("Looking for decoder for %1")
-                .arg(codec_id_string(enc->codec_id)));
+                .arg(ff_codec_id_string(enc->codec_id)));
 
         if (enc->codec_id == CODEC_ID_PROBE)
         {
@@ -1962,7 +1963,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Could not find decoder for "
                             "codec (%1), ignoring.")
-                    .arg(codec_id_string(enc->codec_id)));
+                    .arg(ff_codec_id_string(enc->codec_id)));
 
             // Nigel's bogus codec-debug. Dump the list of codecs & decoders,
             // and have one last attempt to find a decoder. This is usually
@@ -2004,8 +2005,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR
                         <<"Could not open codec "<<enc<<", "
-                        <<"id("<<codec_id_string(enc->codec_id)<<") "
-                        <<"type("<<codec_type_string(enc->codec_type)<<") "
+                        <<"id("<<ff_codec_id_string(enc->codec_id)<<") "
+                        <<"type("<<ff_codec_type_string(enc->codec_type)<<") "
                         <<"aborting. reason "<<open_val);
                 //av_close_input_file(ic); // causes segfault
                 ic = NULL;
@@ -2015,8 +2016,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             else
             {
                 VERBOSE(VB_GENERAL, LOC + "Opened codec "<<enc<<", "
-                        <<"id("<<codec_id_string(enc->codec_id)<<") "
-                        <<"type("<<codec_type_string(enc->codec_type)<<")");
+                        <<"id("<<ff_codec_id_string(enc->codec_id)<<") "
+                        <<"type("<<ff_codec_type_string(enc->codec_type)<<")");
             }
         }
 
@@ -4326,8 +4327,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("No codec for stream index %1, type(%2) id(%3:%4)")
                     .arg(pkt->stream_index)
-                    .arg(codec_type_string(codec_type))
-                    .arg(codec_id_string(curstream->codec->codec_id))
+                    .arg(ff_codec_type_string(codec_type))
+                    .arg(ff_codec_id_string(curstream->codec->codec_id))
                     .arg(curstream->codec->codec_id));
             av_free_packet(pkt);
             continue;
@@ -4381,8 +4382,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 AVCodecContext *enc = curstream->codec;
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         QString("Decoding - id(%1) type(%2)")
-                        .arg(codec_id_string(enc->codec_id))
-                        .arg(codec_type_string(enc->codec_type)));
+                        .arg(ff_codec_id_string(enc->codec_id))
+                        .arg(ff_codec_type_string(enc->codec_type)));
                 have_err = true;
                 break;
             }

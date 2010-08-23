@@ -29,6 +29,7 @@ typedef struct LBFilter
     TF_STRUCT;
 } LBFilter;
 
+void linearBlend(unsigned char *src, int stride);
 void linearBlendMMX(unsigned char *src, int stride);
 void linearBlend3DNow(unsigned char *src, int stride);
 int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame, int field);
@@ -132,9 +133,6 @@ void linearBlend3DNow(unsigned char *src, int stride)
 #endif
 
 #if HAVE_ALTIVEC
-
-// we fall back to the default routines in some situations
-void linearBlend(unsigned char *src, int stride);
 
 inline void linearBlendAltivec(unsigned char *src, int stride)
 {
@@ -278,7 +276,7 @@ void linearBlend(unsigned char *src, int stride)
     }
 }
 
-int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
+static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
 {
     (void)field;
     int height = frame->height;
@@ -327,8 +325,10 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
     return 0;
 }
 
-VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options, int threads)
+static VideoFilter *new_filter(VideoFrameType inpixfmt,
+                               VideoFrameType outpixfmt,
+                               int *width, int *height, char *options,
+                               int threads)
 {
     LBFilter *filter;
     (void)width;

@@ -17,7 +17,7 @@ SOURCES += cpu_accel.c cpu_state.c \
 inc.path = $${PREFIX}/include/mythtv/mpeg2dec/
 inc.files = mpeg2.h
 
-INCLUDEPATH += ../../libs/libavcodec
+INCLUDEPATH += ../../external/FFmpeg
 
 INSTALLS += inc
 
@@ -25,7 +25,7 @@ contains( HAVE_ALTIVEC, yes ) {
     SOURCES += motion_comp_altivec.c idct_altivec.c
 }
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../libs/libavcodec/x86/mmx.h ../../libs/libavcodec/dsputil.h
+    HEADERS += ../../external/FFmpeg/libavcodec/x86/mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
     SOURCES += motion_comp_mmx.c idct_mmx.c
 }
 contains( ARCH_SPARC, yes ) {

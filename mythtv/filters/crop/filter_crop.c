@@ -20,10 +20,10 @@
 #include "filter.h"
 #include "frame.h"
 #include "libavutil/mem.h"
-#include "dsputil.h"
+#include "libavcodec/dsputil.h"
 
 #ifdef MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 #endif
 
 //static const char FILTER_NAME[] = "crop";
@@ -38,7 +38,7 @@ typedef struct ThisFilter
 
 } ThisFilter;
 
-int crop(VideoFilter *f, VideoFrame *frame, int field)
+static int crop(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *tf = (ThisFilter*) f;
@@ -131,7 +131,7 @@ int crop(VideoFilter *f, VideoFrame *frame, int field)
 }
 
 #ifdef MMX
-int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
+static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *tf = (ThisFilter*) f;  
@@ -240,8 +240,10 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
 }
 #endif /* MMX */
 
-VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options, int threads)
+static VideoFilter *new_filter(VideoFrameType inpixfmt,
+                               VideoFrameType outpixfmt,
+                               int *width, int *height, char *options,
+                               int threads)
 {
     ThisFilter *filter;
 

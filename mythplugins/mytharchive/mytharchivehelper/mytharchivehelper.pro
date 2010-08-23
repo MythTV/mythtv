@@ -21,10 +21,11 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += ../mytharchive/archiveutil.h pxsup2dast.h
 SOURCES += main.cpp ../mytharchive/archiveutil.cpp pxsup2dast.c
 
+LIBS += -lmythswscale
+LIBS += -lmythavformat
+LIBS += -lmythavcodec
+LIBS += -lmythavcodec
+LIBS += -lmythavutil
 LIBS += -lz
-LIBS += -lmythavutil-$$LIBVERSION
-LIBS += -lmythavcodec-$$LIBVERSION
-LIBS += -lmythavformat-$$LIBVERSION
-LIBS += -lmythswscale-$$LIBVERSION
 
 QT += xml sql opengl

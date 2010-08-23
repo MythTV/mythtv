@@ -18,8 +18,8 @@
 #ifdef HAVE_MMX
 
 #include "libavutil/mem.h"
-#include "dsputil.h"
-#include "x86/mmx.h"
+#include "libavcodec/dsputil.h"
+#include "libavcodec/x86/mmx.h"
 
 static const mmx_t mm_cpool[] = {
     { w: {1, 1, 1, 1} },
@@ -54,7 +54,7 @@ typedef struct ThisFilter
     TF_STRUCT;
 } ThisFilter;
 
-void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
+static void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
 {
     while (buf < end)
     {
@@ -64,7 +64,7 @@ void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
 }
 
 #if HAVE_MMX
-void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
+static void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
                      const mmx_t *shift, const mmx_t *scale, const mmx_t *min,
                      const mmx_t *clamp1, const mmx_t *clamp2)
 {
@@ -136,7 +136,7 @@ void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
 }
 #endif /* HAVE_MMX */
 
-int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
+static int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *filter = (ThisFilter *) vf;
@@ -189,7 +189,7 @@ int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
     return 0;
 }
 
-void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
+static void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
                 int out_max, float gamma)
 {
     int i;
@@ -205,7 +205,7 @@ void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
 }
 
 #if HAVE_MMX
-int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
+static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
                    int in_min, int in_max, int out_min, int out_max,
                    float gamma)
 {
@@ -235,7 +235,7 @@ int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 }
 #endif /* HAVE_MMX */
 
-VideoFilter *
+static VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                  int *width, int *height, char *options, int threads)
 {

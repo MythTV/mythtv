@@ -67,11 +67,11 @@ SOURCES += virtualkeyboard_qt.cpp
 
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
-INCLUDEPATH += ../libavcodec ../libavutil ../libmythdb
+INCLUDEPATH += ../libmythdb
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
+INCLUDEPATH += ../../external/FFmpeg
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
-DEPENDPATH += ../libavcodec ../libavutil
 DEPENDPATH += ../ ../libmythui ../libmythdb
 DEPENDPATH += ../libmythupnp
 
@@ -82,12 +82,16 @@ LIBS += -L../libmythdb           -lmythdb-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
-LIBS += -L../libavcodec          -lmythavcodec-$${LIBVERSION}
-LIBS += -L../libavutil           -lmythavutil-$${LIBVERSION}
+LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
+LIBS += -L../../external/FFmpeg/libavcore  -lmythavcodec
+LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 
 TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
+TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
@@ -202,7 +206,7 @@ using_jack {
 }
 
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../libs/libavcodec/x86/mmx.h ../../libs/libavcodec/dsputil.h
+    HEADERS += ../../external/FFmpeg/libavcodec/x86/mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
 }
 
 use_hidesyms {

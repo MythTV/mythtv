@@ -10,6 +10,9 @@ CONFIG += ordered
 }
 include ( settings.pro )
 
+# external dependencies
+SUBDIRS += external
+
 # Directories
 SUBDIRS += libs filters programs themes i18n locales
 

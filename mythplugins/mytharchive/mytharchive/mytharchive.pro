@@ -9,10 +9,11 @@ INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavformat
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libswscale
 DEPENDPATH *= $${INCLUDEPATH}
 
-LIBS += -lmythavutil-$$LIBVERSION
-LIBS += -lmythavcodec-$$LIBVERSION
-LIBS += -lmythavformat-$$LIBVERSION
-LIBS += -lmythswscale-$$LIBVERSION
+LIBS += -lmythswscale
+LIBS += -lmythavformat
+LIBS += -lmythavcodec
+LIBS += -lmythavcore
+LIBS += -lmythavutil
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread

@@ -8,7 +8,7 @@
 #define __PGMCONVERTER_H__
 
 extern "C" {
-#include "avcodec.h"    /* AVPicture */
+#include "libavcodec/avcodec.h"    /* AVPicture */
 }
 
 typedef struct VideoFrame_ VideoFrame;

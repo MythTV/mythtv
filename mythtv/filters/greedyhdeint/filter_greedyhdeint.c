@@ -64,7 +64,7 @@ static unsigned int GreedyMotionSense = MOTIONSENSE_DEFAULT;
 
 
 #ifdef MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 
 static const mmx_t mm_cpool[] =
 {
@@ -221,7 +221,7 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
     return 0;
 }
 
-void CleanupGreedyHDeintFilter (VideoFilter * filter)
+static void CleanupGreedyHDeintFilter(VideoFilter * filter)
 {
     ThisFilter* f = (ThisFilter*)filter;
     free(f->deint_frame);
@@ -229,8 +229,10 @@ void CleanupGreedyHDeintFilter (VideoFilter * filter)
     free(f->frames[1]);
 }
 
-VideoFilter* GreedyHDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-        int *width, int *height, char *options, int threads)
+static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
+                                       VideoFrameType outpixfmt,
+                                       int *width, int *height, char *options,
+                                       int threads)
 {
     ThisFilter *filter;
     (void) height;

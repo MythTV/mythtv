@@ -171,7 +171,7 @@ static unsigned int crc_table[256] = {
    0x933eb0bb, 0x97ffad0c, 0xafb010b1, 0xab710d06, 0xa6322bdf, 0xa2f33668,
    0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4};
 
-unsigned int crc32_04c11db7 (const unsigned char *d, int len, unsigned int crc)
+static unsigned int crc32_04c11db7 (const unsigned char *d, int len, unsigned int crc)
 {
    register int i;
    const unsigned char *u = d; // Saves '& 0xff'

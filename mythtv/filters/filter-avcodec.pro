@@ -1,11 +1,11 @@
 # A few filters use routines from libavcodec. Include this in their .pro file
+include(../settings.pro)
 
-INCLUDEPATH += ../../libs/libavcodec ../../libs/libavutil ../../libs ../..
-DEPENDPATH  += ../../libs/libavcodec ../../libs/libavutil
-
-LIBS += -L../../libs/libavutil -lmythavutil-$${LIBVERSION}
-LIBS += -L../../libs/libavcodec -lmythavcodec-$${LIBVERSION}
+LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
+LIBS += -L../../external/FFmpeg/libavcore  -lmythavcore
+LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 
 # Rebuild (link) this filter if the lib changes
-TARGETDEPS += ../../libs/libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)

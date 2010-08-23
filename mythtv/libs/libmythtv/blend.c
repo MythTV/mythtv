@@ -2,7 +2,7 @@
 
 #ifdef MMX
 
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 
 static const mmx_t mm_cpool[] =
 {

@@ -390,7 +390,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 }
 
 
-uint32_t scr_base_ps(uint8_t *scr) 
+static uint32_t scr_base_ps(uint8_t *scr)
 {
 	uint32_t base = 0;
 	uint8_t *buf = (uint8_t *)&base;
@@ -413,7 +413,7 @@ uint32_t scr_base_ps(uint8_t *scr)
 	return base;
 }
 
-uint16_t scr_ext_ps(uint8_t *scr)
+static uint16_t scr_ext_ps(uint8_t *scr)
 {
 	short ext = 0;
 
@@ -425,7 +425,7 @@ uint16_t scr_ext_ps(uint8_t *scr)
 
 
 
-void init_ps(ps_packet *p)
+static void init_ps(ps_packet *p)
 {
         p->stuff_length=0xF8;
         p->data = NULL;
@@ -435,14 +435,14 @@ void init_ps(ps_packet *p)
         p->npes = 0;
 }
 
-void kill_ps(ps_packet *p)
+static void kill_ps(ps_packet *p)
 {
         if (p->data)
                 free(p->data);
         init_ps(p);
 }
 
-void setlength_ps(ps_packet *p)
+static void setlength_ps(ps_packet *p)
 {
         short *ll;
         ll = (short *) p->sheader_llength;
@@ -456,7 +456,7 @@ static void setl_ps(ps_packet *p)
 }
 
 
-int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
+static int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 {
         long count,i;
         (void)length;
@@ -500,7 +500,7 @@ int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 
 
 
-int write_ps_header(uint8_t *buf, 
+static int write_ps_header(uint8_t *buf,
 		    uint64_t   SCR, 
 		    uint32_t   muxr,
 		    uint8_t    audio_bound,

@@ -27,7 +27,7 @@ using namespace std;
 
 // avlib headers
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 // MythTV headers

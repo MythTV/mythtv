@@ -15,7 +15,7 @@ using namespace std;
 
 extern "C" {
 #include "frame.h"
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 class ProgramInfo;

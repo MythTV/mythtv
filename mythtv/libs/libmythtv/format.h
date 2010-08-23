@@ -136,8 +136,6 @@ typedef struct kfatable_entry
 #define FILEHEADERSIZE  sizeof(rtfileheader)
 #define EXTENDEDSIZE sizeof(extendeddata)
 
-#define MKTAG(a,b,c,d) (a | (b << 8) | (c << 16) | (d << 24))
-
 typedef struct vidbuffertype
 {
     int sample;

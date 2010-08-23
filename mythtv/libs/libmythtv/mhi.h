@@ -28,7 +28,7 @@ using namespace std;
 #include "mythdeque.h"
 
 extern "C" {
-#include "avcodec.h" // to decode single MPEG I-frames
+#include "libavcodec/avcodec.h" // to decode single MPEG I-frames
 }
 
 class MythPainter;

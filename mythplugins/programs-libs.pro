@@ -5,8 +5,10 @@ INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmyth
 DEPENDPATH *= $${INCLUDEPATH}
 
 LIBS += -L$${LIBDIR} $$EXTRA_LIBS -lmythdb-$$LIBVERSION
-LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythupnp-$$LIBVERSION
+LIBS += -lmythavcodec
+LIBS += -lmythavcore
+LIBS += -lmythavutil
 
 # On Windows, libs are stored with the binaries:
 mingw:LIBS += -L$${SYSROOT}$${PREFIX}/bin

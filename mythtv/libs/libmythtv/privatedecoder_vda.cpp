@@ -11,8 +11,8 @@
 #include "privatedecoder_vda.h"
 
 extern "C" {
-#include "avformat.h"
-#include "avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
 extern const uint8_t *ff_find_start_code(const uint8_t * p,
                                          const uint8_t *end,
                                          uint32_t * state);

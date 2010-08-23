@@ -44,7 +44,7 @@
 #include "dithertable.h"
 
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 }
 

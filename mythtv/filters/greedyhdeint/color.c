@@ -31,12 +31,12 @@
 #include <math.h>
 
 #include "libavutil/mem.h"
-#include "dsputil.h"
+#include "libavcodec/dsputil.h"
 
 #include "color.h"
 
 #if HAVE_MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 #endif
 
 void (*yv12_to_yuy2)

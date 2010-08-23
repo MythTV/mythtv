@@ -14,7 +14,7 @@
 #include "mythverbose.h"
 
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 #include "../libmyth/util.h"
 

@@ -3,7 +3,7 @@
 
 #include <QString>
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 #include "videodisplayprofile.h"

@@ -8,6 +8,7 @@ INSTALLS = target
 
 INCLUDEPATH += ../libmythdb 
 INCLUDEPATH += ../.. ../
+INCLUDEPATH += ../../external/FFmpeg
 
 LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
 

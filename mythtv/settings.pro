@@ -2,6 +2,20 @@ include ( config.mak )
 
 CONFIG += $$CCONFIG
 
+defineReplace(avLibName) {
+        NAME = $$1
+
+        major = \$\${lib$${NAME}_VERSION_MAJOR}
+        eval(LIBVERSION = $$major)
+
+        temp = $$SLIBNAME_WITH_MAJOR_QT
+        temp = $$replace(temp, FULLNAME, $$NAME)
+        temp = $$replace(temp, NAME,     $$NAME)
+        temp = $$replace(temp, LIBMAJOR, $$LIBVERSION)
+
+        return($$temp)
+}
+
 #check QT major version
 contains(QT_MAJOR_VERSION, 3) {
         error("Must build against Qt4")
@@ -93,8 +107,8 @@ CXX_PP_FLAGS -= -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112
 macx: QMAKE_CFLAGS_STATIC_LIB += -fno-common
 
 # figure out compile flags based on qmake info
-QMAKE_CFLAGS   += $$OPTFLAGS $$PROFILEFLAGS $$CPPFLAGS     $$CFLAGS
-QMAKE_CXXFLAGS += $$OPTFLAGS $$PROFILEFLAGS $$CXX_PP_FLAGS $$ECXXFLAGS
+QMAKE_CFLAGS   += $$PROFILEFLAGS $$CPPFLAGS     $$CFLAGS
+QMAKE_CXXFLAGS += $$PROFILEFLAGS $$CXX_PP_FLAGS $$ECXXFLAGS
 
 profile:CONFIG += debug
 
@@ -139,6 +153,5 @@ EXTRA_LIBS += $$CONFIG_DIRECTFB_LIBS
 
 EXTRA_LIBS += $$LOCAL_LIBDIR_OGL
 EXTRA_LIBS += $$LOCAL_LIBDIR_X11
-EXTRA_LIBS += $$CONFIG_XVMC_LIBS
 EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
 EXTRA_LIBS += $$FRIBIDI_LIBS

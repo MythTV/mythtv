@@ -14,11 +14,9 @@
 #define MMX
 #endif
 
-#include "filter.h"
-#include "minilzo.h"
 #undef HAVE_AV_CONFIG_H
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 // C++ std headers
@@ -32,6 +30,8 @@ using namespace std;
 #include "recorderbase.h"
 #include "format.h"
 #include "cc608decoder.h"
+#include "filter.h"
+#include "minilzo.h"
 
 #include "mythexp.h"
 

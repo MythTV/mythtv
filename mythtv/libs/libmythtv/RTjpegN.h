@@ -50,7 +50,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif
 
 #ifdef MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 #endif
 
 /* Format definitions */

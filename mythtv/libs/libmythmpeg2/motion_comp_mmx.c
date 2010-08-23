@@ -30,7 +30,7 @@
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 
 #define CPU_MMXEXT 0
 #define CPU_3DNOW 1

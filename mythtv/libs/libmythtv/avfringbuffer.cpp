@@ -19,7 +19,7 @@ int AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
     return avfr->GetRingBuffer()->Read(buf, buf_size);
 }
 
-int AVF_Write(URLContext *h, uint8_t *buf, int buf_size)
+int AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 

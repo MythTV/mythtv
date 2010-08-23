@@ -29,7 +29,7 @@
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 
 #ifdef MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 static const mmx_t mz = { 0x0LL };
 #endif
 
@@ -374,7 +374,7 @@ static int denoise3DFilter(VideoFilter *f, VideoFrame *frame, int field)
     return 0;
 }
 
-void Denoise3DFilterCleanup(VideoFilter *filter)
+static void Denoise3DFilterCleanup(VideoFilter *filter)
 {
     if (((ThisFilter*)filter)->prev)
         free(((ThisFilter*)filter)->prev);
@@ -383,8 +383,10 @@ void Denoise3DFilterCleanup(VideoFilter *filter)
         free (((ThisFilter*)filter)->line);
 }
 
-VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                                int *width, int *height, char *options, int threads)
+static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
+                                       VideoFrameType outpixfmt,
+                                       int *width, int *height, char *options,
+                                       int threads)
 {
     double LumSpac   = PARAM1_DEFAULT;
     double LumTmp    = PARAM3_DEFAULT;

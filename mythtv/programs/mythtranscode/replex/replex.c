@@ -43,8 +43,8 @@
 #define O_LARGEFILE 0
 #endif
 
-#include "avcodec.h"
-#include "avformat.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 
 #ifdef USING_MINGW
 # define S_IRGRP 0
@@ -59,7 +59,7 @@
 
 static int replex_all_set(struct replex *rx);
 
-int replex_check_id(struct replex *rx, uint16_t id)
+static int replex_check_id(struct replex *rx, uint16_t id)
 {
 	int i;
 
@@ -77,7 +77,7 @@ int replex_check_id(struct replex *rx, uint16_t id)
 	return -1;
 }
 
-int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
+static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 {
 	AVCodec *codec;
 	AVCodecContext *c= NULL;
@@ -136,7 +136,7 @@ int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 	return 0;
 }
 
-void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
+static void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 {
 	int c=0;
 	int pos=0;
@@ -398,7 +398,7 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 	}	
 }
 
-void analyze_video( pes_in_t *p, struct replex *rx, int len)
+static void analyze_video( pes_in_t *p, struct replex *rx, int len)
 {
 	uint8_t buf[8];
 	int c=0;
@@ -783,7 +783,7 @@ void analyze_video( pes_in_t *p, struct replex *rx, int len)
 	}
 }
 
-void es_out(pes_in_t *p)
+static void es_out(pes_in_t *p)
 {
 
 	struct replex *rx;
@@ -852,7 +852,7 @@ void es_out(pes_in_t *p)
 #endif
 }
 
-void pes_es_out(pes_in_t *p)
+static void pes_es_out(pes_in_t *p)
 {
 
 	struct replex *rx;
@@ -961,7 +961,7 @@ void pes_es_out(pes_in_t *p)
 #endif
 }
 
-void avi_es_out(pes_in_t *p)
+static void avi_es_out(pes_in_t *p)
 {
 
 	struct replex *rx;
@@ -1030,7 +1030,7 @@ void avi_es_out(pes_in_t *p)
 }
 
 
-int replex_tsp(struct replex *rx, uint8_t *tsp)
+static int replex_tsp(struct replex *rx, uint8_t *tsp)
 {
 	uint16_t pid;
 	int type;
@@ -1079,7 +1079,7 @@ int replex_tsp(struct replex *rx, uint8_t *tsp)
 }
 
 
-ssize_t save_read(struct replex *rx, void *buf, size_t count)
+static ssize_t save_read(struct replex *rx, void *buf, size_t count)
 {
 	ssize_t neof = 1;
 	size_t re = 0;
@@ -1111,7 +1111,7 @@ ssize_t save_read(struct replex *rx, void *buf, size_t count)
 	else return re;
 }
 
-int guess_fill( struct replex *rx)
+static int guess_fill( struct replex *rx)
 {
 	int vavail, aavail, ac3avail, i, fill;
 
@@ -1152,7 +1152,7 @@ int guess_fill( struct replex *rx)
 
 
 #define IN_SIZE (1000*TS_SIZE)
-void find_pids_file(struct replex *rx)
+static void find_pids_file(struct replex *rx)
 {
 	uint8_t buf[IN_SIZE];
 	int afound=0;
@@ -1206,7 +1206,7 @@ void find_pids_file(struct replex *rx)
 #define MAXVPID 16
 #define MAXAPID 32
 #define MAXAC3PID 16
-void find_all_pids_file(struct replex *rx)
+static void find_all_pids_file(struct replex *rx)
 {
 	uint8_t buf[IN_SIZE];
 	int count=0;
@@ -1289,7 +1289,7 @@ void find_all_pids_file(struct replex *rx)
 	lseek(rx->fd_in,0,SEEK_SET);
 }
 
-void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
+static void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
 {
 	int afound=0;
 	int vfound=0;
@@ -1350,7 +1350,7 @@ void find_pids_stdin(struct replex *rx, uint8_t *buf, int len)
 }
 
 
-void pes_id_out(pes_in_t *p)
+static void pes_id_out(pes_in_t *p)
 {
 
 	struct replex *rx;
@@ -1411,7 +1411,7 @@ void pes_id_out(pes_in_t *p)
 	}
 }
 
-void find_pes_ids(struct replex *rx)
+static void find_pes_ids(struct replex *rx)
 {
 	uint8_t buf[IN_SIZE];
 	int count=0;
@@ -1510,7 +1510,7 @@ void find_pes_ids(struct replex *rx)
 
 
 
-void replex_finish(struct replex *rx)
+static void replex_finish(struct replex *rx)
 {
 
 	fprintf(stderr,"\n");
@@ -1527,7 +1527,7 @@ void replex_finish(struct replex *rx)
 	exit(0);
 }
 
-int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
+static int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 {
 	uint8_t buf[IN_SIZE];
 	int i,j;
@@ -1662,7 +1662,7 @@ int replex_fill_buffers(struct replex *rx, uint8_t *mbuf)
 	return -1;
 }
 
-int fill_buffers(void *r, int finish)
+static int fill_buffers(void *r, int finish)
 {
 	struct replex *rx = (struct replex *)r;
 	
@@ -1696,7 +1696,7 @@ static int replex_all_set(struct replex *rx)
 }
 
 
-int check_stream_type(struct replex *rx, uint8_t * buf, int len)
+static int check_stream_type(struct replex *rx, uint8_t * buf, int len)
 {
 	int c=0;
 	avi_context ac;
@@ -1745,7 +1745,7 @@ int check_stream_type(struct replex *rx, uint8_t * buf, int len)
 }
 
 
-void init_replex(struct replex *rx)
+static void init_replex(struct replex *rx)
 {
 	int i;
 	uint8_t mbuf[2*TS_SIZE];
@@ -1894,7 +1894,7 @@ void init_replex(struct replex *rx)
 }
 
 
-void fix_audio(struct replex *rx, multiplex_t *mx)
+static void fix_audio(struct replex *rx, multiplex_t *mx)
 {
 	int i;
 	index_unit aiu;
@@ -1988,7 +1988,7 @@ static int get_next_ac3_unit(struct replex *rx, index_unit *aiu, int i)
 }
 
 
-void do_analyze(struct replex *rx)
+static void do_analyze(struct replex *rx)
 {
 	index_unit dummy;
 	index_unit dummy2;
@@ -2111,7 +2111,7 @@ void do_analyze(struct replex *rx)
 
 }
 
-void do_scan(struct replex *rx)
+static void do_scan(struct replex *rx)
 {
 	uint8_t mbuf[2*TS_SIZE];
 	
@@ -2140,7 +2140,7 @@ void do_scan(struct replex *rx)
 	
 }
 
-void do_demux(struct replex *rx)
+static void do_demux(struct replex *rx)
 {
 	index_unit dummy;
 	index_unit dummy2;
@@ -2176,7 +2176,7 @@ void do_demux(struct replex *rx)
 }
 
 
-void do_replex(struct replex *rx)
+static void do_replex(struct replex *rx)
 {
 	int video_ok = 0;
 	int ext_ok[N_AUDIO];
@@ -2235,7 +2235,7 @@ void do_replex(struct replex *rx)
 }
 
 
-void usage(char *progname)
+static void usage(char *progname)
 {
         printf ("usage: %s [options] <input files>\n\n",progname);
         printf ("options:\n");

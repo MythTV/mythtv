@@ -14,7 +14,7 @@
 
 #undef HAVE_AV_CONFIG_H
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 class MythPlayer;

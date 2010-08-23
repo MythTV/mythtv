@@ -1,19 +1,25 @@
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmythtv
-INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
+INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui
 INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb ../../libmythhdhomerun
 INCLUDEPATH += ../../libs/libmythdvdnav ../../libs/libmythbluray ../../libs/libmythsamplerate
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
-LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat
-LIBS += -L../../libs/libswscale
+LIBS += -L../../external/FFmpeg/libavutil
+LIBS += -L../../external/FFmpeg/libavcodec
+LIBS += -L../../external/FFmpeg/libavcore
+LIBS += -L../../external/FFmpeg/libavformat
+LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../../libs/libmythdb
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
 
-LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
-LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION
-LIBS += -lmythswscale-$$LIBVERSION
+LIBS += -lmythtv-$$LIBVERSION
+LIBS += -lmythswscale
+LIBS += -lmythavformat
+LIBS += -lmythavcodec
+LIBS += -lmythavcore
+LIBS += -lmythavutil
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION
@@ -31,18 +37,18 @@ mingw {
 TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythdb/libmythdb-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
-DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
-DEPENDPATH += ../../libs/libswscale
+DEPENDPATH += ../../external/FFmpeg
 DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
 DEPENDPATH += ../../libs/libmythlivemedia ../../libmythdb ../../libmythhdhomerun
 

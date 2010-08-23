@@ -45,7 +45,7 @@
 
 #include "../mm_arch.h"
 #if HAVE_MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 #endif
 
 #include "aclib.h"
@@ -537,7 +537,7 @@ static int YadifDeint (VideoFilter * f, VideoFrame * frame, int field)
 }
 
 
-void CleanupYadifDeintFilter (VideoFilter * filter)
+static void CleanupYadifDeintFilter (VideoFilter * filter)
 {
     int i;
     ThisFilter* f = (ThisFilter*)filter;
@@ -559,7 +559,7 @@ void CleanupYadifDeintFilter (VideoFilter * filter)
     }
 }
 
-void *YadifThread(void *args)
+static void *YadifThread(void *args)
 {
     ThisFilter *filter = (ThisFilter*)args;
 
@@ -591,10 +591,10 @@ void *YadifThread(void *args)
     return NULL;
 }
 
-VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
-                                VideoFrameType outpixfmt,
-                                int *width, int *height, char *options,
-                                int threads)
+static VideoFilter * YadifDeintFilter(VideoFrameType inpixfmt,
+                                      VideoFrameType outpixfmt,
+                                      int *width, int *height, char *options,
+                                      int threads)
 {
     ThisFilter *filter;
     (void) height;

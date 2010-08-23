@@ -128,6 +128,8 @@ __asm__ __volatile__(\
 #define MIN_LEN 0x40  /* 64-byte blocks */
 #endif
 
+void * RENAME(fast_memcpy)(void * to, const void * from, size_t len);
+
 void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 {
 	void *retval;

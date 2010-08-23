@@ -20,7 +20,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 }
 
 DEPENDPATH  += .
-DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil ../libswscale
+DEPENDPATH  += ../libmyth
 DEPENDPATH  += ../libmythdb ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythbluray/
@@ -36,18 +36,26 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythdb ../libmythui
 
 INCLUDEPATH += .. ../.. # for avlib headers
+INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += $$POSTINC
 
-LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat
-LIBS += -L../libswscale
+LIBS += -L../libmyth
+LIBS += -L../../external/FFmpeg/libavutil
+LIBS += -L../../external/FFmpeg/libavcodec
+LIBS += -L../../external/FFmpeg/libavcore
+LIBS += -L../../external/FFmpeg/libavformat
+LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythdvdnav
 LIBS += -L../libmythbluray
 LIBS += -L../libmythdb
-LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
-LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
-LIBS += -lmythswscale-$$LIBVERSION
+LIBS += -lmyth-$$LIBVERSION
+LIBS += -lmythswscale
+LIBS += -lmythavformat
+LIBS += -lmythavcodec
+LIBS += -lmythavcore
+LIBS += -lmythavutil
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythbluray-$$LIBVERSION    -lmythdb-$$LIBVERSION
@@ -63,15 +71,16 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 }
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+TARGETDEPS += ../../external/FFmpeg/libavcore/$$avLibName(avcore)
+TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
 
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
 QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
@@ -113,7 +122,7 @@ using_v4l {
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../libs/libavcodec/x86/mmx.h ../../libs/libavcodec/dsputil.h
+    HEADERS += ../../external/FFmpeg/libavcodec/x86/mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
 }
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)

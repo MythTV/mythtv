@@ -1,7 +1,7 @@
 #include <climits>
 
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 #include "frame.h"
 #include "mythverbose.h"

@@ -1,4 +1,4 @@
-#include "dsputil.h"
+#include <math.h>
 
 using namespace std;
 #include "mythconfig.h"
@@ -37,6 +37,13 @@ static inline bool sse_check()
     return (bool)has_sse2;
 }
 #endif //ARCH_x86
+
+#if !HAVE_LRINTF
+static av_always_inline av_const long int lrintf(float x)
+{
+    return (int)(rint(x));
+}
+#endif /* HAVE_LRINTF */
 
 static inline float clipcheck(float f) {
     if (f > 1.0f) f = 1.0f;

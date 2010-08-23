@@ -8,7 +8,7 @@
 #include "mythcontext.h"
 #include "videobuffers.h"
 extern "C" {
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 #include "fourcc.h"
 #include "compat.h"

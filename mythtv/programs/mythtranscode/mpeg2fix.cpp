@@ -1059,9 +1059,8 @@ void MPEG2fixup::WriteData(const char *filename, uint8_t *data, int size)
     close(fh);
 }
 
-extern "C"
-{
-    extern void copy_quant_matrix(mpeg2dec_t *dec, uint16_t *dest);
+extern "C" {
+#include "helper.h"
 }
 
 int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)

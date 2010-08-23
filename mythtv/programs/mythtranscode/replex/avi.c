@@ -38,22 +38,22 @@
 #ifdef DEBUG
 #include "mpg_common.h"
 #endif
-uint32_t getle32(uint8_t *buf)
+static uint32_t getle32(uint8_t *buf)
 {
 	return (buf[3]<<24)|(buf[2]<<16)|(buf[1]<<8)|buf[0];
 }
 
-uint32_t getbe32(uint8_t *buf)
+static uint32_t getbe32(uint8_t *buf)
 {
 	return (buf[0]<<24)|(buf[1]<<16)|(buf[2]<<8)|buf[3];
 }
 
-void printhead(uint8_t *buf)
+static void printhead(uint8_t *buf)
 {
 	printf("%c%c%c%c ", buf[0], buf[1], buf[2], buf[3]);
 }
 
-uint32_t getsize(int fd)
+static uint32_t getsize(int fd)
 {
 	int len;
 	uint8_t buf[4];
@@ -62,7 +62,7 @@ uint32_t getsize(int fd)
 	return getle32(buf);
 }
 
-uint32_t getsize_buf(uint8_t *buf)
+static uint32_t getsize_buf(uint8_t *buf)
 {
 	return getle32(buf);
 }
@@ -118,7 +118,7 @@ int new_idx_frame( avi_context *ac, uint32_t pos, uint32_t len,
 	return 0;
 }
 
-void print_index(avi_context *ac, int num){
+static void print_index(avi_context *ac, int num){
 	char *cc;
 	cc = (char *) &ac->idx[num].id;
 	fprintf(stderr,"%d chunkid: %c%c%c%c ", 

@@ -23,10 +23,10 @@
 #include "filter.h"
 #include "frame.h"
 #include "libavutil/mem.h"
-#include "dsputil.h"
+#include "libavcodec/dsputil.h"
 
 #ifdef MMX
-#include "x86/mmx.h"
+#include "libavcodec/x86/mmx.h"
 #endif
 
 //Regular filter
@@ -127,7 +127,7 @@ static void init_vars(ThisFilter *tf, VideoFrame *frame,
     buf[2] = frame->buf + frame->offsets[2];
 }
 
-int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
+static int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *tf = (ThisFilter *)f; 
@@ -161,7 +161,7 @@ int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
     return 0;
 }
 
-int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
+static int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *tf = (ThisFilter *)f; 
@@ -204,7 +204,7 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
 
 #ifdef MMX
 
-int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
+static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *tf = (ThisFilter *)f;
@@ -311,7 +311,7 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
 }
 
 
-int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
+static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
 {
     (void)field;
     ThisFilter *tf = (ThisFilter *)f;
@@ -441,7 +441,7 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
 }
 #endif /* MMX */
 
-void cleanup(VideoFilter *vf)
+static void cleanup(VideoFilter *vf)
 {
     ThisFilter *tf = (ThisFilter*) vf;
 
@@ -449,8 +449,10 @@ void cleanup(VideoFilter *vf)
         free(tf->average);
 }
 
-VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options, int threads)
+static VideoFilter *new_filter(VideoFrameType inpixfmt,
+                               VideoFrameType outpixfmt,
+                               int *width, int *height, char *options,
+                               int threads)
 {
     unsigned int Param1, Param2, Param3, Param4;
     int i, double_threshold = 1;

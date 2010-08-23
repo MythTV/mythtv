@@ -16,9 +16,9 @@
 
 extern "C" {
 #include "frame.h"
-#include "avcodec.h"
-#include "avformat.h"
-#include "audioconvert.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavcodec/audioconvert.h"
 }
 
 #include "avfringbuffer.h"
@@ -69,7 +69,7 @@ class AudioInfo
     QString toString() const
     {
         return QString("id(%1) %2Hz %3ch %4bps %5")
-            .arg(codec_id_string(codec_id),4).arg(sample_rate,6)
+            .arg(ff_codec_id_string(codec_id),4).arg(sample_rate,6)
             .arg(channels,2).arg(AudioOutputSettings::FormatToBits(format),2)
             .arg((do_passthru) ? "pt":"",3);
     }

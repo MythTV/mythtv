@@ -4,7 +4,7 @@
 #include <QString>
 extern "C"
 {
-#include "libs/libavcodec/avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 typedef enum

@@ -19,7 +19,7 @@
 #define __TEMPLATEMATCHER_H__
 
 extern "C" {
-#include "avcodec.h"    /* AVPicture */
+#include "libavcodec/avcodec.h"    /* AVPicture */
 }
 #include "FrameAnalyzer.h"
 
