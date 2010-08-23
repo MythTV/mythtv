@@ -110,7 +110,7 @@ TVRec::TVRec(int capturecardnum)
       // Recorder thread, runs RecorderBase::StartRecording()
       recorder_thread(pthread_t()),
       // Configuration variables from database
-      eitIgnoresSource(false),      transcodeFirst(false),
+      transcodeFirst(false),
       earlyCommFlag(false),         runJobOnHostOnly(false),
       eitCrawlIdleStart(60),        eitTransportTimeout(5*60),
       audioSampleRateDB(0),
@@ -250,7 +250,6 @@ bool TVRec::Init(void)
     if (!CreateChannel(startchannel))
         return false;
 
-    eitIgnoresSource  = gCoreContext->GetNumSetting("EITIgnoresSource", 0);
     transcodeFirst    =
         gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
     earlyCommFlag     = gCoreContext->GetNumSetting("AutoCommflagWhileRecording", 0);
@@ -1546,8 +1545,7 @@ void TVRec::RunTV(void)
             }
             else
             {
-                scanner->StartActiveScan(
-                    this, eitTransportTimeout, eitIgnoresSource);
+                scanner->StartActiveScan(this, eitTransportTimeout);
                 SetFlags(kFlagEITScannerRunning);
                 eitScanStartTime = QDateTime::currentDateTime().addYears(1);
             }
@@ -3926,7 +3924,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                     "for all sources on this card.");
         }
         else if (scanner)
-            scanner->StartPassiveScan(channel, streamData, eitIgnoresSource);
+            scanner->StartPassiveScan(channel, streamData);
     }
 
     return streamData;

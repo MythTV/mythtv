@@ -329,7 +329,6 @@ class MPUBLIC TVRec : public SignalMonitorListener
     pthread_t recorder_thread;
 
     // Configuration variables from database
-    bool    eitIgnoresSource;
     bool    transcodeFirst;
     bool    earlyCommFlag;
     bool    runJobOnHostOnly;

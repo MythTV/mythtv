@@ -5493,6 +5493,18 @@ NULL
     return true;
 }
 
+// after 0.26
+/*
+    if (dbver == "")
+    {
+        const char *updates[] = {
+"DELETE FROM settings WHERE value = 'EITIgnoresSource';",
+};
+        if (!performActualUpdate(updates, "", dbver))
+            return false;
+    }
+*/
+
 /**
  * command to get the the initial database layout from an empty database:
  *

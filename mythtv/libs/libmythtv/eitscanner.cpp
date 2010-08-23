@@ -45,8 +45,7 @@ EITScanner::EITScanner(uint _cardnum)
     : channel(NULL),              eitSource(NULL),
       eitHelper(new EITHelper()), exitThread(false),
       rec(NULL),                  activeScan(false),
-      activeScanTrigTime(0),      ignore_source(false),
-      cardnum(_cardnum)
+      activeScanTrigTime(0),      cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);
@@ -192,18 +191,13 @@ void EITScanner::RescheduleRecordings(void)
  *         we happen to be tuned to into the database.
  */
 void EITScanner::StartPassiveScan(ChannelBase *_channel,
-                                  EITSource *_eitSource,
-                                  bool _ignore_source)
+                                  EITSource *_eitSource)
 {
     QMutexLocker locker(&lock);
 
-    uint sourceid = (_ignore_source) ? 0 : _channel->GetCurrentSourceID();
+    uint sourceid = _channel->GetCurrentSourceID();
     eitSource     = _eitSource;
     channel       = _channel;
-    ignore_source = _ignore_source;
-
-    if (ignore_source)
-        VERBOSE(VB_EIT, LOC_ID + "EIT scan ignoring sourceid.");
 
     eitHelper->SetSourceID(sourceid);
     eitSource->SetEITHelper(eitHelper);
@@ -230,11 +224,9 @@ void EITScanner::StopPassiveScan(void)
     eitHelper->SetSourceID(0);
 }
 
-void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
-                                 bool _ignore_source)
+void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 {
     rec           = _rec;
-    ignore_source = _ignore_source;
 
     if (!activeScanChannels.size())
     {

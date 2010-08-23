@@ -654,38 +654,45 @@ static uint get_chan_id_from_db(uint sourceid,
 static uint get_chan_id_from_db(uint sourceid, uint serviceid,
                                 uint networkid, uint transportid)
 {
+    uint chanid = 0;
+    bool useOnAirGuide = false;
     MSqlQuery query(MSqlQuery::InitCon());
 
     // DVB Link to chanid
     QString qstr =
-        "SELECT chanid, useonairguide "
+        "SELECT chanid, useonairguide, channel.sourceid "
         "FROM channel, dtv_multiplex "
         "WHERE serviceid        = :SERVICEID   AND "
         "      networkid        = :NETWORKID   AND "
         "      transportid      = :TRANSPORTID AND "
         "      channel.mplexid  = dtv_multiplex.mplexid";
 
-    if (sourceid)
-        qstr += " AND channel.sourceid = :SOURCEID";
-
     query.prepare(qstr);
     query.bindValue(":SERVICEID",   serviceid);
     query.bindValue(":NETWORKID",   networkid);
     query.bindValue(":TRANSPORTID", transportid);
 
-    if (sourceid)
-        query.bindValue(":SOURCEID", sourceid);
-
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Looking up chanID", query);
-    else if (query.next())
+
+    while (query.next())
     {
         // Check to see if we are interested in this channel
-        bool useOnAirGuide = query.value(1).toBool();
-        return (useOnAirGuide) ? query.value(0).toUInt() : 0;
+        chanid        = query.value(0).toUInt();
+        useOnAirGuide = query.value(1).toBool();
+        if (sourceid == query.value(2).toUInt())
+            return useOnAirGuide ? chanid : 0;
     }
 
-    return 0;
+    if (query.size() > 1) {
+        VERBOSE(VB_EIT, LOC + QString("found %1 channels for networdid %2, "
+                                      "transportid %3, serviceid %4 but none "
+                                      "for current sourceid %5.")
+                .arg(query.size()).arg(networkid).arg(transportid)
+                .arg(serviceid).arg(sourceid));
+    }
+
+    return useOnAirGuide ? chanid : 0;
 }
 
 static void init_fixup(QMap<uint64_t,uint> &fix)

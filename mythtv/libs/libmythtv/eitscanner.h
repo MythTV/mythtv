@@ -41,11 +41,10 @@ class EITScanner
     EITScanner(uint cardnum);
     ~EITScanner() { TeardownAll(); }
 
-    void StartPassiveScan(ChannelBase*, EITSource*, bool ignore_source);
+    void StartPassiveScan(ChannelBase*, EITSource*);
     void StopPassiveScan(void);
 
-    void StartActiveScan(TVRec*, uint max_seconds_per_source,
-                         bool ignore_source);
+    void StartActiveScan(TVRec*, uint max_seconds_per_source);
 
     void StopActiveScan(void);
 
@@ -72,8 +71,6 @@ class EITScanner
     uint             activeScanTrigTime;
     QStringList      activeScanChannels;
     QStringList::iterator activeScanNextChan;
-
-    bool             ignore_source;
 
     uint             cardnum;
 

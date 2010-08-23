@@ -327,20 +327,6 @@ static GlobalCheckBox *MasterBackendOverride()
     return gc;
 };
 
-static GlobalCheckBox *EITIgnoresSource()
-{
-    GlobalCheckBox *gc = new GlobalCheckBox("EITIgnoresSource");
-    gc->setLabel(QObject::tr("Cross source EIT"));
-    gc->setValue(false);
-    QString help = QObject::tr(
-        "If enabled, listings data collected on one Video Source will be "
-        "applied to the first matching DVB channel on any Video Source. "
-        "This is sometimes useful for DVB-S, but may insert bogus "
-        "data into any ATSC listings stored in the same database.");
-    gc->setHelpText(help);
-    return gc;
-};
-
 static GlobalSpinBox *EITCrawIdleStart()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("EITCrawIdleStart", 30, 7200, 30);
@@ -1032,7 +1018,6 @@ BackendSettings::BackendSettings() {
     group2a1->setLabel(QObject::tr("EIT Scanner Options"));
     //group2a1->addChild(EITTimeOffset());
     group2a1->addChild(EITTransportTimeout());
-    group2a1->addChild(EITIgnoresSource());
     group2a1->addChild(EITCrawIdleStart());
     addChild(group2a1);
 
