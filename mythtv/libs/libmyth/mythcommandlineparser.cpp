@@ -105,6 +105,13 @@ bool MythCommandLineParser::PreParse(
 
         return true;
     }
+#ifdef Q_WS_MACX
+    else if (!strncmp(argv[argpos],"-psn_",5))
+    {
+        cerr << "Ignoring Process Serial Number from command line\n";
+        return true;
+    }
+#endif
     else if ((parseTypes & kCLPVerbose) &&
              (!strcmp(argv[argpos],"-v") ||
               !strcmp(argv[argpos],"--verbose")))
