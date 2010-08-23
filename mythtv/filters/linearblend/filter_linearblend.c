@@ -370,7 +370,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "linearblend",
         descript:   "fast blending deinterlace filter",
         formats:    FmtList,

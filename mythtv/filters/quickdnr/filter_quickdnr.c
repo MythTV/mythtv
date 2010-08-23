@@ -590,7 +590,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "quickdnr",
         descript:   "removes noise with a fast single/double thresholded average filter",
         formats:    FmtList,

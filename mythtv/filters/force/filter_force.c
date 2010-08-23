@@ -6,7 +6,7 @@
 #include "filter.h"
 #include "frame.h"
 
-VideoFilter *
+static VideoFilter *
 new_force_template (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
                     VideoFrameType mypixfmt)
 {
@@ -26,9 +26,9 @@ new_force_template (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     return filter;
 }
 
-VideoFilter *
+static VideoFilter *
 new_force_yv12 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options)
+            int *height, char *options, int threads)
 {
     (void) width;
     (void) height;
@@ -37,9 +37,9 @@ new_force_yv12 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
     return new_force_template (inpixfmt, outpixfmt, FMT_YV12);
 }
 
-VideoFilter *
+static VideoFilter *
 new_force_yuv422p (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options)
+            int *height, char *options, int threads)
 {
     (void) width;
     (void) height;
@@ -48,9 +48,9 @@ new_force_yuv422p (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width
     return new_force_template (inpixfmt, outpixfmt, FMT_YUV422P);
 }
 
-VideoFilter *
+static VideoFilter *
 new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options)
+            int *height, char *options, int threads)
 {
     (void) width;
     (void) height;
@@ -59,7 +59,7 @@ new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
     return new_force_template (inpixfmt, outpixfmt, FMT_RGB24);
 }
 
-VideoFilter *
+static VideoFilter *
 new_force_argb32 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
             int *height, char *options, int threads)
 {
@@ -98,28 +98,28 @@ static FmtConv Fmt_List_ARGB32[] =
 ConstFilterInfo filter_table[] =
 {
     {
-        symbol:     "new_force_yv12",
+        filter_init: &new_force_yv12,
         name:       "forceyv12",
         descript:   "forces use of YV12 video format",
         formats:    Fmt_List_YV12,
         libname:    NULL
     },
     {
-        symbol:     "new_force_yuv422p",
+        filter_init: &new_force_yuv422p,
         name:       "forceyuv422p",
         descript:   "forces use of YUV422P video format",
         formats:    Fmt_List_YUV422P,
         libname:    NULL
     },
     {
-        symbol:     "new_force_rgb24",
+        filter_init: &new_force_rgb24,
         name:       "forcergb24",
         descript:   "forces use of RGB24 video format",
         formats:    Fmt_List_RGB24,
         libname:    NULL
     },
     {
-        symbol:     "new_force_argb32",
+        filter_init: &new_force_argb32,
         name:       "forceargb32",
         descript:   "forces use of ARGB32 video format",
         formats:    Fmt_List_ARGB32,

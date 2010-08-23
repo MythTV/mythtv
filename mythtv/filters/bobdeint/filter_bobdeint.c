@@ -103,8 +103,10 @@ void bobDtor(VideoFilter *f)
         free(filter->tmp_ptr);
 }
 
-VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options, int threads)
+static VideoFilter *new_filter(VideoFrameType inpixfmt,
+                               VideoFrameType outpixfmt,
+                               int *width, int *height, char *options,
+                               int threads)
 {
     BDFilter *filter;
     (void)width;
@@ -141,7 +143,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "bobdeint",
         descript:   "bob deinterlace filter; splits fields to top and bottom of buffer",
         formats:    FmtList,

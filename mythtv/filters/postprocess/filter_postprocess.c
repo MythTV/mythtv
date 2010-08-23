@@ -136,7 +136,7 @@ FmtConv FmtList[] =
 FilterInfo filter_table[] = 
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "postprocess",
         descript:   "FFMPEG's postprocessing filters",
         formats:    FmtList,

@@ -312,7 +312,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "newAdjustFilter",
+        filter_init: &newAdjustFilter,
         name:       "adjust",
         descript:   "adjust range and gamma of video",
         formats:    FmtList,

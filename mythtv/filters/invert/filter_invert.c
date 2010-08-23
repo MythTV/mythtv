@@ -38,8 +38,10 @@ int invert(VideoFilter *vf, VideoFrame *frame, int field)
     return 0;
 }
 
-VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options, int threads)
+static VideoFilter *new_filter(VideoFrameType inpixfmt,
+                               VideoFrameType outpixfmt,
+                               int *width, int *height, char *options,
+                               int threads)
 {
     ThisFilter *filter;
     
@@ -77,7 +79,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] =
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "invert",
         descript:   "inverts the colors of the input video",
         formats:    FmtList,

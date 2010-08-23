@@ -103,7 +103,6 @@ FilterManager::~FilterManager()
         FilterInfo *tmp = itf->second;
         itf->second = NULL;
 
-        free(tmp->symbol);
         free(tmp->name);
         free(tmp->descript);
         free(tmp->libname);
@@ -156,13 +155,13 @@ bool FilterManager::LoadFilterLib(const QString &path)
         return false;
     }
 
-    for (; filtInfo->symbol; filtInfo++)
+    for (; filtInfo->filter_init; filtInfo++)
     {
-        if (!filtInfo->symbol || !filtInfo->name || !filtInfo->formats)
+        if (!filtInfo->filter_init || !filtInfo->name || !filtInfo->formats)
             break;
 
         FilterInfo *newFilter = new FilterInfo;
-        newFilter->symbol   = strdup(filtInfo->symbol);
+        newFilter->filter_init = NULL;
         newFilter->name     = strdup(filtInfo->name);
         newFilter->descript = strdup(filtInfo->descript);
 
@@ -495,7 +494,6 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
 {
     void *handle;
     VideoFilter *Filter;
-    VideoFilter *(*InitFilter)(int, int, int *, int *, char *, int);
 
     if (FiltInfo == NULL)
     {
@@ -511,13 +509,6 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
         return NULL;
     }
 
-    if (FiltInfo->symbol == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "FilterManager: LoadFilter called with invalid "
-                "FilterInfo (symbol is NULL)");
-        return NULL;
-    }
-
     handle = dlopen(FiltInfo->libname, RTLD_NOW);
 
     if (!handle)
@@ -529,24 +520,22 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
         return NULL;
     }
 
-    InitFilter =
-        (VideoFilter * (*)(int, int, int *, int *, char *, int))dlsym(handle,
-                                                                 FiltInfo->
-                                                                 symbol);
+    const ConstFilterInfo *filtInfo
+        = (const ConstFilterInfo*)dlsym(handle, "filter_table");
 
-    if (!InitFilter)
+    if (!filtInfo || !filtInfo->filter_init)
     {
-        VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load symbol "
+        VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load filter "
                 "'%1' from shared library '%2', dlopen reports error '%3'")
-                .arg(FiltInfo->symbol)
+                .arg(FiltInfo->name)
                 .arg(FiltInfo->libname)
                 .arg(dlerror()));
         dlclose(handle);
         return NULL;
     }
 
-    Filter = (*InitFilter)(inpixfmt, outpixfmt, &width, &height,
-                           const_cast<char*>(opts), max_threads);
+    Filter = filtInfo->filter_init(inpixfmt, outpixfmt, &width, &height,
+                                   const_cast<char*>(opts), max_threads);
 
     if (Filter == NULL)
     {

@@ -193,10 +193,10 @@ static void CleanupFieldorderDeintFilter(VideoFilter * filter)
     }
 }
 
-static VideoFilter * FieldorderDeintFilter(VideoFrameType inpixfmt,
-                                           VideoFrameType outpixfmt,
-                                           int *width, int *height,
-                                           char *options)
+static VideoFilter *FieldorderDeintFilter(VideoFrameType inpixfmt,
+                                          VideoFrameType outpixfmt,
+                                          int *width, int *height,
+                                          char *options, int threads)
 {
     ThisFilter *filter;
     (void) height;
@@ -229,7 +229,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] =
 {
     {
-        symbol:     "FieldorderDeintFilter",
+        filter_init: &FieldorderDeintFilter,
         name:       "fieldorderdoubleprocessdeint",
         descript:   "avoids synchronisation problems when matching an "
                     "interlaced video mode to an interlaced source",

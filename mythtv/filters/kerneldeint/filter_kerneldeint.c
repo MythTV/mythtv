@@ -663,7 +663,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] =
 {
     {
-        symbol:     "NewKernelDeintFilter",
+        filter_init: &NewKernelDeintFilter,
         name:       "kerneldeint",
         descript:   "combines data from several fields to deinterlace "
                     "with less motion blur",
@@ -671,7 +671,7 @@ ConstFilterInfo filter_table[] =
         libname:    NULL
     },
     {
-        symbol:     "NewKernelDeintFilter",
+        filter_init: &NewKernelDeintFilter,
         name:       "kerneldoubleprocessdeint",
         descript:   "combines data from several fields to deinterlace "
                     "with less motion blur",

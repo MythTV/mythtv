@@ -473,7 +473,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "NewDenoise3DFilter",
+        filter_init: &NewDenoise3DFilter,
         name:       "denoise3d",
         descript:   "removes noise with a spatial and temporal low-pass filter",
         formats:    FmtList,

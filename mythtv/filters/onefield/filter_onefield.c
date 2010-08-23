@@ -58,8 +58,10 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame, int field)
     return 0;
 }
 
-VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options, int threads)
+static VideoFilter *new_filter(VideoFrameType inpixfmt,
+                               VideoFrameType outpixfmt,
+                               int *width, int *height, char *options,
+                               int threads)
 {
     OFFilter *filter;
     (void)width;
@@ -95,7 +97,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "onefield",
         descript:   "one-field-only deinterlace filter; parameter \"bottom\" for bottom field, otherwise top",
         formats:    FmtList,

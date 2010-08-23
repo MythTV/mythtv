@@ -723,14 +723,14 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] =
 {
     {
-            symbol:     "YadifDeintFilter",
+            filter_init: &YadifDeintFilter,
             name:       "yadifdeint",
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },
     {
-            symbol:     "YadifDeintFilter",
+            filter_init: &YadifDeintFilter,
             name:       "yadifdoubleprocessdeint",
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,

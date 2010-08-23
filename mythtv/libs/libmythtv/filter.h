@@ -19,9 +19,13 @@ typedef struct FmtConv_
 
 #define FMT_NULL {FMT_NONE,FMT_NONE}
 
+typedef struct VideoFilter_ VideoFilter;
+
+typedef VideoFilter*(*init_filter)(int, int, int *, int *, char *, int);
+
 typedef struct FilterInfo_
 {
-    char *symbol;
+    init_filter filter_init;
     char *name;
     char *descript;
     FmtConv *formats;
@@ -30,14 +34,14 @@ typedef struct FilterInfo_
 
 typedef struct ConstFilterInfo_
 {
-    const char *symbol;
+    const init_filter filter_init;
     const char *name;
     const char *descript;
     const FmtConv *formats;
     const char *libname;
 } ConstFilterInfo;
 
-typedef struct  VideoFilter_
+struct VideoFilter_
 {
     int (*filter)(struct VideoFilter_ *, VideoFrame *, int);
     void (*cleanup)(struct VideoFilter_ *);
@@ -47,7 +51,7 @@ typedef struct  VideoFilter_
     VideoFrameType outpixfmt;
     char *opts;
     FilterInfo *info;
-} VideoFilter;
+};
 
 #define FILT_NULL {NULL,NULL,NULL,NULL,NULL}
 

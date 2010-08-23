@@ -303,7 +303,7 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] = 
 {
     {
-        symbol:     "new_filter",
+        filter_init: &new_filter,
         name:       "crop",
         descript:   "crops picture by macroblock intervals",
         formats:    FmtList,

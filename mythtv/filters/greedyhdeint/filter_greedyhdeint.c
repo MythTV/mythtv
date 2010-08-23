@@ -275,14 +275,14 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] =
 {
     {
-            symbol:     "GreedyHDeintFilter",
+            filter_init: &GreedyHDeintFilter,
             name:       "greedyhdeint",
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },
     {
-            symbol:     "GreedyHDeintFilter",
+            filter_init: &GreedyHDeintFilter,
             name:       "greedyhdoubleprocessdeint",
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
