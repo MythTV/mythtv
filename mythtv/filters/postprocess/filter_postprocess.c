@@ -67,7 +67,7 @@ static int pp(VideoFilter *vf, VideoFrame *frame, int field)
     tf->dstStride[1] = tf->csize / (tf->height) * 2;
     tf->dstStride[2] = tf->csize / (tf->height) * 2;
 
-    pp_postprocess( tf->src, tf->srcStride,
+    pp_postprocess( (const uint8_t**)tf->src, tf->srcStride,
                     tf->dst, tf->dstStride,
                     frame->width, frame->height,
                     (signed char *)(frame->qscale_table), frame->qstride,
@@ -133,7 +133,7 @@ FmtConv FmtList[] =
     FMT_NULL
 };
 
-FilterInfo filter_table[] = 
+ConstFilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,
