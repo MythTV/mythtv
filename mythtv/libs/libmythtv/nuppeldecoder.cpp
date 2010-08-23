@@ -894,7 +894,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             // if directrendering, writes into buf
             int gotpicture = 0;
             int ret = avcodec_decode_video(mpa_vidctx, &mpa_pic, &gotpicture,
-                                           lstrm, frameheader->packetlength);
+                                           lstrm, frameheader->packetlength
+                                           + FF_INPUT_BUFFER_PADDING_SIZE);
             directframe = NULL;
             if (ret < 0)
             {
