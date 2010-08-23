@@ -1123,8 +1123,6 @@ bool HTTPRequest::ParseRange( QString sRange,
                               long long *pllStart,
                               long long *pllEnd   )
 {
-    char *endptr;
-
     // ----------------------------------------------------------------------
     // -=>TODO: Only handle 1 range at this time... should make work with full spec.
     // ----------------------------------------------------------------------
@@ -1168,14 +1166,15 @@ bool HTTPRequest::ParseRange( QString sRange,
     //
     // ----------------------------------------------------------------------
 
+    bool conv_ok;
     if (parts[0].isNull())
     {
         // ------------------------------------------------------------------
         // Does it match "-####"
         // ------------------------------------------------------------------
 
-        QByteArray tmp = parts[1].toAscii();
-        long long llValue = strtoll(tmp.constData(), NULL, 10);
+        long long llValue = parts[1].toLongLong(&conv_ok);
+        if (!conv_ok)    return false;
 
         *pllStart = llSize - llValue;
         *pllEnd   = llSize - 1;
@@ -1186,10 +1185,9 @@ bool HTTPRequest::ParseRange( QString sRange,
         // Does it match "####-"
         // ------------------------------------------------------------------
 
-        QByteArray tmp = parts[0].toAscii();
-        *pllStart = strtoll(tmp.constData(), &endptr, 10);
+        *pllStart = parts[0].toLongLong(&conv_ok);
 
-        if (*endptr != 0)
+        if (!conv_ok)
             return false;
 
         *pllEnd   = llSize - 1;
@@ -1200,10 +1198,10 @@ bool HTTPRequest::ParseRange( QString sRange,
         // Must be  "####-####"
         // ------------------------------------------------------------------
 
-        QByteArray tmp0 = parts[0].toAscii();
-        QByteArray tmp1 = parts[1].toAscii();
-        *pllStart = strtoll(tmp0.constData(), NULL, 10);
-        *pllEnd   = strtoll(tmp1.constData(), NULL, 10);
+        *pllStart = parts[0].toLongLong(&conv_ok);
+        if (!conv_ok)    return false;
+        *pllEnd   = parts[1].toLongLong(&conv_ok);
+        if (!conv_ok)    return false;
 
         if (*pllStart > *pllEnd)
             return false;
