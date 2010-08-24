@@ -516,8 +516,8 @@ class DBDataRef( list ):
             for v in (self._origdata&diff):
                 data = list(self._refdat)+v.values()
                 wf = []
-                for i in range(len(data)):
-                    if data[i] is None:
+                for i,v in enumerate(data):
+                    if v is None:
                         wf.append('%s IS %%s' % fields[i])
                     else:
                         wf.append('%s=%%s' % fields[i])

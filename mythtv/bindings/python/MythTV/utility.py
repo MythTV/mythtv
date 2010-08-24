@@ -229,10 +229,10 @@ class databaseSearch( object ):
             sql += self.table
 
         if joinbit:
-            for i in range(len(self.joins)):
+            for i,v in enumerate(self.joins):
                 if (2**i)&joinbit:
                     sql += ' JOIN %s ON %s' % \
-                            (self.joins[i][0], self.buildJoinOn(i))
+                            (v[0], self.buildJoinOn(i))
 
         if len(where):
             sql += ' WHERE '

@@ -251,12 +251,12 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                         return protoopen(host, filename, sgroup)
 
         # prefer local storage for new files
-        for i in reversed(xrange(len(sgs))):
-            if not sgs[i].local:
+        for i,v in reversed(enumerate(sgs)):
+            if not v.local:
                 sgs.pop(i)
             else:
-                st = os.statvfs(sgs[i].dirname)
-                sgs[i].free = st[0]*st[3]
+                st = os.statvfs(v.dirname)
+                v.free = st[0]*st[3]
         if len(sgs) > 0:
             # choose path with most free space
             sg = sorted(sgs, key=lambda sg: sg.free, reverse=True)[0]
@@ -803,9 +803,9 @@ class Program( DictData, RECSTATUS, CMPRecord ):
 
         raw = []
         defs = (0,0,0,'',0,'')
-        for i in xrange(len(cls._field_order)):
-            if cls._field_order[i] in dat:
-                raw.append(dat[cls._field_order[i]])
+        for i,v in enumerate(cls._field_order):
+            if v in dat:
+                raw.append(dat[v])
             else:
                 raw.append(defs[cls._field_type[i]])
         return cls(raw, db)

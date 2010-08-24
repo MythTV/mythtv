@@ -137,9 +137,9 @@ class MythLog( LOGLEVEL ):
             return level
         else:
             level = []
-            for l in xrange(len(bwlist)):
+            for l,v in enumerate(bwlist):
                 if cls.LEVEL&2**l:
-                    level.append(bwlist[l])
+                    level.append(v)
             return ','.join(level)
 
     def _time25(self): return datetime.now().strftime('%Y-%m-%d %H:%M:%S.000')

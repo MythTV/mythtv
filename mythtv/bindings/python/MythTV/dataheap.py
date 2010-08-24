@@ -716,12 +716,13 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
             filename = filename.replace(old, ' ')
 
         sep = '(?:\s?(?:-|/)?\s?)?'
-        regex1 = re.compile('^(.*[^s0-9])'+sep \
-                           +'(?:s|(?:Season))?'+sep \
-                           +'(\d{1,4})'+sep \
-                           +'(?:[ex/]|Episode)'+sep \
-                           +'(\d{1,3})'+sep \
-                           +'(.*)$', re.I)
+        regex1 = re.compile(
+            sep.join(['^(.*[^s0-9])',
+                      '(?:s|(?:Season))?',
+                      '(\d{1,4})',
+                      '(?:[ex/]|Episode)',
+                      '(\d{1,3})',
+                      '(.*)$']), re.I)
 
         regex2 = re.compile('(%s(?:Season%s\d*%s)*%s)$' \
                             % (sep, sep, sep, sep), re.I)

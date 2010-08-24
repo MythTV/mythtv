@@ -146,11 +146,11 @@ class DictData( OrdDict ):
             if len(data) != len(self._field_type):
                 raise MythError('Incorrect raw input length to DictData()')
             data = list(data)
-            for i in xrange(len(data)):
-                if data[i] == '':
+            for i,v in enumerate(data):
+                if v == '':
                     data[i] = None
                 else:
-                    data[i] = self._trans[self._field_type[i]](data[i])
+                    data[i] = self._trans[self._field_type[i]](v)
         return dict(zip(self._field_order,data))
 
     def _deprocess(self):
@@ -160,11 +160,11 @@ class DictData( OrdDict ):
         """
         data = self.values()
         if self._field_type != 'Pass':
-            for i in xrange(len(data)):
-                if data[i] is None:
+            for i,v in enumerate(data):
+                if v is None:
                     data[i] = ''
                 else:
-                    data[i] = self._inv_trans[self._field_type[i]](data[i])
+                    data[i] = self._inv_trans[self._field_type[i]](v)
         return data
 
     def _fillNone(self):
