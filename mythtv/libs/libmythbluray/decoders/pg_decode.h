@@ -54,6 +54,7 @@ BD_PRIVATE int pg_decode_object(BITBUFFER *bb, BD_PG_OBJECT *p);
 BD_PRIVATE void pg_clean_object(BD_PG_OBJECT *p);
 
 BD_PRIVATE void pg_free_window(BD_PG_WINDOW **p);
+BD_PRIVATE void pg_free_palette(BD_PG_PALETTE **p);
 BD_PRIVATE void pg_free_object(BD_PG_OBJECT **p);
 
 #endif // _PG_DECODE_H_

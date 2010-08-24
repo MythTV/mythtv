@@ -217,6 +217,13 @@ void pg_free_window(BD_PG_WINDOW **p)
     }
 }
 
+void pg_free_palette(BD_PG_PALETTE **p)
+{
+    if (p && *p) {
+        X_FREE(*p);
+    }
+}
+
 void pg_free_object(BD_PG_OBJECT **p)
 {
     if (p && *p) {
