@@ -886,8 +886,8 @@ void vm_get_audio_info(vm_t *vm, int *current, int *num_avail) {
     break;
   }
 }
-#endif
 
+/* currently unused */
 void vm_get_subp_info(vm_t *vm, int *current, int *num_avail) {
   switch ((vm->state).domain) {
   case VTS_DOMAIN:
@@ -905,8 +905,8 @@ void vm_get_subp_info(vm_t *vm, int *current, int *num_avail) {
     break;
   }
 }
+#endif
 
-/* currently unused */
 void vm_get_video_res(vm_t *vm, int *width, int *height) {
   video_attr_t attr = vm_get_video_attr(vm);
 
