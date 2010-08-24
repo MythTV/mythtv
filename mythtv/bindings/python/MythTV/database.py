@@ -125,7 +125,7 @@ class DBData( DictData, MythSchema ):
     def _process(self, data):
         data = DictData._process(self, data)
         for key, val in self._db.tablefields[self._table].items():
-            if val.type == 'datetime':
+            if (val.type == 'datetime') and (data[key] is not None):
                 data[key] = datetime.duck(data[key])
         return data
 
