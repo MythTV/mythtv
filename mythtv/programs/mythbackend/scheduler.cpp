@@ -3303,7 +3303,7 @@ void Scheduler::AddNewRecords(void)
     progfindid.replace("program.","p.");
     progfindid.replace("channel.","c.");
     QString query = QString(
-        "SELECT DISTINCT "
+        "SELECT "
         "    c.chanid,         c.sourceid,           p.starttime,       "// 0-2
         "    p.endtime,        p.title,              p.subtitle,        "// 3-5
         "    p.description,    c.channum,            c.callsign,        "// 6-8
