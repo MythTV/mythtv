@@ -10,7 +10,11 @@ target.path = $${PREFIX}/bin
 
 INSTALLS = target
 
-LIBS = $$system(mysql_config --libs)
+macx {
+    CONFIG += qt
+    QT += sql
+}
+!macx:LIBS = $$system(mysql_config --libs)
 
 linux: DEFINES += linux
 
