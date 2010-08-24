@@ -87,6 +87,10 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #include "postprocess.h"
 #include "postprocess_internal.h"
 
+// for mm_support()
+#include "libavcodec/avcodec.h"
+#include "libavcodec/dsputil.h"
+
 unsigned postproc_version(void)
 {
     return LIBPOSTPROC_VERSION_INT;
@@ -964,6 +968,22 @@ pp_context *pp_get_context(int width, int height, int cpuCaps){
     PPContext *c= av_malloc(sizeof(PPContext));
     int stride= FFALIGN(width, 16);  //assumed / will realloc if needed
     int qpStride= (width+15)/16 + 2; //assumed / will realloc if needed
+    int cpuflags;
+
+    if (CONFIG_RUNTIME_CPUDETECT &&
+        !(cpuCaps & (PP_CPU_CAPS_MMX   | PP_CPU_CAPS_MMX2    |
+                     PP_CPU_CAPS_3DNOW | PP_CPU_CAPS_ALTIVEC ))) {
+        cpuflags = mm_support();
+
+        if (cpuflags & FF_MM_MMX)
+            cpuCaps |= PP_CPU_CAPS_MMX;
+        if (cpuflags & FF_MM_MMX2)
+            cpuCaps |= PP_CPU_CAPS_MMX2;
+        if (cpuflags & FF_MM_3DNOW)
+            cpuCaps |= PP_CPU_CAPS_3DNOW;
+        if (cpuflags & FF_MM_ALTIVEC)
+            cpuCaps |= PP_CPU_CAPS_ALTIVEC;
+    }
 
     memset(c, 0, sizeof(PPContext));
     c->av_class = &av_codec_context_class;
