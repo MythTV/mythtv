@@ -19,10 +19,17 @@ class MSearch( object ):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
                              socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        try:
-            self.sock.bind(('', port))
-        except socket.error, e:
-             raise MythError(MythError.SOCKET, e)
+        listening = False
+        while listening == False:
+            try:
+                self.sock.bind(('', port))
+                self.addr = (addr, port)
+                listening = True
+            except socket.error, e:
+                if port < 1910:
+                    port += 1
+                else:
+                    raise MythError(MythError.SOCKET, e)
         self.sock.setblocking(0.1)
 
     def __del__(self):
@@ -43,7 +50,7 @@ class MSearch( object ):
         self.log(MythLog.UPNP, 'running UPnP search')
         sock = self.sock
         sreq = '\r\n'.join(['M-SEARCH * HTTP/1.1',
-                            'HOST: %s:%s' % self.dest,
+                            'HOST: %s:%s' % self.addr,
                             'MAN: "ssdp:discover"',
                             'MX: %d' % timeout,
                             'ST: ssdp:all',''])
