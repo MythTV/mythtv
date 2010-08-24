@@ -13,7 +13,11 @@
  * $Id$
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
 #include "libavutil/common.h" // for MKTAG
+}
+#endif
 
 /* Probably not thread safe */
 static inline char * fourcc_str(int i)
