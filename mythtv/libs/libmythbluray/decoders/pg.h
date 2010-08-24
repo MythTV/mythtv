@@ -99,5 +99,8 @@ typedef struct {
 
 } BD_PG_OBJECT;
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif // _BD_PG_H_

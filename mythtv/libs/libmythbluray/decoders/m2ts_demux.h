@@ -46,5 +46,8 @@ BD_PRIVATE void        m2ts_demux_free(M2TS_DEMUX **);
  */
 BD_PRIVATE struct pes_buffer_s *m2ts_demux(M2TS_DEMUX *, uint8_t *block);
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif // _M2TS_DEMUX_H_
