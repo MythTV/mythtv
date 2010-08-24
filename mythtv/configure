@@ -3016,7 +3016,7 @@ case $target_os in
         # Prevent linker problems on default Intel 10.5 XCode:
         ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
         osxver=$(uname -r | cut -c 1)
-        if [[ ${ldver%%.*} -lt "82" && ${osxver} = "9" && ${arch} = "x86_32" ]]; then
+        if [[ ${ldver%%.*} -lt "82" && ${osxver} = "9" && ${subarch} = "x86_32" ]]; then
             cat <<EOF
 You have a broken ld. Please upgrade XCode to 3.1.1 or newer.
 MMX disabled to allow libavcodec to build.
