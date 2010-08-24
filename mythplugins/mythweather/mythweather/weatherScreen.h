@@ -74,48 +74,4 @@ class WeatherScreen : public MythScreenType
     int m_id;
 };
 
-class SevereWeatherScreen : public WeatherScreen
-{
-    Q_OBJECT
-
-  public:
-    SevereWeatherScreen(MythScreenStack *parent, ScreenListInfo *screenDefn,
-                        int id);
-    bool usingKeys() { return true; }
-
-  private:
-    MythUIText *m_text;
-};
-
-class StaticImageScreen : public WeatherScreen
-{
-    Q_OBJECT
-
-  public:
-    StaticImageScreen(MythScreenStack *parent, ScreenListInfo *screenDefn,
-                      int id);
-
-  protected:
-    QString prepareDataItem(const QString &key, const QString &value);
-    void prepareWidget(MythUIType *widget);
-
-  private:
-};
-
-class AnimatedImageScreen : public WeatherScreen
-{
-    Q_OBJECT
-
-  public:
-    AnimatedImageScreen(MythScreenStack *parent, ScreenListInfo *screenDefn,
-                        int id);
-
-  protected:
-    QString prepareDataItem(const QString &key, const QString &value);
-    void prepareWidget(MythUIType *widget);
-
-  private:
-    int m_count;
-};
-
 #endif

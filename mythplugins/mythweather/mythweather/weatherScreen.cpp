@@ -12,15 +12,6 @@ using namespace std;
 WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
                                          ScreenListInfo *screenDefn, int id)
 {
-    QString key = screenDefn->name;
-
-    if (key == "Severe Weather Alerts")
-        return new SevereWeatherScreen(parent, screenDefn, id);
-    if (key == "Static Map")
-        return new StaticImageScreen(parent, screenDefn, id);
-    if (key == "Animated Map")
-        return new AnimatedImageScreen(parent, screenDefn, id);
-
     return new WeatherScreen(parent, screenDefn, id);
 }
 
@@ -234,59 +225,3 @@ bool WeatherScreen::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
-SevereWeatherScreen::SevereWeatherScreen(MythScreenStack *parent,
-                                         ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, screenDefn, id)
-{
-}
-
-StaticImageScreen::StaticImageScreen(MythScreenStack *parent,
-                                     ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, screenDefn, id)
-{
-}
-
-QString StaticImageScreen::prepareDataItem(const QString &key,
-                                           const QString &value)
-{
-    (void)key;
-    return value;
-}
-
-void StaticImageScreen::prepareWidget(MythUIType *widget)
-{
-    (void) widget;
-}
-
-AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent,
-                                         ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, screenDefn, id)
-{
-}
-
-QString AnimatedImageScreen::prepareDataItem(const QString &key,
-                                             const QString &value)
-{
-    QString ret = value;
-    if (key == "animatedimage")
-    {
-        QString cnt = ret.right(ret.length() - ret.lastIndexOf('-') - 1);
-        m_count = cnt.toInt();
-        ret = ret.left(ret.lastIndexOf('-'));
-    }
-
-    return ret;
-}
-
-void AnimatedImageScreen::prepareWidget(MythUIType *widget)
-{
-    if (widget->objectName() == "animatedimage")
-    {
-        MythUIImage *img = (MythUIImage *) widget;
-
-        img->SetImageCount(0, m_count - 1);
-        img->SetDelay(500);
-        img->Load();
-    }
-    return;
-}
