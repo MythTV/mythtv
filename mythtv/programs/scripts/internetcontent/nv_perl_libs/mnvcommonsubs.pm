@@ -1,4 +1,4 @@
-# @(#)$Header: /home/mythtv/mythtvrep/scripts/mnvcommonsubs.pm,v 1.9 2010/07/17 09:06:20 mythtv Exp $
+# @(#)$Header: /home/mythtv/mythtvrep/scripts/nv_perl_libs/mnvcommonsubs.pm,v 1.10 2010/07/25 00:11:35 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #
 # MythNetvision Grabber Script utility subs
@@ -24,7 +24,7 @@ use Image::Magick;
 use File::Copy;
 
 our(@ISA, @EXPORT, @EXPORT_OK, $VERSION);
-$VERSION = '$Revision: 1.9 $'; $VERSION =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
+$VERSION = '$Revision: 1.10 $'; $VERSION =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -111,7 +111,7 @@ sub mnvloadconfig {
 				push(@{$config{$value}}, join('+', @data));
 				next;
 			}
-			if (/^\s[(.*)]\s$/) {
+			if (/^\s*\[(.*)\]\s*$/) {
 				if ($1 eq $section) {
 					$in = 1;
 				} else {
@@ -231,6 +231,7 @@ sub mnvprintversion {
 	my $author = shift @_;
 	my $commandthumbnail = shift @_;
 	my $version = shift @_;
+	my $description = shift @_;
 
 	print '<grabber>'."\n";
 	print '  <name>'.$site.'</name>'."\n";
@@ -238,7 +239,7 @@ sub mnvprintversion {
 	print '  <author>'.$author.'</author>'."\n";
 	print '  <thumbnail>'.$commandthumbnail.'</thumbnail>'."\n";
 	print '  <type>video</type>'."\n";
-	print '  <description>MythNetVision grabber for '.$site.'</description>'."\n";
+	print '  <description>'.$description.'</description>'."\n";
 	print '  <version>'.$version.'</version>'."\n";
 	print '  <search>true</search>'."\n";
 	print '  <tree>true</tree>'."\n";

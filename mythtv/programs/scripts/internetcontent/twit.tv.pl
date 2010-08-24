@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# @(#)$Header: /home/mythtv/mythtvrep/scripts/twit.tv.pl,v 1.31 2010/07/17 09:06:20 mythtv Exp $
+# @(#)$Header: /home/mythtv/mythtvrep/scripts/twit.tv.pl,v 1.32 2010/07/24 23:28:11 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #
 # MythNetvision Grabber Script for TWiT.tv site.
@@ -53,7 +53,7 @@ use mnvcommonsubs;
 mnvloadconfig(fileparse($Script, '.pl'), "notused");
 
 #################################### Globals ##################################
-my $version = '$Revision: 1.31 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
+my $version = '$Revision: 1.32 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
 my $command = "twit.tv.pl"; my $commandthumbnail = "twit.tv.png"; my $author = "Auric";
 my $site = 'TWiT.tv';
 my $description = 'Leo Laporte &amp; Friends';
@@ -347,7 +347,7 @@ getopts('vtTp:S:');
 
 if ($opt_v) {
 	($mnvcommonsubs::netvisionver == 23) and print "$site|TS\n";
-	($mnvcommonsubs::netvisionver > 23) and mnvprintversion($site, $command, $author, $commandthumbnail, $version);
+	($mnvcommonsubs::netvisionver > 23) and mnvprintversion($site, $command, $author, $commandthumbnail, $version, $description);
 	exit 0;
 }
 

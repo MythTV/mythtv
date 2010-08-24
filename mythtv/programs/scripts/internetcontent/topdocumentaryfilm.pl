@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# @(#)$Header: /home/mythtv/mythtvrep/scripts/topdocumentaryfilm.pl,v 1.16 2010/07/17 06:06:33 mythtv Exp $
+# @(#)$Header: /home/mythtv/mythtvrep/scripts/topdocumentaryfilm.pl,v 1.17 2010/07/24 23:28:11 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #
 # MythNetvision Grabber Script for topdocumentaryfilm site.
@@ -62,7 +62,7 @@ my %autoplay = (
 );
 
 #################################### Globals ##################################
-my $version = '$Revision: 1.16 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
+my $version = '$Revision: 1.17 $'; $version =~ s/\D*([\d\.]+)\D*/$1/; # rcs tag populated
 my $command = "topdocumentaryfilm.pl"; my $commandthumbnail = "topdocumentaryfilm.png"; my $author = "Auric";
 my $site = 'TopDocumentaryFilms';
 my $description = 'Great collection of documentary movies';
@@ -324,7 +324,7 @@ getopts('vtTp:S:');
 
 if ($opt_v) {
 	($mnvcommonsubs::netvisionver == 23) and print "$site|TS\n";
-	($mnvcommonsubs::netvisionver > 23) and mnvprintversion($site, $command, $author, $commandthumbnail, $version);
+	($mnvcommonsubs::netvisionver > 23) and mnvprintversion($site, $command, $author, $commandthumbnail, $version, $description);
 	exit 0;
 }
 
