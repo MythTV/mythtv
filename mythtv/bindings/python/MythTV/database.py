@@ -10,6 +10,7 @@ from static import MythSchema
 from altdict import OrdDict, DictData
 from logging import MythLog
 from msearch import MSearch
+from utility import datetime
 from exceptions import MythError, MythDBError
 from connections import DBConnection, LoggedCursor, XMLConnection
 
@@ -120,6 +121,13 @@ class DBData( DictData, MythSchema ):
         else:
             self._evalwheredat(tuple(data))
             self._pull()
+
+    def _process(self, data):
+        data = DictData._process(self, data)
+        for key, val in self._db.tablefields[self._table].items():
+            if val.type == 'datetime':
+                data[key] = datetime.duck(data[key])
+        return data
 
     def _pull(self):
         """Updates table with data pulled from database."""
