@@ -2210,7 +2210,7 @@ if enabled_any cpu_override croos_compile || test x"$tune" != x"generic" &&
     disable proc_opt
 fi
 
-enabled proc_opt && cpu="host"
+enabled proc_opt && disable runtime_cpudetect && cpu="host"
 
 disabled logging && logfile=/dev/null
 
@@ -4187,12 +4187,12 @@ fi
 if test "$build_suffix" != ""; then
     echo "build suffix              $build_suffix"
 fi
-BLOCK_QUOTE
 if test "$extra_version" != ""; then
     echo "version string suffix     $extra_version"
 fi
 echo "big-endian                ${bigendian-no}"
 echo "runtime cpu detection     ${runtime_cpudetect-no}"
+BLOCK_QUOTE
 if enabled x86; then
     echo "yasm                      ${yasm-no}"
     echo "MMX enabled               ${mmx-no}"
