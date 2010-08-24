@@ -144,21 +144,21 @@ static void vm_print_current_domain_state(vm_t *vm) {
 
 static int os2_open(const char *name, int oflag)
 {
-    HFILE hfile;
-    ULONG ulAction;
-    ULONG rc;
+  HFILE hfile;
+  ULONG ulAction;
+  ULONG rc;
 
-    rc = DosOpenL(name, &hfile, &ulAction, 0, FILE_NORMAL,
-                  OPEN_ACTION_OPEN_IF_EXISTS | OPEN_ACTION_FAIL_IF_NEW,
-                  OPEN_ACCESS_READONLY | OPEN_SHARE_DENYNONE | OPEN_FLAGS_DASD,
-                  NULL);
+  rc = DosOpenL(name, &hfile, &ulAction, 0, FILE_NORMAL,
+                OPEN_ACTION_OPEN_IF_EXISTS | OPEN_ACTION_FAIL_IF_NEW,
+                OPEN_ACCESS_READONLY | OPEN_SHARE_DENYNONE | OPEN_FLAGS_DASD,
+                NULL);
 
-    if(rc)
-        return -1;
+  if(rc)
+    return -1;
 
-    setmode(hfile, O_BINARY);
+  setmode(hfile, O_BINARY);
 
-    return (int)hfile;
+  return (int)hfile;
 }
 #endif
 
