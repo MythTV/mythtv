@@ -10,7 +10,7 @@ INCLUDEPATH += . ../../
 INCLUDEPATH += ./bdnav
 INCLUDEPATH += ../libmythdb
 
-DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS
+DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H HAVE_DIRENT_H
 
 # DEFINES += LOG_DEBUG TRACE
 
@@ -18,17 +18,27 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
 HEADERS += bluray.h register.h bdnav/*.h hdmv/*.h util/*.h file/*.h decoders/*.h
-#HEADERS += bdj/*.h
-
 SOURCES += bluray.c register.c bdnav/*.c hdmv/*.c file/*.c util/*.c decoders/*.c
-#SOURCES += bdj/*.c
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bluray
 inc_bdnav.files = bluray.h bdnav/*.h hdmv/*.h file/*.h util/*.h
 
 INSTALLS += target inc_bdnav
 
-
 mingw:DEFINES += STDC_HEADERS
+
+using_bdjava {
+HEADERS += bdj/*.h
+SOURCES += bdj/*.c
+
+QMAKE_POST_LINK=/$${ANTBIN} -f bdj/build.xml
+
+installjar.path = $${PREFIX}/share/mythtv/jars
+installjar.files = libmythbluray.jar
+
+INSTALLS += installjar
+
+QMAKE_CLEAN += libmythbluray.jar
+}
 
 include ( ../libs-targetfix.pro )

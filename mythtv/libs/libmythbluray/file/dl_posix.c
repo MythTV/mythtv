@@ -27,13 +27,32 @@
 #include "util/logging.h"
 #include "util/strutl.h"
 
-#include <stdlib.h>
-#ifdef USING_MINGW
-#include "compat.h"
-#else
-#include <dlfcn.h>
+#if defined(_WIN32)
+#   include <windows.h>
+#elif defined(HAVE_DLFCN_H)
+#   include <dlfcn.h>
+#elif defined(HAVE_SYS_DL_H)
+#   include <sys/dl.h>
 #endif
-#include <string.h>
+
+#if defined(_WIN32)
+const char *dlerror(char *buf, int buf_size)
+{
+    DWORD error_code = GetLastError();
+    wchar_t wbuf[256];
+  
+    if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
+                       FORMAT_MESSAGE_MAX_WIDTH_MASK,
+                       NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                       wbuf, sizeof(wbuf)/sizeof(wbuf[0]), NULL)) {
+        WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, buf_size, NULL, NULL);
+    } else {
+        snprintf(buf, buf_size, "error %d", (int)error_code);
+    }
+    
+    return buf;
+}
+#endif
 
 void   *dl_dlopen  ( const char* path, const char *version )
 {
@@ -42,6 +61,9 @@ void   *dl_dlopen  ( const char* path, const char *version )
 
 #if defined(__APPLE__)
     static const char ext[] = ".dylib";
+    version = NULL;
+#elif defined(_WIN32)
+    static const char ext[] = ".dll";
     version = NULL;
 #else
     static const char ext[] = ".so";
@@ -53,12 +75,24 @@ void   *dl_dlopen  ( const char* path, const char *version )
         name = str_printf("%s%s", path, ext);
     }
 
-    DEBUG(DBG_BDPLUS, "searching for library '%s' ...\n", name);
+    DEBUG(DBG_FILE, "searching for library '%s' ...\n", name);
 
+#if defined(_WIN32)
+    wchar_t wname[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, name, -1, wname, MAX_PATH);
+    result = LoadLibraryW(wname);
+
+    if (!result) {
+        char buf[128];
+        DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror(buf, sizeof(buf)));
+    }
+#else
     result = dlopen(name, RTLD_LAZY);
+
     if (!result) {
         DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror());
     }
+#endif
 
     X_FREE(name);
 
@@ -67,16 +101,30 @@ void   *dl_dlopen  ( const char* path, const char *version )
 
 void   *dl_dlsym   ( void* handle, const char* symbol )
 {
+#if defined(_WIN32)
+    void *result = (void *)GetProcAddress(handle, symbol);
+
+    if (!result) {
+        char buf[128];
+        DEBUG(DBG_FILE | DBG_CRIT, "GetProcAddress(%p, '%s') failed: %s\n", handle, symbol, dlerror(buf, sizeof(buf)));
+    }
+#else
     void *result = dlsym(handle, symbol);
 
     if (!result) {
         DEBUG(DBG_FILE | DBG_CRIT, "dlsym(%p, '%s') failed: %s\n", handle, symbol, dlerror());
     }
+#endif
 
     return result;
 }
 
 int     dl_dlclose ( void* handle )
 {
+#if defined(_WIN32)
+    FreeLibrary(handle);
+    return 0;
+#else
     return dlclose(handle);
+#endif
 }

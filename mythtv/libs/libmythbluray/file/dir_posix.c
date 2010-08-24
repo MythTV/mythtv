@@ -24,16 +24,34 @@
 #include "file.h"
 #include "util/macro.h"
 #include "util/logging.h"
+#include "util/strutl.h"
 
-#include <errno.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <string.h>
+#if defined(HAVE_DIRENT_H)
+#   include <dirent.h>
+#endif
+#if defined(_WIN32)
+#   include <io.h>
+#endif
+
+#if defined(_WIN32)
+typedef struct {
+    long               handle;
+    struct _finddata_t info;
+} dir_data_t;
+#endif
 
 static void dir_close_posix(BD_DIR_H *dir)
 {
     if (dir) {
+#if defined(_WIN32)
+        dir_data_t *priv = dir->internal;
+        _findclose(priv->handle);
+        X_FREE(dir->internal);
+#else
         closedir((DIR *)dir->internal);
+#endif
 
         DEBUG(DBG_DIR, "Closed POSIX dir (%p)\n", dir);
 
@@ -43,14 +61,17 @@ static void dir_close_posix(BD_DIR_H *dir)
 
 static int dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
 {
-#ifdef USING_MINGW
-    errno = 0;
-    struct dirent* e = readdir((DIR*)dir->internal);
-    if (errno)
-        return -errno;
-    if (NULL == e)
+#if defined(_WIN32)
+    dir_data_t *priv = dir->internal;
+
+    if (!priv->info.name[0]) {
         return 1;
-    strncpy(entry->d_name, e->d_name, 256);
+    }
+    strncpy(entry->d_name, priv->info.name, sizeof(entry->d_name));
+
+    priv->info.name[0] = 0;
+    _findnext(priv->handle, &priv->info);
+
 #else
     struct dirent e, *p_e;
     int result;
@@ -63,23 +84,43 @@ static int dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
     }
     strncpy(entry->d_name, e.d_name, 256);
 #endif
+
     return 0;
 }
 
 static BD_DIR_H *dir_open_posix(const char* dirname)
 {
-    DIR *dp = NULL;
     BD_DIR_H *dir = malloc(sizeof(BD_DIR_H));
 
     DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, dir);
     dir->close = dir_close_posix;
     dir->read = dir_read_posix;
 
+#if defined(_WIN32)
+    char       *filespec = str_printf("%s/*", dirname);
+    dir_data_t *priv     = calloc(1, sizeof(dir_data_t));
+
+    dir->internal = priv;
+
+    priv->handle = _findfirst(filespec, &priv->info);
+
+    X_FREE(filespec);
+
+    if (priv->handle != -1) {
+        return dir;
+    }
+
+    X_FREE(dir->internal);
+
+#else
+    DIR *dp = NULL;
+
     if ((dp = opendir(dirname))) {
         dir->internal = dp;
 
         return dir;
     }
+#endif
 
     DEBUG(DBG_DIR, "Error opening dir! (%p)\n", dir);
 
