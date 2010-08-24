@@ -1628,7 +1628,7 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
      Enemy of the State region 2 (de) has Titles where nr_of_vobs field
      is to high, they high ones are never referenced though. */
   if(info_length / sizeof(cell_adr_t) < c_adt->nr_of_vobs) {
-    fprintf(stderr, "libdvdread: *C_ADT nr_of_vobs > avaiable info entries\n");
+    fprintf(stderr, "libdvdread: *C_ADT nr_of_vobs > available info entries\n");
     c_adt->nr_of_vobs = info_length / sizeof(cell_adr_t);
   }
 

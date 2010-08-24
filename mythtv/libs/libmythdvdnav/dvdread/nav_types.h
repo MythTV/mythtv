@@ -192,7 +192,7 @@ typedef struct {
 } ATTRIBUTE_PACKED sml_pbi_t;
 
 /**
- * Seamless Angle Infromation for one angle
+ * Seamless Angle Information for one angle
  */
 typedef struct {
   uint32_t address; /**< offset to next ILVU, high bit is before/after */
@@ -200,7 +200,7 @@ typedef struct {
 } ATTRIBUTE_PACKED sml_agl_data_t;
 
 /**
- * Seamless Angle Infromation
+ * Seamless Angle Information
  */
 typedef struct {
   sml_agl_data_t data[9];

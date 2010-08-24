@@ -495,7 +495,7 @@ static void ifoPrint_USER_OPS(user_ops_t *user_ops) {
 }
 
 
-void ifoPrint_VMGI_MAT(vmgi_mat_t *vmgi_mat) {
+static void ifoPrint_VMGI_MAT(vmgi_mat_t *vmgi_mat) {
 
   printf("VMG Identifier: %.12s\n", vmgi_mat->vmg_identifier);
   printf("Last Sector of VMG: %08x\n", vmgi_mat->vmg_last_sector);
@@ -544,7 +544,7 @@ void ifoPrint_VMGI_MAT(vmgi_mat_t *vmgi_mat) {
 }
 
 
-void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
+static void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
   int i;
 
   printf("VTS Identifier: %.12s\n", vtsi_mat->vts_identifier);
@@ -732,7 +732,7 @@ static void ifoPrint_CELL_POSITION(cell_position_t *cell_position, int nr) {
 }
 
 
-void ifoPrint_PGC(pgc_t *pgc) {
+static void ifoPrint_PGC(pgc_t *pgc) {
   int i;
 
   if (!pgc) {
@@ -789,7 +789,7 @@ void ifoPrint_PGC(pgc_t *pgc) {
 }
 
 
-void ifoPrint_TT_SRPT(tt_srpt_t *tt_srpt) {
+static void ifoPrint_TT_SRPT(tt_srpt_t *tt_srpt) {
   int i;
 
   printf("Number of TitleTrack search pointers: %i\n",
@@ -822,7 +822,7 @@ void ifoPrint_TT_SRPT(tt_srpt_t *tt_srpt) {
 }
 
 
-void ifoPrint_VTS_PTT_SRPT(vts_ptt_srpt_t *vts_ptt_srpt) {
+static void ifoPrint_VTS_PTT_SRPT(vts_ptt_srpt_t *vts_ptt_srpt) {
   int i, j;
   printf(" nr_of_srpts %i last byte %i\n",
          vts_ptt_srpt->nr_of_srpts,
@@ -843,7 +843,7 @@ static void hexdump(uint8_t *ptr, int len) {
     printf("%02x ", *ptr++);
 }
 
-void ifoPrint_PTL_MAIT(ptl_mait_t *ptl_mait) {
+static void ifoPrint_PTL_MAIT(ptl_mait_t *ptl_mait) {
   int i, j;
 
   printf("Number of Countries: %i\n", ptl_mait->nr_of_countries);
@@ -872,7 +872,7 @@ void ifoPrint_PTL_MAIT(ptl_mait_t *ptl_mait) {
   }
 }
 
-void ifoPrint_VTS_TMAPT(vts_tmapt_t *vts_tmapt) {
+static void ifoPrint_VTS_TMAPT(vts_tmapt_t *vts_tmapt) {
   unsigned int timeunit;
   int i, j;
 
@@ -895,7 +895,7 @@ void ifoPrint_VTS_TMAPT(vts_tmapt_t *vts_tmapt) {
   }
 }
 
-void ifoPrint_C_ADT(c_adt_t *c_adt) {
+static void ifoPrint_C_ADT(c_adt_t *c_adt) {
   int i, entries;
 
   printf("Number of VOBs in this VOBS: %i\n", c_adt->nr_of_vobs);
@@ -912,7 +912,7 @@ void ifoPrint_C_ADT(c_adt_t *c_adt) {
 }
 
 
-void ifoPrint_VOBU_ADMAP(vobu_admap_t *vobu_admap) {
+static void ifoPrint_VOBU_ADMAP(vobu_admap_t *vobu_admap) {
   int i, entries;
 
   entries = (vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE)/4;
@@ -922,7 +922,7 @@ void ifoPrint_VOBU_ADMAP(vobu_admap_t *vobu_admap) {
   }
 }
 
-const char *ifo_print_menu_name(int type) {
+static const char *ifo_print_menu_name(int type) {
   const char *menu_name;
   menu_name="";
   switch (type) {
@@ -952,7 +952,7 @@ const char *ifo_print_menu_name(int type) {
 }
 
 /* pgc_type=1 for menu, 0 for title. */
-void ifoPrint_PGCIT(pgcit_t *pgcit, int pgc_type) {
+static void ifoPrint_PGCIT(pgcit_t *pgcit, int pgc_type) {
   int i;
 
   printf("\nNumber of Program Chains: %3i\n", pgcit->nr_of_pgci_srp);
@@ -976,7 +976,7 @@ void ifoPrint_PGCIT(pgcit_t *pgcit, int pgc_type) {
 }
 
 
-void ifoPrint_PGCI_UT(pgci_ut_t *pgci_ut) {
+static void ifoPrint_PGCI_UT(pgci_ut_t *pgci_ut) {
   int i, menu;
 
   printf("Number of Menu Language Units (PGCI_LU): %3i\n", pgci_ut->nr_of_lus);
@@ -1065,7 +1065,7 @@ static void ifoPrint_VTS_ATTRIBUTES(vts_attributes_t *vts_attributes) {
 }
 
 
-void ifoPrint_VTS_ATRT(vts_atrt_t *vts_atrt) {
+static void ifoPrint_VTS_ATRT(vts_atrt_t *vts_atrt) {
   int i;
 
   printf("Number of Video Title Sets: %3i\n", vts_atrt->nr_of_vtss);
