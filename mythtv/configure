@@ -4742,7 +4742,15 @@ SLIB_INSTALL_EXTRA_CMD=${SLIB_INSTALL_EXTRA_CMD}
 SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}
 EOF
 cat >> external/FFmpeg/config.mak < $MYTH_CONFIG_MAK
-echo "endif # FFMPEG_CONFIG_MAK" >> external/FFmpeg/config.mak
+cat >> external/FFmpeg/config.mak <<EOF
+LIBDIR=\$(INSTALL_ROOT)$libdir
+SHLIBDIR=\$(INSTALL_ROOT)$shlibdir
+INCDIR=\$(INSTALL_ROOT)$incdir
+BINDIR=\$(INSTALL_ROOT)$bindir
+DATADIR=\$(INSTALL_ROOT)$datadir
+MANDIR=\$(INSTALL_ROOT)$mandir
+endif # FFMPEG_CONFIG_MAK
+EOF
 
 # link config.h into external/FFmpeg
 rm -f external/FFmpeg/config.h
