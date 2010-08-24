@@ -1993,3 +1993,4 @@ void vm_position_print(vm_t *vm, vm_position_t *position) {
   position->block);
 }
 #endif
+
