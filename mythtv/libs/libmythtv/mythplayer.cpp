@@ -3880,7 +3880,7 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
     infoMap["videocodec"]     = GetEncodingType();
     infoMap["videowidth"]     = QString::number(width);
     infoMap["videoheight"]    = QString::number(height);
-    infoMap["videoframerate"] = QString::number(1000000 / video_frame_rate, 'f', 2);
+    infoMap["videoframerate"] = QString::number(video_frame_rate, 'f', 2);
 
     if (height < 480)
         return;
