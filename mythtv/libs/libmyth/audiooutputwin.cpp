@@ -96,7 +96,7 @@ void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
     if (uMsg != WOM_DONE)
         return;
 
-    AudioOutputWin *instance = static_cast<AudioOutputWin*>(dwInstance);
+    AudioOutputWin *instance = reinterpret_cast<AudioOutputWin*>(dwInstance);
     InterlockedDecrement(&instance->m_nPkts);
     if (instance->m_nPkts < (int)AudioOutputWin::kPacketCnt)
     {
