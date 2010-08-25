@@ -437,7 +437,7 @@ MythImageReader::MythImageReader(const QString &fileName)
         if (m_networkReply)
             setDevice(m_networkReply);
     }
-    else
+    else if (!m_fileName.isEmpty())
     {
         setFileName(m_fileName);
     }

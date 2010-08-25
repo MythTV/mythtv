@@ -84,7 +84,14 @@ class ImageLoadThread : public QRunnable
 
     void run()
     {
-        MythImageReader imageReader(m_filename);
+        QString tmpFilename;
+        if ((m_filename.startsWith("/")) ||
+            (m_filename.startsWith("http://")) ||
+            (m_filename.startsWith("https://")) ||
+            (m_filename.startsWith("ftp://")))
+            tmpFilename = m_filename;
+
+        MythImageReader imageReader(tmpFilename);
 
         if (imageReader.supportsAnimation())
         {
@@ -648,7 +655,15 @@ bool MythUIImage::Load(bool allowLoadInBackground)
             // Perform a blocking load
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
                         "Load(), loading '%1' in foreground").arg(filename));
-            MythImageReader imageReader(filename);
+            QString tmpFilename;
+            if ((filename.startsWith("/")) ||
+                (filename.startsWith("http://")) ||
+                (filename.startsWith("https://")) ||
+                (filename.startsWith("ftp://")))
+                tmpFilename = filename;
+
+            MythImageReader imageReader(tmpFilename);
+
             if (imageReader.supportsAnimation())
             {
                 LoadAnimatedImage(imageReader, filename, bForceSize);
@@ -780,7 +795,13 @@ MythImage *MythUIImage::LoadImage(MythImageReader &imageReader,
 
             image = GetMythPainter()->GetFormatImage();
             image->UpRef();
-            if (!image->Load(imageReader))
+            bool ok = false;
+            if (imageReader.supportsAnimation())
+                ok = image->Load(imageReader);
+            else
+                ok = image->Load(filename);
+
+            if (!ok)
             {
                 image->DownRef();
 
