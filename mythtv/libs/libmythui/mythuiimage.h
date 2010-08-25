@@ -135,6 +135,7 @@ class MPUBLIC MythUIImage : public MythUIType
     enum AnimationCycle {kCycleStart, kCycleReverse};
     AnimationCycle m_animationCycle;
     bool m_animationReverse;
+    bool m_animatedImage;
     
     friend class MythThemeBase;
     friend class MythUIButtonListItem;

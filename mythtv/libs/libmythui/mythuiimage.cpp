@@ -121,15 +121,13 @@ class MythUIImagePrivate
 {
   public:
     MythUIImagePrivate(MythUIImage *p)
-        : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive),
-          m_AnimatedImage(false)
+        : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive)
           { };
    ~MythUIImagePrivate() {};
 
     MythUIImage *m_parent;
 
     QReadWriteLock m_UpdateLock;
-    bool           m_AnimatedImage;
 };
 
 /////////////////////////////////////////////////////////////////
@@ -222,12 +220,12 @@ void MythUIImage::Reset(void)
     if (m_Filename != m_OrigFilename)
     {
         m_Filename = m_OrigFilename;
+        m_animatedImage = false;
         d->m_UpdateLock.unlock();
         Load();
     }
     else
         d->m_UpdateLock.unlock();
-    d->m_AnimatedImage = false;
 
     MythUIType::Reset();
 }
@@ -266,6 +264,7 @@ void MythUIImage::Init(void)
     
     m_animationCycle = kCycleStart;
     m_animationReverse = false;
+    m_animatedImage = false;
 }
 
 /**
@@ -625,9 +624,9 @@ bool MythUIImage::Load(bool allowLoadInBackground)
     ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
 
     int j = 0;
-    for (int i = m_LowNum; i <= m_HighNum && !d->m_AnimatedImage; i++)
+    for (int i = m_LowNum; i <= m_HighNum && !m_animatedImage; i++)
     {
-        if (!d->m_AnimatedImage && m_HighNum >= 1)
+        if (!m_animatedImage && m_HighNum >= 1)
             filename = bFilename.arg(i);
 
         imagelabel = GenImageLabel(filename, w, h);
@@ -754,7 +753,9 @@ MythImage *MythUIImage::LoadImage(MythImageReader &imageReader,
 
     imagelabel = GenImageLabel(filename, w, h);
 
-    image = GetMythUI()->LoadCacheImage(filename, imagelabel);
+    if (!imageReader.supportsAnimation())
+        image = GetMythUI()->LoadCacheImage(filename, imagelabel);
+
     if (image)
     {
         image->UpRef();
@@ -941,7 +942,7 @@ bool MythUIImage::LoadAnimatedImage(MythImageReader &imageReader,
 
     if (images.size())
     {
-        d->m_AnimatedImage = true;
+        m_animatedImage = true;
         SetImages(images);
         if ((m_Delay == -1) &&
             (imageReader.supportsAnimation()) &&
@@ -1301,6 +1302,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_isGreyscale = im->m_isGreyscale;
 
     m_animationCycle = im->m_animationCycle;
+    m_animatedImage = im->m_animatedImage;
 
     //SetImages(im->m_Images);
 
