@@ -19,7 +19,3 @@ TARGETDEPS += $${DEPLIBS}/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${DEPLIBS}/libmythdb-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${DEPLIBS}/libmythui-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${DEPLIBS}/libmythupnp-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${DEPLIBS}/libmythavutil$${SLIBSUF}.$${libavutil_VERSION_MAJOR}
-TARGETDEPS += $${DEPLIBS}/libmythavcodec$${SLIBSUF}.$${libavcodec_VERSION_MAJOR}
-TARGETDEPS += $${DEPLIBS}/libmythavcore$${SLIBSUF}.$${libavcore_VERSION_MAJOR}
-TARGETDEPS += $${DEPLIBS}/libmythavformat$${SLIBSUF}.$${libavformat_VERSION_MAJOR}
