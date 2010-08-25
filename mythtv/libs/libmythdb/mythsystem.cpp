@@ -156,10 +156,29 @@ uint myth_system(const QString &command, int flags)
 
                 qApp->processEvents();
 
-
                 if (res > 0)
                 {
-                    result = WEXITSTATUS(status);
+                    if( WIFEXITED(status) )
+                    {
+                        result = WEXITSTATUS(status);
+                        VERBOSE(VB_IMPORTANT, 
+                            QString("exited: status=%1, result=%2")
+                            .arg(status) .arg(result));
+                    }
+                    else if( WIFSIGNALED(status) )
+                    {
+                        result = GENERIC_EXIT_SIGNALLED;
+                        VERBOSE(VB_IMPORTANT, 
+                            QString("signal: status=%1, result=%2, signal=%3")
+                            .arg(status) .arg(result) .arg(WTERMSIG(status)));
+                    }
+                    else
+                    {
+                        result = GENERIC_EXIT_NOT_OK;
+                        VERBOSE(VB_IMPORTANT, 
+                            QString("other: status=%1, result=%2")
+                            .arg(status) .arg(result));
+                    }
                     break;
                 }
 
@@ -174,8 +193,30 @@ uint myth_system(const QString &command, int flags)
                         .arg(strerror(errno)));
                 result = GENERIC_EXIT_NOT_OK;
             }
-            else
-                result = WEXITSTATUS(status);
+            else 
+            {
+                if( WIFEXITED(status) )
+                {
+                    result = WEXITSTATUS(status);
+                    VERBOSE(VB_IMPORTANT, 
+                        QString("exited: status=%1, result=%2")
+                        .arg(status) .arg(result));
+                }
+                else if( WIFSIGNALED(status) )
+                {
+                    result = GENERIC_EXIT_SIGNALLED;
+                    VERBOSE(VB_IMPORTANT, 
+                        QString("signal: status=%1, result=%2, signal=%3")
+                        .arg(status) .arg(result) .arg(WTERMSIG(status)));
+                }
+                else
+                {
+                    result = GENERIC_EXIT_NOT_OK;
+                    VERBOSE(VB_IMPORTANT, 
+                        QString("other: status=%1, result=%2")
+                        .arg(status) .arg(result));
+                }
+            }
         }
     }
 

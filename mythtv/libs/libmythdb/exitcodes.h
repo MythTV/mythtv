@@ -14,8 +14,9 @@
 #define GENERIC_EXIT_EXECL_ERROR                  246
 #define FIXME_BUG__LIBRARY_EXIT_NO_THEME          245
 #define FIXME_BUG__LIBRARY_EXIT_TFW_FAILED_OPEN   244
-#define GENERIC_EXIT_START                        244
 #define GENERIC_EXIT_INVALID_TIMEZONE             243
+#define GENERIC_EXIT_SIGNALLED                    243
+#define GENERIC_EXIT_START                        243
 #define GENERIC_EXIT_CMD_NOT_FOUND                127
 
 // libmyth
@@ -60,8 +61,8 @@
 #define BACKEND_BUGGY_EXIT_UNKNOWN_FILE_SOCK      GENERIC_EXIT_START-10
 #define BACKEND_EXIT_NO_CAP_CARD                  GENERIC_EXIT_START-11
 #define BACKEND_EXIT_NO_CHAN_DATA                 GENERIC_EXIT_START-12
-#define BACKEND_EXIT_START                        GENERIC_EXIT_START-12
 #define BACKEND_EXIT_PERMISSIONS_ERROR            GENERIC_EXIT_START-13
+#define BACKEND_EXIT_START                        GENERIC_EXIT_START-13
 
 // mythtranscode
 #define TRANSCODE_EXIT_OK                         GENERIC_EXIT_OK
@@ -82,8 +83,8 @@
 #define TRANSCODE_BUGGY_EXIT_INVALID_AUDIO        GENERIC_EXIT_START-10
 #define TRANSCODE_BUGGY_EXIT_INVALID_VIDEO        GENERIC_EXIT_START-11
 #define TRANSCODE_BUGGY_EXIT_DEADLOCK             GENERIC_EXIT_START-12
-#define TRANSCODE_EXIT_START                      GENERIC_EXIT_START-12
 #define TRANSCODE_EXIT_RESTART                    GENERIC_EXIT_START-13
+#define TRANSCODE_EXIT_START                      GENERIC_EXIT_START-13
 
 // mythfilldatabase
 #define FILLDB_EXIT_OK                            GENERIC_EXIT_OK
@@ -135,8 +136,8 @@
 #define COMMFLAG_EXIT_NO_PROGRAM_DATA             GENERIC_EXIT_START-4
 #define COMMFLAG_EXIT_IN_USE                      GENERIC_EXIT_START-5
 #define COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA          GENERIC_EXIT_START-6
-#define COMMFLAG_EXIT_START                       GENERIC_EXIT_START-6
 #define COMMFLAG_EXIT_NO_RINGBUFFER               GENERIC_EXIT_START-7
+#define COMMFLAG_EXIT_START                       GENERIC_EXIT_START-7
 
 // MythTranscodeDaemon
 #define MTD_EXIT_OK                               GENERIC_EXIT_OK
