@@ -742,13 +742,13 @@ SwsContext *sws_getContext(int srcW, int srcH, enum PixelFormat srcFormat,
                    SWS_CPU_CAPS_BFIN ))) {
         cpuflags = mm_support();
 
-        if (cpuflags & FF_MM_MMX)
+        if (HAVE_MMX && cpuflags & FF_MM_MMX)
             flags |= SWS_CPU_CAPS_MMX;
-        if (cpuflags & FF_MM_MMX2)
+        if (HAVE_MMX2 && cpuflags & FF_MM_MMX2)
             flags |= SWS_CPU_CAPS_MMX2;
-        if (cpuflags & FF_MM_3DNOW)
+        if (HAVE_AMD3DNOW && cpuflags & FF_MM_3DNOW)
             flags |= SWS_CPU_CAPS_3DNOW;
-        if (cpuflags & FF_MM_ALTIVEC)
+        if (HAVE_ALTIVEC && cpuflags & FF_MM_ALTIVEC)
             flags |= SWS_CPU_CAPS_ALTIVEC;
     }
 

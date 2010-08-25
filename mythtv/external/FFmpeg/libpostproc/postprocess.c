@@ -975,13 +975,13 @@ pp_context *pp_get_context(int width, int height, int cpuCaps){
                      PP_CPU_CAPS_3DNOW | PP_CPU_CAPS_ALTIVEC ))) {
         cpuflags = mm_support();
 
-        if (cpuflags & FF_MM_MMX)
+        if (HAVE_MMX && cpuflags & FF_MM_MMX)
             cpuCaps |= PP_CPU_CAPS_MMX;
-        if (cpuflags & FF_MM_MMX2)
+        if (HAVE_MMX2 && cpuflags & FF_MM_MMX2)
             cpuCaps |= PP_CPU_CAPS_MMX2;
-        if (cpuflags & FF_MM_3DNOW)
+        if (HAVE_AMD3DNOW && cpuflags & FF_MM_3DNOW)
             cpuCaps |= PP_CPU_CAPS_3DNOW;
-        if (cpuflags & FF_MM_ALTIVEC)
+        if (HAVE_ALTIVEC && cpuflags & FF_MM_ALTIVEC)
             cpuCaps |= PP_CPU_CAPS_ALTIVEC;
     }
 
