@@ -569,3 +569,23 @@ void LiveTVChain::DelHostSocket(MythSocket *sock)
     m_inUseSocks.removeAll(sock);
 }
 
+static QString toString(const LiveTVChainEntry &v)
+{
+    return QString("%1: %2 (%3 to %4)%5")
+        .arg(v.cardtype,6).arg(v.chanid,4)
+        .arg(v.starttime.time().toString())
+        .arg(v.endtime.time().toString())
+        .arg(v.discontinuity?" discontinuous":"");
+}
+
+QString LiveTVChain::toString() const
+{
+    QMutexLocker lock(&m_lock);
+    QString ret = QString("LiveTVChain has %1 entries\n").arg(m_chain.size());
+    for (uint i = 0; i < (uint)m_chain.size(); i++)
+    {
+        ret += (QString((i==(uint)m_curpos) ? "* " : "  ") +
+                ::toString(m_chain[i]) + "\n");
+    }
+    return ret;
+}

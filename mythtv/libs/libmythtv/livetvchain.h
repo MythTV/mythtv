@@ -82,6 +82,8 @@ class MPUBLIC LiveTVChain
     uint HostSocketCount(void) const;
     void DelHostSocket(MythSocket *sock);
  
+    QString toString() const;
+
   private:
     void BroadcastUpdate();
     void GetEntryAt(int at, LiveTVChainEntry &entry) const;
