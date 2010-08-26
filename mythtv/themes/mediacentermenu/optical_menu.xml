@@ -18,14 +18,6 @@
     </button>
 
     <button>
-        <type>DVD_RIP</type>
-        <text>Import DVD</text>
-        <description>Import video from a movie DVD</description>
-        <action>JUMP Rip DVD</action>
-        <depends>mythvideo</depends>
-    </button>
-
-    <button>
         <type>ARCHIVE</type>
         <text>Archive Files</text>
         <description>Write video to a data DVD</description>
