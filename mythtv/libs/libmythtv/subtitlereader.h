@@ -13,8 +13,10 @@ extern "C" {
 class AVSubtitles
 {
   public:
+    AVSubtitles() : fixPosition(false) { }
     MythDeque<AVSubtitle> buffers;
     QMutex lock;
+    bool   fixPosition;
 };
 
 class RawTextSubs
@@ -36,7 +38,7 @@ class SubtitleReader
     void EnableRawTextSubtitles(bool enable);
 
     AVSubtitles* GetAVSubtitles(void) { return &m_AVSubtitles; }
-    void AddAVSubtitle(const AVSubtitle& subtitle);
+    void AddAVSubtitle(const AVSubtitle& subtitle, bool fix_position);
     void ClearAVSubtitles(void);
     void FreeAVSubtitle(const AVSubtitle &sub);
 

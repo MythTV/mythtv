@@ -28,7 +28,8 @@ void SubtitleReader::EnableRawTextSubtitles(bool enable)
     m_RawTextSubtitlesEnabled = enable;
 }
 
-void SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle)
+void SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
+                                   bool fix_position)
 {
     if (!m_AVSubtitlesEnabled)
     {
@@ -36,6 +37,7 @@ void SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle)
         return;
     }
     m_AVSubtitles.lock.lock();
+    m_AVSubtitles.fixPosition = fix_position;
     m_AVSubtitles.buffers.push_back(subtitle);
     m_AVSubtitles.lock.unlock();
 }

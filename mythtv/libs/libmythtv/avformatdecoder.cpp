@@ -1941,10 +1941,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             enc->codec_type != CODEC_TYPE_SUBTITLE)
             continue;
 
-        // skip DVB teletext and text subs, there is no libavcodec decoder
+        // skip DVB teletext, text and SSA subs, there is no libavcodec decoder
         if (enc->codec_type == CODEC_TYPE_SUBTITLE &&
            (enc->codec_id   == CODEC_ID_DVB_TELETEXT ||
-            enc->codec_id   == CODEC_ID_TEXT))
+            enc->codec_id   == CODEC_ID_TEXT ||
+            enc->codec_id   == CODEC_ID_SSA))
             continue;
 
         VERBOSE(VB_PLAYBACK, LOC + QString("Looking for decoder for %1")
@@ -3338,7 +3339,10 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
                 .arg(subtitle.end_display_time));
 
         if (subReader)
-            subReader->AddAVSubtitle(subtitle);
+        {
+            subReader->AddAVSubtitle(subtitle,
+                                 curstream->codec->codec_id == CODEC_ID_XSUB);
+        }
     }
 
     return true;
