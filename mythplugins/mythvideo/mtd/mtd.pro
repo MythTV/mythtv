@@ -11,6 +11,7 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 LIBS += -lmythdvdnav-$$LIBVERSION -ldl
+LIBS += -lmythtv-$$LIBVERSION 
 
 HEADERS += ../mythvideo/dbcheck.h logging.h mtd.h 
 HEADERS += jobthread.h dvdprobe.h fileobs.h threadevents.h
