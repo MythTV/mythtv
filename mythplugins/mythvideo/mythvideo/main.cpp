@@ -20,7 +20,6 @@
 #include "cleanup.h"
 #include "globals.h"
 #include "videolist.h"
-#include "dvdripbox.h"
 
 #if defined(AEW_VG)
 #include <valgrind/memcheck.h>
@@ -85,33 +84,6 @@ namespace
 
     // This stores the last MythMediaDevice that was detected:
     QString gDVDdevice;
-
-    void startDVDRipper()
-    {
-        // MTD could check this and log an error,
-        // but informing the user here/now is probably better
-        QString ripDir = gCoreContext->GetSetting("DVDRipLocation");
-        if (ripDir.length() && !QDir(ripDir).exists())
-            ShowOkPopup(QObject::tr("No directory %1 - DVD importing will fail")
-                        .arg(ripDir));
-
-        QString dvd_device = gDVDdevice;
-
-        if (dvd_device.isEmpty())
-            dvd_device = MediaMonitor::defaultDVDdevice();
-
-#ifdef Q_OS_MAC
-        // Convert the BSD 'leaf' name to a raw device in /dev
-        dvd_device.prepend("/dev/r");
-#endif
-
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-        DVDRipBox *mythdvdrip = new DVDRipBox(mainStack, "ripdvd", dvd_device);
-
-        if (mythdvdrip->Create())
-            mainStack->AddScreen(mythdvdrip);
-    }
 
     void playVCD()
     {
@@ -278,9 +250,6 @@ namespace
             case 2 : // play DVD
                 playDVD();
                 break;
-            case 3 : //Rip DVD
-                startDVDRipper();
-                break;
             default:
                 VERBOSE(VB_IMPORTANT, "mythdvd main.o: handleMedia() does not "
                         "know what to do");
@@ -361,9 +330,6 @@ namespace
         REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
             "MythDVD VCD Media Handler"), "", "", handleVCDMedia,
             MEDIATYPE_VCD, QString::null);
-
-        REG_JUMP("Rip DVD", QT_TRANSLATE_NOOP("MythControls",
-            "Import a DVD into your MythVideo database"), "", startDVDRipper);
     }
 
     class RunSettingsCompletion : public QObject
@@ -475,15 +441,6 @@ namespace
         {
             playVCD();
         }
-        else if (sel == "dvd_rip")
-        {
-            startDVDRipper();
-        }
-        else if (sel == "dvd_settings_rip")
-        {
-            DVDRipperSettings settings;
-            settings.exec();
-        }
     }
 
     int runMenu(const QString &menuname)
@@ -538,10 +495,6 @@ int mythplugin_init(const char *libversion)
     VideoGeneralSettings general;
     general.Load();
     general.Save();
-
-    DVDRipperSettings rsettings;
-    rsettings.Load();
-    rsettings.Save();
 
     setupKeys();
 

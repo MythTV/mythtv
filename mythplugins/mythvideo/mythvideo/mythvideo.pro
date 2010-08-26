@@ -27,10 +27,6 @@ HEADERS += cleanup.h globals.h dirscan.h videoutils.h
 HEADERS += parentalcontrols.h playercommand.h playersettings.h
 HEADERS += metadatasettings.h
 
-#MythDVD
-HEADERS += dvdripbox.h dvdinfo.h titledialog.h
-
-
 SOURCES += main.cpp metadata.cpp
 SOURCES += videofilter.cpp dbcheck.cpp cleanup.cpp
 SOURCES += globalsettings.cpp fileassoc.cpp editmetadata.cpp
@@ -39,9 +35,6 @@ SOURCES += videolist.cpp dbaccess.cpp metadatalistmanager.cpp
 SOURCES += globals.cpp dirscan.cpp videoutils.cpp
 SOURCES += parentalcontrols.cpp playercommand.cpp
 SOURCES += playersettings.cpp metadatasettings.cpp
-
-#MythDVD
-SOURCES += dvdripbox.cpp dvdinfo.cpp titledialog.cpp
 
 mingw:DEFINES += USING_MINGW
 

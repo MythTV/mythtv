@@ -28,12 +28,4 @@
       <description>Associate new file extensions</description>
    </button>
 
-   <!-- MythDVD -->
-   <button>
-      <type>DVD_RIP</type>
-      <text>Rip Settings</text>
-      <action>DVD_SETTINGS_RIP</action>
-      <description>DVD Rip and Transcode options</description>
-   </button>
-
 </mythmenu>

@@ -155,7 +155,6 @@ HostComboBox *SetOnInsertDVD()
     gc->addSelection(QObject::tr("Display mythdvd menu"),"1");
     gc->addSelection(QObject::tr("Do nothing"),"0");
     gc->addSelection(QObject::tr("Play DVD"),"2");
-    gc->addSelection(QObject::tr("Rip DVD"),"3");
     gc->setHelpText(QObject::tr("Media Monitoring should be turned on to "
                    "allow this feature (Setup -> General -> CD/DVD Monitor)."));
     return gc;
@@ -181,149 +180,6 @@ HostSlider *SetDVDDriveSpeed()
                                 "Slower speeds may reduce drive noise but in "
                                 "some cases it causes playback to stutter."));
     return gs;
-}
-
-// Ripper Settings
-
-HostLineEdit *SetRipDirectory()
-{
-    HostLineEdit *gc = new HostLineEdit("DVDRipLocation");
-    gc->setLabel(QObject::tr("Directory to hold temporary files"));
-#ifdef Q_WS_MACX
-    gc->setValue(QDir::homePath() + "/Library/Application Support");
-#else
-    gc->setValue("/var/lib/mythdvd/temp");
-#endif
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythDVD needs to have write permission "
-                    "to the directory."));
-    return gc;
-}
-
-HostLineEdit *TitlePlayCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("TitlePlayCommand");
-    gc->setLabel(QObject::tr("Title Playing Command"));
-    gc->setValue("mplayer dvd://%t -dvd-device %d -fs -zoom -vo xv -aid %a "
-                 "-channels %c");
-    gc->setHelpText(QObject::tr("This is a command used to preview a given "
-                    "title on a DVD. If present %t will be set "
-                    "to the title, %d for device, %a for audio "
-                    "track, %c for audio channels."));
-    return gc;
-}
-
-HostLineEdit *SubTitleCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("SubTitleCommand");
-    gc->setLabel(QObject::tr("Subtitle arguments:"));
-    gc->setValue("-sid %s");
-    gc->setHelpText(QObject::tr("If you choose any subtitles for ripping, this "
-                    "command is added to the end of the Title Play "
-                    "Command to allow previewing of subtitles. If  "
-                    "present %s will be set to the subtitle track. "));
-    return gc;
-}
-
-HostLineEdit *TranscodeCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("TranscodeCommand");
-    gc->setLabel(QObject::tr("Base transcode command"));
-    gc->setValue("transcode");
-    gc->setHelpText(QObject::tr("This is the base (without arguments) command "
-                    "to run transcode on your system."));
-    return gc;
-}
-
-HostSpinBox *MTDPortNumber()
-{
-    HostSpinBox *gc = new HostSpinBox("MTDPort", 1024, 65535, 1);
-    gc->setLabel(QObject::tr("MTD port number"));
-    gc->setValue(2442);
-    gc->setHelpText(QObject::tr("The port number that should be used for "
-                    "communicating with the MTD (Myth Transcoding "
-                    "Daemon)"));
-    return gc;
-}
-
-HostCheckBox *MTDLogFlag()
-{
-    HostCheckBox *gc = new HostCheckBox("MTDLogFlag");
-    gc->setLabel(QObject::tr("MTD logs to terminal window"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, the MTD (Myth Transcoding Daemon) "
-                    "will log to the window it is started from. "
-                    "Otherwise, it will write to a file called  "
-                    "mtd.log in the top level ripping directory."));
-    return gc;
-}
-
-HostCheckBox *MTDac3Flag()
-{
-    HostCheckBox *gc = new HostCheckBox("MTDac3Flag");
-    gc->setLabel(QObject::tr("Transcode AC3 Audio"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, the MTD (Myth Transcoding Daemon) "
-                    "will, by default, preserve AC3 (Dolby "
-                    "Digital) audio in transcoded files. "));
-    return gc;
-}
-
-HostCheckBox *MTDxvidFlag()
-{
-    HostCheckBox *gc = new HostCheckBox("MTDxvidFlag");
-    gc->setLabel(QObject::tr("Use xvid rather than divx"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set, mythdvd will use the (open, free) "
-                    "xvid codec rather than divx whenever "
-                    "possible."));
-    return gc;
-}
-
-HostCheckBox *MTDTrustTranscodeFRDetect()
-{
-    HostCheckBox *gc = new HostCheckBox("mythvideo.TrustTranscodeFRDetect");
-    gc->setLabel(QObject::tr("Let transcode determine frame rate"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set, transcode will determine the frame "
-                                "rate automatically. If not set, 23.976 is "
-                                "assumed."));
-    return gc;
-}
-
-HostSpinBox *MTDNiceLevel()
-{
-    HostSpinBox *gc = new HostSpinBox("MTDNiceLevel", 0, 20, 1);
-    gc->setLabel(QObject::tr("Nice level for MTD"));
-    gc->setValue(20);
-    gc->setHelpText(QObject::tr("This determines the priority of the Myth "
-                    "Transcoding Daemon. Higher numbers mean "
-                    "lower priority (more CPU to other tasks)."));
-    return gc;
-}
-
-HostSpinBox *MTDConcurrentTranscodes()
-{
-    HostSpinBox *gc = new HostSpinBox("MTDConcurrentTranscodes", 1, 99, 1);
-    gc->setLabel(QObject::tr("Simultaneous Transcode Jobs"));
-    gc->setValue(1);
-    gc->setHelpText(QObject::tr("This determines the number of simultaneous "
-                    "transcode jobs. If set at 1 (the default), "
-                    "there will only be one active job at a time."));
-    return gc;
-}
-
-HostSpinBox *MTDRipSize()
-{
-    HostSpinBox *gc = new HostSpinBox("MTDRipSize", 0, 4096, 1);
-    gc->setLabel(QObject::tr("Ripped video segments"));
-    gc->setValue(0);
-    gc->setHelpText(QObject::tr("If set to something other than 0, ripped "
-                    "video titles will be broken up into files "
-                    "of this size (in MB). Applies to both perfect "
-                    "quality recordings and intermediate files "
-                    "used for transcoding."));
-    return gc;
 }
 
 struct ConfigPage
@@ -465,29 +321,4 @@ VideoGeneralSettings::VideoGeneralSettings()
                        .arg(pages.size()));
         addChild(*p);
     }
-}
-
-DVDRipperSettings::DVDRipperSettings()
-{
-    VerticalConfigurationGroup *rippersettings =
-            new VerticalConfigurationGroup(false);
-    rippersettings->setLabel(QObject::tr("DVD Ripper Settings"));
-    rippersettings->addChild(SetRipDirectory());
-    rippersettings->addChild(TitlePlayCommand());
-    rippersettings->addChild(SubTitleCommand());
-    rippersettings->addChild(TranscodeCommand());
-    addChild(rippersettings);
-
-    VerticalConfigurationGroup *mtdsettings =
-            new VerticalConfigurationGroup(false);
-    mtdsettings->setLabel(QObject::tr("MTD Settings"));
-    mtdsettings->addChild(MTDPortNumber());
-    mtdsettings->addChild(MTDNiceLevel());
-    mtdsettings->addChild(MTDConcurrentTranscodes());
-    mtdsettings->addChild(MTDRipSize());
-    mtdsettings->addChild(MTDLogFlag());
-    mtdsettings->addChild(MTDac3Flag());
-    mtdsettings->addChild(MTDxvidFlag());
-    mtdsettings->addChild(MTDTrustTranscodeFRDetect());
-    addChild(mtdsettings);
 }

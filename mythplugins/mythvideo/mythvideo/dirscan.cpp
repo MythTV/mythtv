@@ -8,7 +8,7 @@
 
 #include <remoteutil.h>
 #include <mythcontext.h>
-#include "mythverbose.h"
+#include <mythverbose.h>
 #include "videoutils.h"
 
 DirectoryHandler::~DirectoryHandler()
