@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythvideo i18n theme
+SUBDIRS = mythvideo mtd i18n theme
