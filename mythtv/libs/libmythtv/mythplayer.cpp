@@ -1414,7 +1414,7 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         return;
     }
     int mode = NextCaptionTrack(kDisplayNone);
-    if (origMode != mode)
+    if (origMode != (uint)mode)
     {
         DisableCaptions(origMode, false);
 
