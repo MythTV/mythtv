@@ -205,7 +205,8 @@ bool AudioOutputOSS::OpenDevice()
 
     audio_buf_info info;
     ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-    fragment_size = info.fragsize;
+    // align by frame size
+    fragment_size = info.fragsize - (info.fragsize % output_bytes_per_frame);
 
     soundcard_buffer_size = info.bytes;
 
