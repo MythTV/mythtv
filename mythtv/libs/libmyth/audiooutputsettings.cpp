@@ -196,6 +196,8 @@ int AudioOutputSettings::SampleSize(AudioFormat format)
 void AudioOutputSettings::AddSupportedChannels(int channels)
 {
     m_channels.push_back(channels);
+    VERBOSE(VB_AUDIO, LOC + QString("%1 channel(s) are supported")
+            .arg(channels));
 }
 
 bool AudioOutputSettings::IsSupportedChannels(int channels)
