@@ -456,7 +456,7 @@ class datetime( _pydatetime ):
 
     @classmethod
     def fromRfc(cls, rfctime):
-        return cls.strptime(rfctime, '%a, %d %b %Y %H:%M:%S %Z').strip()
+        return cls.strptime(rfctime.strip(), '%a, %d %b %Y %H:%M:%S %Z')
 
     @classmethod
     def duck(cls, t):
