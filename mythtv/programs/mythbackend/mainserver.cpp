@@ -2749,8 +2749,13 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
             retlist << QString::number(fileinfo.st_gid);
             retlist << QString::number(fileinfo.st_rdev);
             retlist << QString::number(fileinfo.st_size);
+#ifdef USING_MINGW
+            retlist << "0"; // st_blksize
+            retlist << "0"; // st_blocks
+#else
             retlist << QString::number(fileinfo.st_blksize);
             retlist << QString::number(fileinfo.st_blocks);
+#endif
             retlist << QString::number(fileinfo.st_atime);
             retlist << QString::number(fileinfo.st_mtime);
             retlist << QString::number(fileinfo.st_ctime);
