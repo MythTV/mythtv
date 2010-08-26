@@ -1,5 +1,8 @@
-
+#if defined(_WIN32)
+#include <windows.h>
+#else
 #include <dlfcn.h>
+#endif
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -13,7 +16,7 @@
 #include <QReadWriteLock>
 
 #include "mythconfig.h"
-
+#include "compat.h"
 #include "mythcorecontext.h"
 #include "mythverbose.h"
 #include "remotefile.h"
