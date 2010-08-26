@@ -3,6 +3,7 @@ using namespace std;
 
 #include <QUrl>
 
+#include "mythconfig.h"
 #include "mythdb.h"
 #include "remotefile.h"
 #include "decodeencode.h"
@@ -275,8 +276,13 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
             fileinfo->st_gid       = strlist[pos++].toLongLong();
             fileinfo->st_rdev      = strlist[pos++].toLongLong();
             fileinfo->st_size      = strlist[pos++].toLongLong();
+#ifdef USING_MINGW
+            pos++; // st_blksize
+            pos++; // st_blocks
+#else
             fileinfo->st_blksize   = strlist[pos++].toLongLong();
             fileinfo->st_blocks    = strlist[pos++].toLongLong();
+#endif
             fileinfo->st_atime     = strlist[pos++].toLongLong();
             fileinfo->st_mtime     = strlist[pos++].toLongLong();
             fileinfo->st_ctime     = strlist[pos++].toLongLong();
