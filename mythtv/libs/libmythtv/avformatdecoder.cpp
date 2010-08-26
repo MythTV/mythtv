@@ -1848,7 +1848,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     private_dec = PrivateDecoder::Create(
                                             dec, no_hardware_decoders, enc);
-                    thread_count = 1;
+                    if (private_dec)
+                        thread_count = 1;
                 }
 
                 if (!codec_is_std(video_codec_id))
