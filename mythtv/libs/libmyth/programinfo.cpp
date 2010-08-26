@@ -1865,13 +1865,13 @@ void ProgramInfo::SetPathname(const QString &pn) const
     ProgramInfoType pit = kProgramInfoTypeVideoFile;
     if (chanid)
         pit = kProgramInfoTypeRecording;
-    else if (pathname.toLower().startsWith("dvd:"))
+    else if (myth_FileIsDVD(pathname))
         pit = kProgramInfoTypeVideoDVD;
     else if (pathname.toLower().startsWith("http:"))
         pit = kProgramInfoTypeVideoStreamingHTML;
     else if (pathname.toLower().startsWith("rtsp:"))
         pit = kProgramInfoTypeVideoStreamingRTSP;
-    else if (pathname.toLower().startsWith("bd:"))
+    else if (myth_FileIsBD(pathname))
         pit = kProgramInfoTypeVideoBD;
     const_cast<ProgramInfo*>(this)->SetProgramInfoType(pit);
 }

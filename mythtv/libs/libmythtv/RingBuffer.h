@@ -35,6 +35,7 @@ class MPUBLIC RingBuffer : protected QThread
     void SetWriteBufferMinWriteSize(int newMinSize);
     void UpdateRawBitrate(uint rawbitrate);
     void UpdatePlaySpeed(float playspeed);
+    void SetStreamOnly(bool stream) { streamOnly = stream; }
 
     // Gets
     /// Returns name of file used by this RingBuffer
@@ -161,6 +162,7 @@ class MPUBLIC RingBuffer : protected QThread
     bool readsallowed;            // not protected by a lock HR
     volatile bool wantseek;       // not protected by a lock HR
     bool setswitchtonext;         // protected by rwlock
+    bool streamOnly;
 
     uint           rawbitrate;    // protected by rwlock
     float          playspeed;     // protected by rwlock

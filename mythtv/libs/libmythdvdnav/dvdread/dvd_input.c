@@ -27,6 +27,7 @@
 #include "config.h"
 #include "dvdread/dvd_reader.h"
 #include "dvd_input.h"
+#include "mythiowrapper.h"
 
 
 /* The function pointers that is the exported interface of this file. */
@@ -170,9 +171,9 @@ static dvd_input_t file_open(const char *target)
 
   /* Open the device */
 #if !defined(WIN32) && !defined(__OS2__)
-  dev->fd = open(target, O_RDONLY);
+  dev->fd = mythfile_open(target, O_RDONLY);
 #else
-  dev->fd = open(target, O_RDONLY | O_BINARY);
+  dev->fd = mythfile_open(target, O_RDONLY | O_BINARY);
 #endif
   if(dev->fd < 0) {
     perror("libdvdread: Could not open input");
@@ -199,7 +200,7 @@ static int file_seek(dvd_input_t dev, int blocks)
 {
   off_t pos;
 
-  pos = lseek(dev->fd, (off_t)blocks * (off_t)DVD_VIDEO_LB_LEN, SEEK_SET);
+  pos = mythfile_seek(dev->fd, (off_t)blocks * (off_t)DVD_VIDEO_LB_LEN, SEEK_SET);
   if(pos < 0) {
     return pos;
   }
@@ -227,7 +228,7 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks, int flags)
 
   while(len > 0) {
 
-    ret = read(dev->fd, buffer, len);
+    ret = mythfile_read(dev->fd, buffer, len);
 
     if(ret < 0) {
       /* One of the reads failed, too bad.  We won't even bother
@@ -241,7 +242,7 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks, int flags)
        * Adjust the file position back to the previous block boundary. */
       size_t bytes = (size_t)blocks * DVD_VIDEO_LB_LEN - len;
       off_t over_read = -(bytes % DVD_VIDEO_LB_LEN);
-      /*off_t pos =*/ lseek(dev->fd, over_read, SEEK_CUR);
+      /*off_t pos =*/ mythfile_seek(dev->fd, over_read, SEEK_CUR);
       /* should have pos % 2048 == 0 */
       return (int) (bytes / DVD_VIDEO_LB_LEN);
     }
@@ -259,7 +260,7 @@ static int file_close(dvd_input_t dev)
 {
   int ret;
 
-  ret = close(dev->fd);
+  ret = mythfile_close(dev->fd);
 
   if(ret < 0)
     return ret;
@@ -273,7 +274,7 @@ static int file_close(dvd_input_t dev)
 /**
  * Setup read functions with either libdvdcss or minimal DVD access.
  */
-int dvdinput_setup(void)
+int dvdinput_setup(const char *path)
 {
   void *dvdcss_library = NULL;
   char **dvdcss_version = NULL;
@@ -356,7 +357,8 @@ int dvdinput_setup(void)
   }
 #endif /* HAVE_DVDCSS_DVDCSS_H */
 
-  if(dvdcss_library != NULL) {
+  // CSS isn't possible over the myth:// protocol
+  if(strncmp(path, "myth://", 7) && dvdcss_library != NULL) {
     /*
     char *psz_method = getenv( "DVDCSS_METHOD" );
     char *psz_verbose = getenv( "DVDCSS_VERBOSE" );

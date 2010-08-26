@@ -16,7 +16,6 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     refLock(QMutex::NonRecursive), refCount(0), writemode(false)
 {
     pginfo = new ProgramInfo(filename);
-    pginfo->SetPathname(pginfo->GetPlaybackURL());
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
 }
 
@@ -27,7 +26,6 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     refLock(QMutex::NonRecursive), refCount(0), writemode(write)
 {
     pginfo = new ProgramInfo(filename);
-    pginfo->SetPathname(pginfo->GetPlaybackURL());
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)

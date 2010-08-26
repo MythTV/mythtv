@@ -235,6 +235,12 @@ bool RemoteFile::DeleteFile(const QString &url)
 
 bool RemoteFile::Exists(const QString &url)
 {
+    struct stat fileinfo;
+    return Exists(url, &fileinfo);
+}
+
+bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
+{
     bool result      = false;
     QUrl qurl(url);
     QString filename = qurl.path();
@@ -256,7 +262,26 @@ bool RemoteFile::Exists(const QString &url)
     gCoreContext->SendReceiveStringList(strlist);
 
     if (strlist[0] == "1")
+    {
         result = true;
+        if (fileinfo)
+        {
+            int pos = 2;
+            fileinfo->st_dev       = strlist[pos++].toLongLong();
+            fileinfo->st_ino       = strlist[pos++].toLongLong();
+            fileinfo->st_mode      = strlist[pos++].toLongLong();
+            fileinfo->st_nlink     = strlist[pos++].toLongLong();
+            fileinfo->st_uid       = strlist[pos++].toLongLong();
+            fileinfo->st_gid       = strlist[pos++].toLongLong();
+            fileinfo->st_rdev      = strlist[pos++].toLongLong();
+            fileinfo->st_size      = strlist[pos++].toLongLong();
+            fileinfo->st_blksize   = strlist[pos++].toLongLong();
+            fileinfo->st_blocks    = strlist[pos++].toLongLong();
+            fileinfo->st_atime     = strlist[pos++].toLongLong();
+            fileinfo->st_mtime     = strlist[pos++].toLongLong();
+            fileinfo->st_ctime     = strlist[pos++].toLongLong();
+        }
+    }
 
     return result;
 }

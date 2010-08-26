@@ -106,7 +106,7 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "58";
+    our $PROTO_VERSION = "59";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by

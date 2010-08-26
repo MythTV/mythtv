@@ -9,6 +9,7 @@ target.path = $${LIBDIR}
 INCLUDEPATH += . ../../
 INCLUDEPATH += ./bdnav
 INCLUDEPATH += ../libmythdb
+INCLUDEPATH += ../libmythtv
 
 DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H HAVE_DIRENT_H
 

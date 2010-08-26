@@ -1,6 +1,9 @@
 #ifndef REMOTEFILE_H_
 #define REMOTEFILE_H_
 
+#include <sys/stat.h>
+
+#include <QDateTime>
 #include <QStringList>
 #include <QMutex>
 
@@ -24,6 +27,7 @@ class MPUBLIC RemoteFile
     long long Seek(long long pos, int whence, long long curpos = -1);
 
     static bool DeleteFile(const QString &url);
+    static bool Exists(const QString &url, struct stat *fileinfo);
     static bool Exists(const QString &url);
     static QString GetFileHash(const QString &url);
     static QDateTime LastModified(const QString &url);

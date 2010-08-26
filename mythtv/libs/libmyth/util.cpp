@@ -47,6 +47,7 @@ using namespace std;
 #include "msocketdevice.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"
+#include "remotefile.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 
@@ -1304,6 +1305,40 @@ void myth_yield(void)
 #else
     usleep(5000);
 #endif
+}
+
+bool myth_FileIsDVD(const QString &filename)
+{
+    if ((filename.toLower().startsWith("dvd:")) ||
+        (filename.toLower().endsWith(".iso")) ||
+        (filename.toLower().endsWith(".img")) ||
+        (QDir(filename + "/VIDEO_TS").exists()))
+        return true;
+
+    if (filename.toLower().startsWith("myth://"))
+    {
+        QString tmpFile = filename + "/VIDEO_TS";
+        if (RemoteFile::Exists(tmpFile))
+            return true;
+    }
+
+    return false;
+}
+
+bool myth_FileIsBD(const QString &filename)
+{
+    if ((filename.toLower().startsWith("bd:")) ||
+        (QDir(filename + "/BDMV").exists()))
+        return true;
+
+    if (filename.toLower().startsWith("myth://"))
+    {
+        QString tmpFile = filename + "/BDMV";
+        if (RemoteFile::Exists(tmpFile))
+            return true;
+    }
+
+    return false;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -2737,6 +2737,24 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
     {
         retlist << "1";
         retlist << fullname;
+
+        struct stat fileinfo;
+        if (stat(fullname.toLocal8Bit().constData(), &fileinfo) >= 0)
+        {
+            retlist << QString::number(fileinfo.st_dev);
+            retlist << QString::number(fileinfo.st_ino);
+            retlist << QString::number(fileinfo.st_mode);
+            retlist << QString::number(fileinfo.st_nlink);
+            retlist << QString::number(fileinfo.st_uid);
+            retlist << QString::number(fileinfo.st_gid);
+            retlist << QString::number(fileinfo.st_rdev);
+            retlist << QString::number(fileinfo.st_size);
+            retlist << QString::number(fileinfo.st_blksize);
+            retlist << QString::number(fileinfo.st_blocks);
+            retlist << QString::number(fileinfo.st_atime);
+            retlist << QString::number(fileinfo.st_mtime);
+            retlist << QString::number(fileinfo.st_ctime);
+        }
     }
     else
         retlist << "0";

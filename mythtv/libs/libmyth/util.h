@@ -82,6 +82,9 @@ MPUBLIC bool IsPulseAudioRunning(void);
 MPUBLIC bool myth_nice(int val);
 MPUBLIC void myth_yield(void);
 
+MPUBLIC bool myth_FileIsDVD(const QString &filename);
+MPUBLIC bool myth_FileIsBD(const QString &filename);
+
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

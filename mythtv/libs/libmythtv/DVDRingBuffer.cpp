@@ -1306,7 +1306,8 @@ void DVDRingBufferPriv::SetDVDSpeed(void)
  */
 void DVDRingBufferPriv::SetDVDSpeed(int speed)
 {
-    MediaMonitor::SetCDSpeed(m_dvdFilename.toLocal8Bit().constData(), speed);
+    if (m_dvdFilename.startsWith("/"))
+        MediaMonitor::SetCDSpeed(m_dvdFilename.toLocal8Bit().constData(), speed);
 }
 
 /**\brief returns seconds left in the title

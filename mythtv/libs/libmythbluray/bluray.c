@@ -46,6 +46,9 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include <sys/types.h>
+
+#include "mythiowrapper.h"
 
 typedef int     (*fptr_int)();
 typedef int32_t (*fptr_int32)();
@@ -207,6 +210,7 @@ static void _close_m2ts(BD_STREAM *st)
 static int _open_m2ts(BLURAY *bd, BD_STREAM *st)
 {
     char *f_name;
+    struct stat buf;
 
     _close_m2ts(st);
 
@@ -217,8 +221,17 @@ static int _open_m2ts(BLURAY *bd, BD_STREAM *st)
     st->clip_block_pos = (st->clip_pos / 6144) * 6144;
 
     if ((st->fp = file_open(f_name, "rb"))) {
-        file_seek(st->fp, 0, SEEK_END);
-        if ((st->clip_size = file_tell(st->fp))) {
+// Original libbluray code
+//        file_seek(st->fp, 0, SEEK_END);
+//        if ((st->clip_size = file_tell(st->fp))) {
+// New 'stat' and modified 'if' to minimize RingBuffer seeking
+// Optimize here for now until we can optimize in the RingBuffer itself
+        if (mythfile_stat(f_name, &buf) == 0)
+            st->clip_size = buf.st_size;
+        else
+            st->clip_size = 0;
+
+        if (st->clip_size) {
             file_seek(st->fp, st->clip_block_pos, SEEK_SET);
             st->int_buf_off = 6144;
             X_FREE(f_name);

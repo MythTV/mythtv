@@ -68,6 +68,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #include "dvd_input.h"
 #include "dvdread/dvd_reader.h"
 #include "md5.h"
+#include "mythiowrapper.h"
 
 #define DEFAULT_UDF_CACHE_LEVEL 1
 
@@ -239,6 +240,7 @@ static dvd_reader_t *DVDOpenImageFile( const char *location, int have_css )
     dvdinput_close(dev);
     return NULL;
   }
+  memset( dvd, 0, sizeof( dvd_reader_t ) );
   dvd->isImageFile = 1;
   dvd->dev = dev;
   dvd->path_root = NULL;
@@ -353,7 +355,7 @@ dvd_reader_t *DVDOpen( const char *ppath )
     goto DVDOpen_error;
 
   /* Try to open libdvdcss or fall back to standard functions */
-  have_css = dvdinput_setup();
+  have_css = dvdinput_setup(path);
 
 #if defined(_WIN32) || defined(__OS2__)
   /* Strip off the trailing \ if it is not a drive */
@@ -366,7 +368,7 @@ dvd_reader_t *DVDOpen( const char *ppath )
   }
 #endif
 
-  ret = stat( path, &fileinfo );
+  ret = mythfile_stat( path, &fileinfo );
 
   if( ret < 0 ) {
 
@@ -419,6 +421,9 @@ dvd_reader_t *DVDOpen( const char *ppath )
               /* Also WIN32 does not have symlinks, so we don't need this bit of code. */
 
     /* Resolve any symlinks and get the absolute dir name. */
+    if (!strncmp(path, "myth://", 7))
+        dev_name = strdup( path );
+    else
     {
       if( ( cdir  = open( ".", O_RDONLY ) ) >= 0 ) {
         if( chdir( path_copy ) == -1 ) {
@@ -630,6 +635,14 @@ static int findDirFile( const char *path, const char *file, char *filename )
   DIR *dir;
   struct dirent *ent;
 
+  if (!strncmp(path, "myth://", 7) && mythfile_exists(path, file))
+  {
+    sprintf( filename, "%s%s%s", path,
+            ( ( path[ strlen( path ) - 1 ] == '/' ) ? "" : "/" ),
+               file );
+    return 0;
+  }
+
   dir = opendir( path );
   if( !dir ) return -2;
 
@@ -712,7 +725,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
   memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
   dvd_file->filesize = 0;
 
-  if( stat( full_path, &fileinfo ) < 0 ) {
+  if( mythfile_stat( full_path, &fileinfo ) < 0 ) {
     fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
     free( dvd_file );
     dvdinput_close(dev);
@@ -811,7 +824,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
       return NULL;
     }
 
-    if( stat( full_path, &fileinfo ) < 0 ) {
+    if( mythfile_stat( full_path, &fileinfo ) < 0 ) {
       fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
       dvdinput_close(dev);
       free( dvd_file );
@@ -830,7 +843,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
         break;
       }
 
-      if( stat( full_path, &fileinfo ) < 0 ) {
+      if( mythfile_stat( full_path, &fileinfo ) < 0 ) {
         fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
         break;
       }
@@ -982,7 +995,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
   if( !findDVDFile( dvd, filename, full_path ) )
     return -1;
 
-  if( stat( full_path, &fileinfo ) < 0 ) {
+  if( mythfile_stat( full_path, &fileinfo ) < 0 ) {
     fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
     return -1;
   }
@@ -998,7 +1011,7 @@ static int DVDFileStatVOBPath( dvd_reader_t *dvd, int title,
       if( !findDVDFile( dvd, filename, full_path ) )
         break;
 
-      if( stat( full_path, &fileinfo ) < 0 ) {
+      if( mythfile_stat( full_path, &fileinfo ) < 0 ) {
         fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
         break;
       }
@@ -1079,7 +1092,7 @@ int DVDFileStat( dvd_reader_t *dvd, int titlenum,
     }
   } else {
     if( findDVDFile( dvd, filename, full_path ) ) {
-      if( stat( full_path, &fileinfo ) < 0 )
+      if( mythfile_stat( full_path, &fileinfo ) < 0 )
         fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
       else {
         statbuf->size = fileinfo.st_size;

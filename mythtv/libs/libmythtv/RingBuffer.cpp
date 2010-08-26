@@ -124,6 +124,7 @@ RingBuffer::RingBuffer(const QString &lfilename,
       rbrpos(0),                rbwpos(0),
       internalreadpos(0),       ateof(false),
       readsallowed(false),      wantseek(false), setswitchtonext(false),
+      streamOnly(false),
       rawbitrate(4000),         playspeed(1.0f),
       fill_threshold(65536),    fill_min(-1),
       readblocksize(CHUNK),     wanttoread(0),
@@ -294,41 +295,65 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     bool is_bd = false;
     (void) is_bd;
 
+    if (!streamOnly && filename.startsWith("myth://"))
+    {
+        struct stat fileInfo;
+        if ((RemoteFile::Exists(filename, &fileInfo)) &&
+            (S_ISDIR(fileInfo.st_mode)))
+        {
+            QString tmpFile = filename + "/VIDEO_TS";
+            if (RemoteFile::Exists(tmpFile))
+            {
+                is_dvd = true;
+            }
+            else
+            {
+                tmpFile = filename + "/BDMV";
+                if (RemoteFile::Exists(tmpFile))
+                    is_bd = true;
+            }
+        }
+    }
+
     if ((filename.left(1) == "/") ||
         (QFile::exists(filename)))
         is_local = true;
 
 #ifdef USING_FRONTEND
-    else if (filename.left(4) == "dvd:")
+    else if ((!streamOnly) &&
+             ((filename.startsWith("dvd:")) || is_dvd ||
+              ((filename.startsWith("myth://")) &&
+               ((filename.endsWith(".img")) ||
+                (filename.endsWith(".iso"))))))
     {
         is_dvd = true;
         dvdPriv = new DVDRingBufferPriv();
         startreadahead = false;
 
-        if (filename.left(6) == "dvd://")    // 'Play DVD' sends "dvd:/" + dev
-            filename.remove(0,5);            //             e.g. "dvd://dev/sda"
-        else                                 // Less correct URI "dvd:" + path
-            filename.remove(0,4);            //             e.g. "dvd:/videos/ET"
+        if (filename.left(6) == "dvd://")      // 'Play DVD' sends "dvd:/" + dev
+            filename.remove(0,5);              //             e.g. "dvd://dev/sda"
+        else if (filename.left(5) == "dvd:/")  // Less correct URI "dvd:" + path
+            filename.remove(0,4);              //             e.g. "dvd:/videos/ET"
 
-        if (QFile::exists(filename))
+        if (QFile::exists(filename) || filename.startsWith("myth://"))
             VERBOSE(VB_PLAYBACK, "OpenFile() trying DVD at " + filename);
         else
         {
             filename = "/dev/dvd";
         }
     }
-    else if (filename.left(3) == "bd:" || is_bd)
+    else if ((!streamOnly) && (filename.left(3) == "bd:" || is_bd))
     {
         is_bd = true;
         bdPriv = new BDRingBufferPriv();
         startreadahead = false;
 
-        if (filename.left(5) == "bd://")    // 'Play DVD' sends "bd:/" + dev
-            filename.remove(0,4);           //             e.g. "bd://dev/sda"
-        else                                // Less correct URI "bd:" + path
-            filename.remove(0,3);           //             e.g. "bd:/videos/ET"
+        if (filename.left(5) == "bd://")      // 'Play DVD' sends "bd:/" + dev
+            filename.remove(0,4);             //             e.g. "bd://dev/sda"
+        else if (filename.left(4) == "bd:/")  // Less correct URI "bd:" + path
+            filename.remove(0,3);             //             e.g. "bd:/videos/ET"
 
-        if (QFile::exists(filename))
+        if (QFile::exists(filename) || filename.startsWith("myth://"))
             VERBOSE(VB_PLAYBACK, "OpenFile() trying BD at " + filename);
         else
         {
@@ -1474,7 +1499,7 @@ long long RingBuffer::Seek(long long pos, int whence)
 #endif // USING_FRONTEND
     else
     {
-        if (whence == SEEK_SET)
+        if ((whence == SEEK_SET) || (whence == SEEK_END))
 #ifdef USING_MINGW
             ret = lseek64(fd2, pos, whence);
 #else
@@ -1493,10 +1518,7 @@ long long RingBuffer::Seek(long long pos, int whence)
 
     if (ret >= 0)
     {
-        if (whence == SEEK_SET)
-            readpos = pos;
-        else if (whence == SEEK_CUR)
-            readpos += pos;
+        readpos = ret;
 
         if (readaheadrunning)
             ResetReadAhead(readpos);

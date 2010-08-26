@@ -58,6 +58,6 @@ extern char *      (*dvdinput_error) (dvd_input_t);
 /**
  * Setup function accessed by dvd_reader.c.  Returns 1 if there is CSS support.
  */
-int dvdinput_setup(void);
+int dvdinput_setup(const char *);
 
 #endif /* LIBDVDREAD_DVD_INPUT_H */

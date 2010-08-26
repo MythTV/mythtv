@@ -28,6 +28,7 @@
 #endif
 
 #include "file.h"
+#include "file_mythiowrapper.h"
 #include "util/macro.h"
 #include "util/logging.h"
 
@@ -80,6 +81,9 @@ static int64_t file_write_linux(BD_FILE_H *file, const uint8_t *buf, int64_t siz
 
 static BD_FILE_H *file_open_linux(const char* filename, const char *mode)
 {
+    if (strncmp(filename, "myth://", 7) == 0)
+        return file_open_mythiowrapper(filename, mode);
+
     FILE *fp = NULL;
     BD_FILE_H *file = malloc(sizeof(BD_FILE_H));
 
