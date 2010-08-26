@@ -32,7 +32,7 @@ using_bdjava {
 HEADERS += bdj/*.h
 SOURCES += bdj/*.c
 
-QMAKE_POST_LINK=/$${ANTBIN} -f bdj/build.xml
+QMAKE_POST_LINK=/$${ANTBIN} -f bdj/build.xml; /$${ANTBIN} -f bdj/build.xml clean
 
 installjar.path = $${PREFIX}/share/mythtv/jars
 installjar.files = libmythbluray.jar

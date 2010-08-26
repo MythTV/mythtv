@@ -36,6 +36,7 @@
 struct m2ts_demux_s
 {
     uint16_t    pid;
+    uint32_t    pes_length;
     PES_BUFFER *buf;
 };
 
@@ -69,10 +70,22 @@ static int64_t _parse_timestamp(uint8_t *p)
     return ts;
 }
 
+/*
+ * _add_ts()
+ * - add ts payload to buffer.
+ * - parse PES header if pusi is set.
+ * - return:
+ *   < 0   error (incorrect PES header)
+ *   = 0   PES packet continue
+ *   > 0   PES packet payload length from PES header
+ */
 static int _add_ts(PES_BUFFER *p, unsigned pusi, uint8_t *buf, unsigned len)
 {
+    int result = 0;
+
     if (pusi) {
         // Parse PES header
+        unsigned pes_length = buf[4] << 8 | buf[5];
         unsigned pts_exists = buf[7] & 0x80;
         unsigned dts_exists = buf[7] & 0x40;
         unsigned hdr_len    = buf[8] + 9;
@@ -96,6 +109,8 @@ static int _add_ts(PES_BUFFER *p, unsigned pusi, uint8_t *buf, unsigned len)
 
         buf += hdr_len;
         len -= hdr_len;
+
+        result = pes_length + 6 - hdr_len;
     }
 
     // realloc
@@ -108,7 +123,7 @@ static int _add_ts(PES_BUFFER *p, unsigned pusi, uint8_t *buf, unsigned len)
     memcpy(p->buf + p->len, buf, len);
     p->len += len;
 
-    return 0;
+    return result;
 }
 
 PES_BUFFER *m2ts_demux(M2TS_DEMUX *p, uint8_t *buf)
@@ -147,13 +162,17 @@ PES_BUFFER *m2ts_demux(M2TS_DEMUX *p, uint8_t *buf)
             TRACE("skipping packet (no payload)\n");
             continue;
         }
-        if (payload_offset > 188) {
+        if (payload_offset >= 188) {
             DEBUG(DBG_BLURAY, "skipping packet (invalid payload start address)\n");
             continue;
         }
 
         if (pusi) {
-            pes_buffer_append(&result, p->buf);
+            if (p->buf) {
+                DEBUG(DBG_BLURAY, "PES length mismatch: have %d, expected %d\n",
+                      p->buf->len, p->pes_length);
+                pes_buffer_free(&p->buf);
+            }
             p->buf = pes_buffer_alloc(0xffff);
         }
 
@@ -162,10 +181,20 @@ PES_BUFFER *m2ts_demux(M2TS_DEMUX *p, uint8_t *buf)
             continue;
         }
 
-        if (_add_ts(p->buf, pusi, buf + 4 + payload_offset, 188 - payload_offset)) {
-            DEBUG(DBG_BLURAY, "skipping block (PES header error)\n");
-            pes_buffer_free(&p->buf);
-            continue;
+        int r = _add_ts(p->buf, pusi, buf + 4 + payload_offset, 188 - payload_offset);
+        if (r) {
+            if (r < 0) {
+                DEBUG(DBG_BLURAY, "skipping block (PES header error)\n");
+                pes_buffer_free(&p->buf);
+                continue;
+            }
+            p->pes_length = r;
+        }
+
+        if (p->buf->len == p->pes_length) {
+            TRACE("PES complete (%d bytes)\n", p->pes_length);
+            pes_buffer_append(&result, p->buf);
+            p->buf = NULL;
         }
     }
 
