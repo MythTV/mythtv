@@ -34,6 +34,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["libmpeg2"].append("opengl");
     if (opts.decoders->contains("vda"))
         (*opts.safe_renderers)["vda"].append("opengl");
+    if (opts.decoders->contains("crystalhd"))
+        (*opts.safe_renderers)["crystalhd"].append("opengl");
     opts.priorities->insert("opengl", 65);
 }
 

@@ -128,6 +128,7 @@ Advanced options (experts only):
   --enable-xvmc-vld        enable XvMC VLD accel. for the Unichrome (Pro) chipset
   --xvmc-lib=LIB           XvMC library override (for crosscompiling)
   --enable-vdpau           enable NVidia VDPAU hardware acceleration.
+  --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --disable-opengl-vsync   disable OpenGL vsync method
@@ -1280,6 +1281,7 @@ CONFIG_EXTRA="
 
 MYTHTV_CONFIG_LIST='
     backend
+    crystalhd
     cygwin
     darwin
     directfb
@@ -3812,6 +3814,11 @@ check_cpp_condition \
       disable vdpau; }
 fi
 
+if enabled crystalhd; then
+    check_lib libcrystalhd/libcrystalhd_if.h DtsCrystalHDVersion -lcrystalhd ||
+        disable crystalhd;
+fi
+
 enabled debug && add_cflags -g"$debuglevel" && add_asflags -g"$debuglevel"
 enabled debug && add_cxxflags -g"$debuglevel"
 
@@ -4369,6 +4376,7 @@ if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs                 $VENDOR_XVMC_LIBS"
 fi
   echo "VDPAU support             ${vdpau-no}"
+  echo "CrystalHD support         ${crystalhd-no}"
 fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$target_os" = x"darwin" ; then

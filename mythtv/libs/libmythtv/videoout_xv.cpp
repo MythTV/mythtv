@@ -134,6 +134,13 @@ void VideoOutputXv::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["libmpeg2"].append("xv-blit");
     }
 
+    if (opts.decoders->contains("crystalhd"))
+    {
+        (*opts.safe_renderers)["crystalhd"].append("xlib");
+        (*opts.safe_renderers)["crystalhd"].append("xshm");
+        (*opts.safe_renderers)["crystalhd"].append("xv-blit");
+    }
+
 #ifdef USING_XVMC
     if (opts.decoders->contains("xvmc"))
     {

@@ -272,6 +272,13 @@ using_frontend {
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
     SOURCES += privatedecoder.cpp       privatedecoder_mpeg2.cpp
 
+    using_crystalhd {
+        DEFINES += USING_CRYSTALHD
+        HEADERS += privatedecoder_crystalhd.h
+        SOURCES += privatedecoder_crystalhd.cpp
+        LIBS += -lcrystalhd
+    }
+
     macx {
         HEADERS += privatedecoder_vda.h privatedecoder_vda_defs.h
         SOURCES += privatedecoder_vda.cpp

@@ -47,6 +47,8 @@ void VideoOutputD3D::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["ffmpeg"].append("direct3d");
     if (opts.decoders->contains("libmpeg2"))
         (*opts.safe_renderers)["libmpeg2"].append("direct3d");
+    if (opts.decoders->contains("crystalhd"))
+        (*opts.safe_renderers)["crystalhd"].append("direct3d");
     opts.priorities->insert("direct3d", 55);
 }
 
