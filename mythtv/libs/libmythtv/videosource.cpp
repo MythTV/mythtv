@@ -2126,9 +2126,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
-#ifdef USING_IVTV
     addTarget("DEMO",      new DemoConfigurationGroup(parent));
-#endif
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value)
