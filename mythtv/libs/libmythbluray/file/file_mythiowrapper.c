@@ -8,7 +8,8 @@
 #include "util/macro.h"
 #include "util/logging.h"
 
-#include "file_mythiowrapper.h"
+#include "mythiowrapper.h"
+#include "file_mythiowrapper.h"  // to pass GCC -Werror=missing-prototypes
 
 static void file_close_mythiowrapper(BD_FILE_H *file)
 {
