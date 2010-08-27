@@ -750,9 +750,10 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     endts      = startts.addSecs(_length_in_minutes * 60);
 
     QString pn = _pathname;
-    if (_pathname.right(4).toLower() == ".iso" ||
-        _pathname.right(4).toLower() == ".img" ||
-        QDir(_pathname + "/VIDEO_TS").exists())
+    if ((!_pathname.startsWith("myth://")) &&
+        (_pathname.right(4).toLower() == ".iso" ||
+         _pathname.right(4).toLower() == ".img" ||
+         QDir(_pathname + "/VIDEO_TS").exists()))
     {
         pn = QString("dvd:%1").arg(_pathname);
     }
