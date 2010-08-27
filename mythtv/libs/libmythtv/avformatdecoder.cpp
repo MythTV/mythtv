@@ -1175,6 +1175,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             <<") type ("<<ff_codec_type_string(enc->codec_type)
             <<").");
 
+    // store raw codec for later use in GetEncodingType()
+    raw_codec_id = enc->codec_id;
+
     if (ringBuffer && ringBuffer->isDVD())
         directrendering = false;
 
@@ -4484,6 +4487,26 @@ QString AvFormatDecoder::GetCodecDecoderName(void) const
         return private_dec->GetName();
     return get_decoder_name(video_codec_id);
 }
+
+QString AvFormatDecoder::GetEncodingType(void) const
+{
+    // Shorten the most common strings (for use in INFO OSD):
+    switch (raw_codec_id)
+    {
+        case CODEC_ID_MPEG1VIDEO:          return "MPEG1";
+        case CODEC_ID_MPEG2VIDEO:
+        case CODEC_ID_MPEG2VIDEO_XVMC:
+        case CODEC_ID_MPEG2VIDEO_XVMC_VLD: return "MPEG2";
+    }
+
+    const char *string = ff_codec_id_string(raw_codec_id);
+
+    if (strcmp(string, "Unknown Codec ID") == 0)
+        return QObject::tr("Unknown");
+
+    return string;
+}
+
 
 void *AvFormatDecoder::GetVideoCodecPrivate(void)
 {
