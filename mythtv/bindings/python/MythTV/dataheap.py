@@ -227,10 +227,13 @@ class Recorded( DBDataWrite, CMPRecord ):
                                   ('h','%I'),('H','%H'),('i','%M'),('s','%S'),
                                   ('a','%p'),('A','%p') ):
                 path = path.replace(pre+tag, self[data].strftime(format))
+        if self.originalairdate is None:
+            airdate = date(1,1,1)
+        else:
+            airdate = self.originalairdate
         for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
                               ('j','%d'),('d','%d')):
-            path = path.replace('%o'+tag,
-                    self['originalairdate'].strftime(format))
+            path = path.replace('%o'+tag, airdate.strftime(format))
         path = path.replace('%-','-')
         path = path.replace('%%','%')
         path += '.'+self['basename'].split('.')[-1]
