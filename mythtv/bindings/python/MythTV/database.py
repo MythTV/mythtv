@@ -80,6 +80,7 @@ class DBData( DictData, MythSchema ):
         dbdata = cls(None, db=db)
         DictData.__init__(dbdata, raw)
         dbdata._evalwheredat()
+        dbdata._postinit()
         return dbdata
 
     def _evalwheredat(self, wheredat=None):
@@ -101,6 +102,9 @@ class DBData( DictData, MythSchema ):
         else:
             self._wheredat = tuple(wheredat)
 
+    def _postinit(self):
+        pass
+
     def _setDefs(self):
         if self._table is None:
             raise MythError('Invalid DBData subclass: _table required')
@@ -121,6 +125,7 @@ class DBData( DictData, MythSchema ):
         else:
             self._evalwheredat(tuple(data))
             self._pull()
+            self._postinit()
 
     def _process(self, data):
         data = DictData._process(self, data)
@@ -391,7 +396,7 @@ class DBDataRef( list ):
         def __repr__(self): return str(self).encode('utf-8')
         def __hash__(self):
             if self._changed:
-                self._hash = hash(str(self.values()))
+                self._hash = hash(sum(map(hash,self.values())))
                 self._changed = False
             return self._hash
         def __setitem__(self, key, value):

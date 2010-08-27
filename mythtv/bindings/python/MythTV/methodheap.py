@@ -598,9 +598,11 @@ class MythDB( DBCache ):
         if init:
             # table and join descriptor
             return ('recorded', Recorded, ('livetv',),
-                    ('recordedprogram','recorded',('chanid','starttime')),
-                    ('recordedcredits','recorded',('chanid','starttime')),
-                    ('people','recordedcredits',('person',)))
+                    ('recordedprogram','recorded',('chanid','starttime')),  #1
+                    ('recordedcredits','recorded',
+                                            ('chanid','starttime'),
+                                            ('chanid','progstart')),        #2
+                    ('people','recordedcredits',('person',)))               #4
 
         # local table matches
         if key in ('title','subtitle','chanid',

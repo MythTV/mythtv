@@ -170,9 +170,13 @@ class Recorded( DBDataWrite, CMPRecord ):
 
     def _evalwheredat(self, wheredat=None):
         DBDataWrite._evalwheredat(self, wheredat)
-        self.cast = self._Cast(self._wheredat, self._db)
         self.seek = self._Seek(self._wheredat, self._db)
         self.markup = self._Markup(self._wheredat, self._db)
+
+    def _postinit(self):
+        wheredat = (self.chanid, self.progstart)
+        self.cast = self._Cast(wheredat, self._db)
+        self.rating = self._Rating(wheredat, self._db)
 
     @classmethod
     def fromProgram(cls, program):
@@ -183,6 +187,7 @@ class Recorded( DBDataWrite, CMPRecord ):
         self.cast.commit()
         self.seek.commit()
         self.markup.commit()
+        self.rating.commit()
 
     def delete(self, force=False, rerecord=False):
         """
@@ -270,8 +275,11 @@ class Recorded( DBDataWrite, CMPRecord ):
                 self[tagt] = metadata[tagf]
 
         # pull cast
+        trans = {'Author':'writer'}
         for cast in metadata.people:
-            self.cast.append(unicode(cast.name),unicode(cast.job))
+            self.cast.append(unicode(cast.name),
+                             unicode(trans.get(cast.job,
+                                        cast.job.lower().replace(' ','_'))))
 
         # pull images
         exists = {'coverart':False,     'fanart':False,
