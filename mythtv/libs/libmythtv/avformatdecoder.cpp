@@ -3362,6 +3362,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
     QStringList list  = text.split('\n', QString::SkipEmptyParts);
     delete dec;
     subReader->AddRawTextSubtitle(list, pkt->convergence_duration);
+    return true;
 }
 
 bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
