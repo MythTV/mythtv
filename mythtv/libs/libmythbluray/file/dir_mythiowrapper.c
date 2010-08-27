@@ -6,7 +6,7 @@
 #include "util/macro.h"
 #include "util/logging.h"
 
-#include "mythiowrapper.h"
+#include "file_mythiowrapper.h"
 
 static void dir_close_mythiowrapper(BD_DIR_H *dir)
 {

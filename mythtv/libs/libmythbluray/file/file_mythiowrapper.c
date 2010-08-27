@@ -8,7 +8,7 @@
 #include "util/macro.h"
 #include "util/logging.h"
 
-#include "mythiowrapper.h"
+#include "file_mythiowrapper.h"
 
 static void file_close_mythiowrapper(BD_FILE_H *file)
 {
