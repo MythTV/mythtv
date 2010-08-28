@@ -654,7 +654,8 @@ void NuppelVideoRecorder::UpdateResolutions(void)
     }
 
     if (w_out && tot_height && 
-        (tot_height != m_videoHeight || m_videoWidth != w_out))
+        ((uint)tot_height != m_videoHeight ||
+         (uint)w_out      != m_videoWidth))
     {
         m_videoHeight = tot_height;
         m_videoWidth = w_out;
