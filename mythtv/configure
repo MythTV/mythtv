@@ -4782,7 +4782,9 @@ echo "#endif /* AVUTIL_AVCONFIG_H */" >> $TMPH
 
 cp_if_changed $TMPH external/FFmpeg/libavutil/avconfig.h
 
+<<BLOCKQUOTE
 echo "config:$arch:$subarch:$cpu:$target_os:$cc_ident:$FFMPEG_CONFIGURATION" >config.fate
+BLOCKQUOTE
 
-test -n "$WARNINGS" && printf "\n$WARNINGS"
+test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0
 
