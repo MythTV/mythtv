@@ -3094,15 +3094,6 @@ EOF
         enable dos_paths
         # Workaround compile errors due -std=c++98 incompatible system headers
         ECXXFLAGS=`echo $ECXXFLAGS | sed 's/-std=c++98//'`
-        filter_cflags=mingw32_flags
-        mingw32_flags(){
-            for flag; do
-                case $flag in
-                    -Werror=missing-prototypes)                   ;;
-                    *)                    echo $flag              ;;
-                esac
-             done
-        }
         check_cflags -fno-common
         check_cpp_condition _mingw.h "defined (__MINGW64_VERSION_MAJOR) || (__MINGW32_MAJOR_VERSION > 3) \
                                       || (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION >= 15)" ||
@@ -4103,8 +4094,10 @@ elif enabled ccc; then
     add_cflags -msg_disable unreachcode
 elif enabled gcc; then
     check_cflags -fno-tree-vectorize
+<<BLOCKQUOTE
     check_cflags -Werror=implicit-function-declaration
     check_cflags -Werror=missing-prototypes
+BLOCKQUOTE
 elif enabled clang; then
     check_cflags -Qunused-arguments
 elif enabled armcc; then
