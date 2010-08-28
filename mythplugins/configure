@@ -855,6 +855,7 @@ fi
 mkdir -p cleanup
 cat << END_CLEANUP > cleanup/Makefile
 all:
+check:
 clean:
 distclean:
 install:

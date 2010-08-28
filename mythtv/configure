@@ -4641,6 +4641,7 @@ fi
 cat - > config/Makefile <<END
 
 all:
+check:
 qmake_all:
 	\$(NONE)
 
