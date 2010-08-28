@@ -36,6 +36,7 @@ LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavcore  -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
+LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 
 mingw {
 
