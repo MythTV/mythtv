@@ -1,7 +1,6 @@
 #include <map>
 
-#include <mythdb.h>
-
+#include "mythdb.h"
 #include "metadatalistmanager.h"
 
 class MetadataListManagerImp

@@ -7,6 +7,7 @@
 #include <QString>
 
 #include "parentalcontrols.h"
+#include "mythexp.h"
 
 class MSqlQuery;
 class MetadataListManager;
@@ -19,7 +20,7 @@ struct SortData;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class Metadata
+class MPUBLIC Metadata
 {
   public:
     typedef std::pair<int, QString> genre_entry;
@@ -229,11 +230,11 @@ class Metadata
     class MetadataImp *m_imp;
 };
 
-void ClearMap(MetadataMap &metadataMap);
+MPUBLIC void ClearMap(MetadataMap &metadataMap);
 
-bool operator==(const Metadata &a, const Metadata &b);
-bool operator!=(const Metadata &a, const Metadata &b);
+MPUBLIC bool operator==(const Metadata &a, const Metadata &b);
+MPUBLIC bool operator!=(const Metadata &a, const Metadata &b);
 
-bool operator<(const Metadata::SortKey &lhs, const Metadata::SortKey &rhs);
+MPUBLIC bool operator<(const Metadata::SortKey &lhs, const Metadata::SortKey &rhs);
 
 #endif

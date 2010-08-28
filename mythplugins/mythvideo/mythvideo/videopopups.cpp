@@ -5,9 +5,9 @@
 #include <mythuibuttonlist.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>
+#include <video/metadata.h>
+#include <video/videoutils.h>
 
-#include "metadata.h"
-#include "videoutils.h"
 #include "videopopups.h"
 
 CastDialog::CastDialog(MythScreenStack *lparent, Metadata *metadata) :

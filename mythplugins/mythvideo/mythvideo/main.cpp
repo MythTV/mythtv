@@ -10,6 +10,8 @@
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
+#include <video/cleanup.h>
+#include <video/globals.h>
 
 #include "videodlg.h"
 #include "globalsettings.h"
@@ -17,8 +19,6 @@
 #include "playersettings.h"
 #include "metadatasettings.h"
 #include "dbcheck.h"
-#include "cleanup.h"
-#include "globals.h"
 #include "videolist.h"
 
 #if defined(AEW_VG)

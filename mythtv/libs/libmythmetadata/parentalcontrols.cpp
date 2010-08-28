@@ -1,10 +1,9 @@
 #include <map>
 
-#include <mythcontext.h>
-
-#include <mythmainwindow.h>
-#include <mythscreenstack.h>
-#include <mythdialogbox.h>
+#include "mythcontext.h"
+#include "mythmainwindow.h"
+#include "mythscreenstack.h"
+#include "mythdialogbox.h"
 
 #include "parentalcontrols.h"
 

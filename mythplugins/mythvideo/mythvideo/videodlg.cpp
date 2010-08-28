@@ -37,16 +37,17 @@
 #include <metadatadownload.h>
 #include <metadataimagedownload.h>
 
-#include "videoscan.h"
-#include "globals.h"
+#include <video/videoscan.h>
+#include <video/globals.h>
+#include <video/metadatalistmanager.h>
+#include <video/videoutils.h>
+#include <video/dbaccess.h>
+#include <video/dirscan.h>
+
 #include "videofilter.h"
 #include "editmetadata.h"
-#include "metadatalistmanager.h"
 #include "videopopups.h"
 #include "videolist.h"
-#include "videoutils.h"
-#include "dbaccess.h"
-#include "dirscan.h"
 #include "playercommand.h"
 #include "videodlg.h"
 #include "fileassoc.h"

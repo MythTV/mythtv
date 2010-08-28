@@ -7,11 +7,11 @@
 #include <remoteutil.h>
 #include <lcddevice.h>
 #include <util.h>
+#include <video/dbaccess.h>
+#include <video/metadata.h>
+#include <video/videoutils.h>
 
-#include "dbaccess.h"
-#include "metadata.h"
 #include "playercommand.h"
-#include "videoutils.h"
 
 namespace
 {

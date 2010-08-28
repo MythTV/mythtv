@@ -4,9 +4,11 @@
 #include <vector>
 #include <utility> // for std::pair
 
+#include "mythexp.h"
+
 class SingleValueImp;
 
-class SingleValue
+class MPUBLIC SingleValue
 {
   public:
     typedef std::pair<int, QString> entry;
@@ -31,7 +33,7 @@ class SingleValue
 };
 
 class MultiValueImp;
-class MultiValue
+class MPUBLIC MultiValue
 {
   public:
     struct entry
@@ -60,7 +62,7 @@ class MultiValue
     MultiValueImp *m_imp;
 };
 
-class VideoCategory : public SingleValue
+class MPUBLIC VideoCategory : public SingleValue
 {
   public:
     static VideoCategory &GetCategory();
@@ -70,7 +72,7 @@ class VideoCategory : public SingleValue
     ~VideoCategory();
 };
 
-class VideoCountry : public SingleValue
+class MPUBLIC VideoCountry : public SingleValue
 {
   public:
     static VideoCountry &getCountry();
@@ -80,7 +82,7 @@ class VideoCountry : public SingleValue
     ~VideoCountry();
 };
 
-class VideoGenre : public SingleValue
+class MPUBLIC VideoGenre : public SingleValue
 {
   public:
     static VideoGenre &getGenre();
@@ -90,7 +92,7 @@ class VideoGenre : public SingleValue
     ~VideoGenre();
 };
 
-class VideoGenreMap : public MultiValue
+class MPUBLIC VideoGenreMap : public MultiValue
 {
   public:
     static VideoGenreMap &getGenreMap();
@@ -100,7 +102,7 @@ class VideoGenreMap : public MultiValue
     ~VideoGenreMap();
 };
 
-class VideoCountryMap : public MultiValue
+class MPUBLIC VideoCountryMap : public MultiValue
 {
   public:
     static VideoCountryMap &getCountryMap();
@@ -110,7 +112,7 @@ class VideoCountryMap : public MultiValue
     ~VideoCountryMap();
 };
 
-class VideoCast : public SingleValue
+class MPUBLIC VideoCast : public SingleValue
 {
   public:
     static VideoCast &GetCast();
@@ -120,7 +122,7 @@ class VideoCast : public SingleValue
     ~VideoCast();
 };
 
-class VideoCastMap : public MultiValue
+class MPUBLIC VideoCastMap : public MultiValue
 {
   public:
     static VideoCastMap &getCastMap();
@@ -130,7 +132,7 @@ class VideoCastMap : public MultiValue
     ~VideoCastMap();
 };
 
-class FileAssociations
+class MPUBLIC FileAssociations
 {
   public:
     struct file_association

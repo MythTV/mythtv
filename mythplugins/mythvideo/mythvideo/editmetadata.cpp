@@ -18,11 +18,11 @@
 #include <mythuihelper.h>
 #include <mythprogressdialog.h>
 #include <remoteutil.h>
+#include <video/globals.h>
+#include <video/dbaccess.h>
+#include <video/metadatalistmanager.h>
+#include <video/videoutils.h>
 
-#include "globals.h"
-#include "dbaccess.h"
-#include "metadatalistmanager.h"
-#include "videoutils.h"
 #include "editmetadata.h"
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,

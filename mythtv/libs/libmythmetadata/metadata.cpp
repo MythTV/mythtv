@@ -5,13 +5,12 @@
 #include <QFileInfo>
 #include <QRegExp>
 
-#include <mythcontext.h>
-#include <mythdb.h>
-#include <remotefile.h>
-#include <remoteutil.h>
-#include <util.h>
-#include <mythverbose.h>
-
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "remotefile.h"
+#include "remoteutil.h"
+#include "util.h"
+#include "mythverbose.h"
 #include "globals.h"
 #include "dbaccess.h"
 #include "metadatalistmanager.h"

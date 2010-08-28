@@ -2,8 +2,7 @@
 #include <vector>
 #include <map>
 
-#include <mythdb.h>
-
+#include "mythdb.h"
 #include "cleanup.h"
 #include "dbaccess.h"
 

@@ -5,8 +5,9 @@
 
 #include "quicksp.h"
 #include "metadata.h"
+#include "mythexp.h"
 
-class MetadataListManager
+class MPUBLIC MetadataListManager
 {
   public:
     typedef simple_ref_ptr<Metadata> MetadataPtr;

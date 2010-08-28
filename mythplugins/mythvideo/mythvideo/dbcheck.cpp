@@ -11,8 +11,8 @@
 #include <remoteutil.h>
 #include <util.h>
 #include <storagegroup.h>
+#include <video/videoutils.h>
 
-#include "videoutils.h"
 #include "videodlg.h"
 #include "dbcheck.h"
 

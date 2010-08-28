@@ -8,12 +8,10 @@
 #include <QStringList>
 #include <QUrl>
 
-#include <mythcontext.h>
-
-#include <mythscreenstack.h>
-#include <mythprogressdialog.h>
-#include <mythdialogbox.h>
-
+#include "mythcontext.h"
+#include "mythscreenstack.h"
+#include "mythprogressdialog.h"
+#include "mythdialogbox.h"
 #include "globals.h"
 #include "dbaccess.h"
 #include "dirscan.h"

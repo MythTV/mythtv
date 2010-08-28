@@ -6,12 +6,12 @@
 #include <mythuibutton.h>
 #include <mythuitext.h>
 #include <mythuitextedit.h>
+#include <video/globals.h>
+#include <video/dbaccess.h>
+#include <video/metadatalistmanager.h>
+#include <video/videoutils.h>
 
-#include "globals.h"
 #include "videolist.h"
-#include "dbaccess.h"
-#include "metadatalistmanager.h"
-#include "videoutils.h"
 #include "videofilter.h"
 
 enum GenreFilter {

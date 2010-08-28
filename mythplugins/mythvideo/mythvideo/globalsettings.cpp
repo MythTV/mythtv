@@ -4,8 +4,8 @@
 #include <QDir>
 
 #include <mythdirs.h>
+#include <video/globals.h>
 
-#include "globals.h"
 #include "videodlg.h"
 #include "globalsettings.h"
 

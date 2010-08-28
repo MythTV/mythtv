@@ -8,9 +8,8 @@
 #include <metadatadownload.h>
 #include <metadataimagedownload.h>
 #include <metadatacommon.h>
-
-#include "parentalcontrols.h"
-#include "quicksp.h"
+#include <video/parentalcontrols.h>
+#include <video/quicksp.h>
 
 class MythUIText;
 class MythUIButtonList;

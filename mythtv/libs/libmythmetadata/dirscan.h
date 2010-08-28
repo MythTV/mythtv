@@ -1,7 +1,9 @@
 #ifndef DIRSCAN_H_
 #define DIRSCAN_H_
 
-class DirectoryHandler
+#include "mythexp.h"
+
+class MPUBLIC DirectoryHandler
 {
   public:
     virtual ~DirectoryHandler();
@@ -13,7 +15,7 @@ class DirectoryHandler
                             const QString &host) = 0;
 };
 
-bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
+MPUBLIC bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
         const FileAssociations::ext_ignore_list &ext_disposition,
         bool list_unknown_extensions);
 

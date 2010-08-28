@@ -1,6 +1,8 @@
 #ifndef QUICKSP_H_
 #define QUICKSP_H_
 
+#include "mythexp.h"
+
 struct NoLock
 {
     void lock() {}
@@ -19,7 +21,7 @@ struct ThreadLock
 
 // TODO: Get a real reference counted smart pointer in libmyth
 template <typename T, class Locker = NoLock>
-class simple_ref_ptr
+class MPUBLIC simple_ref_ptr
 {
   public:
     simple_ref_ptr() : m_ref(0)

@@ -10,14 +10,14 @@
 #include <mythmediamonitor.h>
 
 #include <mythgenerictree.h>
+#include <video/metadatalistmanager.h>
+#include <video/dbaccess.h>
+#include <video/quicksp.h>
+#include <video/dirscan.h>
+#include <video/videoutils.h>
+#include <video/parentalcontrols.h>
 
 #include "videofilter.h"
-#include "metadatalistmanager.h"
-#include "dbaccess.h"
-#include "quicksp.h"
-#include "dirscan.h"
-#include "videoutils.h"
-#include "parentalcontrols.h"
 #include "videolist.h"
 #include "videodlg.h"
 

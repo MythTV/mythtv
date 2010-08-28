@@ -3,9 +3,11 @@
 
 #include <QObject> // for moc
 
+#include "mythexp.h"
+
 class QStringList;
 
-class VideoScanner : public QObject
+class MPUBLIC VideoScanner : public QObject
 {
     Q_OBJECT
 

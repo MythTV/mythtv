@@ -3,7 +3,9 @@
 
 #include <QObject> // for moc
 
-class ParentalLevel
+#include "mythexp.h"
+
+class MPUBLIC ParentalLevel
 {
   public:
     enum Level { plNone = 0, plLowest = 1, plLow = 2, plMedium = 3,
@@ -37,7 +39,7 @@ bool operator>(const ParentalLevel &lhs, const ParentalLevel &rhs);
 bool operator<=(const ParentalLevel &lhs, const ParentalLevel &rhs);
 bool operator>=(const ParentalLevel &lhs, const ParentalLevel &rhs);
 
-class ParentalLevelChangeChecker : public QObject
+class MPUBLIC ParentalLevelChangeChecker : public QObject
 {
     Q_OBJECT
 

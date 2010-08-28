@@ -5,10 +5,9 @@
 
 #include "dbaccess.h"
 #include "dirscan.h"
-
-#include <remoteutil.h>
-#include <mythcontext.h>
-#include <mythverbose.h>
+#include "remoteutil.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 #include "videoutils.h"
 
 DirectoryHandler::~DirectoryHandler()
