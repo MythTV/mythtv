@@ -1452,7 +1452,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     AVCodecContext *c = NULL;
     AVFrame *picture = NULL;
     AVPacket pkt;
-    uint8_t *buff;
+    uint8_t *buff = NULL;
     int gotPicture = 0, len;
     m_image = QImage();
 
