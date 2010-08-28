@@ -28,12 +28,18 @@ using namespace std;
                  .arg(TVREC_CARDNUM).arg(videodevice)
 
 RecorderBase::RecorderBase(TVRec *rec)
-    : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), videocodec("rtjpeg"),
-      audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
-      vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
-      m_videoAspect(0), m_videoHeight(0), m_videoWidth(0), curRecording(NULL),
-      request_pause(false), paused(false), nextRingBuffer(NULL), nextRecording(NULL),
-      positionMapType(MARK_GOP_BYFRAME), positionMapLock(), m_frameRate(0)
+    : tvrec(rec),               ringBuffer(NULL),
+      weMadeBuffer(true),       videocodec("rtjpeg"),
+      audiodevice("/dev/dsp"),  videodevice("/dev/video"),
+      vbidevice("/dev/vbi"),    vbimode(0),
+      ntsc(true),               ntsc_framerate(true),
+      video_frame_rate(29.97),
+      m_videoAspect(0),         m_videoHeight(0),
+      m_videoWidth(0),          m_frameRate(0),
+      curRecording(NULL),
+      request_pause(false),     paused(false),
+      nextRingBuffer(NULL),     nextRecording(NULL),
+      positionMapType(MARK_GOP_BYFRAME)
 {
     QMutexLocker locker(avcodeclock);
     avcodec_init(); // init CRC's
