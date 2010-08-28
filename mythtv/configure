@@ -3073,6 +3073,7 @@ EOF
         if enabled wince; then
             disable protocols
         fi
+        disable symver
         disable v4l
         enable  windows
         disable x11
