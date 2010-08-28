@@ -26,7 +26,7 @@ all: version.cpp subdirs
 config.mak:
 	$(error run configure to create $@)
 
-version.cpp:
+version.cpp:	libs/libmythdb/mythversion.h
 	sh version.sh $(PWD) $(PWD)
 
 # explicit subdir dependencies

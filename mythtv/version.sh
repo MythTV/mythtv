@@ -34,7 +34,7 @@ case "${SOURCE_VERSION}" in
 esac
 
 echo "#include \"mythexp.h\"" > .vers.new
-echo "#include \"mythversion.h\"" > .vers.new
+echo "#include \"mythversion.h\"" >> .vers.new
 echo "const MPUBLIC char *myth_source_version = \"${SOURCE_VERSION}\";" >> .vers.new
 echo "const MPUBLIC char *myth_source_path = \"${SVNREPOPATH}\";" >> .vers.new
 echo "const MPUBLIC char *myth_binary_version = MYTH_BINARY_VERSION;" >> .vers.new
