@@ -21,7 +21,7 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
 	version.cpp
 
-all: subdirs
+all: version.cpp subdirs
 
 config.mak:
 	$(error run configure to create $@)
