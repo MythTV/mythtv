@@ -1281,6 +1281,8 @@ CONFIG_EXTRA="
 
 MYTHTV_CONFIG_LIST='
     backend
+    bindings_perl
+    bindings_python
     crystalhd
     cygwin
     darwin
@@ -1401,9 +1403,9 @@ CMDLINE_SET="
     logfile
     malloc_prefix
     nm
+    python
     qmake
     samples
-    python
     source_path
     strip
     sysinclude
@@ -4432,6 +4434,7 @@ CC_IDENT=$cc_ident
 ARCH=$arch
 CC=$cc
 AS=$as
+QMAKE=$qmake
 QMAKE_CC=$cc
 QMAKE_CXX=$cxx
 QMAKE_LINK=$cxx
@@ -4789,36 +4792,4 @@ cp_if_changed $TMPH external/FFmpeg/libavutil/avconfig.h
 echo "config:$arch:$subarch:$cpu:$target_os:$cc_ident:$FFMPEG_CONFIGURATION" >config.fate
 
 test -n "$WARNINGS" && printf "\n$WARNINGS"
-
-# Create a special cleanup makefile that will allow make clean to work
-if [ ! -e config ] ; then
-  mkdir config
-fi
-cat - > config/Makefile <<END
-
-all:
-qmake_all:
-	\$(NONE)
-
-clean:
-	\$(NONE)
-
-install:
-	\$(NONE)
-
-# Hack to remove some empty directories that qmake doesn't create rules for
-uninstall:
-	-rmdir \$(INSTALL_ROOT)/$prefix/include/mythtv
-	-rmdir \$(INSTALL_ROOT)/$prefix/lib/mythtv
-	-rmdir \$(INSTALL_ROOT)/$prefix/share/mythtv
-
-distclean: clean
-	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak
-	-rm -f ../$MYTH_CONFIG_H    ../config.h
-	-rm -f ../Makefile          ../config.err
-	-rm -f ../libs/libavutil/avconfig.h
-
-END
-
-$qmake QMAKE=$(which $qmake) mythtv.pro
 
