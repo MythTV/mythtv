@@ -4,7 +4,7 @@ MAKE_SUBDIRS = external/FFmpeg
 QT_SUBDIRS   = libs filters programs themes i18n locales
 
 ifdef CONFIG_BINDINGS_PERL
-    QT_SUBDIRS += bindings/perl
+    MAKE_SUBDIRS += bindings/perl
 endif
 
 ifdef CONFIG_BINDINGS_PERL
@@ -47,7 +47,6 @@ programs/Makefile: programs/programs.pro
 themes/Makefile: themes/themes.pro
 i18n/Makefile: i18n/i18n.pro
 locales/Makefile: locales/locales.pro
-bindings/perl/Makefile: bindings/perl/perl.pro
 bindings/python/Makefile: bindings/python/python.pro
 
 $(addsuffix /Makefile,$(QT_SUBDIRS)): %/Makefile :
