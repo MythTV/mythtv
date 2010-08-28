@@ -96,7 +96,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings()
     settings->setPassthrough(((formats & AFMT_AC3) != 0) - 1);
 #endif
 
-    for (uint i = 1; i <= 2; i++)
+    for (int i = 1; i <= 2; i++)
     {
         int channel = i;
 
