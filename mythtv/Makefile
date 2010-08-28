@@ -8,7 +8,7 @@ ifdef CONFIG_BINDINGS_PERL
 endif
 
 ifdef CONFIG_BINDINGS_PERL
-    QT_SUBDIRS += bindings/python
+    MAKE_SUBDIRS += bindings/python
 endif
 
 
@@ -47,7 +47,6 @@ programs/Makefile: programs/programs.pro
 themes/Makefile: themes/themes.pro
 i18n/Makefile: i18n/i18n.pro
 locales/Makefile: locales/locales.pro
-bindings/python/Makefile: bindings/python/python.pro
 
 $(addsuffix /Makefile,$(QT_SUBDIRS)): %/Makefile :
 	cd $*; $(QMAKE) QMAKE=$(QMAKE) -o $(@F) $(<F)
