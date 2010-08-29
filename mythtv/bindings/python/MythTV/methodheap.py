@@ -43,7 +43,7 @@ class MythBE( FileOps ):
         getUptime()               - returns system uptime in seconds
         isActiveBackend()         - determines whether backend is
                                     currently active
-        isRecording               - determinds whether recorder is
+        isRecording()             - determinds whether recorder is
                                     currently recording
         walkSG()                  - walks a storage group tree, similarly
                                     to os.walk(). returns a tuple of dirnames
@@ -531,10 +531,18 @@ class Frontend( FEConnection ):
         self.jump = self._Jump(self)
         self.key = self._Key(self)
 
-    def sendJump(self,jumppoint): return self.jump[jumppoint]
-    def getJump(self): return self.jump.list()
-    def sendKey(self,key): return self.key[key]
-    def getKey(self): return self.key.list()
+    def sendJump(self,jumppoint): 
+        """legacy - do not use"""
+        return self.jump[jumppoint]
+    def getJump(self):  
+        """legacy - do not use"""
+        return self.jump.list()
+    def sendKey(self,key):  
+        """legacy - do not use"""
+        return self.key[key]
+    def getKey(self):  
+        """legacy - do not use"""
+        return self.key.list()
 
     def sendQuery(self,query): return self.send('query', query)
     def getQuery(self): return self.send('query')
@@ -796,10 +804,7 @@ class MythDB( DBCache ):
 
     def getRecorded(self, title=None, subtitle=None, chanid=None,
                         starttime=None, progstart=None):
-        """
-        Tries to find a recording matching the given information.
-        Returns a Recorded object.
-        """
+        """legacy - do not use"""
         records = self.searchRecorded(title=title, subtitle=subtitle,\
                             chanid=chanid, starttime=starttime,\
                             progstart=progstart)
@@ -809,9 +814,7 @@ class MythDB( DBCache ):
             return None
 
     def getChannels(self):
-        """
-        Returns a tuple of channel object defined in the database
-        """
+        """legacy - do not use"""
         return Channel.getAllEntries()
 
 class MythXML( XMLConnection ):
@@ -1093,10 +1096,7 @@ class MythVideo( VideoSchema, DBCache ):
         return None
 
     def getVideo(self, **kwargs):
-        """
-        Tries to find a video matching the given information.
-        Returns a Video object.
-        """
+        """legacy - do not use"""
         videos = self.searchVideos(**kwargs)
         try:
             return videos.next()

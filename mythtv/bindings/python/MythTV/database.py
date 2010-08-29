@@ -52,14 +52,37 @@ class DBData( DictData, MythSchema ):
             Raw list as returned by 'select * from mytable'
     """
     _field_type = 'Pass'
-    _logmodule = 'Python DBData'
-    _localvars = ['_field_order']
+    _logmodule = None
 
     _table = None
     _where = None
     _key   = None
     _wheredat    = None
     _setwheredat = None
+
+    @classmethod
+    def _setClassDefs(cls, db=None):
+        db = DBCache(db)
+        if cls._table is None:
+            cls._table = cls.__name__.lower()
+        if cls._logmodule is None:
+            cls._logmodule = 'Python %s' % cls.__name__
+        if cls._field_order is None:
+            cls._field_order = db.tablefields[cls._table]
+
+
+        if (cls._setwheredat is None) or (cls._where is None):
+            if cls._key is None:
+                log = MythLog(cls._logmodule)
+                with db.cursor(log) as cursor:
+                    cursor.execute("""SHOW KEYS FROM %s
+                                      WHERE Key_name='PRIMARY'""" \
+                                            % cls._table)
+                    cls._key = [k[4] for k in sorted(cursor.fetchall(),
+                                                     key=lambda x: x[3])]
+            gen = lambda j,s,l: j.join([s % k for k in l])
+            cls._where = gen(' AND ', '%s=%%s', cls._key)
+            cls._setwheredat = gen('', 'self.%s,', cls._key)
 
     @classmethod
     def getAllEntries(cls, db=None):
@@ -69,6 +92,7 @@ class DBData( DictData, MythSchema ):
     @classmethod
     def _fromQuery(cls, where, args, db=None):
         db = DBCache(db)
+        cls._setClassDefs(db)
         with db as cursor:
             cursor.execute("""SELECT * FROM %s %s""" \
                         % (cls._table, where), args)
@@ -77,6 +101,8 @@ class DBData( DictData, MythSchema ):
 
     @classmethod
     def fromRaw(cls, raw, db=None):
+        db = DBCache(db)
+        cls._setClassDefs(db)
         dbdata = cls(None, db=db)
         DictData.__init__(dbdata, raw)
         dbdata._evalwheredat()
@@ -84,19 +110,6 @@ class DBData( DictData, MythSchema ):
         return dbdata
 
     def _evalwheredat(self, wheredat=None):
-        nokey = 'Invalid DBData subclass: _key or %s required'
-        gen = lambda j,s,l: j.join([s % k for k in l])
-        if self._where is None:
-            # build it from _key
-            if self._key is None:
-                raise MythError(nokey % '_where')
-            self._where = gen(' AND ', '%s=%%s', self._key)
-
-        if self._setwheredat is None:
-            if self._key is None:
-                raise MythError(nokey % '_setwheredat')
-            self._setwheredat = gen('', 'self.%s,', self._key)
-
         if wheredat is None:
             self._wheredat = eval(self._setwheredat)
         else:
@@ -106,15 +119,34 @@ class DBData( DictData, MythSchema ):
         pass
 
     def _setDefs(self):
+        cls = self.__class__
         if self._table is None:
-            raise MythError('Invalid DBData subclass: _table required')
-        self._field_order = self._db.tablefields[self._table]
+            cls._table = cls.__name__.lower()
+        if self._logmodule is None:
+            cls._logmodule = 'Python %s' % cls.__name__
+        if self._field_order == []:
+            cls._field_order = self._db.tablefields[self._table]
+
         self._log = MythLog(self._logmodule)
+
+        if (self._setwheredat is None) or (self._where is None):
+            if self._key is None:
+                with self._db.cursor(self._log) as cursor:
+                    cursor.execute("""SHOW KEYS FROM %s
+                                      WHERE Key_name='PRIMARY'""" \
+                                            % self._table)
+                    self._key = [k[4] for k in sorted(cursor.fetchall(),
+                                                     key=lambda x: x[3])]
+            gen = lambda j,s,l: j.join([s % k for k in l])
+            self._where = gen(' AND ', '%s=%%s', self._key)
+            self._setwheredat = gen('', 'self.%s,', self._key)
+
         self._fillNone()
 
     def __init__(self, data, db=None):
         dict.__init__(self)
-        self._field_order = []
+        if self._field_order is None:
+            self.__class__._field_order = []
         self._db = DBCache(db)
         self._db._check_schema(self._schema_value,
                                 self._schema_local, self._schema_name)
@@ -209,7 +241,23 @@ class DBDataWrite( DBData ):
     Additionally, can be left uninitialized to allow creation of a new entry
     """
     _defaults = None
-    _logmodule = 'Python DBDataWrite'
+
+    @classmethod
+    def _setClassDefs(cls, db=None):
+        db = DBCache(db)
+        super(DBDataWrite, cls)._setClassDefs(db)
+        if cls._defaults is None:
+            cls._defaults = {}
+        if cls._key is not None:
+            if len(cls._key) == 1:
+                if 'auto_increment' in \
+                        db.tablefields[cls._table][cls._key[0]].extra:
+                    cls.create = cls._create_autoincrement
+                    cls.__init__ = cls._init_autoincrement
+                    cls._defaults[cls._key[0]] = None
+                    return
+        cls.create = cls._create_normal
+        cls.__init__ = cls._init_normal
 
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
@@ -217,14 +265,13 @@ class DBDataWrite( DBData ):
         for key in data.keys():
             if key not in self._field_order:
                 del data[key]
-        if self._defaults is not None:
-            for key in self._defaults:
-                if key in data:
-                    if self._defaults[key] is None:
-                        del data[key]
-                    elif data[key] is None:
-                        if fill:
-                            data[key] = self._defaults[key]
+        for key in self._defaults:
+            if key in data:
+                if self._defaults[key] is None:
+                    del data[key]
+                elif data[key] is None:
+                    if fill:
+                        data[key] = self._defaults[key]
         return data
 
     def _setDefs(self):
@@ -239,8 +286,11 @@ class DBDataWrite( DBData ):
         DBData._evalwheredat(self, wheredat)
         self._origdata = dict.copy(self)
 
-    def __init__(self, data=None, db=None):
+    def _init_normal(self, data=None, db=None):
         DBData.__init__(self, data, db)
+
+    def _init_autoincrement(self, id=None, db=None):
+        DBData.__init__(self, (id,), db)
 
     def _import(self, data=None):
         if data is not None:
@@ -271,7 +321,7 @@ class DBDataWrite( DBData ):
             intid = cursor.lastrowid
         return intid
 
-    def create(self, data=None):
+    def _create_normal(self, data=None):
         """
         obj.create(data=None) -> self
 
@@ -280,6 +330,18 @@ class DBDataWrite( DBData ):
         """
         self._create(data)
         self._evalwheredat()
+        self._pull()
+        return self
+
+    def _create_autoincrement(self, data=None):
+        """
+        obj.create(data=None) -> self
+
+        Creates a new database entry using the given information.
+        Will only function on an uninitialized object.
+        """
+        intid = self._create(data)
+        self._evalwheredat([intid])
         self._pull()
         return self
 
@@ -332,47 +394,6 @@ class DBDataWrite( DBData ):
         with self._db.cursor(self._log) as cursor:
             cursor.execute("""DELETE FROM %s WHERE %s""" \
                         % (self._table, self._where), self._wheredat)
-
-class DBDataWriteAI( DBDataWrite ):
-    """
-    DBDataWriteAI.__init__(data=None, db=None) --> DBDataWriteAI object
-
-    Altered DBDataWrite, for use with tables whose unique identifier is
-        a single auto-increment field.
-    Must be subclassed for use.
-
-    Subclasses must provide:
-        _table
-            Name of database table to be accessed
-        _where
-            String defining WHERE clause for database lookup
-        _setwheredat
-            String of comma separated variables to be evaluated to set
-            'wheredat'. 'eval(setwheredat)' must return a tuple, so string must
-            contain at least one comma.
-
-    Subclasses may provide:
-        _defaults
-            Dictionary of default values to be used when creating new
-            database entries. Additionally, values of 'None' will be stripped
-            and not used to alter the database.
-
-    Can be populated in two manners:
-        data
-            Tuple used to perform a SQL query, using the subclass provided
-            'where' clause
-        raw
-            Raw list as returned by 'select * from mytable'
-    Additionally, can be left uninitialized to allow creation of a new entry
-    """
-    def __init__(self, id=None, db=None):
-        DBDataWrite.__init__(self, (id,), db)
-
-    def create(self, data=None):
-        intid = self._create(data)
-        self._evalwheredat([intid])
-        self._pull()
-        return self
 
 class DBDataRef( list ):
     """
@@ -772,7 +793,7 @@ class DBCache( MythSchema ):
                     try:
                         cursor.execute("DESC %s" % (key,))
                     except Exception, e:
-                        MythDBError(MythDBError.DB_RAW, e.args)
+                        raise MythDBError(MythDBError.DB_RAW, e.args)
                     self[key] = self._FieldData(cursor.fetchall())
 
             # return cached information
@@ -1073,22 +1094,12 @@ class StorageGroup( DBData ):
     StorageGroup(id=None, db=None, raw=None) -> StorageGroup object
     Represents a single storage group entry
     """
-    _table = 'storagegroup'
-    _where = 'id=%s'
-    _setwheredat = 'self.id,'
-    _logmodule = 'Python StorageGroup'
-
     def __str__(self):
         return u"<StorageGroup 'myth://%s@%s%s' at %s" % \
                     (self.groupname, self.hostname,
                         self.dirname, hex(id(self)))
 
     def __repr__(self): return str(self).encode('utf-8')
-
-    def __init__(self, id=None, db=None):
-        DBData.__init__(self, (id,), db)
-        if self._wheredat is None:
-            return
 
     def _evalwheredat(self, wheredat=None):
         DBData._evalwheredat(self, wheredat)
@@ -1097,4 +1108,3 @@ class StorageGroup( DBData ):
             self.local = True
         else:
             self.local = False
-

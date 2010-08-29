@@ -198,6 +198,14 @@ class Grabber( System ):
         return self._processMetadata(System.command(self, *args))
 
     def search(self, phrase, subtitle=None, tolerance=None):
+        """
+        obj.search(phrase, subtitle=None, tolerance=None) -> result generator
+
+            Returns a generator of results matching the given search
+                phrase.  A secondary phrase can be given through the 
+                'subtitle' parameter, and an optional levenshtein
+                tolerance value can be given for filtering results.
+        """
         if tolerance is None:
             tolerance = int(self.db.settings.NULL.\
                                         get('MetadataLookupTolerance', 5))
@@ -219,16 +227,35 @@ class Grabber( System ):
                 yield res
 
     def sortedSearch(self, phrase, subtitle=None, tolerance=None):
+        """
+        Behaves like obj.search(), but sorts results based off 
+            levenshtein distance.
+        """
         return sorted(self.search(phrase, subtitle, tolerance), \
                         key=lambda r: r.levenshtein)
 
     def grabInetref(self, inetref, season=None, episode=None):
-        if season and episode:
-            return self.command('-D', inetref, season, episode)
-        else:
-            return self.command('-D', inetref)
+        """
+        obj.grabInetref(inetref, season=None, episode=None) -> metadata object
+
+            Returns a direct search for a specific movie or episode.
+            'inetref' can be an existing VideoMetadata object, and
+                this method will return a fully populated object.
+        """
+        try:
+            if inetref.season and inetref.episode:
+                args = (inetref.inetref, inetref.season, inetref.episode)
+            else:
+                args = (inetref.inetref,)
+        except:
+            if season and episode:
+                args = (inetref, season, episode)
+            else:
+                args = (inetref,)
+        return self.command('-D', *args).next()
 
     def grabTitle(self, title, subtitle):
+        """legacy - do not use"""
         return self.search(title, subtitle)
 
 class SystemEvent( System ):

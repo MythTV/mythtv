@@ -19,20 +19,16 @@ import locale
 import xml.etree.cElementTree as etree
 from datetime import date, time
 
-class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
+class Record( DBDataWrite, RECTYPE, CMPRecord ):
     """
     Record(id=None, db=None) -> Record object
     """
-
-    _table = 'record'
-    _key   = ['recordid']
-    _defaults = {'recordid':None,    'type':RECTYPE.kAllRecord,
+    _defaults = {'type':RECTYPE.kAllRecord,
                  'title':u'Unknown', 'subtitle':'',      'description':'',
                  'category':'',      'station':'',       'seriesid':'',
                  'search':0,         'last_record':datetime(1900,1,1),
                  'next_record':datetime(1900,1,1),
                  'last_delete':datetime(1900,1,1)}
-    _logmodule = 'Python Record'
 
     def __str__(self):
         if self._wheredat is None:
@@ -45,17 +41,17 @@ class Record( DBDataWriteAI, RECTYPE, CMPRecord ):
 
     def create(self, data=None, wait=False):
         """Record.create(data=None) -> Record object"""
-        DBDataWriteAI.create(self, data)
+        DBDataWrite.create(self, data)
         FileOps(db=self._db).reschedule(self.recordid, wait)
         return self
 
     def delete(self, wait=False):
-        DBDataWriteAI.delete(self)
+        DBDataWrite.delete(self)
         FileOps(db=self._db).reschedule(self.recordid, wait)
 
     def update(self, *args, **keywords):
         wait = keywords.get('wait',False)
-        DBDataWriteAI.update(self, *args, **keywords)
+        DBDataWrite.update(self, *args, **keywords)
         FileOps(db=self._db).reschedule(self.recordid, wait)
 
     def getUpcoming(self, deactivated=False):
@@ -113,8 +109,6 @@ class Recorded( DBDataWrite, CMPRecord ):
     Recorded(data=None, db=None) -> Recorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
-    _table = 'recorded'
-    _key   = ['chanid','starttime']
     _defaults = {'title':u'Unknown', 'subtitle':'',          'description':'',
                  'category':'',      'hostname':'',          'bookmark':0,
                  'editing':0,        'cutlist':0,            'autoexpire':0,
@@ -126,7 +120,6 @@ class Recorded( DBDataWrite, CMPRecord ):
                  'timestretch':1,    'recpriority':0,        'playgroup':'Default',
                  'profile':'No',     'duplicate':1,          'transcoded':0,
                  'watched':0,        'storagegroup':'Default'}
-    _logmodule = 'Python Recorded'
 
     class _Cast( DBDataCRef ):
         _table = ['recordedcredits','people']
@@ -297,7 +290,7 @@ class Recorded( DBDataWrite, CMPRecord ):
         self.update()
 
     def __getstate__(self):
-        data = DBDataWriteAI.__getstate__(self)
+        data = DBDataWrite.__getstate__(self)
         data['cast'] = self.cast._picklelist()
         data['seek'] = self.seek._picklelist()
         data['markup'] = self.markup._picklelist()
@@ -305,7 +298,7 @@ class Recorded( DBDataWrite, CMPRecord ):
         return data
 
     def __setstate__(self, state):
-        DBDataWriteAI.__setstate__(self, state)
+        DBDataWrite.__setstate__(self, state)
         if self._wheredat is not None:
             self.cast._populate(data=state['cast'])
             self.seek._populate(data=state['seek'])
@@ -322,7 +315,6 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
     RecordedProgram(data=None, db=None) -> RecordedProgram object
             'data' is a tuple containing (chanid, storagegroup)
     """
-    _table = 'recordedprogram'
     _key   = ['chanid','starttime']
     _defaults = {'title':'',     'subtitle':'',
                  'category':'',  'category_type':'',     'airdate':0,
@@ -335,7 +327,6 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
                  'first':0,      'listingsource':0,      'last':0,
                  'audioprop':u'','videoprop':u'',        
                  'subtitletypes':u''}
-    _logmodule = 'Python RecordedProgram'
 
     def __str__(self):
         if self._wheredat is None:
@@ -359,17 +350,15 @@ class RecordedProgram( DBDataWrite, CMPRecord ):
 class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
     """
     OldRecorded(data=None, db=None) -> OldRecorded object
-            'data' is a tuple containing (chanid, storagegroup)
+            'data' is a tuple containing (chanid, starttime)
     """
 
-    _table = 'oldrecorded'
     _key   = ['chanid','starttime']
     _defaults = {'title':'',     'subtitle':'',      
                  'category':'',  'seriesid':'',      'programid':'',
                  'findid':0,     'recordid':0,       'station':'',
                  'rectype':0,    'duplicate':0,      'recstatus':-3,
                  'reactivate':0, 'generic':0}
-    _logmodule = 'Python OldRecorded'
 
     def __str__(self):
         if self._wheredat is None:
@@ -404,15 +393,12 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
         """OldRecorded entries cannot be deleted"""
         return
 
-class Job( DBDataWriteAI, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
+class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """
     Job(id=None, db=None) -> Job object
     """
-
     _table = 'jobqueue'
-    _key   = ['id']
     _logmodule = 'Python Jobqueue'
-    _defaults = {'id': None}
 
     def __str__(self):
         if self._wheredat is None:
@@ -432,10 +418,8 @@ class Job( DBDataWriteAI, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
         self.status = status
         self.update()
 
-class Channel( DBDataWriteAI ):
+class Channel( DBDataWrite ):
     """Channel(chanid=None, db=None) -> Channel object"""
-    _table = 'channel'
-    _key   = ['chanid']
     _defaults = {'icon':'none',          'videofilters':'',  'callsign':u'',
                  'xmltvid':'',           'recpriority':0,    'contrast':32768,
                  'brightness':32768,     'colour':32768,     'hue':32768,
@@ -444,7 +428,6 @@ class Channel( DBDataWriteAI ):
                  'tmoffset':0,           'default_authority':'',
                  'commmethod':-1,        'atsc_minor_chan':0,
                  'last_record':datetime(1900,1,1)}
-    _logmodule = 'Python Channel'
 
     def __str__(self):
         if self._wheredat is None:
@@ -462,7 +445,6 @@ class Guide( DBData, CMPRecord ):
     """
     _table = 'program'
     _key   = ['chanid','starttime']
-    _logmodule = 'Python Guide'
     
     def __str__(self):
         if self._wheredat is None:
@@ -507,23 +489,46 @@ class Guide( DBData, CMPRecord ):
 
 #### MYTHVIDEO ####
 
-class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
+class Video( VideoSchema, DBDataWrite, CMPVideo ):
     """Video(id=None, db=None, raw=None) -> Video object"""
     _table = 'videometadata'
-    _key   = ['intid']
     _defaults = {'subtitle':u'',             'director':u'Unknown',
                  'rating':u'NR',             'inetref':u'00000000',
                  'year':1895,                'userrating':0.0,
                  'length':0,                 'showlevel':1,
                  'coverfile':u'No Cover',    'host':u'',
-                 'intid':None,               'homepage':u'',
+                 'homepage':u'',             'insertdate': datetime.now(),
                  'watched':False,            'category':0,
                  'browse':True,              'hash':u'',
                  'season':0,                 'episode':0,
-                 'releasedate':date(1,1,1),  'childid':-1,
-                 'insertdate': datetime.now()}
-    _logmodule = 'Python Video'
+                 'releasedate':date(1,1,1),  'childid':-1}
     _cm_toid, _cm_toname = DictInvertCI.createPair({0:'none'})
+
+    class _open(object):
+        def __init__(self, func):
+            self.__name__ = func.__name__
+            self.__module__ = func.__module__
+            self.__doc__ = """Video.%s(mode='r', nooverwrite=False)
+                        -> file or FileTransfer object""" % self.__name__
+            self.type, self.sgroup = \
+                        {'':('filename','Videos'),
+                         'Banner':('banner','Banners'),
+                         'Coverart':('coverfile','Coverart'),
+                         'Fanart':('fanart','Fanart'),
+                         'Screenshot':('screenshot','Screenshots'),
+                         'Trailer':('trailer','Trailers')}[self.__name__[4:]]
+        def __get__(self, inst, own):
+            self.inst = inst
+            return self
+
+        def __call__(self, mode='r', nooverwrite=False):
+            if self.inst.host == '':
+                raise MythFileError('File access only works '
+                                    'with Storage Group content')
+            return ftopen('myth://%s@%s/%s' % ( self.sgroup,
+                                                self.inst.host,
+                                                self.inst[self.type]),
+                                    mode, False, nooverwrite, self.inst._db)
 
     @classmethod
     def _getGroup(cls, host, groupname=None, db=None):
@@ -581,13 +586,13 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
             self.category = 0
 
     def _pull(self):
-        DBDataWriteAI._pull(self)
+        DBDataWrite._pull(self)
         self._fill_cm()
         self._cat_toname()
 
     def _push(self):
         self._cat_toid()
-        DBDataWriteAI._push(self)
+        DBDataWrite._push(self)
         self._cat_toname()
         self.cast.commit()
         self.genre.commit()
@@ -607,7 +612,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         return u"<Video '%s' at %s>" % (res, hex(id(self)))
 
     def _evalwheredat(self, wheredat=None):
-        DBDataWriteAI._evalwheredat(self, wheredat)
+        DBDataWrite._evalwheredat(self, wheredat)
         self._fill_cm()
         self._cat_toname()
         if wheredat is None:
@@ -634,7 +639,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         # create new entry
         self._import(data)
         self._cat_toid()
-        return DBDataWriteAI.create(self)
+        return DBDataWrite.create(self)
 
     class _Cast( DBDataCRef ):
         _table = ['videometadatacast','videocast']
@@ -655,23 +660,6 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         _table = 'filemarkup'
         _ref = ['filename',]
 
-    def _open(self, type, mode='r',nooverwrite=False):
-        """
-        Open file pointer
-        """
-        sgroup = {  'filename':'Videos',        'banner':'Banners',
-                    'coverfile':'Coverart',     'fanart':'Fanart',
-                    'screenshot':'Screenshots', 'trailer':'Trailers'}
-        if type not in sgroup:
-            raise MythFileError(MythError.FILE_ERROR,
-                            'Invalid type passed to Video._open(): '+str(type))
-        if self.host == '':
-            raise MythFileError('File access only works with Storage Group content')
-        return ftopen('myth://%s@%s/%s' % ( sgroup[type],
-                                            self.host,
-                                            self[type]),
-                            mode, False, nooverwrite, self._db)
-
     def delete(self):
         """Video.delete() -> None"""
         if (self._where is None) or \
@@ -680,37 +668,20 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         self.cast.clean()
         self.genre.clean()
         self.country.clean()
-        DBDataWriteAI.delete(self)
+        DBDataWrite.delete(self)
 
-    def open(self,mode='r',nooverwrite=False):
-        """Video.open(mode='r', nooverwrite=False)
-                                -> file or FileTransfer object"""
-        return self._open('filename',mode,nooverwrite)
-
-    def openBanner(self,mode='r',nooverwrite=False):
-        """Video.openBanner(mode='r', nooverwrite=False)
-                                -> file or FileTransfer object"""
-        return self._open('banner',mode,nooverwrite)
-
-    def openCoverart(self,mode='r',nooverwrite=False):
-        """Video.openCoverart(mode='r', nooverwrite=False)
-                                -> file or FileTransfer object"""
-        return self._open('coverfile',mode,nooverwrite)
-
-    def openFanart(self,mode='r',nooverwrite=False):
-        """Video.openFanart(mode='r', nooverwrite=False)
-                                -> file or FileTransfer object"""
-        return self._open('fanart',mode,nooverwrite)
-
-    def openScreenshot(self,mode='r',nooverwrite=False):
-        """Video.openScreenshot(mode='r', nooverwrite=False)
-                                -> file or FileTransfer object"""
-        return self._open('screenshot',mode,nooverwrite)
-
-    def openTrailer(self,mode='r',nooverwrite=False):
-        """Video.openTrailer(mode='r', nooverwrite=False)
-                                -> file or FileTransfer object"""
-        return self._open('trailer',mode,nooverwrite)
+    @_open
+    def open(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openBanner(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openCoverart(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openFanart(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openScreenshot(self,mode='r',nooverwrite=False): pass
+    @_open
+    def openTrailer(self,mode='r',nooverwrite=False): pass
 
     def getHash(self):
         """Video.getHash() -> file hash"""
@@ -829,7 +800,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         self.update()
 
     def __getstate__(self):
-        data = DBDataWriteAI.__getstate__(self)
+        data = DBDataWrite.__getstate__(self)
         data['cast'] = self.cast._picklelist()
         data['genre'] = self.genre._picklelist()
         data['markup'] = self.markup._picklelist()
@@ -837,7 +808,7 @@ class Video( VideoSchema, DBDataWriteAI, CMPVideo ):
         return data
 
     def __setstate__(self, state):
-        DBDataWriteAI.__setstate__(self, state)
+        DBDataWrite.__setstate__(self, state)
         if self._wheredat is not None:
             self.cast._populate(data=state['cast'])
             self.genre._populate(data=state['genre'])
@@ -863,12 +834,12 @@ class VideoGrabber( Grabber ):
     """
     logmodule = 'Python MythVideo Grabber'
     cls = VideoMetadata
-    _dbvalue = {'TV':'mythvideo.TVGrabber', 'Movie':'mythvideo.MovieGrabber'}
 
     def __init__(self, mode, lang='en', db=None):
+        dbvalue = {'TV':'mythvideo.TVGrabber', 'Movie':'mythvideo.MovieGrabber'}
         self.mode = mode
         try:
-            Grabber.__init__(self, setting=self._dbvalue[mode], db=db)
+            Grabber.__init__(self, setting=dbvalue[mode], db=db)
         except KeyError:
             raise MythError('Invalid MythVideo grabber')
         self._check_schema('mythvideo.DBSchemaVer',
@@ -878,14 +849,10 @@ class VideoGrabber( Grabber ):
 #### MYTHNETVISION ####
 
 class InternetContent( DBData ):
-    _table = 'internetcontent'
-    _where = 'name=%s'
-    _setwheredat = 'self.name,'
+    _key = ['name']
 
 class InternetContentArticles( DBData ):
-    _table = 'internetcontentarticles'
-    _where = 'feedtitle=%s AND title=%s AND subtitle=%s'
-    _setwheredat = 'self.feedtitle,self.title,self.subtitle'
+    _key = ['feedtitle','title','subtitle']
 
 class InternetSource( DictData ):
     logmodule = 'Python Internet Video Source'
@@ -924,12 +891,8 @@ class InternetSource( DictData ):
 
 #### MYTHMUSIC ####
 
-class Song( MusicSchema, DBDataWriteAI ):
+class Song( MusicSchema, DBDataWrite ):
     _table = 'music_songs'
-    _where = 'song_id=%s'
-    _setwheredat = 'self.song_id,'
-    _defaults = {'song_id':None}
-    _logmodule = 'Python Song'
 
     @classmethod
     def fromAlbum(cls, album, db=None):
@@ -963,12 +926,8 @@ class Song( MusicSchema, DBDataWriteAI ):
 
         return cls._fromQuery("WHERE LOCATE(song_id, %s)", songs, db)
 
-class Album( MusicSchema, DBDataWriteAI ):
+class Album( MusicSchema, DBDataWrite ):
     _table = 'music_albums'
-    _where = 'album_id=%s'
-    _setwheredat = 'self.album_id,'
-    _defaults = {'album_id':None}
-    _logmodule = 'Python Album'
 
     @classmethod
     def fromArtist(cls, artist, db=None):
@@ -991,12 +950,8 @@ class Album( MusicSchema, DBDataWriteAI ):
             album = Song(song, db).album_id
         return cls(album, db)
 
-class Artist( MusicSchema, DBDataWriteAI ):
+class Artist( MusicSchema, DBDataWrite ):
     _table = 'music_artists'
-    _where = 'artist_id=%s'
-    _setwheredat = 'self.artist_id,'
-    _defaults = {'artist_id':None}
-    _logmodule = 'Python Artist'
 
     @classmethod
     def fromName(cls, name, db=None):
@@ -1034,12 +989,8 @@ class Artist( MusicSchema, DBDataWriteAI ):
             artist = Album(album, db).artist_id
         return cls(artist, db)
 
-class MusicPlaylist( MusicSchema, DBDataWriteAI ):
+class MusicPlaylist( MusicSchema, DBDataWrite ):
     _table = 'music_playlists'
-    _where = 'playlist_id=%s'
-    _setwheredat = 'self.playlist_id,'
-    _defaults = {'playlist_id':None}
-    _logmodule = 'Python Music Playlist'
 
     def _pl_tolist(self):
         try:
@@ -1054,16 +1005,16 @@ class MusicPlaylist( MusicSchema, DBDataWriteAI ):
         except: pass
 
     def _pull(self):
-        DBDataWriteAI._pull(self)
+        DBDataWrite._pull(self)
         self._pl_tolist()
 
     def _push(self):
         self._pl_tostr()
-        DBDataWriteAI._push(self)
+        DBDataWrite._push(self)
         self._pl_tolist()
 
     def _evalwheredat(self, wheredat=None):
-        DBDataWriteAI._evalwheredat(self, wheredat)
+        DBDataWrite._evalwheredat(self, wheredat)
         self._pl_tolist()
 
     @classmethod
@@ -1077,12 +1028,8 @@ class MusicPlaylist( MusicSchema, DBDataWriteAI ):
             song = Song(song, db).song_id
         return cls._fromQuery("WHERE LOCATE(%s, playlist_songs)", song, db)
 
-class MusicDirectory( MusicSchema, DBDataWriteAI ):
+class MusicDirectory( MusicSchema, DBDataWrite ):
     _table = 'music_directories'
-    _where = 'directory_id=%s'
-    _setwheredat = 'self.directory_id,'
-    _defaults = {'directory_id':None}
-    _logmodule = 'Python Music Directory'
 
     @classmethod
     def fromPath(cls, path, db=None):
