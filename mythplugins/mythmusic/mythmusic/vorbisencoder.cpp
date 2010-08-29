@@ -25,7 +25,7 @@ using namespace std;
 #include "metaiooggvorbis.h"
 
 
-int write_page(ogg_page *page, FILE *fp)
+static int write_page(ogg_page *page, FILE *fp)
 {
     int written = fwrite(page->header, 1, page->header_len, fp);
     written += fwrite(page->body, 1, page->body_len, fp);

@@ -44,14 +44,14 @@ using namespace std;
 #define BUFFER_SIZE 4096
 
 // streaming callbacks
-int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
+static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
 {
     QIODevice *io = (QIODevice*)opaque;
     buf_size = min(buf_size, (int) io->bytesAvailable());
     return io->read((char*)buf, buf_size);
 }
 
-int WriteFunc(void *opaque, uint8_t *buf, int buf_size)
+static int WriteFunc(void *opaque, uint8_t *buf, int buf_size)
 {
     (void)opaque;
     (void)buf;
@@ -60,7 +60,7 @@ int WriteFunc(void *opaque, uint8_t *buf, int buf_size)
     return -1;
 }
 
-int64_t SeekFunc(void *opaque, int64_t offset, int whence) 
+static int64_t SeekFunc(void *opaque, int64_t offset, int whence)
 {
     (void)opaque;
     (void)offset;

@@ -107,7 +107,7 @@ QString formattedFieldValue(const QVariant &value)
     return result;
 }
 
-QString evaluateDateValue(QString sDate)
+static QString evaluateDateValue(QString sDate)
 {
     if (sDate.startsWith("$DATE"))
     {
