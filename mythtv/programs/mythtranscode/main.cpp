@@ -37,7 +37,7 @@ int CheckJobQueue();
 static int glbl_jobID = -1;
 QString recorderOptions = "";
 
-void usage(char *progname)
+static void usage(char *progname)
 {
     cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
@@ -723,7 +723,7 @@ int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
     return 0;
 }
 
-int transUnlink(QString filename, ProgramInfo *pginfo)
+static int transUnlink(QString filename, ProgramInfo *pginfo)
 {
     if (pginfo != NULL && !pginfo->GetStorageGroup().isEmpty() &&
         !pginfo->GetHostname().isEmpty())

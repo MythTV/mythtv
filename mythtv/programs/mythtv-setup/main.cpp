@@ -39,7 +39,7 @@ using namespace std;
 ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
 
-void SetupMenuCallback(void* data, QString& selection)
+static void SetupMenuCallback(void* data, QString& selection)
 {
     (void)data;
 
@@ -103,7 +103,7 @@ void SetupMenuCallback(void* data, QString& selection)
         VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 }
 
-bool SetupMenu(QString themedir, QString themename)
+static bool SetupMenu(QString themedir, QString themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     MythThemedMenu *menu = new MythThemedMenu(
@@ -126,7 +126,7 @@ bool SetupMenu(QString themedir, QString themename)
 
 // If the theme specified in the DB is somehow broken, try a standard one:
 //
-bool resetTheme(QString themedir, const QString badtheme)
+static bool resetTheme(QString themedir, const QString badtheme)
 {
     QString themename = DEFAULT_UI_THEME;
 

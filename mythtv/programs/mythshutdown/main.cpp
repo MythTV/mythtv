@@ -21,7 +21,7 @@ using namespace std;
 #include "tvremoteutil.h"
 #include "compat.h"
 
-void setGlobalSetting(const QString &key, const QString &value)
+static void setGlobalSetting(const QString &key, const QString &value)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
@@ -48,7 +48,7 @@ void setGlobalSetting(const QString &key, const QString &value)
     }
 }
 
-QString getGlobalSetting(const QString &key, const QString &defaultval)
+static QString getGlobalSetting(const QString &key, const QString &defaultval)
 {
     QString value = defaultval;
 
@@ -71,7 +71,7 @@ QString getGlobalSetting(const QString &key, const QString &defaultval)
     return value;
 }
 
-int lockShutdown()
+static int lockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --lock");
 
@@ -123,7 +123,7 @@ int lockShutdown()
     return 0;
 }
 
-int unlockShutdown()
+static int unlockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --unlock");
 
@@ -203,7 +203,7 @@ static bool isRunning(const char *program)
     return res;
 }
 
-QDateTime getDailyWakeupTime(QString sPeriod)
+static QDateTime getDailyWakeupTime(QString sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime, "hh:mm");
@@ -212,7 +212,7 @@ QDateTime getDailyWakeupTime(QString sPeriod)
     return dtDateTime;
 }
 
-bool isRecording()
+static bool isRecording()
 {
     if (!gCoreContext->IsConnectedToMaster())
     {
@@ -229,7 +229,7 @@ bool isRecording()
     return RemoteGetRecordingStatus(NULL, false);
 }
 
-int getStatus(bool bWantRecStatus)
+static int getStatus(bool bWantRecStatus)
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --status");
 
@@ -378,7 +378,7 @@ int getStatus(bool bWantRecStatus)
     return res;
 }
 
-int checkOKShutdown(bool bWantRecStatus)
+static int checkOKShutdown(bool bWantRecStatus)
 {
     // mythbackend wants 0=ok to shutdown,
     // 1=reset idle count, 2=wait for frontend
@@ -403,7 +403,7 @@ int checkOKShutdown(bool bWantRecStatus)
     return res;
 }
 
-int setWakeupTime(QString sWakeupTime)
+static int setWakeupTime(QString sWakeupTime)
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --setwakeup");
 
@@ -429,7 +429,7 @@ int setWakeupTime(QString sWakeupTime)
     return 0;
 }
 
-int setScheduledWakeupTime()
+static int setScheduledWakeupTime()
 {
     if (!gCoreContext->IsConnectedToMaster())
     {
@@ -464,7 +464,7 @@ int setScheduledWakeupTime()
     return 1;
 }
 
-int shutdown()
+static int shutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --shutdown");
 
@@ -721,7 +721,7 @@ int shutdown()
     return res;
 }
 
-int startup()
+static int startup()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --startup");
 
@@ -760,7 +760,7 @@ int startup()
     return res;
 }
 
-void showUsage()
+static void showUsage()
 {
     QString binname = "mythshutdown";
 

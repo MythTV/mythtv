@@ -30,7 +30,7 @@ XMLTVParser::XMLTVParser() : isJapan(false), current_year(0)
     current_year = QDate::currentDate().toString("yyyy").toUInt();
 }
 
-unsigned int ELFHash(const char *s)
+static unsigned int ELFHash(const char *s)
 {
     /* ELF hash uses unsigned chars and unsigned arithmetic for portability */
     const unsigned char *name = (const unsigned char *)s;
@@ -48,7 +48,7 @@ unsigned int ELFHash(const char *s)
     return (int)h;
 }
 
-QString getFirstText(QDomElement element)
+static QString getFirstText(QDomElement element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
          dname = dname.nextSibling())
@@ -114,7 +114,7 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
     return chaninfo;
 }
 
-int TimezoneToInt (QString timezone)
+static int TimezoneToInt (QString timezone)
 {
     // we signal an error by setting it invalid (> 840min = 14hr)
     int result = 841;
@@ -150,7 +150,7 @@ int TimezoneToInt (QString timezone)
 }
 
 // localTimezoneOffset: 841 == "None", -841 == "Auto", other == fixed offset
-void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 841)
+static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 841)
 {
     if (timestr.isEmpty())
     {
@@ -215,7 +215,7 @@ void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 84
     timestr = dt.toString("yyyyMMddhhmmss");
 }
 
-void parseCredits(QDomElement &element, ProgInfo *pginfo)
+static void parseCredits(QDomElement &element, ProgInfo *pginfo)
 {
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -226,7 +226,7 @@ void parseCredits(QDomElement &element, ProgInfo *pginfo)
     }
 }
 
-void parseVideo(QDomElement &element, ProgInfo *pginfo)
+static void parseVideo(QDomElement &element, ProgInfo *pginfo)
 {
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -248,7 +248,7 @@ void parseVideo(QDomElement &element, ProgInfo *pginfo)
     }
 }
 
-void parseAudio(QDomElement &element, ProgInfo *pginfo)
+static void parseAudio(QDomElement &element, ProgInfo *pginfo)
 {
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())

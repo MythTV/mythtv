@@ -61,7 +61,7 @@ const QString kcid =
 "  </container>\n"
 "</mythnotify>";
 
-void printHelp(void)
+static void printHelp(void)
 {
     cout << "\nUsage: mythtvosd --template=<name> [OPTION]\n";
     cout << "A utility to put items on the mythTV OSD.\n\n";

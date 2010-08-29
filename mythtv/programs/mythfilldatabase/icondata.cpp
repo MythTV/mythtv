@@ -92,7 +92,7 @@ class DOMUnknownChildElement : public DOMException
     }
 };
 
-QDomElement nodeToElement(QDomNode &node)
+static QDomElement nodeToElement(QDomNode &node)
 {
     QDomElement retval = node.toElement();
     if (retval.isNull())
@@ -102,7 +102,7 @@ QDomElement nodeToElement(QDomNode &node)
     return retval;
 }
 
-QString expandURLString(const QString &url)
+static QString expandURLString(const QString &url)
 {
     QRegExp expandtarget("\\[([^\\]]+)\\]");
     QString retval = url;
@@ -133,7 +133,7 @@ QString expandURLString(const QString &url)
     return retval;
 }
 
-QString getNamedElementText(const QDomElement &e,
+static QString getNamedElementText(const QDomElement &e,
         const QString &child_element_name)
 {
     QDomNode child_node = e.namedItem(child_element_name);
@@ -145,7 +145,7 @@ QString getNamedElementText(const QDomElement &e,
     return element.text();
 }
 
-void RunSimpleQuery(const QString &query)
+static void RunSimpleQuery(const QString &query)
 {
     MSqlQuery q(MSqlQuery::InitCon());
     if (!q.exec(query))

@@ -33,7 +33,7 @@ static bool log_rotate(bool report_error);
 static void log_rotate_handler(int);
 
 
-void initKeys(void)
+static void initKeys(void)
 {
     REG_KEY("Welcome", "STARTXTERM", QT_TRANSLATE_NOOP("MythControls",
         "Open an Xterm window"),       "F12");
@@ -43,7 +43,7 @@ void initKeys(void)
         "Start Mythtv-Setup"),            "");
 }
 
-void showUsage(const MythCommandLineParser &cmdlineparser)
+static void showUsage(const MythCommandLineParser &cmdlineparser)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();

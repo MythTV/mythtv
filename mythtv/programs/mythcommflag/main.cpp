@@ -138,7 +138,7 @@ static QMap<QString,OutputMethod> *init_output_types(void)
     return tmp;
 }
 
-QString get_filename(ProgramInfo *program_info)
+static QString get_filename(ProgramInfo *program_info)
 {
     QString filename = program_info->GetPathname();
     if (!QFile::exists(filename))
@@ -146,7 +146,7 @@ QString get_filename(ProgramInfo *program_info)
     return filename;
 }
 
-int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
+static int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 {
     QString filename;
 
@@ -187,7 +187,7 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int QueueCommFlagJob(uint chanid, QString starttime)
+static int QueueCommFlagJob(uint chanid, QString starttime)
 {
     QDateTime recstartts = myth_dt_from_string(starttime);
     const ProgramInfo pginfo(chanid, recstartts);
@@ -231,7 +231,7 @@ int QueueCommFlagJob(uint chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int CopySkipListToCutList(QString chanid, QString starttime)
+static int CopySkipListToCutList(QString chanid, QString starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
@@ -258,7 +258,7 @@ int CopySkipListToCutList(QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int ClearSkipList(QString chanid, QString starttime)
+static int ClearSkipList(QString chanid, QString starttime)
 {
     QDateTime recstartts = myth_dt_from_string(starttime);
     const ProgramInfo pginfo(chanid.toUInt(), recstartts);
@@ -279,7 +279,7 @@ int ClearSkipList(QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int SetCutList(QString chanid, QString starttime, QString newCutList)
+static int SetCutList(QString chanid, QString starttime, QString newCutList)
 {
     frm_dir_map_t cutlist;
 
@@ -312,7 +312,7 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int GetMarkupList(QString list, QString chanid, QString starttime)
+static int GetMarkupList(QString list, QString chanid, QString starttime)
 {
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
@@ -358,7 +358,7 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-void streamOutCommercialBreakList(
+static void streamOutCommercialBreakList(
     ostream &output, const frm_dir_map_t &commercialBreakList)
 {
     if (!quiet)
@@ -432,7 +432,7 @@ static void print_comm_flag_output(
         delete out;
 }
 
-void commDetectorBreathe()
+static void commDetectorBreathe()
 {
     //this is connected to the commdetectors breathe signal so we get a chance
     //while its busy to see if the user already told us to stop.
@@ -469,7 +469,7 @@ void commDetectorBreathe()
     }
 }
 
-void commDetectorStatusUpdate(const QString& status)
+static void commDetectorStatusUpdate(const QString& status)
 {
     if (jobID != -1)
     {
@@ -478,7 +478,7 @@ void commDetectorStatusUpdate(const QString& status)
     }
 }
 
-void commDetectorGotNewCommercialBreakList(void)
+static void commDetectorGotNewCommercialBreakList(void)
 {
     frm_dir_map_t newCommercialMap;
     commDetector->GetCommercialBreakList(newCommercialMap);
@@ -504,7 +504,7 @@ void commDetectorGotNewCommercialBreakList(void)
     RemoteSendMessage(message);
 }
 
-void incomingCustomEvent(QEvent* e)
+static void incomingCustomEvent(QEvent* e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -558,7 +558,7 @@ void incomingCustomEvent(QEvent* e)
     }
 }
 
-int DoFlagCommercials(
+static int DoFlagCommercials(
     ProgramInfo *program_info,
     bool showPercentage, bool fullSpeed, bool inJobQueue,
     MythCommFlagPlayer* cfp, enum SkipTypes commDetectMethod,
@@ -649,7 +649,7 @@ int DoFlagCommercials(
     return comms_found;
 }
 
-int FlagCommercials(
+static int FlagCommercials(
     ProgramInfo *program_info, const QString &outputfilename, bool useDB)
 {
     global_program_info = program_info;
@@ -855,7 +855,7 @@ int FlagCommercials(
     return breaksFound;
 }
 
-int FlagCommercials(
+static int FlagCommercials(
     uint chanid, const QString &starttime,
     const QString &outputfilename, bool useDB)
 {

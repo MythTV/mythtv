@@ -18,7 +18,7 @@ void ExitPrompter::quit()
     qApp->exit();
 }
 
-bool DBusHalt(void)
+static bool DBusHalt(void)
 {
 #if CONFIG_QTDBUS
     QDBusInterface kde("org.kde.ksmserver",
@@ -74,7 +74,7 @@ void ExitPrompter::halt()
 
 }
 
-bool DBusReboot(void)
+static bool DBusReboot(void)
 {
 #if CONFIG_QTDBUS
     QDBusInterface kde("org.kde.ksmserver",

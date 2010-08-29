@@ -34,7 +34,7 @@
 
 #define SHOW_MSG(msg) (msg & print_verbose_messages)
 
-void *my_malloc(unsigned size, mpeg2_alloc_t reason)
+static void *my_malloc(unsigned size, mpeg2_alloc_t reason)
 {
     (void)reason;
     char * buf;
@@ -56,7 +56,7 @@ void *my_malloc(unsigned size, mpeg2_alloc_t reason)
     return NULL;
 }
 
-void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
+static void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
 {
     (void) ptr;
 
@@ -76,7 +76,7 @@ void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
     }
 }
 
-void DEBUGpts(Q3PtrList<MPEG2frame> *vFrame)
+static void DEBUGpts(Q3PtrList<MPEG2frame> *vFrame)
 {
     int pos = vFrame->at();
     for (vFrame->first(); vFrame->current(); vFrame->next())
@@ -439,7 +439,7 @@ int MPEG2fixup::FindMPEG2Header(uint8_t *buf, int size, uint8_t code)
 //as it runs out of buffers.  It will then wait for the buffer to completely
 //fill before returning.  In this way, the 2 threads are never running
 // concurrently
-int fill_buffers(void *r, int finish)
+static int fill_buffers(void *r, int finish)
 {
     MPEG2replex *rx = (MPEG2replex *)r;
 

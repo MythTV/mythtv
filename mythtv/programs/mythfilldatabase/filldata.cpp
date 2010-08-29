@@ -338,7 +338,7 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     return true;
 }
 
-time_t toTime_t(QDateTime &dt)
+static time_t toTime_t(QDateTime &dt)
 {
     tm brokenDown;
     brokenDown.tm_sec = dt.time().second();

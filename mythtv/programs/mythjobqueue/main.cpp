@@ -38,7 +38,7 @@ JobQueue *jobqueue = NULL;
 QString   pidfile;
 QString   logfile  = QString::null;
 
-void cleanup(void)
+static void cleanup(void)
 {
     delete gContext;
     gContext = NULL;
@@ -52,7 +52,7 @@ void cleanup(void)
     signal(SIGHUP, SIG_DFL);
 }
 
-int log_rotate(int report_error)
+static int log_rotate(int report_error)
 {
     int new_logfd = open(logfile.toLocal8Bit().constData(),
                          O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
@@ -78,7 +78,7 @@ int log_rotate(int report_error)
     return 0;
 }
 
-void log_rotate_handler(int)
+static void log_rotate_handler(int)
 {
     log_rotate(0);
 }

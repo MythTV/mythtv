@@ -177,7 +177,7 @@ namespace
     };
 }
 
-void startAppearWiz(void)
+static void startAppearWiz(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -191,7 +191,7 @@ void startAppearWiz(void)
 }
 
 
-void startKeysSetup()
+static void startKeysSetup()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -203,7 +203,7 @@ void startKeysSetup()
         delete mythcontrols;
 }
 
-void startGuide(void)
+static void startGuide(void)
 {
     uint chanid = 0;
     QString channum = gCoreContext->GetSetting("DefaultTVChannel");
@@ -211,12 +211,12 @@ void startGuide(void)
     GuideGrid::RunProgramGuide(chanid, channum);
 }
 
-void startFinder(void)
+static void startFinder(void)
 {
     RunProgramFinder();
 }
 
-void startSearchTitle(void)
+static void startSearchTitle(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plTitleSearch, "", "");
@@ -226,7 +226,7 @@ void startSearchTitle(void)
         delete pl;
 }
 
-void startSearchKeyword(void)
+static void startSearchKeyword(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plKeywordSearch, "", "");
@@ -236,7 +236,7 @@ void startSearchKeyword(void)
         delete pl;
 }
 
-void startSearchPeople(void)
+static void startSearchPeople(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plPeopleSearch, "", "");
@@ -246,7 +246,7 @@ void startSearchPeople(void)
         delete pl;
 }
 
-void startSearchPower(void)
+static void startSearchPower(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plPowerSearch, "", "");
@@ -256,7 +256,7 @@ void startSearchPower(void)
         delete pl;
 }
 
-void startSearchStored(void)
+static void startSearchStored(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plStoredSearch, "", "");
@@ -266,7 +266,7 @@ void startSearchStored(void)
         delete pl;
 }
 
-void startSearchChannel(void)
+static void startSearchChannel(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plChannel, "", "");
@@ -276,7 +276,7 @@ void startSearchChannel(void)
         delete pl;
 }
 
-void startSearchCategory(void)
+static void startSearchCategory(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plCategory, "", "");
@@ -286,7 +286,7 @@ void startSearchCategory(void)
         delete pl;
 }
 
-void startSearchMovie(void)
+static void startSearchMovie(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plMovies, "", "");
@@ -296,7 +296,7 @@ void startSearchMovie(void)
         delete pl;
 }
 
-void startSearchNew(void)
+static void startSearchNew(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plNewListings, "", "");
@@ -306,7 +306,7 @@ void startSearchNew(void)
         delete pl;
 }
 
-void startSearchTime(void)
+static void startSearchTime(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack, plTime, "", "");
@@ -316,7 +316,7 @@ void startSearchTime(void)
         delete pl;
 }
 
-void startManaged(void)
+static void startManaged(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -328,7 +328,7 @@ void startManaged(void)
         delete viewsched;
 }
 
-void startProgramRecPriorities(void)
+static void startProgramRecPriorities(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -341,7 +341,7 @@ void startProgramRecPriorities(void)
         delete progRecPrior;
 }
 
-void startManageRecordingRules(void)
+static void startManageRecordingRules(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -354,7 +354,7 @@ void startManageRecordingRules(void)
         delete progRecPrior;
 }
 
-void startChannelRecPriorities(void)
+static void startChannelRecPriorities(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -366,7 +366,7 @@ void startChannelRecPriorities(void)
         delete chanRecPrior;
 }
 
-void startCustomPriority(void)
+static void startCustomPriority(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -378,7 +378,7 @@ void startCustomPriority(void)
         delete custom;
 }
 
-void startPlaybackWithGroup(QString recGroup = "")
+static void startPlaybackWithGroup(QString recGroup = "")
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -396,12 +396,12 @@ void startPlaybackWithGroup(QString recGroup = "")
         delete pbb;
 }
 
-void startPlayback(void)
+static void startPlayback(void)
 {
     startPlaybackWithGroup();
 }
 
-void startDelete(void)
+static void startDelete(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -414,7 +414,7 @@ void startDelete(void)
         delete pbb;
 }
 
-void startPrevious(void)
+static void startPrevious(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack);
@@ -424,7 +424,7 @@ void startPrevious(void)
         delete pl;
 }
 
-void startCustomEdit(void)
+static void startCustomEdit(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     CustomEdit *custom = new CustomEdit(mainStack);
@@ -435,7 +435,7 @@ void startCustomEdit(void)
         delete custom;
 }
 
-void startManualSchedule(void)
+static void startManualSchedule(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -447,17 +447,17 @@ void startManualSchedule(void)
         delete mansched;
 }
 
-void startTVInGuide(void)
+static void startTVInGuide(void)
 {
     TV::StartTV(NULL, kStartTVInGuide);
 }
 
-void startTVNormal(void)
+static void startTVNormal(void)
 {
     TV::StartTV(NULL, kStartTVNoFlags);
 }
 
-void showStatus(void)
+static void showStatus(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -469,7 +469,7 @@ void showStatus(void)
         delete statusbox;
 }
 
-void TVMenuCallback(void *data, QString &selection)
+static void TVMenuCallback(void *data, QString &selection)
 {
     (void)data;
     QString sel = selection.toLower();
@@ -637,7 +637,7 @@ void TVMenuCallback(void *data, QString &selection)
     }
 }
 
-void handleExit(void)
+static void handleExit(void)
 {
     if (gCoreContext->GetNumSetting("NoPromptOnExit", 1) == 0)
         qApp->quit();
@@ -650,7 +650,7 @@ void handleExit(void)
     }
 }
 
-bool RunMenu(QString themedir, QString themename)
+static bool RunMenu(QString themedir, QString themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     menu = new MythThemedMenu(
@@ -676,7 +676,7 @@ bool RunMenu(QString themedir, QString themename)
 
 // If any settings are missing from the database, this will write
 // the default values
-void WriteDefaults()
+static void WriteDefaults()
 {
     PlaybackSettings ps;
     ps.Load();
@@ -701,7 +701,7 @@ void WriteDefaults()
     grs.Save();
 }
 
-int internal_play_media(const QString &mrl, const QString &plot,
+static int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
                         int lenMins, const QString &year)
@@ -776,7 +776,7 @@ int internal_play_media(const QString &mrl, const QString &plot,
     return res;
 }
 
-void gotoMainMenu(void)
+static void gotoMainMenu(void)
 {
     // If we got to this callback, we're back on the menu.  So, send a CTRL-L
     // to cause the menu to reload
@@ -787,7 +787,7 @@ void gotoMainMenu(void)
 
 // If the theme specified in the DB is somehow broken, try a standard one:
 //
-bool resetTheme(QString themedir, const QString badtheme)
+static bool resetTheme(QString themedir, const QString badtheme)
 {
     QString themename = DEFAULT_UI_THEME;
 
@@ -810,7 +810,7 @@ bool resetTheme(QString themedir, const QString badtheme)
     return RunMenu(themedir, themename);
 }
 
-int reloadTheme(void)
+static int reloadTheme(void)
 {
     MythTranslation::reload();
 
@@ -848,19 +848,19 @@ int reloadTheme(void)
     return 0;
 }
 
-void reloadTheme_void(void)
+static void reloadTheme_void(void)
 {
     int err = reloadTheme();
     if (err)
         exit(err);
 }
 
-void getScreenShot(void)
+static void getScreenShot(void)
 {
     (void) GetMythMainWindow()->screenShot();
 }
 
-void InitJumpPoints(void)
+static void InitJumpPoints(void)
 {
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Reload Theme"),
          "", "", reloadTheme_void);
@@ -905,7 +905,7 @@ void InitJumpPoints(void)
 }
 
 
-void signal_USR1_handler(int){
+static void signal_USR1_handler(int){
       VERBOSE(VB_GENERAL, "SIG USR1 received, reloading theme");
       RemoteSendMessage("CLEAR_SETTINGS_CACHE");
       gCoreContext->ActivateSettingsCache(false);
@@ -913,14 +913,14 @@ void signal_USR1_handler(int){
       gCoreContext->ActivateSettingsCache(true);
 }
 
-void signal_USR2_handler(int)
+static void signal_USR2_handler(int)
 {
     VERBOSE(VB_GENERAL, "SIG USR2 received, restart LIRC handler");
     GetMythMainWindow()->StartLIRC();
 }
 
 
-int internal_media_init()
+static int internal_media_init()
 {
     REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
         "MythTV's native media player."), internal_play_media);
@@ -986,7 +986,7 @@ static void *run_priv_thread(void *data)
     return NULL; // will never happen
 }
 
-void CleanupMyOldInUsePrograms(void)
+static void CleanupMyOldInUsePrograms(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -997,7 +997,7 @@ void CleanupMyOldInUsePrograms(void)
         MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
 
-void ShowUsage(const MythCommandLineParser &cmdlineparser)
+static void ShowUsage(const MythCommandLineParser &cmdlineparser)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();
@@ -1018,7 +1018,7 @@ void ShowUsage(const MythCommandLineParser &cmdlineparser)
 
 }
 
-int log_rotate(int report_error)
+static int log_rotate(int report_error)
 {
     int new_logfd = open(logfile.toLocal8Bit().constData(),
                          O_WRONLY|O_CREAT|O_APPEND, 0664);
@@ -1055,7 +1055,7 @@ int log_rotate(int report_error)
     return 0;
 }
 
-void log_rotate_handler(int)
+static void log_rotate_handler(int)
 {
     log_rotate(0);
 }

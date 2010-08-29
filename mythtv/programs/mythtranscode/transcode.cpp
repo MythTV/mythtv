@@ -348,7 +348,7 @@ static int get_int_option(RecordingProfile &profile, const QString &name)
     return ret_int;
 }
 
-void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, int pagenr)
+static void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, int pagenr)
 {
   NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
   nvr->WriteText(buf, len, timecode, pagenr);

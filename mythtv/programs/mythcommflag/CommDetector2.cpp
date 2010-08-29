@@ -833,9 +833,8 @@ void CommDetector2::requestCommBreakMapUpdate(void)
     breakMapUpdateRequested = true;
 }
 
-void PrintReportMap(
-    ostream &out,
-    const FrameAnalyzer::FrameMap &frameMap)
+static void PrintReportMap(ostream &out,
+                           const FrameAnalyzer::FrameMap &frameMap)
 {
     FrameAnalyzer::FrameMap::const_iterator it = frameMap.begin();
     for (; it != frameMap.end(); ++it)
