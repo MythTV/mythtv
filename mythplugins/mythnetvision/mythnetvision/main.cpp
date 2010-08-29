@@ -23,48 +23,6 @@ using namespace std;
 GrabberManager *grabMan = 0;
 RSSManager *rssMan = 0;
 
-void runNetVision(void);
-int  RunNetVision(void);
-void runNetTree(void);
-int  RunNetTree(void);
-void runTreeEditor(void);
-int  RunTreeEditor(void);
-
-void setupKeys(void)
-{
-    REG_JUMP("MythNetSearch", QT_TRANSLATE_NOOP("MythControls",
-        "Internet Television Client - Search"), "", runNetVision);
-    REG_JUMP("MythNetTree", QT_TRANSLATE_NOOP("MythControls",
-        "Internet Television Client - Site/Tree View"), "", runNetTree);
-}
-
-int mythplugin_init(const char *libversion)
-{
-    if (!gContext->TestPopupVersion("mythnetvision",
-                                    libversion,
-                                    MYTH_BINARY_VERSION))
-        return -1;
-
-    setupKeys();
-
-    return 0;
-}
-
-void runNetVision(void)
-{
-    RunNetVision();
-}
-
-void runNetTree(void)
-{
-    RunNetTree();
-}
-
-void runTreeEditor(void)
-{
-    RunTreeEditor();
-}
-
 int RunNetVision(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -120,6 +78,41 @@ int RunTreeEditor(void)
         delete treeedit;
         return -1;
     }
+}
+
+void runNetVision(void)
+{
+    RunNetVision();
+}
+
+void runNetTree(void)
+{
+    RunNetTree();
+}
+
+void runTreeEditor(void)
+{
+    RunTreeEditor();
+}
+
+void setupKeys(void)
+{
+    REG_JUMP("MythNetSearch", QT_TRANSLATE_NOOP("MythControls",
+        "Internet Television Client - Search"), "", runNetVision);
+    REG_JUMP("MythNetTree", QT_TRANSLATE_NOOP("MythControls",
+        "Internet Television Client - Site/Tree View"), "", runNetTree);
+}
+
+int mythplugin_init(const char *libversion)
+{
+    if (!gContext->TestPopupVersion("mythnetvision",
+                                    libversion,
+                                    MYTH_BINARY_VERSION))
+        return -1;
+
+    setupKeys();
+
+    return 0;
 }
 
 int mythplugin_run(void)
