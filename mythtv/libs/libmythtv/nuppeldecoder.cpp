@@ -1260,7 +1260,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                 QMutexLocker locker(avcodeclock);
 
-                while (pkt.data > 0)
+                while (pkt.size > 0)
                 {
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                     ret = avcodec_decode_audio3(mpa_audctx, audioSamples,
