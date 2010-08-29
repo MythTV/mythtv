@@ -13,6 +13,10 @@
 
 // QT headers
 #include <QCoreApplication>
+#include <QThread>
+#include <QMutex>
+#include <QSemaphore>
+#include <QMap>
 
 # ifdef linux
 #   include <sys/vfs.h>
@@ -43,6 +47,99 @@
 #ifdef USE_JOYSTICK_MENU
 #include "jsmenuevent.h"
 #endif
+
+typedef struct {
+    QMutex  mutex;
+    uint    result;
+} PidData_t;
+
+typedef QMap<pid_t, PidData_t *> PidMap_t;
+
+class MythSystemReaper : public QThread
+{
+    public:
+        void run(void);
+        uint waitPid( pid_t pid );
+    private:
+        PidMap_t    m_pidMap;
+        QSemaphore  m_sem;
+};
+
+static class MythSystemReaper *reaper = NULL;
+
+void MythSystemReaper::run(void)
+{
+    VERBOSE(VB_IMPORTANT, "Starting reaper thread");
+
+    while( 1 ) {
+        usleep(100000);
+
+        m_sem.acquire(1);
+
+        /* There's at least one child to wait on */
+        pid_t       res;
+        int         status;
+
+        res = waitpid(-1, &status, WNOHANG);
+        if (res <= 0)
+        {
+            if( res < 0 )
+                VERBOSE(VB_IMPORTANT, QString("waitpid() failed because %1")
+                    .arg(strerror(errno)));
+            m_sem.release(1);
+            continue;
+        }
+
+        if (!m_pidMap.contains(res))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Child PID %1 not found in map!")
+                .arg(res));
+            continue;
+        }
+
+        PidData_t  *pidData = m_pidMap.value(res);
+        m_pidMap.remove(res);
+
+        if( WIFEXITED(status) )
+        {
+            pidData->result = WEXITSTATUS(status);
+            VERBOSE(VB_IMPORTANT, QString("PID %1: exited: status=%2, result=%3")
+                .arg(res) .arg(status) .arg(pidData->result));
+        }
+        else if( WIFSIGNALED(status) )
+        {
+            pidData->result = GENERIC_EXIT_SIGNALLED;
+            VERBOSE(VB_IMPORTANT, QString("PID %1: signal: status=%2, result=%3, signal=%4")
+                .arg(res) .arg(status) .arg(pidData->result) 
+                .arg(WTERMSIG(status)));
+        }
+        else
+        {
+            pidData->result = GENERIC_EXIT_NOT_OK;
+            VERBOSE(VB_IMPORTANT, QString("PID %1: other: status=%2, result=%3")
+                .arg(res) .arg(status) .arg(pidData->result));
+        }
+
+        pidData->mutex.unlock();
+    }
+}
+
+uint MythSystemReaper::waitPid( pid_t pid )
+{
+    PidData_t  *pidData = new PidData_t;
+    uint        result;
+
+    pidData->mutex.lock();
+    m_pidMap.insert( pid, pidData );
+    m_sem.release(1);
+
+    /* Now we wait for the thread to see the SIGCHLD */
+    pidData->mutex.lock();
+    result = pidData->result;
+    delete pidData;
+
+    return( result );
+}
 
 /** \fn myth_system(const QString&, int)
  *  \brief Runs a system command inside the /bin/sh shell.
@@ -87,6 +184,7 @@ uint myth_system(const QString &command, int flags)
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
 
 #ifndef USING_MINGW
+    VERBOSE(VB_IMPORTANT, QString("Launching: %1") .arg(command));
     pid_t child = fork();
 
     if (child < 0)
@@ -99,6 +197,12 @@ uint myth_system(const QString &command, int flags)
     else if (child == 0)
     {
         /* Child */
+        /* In case we forked WHILE it was locked */
+        bool unlocked = verbose_mutex.tryLock();
+        verbose_mutex.unlock();
+        if( !unlocked )
+            VERBOSE(VB_IMPORTANT, "Cleared parent's verbose lock");
+
         /* Close all open file descriptors except stdout/stderr */
         for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
             close(i);
@@ -136,88 +240,14 @@ uint myth_system(const QString &command, int flags)
     else
     {
         /* Parent */
-        int status;
-
-        if (flags & MYTH_SYSTEM_DONT_BLOCK_PARENT)
+        if( reaper == NULL )
         {
-            int res = 0;
-
-            while (res == 0)
-            {
-                res = waitpid(child, &status, WNOHANG);
-                if (res == -1)
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            (LOC_ERR + "waitpid() failed because %1")
-                            .arg(strerror(errno)));
-                    result = GENERIC_EXIT_NOT_OK;
-                    break;
-                }
-
-                qApp->processEvents();
-
-                if (res > 0)
-                {
-                    if( WIFEXITED(status) )
-                    {
-                        result = WEXITSTATUS(status);
-                        VERBOSE(VB_IMPORTANT, 
-                            QString("exited: status=%1, result=%2")
-                            .arg(status) .arg(result));
-                    }
-                    else if( WIFSIGNALED(status) )
-                    {
-                        result = GENERIC_EXIT_SIGNALLED;
-                        VERBOSE(VB_IMPORTANT, 
-                            QString("signal: status=%1, result=%2, signal=%3")
-                            .arg(status) .arg(result) .arg(WTERMSIG(status)));
-                    }
-                    else
-                    {
-                        result = GENERIC_EXIT_NOT_OK;
-                        VERBOSE(VB_IMPORTANT, 
-                            QString("other: status=%1, result=%2")
-                            .arg(status) .arg(result));
-                    }
-                    break;
-                }
-
-                usleep(100000);
-            }
+            reaper = new MythSystemReaper;
+            reaper->start();
         }
-        else
-        {
-            if (waitpid(child, &status, 0) < 0)
-            {
-                VERBOSE(VB_IMPORTANT, (LOC_ERR + "waitpid() failed because %1")
-                        .arg(strerror(errno)));
-                result = GENERIC_EXIT_NOT_OK;
-            }
-            else 
-            {
-                if( WIFEXITED(status) )
-                {
-                    result = WEXITSTATUS(status);
-                    VERBOSE(VB_IMPORTANT, 
-                        QString("exited: status=%1, result=%2")
-                        .arg(status) .arg(result));
-                }
-                else if( WIFSIGNALED(status) )
-                {
-                    result = GENERIC_EXIT_SIGNALLED;
-                    VERBOSE(VB_IMPORTANT, 
-                        QString("signal: status=%1, result=%2, signal=%3")
-                        .arg(status) .arg(result) .arg(WTERMSIG(status)));
-                }
-                else
-                {
-                    result = GENERIC_EXIT_NOT_OK;
-                    VERBOSE(VB_IMPORTANT, 
-                        QString("other: status=%1, result=%2")
-                        .arg(status) .arg(result));
-                }
-            }
-        }
+        VERBOSE(VB_IMPORTANT, QString("PID %1: launched")
+            .arg(child));
+        result = reaper->waitPid(child);
     }
 
 #else
@@ -264,3 +294,6 @@ uint myth_system(const QString &command, int flags)
     return result;
 }
 
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */
