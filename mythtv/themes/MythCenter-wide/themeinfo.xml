@@ -43,18 +43,12 @@
              with the theme.
              There is no limit to the number of thumbnails.
              Each thumbnail must be given a different name -->
-        <thumbnail name="preview">preview.jpg</thumbnail>
+        <thumbnail name="preview">preview.png</thumbnail>
 
         <!-- A description of the theme, including general colours and
              style. The description should include any details that
              may help to locate your theme in a search. -->
-        <description>
-          This was adapted from the Jeroen Brosens' MythCenter theme.
-          The fonts have been changed to freely redistributable ones
-          and layout changes have been made to make this theme look
-          good on 1280x720 and 1920x1080 screens with a 1:1 pixel
-          aspect ratio.
-        </description>
+        <description>This was adapted from the Jeroen Brosens' MythCenter theme.  The fonts have been changed to freely redistributable ones and layout changes have been made to make this theme look good on 1280x720 and 1920x1080 screens with a 1:1 pixel aspect ratio.</description>
 
         <!-- Errata. A list of known faults, missing elements or unfinished
              areas. e.g. "mythgallery not themed" -->
