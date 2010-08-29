@@ -19,7 +19,7 @@
 
 using namespace std;
 
-int RunNews(void)
+static int RunNews(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -37,12 +37,12 @@ int RunNews(void)
     }
 }
 
-void runNews(void)
+static void runNews(void)
 {
     RunNews();
 }
 
-void setupKeys(void)
+static void setupKeys(void)
 {
     REG_JUMP("MythNews", QT_TRANSLATE_NOOP("MythControls",
         "RSS News feed reader"), "", runNews);
