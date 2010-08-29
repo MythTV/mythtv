@@ -53,18 +53,18 @@ static int run(MythMediaDevice *dev = NULL)
     return -1;
 }
 
-void runGallery(void)
+static void runGallery(void)
 {
     run();
 }
 
-void handleMedia(MythMediaDevice *dev)
+static void handleMedia(MythMediaDevice *dev)
 {
     if (dev && dev->isUsable())
         run(dev);
 }
 
-void setupKeys(void)
+static void setupKeys(void)
 {
     REG_JUMP("MythGallery", QT_TRANSLATE_NOOP("MythControls",
         "Image viewer / slideshow"), "", runGallery);
