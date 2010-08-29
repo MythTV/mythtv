@@ -401,11 +401,58 @@ static int runMenu(QString which_menu)
     }
 }
 
-static void runMusicPlayback(void);
-static void runMusicSelection(void);
-static void runRipCD(void);
-static void runScan(void);
-static void showMiniPlayer(void);
+static void runMusicPlayback(void)
+{
+    GetMythUI()->AddCurrentLocation("playmusic");
+    startPlayback();
+    GetMythUI()->RemoveCurrentLocation();
+}
+
+static void runMusicSelection(void)
+{
+    GetMythUI()->AddCurrentLocation("musicplaylists");
+    startDatabaseTree();
+    GetMythUI()->RemoveCurrentLocation();
+}
+
+static void runRipCD(void)
+{
+    loadMusic();
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    Ripper *rip = new Ripper(mainStack, chooseCD());
+
+    if (rip->Create())
+        mainStack->AddScreen(rip);
+    else
+        delete rip;
+
+//   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
+}
+
+static void runScan(void)
+{
+    loadMusic();
+
+    if ("" != gMusicData->startdir)
+    {
+        FileScanner *fscan = new FileScanner();
+        fscan->SearchDir(gMusicData->startdir);
+        RebuildMusicTree();
+        delete fscan;
+    }
+}
+
+static void showMiniPlayer(void)
+{
+    if (!gMusicData->all_music)
+        return;
+
+    // only show the miniplayer if there isn't already a client attached
+    if (!gPlayer->hasClient())
+        gPlayer->showMiniPlayer();
+}
 
 static void handleMedia(MythMediaDevice *cd)
 {
@@ -602,57 +649,4 @@ void mythplugin_destroy(void)
     gPlayer->deleteLater();
 
     delete gMusicData;
-}
-
-static void runMusicPlayback(void)
-{
-    GetMythUI()->AddCurrentLocation("playmusic");
-    startPlayback();
-    GetMythUI()->RemoveCurrentLocation();
-}
-
-static void runMusicSelection(void)
-{
-    GetMythUI()->AddCurrentLocation("musicplaylists");
-    startDatabaseTree();
-    GetMythUI()->RemoveCurrentLocation();
-}
-
-static void runRipCD(void)
-{
-    loadMusic();
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    Ripper *rip = new Ripper(mainStack, chooseCD());
-
-    if (rip->Create())
-        mainStack->AddScreen(rip);
-    else
-        delete rip;
-
-//   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
-}
-
-static void runScan(void)
-{
-    loadMusic();
-
-    if ("" != gMusicData->startdir)
-    {
-        FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(gMusicData->startdir);
-        RebuildMusicTree();
-        delete fscan;
-    }
-}
-
-static void showMiniPlayer(void)
-{
-    if (!gMusicData->all_music)
-        return;
-
-    // only show the miniplayer if there isn't already a client attached
-    if (!gPlayer->hasClient())
-        gPlayer->showMiniPlayer();
 }
