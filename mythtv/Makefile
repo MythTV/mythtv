@@ -27,7 +27,7 @@ config.mak:
 	$(error run configure to create $@)
 
 version.cpp:	libs/libmythdb/mythversion.h
-	sh version.sh $(PWD) $(PWD)
+	sh version.sh $(PWD)
 
 # explicit subdir dependencies
 libs: external/FFmpeg

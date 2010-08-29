@@ -5,8 +5,8 @@
 # first parameter is the root of the source directory
 # second parameter is the svn base folder (trunk, branches/release-0-21-fixes)
 
-if test $# -ne 2; then
-    echo "Usage: version.sh SVN_TREE_DIR SVN_REPO_PATH"
+if test $# -ne 1; then
+    echo "Usage: version.sh SVN_TREE_DIR"
     exit 1
 fi
 
@@ -19,9 +19,9 @@ else
 fi
 
 SVNTREEDIR=$1
-SVNREPOPATH=$(echo $2 | sed -e 's,.*/svn/,,' \
-                            -e 's,/mythtv/version\.pro.*,,' \
-                            -e 's,/version\.pro.*,,')
+SVNREPOPATH=$(echo "$$URL$$" | sed -e 's,.*/svn/,,' \
+                            -e 's,/mythtv/version\.sh.*,,' \
+                            -e 's,/version\.sh.*,,')
 
 SOURCE_VERSION=$(svnversion ${SVNTREEDIR} 2>/dev/null || echo Unknown)
 
