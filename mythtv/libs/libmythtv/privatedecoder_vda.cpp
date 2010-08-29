@@ -268,13 +268,17 @@ void PrivateDecoderVDA::PopDecodedFrame(void)
     m_decoded_frames.removeLast();
 }
 
-int  PrivateDecoderVDA::GetFrame(AVCodecContext *avctx,
+int  PrivateDecoderVDA::GetFrame(AVStream *stream,
                                  AVFrame *picture,
                                  int *got_picture_ptr,
                                  AVPacket *pkt)
 {
     CocoaAutoReleasePool pool;        
-    if (!m_lib || !avctx || !pkt)
+    if (!m_lib || !stream || !pkt)
+        return -1;
+
+    AVCodecContext *avctx = stream->codec;
+    if (avctx)
         return -1;
 
     CFDataRef data;

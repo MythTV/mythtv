@@ -331,13 +331,17 @@ bool PrivateDecoderCrystalHD::Reset(void)
     return true;;
 }
 
-int PrivateDecoderCrystalHD::GetFrame(AVCodecContext *avctx,
+int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
                                       AVFrame *picture,
                                       int *got_picture_ptr,
                                       AVPacket *pkt)
 {
     int result = -1;
-    if (!pkt || !pkt->size || !avctx || !m_device || !picture)
+    if (!pkt || !pkt->size || !stream || !m_device || !picture)
+        return result;
+
+    AVCodecContext *avctx = stream->codec;
+    if (avctx)
         return result;
 
     uint8_t* buf    = pkt->data;
@@ -472,7 +476,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
     {
         unsigned char* buf  = new unsigned char[size];
         m_frame = new VideoFrame();
-        init(m_frame, FMT_YV12, buf, out_width, out_height, 12, size);
+        init(m_frame, FMT_YV12, buf, out_width, out_height, size);
         m_frame->timecode = (uint64_t)((double)out->PicInfo.timeStamp / 1000.0f);
         m_frame->frameNumber = out->PicInfo.picture_number;
     }

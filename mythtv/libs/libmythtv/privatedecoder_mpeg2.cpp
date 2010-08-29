@@ -51,11 +51,12 @@ bool PrivateDecoderMPEG2::Reset(void)
     return true;
 }
 
-int  PrivateDecoderMPEG2::GetFrame(AVCodecContext *avctx,
+int  PrivateDecoderMPEG2::GetFrame(AVStream *stream,
                                    AVFrame *picture,
                                    int *got_picture_ptr,
                                    AVPacket *pkt)
 {
+    AVCodecContext *avctx = stream->codec;
     *got_picture_ptr = 0;
     const mpeg2_info_t *info = mpeg2_info(mpeg2dec);
     mpeg2_buffer(mpeg2dec, pkt->data, pkt->data + pkt->size);

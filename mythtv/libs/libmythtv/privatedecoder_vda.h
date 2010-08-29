@@ -58,7 +58,7 @@ class PrivateDecoderVDA : public PrivateDecoder
                       bool no_hardware_decode,
                       AVCodecContext *avctx);
     virtual bool Reset(void);
-    virtual int  GetFrame(AVCodecContext *avctx,
+    virtual int  GetFrame(AVStream *stream,
                           AVFrame *picture,
                           int *got_picture_ptr,
                           AVPacket *pkt);

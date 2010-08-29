@@ -2947,13 +2947,14 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             // HACK
             while (!gotpicture && count < 5)
             {
-                ret = private_dec->GetFrame(context, &mpa_pic, &gotpicture, pkt);
+                ret = private_dec->GetFrame(curstream, &mpa_pic,
+                                            &gotpicture, pkt);
                 count++;
             }
         }
         else
         {
-            ret = private_dec->GetFrame(context, &mpa_pic, &gotpicture, pkt);
+            ret = private_dec->GetFrame(curstream, &mpa_pic, &gotpicture, pkt);
         }
     }
     else

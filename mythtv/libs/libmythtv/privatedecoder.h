@@ -4,6 +4,7 @@
 #include <QString>
 extern "C" {
 #include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 }
 
 #include "videodisplayprofile.h"
@@ -23,7 +24,7 @@ class PrivateDecoder
                       bool no_hardware_decode,
                       AVCodecContext *avctx) = 0;
     virtual bool Reset(void) = 0;
-    virtual int  GetFrame(AVCodecContext *avctx,
+    virtual int  GetFrame(AVStream *stream,
                           AVFrame *picture,
                           int *got_picture_ptr,
                           AVPacket *pkt) = 0;
