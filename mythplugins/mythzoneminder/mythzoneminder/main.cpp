@@ -34,7 +34,7 @@ using namespace std;
 
 
 
-bool checkConnection(void)
+static bool checkConnection(void)
 {
     if (!ZMClient::get()->connected())
     {
@@ -45,7 +45,7 @@ bool checkConnection(void)
     return true;
 }
 
-void runZMConsole(void)
+static void runZMConsole(void)
 {
     if (!checkConnection())
         return;
@@ -58,7 +58,7 @@ void runZMConsole(void)
         mainStack->AddScreen(console);
 }
 
-void runZMLiveView(void)
+static void runZMLiveView(void)
 {
     if (!checkConnection())
         return;
@@ -72,7 +72,7 @@ void runZMLiveView(void)
         mainStack->AddScreen(player);
 }
 
-void runZMEventView(void)
+static void runZMEventView(void)
 {
     if (!checkConnection())
         return;
@@ -85,7 +85,7 @@ void runZMEventView(void)
         mainStack->AddScreen(events);
 }
 
-void ZoneMinderCallback(void *data, QString &selection)
+static void ZoneMinderCallback(void *data, QString &selection)
 {
     (void) data;
 
@@ -99,7 +99,7 @@ void ZoneMinderCallback(void *data, QString &selection)
         runZMEventView();
 }
 
-int runMenu(QString which_menu)
+static int runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
@@ -124,7 +124,7 @@ int runMenu(QString which_menu)
     }
 }
 
-void setupKeys(void)
+static void setupKeys(void)
 {
     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Console"),
         "", "", runZMConsole);
