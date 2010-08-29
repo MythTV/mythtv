@@ -75,7 +75,7 @@ static bool _connected = false;
 
 #define SIZE_INDICATOR 0x80
 
-ssize_t safe_read(int filedes, void *buffer, size_t size)
+static ssize_t safe_read(int filedes, void *buffer, size_t size)
 {
   for (;;) {
       ssize_t p = read(filedes, buffer, size);

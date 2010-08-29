@@ -16,6 +16,8 @@ class SwitchTypeSetting;
 class SwitchPortsSetting;
 class SwitchAddressSetting;
 
+bool convert_diseqc_db(void);
+
 class SwitchConfig : public QObject, public ConfigurationWizard
 {
     Q_OBJECT

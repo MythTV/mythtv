@@ -345,7 +345,7 @@ static struct { const char *name; unsigned char r, g, b, t; } colourTable[] =
 
 
 // Search for a tag and return it if it exists.  Returns -1 if it isn't found.
-int FindTag(const char *p)
+static int FindTag(const char *p)
 {
     for (int i = 0; i < (int)(sizeof(rchTagNames)/sizeof(rchTagNames[0])); i++) {
         if (stricmp(p, rchTagNames[i]) == 0) return i;

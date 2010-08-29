@@ -191,7 +191,7 @@ RingBuffer::RingBuffer(const QString &lfilename,
  *  \brief Returns false iff file exists and has incorrect permissions.
  *  \param filename File (including path) that we want to know about
  */
-bool check_permissions(const QString &filename)
+static bool check_permissions(const QString &filename)
 {
     QFileInfo fileInfo(filename);
     if (fileInfo.exists() && !fileInfo.isReadable())

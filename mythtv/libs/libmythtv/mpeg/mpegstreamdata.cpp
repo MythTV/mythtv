@@ -450,7 +450,7 @@ bool MPEGStreamData::CreatePATSingleProgram(
 
 }
 
-desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
+static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
                               const cvct_vec_t &cvct,
                               uint pnum)
 {

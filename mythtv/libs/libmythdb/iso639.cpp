@@ -73,7 +73,7 @@ QString iso639_str2_to_str3(const QString &str2)
     return "und";
 }
 
-QString iso639_Alpha3_toName(const unsigned char *iso639_2)
+static QString iso639_Alpha3_toName(const unsigned char *iso639_2)
 {
     int alpha3 = iso639_str3_to_key(iso639_2);
     alpha3 = iso639_key_to_canonical_key(alpha3);
@@ -84,7 +84,7 @@ QString iso639_Alpha3_toName(const unsigned char *iso639_2)
     return "Unknown";
 }
 
-QString iso639_Alpha2_toName(const unsigned char *iso639_1)
+static QString iso639_Alpha2_toName(const unsigned char *iso639_1)
 {
     int alpha2 = iso639_str2_to_key2(iso639_1);
 

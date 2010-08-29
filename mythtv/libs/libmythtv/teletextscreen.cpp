@@ -656,7 +656,7 @@ void TeletextScreen::DrawHeader(const uint8_t *page, int lang)
     DrawStatus();
 }
 
-QColor ttcolortoqcolor(int ttcolor)
+static QColor ttcolortoqcolor(int ttcolor)
 {
     QColor color;
 

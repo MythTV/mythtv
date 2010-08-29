@@ -56,7 +56,7 @@ int GetNumberXineramaScreens(void)
 // Everything below this line is only compiled if using X11
 #ifdef USING_X11
 
-int ErrorHandler(Display *d, XErrorEvent *xeev)
+static int ErrorHandler(Display *d, XErrorEvent *xeev)
 {
     xerrors[d].push_back(*xeev);
     return 0;

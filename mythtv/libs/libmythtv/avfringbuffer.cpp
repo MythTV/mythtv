@@ -1,6 +1,6 @@
 #include "avfringbuffer.h"
 
-int AVF_Open(URLContext *h, const char *filename, int flags)
+static int AVF_Open(URLContext *h, const char *filename, int flags)
 {
     (void)filename;
     (void)flags;
@@ -9,7 +9,7 @@ int AVF_Open(URLContext *h, const char *filename, int flags)
     return 0;
 }
 
-int AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
+static int AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
@@ -19,7 +19,7 @@ int AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
     return avfr->GetRingBuffer()->Read(buf, buf_size);
 }
 
-int AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
+static int AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
@@ -29,7 +29,7 @@ int AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
     return avfr->GetRingBuffer()->Write(buf, buf_size);
 }
 
-int64_t AVF_Seek(URLContext *h, int64_t offset, int whence)
+static int64_t AVF_Seek(URLContext *h, int64_t offset, int whence)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
@@ -45,7 +45,7 @@ int64_t AVF_Seek(URLContext *h, int64_t offset, int whence)
     return avfr->GetRingBuffer()->Seek(offset, whence);
 }
 
-int AVF_Close(URLContext *h)
+static int AVF_Close(URLContext *h)
 {
     (void)h;
     return 0;

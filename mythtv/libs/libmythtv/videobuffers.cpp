@@ -1371,7 +1371,7 @@ QString dbg_str_arr_short[DBG_STR_ARR_SIZE] =
 
 map<const VideoFrame *, int> dbg_str;
 
-int DebugNum(const VideoFrame *frame)
+static int DebugNum(const VideoFrame *frame)
 {
     map<const VideoFrame *, int>::iterator it = dbg_str.find(frame);
     if (it == dbg_str.end())

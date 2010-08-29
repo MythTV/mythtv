@@ -805,7 +805,7 @@ static int OddParity(unsigned char c)
 // // // // // // // // // // //  VPS  // // // // // // // // // // //
 // // // // // // // // // // // // // // // // // // // // // // // //
 
-void DumpPIL(int pil)
+static void DumpPIL(int pil)
 {
     int day  = (pil >> 15);
     int mon  = (pil >> 11) & 0xF;
@@ -938,7 +938,7 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
     return tmp.trimmed();
 }
 
-bool is_better(const QString &newStr, const QString &oldStr)
+static bool is_better(const QString &newStr, const QString &oldStr)
 {
     if (!newStr.isEmpty() && newStr != oldStr &&
         (newStr != oldStr.left(newStr.length())))

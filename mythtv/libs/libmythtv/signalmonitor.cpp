@@ -66,7 +66,7 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-void ALRMhandler(int /*sig*/)
+static void ALRMhandler(int /*sig*/)
 {
      cerr<<"SignalMonitor: Got SIGALRM"<<endl;
      signal(SIGINT, ALRMhandler);

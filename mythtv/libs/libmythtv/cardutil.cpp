@@ -591,7 +591,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
     return dst_cardid;
 }
 
-bool clone_cardinputs(uint src_cardid, uint dst_cardid)
+static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
 {
     vector<uint> src_inputs = CardUtil::GetInputIDs(src_cardid);
     vector<uint> dst_inputs = CardUtil::GetInputIDs(dst_cardid);

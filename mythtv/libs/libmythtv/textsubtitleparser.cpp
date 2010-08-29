@@ -22,8 +22,8 @@ using std::lower_bound;
 #include "textsubtitleparser.h"
 #include "xine_demux_sputext.h"
 
-bool operator<(const text_subtitle_t& left,
-               const text_subtitle_t& right)
+static bool operator<(const text_subtitle_t& left,
+                      const text_subtitle_t& right)
 {
     return left.start < right.start;
 }

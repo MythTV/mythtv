@@ -598,7 +598,7 @@ static lnb_preset lnb_presets[] =
     lnb_preset(QString::null, DiSEqCDevLNB::kTypeVoltageControl),
 };
 
-uint FindPreset(const DiSEqCDevLNB &lnb)
+static uint FindPreset(const DiSEqCDevLNB &lnb)
 {
     uint i;
     for (i = 0; !lnb_presets[i].name.isEmpty(); i++)

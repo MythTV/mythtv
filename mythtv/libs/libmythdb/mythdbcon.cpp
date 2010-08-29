@@ -356,7 +356,7 @@ void MDBManager::CloseDatabases()
 
 // -----------------------------------------------------------------------
 
-void InitMSqlQueryInfo(MSqlQueryInfo &qi)
+static void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 {
     qi.db = NULL;
     qi.qsqldb = QSqlDatabase();

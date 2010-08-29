@@ -130,7 +130,7 @@ void LIRC::TeardownAll(void)
     }
 }
   
-QByteArray get_ip(const QString &h)
+static QByteArray get_ip(const QString &h)
 {
     QByteArray hba = h.toLatin1();
     struct in_addr sin_addr;

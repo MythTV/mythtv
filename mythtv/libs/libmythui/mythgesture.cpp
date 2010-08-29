@@ -146,7 +146,7 @@ MythGestureEvent *MythGesture::gesture(void) const
 }
 
 /* comments in header */
-int determineBin (const QPoint & p, int x1, int x2, int y1, int y2)
+static int determineBin (const QPoint & p, int x1, int x2, int y1, int y2)
 {
     int bin_num = 1;
     if (p.x() > x1)

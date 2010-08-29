@@ -11,7 +11,7 @@ using namespace std;
 #include "schemawizard.h"
 #include "mythdb.h"
 #include "mythverbose.h"
-
+#include "diseqcsettings.h" // for convert_diseqc_db()
 
 #define MINIMUM_DBMS_VERSION 5,0,15
 
@@ -26,7 +26,6 @@ static bool performActualUpdate(
     const char **updates, const char *version, QString &dbver);
 static bool InitializeDatabase(void);
 static bool doUpgradeTVDatabaseSchema(void);
-bool convert_diseqc_db(void);
 
 /** \defgroup db_schema MythTV Database Schema
 

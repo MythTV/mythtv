@@ -96,9 +96,9 @@ bool extractZIP(const QString &zipFile, const QString &outDir)
     return true;
 }
 
-QString downloadRemoteFile(const QString &cmd, const QString &url,
-                           const QString &storageGroup,
-                           const QString &filename)
+static QString downloadRemoteFile(const QString &cmd, const QString &url,
+                                  const QString &storageGroup,
+                                  const QString &filename)
 {
     QStringList strlist(cmd);
     strlist << url;

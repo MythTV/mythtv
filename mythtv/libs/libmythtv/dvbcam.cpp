@@ -368,7 +368,7 @@ void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
     }
 }
 
-void process_desc(cCiCaPmt &capmt,
+static void process_desc(cCiCaPmt &capmt,
                   const unsigned short *casids,
                   const desc_list_t &desc)
 {

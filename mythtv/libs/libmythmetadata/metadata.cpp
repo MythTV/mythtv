@@ -28,7 +28,7 @@ struct SortData
     QString m_id;
 };
 
-bool operator<(const SortData &lhs, const SortData &rhs)
+static bool operator<(const SortData &lhs, const SortData &rhs)
 {
     int ret = QString::localeAwareCompare(lhs.m_title, rhs.m_title);
 

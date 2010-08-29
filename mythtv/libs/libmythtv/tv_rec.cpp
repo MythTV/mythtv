@@ -1289,7 +1289,7 @@ void *TVRec::RecorderThread(void *param)
     return NULL;
 }
 
-bool get_use_eit(uint cardid)
+static bool get_use_eit(uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1872,7 +1872,7 @@ QString TVRec::GetStartChannel(uint cardid, const QString &defaultinput)
     return startchan;
 }
 
-void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
+static void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
 {
     if (!dtvMon->GetATSCStreamData())
         return;
@@ -1889,7 +1889,7 @@ void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
     dtvMon->GetATSCStreamData()->ReturnCachedTable(mgt);
 }
 
-bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const DTVChannel* channel)
+static bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const DTVChannel* channel)
 {
     pid_cache_t pid_cache;
     channel->GetCachedPids(pid_cache);

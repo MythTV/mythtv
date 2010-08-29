@@ -271,8 +271,9 @@ static uint insert_dtv_multiplex(
     return mplex;
 }
 
-void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
-                           uint sourceid, uint tsid, uint netid)
+static void handle_transport_desc(vector<uint> &muxes,
+                                  const MPEGDescriptor &desc,
+                                  uint sourceid, uint tsid, uint netid)
 {
     uint tag = desc.DescriptorTag();
 
