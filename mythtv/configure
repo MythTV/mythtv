@@ -3863,6 +3863,7 @@ check_cxxflags -Wpointer-arith
 check_cxxflags -Wredundant-decls
 check_cxxflags -Wno-non-virtual-dtor
 check_cxxflags -funit-at-a-time
+check_cxxflags -Wmissing-declarations
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
 
