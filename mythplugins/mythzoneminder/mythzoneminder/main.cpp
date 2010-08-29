@@ -32,19 +32,7 @@
 
 using namespace std;
 
-void runZMConsole(void);
-void runZMLiveView(void);
-void runZMEventView(void);
 
-void setupKeys(void)
-{
-    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Console"),
-        "", "", runZMConsole);
-    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Live View"),
-        "", "", runZMLiveView);
-    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Events"),
-        "", "", runZMEventView);
-}
 
 bool checkConnection(void)
 {
@@ -55,18 +43,6 @@ bool checkConnection(void)
     }
 
     return true;
-}
-
-int mythplugin_init(const char *libversion)
-{
-    if (!gContext->TestPopupVersion("mythzoneminder",
-                                    libversion,
-                                    MYTH_BINARY_VERSION))
-        return -1;
-
-    setupKeys();
-
-    return 0;
 }
 
 void runZMConsole(void)
@@ -146,6 +122,28 @@ int runMenu(QString which_menu)
         delete diag;
         return -1;
     }
+}
+
+void setupKeys(void)
+{
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Console"),
+        "", "", runZMConsole);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Live View"),
+        "", "", runZMLiveView);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Events"),
+        "", "", runZMEventView);
+}
+
+int mythplugin_init(const char *libversion)
+{
+    if (!gContext->TestPopupVersion("mythzoneminder",
+                                    libversion,
+                                    MYTH_BINARY_VERSION))
+        return -1;
+
+    setupKeys();
+
+    return 0;
 }
 
 int mythplugin_run(void)
