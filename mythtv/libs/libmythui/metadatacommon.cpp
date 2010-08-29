@@ -221,8 +221,9 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     trailerURL = item.firstChildElement("trailer").text();
     language = item.firstChildElement("language").text();
 
-    releasedate = QDate::fromString(item.firstChildElement("releasedate")
-                                    .text(), "yyyy-MM-dd");
+    QString tmpDate = item.firstChildElement("releasedate").text();
+    if (!tmpDate.isEmpty())
+        releasedate = QDate::fromString(tmpDate, "yyyy-MM-dd");
     lastupdated = RFC822TimeToQDateTime(item.
                       firstChildElement("lastupdated").text());
 
@@ -232,6 +233,8 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     budget = item.firstChildElement("budget").text().toUInt();
     revenue = item.firstChildElement("revenue").text().toUInt();
     year = item.firstChildElement("year").text().toUInt();
+    if (!year && !releasedate.isNull())
+        year = releasedate.toString("yyyy").toUInt();
     runtime = item.firstChildElement("runtime").text().toUInt();
     runtimesecs = item.firstChildElement("runtimesecs").text().toUInt();
 
