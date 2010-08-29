@@ -940,6 +940,9 @@ void MainServer::customEvent(QEvent *e)
 
             if ((tokens.size() >= 2) && (tokens[1] == "FINISHED"))
                 m_downloadURLs.remove(localFile);
+
+            mod_me = MythEvent(me->Message(), extraDataList);
+            me = &mod_me;
         }
 
         broadcast = QStringList( "BACKEND_MESSAGE" );
