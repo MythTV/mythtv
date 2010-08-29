@@ -1107,19 +1107,23 @@ VideoFrame* VideoBuffers::GetOSDParent(const VideoFrame *osd)
 
 #endif
 
-bool VideoBuffers::CreateBuffers(int width, int height)
+bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height)
 {
     vector<unsigned char*> bufs;
     vector<YUVInfo>        yuvinfo;
-    return CreateBuffers(width, height, bufs, yuvinfo);
+    return CreateBuffers(type, width, height, bufs, yuvinfo);
 }
 
-bool VideoBuffers::CreateBuffers(int width, int height,
+bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
                                  vector<unsigned char*> bufs,
                                  vector<YUVInfo>        yuvinfo)
 {
+    if ((FMT_YV12 != type) && (FMT_YUY2 != type))
+        return false;
+
     bool ok = true;
-    uint bpp = 12 / 4; /* bits per pixel div common factor */
+    int  type_bpp = bitsperpixel(type);
+    uint bpp = type_bpp / 4; /* bits per pixel div common factor */
     uint bpb =  8 / 4; /* bits per byte div common factor */
 
     // If the buffer sizes are not a multple of 16, adjust.
@@ -1149,14 +1153,14 @@ bool VideoBuffers::CreateBuffers(int width, int height,
     for (uint i = 0; i < allocSize(); i++)
     {
         init(&buffers[i],
-             FMT_YV12, bufs[i], yuvinfo[i].width, yuvinfo[i].height,
-             12, max(buf_size, yuvinfo[i].size),
+             type, bufs[i], yuvinfo[i].width, yuvinfo[i].height,
+             max(buf_size, yuvinfo[i].size),
              (const int*) yuvinfo[i].pitches, (const int*) yuvinfo[i].offsets);
 
         ok &= (bufs[i] != NULL);
     }
 
-    Clear(GUID_I420_PLANAR); // GUID_YV12_PLANAR is cleared the same way..
+    Clear();
 
     return ok;
 }
@@ -1170,7 +1174,7 @@ bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data,
     if (num >= allocSize())
         return false;
 
-    init(&buffers[num], fmt, (unsigned char*)data, width, height, -1, 0);
+    init(&buffers[num], fmt, (unsigned char*)data, width, height, 0);
     buffers[num].priv[0] = ffmpeg_hack;
     buffers[num].priv[1] = ffmpeg_hack;
     return true;
@@ -1229,7 +1233,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 
         init(&buffers[i],
              FMT_XVMC_IDCT_MPEG2, (unsigned char*) render,
-             width, height, -1, sizeof(XvMCSurface));
+             width, height, sizeof(XvMCSurface));
 
         buffers[i].priv[0]      = ffmpeg_vld_hack;
         buffers[i].priv[1]      = ffmpeg_vld_hack;
@@ -1327,15 +1331,15 @@ QString VideoBuffers::GetStatus(int n) const
     return str;
 }
 
-void VideoBuffers::Clear(uint i, int fourcc)
+void VideoBuffers::Clear(uint i)
 {
-    clear(at(i), fourcc);
+    clear(at(i));
 }
 
-void VideoBuffers::Clear(int fourcc)
+void VideoBuffers::Clear(void)
 {
     for (uint i = 0; i < allocSize(); i++)
-        Clear(i, fourcc);
+        Clear(i);
 }
 
 /*******************************

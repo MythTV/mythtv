@@ -4456,10 +4456,10 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
         dummy_frame = new VideoFrame;
         init(dummy_frame,
              frame->codec, new unsigned char[frame->size],
-             frame->width, frame->height, frame->bpp, frame->size,
+             frame->width, frame->height, frame->size,
              frame->pitches, frame->offsets);
 
-        clear(dummy_frame, GUID_YV12_PLANAR);
+        clear(dummy_frame);
         // Note: instead of clearing the frame to black, one
         // could load an image or a series of images...
 

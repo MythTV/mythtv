@@ -75,10 +75,10 @@ class VideoBuffers
               uint needprebuffer_small, uint keepprebuffer,
               bool enable_frame_locking = false);
 
-    bool CreateBuffers(int width, int height,
+    bool CreateBuffers(VideoFrameType type, int width, int height,
                        vector<unsigned char*> bufs,
                        vector<YUVInfo>        yuvinfo);
-    bool CreateBuffers(int width, int height);
+    bool CreateBuffers(VideoFrameType type, int width, int height);
     void DeleteBuffers(void);
 
     void Reset(void);
@@ -150,8 +150,8 @@ class VideoBuffers
     frame_queue_t Children(const VideoFrame *frame);
     bool HasChildren(const VideoFrame *frame);
 
-    void Clear(uint i, int fourcc);
-    void Clear(int fourcc);
+    void Clear(uint i);
+    void Clear(void);
 
 #ifdef USING_XVMC
     VideoFrame* PastFrame(const VideoFrame *frame);

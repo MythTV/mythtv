@@ -214,7 +214,8 @@ bool DirectfbData::CreateBuffers(VideoBuffers &vbuffers,
         return false;
     }
 
-    bool ok = vbuffers.CreateBuffers(desc.width, desc.height, bufs, yuvinfo);
+    bool ok = vbuffers.CreateBuffers(FMT_YV12, desc.width, desc.height,
+                                     bufs, yuvinfo);
 
     return ok;
 }
@@ -280,7 +281,7 @@ VideoOutputDirectfb::VideoOutputDirectfb()
     : VideoOutput(), XJ_started(false), widget(NULL),
       data(new DirectfbData())
 {
-    init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
+    init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0);
 }
 
 VideoOutputDirectfb::~VideoOutputDirectfb()
@@ -611,7 +612,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     init(&pauseFrame, vbuffers.GetScratchFrame()->codec,
          new unsigned char[vbuffers.GetScratchFrame()->size + 64],
          vbuffers.GetScratchFrame()->width, vbuffers.GetScratchFrame()->height,
-         vbuffers.GetScratchFrame()->bpp,   vbuffers.GetScratchFrame()->size,
+         vbuffers.GetScratchFrame()->size,
          vbuffers.GetScratchFrame()->pitches,
          vbuffers.GetScratchFrame()->offsets);
 
@@ -730,10 +731,10 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *frame, FrameScanType,
     {
         VideoFrame src_frame;
         init(&src_frame, FMT_YV12, src, frame->width, frame->height,
-             frame->bpp, frame->size, frame->pitches, frame->offsets);
+             frame->size, frame->pitches, frame->offsets);
 
         VideoFrame dst_frame;
-        init(&dst_frame, FMT_YV12, dst, frame->width, frame->height, 12,
+        init(&dst_frame, FMT_YV12, dst, frame->width, frame->height,
              frame->offsets[2] + (pitches[2]>>1) * (frame->height>>1),
              pitches, offsets);
 
@@ -837,7 +838,7 @@ void VideoOutputDirectfb::UpdatePauseFrame(void)
 
     VideoFrame src_frame;
     init(&src_frame, FMT_YV12, src,
-         used_frame->width, used_frame->height, used_frame->bpp,
+         used_frame->width, used_frame->height,
          used_frame->size, used_frame->pitches, used_frame->offsets);
 
     CopyFrame(&pauseFrame, &src_frame);
@@ -880,7 +881,7 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     VideoFrame mem_frame;
     init(&mem_frame, FMT_YV12, src,
-         frame->width, frame->height, frame->bpp,
+         frame->width, frame->height,
          frame->size, frame->pitches, frame->offsets);
 
     if (copy_from_pause)
@@ -936,7 +937,6 @@ bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
          new unsigned char[vbuffers.GetScratchFrame()->size + 64],
          vbuffers.GetScratchFrame()->width,
          vbuffers.GetScratchFrame()->height,
-         vbuffers.GetScratchFrame()->bpp,
          vbuffers.GetScratchFrame()->size);
 
     pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;

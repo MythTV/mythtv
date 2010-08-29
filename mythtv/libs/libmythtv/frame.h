@@ -24,6 +24,7 @@ typedef enum FrameType_
     FMT_BGRA,
     FMT_VDPAU,
     FMT_VAAPI,
+    FMT_YUY2,
 } VideoFrameType;
 
 typedef struct VideoFrame_
@@ -60,27 +61,25 @@ typedef struct VideoFrame_
 #endif
 
 #ifdef __cplusplus
-static inline void init(
-    VideoFrame *vf,
-    VideoFrameType _codec, unsigned char *_buf,
-    int _width, int _height, int _bpp, int _size,
-    const int *p = 0, const int *o = 0) __attribute__ ((unused));
-static inline void clear(VideoFrame *vf, int fourcc) __attribute__ ((unused));
-static inline bool compatible(
-    const VideoFrame *a, const VideoFrame *b) __attribute__ ((unused));
+static inline void init(VideoFrame *vf, VideoFrameType _codec,
+                        unsigned char *_buf, int _width, int _height, int _size,
+                        const int *p = 0,
+                        const int *o = 0) __attribute__ ((unused));
+static inline void clear(VideoFrame *vf) __attribute__ ((unused));
+static inline bool compatible(const VideoFrame *a,
+                              const VideoFrame *b) __attribute__ ((unused));
+static inline int  bitsperpixel(VideoFrameType type);
 
-static inline void init(
-    VideoFrame *vf,
-    VideoFrameType _codec, unsigned char *_buf,
-    int _width, int _height, int _bpp, int _size,
-    const int *p, const int *o)
+static inline void init(VideoFrame *vf, VideoFrameType _codec,
+                        unsigned char *_buf, int _width, int _height,
+                        int _size, const int *p, const int *o)
 {
+    vf->bpp    = bitsperpixel(_codec);
     vf->codec  = _codec;
     vf->buf    = _buf;
     vf->width  = _width;
     vf->height = _height;
 
-    vf->bpp          = _bpp;
     vf->size         = _size;
     vf->frameNumber  = 0;
     vf->timecode     = 0;
@@ -109,7 +108,7 @@ static inline void init(
         }
         else
         {
-            vf->pitches[0] = (_width * _bpp) >> 3;
+            vf->pitches[0] = (_width * vf->bpp) >> 3;
             vf->pitches[1] = vf->pitches[2] = 0;
         }
     }
@@ -139,13 +138,12 @@ static inline void init(
     }
 }
 
-static inline void clear(VideoFrame *vf, int fourcc)
+static inline void clear(VideoFrame *vf)
 {
     if (!vf)
         return;
 
-    if ((GUID_I420_PLANAR == fourcc) || (GUID_IYUV_PLANAR == fourcc) ||
-        (GUID_YV12_PLANAR == fourcc))
+    if (FMT_YV12 == vf->codec)
     {
         int uv_height = vf->height >> 1;
         // MS Windows doesn't like bzero()..
@@ -195,6 +193,34 @@ static inline void copy(VideoFrame *dst, const VideoFrame *src)
         memcpy(dst->buf + dst->offsets[2],
                src->buf + src->offsets[2], pitch2 * height2);
     }
+}
+
+static inline int bitsperpixel(VideoFrameType type)
+{
+    int res = 8;
+    switch (type)
+    {
+        case FMT_BGRA:
+        case FMT_RGBA32:
+        case FMT_ARGB32:
+            res = 32;
+            break;
+        case FMT_RGB24:
+            res = 24;
+            break;
+        case FMT_YUV422P:
+        case FMT_YUY2:
+            res = 16;
+            break;
+        case FMT_YV12:
+            res = 12;
+            break;
+        case FMT_IA44:
+        case FMT_AI44:
+        default:
+            res = 8;
+    }
+    return res;
 }
 
 #endif /* __cplusplus */

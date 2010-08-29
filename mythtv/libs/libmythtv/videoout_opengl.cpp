@@ -281,7 +281,8 @@ bool VideoOutputOpenGL::CreateBuffers(void)
 
     bool success = true;
     vbuffers.Init(31, true, 1, 12, 4, 2, false);
-    success &= vbuffers.CreateBuffers(window.GetVideoDim().width(),
+    success &= vbuffers.CreateBuffers(FMT_YV12,
+                                      window.GetVideoDim().width(),
                                       window.GetVideoDim().height());
 
     av_pause_frame.height = vbuffers.GetScratchFrame()->height;
@@ -294,7 +295,7 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     if (!av_pause_frame.buf)
         success = false;
     else
-        clear(&av_pause_frame, GUID_YV12_PLANAR);
+        clear(&av_pause_frame);
 
     return success;
 }

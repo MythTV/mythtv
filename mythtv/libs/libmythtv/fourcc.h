@@ -69,6 +69,8 @@ static inline char * fourcc_str(int i)
 #define GUID_YV12_PLANAR 0x32315659
 #define GUID_IA44_PACKED 0x34344941
 #define GUID_AI44_PACKED 0x34344149
+#define GUID_YUY2_PACKED 0x32595559 /* same as YUYV */
+#define GUID_UYVY_PACKED 0x59565955
 
 
 /******************************************************************************

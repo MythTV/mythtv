@@ -2929,7 +2929,7 @@ void NuppelVideoRecorder::doWriteThread(void)
                 VideoFrame frame;
                 init(&frame,
                      FMT_YV12, videobuffer[act_video_encode]->buffer,
-                     width, height, 12, videobuffer[act_video_encode]->bufferlen);
+                     width, height, videobuffer[act_video_encode]->bufferlen);
 
                 frame.frameNumber = videobuffer[act_video_encode]->sample;
                 frame.timecode = videobuffer[act_video_encode]->timecode;

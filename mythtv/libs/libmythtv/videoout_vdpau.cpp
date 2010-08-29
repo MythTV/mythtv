@@ -201,7 +201,8 @@ bool VideoOutputVDPAU::InitBuffers(void)
     {
         ok = CreateVideoSurfaces(NUM_REFERENCE_FRAMES);
         if (ok)
-            ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+            ok = vbuffers.CreateBuffers(FMT_YV12,
+                                        video_dim.width(), video_dim.height());
     }
 
     if (!ok)

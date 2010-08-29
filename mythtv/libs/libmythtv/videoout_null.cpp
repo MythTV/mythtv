@@ -75,12 +75,11 @@ void VideoOutputNull::CreatePauseFrame(void)
          new unsigned char[vbuffers.GetScratchFrame()->size + 128],
          vbuffers.GetScratchFrame()->width,
          vbuffers.GetScratchFrame()->height,
-         vbuffers.GetScratchFrame()->bpp,
          vbuffers.GetScratchFrame()->size);
 
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
-    clear(&av_pause_frame, GUID_I420_PLANAR);
+    clear(&av_pause_frame);
 
     vbuffers.UnlockFrame(&av_pause_frame, "CreatePauseFrame");
 }
@@ -108,7 +107,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     if (input_size == window.GetVideoDispDim())
     {
-        vbuffers.Clear(GUID_I420_PLANAR);
+        vbuffers.Clear();
         MoveResize();
         return true;
     }
@@ -121,7 +120,8 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     const QSize video_dim = window.GetVideoDim();
 
-    bool ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+    bool ok = vbuffers.CreateBuffers(FMT_YV12, video_dim.width(),
+                                     video_dim.height());
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
@@ -157,7 +157,7 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
 
     const QSize video_dim = window.GetVideoDim();
 
-    if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
+    if (!vbuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height()))
         return false;
 
     CreatePauseFrame();
