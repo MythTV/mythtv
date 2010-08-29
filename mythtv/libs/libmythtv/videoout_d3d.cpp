@@ -217,7 +217,8 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
-    success &= vbuffers.CreateBuffers(window.GetVideoDim().width(),
+    success &= vbuffers.CreateBuffers(FMT_YV12,
+                                      window.GetVideoDim().width(),
                                       window.GetVideoDim().height());
     m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
     m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
