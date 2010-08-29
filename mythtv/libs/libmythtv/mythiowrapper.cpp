@@ -22,6 +22,8 @@
 #include "remotefile.h"
 #include "RingBuffer.h"
 
+#include "mythiowrapper.h"
+
 const int maxID = 1024 * 1024;
 
 QReadWriteLock            m_fileWrapperLock;
@@ -40,7 +42,7 @@ QHash <int, DIR *>        m_localdirs;
 
 extern "C" {
 
-int getNextFileID(void)
+static int getNextFileID(void)
 {
     int id = 100000;
 
@@ -234,7 +236,7 @@ int mythfile_stat(const char *path, struct stat *buf)
     return stat(path, buf);
 }
 
-bool mythfile_exists(const char *path, const char *file)
+int mythfile_exists(const char *path, const char *file)
 {
     VERBOSE(VB_FILE+VB_EXTRA,
             QString("mythfile_exists('%1', '%2')").arg(path).arg(file));
@@ -247,7 +249,7 @@ bool mythfile_exists(const char *path, const char *file)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int getNextDirID(void)
+static int getNextDirID(void)
 {
     int id = 100000;
 
