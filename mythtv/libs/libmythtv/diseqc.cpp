@@ -1657,6 +1657,9 @@ bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
 
         m_last_position = position;
         m_reset = false;
+        if (success)
+            // prevent tuning paramaters overiding rotor parameters
+            usleep(DISEQC_LONG_WAIT);
     }
 
     // chain to child
