@@ -23,7 +23,7 @@ using namespace std;
 GrabberManager *grabMan = 0;
 RSSManager *rssMan = 0;
 
-int RunNetVision(void)
+static int RunNetVision(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -41,7 +41,7 @@ int RunNetVision(void)
     }
 }
 
-int RunNetTree(void)
+static int RunNetTree(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -62,7 +62,7 @@ int RunNetTree(void)
     }
 }
 
-int RunTreeEditor(void)
+static int RunTreeEditor(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -80,22 +80,22 @@ int RunTreeEditor(void)
     }
 }
 
-void runNetVision(void)
+static void runNetVision(void)
 {
     RunNetVision();
 }
 
-void runNetTree(void)
+static void runNetTree(void)
 {
     RunNetTree();
 }
 
-void runTreeEditor(void)
+static void runTreeEditor(void)
 {
     RunTreeEditor();
 }
 
-void setupKeys(void)
+static void setupKeys(void)
 {
     REG_JUMP("MythNetSearch", QT_TRANSLATE_NOOP("MythControls",
         "Internet Television Client - Search"), "", runNetVision);
