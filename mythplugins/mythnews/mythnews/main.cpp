@@ -19,8 +19,28 @@
 
 using namespace std;
 
-void runNews(void);
-int  RunNews(void);
+int RunNews(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythNews *mythnews = new MythNews(mainStack, "mythnews");
+
+    if (mythnews->Create())
+    {
+        mainStack->AddScreen(mythnews);
+        return 0;
+    }
+    else
+    {
+        delete mythnews;
+        return -1;
+    }
+}
+
+void runNews(void)
+{
+    RunNews();
+}
 
 void setupKeys(void)
 {
@@ -54,29 +74,6 @@ int mythplugin_init(const char *libversion)
     setupKeys();
 
     return 0;
-}
-
-void runNews(void)
-{
-    RunNews();
-}
-
-int RunNews(void)
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    MythNews *mythnews = new MythNews(mainStack, "mythnews");
-
-    if (mythnews->Create())
-    {
-        mainStack->AddScreen(mythnews);
-        return 0;
-    }
-    else
-    {
-        delete mythnews;
-        return -1;
-    }
 }
 
 int mythplugin_run(void)
