@@ -28,7 +28,7 @@ struct GameData
 {
 };
 
-void GameCallback(void *data, QString &selection)
+static void GameCallback(void *data, QString &selection)
 {
     GameData *ddata = (GameData *)data;
     QString sel = selection.toLower();
@@ -57,7 +57,7 @@ void GameCallback(void *data, QString &selection)
 
 }
 
-int runMenu(QString which_menu)
+static int runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
@@ -86,7 +86,7 @@ int runMenu(QString which_menu)
     }
 }
 
-int RunGames(void)
+static int RunGames(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     GameUI *game = new GameUI(mainStack);
@@ -103,12 +103,12 @@ int RunGames(void)
     }
 }
 
-void runGames(void)
+static void runGames(void)
 {
     RunGames();
 }
 
-void setupKeys(void)
+static void setupKeys(void)
 {
     REG_JUMP("MythGame", QT_TRANSLATE_NOOP("MythControls",
         "Game frontend"), "", runGames);
