@@ -23,7 +23,7 @@
 
 SourceManager *srcMan = 0;
 
-int RunWeather()
+static int RunWeather()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -42,12 +42,12 @@ int RunWeather()
     }
 }
 
-void runWeather()
+static void runWeather()
 {
     RunWeather();
 }
 
-void setupKeys()
+static void setupKeys()
 {
     REG_JUMP("MythWeather", QT_TRANSLATE_NOOP("MythControls",
         "Weather forecasts"), "", runWeather);
@@ -88,7 +88,7 @@ int mythplugin_run()
     return RunWeather();
 }
 
-void WeatherCallback(void *data, QString &selection)
+static void WeatherCallback(void *data, QString &selection)
 {
     (void) data;
 

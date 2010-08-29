@@ -9,7 +9,7 @@
 // MythWeather headers
 #include "weatherUtils.h"
 
-QString getScreenTitle(const QString &screenName)
+static QString getScreenTitle(const QString &screenName)
 {
     if (screenName == "Current Conditions")
         return QObject::tr("Current Conditions");
