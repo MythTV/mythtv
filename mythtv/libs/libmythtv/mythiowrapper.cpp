@@ -231,7 +231,7 @@ int mythfile_stat(const char *path, struct stat *buf)
             return 0;
     }
 
-    return lstat(path, buf);
+    return stat(path, buf);
 }
 
 bool mythfile_exists(const char *path, const char *file)
