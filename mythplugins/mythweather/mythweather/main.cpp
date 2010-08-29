@@ -23,8 +23,29 @@
 
 SourceManager *srcMan = 0;
 
-void runWeather();
-int  RunWeather();
+int RunWeather()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    Weather *weather = new Weather(mainStack, "mythweather", srcMan);
+
+    if (weather->Create())
+    {
+        mainStack->AddScreen(weather);
+        weather->setupScreens();
+        return 0;
+    }
+    else
+    {
+        delete weather;
+        return -1;
+    }
+}
+
+void runWeather()
+{
+    RunWeather();
+}
 
 void setupKeys()
 {
@@ -60,30 +81,6 @@ int mythplugin_init(const char *libversion)
     }
 
     return 0;
-}
-
-void runWeather()
-{
-    RunWeather();
-}
-
-int RunWeather()
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    Weather *weather = new Weather(mainStack, "mythweather", srcMan);
-
-    if (weather->Create())
-    {
-        mainStack->AddScreen(weather);
-        weather->setupScreens();
-        return 0;
-    }
-    else
-    {
-        delete weather;
-        return -1;
-    }
 }
 
 int mythplugin_run()
