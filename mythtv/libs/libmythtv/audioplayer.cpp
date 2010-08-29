@@ -7,9 +7,9 @@
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),    m_audioOutput(NULL),   m_channels(2),
     m_orig_channels(2),  m_codec(0),            m_format(FORMAT_NONE),
-    m_samplerate(44100), m_stretchfactor(1.0f), m_lock(QMutex::Recursive),
-    m_muted_on_creation(muted), m_main_device(QString::null),
-    m_passthru_device(QString::null), m_passthru(false),
+    m_samplerate(44100), m_stretchfactor(1.0f), m_passthru(false),
+    m_lock(QMutex::Recursive), m_muted_on_creation(muted), 
+    m_main_device(QString::null), m_passthru_device(QString::null),
     no_audio_in(false), no_audio_out(false)
 {
 }
