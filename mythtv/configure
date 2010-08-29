@@ -3866,6 +3866,7 @@ check_cxxflags -funit-at-a-time
 check_cxxflags -Wmissing-declarations
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
+check_cxxflags -D__STDC_LIMIT_MACROS
 
 # add some linker flags
 check_ldflags -Wl,--warn-common

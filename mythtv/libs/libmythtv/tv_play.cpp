@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cmath>
 #include <unistd.h>
+#include <stdint.h>
 #include <pthread.h>
 
 #include <algorithm>
@@ -872,7 +873,7 @@ TV::TV(void)
       switchToInputId(0),
       wantsToQuit(true),
       stretchAdjustment(false),
-      audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
+      audiosyncAdjustment(false), audiosyncBaseline(INT64_MIN),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
       endOfRecording(false),
@@ -5643,7 +5644,7 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 
     bool res = false;
 
-    if (LONG_LONG_MIN != audiosyncBaseline)
+    if (INT64_MIN != audiosyncBaseline)
     {
         long long aud_tc = ctx->player->GetAudioTimecodeOffset();
         ctx->player->SaveAudioTimecodeOffset(aud_tc - audiosyncBaseline);
@@ -8055,7 +8056,7 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
         return;
     }
 
-    if (!audiosyncAdjustment && LONG_LONG_MIN == audiosyncBaseline)
+    if (!audiosyncAdjustment && INT64_MIN == audiosyncBaseline)
         audiosyncBaseline = ctx->player->GetAudioTimecodeOffset();
 
     audiosyncAdjustment = allowEdit;

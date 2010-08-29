@@ -3,7 +3,6 @@
 #undef HAVE_AV_CONFIG_H
 
 // Std C headers
-#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <cstdio>
 #include <cstdlib>
@@ -2885,7 +2884,7 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
 
 void MythPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
 {
-    if ((tc_type == TC_AUDIO) && (tc_wrap[TC_AUDIO] == LONG_LONG_MIN))
+    if ((tc_type == TC_AUDIO) && (tc_wrap[TC_AUDIO] == INT64_MIN))
     {
         long long newaudio;
         newaudio = tc_lastval[TC_VIDEO];

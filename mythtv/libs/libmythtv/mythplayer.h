@@ -34,10 +34,6 @@ extern "C" {
 }
 using namespace std;
 
-#ifndef LONG_LONG_MIN
-#define LONG_LONG_MIN LLONG_MIN
-#endif
-
 class VideoOutput;
 class RemoteEncoder;
 class MythSqlDatabase;

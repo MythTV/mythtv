@@ -1,4 +1,3 @@
-#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 
 #include <algorithm> // for min
