@@ -19,7 +19,7 @@
 
 using namespace std;
 
-int handleMedia(const QString &url, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &)
+static int handleMedia(const QString &url, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &)
 {
     if (url.isEmpty())
     {
@@ -42,7 +42,7 @@ int handleMedia(const QString &url, const QString &, const QString &, const QStr
     return 0;
 }
 
-void setupKeys(void)
+static void setupKeys(void)
 {
     REG_KEY("Browser", "NEXTTAB", QT_TRANSLATE_NOOP("MythControls",
         "Move to next browser tab"), "P");
