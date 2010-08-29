@@ -2868,9 +2868,6 @@ static HostComboBox *ThemePainter()
 #ifdef USING_OPENGL
     gc->addSelection(QObject::tr("OpenGL"), "opengl");
 #endif
-#ifdef USING_VDPAU
-    gc->addSelection("VDPAU", "vdpau");
-#endif
     gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. If "
                     "you have decent hardware, select OpenGL."));
     return gc;
