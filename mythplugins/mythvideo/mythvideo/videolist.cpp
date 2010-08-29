@@ -509,7 +509,7 @@ namespace fake_unnamed
         bool m_ignore_case;
     };
 
-    QString path_to_node_name(const QString &path)
+    static QString path_to_node_name(const QString &path)
     {
         QString ret;
         int slashLoc = path.lastIndexOf('/', -2) + 1;
@@ -521,7 +521,8 @@ namespace fake_unnamed
         return ret;
     }
 
-    meta_dir_node *AddMetadataToDir(Metadata *metadata, meta_dir_node *dir,
+    static meta_dir_node *AddMetadataToDir(Metadata *metadata,
+                                           meta_dir_node *dir,
                      meta_dir_node *hint = NULL)
     {
         meta_dir_node *start = dir;
@@ -591,7 +592,7 @@ namespace fake_unnamed
         kOrderItem
     };
 
-    MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
+    static MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
             QString name, QString fqPath, bool add_up_dirs,
             QString host = "", QString prefix = "")
     {
@@ -615,7 +616,7 @@ namespace fake_unnamed
         return sub_node;
     }
 
-    int AddFileNode(MythGenericTree *where_to_add, QString name,
+    static int AddFileNode(MythGenericTree *where_to_add, QString name,
             Metadata *metadata)
     {
         MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
@@ -1403,7 +1404,7 @@ void VideoListImp::buildFsysList()
 
 namespace fake_unnamed
 {
-    void copy_entries(meta_dir_node &dst, meta_dir_node &src,
+    static void copy_entries(meta_dir_node &dst, meta_dir_node &src,
                       const VideoFilterSettings &filter)
     {
         for (meta_dir_node::entry_iterator e = src.entries_begin();
@@ -1417,7 +1418,7 @@ namespace fake_unnamed
         }
     }
 
-    void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
+    static void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
                             const VideoFilterSettings &filter)
     {
         copy_entries(dst, src, filter);
