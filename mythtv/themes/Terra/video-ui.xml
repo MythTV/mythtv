@@ -25,10 +25,43 @@
             <value>Search Results</value>
         </textarea>
 
-        <buttonlist name="results" from="basebuttonlist">
-            <area>900,248,364,307</area>
-            <buttonarea>0,0,378,300</buttonarea>
-            <spacing>2</spacing>
+        <buttonlist name="results">
+            <area>900,238,364,307</area>
+            <buttonarea>0,0,378,350</buttonarea>
+            <spacing>3</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,367,53</area>
+                <state name="active">
+                    <area>0,0,367,53</area>
+                    <imagetype name="buttonbackground">
+                        <filename>popups/menu_button.png</filename>
+                    </imagetype>
+                    <textarea name="title">
+                        <area>18,0,260,50</area>
+                        <align>left,vcenter</align>
+                        <font>basemedium</font>
+                    </textarea>
+                    <textarea name="year">
+                        <area>280,0,70,50</area>
+                        <align>right,vcenter</align>
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>5,16</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="title">
+                        <font>basemediumbrown</font>
+                    </textarea>
+                    <textarea name="year">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
         </buttonlist>
     </window>
 
@@ -66,13 +99,12 @@
                         <align>allcenter</align>
                         <font>basemedium</font>
                     </textarea>
-                    <imagetype name="buttonarrow">
+<!--                    <imagetype name="buttonarrow">
                         <position>346,16</position>
                         <filename>popups/submenu_arrow.png</filename>
-                    </imagetype>
+                    </imagetype>-->
                 </state>
-                <state name="selectedinactive" from="active">
-                </state>
+                <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>5,16</position>
@@ -622,7 +654,7 @@
                     <textarea name="childcount">
                         <position>135,265</position>
                     </textarea>
-                    
+
                 </state>
             </statetype>
         </buttonlist>
@@ -660,7 +692,7 @@
         <textarea name="novideos" from="description">
             <align>allcenter</align>
             <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
-        </textarea>  
+        </textarea>
 
         <textarea name="year" from="basetextarea">
             <area>48,284,290,30</area>
@@ -704,7 +736,7 @@
                         <area>6,5,187,145</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
-                    
+
                     <statetype name="nodetype">
                         <position>118,83</position>
                         <state name="subfolder">
@@ -863,7 +895,7 @@
         <textarea name="novideos" from="description">
             <align>allcenter</align>
             <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
-        </textarea>  
+        </textarea>
 
         <textarea name="cast" from="basetextarea">
             <area>60,480,505,70</area>
