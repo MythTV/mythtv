@@ -186,7 +186,7 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
     return true;
 }
 
-bool createISOImage(QString &sourceDirectory)
+static bool createISOImage(QString &sourceDirectory)
 {
     VERBOSE(VB_JOBQUEUE, "Creating ISO image");
 
@@ -212,7 +212,7 @@ bool createISOImage(QString &sourceDirectory)
     return true;
 }
 
-int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
+static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 {
     QString dvdDrive = gCoreContext->GetSetting("MythArchiveDVDLocation",
                                             "/dev/dvd");
@@ -269,7 +269,7 @@ int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
     return res;
 }
 
-int doBurnDVD(int mediaType, bool bEraseDVDRW, bool nativeFormat)
+static int doBurnDVD(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 {
     gCoreContext->SaveSetting("MythArchiveLastRunStart",
         QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
@@ -1729,7 +1729,7 @@ QString NativeArchive::findNodeText(const QDomElement &elem, const QString &node
     return res;
 }
 
-void clearArchiveTable(void)
+static void clearArchiveTable(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems;");
@@ -1742,7 +1742,7 @@ void clearArchiveTable(void)
     }
 }
 
-int doNativeArchive(const QString &jobFile)
+static int doNativeArchive(const QString &jobFile)
 {
     gCoreContext->SaveSetting("MythArchiveLastRunType", "Native Export");
     gCoreContext->SaveSetting("MythArchiveLastRunStart", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
@@ -1760,7 +1760,7 @@ int doNativeArchive(const QString &jobFile)
     return res;
 }
 
-int doImportArchive(const QString &inFile, int chanID)
+static int doImportArchive(const QString &inFile, int chanID)
 {
     NativeArchive na;
     return na.doImportArchive(inFile, chanID);
@@ -1792,7 +1792,7 @@ static int myth_sws_img_convert(
     return 0;
 }
 
-int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
+static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
 {
     av_register_all();
 
@@ -1996,7 +1996,7 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
     return 0;
 }
 
-long long getFrameCount(AVFormatContext *inputFC, int vid_id)
+static long long getFrameCount(AVFormatContext *inputFC, int vid_id)
 {
     AVPacket pkt;
     long long count = 0;
@@ -2017,7 +2017,7 @@ long long getFrameCount(AVFormatContext *inputFC, int vid_id)
     return count;
 }
 
-long long getCutFrames(const QString &filename)
+static long long getCutFrames(const QString &filename)
 {
     // only wont the filename
     QString basename = filename;
@@ -2068,7 +2068,7 @@ long long getCutFrames(const QString &filename)
     return frames;
 }
 
-long long getFrameCount(const QString &filename, float fps)
+static long long getFrameCount(const QString &filename, float fps)
 {
     // only wont the filename
     QString basename = filename;
@@ -2118,7 +2118,7 @@ long long getFrameCount(const QString &filename, float fps)
     return totframes;
 }
 
-int getFileInfo(QString inFile, QString outFile, int lenMethod)
+static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
     const char *type = NULL;
 
@@ -2389,7 +2389,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
     return 0;
 }
 
-int getDBParamters(QString outFile)
+static int getDBParamters(QString outFile)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
@@ -2415,7 +2415,7 @@ int getDBParamters(QString outFile)
     return 0;
 }
 
-int isRemote(QString filename)
+static int isRemote(QString filename)
 {
     // check if the file exists
     if (!QFile::exists(filename))
@@ -2440,7 +2440,7 @@ int isRemote(QString filename)
     return 1;
 }
 
-void showUsage()
+static void showUsage()
 {
     cout << "Usage of mytharchivehelper\n";
     cout << "-t/--createthumbnail infile thumblist outfile framecount\n";

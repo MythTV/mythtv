@@ -41,7 +41,7 @@ using namespace std;
 #include "mythburn.h"
 
 // return true if the process belonging to the lock file is still running
-bool checkProcess(const QString &lockFile)
+static bool checkProcess(const QString &lockFile)
 {
     // read the PID from the lock file
     QFile file(lockFile);
@@ -77,7 +77,7 @@ bool checkProcess(const QString &lockFile)
 }
 
 // return true if a lock file is found and the owning process is still running
-bool checkLockFile(const QString &lockFile)
+static bool checkLockFile(const QString &lockFile)
 {
     QFile file(lockFile);
 
@@ -102,7 +102,7 @@ bool checkLockFile(const QString &lockFile)
     return false;
 }
 
-void runCreateDVD(void)
+static void runCreateDVD(void)
 {
     QString commandline;
     QString tempDir = getTempDirectory(true);
@@ -131,7 +131,7 @@ void runCreateDVD(void)
         mainStack->AddScreen(dest);
 }
 
-void runCreateArchive(void)
+static void runCreateArchive(void)
 {
     QString commandline;
     QString tempDir = getTempDirectory(true);
@@ -160,12 +160,12 @@ void runCreateArchive(void)
         mainStack->AddScreen(dest);
 }
 
-void runEncodeVideo(void)
+static void runEncodeVideo(void)
 {
 
 }
 
-void runImportVideo(void)
+static void runImportVideo(void)
 {
     QString tempDir = getTempDirectory(true);
 
@@ -195,12 +195,12 @@ void runImportVideo(void)
         mainStack->AddScreen(selector);
 }
 
-void runShowLog(void)
+static void runShowLog(void)
 {
     showLogViewer();
 }
 
-void runTestDVD(void)
+static void runTestDVD(void)
 {
     if (!gCoreContext->GetSetting("MythArchiveLastRunType").startsWith("DVD"))
     {
@@ -238,13 +238,13 @@ void runTestDVD(void)
     }
 }
 
-void runBurnDVD(void)
+static void runBurnDVD(void)
 {
     BurnMenu *menu = new BurnMenu();
     menu->start();
 }
 
-void ArchiveCallback(void *data, QString &selection)
+static void ArchiveCallback(void *data, QString &selection)
 {
     (void) data;
 
@@ -266,7 +266,7 @@ void ArchiveCallback(void *data, QString &selection)
         runBurnDVD();
 }
 
-int runMenu(QString which_menu)
+static int runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
     MythThemedMenu *diag = new MythThemedMenu(
@@ -290,7 +290,7 @@ int runMenu(QString which_menu)
     }
 }
 
-void initKeys(void)
+static void initKeys(void)
 {
     REG_KEY("Archive", "TOGGLECUT", QT_TRANSLATE_NOOP("MythControls",
         "Toggle use cut list state for selected program"), "C");
