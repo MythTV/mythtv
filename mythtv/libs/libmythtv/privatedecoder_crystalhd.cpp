@@ -341,7 +341,7 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
         return result;
 
     AVCodecContext *avctx = stream->codec;
-    if (avctx)
+    if (!avctx)
         return result;
 
     uint8_t* buf    = pkt->data;

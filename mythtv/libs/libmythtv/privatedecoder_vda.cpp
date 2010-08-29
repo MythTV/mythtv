@@ -278,7 +278,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
         return -1;
 
     AVCodecContext *avctx = stream->codec;
-    if (avctx)
+    if (!avctx)
         return -1;
 
     CFDataRef data;
