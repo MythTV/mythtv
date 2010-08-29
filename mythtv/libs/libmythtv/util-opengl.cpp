@@ -559,15 +559,3 @@ void pack_yv12interlaced(const unsigned char *source,
         dst_1 += dwrap; dst_2 += dwrap; dst_3 += dwrap; dst_4 += dwrap;
     }
 }
-
-void store_bicubic_weights(float x, float *dst)
-{
-    float w0 = (((-1 * x + 3) * x - 3) * x + 1) / 6;
-    float w1 = ((( 3 * x - 6) * x + 0) * x + 4) / 6;
-    float w2 = (((-3 * x + 3) * x + 3) * x + 1) / 6;
-    float w3 = ((( 1 * x + 0) * x + 0) * x + 0) / 6;
-    *dst++ = 1 + x - w1 / (w0 + w1);
-    *dst++ = 1 - x + w3 / (w2 + w3);
-    *dst++ = w0 + w1;
-    *dst++ = 0;
-}
