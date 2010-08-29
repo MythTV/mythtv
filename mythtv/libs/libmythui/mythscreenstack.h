@@ -29,6 +29,7 @@ class MPUBLIC MythScreenStack : public QObject
 
     void GetDrawOrder(QVector<MythScreenType *> &screens);
     void ScheduleInitIfNeeded(void);
+    void AllowReInit(void) { m_DoInit = true; }
     int TotalScreens() const;
 
     void DisableEffects(void) { m_DoTransitions = false; }

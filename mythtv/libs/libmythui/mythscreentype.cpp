@@ -269,6 +269,7 @@ void MythScreenType::Load(void)
 void MythScreenType::LoadInBackground(void)
 {
     m_IsLoading = true;
+    m_ScreenStack->AllowReInit();
 
     OpenBusyPopup();
 
@@ -279,6 +280,7 @@ void MythScreenType::LoadInBackground(void)
 void MythScreenType::LoadInForeground(void)
 {
     m_IsLoading = true;
+    m_ScreenStack->AllowReInit();
     Load();
     m_IsLoaded = true;
     m_IsLoading = false;
