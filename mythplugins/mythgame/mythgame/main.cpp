@@ -86,8 +86,27 @@ int runMenu(QString which_menu)
     }
 }
 
-void runGames(void);
-int  RunGames(void);
+int RunGames(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    GameUI *game = new GameUI(mainStack);
+
+    if (game->Create())
+    {
+        mainStack->AddScreen(game);
+        return 0;
+    }
+    else
+    {
+        delete game;
+        return -1;
+    }
+}
+
+void runGames(void)
+{
+    RunGames();
+}
 
 void setupKeys(void)
 {
@@ -130,28 +149,6 @@ int mythplugin_init(const char *libversion)
     setupKeys();
 
     return 0;
-}
-
-void runGames()
-{
-    RunGames();
-}
-
-int RunGames(void)
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    GameUI *game = new GameUI(mainStack);
-
-    if (game->Create())
-    {
-        mainStack->AddScreen(game);
-        return 0;
-    }
-    else
-    {
-        delete game;
-        return -1;
-    } 
 }
 
 int mythplugin_run(void)
