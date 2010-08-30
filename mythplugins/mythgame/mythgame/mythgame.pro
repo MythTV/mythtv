@@ -6,6 +6,8 @@ TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythgame
 
+LIBS += -lmythmetadata-$$LIBVERSION
+
 installscripts.path = $${PREFIX}/share/mythtv/metadata/Game
 installscripts.files = scripts/*.py
 installgiantbomb.path = $${PREFIX}/share/mythtv/metadata/Game/giantbomb

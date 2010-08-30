@@ -10,6 +10,8 @@ TARGET = mythnetvision
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
+LIBS += -lmythmetadata-$$LIBVERSION
+
 installfiles.path = $${PREFIX}/share/mythtv/mythnetvision
 
 installicons.path = $${PREFIX}/share/mythtv/mythnetvision/icons
