@@ -338,30 +338,6 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     return true;
 }
 
-static time_t toTime_t(QDateTime &dt)
-{
-    tm brokenDown;
-    brokenDown.tm_sec = dt.time().second();
-    brokenDown.tm_min = dt.time().minute();
-    brokenDown.tm_hour = dt.time().hour();
-    brokenDown.tm_mday = dt.date().day();
-    brokenDown.tm_mon = dt.date().month() - 1;
-    brokenDown.tm_year = dt.date().year() - 1900;
-    brokenDown.tm_wday = dt.date().dayOfWeek() - 1;
-    brokenDown.tm_yday = dt.date().dayOfYear() - 1;
-    brokenDown.tm_isdst = -1;
-#if defined(__GLIBC__)
-    // glibc has a couple of extra additional fields
-    ::tzset();
-    brokenDown.tm_gmtoff = 0;
-    brokenDown.tm_zone = (const char*) NULL;
-#endif
-    int secsSince1Jan1970UTC = (int) mktime( &brokenDown );
-    if ( secsSince1Jan1970UTC < -1 )
-        secsSince1Jan1970UTC = -1;
-    return secsSince1Jan1970UTC;
-}
-
 bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 {
     QString xmltv_grabber = source.xmltvgrabber;
