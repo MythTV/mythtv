@@ -16,7 +16,7 @@ enum TreeNodeAttributes {
 
 class MythGenericTree;
 class VideoFilterSettings;
-class MetadataListManager;
+class VideoMetadataListManager;
 class ParentalLevel;
 
 class VideoList
@@ -45,7 +45,7 @@ class VideoList
 
     bool Delete(int video_id);
 
-    const MetadataListManager &getListCache() const;
+    const VideoMetadataListManager &getListCache() const;
 
     MythGenericTree *GetTreeRoot();
 

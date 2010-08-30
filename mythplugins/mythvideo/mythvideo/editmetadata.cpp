@@ -20,14 +20,14 @@
 #include <remoteutil.h>
 #include <metadata/globals.h>
 #include <metadata/dbaccess.h>
-#include <metadata/metadatalistmanager.h>
+#include <metadata/videometadatalistmanager.h>
 #include <metadata/videoutils.h>
 
 #include "editmetadata.h"
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, VideoMetadata *source_metadata,
-        const MetadataListManager &cache) : MythScreenType(lparent, lname),
+        const VideoMetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
     m_taglineEdit(0), m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0),
     m_inetrefEdit(0), m_homepageEdit(0), m_plotEdit(0), m_seasonSpin(0),
@@ -513,10 +513,10 @@ void EditMetadataDialog::fillWidgets()
     // TODO: maybe make the title list have the same sort order
     // as elsewhere.
     typedef std::vector<std::pair<unsigned int, QString> > title_list;
-    const MetadataListManager::metadata_list &mdl = m_metaCache.getList();
+    const VideoMetadataListManager::metadata_list &mdl = m_metaCache.getList();
     title_list tc;
     tc.reserve(mdl.size());
-    for (MetadataListManager::metadata_list::const_iterator p = mdl.begin();
+    for (VideoMetadataListManager::metadata_list::const_iterator p = mdl.begin();
             p != mdl.end(); ++p)
     {
         tc.push_back(std::make_pair((*p)->GetID(), (*p)->GetTitle()));

@@ -35,7 +35,7 @@
 
 #include <metadata/videoscan.h>
 #include <metadata/globals.h>
-#include <metadata/metadatalistmanager.h>
+#include <metadata/videometadatalistmanager.h>
 #include <metadata/videoutils.h>
 #include <metadata/dbaccess.h>
 #include <metadata/dirscan.h>
@@ -403,13 +403,13 @@ namespace
     }
 
     void PlayVideo(const QString &filename,
-            const MetadataListManager &video_list, bool useAltPlayer = false)
+            const VideoMetadataListManager &video_list, bool useAltPlayer = false)
     {
         const int WATCHED_WATERMARK = 10000; // Less than this and the chain of
                                              // videos will not be followed when
                                              // playing.
 
-        MetadataListManager::VideoMetadataPtr item = video_list.byFilename(filename);
+        VideoMetadataListManager::VideoMetadataPtr item = video_list.byFilename(filename);
 
         if (!item) return;
 
@@ -708,7 +708,7 @@ class ItemDetailPopup : public MythScreenType
 
   public:
     ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
-            const MetadataListManager &listManager) :
+            const VideoMetadataListManager &listManager) :
         MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
         m_listManager(listManager)
     {
@@ -796,7 +796,7 @@ class ItemDetailPopup : public MythScreenType
   private:
     static const char * const WINDOW_NAME;
     VideoMetadata *m_metadata;
-    const MetadataListManager &m_listManager;
+    const VideoMetadataListManager &m_listManager;
 
     MythUIButton *m_playButton;
     MythUIButton *m_doneButton;

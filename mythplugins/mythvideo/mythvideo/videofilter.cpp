@@ -8,7 +8,7 @@
 #include <mythuitextedit.h>
 #include <metadata/globals.h>
 #include <metadata/dbaccess.h>
-#include <metadata/metadatalistmanager.h>
+#include <metadata/videometadatalistmanager.h>
 #include <metadata/videoutils.h>
 
 #include "videolist.h"
@@ -646,9 +646,9 @@ void VideoFilterDialog::fillWidgets()
     int_list runtimes;
     int_list user_ratings;
 
-    const MetadataListManager::metadata_list &mdl =
+    const VideoMetadataListManager::metadata_list &mdl =
             m_videoList.getListCache().getList();
-    for (MetadataListManager::metadata_list::const_iterator p = mdl.begin();
+    for (VideoMetadataListManager::metadata_list::const_iterator p = mdl.begin();
          p != mdl.end(); ++p)
     {
         int year = (*p)->GetYear();

@@ -8,7 +8,7 @@
 #include "mythuistatetype.h"
 #include "mythuiimage.h"
 #include "globals.h"
-#include "metadatalistmanager.h"
+#include "videometadatalistmanager.h"
 #include "videoutils.h"
 #include "storagegroup.h"
 

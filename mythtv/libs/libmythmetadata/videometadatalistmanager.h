@@ -1,5 +1,5 @@
-#ifndef METADATALISTMANAGER_H_
-#define METADATALISTMANAGER_H_
+#ifndef VIDEOMETADATALISTMANAGER_H_
+#define VIDEOMETADATALISTMANAGER_H_
 
 #include <list>
 
@@ -7,7 +7,7 @@
 #include "videometadata.h"
 #include "mythexp.h"
 
-class MPUBLIC MetadataListManager
+class MPUBLIC VideoMetadataListManager
 {
   public:
     typedef simple_ref_ptr<VideoMetadata> VideoMetadataPtr;
@@ -17,8 +17,8 @@ class MPUBLIC MetadataListManager
     static void loadAllFromDatabase(metadata_list &items);
 
   public:
-    MetadataListManager();
-    ~MetadataListManager();
+    VideoMetadataListManager();
+    ~VideoMetadataListManager();
 
     void setList(metadata_list &list);
     const metadata_list &getList() const;
@@ -30,7 +30,7 @@ class MPUBLIC MetadataListManager
     bool purgeByID(unsigned int db_id);
 
   private:
-    class MetadataListManagerImp *m_imp;
+    class VideoMetadataListManagerImp *m_imp;
 };
 
-#endif // METADATALISTMANAGER_H_
+#endif // VIDEOMETADATALISTMANAGER_H_

@@ -1,13 +1,13 @@
 #include <map>
 
 #include "mythdb.h"
-#include "metadatalistmanager.h"
+#include "videometadatalistmanager.h"
 
-class MetadataListManagerImp
+class VideoMetadataListManagerImp
 {
   public:
-    typedef MetadataListManager::VideoMetadataPtr VideoMetadataPtr;
-    typedef MetadataListManager::metadata_list metadata_list;
+    typedef VideoMetadataListManager::VideoMetadataPtr VideoMetadataPtr;
+    typedef VideoMetadataListManager::metadata_list metadata_list;
 
   private:
     typedef std::map<unsigned int, metadata_list::iterator> int_to_meta;
@@ -96,17 +96,17 @@ class MetadataListManagerImp
     string_to_meta m_file_map;
 };
 
-MetadataListManager::MetadataListManager()
+VideoMetadataListManager::VideoMetadataListManager()
 {
-    m_imp = new MetadataListManagerImp();
+    m_imp = new VideoMetadataListManagerImp();
 }
 
-MetadataListManager::~MetadataListManager()
+VideoMetadataListManager::~VideoMetadataListManager()
 {
     delete m_imp;
 }
 
-void MetadataListManager::loadAllFromDatabase(metadata_list &items)
+void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
@@ -133,35 +133,35 @@ void MetadataListManager::loadAllFromDatabase(metadata_list &items)
     }
 }
 
-void MetadataListManager::setList(metadata_list &list)
+void VideoMetadataListManager::setList(metadata_list &list)
 {
     m_imp->setList(list);
 }
 
-const MetadataListManager::metadata_list &
-MetadataListManager::getList() const
+const VideoMetadataListManager::metadata_list &
+VideoMetadataListManager::getList() const
 {
     return m_imp->getList();
 }
 
-MetadataListManager::VideoMetadataPtr
-MetadataListManager::byFilename(const QString &file_name) const
+VideoMetadataListManager::VideoMetadataPtr
+VideoMetadataListManager::byFilename(const QString &file_name) const
 {
     return m_imp->byFilename(file_name);
 }
 
-MetadataListManager::VideoMetadataPtr
-MetadataListManager::byID(unsigned int db_id) const
+VideoMetadataListManager::VideoMetadataPtr
+VideoMetadataListManager::byID(unsigned int db_id) const
 {
     return m_imp->byID(db_id);
 }
 
-bool MetadataListManager::purgeByFilename(const QString &file_name)
+bool VideoMetadataListManager::purgeByFilename(const QString &file_name)
 {
     return m_imp->purgeByFilename(file_name);
 }
 
-bool MetadataListManager::purgeByID(unsigned int db_id)
+bool VideoMetadataListManager::purgeByID(unsigned int db_id)
 {
     return m_imp->purgeByID(db_id);
 }

@@ -13,7 +13,7 @@
 #include "mythverbose.h"
 #include "globals.h"
 #include "dbaccess.h"
-#include "metadatalistmanager.h"
+#include "videometadatalistmanager.h"
 #include "videoutils.h"
 
 struct SortData
@@ -1631,12 +1631,12 @@ bool VideoMetadata::DeleteFromDatabase()
 }
 
 #if 0
-bool VideoMetadata::fillDataFromID(const MetadataListManager &cache)
+bool VideoMetadata::fillDataFromID(const VideoMetadataListManager &cache)
 {
     if (m_imp->getID() == 0)
         return false;
 
-    MetadataListManager::VideoMetadataPtr mp = cache.byID(m_imp->getID());
+    VideoMetadataListManager::VideoMetadataPtr mp = cache.byID(m_imp->getID());
     if (mp.get())
     {
         *this = *mp;
@@ -1647,12 +1647,12 @@ bool VideoMetadata::fillDataFromID(const MetadataListManager &cache)
 }
 #endif
 
-bool VideoMetadata::FillDataFromFilename(const MetadataListManager &cache)
+bool VideoMetadata::FillDataFromFilename(const VideoMetadataListManager &cache)
 {
     if (m_imp->getFilename().isEmpty())
         return false;
 
-    MetadataListManager::VideoMetadataPtr mp =
+    VideoMetadataListManager::VideoMetadataPtr mp =
             cache.byFilename(m_imp->getFilename());
     if (mp)
     {

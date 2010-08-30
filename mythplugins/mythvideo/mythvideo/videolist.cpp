@@ -10,7 +10,7 @@
 #include <mythmediamonitor.h>
 
 #include <mythgenerictree.h>
-#include <metadata/metadatalistmanager.h>
+#include <metadata/videometadatalistmanager.h>
 #include <metadata/dbaccess.h>
 #include <metadata/quicksp.h>
 #include <metadata/dirscan.h>
@@ -578,7 +578,7 @@ namespace fake_unnamed
             return &data;
         }
 
-        VideoMetadata *operator()(const MetadataListManager::VideoMetadataPtr &data)
+        VideoMetadata *operator()(const VideoMetadataListManager::VideoMetadataPtr &data)
         {
             return data.get();
         }
@@ -640,8 +640,8 @@ class VideoListImp
                               ltDBYearGroup, ltDBDirectorGroup,
                               ltDBCastGroup, ltDBUserRatingGroup,
                               ltDBInsertDateGroup, ltTVMetadata};
-    typedef MetadataListManager::metadata_list metadata_list;
-    typedef MetadataListManager::VideoMetadataPtr MetadataPtr;
+    typedef VideoMetadataListManager::metadata_list metadata_list;
+    typedef VideoMetadataListManager::VideoMetadataPtr MetadataPtr;
 
   public:
     VideoListImp();
@@ -681,7 +681,7 @@ class VideoListImp
         return ret;
     }
 
-    const MetadataListManager &getListCache() const
+    const VideoMetadataListManager &getListCache() const
     {
         return m_metadata;
     }
@@ -715,7 +715,7 @@ class VideoListImp
         m_metadata_list_type = VideoListImp::ltNone;
 
         metadata_list ml;
-        MetadataListManager::loadAllFromDatabase(ml);
+        VideoMetadataListManager::loadAllFromDatabase(ml);
         m_metadata.setList(ml);
     }
 
@@ -738,7 +738,7 @@ class VideoListImp
 
     std::auto_ptr<MythGenericTree> video_tree_root;
 
-    MetadataListManager m_metadata;
+    VideoMetadataListManager m_metadata;
     meta_dir_node m_metadata_tree; // master list for tree views
 
     metadata_view_list m_metadata_view_flat;
@@ -794,7 +794,7 @@ int VideoList::TryFilter(const VideoFilterSettings &filter) const
     return m_imp->TryFilter(filter);
 }
 
-const MetadataListManager &VideoList::getListCache() const
+const VideoMetadataListManager &VideoList::getListCache() const
 {
     return m_imp->getListCache();
 }
@@ -1031,7 +1031,7 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
 void VideoListImp::buildGroupList(metadata_list_type whence) 
 { 
     metadata_list ml; 
-    MetadataListManager::loadAllFromDatabase(ml); 
+    VideoMetadataListManager::loadAllFromDatabase(ml); 
     m_metadata.setList(ml); 
  
     metadata_view_list mlist; 
@@ -1157,7 +1157,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
 void VideoListImp::buildTVList()
 {
     metadata_list ml;
-    MetadataListManager::loadAllFromDatabase(ml);
+    VideoMetadataListManager::loadAllFromDatabase(ml);
     m_metadata.setList(ml);
 
     metadata_view_list mlist;
@@ -1204,7 +1204,7 @@ void VideoListImp::buildTVList()
 void VideoListImp::buildDbList()
 {
     metadata_list ml;
-    MetadataListManager::loadAllFromDatabase(ml);
+    VideoMetadataListManager::loadAllFromDatabase(ml);
     m_metadata.setList(ml);
 
     metadata_view_list mlist;
@@ -1390,9 +1390,9 @@ void VideoListImp::buildFsysList()
     {
         // Load the DB data so metadata lookups work
         // TODO: ugly, pass the list
-        MetadataListManager mdlm;
+        VideoMetadataListManager mdlm;
         metadata_list db_metadata;
-        MetadataListManager::loadAllFromDatabase(db_metadata);
+        VideoMetadataListManager::loadAllFromDatabase(db_metadata);
         mdlm.setList(db_metadata);
         for (metadata_list::iterator p = ml.begin(); p != ml.end(); ++p)
         {
@@ -1521,7 +1521,7 @@ namespace fake_unnamed
 
       public:
         dirhandler(smart_dir_node &directory, const QString &prefix,
-                   MetadataListManager::metadata_list &metalist,
+                   VideoMetadataListManager::metadata_list &metalist,
                    free_list &dh_free_list, bool infer_title) :
             m_directory(directory), m_prefix(prefix), m_metalist(metalist),
             m_dh_free_list(dh_free_list), m_infer_title(infer_title)
@@ -1556,7 +1556,7 @@ namespace fake_unnamed
             (void) extension;
             QString file_string(fq_file_name);
 
-            MetadataListManager::VideoMetadataPtr myData(new VideoMetadata(file_string));
+            VideoMetadataListManager::VideoMetadataPtr myData(new VideoMetadata(file_string));
             QFileInfo qfi(file_string);
             QString title = qfi.completeBaseName();
             if (m_infer_title)
@@ -1577,7 +1577,7 @@ namespace fake_unnamed
       private:
         smart_dir_node m_directory;
         const QString &m_prefix;
-        MetadataListManager::metadata_list &m_metalist;
+        VideoMetadataListManager::metadata_list &m_metalist;
         free_list &m_dh_free_list;
         const bool m_infer_title;
     };

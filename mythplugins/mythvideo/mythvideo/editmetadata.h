@@ -7,7 +7,7 @@
 #include <metadata/metadataimagedownload.h>
 
 class VideoMetadata;
-class MetadataListManager;
+class VideoMetadataListManager;
 class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIText;
@@ -24,7 +24,7 @@ class EditMetadataDialog : public MythScreenType
      EditMetadataDialog(MythScreenStack *lparent,
                        QString lname,
                        VideoMetadata *source_metadata,
-                       const MetadataListManager &cache);
+                       const VideoMetadataListManager &cache);
     ~EditMetadataDialog();
 
     bool Create();
@@ -137,9 +137,9 @@ class EditMetadataDialog : public MythScreenType
 
     int cachedChildSelection;
 
-    const MetadataListManager &m_metaCache;
-    MetadataDownload          *m_query;
-    MetadataImageDownload     *m_imageDownload;
+    const VideoMetadataListManager &m_metaCache;
+    MetadataDownload               *m_query;
+    MetadataImageDownload          *m_imageDownload;
 
     MythUIBusyDialog *m_busyPopup;
     MythScreenStack  *m_popupStack;

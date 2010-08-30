@@ -12,12 +12,12 @@ QMAKE_CLEAN += version.cpp
 # Input
 
 HEADERS += cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
-HEADERS += videoscan.h  videoutils.h  videometadata.h  metadatalistmanager.h
+HEADERS += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 HEADERS += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp  
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
-SOURCES += videometadata.cpp  metadatalistmanager.cpp
+SOURCES += videometadata.cpp  videometadatalistmanager.cpp
 SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
 
 INCLUDEPATH += ../libmythdb
@@ -47,7 +47,7 @@ mingw {
 inc.path = $${PREFIX}/include/mythtv/metadata/
 
 inc.files = cleanup.h  dbaccess.h  dirscan.h  globals.h  parentalcontrols.h
-inc.files += videoscan.h  videoutils.h  videometadata.h  metadatalistmanager.h
+inc.files += videoscan.h  videoutils.h  videometadata.h  videometadatalistmanager.h
 inc.files += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload.h
 
 INSTALLS += inc

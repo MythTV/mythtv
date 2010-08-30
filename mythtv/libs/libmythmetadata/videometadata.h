@@ -10,7 +10,7 @@
 #include "mythexp.h"
 
 class MSqlQuery;
-class MetadataListManager;
+class VideoMetadataListManager;
 
 enum { VIDEO_YEAR_DEFAULT = 1895 };
 
@@ -215,8 +215,8 @@ class MPUBLIC VideoMetadata
     // drops the metadata from the DB
     bool DeleteFromDatabase();
 
-//    bool fillDataFromID(const MetadataListManager &cache);
-    bool FillDataFromFilename(const MetadataListManager &cache);
+//    bool fillDataFromID(const VideoMetadataListManager &cache);
+    bool FillDataFromFilename(const VideoMetadataListManager &cache);
 
     // If you aren't VideoList don't call this
     bool DeleteFile(class VideoList &dummy);

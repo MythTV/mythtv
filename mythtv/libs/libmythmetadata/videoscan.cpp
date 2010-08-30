@@ -15,7 +15,7 @@
 #include "globals.h"
 #include "dbaccess.h"
 #include "dirscan.h"
-#include "metadatalistmanager.h"
+#include "videometadatalistmanager.h"
 #include "videoscan.h"
 
 namespace
@@ -65,7 +65,7 @@ namespace
     };
 }
 
-class MetadataListManager;
+class VideoMetadataListManager;
 class MythUIProgressDialog;
 
 class VideoScannerThread : public QThread
@@ -75,9 +75,9 @@ class VideoScannerThread : public QThread
     VideoScannerThread() : m_RemoveAll(false), m_KeepAll(false),
         m_DBDataChanged(false)
     {
-        m_dbmetadata = new MetadataListManager;
-        MetadataListManager::metadata_list ml;
-        MetadataListManager::loadAllFromDatabase(ml);
+        m_dbmetadata = new VideoMetadataListManager;
+        VideoMetadataListManager::metadata_list ml;
+        VideoMetadataListManager::loadAllFromDatabase(ml);
         m_dbmetadata->setList(ml);
 
         m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
@@ -215,7 +215,7 @@ class VideoScannerThread : public QThread
                           tr("Verifying video files"));
 
         // For every file we know about, check to see if it still exists.
-        for (MetadataListManager::metadata_list::const_iterator p =
+        for (VideoMetadataListManager::metadata_list::const_iterator p =
              m_dbmetadata->getList().begin();
              p != m_dbmetadata->getList().end(); ++p)
         {
@@ -362,7 +362,7 @@ class VideoScannerThread : public QThread
     QStringList m_directories;
     QStringList failedSGHosts;
 
-    MetadataListManager *m_dbmetadata;
+    VideoMetadataListManager *m_dbmetadata;
     MythUIProgressDialog *m_dialog;
 
     bool m_DBDataChanged;
