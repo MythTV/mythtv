@@ -68,7 +68,9 @@ void ChannelBase::TeardownAll(void)
     {
         m_thread_lock.lock();
         m_abort_change = true;
+#ifndef USING_MINGW
         myth_system_abort(m_changer_pid);
+#endif
         m_tuneCond.wakeAll();
         m_thread_lock.unlock();
         m_tuneThread.wait();
