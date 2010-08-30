@@ -171,6 +171,7 @@ class ChannelBase
     Status   m_tuneStatus;
     QMutex   m_thread_lock;
     bool     m_abort_change;
+    pid_t    m_changer_pid;
 };
 
 #endif

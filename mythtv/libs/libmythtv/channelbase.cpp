@@ -29,6 +29,7 @@ using namespace std;
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "compat.h"
+#include "mythsystem.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
 #define LOC_WARN QString("ChannelBase(%1) Warning: ").arg(GetCardID())
@@ -49,7 +50,7 @@ ChannelBase::ChannelBase(TVRec *parent)
     :
     m_pParent(parent), m_curchannelname(""),
     m_currentInputID(-1), m_commfree(false), m_cardid(0),
-    m_abort_change(false)
+    m_abort_change(false), m_changer_pid(-1)
 {
     m_tuneStatus = changeUnknown;
     m_tuneThread.tuner = this;
@@ -67,6 +68,7 @@ void ChannelBase::TeardownAll(void)
     {
         m_thread_lock.lock();
         m_abort_change = true;
+        myth_system_abort(m_changer_pid);
         m_tuneCond.wakeAll();
         m_thread_lock.unlock();
         m_tuneThread.wait();
@@ -715,98 +717,18 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
 
     QString command = QString("%1 %2").arg(changer).arg(channum);
 
-    VERBOSE(VB_CHANNEL, QString("External channel change: %1").arg(command));
-    pid_t child = fork();
-    if (child < 0)
-    {   // error encountered in creating fork
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Fork error -- " + ENO);
-        return false;
-    }
-    else if (child == 0)
-    {   // we are the new fork
-        for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
-            close(i);
-        QByteArray cmd = command.toAscii();
-        int ret = execl("/bin/sh", "sh", "-c", cmd.constData(), (char *)NULL);
-        QString msg("ChannelBase: ");
-        if (EACCES == ret) {
-            msg.append(QString("Access denied to /bin/sh"
-                               " when executing %1\n").arg(cmd.constData()));
-        }
-        msg.append(strerror(errno));
-        VERBOSE(VB_IMPORTANT, msg);
-        _exit(CHANNEL__EXIT__EXECL_ERROR); // this exit is ok
-    }
-    else
-    {   // child contains the pid of the new process
-        QMutex      lock;
-        int         status = 0, pid = 0;
+    int  flags = 0;
+    bool ready_to_lock;
+    uint result;
 
-        VERBOSE(VB_CHANNEL, "Waiting for External Tuning program to exit");
+    // Use myth_system, but since we need abort support, do it in pieces
+    myth_system_pre_flags(flags, ready_to_lock);
+    m_changer_pid = myth_system_fork(command, result); 
+    if( result == GENERIC_EXIT_RUNNING )
+        result = myth_system_wait(m_changer_pid, 30);
+    myth_system_post_flags(flags, ready_to_lock);
 
-        bool timed_out = false;
-        uint timeout = 30; // how long to wait in seconds
-        time_t start_time = time(0);
-        while (-1 != pid && !timed_out && !Aborted())
-        {
-            lock.lock();
-            m_tuneCond.wait(&lock, 500);  // sleep up to 0.5 seconds
-            pid = waitpid(child, &status, WUNTRACED|WNOHANG);
-            VERBOSE(VB_IMPORTANT, QString("ret_pid(%1) child(%2) status(0x%3)")
-                    .arg(pid).arg(child).arg(status,0,16));
-            if (pid==child)
-            {
-                lock.unlock();
-                break;
-            }
-            else if (time(0) > (time_t)(start_time + timeout))
-                timed_out = true;
-            lock.unlock();
-        }
-
-        if (timed_out || Aborted())
-        {
-            if (Aborted())
-                VERBOSE(VB_IMPORTANT, "Aborting External Tuning program");
-            else
-                VERBOSE(VB_IMPORTANT, "External Tuning program timed out, "
-                        "killing");
-            kill(child, SIGTERM);
-            usleep(500);
-            kill(child, SIGKILL);
-            return false;
-        }
-
-        VERBOSE(VB_CHANNEL, "External Tuning program no longer running");
-        if (WIFEXITED(status))
-        {   // program exited normally
-            int ret = WEXITSTATUS(status);
-            if (CHANNEL__EXIT__EXECL_ERROR == ret)
-            {
-                VERBOSE(VB_IMPORTANT, QString("ChannelBase: Could not execute "
-                                              "external tuning program."));
-                return false;
-            }
-            else if (ret)
-            {   // external tuning program returned error value
-                VERBOSE(VB_IMPORTANT,
-                        QString("ChannelBase: external tuning program "
-                                "exited with error %1").arg(ret));
-                return false;
-            }
-            VERBOSE(VB_IMPORTANT, "External Tuning program exited with no error");
-        }
-        else
-        {   // program exited abnormally
-            QString msg = QString("ChannelBase: external tuning program "
-                                  "encountered error %1 -- ").arg(errno);
-            msg.append(strerror(errno));
-            VERBOSE(VB_IMPORTANT, msg);
-            return false;
-        }
-    }
-
-    return true;
+    return( result == 0 );
 #endif // !USING_MINGW
 }
 

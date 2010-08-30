@@ -16,7 +16,10 @@
 #define FIXME_BUG__LIBRARY_EXIT_TFW_FAILED_OPEN   244
 #define GENERIC_EXIT_INVALID_TIMEZONE             243
 #define GENERIC_EXIT_SIGNALLED                    242
-#define GENERIC_EXIT_START                        242
+#define GENERIC_EXIT_TIMEOUT                      241
+#define GENERIC_EXIT_ABORTED                      240
+#define GENERIC_EXIT_RUNNING                      239
+#define GENERIC_EXIT_START                        239
 #define GENERIC_EXIT_CMD_NOT_FOUND                127
 
 // libmyth
