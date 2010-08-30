@@ -376,7 +376,7 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
 
     int64_t chd_timestamp = 0; // 100ns units
     if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
-        chd_timestamp = (int64_t)(av_q2d(stream->time_base) * pkt->pts * 100000000000);
+        chd_timestamp = (int64_t)(av_q2d(stream->time_base) * pkt->pts * 100000000000LL);
 
     // TODO check for busy state and available buffer size
     INIT_ST
@@ -540,10 +540,10 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
 
 void PrivateDecoderCrystalHD::AddFrameToQueue(void)
 {
-    bool found = false;
     int i = 0;
 // TODO is the following code needed
 #if 0
+    bool found = false;
     for (; i < m_decoded_frames.size(); i++)
     {
         if (m_frame->timecode >= m_decoded_frames[i]->timecode)
