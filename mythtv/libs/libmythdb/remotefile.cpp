@@ -10,6 +10,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "compat.h"
+#include "mythtimer.h"
 
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
                        int _retries,
@@ -517,10 +518,14 @@ int RemoteFile::Read(void *data, int size)
     controlSock->writeStringList(strlist);
 
     sent = size;
+
+    int waitms = 10;
+    MythTimer mtimer;
+    mtimer.start();
     
-    while (recv < sent && !error && zerocnt++ < 50)
+    while (recv < sent && !error && mtimer.elapsed() < 10000)
     {
-        while (recv < sent && sock->waitForMore(200) > 0)
+        while (recv < sent && sock->waitForMore(waitms) > 0)
         {
             int ret = sock->readBlock(((char *)data) + recv, sent - recv);
             if (ret > 0)
@@ -533,6 +538,9 @@ int RemoteFile::Read(void *data, int size)
                 error = true;
                 break;
             }
+
+            if (waitms < 200)
+                waitms += 20;
         }
 
         if (controlSock->bytesAvailable() > 0)
