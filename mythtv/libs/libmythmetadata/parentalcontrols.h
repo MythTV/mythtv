@@ -2,6 +2,7 @@
 #define PARENTALCONTROLS_H_
 
 #include <QObject> // for moc
+#include <QMetaType>
 
 #include "mythexp.h"
 
@@ -31,6 +32,7 @@ class MPUBLIC ParentalLevel
     Level m_level;
     bool m_hitlimit;
 };
+Q_DECLARE_METATYPE(ParentalLevel*)
 
 bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs);
 bool operator==(const ParentalLevel &lhs, const ParentalLevel &rhs);
