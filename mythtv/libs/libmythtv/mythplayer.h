@@ -371,7 +371,7 @@ class MPUBLIC MythPlayer
     long long ResetAudioTimecodeOffset(void)
         { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
     long long ResyncAudioTimecodeOffset(void)
-        { tc_wrap[TC_AUDIO] = LONG_LONG_MIN; return 0L; }
+        { tc_wrap[TC_AUDIO] = INT64_MIN; return 0L; }
     long long GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
     void SaveAudioTimecodeOffset(long long v)

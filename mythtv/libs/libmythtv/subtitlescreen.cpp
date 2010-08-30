@@ -117,7 +117,7 @@ void SubtitleScreen::ExpireSubtitles(void)
 {
     VideoOutput    *videoOut = m_player->getVideoOutput();
     VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : NULL;
-    long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
+    long long now = currentFrame ? currentFrame->timecode : INT64_MAX;
     QMutableHashIterator<MythUIType*, long long> it(m_expireTimes);
     while (it.hasNext())
     {
