@@ -1298,7 +1298,13 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         QXmlInputSource  xmlsource(&f);
         QXmlSimpleReader xmlsimplereader;
         xmlsimplereader.setContentHandler(&ddhandler);
-        xmlsimplereader.parse(xmlsource);
+        if (!xmlsimplereader.parse(xmlsource))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "DataDirect XML failed to "
+                    "properly parse, downloaded listings were probably "
+                    "corrupt.");
+            ok = false;
+        }
         f.close();
     }
     else
