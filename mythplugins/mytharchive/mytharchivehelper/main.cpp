@@ -31,7 +31,7 @@
 #include <cstdlib>
 
 #include <mythconfig.h>
-#if CONFIG_DARWIN
+#if CONFIG_DARWIN or defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
 #elif __linux__
