@@ -374,10 +374,18 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
 
     }
 
+    int64_t chd_timestamp = 0; // 100ns units
+    if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
+        chd_timestamp = (int64_t)(av_q2d(stream->time_base) * pkt->pts * 100000000000);
+
     // TODO check for busy state and available buffer size
     INIT_ST
-    st = DtsProcInput(m_device, buf, size, pkt->pts * 1000, false);
+    st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
     CHECK_ST
+
+    // TODO why is this needed - possibly overruning CrystalHD decoder or too
+    // many buffered packets causing mythplayer problems?
+    usleep(10000);
 
     if (free_buf)
         delete buf;
@@ -401,7 +409,8 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
 
     VideoFrame *frame = m_decoded_frames.takeLast();
     *got_picture_ptr = 1;
-    picture->reordered_opaque = frame->timecode;
+    picture->reordered_opaque = (int64_t)(frame->timecode / av_q2d(stream->time_base) 
+                                                          / 100000000);
     picture->interlaced_frame = frame->interlaced_frame;
     picture->top_field_first  = frame->top_field_first;
     picture->repeat_pict      = frame->repeat_pict;
@@ -533,6 +542,8 @@ void PrivateDecoderCrystalHD::AddFrameToQueue(void)
 {
     bool found = false;
     int i = 0;
+// TODO is the following code needed
+#if 0
     for (; i < m_decoded_frames.size(); i++)
     {
         if (m_frame->timecode >= m_decoded_frames[i]->timecode)
@@ -543,6 +554,7 @@ void PrivateDecoderCrystalHD::AddFrameToQueue(void)
     }
     if (!found)
         i = m_decoded_frames.size();
+#endif
     m_decoded_frames.insert(i, m_frame);
     m_frame = NULL;
 }
