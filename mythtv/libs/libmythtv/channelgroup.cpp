@@ -228,10 +228,9 @@ int ChannelGroup::GetChannelGroupId(QString changroupname)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString qstr = QString("SELECT grpid FROM channelgroupnames where name='%1'")
-                   .arg(changroupname);
-
-    query.prepare(qstr);
+    query.prepare("SELECT grpid FROM channelgroupnames "
+                  "WHERE name = :GROUPNAME");
+    query.bindValue(":GROUPNAME", changroupname);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("ChannelGroup::GetChannelGroups", query);
