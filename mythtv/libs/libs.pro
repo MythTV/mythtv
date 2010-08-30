@@ -14,7 +14,7 @@ using_x11:SUBDIRS += libmythnvctrl
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
 # Libraries with dependencies
-SUBDIRS += libmythui libmyth libmythupnp libmythtv libmythmetadata
+SUBDIRS += libmythui libmythupnp libmyth
 
 libmythui.depends = libmythdb
 libmythupnp.depends = libmythdb
@@ -22,6 +22,11 @@ libmyth.depends =  libmythdb libmythui libmythupnp
 libmyth.depends += libmythsamplerate libmythsoundtouch libmythfreesurround
 
 LIBMYTHTVDEPS = $$SUBDIRS
-LIBMYTHTVDEPS -= libmythtv
+
+# libmythtv
 libmythtv.depends = $$LIBMYTHTVDEPS
+SUBDIRS += libmythtv
+
+# libmythmetadata
+SUBDIRS += libmythmetadata
 libmythmetadata.depends = $$LIBMYTHTVDEPS
