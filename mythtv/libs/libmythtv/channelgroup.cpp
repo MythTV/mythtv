@@ -40,19 +40,17 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":GRPID", changrpid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("ChannelGroup::ToggleChannel", query);
         return false;
     }
-    else if ((query.size() > 0) && delete_chan)
+    else if (query.next() && delete_chan)
     {
         // We have a record...Remove it to toggle...
-        query.next();
         QString id = query.value(0).toString();
-        query.prepare(
-            QString("DELETE FROM channelgroup "
-                    "WHERE id = '%1'").arg(id));
+        query.prepare("DELETE FROM channelgroup WHERE id = :CHANID");
+        query.bindValue(":CHANID", id);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::ToggleChannel -- delete", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Removing channel with id=%1.").arg(id));
@@ -60,9 +58,10 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
     else if (query.size() == 0)
     {
         // We have no record...Add one to toggle...
-        query.prepare(
-            QString("INSERT INTO channelgroup (chanid,grpid) "
-                    "VALUES ('%1','%2')").arg(chanid).arg(changrpid));
+        query.prepare("INSERT INTO channelgroup (chanid,grpid) "
+                      "VALUES (:CHANID, :GRPID)");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":GRPID", changrpid);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::ToggleChannel -- insert", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Adding channel %1 to group %2.").arg(chanid).arg(changrpid));
@@ -84,7 +83,7 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":GRPID", changrpid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("ChannelGroup::AddChannel", query);
         return false;
@@ -92,9 +91,10 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
     else if (query.size() == 0)
     {
         // We have no record...Add one to toggle...
-        query.prepare(
-            QString("INSERT INTO channelgroup (chanid,grpid) "
-                    "VALUES ('%1','%2')").arg(chanid).arg(changrpid));
+        query.prepare("INSERT INTO channelgroup (chanid,grpid) "
+                      "VALUES (:CHANID, :GRPID)");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":GRPID", changrpid);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::AddChannel -- insert", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Adding channel %1 to group %2.").arg(chanid).arg(changrpid));
@@ -116,19 +116,17 @@ bool ChannelGroup::DeleteChannel(uint chanid, int changrpid)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":GRPID", changrpid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("ChannelGroup::DeleteChannel", query);
         return false;
     }
-    else if (query.size() > 0)
+    else if (query.next())
     {
         // We have a record...Remove it to toggle...
-        query.next();
         QString id = query.value(0).toString();
-        query.prepare(
-            QString("DELETE FROM channelgroup "
-                    "WHERE id = '%1'").arg(id));
+        query.prepare("DELETE FROM channelgroup WHERE id = :CHANID");
+        query.bindValue(":CHANID", id);
         if (!query.exec())
             MythDB::DBError("ChannelGroup::DeleteChannel -- delete", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Removing channel with id=%1.").arg(id));
@@ -153,7 +151,7 @@ ChannelGroupList ChannelGroup::GetChannelGroups(bool includeEmpty)
 
     query.prepare(qstr);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups", query);
     else
     {
@@ -203,19 +201,13 @@ QString ChannelGroup::GetChannelGroupName(int grpid)
         return QObject::tr("All Channels");
 
     MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name FROM channelgroupnames WHERE grpid = :GROUPID");
+    query.bindValue(":GROUPID", grpid);
 
-    QString qstr = QString("SELECT name FROM channelgroupnames where grpid='%1'")
-                   .arg(grpid);
-
-    query.prepare(qstr);
-
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups", query);
-    else if (query.size() > 0)
-    {
-        query.next();
+    else if (query.next())
         return query.value(0).toString();
-    }
 
     return "";
 }
@@ -232,13 +224,10 @@ int ChannelGroup::GetChannelGroupId(QString changroupname)
                   "WHERE name = :GROUPNAME");
     query.bindValue(":GROUPNAME", changroupname);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("ChannelGroup::GetChannelGroups", query);
-    else if (query.size() > 0)
-    {
-        query.next();
+    else if (query.next())
         return query.value(0).toUInt();
-    }
 
     return 0;
 }
