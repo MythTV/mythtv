@@ -27,6 +27,8 @@
 
 #include <unistd.h>
 
+#include "mythiowrapper.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -65,10 +67,20 @@ static inline void bb_init( BITBUFFER *bb, void *p_data, size_t i_data )
 
 static inline void bs_init( BITSTREAM *bs, BD_FILE_H *fp )
 {
+    struct stat buf;
+
     bs->fp = fp;
     bs->pos = 0;
-    file_seek(bs->fp, 0, SEEK_END);
-    bs->end = file_tell(bs->fp);
+// Original libbluray code
+//    file_seek(bs->fp, 0, SEEK_END);
+//    bs->end = file_tell(bs->fp);
+// Instead use 'stat' so we don't flush our readahead buffer
+// Optimize here for now until we can optimize in the RingBuffer itself
+    if (mythfile_stat_fd((int)fp->internal, &buf) == 0)
+        bs->end = buf.st_size;
+    else
+        bs->end = 0;
+
     file_seek(bs->fp, 0, SEEK_SET);
     bs->size = file_read(bs->fp, bs->buf, BF_BUF_SIZE);
     bb_init(&bs->bb, bs->buf, bs->size);

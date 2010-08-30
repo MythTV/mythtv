@@ -8,17 +8,18 @@
 extern "C" {
 #endif
 
-int     mythfile_check(int fd);
+int     mythfile_check(int fileID);
 int     mythfile_open(const char *pathname, int flags);
-int     mythfile_close(int fd);
-off_t   mythfile_seek(int fd, off_t offset, int whence);
+int     mythfile_close(int fileID);
+off_t   mythfile_seek(int fileID, off_t offset, int whence);
 off_t   mythfile_tell(int fileID);
-ssize_t mythfile_read(int fd, void *buf, size_t count);
-ssize_t mythfile_write(int fd, void *buf, size_t count);
+ssize_t mythfile_read(int fileID, void *buf, size_t count);
+ssize_t mythfile_write(int fileID, void *buf, size_t count);
 int     mythfile_stat(const char *path, struct stat *buf);
+int     mythfile_stat_fd(int fileID, struct stat *buf);
 int     mythfile_exists(const char *path, const char *file);
 
-int     mythdir_check(int fd);
+int     mythdir_check(int fileID);
 int     mythdir_opendir(const char *dirname);
 int     mythdir_closedir(int dirID);
 char   *mythdir_readdir(int dirID);

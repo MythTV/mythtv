@@ -29,11 +29,13 @@ const int maxID = 1024 * 1024;
 QReadWriteLock            m_fileWrapperLock;
 QHash <int, RingBuffer *> m_ringbuffers;
 QHash <int, int>          m_localfiles;
+QHash <int, QString>      m_filenames;
 
 QReadWriteLock            m_dirWrapperLock;
 QHash <int, QStringList>  m_remotedirs;
 QHash <int, int>          m_remotedirPositions;
 QHash <int, DIR *>        m_localdirs;
+QHash <int, QString>      m_dirnames;
 
 #define LOC     QString("mythiowrapper: ")
 #define LOC_ERR QString("mythiowrapper: ERROR: ")
@@ -84,6 +86,13 @@ int mythfile_open(const char *pathname, int flags)
     VERBOSE(VB_FILE+VB_EXTRA,
             QString("mythfile_open('%1', %2)").arg(pathname).arg(flags));
 
+    struct stat fileinfo;
+    if (mythfile_stat(pathname, &fileinfo))
+        return -1;
+
+    if (S_ISDIR( fileinfo.st_mode )) // libmythdvdnav tries to open() a dir
+        return -1;
+
     int fileID = -1;
     if (strncmp(pathname, "myth://", 7))
     {
@@ -94,6 +103,7 @@ int mythfile_open(const char *pathname, int flags)
         m_fileWrapperLock.lockForWrite();
         fileID = getNextFileID();
         m_localfiles[fileID] = lfd;
+        m_filenames[fileID] = pathname;
         m_fileWrapperLock.unlock();
     }
     else
@@ -114,6 +124,7 @@ int mythfile_open(const char *pathname, int flags)
         m_fileWrapperLock.lockForWrite();
         fileID = getNextFileID();
         m_ringbuffers[fileID] = rb;
+        m_filenames[fileID] = pathname;
         m_fileWrapperLock.unlock();
     }
 
@@ -236,6 +247,23 @@ int mythfile_stat(const char *path, struct stat *buf)
     return stat(path, buf);
 }
 
+int mythfile_stat_fd(int fileID, struct stat *buf)
+{
+    VERBOSE(VB_FILE+VB_EXTRA,
+            QString("mythfile_stat_fd(%1, %2)").arg(fileID).arg((long long)buf));
+
+    m_fileWrapperLock.lockForRead();
+    if (!m_filenames.contains(fileID))
+    {
+        m_fileWrapperLock.unlock();
+        return -1;
+    }
+    QString filename = m_filenames[fileID];
+    m_fileWrapperLock.unlock();
+
+    return mythfile_stat(filename.toLocal8Bit().constData(), buf);
+}
+
 int mythfile_exists(const char *path, const char *file)
 {
     VERBOSE(VB_FILE+VB_EXTRA,
@@ -296,6 +324,7 @@ int mythdir_opendir(const char *dirname)
         m_dirWrapperLock.lockForWrite();
         id = getNextDirID();
         m_localdirs[id] = dir;
+        m_dirnames[id] = dirname;
         m_dirWrapperLock.unlock();
     }
     else
@@ -330,6 +359,7 @@ int mythdir_opendir(const char *dirname)
         id = getNextDirID();
         m_remotedirs[id] = list;
         m_remotedirPositions[id] = 0;
+        m_dirnames[id] = dirname;
         m_dirWrapperLock.unlock();
     }
 
