@@ -2006,18 +2006,6 @@ static HostSpinBox *YScanDisplacement()
     return gs;
 };
 
-static HostCheckBox *AlwaysStreamFiles()
-{
-    HostCheckBox *gc = new HostCheckBox("AlwaysStreamFiles");
-    gc->setLabel(QObject::tr("Always stream recordings from the backend"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "If enabled, MythTV will always stream files from a "
-                        "remote backend instead of directly reading a "
-                        "recording file if it is accessible locally."));
-    return gc;
-}
-
 static HostCheckBox *CCBackground()
 {
     HostCheckBox *gc = new HostCheckBox("CCBackground");
@@ -4148,7 +4136,6 @@ PlaybackSettings::PlaybackSettings()
 
     general1->addChild(columns);
     general1->addChild(LiveTVIdleTimeout());
-    general1->addChild(AlwaysStreamFiles());
 #ifdef USING_OPENGL_VSYNC
     general1->addChild(UseOpenGLVSync());
 #endif // USING_OPENGL_VSYNC

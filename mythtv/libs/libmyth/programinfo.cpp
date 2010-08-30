@@ -1974,9 +1974,7 @@ QString ProgramInfo::GetPlaybackURL(
 
     bool alwaysStream = gCoreContext->GetNumSetting("AlwaysStreamFiles", 0);
 
-    if ((!alwaysStream) ||
-        (forceCheckLocal) ||
-        (hostname == gCoreContext->GetHostName()))
+    if ((!alwaysStream) || (forceCheckLocal))
     {
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
