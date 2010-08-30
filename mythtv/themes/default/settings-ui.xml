@@ -61,4 +61,198 @@
 
     </window>
 
+    <window name="themechooser">
+        <area>0,0,800,600</area>
+
+        <shape name="background" from="basebackground">
+            <area>0,0,800,600</area>
+            <fill color="#000000" alpha="200" />
+        </shape>
+
+        <shape name="preview-shape">
+            <area>410,50,380,285</area>
+            <type>roundbox</type>
+            <fill color="#000000" />
+            <cornerradius>20</cornerradius>
+        </shape>
+
+        <imagetype name="preview">
+            <area>425,65,350,260</area>
+            <filename />
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="name" from="basetextarea">
+            <area>425,350,350,30</area>
+            <multiline>no</multiline>
+            <font>basemedium</font>
+            <align>left,vcenter</align>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="resolution" from="basetextarea">
+            <area>425,380,175,30</area>
+            <multiline>no</multiline>
+            <font>basesmall</font>
+            <align>left,vcenter</align>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="aspect" from="basetextarea">
+            <area>600,380,175,30</area>
+            <multiline>no</multiline>
+            <font>basesmall</font>
+            <align>left,vcenter</align>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>425,410,350,350</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>left,top</align>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <buttonlist name="themes">
+            <area>40,60,375,512</area>
+            <scrollstyle>free</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <layout>vertical</layout>
+            <spacing>2</spacing>
+            <drawfrombottom>false</drawfrombottom>
+            <buttonarea>0,0,100%,95%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,375,66</area>
+                    <shape name="item">
+                        <area>0,0,375,66</area>
+                        <type>box</type>
+                        <fill color="#000000" alpha="180" />
+                    </shape>
+                    <imagetype name="buttonimage">
+                        <area>30,5,110,56</area>
+                        <alpha>160</alpha>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>150,5,281,56</area>
+                        <align>left,vcenter</align>
+                        <font>basesmall</font>
+                        <alpha>210</alpha>
+                    </textarea>
+
+<!-- State to show whether a theme is locally installed or remotely downloadable
+                    <statetype name="themelocation">
+                        <area>0,0,30,30</area>
+                        <state name="local">
+                            <shape name="location">
+                                <area>0,0,30,30</area>
+                                <type>ellipse</type>
+                                <fill color="#00FF00" />
+                            </shape>
+                        </state>
+                        <state name="remote">
+                            <shape name="location">
+                                <area>0,0,30,30</area>
+                                <type>ellipse</type>
+                                <fill color="#FF0000" />
+                            </shape>
+                        </state>
+                    </statetype>
+-->
+
+<!-- State to indicate whether an installed downloadable theme is up to date or not
+                    <statetype name="themestatus">
+                        <area>0,30,60,30</area>
+                        <state name="uptodate">
+                            <shape name="status">
+                                <area>0,0,60,30</area>
+                                <type>ellipse</type>
+                                <fill color="#00FF00" />
+                            </shape>
+                        </state>
+                        <state name="updateavailable">
+                            <shape name="status">
+                                <area>0,0,60,30</area>
+                                <type>ellipse</type>
+                                <fill color="#0000FF" />
+                            </shape>
+                        </state>
+                    </statetype>
+-->
+                </state>
+
+                <state name="selectedactive" from="active">
+                    <shape name="item">
+                        <fill color="#0767AB" alpha="240" />
+                    </shape>
+                    <textarea name="buttontext">
+                        <alpha>200</alpha>
+                        <font>basesmall</font>
+                    </textarea>
+                    <imagetype name="buttonimage">
+                        <alpha>255</alpha>
+                    </imagetype>
+                    <imagetype name="divider">
+                        <filename />
+                    </imagetype>
+                </state>
+                <state name="selectedinactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>325,490</position>
+                <state type="off">
+                </state>
+                <state type="full">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                        <alpha>230</alpha>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>343,490</position>
+                <state type="off">
+                </state>
+                <state type="full">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                        <alpha>230</alpha>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+<!-- a progressbar to display the progress of the theme download
+        <progressbar name="downloadprogressbar" from="baseprogressbar">
+            <area>40,540,375,20</area>
+        </progressbar>
+-->
+
+        <statetype name="fullpreviewstate">
+            <area>0,0,800,600</area>
+            <state name="fullscreen">
+                <area>0,0,800,600</area>
+                <imagetype name="fullscreenpreview">
+                    <area>0,0,800,600</area>
+                    <filename />
+                </imagetype>
+
+                <shape name="fullscreennameback" from="basebackground">
+                    <area>275,10,250,66</area>
+                    <fill color="#000000" alpha="220" />
+                </shape>
+
+                <textarea name="fullscreenname" from="basetextarea">
+                    <area>283,18,234,50</area>
+                    <multiline>no</multiline>
+                    <font>basemediumgreen</font>
+                    <align>center,vcenter</align>
+                </textarea>
+            </state>
+        </statetype>
+
+    </window>
+
 </mythuitheme>

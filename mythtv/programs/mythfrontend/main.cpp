@@ -26,6 +26,7 @@ using namespace std;
 #include "scheduleeditor.h"
 #include "manualschedule.h"
 #include "playbackbox.h"
+#include "themechooser.h"
 #include "customedit.h"
 #include "viewscheduled.h"
 #include "programrecpriority.h"
@@ -541,6 +542,16 @@ static void TVMenuCallback(void *data, QString &selection)
             qApp->processEvents();
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
+    }
+    else if (sel == "settings themechooser")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        ThemeChooser *tp = new ThemeChooser(mainStack);
+
+        if (tp->Create())
+            mainStack->AddScreen(tp);
+        else
+            delete tp;
     }
     else if (sel == "screensetupwizard")
     {

@@ -31,6 +31,7 @@ HEADERS += schedulecommon.h progdetails.h scheduleeditor.h
 HEADERS += backendconnectionmanager.h   programinfocache.h
 HEADERS += proglist.h                   proglist_helpers.h
 HEADERS += playbackboxhelper.h          viewschedulediff.h
+HEADERS += themechooser.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -43,6 +44,7 @@ SOURCES += customedit.cpp schedulecommon.cpp progdetails.cpp scheduleeditor.cpp
 SOURCES += backendconnectionmanager.cpp programinfocache.cpp
 SOURCES += proglist.cpp                 proglist_helpers.cpp
 SOURCES += playbackboxhelper.cpp        viewschedulediff.cpp
+SOURCES += themechooser.cpp
 
 macx {
     mac_bundle {
