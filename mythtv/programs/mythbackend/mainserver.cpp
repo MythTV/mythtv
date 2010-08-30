@@ -1301,6 +1301,17 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             filename = LocalFilePath(qurl, wantgroup);
 
+        QFileInfo finfo(filename);
+        if (finfo.isDir())
+        {
+            VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer filename "
+                    "'%1' is actually a directory, cannot transfer.")
+                    .arg(filename));
+            errlist << "filetransfer_filename_is_a_directory";
+            socket->writeStringList(errlist);
+            return;
+        }
+
         if (retries < 0)
             ft = new FileTransfer(filename, socket, writemode);
         else
