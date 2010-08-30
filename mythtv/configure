@@ -70,9 +70,6 @@ Standard options:
   --disable-ccache         disable compiler cache (ccache)
   --disable-distcc         disable distributed compilation (distcc)
 
-External library support:
-  --enable-libfaad         enable FAAD support via libfaad [no]
-
 Advanced options (experts only):
   --cross-prefix=PREFIX    use PREFIX for compilation tools [$cross_prefix]
   --enable-cross-compile   assume a cross-compiler is used
