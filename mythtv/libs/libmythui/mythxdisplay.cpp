@@ -108,9 +108,9 @@ QSize MythXGetDisplayDimensions(void)
     return ret;
 }
 
-int MythXGetRefreshRate(void)
+float MythXGetRefreshRate(void)
 {
-    int ret = -1;
+    float ret = -1;
     MythXDisplay *d = OpenMythXDisplay();
     if (d)
     {
@@ -224,7 +224,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
     return QSize(displayWidthMM, displayHeightMM);
 }
 
-int MythXDisplay::GetRefreshRate(void)
+float MythXDisplay::GetRefreshRate(void)
 {
     XF86VidModeModeLine mode_line;
     int dot_clock;
@@ -267,7 +267,7 @@ int MythXDisplay::GetRefreshRate(void)
 
     rate = 1000000.0 / rate;
 
-    return (int)rate;
+    return rate;
 }
 
 void MythXDisplay::Sync(bool flush)

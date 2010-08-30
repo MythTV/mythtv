@@ -26,7 +26,7 @@ bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
     h_mm   = info.res.height();
     w_pix  = info.size.width();
     h_pix  = info.size.height();
-    rate   = info.rate;
+    rate   = 1000000.0f / info.rate;
     par    = 1.0;
     return true;
 }

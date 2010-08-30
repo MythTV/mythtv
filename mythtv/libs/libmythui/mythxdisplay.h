@@ -34,7 +34,7 @@ class MPUBLIC MythXDisplay
     int      GetNumberXineramaScreens(void);
     QSize    GetDisplaySize(void);
     QSize    GetDisplayDimensions(void);
-    int      GetRefreshRate(void);
+    float    GetRefreshRate(void);
     void     Sync(bool flush = false);
     void     StartLog(void);
     bool     StopLog(void);
@@ -74,7 +74,7 @@ MPUBLIC void          LockMythXDisplays(bool lock);
 MPUBLIC MythXDisplay *GetMythXDisplay(Display*);
 MPUBLIC MythXDisplay *OpenMythXDisplay(void);
 MPUBLIC QSize         MythXGetDisplayDimensions(void);
-MPUBLIC int           MythXGetRefreshRate(void);
+MPUBLIC float         MythXGetRefreshRate(void);
 #define XLOCK(dpy, arg) { dpy->Lock(); arg; dpy->Unlock(); }
 #endif // USING_X11
 

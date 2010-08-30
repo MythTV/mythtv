@@ -34,7 +34,7 @@ bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
     h_mm   = info.res.height();
     w_pix  = info.size.width();
     h_pix  = info.size.height();
-    rate   = info.rate;
+    rate   = 1000000.0f / info.rate;
     par    = 1.0;
     if (w_mm > 0 && h_mm > 0 && w_pix > 0 && h_pix > 0)
         par = ((double)w_mm  / (double)w_pix) / ((double)h_mm / (double)h_pix);

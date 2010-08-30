@@ -15,7 +15,7 @@ class DisplayInfo
 
     QSize size;
     QSize res;
-    int   rate;
+    float rate;
 };
 
 class MPUBLIC MythDisplay

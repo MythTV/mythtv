@@ -36,11 +36,11 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
     CFDictionaryRef ref = CGDisplayCurrentMode(disp);
     if (ref)
     {
-        int rate = get_float_CF(ref, kCGDisplayRefreshRate);
+        float rate = get_float_CF(ref, kCGDisplayRefreshRate);
         // N.B. A rate of zero typically indicates the internal macbook
         // lcd display which does not have a rate in the traditional sense
         if (rate > 20 && rate < 200)
-            ret.rate = 1000000 / rate;
+            ret.rate = 1000000.0f / rate;
     }
 
     CGSize size_in_mm = CGDisplayScreenSize(disp);
@@ -66,7 +66,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
                 case 59:  ret.rate = 16683; break; // 59.940Hz
                 case 71:  ret.rate = 13903; break; // 71.928Hz
                 case 119: ret.rate = 8342;  break; // 119.880Hz
-                default:  ret.rate = 1000000 / rate;
+                default:  ret.rate = 1000000.0f / (float)rate;
             }
         }
         int width  = GetDeviceCaps(hdc, HORZSIZE);
