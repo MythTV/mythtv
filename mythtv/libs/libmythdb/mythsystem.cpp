@@ -246,6 +246,8 @@ uint myth_system(const QString &command, int flags, uint timeout)
 #else
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
+    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
+
     memset(&si, 0, sizeof(si));
     memset(&pi, 0, sizeof(pi));
     si.cb = sizeof(si);
@@ -280,7 +282,6 @@ uint myth_system(const QString &command, int flags, uint timeout)
 }
 
 
-#ifndef USING_MINGW
 void myth_system_pre_flags(int &flags, bool &ready_to_lock)
 {
     ready_to_lock = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
@@ -326,6 +327,7 @@ void myth_system_post_flags(int &flags, bool &ready_to_lock)
 }
 
 
+#ifndef USING_MINGW
 pid_t myth_system_fork(const QString &command, uint &result)
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);

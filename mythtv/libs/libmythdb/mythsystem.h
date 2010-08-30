@@ -12,9 +12,9 @@
 MPUBLIC unsigned int myth_system(const QString &command, int flags = 0,
                                  uint timeout = 0);
 
-#ifndef USING_MINGW
 MPUBLIC void myth_system_pre_flags(int &flags, bool &ready_to_lock);
 MPUBLIC void myth_system_post_flags(int &flags, bool &ready_to_lock);
+#ifndef USING_MINGW
 MPUBLIC pid_t myth_system_fork(const QString &command, uint &result);
 MPUBLIC uint myth_system_wait(pid_t pid, uint timeout);
 MPUBLIC uint myth_system_abort(pid_t pid);
