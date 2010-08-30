@@ -48,6 +48,7 @@
 #include "jsmenuevent.h"
 #endif
 
+#ifndef USING_MINGW
 typedef struct {
     QMutex  mutex;
     uint    result;
@@ -140,6 +141,7 @@ uint MythSystemReaper::waitPid( pid_t pid )
 
     return( result );
 }
+#endif
 
 /** \fn myth_system(const QString&, int)
  *  \brief Runs a system command inside the /bin/sh shell.
