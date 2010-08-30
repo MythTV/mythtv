@@ -29,7 +29,6 @@ HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
-HEADERS += metadatacommon.h metadatadownload.h metadataimagedownload.h
 HEADERS += mythdisplay.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
@@ -47,7 +46,6 @@ SOURCES += themeinfo.cpp mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
-SOURCES += metadatacommon.cpp metadatadownload.cpp metadataimagedownload.cpp
 SOURCES += mythdisplay.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
@@ -63,8 +61,7 @@ inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
-inc.files += mythuieditbar.h metadatacommon.h metadatadownload.h
-inc.files += metadataimagedownload.h
+inc.files += mythuieditbar.h
 
 INSTALLS += inc
 

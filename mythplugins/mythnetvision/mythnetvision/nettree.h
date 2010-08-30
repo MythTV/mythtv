@@ -18,7 +18,7 @@
 #include <netgrabbermanager.h>
 #include <mythrssmanager.h>
 #include <mythdownloadmanager.h>
-#include <metadataimagedownload.h>
+#include <metadata/metadataimagedownload.h>
 
 enum DialogType { DLG_DEFAULT = 0, DLG_GALLERY = 0x1, DLG_TREE = 0x2,
                   DLG_BROWSER = 0x4, dtLast };

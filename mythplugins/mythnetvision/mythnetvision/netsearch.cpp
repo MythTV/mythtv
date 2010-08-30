@@ -236,7 +236,7 @@ void NetSearch::showMenu(void)
                   qVariantValue<ResultItem *>(m_searchResultList->GetDataValue());
 
             QString filename;
-            bool exists;
+            bool exists = false;
 
             if (item)
             {

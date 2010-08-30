@@ -33,10 +33,6 @@
 #include <remoteutil.h>
 #include <storagegroup.h>
 
-#include <metadatacommon.h>
-#include <metadatadownload.h>
-#include <metadataimagedownload.h>
-
 #include <metadata/videoscan.h>
 #include <metadata/globals.h>
 #include <metadata/metadatalistmanager.h>

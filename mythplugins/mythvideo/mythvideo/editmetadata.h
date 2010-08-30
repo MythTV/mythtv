@@ -2,9 +2,9 @@
 #define EDITMETADATA_H_
 
 #include <mythscreentype.h>
-#include <metadatacommon.h>
-#include <metadatadownload.h>
-#include <metadataimagedownload.h>
+#include <metadata/metadatacommon.h>
+#include <metadata/metadatadownload.h>
+#include <metadata/metadataimagedownload.h>
 
 class VideoMetadata;
 class MetadataListManager;

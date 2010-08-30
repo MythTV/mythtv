@@ -5,9 +5,9 @@
 #include <QStringList>
 
 #include <mythscreentype.h>
-#include <metadatadownload.h>
-#include <metadataimagedownload.h>
-#include <metadatacommon.h>
+#include <metadata/metadatadownload.h>
+#include <metadata/metadataimagedownload.h>
+#include <metadata/metadatacommon.h>
 #include <metadata/parentalcontrols.h>
 #include <metadata/quicksp.h>
 

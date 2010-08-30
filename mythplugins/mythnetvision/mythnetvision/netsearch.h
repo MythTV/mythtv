@@ -18,7 +18,7 @@
 #include <netgrabbermanager.h>
 #include <mythrssmanager.h>
 #include <mythdownloadmanager.h>
-#include <metadataimagedownload.h>
+#include <metadata/metadataimagedownload.h>
 
 class MythUIBusyDialog;
 
