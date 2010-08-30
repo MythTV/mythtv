@@ -11,9 +11,6 @@
 #include "osdxvmc.h"
 #include "videoout_xv.h"
 
-extern "C" XvImage *XvShmCreateImage(Display*, XvPortID, int, char*,
-                                     int, int, XShmSegmentInfo*);
-
 #define NO_SUBPICTURE      0
 #define OVERLAY_SUBPICTURE 1
 #define BLEND_SUBPICTURE   2

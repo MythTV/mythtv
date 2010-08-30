@@ -60,8 +60,6 @@ extern "C" {
     extern int      XShmQueryExtension(Display*);
     extern int      XShmGetEventBase(Display*);
 #endif // silences warning when these are already defined
-    extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*,
-                                      int, int, XShmSegmentInfo*);
 
 #include "libswscale/swscale.h"
 }
