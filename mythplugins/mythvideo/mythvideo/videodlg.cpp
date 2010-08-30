@@ -1318,6 +1318,8 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
                             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
         item->SetText(metadata->GetSubtitle());
+    else if (metadata && !metadata->GetSubtitle().isEmpty())
+        item->SetText(QString("%1: %2").arg(metadata->GetTitle()).arg(metadata->GetSubtitle()));
     else
         item->SetText(metadata ? metadata->GetTitle() : node->getString());
 
