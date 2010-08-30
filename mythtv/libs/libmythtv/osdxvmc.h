@@ -6,11 +6,11 @@
 #define __OSD_XVMC_H__
 
 #include "videooutbase.h"
-#include "XvMCSurfaceTypes.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
+#include "XvMCSurfaceTypes.h"
+#include <X11/extensions/Xvlib.h>
 #include <X11/extensions/Xv.h>
 
 class XvMCOSD
