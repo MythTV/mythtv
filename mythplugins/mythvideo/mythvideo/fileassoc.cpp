@@ -10,8 +10,8 @@
 #include <mythuitextedit.h>
 #include <mythuicheckbox.h>
 #include <mythuibutton.h>
-#include <video/dbaccess.h>
-#include <video/videoutils.h>
+#include <metadata/dbaccess.h>
+#include <metadata/videoutils.h>
 
 #include "fileassoc.h"
 

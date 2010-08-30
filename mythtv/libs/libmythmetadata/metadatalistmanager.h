@@ -4,14 +4,14 @@
 #include <list>
 
 #include "quicksp.h"
-#include "metadata.h"
+#include "videometadata.h"
 #include "mythexp.h"
 
 class MPUBLIC MetadataListManager
 {
   public:
-    typedef simple_ref_ptr<Metadata> MetadataPtr;
-    typedef std::list<MetadataPtr> metadata_list;
+    typedef simple_ref_ptr<VideoMetadata> VideoMetadataPtr;
+    typedef std::list<VideoMetadataPtr> metadata_list;
 
   public:
     static void loadAllFromDatabase(metadata_list &items);
@@ -23,8 +23,8 @@ class MPUBLIC MetadataListManager
     void setList(metadata_list &list);
     const metadata_list &getList() const;
 
-    MetadataPtr byFilename(const QString &file_name) const;
-    MetadataPtr byID(unsigned int db_id) const;
+    VideoMetadataPtr byFilename(const QString &file_name) const;
+    VideoMetadataPtr byID(unsigned int db_id) const;
 
     bool purgeByFilename(const QString &file_name);
     bool purgeByID(unsigned int db_id);

@@ -32,7 +32,7 @@ MPUBLIC bool IsDefaultScreenshot(const QString &screenshot);
 MPUBLIC bool IsDefaultBanner(const QString &banner);
 MPUBLIC bool IsDefaultFanart(const QString &fanart);
 
-class Metadata;
+class VideoMetadata;
 
 MPUBLIC QString GetDisplayUserRating(float userrating);
 MPUBLIC QString GetDisplayLength(int length);
@@ -43,9 +43,9 @@ MPUBLIC QString GetDisplayProcessed(bool processed);
 MPUBLIC QString GetDisplayYear(int year);
 MPUBLIC QString GetDisplayRating(const QString &rating);
 
-MPUBLIC QString GetDisplayGenres(const Metadata &item);
-MPUBLIC QString GetDisplayCountries(const Metadata &item);
-MPUBLIC QStringList GetDisplayCast(const Metadata &item);
+MPUBLIC QString GetDisplayGenres(const VideoMetadata &item);
+MPUBLIC QString GetDisplayCountries(const VideoMetadata &item);
+MPUBLIC QStringList GetDisplayCast(const VideoMetadata &item);
 
 MPUBLIC QString TrailerToState(const QString &trailerFile);
 MPUBLIC QString ParentalLevelToState(const ParentalLevel &level);

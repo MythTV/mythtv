@@ -6,10 +6,10 @@
 #include <mythuibutton.h>
 #include <mythuitext.h>
 #include <mythuitextedit.h>
-#include <video/globals.h>
-#include <video/dbaccess.h>
-#include <video/metadatalistmanager.h>
-#include <video/videoutils.h>
+#include <metadata/globals.h>
+#include <metadata/dbaccess.h>
+#include <metadata/metadatalistmanager.h>
+#include <metadata/videoutils.h>
 
 #include "videolist.h"
 #include "videofilter.h"
@@ -245,7 +245,7 @@ void VideoFilterSettings::saveAsDefault()
     gCoreContext->SaveSetting(QString("%1Filter").arg(prefix), textfilter);
 }
 
-bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
+bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
 {
     bool matches = true;
 
@@ -269,8 +269,8 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
     {
         matches = false;
 
-        const Metadata::genre_list &gl = mdata.GetGenres();
-        for (Metadata::genre_list::const_iterator p = gl.begin();
+        const VideoMetadata::genre_list &gl = mdata.GetGenres();
+        for (VideoMetadata::genre_list::const_iterator p = gl.begin();
              p != gl.end(); ++p)
         {
             if ((matches = p->first == genre))
@@ -284,8 +284,8 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
     {
         matches = false;
 
-        const Metadata::country_list &cl = mdata.GetCountries();
-        for (Metadata::country_list::const_iterator p = cl.begin();
+        const VideoMetadata::country_list &cl = mdata.GetCountries();
+        for (VideoMetadata::country_list::const_iterator p = cl.begin();
              p != cl.end(); ++p)
         {
             if ((matches = p->first == country))
@@ -297,7 +297,7 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
     if (matches && cast != kCastFilterAll)
     {
-        const Metadata::cast_list &cl = mdata.GetCast();
+        const VideoMetadata::cast_list &cl = mdata.GetCast();
 
         if (cast == kCastFilterUnknown && cl.size() == 0)
         {
@@ -307,7 +307,7 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
         {
             matches = false;
 
-            for (Metadata::cast_list::const_iterator p = cl.begin();
+            for (VideoMetadata::cast_list::const_iterator p = cl.begin();
                  p != cl.end(); ++p)
             {
                 if ((matches = p->first == cast))
@@ -382,9 +382,9 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
     return matches;
 }
 
-/// Compares two Metadata instances
-bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
-                                         const Metadata &rhs,
+/// Compares two VideoMetadata instances
+bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
+                                         const VideoMetadata &rhs,
                                          bool sort_ignores_case) const
 {
     bool ret = false;
@@ -392,8 +392,8 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
     {
         case kOrderByTitle:
         {
-            Metadata::SortKey lhs_key;
-            Metadata::SortKey rhs_key;
+            VideoMetadata::SortKey lhs_key;
+            VideoMetadata::SortKey rhs_key;
             if (lhs.HasSortKey() && rhs.HasSortKey())
             {
                 lhs_key = lhs.GetSortKey();
@@ -401,9 +401,9 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
             }
             else
             {
-                lhs_key = Metadata::GenerateDefaultSortKey(lhs,
+                lhs_key = VideoMetadata::GenerateDefaultSortKey(lhs,
                                                            sort_ignores_case);
-                rhs_key = Metadata::GenerateDefaultSortKey(rhs,
+                rhs_key = VideoMetadata::GenerateDefaultSortKey(rhs,
                                                            sort_ignores_case);
             }
             ret = lhs_key < rhs_key;
@@ -418,8 +418,8 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
                 && (lhs.GetEpisode() == 0)
                 && (rhs.GetEpisode() == 0))
             {
-                Metadata::SortKey lhs_key;
-                Metadata::SortKey rhs_key;
+                VideoMetadata::SortKey lhs_key;
+                VideoMetadata::SortKey rhs_key;
                 if (lhs.HasSortKey() && rhs.HasSortKey())
                 {
                     lhs_key = lhs.GetSortKey();
@@ -427,9 +427,9 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
                 }
                 else
                 {
-                    lhs_key = Metadata::GenerateDefaultSortKey(lhs,
+                    lhs_key = VideoMetadata::GenerateDefaultSortKey(lhs,
                                                                sort_ignores_case);
-                    rhs_key = Metadata::GenerateDefaultSortKey(rhs,
+                    rhs_key = VideoMetadata::GenerateDefaultSortKey(rhs,
                                                                sort_ignores_case);
                 }
                 ret = lhs_key < rhs_key;

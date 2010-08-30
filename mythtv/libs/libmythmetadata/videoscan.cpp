@@ -272,10 +272,10 @@ class VideoScannerThread : public QThread
                 int id = -1;
 
                 // Are we sure this needs adding?  Let's check our Hash list.
-                QString hash = Metadata::VideoFileHash(p->first, p->second.host);
+                QString hash = VideoMetadata::VideoFileHash(p->first, p->second.host);
                 if (hash != "NULL" && !hash.isEmpty())
                 {
-                    id = Metadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
+                    id = VideoMetadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
                     if (id != -1)
                     {
                         // Whew, that was close.  Let's remove that thing from
@@ -289,22 +289,22 @@ class VideoScannerThread : public QThread
                 }
                 if (id == -1)
                 {
-                    Metadata newFile(p->first, hash,
+                    VideoMetadata newFile(p->first, hash,
                                      VIDEO_TRAILER_DEFAULT,
                                      VIDEO_COVERFILE_DEFAULT, 
                                      VIDEO_SCREENSHOT_DEFAULT,
                                      VIDEO_BANNER_DEFAULT,
                                      VIDEO_FANART_DEFAULT,
-                                     Metadata::FilenameToMeta(p->first, 1),
-                                     Metadata::FilenameToMeta(p->first, 4),
+                                     VideoMetadata::FilenameToMeta(p->first, 1),
+                                     VideoMetadata::FilenameToMeta(p->first, 4),
                                      QString(),
                                      VIDEO_YEAR_DEFAULT,
                                      QDate::fromString("0000-00-00","YYYY-MM-DD"), 
                                      VIDEO_INETREF_DEFAULT, QString(),
                                      VIDEO_DIRECTOR_DEFAULT, VIDEO_PLOT_DEFAULT,
                                      0.0, VIDEO_RATING_DEFAULT, 0,
-                                     Metadata::FilenameToMeta(p->first, 2).toInt(), 
-                                     Metadata::FilenameToMeta(p->first, 3).toInt(), 
+                                     VideoMetadata::FilenameToMeta(p->first, 2).toInt(), 
+                                     VideoMetadata::FilenameToMeta(p->first, 3).toInt(), 
                                      QDate::currentDate(),
                                      0, ParentalLevel::plLowest);
 

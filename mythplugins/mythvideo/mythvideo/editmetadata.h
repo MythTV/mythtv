@@ -6,7 +6,7 @@
 #include <metadatadownload.h>
 #include <metadataimagedownload.h>
 
-class Metadata;
+class VideoMetadata;
 class MetadataListManager;
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -23,7 +23,7 @@ class EditMetadataDialog : public MythScreenType
   public:
      EditMetadataDialog(MythScreenStack *lparent,
                        QString lname,
-                       Metadata *source_metadata,
+                       VideoMetadata *source_metadata,
                        const MetadataListManager &cache);
     ~EditMetadataDialog();
 
@@ -83,8 +83,8 @@ class EditMetadataDialog : public MythScreenType
     void OnArtworkSearchDone(MetadataLookup *lookup);
     void handleDownloadedImages(MetadataLookup *lookup);
 
-    Metadata            *m_workingMetadata;
-    Metadata            *m_origMetadata;
+    VideoMetadata            *m_workingMetadata;
+    VideoMetadata            *m_origMetadata;
 
     //
     //  GUI stuff

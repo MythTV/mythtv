@@ -2,14 +2,14 @@
 #define VIDEOFILTER_H_
 
 #include <mythscreentype.h>
-#include <video/parentalcontrols.h>
+#include <metadata/parentalcontrols.h>
 
 class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIButton;
 class MythUIText;
 
-class Metadata;
+class VideoMetadata;
 class VideoList;
 
 class VideoFilterSettings
@@ -40,8 +40,8 @@ class VideoFilterSettings
     VideoFilterSettings(const VideoFilterSettings &rhs);
     VideoFilterSettings &operator=(const VideoFilterSettings &rhs);
 
-    bool matches_filter(const Metadata &mdata) const;
-    bool meta_less_than(const Metadata &lhs, const Metadata &rhs,
+    bool matches_filter(const VideoMetadata &mdata) const;
+    bool meta_less_than(const VideoMetadata &lhs, const VideoMetadata &rhs,
                         bool sort_ignores_case) const;
 
     void saveAsDefault();

@@ -18,15 +18,15 @@
 #include <mythuihelper.h>
 #include <mythprogressdialog.h>
 #include <remoteutil.h>
-#include <video/globals.h>
-#include <video/dbaccess.h>
-#include <video/metadatalistmanager.h>
-#include <video/videoutils.h>
+#include <metadata/globals.h>
+#include <metadata/dbaccess.h>
+#include <metadata/metadatalistmanager.h>
+#include <metadata/videoutils.h>
 
 #include "editmetadata.h"
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
-        QString lname, Metadata *source_metadata,
+        QString lname, VideoMetadata *source_metadata,
         const MetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
     m_taglineEdit(0), m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0),
@@ -46,7 +46,7 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
 {
     m_query = new MetadataDownload(this);
     m_imageDownload = new MetadataImageDownload(this);
-    m_workingMetadata = new Metadata(*m_origMetadata);
+    m_workingMetadata = new VideoMetadata(*m_origMetadata);
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }

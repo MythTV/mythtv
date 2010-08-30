@@ -9,10 +9,4 @@ class VideoGeneralSettings : public ConfigurationWizard
     VideoGeneralSettings();
 };
 
-class DVDRipperSettings :  public ConfigurationWizard
-{
-  public:
-    DVDRipperSettings();
-};
-
 #endif

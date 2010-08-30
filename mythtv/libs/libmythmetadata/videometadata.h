@@ -1,5 +1,5 @@
-#ifndef METADATA_H_
-#define METADATA_H_
+#ifndef VIDEOMETADATA_H_
+#define VIDEOMETADATA_H_
 
 #include <utility> // for std::pair
 #include <vector>
@@ -20,7 +20,7 @@ struct SortData;
 
 typedef QHash<QString,QString> MetadataMap;
 
-class MPUBLIC Metadata
+class MPUBLIC VideoMetadata
 {
   public:
     typedef std::pair<int, QString> genre_entry;
@@ -48,7 +48,7 @@ class MPUBLIC Metadata
     };
 
   public:
-    static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
+    static SortKey GenerateDefaultSortKey(const VideoMetadata &m, bool ignore_case);
     static int UpdateHashedDBRecord(const QString &hash, const QString &file_name,
                                     const QString &host);
     static QString VideoFileHash(const QString &file_name, const QString &host);
@@ -56,7 +56,7 @@ class MPUBLIC Metadata
     static QString TrimTitle(const QString &title, bool ignore_case);
 
   public:
-    Metadata(const QString &filename = QString(),
+    VideoMetadata(const QString &filename = QString(),
              const QString &hash = QString(),
              const QString &trailer = QString(),
              const QString &coverfile = QString(),
@@ -91,10 +91,10 @@ class MPUBLIC Metadata
              const cast_list &cast = cast_list(),
              const QString &host = "",
              bool processed = false);
-    ~Metadata();
-    Metadata(MSqlQuery &query);
-    Metadata(const Metadata &rhs);
-    Metadata &operator=(const Metadata &rhs);
+    ~VideoMetadata();
+    VideoMetadata(MSqlQuery &query);
+    VideoMetadata(const VideoMetadata &rhs);
+    VideoMetadata &operator=(const VideoMetadata &rhs);
 
     void toMap(MetadataMap &metadataMap);
 
@@ -227,14 +227,14 @@ class MPUBLIC Metadata
     bool IsHostSet() const;
 
   private:
-    class MetadataImp *m_imp;
+    class VideoMetadataImp *m_imp;
 };
 
 MPUBLIC void ClearMap(MetadataMap &metadataMap);
 
-MPUBLIC bool operator==(const Metadata &a, const Metadata &b);
-MPUBLIC bool operator!=(const Metadata &a, const Metadata &b);
+MPUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
+MPUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
 
-MPUBLIC bool operator<(const Metadata::SortKey &lhs, const Metadata::SortKey &rhs);
+MPUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
 
 #endif

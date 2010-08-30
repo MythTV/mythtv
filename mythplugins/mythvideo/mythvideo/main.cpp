@@ -10,8 +10,8 @@
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
-#include <video/cleanup.h>
-#include <video/globals.h>
+#include <metadata/cleanup.h>
+#include <metadata/globals.h>
 
 #include "videodlg.h"
 #include "globalsettings.h"

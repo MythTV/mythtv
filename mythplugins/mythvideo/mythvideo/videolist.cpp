@@ -10,12 +10,12 @@
 #include <mythmediamonitor.h>
 
 #include <mythgenerictree.h>
-#include <video/metadatalistmanager.h>
-#include <video/dbaccess.h>
-#include <video/quicksp.h>
-#include <video/dirscan.h>
-#include <video/videoutils.h>
-#include <video/parentalcontrols.h>
+#include <metadata/metadatalistmanager.h>
+#include <metadata/dbaccess.h>
+#include <metadata/quicksp.h>
+#include <metadata/dirscan.h>
+#include <metadata/videoutils.h>
+#include <metadata/parentalcontrols.h>
 
 #include "videofilter.h"
 #include "videolist.h"
@@ -24,7 +24,7 @@
 class TreeNodeDataPrivate
 {
   public:
-    TreeNodeDataPrivate(Metadata *metadata) :
+    TreeNodeDataPrivate(VideoMetadata *metadata) :
         m_metadata(metadata)
     {
         if (m_metadata)
@@ -38,12 +38,12 @@ class TreeNodeDataPrivate
     {
     }
 
-    Metadata *GetMetadata()
+    VideoMetadata *GetMetadata()
     {
         return m_metadata;
     }
 
-    const Metadata *GetMetadata() const
+    const VideoMetadata *GetMetadata() const
     {
         return m_metadata;
     }
@@ -64,7 +64,7 @@ class TreeNodeDataPrivate
     }
 
   private:
-    Metadata *m_metadata;
+    VideoMetadata *m_metadata;
     QString m_host;
     QString m_path;
     QString m_prefix;
@@ -74,7 +74,7 @@ TreeNodeData::TreeNodeData() : m_d(0)
 {
 }
 
-TreeNodeData::TreeNodeData(Metadata *metadata)
+TreeNodeData::TreeNodeData(VideoMetadata *metadata)
 {
     m_d = new TreeNodeDataPrivate(metadata);
 }
@@ -105,7 +105,7 @@ TreeNodeData::~TreeNodeData()
     delete m_d;
 }
 
-Metadata *TreeNodeData::GetMetadata()
+VideoMetadata *TreeNodeData::GetMetadata()
 {
     if (m_d)
         return m_d->GetMetadata();
@@ -113,7 +113,7 @@ Metadata *TreeNodeData::GetMetadata()
     return 0;
 }
 
-const Metadata *TreeNodeData::GetMetadata() const
+const VideoMetadata *TreeNodeData::GetMetadata() const
 {
     if (m_d)
         return m_d->GetMetadata();
@@ -200,7 +200,7 @@ namespace fake_unnamed
     class meta_data_node : public meta_node
     {
       public:
-        meta_data_node(Metadata *data, meta_node *parent = NULL) :
+        meta_data_node(VideoMetadata *data, meta_node *parent = NULL) :
             meta_node(parent), m_data(data)
         {
         }
@@ -215,18 +215,18 @@ namespace fake_unnamed
             return m_meta_bug;
         }
 
-        const Metadata *getData() const
+        const VideoMetadata *getData() const
         {
             return m_data;
         }
 
-        Metadata *getData()
+        VideoMetadata *getData()
         {
             return m_data;
         }
 
       private:
-        Metadata *m_data;
+        VideoMetadata *m_data;
         static const QString m_meta_bug;
     };
     const QString meta_data_node::m_meta_bug = "Bug";
@@ -453,7 +453,7 @@ namespace fake_unnamed
         metadata_sort(const VideoFilterSettings &vfs, bool sort_ignores_case) :
             m_vfs(vfs), m_sic(sort_ignores_case) {}
 
-        bool operator()(const Metadata *lhs, const Metadata *rhs)
+        bool operator()(const VideoMetadata *lhs, const VideoMetadata *rhs)
         {
             return m_vfs.meta_less_than(*lhs, *rhs, m_sic);
         }
@@ -473,12 +473,12 @@ namespace fake_unnamed
     {
         metadata_path_sort(bool ignore_case) : m_ignore_case(ignore_case) {}
 
-        bool operator()(const Metadata &lhs, const Metadata &rhs)
+        bool operator()(const VideoMetadata &lhs, const VideoMetadata &rhs)
         {
             return sort(&lhs, &rhs);
         }
 
-        bool operator()(const Metadata *lhs, const Metadata *rhs)
+        bool operator()(const VideoMetadata *lhs, const VideoMetadata *rhs)
         {
             return sort(lhs, rhs);
         }
@@ -489,7 +489,7 @@ namespace fake_unnamed
         }
 
       private:
-        bool sort(const Metadata *lhs, const Metadata *rhs)
+        bool sort(const VideoMetadata *lhs, const VideoMetadata *rhs)
         {
             return sort(lhs->GetFilename(), rhs->GetFilename());
         }
@@ -521,7 +521,7 @@ namespace fake_unnamed
         return ret;
     }
 
-    static meta_dir_node *AddMetadataToDir(Metadata *metadata,
+    static meta_dir_node *AddMetadataToDir(VideoMetadata *metadata,
                                            meta_dir_node *dir,
                      meta_dir_node *hint = NULL)
     {
@@ -568,17 +568,17 @@ namespace fake_unnamed
 
     struct to_metadata_ptr
     {
-        Metadata *operator()(smart_meta_node &smn)
+        VideoMetadata *operator()(smart_meta_node &smn)
         {
             return smn->getData();
         }
 
-        Metadata *operator()(Metadata &data)
+        VideoMetadata *operator()(VideoMetadata &data)
         {
             return &data;
         }
 
-        Metadata *operator()(const MetadataListManager::MetadataPtr &data)
+        VideoMetadata *operator()(const MetadataListManager::VideoMetadataPtr &data)
         {
             return data.get();
         }
@@ -617,7 +617,7 @@ namespace fake_unnamed
     }
 
     static int AddFileNode(MythGenericTree *where_to_add, QString name,
-            Metadata *metadata)
+            VideoMetadata *metadata)
     {
         MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
         sub_node->setAttribute(kNodeSort, kOrderItem);
@@ -632,7 +632,7 @@ using namespace fake_unnamed;
 class VideoListImp
 {
   public:
-    typedef std::vector<Metadata *> metadata_view_list;
+    typedef std::vector<VideoMetadata *> metadata_view_list;
 
   private:
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
@@ -641,7 +641,7 @@ class VideoListImp
                               ltDBCastGroup, ltDBUserRatingGroup,
                               ltDBInsertDateGroup, ltTVMetadata};
     typedef MetadataListManager::metadata_list metadata_list;
-    typedef MetadataListManager::MetadataPtr MetadataPtr;
+    typedef MetadataListManager::VideoMetadataPtr MetadataPtr;
 
   public:
     VideoListImp();
@@ -1054,7 +1054,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
 
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p) 
     { 
-        Metadata *data = *p; 
+        VideoMetadata *data = *p; 
 
         all_group_node->addEntry(smart_meta_node(new meta_data_node(data))); 
  
@@ -1183,7 +1183,7 @@ void VideoListImp::buildTVList()
 
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
-        Metadata *data = *p;
+        VideoMetadata *data = *p;
 
         if (((*p)->GetSeason() > 0) || ((*p)->GetEpisode() > 0))
         {
@@ -1474,8 +1474,8 @@ void VideoListImp::update_meta_view(bool flat_list)
     {
         if (!(*si)->HasSortKey())
         {
-            Metadata::SortKey skey =
-                    Metadata::GenerateDefaultSortKey(*(*si), true);
+            VideoMetadata::SortKey skey =
+                    VideoMetadata::GenerateDefaultSortKey(*(*si), true);
             (*si)->SetSortKey(skey);
         }
     }
@@ -1556,12 +1556,12 @@ namespace fake_unnamed
             (void) extension;
             QString file_string(fq_file_name);
 
-            MetadataListManager::MetadataPtr myData(new Metadata(file_string));
+            MetadataListManager::VideoMetadataPtr myData(new VideoMetadata(file_string));
             QFileInfo qfi(file_string);
             QString title = qfi.completeBaseName();
             if (m_infer_title)
             {
-                QString tmptitle(Metadata::FilenameToMeta(file_string, 1));
+                QString tmptitle(VideoMetadata::FilenameToMeta(file_string, 1));
                 if (tmptitle.length())
                     title = tmptitle;
             }

@@ -7,9 +7,9 @@
 #include <remoteutil.h>
 #include <lcddevice.h>
 #include <util.h>
-#include <video/dbaccess.h>
-#include <video/metadata.h>
-#include <video/videoutils.h>
+#include <metadata/dbaccess.h>
+#include <metadata/videometadata.h>
+#include <metadata/videoutils.h>
 
 #include "playercommand.h"
 
@@ -195,7 +195,7 @@ class VideoPlayerCommandPrivate
         ClearPlayerList();
     }
 
-    void AltPlayerFor(const Metadata *item)
+    void AltPlayerFor(const VideoMetadata *item)
     {
         if (item)
         {
@@ -224,7 +224,7 @@ class VideoPlayerCommandPrivate
         }
     }
 
-    void PlayerFor(const Metadata *item)
+    void PlayerFor(const VideoMetadata *item)
     {
         if (item)
         {
@@ -252,7 +252,7 @@ class VideoPlayerCommandPrivate
         }
     }
 
-    void PlayerFor(const QString &filename, const Metadata *extraData = 0)
+    void PlayerFor(const QString &filename, const VideoMetadata *extraData = 0)
     {
         QString extension = filename.section(".", -1, -1);
         QDir dir_test(QString("%1/VIDEO_TS").arg(filename));
@@ -281,8 +281,8 @@ class VideoPlayerCommandPrivate
             play_command = "Internal";
 
         QString plot;
-        QString title = Metadata::FilenameToMeta(filename, 1);
-        QString subtitle = Metadata::FilenameToMeta(filename, 4);
+        QString title = VideoMetadata::FilenameToMeta(filename, 1);
+        QString subtitle = VideoMetadata::FilenameToMeta(filename, 4);
         QString director;
         int season = 0;
         int episode = 0;
@@ -350,14 +350,14 @@ class VideoPlayerCommandPrivate
 
 ////////////////////////////////////////////////////////////////////////
 
-VideoPlayerCommand VideoPlayerCommand::AltPlayerFor(const Metadata *item)
+VideoPlayerCommand VideoPlayerCommand::AltPlayerFor(const VideoMetadata *item)
 {
     VideoPlayerCommand ret;
     ret.m_d->AltPlayerFor(item);
     return ret;
 }
 
-VideoPlayerCommand VideoPlayerCommand::PlayerFor(const Metadata *item)
+VideoPlayerCommand VideoPlayerCommand::PlayerFor(const VideoMetadata *item)
 {
     VideoPlayerCommand ret;
     ret.m_d->PlayerFor(item);

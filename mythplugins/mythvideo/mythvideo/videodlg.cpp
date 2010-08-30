@@ -37,12 +37,12 @@
 #include <metadatadownload.h>
 #include <metadataimagedownload.h>
 
-#include <video/videoscan.h>
-#include <video/globals.h>
-#include <video/metadatalistmanager.h>
-#include <video/videoutils.h>
-#include <video/dbaccess.h>
-#include <video/dirscan.h>
+#include <metadata/videoscan.h>
+#include <metadata/globals.h>
+#include <metadata/metadatalistmanager.h>
+#include <metadata/videoutils.h>
+#include <metadata/dbaccess.h>
+#include <metadata/dirscan.h>
 
 #include "videofilter.h"
 #include "editmetadata.h"
@@ -122,7 +122,7 @@ namespace
         return 0;
     }
 
-    Metadata *GetMetadataPtrFromNode(MythGenericTree *node)
+    VideoMetadata *GetMetadataPtrFromNode(MythGenericTree *node)
     {
         if (node)
             return node->GetData().value<TreeNodeData>().GetMetadata();
@@ -413,7 +413,7 @@ namespace
                                              // videos will not be followed when
                                              // playing.
 
-        MetadataListManager::MetadataPtr item = video_list.byFilename(filename);
+        MetadataListManager::VideoMetadataPtr item = video_list.byFilename(filename);
 
         if (!item) return;
 
@@ -580,7 +580,7 @@ namespace
         MythUIButtonListItem *m_item;
     };
 
-    void CopyMetadataToUI(const Metadata *metadata,
+    void CopyMetadataToUI(const VideoMetadata *metadata,
             CopyMetadataDestination &dest)
     {
         typedef std::map<QString, QString> valuelist;
@@ -711,7 +711,7 @@ class ItemDetailPopup : public MythScreenType
     }
 
   public:
-    ItemDetailPopup(MythScreenStack *lparent, Metadata *metadata,
+    ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
             const MetadataListManager &listManager) :
         MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
         m_listManager(listManager)
@@ -799,7 +799,7 @@ class ItemDetailPopup : public MythScreenType
 
   private:
     static const char * const WINDOW_NAME;
-    Metadata *m_metadata;
+    VideoMetadata *m_metadata;
     const MetadataListManager &m_listManager;
 
     MythUIButton *m_playButton;
@@ -884,7 +884,7 @@ class VideoDialogPrivate
         }
     }
 
-    void AutomaticParentalAdjustment(Metadata *metadata)
+    void AutomaticParentalAdjustment(VideoMetadata *metadata)
     {
         if (metadata && m_rating_to_pl.size())
         {
@@ -1300,7 +1300,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     MythGenericTree *node = GetNodePtrFromButton(item);
 
-    Metadata *metadata = GetMetadata(item);
+    VideoMetadata *metadata = GetMetadata(item);
 
     if (metadata)
     {
@@ -1474,11 +1474,11 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
     return result;
 }
 
-/** \fn VideoDialog::GetImageFromFolder(Metadata *metadata)
+/** \fn VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
  *  \brief Attempt to find/fallback a cover image for a given metadata item.
  *  \return QString local or myth:// for the first found cover file.
  */
-QString VideoDialog::GetImageFromFolder(Metadata *metadata)
+QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
 {
     QString icon_file;
     QString host = metadata->GetHost();
@@ -1744,7 +1744,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         MythGenericTree *subnode = node->getVisibleChildAt(i);
                         if (subnode)
                         {
-                            Metadata *metadata = GetMetadataPtrFromNode(subnode);
+                            VideoMetadata *metadata = GetMetadataPtrFromNode(subnode);
                             if (metadata)
                             {
                                 if (!metadata->GetHost().isEmpty() &&
@@ -1796,7 +1796,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
     }
     else
     {
-        const Metadata *metadata = GetMetadataPtrFromNode(node);
+        const VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
         if (metadata)
         {
@@ -1853,7 +1853,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                 if (subnode->childCount() > 0)
                     subDirs << subnode;
 
-                Metadata *metadata = GetMetadataPtrFromNode(subnode);
+                VideoMetadata *metadata = GetMetadataPtrFromNode(subnode);
                 if (metadata)
                 {
                     QString test_file;
@@ -1968,7 +1968,7 @@ QString VideoDialog::GetScreenshot(MythGenericTree *node)
     }
     else
     {
-        const Metadata *metadata = GetMetadataPtrFromNode(node);
+        const VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
         if (metadata)
         {
@@ -2004,7 +2004,7 @@ QString VideoDialog::GetBanner(MythGenericTree *node)
         return QString();
 
     QString icon_file;
-    const Metadata *metadata = GetMetadataPtrFromNode(node);
+    const VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
     if (metadata)
     {
@@ -2039,7 +2039,7 @@ QString VideoDialog::GetFanart(MythGenericTree *node)
         return QString();
 
     QString icon_file;
-    const Metadata *metadata = GetMetadataPtrFromNode(node);
+    const VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
     if (metadata)
     {
@@ -2338,7 +2338,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     if (!currentList)
         return;
 
-    Metadata *metadata = GetMetadata(item);
+    VideoMetadata *metadata = GetMetadata(item);
 
     MythGenericTree *node = GetNodePtrFromButton(item);
 
@@ -2394,7 +2394,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
  */
 void VideoDialog::VideoMenu()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     QString label;
 
     if (metadata)
@@ -2445,7 +2445,7 @@ void VideoDialog::VideoMenu()
  */
 void VideoDialog::PlayMenu()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     QString label;
 
     if (metadata)
@@ -2687,7 +2687,7 @@ void VideoDialog::InfoMenu()
 
     m_menuPopup->AddButton(tr("View Full Plot"), SLOT(ViewPlot()));
 
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         if (metadata->GetCast().size())
@@ -2707,7 +2707,7 @@ void VideoDialog::VideoOptionMenu()
 
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
@@ -2738,7 +2738,7 @@ void VideoDialog::ManageMenu()
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
 
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     m_menuPopup->SetReturnEvent(this, "manage");
 
@@ -2755,7 +2755,7 @@ void VideoDialog::ManageMenu()
 
 void VideoDialog::ToggleProcess()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         metadata->SetProcessed(!metadata->GetProcessed());
@@ -2992,7 +2992,7 @@ void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
  */
 void VideoDialog::ViewPlot()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     PlotDialog *plotdialog = new PlotDialog(m_popupStack, metadata);
 
@@ -3006,7 +3006,7 @@ void VideoDialog::ViewPlot()
  */
 bool VideoDialog::DoItemDetailShow()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     if (metadata)
     {
@@ -3030,7 +3030,7 @@ bool VideoDialog::DoItemDetailShow()
  */
 void VideoDialog::ShowCastDialog()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     CastDialog *castdialog = new CastDialog(m_popupStack, metadata);
 
@@ -3040,7 +3040,7 @@ void VideoDialog::ShowCastDialog()
 
 void VideoDialog::ShowHomepage()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     if (!metadata)
         return;
@@ -3087,7 +3087,7 @@ void VideoDialog::ShowHomepage()
  */
 void VideoDialog::playVideo()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
         PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
 }
@@ -3098,7 +3098,7 @@ void VideoDialog::playVideo()
  */
 void VideoDialog::playVideoAlt()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
         PlayVideo(metadata->GetFilename(),
                   m_d->m_videoList->getListCache(), true);
@@ -3134,7 +3134,7 @@ void VideoDialog::playFolder()
             MythGenericTree *subnode = node->getChildAt(i);
             if (subnode)
             {
-                Metadata *metadata = GetMetadataPtrFromNode(subnode);
+                VideoMetadata *metadata = GetMetadataPtrFromNode(subnode);
                 if (metadata)
                 {
                     playing_time.start();
@@ -3194,7 +3194,7 @@ namespace
  */
 void VideoDialog::playVideoWithTrailers()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (!metadata) return;
 
     QStringList trailers = GetTrailersInDirectory(gCoreContext->
@@ -3227,7 +3227,7 @@ void VideoDialog::playVideoWithTrailers()
  */
 void VideoDialog::playTrailer()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (!metadata) return;
     QString url;
 
@@ -3280,9 +3280,9 @@ void VideoDialog::ChangeFilter()
  *  \brief Retrieve the Database Metadata for a given MythUIButtonListItem.
  *  \return a Metadata object containing the item's videometadata record.
  */
-Metadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
+VideoMetadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
 {
-    Metadata *metadata = NULL;
+    VideoMetadata *metadata = NULL;
 
     if (item)
     {
@@ -3351,7 +3351,7 @@ void VideoDialog::customEvent(QEvent *levent)
             MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
             if (node)
             {
-                Metadata *metadata = GetMetadataPtrFromNode(node);
+                VideoMetadata *metadata = GetMetadataPtrFromNode(node);
                 if (metadata)
                 {
                     metadata->SetProcessed(true);
@@ -3393,7 +3393,7 @@ void VideoDialog::handleDownloadedImages(MetadataLookup *lookup)
     if (!node)
         return;
 
-    Metadata *metadata = GetMetadataPtrFromNode(node);
+    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
     if (!metadata)
         return;
@@ -3435,7 +3435,7 @@ void VideoDialog::handleDownloadedImages(MetadataLookup *lookup)
 }
 
 // This is the final call as part of a StartVideoImageSet
-void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
+void VideoDialog::OnVideoImageSetDone(VideoMetadata *metadata)
 {
     // The metadata has some cover file set
      if (m_busyPopup)
@@ -3462,7 +3462,7 @@ MythUIButtonListItem *VideoDialog::GetItemCurrent()
     return m_videoButtonList->GetItemCurrent();
 }
 
-MythUIButtonListItem *VideoDialog::GetItemByMetadata(Metadata *metadata)
+MythUIButtonListItem *VideoDialog::GetItemByMetadata(VideoMetadata *metadata)
 {
     if (m_videoButtonTree)
     {
@@ -3481,7 +3481,7 @@ MythUIButtonListItem *VideoDialog::GetItemByMetadata(Metadata *metadata)
         int nodeInt = child->getInt();
         if (nodeInt != kSubFolder && nodeInt != kUpFolder)
         {
-            Metadata *listmeta =
+            VideoMetadata *listmeta =
                         GetMetadataPtrFromNode(child);
             if (listmeta)
             {
@@ -3504,7 +3504,7 @@ void VideoDialog::VideoSearch(MythGenericTree *node,
     if (!node)
         return;
 
-    Metadata *metadata = GetMetadataPtrFromNode(node);
+    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
     if (!metadata)
         return;
@@ -3560,7 +3560,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
             VideoAutoSearch((*p));
         else
         {
-            Metadata *metadata = GetMetadataPtrFromNode((*p));
+            VideoMetadata *metadata = GetMetadataPtrFromNode((*p));
 
             if (!metadata)
                 continue;
@@ -3573,7 +3573,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
 
 void VideoDialog::ToggleBrowseable()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         metadata->SetBrowse(!metadata->GetBrowse());
@@ -3585,7 +3585,7 @@ void VideoDialog::ToggleBrowseable()
 
 void VideoDialog::ToggleWatched()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         metadata->SetWatched(!metadata->GetWatched());
@@ -3606,7 +3606,7 @@ void VideoDialog::OnVideoSearchListSelection(MetadataLookup *lookup)
 
 void VideoDialog::OnParentalChange(int amount)
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         ParentalLevel curshowlevel = metadata->GetShowLevel();
@@ -3638,7 +3638,7 @@ void VideoDialog::ManualVideoUID()
 
 void VideoDialog::OnManualVideoUID(QString video_uid)
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     MythGenericTree *node = GetNodePtrFromButton(GetItemCurrent());
  
    if (video_uid.length() && node && metadata)
@@ -3654,7 +3654,7 @@ void VideoDialog::OnManualVideoUID(QString video_uid)
 
 void VideoDialog::EditMetadata()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (!metadata)
         return;
 
@@ -3672,7 +3672,7 @@ void VideoDialog::EditMetadata()
 
 void VideoDialog::RemoveVideo()
 {
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
     if (!metadata)
         return;
@@ -3698,7 +3698,7 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *gtItem = GetNodePtrFromButton(item);
 
-    Metadata *metadata = GetMetadata(item);
+    VideoMetadata *metadata = GetMetadata(item);
 
     if (!metadata)
         return;
@@ -3728,7 +3728,7 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
 void VideoDialog::ResetMetadata()
 {
     MythUIButtonListItem *item = GetItemCurrent();
-    Metadata *metadata = GetMetadata(item);
+    VideoMetadata *metadata = GetMetadata(item);
 
     if (metadata)
     {
@@ -3787,7 +3787,7 @@ void VideoDialog::StartVideoImageSet(MythGenericTree *node, QStringList coverart
     if (!node)
         return;
 
-    Metadata *metadata = GetMetadataPtrFromNode(node);
+    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
     if (!metadata)
         return;
@@ -3935,7 +3935,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (!node)
         return;
 
-    Metadata *metadata = GetMetadataPtrFromNode(node);
+    VideoMetadata *metadata = GetMetadataPtrFromNode(node);
 
     if (!metadata)
         return;
@@ -4014,7 +4014,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         actors.append(*p);
     }
 
-    Metadata::cast_list cast;
+    VideoMetadata::cast_list cast;
     QStringList cl;
 
     for (QList<PersonInfo>::const_iterator p = actors.begin();
@@ -4029,7 +4029,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QString cn = (*p).trimmed();
         if (cn.length())
         {
-            cast.push_back(Metadata::cast_list::
+            cast.push_back(VideoMetadata::cast_list::
                         value_type(-1, cn));
         }
     }
@@ -4037,7 +4037,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     metadata->SetCast(cast);
 
     // Genres
-    Metadata::genre_list video_genres;
+    VideoMetadata::genre_list video_genres;
     QStringList genres = lookup->GetCategories();
 
     for (QStringList::const_iterator p = genres.begin();
@@ -4047,14 +4047,14 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         if (genre_name.length())
         {
             video_genres.push_back(
-                    Metadata::genre_list::value_type(-1, genre_name));
+                    VideoMetadata::genre_list::value_type(-1, genre_name));
         }
     }
 
     metadata->SetGenres(video_genres);
 
     // Countries
-    Metadata::country_list video_countries;
+    VideoMetadata::country_list video_countries;
     QStringList countries = lookup->GetCountries();
 
     for (QStringList::const_iterator p = countries.begin();
@@ -4064,7 +4064,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         if (country_name.length())
         {
             video_countries.push_back(
-                    Metadata::country_list::value_type(-1,
+                    VideoMetadata::country_list::value_type(-1,
                             country_name));
         }
     }

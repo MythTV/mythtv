@@ -8,8 +8,8 @@
 #include <metadatadownload.h>
 #include <metadataimagedownload.h>
 #include <metadatacommon.h>
-#include <video/parentalcontrols.h>
-#include <video/quicksp.h>
+#include <metadata/parentalcontrols.h>
+#include <metadata/quicksp.h>
 
 class MythUIText;
 class MythUIButtonList;
@@ -21,7 +21,7 @@ class MythUIStateType;
 class MythDialogBox;
 class MythGenericTree;
 
-class Metadata;
+class VideoMetadata;
 class VideoScanner;
 
 class QUrl;
@@ -145,7 +145,7 @@ class VideoDialog : public MythScreenType
     void customEvent(QEvent *levent);
 
     virtual MythUIButtonListItem *GetItemCurrent();
-    virtual MythUIButtonListItem *GetItemByMetadata(Metadata *metadata);
+    virtual MythUIButtonListItem *GetItemByMetadata(VideoMetadata *metadata);
 
     virtual void loadData();
     void fetchVideos();
@@ -153,14 +153,14 @@ class VideoDialog : public MythScreenType
     QString GetCoverImage(MythGenericTree *node);
     QString GetFirstImage(MythGenericTree *node, QString type,
                           QString gpnode = NULL, int levels = 0);
-    QString GetImageFromFolder(Metadata *metadata);
+    QString GetImageFromFolder(VideoMetadata *metadata);
     QString GetScreenshot(MythGenericTree *node);
     QString GetBanner(MythGenericTree *node);
     QString GetFanart(MythGenericTree *node);
 
     void handleDownloadedImages(MetadataLookup *lookup);
 
-    Metadata *GetMetadata(MythUIButtonListItem *item);
+    VideoMetadata *GetMetadata(MythUIButtonListItem *item);
 
     void handleDirSelect(MythGenericTree *node);
     bool goBack();
@@ -178,7 +178,7 @@ class VideoDialog : public MythScreenType
 
   private slots:
 
-    void OnVideoImageSetDone(Metadata *metadata);
+    void OnVideoImageSetDone(VideoMetadata *metadata);
     void OnVideoSearchDone(MetadataLookup *lookup);
 
   private:

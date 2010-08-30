@@ -5,12 +5,12 @@
 #include <mythuibuttonlist.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>
-#include <video/metadata.h>
-#include <video/videoutils.h>
+#include <metadata/videometadata.h>
+#include <metadata/videoutils.h>
 
 #include "videopopups.h"
 
-CastDialog::CastDialog(MythScreenStack *lparent, Metadata *metadata) :
+CastDialog::CastDialog(MythScreenStack *lparent, VideoMetadata *metadata) :
     MythScreenType(lparent, "videocastpopup"), m_metadata(metadata)
 {
 }
@@ -51,7 +51,7 @@ bool CastDialog::Create()
 
 /////////////////////////////////////////////////////////////
 
-PlotDialog::PlotDialog(MythScreenStack *lparent, Metadata *metadata) :
+PlotDialog::PlotDialog(MythScreenStack *lparent, VideoMetadata *metadata) :
     MythScreenType(lparent, "videoplotpopup"), m_metadata(metadata)
 {
 }

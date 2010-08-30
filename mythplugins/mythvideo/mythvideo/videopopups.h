@@ -3,7 +3,7 @@
 
 #include <mythscreentype.h>
 
-class Metadata;
+class VideoMetadata;
 
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -13,12 +13,12 @@ class CastDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    CastDialog(MythScreenStack *lparent, Metadata *metadata);
+    CastDialog(MythScreenStack *lparent, VideoMetadata *metadata);
 
     bool Create();
 
   private:
-    Metadata *m_metadata;
+    VideoMetadata *m_metadata;
 };
 
 class PlotDialog : public MythScreenType
@@ -26,12 +26,12 @@ class PlotDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    PlotDialog(MythScreenStack *lparent, Metadata *metadata);
+    PlotDialog(MythScreenStack *lparent, VideoMetadata *metadata);
 
     bool Create();
 
   private:
-    Metadata *m_metadata;
+    VideoMetadata *m_metadata;
 };
 
 #endif

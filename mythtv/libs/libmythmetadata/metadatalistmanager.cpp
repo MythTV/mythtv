@@ -6,7 +6,7 @@
 class MetadataListManagerImp
 {
   public:
-    typedef MetadataListManager::MetadataPtr MetadataPtr;
+    typedef MetadataListManager::VideoMetadataPtr VideoMetadataPtr;
     typedef MetadataListManager::metadata_list metadata_list;
 
   private:
@@ -35,24 +35,24 @@ class MetadataListManagerImp
     }
 
 
-    MetadataPtr byFilename(const QString &file_name) const
+    VideoMetadataPtr byFilename(const QString &file_name) const
     {
         string_to_meta::const_iterator p = m_file_map.find(file_name);
         if (p != m_file_map.end())
         {
             return *(p->second);
         }
-        return MetadataPtr();
+        return VideoMetadataPtr();
     }
 
-    MetadataPtr byID(unsigned int db_id) const
+    VideoMetadataPtr byID(unsigned int db_id) const
     {
         int_to_meta::const_iterator p = m_id_map.find(db_id);
         if (p != m_id_map.end())
         {
             return *(p->second);
         }
-        return MetadataPtr();
+        return VideoMetadataPtr();
     }
 
     bool purgeByFilename(const QString &file_name)
@@ -66,7 +66,7 @@ class MetadataListManagerImp
     }
 
   private:
-    bool purge_entry(MetadataPtr metadata)
+    bool purge_entry(VideoMetadataPtr metadata)
     {
         if (metadata)
         {
@@ -124,7 +124,7 @@ void MetadataListManager::loadAllFromDatabase(metadata_list &items)
     {
         while (query.next())
         {
-            items.push_back(MetadataPtr(new Metadata(query)));
+            items.push_back(VideoMetadataPtr(new VideoMetadata(query)));
         }
     }
     else
@@ -144,13 +144,13 @@ MetadataListManager::getList() const
     return m_imp->getList();
 }
 
-MetadataListManager::MetadataPtr
+MetadataListManager::VideoMetadataPtr
 MetadataListManager::byFilename(const QString &file_name) const
 {
     return m_imp->byFilename(file_name);
 }
 
-MetadataListManager::MetadataPtr
+MetadataListManager::VideoMetadataPtr
 MetadataListManager::byID(unsigned int db_id) const
 {
     return m_imp->byID(db_id);

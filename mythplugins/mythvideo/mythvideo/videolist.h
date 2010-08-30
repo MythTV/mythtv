@@ -55,12 +55,12 @@ class VideoList
     class VideoListImp *m_imp;
 };
 
-class Metadata;
+class VideoMetadata;
 class TreeNodeData
 {
   public:
     TreeNodeData();
-    TreeNodeData(Metadata *metadata);
+    TreeNodeData(VideoMetadata *metadata);
     TreeNodeData(QString path, QString host, QString prefix);
 
     TreeNodeData(const TreeNodeData &other);
@@ -68,8 +68,8 @@ class TreeNodeData
 
     ~TreeNodeData();
 
-    Metadata *GetMetadata();
-    const Metadata *GetMetadata() const;
+    VideoMetadata *GetMetadata();
+    const VideoMetadata *GetMetadata() const;
     QString GetPath() const;
     QString GetHost() const;
     QString GetPrefix() const;

@@ -177,21 +177,21 @@ QString GetDisplayRating(const QString &rating)
     return rating;
 }
 
-QString GetDisplayGenres(const Metadata &item)
+QString GetDisplayGenres(const VideoMetadata &item)
 {
     QStringList ret;
     CopySecond(item.GetGenres(), ret);
     return ret.join(", ");
 }
 
-QString GetDisplayCountries(const Metadata &item)
+QString GetDisplayCountries(const VideoMetadata &item)
 {
     QStringList ret;
     CopySecond(item.GetCountries(), ret);
     return ret.join(", ");
 }
 
-QStringList GetDisplayCast(const Metadata &item)
+QStringList GetDisplayCast(const VideoMetadata &item)
 {
     QStringList ret;
     CopySecond(item.GetCast(), ret);
