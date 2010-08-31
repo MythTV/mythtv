@@ -4,6 +4,7 @@
 #include <QString>
 #include <QSize>
 #include <QMetaType>
+#include <QHash>
 
 #include "mythexp.h"
 
@@ -24,7 +25,7 @@ class MPUBLIC ThemeInfo
 
     bool IsWide() const;
     QString GetAspect() const { return m_aspect; }
-    QSize   *GetBaseRes() { return &m_baseres; }
+    const QSize   *GetBaseRes() const { return &m_baseres; }
     QString GetName() const { return m_name; }
     QString GetDescription() const { return m_description; }
     QString GetErrata() const { return m_errata; }
@@ -35,6 +36,8 @@ class MPUBLIC ThemeInfo
 
     QString GetDownloadURL() const { return m_downloadurl; }
     QString GetThemeWebSite() const { return m_themesite; }
+
+    void ToMap(QHash<QString, QString> &infoMap) const;
 
   private:
     bool parseThemeInfo();
@@ -50,6 +53,9 @@ class MPUBLIC ThemeInfo
     QString   m_errata;
     int       m_majorver;
     int       m_minorver;
+
+    QString   m_authorName;
+    QString   m_authorEmail;
 
     QString   m_downloadurl;  // URL to download theme package from
     QString   m_themesite;    // Theme's website

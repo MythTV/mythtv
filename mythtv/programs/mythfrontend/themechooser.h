@@ -8,15 +8,14 @@
 #include <QFileInfo>
 
 // MythTV headers
-#include <themeinfo.h>
-#include <mythdirs.h>
-#include <mythuibuttonlist.h>
-#include <mythscreentype.h>
-#include <mythdialogs.h>
+#include "themeinfo.h"
+#include "mythdirs.h"
+#include "mythscreentype.h"
 
 class MythDialogBox;
 class MythUIButtonList;
 class MythUIText;
+class MythUIStateType;
 
 /** \class ThemeChooser
  *  \brief View and select installed themes.
@@ -63,13 +62,6 @@ class ThemeChooser : public MythScreenType
     void updateProgressBar(int bytesReceived, int bytesTotal);
 
     MythUIButtonList *m_themes;
-    MythUIText       *m_name;
-    MythUIText       *m_aspect;
-    MythUIText       *m_resolution;
-    MythUIText       *m_description;
-    MythUIText       *m_errata;
-    MythUIText       *m_version;
-
     MythUIImage      *m_preview;
 
     MythUIStateType  *m_fullPreviewStateType;

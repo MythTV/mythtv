@@ -165,6 +165,25 @@ bool ThemeInfo::parseThemeInfo()
                     }
                 }
             }
+            else if (e.tagName() == "author")
+            {
+                for (QDomNode child = e.firstChild(); !child.isNull();
+                        child = child.nextSibling())
+                {
+                    QDomElement ce = child.toElement();
+                    if (!ce.isNull())
+                    {
+                        if (ce.tagName() == "name")
+                        {
+                            m_authorName = ce.firstChild().toText().data();
+                        }
+                        else if (ce.tagName() == "email")
+                        {
+                            m_authorEmail = ce.firstChild().toText().data();
+                        }
+                    }
+                }
+            }
             else if (e.tagName() == "detail")
             {
                 for (QDomNode child = e.firstChild(); !child.isNull();
@@ -209,9 +228,24 @@ bool ThemeInfo::parseThemeInfo()
 
 bool ThemeInfo::IsWide() const
 {
-
     if (m_aspect == "16:9" || m_aspect == "16:10")
         return true;
 
     return false;
+}
+
+void ThemeInfo::ToMap(QHash<QString, QString> &infoMap) const
+{
+    infoMap["description"] = m_description;
+    infoMap["name"] = m_name;
+    infoMap["aspect"] = m_aspect;
+    infoMap["resolution"] = QString("%1x%2").arg(m_baseres.width())
+                                            .arg(m_baseres.height());
+    infoMap["errata"] = m_errata;
+    infoMap["majorversion"] = m_majorver;
+    infoMap["minorversion"] = m_minorver;
+    infoMap["version"] = QString("%1.%2").arg(m_majorver).arg(m_minorver);
+
+    infoMap["authorname"] = m_authorName;
+    infoMap["authoremail"] = m_authorEmail;
 }

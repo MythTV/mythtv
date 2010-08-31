@@ -1,10 +1,13 @@
+
+// Theme Chooser headers
+#include "themechooser.h"
+
 // Qt headers
 #include <QCoreApplication>
 #include <QThreadPool>
 
 // MythTV headers
 #include "mythverbose.h"
-#include "mythuihelper.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
 #include "remotefile.h"
@@ -12,11 +15,13 @@
 #include "programtypes.h"
 
 // LibMythUI headers
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
 #include "mythuiprogressbar.h"
 #include "mythdialogbox.h"
-
-// Theme Chooser headers
-#include "themechooser.h"
+#include "mythuibuttonlist.h"
+#include "mythscreenstack.h"
+#include "mythuistatetype.h"
 
 #define LOC      QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")
@@ -92,13 +97,7 @@ bool ThemeChooser::Create(void)
     bool err = false;
     UIUtilE::Assign(this, m_themes, "themes", &err);
 
-    UIUtilW::Assign(this, m_name, "name");
-    UIUtilW::Assign(this, m_description, "description");
-    UIUtilW::Assign(this, m_aspect, "aspect");
-    UIUtilW::Assign(this, m_errata, "errata");
-    UIUtilW::Assign(this, m_version, "version");
     UIUtilW::Assign(this, m_preview, "preview");
-    UIUtilW::Assign(this, m_resolution, "resolution");
     UIUtilW::Assign(this, m_fullPreviewStateType, "fullpreviewstate");
     UIUtilW::Assign(this, m_fullScreenName, "fullscreenname");
     UIUtilW::Assign(this, m_fullScreenPreview, "fullscreenpreview");
@@ -137,9 +136,6 @@ bool ThemeChooser::Create(void)
 
 void ThemeChooser::Load(void)
 {
-    QString   curThemeName = GetMythUI()->GetThemeName();
-    ThemeInfo curThemeInfo(GetMythUI()->FindThemeDir(curThemeName));
-
     QStringList themesSeen;
     QDir themes(GetConfDir() + "/themes");
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -272,14 +268,10 @@ void ThemeChooser::Init(void)
 
             item->DisplayState(m_themeStatuses[themeinfo->GetName()],
                                "themestatus");
-
-            item->SetText(themeinfo->GetName(), "name");
-            item->SetText(themeinfo->GetAspect(), "aspect");
-            item->SetText(themeinfo->GetDescription(), "description");
-            item->SetText(themeinfo->GetErrata(), "errata");
-            item->SetText(QString("%1.%2").arg(themeinfo->GetMajorVersion())
-                                          .arg(themeinfo->GetMinorVersion()), "version");
-            item->SetData(qVariantFromValue((void*)themeinfo));
+            QHash<QString, QString> infomap;
+            themeinfo->ToMap(infomap);
+            item->SetTextFromMap(infomap);
+            item->SetData(qVariantFromValue(themeinfo));
 
             QString thumbnail = themeinfo->GetPreviewPath();
             QFileInfo fInfo(thumbnail);
@@ -485,25 +477,9 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
     if (!info)
         return;
 
-    if (m_name)
-        m_name->SetText(info->GetName());
-    if (m_aspect)
-        m_aspect->SetText(info->GetAspect());
-    if (m_description)
-        m_description->SetText(info->GetDescription());
-    if (m_errata)
-        m_errata->SetText(info->GetErrata());
-    if (m_version)
-        m_version->SetText(QString("%1.%2")
-                   .arg(info->GetMajorVersion())
-                   .arg(info->GetMinorVersion()));
-    if (m_resolution)
-    {
-        QSize *size = info->GetBaseRes();
-        m_resolution->SetText(QString("%1x%2")
-                   .arg(size->width())
-                   .arg(size->height()));
-    }
+    QHash<QString, QString> infomap;
+    info->ToMap(infomap);
+    SetTextFromMap(infomap);
     if (m_preview)
     {
         m_preview->SetFilename(info->GetPreviewPath());
@@ -547,8 +523,7 @@ void ThemeChooser::customEvent(QEvent *e)
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
-        QStringList tokens = me->Message()
-            .split(" ", QString::SkipEmptyParts);
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())
             return;
