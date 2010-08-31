@@ -2469,7 +2469,7 @@ void MythPlayer::EventLoop(void)
         JumpToProgram();
     }
 
-    // Disable fastforward if we are too close the end of the buffer
+    // Disable fastforward if we are too close to the end of the buffer
     if (ffrew_skip > 1 && (CalcMaxFFTime(100, false) < 100))
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near end, stopping fastforward.");
@@ -2477,7 +2477,7 @@ void MythPlayer::EventLoop(void)
     }
 
     // Disable rewind if we are too close to the beginning of the buffer
-    if (CalcRWTime(-ffrew_skip) >= 0 &&
+    if (CalcRWTime(-ffrew_skip) > 0 &&
        (!noVideoTracks && (framesPlayed <= keyframedist)))
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near start, stopping rewind.");
