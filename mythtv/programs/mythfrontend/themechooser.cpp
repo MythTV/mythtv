@@ -192,7 +192,7 @@ void ThemeChooser::Load(void)
             QStringList::iterator lineIt = lines.begin();
             for (; lineIt != lines.end(); ++lineIt)
             {
-                tokens = (*lineIt).split("\t"); 
+                tokens = (*lineIt).split("\t");
                 if (tokens.size() == 2)
                 {
                     themeURL = site + "/" + tokens[1];
@@ -298,7 +298,7 @@ void ThemeChooser::Init(void)
     SetFocusWidget(m_themes);
 
     if (curThemeInfo)
-        m_themes->SetValueByData(qVariantFromValue((void*)curThemeInfo));
+        m_themes->SetValueByData(qVariantFromValue(curThemeInfo));
 
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
@@ -423,8 +423,7 @@ void ThemeChooser::toggleFullscreenPreview(void)
         if (m_fullScreenPreview->GetFilename().isEmpty())
         {
             MythUIButtonListItem *item = m_themes->GetItemCurrent();
-            ThemeInfo *info =
-                (ThemeInfo*)qVariantValue<void *>(item->GetData());
+            ThemeInfo *info = qVariantValue<ThemeInfo*>(item->GetData());
             m_fullScreenPreview->SetFilename(info->GetPreviewPath());
             m_fullScreenPreview->Load();
             m_fullScreenName->SetText(info->GetName());
@@ -456,7 +455,7 @@ void ThemeChooser::saveAndReload(void)
 
 void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 {
-    ThemeInfo *info = (ThemeInfo*)qVariantValue<void *>(item->GetData());
+    ThemeInfo *info = qVariantValue<ThemeInfo *>(item->GetData());
 
     if (!info->GetDownloadURL().isEmpty())
     {
@@ -478,7 +477,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
 void ThemeChooser::itemChanged(MythUIButtonListItem *item)
 {
-    ThemeInfo *info = (ThemeInfo*)qVariantValue<void *>(item->GetData());
+    ThemeInfo *info = qVariantValue<ThemeInfo*>(item->GetData());
 
     if (!info)
         return;
@@ -494,7 +493,7 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
     if (m_version)
         m_version->SetText(QString("%1.%2")
                    .arg(info->GetMajorVersion())
-                   .arg(info->GetMinorVersion()));        
+                   .arg(info->GetMinorVersion()));
     if (m_resolution)
     {
         QSize *size = info->GetBaseRes();
