@@ -16,6 +16,7 @@ class MPUBLIC VideoScanner : public QObject
     ~VideoScanner();
 
     void doScan(const QStringList &dirs);
+    void doScanAll(void);
 
   signals:
     void finished(bool);

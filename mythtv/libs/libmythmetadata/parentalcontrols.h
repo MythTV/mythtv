@@ -59,5 +59,6 @@ class MPUBLIC ParentalLevelChangeChecker : public QObject
   private:
     class ParentalLevelChangeCheckerPrivate *m_private;
 };
+Q_DECLARE_METATYPE(ParentalLevelChangeChecker*)
 
 #endif // PARENTALCONTROLS_H_
