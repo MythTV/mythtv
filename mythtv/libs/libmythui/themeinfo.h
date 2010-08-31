@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QSize>
+#include <QMetaType>
 
 #include "mythexp.h"
 
@@ -54,6 +55,6 @@ class MPUBLIC ThemeInfo
     QString   m_themesite;    // Theme's website
 };
 
-Q_DECLARE_METATYPE(ThemeInfo *)
+Q_DECLARE_METATYPE(ThemeInfo*)
 
 #endif
