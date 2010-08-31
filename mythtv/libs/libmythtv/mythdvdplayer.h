@@ -1,6 +1,8 @@
 #ifndef MYTHDVDPLAYER_H
 #define MYTHDVDPLAYER_H
 
+#include <stdint.h>
+
 #include "mythplayer.h"
 
 class MythDVDPlayer : public MythPlayer
@@ -8,7 +10,7 @@ class MythDVDPlayer : public MythPlayer
   public:
     MythDVDPlayer(bool muted = false);
     virtual int  OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
-    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode,
+    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     virtual void DisableCaptions(uint mode, bool osd_msg=true);
     virtual void EnableCaptions(uint mode, bool osd_msg=true);
@@ -19,7 +21,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void EventLoop(void);
     virtual void ResetPlaying(bool resetframes = true);
     virtual void EventEnd(void);
-    virtual bool PrepareAudioSample(long long &timecode);
+    virtual bool PrepareAudioSample(int64_t &timecode);
     virtual uint64_t GetBookmark(void) const;
     virtual void SetBookmark(void);
     virtual void ClearBookmark(bool message = true);

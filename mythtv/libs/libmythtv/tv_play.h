@@ -3,6 +3,9 @@
 #ifndef TVPLAY_H
 #define TVPLAY_H
 
+// C
+#include <stdint.h>
+
 // C++
 #include <vector>
 using namespace std;
@@ -694,7 +697,7 @@ class MPUBLIC TV : public QThread
     mutable bool wantsToQuit;
     bool stretchAdjustment; ///< True if time stretch is turned on
     bool audiosyncAdjustment; ///< True if audiosync is turned on
-    long long audiosyncBaseline;
+    int64_t audiosyncBaseline;
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?

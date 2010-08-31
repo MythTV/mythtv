@@ -5646,7 +5646,7 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 
     if (INT64_MIN != audiosyncBaseline)
     {
-        long long aud_tc = ctx->player->GetAudioTimecodeOffset();
+        int64_t aud_tc = ctx->player->GetAudioTimecodeOffset();
         ctx->player->SaveAudioTimecodeOffset(aud_tc - audiosyncBaseline);
     }
 

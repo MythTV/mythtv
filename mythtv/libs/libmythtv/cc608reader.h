@@ -1,6 +1,8 @@
 #ifndef CC608READER_H
 #define CC608READER_H
 
+#include <stdint.h>
+
 #include <QMutex>
 
 #include "cc608decoder.h"
@@ -66,7 +68,7 @@ class MPUBLIC CC608Reader : public CC608Input
     void SetMode(int mode);
     void ClearBuffers(bool input, bool output);
     void AddTextData(unsigned char *buf, int len,
-                     long long timecode, char type);
+                     int64_t timecode, char type);
     void TranscodeWriteText(void (*func)
                            (void *, unsigned char *, int, int, int),
                             void * ptr);

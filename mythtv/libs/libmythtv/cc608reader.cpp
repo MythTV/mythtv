@@ -425,7 +425,7 @@ int CC608Reader::NumInputBuffers(bool need_to_lock)
 }
 
 void CC608Reader::AddTextData(unsigned char *buffer, int len,
-                              long long timecode, char type)
+                              int64_t timecode, char type)
 {
     if (m_parent)
         m_parent->WrapTimecode(timecode, TC_CC);

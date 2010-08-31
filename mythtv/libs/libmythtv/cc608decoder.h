@@ -20,7 +20,7 @@ class CC608Input
   public:
     virtual ~CC608Input() { }
     virtual void AddTextData(unsigned char *buf, int len,
-                             long long timecode, char type) = 0;
+                             int64_t timecode, char type) = 0;
 };
 
 enum

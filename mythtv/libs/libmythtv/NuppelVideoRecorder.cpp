@@ -2652,7 +2652,7 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc)
 }
 
 void NuppelVideoRecorder::AddTextData(unsigned char *buf, int len,
-                                      long long timecode, char /*type*/)
+                                      int64_t timecode, char /*type*/)
 {
     int act = act_text_buffer;
     if (!textbuffer[act]->freeToBuffer)

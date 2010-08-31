@@ -1,6 +1,8 @@
 #ifndef AUDIOPLAYER_H
 #define AUDIOPLAYER_H
 
+#include <stdint.h>
+
 class MythPlayer;
 class AudioOutput;
 
@@ -49,7 +51,7 @@ class MPUBLIC AudioPlayer
     MuteState SetMuteState(MuteState);
     MuteState IncrMuteState(void);
 
-    void AddAudioData(char *buffer, int len, long long timecode);
+    void AddAudioData(char *buffer, int len, int64_t timecode);
     bool GetBufferStatus(uint &fill, uint &total);
 
   private:

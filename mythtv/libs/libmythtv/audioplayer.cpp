@@ -323,7 +323,7 @@ bool AudioPlayer::CanPassthrough(void)
     return ret;
 }
 
-void AudioPlayer::AddAudioData(char *buffer, int len, long long timecode)
+void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
 {
     if (m_parent->PrepareAudioSample(timecode) && m_audioOutput)
         m_audioOutput->Drain();

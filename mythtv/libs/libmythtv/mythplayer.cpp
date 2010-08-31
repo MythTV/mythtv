@@ -1106,7 +1106,7 @@ VideoFrame *MythPlayer::GetNextVideoFrame(bool allow_unsafe)
  *  \brief Places frame on the queue of frames ready for display.
  */
 void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
-                                       long long timecode,
+                                       int64_t timecode,
                                        bool wrap)
 {
     if (wrap)
@@ -2882,11 +2882,11 @@ PIPLocation MythPlayer::GetNextPIPLocation(void) const
     return kPIP_END;
 }
 
-void MythPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
+void MythPlayer::WrapTimecode(int64_t &timecode, TCTypes tc_type)
 {
     if ((tc_type == TC_AUDIO) && (tc_wrap[TC_AUDIO] == INT64_MIN))
     {
-        long long newaudio;
+        int64_t newaudio;
         newaudio = tc_lastval[TC_VIDEO];
         tc_wrap[TC_AUDIO] = newaudio - timecode;
         timecode = newaudio;
@@ -2897,7 +2897,7 @@ void MythPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
     timecode += tc_wrap[tc_type];
 }
 
-bool MythPlayer::PrepareAudioSample(long long &timecode)
+bool MythPlayer::PrepareAudioSample(int64_t &timecode)
 {
     WrapTimecode(timecode, TC_AUDIO);
     return false;

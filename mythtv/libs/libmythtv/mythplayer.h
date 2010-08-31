@@ -1,6 +1,8 @@
 #ifndef MYTHPLAYER_H
 #define MYTHPLAYER_H
 
+#include <stdint.h>
+
 #include <sys/time.h>
 
 #include <QObject>
@@ -302,7 +304,7 @@ class MPUBLIC MythPlayer
     VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);
-    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode,
+    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     void ReleaseNextVideoFrame(void)
         { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
@@ -321,7 +323,7 @@ class MPUBLIC MythPlayer
     void    ReinitVideo(void);
 
     // Add data
-    virtual bool PrepareAudioSample(long long &timecode);
+    virtual bool PrepareAudioSample(int64_t &timecode);
 
     // OSD conveniences
     void SetOSDMessage(const QString &msg, OSDTimeout timeout);
@@ -366,15 +368,15 @@ class MPUBLIC MythPlayer
     bool SetVideoByComponentTag(int tag);
 
     // Time Code adjustment stuff
-    long long AdjustAudioTimecodeOffset(long long v)
+    int64_t AdjustAudioTimecodeOffset(int64_t v)
         { tc_wrap[TC_AUDIO] += v;  return tc_wrap[TC_AUDIO]; }
-    long long ResetAudioTimecodeOffset(void)
+    int64_t ResetAudioTimecodeOffset(void)
         { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
-    long long ResyncAudioTimecodeOffset(void)
+    int64_t ResyncAudioTimecodeOffset(void)
         { tc_wrap[TC_AUDIO] = INT64_MIN; return 0L; }
-    long long GetAudioTimecodeOffset(void) const
+    int64_t GetAudioTimecodeOffset(void) const
         { return tc_wrap[TC_AUDIO]; }
-    void SaveAudioTimecodeOffset(long long v)
+    void SaveAudioTimecodeOffset(int64_t v)
         { savedAudioTimecodeOffset = v; }
 
     // LiveTV public stuff
@@ -481,7 +483,7 @@ class MPUBLIC MythPlayer
     void HandleArbSeek(bool right);
 
     // Private A/V Sync Stuff
-    void  WrapTimecode(long long &timecode, TCTypes tc_type);
+    void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
     virtual void AVSync(bool limit_delay = false);
     void  FallbackDeint(void);
@@ -675,9 +677,9 @@ class MPUBLIC MythPlayer
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
     int        prevrp;        ///< repeat_pict of last frame
-    long long  tc_wrap[TCTYPESMAX];
-    long long  tc_lastval[TCTYPESMAX];
-    long long  savedAudioTimecodeOffset;
+    int64_t    tc_wrap[TCTYPESMAX];
+    int64_t    tc_lastval[TCTYPESMAX];
+    int64_t    savedAudioTimecodeOffset;
 
     // LiveTV
     TV *m_tv;

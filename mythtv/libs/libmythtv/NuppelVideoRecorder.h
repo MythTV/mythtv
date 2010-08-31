@@ -2,6 +2,8 @@
 #define NUPPELVIDEORECORDER
 
 // C headers
+#include <stdint.h>
+
 #include <sys/time.h>
 #include <time.h>
 #include <pthread.h>
@@ -140,7 +142,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Input
     void FormatTeletextSubtitles(struct VBIData *vbidata);
     void FormatCC(struct cc *cc);
     void AddTextData(unsigned char *buf, int len,
-                     long long timecode, char type);
+                     int64_t timecode, char type);
     void UpdateResolutions(void);
     
     bool encoding;

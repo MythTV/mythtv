@@ -20,7 +20,7 @@ void MythDVDPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 }
 
 void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
-                                          long long timecode, bool wrap)
+                                          int64_t timecode, bool wrap)
 {
     MythPlayer::ReleaseNextVideoFrame(buffer, timecode,
                         !player_ctx->buffer->InDVDMenuOrStillFrame());
@@ -197,7 +197,7 @@ void MythDVDPlayer::EventEnd(void)
     player_ctx->buffer->DVD()->SetParent(NULL);
 }
 
-bool MythDVDPlayer::PrepareAudioSample(long long &timecode)
+bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
 {
     if (!player_ctx->buffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
