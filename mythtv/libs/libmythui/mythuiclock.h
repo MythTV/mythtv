@@ -45,7 +45,6 @@ class MPUBLIC MythUIClock : public MythUIText
     QString m_DateFormat;
     QString m_ShortDateFormat;
 
-    bool m_SecsFlash;
     bool m_Flash;
 };
 

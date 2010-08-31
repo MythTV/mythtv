@@ -182,7 +182,6 @@
             <area>1090,30,150,32</area>
             <align>bottom,right</align>
             <template>%TIME%</template>
-            <secondflash>yes</secondflash>
         </clock>
 
         <imagetype name="channelicon">
@@ -405,7 +404,6 @@
             <area>1090,15,150,32</area>
             <align>bottom,right</align>
             <template>%TIME%</template>
-            <secondflash>yes</secondflash>
         </clock>
 
         <imagetype name="channelicon">

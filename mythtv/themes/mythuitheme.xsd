@@ -446,7 +446,6 @@
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:group ref="widget_common" />
                 <xs:group ref="textarea_elements" />
-                <xs:element name="secondflash" type="boolean" minOccurs="0" maxOccurs="1" />
                 <xs:group ref="widgets" />
             </xs:choice>
             <xs:attributeGroup ref="common_attributes" />

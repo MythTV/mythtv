@@ -24,7 +24,6 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
 
     m_Format = QString("%1, %2").arg(m_DateFormat).arg(m_TimeFormat);
 
-    m_SecsFlash = false;
     m_Flash = false;
 }
 
@@ -46,17 +45,6 @@ void MythUIClock::Pulse(void)
         QString newMsg;
 
         newMsg = m_Time.toString(m_Format);
-        if (m_SecsFlash)
-        {
-            if (m_Flash)
-            {
-                newMsg.replace(':', " ");
-                newMsg.replace('.', " ");
-                m_Flash = false;
-            }
-            else
-                m_Flash = true;
-        }
 
         SetText(newMsg);
 
@@ -80,10 +68,6 @@ bool MythUIClock::ParseElement(
         format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
         m_Format=format;
-    }
-    else if (element.tagName() == "secondflash")
-    {
-        m_SecsFlash = parseBool(element);
     }
     else
     {
@@ -113,7 +97,6 @@ void MythUIClock::CopyFrom(MythUIType *base)
     m_DateFormat = clock->m_DateFormat;
     m_ShortDateFormat = clock->m_ShortDateFormat;
 
-    m_SecsFlash = clock->m_SecsFlash;
     m_Flash = clock->m_Flash;
 
     MythUIText::CopyFrom(base);

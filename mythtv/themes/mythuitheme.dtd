@@ -127,10 +127,9 @@
                 from CDATA #IMPLIED>
 
 <!-- Clock Widget -->
-<!ELEMENT clock (%widget_common;|%textarea_elements;|secondflash|
+<!ELEMENT clock (%widget_common;|%textarea_elements;|
                  %widgets;)*>
 <!ATTLIST clock %common_attributes;>
-<!ELEMENT secondflash (#PCDATA)>
 
 <!-- Button Widget -->
 <!ELEMENT button (%widget_common;|value|%widgets;)*> <!-- statetype -->
