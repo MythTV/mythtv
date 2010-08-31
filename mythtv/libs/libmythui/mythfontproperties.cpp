@@ -275,10 +275,6 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             {
                 newFont->m_face.setItalic(parseBool(info));
             }
-            else if (info.tagName() == "underline")
-            {
-                newFont->m_face.setUnderline(parseBool(info));
-            }
             else if (info.tagName() == "letterspacing")
             {
                 newFont->m_face.setLetterSpacing(QFont::AbsoluteSpacing,
