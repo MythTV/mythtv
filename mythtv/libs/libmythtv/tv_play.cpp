@@ -10638,7 +10638,7 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
         {
             vector<InputInfo> inputs = RemoteRequestFreeInputList(
                 *it, excluded_cardids);
-            int testsize = 0;
+            uint testsize = 0;
             for (uint i = 0; i < inputs.size(); i++)
             {
                 if ((inputs[i].cardid   == cardid) &&
