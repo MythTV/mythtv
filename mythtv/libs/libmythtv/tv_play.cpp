@@ -10638,7 +10638,17 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
         {
             vector<InputInfo> inputs = RemoteRequestFreeInputList(
                 *it, excluded_cardids);
-            if (inputs.empty())
+            int testsize = 0;
+            for (uint i = 0; i < inputs.size(); i++)
+            {
+                if ((inputs[i].cardid   == cardid) &&
+                    (inputs[i].sourceid == sourceid))
+                {
+                    testsize = 1;
+                    break;
+                }
+            }
+            if (inputs.size() <= testsize)
                 continue;
             osd->DialogAddButton(tr("Switch Input"),
                                  "DIALOG_MENU_INPUTSWITCHING_0",
