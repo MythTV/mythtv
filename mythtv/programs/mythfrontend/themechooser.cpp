@@ -373,7 +373,7 @@ void ThemeChooser::showPopupMenu(void)
                                SLOT(toggleDownloadableThemes()));
 
     m_popupMenu->AddButton(tr("Select Current Theme"),
-                           SLOT(saveAndClose()));
+                           SLOT(saveAndReload()));
 }
 
 void ThemeChooser::popupClosed(QString which, int result)
