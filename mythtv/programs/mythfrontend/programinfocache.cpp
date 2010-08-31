@@ -119,6 +119,9 @@ void ProgramInfoCache::Refresh(void)
         vector<ProgramInfo*>::iterator it = m_next_cache->begin();
         for (; it != m_next_cache->end(); ++it)
         {
+            if (!(*it)->GetChanID())
+                continue;
+
             PICKey k((*it)->GetChanID(), (*it)->GetRecordingStartTime());
             m_cache[k] = *it;
         }
@@ -203,7 +206,7 @@ QString ProgramInfoCache::GetRecGroup(
  */
 void ProgramInfoCache::Add(const ProgramInfo &pginfo)
 {
-    if (Update(pginfo))
+    if (!pginfo.GetChanID() || Update(pginfo))
         return;
 
     PICKey key(pginfo.GetChanID(),pginfo.GetRecordingStartTime());

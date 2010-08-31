@@ -215,10 +215,7 @@ uint RemoteGetRecordingList(
     for (int i = 0; i < numrecordings; i++)
     {
         ProgramInfo *pginfo = new ProgramInfo(it, strList.end());
-        if (pginfo->GetChanID())
             reclist.push_back(pginfo);
-        else
-            delete pginfo;
     }
 
     return ((uint) reclist.size()) - reclist_initial_size;
