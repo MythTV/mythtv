@@ -3,7 +3,7 @@
         <fontdef name="basesmall" face="Droid Sans">
             <pixelsize>22</pixelsize>
             <color>#EEEEEE</color>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
         <fontdef name="basesmall_normal_inactive" from="basesmall">
             <color>#666666</color>
