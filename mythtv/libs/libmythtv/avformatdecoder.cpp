@@ -3181,6 +3181,11 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 // SECAM lines  6-23
                 // PAL   lines  6-22
                 // NTSC  lines 10-21 (rare)
+                if (tracks[kTrackTypeTeletextMenu].empty())
+                {
+                    StreamInfo si(pkt->stream_index, 0, 0, 0, 0);
+                    tracks[kTrackTypeTeletextMenu].push_back(si);
+                }
                 ttd->Decode(buf+1, VBI_IVTV);
                 break;
             case VBI_TYPE_CC:
