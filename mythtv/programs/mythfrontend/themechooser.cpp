@@ -424,11 +424,14 @@ void ThemeChooser::toggleFullscreenPreview(void)
         {
             MythUIButtonListItem *item = m_themes->GetItemCurrent();
             ThemeInfo *info = qVariantValue<ThemeInfo*>(item->GetData());
-            m_fullScreenPreview->SetFilename(info->GetPreviewPath());
-            m_fullScreenPreview->Load();
-            m_fullScreenName->SetText(info->GetName());
-            if (m_fullPreviewStateType)
-                m_fullPreviewStateType->DisplayState("fullscreen");
+            if (info)
+            {
+                m_fullScreenPreview->SetFilename(info->GetPreviewPath());
+                m_fullScreenPreview->Load();
+                m_fullScreenName->SetText(info->GetName());
+                if (m_fullPreviewStateType)
+                    m_fullPreviewStateType->DisplayState("fullscreen");
+            }
         }
         else
         {
