@@ -88,7 +88,7 @@ bool MythUISpinBox::ParseElement(
 {
     if (element.tagName() == "template")
     {
-        QString format = getFirstText(element);
+        QString format = parseText(element);
         if (element.attribute("type") == "negative")
             m_negativeTemplate = format;
         else if (element.attribute("type") == "zero")

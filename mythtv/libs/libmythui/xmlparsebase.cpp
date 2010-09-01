@@ -261,6 +261,30 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
     return QBrush(gradient);
 }
 
+QString XMLParseBase::parseText(QDomElement &element)
+{
+    QString text = getFirstText(element);
+
+    // Escape xml-escaped newline
+    text.replace("\\n", QString("<newline>"));
+
+    // Remove newline whitespace added by
+    // xml formatting
+    QStringList lines = text.split('\n');
+    QStringList::iterator lineIt;
+
+    for (lineIt = lines.begin(); lineIt != lines.end(); ++lineIt)
+    {
+        (*lineIt) = (*lineIt).trimmed();
+    }
+
+    text = lines.join(" ");
+
+    text.replace(QString("<newline>"), QString("\n"));
+
+    return text;
+}
+
 static MythUIType *globalObjectStore = NULL;
 
 MythUIType *XMLParseBase::GetGlobalObjectStore(void)
@@ -747,7 +771,7 @@ bool XMLParseBase::LoadBaseTheme(void)
                     QString("No theme file '%1'").arg(themefile));
         }
     }
-    
+
     return ok;
 }
 

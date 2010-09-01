@@ -29,7 +29,7 @@ class MPUBLIC XMLParseBase
     static int parseAlignment(const QString &text);
     static int parseAlignment(QDomElement &element);
     static QBrush parseGradient(const QDomElement &element);
-
+    static QString parseText(QDomElement &element);
     static MythUIType *GetGlobalObjectStore(void);
     static void ClearGlobalObjectStore(void);
 

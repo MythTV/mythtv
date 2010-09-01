@@ -86,8 +86,6 @@ void MythUIText::Reset()
 void MythUIText::SetText(const QString &text)
 {
     QString newtext = text;
-    newtext.replace(QRegExp("\\\\n"), "\n");
-    newtext = newtext.trimmed();
 
     if (newtext == m_Message)
         return;
@@ -618,18 +616,18 @@ bool MythUIText::ParseElement(
         if (element.attribute("lang","").isEmpty())
         {
             m_Message = qApp->translate("ThemeUI",
-                                        getFirstText(element).toUtf8(), NULL,
+                                        parseText(element).toUtf8(), NULL,
                                         QCoreApplication::UnicodeUTF8);
         }
         else if (element.attribute("lang","").toLower() ==
                  GetMythUI()->GetLanguageAndVariant())
         {
-            m_Message = getFirstText(element);
+            m_Message = parseText(element);
         }
         else if (element.attribute("lang","").toLower() ==
                  GetMythUI()->GetLanguage())
         {
-            m_Message = getFirstText(element);
+            m_Message = parseText(element);
         }
 
         SetText(m_Message);
@@ -637,7 +635,7 @@ bool MythUIText::ParseElement(
     }
     else if (element.tagName() == "template")
     {
-        m_TemplateText = getFirstText(element);
+        m_TemplateText = parseText(element);
     }
     else if (element.tagName() == "cutdown")
     {
