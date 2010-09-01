@@ -22,8 +22,7 @@
                 <state name="active">
                     <area>0,0,595,84</area>
                     <imagetype name="statusimage">
-                        <area>0,0,20,80</area>
-                        <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
+                        <filename>shared/disabled.png</filename>
                     </imagetype>
                     <imagetype name="frame">
                         <filename>recordings/generallistbackground.png</filename>
@@ -40,9 +39,7 @@
                         <filename>recordings/generallistselectedframe.png</filename>
                     </imagetype>
                     <imagetype name="statusimage">
-                        <area>0,0,40,86</area>
-                        <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
-                        <mask>shared/selected_state_mask.png</mask>
+                        <filename>shared/selected_disabled.png</filename>
                     </imagetype>
                     <textarea name="buttontext">
                         <area>37,10,555,42</area>

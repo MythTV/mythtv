@@ -102,28 +102,27 @@
                         <position>4,4</position>
                         <state name="disabled">
                             <imagetype name="statusimage">
-                                <area>0,0,20,80</area>
-                                <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
+                                <filename>shared/disabled.png</filename>
                             </imagetype>
                         </state>
-                        <state name="error" from="disabled">
+                        <state name="error">
                             <imagetype name="statusimage">
-                                <gradient start="#e43e3e" end="#e43e3e" alpha="255" />
+                                <filename>shared/error.png</filename>
                             </imagetype>
                         </state>
-                        <state name="warning" from="disabled">
+                        <state name="warning">
                             <imagetype name="statusimage">
-                                <gradient start="#ff9147" end="#ff9147" alpha="255" />
+                                <filename>shared/warning.png</filename>
                             </imagetype>
                         </state>
-                        <state name="normal" from="disabled">
+                        <state name="normal">
                             <imagetype name="statusimage">
-                                <gradient start="#066aff" end="#066aff" alpha="255" />
+                                <filename>shared/normal.png</filename>
                             </imagetype>
                         </state>
-                        <state name="running" from="disabled">
+                        <state name="running">
                             <imagetype name="statusimage">
-                                <gradient start="#33bf33" end="#33bd33" alpha="255" />
+                                <filename>shared/running.png</filename>
                             </imagetype>
                         </state>
                     </statetype>
@@ -159,32 +158,30 @@
                         <filename>recordings/generallistselectedframe.png</filename>
                     </imagetype>
                     <statetype name="status">
-                        <position>-13,1</position>
+                        <position>-13,2</position>
                         <state name="disabled">
                             <imagetype name="statusimage">
-                                <area>0,0,40,86</area>
-                                <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
-                                <mask>shared/selected_state_mask.png</mask>
+                                <filename>shared/selected_disabled.png</filename>
                             </imagetype>
                         </state>
-                        <state name="error" from="disabled">
+                        <state name="error">
                             <imagetype name="statusimage">
-                                <gradient start="#e43e3e" end="#e43e3e" alpha="255" />
+                                <filename>shared/selected_error.png</filename>
                             </imagetype>
                         </state>
-                        <state name="warning" from="disabled">
+                        <state name="warning">
                             <imagetype name="statusimage">
-                                <gradient start="#ff9147" end="#ff9147" alpha="255" />
+                                <filename>shared/selected_warning.png</filename>
                             </imagetype>
                         </state>
-                        <state name="normal" from="disabled">
+                        <state name="normal">
                             <imagetype name="statusimage">
-                                <gradient start="#066aff" end="#066aff" alpha="255" />
+                                <filename>shared/selected_normal.png</filename>
                             </imagetype>
                         </state>
-                        <state name="running" from="disabled">
+                        <state name="running">
                             <imagetype name="statusimage">
-                                <gradient start="#33bf33" end="#33bd33" alpha="255" />
+                                <filename>shared/selected_running.png</filename>
                             </imagetype>
                         </state>
                     </statetype>
