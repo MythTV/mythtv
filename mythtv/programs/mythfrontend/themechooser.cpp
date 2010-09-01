@@ -254,9 +254,10 @@ void ThemeChooser::Init(void)
         if (!themeinfo)
             continue;
 
-        QString buttonText = themeinfo->GetName() + " " +
-            QString("%1.%2").arg(themeinfo->GetMajorVersion())
-                            .arg(themeinfo->GetMinorVersion());
+        QString buttonText = QString("%1 %2.%3")
+                                .arg(themeinfo->GetName())
+                                .arg(themeinfo->GetMajorVersion())
+                                .arg(themeinfo->GetMinorVersion());
 
         item = new MythUIButtonListItem(m_themes, buttonText);
         if (item)
@@ -265,6 +266,8 @@ void ThemeChooser::Init(void)
                 item->DisplayState("local", "themelocation");
             else
                 item->DisplayState("remote", "themelocation");
+
+            item->DisplayState(themeinfo->GetAspect(), "aspectstate");
 
             item->DisplayState(m_themeStatuses[themeinfo->GetName()],
                                "themestatus");
@@ -277,7 +280,7 @@ void ThemeChooser::Init(void)
             QFileInfo fInfo(thumbnail);
             // Downloadable themes have thumbnail copies of their preview images
             if (!thumbnail.startsWith("/"))
-                thumbnail = thumbnail + ".thumb.png";
+                thumbnail = thumbnail.append(".thumb.png");
             item->SetImage(thumbnail);
 
             if (curTheme == themeinfo->GetName())
@@ -495,7 +498,8 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
         }
     }
 
-    MythUIStateType *jobState = dynamic_cast<MythUIStateType*>(GetChild("themelocation"));
+    MythUIStateType *jobState =
+                    dynamic_cast<MythUIStateType*>(GetChild("themelocation"));
     if (jobState)
     {
         if (info->GetPreviewPath().startsWith("http://"))
@@ -503,10 +507,15 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
         else
             jobState->DisplayState("local");
     }
+
+    MythUIStateType *aspectState =
+                        dynamic_cast<MythUIStateType*>(GetChild("aspectstate"));
+    if (aspectState)
+        aspectState->DisplayState(info->GetAspect());
 }
 
 void ThemeChooser::updateProgressBar(int bytesReceived,
-                                    int bytesTotal)
+                                     int bytesTotal)
 {
     MythUIProgressBar *progressBar   =
         dynamic_cast<MythUIProgressBar *>(GetChild("downloadprogressbar"));
