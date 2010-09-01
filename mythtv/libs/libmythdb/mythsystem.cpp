@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
+#include <signal.h>  // for kill()
 
 // QT headers
 #include <QCoreApplication>
