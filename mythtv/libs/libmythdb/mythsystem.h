@@ -2,6 +2,7 @@
 #define MYTHSYSTEM_H_
 
 #include <QString>
+#include <unistd.h>  // for pid_t
 
 #include "mythexp.h"
 
