@@ -188,7 +188,7 @@ void HouseKeeper::RunHouseKeeping(void)
             }
 
             // Run mythfilldatabase to grab the TV listings
-            if (gCoreContext->GetNumSetting("MythFillEnabled", 0))
+            if (gCoreContext->GetNumSetting("MythFillEnabled", 1))
             {
                 if (HouseKeeper_filldb_running)
                 {
