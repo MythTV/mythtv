@@ -13,12 +13,12 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.12';
+    $VERSION        = '1.0.13';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
     our ($partial_restore, $with_plugin_data, $restore_xmltvids);
-    our ($mysql_client, $uncompress, $mc_sql);
+    our ($mysql_client, $uncompress, $drop_database, $create_database);
     our ($change_hostname, $old_hostname, $new_hostname);
     our ($usage, $debug, $show_version, $show_version_script, $dbh);
     our ($d_mysql_client, $d_db_name, $d_uncompress);
@@ -72,7 +72,8 @@
                'restore_xmltvids|xmltvids'          => \$restore_xmltvids,
                'mysql_client|client=s'              => \$mysql_client,
                'uncompress=s'                       => \$uncompress,
-               'create_database|create_db|mc_sql=s' => \$mc_sql,
+               'drop_database|drop_db'              => \$drop_database,
+               'create_database|create_db|mc_sql'   => \$create_database,
                'change_hostname'                    => \$change_hostname,
                'new_hostname=s'                     => \$new_hostname,
                'old_hostname=s'                     => \$old_hostname,
@@ -127,10 +128,12 @@ executable by issuing the command:
 
 # mysql -umythtv -p mythconverg -e "DROP DATABASE IF EXISTS mythconverg;"
 
-(fix the database name, username, and password, as required). Then, execute the
-mc.sql script as described in the MythTV HOWTO ( http://www.mythtv.org/docs/ )
-to prepare a new (empty) database (or see the description of the
---create_database argument in the detailed help).
+(fix the database name and username, as required). Then, execute the mc.sql
+script as described in the MythTV HOWTO ( http://www.mythtv.org/docs/ ) to
+prepare a new (empty) database. Alternatively, you may specify the
+--drop_database and/or --create_database arguments to automatically drop and/or
+create the database for you (see the command-line argument descriptions in the
+detailed help for more information).
 
 Then, run this script to restore the most-recent backup in the directory
 specified in ~/.mythtv/backuprc . Use the --verbose argument to see what is
@@ -207,21 +210,9 @@ backup resource file, or a MySQL options file. The username may be specified
 the same way or may be specified using a command-line argument if not using a
 database information file.
 
-If no database exists, the script can attempt to create the initial database.
-To allow this, specify the --create_database argument and specify the location
-of the mc.sql script (full directory/filename). On most MySQL configurations
-this will fail unless connecting to the database using the MySQL root user--
-even if the user specified has CREATE DATABASE privilege--as RELOAD privilege
-is also required. Though you may specify '--username=root' on the command line,
-the script does not allow specifying a database password on the command line.
-Therefore, you will need to specify 'DBPassword=<MySQL root user password>' in
-the backup resource file.
-
 If attempting to perform a full restore, the database must be empty (no
-tables), or--if the script is allowed to create the initial database, as
-explained above--must not exist. If attempting to do a partial or "new
-hardware" restore, the database must exist and must have tables. See QUICK
-START, below, for more information.
+tables). To automatically drop any existing database and create an empty
+database, specify the --drop_database and the --create_database arguments.
 
 If you have a corrupt database, you may be able to recover some information
 using a partial restore. To do a partial restore, you must have a
@@ -234,8 +225,10 @@ with:
 
 # $0 --partial_restore
 
-Include the --with_plugin_data argument if you would like to keep the data
-used by MythTV plugins.
+Include the --with_plugin_data argument if you would like to keep the data used
+by MythTV plugins.  Note that this approach can not be used to "merge"
+databases from different MythTV databases nor to import recordings from other
+MythTV databases.
 
 If you would like to do a partial/new-hardware restore and have upgraded
 MythTV, you must first do a full restore, then start and exit mythtv-setup (to
@@ -301,14 +294,6 @@ files. The following variables are recognized:
                      specified. Therefore, if IO::Uncompress::Gunzip is
                      installed and functional, specifying a value for
                      uncompress is unnecessary.
-  create_database  - The location of the mc.sql script (full directory and
-                     filename). If specified, and if the database does not
-                     exist, the script will attempt to create the initial
-                     database by running the specified mc.sql script commands.
-                     This probably requires running the restore script with
-                     the DBUserName set to root. See, also, the MythTV HOWTO
-                     ( http://www.mythtv.org/docs/ )for details on "Setting up
-                     the initial database."
 
 RESOURCE FILE
 
@@ -379,7 +364,7 @@ options:
 
 --restore_xmltvids
 
-    Restore channel xmltvids from a backup create with
+    Restore channel xmltvids from a backup created with
     mythconverg_backup.pl --backup_xmltvids
 
 --mysql_client [path]
@@ -396,10 +381,20 @@ options:
 
     Default: $d_uncompress
 
---create_database [path]
+--drop_database
 
-    The location of the mc.sql script (full directory and filename). See
-    create_database in the DATABASE INFORMATION FILE description, above.
+    If specified, and if the database already exists, the script will attempt
+    to drop the database. This argument may only be used when the
+    --create_database argument is also specified (see below).
+
+--create_database
+
+    If specified, and if the database does not exist or the --drop_database
+    argument is specified, the script will attempt to create the initial
+    database. Note that database creation requires a properly configured MySQL
+    user and permissions.  See, also, the MythTV HOWTO (
+    http://www.mythtv.org/docs/ ) for details on "Setting up the initial
+    database."
 
 --change_hostname
 
@@ -474,7 +469,8 @@ EOF
                 "        DBSchemaVer: $mysql_conf{'db_schemaver'}",
                 "  DBBackupDirectory: $backup_conf{'directory'}",
                 "   DBBackupFilename: $backup_conf{'filename'}",
-                '    create_database: '.($mc_sql ? $mc_sql : ''));
+                '      drop_database: '.($drop_database ? 'yes' : 'no'),
+                '    create_database: '.($create_database ? 'yes' : 'no'));
         verbose($verbose_level_debug,
                 '',
                 'Executables:',
@@ -613,10 +609,6 @@ EOF
             elsif ($var eq 'uncompress')
             {
                 $uncompress = $val;
-            }
-            elsif ($var eq 'create_database')
-            {
-                $mc_sql = $val;
             }
         }
         close CONF;
@@ -786,11 +778,11 @@ EOF
             verbose($verbose_level_error,
                     '', 'ERROR: DBBackupDirectory is not a directory. Please'.
                     ' specify a directory in',
-                    '        your database information file using'.
+                    '       your database information file using'.
                     ' DBBackupDirectory.',
-                    '        If not using a database information file,' .
+                    '       If not using a database information file,' .
                     ' please specify the ',
-                    '        --directory command-line option.');
+                    '       --directory command-line option.');
             die("\nInvalid backup directory, stopped");
         }
         if (!$backup_conf{'filename'})
@@ -812,7 +804,7 @@ EOF
                 }
             }
             my @files = <$backup_conf{'directory'}/$backup_conf{'filename'}*>;
-            @files = grep(!/.*mythconverg_(backup|restore).pl$/, @files);
+            @files = grep(!/.*mythconverg_(backup|restore).*\.pl$/, @files);
             my $num_files = @files;
             if ($num_files < 1)
             {
@@ -913,16 +905,24 @@ EOF
         }
     }
 
-    sub database_exists
+    sub connect_to_database
     {
-        $result = 1;
-        $dbh = DBI->connect("dbi:mysql:".
-                            "database=$mysql_conf{'db_name'}:".
-                            "host=$mysql_conf{'db_host'}",
+        my $use_db = shift;
+        my $show_errors = shift;
+        my $result = 1;
+        my $connect_string = 'dbi:mysql:database=';
+        if ($use_db)
+        {
+            $connect_string .= $mysql_conf{'db_name'};
+        }
+        $connect_string .= ":host=$mysql_conf{'db_host'}";
+        $dbh->disconnect if (defined($dbh));
+        $dbh = DBI->connect($connect_string,
                             "$mysql_conf{'db_user'}",
                             "$mysql_conf{'db_pass'}",
                             { PrintError => 0 });
-        if (!defined($dbh))
+        $result = 0 if (!defined($dbh));
+        if ($show_errors && !defined($dbh))
         {
             verbose($verbose_level_always,
                     '', 'Unable to connect to database.',
@@ -930,13 +930,13 @@ EOF
                     "               host: $mysql_conf{'db_host'}",
                     "           username: $mysql_conf{'db_user'}"
                    );
-        if ($debug < $verbose_level_debug)
-        {
-            verbose($verbose_level_always,
-                    'To see the password used, please re-run the script with'.
-                    ' the --verbose',
-                    'argument.');
-        }
+            if ($debug < $verbose_level_debug)
+            {
+                verbose($verbose_level_always,
+                        'To see the password used, please re-run the script '.
+                        'with the --verbose',
+                        'argument.');
+            }
         # Connection issues will only occur with improper user configuration
         # Because they should be rare, output the password with --verbose
             verbose($verbose_level_debug,
@@ -956,76 +956,21 @@ EOF
                     ' will take precedence over',
                     'the password specified in the MythTV configuration'.
                     ' files.');
-            $result = 0;
         }
         return $result;
     }
 
-    sub create_initial_database
-    {
-        return 1 if (!$mc_sql);
-        return 1 if (!-r "$mc_sql");
-
-        my $defaults_extra_file = create_defaults_extra_file;
-        my $host_arg = '';
-        my $port_arg = '';
-        my $user_arg = '';
-        if ($defaults_extra_file)
-        {
-            $defaults_arg = " --defaults-extra-file='$defaults_extra_file'";
-        }
-        else
-        {
-            $defaults_arg = '';
-        }
-        my $safe_mysql_client = $mysql_client;
-        $safe_mysql_client =~ s/'/'\\''/g;
-    # Create the args for host, port, and user, shell-escaping values, as
-    # necessary.
-        my $safe_string;
-        if ($mysql_conf{'db_host'})
-        {
-            $safe_string = $mysql_conf{'db_host'};
-            $safe_string =~ s/'/'\\''/g;
-            $host_arg = " --host='$safe_string'";
-        }
-        if ($mysql_conf{'db_port'} > 0)
-        {
-            $safe_string = $mysql_conf{'db_port'};
-            $safe_string =~ s/'/'\\''/g;
-            $port_arg = " --port='$safe_string'";
-        }
-        if ($mysql_conf{'db_user'})
-        {
-            $safe_string = $mysql_conf{'db_user'};
-            $safe_string =~ s/'/'\\''/g;
-            $user_arg = " --user='$safe_string'";
-        }
-        verbose($verbose_level_debug,
-                '', 'Attempting to create initial database.');
-        my $safe_mc_sql = $mc_sql;
-        $safe_mc_sql =~ s/'/'\\''/g;
-    # Use redirects to capture stdout and stderr (for debug)
-        my $command = "'${safe_mysql_client}'${defaults_arg}${host_arg}".
-                      "${port_arg}${user_arg} 2>&1 < '$safe_mc_sql'";
-        verbose($verbose_level_debug,
-                '', 'Executing command:', $command);
-        my $result = `$command`;
-        my $exit = $? >> 8;
-        verbose($verbose_level_debug,
-                '', "$mysql_client exited with status: $exit");
-        if ($exit)
-        {
-            verbose($verbose_level_error,
-                    "$mysql_client output:", $result);
-            die("\nUnable to create initial database, stopped");
-        }
-        return $exit;
-    }
-
     sub is_database_empty
     {
-        $result = 1;
+        my $result = 1;
+        connect_to_database(1, 1);
+        if (!defined($dbh))
+        {
+            verbose($verbose_level_error,
+                    '', 'ERROR: Unable to connect to database.');
+            return -1;
+        }
+
         if (defined($dbh))
         {
             my $sth = $dbh->table_info('', '', '', 'TABLE');
@@ -1043,6 +988,97 @@ EOF
             }
         }
         return $result;
+    }
+
+    sub create_initial_database
+    {
+        return 0 if (!$create_database && !$drop_database);
+
+        my $database_exists = (connect_to_database(1, 0) && defined($dbh));
+        if ($database_exists)
+        {
+            if ($drop_database && !$create_database)
+            {
+                verbose($verbose_level_error,
+                        '', 'ERROR: Refusing to drop the database without'.
+                        ' the --create_database argument.',
+                        'If you really want to drop the database, please '.
+                        're-run the script and specify',
+                        'the --create_database argument, too.');
+                return 2;
+            }
+        }
+        else
+        {
+            if (!$create_database)
+            {
+                verbose($verbose_level_error,
+                        '', 'ERROR: The database does not exist.');
+                return 1;
+            }
+        }
+
+        verbose($verbose_level_debug,
+                '', 'Preparing initial database.');
+
+        my ($query, $sth);
+
+        if ($database_exists && $drop_database)
+        {
+            verbose($verbose_level_debug, 'Dropping database.');
+            connect_to_database(0, 1);
+            if (!defined($dbh))
+            {
+                verbose($verbose_level_error,
+                        '', 'ERROR: Unable to connect to database.');
+                return -1;
+            }
+
+            $query = qq{DROP DATABASE $mysql_conf{'db_name'};};
+            $sth = $dbh->prepare($query);
+            if (! $sth->execute())
+            {
+                verbose($verbose_level_error,
+                        '', 'ERROR: Unable to drop database.',
+                        $sth->errstr);
+                return -2;
+            }
+        }
+
+        connect_to_database(0, 1) if (!defined($dbh));
+
+        if (!defined($dbh))
+        {
+            verbose($verbose_level_error,
+                    '', 'ERROR: Unable to connect to database.');
+            return -1;
+        }
+
+        verbose($verbose_level_debug, 'Creating database.');
+        $query = qq{CREATE DATABASE $mysql_conf{'db_name'};};
+        $sth = $dbh->prepare($query);
+        if (! $sth->execute())
+        {
+            verbose($verbose_level_error,
+                    '', 'ERROR: Unable to create database.',
+                    $sth->errstr);
+            return -4;
+        }
+
+        verbose($verbose_level_debug, 'Setting database character set.');
+        $query = qq{ALTER DATABASE $mysql_conf{'db_name'}
+                    DEFAULT CHARACTER SET latin1
+                    COLLATE latin1_general_ci;};
+        $sth = $dbh->prepare($query);
+        if (! $sth->execute())
+        {
+            verbose($verbose_level_error,
+                    '', 'ERROR: Unable to create database.',
+                    $sth->errstr);
+            return -8;
+        }
+
+        return 0;
     }
 
     sub check_database_libs
@@ -1079,14 +1115,14 @@ EOF
         my $have_database_libs = check_database_libs;
         if ($have_database_libs < 2)
         {
-            if ($mc_sql)
+            if ($create_database || $drop_database)
             {
                 verbose($verbose_level_error,
-                        '',
-                        'ERROR: Unable to create initial database without'.
-                        ' Perl database libraries.',
-                        '        Please ensure the Perl DBI and DBD::mysql'.
-                        ' modules are installed.');
+                        '', 'ERROR: Unable to drop or create the initial '.
+                        'database without Perl database',
+                        '       libraries.',
+                        'Please ensure the Perl DBI and DBD::mysql modules'.
+                        ' are installed.');
                 die("\nPerl database libraries missing, stopped");
             }
             if ($change_hostname)
@@ -1094,8 +1130,8 @@ EOF
                 verbose($verbose_level_error,
                         '', 'ERROR: Unable to change hostname without Perl'.
                         ' database libraries.',
-                        '        Please ensure the Perl DBI and DBD::mysql'.
-                        ' modules are installed.');
+                        'Please ensure the Perl DBI and DBD::mysql modules'.
+                        ' are installed.');
                 die("\nPerl database libraries missing, stopped");
             }
             else
@@ -1111,16 +1147,17 @@ EOF
     # DBI/DBD::mysql are available; check the DB status
         verbose($verbose_level_debug,
                 '', 'Checking database.');
-        if (!database_exists)
+        my $initial_database = create_initial_database;
+        if ($initial_database)
         {
-            if (create_initial_database)
-            {
-                verbose($verbose_level_error,
-                        '', 'ERROR: The database does not exist.');
-                return 0;
-            }
+            return 0;
         }
         my $database_empty = is_database_empty;
+        if ($database_empty == -1)
+        {
+        # Unable to connect to database
+            return 0;
+        }
         if ($change_hostname)
         {
             if ($database_empty)
@@ -1128,7 +1165,7 @@ EOF
                 verbose($verbose_level_error,
                         '', 'ERROR: Unable to change hostname. The database'.
                         ' is empty.',
-                        '        Please restore a backup, first, then re-run'.
+                        '       Please restore a backup, first, then re-run'.
                         ' this script.');
                 return 0;
             }
@@ -1140,7 +1177,7 @@ EOF
                 verbose($verbose_level_error,
                         '', 'ERROR: Unable to do a partial restore. The'.
                         ' database is empty.',
-                        '        Please run mythtv-setup, first, then re-run'.
+                        '       Please run mythtv-setup, first, then re-run'.
                         ' this script.');
                 return 0;
             }
