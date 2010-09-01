@@ -63,11 +63,11 @@ bool MythUIClock::ParseElement(
     if (element.tagName() == "format" ||
         element.tagName() == "template")
     {
-        QString format = getFirstText(element);
+        QString format = parseText(element);
         format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
         format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
-        m_Format=format;
+        m_Format = format;
     }
     else
     {
