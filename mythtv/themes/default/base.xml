@@ -927,7 +927,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,165,105</area>
-                    <imagetype name="buttonbackground" />
+                    <shape name="buttonbackground" />
                     <statetype name="nodetype">
                         <state name="folder">
                             <imagetype name="icon">
