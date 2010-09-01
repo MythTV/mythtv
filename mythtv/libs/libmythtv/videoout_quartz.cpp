@@ -1450,7 +1450,7 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     db_vdisp_profile->SetVideoRenderer(renderer);
     VERBOSE(VB_IMPORTANT, LOC + "VProf: " + db_vdisp_profile->toString());
 
-    vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+    vbuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height());
 
     // Set up pause frame
     if (pauseFrame.buf)
@@ -1459,7 +1459,7 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     VideoFrame *scratch = vbuffers.GetScratchFrame();
 
     init(&pauseFrame, FMT_YV12, new unsigned char[scratch->size],
-         scratch->width, scratch->height, scratch->bpp, scratch->size);
+         scratch->width, scratch->height, scratch->size);
 
     pauseFrame.frameNumber = scratch->frameNumber;
 
