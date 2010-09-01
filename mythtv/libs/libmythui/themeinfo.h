@@ -5,6 +5,7 @@
 #include <QSize>
 #include <QMetaType>
 #include <QHash>
+#include <QFileInfo>
 
 #include "mythexp.h"
 
@@ -14,8 +15,6 @@ typedef enum {
     THEME_OSD   = 0x02,
     THEME_MENU  = 0x04
 } ThemeType;
-
-class QFileInfo;
 
 class MPUBLIC ThemeInfo
 {
@@ -36,6 +35,9 @@ class MPUBLIC ThemeInfo
 
     QString GetDownloadURL() const { return m_downloadurl; }
     QString GetThemeWebSite() const { return m_themesite; }
+
+    QString GetLocalURL() const { return m_themeurl; }
+    QString GetDirectoryName() const { return m_theme->baseName(); }
 
     void ToMap(QHash<QString, QString> &infoMap) const;
 

@@ -283,7 +283,7 @@ void ThemeChooser::Init(void)
                 thumbnail = thumbnail.append(".thumb.png");
             item->SetImage(thumbnail);
 
-            if (curTheme == themeinfo->GetName())
+            if (curTheme == themeinfo->GetDirectoryName())
                 curThemeInfo = themeinfo;
         }
         else
@@ -468,7 +468,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
     }
     else
     {
-        gCoreContext->SaveSetting("Theme", info->GetName());
+        gCoreContext->SaveSetting("Theme", info->GetDirectoryName());
         GetMythMainWindow()->JumpTo("Reload Theme");
     }
 }
@@ -628,7 +628,7 @@ void ThemeChooser::customEvent(QEvent *e)
             QStringList args = me->ExtraDataList();
             QFile::remove(args[0]);
 
-            gCoreContext->SaveSetting("Theme", m_downloadTheme->GetName());
+            gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
     }
