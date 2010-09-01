@@ -127,7 +127,7 @@
 
     <xs:simpleType name="align">
         <xs:restriction base="xs:string">
-            <xs:pattern value="(left|right|top|bottom|hcenter|vcenter|center|allcenter)(,(left|right|top|bottom|hcenter|vcenter|center|allcenter))?" />
+            <xs:pattern value="(left|right|top|bottom|hcenter|vcenter|center|allcenter|justify)(,(left|right|top|bottom|hcenter|vcenter|center|allcenter|justify))?" />
         </xs:restriction>
     </xs:simpleType>
 
