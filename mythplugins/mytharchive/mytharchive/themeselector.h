@@ -16,15 +16,15 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIImage;
 
-class ThemeSelector : public MythScreenType
+class DVDThemeSelector : public MythScreenType
 {
 
   Q_OBJECT
 
   public:
-    ThemeSelector(MythScreenStack *parent, MythScreenType *previousScreen,
-                  ArchiveDestination archiveDestination, QString name);
-    ~ThemeSelector(void);
+    DVDThemeSelector(MythScreenStack *parent, MythScreenType *previousScreen,
+                     ArchiveDestination archiveDestination, QString name);
+    ~DVDThemeSelector(void);
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

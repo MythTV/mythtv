@@ -24,7 +24,7 @@
 #include "mythburn.h"
 #include "themeselector.h"
 
-ThemeSelector::ThemeSelector(MythScreenStack *parent, MythScreenType *destinationScreen,
+DVDThemeSelector::DVDThemeSelector(MythScreenStack *parent, MythScreenType *destinationScreen,
                              ArchiveDestination archiveDestination, QString name)
                 : MythScreenType(parent, name, true)
 {
@@ -33,12 +33,12 @@ ThemeSelector::ThemeSelector(MythScreenStack *parent, MythScreenType *destinatio
     themeDir = GetShareDir() + "mytharchive/themes/";
 }
 
-ThemeSelector::~ThemeSelector(void)
+DVDThemeSelector::~DVDThemeSelector(void)
 {
     saveConfiguration();
 }
 
-bool ThemeSelector::Create(void)
+bool DVDThemeSelector::Create(void)
 {
     bool foundtheme = false;
 
@@ -75,6 +75,7 @@ bool ThemeSelector::Create(void)
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
 
     getThemeList();
+
     connect(theme_selector, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(themeChanged(MythUIButtonListItem*)));
 
@@ -85,7 +86,7 @@ bool ThemeSelector::Create(void)
     return true;
 }
 
-bool ThemeSelector::keyPressEvent(QKeyEvent *event)
+bool DVDThemeSelector::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
@@ -96,7 +97,7 @@ bool ThemeSelector::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
-void ThemeSelector::handleNextPage()
+void DVDThemeSelector::handleNextPage()
 {
     saveConfiguration();
 
@@ -110,18 +111,18 @@ void ThemeSelector::handleNextPage()
         mainStack->AddScreen(burn);
 }
 
-void ThemeSelector::handlePrevPage()
+void DVDThemeSelector::handlePrevPage()
 {
     Close();
 }
 
-void ThemeSelector::handleCancel()
+void DVDThemeSelector::handleCancel()
 {
     m_destinationScreen->Close();
     Close();
 }
 
-void ThemeSelector::getThemeList(void)
+void DVDThemeSelector::getThemeList(void)
 {
     theme_list.clear();
     QDir d;
@@ -150,7 +151,7 @@ void ThemeSelector::getThemeList(void)
         VERBOSE(VB_IMPORTANT, "MythArchive:  Theme directory does not exist!");
 }
 
-void ThemeSelector::themeChanged(MythUIButtonListItem *item)
+void DVDThemeSelector::themeChanged(MythUIButtonListItem *item)
 {
     if (!item)
         return;
@@ -201,7 +202,7 @@ void ThemeSelector::themeChanged(MythUIButtonListItem *item)
         themedesc_text->SetText("No description found!");
 }
 
-QString ThemeSelector::loadFile(const QString &filename)
+QString DVDThemeSelector::loadFile(const QString &filename)
 {
     QString res = "";
 
@@ -226,14 +227,14 @@ QString ThemeSelector::loadFile(const QString &filename)
     return res;
 }
 
-void ThemeSelector::loadConfiguration(void)
+void DVDThemeSelector::loadConfiguration(void)
 {
     QString theme = gCoreContext->GetSetting("MythBurnMenuTheme", "");
     theme = theme.replace(QString("_"), QString(" "));
     theme_selector->MoveToNamedPosition(theme);
 }
 
-void ThemeSelector::saveConfiguration(void)
+void DVDThemeSelector::saveConfiguration(void)
 {
     QString theme = theme_selector->GetValue();
     theme = theme.replace(QString(" "), QString("_"));

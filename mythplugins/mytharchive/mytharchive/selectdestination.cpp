@@ -136,7 +136,7 @@ void SelectDestination::handleNextPage()
     }
     else
     {
-        ThemeSelector *theme = new ThemeSelector(mainStack, this, m_archiveDestination, "ThemeSelector");
+        DVDThemeSelector *theme = new DVDThemeSelector(mainStack, this, m_archiveDestination, "ThemeSelector");
 
         if (theme->Create())
             mainStack->AddScreen(theme);
