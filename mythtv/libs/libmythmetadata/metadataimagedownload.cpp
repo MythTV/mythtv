@@ -79,7 +79,7 @@ void MetadataImageDownload::run()
 
         bool exists = QFile::exists(sFilename);
         if (!exists && !thumb->url.isEmpty())
-            HttpComms::getHttpFile(sFilename, thumb->url, 20000, 1, 2);
+            GetMythDownloadManager()->download(thumb->url, sFilename);
 
         // inform parent we have thumbnail ready for it
         if (QFile::exists(sFilename) && m_parent)
