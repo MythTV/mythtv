@@ -41,6 +41,8 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
         programFind = new JaProgFinder(mainStack, allowEPG, player, embedVideo);
     else if (GetMythUI()->GetLanguage() == "he")
         programFind = new HeProgFinder(mainStack, allowEPG, player, embedVideo);
+    else if (GetMythUI()->GetLanguage() == "ru")
+        programFind = new RuProgFinder(mainStack, allowEPG, player, embedVideo);
     else // default
         programFind = new ProgFinder(mainStack, allowEPG, player, embedVideo);
 
@@ -937,6 +939,115 @@ void HeProgFinder::restoreSelectedData(QString& data)
     (void)data;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+// Cyrrilic specific program finder
+// Cyrrilic alphabet list and more
+const char* RuProgFinder::searchChars[] = {
+    "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И",
+    "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т",
+    "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "ь",
+    "Э", "Ю", "Я", "0", "1", "2", "3", "4", "5", "6",
+    "7", "8", "9", "@", "A", "B", "C", "D", "E", "F",
+    "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 0 };
+
+RuProgFinder::RuProgFinder(MythScreenStack *parentStack, bool gg,
+                           TV *player, bool embedVideo)
+            : ProgFinder(parentStack, gg, player, embedVideo)
+{
+    for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
+         ++numberOfSearchChars)
+        ;
+}
+
+void RuProgFinder::initAlphabetList()
+{
+    for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
+    {
+        new MythUIButtonListItem(m_alphabetList, QString::fromUtf8(searchChars[charNum]));
+    }
+}
+
+// search by cyrillic and latin alphabet
+// @ all programm
+void RuProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings
+&bindings)
+{
+   QDateTime progStart = QDateTime::currentDateTime();
+   QString searchChar = m_alphabetList->GetValue();
+
+   if (searchChar.isEmpty())
+       searchChar = searchChars[0];
+
+
+  if (searchChar.contains('@'))
+   {
+       where = "SELECT DISTINCT title FROM program WHERE ( "
+                  "title NOT REGEXP '^[A-Z0-9]' AND "
+                  "title NOT REGEXP '^The [A-Z0-9]' AND "
+                  "title NOT REGEXP '^A [A-Z0-9]' AND "
+                  "title NOT REGEXP '^[0-9]' AND "
+                  "starttime > :STARTTIME ) ";
+       if (!m_searchStr.isEmpty())
+       {
+           where += "AND title LIKE :SEARCH ";
+           bindings[":SEARCH"] = '%' + m_searchStr + '%';
+       }
+
+       where += "ORDER BY title;";
+
+       bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
+   }
+   else
+   {
+       QString one = searchChar + '%';
+       QString two = QString("The ") + one;
+       QString three = QString("A ") + one;
+       QString four = QString("An ") + one;
+       QString five = QString("\"") + one;
+
+       where = "SELECT DISTINCT title "
+               "FROM program "
+               "WHERE ( title LIKE :ONE OR title LIKE :TWO "
+               "        OR title LIKE :THREE "
+               "        OR title LIKE :FOUR  "
+               "        OR title LIKE :FIVE )"
+               "AND starttime > :STARTTIME ";
+       if (!m_searchStr.isEmpty())
+           where += "AND title LIKE :SEARCH ";
+
+       where += "ORDER BY title;";
+
+       bindings[":ONE"] = one;
+       bindings[":TWO"] = two;
+       bindings[":THREE"] = three;
+       bindings[":FOUR"] = four;
+       bindings[":FIVE"] = five;
+       bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
+
+       if (!m_searchStr.isEmpty())
+           bindings[":SEARCH"] = '%' + m_searchStr + '%';
+   }
+}
+
+bool RuProgFinder::formatSelectedData(QString& data)
+{
+    (void)data;
+    return true;
+}
+
+bool RuProgFinder::formatSelectedData(QString& data, int charNum)
+{
+    (void)data;
+    (void)charNum;
+    return true;
+}
+
+void RuProgFinder::restoreSelectedData(QString& data)
+{
+    (void)data;
+}
 //////////////////////////////////////////////////////////////////////////////
 
 SearchInputDialog::SearchInputDialog(MythScreenStack *parent,

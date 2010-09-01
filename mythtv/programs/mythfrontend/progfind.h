@@ -128,6 +128,25 @@ class HeProgFinder : public ProgFinder
     static const char* searchChars[];
     int numberOfSearchChars;
 };
+///////////////////////////////
+class RuProgFinder : public ProgFinder
+{
+  public:
+    explicit RuProgFinder(MythScreenStack *parentStack, bool gg = false, 
+                       TV *player = NULL, bool embedVideo = false);
+                       
+  protected:
+    virtual void initAlphabetList();
+    virtual bool formatSelectedData(QString &data);
+    virtual bool formatSelectedData(QString &data, int charNum);
+    virtual void restoreSelectedData(QString &data);
+    virtual void whereClauseGetSearchData(QString &where, MSqlBindings &bindings);
+                                             
+  private:
+    static const char* searchChars[];
+    int numberOfSearchChars;
+};
+///////////////////////////////////
 
 class SearchInputDialog : public MythTextInputDialog
 {
