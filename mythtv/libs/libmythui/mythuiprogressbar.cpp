@@ -157,6 +157,11 @@ void MythUIProgressBar::CalculatePosition(void)
     SetRedraw();
 }
 
+void MythUIProgressBar::Finalize()
+{
+    CalculatePosition();
+}
+
 void MythUIProgressBar::CopyFrom(MythUIType *base)
 {
     MythUIProgressBar *progressbar = dynamic_cast<MythUIProgressBar *>(base);
