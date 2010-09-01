@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
     <window name="MythPopupBox">
         <fontdef name="basesmall" face="Droid Sans">
@@ -32,9 +34,11 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,100%,30</area>
-                    <imagetype name="buttonbackground">
-                        <gradient start="#505050" end="#000000" alpha="200" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <area>0,0,100%,30</area>
                         <align>allcenter</align>
@@ -68,14 +72,18 @@
                     </imagetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmall_normal_inactive</font>
                     </textarea>
