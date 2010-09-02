@@ -1918,9 +1918,9 @@ static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
 static HostSpinBox *OSDCC708TextZoomPercentage(void)
 {
     HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
-    gs->setLabel(QObject::tr("ATSC caption text zoom percentage"));
+    gs->setLabel(QObject::tr("Subtitle text zoom percentage"));
     gs->setValue(100);
-    gs->setHelpText(QObject::tr("Use this to enlarge or shrink captions."));
+    gs->setHelpText(QObject::tr("Use this to enlarge or shrink text based subtitles."));
 
     return gs;
 }
@@ -2120,6 +2120,8 @@ static HostCheckBox *UsePicControls()
 }
 #endif
 
+// This currently does not work
+/*
 static HostLineEdit *UDPNotifyPort()
 {
     HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
@@ -2131,6 +2133,7 @@ static HostLineEdit *UDPNotifyPort()
                     "http://www.mythtv.org/wiki/MythNotify ."));
     return ge;
 }
+*/
 
 static HostComboBox *PlaybackExitPrompt()
 {
@@ -4258,19 +4261,19 @@ OSDSettings::OSDSettings()
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
+    osd->addChild(CCBackground());
+    osd->addChild(DefaultCCMode());
+    osd->addChild(PreferCC708());
     osd->addChild(SubtitleFont());
+    osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
-    osd->addChild(UDPNotifyPort());
+    //osd->addChild(UDPNotifyPort());
     addChild(osd);
 
-    VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
-    cc->setLabel(QObject::tr("Closed Captions"));
+    //VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
+    //cc->setLabel(QObject::tr("Closed Captions"));
     //cc->addChild(DecodeVBIFormat());
-    cc->addChild(CCBackground());
-    cc->addChild(DefaultCCMode());
-    cc->addChild(PreferCC708());
-    cc->addChild(OSDCC708TextZoomPercentage());
-    addChild(cc);
+    //addChild(cc);
 
 #if CONFIG_DARWIN
     // Any Mac OS-specific OSD stuff would go here.

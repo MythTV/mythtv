@@ -18,7 +18,7 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name) :
     m_player(player),  m_subreader(NULL),   m_608reader(NULL),
     m_708reader(NULL), m_safeArea(QRect()), m_useBackground(false),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
-    m_708fontZoom(100),                     m_refreshArea(false)
+    m_textFontZoom(100),                    m_refreshArea(false)
 {
     m_708fontSizes[0] = 36;
     m_708fontSizes[1] = 45;
@@ -64,7 +64,7 @@ bool SubtitleScreen::Create(void)
     if (!m_708reader)
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to get CEA-708 reader.");
     m_useBackground = (bool)gCoreContext->GetNumSetting("CCBackground", 0);
-    m_708fontZoom   = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
+    m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     return true;
 }
 
@@ -295,7 +295,8 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         if (oldsafe != m_safeArea)
         {
             changed = true;
-            gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / 18);
+            int height = (m_safeArea.height() * m_textFontZoom) / 1800;
+            gTextSubFont->GetFace()->setPixelSize(height);
             gTextSubFont->SetColor(Qt::white);
             gTextSubFont->SetOutline(true, Qt::black, 2, 255);
         }
@@ -374,7 +375,8 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
         m_safeArea = m_player->getVideoOutput()->GetSafeRect();
         if (oldsafe != m_safeArea)
         {
-            gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / 18);
+            int height = (m_safeArea.height() * m_textFontZoom) / 1800;
+            gTextSubFont->GetFace()->setPixelSize(height);
             gTextSubFont->SetColor(Qt::white);
             gTextSubFont->SetOutline(true, Qt::black, 2, 255);
         }
@@ -624,7 +626,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         {
             for (uint i = 0; i < 8; i++)
                 cc708service->windows[i].changed = true;
-            int size = (m_safeArea.height() * m_708fontZoom) / 2000;
+            int size = (m_safeArea.height() * m_textFontZoom) / 2000;
             m_708fontSizes[1] = size;
             m_708fontSizes[0] = size * 32 / 42;
             m_708fontSizes[2] = size * 42 / 32;
