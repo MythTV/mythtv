@@ -118,6 +118,7 @@ const char *ff_codec_id_string(enum CodecID codec_id)
         case CODEC_ID_FRAPS:            return "FRAPS";
         case CODEC_ID_TRUEMOTION2:      return "TRUEMOTION2";
         case CODEC_ID_BMP:              return "BMP";
+        case CODEC_ID_VP8:              return "VP8";
 
             /* various pcm "codecs" */
         case CODEC_ID_PCM_S16LE:        return "PCM_S16LE";

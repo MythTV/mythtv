@@ -134,6 +134,13 @@ MythCodecID NuppelDecoder::GetVideoCodecID(void) const
     return (value);
 }
 
+QString NuppelDecoder::GetRawEncodingType(void)
+{
+    if (mpa_vidctx)
+        return ff_codec_id_string(mpa_vidctx->codec_id);
+    return QString();
+}
+
 bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 {
     if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)

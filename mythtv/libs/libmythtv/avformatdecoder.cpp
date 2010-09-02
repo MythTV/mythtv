@@ -4491,6 +4491,14 @@ QString AvFormatDecoder::GetCodecDecoderName(void) const
     return get_decoder_name(video_codec_id);
 }
 
+QString AvFormatDecoder::GetRawEncodingType(void)
+{
+    int stream = selectedTrack[kTrackTypeVideo].av_stream_index;
+    if (stream < 0 || !ic)
+        return QString();
+    return ff_codec_id_string(ic->streams[stream]->codec->codec_id);
+}
+
 void *AvFormatDecoder::GetVideoCodecPrivate(void)
 {
     return NULL; // TODO is this still needed
