@@ -31,6 +31,7 @@
 #include "mythprogressdialog.h"
 #include "mythimage.h"
 #include "remotefile.h"
+#include "mythcorecontext.h"
 
 #define LOC      QString("MythUIHelper: ")
 #define LOC_ERR  QString("MythUIHelper, Error: ")
@@ -92,8 +93,6 @@ class MythUIHelperPrivate
     QString   m_themename;
     QPalette  m_palette;           ///< Colour scheme
 
-    QString language;
-
     float m_wmult, m_hmult;
     float m_pixelAspectRatio;
 
@@ -148,7 +147,6 @@ int MythUIHelperPrivate::h_override = -1;
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
     : m_qtThemeSettings(new Settings()),
       m_themeloaded(false),
-      language(""),
       m_wmult(1.0), m_hmult(1.0), m_pixelAspectRatio(-1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
@@ -406,7 +404,7 @@ bool MythUIHelper::IsTopScreenInitialized(void)
 
 void MythUIHelper::LoadQtConfig(void)
 {
-    d->language.clear();
+    gCoreContext->ResetLanguage();
     d->themecachedir.clear();
 
     if (GetMythDB()->GetNumSetting("UseVideoModes", 0))
@@ -1497,30 +1495,6 @@ QFont MythUIHelper::GetSmallFont(void)
     font.setWeight(QFont::Bold);
 
     return font;
-}
-
-/** \fn MythUIHelper::GetLanguage()
- *  \brief Returns two character ISO-639 language descriptor for UI language.
- *  \sa iso639_get_language_list()
- */
-QString MythUIHelper::GetLanguage(void)
-{
-    return GetLanguageAndVariant().left(2);
-}
-
-/** \fn MythUIHelper::GetLanguageAndVariant()
- *  \brief Returns the user-set language and variant.
- *
- *   The string has the form ll or ll_vv, where ll is the two character
- *   ISO-639 language code, and vv (which may not exist) is the variant.
- *   Examples include en_AU, en_CA, en_GB, en_US, fr_CH, fr_DE, pt_BR, pt_PT.
- */
-QString MythUIHelper::GetLanguageAndVariant(void)
-{
-    if (d->language.isEmpty())
-        d->language = GetMythDB()->GetSetting("Language", "EN_US").toLower();
-
-    return d->language;
 }
 
 void MythUIHelper::DisableScreensaver(void)

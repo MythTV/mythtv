@@ -17,6 +17,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "x11colors.h"
 #include "mythverbose.h"
+#include "mythcorecontext.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -1111,16 +1112,18 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
                 if ((value.isNull() || value.isEmpty()) &&
                     info.attribute("lang","").isEmpty())
                 {
-                    value = qApp->translate(
-                        "ThemeUI", getFirstText(info).toLatin1().constData());
+                    value = qApp->translate("ThemeUI",
+                                            getFirstText(element).toUtf8(),
+                                            NULL,
+                                            QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         ui->GetLanguageAndVariant())
+                         gCoreContext->GetLanguageAndVariant())
                 {
                     value = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         ui->GetLanguage())
+                         gCoreContext->GetLanguage())
                 {
                     value = getFirstText(info);
                 }
@@ -1249,16 +1252,18 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                 if ((value.isNull() || value.isEmpty()) &&
                     info.attribute("lang","").isEmpty())
                 {
-                    value = qApp->translate(
-                        "ThemeUI", getFirstText(info).toLatin1().constData());
+                    value = qApp->translate("ThemeUI",
+                                            getFirstText(element).toUtf8(),
+                                            NULL,
+                                            QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         ui->GetLanguageAndVariant())
+                         gCoreContext->GetLanguageAndVariant())
                 {
                     value = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         ui->GetLanguage())
+                         gCoreContext->GetLanguage())
                 {
                     value = getFirstText(info);
                 }

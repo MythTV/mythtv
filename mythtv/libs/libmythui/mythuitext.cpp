@@ -14,6 +14,7 @@
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
+#include "mythcorecontext.h"
 
 #include "compat.h"
 
@@ -620,12 +621,12 @@ bool MythUIText::ParseElement(
                                         QCoreApplication::UnicodeUTF8);
         }
         else if (element.attribute("lang","").toLower() ==
-                 GetMythUI()->GetLanguageAndVariant())
+                 gCoreContext->GetLanguageAndVariant())
         {
             m_Message = parseText(element);
         }
         else if (element.attribute("lang","").toLower() ==
-                 GetMythUI()->GetLanguage())
+                 gCoreContext->GetLanguage())
         {
             m_Message = parseText(element);
         }

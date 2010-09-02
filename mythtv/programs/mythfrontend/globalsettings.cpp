@@ -3399,7 +3399,7 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     if ((lang.isEmpty() || lang == "aar") &&
         !gCoreContext->GetSetting("Language", "").isEmpty())
     {
-        lang = iso639_str2_to_str3(GetMythUI()->GetLanguage().toLower());
+        lang = iso639_str2_to_str3(gCoreContext->GetLanguage().toLower());
     }
 
     QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();

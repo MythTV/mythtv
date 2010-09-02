@@ -17,6 +17,7 @@
 #include "mythuihelper.h"
 #include "mythuibutton.h"
 #include "mythuitextedit.h"
+#include "mythcorecontext.h"
 
 
 #define LOC      QString("MythUIVirtualKeyboard: ")
@@ -110,7 +111,7 @@ bool MythUIVirtualKeyboard::Create()
 
     BuildFocusList();
 
-    loadKeyDefinitions(GetMythUI()->GetLanguageAndVariant());
+    loadKeyDefinitions(gCoreContext->GetLanguageAndVariant());
     updateKeys(true);
 
     int screenWidth, screenHeight;

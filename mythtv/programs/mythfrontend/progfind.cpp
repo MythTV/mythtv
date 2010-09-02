@@ -37,11 +37,11 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
     // Language specific progfinder, if needed
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgFinder *programFind = NULL;
-    if (GetMythUI()->GetLanguage() == "ja")
+    if (gCoreContext->GetLanguage() == "ja")
         programFind = new JaProgFinder(mainStack, allowEPG, player, embedVideo);
-    else if (GetMythUI()->GetLanguage() == "he")
+    else if (gCoreContext->GetLanguage() == "he")
         programFind = new HeProgFinder(mainStack, allowEPG, player, embedVideo);
-    else if (GetMythUI()->GetLanguage() == "ru")
+    else if (gCoreContext->GetLanguage() == "ru")
         programFind = new RuProgFinder(mainStack, allowEPG, player, embedVideo);
     else // default
         programFind = new ProgFinder(mainStack, allowEPG, player, embedVideo);

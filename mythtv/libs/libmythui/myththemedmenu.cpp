@@ -18,6 +18,7 @@
 #include "mythsystem.h"
 #include "mythuihelper.h"
 #include "lcddevice.h"
+#include "mythcorecontext.h"
 
 // Mythdb headers
 #include "mythverbose.h"
@@ -466,12 +467,12 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                                            QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         GetMythUI()->GetLanguageAndVariant())
+                         gCoreContext->GetLanguageAndVariant())
                 {
                     text = parseText(info);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         GetMythUI()->GetLanguage())
+                         gCoreContext->GetLanguage())
                 {
                     text = parseText(info);
                 }
@@ -486,12 +487,12 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                                               QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         GetMythUI()->GetLanguageAndVariant())
+                         gCoreContext->GetLanguageAndVariant())
                 {
                     alttext = parseText(info);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         GetMythUI()->GetLanguage())
+                         gCoreContext->GetLanguage())
                 {
                     alttext = parseText(info);
                 }
@@ -533,12 +534,12 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                                                   QCoreApplication::UnicodeUTF8);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         GetMythUI()->GetLanguageAndVariant())
+                         gCoreContext->GetLanguageAndVariant())
                 {
                     description = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         GetMythUI()->GetLanguage())
+                         gCoreContext->GetLanguage())
                 {
                     description = getFirstText(info);
                 }

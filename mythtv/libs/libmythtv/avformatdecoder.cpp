@@ -225,7 +225,7 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     opts.decoders->append("ffmpeg");
     (*opts.equiv_decoders)["ffmpeg"].append("nuppel");
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
-    
+
 #ifdef USING_XVMC
     opts.decoders->append("xvmc");
     opts.decoders->append("xvmc-vld");
@@ -1589,7 +1589,7 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
                     .arg(tracks[kTrackTypeRawText].size()).arg(av_stream_index)
                     .arg(iso639_key_toName(lang)).arg(lang));
     StreamInfo si(av_stream_index, lang, 0, 0, 0);
-    tracks[kTrackTypeRawText].push_back(si);                    
+    tracks[kTrackTypeRawText].push_back(si);
 }
 
 /** \fn AvFormatDecoder::ScanDSMCCStreams(void)
@@ -3051,7 +3051,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     // frame and fixups aren't enabled for DVD.
     // Select reordered_opaque (PTS) timestamps if they are less faulty or the
     // the DTS timestamp is missing. Also use fixups for missing PTS instead of
-    // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is 
+    // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
     // more faulty or never detected.
     if (ringBuffer->isDVD())
     {
@@ -3677,7 +3677,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (w/lang)");
 
         // try to get the language track matching the frontend language.
-        QString language_key_convert = iso639_str2_to_str3(GetMythUI()->GetLanguage());
+        QString language_key_convert = iso639_str2_to_str3(gCoreContext->GetLanguage());
         uint language_key = iso639_str3_to_key(language_key_convert);
         uint canonical_key = iso639_key_to_canonical_key(language_key);
 

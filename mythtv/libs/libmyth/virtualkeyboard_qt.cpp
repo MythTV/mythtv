@@ -7,6 +7,7 @@
 #include "mythdialogs.h"
 #include "uitypes.h"
 #include "mythverbose.h"
+#include "mythcorecontext.h"
 
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
@@ -25,7 +26,7 @@ VirtualKeyboardQt::VirtualKeyboardQt(MythMainWindow *parent,
     setLineWidth(1);
     m_parentEdit = parentEdit;
 
-    SwitchLayout(GetMythUI()->GetLanguageAndVariant());
+    SwitchLayout(gCoreContext->GetLanguage());
 }
 
 void VirtualKeyboardQt::SwitchLayout(const QString &lang)

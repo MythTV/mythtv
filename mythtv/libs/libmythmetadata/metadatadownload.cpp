@@ -215,7 +215,7 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(GetMythUI()->GetLanguage()); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
 
     // If the inetref is populated, even in search mode,
     // become a getdata grab and use that.
@@ -251,7 +251,7 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(GetMythUI()->GetLanguage()); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
 
     // If the inetref is populated, even in search mode,
     // become a getdata grab and use that.
@@ -287,7 +287,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(GetMythUI()->GetLanguage()); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
 
     // If the inetref is populated, even in search mode,
     // become a getdata grab and use that.
@@ -327,7 +327,7 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(GetMythUI()->GetLanguage()); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
     args.append(QString("-N"));
     args.append(lookup->GetTitle());
     args.append(lookup->GetSubtitle());

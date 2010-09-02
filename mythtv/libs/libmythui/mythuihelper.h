@@ -94,9 +94,6 @@ class MPUBLIC MythUIHelper
 
     bool FindThemeFile(QString &filename);
 
-    QString GetLanguage(void);
-    QString GetLanguageAndVariant(void);
-
     QFont GetBigFont(void);
     QFont GetMediumFont(void);
     QFont GetSmallFont(void);
