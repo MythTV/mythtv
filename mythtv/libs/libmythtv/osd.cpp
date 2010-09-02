@@ -678,10 +678,10 @@ void OSD::CheckExpiry(void)
             {
                 QString replace = QObject::tr("%n second(s)", NULL,
                                               now.secsTo(it.value()));
-                QString newtext = m_PulsedDialogText.replace("%d", replace);
+                QString newtext = m_PulsedDialogText;
                 MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
-                    dialog->SetText(newtext);
+                    dialog->SetText(newtext.replace("%d", replace));
                 m_NextPulseUpdate = now.addSecs(1);
             }
         }
