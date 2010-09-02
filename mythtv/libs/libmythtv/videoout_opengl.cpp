@@ -166,7 +166,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         return false;
     }
 
-    if (input_size == window.GetVideoDim())
+    if (input_size == window.GetActualVideoDim())
     {
         if (window.GetVideoAspect() != aspect)
         {

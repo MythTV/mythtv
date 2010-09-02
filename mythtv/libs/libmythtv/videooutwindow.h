@@ -66,13 +66,14 @@ class VideoOutWindow
     /// \brief Returns if videooutput is embedding
     bool     IsEmbedding(void)           const { return embedding;       }
     QSize    GetVideoDim(void)           const { return video_dim;       }
+    QSize    GetActualVideoDim(void)     const { return video_dim_act;   }
+    QSize    GetVideoDispDim(void)       const { return video_disp_dim;  }
     QSize    GetDisplayDim(void)         const { return display_dim;     }
     float    GetMzScaleV(void)           const { return mz_scale_v;      }
     float    GetMzScaleH(void)           const { return mz_scale_h;      }
     QPoint   GetMzMove(void)             const { return mz_move;         }
     int         GetPIPSize(void)         const { return db_pip_size;     }
     PIPState    GetPIPState(void)        const { return pip_state;       }
-    QSize  GetVideoDispDim(void)         const { return video_disp_dim;  }
     float  GetOverridenVideoAspect(void) const { return overriden_video_aspect;}
     QRect  GetDisplayVisibleRect(void)   const { return display_visible_rect; }
     QRect  GetScreenGeometry(void)       const { return screen_geom; }
@@ -135,6 +136,7 @@ class VideoOutWindow
     // Video dimensions
     QSize   video_dim;        ///< Pixel dimensions of video buffer
     QSize   video_disp_dim;   ///< Pixel dimensions of video display area
+    QSize   video_dim_act;    ///< Pixel dimensions of the raw video stream
     float   video_aspect;     ///< Physical aspect ratio of video
 
     /// Normally this is the same as videoAspect, but may not be

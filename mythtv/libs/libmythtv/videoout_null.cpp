@@ -105,7 +105,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&global_lock);
 
-    if (input_size == window.GetVideoDispDim())
+    if (input_size == window.GetActualVideoDim())
     {
         vbuffers.Clear();
         MoveResize();

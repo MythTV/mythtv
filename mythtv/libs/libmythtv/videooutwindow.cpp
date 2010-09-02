@@ -68,7 +68,8 @@ VideoOutWindow::VideoOutWindow() :
     display_dim(400, 300), display_aspect(1.3333f),
 
     // Video dimensions
-    video_dim(640, 480), video_disp_dim(640, 480), video_aspect(1.3333f),
+    video_dim(640, 480),     video_disp_dim(640, 480),
+    video_dim_act(640, 480), video_aspect(1.3333f),
 
     // Aspect override
     overriden_video_aspect(1.3333f), aspectoverride(kAspect_Off),
@@ -132,7 +133,7 @@ void VideoOutWindow::MoveResize(void)
     // Avoid too small frames for audio only streams (for OSD).
     if ((video_rect.width() <= 0) || (video_rect.height() <= 0))
     {
-        video_disp_dim = display_visible_rect.size();
+        video_disp_dim = video_dim_act = display_visible_rect.size();
         video_dim      = fix_alignment(display_visible_rect.size());
         video_rect     = QRect(QPoint(0, 0), video_dim);
     }
@@ -463,6 +464,7 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
     if (pip_state == kPBPRight)
             display_visible_rect.moveLeft(pbp_width);
 
+    video_dim_act  = new_video_dim;
     video_disp_dim = fix_1080i(new_video_dim);
     video_dim = fix_alignment(new_video_dim);
     video_rect = QRect(display_visible_rect.topLeft(), video_disp_dim);
@@ -565,6 +567,7 @@ bool VideoOutWindow::InputChanged(const QSize &input_size, float aspect,
     (void) myth_codec_id;
     (void) codec_private;
 
+    video_dim_act  = input_size;
     video_disp_dim = fix_1080i(input_size);
     video_dim = fix_alignment(input_size);
 

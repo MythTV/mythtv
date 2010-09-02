@@ -1186,7 +1186,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
             .arg(input_size.height()).arg(aspect));
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size != window.GetVideoDispDim();
+    bool res_changed = input_size != window.GetActualVideoDim();
     bool asp_changed = aspect != window.GetVideoAspect();
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,

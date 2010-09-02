@@ -289,7 +289,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     QMutexLocker locker(&global_lock);
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size     != window.GetVideoDispDim();
+    bool res_changed = input_size     != window.GetActualVideoDim();
     bool asp_changed = aspect         != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
