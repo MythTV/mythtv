@@ -25,7 +25,8 @@
 
 #define CHECK_ST \
   ok &= (vdp_st == VDP_STATUS_OK); \
-  if (!ok) { \
+  if (!ok) \
+  { \
       VERBOSE(VB_GENERAL, LOC_ERR + QString("Error at %1:%2 (#%3, %4)") \
               .arg(__FILE__).arg( __LINE__).arg(vdp_st) \
               .arg(vdp_get_error_string(vdp_st))); \

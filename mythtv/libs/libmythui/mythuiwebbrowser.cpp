@@ -4,7 +4,7 @@
  * \brief Provide a web browser widget.
  *
  * This requires qt4.4.0 or later to function properly.
- * 
+ *
  */
 
 #include "mythuiwebbrowser.h"
@@ -51,7 +51,7 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
  */
 void MythWebView::keyPressEvent(QKeyEvent *event)
 {
-    // if the QWebView widget has focus then all keypresses from a regular keyboard 
+    // if the QWebView widget has focus then all keypresses from a regular keyboard
     // get sent here first
     if (m_parentBrowser && m_parentBrowser->IsInputToggled())
     {
@@ -130,7 +130,8 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
     imageBuffer.open(QBuffer::ReadWrite);
     QIcon icon = style()->standardIcon(QStyle::SP_MessageBoxWarning, 0, this);
     QPixmap pixmap = icon.pixmap(QSize(32,32));
-    if (pixmap.save(&imageBuffer, "PNG")) {
+    if (pixmap.save(&imageBuffer, "PNG"))
+    {
         html.replace(QLatin1String("IMAGE_BINARY_DATA_HERE"),
                      QString(QLatin1String(imageBuffer.buffer().toBase64())));
     }
@@ -166,7 +167,7 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
  *
  * This is how you would add the widget to a theme file :-
  *
- * 
+ *
  *      <webbrowser name="webbrowser">
  *           <url>http://www.google.com/</url>
  *           <area>20,55,760,490</area>
@@ -455,7 +456,7 @@ void MythUIWebBrowser::SetZoom(float zoom)
 
 /** \fn MythUIWebBrowser::GetZoom()
  *  \brief Get the current zoom level
- *  \return the zoom level 
+ *  \return the zoom level
  */
 float MythUIWebBrowser::GetZoom(void)
 {

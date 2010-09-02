@@ -26,10 +26,8 @@ MythDialogBox::MythDialogBox(const QString &text,
                              bool fullscreen, bool osd)
          : MythScreenType(parent, name, false)
 {
-    m_id = "";
     m_retObject = NULL;
     m_titlearea = NULL;
-    m_title = "";
     m_text = text;
     m_textarea = NULL;
     m_buttonList = NULL;

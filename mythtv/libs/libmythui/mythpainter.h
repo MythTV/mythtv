@@ -3,8 +3,12 @@
 
 #include <QString>
 #include <QWidget>
+#include <QPaintDevice>
 
 class QRect;
+class QRegion;
+class QPoint;
+class QColor;
 
 //  #include "mythfontproperties.h"
 
@@ -46,10 +50,10 @@ class MPUBLIC MythPainter
                           const QRect &boundRect) = 0;
 
     virtual void DrawRect(const QRect &area,
-                          bool drawFill, const QColor &fillColor, 
+                          bool drawFill, const QColor &fillColor,
                           bool drawLine, int lineWidth, const QColor &lineColor) = 0;
-    virtual void DrawRoundRect(const QRect &area, int radius, 
-                               bool drawFill, const QColor &fillColor, 
+    virtual void DrawRoundRect(const QRect &area, int radius,
+                               bool drawFill, const QColor &fillColor,
                                bool drawLine, int lineWidth, const QColor &lineColor) = 0;
 
     virtual MythImage *GetFormatImage() = 0;
@@ -66,4 +70,4 @@ class MPUBLIC MythPainter
     static int    m_MaxCacheSize;
 };
 
-#endif  
+#endif
