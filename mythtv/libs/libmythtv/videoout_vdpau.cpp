@@ -180,7 +180,8 @@ bool VideoOutputVDPAU::InitBuffers(void)
     QMutexLocker locker(&m_lock);
     if (!m_render)
         return false;
-    const QSize video_dim = window.GetVideoDim();
+    const QSize video_dim = codec_is_std(video_codec_id) ?
+                            window.GetVideoDim() : window.GetActualVideoDim();
 
     vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
 
@@ -250,7 +251,8 @@ bool VideoOutputVDPAU::CreateVideoSurfaces(uint num)
         return false;
 
     bool ret = true;
-    QSize size = window.GetVideoDim();
+    const QSize size = codec_is_std(video_codec_id) ?
+                       window.GetVideoDim() : window.GetActualVideoDim();
     for (uint i = 0; i < num; i++)
     {
         uint tmp = m_render->CreateVideoSurface(size);
@@ -601,7 +603,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
                 return;
         }
 
-        m_decoder = m_render->CreateDecoder(QSize(frame->width, frame->height),
+        m_decoder = m_render->CreateDecoder(window.GetActualVideoDim(),
                                             vdp_decoder_profile, max_refs);
         if (m_decoder)
         {
