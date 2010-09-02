@@ -264,14 +264,15 @@ bool OSD::IsVisible(void)
     return false;
 }
 
-void OSD::HideAll(bool keepsubs)
+void OSD::HideAll(bool keepsubs, MythScreenType* except)
 {
     QMutableHashIterator<QString, MythScreenType*> it(m_Children);
     while (it.hasNext())
     {
         it.next();
-        if (!(keepsubs && (it.key() == OSD_WIN_SUBTITLE ||
-            it.key() == OSD_WIN_TELETEXT)))
+        if (!((keepsubs && (it.key() == OSD_WIN_SUBTITLE ||
+            it.key() == OSD_WIN_TELETEXT)) ||
+            it.value() == except))
             HideWindow(it.key());
     }
 }
@@ -675,8 +676,9 @@ void OSD::CheckExpiry(void)
         {
             if (!m_PulsedDialogText.isEmpty() && now > m_NextPulseUpdate)
             {
-                QString newtext = m_PulsedDialogText;
-                newtext.replace("%d", QString::number(now.secsTo(it.value())));
+                QString replace = QObject::tr("%n second(s)", NULL,
+                                              now.secsTo(it.value()));
+                QString newtext = m_PulsedDialogText.replace("%d", replace);
                 MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
                     dialog->SetText(newtext);
@@ -902,7 +904,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
     }
 
     DialogBack();
-    HideAll();
+    HideAll(true, m_Dialog);
     m_Dialog->SetVisible(true);
 }
 
