@@ -8616,6 +8616,9 @@ void TV::customEvent(QEvent *e)
         MythMainWindow *mwnd = GetMythMainWindow();
 
         StopEmbedding(actx);                // Undo any embedding
+        MythPainter *painter = GetMythPainter();
+        if (painter)
+            painter->FreeResources();
 
         mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
