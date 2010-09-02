@@ -36,6 +36,7 @@
 #include <metadata/videoscan.h>
 #include <metadata/globals.h>
 #include <metadata/videometadatalistmanager.h>
+#include <metadata/parentalcontrols.h>
 #include <metadata/videoutils.h>
 #include <metadata/dbaccess.h>
 #include <metadata/dirscan.h>
@@ -49,9 +50,6 @@
 #include "fileassoc.h"
 #include "playersettings.h"
 #include "metadatasettings.h"
-
-QEvent::Type ImageDLEvent::kEventType =
-    (QEvent::Type) QEvent::registerEventType();
 
 namespace
 {
