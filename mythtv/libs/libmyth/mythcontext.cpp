@@ -567,7 +567,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     s << "DBHostName=" << params.dbHostName << endl;
 
     s << "\n"
-      << "# By default, Myth tries to ping the DB host to see if it exists.\n"
+      << "# By default, MythTV tries to ping the DB host to see if it exists.\n"
       << "# If your DB host or network doesn't accept pings, set this to no:\n"
       << "#\n";
 
@@ -986,7 +986,11 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     switch (selected)
     {
         case kDialogCodeButton0:
-            WriteSettingsFile(m_DBparams, true);
+            if (!WriteSettingsFile(m_DBparams, true))
+            {
+                VERBOSE(VB_IMPORTANT, "WriteSettingsFile failed.");
+                return -1;
+            }
             // User prefers mysql.txt, so throw away default UPnP backend:
             m_XML->SetValue(kDefaultUSN, "");
             m_XML->Save();
