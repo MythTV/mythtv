@@ -1136,6 +1136,11 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
     while (bufs.size() < allocSize())
     {
         unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
+        if (!data)
+        {
+            VERBOSE(VB_IMPORTANT, "Failed to allocate memory for frame.");
+            return false;
+        }
 
         bufs.push_back(data);
         yuvinfo.push_back(YUVInfo(width, height, buf_size, NULL, NULL));
