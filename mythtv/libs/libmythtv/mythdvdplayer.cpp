@@ -173,7 +173,8 @@ bool MythDVDPlayer::JumpToFrame(uint64_t frame)
 
 void MythDVDPlayer::EventStart(void)
 {
-    player_ctx->buffer->DVD()->SetParent(this);
+    if (player_ctx->buffer->DVD())
+        player_ctx->buffer->DVD()->SetParent(this);
     MythPlayer::EventStart();
 }
 
@@ -194,7 +195,8 @@ void MythDVDPlayer::ResetPlaying(bool resetframes)
 
 void MythDVDPlayer::EventEnd(void)
 {
-    player_ctx->buffer->DVD()->SetParent(NULL);
+    if (player_ctx->buffer->DVD())
+        player_ctx->buffer->DVD()->SetParent(NULL);
 }
 
 bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
