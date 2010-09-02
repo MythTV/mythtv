@@ -840,15 +840,16 @@ void CustomEdit::customEvent(QEvent *event)
 
         if (resultid == "storeruledialog")
         {
-             if (resulttext.startsWith(tr("Delete")))
-             {
-                 deleteRule();
-             }
-             else if (!resulttext.isEmpty())
-             {
-                 storeRule(resulttext.contains(tr("as a search")),
-                           !resulttext.startsWith(tr("Replace")));
-             }
+            if (resulttext.startsWith(tr("Delete")))
+            {
+                deleteRule();
+            }
+            else if (!resulttext.isEmpty())
+            {
+                storeRule(resulttext.contains(tr("as a search")),
+                        !resulttext.startsWith(tr("Replace")));
+                loadData();
+            }
         }
     }
 }
