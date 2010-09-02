@@ -53,7 +53,7 @@
             <position>20,660</position>
             <value>Cancel</value>
         </button>
-    
+
         <button name="save" from="basebutton">
             <position>1110,660</position>
             <value>Save</value>
@@ -225,7 +225,7 @@
         </buttonlist>
 
         <progressbar name="downloadprogressbar" from="baseprogressbar">
-            <area>680,30,560,40</area>
+            <position>680,30</position>
         </progressbar>
 
         <statetype name="fullpreviewstate">
