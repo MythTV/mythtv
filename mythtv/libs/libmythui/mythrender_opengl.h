@@ -92,6 +92,7 @@ class MythRenderOpenGL : public QGLContext, public MythRender
                         uint data_fmt = GL_BGRA, uint internal_fmt = GL_RGBA8,
                         uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
     QSize GetTextureSize(uint type, const QSize &size);
+    QSize GetTextureSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
     uint  CreateHelperTexture(void);
