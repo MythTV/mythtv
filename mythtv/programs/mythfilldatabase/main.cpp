@@ -453,7 +453,10 @@ int main(int argc, char *argv[])
             cout << "--refresh-day <number>";
             cout << "   (Only valid for selected grabbers: e.g. DataDirect)\n";
             cout << "   Force a refresh today, two days, every day, or a specific day from now,\n";
-            cout << "   to catch the latest changes.  DataDirect users, see --dd-grab-all.\n";
+            cout << "   to catch the latest changes.  --refresh-all will update every day except\n";
+            cout << "   the current day. To refresh today and all following days, XMLTV users\n";
+            cout << "   should combine --refresh-today and --refresh-all.  Schedules Direct/\n";
+            cout << "   DataDirect users should use --dd-grab-all.\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will always be refreshed unless this argument is used\n";
             cout << "--dont-refresh-tba\n";
