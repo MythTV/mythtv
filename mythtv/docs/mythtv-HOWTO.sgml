@@ -67,11 +67,10 @@ Other modules in MythTV include:
 <itemize>
 <item>MythArchive, a tool to create DVDs
 <item>MythBrowser, a web browser
-<item>MythFlix, a Netflix module
-<item>MythGallery, a picture-viewing application
+<item>MythGallery, a photo-viewing application
 <item>MythGame
-<item>MythMusic, a music playing / ripping application which supports MP3
-and FLAC
+<item>MythMusic, a music playing / ripping application
+<item>MythNetVision, an internet video browser and viewer
 <item>MythNews, a RSS news grabber
 <item>MythVideo, DVD ripper and a media-viewer for content not created within MythTV
 <item>MythWeather
@@ -91,10 +90,6 @@ like to install a custom version of Arch Linux optimized for MythTV.
 
 See <url url="http://www.minimyth.org" name="http://www.minimyth.org"> for a
 small MythTV distribution which can be booted over a network.
-
-See <url url="http://wilsonet.com/mythtv/"
-name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
-Fedora Core distribution.
 
 See <url url="http://www.mythbuntu.org/" name="http://www.mythbuntu.org/">
 for a distribution using a customized Ubuntu.
@@ -538,7 +533,7 @@ For 720p content (1280x720), a 2.4GHz P4 should be sufficient.
 
 For 1920x1080i->1920x1080p with the better deinterlacing methods done in
 real time a 2.4GHz CPU is taxed, but should work if you use "Bob and Weave"
-deinterlacing, or if you have an NVIDIA card with video decode acceleration. 
+deinterlacing, or if you have an NVIDIA card with video decode acceleration.
 
 <sect2>Playback of HDTV using VDPAU
 <p>NVIDIA now incorporates MPEG-2 and H.264 decode acceleration in their
@@ -550,7 +545,7 @@ at 1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264 if it has
 VDPAU supported video.
 
 <sect3>Firewire.
-<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
+<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
 If your provider uses 5C encryption on a particular channel, you won't be
 able to get any content.  Many users have resorted to using Firewire to
 change channels on their set-top-box and capture the High Def video using
@@ -847,11 +842,11 @@ The reference compilation system for MythTV is Ubuntu.
 <p>The runtime manager for shared libraries, <bf>/lib/ld.so</bf>, gets
 information about the locations and contents of shared libraries from
 <tt>/etc/ld.so.cache</tt>, a file created by <bf>ldconfig</bf> from
-information in <tt>/etc/ld.so.conf</tt>.  Because MythTV installs 
+information in <tt>/etc/ld.so.conf</tt>.  Because MythTV installs
 shared libraries in <tt>/usr/local/lib</tt>, that directory needs to be
 added to the list of directories for <bf>ld.so</bf> to search when doing
 runtime linking of programs, if it is not already there.  You do this, as
-root, by editing <tt>/etc/ld.so.conf</tt>, then running <bf>ldconfig</bf>. 
+root, by editing <tt>/etc/ld.so.conf</tt>, then running <bf>ldconfig</bf>.
 There are many ways to do this; to determine the way that your distribution
 is configured, type:
 
@@ -1176,7 +1171,7 @@ you must grant access to the database from remote systems.  By default, the
 
 To allow other hosts access to your master database, you can either
 configure MySQL database access with no security or with additional
-granularity. 
+granularity.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -1231,7 +1226,7 @@ TODO:  UPDATE FOR NEW SOUND CODE in 0.24
 <sect>Setting up a remote control.
 <p>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
-with <bf>lirc</bf>, the Linux Infrared Remote Control program. 
+with <bf>lirc</bf>, the Linux Infrared Remote Control program.
 <bf>lirc</bf> handles the IR hardware and passes keystrokes to MythTV, which
 then acts as if the user had pressed the keys on the keyboard.  The file
 <tt>keys.txt</tt> describes the keys used to control MythTV.
@@ -1253,7 +1248,7 @@ receiver senses the pulses and sends them to the lirc daemon.  The lircd
 loads a file called <tt>lircd.conf</tt> which instructs it how interpret the
 IR pulses that it received and convert them to a human-readable name.
 
-For example, the hardware may receive pulses may correlate to "Channel Up". 
+For example, the hardware may receive pulses may correlate to "Channel Up".
 The <tt>lircd.conf</tt> file will then contain a line that looks something
 like this:
 
@@ -1782,7 +1777,7 @@ go into the Default Storage Group where they'll be the first programs
 eligible for expiration if the system needs free space for recordings.
 
 Usage information for all Storage Group directories is visible on the
-mythfrontend status screen as well as the mythbackend status webpage. 
+mythfrontend status screen as well as the mythbackend status webpage.
 MythTV is smart enough to determine which directories are on shared
 filesystems so it should not count free or used space multiple times if you
 have more than one directory on the same filesystem.
@@ -5414,7 +5409,7 @@ libmp3lame library.
 <sect2>Can't change the channel when watching Live TV.
 <p>Something's wrong with your program database.  Did mythfilldatabase run
 with no major errors?  Or, MythTV may not have permissions to the
-appropriate video4linux devices. 
+appropriate video4linux devices.
 
 <sect2>Screen goes black when you try to play something
 <p>MythTV prints error and status messages to the shell that was used to
@@ -5792,7 +5787,7 @@ masterbackend:/var/video /var/video nfs hard,intr,nfsvers=3,actimeo=0
 
 Then run <tt># mount -a</tt> to re-read the file to mount the file system.
 
-<bf>NOTE</bf>:  Previous versions of this HOWTO gave specific values for 
+<bf>NOTE</bf>:  Previous versions of this HOWTO gave specific values for
 variables like the "rsize".  Best common practice at this point is to <em>not</em>
 specify these and allow the server and the client to autonegotiate.
 

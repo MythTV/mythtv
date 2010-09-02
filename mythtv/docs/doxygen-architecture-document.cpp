@@ -53,13 +53,13 @@ There are also a few simple \ref testing "testing shortcuts".
 
       Contains the \ref database_subsystem "database",
       and network support code (used by the
-      \ref myth_network_protocol "myth network protocol" and
+      \ref myth_network_protocol "MythTV network protocol" and
       \ref lcd_subsystem "LCDproc interface").
 
       This also contains some other basic functionality and classes which
       are used by one or more of libmyth, libmythui and libmythtv.
 
-      Any changes to this library's ABI may trigger a myth binary version
+      Any changes to this library's ABI may trigger a MythTV binary version
       change because the plugins depend on it.
 
   <dt>libmythui
@@ -70,7 +70,8 @@ There are also a few simple \ref testing "testing shortcuts".
       and screen saver control code are also contained in this library.
 
       This library depends on libmyth. Any changes to this library's ABI
-      may trigger a myth binary version change because the plugins depend on it.
+      may trigger a MythTV binary version change because the plugins depend on
+      it.
 
   <dt>libmythupnp            <dd>Simple uPnP (universal Plug and Play) support.
 
@@ -87,7 +88,7 @@ There are also a few simple \ref testing "testing shortcuts".
       This library depends on libav*, libmythdb, libmythui, libmythupnp,
       libmythsamplerate, libmythsoundtouch and libmythfreesurround.
 
-      Any changes to this library's ABI may trigger a myth binary version
+      Any changes to this library's ABI may trigger a MythTV binary version
       change because the plugins depend on it.
 
   <dt>libmythtv
@@ -100,10 +101,10 @@ There are also a few simple \ref testing "testing shortcuts".
       This library basically depends on all the other libraries!
 
       This library is used by some plugins so changes to it's ABI may
-      require a myth binary version change.
+      require a MythTV binary version change.
 
       Any changes to classes that are serialized by the
-      \ref myth_network_protocol "myth network protocol" (for example
+      \ref myth_network_protocol "MythTV network protocol" (for example
       ProgramInfo) or to the protocol itself require the protocol version
       number to be incremented.
 
@@ -223,7 +224,8 @@ The database schema is documented \ref db_schema "here".
   <dt>mythlcdserver    <dd>This is an interface between a number of Myth
                            clients and a small text display (LCDProc server).
   <dt>mythwelcome/mythshutdown
-      <dd>These programs manage Power Saving (shutdown/wakeup) on your Myth PCs.
+      <dd>These programs manage Power Saving (shutdown/wakeup) on your MythTV
+          PCs.
 </dl>
 
 \section fe_plugins Frontend Plugins
@@ -416,7 +418,7 @@ Other plugin functions are listed in the file \link mythpluginapi.h \endlink
 
 */
 
-/** \defgroup mtd                   MTD (the Myth Transcoding Daemon)
+/** \defgroup mtd                   MTD (the MythTV Transcoding Daemon)
 This line is filler that is ignored by Doxygen.
 
 The %MTD is a simple program that is used by the MythVideo plugin.
@@ -495,10 +497,10 @@ no dvd PATH
   forget about it.
  */
 
-/** \defgroup myth_media            Myth Media Manager
+/** \defgroup myth_media            MythTV Media Manager
 This line is filler that is ignored by Doxygen.
 
-The Myth Media Manager is a thread in the frontend which looks for any
+The MythTV Media Manager is a thread in the frontend which looks for any
 changes to removable media, and sends events to any Frontend Plugins
 which are interested in that media.
 
@@ -534,7 +536,7 @@ NOTMOUNTED
 \endverbatim
  */
 
-/** \defgroup myth_network_protocol Myth Network Protocol
+/** \defgroup myth_network_protocol MythTV Network Protocol
 This line is filler that is ignored by Doxygen.
 
 The MythTV backend process currently opens sockets for three different types
@@ -584,7 +586,7 @@ For a full understanding of all the commands, either read the source code
 
  */
 
-/** \defgroup myth_startup Myth Startup Sequence
+/** \defgroup myth_startup MythTV Startup Sequence
 This line is filler that is ignored by Doxygen.
 
 Most MythTV programs follow a common sequence:
@@ -649,7 +651,7 @@ to access these assets:
  */
 
 /**
-\defgroup lang_supp Myth Language Support
+\defgroup lang_supp MythTV Language Support
 This line is filler that is ignored by Doxygen.
 
 There are three sets of language translations in %MythTV;
