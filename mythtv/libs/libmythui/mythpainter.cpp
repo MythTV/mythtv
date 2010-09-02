@@ -12,6 +12,8 @@
 #include "mythfontproperties.h"
 #include "mythimage.h"
 
+int MythPainter::m_MaxCacheSize = 1024 * 1024 * 64;
+
 void MythPainter::SetClipRect(const QRect &)
 {
 }
@@ -42,3 +44,13 @@ void MythPainter::DrawImage(const QPoint &topLeft, MythImage *im, int alpha)
     DrawImage(topLeft.x(), topLeft.y(), im, alpha);
 }
 
+// the following assume graphics hardware operates natively at 32bpp
+void MythPainter::IncreaseCacheSize(QSize size)
+{
+    m_CacheSize += size.width() * size.height() * 4;
+}
+
+void MythPainter::DecreaseCacheSize(QSize size)
+{
+    m_CacheSize -= size.width() * size.height() * 4;
+}

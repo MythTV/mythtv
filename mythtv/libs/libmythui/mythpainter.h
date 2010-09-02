@@ -18,7 +18,7 @@ class MythImage;
 class MPUBLIC MythPainter
 {
   public:
-    MythPainter() : m_Parent(0) { }
+    MythPainter() : m_Parent(0), m_CacheSize(0) { }
     virtual ~MythPainter() { }
 
     virtual QString GetName(void) = 0;
@@ -58,7 +58,12 @@ class MPUBLIC MythPainter
     virtual void DeleteFormatImage(MythImage *im) = 0;
 
   protected:
+    void IncreaseCacheSize(QSize size);
+    void DecreaseCacheSize(QSize size);
+
     QPaintDevice *m_Parent;
+    int           m_CacheSize;
+    static int    m_MaxCacheSize;
 };
 
 #endif  
