@@ -11,7 +11,6 @@
 #include "mythpainter_d3d9.h"
 
 #define MAX_STRING_ITEMS 128
-#define MAX_D3D9_ITEMS  256
 #define LOC QString("D3D9 Painter: ")
 
 MythD3D9Painter::MythD3D9Painter(MythRenderD3D9 *render) :
@@ -142,6 +141,7 @@ void MythD3D9Painter::DeleteBitmaps(void)
     {
         D3D9Image *img = m_bitmapDeleteList.front();
         m_bitmapDeleteList.pop_front();
+        DecreaseCacheSize(img->GetSize());
         delete img;
     }
 }
@@ -280,15 +280,17 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
 
     if (newimage && newimage->IsValid())
     {
+        IncreaseCacheSize(im->size);
         newimage->UpdateImage(im);
         m_ImageBitmapMap[im] = newimage;
         m_ImageExpireList.push_back(im);
 
-        if (m_ImageExpireList.size() > MAX_D3D9_ITEMS)
+        while (m_CacheSize > m_MaxCacheSize)
         {
             MythImage *expiredIm = m_ImageExpireList.front();
             m_ImageExpireList.pop_front();
             DeleteFormatImage(expiredIm);
+            DeleteBitmaps();
         }
     }
     else

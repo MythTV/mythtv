@@ -20,8 +20,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythrender_opengl.h"
 
-#define MAX_GL_ITEMS 256
-#define MAX_STRING_ITEMS 256
+#define MAX_STRING_ITEMS 128
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
                                      QGLWidget *parent) :
@@ -54,7 +53,9 @@ void MythOpenGLPainter::DeleteTextures(void)
     QMutexLocker locker(&m_textureDeleteLock);
     while (!m_textureDeleteList.empty())
     {
-        realRender->DeleteTexture(m_textureDeleteList.front());
+        uint tex = m_textureDeleteList.front();
+        DecreaseCacheSize(realRender->GetTextureSize(tex));
+        realRender->DeleteTexture(tex);
         m_textureDeleteList.pop_front();
     }
     realRender->Flush(true);
@@ -136,13 +137,11 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 
     if (m_ImageIntMap.contains(im))
     {
-        long val = m_ImageIntMap[im];
-
         if (!im->IsChanged())
         {
             m_ImageExpireList.remove(im);
             m_ImageExpireList.push_back(im);
-            return val;
+            return m_ImageIntMap[im];
         }
         else
         {
@@ -157,17 +156,26 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
         realRender->CreateTexture(tx.size(),false, 0,
                                   GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8,
                                   GL_LINEAR_MIPMAP_LINEAR);
+
+    if (!tx_id)
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to create OpenGL texture.");
+        return tx_id;
+    }
+
+    IncreaseCacheSize(realRender->GetTextureSize(tx_id));
     realRender->GetTextureBuffer(tx_id, false);
     realRender->UpdateTexture(tx_id, tx.bits());
 
     m_ImageIntMap[im] = tx_id;
     m_ImageExpireList.push_back(im);
 
-    if (m_ImageExpireList.size() > MAX_GL_ITEMS)
+    while (m_CacheSize > m_MaxCacheSize)
     {
         MythImage *expiredIm = m_ImageExpireList.front();
         m_ImageExpireList.pop_front();
         DeleteFormatImage(expiredIm);
+        DeleteTextures();
     }
 
     return tx_id;

@@ -19,7 +19,6 @@
 #include "mythrender_vdpau.h"
 
 #define MAX_STRING_ITEMS 128
-#define MAX_VDPAU_ITEMS  256
 #define LOC QString("VDPAU Painter: ")
 
 MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
@@ -134,6 +133,7 @@ void MythVDPAUPainter::DeleteBitmaps(void)
     {
         uint bitmap = m_bitmapDeleteList.front();
         m_bitmapDeleteList.pop_front();
+        DecreaseCacheSize(m_render->GetBitmapSize(bitmap));
         m_render->DestroyBitmapSurface(bitmap);
     }
 }
@@ -280,12 +280,13 @@ uint MythVDPAUPainter::GetTextureFromCache(MythImage *im)
         m_render->UploadMythImage(newbitmap, im);
         m_ImageBitmapMap[im] = newbitmap;
         m_ImageExpireList.push_back(im);
-
-        if (m_ImageExpireList.size() > MAX_VDPAU_ITEMS)
+        IncreaseCacheSize(im->size());
+        while (m_CacheSize > m_MaxCacheSize)
         {
             MythImage *expiredIm = m_ImageExpireList.front();
             m_ImageExpireList.pop_front();
             DeleteFormatImage(expiredIm);
+            DeleteBitmaps();
         }
     }
     else

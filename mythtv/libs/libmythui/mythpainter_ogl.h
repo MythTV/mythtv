@@ -60,12 +60,12 @@ class MPUBLIC MythOpenGLPainter : public MythPainter
     int               target;
     bool              swapControl;
 
-    QMap<MythImage *, unsigned int> m_ImageIntMap;
-    std::list<MythImage *>          m_ImageExpireList;
-    QMap<QString, MythImage *>      m_StringToImageMap;
-    std::list<QString>              m_StringExpireList;
-    std::list<long long>            m_textureDeleteList;
-    QMutex                          m_textureDeleteLock;
+    QMap<MythImage *, uint>    m_ImageIntMap;
+    std::list<MythImage *>     m_ImageExpireList;
+    QMap<QString, MythImage *> m_StringToImageMap;
+    std::list<QString>         m_StringExpireList;
+    std::list<uint>            m_textureDeleteList;
+    QMutex                     m_textureDeleteLock;
 };
 
 #endif
