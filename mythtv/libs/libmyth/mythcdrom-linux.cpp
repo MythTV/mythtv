@@ -285,7 +285,10 @@ int MythCDROMLinux::SCSIstatus()
 MediaError MythCDROMLinux::eject(bool open_close)
 {
     if (!isDeviceOpen())
-        openDevice();
+    {
+        if (!openDevice())
+            return MEDIAERR_FAILED;
+    }
 
     if (open_close)
         return (ioctl(m_DeviceHandle, CDROMEJECT) == 0) ? MEDIAERR_OK
