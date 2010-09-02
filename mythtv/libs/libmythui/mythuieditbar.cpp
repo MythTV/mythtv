@@ -176,7 +176,7 @@ void MythUIEditBar::Display(void)
 }
 
 void MythUIEditBar::AddBar(MythUIShape *shape, MythUIImage *image,
-                           const QRect area)
+                           const QRect &area)
 {
     MythUIType *add = GetNew(shape, image);
     if (add)

@@ -27,7 +27,7 @@ class MPUBLIC MythUIEditBar : public MythUIType
 
   private:
 
-    void AddBar(MythUIShape *shape, MythUIImage *image, const QRect area);
+    void AddBar(MythUIShape *shape, MythUIImage *image, const QRect &area);
     void AddMark(MythUIShape *shape, MythUIImage *image, int start, bool left);
     MythUIType* GetNew(MythUIShape *shape, MythUIImage *image);
     void CalcInverseRegions(void);
