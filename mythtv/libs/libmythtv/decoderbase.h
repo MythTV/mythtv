@@ -138,7 +138,6 @@ class DecoderBase
     long long GetFramesRead(void) const { return framesRead; };
 
     virtual QString GetCodecDecoderName(void) const = 0;
-    virtual QString GetEncodingType(void)     const = 0;
     virtual MythCodecID GetVideoCodecID(void) const = 0;
     virtual void *GetVideoCodecPrivate(void) { return NULL; }
 

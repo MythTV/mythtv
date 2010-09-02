@@ -133,7 +133,6 @@ class AvFormatDecoder : public DecoderBase
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
 
     QString      GetCodecDecoderName(void) const;
-    QString      GetEncodingType(void) const;
     MythCodecID  GetVideoCodecID(void) const { return video_codec_id; }
     void        *GetVideoCodecPrivate(void);
 
@@ -282,7 +281,6 @@ class AvFormatDecoder : public DecoderBase
     bool pts_detected;
 
     bool using_null_videoout;
-    enum CodecID raw_codec_id;
     MythCodecID video_codec_id;
     bool no_hardware_decoders;
     bool allow_private_decoders;
