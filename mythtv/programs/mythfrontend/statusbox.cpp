@@ -857,7 +857,7 @@ void StatusBox::doJobQueueStatus()
     if (m_iconState)
         m_iconState->DisplayState("jobqueue");
     m_logList->Reset();
-    m_helpText->SetText(tr("Job Queue shows any jobs currently in Myth's Job "
+    m_helpText->SetText(tr("Job Queue shows any jobs currently in MythTV's Job "
                            "Queue such as a commercial detection job."));
 
     QMap<int, JobQueueEntry> jobs;

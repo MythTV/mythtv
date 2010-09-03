@@ -44,7 +44,7 @@ typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
 /**
  *  \class MythControls
  *
- *  \brief The myth controls configuration class.
+ *  \brief Screen for managing and configuring keyboard input bindings
  */
 class MythControls : public MythScreenType
 {
@@ -107,7 +107,7 @@ class MythControls : public MythScreenType
   private:
     void ShowMenu(void);
     void Close(void);
-    
+
     ViewType          m_currentView;
     MythUIButtonList    *m_leftList;
     MythUIButtonList    *m_rightList;

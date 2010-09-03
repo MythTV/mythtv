@@ -271,7 +271,7 @@ bool FillData::GrabDDData(Source source, int poffset,
     VERBOSE(VB_GENERAL, "Main temp tables populated.");
     if (!channel_update_run)
     {
-        VERBOSE(VB_GENERAL, "Updating myth channels.");
+        VERBOSE(VB_GENERAL, "Updating MythTV channels.");
         DataDirectStationUpdate(source);
         VERBOSE(VB_GENERAL, "Channels updated.");
         channel_update_run = true;
@@ -400,7 +400,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     else if (source.xmltvgrabber_prefmethod != "allatonce")
     {
         // XMLTV Docs don't recommend grabbing one day at a
-        // time but the current myth code is heavily geared
+        // time but the current MythTV code is heavily geared
         // that way so until it is re-written behave as
         // we always have done.
         command += QString(" --days 1 --offset %1").arg(offset);

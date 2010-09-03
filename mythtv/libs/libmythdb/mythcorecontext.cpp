@@ -672,7 +672,7 @@ MDBManager *MythCoreContext::GetDBManager(void)
 /** /brief Returns true if database is being ignored.
  *
  *  This was created for some command line only programs which
- *  still need myth libraries, such as channel scanners, channel
+ *  still need MythTV libraries, such as channel scanners, channel
  *  change programs, and the off-line commercial flagger.
  */
 bool MythCoreContext::IsDatabaseIgnored(void) const

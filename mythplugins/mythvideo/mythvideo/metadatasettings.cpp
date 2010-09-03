@@ -152,7 +152,7 @@ void MetadataSettings::slotFocusChanged(void)
     else if (GetFocusWidget() == m_trailerSpin)
         msg = tr("Number of trailers to play before a film.");
     else if (GetFocusWidget() == m_unknownFileCheck)
-        msg = tr("If set, all files below the Myth Video "
+        msg = tr("If set, all files below the MythVideo "
                  "directory will be displayed unless their "
                  "extension is explicitly set to be ignored.");
     else if (GetFocusWidget() == m_autoMetaUpdateCheck)

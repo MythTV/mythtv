@@ -1645,7 +1645,7 @@ void LCDProcClient::startVolume(QString app_name)
     if (lcd_showvolume)
       setPriority("Volume", TOP);
     if (lcdHeight > 1)
-        outputCenteredText("Volume", "Myth " + app_name + " Volume");
+        outputCenteredText("Volume", "MythTV " + app_name + " Volume");
     volume_level = 0.0;
 
     outputVolume();

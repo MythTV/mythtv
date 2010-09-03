@@ -163,7 +163,7 @@ bool extractDetailsFromFilename(const QString &inFile,
     }
     else
     {
-        VERBOSE(VB_JOBQUEUE, 
+        VERBOSE(VB_JOBQUEUE,
                 QString("Cannot find details for %1").arg(inFile));
         return false;
     }
@@ -201,10 +201,10 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
     {
         // file is not a myth recording or is no longer in the db
         pinfo = new ProgramInfo(inFile);
-        VERBOSE(VB_JOBQUEUE, "File is not a Myth recording.");
+        VERBOSE(VB_JOBQUEUE, "File is not a MythTV recording.");
     }
     else
-        VERBOSE(VB_JOBQUEUE, "File is a Myth recording.");
+        VERBOSE(VB_JOBQUEUE, "File is a MythTV recording.");
 
     return pinfo;
 }
@@ -249,7 +249,7 @@ bool getFileDetails(ArchiveItem *a)
     if (!file.open(QIODevice::ReadOnly))
         return false;
 
-    if (!doc.setContent( &file )) 
+    if (!doc.setContent( &file ))
     {
         file.close();
         return false;

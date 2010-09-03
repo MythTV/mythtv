@@ -15,7 +15,7 @@
 static HostLineEdit *MythArchiveTempDir()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveTempDir");
-    gc->setLabel(QObject::tr("Myth Archive Temp Directory"));
+    gc->setLabel(QObject::tr("MythArchive Temp Directory"));
     gc->setValue("");
     gc->setHelpText(QObject::tr("Location where MythArchive should create its "
             "temporory work files. LOTS of free space required here."));
@@ -25,7 +25,7 @@ static HostLineEdit *MythArchiveTempDir()
 static HostLineEdit *MythArchiveShareDir()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveShareDir");
-    gc->setLabel(QObject::tr("Myth Archive Share Directory"));
+    gc->setLabel(QObject::tr("MythArchive Share Directory"));
     gc->setValue(GetShareDir() + "mytharchive/");
     gc->setHelpText(QObject::tr("Location where MythArchive stores its scripts, "
             "intro movies and theme files"));
@@ -132,7 +132,7 @@ static HostCheckBox *MythArchiveUseFIFO()
     gc->setValue(true);
     gc->setHelpText(QObject::tr("The script will use FIFOs to pass the output"
             " of mplex into dvdauthor rather than creating intermediate files."
-            " Saves time and disk space during multiplex operations but not " 
+            " Saves time and disk space during multiplex operations but not "
             " supported on Windows platform"));
     return gc;
 };
@@ -196,7 +196,7 @@ static HostComboBox *MythArchiveDateFormat()
     gc->addSelection(sampdate.toString("M/d/yyyy"), "%m/%d/%Y");
     gc->addSelection(sampdate.toString("dd.MM.yyyy"), "%d.%m.%Y");
     gc->addSelection(sampdate.toString("yyyy-MM-dd"), "%Y-%m-%d");
-    gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "%a %b %d %Y"); 
+    gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "%a %b %d %Y");
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "%a %Y-%m-%d");
     gc->addSelection(sampdate.toString("ddd dd MMM yyyy"), "%a %d %b %Y");
     gc->setHelpText(QObject::tr("Your preferred date format to use on DVD menus.") + " " +
@@ -257,7 +257,7 @@ static HostLineEdit *MythArchiveDvdauthorCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveDvdauthorCmd");
     gc->setLabel(QObject::tr("dvdauthor command"));
     gc->setValue("dvdauthor");
-    gc->setHelpText(QObject::tr("Command to run dvdauthor.")); 
+    gc->setHelpText(QObject::tr("Command to run dvdauthor."));
     return gc;
 };
 
@@ -266,7 +266,7 @@ static HostLineEdit *MythArchiveMkisofsCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveMkisofsCmd");
     gc->setLabel(QObject::tr("mkisofs command"));
     gc->setValue("mkisofs");
-    gc->setHelpText(QObject::tr("Command to run mkisofs. (Used to create ISO images)")); 
+    gc->setHelpText(QObject::tr("Command to run mkisofs. (Used to create ISO images)"));
     return gc;
 };
 
@@ -275,7 +275,7 @@ static HostLineEdit *MythArchiveGrowisofsCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveGrowisofsCmd");
     gc->setLabel(QObject::tr("growisofs command"));
     gc->setValue("growisofs");
-    gc->setHelpText(QObject::tr("Command to run growisofs. (Used to burn DVD's)")); 
+    gc->setHelpText(QObject::tr("Command to run growisofs. (Used to burn DVD's)"));
     return gc;
 };
 
@@ -284,7 +284,7 @@ static HostLineEdit *MythArchiveM2VRequantiserCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveM2VRequantiserCmd");
     gc->setLabel(QObject::tr("M2VRequantiser command"));
     gc->setValue("M2VRequantiser");
-    gc->setHelpText(QObject::tr("Command to run M2VRequantiser. Optional - leave blank if you don't have M2VRequantiser installed.")); 
+    gc->setHelpText(QObject::tr("Command to run M2VRequantiser. Optional - leave blank if you don't have M2VRequantiser installed."));
     return gc;
 };
 
@@ -293,7 +293,7 @@ static HostLineEdit *MythArchiveJpeg2yuvCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveJpeg2yuvCmd");
     gc->setLabel(QObject::tr("jpeg2yuv command"));
     gc->setValue("jpeg2yuv");
-    gc->setHelpText(QObject::tr("Command to run jpeg2yuv. Part of mjpegtools package")); 
+    gc->setHelpText(QObject::tr("Command to run jpeg2yuv. Part of mjpegtools package"));
     return gc;
 };
 
@@ -302,7 +302,7 @@ static HostLineEdit *MythArchiveSpumuxCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveSpumuxCmd");
     gc->setLabel(QObject::tr("spumux command"));
     gc->setValue("spumux");
-    gc->setHelpText(QObject::tr("Command to run spumux. Part of dvdauthor package")); 
+    gc->setHelpText(QObject::tr("Command to run spumux. Part of dvdauthor package"));
     return gc;
 };
 
@@ -311,7 +311,7 @@ static HostLineEdit *MythArchiveMpeg2encCmd()
     HostLineEdit *gc = new HostLineEdit("MythArchiveMpeg2encCmd");
     gc->setLabel(QObject::tr("mpeg2enc command"));
     gc->setValue("mpeg2enc");
-    gc->setHelpText(QObject::tr("Command to run mpeg2enc. Part of mjpegtools package")); 
+    gc->setHelpText(QObject::tr("Command to run mpeg2enc. Part of mjpegtools package"));
     return gc;
 };
 

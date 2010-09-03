@@ -2456,7 +2456,7 @@ static void showUsage()
     cout << "       method is the method to used to calc the file duration\n";
     cout << "       0 - use av_estimate_timings() (quick but not very accurate)\n";
     cout << "       1 - read all frames (most accurate but slow)\n";
-    cout << "       2 - use position map in DB (quick, only works for myth recordings)\n\n";
+    cout << "       2 - use position map in DB (quick, only works for MythTV recordings)\n\n";
     cout << "-p/--getdbparameters outfile\n";
     cout << "       (write the mysql database parameters to outfile)\n\n";
     cout << "-n/--nativearchive jobfile \n";
@@ -2504,8 +2504,8 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        cout << "mytharchivehelper: Could not initialize myth context. "
-                "Exiting." << endl;;
+        cout << "mytharchivehelper: Could not initialize MythContext. "
+                "Exiting." << endl;
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 

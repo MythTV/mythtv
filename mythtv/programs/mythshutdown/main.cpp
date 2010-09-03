@@ -941,7 +941,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        cout << "mythshutdown: Could not initialize myth context. "
+        cout << "mythshutdown: Could not initialize MythContext. "
                 "Exiting." << endl;
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }

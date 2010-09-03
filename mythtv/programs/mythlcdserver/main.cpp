@@ -238,11 +238,11 @@ int main(int argc, char **argv)
         cout << endl;
     }
 
-    //  Get the Myth context and db hooks
+    //  Get the MythTV context and db hooks
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "lcdserver: Could not initialize myth context. "
+        VERBOSE(VB_IMPORTANT, "lcdserver: Could not initialize MythContext. "
                         "Exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }

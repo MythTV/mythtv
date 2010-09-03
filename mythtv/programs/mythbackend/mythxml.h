@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: mythxml.h
 //
-// Purpose - Myth XML protocol HttpServerExtension
+// Purpose - MythTV XML protocol HttpServerExtension
 //
 // Created By  : David Blain                    Created On : Oct. 24, 2005
 // Modified By :                                Modified On:
