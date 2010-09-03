@@ -186,7 +186,7 @@ When descrining an ATSC Multiplex, the \ref channel_table contains
 the major and minor channels used to tune to a particular stream.
 
 Other fields are used by different DVBx implementations to tune to a
-a particular type of service and Myth just passes them along to the
+a particular type of service and MythTV just passes them along to the
 drivers to take care of.
 
 
