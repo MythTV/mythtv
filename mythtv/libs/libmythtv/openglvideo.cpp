@@ -84,6 +84,7 @@ OpenGLVideo::OpenGLVideo() :
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
     gl_features(0),           using_ycbcrtex(false),
+    using_hardwaretex(false),
     gl_letterbox_colour(kLetterBoxColour_Black)
 {
 }
@@ -139,6 +140,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
                        QSize videoDim, QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
                        bool viewport_control, QString options,
+                       bool hw_accel,
                        LetterBoxColour letterbox_colour)
 {
     gl_context            = glcontext;
@@ -175,10 +177,12 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
 
     SetViewPort(display_visible_rect.size());
 
-    bool use_pbo        = gl_features & kGLExtPBufObj;
+    using_hardwaretex   = hw_accel;
+    bool use_pbo        = !using_hardwaretex && (gl_features & kGLExtPBufObj);
     bool basic_features = gl_features & kGLExtFragProg;
     bool full_features  = basic_features && (gl_features & kGLExtFBufObj);
-    using_ycbcrtex      = !full_features && (gl_features & kGLMesaYCbCr);
+    using_ycbcrtex      = !using_hardwaretex && !full_features &&
+                          (gl_features & kGLMesaYCbCr);
 
     if (using_ycbcrtex)
         basic_features = false;
@@ -192,27 +196,33 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, bool colour_control,
                 QString("No OpenGL feature support for Bicubic filter."));
     }
 
-    if ((defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
+    if (!using_hardwaretex &&
+        (defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
         textureType = gl_context->GetTextureType(textureRects);
 
     GLuint tex = 0;
     bool    ok = false;
 
-    if (basic_features)
+    if (basic_features && !using_hardwaretex)
     {
         tex = CreateVideoTexture(actual_video_dim, inputTextureSize, use_pbo);
         ok = tex && AddFilter(kGLFilterYUV2RGB);
     }
-    else if (using_ycbcrtex)
+    else if (using_ycbcrtex || using_hardwaretex)
     {
         tex = CreateVideoTexture(actual_video_dim,
                                  inputTextureSize, use_pbo);
         ok = tex && AddFilter(kGLFilterResize);
-        if (ok)
+        if (ok && using_ycbcrtex)
             VERBOSE(VB_PLAYBACK, LOC + QString("Using GL_MESA_ycbcr_texture for"
                                                " colorspace conversion."));
+        else if (ok && using_hardwaretex)
+            VERBOSE(VB_PLAYBACK, LOC + QString("Using plain RGBA tex for hw accel."));
         else
+        {
             using_ycbcrtex = false;
+            using_hardwaretex = false;
+        }
     }
 
     if (ok)
@@ -707,6 +717,11 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
                                             GL_UNSIGNED_SHORT_8_8_MESA,
                                             GL_YCBCR_MESA, GL_YCBCR_MESA);
+    else if (using_hardwaretex)
+        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+                                            GL_UNSIGNED_BYTE, GL_RGBA,
+                                            GL_RGBA, GL_LINEAR,
+                                            GL_CLAMP_TO_EDGE);
     else
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType);
     tex_size = gl_context->GetTextureSize(textureType, size);
@@ -735,6 +750,21 @@ QSize OpenGLVideo::GetTextureSize(const QSize &size)
     }
 
     return QSize(w, h);
+}
+
+uint OpenGLVideo::GetInputTexture(void)
+{
+    return inputTextures[0];
+}
+
+uint OpenGLVideo::GetTextureType(void)
+{
+    return textureType;
+}
+
+void OpenGLVideo::SetInputUpdated(void)
+{
+    inputUpdated = true;
 }
 
 /**

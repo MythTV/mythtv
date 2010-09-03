@@ -44,8 +44,12 @@ class OpenGLVideo
               QSize videoDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
               bool viewport_control,  QString options,
+              bool hwaccel,
               LetterBoxColour letterbox_colour = kLetterBoxColour_Black);
 
+    uint GetInputTexture(void);
+    uint GetTextureType(void);
+    void SetInputUpdated(void);
     void UpdateInputFrame(const VideoFrame *frame, bool soft_bob = false);
 
     /// \brief Public interface to AddFilter(OpenGLFilterType filter)
@@ -124,6 +128,7 @@ class OpenGLVideo
     OpenGLFilterType defaultUpsize;
     uint           gl_features;
     bool           using_ycbcrtex;
+    bool           using_hardwaretex;
     LetterBoxColour gl_letterbox_colour;
 };
 #endif // _OPENGL_VIDEO_H__

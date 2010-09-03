@@ -11,22 +11,23 @@ class VideoOutputOpenGL : public VideoOutput
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputOpenGL();
-   ~VideoOutputOpenGL();
+    virtual ~VideoOutputOpenGL();
 
-    bool Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh,
-              MythCodecID codec_id, WId embedid = 0);
-    void TearDown(void);
+    virtual bool Init(int width, int height, float aspect, WId winid,
+                      int winx, int winy, int winw, int winh,
+                      MythCodecID codec_id, WId embedid = 0);
+    virtual void SetProfile(void);
+    virtual void TearDown(void);
 
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
-                      const PIPMap &pipPlayers,
-                      FrameScanType scan);
-    void Show(FrameScanType );
-    bool InputChanged(const QSize &input_size, float aspect,
-                      MythCodecID  av_codec_id, void *codec_private,
-                      bool &aspect_only);
+    virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
+                              FilterChain *filterList,
+                              const PIPMap &pipPlayers,
+                              FrameScanType scan);
+    virtual void Show(FrameScanType );
+    virtual bool InputChanged(const QSize &input_size, float aspect,
+                              MythCodecID  av_codec_id, void *codec_private,
+                              bool &aspect_only);
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) { }
     void Zoom(ZoomDirection direction);
@@ -37,8 +38,8 @@ class VideoOutputOpenGL : public VideoOutput
                                            const QSize &video_dim);
     void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
-    bool SetDeinterlacingEnabled(bool);
-    bool SetupDeinterlace(bool i, const QString& ovrf="");
+    virtual bool SetDeinterlacingEnabled(bool);
+    virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
     void ShowPIP(VideoFrame  *frame,
                  MythPlayer  *pipplayer,
                  PIPLocation  loc);
@@ -51,8 +52,9 @@ class VideoOutputOpenGL : public VideoOutput
     virtual bool ApproveDeintFilter(const QString& filtername) const;
     virtual MythPainter *GetOSDPainter(void)  { return (MythPainter*)gl_painter; }
 
-  private:
-    bool CreateBuffers(void);
+  protected:
+    virtual bool CreateBuffers(void);
+    bool CreatePauseFrame(void);
     bool SetupContext(void);
     bool SetupOpenGL(void);
     void InitOSD(void);

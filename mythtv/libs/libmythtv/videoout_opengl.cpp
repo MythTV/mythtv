@@ -7,8 +7,8 @@
 #include "osd.h"
 #include "mythuihelper.h"
 
-#define LOC      QString("VidOutOGL: ")
-#define LOC_ERR  QString("VidOutOGL: ")
+#define LOC      QString("VidOutGL: ")
+#define LOC_ERR  QString("VidOutGL Error: ")
 
 void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
                                          QStringList &cpudeints)
@@ -125,12 +125,12 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
                       winid, winx, winy, winw, winh,
                       codec_id, embedid);
 
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetVideoRenderer("opengl");
+    SetProfile();
 
     success &= SetupContext();
     InitDisplayMeasurements(width, height, false);
     success &= CreateBuffers();
+    success &= CreatePauseFrame();
     success &= SetupOpenGL();
 
     InitOSD();
@@ -146,18 +146,23 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
     return success;
 }
 
+void VideoOutputOpenGL::SetProfile(void)
+{
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer("opengl");
+}
+
 bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
                                      float        aspect,
                                      MythCodecID  av_codec_id,
                                      void        *codec_private,
                                      bool        &aspect_only)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) %4")
+    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
-            .arg(toString(av_codec_id)));
+            .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&gl_context_lock);
-
     if (!codec_is_std(av_codec_id))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -244,7 +249,8 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
                                   window.GetVideoDim(), dvr,
                                   window.GetDisplayVideoRect(),
                                   window.GetVideoRect(), true,
-                                  GetFilters(), db_letterbox_colour);
+                                  GetFilters(), !codec_is_std(video_codec_id),
+                                  db_letterbox_colour);
     if (success)
     {
         bool temp_deinterlacing = m_deinterlacing;
@@ -278,13 +284,14 @@ void VideoOutputOpenGL::InitOSD(void)
 bool VideoOutputOpenGL::CreateBuffers(void)
 {
     QMutexLocker locker(&gl_context_lock);
-
-    bool success = true;
     vbuffers.Init(31, true, 1, 12, 4, 2, false);
-    success &= vbuffers.CreateBuffers(FMT_YV12,
-                                      window.GetVideoDim().width(),
-                                      window.GetVideoDim().height());
+    return vbuffers.CreateBuffers(FMT_YV12,
+                                  window.GetVideoDim().width(),
+                                  window.GetVideoDim().height());
+}
 
+bool VideoOutputOpenGL::CreatePauseFrame(void)
+{
     av_pause_frame.height = vbuffers.GetScratchFrame()->height;
     av_pause_frame.width  = vbuffers.GetScratchFrame()->width;
     av_pause_frame.bpp    = vbuffers.GetScratchFrame()->bpp;
@@ -293,11 +300,10 @@ bool VideoOutputOpenGL::CreateBuffers(void)
     av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     if (!av_pause_frame.buf)
-        success = false;
-    else
-        clear(&av_pause_frame);
+        return false;
 
-    return success;
+    clear(&av_pause_frame);
+    return true;
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -309,6 +315,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (!gl_videochain || !gl_context)
         return;
 
+    bool sw_frame = codec_is_std(video_codec_id);
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
     OpenGLLocker ctx_lock(gl_context);
 
@@ -320,11 +327,11 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         pauseframe = true;
     }
 
-    if (filterList)
+    if (filterList && sw_frame)
         filterList->ProcessFrame(frame);
 
     bool safepauseframe = pauseframe && !IsBobDeint();
-    if (deint_proc && m_deinterlaceBeforeOSD &&
+    if (sw_frame && deint_proc && m_deinterlaceBeforeOSD &&
        (!pauseframe || safepauseframe))
     {
         m_deintFilter->ProcessFrame(frame, scan);
@@ -336,7 +343,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         ShowPIPs(frame, pipPlayers);
     }
 
-    if ((!pauseframe || safepauseframe) &&
+    if (sw_frame && (!pauseframe || safepauseframe) &&
         deint_proc && !m_deinterlaceBeforeOSD)
     {
         m_deintFilter->ProcessFrame(frame, scan);
@@ -344,7 +351,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");
 
-    if (gl_videochain)
+    if (gl_videochain && sw_frame)
         gl_videochain->UpdateInputFrame(frame, soft_bob);
 }
 
@@ -633,7 +640,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
                      QSize(pipVideoWidth, pipVideoHeight),
                      dvr, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                     false, GetFilters());
+                     false, GetFilters(), false);
         gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
         if (!success)
         {
@@ -654,7 +661,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
             QSize(pipVideoWidth, pipVideoHeight),
             dvr, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight),
-            false, GetFilters());
+            false, GetFilters(), false);
 
         gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
         if (!success)
