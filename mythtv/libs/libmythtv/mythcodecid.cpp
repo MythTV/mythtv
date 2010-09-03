@@ -96,6 +96,21 @@ QString toString(MythCodecID codecid)
         case kCodec_WMV3_VAAPI:
             return "WMV3 VAAPI";
 
+        case kCodec_MPEG1_DXVA2:
+            return "MPEG1 DXVA2";
+        case kCodec_MPEG2_DXVA2:
+            return "MPEG2 DXVA2";
+        case kCodec_H263_DXVA2:
+            return "H.263 DXVA2";
+        case kCodec_MPEG4_DXVA2:
+            return "MPEG4 DXVA2";
+        case kCodec_H264_DXVA2:
+            return "H.264 DXVA2";
+        case kCodec_VC1_DXVA2:
+            return "VC1 DXVA2";
+        case kCodec_WMV3_DXVA2:
+            return "WMV3 DXVA2";
+
         default:
             break;
     }
@@ -240,6 +255,28 @@ int myth2av_codecid(MythCodecID codec_id,
             ret = CODEC_ID_WMV3;
             break;
 
+        case kCodec_MPEG1_DXVA2:
+            ret = CODEC_ID_MPEG1VIDEO;
+            break;
+        case kCodec_MPEG2_DXVA2:
+            ret = CODEC_ID_MPEG2VIDEO;
+            break;
+        case kCodec_H263_DXVA2:
+            ret = CODEC_ID_H263;
+            break;
+        case kCodec_MPEG4_DXVA2:
+            ret = CODEC_ID_MPEG4;
+            break;
+        case kCodec_H264_DXVA2:
+            ret = CODEC_ID_H264;
+            break;
+        case kCodec_VC1_DXVA2:
+            ret = CODEC_ID_VC1;
+            break;
+        case kCodec_WMV3_DXVA2:
+            ret = CODEC_ID_WMV3;
+            break;
+
         default:
             VERBOSE(VB_IMPORTANT,
                     QString("Error: MythCodecID %1 has not been "
@@ -288,12 +325,14 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG1_VLD:
         case kCodec_MPEG1_VDPAU:
         case kCodec_MPEG1_VAAPI:
+        case kCodec_MPEG1_DXVA2:
         case kCodec_MPEG2:
         case kCodec_MPEG2_XVMC:
         case kCodec_MPEG2_IDCT:
         case kCodec_MPEG2_VLD:
         case kCodec_MPEG2_VDPAU:
         case kCodec_MPEG2_VAAPI:
+        case kCodec_MPEG2_DXVA2:
             return "MPEG-2";
 
         case kCodec_H263:
@@ -302,6 +341,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H263_VLD:
         case kCodec_H263_VDPAU:
         case kCodec_H263_VAAPI:
+        case kCodec_H263_DXVA2:
             return "H.263";
 
         case kCodec_NUV_MPEG4:
@@ -311,6 +351,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG4_VLD:
         case kCodec_MPEG4_VDPAU:
         case kCodec_MPEG4_VAAPI:
+        case kCodec_MPEG4_DXVA2:
             return "MPEG-4";
 
         case kCodec_H264:
@@ -319,16 +360,19 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H264_VLD:
         case kCodec_H264_VDPAU:
         case kCodec_H264_VAAPI:
+        case kCodec_H264_DXVA2:
             return "H.264";
 
         case kCodec_VC1:
         case kCodec_VC1_VDPAU:
         case kCodec_VC1_VAAPI:
+        case kCodec_VC1_DXVA2:
             return "VC-1";
 
         case kCodec_WMV3:
         case kCodec_WMV3_VDPAU:
         case kCodec_WMV3_VAAPI:
+        case kCodec_WMV3_DXVA2:
             return "WMV3";
 
         case kCodec_NONE:
@@ -337,6 +381,7 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VLD_END:
         case kCodec_VDPAU_END:
         case kCodec_VAAPI_END:
+        case kCodec_DXVA2_END:
             return QString::null;
     }
 
@@ -356,6 +401,9 @@ QString get_decoder_name(MythCodecID codec_id)
 
     if (codec_is_vaapi(codec_id))
         return "vaapi";
+
+    if (codec_is_dxva2(codec_id))
+        return "dxva2";
 
     return "ffmpeg";
 }

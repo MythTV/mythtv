@@ -1154,6 +1154,18 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     return fmt[i];
 }
 
+static enum PixelFormat get_format_dxva2(struct AVCodecContext *avctx,
+                                         const enum PixelFormat *fmt)
+{
+    if (!fmt)
+        return PIX_FMT_NONE;
+    int i = 0;
+    for (; fmt[i] != PIX_FMT_NONE ; i++)
+        if (PIX_FMT_DXVA2_VLD == fmt[i])
+            break;
+    return fmt[i];
+}
+
 static bool IS_VAAPI_PIX_FMT(enum PixelFormat fmt)
 {
     return fmt == PIX_FMT_VAAPI_MOCO ||
