@@ -9438,7 +9438,7 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)
     QMutexLocker locker(&chanEditMapLock);
     bool hide = false;
 
-    if (!DialogIsVisible(ctx, OSD_DLG_EDITOR));
+    if (!DialogIsVisible(ctx, OSD_DLG_EDITOR))
         return hide;
 
     OSD *osd = GetOSDLock(ctx);
@@ -9456,6 +9456,10 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)
         osd->DialogGetText(infoMap);
         insert_map(chanEditMap, infoMap);
         ctx->recorder->SetChannelInfo(chanEditMap);
+        hide = true;
+    }
+    else if (osd && action == "QUIT")
+    {
         hide = true;
     }
     ReturnOSDLock(ctx, osd);
