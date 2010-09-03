@@ -540,6 +540,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "CHANGEGROUPVIEW", QT_TRANSLATE_NOOP("MythControls",
             "Change Group View"), "");
 
+    REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
+            "Exit or return to DVD menu"), "");
     REG_KEY("TV Playback", "CLEAROSD", QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
     REG_KEY("TV Playback", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
@@ -3523,7 +3525,8 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         if (handled || actions.isEmpty())
             return;
 
-        bool esc   = has_action("ESCAPE", actions);
+        bool esc   = has_action("ESCAPE", actions) ||
+                     has_action("BACK", actions);
         bool pause = has_action("PAUSE",  actions);
         bool play  = has_action("PLAY",   actions);
 
@@ -3691,6 +3694,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
     }
     else if (has_action("CLEAROSD",     actions) ||
              has_action("ESCAPE",       actions) ||
+             has_action("BACK",         actions) ||
              has_action("TOGGLEBROWSE", actions))
     {
         BrowseEnd(ctx, false);
@@ -3760,7 +3764,8 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
         actx->player->Zoom(kZoomAspectUp);
     else if (has_action("VOLUMEDOWN", actions))
         actx->player->Zoom(kZoomAspectDown);
-    else if (has_action("ESCAPE", actions))
+    else if (has_action("ESCAPE", actions) ||
+             has_action("BACK", actions))
     {
         actx->player->Zoom(kZoomHome);
         end_manual_zoom = true;
@@ -4092,7 +4097,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
     }
-    else if (has_action("ESCAPE", actions))
+    else if (has_action("ESCAPE", actions) ||
+             has_action("BACK", actions))
     {
         if (StateIsLiveTV(ctx->GetState()) &&
             (ctx->lastSignalMsgTime.elapsed() <
@@ -4153,6 +4159,19 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
             else
             {
+                // If it's a DVD, and we're not trying to execute a
+                // jumppoint, and it's not in a menu, then first try
+                // jumping to the title or root menu.
+                if (isDVD &&
+                    !GetMythMainWindow()->IsExitingToMain() &&
+                    has_action("BACK", actions) &&
+                    !ctx->buffer->DVD()->IsInMenu() &&
+                    (ctx->player->GoToDVDMenu("title") ||
+                     ctx->player->GoToDVDMenu("root"))
+                    )
+                {
+                    return handled;
+                }
                 SetExitPlayer(true, true);
             }
         }
