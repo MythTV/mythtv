@@ -1154,6 +1154,25 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     return fmt[i];
 }
 
+static bool IS_VAAPI_PIX_FMT(enum PixelFormat fmt)
+{
+    return fmt == PIX_FMT_VAAPI_MOCO ||
+           fmt == PIX_FMT_VAAPI_IDCT ||
+           fmt == PIX_FMT_VAAPI_VLD;
+}
+
+static enum PixelFormat get_format_vaapi(struct AVCodecContext *avctx,
+                                         const enum PixelFormat *fmt)
+{
+    if (!fmt)
+        return PIX_FMT_NONE;
+    int i = 0;
+    for (; fmt[i] != PIX_FMT_NONE ; i++)
+        if (IS_VAAPI_PIX_FMT(fmt[i]))
+            break;
+    return fmt[i];
+}
+
 static bool IS_DR1_PIX_FMT(const enum PixelFormat fmt)
 {
     switch (fmt)
@@ -1201,7 +1220,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         directrendering = true;
         if (!gCoreContext->GetNumSetting("DecodeExtraAudio", 0) &&
-            !CODEC_IS_HWACCEL(codec))
+            !CODEC_IS_HWACCEL(codec, enc))
         {
             SetLowBuffers(false);
         }

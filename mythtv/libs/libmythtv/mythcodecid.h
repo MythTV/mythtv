@@ -115,7 +115,9 @@ int mpeg_version(int codec_id);
                               codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
 #define CODEC_IS_VDPAU(codec) (codec &&\
                                codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
-#define CODEC_IS_HWACCEL(codec)  (CODEC_IS_XVMC(codec)  ||\
-                                  CODEC_IS_VDPAU(codec))
+#define CODEC_IS_VAAPI(codec, enc) (codec && IS_VAAPI_PIX_FMT(enc->pix_fmt))
+#define CODEC_IS_HWACCEL(codec, enc) (CODEC_IS_XVMC(codec)  ||\
+                                      CODEC_IS_VDPAU(codec) ||\
+                                      CODEC_IS_VAAPI(codec, enc))
 
 #endif // _MYTH_CODEC_ID_H_
