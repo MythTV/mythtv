@@ -17,7 +17,7 @@ class MPUBLIC RemoteFile
     RemoteFile(const QString &url = "",
                bool write = false,
                bool usereadahead = true,
-               int retries = -1,
+               int timeout_ms = 2000/*RingBuffer::kDefaultOpenTimeout*/,
                const QStringList *possibleAuxiliaryFiles = NULL);
    ~RemoteFile();
 
@@ -59,7 +59,7 @@ class MPUBLIC RemoteFile
 
     QString         path;
     bool            usereadahead;
-    int             retries;
+    int             timeout_ms;
     long long       filesize;
     bool            timeoutisfast;
     long long       readposition;

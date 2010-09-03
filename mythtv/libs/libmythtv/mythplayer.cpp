@@ -935,14 +935,24 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     SetDecoder(NULL);
     int testreadsize = 2048;
 
+    MythTimer bigTimer; bigTimer.start();
+    int timeout = (retries + 1) * 500;
     while (testreadsize <= kDecoderProbeBufferSize)
     {
-        if (player_ctx->buffer->Peek(testbuf, testreadsize) != testreadsize)
+        MythTimer peekTimer; peekTimer.start();
+        while (player_ctx->buffer->Peek(testbuf, testreadsize) != testreadsize)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("OpenFile(): Error, couldn't read file: %1")
-                    .arg(player_ctx->buffer->GetFilename()));
-            return -1;
+            if (peekTimer.elapsed() > 1000 || bigTimer.elapsed() > timeout)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("OpenFile(): Could not read "
+                                "first %1 bytes of '%2'")
+                        .arg(testreadsize)
+                        .arg(player_ctx->buffer->GetFilename()));
+                return -1;
+            }
+            VERBOSE(VB_IMPORTANT, LOC_WARN + "OpenFile() waiting on data");
+            usleep(50 * 1000);
         }
 
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -959,7 +969,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
                                            player_ctx->GetSpecialDecode()));
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        if (GetDecoder())
+        if (GetDecoder() || (bigTimer.elapsed() > timeout))
             break;
         testreadsize <<= 1;
     }
@@ -2167,12 +2177,15 @@ void MythPlayer::SwitchToProgram(void)
         return;
     }
 
-    uint retries = 10; // about 5 seconds of retries
-    player_ctx->buffer->OpenFile(pginfo->GetPlaybackURL(), retries);
+    player_ctx->buffer->OpenFile(
+        pginfo->GetPlaybackURL(), RingBuffer::kDefaultOpenTimeout);
 
     if (!player_ctx->buffer->IsOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram's OpenFile failed.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram's OpenFile failed " +
+                QString("(card type: %1).")
+                .arg(player_ctx->tvchain->GetCardType(newid)));
+        VERBOSE(VB_IMPORTANT, QString("\n") + player_ctx->tvchain->toString());
         eof = true;
         SetErrored(QObject::tr("Error opening switch program buffer"));
         delete pginfo;
@@ -2289,10 +2302,16 @@ void MythPlayer::JumpToProgram(void)
 
     SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
 
-    player_ctx->buffer->OpenFile(pginfo->GetPlaybackURL());
+    player_ctx->buffer->OpenFile(
+        pginfo->GetPlaybackURL(), RingBuffer::kDefaultOpenTimeout);
+
     if (!player_ctx->buffer->IsOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram's OpenFile failed.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram's OpenFile failed " +
+                QString("(card type: %1).")
+                .arg(player_ctx->tvchain->GetCardType(newid)));
+        VERBOSE(VB_IMPORTANT, QString("\n") + player_ctx->tvchain->toString());
+
         eof = true;
         SetErrored(QObject::tr("Error opening jump program file buffer"));
         delete pginfo;
@@ -3189,29 +3208,8 @@ bool MythPlayer::IsReallyNearEnd(void) const
     if (!videoOutput)
         return false;
 
-    int    sz              = player_ctx->buffer->DataInReadAhead();
-    uint   rbs             = player_ctx->buffer->GetReadBlockSize();
-    uint   kbits_per_sec   = player_ctx->buffer->GetBitrate();
-    uint   vvf             = videoOutput->ValidVideoFrames();
-    double inv_fps         = 1.0 / GetDecoder()->GetFPS();
-    double bytes_per_frame = kbits_per_sec * (1000.0/8.0) * inv_fps;
-    double rh_frames       = sz / bytes_per_frame;
-
-    // WARNING: rh_frames can greatly overestimate or underestimate
-    //          the number of frames available in the read ahead buffer
-    //          when rh_frames is less than the keyframe distance.
-
-    bool near_end = ((vvf + rh_frames) < 10.0) || (sz < rbs*1.5);
-
-    VERBOSE(VB_PLAYBACK, LOC + "IsReallyNearEnd()"
-            <<" br("<<(kbits_per_sec/8)<<"KB)"
-            <<" fps("<<((uint)(1.0/inv_fps))<<")"
-            <<" sz("<<(sz / 1000)<<"KB)"
-            <<" vfl("<<vvf<<")"
-            <<" frh("<<((uint)rh_frames)<<")"
-            <<" ne:"<<near_end);
-
-    return near_end;
+    return player_ctx->buffer->IsNearEnd(
+        GetDecoder()->GetFPS(), videoOutput->ValidVideoFrames());
 }
 
 /** \brief Returns true iff near end of recording.

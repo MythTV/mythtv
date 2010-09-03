@@ -875,7 +875,7 @@ TV::TV(void)
       switchToInputId(0),
       wantsToQuit(true),
       stretchAdjustment(false),
-      audiosyncAdjustment(false), audiosyncBaseline(INT64_MIN),
+      audiosyncAdjustment(false), audiosyncBaseline(LLONG_MIN),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
       endOfRecording(false),
@@ -1973,7 +1973,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                     .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
 
             ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
-                                      opennow ? 12 : (uint)-1));
+                                              opennow ? 2000 : -1));
             ctx->buffer->SetLiveMode(ctx->tvchain);
         }
 
@@ -5663,7 +5663,7 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 
     bool res = false;
 
-    if (INT64_MIN != audiosyncBaseline)
+    if (LLONG_MIN != audiosyncBaseline)
     {
         int64_t aud_tc = ctx->player->GetAudioTimecodeOffset();
         ctx->player->SaveAudioTimecodeOffset(aud_tc - audiosyncBaseline);
@@ -6384,7 +6384,7 @@ void TV::SwitchCards(PlayerContext *ctx,
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
             ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
-                                              opennow ? 12 : (uint)-1));
+                                              opennow ? 2000 : -1));
 
             ctx->tvchain->SetProgram(*ctx->playingInfo);
             ctx->buffer->SetLiveMode(ctx->tvchain);
@@ -8075,7 +8075,7 @@ void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
         return;
     }
 
-    if (!audiosyncAdjustment && INT64_MIN == audiosyncBaseline)
+    if (!audiosyncAdjustment && LLONG_MIN == audiosyncBaseline)
         audiosyncBaseline = ctx->player->GetAudioTimecodeOffset();
 
     audiosyncAdjustment = allowEdit;

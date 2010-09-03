@@ -13,10 +13,10 @@ using namespace std;
 #include "mythtimer.h"
 
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
-                       int _retries,
+                       int _timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
     path(_path),
-    usereadahead(useRA),  retries(_retries),
+    usereadahead(useRA),  timeout_ms(_timeout_ms),
     filesize(-1),         timeoutisfast(false),
     readposition(0),      recordernum(0),
     lock(QMutex::NonRecursive),
@@ -27,7 +27,7 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
     if (writemode)
     {
         usereadahead = false;
-        retries = -1;
+        timeout_ms = -1;
     }
     else if (possibleAuxiliaryFiles)
         possibleauxfiles = *possibleAuxiliaryFiles;
@@ -107,8 +107,9 @@ MythSocket *RemoteFile::openSocket(bool control)
     }
     else
     {
-        strlist.append( QString("ANN FileTransfer %1 %2 %3 %4")
-            .arg(hostname).arg(writemode).arg(usereadahead).arg(retries) );
+        strlist.push_back(QString("ANN FileTransfer %1 %2 %3 %4")
+                          .arg(hostname).arg(writemode)
+                          .arg(usereadahead).arg(timeout_ms));
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 

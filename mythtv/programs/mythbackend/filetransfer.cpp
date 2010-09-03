@@ -9,9 +9,9 @@
 #include "programinfo.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
-                           bool usereadahead, int retries) :
+                           bool usereadahead, int timeout_ms) :
     readthreadlive(true), readsLocked(false),
-    rbuffer(new RingBuffer(filename, false, usereadahead, retries)),
+    rbuffer(new RingBuffer(filename, false, usereadahead, timeout_ms)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0), writemode(false)
 {

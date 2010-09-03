@@ -104,7 +104,7 @@ void ImportRecorder::StartRecording(void)
     {
         MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
         RingBuffer *rb = new RingBuffer(
-            ringBuffer->GetFilename(), false, true, 6);
+            ringBuffer->GetFilename(), false, true, 6000);
 
         PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
         ctx->SetPlayingInfo(curRecording);

@@ -26,7 +26,7 @@ class FileTransfer
 
   public:
     FileTransfer(QString &filename, MythSocket *remote,
-                 bool usereadahead, int retries);
+                 bool usereadahead, int timeout_ms);
     FileTransfer(QString &filename, MythSocket *remote, bool write);
 
     MythSocket *getSocket() { return sock; }

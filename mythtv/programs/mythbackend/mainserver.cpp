@@ -1248,7 +1248,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         FileTransfer *ft = NULL;
         bool writemode = false;
         bool usereadahead = true;
-        int retries = -1;
+        int timeout_ms = 2000;
         if (commands.size() > 3)
             writemode = commands[3].toInt();
 
@@ -1256,7 +1256,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             usereadahead = commands[4].toInt();
 
         if (commands.size() > 5)
-            retries = commands[5].toInt();
+            timeout_ms = commands[5].toInt();
 
         if (writemode)
         {
@@ -1312,10 +1312,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
 
-        if (retries < 0)
+        if (writemode)
             ft = new FileTransfer(filename, socket, writemode);
         else
-            ft = new FileTransfer(filename, socket, usereadahead, retries);
+            ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
 
         sockListLock.lockForWrite();
         fileTransferList.push_back(ft);
