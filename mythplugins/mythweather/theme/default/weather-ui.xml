@@ -38,7 +38,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="update_text" from="basetextarea">
+        <textarea name="updatetime" from="basetextarea">
             <area>30,531,740,33</area>
             <align>vcenter</align>
         </textarea>
@@ -51,7 +51,7 @@
             <type>box</type>
             <fill color="#000000" alpha="30" />
         </shape>
-        
+
         <shape name="background2">
             <area>520,140,240,360</area>
             <type>box</type>
@@ -155,7 +155,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="Three Day Forecast">
@@ -265,7 +265,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="Six Day Forecast">
@@ -424,7 +424,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="Static Map">
@@ -444,7 +444,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="Animated Map">
@@ -465,7 +465,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="Severe Weather Alerts">
@@ -487,7 +487,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="18 Hour Forecast">
@@ -647,7 +647,7 @@
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
-        
+
     </window>
 
     <window name="global-setup">
