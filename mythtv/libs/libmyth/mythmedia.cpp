@@ -280,7 +280,7 @@ MediaError MythMediaDevice::eject(bool open_close)
 
     QString  command = "disktool -e " + m_DevicePath + " &";
 
-    if (myth_system(command) > 0)
+    if (myth_system(command, MYTH_SYSTEM_RUN_BACKGROUND) > 0)
         return MEDIAERR_FAILED;
 
     return MEDIAERR_OK;

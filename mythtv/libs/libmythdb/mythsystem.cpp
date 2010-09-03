@@ -55,6 +55,7 @@ typedef struct {
     QMutex  mutex;
     uint    result;
     time_t  timeout;
+    bool    background;
 } PidData_t;
 
 typedef QMap<pid_t, PidData_t *> PidMap_t;
@@ -63,7 +64,7 @@ class MythSystemReaper : public QThread
 {
     public:
         void run(void);
-        uint waitPid( pid_t pid, time_t timeout );
+        uint waitPid( pid_t pid, time_t timeout, bool background = false );
         uint abortPid( pid_t pid );
     private:
         PidMap_t    m_pidMap;
@@ -163,35 +164,42 @@ void MythSystemReaper::run(void)
                 .arg(pid) .arg(status) .arg(pidData->result));
         }
 
-        pidData->mutex.unlock();
+        if( pidData->background )
+            delete pidData;
+        else
+            pidData->mutex.unlock();
     }
 }
 
-uint MythSystemReaper::waitPid( pid_t pid, time_t timeout )
+uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background )
 {
     PidData_t  *pidData = new PidData_t;
     uint        result;
-    time_t      now;
 
     if( timeout > 0 )
-    {
-        now = time(NULL);
-        pidData->timeout = now + timeout;
-    }
+        pidData->timeout = time(NULL) + timeout;
     else
         pidData->timeout = 0;
+
+    pidData->background = background;
 
     pidData->mutex.lock();
     m_mapLock.lock();
     m_pidMap.insert( pid, pidData );
     m_mapLock.unlock();
 
-    /* Now we wait for the thread to see the SIGCHLD */
-    pidData->mutex.lock();
-    result = pidData->result;
-    delete pidData;
+    if( !background ) {
+        /* Now we wait for the thread to see the SIGCHLD */
+        pidData->mutex.lock();
+        result = pidData->result;
+        delete pidData;
 
-    return( result );
+        return( result );
+    }
+
+    /* We are running in the background, the reaper will still catch the 
+       child */
+    return( GENERIC_EXIT_OK );
 }
 
 uint MythSystemReaper::abortPid( pid_t pid )
@@ -236,6 +244,12 @@ uint myth_system(const QString &command, int flags, uint timeout)
     uint    result;
     bool    ready_to_lock;
 
+    if( !(flags & MYTH_SYSTEM_RUN_BACKGROUND) && command.endsWith("&") )
+    {
+        VERBOSE(VB_IMPORTANT, "Adding background flag");
+        flags |= MYTH_SYSTEM_RUN_BACKGROUND;
+    }
+
     myth_system_pre_flags( flags, ready_to_lock );
 #ifndef USING_MINGW
     pid_t   pid;
@@ -243,7 +257,8 @@ uint myth_system(const QString &command, int flags, uint timeout)
     pid    = myth_system_fork( command, result );
 
     if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait( pid, timeout );
+        result = myth_system_wait( pid, timeout, 
+                                   (flags & MYTH_SYSTEM_RUN_BACKGROUND) );
 #else
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -392,15 +407,16 @@ pid_t myth_system_fork(const QString &command, uint &result)
     return child;
 }
 
-uint myth_system_wait(pid_t pid, uint timeout)
+uint myth_system_wait(pid_t pid, uint timeout, bool background)
 {
     if( reaper == NULL )
     {
         reaper = new MythSystemReaper;
         reaper->start();
     }
-    VERBOSE(VB_IMPORTANT, QString("PID %1: launched") .arg(pid));
-    return reaper->waitPid(pid, timeout);
+    VERBOSE(VB_IMPORTANT, QString("PID %1: launched%2") .arg(pid)
+        .arg(background ? " in the background, not waiting" : ""));
+    return reaper->waitPid(pid, timeout, background);
 }
 
 uint myth_system_abort(pid_t pid)

@@ -207,7 +207,8 @@ class ScreenSaverX11Private
                 myth_system("xscreensaver-command -deactivate >&- 2>&- &",
                             MYTH_SYSTEM_DONT_BLOCK_LIRC |
                             MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
-                            MYTH_SYSTEM_DONT_BLOCK_PARENT);
+                            MYTH_SYSTEM_DONT_BLOCK_PARENT |
+                            MYTH_SYSTEM_RUN_BACKGROUND);
             }
             if (m_gscreensaverRunning)
             {
@@ -215,7 +216,8 @@ class ScreenSaverX11Private
                 myth_system("gnome-screensaver-command --poke >&- 2>&- &",
                             MYTH_SYSTEM_DONT_BLOCK_LIRC |
                             MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
-                            MYTH_SYSTEM_DONT_BLOCK_PARENT);
+                            MYTH_SYSTEM_DONT_BLOCK_PARENT |
+                            MYTH_SYSTEM_RUN_BACKGROUND);
             }
             m_last_deactivated = current_time;
         }
