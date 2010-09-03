@@ -862,7 +862,7 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     if (parseTypes & kCLPClearCache)
     {
         msg << "--clearcache                   "
-            << "Clear the settings cache on all myth servers" << endl;
+            << "Clear the settings cache on all MythTV servers" << endl;
     }
 
     if (parseTypes & kCLPGeneratePreview)
