@@ -204,8 +204,10 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 // AVSubtitleRect's image data's not guaranteed to be 4 byte
                 // aligned.
 
-                QRect qrect(rect->x, rect->y, rect->w, rect->h);
-                QRect scaled = videoOut->GetImageRect(qrect);
+                QSize img_size(rect->w, rect->h);
+                QRect img_rect(rect->x, rect->y, rect->w, rect->h);
+                QRect display(rect->display_x, rect->display_y,
+                              rect->display_w, rect->display_h);
 
                 // XSUB images are based on the original video size before
                 // they were converted to DivX. We need to guess the original
@@ -216,13 +218,11 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                                  (currentFrame->height <= 720)  ? 720 : 1080;
                     int width  = (currentFrame->width  <= 720)  ? 720 :
                                  (currentFrame->width  <= 1280) ? 1280 : 1920;
-                    QMatrix m;
-                    m.scale((float)currentFrame->width / width,
-                            (float)currentFrame->height / height);
-                    scaled = m.mapRect(scaled);
+                    display = QRect(0, 0, width, height);
                 }
 
-                QImage qImage(rect->w, rect->h, QImage::Format_ARGB32);
+                QRect scaled = videoOut->GetImageRect(img_rect, &display);
+                QImage qImage(img_size, QImage::Format_ARGB32);
                 for (int y = 0; y < rect->h; ++y)
                 {
                     for (int x = 0; x < rect->w; ++x)
@@ -233,7 +233,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                     }
                 }
 
-                if (scaled.size() != qrect.size())
+                if (scaled.size() != img_size)
                 {
                     qImage = qImage.scaled(scaled.width(), scaled.height(),
                              Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

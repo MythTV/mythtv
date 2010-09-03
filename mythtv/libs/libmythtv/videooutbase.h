@@ -247,7 +247,7 @@ class VideoOutput
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space
-    QRect   GetImageRect(const QRect &rect);
+    QRect   GetImageRect(const QRect &rect, QRect *display = NULL);
     QRect   GetSafeRect(void);
 
   protected:

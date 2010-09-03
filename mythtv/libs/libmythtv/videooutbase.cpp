@@ -1436,9 +1436,8 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 */
 }
 
-QRect VideoOutput::GetImageRect(const QRect &rect)
+QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
 {
-    QRect result = rect;
     float hscale, vscale, tmp;
     tmp = 0.0;
     QRect visible_osd  = GetVisibleOSDBounds(tmp, tmp, tmp);
@@ -1449,6 +1448,17 @@ QRect VideoOutput::GetImageRect(const QRect &rect)
     float image_aspect = (float)image_width / (float)image_height;
     float pixel_aspect = (float)video_size.width() /
                          (float)video_size.height();
+
+    QRect rect1 = rect;
+    if (display && display->isValid())
+    {
+        QMatrix m0;
+        m0.scale((float)image_width  / (float)display->width(),
+                 (float)image_height / (float)display->height());
+        rect1 = m0.mapRect(rect1);
+        rect1.translate(display->left(), display->top());
+    }
+    QRect result = rect1;
 
     if (hasFullScreenOSD())
     {
@@ -1482,8 +1492,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect)
     hscale = pixel_aspect / image_aspect;
     if (hscale < 0.99f || hscale > 1.01f)
     {
-        result.setLeft((int)(((float)rect.left() * hscale) + 0.5f));
-        result.setWidth((int)(((float)rect.width() * hscale) + 0.5f));
+        result.setLeft((int)(((float)rect1.left() * hscale) + 0.5f));
+        result.setWidth((int)(((float)rect1.width() * hscale) + 0.5f));
     }
 
     result.translate(-visible_osd.left(), -visible_osd.top());

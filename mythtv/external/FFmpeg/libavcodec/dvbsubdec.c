@@ -1344,17 +1344,11 @@ static int dvbsub_display_end_segment(AVCodecContext *avctx, const uint8_t *buf,
     DVBSubCLUT *clut;
     uint32_t *clut_table;
     int i;
-    int offset_x=0, offset_y=0;
 
     sub->rects = NULL;
     sub->start_display_time = 0;
     sub->end_display_time = ctx->time_out * 1000;
     sub->format = 0;
-
-    if (display_def) {
-        offset_x = display_def->x;
-        offset_y = display_def->y;
-    }
 
     sub->num_rects = ctx->display_list_size;
 
@@ -1373,10 +1367,20 @@ static int dvbsub_display_end_segment(AVCodecContext *avctx, const uint8_t *buf,
         if (!region)
             continue;
 
-        rect->x = display->x_pos + offset_x;
-        rect->y = display->y_pos + offset_y;
+        rect->x = display->x_pos;
+        rect->y = display->y_pos;
         rect->w = region->width;
         rect->h = region->height;
+        if (display_def) {
+            rect->display_x = display_def->x;
+            rect->display_y = display_def->y;
+            rect->display_w = display_def->width;
+            rect->display_h = display_def->height;
+        }
+        else {
+            rect->display_w = 720;
+            rect->display_h = 576;
+        }
         rect->nb_colors = 16;
         rect->type      = SUBTITLE_BITMAP;
         rect->pict.linesize[0] = region->width;
