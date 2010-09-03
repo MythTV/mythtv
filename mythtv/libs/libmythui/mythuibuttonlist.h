@@ -112,7 +112,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
-    
+
     void SetDrawFromBottom(bool draw);
 
     void Reset();
@@ -169,7 +169,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
     enum ArrangeType  { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
     enum WrapStyle    { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems };
-      
+
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
     void Const();
@@ -207,7 +207,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     int PageUp(void);
     int PageDown(void);
-    
+
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);
     virtual QPoint GetButtonPosition(int column, int row) const;

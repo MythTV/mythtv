@@ -1497,7 +1497,7 @@ uint MythUIButtonList::GetVisibleCount()
     if (m_needsUpdate)
         SetPositionArrowStates();
 
-    return m_itemsVisible; 
+    return m_itemsVisible;
 }
 
 bool MythUIButtonList::IsEmpty() const
