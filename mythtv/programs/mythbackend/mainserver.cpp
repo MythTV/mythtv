@@ -37,6 +37,7 @@ using namespace std;
 #include <QTcpServer>
 #include <QTimer>
 
+#include "previewgeneratorqueue.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythverbose.h"
@@ -53,7 +54,6 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "jobqueue.h"
 #include "autoexpire.h"
-#include "previewgenerator.h"
 #include "storagegroup.h"
 #include "compat.h"
 #include "RingBuffer.h"
@@ -184,6 +184,10 @@ MainServer::MainServer(bool master, int port,
 {
     AutoExpire::Update(true);
 
+    PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
+        PreviewGenerator::kLocalAndRemote, ~0, 0);
+    PreviewGeneratorQueue::AddListener(this);
+
     for (int i = 0; i < PRT_STARTUP_THREAD_COUNT; i++)
     {
         ProcessRequestThread *prt = new ProcessRequestThread(this);
@@ -237,6 +241,9 @@ MainServer::MainServer(bool master, int port,
 
 MainServer::~MainServer()
 {
+    PreviewGeneratorQueue::RemoveListener(this);
+    PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
+
     if (mythserver)
     {
         mythserver->disconnect();
@@ -546,7 +553,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleFileTransferQuery(listline, tokens, pbs);
     }
-    else if (command == "QUERY_GENPIXMAP")
+    else if (command == "QUERY_GENPIXMAP2")
     {
         HandleGenPreviewPixmap(listline, pbs);
     }
@@ -729,10 +736,107 @@ void MainServer::MarkUnused(ProcessRequestThread *prt)
 void MainServer::customEvent(QEvent *e)
 {
     QStringList broadcast;
+    QSet<QString> receivers;
 
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
+
+        QString message = me->Message();
+        QString error;
+        if ((message == "PREVIEW_SUCCESS" || message == "PREVIEW_QUEUED") &&
+            me->ExtraDataCount() >= 5)
+        {
+            bool ok = true;
+            QString pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
+            QString filename  = me->ExtraData(1); // outFileName
+            QString msg       = me->ExtraData(2);
+            QString datetime  = me->ExtraData(3);
+
+            if (message == "PREVIEW_QUEUED")
+            {
+                VERBOSE(VB_PLAYBACK, QString("Preview Queued: '%1' '%2'")
+                        .arg(pginfokey).arg(filename));
+                return;
+            }
+
+            QFile file(filename);
+            ok = ok && file.open(QIODevice::ReadOnly);
+
+            if (ok)
+            {
+                QByteArray data = file.readAll();
+                QStringList extra("OK");
+                extra.push_back(pginfokey);
+                extra.push_back(msg);
+                extra.push_back(datetime);
+                extra.push_back(QString::number(data.size()));
+                extra.push_back(
+                    QString::number(qChecksum(data.constData(), data.size())));
+                extra.push_back(QString(data.toBase64()));
+
+                for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
+                {
+                    QString token = me->ExtraData(i);
+                    extra.push_back(token);
+                    RequestedBy::iterator it = m_previewRequestedBy.find(token);
+                    if (it != m_previewRequestedBy.end())
+                    {
+                        receivers.insert(*it);
+                        m_previewRequestedBy.erase(it);
+                    }
+                }
+
+                if (receivers.empty())
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "PREVIEW_SUCCESS but no receivers.");
+                    return;
+                }
+
+                broadcast.push_back("BACKEND_MESSAGE");
+                broadcast.push_back("GENERATED_PIXMAP");
+                broadcast += extra;
+            }
+            else
+            {
+                message = "PREVIEW_FAILED";
+                error = QString("Failed to read '%1'").arg(filename);
+                VERBOSE(VB_IMPORTANT, LOC_ERR + error);
+            }
+        }
+
+        if (message == "PREVIEW_FAILED" && me->ExtraDataCount() >= 5)
+        {
+            QString pginfokey = me->ExtraData(0); // pginfo->MakeUniqueKey()
+            QString msg       = me->ExtraData(2);
+
+            QStringList extra("ERROR");
+            extra.push_back(pginfokey);
+            extra.push_back(msg);
+            for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
+            {
+                QString token = me->ExtraData(i);
+                extra.push_back(token);
+                RequestedBy::iterator it = m_previewRequestedBy.find(token);
+                if (it != m_previewRequestedBy.end())
+                {
+                    receivers.insert(*it);
+                    m_previewRequestedBy.erase(it);
+                }
+            }
+
+            if (receivers.empty())
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "PREVIEW_FAILED but no receivers.");
+                return;
+            }
+
+            broadcast.push_back("BACKEND_MESSAGE");
+            broadcast.push_back("GENERATED_PIXMAP");
+            broadcast += extra;
+        }
 
         if (me->Message().left(11) == "AUTO_EXPIRE")
         {
@@ -945,9 +1049,12 @@ void MainServer::customEvent(QEvent *e)
             me = &mod_me;
         }
 
-        broadcast = QStringList( "BACKEND_MESSAGE" );
-        broadcast << me->Message();
-        broadcast += me->ExtraDataList();
+        if (broadcast.empty())
+        {
+            broadcast.push_back("BACKEND_MESSAGE");
+            broadcast.push_back(me->Message());
+            broadcast += me->ExtraDataList();
+        }
     }
 
     if (!broadcast.empty())
@@ -973,7 +1080,7 @@ void MainServer::customEvent(QEvent *e)
             sendGlobal = true;
         }
 
-        vector<PlaybackSock*> sentSet;
+        QSet<PlaybackSock*> sentSet;
 
         bool isSystemEvent = broadcast[1].startsWith("SYSTEM_EVENT ");
         QStringList sentSetSystemEvent(gCoreContext->GetHostName());
@@ -983,12 +1090,13 @@ void MainServer::customEvent(QEvent *e)
         {
             PlaybackSock *pbs = *iter;
 
-            vector<PlaybackSock*>::const_iterator it =
-                find(sentSet.begin(), sentSet.end(), pbs);
-            if (it != sentSet.end() || pbs->IsDisconnected())
+            if (sentSet.contains(pbs) || pbs->IsDisconnected())
                 continue;
 
-            sentSet.push_back(pbs);
+            if (!receivers.empty() && !receivers.contains(pbs->getHostname()))
+                continue;
+
+            sentSet.insert(pbs);
 
             bool reallysendit = false;
 
@@ -4913,6 +5021,15 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
+    if (slist.size() < 3)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Too few params in pixmap request");
+        QStringList outputlist("ERROR");
+        outputlist += "TOO_FEW_PARAMS";
+        SendResponse(pbssock, outputlist);
+        return;
+    }
+
     bool      time_fmt_sec   = true;
     long long time           = -1;
     QString   outputfile;
@@ -4920,16 +5037,34 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     int       height         = -1;
     bool      has_extra_data = false;
 
-    QStringList::const_iterator it = slist.begin() + 1;
+    QString token = slist[1];
+    if (token.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to parse pixmap request. "
+                "Token absent");
+        QStringList outputlist("ERROR");
+        outputlist += "TOKEN_ABSENT";
+        SendResponse(pbssock, outputlist);
+        return;
+    }
+
+    QStringList::const_iterator it = slist.begin() + 2;
     QStringList::const_iterator end = slist.end();
     ProgramInfo pginfo(it, end);
     bool ok = pginfo.HasPathname();
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, "MainServer: Failed to parse pixmap request.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to parse pixmap request. "
+                "ProgramInfo missing pathname");
         QStringList outputlist("BAD");
-        outputlist += "ERROR_INVALID_REQUEST";
+        outputlist += "NO_PATHNAME";
         SendResponse(pbssock, outputlist);
+        return;
+    }
+    if (token.toLower() == "do_not_care")
+    {
+        token = QString("%1:%2")
+            .arg(pginfo.MakeUniqueKey()).arg(rand());
     }
     if (it != slist.end())
         (time_fmt_sec = ((*it).toLower() == "s")), it++;
@@ -4961,6 +5096,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     pginfo.SetPathname(GetPlaybackURL(&pginfo));
 
+    m_previewRequestedBy[token] = pbs->getHostname();
+
     if ((ismaster) &&
         (pginfo.GetHostname() != gCoreContext->GetHostName()) &&
         (!masterBackendOverride || !pginfo.IsLocal()))
@@ -4969,18 +5106,22 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
         if (slave)
         {
-            QStringList outputlist("OK");
+            QStringList outputlist;
             if (has_extra_data)
             {
                 outputlist = slave->GenPreviewPixmap(
-                    &pginfo, time_fmt_sec, time, outputfile, outputsize);
+                    token, &pginfo, time_fmt_sec, time, outputfile, outputsize);
             }
             else
             {
-                outputlist = slave->GenPreviewPixmap(&pginfo);
+                outputlist = slave->GenPreviewPixmap(token, &pginfo);
             }
 
             slave->DownRef();
+
+            if (outputlist.empty() || outputlist[0] != "OK")
+                m_previewRequestedBy.remove(token);
+
             SendResponse(pbssock, outputlist);
             return;
         }
@@ -4992,38 +5133,29 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (!pginfo.IsLocal())
     {
-        VERBOSE(VB_IMPORTANT, "MainServer: HandleGenPreviewPixmap: Unable to "
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleGenPreviewPixmap: Unable to "
                 "find file locally, unable to make preview image.");
-        QStringList outputlist( "BAD" );
-        outputlist += "ERROR_NOFILE";
+        QStringList outputlist( "ERROR" );
+        outputlist += "FILE_INACCESSIBLE";
         SendResponse(pbssock, outputlist);
+        m_previewRequestedBy.remove(token);
         return;
     }
 
-    PreviewGenerator *previewgen = new PreviewGenerator(&pginfo);
     if (has_extra_data)
     {
-        previewgen->SetOutputSize(outputsize);
-        previewgen->SetOutputFilename(outputfile);
-        previewgen->SetPreviewTime(time, time_fmt_sec);
-    }
-    ok = previewgen->Run();
-    previewgen->deleteLater();
-
-    if (ok)
-    {
-        QStringList outputlist("OK");
-        if (!outputfile.isEmpty())
-            outputlist += outputfile;
-        SendResponse(pbssock, outputlist);
+        PreviewGeneratorQueue::GetPreviewImage(
+            pginfo, outputsize, outputfile, time, time_fmt_sec, token);
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "MainServer: Failed to make preview image.");
-        QStringList outputlist( "BAD" );
-        outputlist += "ERROR_UNKNOWN";
-        SendResponse(pbssock, outputlist);
+        PreviewGeneratorQueue::GetPreviewImage(pginfo, token);
     }
+
+    QStringList outputlist("OK");
+    if (!outputfile.isEmpty())
+        outputlist += outputfile;
+    SendResponse(pbssock, outputlist);
 }
 
 void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)

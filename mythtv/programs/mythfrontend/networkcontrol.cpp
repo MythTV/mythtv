@@ -1403,7 +1403,8 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
 
         frameNumber = results[7].toLongLong();
 
-        PreviewGenerator *previewgen = new PreviewGenerator(&pginfo);
+        PreviewGenerator *previewgen = new PreviewGenerator(
+            &pginfo, QString(), PreviewGenerator::kLocal);
         previewgen->SetPreviewTimeAsFrameNumber(frameNumber);
         previewgen->SetOutputFilename(outFile);
         previewgen->SetOutputSize(QSize(width, height));

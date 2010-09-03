@@ -2,18 +2,27 @@
 #ifndef PREVIEW_GENERATOR_H_
 #define PREVIEW_GENERATOR_H_
 
-#include <pthread.h>
-
+#include <QWaitCondition>
+#include <QDateTime>
 #include <QString>
+#include <QThread>
 #include <QMutex>
 #include <QSize>
+#include <QMap>
+#include <QSet>
 
 #include "programinfo.h"
 #include "util.h"
 
+class PreviewGenerator;
+class QByteArray;
 class MythSocket;
+class QObject;
+class QEvent;
 
-class MPUBLIC PreviewGenerator : public QObject
+typedef QMap<QString,QDateTime> FileTimeStampMap;
+
+class MPUBLIC PreviewGenerator : public QThread
 {
     friend int preview_helper(const QString &chanid,
                               const QString &starttime,
@@ -36,7 +45,9 @@ class MPUBLIC PreviewGenerator : public QObject
     } Mode;
 
   public:
-    PreviewGenerator(const ProgramInfo *pginfo, Mode mode = kLocal);
+    PreviewGenerator(const ProgramInfo *pginfo,
+                     const QString     &token,
+                     Mode               mode = kLocal);
 
     void SetPreviewTime(long long time, bool in_seconds)
         { captureTime = time; timeInSeconds = in_seconds; }
@@ -47,15 +58,12 @@ class MPUBLIC PreviewGenerator : public QObject
     void SetOutputFilename(const QString&);
     void SetOutputSize(const QSize &size) { outSize = size; }
 
-    void Start(void);
+    QString GetToken(void) const { return token; }
+
+    void run(void); // QThread
     bool Run(void);
 
     void AttachSignals(QObject*);
-    void disconnectSafe(void);
-
-  signals:
-    void previewThreadDone(const QString&, bool&);
-    void previewReady(const ProgramInfo*);
 
   public slots:
     void deleteLater();
@@ -64,16 +72,11 @@ class MPUBLIC PreviewGenerator : public QObject
     virtual ~PreviewGenerator();
     void TeardownAll(void);
 
-    bool RemotePreviewSetup(void);
     bool RemotePreviewRun(void);
-    void RemotePreviewTeardown(void);
-
     bool LocalPreviewRun(void);
     bool IsLocal(void) const;
 
     bool RunReal(void);
-
-    static void *PreviewRun(void*);
 
     static char *GetScreenGrab(const ProgramInfo &pginfo,
                                const QString     &filename,
@@ -93,15 +96,16 @@ class MPUBLIC PreviewGenerator : public QObject
     static QString CreateAccessibleFilename(
         const QString &pathname, const QString &outFileName);
 
+    virtual bool event(QEvent *e); // QObject
+    bool SaveOutFile(const QByteArray &data, const QDateTime &dt);
+
   protected:
+    QWaitCondition     previewWaitCondition;
     QMutex             previewLock;
-    pthread_t          previewThread;
     ProgramInfo        programInfo;
 
     Mode               mode;
-    bool               isConnected;
-    bool               createSockets;
-    MythSocket        *serverSock;
+    QObject           *listener;
     QString            pathname;
 
     /// tells us whether to use time as seconds or frame number
@@ -110,6 +114,10 @@ class MPUBLIC PreviewGenerator : public QObject
     long long          captureTime;
     QString            outFileName;
     QSize              outSize;
+
+    QString            token;
+    bool               gotReply;
+    bool               pixmapOk;
 };
 
 #endif // PREVIEW_GENERATOR_H_

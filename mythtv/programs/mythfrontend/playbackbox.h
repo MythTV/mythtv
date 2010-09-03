@@ -16,6 +16,7 @@ using namespace std;
 #include <QObject>
 #include <QMutex>
 #include <QMap>
+#include <QSet>
 
 #include "jobqueue.h"
 #include "tv_play.h"
@@ -138,6 +139,7 @@ class PlaybackBox : public ScheduleCommon
     void updateRecList(MythUIButtonListItem *);
     void ItemSelected(MythUIButtonListItem *item)
         { UpdateUIListItem(item, true); }
+    void ItemVisible(MythUIButtonListItem *item);
     void selected(MythUIButtonListItem *item);
     void PlayFromBookmark(MythUIButtonListItem *item = NULL);
     void PlayFromBeginning(MythUIButtonListItem *item = NULL);
@@ -315,9 +317,9 @@ class PlaybackBox : public ScheduleCommon
         ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists,
         bool force_preview_reload);
     void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
-                          bool force_preview_reload = false);
+                          bool force_preview_reload = true);
 
-    void HandlePreviewEvent(const QString &piKey, const QString &previewFile);
+    void HandlePreviewEvent(const QStringList &list);
     void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
@@ -442,6 +444,8 @@ class PlaybackBox : public ScheduleCommon
     QStringList         m_player_selected_new_show;
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
+    /// Outstanding preview image requests
+    QSet<QString>       m_preview_tokens;
 };
 
 class GroupSelector : public MythScreenType

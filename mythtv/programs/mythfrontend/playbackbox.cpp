@@ -8,43 +8,38 @@
 #include <QTimer>
 #include <QMap>
 
-// libmythdb
-#include "oldsettings.h"
-#include "mythdb.h"
-#include "mythdbcon.h"
-#include "mythverbose.h"
-#include "mythdirs.h"
-
-// libmythtv
-#include "tv.h"
-#include "mythplayer.h"
-#include "recordinginfo.h"
-#include "playgroup.h"
-#include "mythsystemevent.h"
-
-// libmyth
-#include "mythcorecontext.h"
-#include "util.h"
-#include "storagegroup.h"
-#include "programinfo.h"
-
-// libmythui
-#include "mythuihelper.h"
-#include "mythuitext.h"
-#include "mythuibutton.h"
-#include "mythuibuttonlist.h"
-#include "mythuistatetype.h"
-#include "mythdialogbox.h"
-#include "mythuitextedit.h"
-#include "mythuiimage.h"
-#include "mythuicheckbox.h"
+// MythTV
+#include "previewgeneratorqueue.h"
 #include "mythuiprogressbar.h"
-
+#include "mythuibuttonlist.h"
+#include "mythcorecontext.h"
+#include "mythsystemevent.h"
+#include "mythuistatetype.h"
+#include "mythuicheckbox.h"
+#include "mythuitextedit.h"
+#include "mythdialogbox.h"
+#include "recordinginfo.h"
+#include "mythuihelper.h"
+#include "storagegroup.h"
+#include "mythuibutton.h"
+#include "mythverbose.h"
+#include "mythuiimage.h"
+#include "programinfo.h"
+#include "oldsettings.h"
+#include "mythplayer.h"
+#include "mythuitext.h"
 #include "remoteutil.h"
+#include "mythdbcon.h"
+#include "playgroup.h"
+#include "mythdirs.h"
+#include "mythdb.h"
+#include "util.h"
+#include "tv.h"
 
 //  Mythfrontend
 #include "playbackboxlistitem.h"
 #include "customedit.h"
+#include "proglist.h"
 
 #define LOC      QString("PlaybackBox: ")
 #define LOC_WARN QString("PlaybackBox Warning: ")
@@ -444,6 +439,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
 PlaybackBox::~PlaybackBox(void)
 {
     gCoreContext->removeListener(this);
+    PreviewGeneratorQueue::RemoveListener(this);
 
     for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
@@ -498,6 +494,8 @@ bool PlaybackBox::Create()
             SLOT(ItemSelected(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(PlayFromBookmark(MythUIButtonListItem*)));
+    connect(m_recordingList, SIGNAL(itemVisible(MythUIButtonListItem*)),
+            SLOT(ItemVisible(MythUIButtonListItem*)));
 
     // connect up timers...
     connect(m_artTimer[kArtworkFan],   SIGNAL(timeout()), SLOT(fanartLoad()));
@@ -514,6 +512,7 @@ bool PlaybackBox::Create()
 void PlaybackBox::Load(void)
 {
     m_programInfoCache.WaitForLoadToComplete();
+    PreviewGeneratorQueue::AddListener(this);
 }
 
 void PlaybackBox::Init()
@@ -787,7 +786,7 @@ void PlaybackBox::UpdateUIListItem(
 
     QString oldimgfile = item->GetImage("preview");
     if (oldimgfile.isEmpty() || force_preview_reload)
-        m_helper.GetPreviewImage(*pginfo);
+        m_preview_tokens.insert(m_helper.GetPreviewImage(*pginfo));
 
     if ((GetFocusWidget() == m_recordingList) && is_sel)
     {
@@ -811,7 +810,7 @@ void PlaybackBox::UpdateUIListItem(
         if (m_previewImage)
         {
             m_previewImage->SetFilename(oldimgfile);
-            m_previewImage->Load();
+            m_previewImage->Load(true, true);
         }
 
         // Handle artwork
@@ -847,17 +846,75 @@ void PlaybackBox::UpdateUIListItem(
     }
 }
 
+void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
+{
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+
+    MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
+    if (item != sel_item)
+    {
+        if (pginfo && item->GetImage("preview").isEmpty())
+            m_preview_tokens.insert(m_helper.GetPreviewImage(*pginfo));
+    }
+
+    // make sure selected item is still at the top of the queue
+    ProgramInfo *sel_pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+    if (sel_pginfo && sel_item->GetImage("preview").isEmpty())
+        m_preview_tokens.insert(m_helper.GetPreviewImage(*sel_pginfo));
+}
+
+
 /** \brief Updates the UI properties for a new preview file.
  *  This first update the image property of the MythUIButtonListItem
  *  with the new preview file, then if it is selected and there is
  *  a preview image UI item in the theme that it's filename property
  *  gets updated as well.
  */
-void PlaybackBox::HandlePreviewEvent(
-    const QString &piKey, const QString &previewFile)
+void PlaybackBox::HandlePreviewEvent(const QStringList &list)
 {
-    if (previewFile.isEmpty())
+    if (list.size() < 5)
+    {
+        VERBOSE(VB_IMPORTANT, "HandlePreviewEvent() -- too few args");
+        for (uint i = 0; i < (uint) list.size(); i++)
+        {
+            VERBOSE(VB_IMPORTANT, QString("%1: %2")
+                    .arg(i).arg(list[i]));
+        }
         return;
+    }
+
+    const QString piKey       = list[0];
+    const QString previewFile = list[1];
+    const QString message     = list[2];
+
+    bool found = false;
+    for (uint i = 4; i < (uint) list.size(); i++)
+    {
+        QString token = list[i];
+        QSet<QString>::iterator it = m_preview_tokens.find(token);
+        if (it != m_preview_tokens.end())
+        {
+            found = true;
+            m_preview_tokens.erase(it);
+        }
+    }
+
+    if (!found)
+    {
+        QString tokens("\n\t\t\ttokens: ");
+        for (uint i = 4; i < (uint) list.size(); i++)
+            tokens += list[i] + ", ";
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Ignoring PREVIEW_SUCCESS, no matcing token" + tokens);
+        return;
+    }
+
+    if (previewFile.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Ignoring PREVIEW_SUCCESS, no preview file.");
+        return;
+    }
 
     ProgramInfo *info = m_programInfoCache.GetProgramInfo(piKey);
     MythUIButtonListItem *item = NULL;
@@ -865,8 +922,18 @@ void PlaybackBox::HandlePreviewEvent(
     if (info)
         item = m_recordingList->GetItemByData(qVariantFromValue(info));
 
+    if (!item)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Ignoring PREVIEW_SUCCESS, item no longer on screen.");
+    }
+
     if (item)
     {
+        VERBOSE(VB_GUI, LOC +
+                QString("Loading preview %1,\n\t\t\tmsg %2")
+                .arg(previewFile).arg(message));
+
         item->SetImage(previewFile, "preview", true);
 
         if ((GetFocusWidget() == m_recordingList) &&
@@ -874,7 +941,7 @@ void PlaybackBox::HandlePreviewEvent(
             m_previewImage)
         {
             m_previewImage->SetFilename(previewFile);
-            m_previewImage->Load();
+            m_previewImage->Load(true, true);
         }
     }
 }
@@ -2248,6 +2315,15 @@ bool PlaybackBox::Play(
     {
         QCoreApplication::postEvent(
             this, new MythEvent("PLAY_PLAYLIST"));
+    }
+    else
+    {
+        // User may have saved or deleted a bookmark,
+        // requiring update of preview..
+        ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
+            tvrec.GetChanID(), tvrec.GetRecordingStartTime());
+        if (pginfo)
+            UpdateUIListItem(pginfo, true);
     }
 
     return playCompleted;
@@ -3793,9 +3869,19 @@ void PlaybackBox::customEvent(QEvent *event)
             // asPendingDelete, we need to put them back now..
             ScheduleUpdateUIList();
         }
-        else if (message == "PREVIEW_READY" && me->ExtraDataCount() == 2)
+        else if (message == "PREVIEW_SUCCESS")
         {
-            HandlePreviewEvent(me->ExtraData(0), me->ExtraData(1));
+            HandlePreviewEvent(me->ExtraDataList());
+        }
+        else if (message == "PREVIEW_FAILED" && me->ExtraDataCount() >= 5)
+        {
+            for (uint i = 4; i < (uint) me->ExtraDataCount(); i++)
+            {
+                QString token = me->ExtraData(i);
+                QSet<QString>::iterator it = m_preview_tokens.find(token);
+                if (it != m_preview_tokens.end())
+                    m_preview_tokens.erase(it);
+            }
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
@@ -4013,7 +4099,7 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
     {
         ProgramInfo *dst = FindProgramInUILists(evinfo);
         if (dst)
-            UpdateUIListItem(dst, false);
+            UpdateUIListItem(dst, true);
         return;
     }
 

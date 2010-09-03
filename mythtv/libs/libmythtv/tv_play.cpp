@@ -57,6 +57,7 @@ using namespace std;
 #include "mythsystemevent.h"
 #include "videometadatautil.h"
 #include "mythdialogbox.h"
+#include "mythdirs.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -11470,6 +11471,15 @@ void TV::ITVRestart(PlayerContext *ctx, bool isLive)
  */
 bool TV::ScreenShot(PlayerContext *ctx, long long frameNumber)
 {
+    QDir d;
+    QString confdir = GetConfDir();
+    if (!d.mkpath(confdir))
+    {
+        QString msg = tr("Screen Shot") + " " + tr("Error");
+        SetOSDMessage(ctx, msg);
+        return false;
+    }
+
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (!ctx->playingInfo)
     {
@@ -11479,16 +11489,14 @@ bool TV::ScreenShot(PlayerContext *ctx, long long frameNumber)
         return false;
     }
 
-    // TODO FIXME .mythtv isn't guaranteed to exist, and may
-    // very well belong to another frontend.
     QString outFile =
-        QString("%1/.mythtv/%2_%3_%4.png")
-        .arg(QDir::homePath()).arg(ctx->playingInfo->GetChanID())
+        QString("%1/%2_%3_%4.png")
+        .arg(confdir).arg(ctx->playingInfo->GetChanID())
         .arg(ctx->playingInfo->GetRecordingStartTime(MythDate))
         .arg(frameNumber);
 
     PreviewGenerator *previewgen = new PreviewGenerator(
-        ctx->playingInfo, PreviewGenerator::kLocalAndRemote);
+        ctx->playingInfo, QString(), PreviewGenerator::kLocalAndRemote);
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     previewgen->SetPreviewTimeAsFrameNumber(frameNumber);

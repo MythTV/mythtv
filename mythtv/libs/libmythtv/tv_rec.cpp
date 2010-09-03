@@ -11,6 +11,7 @@
 using namespace std;
 
 // MythTV headers
+#include "previewgeneratorqueue.h"
 #include "mythconfig.h"
 #include "tv_rec.h"
 #include "osd.h"
@@ -25,7 +26,6 @@ using namespace std;
 #include "recordingrule.h"
 #include "eitscanner.h"
 #include "RingBuffer.h"
-#include "previewgenerator.h"
 #include "storagegroup.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
@@ -1143,10 +1143,7 @@ void TVRec::TeardownRecorder(bool killFile)
         if (!killFile)
         {
             if (curRecording->IsLocal())
-            {
-                (new PreviewGenerator(
-                    curRecording, PreviewGenerator::kLocal))->Start();
-            }
+                PreviewGeneratorQueue::GetPreviewImage(*curRecording, "");
 
             if (!tvchain)
             {
@@ -4528,10 +4525,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
             if (!oldinfo->IsLocal())
                 oldinfo->SetPathname(oldinfo->GetPlaybackURL(false,true));
             if (oldinfo->IsLocal())
-            {
-                (new PreviewGenerator(
-                    oldinfo, PreviewGenerator::kLocal))->Start();
-            }
+                PreviewGeneratorQueue::GetPreviewImage(*oldinfo, "");
         }
         delete oldinfo;
     }

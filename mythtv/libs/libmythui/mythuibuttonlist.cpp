@@ -1333,6 +1333,12 @@ void MythUIButtonList::SetPositionArrowStates()
     }
 }
 
+void MythUIButtonList::ItemVisible(MythUIButtonListItem* item)
+{
+    if (item)
+        emit itemVisible(item);
+}
+
 void MythUIButtonList::InsertItem(MythUIButtonListItem *item)
 {
     bool wasEmpty = m_itemList.isEmpty();
@@ -2944,5 +2950,5 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         ++state_it;
     }
 
-
+    m_parent->ItemVisible(this);
 }

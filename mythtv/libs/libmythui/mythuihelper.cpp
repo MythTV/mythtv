@@ -1393,18 +1393,21 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
     if (srcfile.isEmpty() || label.isEmpty())
         return NULL;
 
-    // Some screens include certain images dozens or even hundreds of
-    // times.  Even if the image is in the cache, there is still a
-    // stat system call on the original file to see if it has changed.
-    // This code relaxes the original-file check so that the check
-    // isn't repeated if it was already done within kImageCacheTimeout
-    // seconds.
-    const uint kImageCacheTimeout = 5;
-    uint now = QDateTime::currentDateTime().toTime_t();
-    if (d->imageCache.contains(label) &&
-        d->CacheTrack[label] + kImageCacheTimeout > now)
+    if (!(kCacheForceStat & cacheMode))
     {
-        return d->imageCache[label];
+        // Some screens include certain images dozens or even hundreds of
+        // times.  Even if the image is in the cache, there is still a
+        // stat system call on the original file to see if it has changed.
+        // This code relaxes the original-file check so that the check
+        // isn't repeated if it was already done within kImageCacheTimeout
+        // seconds.
+        const uint kImageCacheTimeout = 5;
+        uint now = QDateTime::currentDateTime().toTime_t();
+        if (d->imageCache.contains(label) &&
+            d->CacheTrack[label] + kImageCacheTimeout > now)
+        {
+            return d->imageCache[label];
+        }
     }
 
     QString cachefilepath = GetThemeCacheDir() + '/' + label;
@@ -1412,10 +1415,10 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
     MythImage *ret = NULL;
 
-    if ((cacheMode == kCacheIgnoreDisk) || fi.exists())
+    if (!!(cacheMode & kCacheIgnoreDisk) || fi.exists())
     {
         // Now compare the time on the source versus our cached copy
-        if (cacheMode != kCacheIgnoreDisk)
+        if (!(cacheMode & kCacheIgnoreDisk))
             FindThemeFile(srcfile);
 
         QDateTime srcLastModified;
@@ -1433,12 +1436,12 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         else if (original.exists())
             srcLastModified = original.lastModified();
 
-        if ((cacheMode == kCacheIgnoreDisk) ||
+        if (!!(cacheMode & kCacheIgnoreDisk) ||
             (fi.lastModified() > srcLastModified))
         {
             // Check Memory Cache
             ret = GetImageFromCache(label);
-            if (!ret && (cacheMode == kCacheNormal))
+            if (!ret && (!!(kCacheNormal & cacheMode)))
             {
                 // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();

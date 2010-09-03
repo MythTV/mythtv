@@ -51,7 +51,6 @@ using namespace std;
 #include "programinfo.h"
 #include "dbcheck.h"
 #include "jobqueue.h"
-#include "previewgenerator.h"
 #include "mythcommandlineparser.h"
 #include "mythsystemevent.h"
 

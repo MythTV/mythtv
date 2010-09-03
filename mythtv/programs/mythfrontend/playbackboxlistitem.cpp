@@ -9,7 +9,7 @@ PlaybackBoxListItem::PlaybackBoxListItem(
     pbbox(parent), needs_update(true)
 {
 }
-
+/*
 void PlaybackBoxListItem::SetToRealButton(
     MythUIStateType *button, bool selected)
 {
@@ -20,3 +20,4 @@ void PlaybackBoxListItem::SetToRealButton(
     }
     MythUIButtonListItem::SetToRealButton(button, selected);
 }
+*/

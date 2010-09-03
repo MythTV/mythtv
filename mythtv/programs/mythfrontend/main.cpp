@@ -19,6 +19,7 @@ using namespace std;
 #include <QApplication>
 #include <QTimer>
 
+#include "previewgeneratorqueue.h"
 #include "mythconfig.h"
 #include "tv.h"
 #include "proglist.h"
@@ -1458,7 +1459,12 @@ int main(int argc, char **argv)
 
     BackendConnectionManager bcm;
 
+    PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
+        PreviewGenerator::kRemote, 50, 60);
+
     int ret = qApp->exec();
+
+    PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete sysEventHandler;
 

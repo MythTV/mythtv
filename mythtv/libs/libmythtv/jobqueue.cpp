@@ -2169,7 +2169,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         if (program_info->IsLocal())
         {
             PreviewGenerator *pg = new PreviewGenerator(
-                program_info, PreviewGenerator::kLocal);
+                program_info, QString(), PreviewGenerator::kLocal);
             pg->Run();
             pg->deleteLater();
         }

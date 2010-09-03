@@ -73,10 +73,10 @@ class ImageLoadThread : public QRunnable
   public:
     ImageLoadThread(MythUIImage *parent, const QString &basefile,
                     const QString &filename, int number,
-                    QSize forceSize) :
+                    QSize forceSize, ImageCacheMode mode) :
         m_parent(parent), m_basefile(basefile),
         m_filename(filename), m_number(number),
-        m_ForceSize(forceSize)
+        m_ForceSize(forceSize), m_cacheMode(mode)
     {
         m_basefile.detach();
         m_filename.detach();
@@ -95,13 +95,13 @@ class ImageLoadThread : public QRunnable
 
         if (imageReader.supportsAnimation())
         {
-            m_parent->LoadAnimatedImage(imageReader, m_filename, m_ForceSize);
+            m_parent->LoadAnimatedImage(
+                imageReader, m_filename, m_ForceSize, m_cacheMode);
         }
         else
         {
-            MythImage *image =
-                m_parent->LoadImage(imageReader, m_filename, m_ForceSize);
-
+            MythImage *image = m_parent->LoadImage(
+                imageReader, m_filename, m_ForceSize, m_cacheMode);
             ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
                                                     m_filename, m_number);
             QCoreApplication::postEvent(m_parent, le);
@@ -114,6 +114,7 @@ class ImageLoadThread : public QRunnable
     QString      m_filename;
     int          m_number;
     QSize        m_ForceSize;
+    ImageCacheMode m_cacheMode;
 };
 
 /////////////////////////////////////////////////////////////////
@@ -542,7 +543,7 @@ QString MythUIImage::GenImageLabel(int w, int h) const
 /**
  *  \brief Load the image(s), wraps LoadImage()
  */
-bool MythUIImage::Load(bool allowLoadInBackground)
+bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 {
     d->m_UpdateLock.lockForRead();
 
@@ -621,7 +622,6 @@ bool MythUIImage::Load(bool allowLoadInBackground)
     }
 
     QString imagelabel;
-    ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
 
     int j = 0;
     for (int i = m_LowNum; i <= m_HighNum && !m_animatedImage; i++)
@@ -633,10 +633,16 @@ bool MythUIImage::Load(bool allowLoadInBackground)
 
         // Only load in the background if allowed and the image is
         // not already in our mem cache
+        ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
         if (m_gradient)
             cacheMode = kCacheIgnoreDisk;
-        else
-            cacheMode = kCacheCheckMemoryOnly;
+        else if (forceStat)
+            cacheMode = (ImageCacheMode)
+                ((int)kCacheCheckMemoryOnly | (int)kCacheForceStat);
+        
+        ImageCacheMode cacheMode2 = (!forceStat) ? kCacheNormal :
+            (ImageCacheMode) ((int)kCacheNormal | (int)kCacheForceStat);
+
 
         if ((allowLoadInBackground) &&
             (!GetMythUI()->LoadCacheImage(filename, imagelabel, cacheMode)) &&
@@ -644,9 +650,8 @@ bool MythUIImage::Load(bool allowLoadInBackground)
         {
             VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
                         "Load(), spawning thread to load '%1'").arg(filename));
-            ImageLoadThread *bImgThread =
-                new ImageLoadThread(this, bFilename, filename, i,
-                                    bForceSize);
+            ImageLoadThread *bImgThread = new ImageLoadThread(
+                this, bFilename, filename, i, bForceSize, cacheMode2);
             GetMythUI()->GetImageThreadPool()->start(bImgThread);
         }
         else
@@ -665,11 +670,13 @@ bool MythUIImage::Load(bool allowLoadInBackground)
 
             if (imageReader.supportsAnimation())
             {
-                LoadAnimatedImage(imageReader, filename, bForceSize);
+                LoadAnimatedImage(
+                    imageReader, filename, bForceSize, cacheMode2);
             }
             else
             {
-                MythImage *image = LoadImage(imageReader, filename, bForceSize);
+                MythImage *image = LoadImage(
+                    imageReader, filename, bForceSize, cacheMode2);
                 if (image)
                 {
                     if (bForceSize.isNull())
@@ -701,8 +708,9 @@ bool MythUIImage::Load(bool allowLoadInBackground)
 /**
 *  \brief Load an image
 */
-MythImage *MythUIImage::LoadImage(MythImageReader &imageReader,
-                                  const QString &imFile, QSize bForceSize)
+MythImage *MythUIImage::LoadImage(
+    MythImageReader &imageReader, const QString &imFile,
+    QSize bForceSize, int cacheMode)
 {
     QString filename = imFile;
 
@@ -754,7 +762,10 @@ MythImage *MythUIImage::LoadImage(MythImageReader &imageReader,
     imagelabel = GenImageLabel(filename, w, h);
 
     if (!imageReader.supportsAnimation())
-        image = GetMythUI()->LoadCacheImage(filename, imagelabel);
+    {
+        image = GetMythUI()->LoadCacheImage(
+            filename, imagelabel, (ImageCacheMode) cacheMode);
+    }
 
     if (image)
     {
@@ -882,8 +893,9 @@ MythImage *MythUIImage::LoadImage(MythImageReader &imageReader,
 /**
 *  \brief Load an animated image
 */
-bool MythUIImage::LoadAnimatedImage(MythImageReader &imageReader,
-                                    const QString &imFile, QSize bForceSize)
+bool MythUIImage::LoadAnimatedImage(
+    MythImageReader &imageReader, const QString &imFile,
+    QSize bForceSize, int cacheMode)
 {
     bool result = false;
     m_loadingImagesLock.lock();
@@ -930,7 +942,9 @@ bool MythUIImage::LoadAnimatedImage(MythImageReader &imageReader,
     {
         frameFilename = filename.arg(imageCount);
         imageLabel = GenImageLabel(frameFilename, w, h);
-        MythImage *im = LoadImage(imageReader, frameFilename, bForceSize);
+        MythImage *im = LoadImage(
+            imageReader, frameFilename,
+            bForceSize, (ImageCacheMode) cacheMode);
 
         if (!im)
             break;

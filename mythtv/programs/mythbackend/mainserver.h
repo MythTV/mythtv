@@ -1,10 +1,11 @@
 #ifndef MAINSERVER_H_
 #define MAINSERVER_H_
 
-#include <QMap>
-#include <QMutex>
 #include <QReadWriteLock>
 #include <QEvent>
+#include <QMutex>
+#include <QHash>
+#include <QMap>
 
 #include <vector>
 using namespace std;
@@ -248,6 +249,9 @@ class MainServer : public QObject, public MythSocketCBs
     QMap<QString, QString>     m_downloadURLs;
 
     int m_exitCode;
+
+    typedef QHash<QString,QString> RequestedBy;
+    RequestedBy                m_previewRequestedBy;
 
     static const uint kMasterServerReconnectTimeout;
 };

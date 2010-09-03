@@ -448,10 +448,11 @@ package MythTV::Recording;
     sub generate_pixmap {
         my $self = shift;
         my $ret = $self->{'_mythtv'}->backend_command(join($MythTV::BACKEND_SEP,
-                                                           'QUERY_GENPIXMAP',
+                                                           'QUERY_GENPIXMAP2',
+                                                           "do_not_care",
                                                            $self->to_string())
                                                      );
-        if ($ret eq 'BAD') {
+        if ($ret eq 'ERROR') {
             print STDERR "Unknown error generating pixmap for $self->{'chanid'}:$self->{'starttime'}\n";
             return 0;
         }

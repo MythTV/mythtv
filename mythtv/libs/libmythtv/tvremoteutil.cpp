@@ -264,14 +264,6 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
     return blank;
 }
 
-void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
-{
-    QStringList strlist( "QUERY_GENPIXMAP" );
-    pginfo->ToStringList(strlist);
-
-    gCoreContext->SendReceiveStringList(strlist);
-}
-
 bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
 {
     //VERBOSE(VB_IMPORTANT, QString("RemoteIsBusy(%1) %2")

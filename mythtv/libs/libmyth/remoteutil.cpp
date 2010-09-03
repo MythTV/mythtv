@@ -278,14 +278,6 @@ void RemoteSendEvent(const MythEvent &event)
     gCoreContext->SendReceiveStringList(strlist);
 }
 
-void RemoteGeneratePreviewPixmap(const ProgramInfo *pginfo)
-{
-    QStringList strlist( "QUERY_GENPIXMAP" );
-    pginfo->ToStringList(strlist);
-
-    gCoreContext->SendReceiveStringList(strlist);
-}
-    
 QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
 {
     QDateTime retdatetime;
@@ -354,7 +346,7 @@ QDateTime RemoteGetPreviewIfModified(
         return retdatetime;
     }
 
-    size_t  length     = strlist[1].toLongLong();
+    size_t  length     = strlist[1].toULongLong();
     quint16 checksum16 = strlist[2].toUInt();
     QByteArray data = QByteArray::fromBase64(strlist[3].toAscii());
     if ((size_t) data.size() < length)
@@ -364,6 +356,7 @@ QDateTime RemoteGetPreviewIfModified(
                 .arg(data.size()).arg(length));
         return QDateTime();
     }
+    data.resize(length);
 
     if (checksum16 != qChecksum(data.constData(), data.size()))
     {

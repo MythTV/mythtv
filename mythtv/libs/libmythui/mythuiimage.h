@@ -51,7 +51,7 @@ class MPUBLIC MythUIImage : public MythUIType
     void SetDelays(QVector<int> delays);
 
     void Reset(void);
-    bool Load(bool allowLoadInBackground = true);
+    bool Load(bool allowLoadInBackground = true, bool forceStat = false);
 
     bool IsGradient(void) const { return m_gradient; }
 
@@ -66,9 +66,9 @@ class MPUBLIC MythUIImage : public MythUIType
     void Init(void);
     void Clear(void);
     MythImage* LoadImage(MythImageReader &imageReader, const QString &imFile,
-                         QSize bForceSize);
+                         QSize bForceSize, int cacheMode);
     bool LoadAnimatedImage(MythImageReader &imageReader, const QString &imFile,
-                           QSize bForceSize);
+                           QSize bForceSize, int mode);
     void customEvent(QEvent *event);
 
     virtual bool ParseElement(

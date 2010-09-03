@@ -1149,7 +1149,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
             return;
 
         PreviewGenerator *previewgen = new PreviewGenerator(
-            &pginfo, PreviewGenerator::kLocal);
+            &pginfo, QString(), PreviewGenerator::kLocal);
         previewgen->SetPreviewTimeAsSeconds(nSecsIn);
         previewgen->SetOutputFilename(sPreviewFileName);
         bool ok = previewgen->Run();

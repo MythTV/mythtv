@@ -70,8 +70,10 @@ class PlaybackSock
     QStringList GetSGFileQuery(QString &host, QString &groupname,
                                QString &filename);
 
-    QStringList GenPreviewPixmap(const ProgramInfo *pginfo);
-    QStringList GenPreviewPixmap(const ProgramInfo *pginfo,
+    QStringList GenPreviewPixmap(const QString     &token,
+                                 const ProgramInfo *pginfo);
+    QStringList GenPreviewPixmap(const QString     &token,
+                                 const ProgramInfo *pginfo,
                                  bool               time_fmt_sec,
                                  long long          time,
                                  const QString     &outputFile,

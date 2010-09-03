@@ -53,7 +53,6 @@ MPUBLIC vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
 MPUBLIC void RemoteSendMessage(const QString &message);
 MPUBLIC void RemoteSendEvent(const MythEvent &event);
 MPUBLIC vector<uint> RemoteRequestFreeRecorderList(void);
-MPUBLIC void RemoteGeneratePreviewPixmap(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewIfModified(
     const ProgramInfo &pginfo, const QString &cachefile);

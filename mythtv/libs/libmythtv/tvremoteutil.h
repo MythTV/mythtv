@@ -45,7 +45,6 @@ MPUBLIC RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
 MPUBLIC vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, const vector<uint> &excluded_cardids);
 MPUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
-MPUBLIC void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);
 MPUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);
 
 MPUBLIC bool RemoteGetRecordingStatus(

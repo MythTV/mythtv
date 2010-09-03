@@ -162,6 +162,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
   signals:
     void itemSelected(MythUIButtonListItem* item);
     void itemClicked(MythUIButtonListItem* item);
+    void itemVisible(MythUIButtonListItem* item);
 
   protected:
     enum ScrollStyle  { ScrollFree, ScrollCenter, ScrollGroupCenter };
@@ -198,6 +199,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     bool DistributeButtons(void);
     void SetPosition(void);
     void SetPositionArrowStates(void);
+    void ItemVisible(MythUIButtonListItem *item);
 
     void updateLCD(void);
 
