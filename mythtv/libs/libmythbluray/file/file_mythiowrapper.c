@@ -3,6 +3,8 @@
 #endif
 
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "file.h"
 #include "util/macro.h"
@@ -41,6 +43,11 @@ static int file_eof_mythiowrapper(BD_FILE_H *file)
     return 0;
 }
 
+static int file_stat_mythiowrapper(BD_FILE_H *file, struct stat *buf)
+{
+    return mythfile_stat_fd((int)file->internal, buf);
+}
+
 static int64_t file_read_mythiowrapper(BD_FILE_H *file, uint8_t *buf, int64_t size)
 {
     return mythfile_read((int)file->internal, buf, size);
@@ -63,6 +70,7 @@ BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *mode)
     file->write = file_write_mythiowrapper;
     file->tell = file_tell_mythiowrapper;
     file->eof = file_eof_mythiowrapper;
+    file->stat = file_stat_mythiowrapper;
 
     int fd;
     int intMode = O_RDONLY;

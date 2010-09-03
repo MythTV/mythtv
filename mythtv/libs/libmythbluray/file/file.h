@@ -43,6 +43,7 @@ extern "C" {
 #define file_seek(X,Y,Z) X->seek(X,Y,Z)
 #define file_tell(X) X->tell(X)
 #define file_eof(X) X->eof(X)
+#define file_stat(X,Y) X->stat(X,Y)
 #define file_read(X,Y,Z) X->read(X,Y,Z)
 #define file_write(X,Y,Z) X->write(X,Y,Z)
 

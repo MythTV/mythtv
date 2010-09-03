@@ -34,6 +34,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 static void file_close_linux(BD_FILE_H *file)
 {
@@ -62,6 +64,11 @@ static int64_t file_tell_linux(BD_FILE_H *file)
 #else
     return ftello((FILE *)file->internal);
 #endif
+}
+
+static int file_stat_linux(BD_FILE_H *file, struct stat *buf)
+{
+    return fstat(fileno((FILE *)file->internal), buf);
 }
 
 static int file_eof_linux(BD_FILE_H *file)
@@ -94,6 +101,7 @@ static BD_FILE_H *file_open_linux(const char* filename, const char *mode)
     file->write = file_write_linux;
     file->tell = file_tell_linux;
     file->eof = file_eof_linux;
+    file->stat = file_stat_linux;
 
     if ((fp = fopen(filename, mode))) {
         file->internal = fp;
