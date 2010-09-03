@@ -493,7 +493,7 @@ bool FillData::GrabDataFromDDFile(
 /** \fn FillData::Run(SourceList &sourcelist)
  *  \brief Goes through the sourcelist and updates its channels with
  *         program info grabbed with the associated grabber.
- *  \return true if there was no failures
+ *  \return true if there were no failures
  */
 bool FillData::Run(SourceList &sourcelist)
 {
@@ -929,7 +929,7 @@ bool FillData::Run(SourceList &sourcelist)
                     else
                     {
                         VERBOSE(VB_GENERAL, QString(
-                                "Data Refresh because we are unable to "
+                                "Data Refresh needed because we are unable to "
                                 "query the data for day @ offset %1 to "
                                 "determine how much we should have for "
                                 "offset day %2.").arg(i-1).arg(i));
@@ -952,8 +952,8 @@ bool FillData::Run(SourceList &sourcelist)
 
                     if (endofdata)
                     {
-                        VERBOSE(VB_GENERAL, "Grabber is no longer returning"
-                                            " program data, finishing");
+                        VERBOSE(VB_GENERAL, "Grabber is no longer returning "
+                                            "program data, finishing");
                         break;
                     }
                 }

@@ -59,8 +59,8 @@ subdir (or at http://www.mythtv.org/docs/ ) these days.  Read those carefully.
 keys.txt has a listing of all the various default key bindings.  All
 keybindings can be changed via MythWeb.
 
-If you want to check out the theme format, and perhaps make your own, just
-look http://www.mythtv.org/wiki/MythUI_Theme_Development and at the .xml files
+If you want to check out the theme format, and perhaps make your own,
+look at http://www.mythtv.org/wiki/MythUI_Theme_Development and at the .xml files
 in the /usr/local/share/mythtv/themes/[themename] subdirs.
 
 Feel free to subscribe to the development mailing list at:
