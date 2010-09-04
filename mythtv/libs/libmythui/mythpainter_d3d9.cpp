@@ -280,7 +280,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
 
     if (newimage && newimage->IsValid())
     {
-        IncreaseCacheSize(im->size);
+        IncreaseCacheSize(newimage->GetSize());
         newimage->UpdateImage(im);
         m_ImageBitmapMap[im] = newimage;
         m_ImageExpireList.push_back(im);
