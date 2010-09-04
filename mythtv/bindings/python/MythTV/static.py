@@ -47,6 +47,14 @@ class RECTYPE( object ):
     kFindDailyRecord    = 9
     kFindWeeklyRecord   = 10
 
+class RECSEARCHTYPE( object ):
+    kNoSearch           = 0
+    kPowerSearch        = 1
+    kTitleSearch        = 2
+    kKeywordSearch      = 3
+    kPeopleSearch       = 4
+    kManualSearch       = 5
+
 class RECSTATUS( object ):
     rsFailed            = -9
     rsTunerBusy         = -8

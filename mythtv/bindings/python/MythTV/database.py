@@ -17,8 +17,10 @@ from connections import DBConnection, LoggedCursor, XMLConnection
 from socket import gethostname
 from uuid import uuid4
 from lxml import etree
-import os
+import datetime as _pydt
+import time as _pyt
 import weakref
+import os
 
 
 class DBData( DictData, MythSchema ):
@@ -1080,6 +1082,40 @@ class DBCache( MythSchema ):
 
             for row in cursor:
                 yield StorageGroup.fromRaw(row, self)
+
+    def literal(self, query, args=None):
+        """
+        obj.literal(query, args=None) -> processed query
+        """
+        conv = {int: str,
+                str: lambda x: '"%s"'%x,
+                long: str,
+                float: str,
+                unicode: lambda x: '"%s"'%x,
+                bool: str,
+                type(None): lambda x: 'NULL',
+                _pydt.datetime: lambda x: x.strftime('"%Y-%m-%d %H:%M:%S"'),
+                _pydt.date: lambda x: x.strftime('"%Y-%m-%d"'),
+                _pydt.time: lambda x: x.strftime('"%H:%M:%S"'),
+                _pydt.timedelta: lambda x: '"%d:%02d:%02d"' % \
+                                                (x.seconds/3600+x.days*24,
+                                                 x.seconds%3600/60,
+                                                 x.seconds%60),
+                _pyt.struct_time: lambda x: _pyt.\
+                                        strftime('"%Y-%m-%d %H:%M:%S"',x)}
+        
+        if args is None:
+            return query
+        args = list(args)
+        for i, arg in enumerate(args):
+            for k,v in conv.items():
+                if isinstance(arg, k):
+                    args[i] = v(arg)
+                    break
+            else:
+                args[i] = str(arg)
+
+        return query % tuple(args)
 
     def cursor(self, log=None):
         if not log:

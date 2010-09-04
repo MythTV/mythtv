@@ -584,6 +584,7 @@ class MythDB( DBCache ):
         obj.getChannels()       - return a list of all channels
     """
 
+
     @databaseSearch
     def searchRecorded(self, init=False, key=None, value=None):
         """
@@ -704,7 +705,9 @@ class MythDB( DBCache ):
             category,   airdate,    stars,      previouslyshown,
             stereo,     subtitled,  hdtv,       closecaptioned,
             partnumber, parttotal,  seriesid,   originalairdate,
-            showtype,   programid,  generic,    syndicatedepisodenumber
+            showtype,   programid,  generic,    syndicatedepisodenumber,
+            ondate,     cast,       startbefore,startafter
+            endbefore,  endafter
         """
         if init:
             return ('program', Guide, (),
@@ -731,6 +734,14 @@ class MythDB( DBCache ):
         if key == 'endafter':
             return ('endtime>%s', datetime.duck(value), 0)
         return None
+
+    def makePowerRule(self, ruletitle='unnamed (Power Search', 
+                            type=RECTYPE.kAllRecord, **kwargs):
+        where, args, join = self.searchGuide.parseInp(kwargs)
+        where = ' AND '.join(where)
+        join = self.searchGuide.buildJoin(join)
+        return Record.fromPowerRule(title=ruletitle, type=type, where=where,
+                                    args=args, join=join, db=self)
 
     @databaseSearch
     def searchRecord(self, init=False, key=None, value=None):

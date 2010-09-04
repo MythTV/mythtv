@@ -131,6 +131,20 @@ class databaseSearch( object ):
         return self
 
     def __call__(self, **kwargs):
+        where,fields,joinbit = self.parseInp(kwargs)
+
+        # process query
+        query = self.buildQuery(where, joinbit=joinbit)
+        with self.inst.cursor(self.inst.log) as cursor:
+            if len(where) > 0:
+                cursor.execute(query, fields)
+            else:
+                cursor.execute(query)
+
+        for row in cursor:
+            yield self.dbclass.fromRaw(row, self.inst)
+
+    def parseInp(self, kwargs):
         where = []
         fields = []
         joinbit = 0
@@ -139,6 +153,7 @@ class databaseSearch( object ):
         for key, val in kwargs.items():
             if val is None:
                 continue
+
             # process custom query
             if key == 'custom':
                 custwhere = {}
@@ -147,22 +162,26 @@ class databaseSearch( object ):
                     where.append(k)
                     fields.append(v)
                 continue
+
             # let function process remaining queries
             res = self.func(self.inst, key=key, value=val)
             errstr = "%s got an unexpected keyword argument '%s'"
             if res is None:
                 if 'not' not in key:
                     raise TypeError(errstr % (self.__name__, key))
+                # try inverted argument
                 res = list(self.func(self.inst, key=key[3:], value=val))
                 if res is None:
                     raise TypeError(errstr % (self.__name__, key))
                 res[0] = 'NOT '+res[0]
 
             if len(res) == 3:
+                # normal processing
                 where.append(res[0])
                 fields.append(res[1])
                 joinbit = joinbit|res[2]
             elif len(res) == 4:
+                # special format for crossreferenced data
                 lval = val.split(',')
                 where.append('(%s)=%d' %\
                     (self.buildQuery(
@@ -185,16 +204,7 @@ class databaseSearch( object ):
                 fields.append(res[1])
                 joinbit = joinbit|res[2]
 
-        # process query
-        query = self.buildQuery(where, joinbit=joinbit)
-        with self.inst.cursor(self.inst.log) as cursor:
-            if len(where) > 0:
-                cursor.execute(query, fields)
-            else:
-                cursor.execute(query)
-
-        for row in cursor:
-            yield self.dbclass.fromRaw(row, self.inst)
+        return where,fields,joinbit
 
     def buildJoinOn(self, i):
         if len(self.joins[i]) == 3:
@@ -213,6 +223,15 @@ class databaseSearch( object ):
                                     self.joins[i][3])])
         return on
 
+    def buildJoin(self, joinbit):
+        join = ''
+        if joinbit:
+            for i,v in enumerate(self.joins):
+                if (2**i)&joinbit:
+                    join += ' JOIN %s ON %s' % \
+                            (v[0], self.buildJoinOn(i))
+        return join
+
     def buildQuery(self, where, select=None, tfrom=None, joinbit=0):
         sql = 'SELECT '
         if select:
@@ -228,11 +247,7 @@ class databaseSearch( object ):
         else:
             sql += self.table
 
-        if joinbit:
-            for i,v in enumerate(self.joins):
-                if (2**i)&joinbit:
-                    sql += ' JOIN %s ON %s' % \
-                            (v[0], self.buildJoinOn(i))
+        sql += self.buildJoin(joinbit)
 
         if len(where):
             sql += ' WHERE '

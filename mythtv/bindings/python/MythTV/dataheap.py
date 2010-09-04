@@ -104,6 +104,32 @@ class Record( DBDataWrite, RECTYPE, CMPRecord ):
             rec.type = type
         return rec.create(wait=wait)
 
+    @classmethod
+    def fromPowerRule(cls, title='unnamed (Power Search)', where='', args=None, 
+                           join='', db=None, type=RECTYPE.kAllRecord, 
+                           searchtype=RECSEARCHTYPE.kPowerSearch, wait=False):
+
+        if type not in (RECTYPE.kAllRecord,           RECTYPE.kFindDailyRecord,
+                        RECTYPE.kFindWeeklyRecord,    RECTYPE.kFindOneRecord):
+            raise MythDBError("Invalid 'type' set for power recording rule.")
+
+        rec = cls(None, db=db)
+        if args is not None:
+            where = rec._db.literal(where, args)
+
+        now = datetime.now()
+        rec.starttime = now.time()
+        rec.endtime = now.time()
+        rec.startdate = now.date()
+        rec.enddate = now.date()
+
+        rec.title = title
+        rec.description = where
+        rec.subtitle = join
+        rec.type = type
+        rec.search = searchtype
+        return rec.create(wait=wait)
+
 class Recorded( DBDataWrite, CMPRecord ):
     """
     Recorded(data=None, db=None) -> Recorded object
