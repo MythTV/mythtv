@@ -311,13 +311,18 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
                 commBreakIter--;
         }
     }
-    else if (*commBreakIter == MARK_COMM_START)
+    else
     {
         int skipped_seconds = (int)(((int64_t)(commBreakIter.key()) -
                               (int64_t)framesPlayed) / video_frame_rate);
 
-        // special case when hitting 'skip' < 20 seconds before break
-        if (skipped_seconds < 20)
+        // special case when hitting 'skip' within 20 seconds of the break
+        // start or within commrewindamount of the break end
+        // Even though commrewindamount has a max of 10 per the settings UI,
+        // check for MARK_COMM_END to make the code generic
+        MarkTypes type = *commBreakIter;
+        if (((type == MARK_COMM_START) && (skipped_seconds < 20)) ||
+            ((type == MARK_COMM_END) && (skipped_seconds < commrewindamount)))
         {
             commBreakIter++;
 
