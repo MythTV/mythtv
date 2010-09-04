@@ -8954,8 +8954,8 @@ void TV::ToggleRecord(PlayerContext *ctx)
             recinfo.ToggleRecord();
         recinfo.ToMap(infoMap);
         infoMap["iconpath"] = ChannelUtil::GetIcon(recinfo.GetChanID());
-        if (recinfo.IsVideoFile() &&
-            recinfo.GetPathname() != recinfo.GetBasename())
+        if ((recinfo.IsVideoFile() || recinfo.IsVideoDVD() ||
+            recinfo.IsVideoBD()) && recinfo.GetPathname() != recinfo.GetBasename())
         {
             infoMap["coverartpath"] = VideoMetaDataUtil::GetArtPath(
                 recinfo.GetPathname(), "Coverart");

@@ -741,8 +741,9 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
         playingInfo->ToMap(infoMap);
         infoMap["tvstate"]  = StateToString(playingState);
         infoMap["iconpath"] = ChannelUtil::GetIcon(playingInfo->GetChanID());
-        if (playingInfo->IsVideoFile() &&
-            playingInfo->GetPathname() != playingInfo->GetBasename())
+        if ((playingInfo->IsVideoFile() || playingInfo->IsVideoDVD() ||
+            playingInfo->IsVideoBD()) && playingInfo->GetPathname() !=
+            playingInfo->GetBasename())
         {
             infoMap["coverartpath"] = VideoMetaDataUtil::GetArtPath(
                 playingInfo->GetPathname(), "Coverart");
