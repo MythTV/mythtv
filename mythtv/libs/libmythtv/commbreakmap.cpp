@@ -295,8 +295,8 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     {
         commBreakIter--;
 
-        int skipped_seconds = (int)((commBreakIter.key() -
-                framesPlayed) / video_frame_rate);
+        int skipped_seconds = (int)(((int64_t)(commBreakIter.key()) -
+                              (int64_t)framesPlayed) / video_frame_rate);
 
         // special case when hitting 'skip backwards' <3 seconds after break
         if (skipped_seconds > -3)
@@ -313,8 +313,8 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     }
     else if (*commBreakIter == MARK_COMM_START)
     {
-        int skipped_seconds = (int)((commBreakIter.key() -
-                framesPlayed) / video_frame_rate);
+        int skipped_seconds = (int)(((int64_t)(commBreakIter.key()) -
+                              (int64_t)framesPlayed) / video_frame_rate);
 
         // special case when hitting 'skip' < 20 seconds before break
         if (skipped_seconds < 20)
@@ -334,9 +334,8 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
 
     if (skipcommercials > 0)
         MergeShortCommercials(video_frame_rate);
-
-    int skipped_seconds = (int)((commBreakIter.key() -
-                          framesPlayed) / video_frame_rate);
+    int skipped_seconds = (int)(((int64_t)(commBreakIter.key()) -
+                          (int64_t)framesPlayed) / video_frame_rate);
     QString skipTime;
     skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                      abs(skipped_seconds) % 60);
