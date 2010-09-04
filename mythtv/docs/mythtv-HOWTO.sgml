@@ -2521,7 +2521,7 @@ X	        | queues the current recording for transcoding			    @
 O	        | brings up menu to allow toggling settings such as Commercial&nbsp;
                   Auto-Skip, Auto-Expire, etc.					    @
 D		| exits the current recording and displays the Delete menu @
-E or M	        | enters/exits edit mode.					    @
+E	        | enters/exits edit mode.					    @
                 | @
                 | @
                 | <bf>In edit mode</bf>                                             @
@@ -2532,10 +2532,14 @@ Up/Down	        | alter the amount of time you jump forward and backward.&nbsp;
                   and 10 minutes.						    @
 PageUp/PageDown	| move forward and backward to the nearest cut point		    @
 < or >	        | move forward or backward by 10 times the normal jump amount	    @
-Space/Enter	| allows you to set or delete a cut point			    @
-Z	        | loads the commercial skip list (if one exists) into the cutlist  @
-C or Q	        | clear all cut points in the cutlist			    @
-I		| Inverts the cutlist
+M	        | shows a menu allowing you to add, move, or delete a cut&nbsp;
+                  or to save or revert changes					    @
+Space/Enter	| adds a cut or, if in a cut area, prompts for action		    @
+D	        | deletes the cut						    @
+Z	        | loads the commercial skip list (if one exists) into the cut list  @
+C or Q	        | clear all cut points in the cut list				    @
+I		| inverts the cut list						    @
+Escape		| prompts whether to save or cancel changes and allows exit
 </tabular>
 </table>
 <sect2>EPG
@@ -6086,7 +6090,7 @@ A recording can be transcoded in two ways:
 <item>Automatically transcode the file once it has completed
 recording.</item>
 <item>Manually choosing to transcode a recording, usually after
-importing a cutlist or manually marking commercials to be
+importing a cut list or manually marking commercials to be
 removed.</item>
 </itemize>
 

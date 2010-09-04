@@ -23,7 +23,7 @@ QString toString(MarkTypes type)
     {
         case MARK_UNSET:        return "UNSET";
         case MARK_UPDATED_CUT:  return "UPDATED_CUT";
-        case MARK_EDIT_MODE:    return "EDIT_MODE";
+        case MARK_PLACEHOLDER:  return "PLACEHOLDER";
         case MARK_CUT_END:      return "CUT_END";
         case MARK_CUT_START:    return "CUT_START";
         case MARK_BOOKMARK:     return "BOOKMARK";

@@ -34,15 +34,16 @@ class DeleteMap
     void Clear(void);
     void ReverseAll(uint64_t total);
     void Add(uint64_t frame, uint64_t total, MarkTypes type);
+    void NewCut(uint64_t frame, uint64_t total);
     void Delete(uint64_t frame, uint64_t total);
     void Reverse(uint64_t frame, uint64_t total);
+    void MoveRelative(uint64_t frame, uint64_t total, bool right);
     void Move(uint64_t frame, uint64_t to, uint64_t total);
 
-    bool IsNearDeletePoint(uint64_t frame, uint64_t total, uint margin,
-                           int &direction, bool &cutAfter,
-                           uint64_t &nearestMark);
     bool     IsInDelete(uint64_t frame);
     uint64_t GetNearestMark(uint64_t frame, uint64_t total, bool right);
+    bool     IsTemporaryMark(uint64_t frame);
+    bool     HasTemporaryMark(uint64_t frame);
     uint64_t GetLastFrame(uint64_t total);
 
     void TrackerReset(uint64_t frame, uint64_t total);

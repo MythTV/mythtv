@@ -556,7 +556,7 @@ class MPUBLIC TV : public QThread
     void HandleOSDAskAllow(PlayerContext *ctx, QString action);
 
     // Program editing support
-    void ShowOSDCutpoint(PlayerContext *ctx, bool allowSelectNear);
+    void ShowOSDCutpoint(PlayerContext *ctx, const QString &type);
     bool HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame);
     void StartProgramEditMode(PlayerContext*);
 

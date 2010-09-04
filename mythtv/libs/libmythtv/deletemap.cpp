@@ -14,16 +14,8 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
                              uint64_t played, uint64_t total, double rate)
 {
     bool handled = true;
-    if (action == "DELETE")
-        Delete(frame, total);
-    else if (action == "MOVETOCURRENT")
-        Move(frame, played, total);
-    else if (action == "REVERSE")
+    if (action == "REVERSE")
         Reverse(frame, total);
-    else if (action == "NEWCUTTOLEFT")
-        Add(frame, total, MARK_CUT_END);
-    else if (action == "NEWCUTTORIGHT")
-        Add(frame, total, MARK_CUT_START);
     else if (action == "UP")
         UpdateSeekAmount(1, rate);
     else if (action == "DOWN")
@@ -32,6 +24,18 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
         Clear();
     else if (action == "INVERTMAP")
         ReverseAll(total);
+    else if (action == "MOVEPREV")
+        MoveRelative(frame, total, false);
+    else if (action == "MOVENEXT")
+        MoveRelative(frame, total, true);
+    else if (action == "CUTTOBEGINNING")
+        Add(frame, total, MARK_CUT_END);
+    else if (action == "CUTTOEND")
+        Add(frame, total, MARK_CUT_START);
+    else if (action == "NEWCUT")
+        NewCut(frame, total);
+    else if (action == "DELETE")
+        Delete(frame, total);
     else
         handled = false;
     return handled;
@@ -158,10 +162,8 @@ void DeleteMap::ReverseAll(uint64_t total)
     EDIT_CHECK
     frm_dir_map_t::Iterator it = m_deleteMap.begin();
     for ( ; it != m_deleteMap.end(); ++it)
-    {
-        int type = Delete(it.key());
-        Add(it.key(), type == MARK_CUT_END ? MARK_CUT_START : MARK_CUT_END);
-    }
+        Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
+                                                   MARK_CUT_END);
     CleanMap(total);
 }
 
@@ -173,9 +175,22 @@ void DeleteMap::ReverseAll(uint64_t total)
 void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type)
 {
     EDIT_CHECK
-    if (m_deleteMap.contains(frame) ||
-       ((MARK_CUT_START != type) && (MARK_CUT_END != type)))
+    if ((MARK_CUT_START != type) && (MARK_CUT_END != type) &&
+        (MARK_PLACEHOLDER != type))
         return;
+
+    frm_dir_map_t::Iterator find_temporary = m_deleteMap.find(frame);
+    if (find_temporary != m_deleteMap.end())
+    {
+        if (MARK_PLACEHOLDER == find_temporary.value())
+        {
+            // Delete the temporary mark before putting a real mark at its
+            // location
+            Delete(frame, total);
+        }
+        else // Don't add a mark on top of a mark
+            return;
+    }
 
     int       lasttype  = MARK_UNSET;
     long long lastframe = -1;
@@ -201,7 +216,7 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type)
             (lastframe > -1) && (lastframe < (int64_t)frame))
             remove = lastframe;
     }
-    else
+    else if (type == MARK_CUT_START)
     {
         // remove curent start marker if it exists
         it.toBack();
@@ -232,7 +247,29 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type)
 void DeleteMap::Delete(uint64_t frame, uint64_t total)
 {
     EDIT_CHECK
-    Delete(frame);
+    if (m_deleteMap.isEmpty())
+        return;
+
+    uint64_t prev = GetNearestMark(frame, total, false);
+    uint64_t next = GetNearestMark(frame, total, true);
+
+    // If frame is a cut point, GetNearestMark() would return the previous/next
+    // mark (not this frame), so check to see if we need to use frame, instead
+    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
+    if (it != m_deleteMap.end())
+    {
+        int type = it.value();
+        if (MARK_PLACEHOLDER == type)
+            next = prev = frame;
+        else if (MARK_CUT_END == type)
+            next  = frame;
+        else if (MARK_CUT_START == type)
+            prev = frame;
+    }
+
+    Delete(prev);
+    if (prev != next)
+        Delete(next);
     CleanMap(total);
 }
 
@@ -244,11 +281,149 @@ void DeleteMap::Reverse(uint64_t frame, uint64_t total)
     Add(frame, total, type == MARK_CUT_END ? MARK_CUT_START : MARK_CUT_END);
 }
 
+/// Add a new cut marker (to start or end a cut region)
+void DeleteMap::NewCut(uint64_t frame, uint64_t total)
+{
+    EDIT_CHECK
+
+    // find any existing temporary marker to determine cut range
+    int64_t existing = -1;
+    frm_dir_map_t::Iterator it;
+    for (it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
+    {
+        if (MARK_PLACEHOLDER == it.value())
+        {
+            existing = it.key();
+            break;
+        }
+    }
+
+    if (existing > -1)
+    {
+        uint64_t otherframe = static_cast<uint64_t>(existing);
+        if (otherframe == frame)
+            Delete(otherframe);
+        else
+        {
+            uint64_t startframe;
+            uint64_t endframe;
+            int64_t cut_start = -1;
+            int64_t cut_end = -1;
+            if (IsInDelete(frame))
+            {
+                MarkTypes type = MARK_UNSET;
+                cut_start = GetNearestMark(frame, total, false);
+                cut_end = GetNearestMark(frame, total, true);
+                frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
+                if (it != m_deleteMap.end())
+                    type = it.value();
+                if (MARK_CUT_START == type)
+                {
+                    cut_start = frame;
+                }
+                else if (MARK_CUT_END == type)
+                {
+                    cut_end = frame;
+                }
+            }
+
+            if (otherframe < frame)
+            {
+                startframe = otherframe;
+                endframe = cut_end != -1 ? static_cast<uint64_t>(cut_end)
+                                         : frame;
+            }
+            else
+            {
+                startframe = cut_start != -1 ? static_cast<uint64_t>(cut_start)
+                                             : frame;
+                endframe = otherframe;
+            }
+
+            // Don't place a cut marker on first or last frame; instead cut
+            // to beginning or end
+            if (startframe == 1)
+                startframe = 0;
+            if (endframe == total - 1)
+                endframe = total;
+
+            // Don't cut the entire recording
+            if ((startframe == 0) && (endframe == total))
+            {
+                VERBOSE(VB_IMPORTANT, "Refusing to cut entire recording.");
+                return;
+            }
+
+            Delete(otherframe);
+            Add(startframe, MARK_CUT_START);
+            Add(endframe, MARK_CUT_END);
+            // Clear out any markers between the start and end frames
+            otherframe = 0;
+            frm_dir_map_t::Iterator it = m_deleteMap.find(startframe);
+            for ( ; it != m_deleteMap.end() && otherframe < endframe; ++it)
+            {
+                otherframe = it.key();
+                if ((startframe < otherframe) && (endframe > otherframe))
+                {
+                    VERBOSE(VB_PLAYBACK, QString("Deleting bounded marker: %1")
+                                                 .arg(otherframe));
+                    Delete(otherframe);
+                }
+            }
+        }
+    }
+    else
+        Add(frame, MARK_PLACEHOLDER);
+
+    CleanMap(total);
+}
+
+/// Move the previous (!right) or next (right) cut to frame.
+void DeleteMap::MoveRelative(uint64_t frame, uint64_t total, bool right)
+{
+    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
+    if (it != m_deleteMap.end())
+    {
+        int type = it.value();
+        if (((MARK_CUT_START == type) && !right) ||
+            ((MARK_CUT_END == type) && right))
+        {
+            // If on a mark, don't move a mark from a different cut region;
+            // instead, "move" this mark onto itself
+            return;
+        }
+        else if (((MARK_CUT_START == type) && right) ||
+                 ((MARK_CUT_END == type) && !right))
+        {
+            // If on a mark, don't collapse a cut region to 0;
+            // instead, delete the region
+            Delete(frame, total);
+            return;
+        }
+        else if (MARK_PLACEHOLDER == type)
+        {
+            // Delete the temporary mark before putting a real mark at its
+            // location
+            Delete(frame, total);
+        }
+    }
+
+    uint64_t from = GetNearestMark(frame, total, right);
+    Move(from, frame, total);
+}
+
 /// Move an existing mark to a new frame.
 void DeleteMap::Move(uint64_t frame, uint64_t to, uint64_t total)
 {
     EDIT_CHECK
     MarkTypes type = Delete(frame);
+    if (MARK_UNSET == type)
+    {
+        if (frame == 0)
+            type = MARK_CUT_START;
+        else if (frame == total)
+            type = MARK_CUT_END;
+    }
     Add(to, total, type);
 }
 
@@ -268,41 +443,6 @@ MarkTypes DeleteMap::Delete(uint64_t frame)
         return m_deleteMap.take(frame);
     }
     return MARK_UNSET;
-}
-
-/**
- * \brief Establish if the given frame is on or near an existing mark and
- *        provide hints on how the OSD dialog should pose questions to the user.
- */
-bool DeleteMap::IsNearDeletePoint(uint64_t frame, uint64_t total, uint margin,
-                                  int &direction, bool &cutAfter,
-                                  uint64_t &nearestMark)
-{
-    if (IsEmpty())
-        return false;
-
-    uint64_t prev     = GetNearestMark(frame, total, false);
-    uint64_t next     = GetNearestMark(frame, total, true);
-    uint64_t prevdist = frame - prev;
-    uint64_t nextdist = frame - next;
-    prevdist = prevdist >= 0 ? prevdist : -prevdist;
-    nextdist = nextdist >= 0 ? nextdist : -nextdist;
-    nearestMark       = prevdist < nextdist ? prev : next;
-    uint64_t frames   = prevdist < nextdist ? prevdist : nextdist;
-
-    frm_dir_map_t::iterator it = m_deleteMap.find(frame);
-    if (it != m_deleteMap.end())
-    {
-        frames = 0;
-        nearestMark = it.key();
-    }
-
-    cutAfter = !IsInDelete(frame);
-    if (nearestMark == 0 || nearestMark == total || frames > margin)
-        return false;
-
-    direction = m_deleteMap.value(nearestMark);
-    return true;
 }
 
 /**
@@ -334,6 +474,18 @@ bool DeleteMap::IsInDelete(uint64_t frame)
 }
 
 /**
+ * \brief Returns true if the given frame is a temporary/placeholder mark
+ */
+bool DeleteMap::IsTemporaryMark(uint64_t frame)
+{
+    if (m_deleteMap.isEmpty())
+        return false;
+
+    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
+    return (it != m_deleteMap.end()) && (MARK_PLACEHOLDER == it.value());
+}
+
+/**
  * \brief Returns the next or previous mark. If these do not exist, returns
  *        either zero (the first frame) or total (the last frame).
  */
@@ -362,6 +514,22 @@ uint64_t DeleteMap::GetNearestMark(uint64_t frame, uint64_t total, bool right)
 }
 
 /**
+ * \brief Returns true if a temporary placeholder mark is defined.
+ */
+bool DeleteMap::HasTemporaryMark(uint64_t frame)
+{
+    if (!m_deleteMap.isEmpty())
+    {
+        frm_dir_map_t::Iterator it = m_deleteMap.begin();
+        for ( ; it != m_deleteMap.end(); ++it)
+            if (MARK_PLACEHOLDER == it.value())
+                return true;
+    }
+
+    return false;
+}
+
+/**
  * \brief Removes redundant marks and ensures the markup sequence is valid.
  *        A valid sequence is 1 or more marks of alternating values and does
  *        not include the first or last frames.
@@ -380,6 +548,7 @@ void DeleteMap::CleanMap(uint64_t total)
         clear = true;
         int     lasttype  = MARK_UNSET;
         int64_t lastframe = -1;
+        int64_t tempframe = -1;
         frm_dir_map_t::iterator it = m_deleteMap.begin();
         for ( ; it != m_deleteMap.end(); ++it)
         {
@@ -392,8 +561,17 @@ void DeleteMap::CleanMap(uint64_t total)
                 clear = false;
                 break;
             }
-            lasttype  = thistype;
-            lastframe = thisframe;
+            if (MARK_PLACEHOLDER == thistype)
+            {
+                if (tempframe > 0)
+                    Delete(tempframe);
+                tempframe = thisframe;
+            }
+            else
+            {
+                lasttype  = thistype;
+                lastframe = thisframe;
+            }
         }
     }
 }

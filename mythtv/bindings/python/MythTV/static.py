@@ -15,7 +15,7 @@ BACKEND_SEP = '[]:[]'
 class MARKUP( object ):
     MARK_UNSET          = -10
     MARK_UPDATED_CUT    = -3
-    MARK_EDIT_MODE      = -2
+    MARK_PLACEHOLDER    = -2
     MARK_CUT_END        = 0
     MARK_CUT_START      = 1
     MARK_BOOKMARK       = 2

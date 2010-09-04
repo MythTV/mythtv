@@ -475,6 +475,10 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
                 error = true;
             end = it.key();
         }
+        else if (it.value() == MARK_PLACEHOLDER)
+        {
+            start = end = it.key();
+        }
         first = false;
 
         if (error)

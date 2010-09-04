@@ -296,9 +296,11 @@ class MPUBLIC MythPlayer
     bool EnableEdit(void);
     bool HandleProgrameEditorActions(QStringList &actions, long long frame = -1);
     bool GetEditMode(void) { return deleteMap.IsEditing(); }
-    bool IsNearDeletePoint(int &direction, bool &cutAfter,
-                           uint64_t &nearestMark);
-    void DisableEdit(void);
+    void DisableEdit(bool save = true);
+    bool IsInDelete(uint64_t frame);
+    uint64_t GetNearestMark(uint64_t frame, bool right);
+    bool IsTemporaryMark(uint64_t frame);
+    bool HasTemporaryMark(uint64_t frame);
 
     // Decoder stuff..
     VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);

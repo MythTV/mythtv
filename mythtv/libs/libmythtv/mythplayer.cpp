@@ -3275,7 +3275,7 @@ bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
     uint64_t number = frames - 1;
     uint64_t desiredFrame = framesPlayed + number;
 
-    if (!deleteMap.IsEditing() && deleteMap.IsInDelete(desiredFrame))
+    if (!deleteMap.IsEditing() && IsInDelete(desiredFrame))
     {
         uint64_t endcheck = deleteMap.GetLastFrame(totalFrames);
         if (desiredFrame > endcheck)
@@ -3387,10 +3387,13 @@ bool MythPlayer::EnableEdit(void)
     return deleteMap.IsEditing();
 }
 
-void MythPlayer::DisableEdit(void)
+void MythPlayer::DisableEdit(bool save)
 {
     deleteMap.SetEditing(false, osd);
-    deleteMap.SaveMap(totalFrames, player_ctx);
+    if (save)
+        deleteMap.SaveMap(totalFrames, player_ctx);
+    else
+        deleteMap.LoadMap(totalFrames, player_ctx);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
     deleteMap.SetFileEditing(player_ctx, false);
     if (!pausedBeforeEdit)
@@ -3473,8 +3476,35 @@ bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
                 DoFastForward(fps * FFREW_MULTICOUNT / 2, true, true);
             }
         }
-        else if (action == "ESCAPE" || action == "MENU" ||
-                 action == "EDIT")
+        else if (action == "SELECT")
+        {
+            deleteMap.NewCut(frame, totalFrames);
+            refresh = true;
+        }
+        else if (action == "DELETE")
+        {
+            if (IsInDelete(frame))
+            {
+                deleteMap.Delete(frame, totalFrames);
+                refresh = true;
+            }
+        }
+        else if (action == "REVERT")
+        {
+            deleteMap.LoadMap(totalFrames, player_ctx);
+            refresh = true;
+        }
+        else if (action == "REVERTEXIT")
+        {
+            DisableEdit(false);
+            refresh = false;
+        }
+        else if (action == "SAVEMAP")
+        {
+            deleteMap.SaveMap(totalFrames, player_ctx);
+            refresh = false;
+        }
+        else if (action == "EDIT" || action == "SAVEEXIT")
         {
             DisableEdit();
             refresh = false;
@@ -3493,12 +3523,24 @@ bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
     return handled;
 }
 
-bool MythPlayer::IsNearDeletePoint(int &direction, bool &cutAfter,
-                                   uint64_t &nearestMark)
+bool MythPlayer::IsInDelete(uint64_t frame)
 {
-    return deleteMap.IsNearDeletePoint(framesPlayed, totalFrames,
-                                       (int)ceil(20 * video_frame_rate),
-                                       direction, cutAfter, nearestMark);
+    return deleteMap.IsInDelete(frame);
+}
+
+uint64_t MythPlayer::GetNearestMark(uint64_t frame, bool right)
+{
+    return deleteMap.GetNearestMark(frame, totalFrames, right);
+}
+
+bool MythPlayer::IsTemporaryMark(uint64_t frame)
+{
+    return deleteMap.IsTemporaryMark(frame);
+}
+
+bool MythPlayer::HasTemporaryMark(uint64_t frame)
+{
+    return deleteMap.HasTemporaryMark(frame);
 }
 
 void MythPlayer::HandleArbSeek(bool right)
@@ -3797,7 +3839,7 @@ void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
 
             bool started_in_break_map = false;
             while (commBreakMap.IsInCommBreak(number) ||
-                   deleteMap.IsInDelete(number))
+                   IsInDelete(number))
             {
                 started_in_break_map = true;
                 number += (uint64_t) (30 * video_frame_rate);

@@ -130,6 +130,8 @@ void MythUIEditBar::Display(void)
         QPair<float,float> region = regions.next();
         int left  = (int)((region.first * cutarea.width()) + 0.5f);
         int right = (int)((region.second * cutarea.width()) + 0.5f);
+        if (left >= right)
+            right = left + 1;
         if (cut)
         {
             AddBar(barshape, barimage, QRect(left, cutarea.top(), right - left,
@@ -158,6 +160,8 @@ void MythUIEditBar::Display(void)
         QPair<float,float> region = regions2.next();
         int left  = (int)((region.first * keeparea.width()) + 0.5f);
         int right = (int)((region.second * keeparea.width()) + 0.5f);
+        if (left >= right)
+            right = left + 1;
         if (keep)
         {
             AddBar(barshape, barimage, QRect(left, keeparea.top(), right - left,

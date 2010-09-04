@@ -156,7 +156,7 @@ While watching a recording:
 - SPACE or ENTER will set a bookmark at that point.  Next time you start the
   recording, you will automatically jump forward to this point and clear the
   bookmark.
-- E or M enters/exits edit mode.
+- E enters/exits edit mode.
   - The left and right keys move forward and backward.
   - The up and down arrow keys alter the amount of time you jump forward and
     backward.  Increments are: nearest cutpoint, nearest video keyframe,
@@ -166,10 +166,14 @@ While watching a recording:
     point.
   - The < or comma and > or period keys move forward or backward by 10 times
     the normal jump amount.
-  - Space/Enter allows you to set or delete a cut point.
-  - 'Z' loads the commercial skip list (if one exists) into the cutlist.
-  - 'C' and 'Q' clear all cut points in the cutlist.
-  - 'I' inverts the cutlist.
+  - The M key shows a menu, allowing you to add, move, or delete a cut or to
+    save or revert changes.
+  - Space/Enter adds a cut or, if in a cut area, prompts for action.
+  - The D key deletes a cut.
+  - 'Z' loads the commercial skip list (if one exists) into the cut list.
+  - 'C' and 'Q' clear all cut points in the cut list.
+  - 'I' inverts the cut list.
+  - Escape prompts whether to save or cancel changes and allows exit.
 - X queues the current recording for transcoding.
 - O brings up menu to allow toggling settings such as Commercial Auto-Skip,
     Auto-Expire, etc.
