@@ -2678,12 +2678,14 @@ void ProgramInfo::QueryCutList(frm_dir_map_t &delMap) const
 {
     QueryMarkupMap(delMap, MARK_CUT_START);
     QueryMarkupMap(delMap, MARK_CUT_END, true);
+    QueryMarkupMap(delMap, MARK_PLACEHOLDER, true);
 }
 
 void ProgramInfo::SaveCutList(frm_dir_map_t &delMap) const
 {
     ClearMarkupMap(MARK_CUT_START);
     ClearMarkupMap(MARK_CUT_END);
+    ClearMarkupMap(MARK_PLACEHOLDER);
     SaveMarkupMap(delMap);
 
     if (IsRecording())

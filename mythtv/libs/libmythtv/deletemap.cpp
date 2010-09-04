@@ -614,6 +614,18 @@ void DeleteMap::SaveMap(uint64_t total, PlayerContext *ctx)
     if (!ctx || !ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
+    // Remove temporary placeholder marks
+    QMutableMapIterator<uint64_t, MarkTypes> it(m_deleteMap);
+    while (it.hasNext())
+    {
+        it.next();
+        if (MARK_PLACEHOLDER == it.value())
+        {
+            it.remove();
+            m_changed = true;
+        }
+    }
+
     CleanMap(total);
     ctx->LockPlayingInfo(__FILE__, __LINE__);
     ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);

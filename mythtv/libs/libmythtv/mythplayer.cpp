@@ -3502,7 +3502,7 @@ bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
         else if (action == "SAVEMAP")
         {
             deleteMap.SaveMap(totalFrames, player_ctx);
-            refresh = false;
+            refresh = true;
         }
         else if (action == "EDIT" || action == "SAVEEXIT")
         {
