@@ -36,7 +36,7 @@
 #endif
 
 #if defined(_WIN32)
-const char *dlerror(char *buf, int buf_size)
+static const char *dlerror(char *buf, int buf_size)
 {
     DWORD error_code = GetLastError();
     wchar_t wbuf[256];

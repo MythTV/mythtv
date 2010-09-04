@@ -149,7 +149,7 @@ struct bd_registers_s
     int          num_cb;
     PSR_CB_DATA *cb;
 
-    pthread_mutex_t mutex;
+    BD_MUTEX     mutex;
 };
 
 /*
@@ -162,7 +162,7 @@ BD_REGISTERS *bd_registers_init(void)
 
     memcpy(p->psr, bd_psr_init, sizeof(bd_psr_init));
 
-    pthread_mutex_init(&p->mutex, NULL);
+    bd_mutex_init(&p->mutex);
 
     return p;
 }
@@ -170,7 +170,7 @@ BD_REGISTERS *bd_registers_init(void)
 void bd_registers_free(BD_REGISTERS *p)
 {
     if (p) {
-        pthread_mutex_destroy(&p->mutex);
+        bd_mutex_destroy(&p->mutex);
 
         X_FREE(p->cb);
     }
@@ -184,12 +184,12 @@ void bd_registers_free(BD_REGISTERS *p)
 
 void bd_psr_lock(BD_REGISTERS *p)
 {
-    pthread_mutex_lock(&p->mutex);
+    bd_mutex_lock(&p->mutex);
 }
 
 void bd_psr_unlock(BD_REGISTERS *p)
 {
-    pthread_mutex_unlock(&p->mutex);
+    bd_mutex_unlock(&p->mutex);
 }
 
 /*

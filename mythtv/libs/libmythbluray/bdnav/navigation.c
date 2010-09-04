@@ -275,6 +275,24 @@ char* nav_find_main_title(const char *root)
     }
 }
 
+uint8_t nav_lookup_aspect(NAV_CLIP *clip, int pid)
+{
+    CLPI_PROG *progs;
+    int ii, jj;
+
+    progs = clip->cl->program.progs;
+    for (ii = 0; ii < clip->cl->program.num_prog; ii++) {
+        CLPI_PROG_STREAM *ps = progs[ii].streams;
+        for (jj = 0; jj < progs[ii].num_streams; jj++) {
+            if (ps[jj].pid == pid)
+            {
+                return ps[jj].aspect;
+            }
+        }
+    }
+    return 0;
+}
+
 static void
 _fill_mark(NAV_TITLE *title, NAV_MARK *mark, int entry)
 {
@@ -542,6 +560,13 @@ uint32_t nav_chapter_get_current(NAV_CLIP *clip, uint32_t pkt)
     title = clip->title;
     for (ii = 0; ii < title->chap_list.count; ii++) {
         mark = &title->chap_list.mark[ii];
+        if (mark->clip_ref > clip->ref)
+        {
+            if (ii)
+                return ii-1;
+            else
+                return 0;
+        }
         if (mark->clip_ref == clip->ref && mark->clip_pkt <= pkt) {
             if ( ii == title->chap_list.count - 1 ) {
                 return ii;
