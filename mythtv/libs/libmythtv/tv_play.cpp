@@ -3568,7 +3568,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                 actx->UnlockDeletePlayer(__FILE__, __LINE__);
                 if ((has_action("SELECT", actions)) &&
                     (actx->player->IsInDelete(current_frame)) &&
-                    (!(actx->player->HasTemporaryMark(current_frame))))
+                    (!(actx->player->HasTemporaryMark())))
                 {
                     ShowOSDCutpoint(actx, "EDIT_CUT_REGION");
                     handled = true;

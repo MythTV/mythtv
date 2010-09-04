@@ -516,7 +516,7 @@ uint64_t DeleteMap::GetNearestMark(uint64_t frame, uint64_t total, bool right)
 /**
  * \brief Returns true if a temporary placeholder mark is defined.
  */
-bool DeleteMap::HasTemporaryMark(uint64_t frame)
+bool DeleteMap::HasTemporaryMark(void)
 {
     if (!m_deleteMap.isEmpty())
     {

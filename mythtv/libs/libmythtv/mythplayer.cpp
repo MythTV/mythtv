@@ -3538,9 +3538,9 @@ bool MythPlayer::IsTemporaryMark(uint64_t frame)
     return deleteMap.IsTemporaryMark(frame);
 }
 
-bool MythPlayer::HasTemporaryMark(uint64_t frame)
+bool MythPlayer::HasTemporaryMark(void)
 {
-    return deleteMap.HasTemporaryMark(frame);
+    return deleteMap.HasTemporaryMark();
 }
 
 void MythPlayer::HandleArbSeek(bool right)

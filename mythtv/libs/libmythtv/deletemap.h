@@ -43,7 +43,7 @@ class DeleteMap
     bool     IsInDelete(uint64_t frame);
     uint64_t GetNearestMark(uint64_t frame, uint64_t total, bool right);
     bool     IsTemporaryMark(uint64_t frame);
-    bool     HasTemporaryMark(uint64_t frame);
+    bool     HasTemporaryMark(void);
     uint64_t GetLastFrame(uint64_t total);
 
     void TrackerReset(uint64_t frame, uint64_t total);
