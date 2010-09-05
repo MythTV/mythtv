@@ -553,6 +553,7 @@ class delOldRecorded( OldRecorded ):
     original intent.
     return nothing
     '''
+    _table = 'oldrecorded'
     def delete(self):
         """
         Delete video entry from database.
