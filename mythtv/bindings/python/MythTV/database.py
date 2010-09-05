@@ -150,8 +150,8 @@ class DBData( DictData, MythSchema ):
         if self._field_order is None:
             self.__class__._field_order = []
         self._db = DBCache(db)
-        self._db._check_schema(self._schema_value,
-                                self._schema_local, self._schema_name)
+        self._db._check_schema(self._schema_value, self._schema_local,
+                                self._schema_name, self._schema_update)
         self._setDefs()
 
         if data is None: pass
@@ -204,8 +204,8 @@ class DBData( DictData, MythSchema ):
     def __setstate__(self, state):
         self._field_order = []
         self._db = DBCache(**state['db'])
-        self._db._check_schema(self._schema_value,
-                                self._schema_local, self._schema_name)
+        self._db._check_schema(self._schema_value, self._schema_local,
+                               self._schema_name, self._schema_update)
         self._setDefs()
         DictData.__setstate__(self, state['data'])
         if state['wheredat'] is not None:
@@ -1034,7 +1034,7 @@ class DBCache( MythSchema ):
                 return False
         return True
 
-    def _check_schema(self, value, local, name='Database'):
+    def _check_schema(self, value, local, name='Database', update=None):
         if self.settings is None:
             with self.cursor(self.log) as cursor:
                 if cursor.execute("""SELECT data
@@ -1048,11 +1048,14 @@ class DBCache( MythSchema ):
             sver = int(self.settings['NULL'][value])
 
         if local != sver:
-            self.log(MythLog.DATABASE|MythLog.IMPORTANT,
+            if update is None:
+                self.log(MythLog.DATABASE|MythLog.IMPORTANT,
                     "%s schema mismatch: we speak %d but database speaks %s" \
                     % (name, local, sver))
-            self.db = None
-            raise MythDBError(MythError.DB_SCHEMAMISMATCH, value, sver, local)
+                self.db = None
+                raise MythDBError(MythError.DB_SCHEMAMISMATCH, value, sver, local)
+            else:
+                update(self).run()
 
     def gethostname(self):
         return self.dbconn['LocalHostName']

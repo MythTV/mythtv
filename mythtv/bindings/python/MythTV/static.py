@@ -4,7 +4,7 @@
 Contains any static and global variables for MythTV Python Bindings
 """
 
-OWN_VERSION = (0,23,0,23)
+OWN_VERSION = (0,23,0,24)
 SCHEMA_VERSION = 1263
 MVSCHEMA_VERSION = 1036
 NVSCHEMA_VERSION = 1007
@@ -190,14 +190,17 @@ class MythSchema( object ):
     _schema_value = 'DBSchemaVer'
     _schema_local = SCHEMA_VERSION
     _schema_name = 'Database'
+    _schema_update = None
 
 class VideoSchema( object ):
     _schema_value = 'mythvideo.DBSchemaVer'
     _schema_local = MVSCHEMA_VERSION
     _schema_name = 'MythVideo'
+    _schema_update = None
 
 class MusicSchema( object ):
     _schema_value = 'MusicDBSchemaVer'
     _schema_local = MUSICSCHEMA_VERSION
     _schema_name = 'MythMusic'
+    _schema_update = None
 

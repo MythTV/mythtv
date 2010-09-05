@@ -18,49 +18,35 @@ import re
 def _donothing(*args, **kwargs):
     pass
 
-class schemaUpdate( object ):
+class SchemaUpdate( object ):
     # TODO: do locking and lock checking
     #       if interactive terminal, ask for update permission
     #       perform database backup (partial?)
     """
-    Decorator class
-
-    Acquires name of database variable by calling function with input of '-1'.
-    Recursively calls decorated function with the current schema version.
-        Expects (updates, newver) in return, where:
-                updates -- tuple of (sql commands, values)
-                newver -- new schema revision
-        Stops when StopIteration is called.
+    Iteratively calls methods named 'up<schema version>' to update
+        schema. Methods must return an integer of the new schema
+        version.
     """
-    def __init__(self, func):
-        self.func = func
-        self.__doc__ = self.func.__doc__
-        self.__name__ = self.func.__name__
-        self.__module__ = self.func.__module__
+    _schema_name = None
+    def __init__(self, db):
+        self.db = db
+        self.log = MythLog('Schema Update')
 
-        self.schemavar = func(-1)
-
-    def __call__(self, db):
-        log = MythLog('Schema Update')
-
-        with db as cursor:
-          while True:
-            try:
-                updates, newver = self.func(db.settings.NULL[self.schemavar])
-            except StopIteration:
-                break
-
-            log(log.IMPORTANT, 'Updating %s from %s to %s' % \
-                        (schemaname, db.settings.NULL[self.schemavar], newver))
-
-            try:
-                for sql, values in updates:
-                    cursor.execute(sql, values)
-            except Exception, e:
-                log(log.IMPORTANT, 'Update of %s failed' % self.schemavar)
-                raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
-
-            db.settings.NULL[self.schemavar] = newver
+    def run(self):
+        if self._schema_name is None:
+            raise MythDBError('Schema update failed, variable name not set')
+        schema = int(self.db.settings.NULL[self._schema_name])
+        try:
+            while True:
+                schema = eval('self.up%d()' % schema)
+                self.db.settings.NULL[self._schema_name] = schema
+        except AttributeError, e:
+            raise MythDBError('Schema update failed, ' 
+                    "SchemaUpdate has no function 'up%s'" % schema)
+        except StopIteration:
+            pass
+        except Exception, e:
+            raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
 
 class databaseSearch( object ):
     # decorator class for database searches
