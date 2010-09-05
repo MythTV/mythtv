@@ -983,157 +983,157 @@
         <translation>Begin Ripping</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="28"/>
         <source>No Current Jobs</source>
         <translation>No Current Jobs</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Select a Track to Rip</source>
         <translation>Select a Track to Rip</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Name of Film:</source>
         <translation>Name of Film:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Selected track length:</source>
         <translation>Selected track length:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Check this box to select this track:</source>
         <translation>Check this box to select this track:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Check to rip AC-3 audio:</source>
         <translation>Check to rip AC3 audio:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Subtitles:</source>
         <translation>Subtitles:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Press to view excerpt:</source>
         <translation>Press to view excerpt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Previous</source>
         <translation>Previous</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Next</source>
         <translation>Next</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Rip/Transcode</source>
         <translation>Rip/Transcode</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Job 1 of 1</source>
         <translation>Job 1 of 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Length:</source>
         <translation>Length:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Select:</source>
         <translation>Select:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Quality:</source>
         <translation>Quality:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="25"/>
         <source>AC3 Audio:</source>
         <translation>AC3 Audio:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="37"/>
         <source>View:</source>
         <translation>View:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Cast</source>
         <translation>Cast</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Plot</source>
         <translation>Plot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="42"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Season/Episode: %1</source>
         <translation>Season/Episode: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Directed by %1</source>
         <translation>Directed by %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Starring: %1</source>
         <translation>Starring: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Parental Level 0</source>
         <translation>Parental Level 0</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Parental Level 1</source>
         <translation>Parental Level 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Parental Level 2</source>
         <translation>Parental Level 2</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Parental Level 3</source>
         <translation>Parental Level 3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Parental Level 4</source>
         <translation>Parental Level 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Add New File Types</source>
         <translation>Add New File Types</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="52"/>
         <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
 
 If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
@@ -1142,722 +1142,892 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
 If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Extension:</source>
         <translation>Extension:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Command:</source>
         <translation>Command:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Use Default Player</source>
         <translation>Use Default Player</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Ignore This File Type</source>
         <translation>Ignore This File Type</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="57"/>
         <source>New</source>
         <translation>New</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
-        <source>Edit Metadata</source>
-        <translation>Edit Metadata</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="55"/>
-        <source>Modify your film&apos;s metadata.</source>
-        <translation>Modify your film&apos;s metadata.</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Title:</source>
         <translation>Title:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Rating:</source>
         <translation>Rating:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Director:</source>
         <translation>Director:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="63"/>
         <source>TMDB Number:</source>
         <translation>TMDB Number:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Plot:</source>
         <translation>Plot:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Cover Art:</source>
         <translation>Cover Art:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Screenshot:</source>
         <translation>Screenshot:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Banner:</source>
         <translation>Banner:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Fanart:</source>
         <translation>Fanart:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Trailer:</source>
         <translation>Trailer:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Homepage:</source>
         <translation>Homepage:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Custom Player:</source>
         <translation>Custom Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
-        <source>Film has been Watched</source>
-        <translation>Film has been Watched</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="69"/>
-        <source>Film is Browsable</source>
-        <translation>Film is Browsable</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Season:</source>
         <translation>Season:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Episode:</source>
         <translation>Episode:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Year:</source>
         <translation>Year:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="77"/>
         <source>User Rating:</source>
         <translation>User Rating:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Parental Level:</source>
         <translation>Parental Level:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Category:</source>
         <translation>Category:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Next File:</source>
         <translation>Next File:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Click here to search existing coverart...</source>
         <translation>Click here to search existing coverart...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Click here to search existing screenshots...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Click here to search existing banners...</source>
         <translation>Click here to search existing banners...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Click here to search existing fanart...</source>
         <translation>Click here to search existing fanart...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Click here to search existing trailers...</source>
         <translation>Click here to search existing trailers...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Filter Videos</source>
         <translation>Filter Videos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Genre:</source>
         <translation>Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Country:</source>
         <translation>Country:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Actor/Actress:</source>
         <translation>Actor/Actress:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Runtime:</source>
         <translation>Runtime:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Browse:</source>
         <translation>Browse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="96"/>
         <source>TMDB/TVDB #:</source>
         <translation>TMDB/TVDB #:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Coverart:</source>
         <translation>Coverart:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Sort By:</source>
         <translation>Sort By:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Watched:</source>
         <translation>Watched:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Text Filter:</source>
         <translation>Text Filter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Result</source>
         <translation>Result</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="103"/>
         <source>This item was released on %1.</source>
         <translation>This item was released on %1.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="104"/>
         <source>It was added to your collection on %1.</source>
         <translation>It was added to your collection on %1.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Video Player Settings</source>
         <translation>Video Player Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Default:</source>
         <translation>Default:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="109"/>
         <source>DVD Player:</source>
         <translation>DVD Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="110"/>
         <source>DVD Drive:</source>
         <translation>DVD Drive:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="111"/>
         <source>VCD Player:</source>
         <translation>VCD Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="112"/>
         <source>VCD Drive:</source>
         <translation>VCD Drive:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Enable Alternate Player</source>
         <translation>Enable Alternate Player</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="114"/>
         <source>Alt. Player:</source>
         <translation>Alt. Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="115"/>
         <source>Video Metadata Settings</source>
         <translation>Video Metadata Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
-        <source>Movie Grab:</source>
-        <translation>Movie Grab:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="109"/>
-        <source>TV Grab:</source>
-        <translation>TV Grab:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="117"/>
         <source>Display unknown file types</source>
         <translation>Display unknown file types</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="118"/>
         <source>Enable metadata in file browse mode</source>
         <translation>Enable metadata in file browse mode</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="119"/>
         <source>Enable Random Trailer Playback</source>
         <translation>Enable Random Trailer Playback</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="120"/>
         <source>Trailer #:</source>
         <translation>Trailer #:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="114"/>
+        <location filename="themestrings.h" line="161"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
         <translation>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="115"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Rated:</source>
         <translation>Rated:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="116"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Browsable:</source>
         <translation>Browsable:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="117"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Filename:</source>
         <translation>Filename:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="118"/>
+        <location filename="themestrings.h" line="164"/>
         <source>Cover File:</source>
         <translation>Cover File:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="119"/>
+        <location filename="themestrings.h" line="165"/>
         <source>Video Num.:</source>
         <translation>Video Num.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="120"/>
+        <location filename="themestrings.h" line="166"/>
         <source>Directed by:</source>
         <translation>Directed by:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="121"/>
+        <location filename="themestrings.h" line="122"/>
         <source>Use default player:</source>
         <translation>Use default player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="122"/>
+        <location filename="themestrings.h" line="123"/>
         <source>Ignore:</source>
         <translation>Ignore:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="123"/>
+        <location filename="themestrings.h" line="167"/>
         <source>TMDB:</source>
         <translation>TMDB:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="124"/>
+        <location filename="themestrings.h" line="168"/>
         <source>Parental Lvl:</source>
         <translation>Parental Lvl:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="125"/>
+        <location filename="themestrings.h" line="169"/>
         <source>Browseable</source>
         <translation>Browseable</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="126"/>
+        <location filename="themestrings.h" line="146"/>
         <source>Watched</source>
         <translation>Watched</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Player Command:</source>
         <translation>Player Command:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="128"/>
+        <location filename="themestrings.h" line="171"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/path/to/the/thing.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="129"/>
+        <location filename="themestrings.h" line="124"/>
         <source>Done</source>
         <translation>Done</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="130"/>
+        <location filename="themestrings.h" line="18"/>
+        <source>Overall Progress</source>
+        <translation>Overall Progress</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Job Progress</source>
+        <translation>Job Progress</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>Preview Track</source>
+        <translation>Preview Track</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Released %1</source>
+        <translation>Released %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>User Rating: %1</source>
+        <translation>User Rating: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>Tagline:</source>
+        <translation>Tagline:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="82"/>
+        <source>Click to select from online coverart...</source>
+        <translation>Click to select from online cover art...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="84"/>
+        <source>Click to select from online screenshots...</source>
+        <translation>Click to select from online screenshots...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="86"/>
+        <source>Click to select from online banners...</source>
+        <translation>Click to select from online banners...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="88"/>
+        <source>Click to select from online fanart...</source>
+        <translation>Click to select from online fan art...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="116"/>
+        <source>Update metadata after video scan</source>
+        <translation>Update metadata after video scan</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="121"/>
+        <source>Video File Associations</source>
+        <translation>Video File Associations</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="125"/>
+        <source>Edit Video Metadata</source>
+        <translation>Edit Video Metadata</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="127"/>
+        <source>File to Play Next:</source>
+        <translation>File to Play Next:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="129"/>
+        <source>Item has been Watched:</source>
+        <translation>Item has been Watched:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="131"/>
+        <source>Search Results</source>
+        <translation>Search Results</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="132"/>
+        <source>Cast Members</source>
+        <translation>Cast Members</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="133"/>
+        <source>Full Plot</source>
+        <translation>Full Plot</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="135"/>
+        <source>Category</source>
+        <translation>Category</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="136"/>
+        <source>Genre</source>
+        <translation>Genre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="137"/>
+        <source>Country</source>
+        <translation>Country</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="138"/>
+        <source>Actor/Actress</source>
+        <translation>Actor/Actress</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="142"/>
+        <source>Browse</source>
+        <translation>Browse</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="143"/>
+        <source>InetRef</source>
+        <translation>InetRef</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="144"/>
+        <source>Cover File</source>
+        <translation>Cover File</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="145"/>
+        <source>Sort by</source>
+        <translation>Sort by</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="147"/>
+        <source>Make default</source>
+        <translation>Make default</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="148"/>
+        <source>Videos - Manager</source>
+        <translation>Videos - Manager</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="149"/>
+        <source>Cast:</source>
+        <translation>Cast:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="150"/>
+        <source>Videos - Browser</source>
+        <translation>Videos - Browser</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="151"/>
+        <source>Videos - Gallery</source>
+        <translation>Videos - Gallery</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="152"/>
+        <source>Videos - Tree</source>
+        <translation>Videos - Tree</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="172"/>
         <source>Category :</source>
         <translation>Category :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="131"/>
+        <location filename="themestrings.h" line="173"/>
         <source>Genre :</source>
         <translation>Genre :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="132"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Country :</source>
         <translation>Country :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="133"/>
+        <location filename="themestrings.h" line="175"/>
         <source>Actor/Actress :</source>
         <translation>Actor/Actress :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="134"/>
+        <location filename="themestrings.h" line="176"/>
         <source>Year :</source>
         <translation>Year :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="135"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Runtime :</source>
         <translation>Runtime :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="136"/>
+        <location filename="themestrings.h" line="178"/>
         <source>User Rating :</source>
         <translation>User Rating :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="137"/>
+        <location filename="themestrings.h" line="179"/>
         <source>Browse :</source>
         <translation>Browse :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="138"/>
+        <location filename="themestrings.h" line="180"/>
         <source>InetRef :</source>
         <translation>InetRef :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="139"/>
+        <location filename="themestrings.h" line="181"/>
         <source>Cover File :</source>
         <translation>Cover File :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="140"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Sort by :</source>
         <translation>Sort by :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="141"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Watched :</source>
         <translation>Watched :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="142"/>
+        <location filename="themestrings.h" line="184"/>
         <source>Text Filter :</source>
         <translation>Text Filter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="143"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Seas/Ep:</source>
         <translation>Seas/Ep:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="144"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Lowest</source>
         <translation>Lowest</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="145"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="146"/>
+        <location filename="themestrings.h" line="188"/>
         <source>Medium</source>
         <translation>Medium</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="147"/>
+        <location filename="themestrings.h" line="189"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="148"/>
+        <location filename="themestrings.h" line="190"/>
         <source>SELECT: Edit</source>
         <translation>SELECT: Edit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="149"/>
+        <location filename="themestrings.h" line="191"/>
         <source>INFO - Action Menu</source>
         <translation>INFO - Action Menu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="150"/>
+        <location filename="themestrings.h" line="192"/>
         <source>Directed by</source>
         <translation>Directed by</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="151"/>
+        <location filename="themestrings.h" line="140"/>
         <source>Runtime</source>
         <translation>Runtime</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="139"/>
         <source>Year</source>
         <translation>Year</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="141"/>
         <source>User Rating</source>
         <translation>User Rating</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="193"/>
         <source>Video Gallery</source>
         <translation>Video Gallery</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="194"/>
         <source>Parental Level</source>
         <translation>Parental Level</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="195"/>
         <source>MythVideo File Associations</source>
         <translation>MythVideo File Associations</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="196"/>
         <source>Filters video list</source>
         <translation>Filters video list</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="197"/>
         <source>Background:</source>
         <translation>Background:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="198"/>
         <source>Edit Video Information</source>
         <translation>Edit Video Information</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="126"/>
         <source>Parental Control:</source>
         <translation>Parental Control:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="199"/>
         <source>File to Always Play Next:</source>
         <translation>File to Always Play Next:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="128"/>
         <source>Include while Browsing:</source>
         <translation>Include while Browsing:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="200"/>
         <source>Item has been watched:</source>
         <translation>Item has been watched:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="130"/>
         <source>Unique Player Command:</source>
         <translation>Unique Player Command:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="134"/>
         <source>Video List Filters</source>
         <translation>Video List Filters</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="206"/>
         <source>Save as default</source>
         <translation>Save as default</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Player Settings</source>
         <translation>Player Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="154"/>
         <source>Default Player:</source>
         <translation>Default Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="155"/>
         <source>Enable Alternate Player:</source>
         <translation>Enable Alternate Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="156"/>
         <source>Alternate Player:</source>
         <translation>Alternate Player:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="158"/>
         <source>Movie Grabber:</source>
         <translation>Movie Grabber:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="159"/>
         <source>TV Grabber:</source>
         <translation>TV Grabber:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Trailers to Play:</source>
         <translation>Trailers to Play:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="209"/>
         <source>General Settings</source>
         <translation>General Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="210"/>
         <source>File Paths and general options</source>
         <translation>File Paths and General Options</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="211"/>
         <source>Player Applications and DVD/VCD Drives</source>
         <translation>Player Applications and DVD/VCD Drives</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="157"/>
         <source>Metadata Settings</source>
         <translation>Metadata Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="201"/>
+        <source>Visible:</source>
+        <translation>Visible:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="202"/>
+        <source>Coverart</source>
+        <translation>Cover Art</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="203"/>
+        <source>Screenshots</source>
+        <translation>Screenshots</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="204"/>
+        <source>Banners</source>
+        <translation>Banners</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="205"/>
+        <source>Fanart</source>
+        <translation>Fan Art</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="207"/>
+        <source>Perform metadata update after video scan</source>
+        <translation>Perform metadata update after video scan</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="208"/>
+        <source>Find Online...</source>
+        <translation>Find Online...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="212"/>
         <source>Grabber Setup and display preferences</source>
         <translation>Grabber Setup and Display Preferences</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="213"/>
         <source>File Types</source>
         <translation>File Types</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="214"/>
         <source>Associate new file extensions</source>
         <translation>Associate new file extensions</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="215"/>
         <source>Rip Settings</source>
         <translation>Rip Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="216"/>
         <source>DVD Rip and Transcode options</source>
         <translation>DVD Rip and Transcode options</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="217"/>
         <source>Browse Videos</source>
         <translation>Browse Videos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="218"/>
         <source>Video List</source>
         <translation>Video List</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="219"/>
         <source>Video Manager</source>
         <translation>Video Manager</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="220"/>
         <source>Play DVD</source>
         <translation>Play DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="221"/>
         <source>Play VCD</source>
         <translation>Play VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="222"/>
         <source>Rip DVD</source>
         <translation>Rip DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="189"/>
+        <location filename="themestrings.h" line="223"/>
         <source>Eject media</source>
         <translation>Eject media</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="190"/>
+        <location filename="themestrings.h" line="224"/>
         <source>Videos Settings</source>
         <translation>Videos Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="191"/>
+        <location filename="themestrings.h" line="225"/>
         <source>Configure playback and DVD ripping</source>
         <translation>Configure Payback and DVD Ripping</translation>
     </message>

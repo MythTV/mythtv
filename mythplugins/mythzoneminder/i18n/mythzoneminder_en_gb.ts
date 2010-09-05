@@ -366,6 +366,16 @@
     </message>
 </context>
 <context>
+    <name>ZMLivePlayer</name>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="127"/>
+        <source>Can&apos;t show live view.
+You don&apos;t have any monitors defined!</source>
+        <translation>Can&apos;t show live view.
+You don&apos;t have any monitors defined!</translation>
+    </message>
+</context>
+<context>
     <name>ZMPlayer</name>
     <message>
         <location filename="../mythzoneminder/zmplayer.cpp" line="106"/>
