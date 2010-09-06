@@ -42,11 +42,11 @@
 #include "mythverbose.h"
 #include "exitcodes.h"
 
-#ifdef USE_LIRC
+#ifdef CONFIG_LIRC
 #include "lircevent.h"
 #endif
 
-#ifdef USE_JOYSTICK_MENU
+#ifdef CONFIG_JOYSTICK_MENU
 #include "jsmenuevent.h"
 #endif
 
@@ -241,8 +241,8 @@ uint MythSystemReaper::abortPid( pid_t pid )
  */
 uint myth_system(const QString &command, int flags, uint timeout)
 {
-    uint    result;
-    bool    ready_to_lock;
+    uint            result;
+    MythSystemLocks locks;
 
     if( !(flags & MYTH_SYSTEM_RUN_BACKGROUND) && command.endsWith("&") )
     {
@@ -250,7 +250,8 @@ uint myth_system(const QString &command, int flags, uint timeout)
         flags |= MYTH_SYSTEM_RUN_BACKGROUND;
     }
 
-    myth_system_pre_flags( flags, ready_to_lock );
+    myth_system_pre_flags( flags, locks );
+
 #ifndef USING_MINGW
     pid_t   pid;
 
@@ -292,24 +293,27 @@ uint myth_system(const QString &command, int flags, uint timeout)
     }
 #endif
 
-    myth_system_post_flags( flags, ready_to_lock );
+    myth_system_post_flags( flags, locks );
 
     return result;
 }
 
 
-void myth_system_pre_flags(int &flags, bool &ready_to_lock)
+void myth_system_pre_flags(int &flags, MythSystemLocks &locks)
 {
-    ready_to_lock = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
+    // Clear out the locks structure to be sure
+    memset( &locks, 0x00, sizeof(locks) );
 
-#ifdef USE_LIRC
-    bool lirc_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC);
-    LircEventLock lirc_lock(lirc_lock_flag && ready_to_lock);
+    locks.ready_to_lock = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
+
+#ifdef CONFIG_LIRC
+    if( !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC) && locks.ready_to_lock )
+        locks.lirc = new LircEventLock(true);
 #endif
 
-#ifdef USE_JOYSTICK_MENU
-    bool joy_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
-    JoystickMenuEventLock joystick_lock(joy_lock_flag && ready_to_lock);
+#ifdef CONFIG_JOYSTICK_MENU
+    if( !(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU) && locks.ready_to_lock )
+        locks.jsmenu = new JoystickMenuEventLock(true);
 #endif
 
 #ifdef BSD
@@ -322,20 +326,29 @@ void myth_system_pre_flags(int &flags, bool &ready_to_lock)
     // This needs to be a send event so that the MythUI m_drawState change is
     // flagged immediately instead of after existing events are processed
     // since this function could be called inside one of those events.
-    if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
+    if (locks.ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
     {
         QEvent event(MythEvent::kPushDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
     }
 }
 
-
-void myth_system_post_flags(int &flags, bool &ready_to_lock)
+void myth_system_post_flags(int &flags, MythSystemLocks &locks)
 {
+    if( locks.jsmenu ) {
+        delete locks.jsmenu;
+        locks.jsmenu = NULL;
+    }
+
+    if( locks.lirc ) {
+        delete locks.lirc;
+        locks.lirc = NULL;
+    }
+
     // This needs to be a send event so that the MythUI m_drawState change is
     // flagged immediately instead of after existing events are processed
     // since this function could be called inside one of those events.
-    if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
+    if (locks.ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
     {
         QEvent event(MythEvent::kPopDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);

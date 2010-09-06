@@ -106,12 +106,14 @@ using_joystick_menu {
     DEFINES += USE_JOYSTICK_MENU
     HEADERS += jsmenu.h jsmenuevent.h
     SOURCES += jsmenu.cpp jsmenuevent.cpp
+    inc.files += jsmenuevent.h
 }
 
 using_lirc {
     DEFINES += USE_LIRC
     HEADERS += lirc.h   lircevent.h   lirc_client.h
     SOURCES += lirc.cpp lircevent.cpp lirc_client.c
+    inc.files += lircevent.h
 }
 
 using_xrandr {
