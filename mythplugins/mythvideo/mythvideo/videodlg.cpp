@@ -2646,7 +2646,7 @@ void VideoDialog::MetadataBrowseMenu()
         m_menuPopup->AddButton(tr("Director"),
                   SLOT(SwitchVideoDirectorGroup()));
 
-    if (m_d->m_groupType != BRS_DIRECTOR)
+    if (m_d->m_groupType != BRS_STUDIO)
         m_menuPopup->AddButton(tr("Studio"),
                   SLOT(SwitchVideoStudioGroup()));
 
