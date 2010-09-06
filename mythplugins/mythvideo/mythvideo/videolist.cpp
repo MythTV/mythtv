@@ -638,8 +638,9 @@ class VideoListImp
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
                               ltDBGenreGroup, ltDBCategoryGroup,
                               ltDBYearGroup, ltDBDirectorGroup,
-                              ltDBCastGroup, ltDBUserRatingGroup,
-                              ltDBInsertDateGroup, ltTVMetadata};
+                              ltDBStudioGroup, ltDBCastGroup,
+                              ltDBUserRatingGroup, ltDBInsertDateGroup,
+                              ltTVMetadata};
     typedef VideoMetadataListManager::metadata_list metadata_list;
     typedef VideoMetadataListManager::VideoMetadataPtr MetadataPtr;
 
@@ -953,6 +954,10 @@ void VideoListImp::refreshList(bool filebrowser,
                 fillMetadata(ltDBDirectorGroup);
                 VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Director mode"));
                 break;
+            case VideoDialog::BRS_STUDIO:
+                fillMetadata(ltDBStudioGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Studio mode"));
+                break;
             case VideoDialog::BRS_CAST:
                 fillMetadata(ltDBCastGroup);
                 VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Cast Mode"));
@@ -1017,6 +1022,7 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
             case ltDBCategoryGroup:
             case ltDBYearGroup:
             case ltDBDirectorGroup:
+            case ltDBStudioGroup:
             case ltDBCastGroup:
             case ltDBUserRatingGroup:
             case ltDBInsertDateGroup:
@@ -1087,6 +1093,11 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             case ltDBDirectorGroup:
             {
                 groups.push_back(data->GetDirector());
+                break;
+            }
+            case ltDBStudioGroup:
+            {
+                groups.push_back(data->GetStudio());
                 break;
             }
             case ltDBCastGroup:

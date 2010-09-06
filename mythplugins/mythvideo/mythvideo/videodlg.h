@@ -39,7 +39,7 @@ class VideoDialog : public MythScreenType
     enum BrowseType { BRS_FOLDER = 0, BRS_GENRE = 0x1, BRS_CATEGORY = 0x2,
                       BRS_YEAR = 0x4, BRS_DIRECTOR = 0x8, BRS_CAST = 0x10,
                       BRS_USERRATING = 0x20, BRS_INSERTDATE = 0x40,
-                      BRS_TVMOVIE = 0x80, btLast };
+                      BRS_TVMOVIE = 0x80, BRS_STUDIO = 0x100, btLast };
 
     typedef simple_ref_ptr<class VideoList> VideoListPtr;
 
@@ -86,6 +86,7 @@ class VideoDialog : public MythScreenType
     void SwitchVideoCategoryGroup();
     void SwitchVideoYearGroup();
     void SwitchVideoDirectorGroup();
+    void SwitchVideoStudioGroup();
     void SwitchVideoCastGroup();
     void SwitchVideoUserRatingGroup();
     void SwitchVideoInsertDateGroup();
@@ -205,6 +206,7 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_videoLevelState;
     MythUIStateType  *m_userRatingState;
     MythUIStateType  *m_watchedState;
+    MythUIStateType  *m_studioState;
 
     MetadataDownload *m_query;
     MetadataImageDownload *m_imageDownload;

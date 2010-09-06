@@ -71,6 +71,7 @@ class MPUBLIC VideoMetadata
              const QString &inetref = QString(),
              const QString &homepage = QString(),
              const QString &director = QString(),
+             const QString &studio = QString(),
              const QString &plot = QString(),
              float userrating = 0.0,
              const QString &rating = QString(),
@@ -129,6 +130,9 @@ class MPUBLIC VideoMetadata
 
     const QString &GetDirector() const;
     void SetDirector(const QString &director);
+
+    const QString &GetStudio() const;
+    void SetStudio(const QString &studio);
 
     const QString &GetPlot() const;
     void SetPlot(const QString &plot);

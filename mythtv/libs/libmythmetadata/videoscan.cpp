@@ -271,7 +271,7 @@ class VideoScannerThread : public QThread
                                      VIDEO_YEAR_DEFAULT,
                                      QDate::fromString("0000-00-00","YYYY-MM-DD"), 
                                      VIDEO_INETREF_DEFAULT, QString(),
-                                     VIDEO_DIRECTOR_DEFAULT, VIDEO_PLOT_DEFAULT,
+                                     VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
                                      0.0, VIDEO_RATING_DEFAULT, 0,
                                      VideoMetadata::FilenameToMeta(p->first, 2).toInt(), 
                                      VideoMetadata::FilenameToMeta(p->first, 3).toInt(), 

@@ -653,6 +653,7 @@ namespace
             tmp["fanartfile"] = fanartfile;
 
             tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
+            tmp["studiostate"] = metadata->GetStudio();
             tmp["userratingstate"] =
                     QString::number((int)(metadata->GetUserRating()));
             tmp["watchedstate"] = WatchedToState(metadata->GetWatched());
@@ -991,7 +992,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
     m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0),
-    m_parentalLevelState(0), m_watchedState(0)
+    m_parentalLevelState(0), m_watchedState(0), m_studioState(0)
 {
     m_query = new MetadataDownload(this);
     m_imageDownload = new MetadataImageDownload(this);
@@ -1085,6 +1086,9 @@ bool VideoDialog::Create()
         case BRS_DIRECTOR:
             m_d->m_groupType = BRS_DIRECTOR;
             break;
+        case BRS_STUDIO:
+            m_d->m_groupType = BRS_STUDIO;
+            break;
         case BRS_CAST:
             m_d->m_groupType = BRS_CAST;
             break;
@@ -1129,6 +1133,7 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_trailerState, "trailerstate");
     UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
     UIUtilW::Assign(this, m_watchedState, "watchedstate");
+    UIUtilW::Assign(this, m_studioState, "studiostate");
 
     if (err)
     {
@@ -1139,6 +1144,7 @@ bool VideoDialog::Create()
     CheckedSet(m_trailerState, "None");
     CheckedSet(m_parentalLevelState, "None");
     CheckedSet(m_watchedState, "None");
+    CheckedSet(m_studioState, "None");
 
     BuildFocusList();
 
@@ -2640,6 +2646,10 @@ void VideoDialog::MetadataBrowseMenu()
         m_menuPopup->AddButton(tr("Director"),
                   SLOT(SwitchVideoDirectorGroup()));
 
+    if (m_d->m_groupType != BRS_DIRECTOR)
+        m_menuPopup->AddButton(tr("Studio"),
+                  SLOT(SwitchVideoStudioGroup()));
+
     if (m_d->m_groupType != BRS_FOLDER)
         m_menuPopup->AddButton(tr("Folder"),
                  SLOT(SwitchVideoFolderGroup()));
@@ -2906,6 +2916,15 @@ void VideoDialog::SwitchVideoYearGroup()
 void VideoDialog::SwitchVideoDirectorGroup()
 {
    SwitchLayout(m_d->m_type, BRS_DIRECTOR);
+}
+
+/** \fn VideoDialog::SwitchVideoStudioGroup()
+ *  \brief Switch to Studio browse mode.
+ *  \return void.
+ */
+void VideoDialog::SwitchVideoStudioGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_STUDIO);
 }
 
 /** \fn VideoDialog::SwitchVideoCastGroup()
@@ -3951,6 +3970,12 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         QList<PersonInfo> director = lookup->GetPeople(DIRECTOR);
         if (director.count() > 0)
             metadata->SetDirector(director.takeFirst().name);
+    }
+    if (metadata->GetStudio().isEmpty())
+    {
+        QStringList studios = lookup->GetStudios();
+        if (studios.count() > 0)
+            metadata->SetStudio(studios.takeFirst());
     }
     if (metadata->GetPlot() == VIDEO_PLOT_DEFAULT ||
         metadata->GetPlot().isEmpty())

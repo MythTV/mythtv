@@ -111,7 +111,7 @@ void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items)
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
     const QString BaseMetadataQuery(
-        "SELECT title, director, plot, rating, year, releasedate,"
+        "SELECT title, director, studio, plot, rating, year, releasedate,"
         "userrating, length, filename, hash, showlevel, "
         "coverfile, inetref, homepage, childid, browse, watched, "
         "playcommand, category, intid, trailer, screenshot, banner, fanart, "

@@ -96,7 +96,8 @@ class VideoMetadataImp
              const QString &fanart, const QString &title, const QString &subtitle,
              const QString &tagline, int year, const QDate &releasedate,
              const QString &inetref, const QString &homepage,
-             const QString &director, const QString &plot, float userrating,
+             const QString &director, const QString &studio,
+             const QString &plot, float userrating,
              const QString &rating, int length,
              int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
@@ -108,8 +109,8 @@ class VideoMetadataImp
              const QString &host = "",
              bool processed = false) :
         m_title(title), m_subtitle(subtitle), m_tagline(tagline),
-        m_inetref(inetref), m_homepage(homepage), m_director(director), m_plot(plot),
-        m_rating(rating), m_playcommand(playcommand), m_category(category),
+        m_inetref(inetref), m_homepage(homepage), m_director(director), m_studio(studio),
+        m_plot(plot), m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
         m_filename(filename), m_hash(hash), m_trailer(trailer), m_coverfile(coverfile),
         m_screenshot(screenshot), m_banner(banner), m_fanart(fanart),
@@ -142,6 +143,7 @@ class VideoMetadataImp
             m_inetref = rhs.m_inetref;
             m_homepage = rhs.m_homepage;
             m_director = rhs.m_director;
+            m_studio = rhs.m_studio;
             m_plot = rhs.m_plot;
             m_rating = rhs.m_rating;
             m_playcommand = rhs.m_playcommand;
@@ -213,6 +215,9 @@ class VideoMetadataImp
 
     const QString &getDirector() const { return m_director; }
     void SetDirector(const QString &director) { m_director = director; }
+
+    const QString &getStudio() const { return m_studio; }
+    void SetStudio(const QString &studio) { m_studio = studio; }
 
     const QString &getPlot() const { return m_plot; }
     void SetPlot(const QString &plot) { m_plot = plot; }
@@ -343,6 +348,7 @@ class VideoMetadataImp
     QString m_inetref;
     QString m_homepage;
     QString m_director;
+    QString m_studio;
     QString m_plot;
     QString m_rating;
     QString m_playcommand;
@@ -454,7 +460,7 @@ void VideoMetadataImp::Reset()
                     VIDEO_FANART_DEFAULT, VideoMetadata::FilenameToMeta(m_filename, 1), QString(),
                     VideoMetadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT,
                     QDate(), VIDEO_INETREF_DEFAULT, QString(), VIDEO_DIRECTOR_DEFAULT,
-                    VIDEO_PLOT_DEFAULT, 0.0,
+                    QString(), VIDEO_PLOT_DEFAULT, 0.0,
                     VIDEO_RATING_DEFAULT, 0,
                     VideoMetadata::FilenameToMeta(m_filename, 2).toInt(),
                     VideoMetadata::FilenameToMeta(m_filename, 3).toInt(), QDate(), m_id,
@@ -533,39 +539,40 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
 {
     m_title = query.value(0).toString();
     m_director = query.value(1).toString();
-    m_plot = query.value(2).toString();
-    m_rating = query.value(3).toString();
-    m_year = query.value(4).toInt();
-    m_releasedate = query.value(5).toDate();
-    m_userrating = (float)query.value(6).toDouble();
+    m_studio = query.value(2).toString();
+    m_plot = query.value(3).toString();
+    m_rating = query.value(4).toString();
+    m_year = query.value(5).toInt();
+    m_releasedate = query.value(6).toDate();
+    m_userrating = (float)query.value(7).toDouble();
     if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
     if (m_userrating > 10.0)
         m_userrating = 10.0;
-    m_length = query.value(7).toInt();
-    m_filename = query.value(8).toString();
-    m_hash = query.value(9).toString();
-    m_showlevel = ParentalLevel(query.value(10).toInt()).GetLevel();
-    m_coverfile = query.value(11).toString();
-    m_inetref = query.value(12).toString();
-    m_homepage = query.value(13).toString();
-    m_childID = query.value(14).toUInt();
-    m_browse = query.value(15).toBool();
-    m_watched = query.value(16).toBool();
-    m_playcommand = query.value(17).toString();
-    m_categoryID = query.value(18).toInt();
-    m_id = query.value(19).toInt();
-    m_trailer = query.value(20).toString();
-    m_screenshot = query.value(21).toString();
-    m_banner = query.value(22).toString();
-    m_fanart = query.value(23).toString();
-    m_subtitle = query.value(24).toString();
-    m_tagline = query.value(25).toString();
-    m_season = query.value(26).toInt();
-    m_episode = query.value(27).toInt();
-    m_host = query.value(28).toString();
-    m_insertdate = query.value(29).toDate();
-    m_processed = query.value(30).toBool();
+    m_length = query.value(8).toInt();
+    m_filename = query.value(9).toString();
+    m_hash = query.value(10).toString();
+    m_showlevel = ParentalLevel(query.value(11).toInt()).GetLevel();
+    m_coverfile = query.value(12).toString();
+    m_inetref = query.value(13).toString();
+    m_homepage = query.value(14).toString();
+    m_childID = query.value(15).toUInt();
+    m_browse = query.value(16).toBool();
+    m_watched = query.value(17).toBool();
+    m_playcommand = query.value(18).toString();
+    m_categoryID = query.value(19).toInt();
+    m_id = query.value(20).toInt();
+    m_trailer = query.value(21).toString();
+    m_screenshot = query.value(22).toString();
+    m_banner = query.value(23).toString();
+    m_fanart = query.value(24).toString();
+    m_subtitle = query.value(25).toString();
+    m_tagline = query.value(26).toString();
+    m_season = query.value(27).toInt();
+    m_episode = query.value(28).toInt();
+    m_host = query.value(29).toString();
+    m_insertdate = query.value(30).toDate();
+    m_processed = query.value(31).toBool();
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -622,11 +629,11 @@ void VideoMetadataImp::saveToDatabase()
 
         m_watched = 0;
 
-        query.prepare("INSERT INTO videometadata (title,subtitle, tagline,director,plot,"
+        query.prepare("INSERT INTO videometadata (title,subtitle,tagline,director,studio,plot,"
                       "rating,year,userrating,length,season,episode,filename,hash,"
                       "showlevel,coverfile,inetref,homepage,browse,watched,trailer,"
                       "screenshot,banner,fanart,host,processed) VALUES (:TITLE, :SUBTITLE, "
-                      ":TAGLINE, :DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, "
+                      ":TAGLINE, :DIRECTOR, :STUDIO, :PLOT, :RATING, :YEAR, :USERRATING, "
                       ":LENGTH, :SEASON, :EPISODE, :FILENAME, :HASH, :SHOWLEVEL, "
                       ":COVERFILE, :INETREF, :HOMEPAGE, :BROWSE, :WATCHED, "
                       ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST, :PROCESSED)");
@@ -634,8 +641,9 @@ void VideoMetadataImp::saveToDatabase()
     else
     {
         query.prepare("UPDATE videometadata SET title = :TITLE, subtitle = :SUBTITLE, "
-                      "tagline = :TAGLINE, director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
-                      "year = :YEAR, releasedate = :RELEASEDATE, userrating = :USERRATING, "
+                      "tagline = :TAGLINE, director = :DIRECTOR, studio = :STUDIO, "
+                      "plot = :PLOT, rating= :RATING, year = :YEAR, "
+                      "releasedate = :RELEASEDATE, userrating = :USERRATING, "
                       "length = :LENGTH, season = :SEASON, episode = :EPISODE, "
                       "filename = :FILENAME, hash = :HASH, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
@@ -655,6 +663,7 @@ void VideoMetadataImp::saveToDatabase()
     query.bindValue(":SUBTITLE", m_subtitle);
     query.bindValue(":TAGLINE", m_tagline);
     query.bindValue(":DIRECTOR", m_director);
+    query.bindValue(":STUDIO", m_studio);
     query.bindValue(":PLOT", m_plot);
     query.bindValue(":RATING", m_rating);
     query.bindValue(":YEAR", m_year);
@@ -1046,7 +1055,7 @@ VideoMetadata::VideoMetadata(const QString &filename, const QString &hash,
              const QString &screenshot, const QString &banner, const QString &fanart,
              const QString &title, const QString &subtitle, const QString &tagline,
              int year, const QDate &releasedate, const QString &inetref,
-             const QString &homepage, const QString &director,
+             const QString &homepage, const QString &director, const QString &studio,
              const QString &plot, float userrating, const QString &rating,
              int length, int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
@@ -1059,9 +1068,10 @@ VideoMetadata::VideoMetadata(const QString &filename, const QString &hash,
 {
     m_imp = new VideoMetadataImp(filename, hash, trailer, coverfile, screenshot, banner,
                             fanart, title, subtitle, tagline, year, releasedate, inetref,
-                            homepage, director, plot, userrating, rating, length, season, episode,
-                            insertdate, id, showlevel, categoryID, childID, browse, watched,
-                            playcommand, category, genres, countries, cast, host, processed);
+                            homepage, director, studio, plot, userrating, rating, length,
+                            season, episode, insertdate, id, showlevel, categoryID, childID,
+                            browse, watched, playcommand, category, genres, countries, cast,
+                            host, processed);
 }
 
 VideoMetadata::~VideoMetadata()
@@ -1157,6 +1167,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["subtitle"] = GetSubtitle();
     metadataMap["tagline"] = GetTagline();
     metadataMap["director"] = GetDirector();
+    metadataMap["studio"] = GetStudio();
     metadataMap["description"] = GetPlot();
     metadataMap["genres"] = GetDisplayGenres(*this);
     metadataMap["countries"] = GetDisplayCountries(*this);
@@ -1213,6 +1224,7 @@ void ClearMap(MetadataMap &metadataMap)
     metadataMap["subtitle"] = "";
     metadataMap["tagline"] = "";
     metadataMap["director"] = "";
+    metadataMap["studio"] == "";
     metadataMap["description"] = "";
     metadataMap["genres"] = "";
     metadataMap["countries"] = "";
@@ -1343,6 +1355,16 @@ const QString &VideoMetadata::GetDirector() const
 void VideoMetadata::SetDirector(const QString &director)
 {
     m_imp->SetDirector(director);
+}
+
+const QString &VideoMetadata::GetStudio() const
+{
+    return m_imp->getStudio();
+}
+
+void VideoMetadata::SetStudio(const QString &studio)
+{
+    m_imp->SetStudio(studio);
 }
 
 const QString &VideoMetadata::GetPlot() const
