@@ -102,6 +102,7 @@ class MPUBLIC RecordingInfo : public ProgramInfo
 
         uint findid,
 
+        bool commfree,
         uint subtitleType,
         uint videoproperties,
         uint audioproperties);
@@ -139,7 +140,9 @@ class MPUBLIC RecordingInfo : public ProgramInfo
         RecordingDupInType dupin,
         RecordingDupMethodType dupmethod,
 
-        uint findid);
+        uint findid,
+
+        bool commfree);
 
     // Create ProgramInfo that overlaps the desired time on the
     // specified channel id.

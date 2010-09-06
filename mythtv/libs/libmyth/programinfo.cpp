@@ -791,15 +791,19 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
     clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, channum, callsign, name "
-                  "FROM channel "
-                  "WHERE chanid=:CHANID");
+    query.prepare(
+        "SELECT chanid, channum, callsign, name, outputfilters, commmethod "
+        "FROM channel "
+        "WHERE chanid=:CHANID");
     query.bindValue(":CHANID", _chanid);
     if (query.exec() && query.next())
     {
         chanstr  = query.value(1).toString();
         chansign = query.value(2).toString();
         channame = query.value(3).toString();
+        chanplaybackfilters = query.value(4).toString();
+        set_flag(programflags, FL_CHANCOMMFREE,
+                 query.value(5).toInt() == COMM_DETECT_COMMFREE);
     }
 
     chanid  = _chanid;

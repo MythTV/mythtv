@@ -3420,6 +3420,7 @@ void Scheduler::AddNewRecords(void)
 
             result.value(34).toUInt(),//findid
 
+            result.value(23).toInt() == COMM_DETECT_COMMFREE,//commfree
             result.value(39).toUInt(),//subtitleType
             result.value(38).toUInt(),//videoproperties
             result.value(40).toUInt());//audioproperties
@@ -3549,7 +3550,8 @@ void Scheduler::AddNotListed(void) {
         "       RECTABLE.recordid,    RECTABLE.type,        " // 17,18
         "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 19,20
         "       RECTABLE.findid,                            " // 21
-        "       RECTABLE.startoffset, RECTABLE.endoffset    " // 22,23
+        "       RECTABLE.startoffset, RECTABLE.endoffset,   " // 22,23
+        "       channel.commmethod                          " // 24
         "FROM RECTABLE "
         "INNER JOIN channel ON (channel.chanid = RECTABLE.chanid) "
         "LEFT JOIN recordmatch on RECTABLE.recordid = recordmatch.recordid "
@@ -3659,7 +3661,9 @@ void Scheduler::AddNotListed(void) {
             RecordingDupInType(result.value(19).toInt()),
             RecordingDupMethodType(result.value(20).toInt()),
 
-            result.value(21).toUInt());
+            result.value(21).toUInt(),
+
+            result.value(24).toInt() == COMM_DETECT_COMMFREE);
 
         tmpList.push_back(p);
     }
@@ -3683,7 +3687,8 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
         "       RECTABLE.enddate,     RECTABLE.endtime,     " // 15,16
         "       RECTABLE.recordid,    RECTABLE.type,        " // 17,18
         "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 19,20
-        "       RECTABLE.findid                             " // 21
+        "       RECTABLE.findid,                            " // 21
+        "       channel.commmethod                          " // 22
         "FROM RECTABLE "
         "LEFT JOIN channel ON channel.callsign = RECTABLE.station "
         "GROUP BY recordid "
@@ -3746,7 +3751,9 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
             RecordingDupInType(result.value(19).toInt()),
             RecordingDupMethodType(result.value(20).toInt()),
 
-            result.value(21).toUInt()));
+            result.value(21).toUInt(),
+
+            result.value(22).toInt() == COMM_DETECT_COMMFREE));
     }
 }
 

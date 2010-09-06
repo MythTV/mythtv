@@ -89,6 +89,7 @@ RecordingInfo::RecordingInfo(
 
     uint _findid,
 
+    bool _commfree,
     uint _subtitleType,
     uint _videoproperties,
     uint _audioproperties) :
@@ -120,6 +121,8 @@ RecordingInfo::RecordingInfo(
     programflags |= _repeat ? FL_REPEAT : 0;
     programflags &= ~FL_REACTIVATE;
     programflags |= _reactivate ? FL_REACTIVATE : 0;
+    programflags &= ~FL_CHANCOMMFREE;
+    programflags |= _commfree ? FL_CHANCOMMFREE : 0;
 
     oldrecstatus = _oldrecstatus;
 
@@ -182,7 +185,9 @@ RecordingInfo::RecordingInfo(
     RecordingDupInType _dupin,
     RecordingDupMethodType _dupmethod,
 
-    uint _findid) :
+    uint _findid,
+
+    bool _commfree) :
     ProgramInfo(
         _title, _subtitle, _description, _category,
         _chanid, _chanstr, _chansign, _channame, QString(),
@@ -203,6 +208,9 @@ RecordingInfo::RecordingInfo(
     dupmethod = _dupmethod;
 
     findid = _findid;
+
+    programflags &= ~FL_CHANCOMMFREE;
+    programflags |= _commfree ? FL_CHANCOMMFREE : 0;
 }
 
 /** \brief Fills RecordingInfo for the program that air at
