@@ -42,11 +42,11 @@
 #include "mythverbose.h"
 #include "exitcodes.h"
 
-#ifdef CONFIG_LIRC
+#if CONFIG_LIRC
 #include "lircevent.h"
 #endif
 
-#ifdef CONFIG_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
 #include "jsmenuevent.h"
 #endif
 
@@ -306,12 +306,12 @@ void myth_system_pre_flags(int &flags, MythSystemLocks &locks)
 
     locks.ready_to_lock = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
 
-#ifdef CONFIG_LIRC
+#if CONFIG_LIRC
     if( !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC) && locks.ready_to_lock )
         locks.lirc = new LircEventLock(true);
 #endif
 
-#ifdef CONFIG_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if( !(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU) && locks.ready_to_lock )
         locks.jsmenu = new JoystickMenuEventLock(true);
 #endif

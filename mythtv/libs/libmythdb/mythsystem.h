@@ -6,10 +6,10 @@
 
 #include "mythexp.h"
 #include "mythconfig.h"
-#ifdef CONFIG_LIRC
+#if CONFIG_LIRC
 #  include "lircevent.h"
 #endif
-#ifdef CONFIG_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
 #  include "jsmenuevent.h"
 #endif
 
