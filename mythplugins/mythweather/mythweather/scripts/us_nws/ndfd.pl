@@ -33,6 +33,8 @@ my @types = ('3dlocation', '6dlocation',  'updatetime',
         'icon-0', 'icon-1', 'icon-2', 'icon-3', 'icon-4', 'icon-5',
         'date-0', 'date-1', 'date-2', 'date-3', 'date-4', 'date-5', 'copyright');
 my $dir = './';
+my $icon_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/icons";
+
 getopts('Tvtlu:d:');
 
 if (defined $opt_v) {
@@ -200,7 +202,7 @@ foreach $time (sort(keys(%$result))) {
             $icon = $result->{$iconkey}->{'conditions-icon_forecast-NWS'};
             $icon =~ s/.*\/([a-z0-9_]+[.][j][p][g])/$1/;
             local *FH;
-            open(FH, "icons") or die "Cannot open icons";
+            open(FH, $icon_file) or die "Cannot open icons";
             while(my $line = <FH>) {
                 if ($line =~ /${icon}::/) {
                     $line =~ s/.*:://;

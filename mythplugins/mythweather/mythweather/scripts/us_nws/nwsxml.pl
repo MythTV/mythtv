@@ -31,6 +31,7 @@ my @types = ('cclocation', 'station_id', 'latitude', 'longitude',
         'heat_index_string', 'heat_index', 'windchill_string', 'windchill',
         'visibility', 'weather_icon', 'appt', 'wind_spdgst', 'copyright');
 my $dir = "./";
+my $icon_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/icons";
 
 getopts('Tvtlu:d:');
 
@@ -130,7 +131,7 @@ foreach (@types) {
         $key = 'weather_icon';
         $xml->{$key} = 'unknown.png';
         local *FH;
-        open(FH, "icons") or die "Cannot open icons";
+        open(FH, $icon_file) or die "Cannot open icons";
         while(my $line = <FH>) {
             chomp $line;
             if ($line =~ /$xml->{'icon_url_name'}::/) {

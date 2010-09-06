@@ -12,6 +12,7 @@ use lib dirname(abs_path($0 or $PROGRAM_NAME)),
 use XML::Parser;
 use base qw(XML::SAX::Base);
 use Date::Manip;
+use Date::Manip::TZ;
 use Data::Dumper;
 use Getopt::Std;
 use LWP::Simple;
@@ -19,6 +20,7 @@ use LWP::Simple;
 my $alerts;
 my $currAlert;
 my $currInfo;
+my $loc_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/bp16mr06.dbx";
 
 sub StartDocument {
     $alerts = [];
@@ -86,15 +88,18 @@ sub getEffectiveWarnings {
     my $info;
 
     $date = ParseDate($date);
-    $date = Date_ConvTZ($date, "", "UTC");
+    my $tz = new Date::Manip::TZ;
+    $date = Date_ConvTZ($date, $tz->curr_zone(), "UTC");
     $date = UnixDate($date, "%O");
+
     my @dates;
     while ($alert = shift @$alerts) {
         push @dates, $alert->{'cap:sent'};
         while ($info = shift @{$alert->{'cap:info'}}) {
-            if ($info->{'cap:effective'} && Date_Cmp($date, "$info->{'cap:effective'}") >= 0 &&
-                    Date_Cmp($date, "$info->{'cap:expires'}") < 0 &&
-                    (!$geo || $info->{'cap:geocode'} == $geo)) {
+            if ($info->{'cap:effective'} && 
+                Date_Cmp($date, "$info->{'cap:effective'}") >= 0 &&
+                Date_Cmp($date, "$info->{'cap:expires'}") < 0 &&
+                (!$geo || $info->{'cap:geocode'} == $geo)) {
                 push @results, $info;
             }
         }
@@ -110,7 +115,7 @@ sub getEffectiveWarnings {
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NWS-Alerts';
-my $version = 0.2;
+my $version = 0.3;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 10*60;
@@ -130,7 +135,7 @@ if (defined $opt_T) {
     exit 0;
 }
 if (defined $opt_l) {
-    open(LOCS, "bp16mr06.dbx") or die "couldn't open bp16mr06.dbx";
+    open(LOCS, $loc_file) or die "couldn't open bp16mr06.dbx";
     my $search = shift;
     while(<LOCS>) {
         if (m/$search/i) {
@@ -188,13 +193,15 @@ if (!@warnings) {
 
 print "swlocation::$locstr,$state\n";
 
-print "updatetime::Last Updated on " .
-UnixDate(Date_ConvTZ(ParseDate($updatetime)), "%b %d, %I:%M %p %Z") . "\n";
+$updatetime = ParseDate($updatetime);
+$updatetime = UnixDate($updatetime, "%b %d, %I:%M %p %Z");
+
+print "updatetime::Last Updated at $updatetime\n";
 print "copyright::NOAA,National Weather Service\n";
 
 sub doLocation {
     my $code = shift;
-    open(LOCS, "bp16mr06.dbx") or die "couldn't open bp16mr06.dbx";
+    open(LOCS, $loc_file) or die "couldn't open bp16mr06.dbx";
     while(<LOCS>) {
         if (m/$code/) {
             my @entry = split /[|]/;

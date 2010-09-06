@@ -1,5 +1,5 @@
 
-#TODO In its infinite wisdom, the XML the NWS gives us (NWS-Satations.xml) is
+#TODO In its infinite wisdom, the XML the NWS gives us (NWS-Stations.xml) is
 # not consistent wrt to lat lon.  Some are in a +/- format, others in [NSEW]
 # format, also, some aren't even listed.  It seems unlikely that the NWS doesn't
 # know that location of some of its weather stations and in fact they are on
@@ -7,11 +7,16 @@
 # all to a consistent format.
 
 package NWSLocation;
+use English;
 use strict;
+use warnings;
+
 require Exporter;
 use base qw(XML::SAX::Base);
 use XML::Parser;
 use Data::Dumper;
+use File::Basename;
+use Cwd 'abs_path';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(doSearch AddLatLonSearch AddStationIdSearch AddLocSearch);
@@ -25,9 +30,10 @@ my %currStation;
 my $searchresults;
 
 sub doSearch {
+    my $xml_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/NWS-Stations.xml";
 
     my $parser = new XML::Parser( Style => 'Stream' );
-    open(XML, 'NWS-Stations.xml') or die "cannot open file\n";
+    open(XML, $xml_file) or die "cannot open NWS-Stations.xml file\n";
     $parser->parse(*XML); 
     close(XML);
     return $searchresults;
