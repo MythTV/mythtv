@@ -594,7 +594,7 @@ void WeatherSource::processExit()
     m_scriptTimer->stop();
     if (m_proc->exitStatus())
     {
-        VERBOSE(VB_IMPORTANT, "script exit status " + m_proc->exitStatus());
+        VERBOSE(VB_IMPORTANT, QString("script exit status %1").arg(m_proc->exitStatus()));
         return;
     }
 

@@ -10,6 +10,9 @@
 #include <mythdb.h>
 #include <mythcontext.h>
 
+#include <mythuitext.h>
+#include <util.h>
+
 // MythWeather headers
 #include "weatherScreen.h"
 #include "sourceManager.h"
@@ -30,8 +33,12 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
     if (!srcMan)
     {
         m_srcMan = new SourceManager();
+	// No point in doing this as the very first thing we are going to do
+        // is destroy the sources and reload them.
+#if 0
         m_srcMan->startTimers();
         m_srcMan->doUpdate();
+#endif
         m_createdSrcMan = true;
     }
     else
@@ -73,11 +80,13 @@ bool Weather::Create()
         return false;
     }
 
-    m_pauseText = dynamic_cast<MythUIText *> (GetChild("pause_text"));
-    m_headerText = dynamic_cast<MythUIText *> (GetChild("header"));
-    m_updatedText = dynamic_cast<MythUIText *> (GetChild("update_text"));
+    bool err = false;
 
-    if (!m_pauseText || !m_headerText || !m_updatedText)
+    UIUtilE::Assign(this, m_pauseText, "pause_text", &err);
+    UIUtilE::Assign(this, m_headerText, "header", &err);
+    UIUtilE::Assign(this, m_updatedText, "update_text", &err);
+
+    if (err)
     {
         VERBOSE(VB_IMPORTANT, "Window weatherbase is missing required elements.");
         return false;
@@ -109,6 +118,11 @@ void Weather::clearScreens()
 
 void Weather::setupScreens()
 {
+    SetupScreens();
+}
+
+bool Weather::SetupScreens()
+{
     // Delete any existing screens
     clearScreens();
 
@@ -129,7 +143,7 @@ void Weather::setupScreens()
     if (!db.exec())
     {
         MythDB::DBError("Selecting weather screens.", db);
-        return;
+        return false;
     }
 
     if (!db.size())
@@ -186,9 +200,25 @@ void Weather::setupScreens()
             m_srcMan->connectScreen(id, ws);
         }
 
+        if( m_screens.empty() )
+        {
+            // We rejected every screen...  sit on this and rotate.
+            VERBOSE(VB_IMPORTANT, "No weather screens left, aborting.");
+            m_nextpage_Timer->stop();
+            if( m_updatedText )
+            {
+                m_updatedText->SetText(tr("None of the configured screens are complete in this theme (missing copyright information)."));
+                m_updatedText->Show();
+                return true;
+            }
+            return false;
+        }
+
         m_srcMan->startTimers();
         m_srcMan->doUpdate(true);
     }
+
+    return true;
 }
 
 void Weather::screenReady(WeatherScreen *ws)
@@ -366,3 +396,7 @@ void Weather::nextpage_timeout()
 
     m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

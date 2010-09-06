@@ -16,9 +16,9 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
 }
 
 WeatherScreen::WeatherScreen(MythScreenStack *parent,
-                             ScreenListInfo *screenDefn, int id) : 
+                             ScreenListInfo *screenDefn, int id) :
                MythScreenType (parent, screenDefn->title),
-    m_screenDefn(screenDefn), 
+    m_screenDefn(screenDefn),
     m_name(m_screenDefn->name),
     m_inuse(false),
     m_prepared(false),
@@ -46,6 +46,9 @@ bool WeatherScreen::Create()
     foundtheme = LoadWindowFromXML("weather-ui.xml", m_name, this);
 
     if (!foundtheme)
+        return false;
+
+    if (!prepareScreen(true))
         return false;
 
     return true;
@@ -91,7 +94,8 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
 
     // This may seem like overkill, but it is necessary to actually update the
     // static and animated maps when they are redownloaded on an update
-    prepareScreen();
+    if (!prepareScreen())
+        VERBOSE(VB_IMPORTANT, "Theme is missing a required widget!");
 
     emit screenReady(this);
 }
@@ -104,15 +108,29 @@ QString WeatherScreen::getTemperatureUnit()
         return QString::fromUtf8("°") + "C";
 }
 
-void WeatherScreen::prepareScreen()
+bool WeatherScreen::prepareScreen(bool checkOnly)
 {
     QMap<QString, QString>::iterator itr = m_dataValueMap.begin();
     while (itr != m_dataValueMap.end())
     {
-        MythUIType *widget = GetChild(itr.key());
+        QString name = itr.key();
+        MythUIType *widget = GetChild(name);
+
         if (!widget)
         {
             VERBOSE(VB_GENERAL, "Widget not found " + itr.key());
+
+            if (name == "copyright")
+            {
+                VERBOSE(VB_IMPORTANT, 
+                    QString("No copyright widget found, skipping screen %1.")
+                    .arg(m_name));
+                return false;
+            }
+        }
+
+        if( !widget || checkOnly )
+        {
             ++itr;
             continue;
         }
@@ -132,6 +150,7 @@ void WeatherScreen::prepareScreen()
     }
 
     m_prepared = true;
+    return true;
 }
 
 void WeatherScreen::prepareWidget(MythUIType *widget)
@@ -225,3 +244,6 @@ bool WeatherScreen::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

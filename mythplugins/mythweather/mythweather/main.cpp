@@ -31,15 +31,14 @@ static int RunWeather()
 
     if (weather->Create())
     {
-        mainStack->AddScreen(weather);
-        weather->setupScreens();
+        if( weather->SetupScreens() )
+            mainStack->AddScreen(weather);
+
         return 0;
     }
-    else
-    {
-        delete weather;
-        return -1;
-    }
+
+    delete weather;
+    return -1;
 }
 
 static void runWeather()
@@ -164,3 +163,7 @@ void  mythplugin_destroy()
         srcMan = 0;
     }
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

@@ -29,6 +29,7 @@ class Weather : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
     bool UpdateData();
+    bool SetupScreens();
 
   public slots:
     void setupScreens();
@@ -81,3 +82,7 @@ class Weather : public MythScreenType
 };
 
 #endif
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

@@ -62,7 +62,7 @@ class WeatherScreen : public MythScreenType
   protected:
     virtual QString prepareDataItem(const QString &key, const QString &value);
     virtual void prepareWidget(MythUIType *widget);
-    virtual void prepareScreen();
+    virtual bool prepareScreen(bool checkOnly = false);
     virtual QString getTemperatureUnit();
     QString formatDataItem(const QString &key, const QString &value);
 
