@@ -259,7 +259,7 @@
             <area>360,647,200,30</area>
             <align>right</align>
         </textarea>
-        
+
         <textarea name="freereport" from="basetextarea">
             <area>570,647,300,30</area>
             <align>left</align>
@@ -309,7 +309,7 @@
                 </imagetype>
             </state>
         </statetype>
-        
+
         <textarea name="lentime" from="basetextarea">
             <area>1030,647,200,30</area>
             <align>right</align>
@@ -319,7 +319,7 @@
             <font>basemedium</font>
             <align>allcenter</align>
         </textarea>
-        
+
     </window>
 
     <window name="groupselector">
@@ -525,8 +525,8 @@
         </textarea>
 
         <buttonlist name="iconlist">
-            <area>900,248,364,307</area>
-            <buttonarea>0,0,364,305</buttonarea>
+            <area>900,248,364,350</area>
+            <buttonarea>0,0,364,350</buttonarea>
             <spacing>2</spacing>
             <statetype name="buttonitem">
                 <state name="active">
@@ -570,46 +570,6 @@
                                 <position>0,2</position>
                             </imagetype>
                         </state>
-                        <state name="mono">
-                            <imagetype name="statusimage">
-                                <filename>shared/icons/audio_mono.png</filename>
-                                <position>0,5</position>
-                            </imagetype>
-                        </state>
-                        <state name="stereo">
-                            <imagetype name="statusimage">
-                                <filename>shared/icons/audio_stereo.png</filename>
-                                <position>0,5</position>
-                            </imagetype>
-                        </state>
-                        <state name="surround">
-                            <imagetype name="statusimage">
-                                <filename>shared/icons/audio_surround.png</filename>
-                                <position>0,5</position>
-                            </imagetype>
-                        </state>
-                        <!--
-                        <state name="dolby">
-                            <imagetype name="statusimage">
-                                <filename></filename>
-                            </imagetype>
-                        </state>
-                        <state name="cc">
-                            <imagetype name="statusimage">
-                                <filename></filename>
-                            </imagetype>
-                        </state>
-                        <state name="subtitles">
-                            <imagetype name="statusimage">
-                                <filename></filename>
-                            </imagetype>
-                        </state>
-                        <state name="onscreensub">
-                            <imagetype name="statusimage">
-                                <filename></filename>
-                            </imagetype>
-                        </state>
-                        -->
                         <state name="hdtv">
                             <imagetype name="statusimage">
                                 <filename>shared/icons/hdtv.png</filename>
