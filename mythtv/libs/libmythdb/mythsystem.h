@@ -16,10 +16,10 @@
 
 typedef struct {
     bool                    ready_to_lock;
-#ifdef CONFIG_LIRC
+#if CONFIG_LIRC
     LircEventLock          *lirc;
 #endif
-#ifdef CONFIG_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     JoystickMenuEventLock  *jsmenu;
 #endif
 } MythSystemLocks;
