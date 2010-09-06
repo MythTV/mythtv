@@ -527,7 +527,8 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
                  'watched':False,            'category':0,
                  'browse':True,              'hash':u'',
                  'season':0,                 'episode':0,
-                 'releasedate':date(1,1,1),  'childid':-1}
+                 'releasedate':date(1,1,1),  'childid':-1,
+                 'studio':u''}
     _cm_toid, _cm_toname = DictInvertCI.createPair({0:'none'})
 
     class _open(object):
