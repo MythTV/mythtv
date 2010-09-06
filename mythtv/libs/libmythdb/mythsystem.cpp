@@ -335,15 +335,19 @@ void myth_system_pre_flags(int &flags, MythSystemLocks &locks)
 
 void myth_system_post_flags(int &flags, MythSystemLocks &locks)
 {
+#if CONFIG_JOYSTICK_MENU
     if( locks.jsmenu ) {
         delete locks.jsmenu;
         locks.jsmenu = NULL;
     }
+#endif
 
+#if CONFIG_LIRC
     if( locks.lirc ) {
         delete locks.lirc;
         locks.lirc = NULL;
     }
+#endif
 
     // This needs to be a send event so that the MythUI m_drawState change is
     // flagged immediately instead of after existing events are processed
