@@ -633,7 +633,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     }
 
     QString desc = tr("There is/are %n recording(s) in this display group",
-                      NULL, countInGroup);
+                      "", countInGroup);
 
     if (m_type == kDeleteBox && countInGroup > 1)
     {

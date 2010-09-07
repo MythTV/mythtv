@@ -973,12 +973,12 @@ void ProgLister::FillViewList(const QString &view)
         m_viewList.push_back("= 0.0");
         m_viewTextList.push_back(tr("Unrated"));
         m_viewList.push_back(QString("= 10.0"));
-        m_viewTextList.push_back(tr("%n star(s)", NULL, 10));
+        m_viewTextList.push_back(tr("%n star(s)", "", 10));
         for (int i = 9; i > 0; i--)
         {
             float stars = i / 10.0;
             m_viewList.push_back(QString(">= %1").arg(stars));
-            m_viewTextList.push_back(tr("%n star(s) and above", NULL, i));
+            m_viewTextList.push_back(tr("%n star(s) and above", "", i));
         }
 
         if (!view.isEmpty())
