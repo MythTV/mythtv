@@ -4,24 +4,24 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="27"/>
+        <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
         <translation type="unfinished">Просмотр новостных лент RSS </translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="31"/>
+        <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
-        <translation type="unfinished">Обновить элементы новостей</translation>
+        <translation>Обновить элементы новостей</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="33"/>
+        <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
-        <translation type="unfinished">Принудительно обновить элементы новостей</translation>
+        <translation>Принудительно обновить элементы новостей</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="35"/>
+        <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished">Отменить обновление элемента новостей</translation>
+        <translation>Отменить обновление элемента новостей</translation>
     </message>
 </context>
 <context>
@@ -113,12 +113,12 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
         <source>Ok</source>
-        <translation type="unfinished">Ок</translation>
+        <translation>Ок</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
@@ -168,11 +168,16 @@
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
         <source>Edit RSS News Feeds</source>
         <translation type="unfinished">Изменить новостные ленты RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="4"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -181,94 +186,114 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 По окончании редактирования для продолжения нажмите &quot;ОК&quot; или &quot;Отмена&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
-        <source>Name:</source>
-        <translation type="unfinished">Название:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="5"/>
-        <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <source>Name:</source>
+        <translation>Название:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
-        <source>Icon:</source>
-        <translation type="unfinished">Значок:</translation>
+        <source>URL:</source>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
-        <source>Podcast:</source>
-        <translation type="unfinished">Подкаст:</translation>
+        <source>Icon:</source>
+        <translation>Значок:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
-        <source>Genre:</source>
-        <translation type="unfinished">Жанр:</translation>
+        <source>Podcast:</source>
+        <translation>Подкаст:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
-        <source>Channel:</source>
-        <translation type="unfinished">Канал:</translation>
+        <source>Genre:</source>
+        <translation>Жанр:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <source>Channel:</source>
+        <translation>Канал:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
-        <source>OK</source>
-        <translation type="unfinished">ОК</translation>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
-        <source>News Subscriptions</source>
-        <translation type="unfinished">Подписки на новости</translation>
+        <source>OK</source>
+        <translation>ОК</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
+        <source>News Subscriptions</source>
+        <translation>Подписки на новости</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
         <source>Choose the news sites you would like to read.</source>
         <translation type="unfinished">Выберите новостные сайты, которые вы хотите читать.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="16"/>
+        <source>News Settings</source>
+        <translation type="unfinished">Настройки новостей</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Category</source>
+        <translation type="unfinished">Категория</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>[x]</source>
+        <translation type="unfinished">[x]</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Web Site</source>
+        <translation type="unfinished">Веб-сайт</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
         <source>Edit RSS News Feed</source>
         <translation type="unfinished">Изменить новостные ленты RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Ok</source>
-        <translation type="unfinished">Ок</translation>
+        <translation>Ок</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Contexts</source>
         <translation type="unfinished">Контекст</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Actions</source>
-        <translation type="unfinished">Действия</translation>
+        <translation>Действия</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="24"/>
         <source>RSS Feeds</source>
-        <translation type="unfinished">Летны RSS</translation>
+        <translation>Летны RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="25"/>
         <source>MythNews Configuration</source>
-        <translation type="unfinished">Настройка MythNews</translation>
+        <translation>Настройка MythNews</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Minutes</source>
-        <translation type="unfinished">Минуты</translation>
+        <translation>Минуты</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="15"/>
         <source>News Feeds</source>
-        <translation type="unfinished">Новостные ленты</translation>
+        <translation>Новостные ленты</translation>
     </message>
 </context>
 </TS>
