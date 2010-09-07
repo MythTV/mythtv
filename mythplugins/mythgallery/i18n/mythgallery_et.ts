@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythgallery/glsingleview.cpp" line="240"/>
         <source>Press SELECT to play again</source>
-        <translation>Klõpsa VALIK uuesti esitamiseks</translation>
+        <translation>Klõpsa OK/ENTER uuesti esitamiseks</translation>
     </message>
 </context>
 <context>
@@ -534,28 +534,33 @@ Vaata kas kaust on olemas, loetav ja seades on seadistuste lehel õiged.</transl
     <message>
         <location filename="../mythgallery/singleview.cpp" line="220"/>
         <source>Press SELECT to play again</source>
-        <translation>Klõpsa VALIK uuesti esitamiseks</translation>
+        <translation>Klõpsa OK/ENTER uuesti esitamiseks</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
         <source>No images are present in the pictures folder.</source>
         <translation>Piltide kaustas pole pilte.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="4"/>
         <source>Image Gallery</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="5"/>
         <source>SELECT: View</source>
-        <translation>VALIK: vaade</translation>
+        <translation>OK/ENTER: vaata</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="6"/>
         <source>MENU: Activate Menu</source>
         <translation>MENÜÜ: Aktiveeri menüü</translation>
     </message>

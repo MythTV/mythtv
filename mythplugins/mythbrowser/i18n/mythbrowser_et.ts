@@ -214,57 +214,67 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Bookmark Manager</source>
         <translation>Järjehoidjate haldur</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Category</source>
         <translation>Kategooria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="19"/>
         <source>[x]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Name</source>
         <translation>Nimi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="21"/>
         <source>URL</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Category:</source>
         <translation>Kategooria:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="3"/>
+        <source>Web Bookmarks</source>
+        <translation>Järjehoidjad</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
         <source>Browse your favorite web sites.</source>
         <translation>Lehitse lemmiklehekülgi.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Browser:</source>
         <translation>Brauser:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="8"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Configure Web Browser</source>
         <translation>Seadista brauserit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -273,22 +283,22 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Click to choose from existing categories...</source>
         <translation>Klõpsa olemasolevatest kategooriatest valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Find</source>
         <translation>Otsi</translation>
     </message>
@@ -298,32 +308,32 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <translation>Otsi...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Browser Command:</source>
         <translation>Brauseri käsk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Text Size:</source>
         <translation>Teksti suurus:</translation>
     </message>

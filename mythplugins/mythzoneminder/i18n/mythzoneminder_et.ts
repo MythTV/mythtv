@@ -12,17 +12,17 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="41"/>
+        <location filename="../mythzoneminder/main.cpp" line="129"/>
         <source>ZoneMinder Console</source>
         <translation>ZoneMinder Konsool</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="43"/>
+        <location filename="../mythzoneminder/main.cpp" line="131"/>
         <source>ZoneMinder Live View</source>
         <translation>ZoneMinder otse</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="45"/>
+        <location filename="../mythzoneminder/main.cpp" line="133"/>
         <source>ZoneMinder Events</source>
         <translation>ZoneMinder sündmused</translation>
     </message>

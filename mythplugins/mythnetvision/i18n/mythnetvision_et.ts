@@ -4,12 +4,12 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="35"/>
+        <location filename="../mythnetvision/main.cpp" line="100"/>
         <source>Internet Television Client - Search</source>
         <translation>Internetitelevisiooni klient - Otsing</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/main.cpp" line="37"/>
+        <location filename="../mythnetvision/main.cpp" line="102"/>
         <source>Internet Television Client - Site/Tree View</source>
         <translation>Internetitelevisiooni klient - Lehe/puu vaade</translation>
     </message>
@@ -286,37 +286,42 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Search Term:</source>
         <translation>Osingu fraas:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Author: %1</source>
         <translation>Autor: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
         <source>No search scripts found!  This usually indicates missing prerequisites.</source>
         <translation>Otsingu skripti ei leitud! Tõenäoliselt on midagi installimata.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="4"/>
         <source>Page %1</source>
         <translation>Leht %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Search:</source>
         <translation>Otsi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Edit/Add a New RSS Feed</source>
         <translation>Muuda/lisa uus RSS voog</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;</source>
@@ -325,183 +330,201 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
 Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Title:</source>
         <translation>Pealkiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>URL:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Author:</source>
         <translation>Autor:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Description:</source>
         <translation>Kirjeldus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Download video from this feed automatically</source>
         <translation>Laadi sellest voost video automaatselt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Select to change image...</source>
         <translation>Vali pildi muutmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
         <source>Manage Tree Subscriptions</source>
-        <translation>Halda liitumiste puud</translation>
+        <translation type="obsolete">Halda liitumiste puud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
         <source>Choose the sites you wish to browse.</source>
-        <translation>Vali lehed, mida soovid sirvida.</translation>
+        <translation type="obsolete">Vali lehed, mida soovid sirvida.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>New Site</source>
         <translation>Uus leht</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Edit Site</source>
         <translation>Muuda lehte</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Unsubscribe</source>
         <translation>Tühista liitumine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
+        <source>Search Net Videos</source>
+        <translation>Otsi võrguvideosid</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
         <source>Size: %1</source>
         <translation>Suurus: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Description: %1</source>
         <translation>Kirjeldus: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</source>
         <translation>Otsingu skripti ei leitud! Tõenäoliselt on midagi installimata. Proovi skripti käsurealt käivitada.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Manage Site Subscriptions</source>
         <translation>Halda lehtedele liitumisi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Edit</source>
         <translation>Muuda</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="30"/>
         <source>New</source>
         <translation>Uus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Remove</source>
         <translation>Eemalda</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Halda RSS liitumisi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Feed Name:</source>
         <translation>Voo nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Feed URL:</source>
         <translation>Voo URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Site Description:</source>
         <translation>Lehe kirjeldus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Feed Author:</source>
         <translation>Voo autor:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Download this feed automatically</source>
         <translation>Lae see voog automaatselt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Choose Image</source>
         <translation>Vali pilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Save</source>
         <translation>Salvesta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Posted: %1</source>
         <translatorcomment>Har ikke testet om dette er korrekt, antager at det er dato for upload af en video til internettet</translatorcomment>
         <translation>Postitatud: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
         <translation>Hetkel pole ühtegi voogu/lehte lisatud! Lisamiseks klõpsa MENÜÜ ja vali &quot;Otsi/halda liitumisi&quot;, siis &quot;Halda lehe liitumisi&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="18"/>
+        <source>Manage Subscriptions</source>
+        <translation>Halda liitumisi</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Choose the sites you wish to browse/search.</source>
+        <translation>Vali lehti kust soovid otsida.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Browse Net Videos</source>
+        <translation>Sirvi võrguvideoid</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
         <source>Runtime</source>
         <translation>Pikkus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Author</source>
         <translation>Autor</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Rating</source>
         <translation>Hinnang</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Search Internet Video</source>
         <translation>Otsi interneti videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Search popular video sites</source>
         <translation>Otsi populaarseid video lehti</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Browse Internet Video</source>
         <translation>Sirvi interneti videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Browse highlights and entire sites</source>
         <translation>Sirvi esile tõstetuid ja kogu lehti</translation>
     </message>

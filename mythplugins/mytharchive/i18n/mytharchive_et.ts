@@ -363,9 +363,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
         <source>Myth Archive Temp Directory</source>
-        <translation>Myth arhiveerija ajutine kataloog</translation>
+        <translation type="obsolete">Myth arhiveerija ajutine kataloog</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="20"/>
@@ -373,9 +372,8 @@
         <translation>Siia kataloogi tekitab MythArchive ajutised tööfailid. Siin peab olema VÄGA PALJU ruumi!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="28"/>
         <source>Myth Archive Share Directory</source>
-        <translation>Myth arhiveerija jagatud kataloog</translation>
+        <translation type="obsolete">Myth arhiveerija jagatud kataloog</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="30"/>
@@ -543,12 +541,12 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="331"/>
         <source>MythArchive Settings</source>
-        <translation>MythArchive sätted</translation>
+        <translation>MythArchive seaded</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="342"/>
         <source>MythArchive Settings (2)</source>
-        <translation>MythArchive sätted (2)</translation>
+        <translation>MythArchive seaded (2)</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="361"/>
@@ -601,6 +599,16 @@ Selleks võib kuluda mõni minut.</translation>
         <location filename="../mytharchive/archivesettings.cpp" line="66"/>
         <source>DVD Drive Write Speed</source>
         <translation>DVD kirjutamise kiirus</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
+        <source>MythArchive Temp Directory</source>
+        <translation>Myth arhiveerija ajutine kataloog</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="28"/>
+        <source>MythArchive Share Directory</source>
+        <translation>Myth arhiveerija jagatud kataloog</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="68"/>
@@ -901,382 +909,397 @@ Place a blank DVD in the drive and select an option below.</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Select Destination</source>
         <translation>Vali sihtkoht</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="30"/>
         <source>description goes here.</source>
         <translation>Kirjeldus läheb siia.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Free Space:</source>
         <translation>Vaba ruum:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Make ISO Image</source>
         <translation>Loo ISO tõmmis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Burn to DVD</source>
         <translation>Kirjuta DVD-le</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Force Overwrite of DVD-RW Media</source>
         <translation>DVD-RW üle kirjutamine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Select Recordings</source>
         <translation>Vali salvestised</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Show Recordings</source>
         <translation>Näita salvestisi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="21"/>
         <source>File Finder</source>
         <translation>Faili otsija</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Select Videos</source>
         <translation>Vaili videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Video Category</source>
         <translation>Video kategooria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="38"/>
         <source>title goes here</source>
         <translation>pealkiri läheb siia</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="39"/>
         <source>PL:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="40"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="25"/>
         <source>No videos available</source>
         <translation>Videod puuduvad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Log Viewer</source>
         <translation>Logi vaataja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Change Encoding Profile</source>
         <translation>Muuda kodeerimis profiili</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="45"/>
         <source>DVD Menu Theme</source>
         <translation>DVD menüü teema</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Select a theme</source>
         <translation>Vali teema</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Intro</source>
         <translation>Intro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Main Menu</source>
         <translation>Peamenüü</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Chapter Menu</source>
         <translation>Peatüki menüü</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Details</source>
         <translation>Üksikasjad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Select Archive Items</source>
         <translation>Vali arhiivi elemendid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="54"/>
         <source>No files are selected for archive</source>
         <translation>Arhiivi pole midagi valitud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
-        <source>0 mb</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Archive Item Details</source>
         <translation>Arhiivi elementide üksikasjad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Choose where you would like your files archived.</source>
         <translation>Vali kuhu failid arhiveeritakse.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Output Type:</source>
         <translation>Väljundi tüüp:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Destination:</source>
         <translation>Sihtkoht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Click here to find an output location...</source>
         <translation>Klõpsa siin väljundi leidmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Erase DVD-RW before burning</source>
         <translation>Kustuta DVD-RW enne kirjutamist</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Previous</source>
         <translation>Eelmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Next</source>
         <translation>Järgmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Filter:</source>
         <translation>Filter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Select the file you wish to use.</source>
         <translation>Vali fail mida soovid kasutada.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Home</source>
         <translation>Algusesse</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="27"/>
         <source>See logs from your archive runs.</source>
         <translation>Vaata arhiveerimise logisid.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Update</source>
         <translation>Uuenda</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Exit</source>
         <translation>Välju</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="32"/>
         <source>0.00 GB</source>
         <translation>0.00 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="72"/>
+        <source>0 MB</source>
+        <translation>0 MB</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="75"/>
         <source>x.xx GB</source>
         <translation>x.xx GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>12.34 GB</source>
         <translation>12.34 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="6"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Video Category:</source>
+        <translation>Video kategooria:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>x.xx Gb</source>
+        <translation>x.xx GB</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
         <source>Choose the appearance of your DVD.</source>
         <translation>Vali DVD välimus.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Theme:</source>
         <translation>Kujundus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Select the recordings and videos you wish to save.</source>
         <translation>Vali videod ja salvestised mida soovid salvestada.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Add Recording</source>
         <translation>Lisa salvestis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Add Video</source>
         <translation>Lisa video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Add File</source>
         <translation>Lisa fail</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Title:</source>
         <translation>Pealkiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Subtitle:</source>
         <translation>Alapealkiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Start Date:</source>
         <translation>Algusaeg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Time:</source>
         <translation>Aeg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Description:</source>
         <translation>Kirjeldus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Thumb Image Selector</source>
         <translation>Pisipildi valija</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Current Position</source>
         <translation>Hetke asukoht</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="66"/>
         <source>0:00:00.00</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Seek Amount</source>
         <translation>Otsingu ulatus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Frame</source>
         <translation>Kaader</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Save</source>
         <translation>Salvesta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="71"/>
         <source>xxxxx MB</source>
         <translation>xxxxx MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Find</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Prev</source>
         <translation>Eelmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="74"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="76"/>
         <source>File Finder To Import</source>
         <translation>Imporditav faili otsija</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Start Time:</source>
         <translation>Algusaeg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Select Associated Channel</source>
         <translation>Vali seotud kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Archived Channel</source>
         <translation>Arhiveeritud kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Chan. ID:</source>
         <translation>Kanali ID:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Chan. No:</source>
         <translation>Kanali nr.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Callsign:</source>
         <translation>Kutsung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Local Channel</source>
         <translation>Lokaalne kanal</translation>
     </message>
@@ -1301,67 +1324,67 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Laiendatud kauamängiv profiil mahutab ühekihilisele DVD-le umbes 6 tundi videot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Search Channel</source>
         <translation>Otsi kanalit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Search Callsign</source>
         <translation>Otsi kanali kutsungit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Search Name</source>
         <translation>Otsi nime</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Add video</source>
         <translation>Lisa video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Create DVD</source>
         <translation>Loo DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Create Archive</source>
         <translation>Loo arhiiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Encode Video File</source>
         <translation>Kodeeri video fail</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Import Archive</source>
         <translation>Impordi arhiiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Archive Utilities</source>
         <translation>Arhiivi tööriistad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Show Log Viewer</source>
         <translation>Vaata logi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Play Created DVD</source>
         <translation>Esita loodud DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Burn DVD</source>
         <translation>Kirjuta DVD</translation>
     </message>

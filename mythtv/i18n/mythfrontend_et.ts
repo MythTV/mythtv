@@ -117,7 +117,7 @@
 <context>
     <name>CaptureCardEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3047"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3045"/>
         <source>Capture Card Menu</source>
         <translation>Salvestuskaardi menüü</translation>
     </message>
@@ -130,60 +130,60 @@
         <translation type="obsolete">Kustuta..</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3125"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3123"/>
         <source>Are you sure you want to delete this capture card?</source>
         <translation>Oled sa kindel, et soovid selle salvestuskaardi kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3126"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3124"/>
         <source>Yes, delete capture card</source>
         <translation>Jah, kustuta salvestuskaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3069"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3104"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3127"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3067"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3102"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3125"/>
         <source>No, don&apos;t</source>
         <translation>Ei, ära kustuta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3003"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3001"/>
         <source>Capture cards</source>
         <translation>Salvestuskaardid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3101"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3099"/>
         <source>Are you sure you want to delete ALL capture cards?</source>
         <translation>Oled sa kindel, et soovid KÕIK salvestuskaardid kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3068"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3103"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3066"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3101"/>
         <source>Yes, delete capture cards</source>
         <translation>Jah, kustuta salvestuskaardid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3048"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3046"/>
         <source>Edit...</source>
         <translation>Muuda...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3049"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3047"/>
         <source>Delete...</source>
         <translation>Kustuta...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3066"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3064"/>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
         <translation>Oled sa kindel, et soovid KÕIK salvestuskaardid masinast %1 kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3085"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3083"/>
         <source>Error getting list of cards for this host</source>
         <translation>Viga selle masina salvestuskaartide nimekirja tekitamisel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3086"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3084"/>
         <source>Unable to delete capturecards for %1</source>
         <translation>Ei saa %1 salvestuskaarte kustutada</translation>
     </message>
@@ -191,53 +191,53 @@
 <context>
     <name>CardInput</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2687"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2685"/>
         <source>Scan for channels</source>
         <translation>Skaneeri kanaleid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2689"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2687"/>
         <source>Use channel scanner to find channels for this input.</source>
         <translation>Kasuta kanaliskaneerijat selle sisendi kanalite leidmiseks.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2691"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2689"/>
         <source>Fetch channels from listings source</source>
         <translation>Lae kanalid saadete nimekirjast</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2693"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2691"/>
         <source>This uses the listings data source to provide the channels for this input.</source>
         <translation>Selle sisendi kanalite leidmiseks kasutatakse saadete nimekirja.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2695"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2693"/>
         <source>This can take a long time to run.</source>
         <translation>Käivitamine võib võtta kaua aega.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2774"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2772"/>
         <source>Create Input Group</source>
         <translation>Loo uus sisendgrupp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2775"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2773"/>
         <source>Enter new group name</source>
         <translation>Uus grupi nimi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2785"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2806"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2783"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2804"/>
         <source>Error</source>
         <translation>Viga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2786"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2784"/>
         <source>Sorry, this Input Group name can not be blank.</source>
         <translation>Sisendgrupi nimi ei saa olla tühi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2807"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2805"/>
         <source>Sorry, this Input Group name is already in use.</source>
         <translation>Sisendgrupi nimi on juba kasutusel</translation>
     </message>
@@ -245,7 +245,7 @@
 <context>
     <name>CardInputEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3238"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3236"/>
         <source>Input connections</source>
         <translation>Sisendite ühendused</translation>
     </message>
@@ -966,27 +966,27 @@
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3584"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3582"/>
         <source>Recording Options</source>
-        <translation>Salvestamissätted</translation>
+        <translation>Salvestamise valikud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3580"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3578"/>
         <source>DiSEqC</source>
         <translation>DiSEqC</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3581"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3579"/>
         <source>Input and satellite settings.</source>
-        <translation>Sisendite ning satelliidi sätted.</translation>
+        <translation>Sisendite ning satelliidi seaded.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3364"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3362"/>
         <source>Could not open card %1</source>
         <translation>Ei suuda kaari %1 avada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3365"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3363"/>
         <source>Could not get card info for card %1</source>
         <translation>Ei saa infot kaardi %1 kohta</translation>
     </message>
@@ -1136,7 +1136,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="245"/>
         <source>Switch Configuration</source>
-        <translation>Lüliti sätted</translation>
+        <translation>Lüliti seaded</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="298"/>
@@ -1219,7 +1219,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="517"/>
         <source>Rotor Configuration</source>
-        <translation>Rootori sätted</translation>
+        <translation>Rootori seaded</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="531"/>
@@ -1229,7 +1229,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="532"/>
         <source>Rotor position setup.</source>
-        <translation>Rootori asendite sätted.</translation>
+        <translation>Rootori asendite seadistamine.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="585"/>
@@ -1339,7 +1339,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="818"/>
         <source>LNB Configuration</source>
-        <translation>Pea sätted</translation>
+        <translation>LNB seaded</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="975"/>
@@ -1718,87 +1718,87 @@
 <context>
     <name>HelpPopup</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4896"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4982"/>
         <source>Commercials are flagged</source>
         <translation>Reklaamid on märgistatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4897"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4983"/>
         <source>An editing cutlist is present</source>
         <translation>Muutmise lõikeloend olemas</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4898"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4984"/>
         <source>The program is able to auto-expire</source>
         <translation>Saade saab automaatselt aeguda</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4899"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4985"/>
         <source>Commercials are being flagged</source>
         <translation>Reklaame hakatakse märgistama</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4900"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4986"/>
         <source>A bookmark is set</source>
         <translation>Järjehoidja määratud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4904"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4990"/>
         <source>Recording is in Mono</source>
         <translation>Salvestisel on monoheli</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4905"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4991"/>
         <source>Recording is in Stereo</source>
         <translation>Salvestisel on stereoheli</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4906"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4992"/>
         <source>Recording is in Surround Sound</source>
         <translation>Salvestisel on surround heli</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4907"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4993"/>
         <source>Recording is in Dolby Surround Sound</source>
         <translation>Salvestisel on Dolby surround heli</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4909"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4995"/>
         <source>Recording is Closed Captioned</source>
         <translation>Salvestisel on teleteksti subtiitrid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4910"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4996"/>
         <source>Recording has Subtitles Available</source>
         <translation>Salvestusel on subtiitrid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4911"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4997"/>
         <source>Recording is Subtitled</source>
         <translation>Salvestus on subtitleeritud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4913"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4999"/>
         <source>Recording is in 1080i/p High Definition</source>
         <translation>Salvestus on 1080/p kõrglahutus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4914"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5000"/>
         <source>Recording is in 720p High Definition</source>
         <translation>Salvestus on 720p kõrglahutus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4915"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5001"/>
         <source>Recording is in High Definition</source>
         <translation>Salvestis on kõrglahutus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4919"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5005"/>
         <source>Recording has been watched</source>
         <translation>Salvestus on vaadatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4916"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5002"/>
         <source>Recording is Widescreen</source>
         <translation>Salvestus on laiekraan</translation>
     </message>
@@ -2149,14 +2149,12 @@
 <context>
     <name>MetadataLookup</name>
     <message>
-        <location filename="../libs/libmythui/metadatacommon.cpp" line="178"/>
         <source> Minutes</source>
-        <translation>Minutit</translation>
+        <translation type="obsolete">Minutit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/metadatacommon.cpp" line="180"/>
         <source> Seconds</source>
-        <translation>Sekundit</translation>
+        <translation type="obsolete">Sekundit</translation>
     </message>
 </context>
 <context>
@@ -2329,82 +2327,82 @@
         <translation>Klahvid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="865"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="877"/>
         <source>Reload Theme</source>
         <translation>Lae teema uuesti</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="867"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="879"/>
         <source>Main Menu</source>
         <translation>Peamenüü</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="869"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="881"/>
         <source>Program Guide</source>
         <translation>Saatekava</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="871"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="883"/>
         <source>Program Finder</source>
         <translation>Saate otsija</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="874"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="886"/>
         <source>Manage Recordings / Fix Conflicts</source>
         <translation>Halda salvestusi / Paranda konfliktid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="876"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="888"/>
         <source>Program Recording Priorities</source>
         <translation>Saadete salvestusprioriteedid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="878"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="890"/>
         <source>Manage Recording Rules</source>
         <translation>Halda salvestusreegleid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="880"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="892"/>
         <source>Channel Recording Priorities</source>
         <translation>Kanalite salvestusprioriteedid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="882"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="894"/>
         <source>TV Recording Playback</source>
         <translation>TV salvestise esitus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="884"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="896"/>
         <source>TV Recording Deletion</source>
         <translation>TV salvestise kustutamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="886"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="898"/>
         <source>Live TV</source>
         <translation>Otse eeter</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="888"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="900"/>
         <source>Live TV In Guide</source>
         <translation>Otse eeter kavas</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="890"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="902"/>
         <source>Status Screen</source>
         <translation>Oleku kuva</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="892"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="904"/>
         <source>Previously Recorded</source>
         <translation>Varem salvestatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="895"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="907"/>
         <source>ScreenShot</source>
         <translation>Kuvatõmmis</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="925"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="937"/>
         <source>MythTV&apos;s native media player.</source>
         <translation>MythTV sisemine meediamängija.</translation>
     </message>
@@ -2419,655 +2417,685 @@
         <translation>Alla</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="490"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="492"/>
         <source>Play Program</source>
         <translation>Esita saade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="492"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="586"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="494"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="590"/>
         <source>Toggle recording status of current program</source>
         <translation>Muuda saate salvestamise olekut</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="494"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="496"/>
         <source>Page the program guide back one day</source>
         <translation>Mine kavas üks päev tagasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="496"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="498"/>
         <source>Page the program guide forward one day</source>
         <translation>Mine kavas üks päev edasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="498"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="500"/>
         <source>Page the program guide left</source>
         <translation>Mine kavas vasakule</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="500"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="502"/>
         <source>Page the program guide right</source>
         <translation>Mine kavas paremale</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="502"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="588"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="504"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="592"/>
         <source>Toggle the current channel as a favorite</source>
         <translation>Määra see kanal lemmikuks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="504"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="506"/>
         <source>Reverse the channel order in the program guide</source>
         <translation>Keera kanalite järjestus kavas teistpidi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="506"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="707"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="508"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="719"/>
         <source>Show the Program Guide</source>
         <translation>Näita saatekava</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="508"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="709"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="510"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="721"/>
         <source>Show the Program Finder</source>
         <translation>Näita saate otsijat</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="510"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="512"/>
         <source>Cycle through channel groups and all channels in the program guide.</source>
         <translation>Jaluta kavas läbi kanaligruppide ja kanalite.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="513"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="515"/>
         <source>Switch channels without exiting guide in Live TV mode.</source>
         <translation>Vaheta otseetris kanaleid ilma kavast lahkumata.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="515"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="590"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="517"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="594"/>
         <source>Volume down</source>
         <translation>Heli vaiksemaks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="517"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="592"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="519"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="596"/>
         <source>Volume up</source>
         <translation>Heli valjemaks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="519"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="594"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="521"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="598"/>
         <source>Mute</source>
         <translation>Vaigista</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="521"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="596"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="523"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="600"/>
         <source>Cycle audio channels</source>
         <translation>Vali heli kanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="523"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="525"/>
         <source>Increase program or channel rank</source>
         <translation>Tõsta saate või kanali hinnangut</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="525"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="527"/>
         <source>Decrease program or channel rank</source>
         <translation>Vähenda saate või kanali hinnangut</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="527"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="529"/>
         <source>List upcoming episodes</source>
         <translation>Loetle tolevased osad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="529"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="531"/>
         <source>Show program details</source>
         <translation>Näita saate üksikasju</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="531"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="533"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="535"/>
         <source>Switch Capture Card view</source>
         <translation>Lülita hõive kaardi vaateid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="535"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="537"/>
         <source>Edit Custom Record Rule</source>
         <translation>Muuda kohandatud salvestusreegleid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="537"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="539"/>
         <source>Change Recording Group</source>
         <translation>Vaheta salvestusgruppi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="539"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="541"/>
         <source>Change Group View</source>
         <translation>Vaheta grupi vaadet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="542"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="544"/>
+        <source>Exit or return to DVD menu</source>
+        <translation>Tagasi DVD menüsse või välju</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="546"/>
         <source>Clear OSD</source>
         <translation>Puhasta OSD</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="544"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="548"/>
         <source>Pause</source>
         <translation>Peata</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="546"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="550"/>
         <source>Fast Forward</source>
         <translation>Kiiresti edasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="548"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="552"/>
         <source>Rewind</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="550"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="554"/>
         <source>Arbitrary Seek</source>
         <translation>Suvaline otsing</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="552"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="556"/>
         <source>Channel up</source>
         <translation>Kanal üles</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="554"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="558"/>
         <source>Channel down</source>
         <translation>Kanal alla</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="556"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="560"/>
         <source>Switch to the next favorite channel</source>
         <translation>Lülitu järgmisele lemmik kanalile</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="558"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="562"/>
         <source>Switch to the previous channel</source>
         <translation>Lülitu eelmisele kanalile</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="560"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="564"/>
         <source>Jump ahead</source>
         <translation>Hüppa edasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="562"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="566"/>
         <source>Jump back</source>
         <translation>Hüppa tagasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="564"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="568"/>
         <source>Jump to bookmark</source>
         <translation>Hüppa järjehoidjani</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="566"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="570"/>
         <source>Fast Forward (Sticky) or Forward one frame while paused</source>
         <translation>Edasi kerimine(kleepuv) või keri üks kaader edasi kui peatatakse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="568"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="572"/>
         <source>Rewind (Sticky) or Rewind one frame while paused</source>
         <translation>Tagasi kerimine(kleepuv) või keri üks kaader tagasi kui peatatakse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="570"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="574"/>
         <source>Next Video Source</source>
         <translation>Järgmine video allikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="572"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="576"/>
         <source>Previous Video Source</source>
         <translation>Eelmine videoallikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="574"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="578"/>
         <source>Next Input</source>
         <translation>Järgmine sisend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="576"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="580"/>
         <source>Next Card</source>
         <translation>Järgmine kaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="578"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="582"/>
         <source>Skip Commercial</source>
         <translation>Jäta reklaamid vahele</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="580"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="584"/>
         <source>Skip Commercial (Reverse)</source>
         <translation>Jäta reklaamid vahele (tagasisuunas)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="582"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="586"/>
         <source>Jump to the start of the recording.</source>
         <translation>Salvestuse algusesse.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="584"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="588"/>
         <source>Toggle channel browse mode</source>
         <translation>Kanali sirvimis vaate lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="598"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="602"/>
         <source>Toggle audio upmixer</source>
         <translation>Audio üles miksimise lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="600"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="604"/>
         <source>Toggle Picture-in-Picture view</source>
         <translation>Pilt-pildis vaate lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="602"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="606"/>
         <source>Toggle Picture-by-Picture view</source>
         <translation>Pilt-pildi järel vaate lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="604"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="608"/>
         <source>Create Picture-in-Picture view</source>
         <translation>Loo pilt pildis vaade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="606"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="610"/>
         <source>Create Picture-by-Picture view</source>
         <translation>loo pilt-pildi järel vaade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="608"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="612"/>
         <source>Toggle active PIP/PBP window</source>
         <translation>Aktiivse PIP/PBP akna lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="610"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="614"/>
         <source>Swap PBP/PIP Windows</source>
         <translation>Vaheta PIPP/PBP aknaid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="612"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="616"/>
         <source>Change PxP view</source>
         <translation>Muuda PxP vaadet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="614"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="618"/>
         <source>Toggle the video aspect ratio</source>
         <translation>Vaheta video kuvasuhet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="616"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="620"/>
         <source>Next Preconfigured Zoom mode</source>
         <translation>Järgmine eelseadistatud suurendus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="618"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="622"/>
         <source>Toggle any captions</source>
         <translation>Teksti lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="620"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="624"/>
         <source>Toggle Teletext Captions</source>
         <translation>Teleteksti subtiitrite lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="622"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="626"/>
         <source>Toggle Subtitles</source>
         <translation>Subtiitlite lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="624"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="628"/>
         <source>Toggle VBI CC</source>
         <translation>VBI CC lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="626"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="630"/>
         <source>Toggle ATSC CC</source>
         <translation>ATSC CC lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="628"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="632"/>
         <source>Toggle Teletext Menu</source>
         <translation>Teleteksti menüü lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="630"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="634"/>
+        <source>Toggle External Subtitles</source>
+        <translation>Väliste subtiitlite lülitamine</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="636"/>
         <source>Toggle Text Subtitles</source>
         <translation>Subtiitlite lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="633"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="639"/>
         <source>Play audio track 1</source>
         <translation>Esita 1. audio rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="635"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="641"/>
         <source>Play audio track 2</source>
         <translation>Esita 2. audio rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="637"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="643"/>
         <source>Display subtitle 1</source>
         <translation>Näita 1. subtiitlit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="639"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="645"/>
         <source>Display subtitle 2</source>
         <translation>Näita 2. subtiitlit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="641"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="647"/>
+        <source>Display Text Subtitle 1</source>
+        <translation>Näita 1. tekstisubtiitlit</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="649"/>
         <source>Display VBI CC1</source>
         <translation>Näita VBI CC1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="643"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="651"/>
         <source>Display VBI CC2</source>
         <translation>Näita VBI CC2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="645"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="653"/>
         <source>Display VBI CC3</source>
         <translation>Näita VBI CC3</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="647"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="655"/>
         <source>Display VBI CC4</source>
         <translation>Näita VBI CC4</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="649"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="657"/>
         <source>Display ATSC CC1</source>
         <translation>Näita ATSC CC1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="651"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="659"/>
         <source>Display ATSC CC2</source>
         <translation>Näita ATSC CC2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="653"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="661"/>
         <source>Display ATSC CC3</source>
         <translation>Näita ATSC CC3</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="655"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="663"/>
         <source>Display ATSC CC4</source>
         <translation>Näita ATSC CC4</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="658"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="666"/>
         <source>Next audio track</source>
         <translation>Järgmine audio rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="660"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="668"/>
         <source>Previous audio track</source>
         <translation>Eelmine audio rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="662"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="670"/>
         <source>Next subtitle track</source>
         <translation>Järgmised subtiitlid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="664"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="672"/>
         <source>Previous subtitle track</source>
         <translation>Eelmised subtiitlid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="666"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="674"/>
+        <source>Next Text track</source>
+        <translation>Järgmine teksti rada</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="676"/>
+        <source>Previous Text track</source>
+        <translation>Eelmine teksti rada</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="678"/>
         <source>Next VBI CC track</source>
         <translation>Järgmine VBI CC rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="668"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="680"/>
         <source>Previous VBI CC track</source>
         <translation>Eelmine VBI CC rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="670"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="682"/>
         <source>Next ATSC CC track</source>
         <translation>Järgmine ATSC CC rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="672"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="684"/>
         <source>Previous ATSC CC track</source>
         <translation>Eelmine ATSC CC rada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="674"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="686"/>
         <source>Next of any captions</source>
         <translation>Järgmine tekst</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="677"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="689"/>
         <source>Next video scan overidemode</source>
         <translation>Järgmine video skanneerimise ülekirjutus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="679"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="691"/>
         <source>Queue the current recording for transcoding</source>
         <translation>Pane praegune salvestus transkodeerimis järjekorda</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="681"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="693"/>
         <source>Increase the playback speed</source>
         <translation>Suurenda esitamiskiirust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="683"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="695"/>
         <source>Decrease the playback speed</source>
         <translation>Vähenda esitamiskiirust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="685"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="697"/>
         <source>Turn on time stretch control</source>
         <translation>Lülita aja venitamis kontroll sisse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="687"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="699"/>
         <source>Increase time stretch speed</source>
         <translation>Suurenda aja venitus kiirust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="689"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="701"/>
         <source>Decrease time stretch speed</source>
         <translation>Vähenda aja venitus kiirust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="691"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="703"/>
         <source>Toggle time stretch speed</source>
         <translation>Aja venitus kiiruse lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="693"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="705"/>
         <source>Turn on audio sync adjustment controls</source>
         <translation>Audio sünkroniseerimise seadmine sisse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="696"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="708"/>
         <source>Playback picture adjustments</source>
         <translation>Taasesitus pildi seadistamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="699"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="711"/>
         <source>Recording picture adjustments for this channel</source>
         <translation>Selle kana pildi seadistus salvestamiseks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="702"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="714"/>
         <source>Recording picture adjustments for this recorder</source>
         <translation>Selle salvestaja pildi seadistus salvestamiseks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="705"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="717"/>
         <source>Cycle Commercial Skip mode</source>
         <translation>Vali reklaami vahelejätu meetodeid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="711"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="723"/>
         <source>Toggle the Sleep Timer</source>
         <translation>Uinumis taimeri lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="713"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="725"/>
         <source>Play</source>
         <translation>Esita</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="715"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="727"/>
         <source>Jump to previously played recording</source>
         <translation>Lülitu varem esitatud salvestisele</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="717"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="729"/>
         <source>Display menu of recorded programs to jump to</source>
         <translation>Näita salvestiste valiku menüüd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="719"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="731"/>
         <source>Display scheduled recording list</source>
         <translation>Näita planeeritud salvestuste loendit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="721"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="733"/>
         <source>Monitor Signal Quality</source>
         <translation>Jälgi signaali kvaliteeti</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="724"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="736"/>
         <source>Jump to the DVD Root Menu</source>
         <translation>DVD peamenüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="726"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="738"/>
         <source>Exit Show without any prompts</source>
         <translation>Välju ilma küsimusteta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="729"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="741"/>
         <source>Save screenshot of current video frame</source>
         <translation>Salvesta kaader ekraanitõmmiseks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="733"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="775"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="745"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="789"/>
         <source>Menu Red</source>
         <translation>Punane menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="735"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="777"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="747"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="791"/>
         <source>Menu Green</source>
         <translation>Roheline menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="737"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="779"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="749"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="793"/>
         <source>Menu Yellow</source>
         <translation>Kollane menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="739"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="781"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="751"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="795"/>
         <source>Menu Blue</source>
         <translation>Sinine menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="741"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="753"/>
         <source>Menu Exit</source>
         <translation>Välju menüüst</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="743"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="755"/>
         <source>Menu Text</source>
         <translation>Teksti menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="745"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="757"/>
         <source>Menu EPG</source>
         <translation>EPG menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="749"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="761"/>
         <source>Clear editing cut points</source>
         <translation>Puhasta toimetamise lõikepunktid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="751"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="763"/>
         <source>Invert Begin/End cut points</source>
         <translation>Vaheta alguse/lõpu lõikepunktid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="753"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="765"/>
+        <source>Save cut list</source>
+        <translation>Salvesta lõikeloend</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="767"/>
         <source>Load cut list from commercial skips</source>
         <translation>Laadi lõikepunktid reklaami vahelejättudest</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="755"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="769"/>
         <source>Jump to the next cut point</source>
         <translation>Järgmine lõikepunkt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="757"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="771"/>
         <source>Jump to the previous cut point</source>
         <translation>Eelmine lõikepunkt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="759"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="773"/>
         <source>Jump back 10x the normal amount</source>
         <translation>Tagasi 10x tavalisest rohkem</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="761"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="775"/>
         <source>Jump forward 10x the normal amount</source>
         <translation>Edasi 10x tavalisest rohkem</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="765"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="779"/>
         <source>Next Page</source>
         <translation>Järgmine leht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="767"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="781"/>
         <source>Previous Page</source>
         <translation>Eelmine leht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="769"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="783"/>
         <source>Next Subpage</source>
         <translation>Järgmine leheosa</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="771"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="785"/>
         <source>Previous Subpage</source>
         <translation>Eelmine leheosa</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="773"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="787"/>
         <source>Toggle Teletext</source>
         <translation>Teleteksti lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="783"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="797"/>
         <source>Menu White</source>
         <translation>Valge menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="786"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="800"/>
         <source>Toggle Background</source>
         <translation>Tausta lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="787"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="801"/>
         <source>Reveal hidden Text</source>
         <translation>Leia peidetud tekst</translation>
     </message>
@@ -3412,7 +3440,7 @@
 <context>
     <name>MythScreenType</name>
     <message>
-        <location filename="../libs/libmythui/mythscreentype.cpp" line="292"/>
+        <location filename="../libs/libmythui/mythscreentype.cpp" line="294"/>
         <source>Loading...</source>
         <translation>Laen...</translation>
     </message>
@@ -3632,34 +3660,34 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
 <context>
     <name>MythThemedMenu</name>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="285"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="286"/>
         <source>System Menu</source>
         <translation>Süsteemi menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="298"/>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="309"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="299"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="310"/>
         <source>Shutdown</source>
         <translation>Lülita välja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="303"/>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="310"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="304"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="311"/>
         <source>Reboot</source>
         <translation>Taaskäivita</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="318"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="319"/>
         <source>About</source>
         <translation>Teave</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="319"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="320"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="338"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="339"/>
         <source>Revision: %1
  Branch: %2
  %3</source>
@@ -3668,12 +3696,12 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
  %3</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="349"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="350"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="920"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="921"/>
         <source>Enter password:</source>
         <translation>Sisesta parool:</translation>
     </message>
@@ -3707,8 +3735,8 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
 <context>
     <name>MythUISearchDialog</name>
     <message numerus="yes">
-        <location filename="../libs/libmythui/mythdialogbox.cpp" line="571"/>
-        <location filename="../libs/libmythui/mythdialogbox.cpp" line="632"/>
+        <location filename="../libs/libmythui/mythdialogbox.cpp" line="569"/>
+        <location filename="../libs/libmythui/mythdialogbox.cpp" line="630"/>
         <source>%n match(es)</source>
         <translation>
             <numerusform>%n vastet</numerusform>
@@ -3864,12 +3892,12 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation type="obsolete">Näidatavas grupis pole ühtegi salvestist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1029"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1096"/>
         <source>% used</source>
         <translation>% kasutatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1033"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1100"/>
         <source>, %1 GB free</source>
         <translation>, %1 GB vaba</translation>
     </message>
@@ -3878,177 +3906,177 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation type="obsolete">Salvestusnimekirja menüü</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2188"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2255"/>
         <source>Change Group View</source>
         <translation>Vaheta grupi vaadet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2192"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2259"/>
         <source>Change Group Password</source>
         <translation>Vaheta grupi parooli</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2197"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2900"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2264"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2976"/>
         <source>Playlist options</source>
         <translation>Esitusnimekirja valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2209"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2276"/>
         <source>Add this recording to Playlist</source>
         <translation>Lisa see salvestis esitusnimekirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2314"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2390"/>
         <source>Are you sure you want to delete:</source>
         <translation>Oled sa kindel, et soovid kustutada:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2320"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2396"/>
         <source>Are you sure you want to stop:</source>
         <translation>Oled sa kindel, et soovid peatada:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2364"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2440"/>
         <source>Yes, and allow re-record</source>
         <translation>Jah, üle salvestamine lubatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2372"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2376"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2448"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2452"/>
         <source>Yes, delete it</source>
         <translation>Jah, kustuta see</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2476"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2887"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2552"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2963"/>
         <source>Play</source>
         <translation>Mängi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2477"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2553"/>
         <source>Shuffle Play</source>
         <translation>Mängi suvalises järjekorras</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2478"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2554"/>
         <source>Clear Playlist</source>
         <translation>Puhasta esitusnimekiri</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2483"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2559"/>
         <source>Toggle playlist for this Category/Title</source>
         <translation>Lülita selle kategooria / pealkirja esitusnimekirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2490"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2566"/>
         <source>Toggle playlist for this recording</source>
         <translation>Lülita selle salvestise esitusnimekirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2507"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2692"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2583"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2768"/>
         <source>Change Recording Group</source>
         <translation>Vaheta salvestusgruppi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2495"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2741"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2922"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2571"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2817"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2998"/>
         <source>Job Options</source>
-        <translation>Tööparameetrid</translation>
+        <translation>Toimingu valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="522"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="521"/>
         <source>Recordings</source>
         <translation>Salvestused</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="636"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="635"/>
         <source>There is/are %n recording(s) in this display group</source>
         <translation>Selles grupis on %n salvestist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="655"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="654"/>
         <source>, which consume %1</source>
         <translation>, mis tarbivad %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="656"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="655"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1487"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1874"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1875"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4111"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4296"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1554"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1941"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1942"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4197"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4382"/>
         <source>Live TV</source>
         <translation>Otse eeter</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2038"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2053"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2058"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2105"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2120"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2125"/>
         <source>Can not delete
 </source>
         <translation>Ei saa kustutada
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2039"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2054"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2106"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2121"/>
         <source>This recording is already being deleted</source>
         <translation>Salvestus on juba kustutatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2165"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2232"/>
         <source>Group List Menu</source>
         <translation>Grupi loendi menüü</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2394"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2470"/>
         <source>Yes, delete it and the remaining %1 list items</source>
         <translation>Jah, kustuta see ja ülejäänud %1 loendiüksust</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2416"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2492"/>
         <source>No, and keep the remaining %1 list items</source>
         <translation>Ei, ja säilita ülejäänud %1 loendiüksust</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2451"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2527"/>
         <source>This recording has been deleted and is unavailable</source>
         <translation>See salvestus on kustutatud ja pole enam saadaval</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2497"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2858"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2936"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2573"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2934"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3012"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2515"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2591"/>
         <source>Mark As Watched</source>
         <translation>Märgi vaadatuks</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2517"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2593"/>
         <source>Mark As Unwatched</source>
         <translation>Märgi mittevaadatuks</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2572"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2768"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2648"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2844"/>
         <source>Begin Transcoding</source>
         <translation>Alusta transkodeerimist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2575"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2768"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2651"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2844"/>
         <source>Stop Transcoding</source>
         <translation>Peata transkodeerimine</translation>
     </message>
@@ -4061,25 +4089,25 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation type="obsolete">Peata reklaamide märgistamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2590"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2603"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2616"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2630"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2798"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2666"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2679"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2692"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2706"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2874"/>
         <source>Begin</source>
         <translation>Alusta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2593"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2606"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2619"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2634"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2797"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2669"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2682"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2695"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2710"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2873"/>
         <source>Stop</source>
         <translation>Peata</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2670"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2746"/>
         <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
         <translation>
             <numerusform>Esitosloendis on %n üksust. Toiming rakendatakse kõigile üksustele</numerusform>
@@ -4087,106 +4115,106 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2677"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2753"/>
         <source>Play Options</source>
-        <translation>Esitamisvalikud</translation>
+        <translation type="unfinished">Esitusvalikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2681"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
         <source>Play from bookmark</source>
         <translation>Mängi järjehoidjast</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2683"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2759"/>
         <source>Play from beginning</source>
         <translation>Mängi algusest</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2708"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2784"/>
         <source>Do not preserve this episode</source>
         <translation>Ära säilita seda osa</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2711"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2787"/>
         <source>Preserve this episode</source>
         <translation>Säilita see osa</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2719"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2795"/>
         <source>Scheduling Options</source>
-        <translation>AjastamisvalikudPlaneerimissätted</translation>
+        <translation>Planeerimise valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2722"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2798"/>
         <source>Edit Recording Schedule</source>
         <translation>Muuda salvestuskava</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2734"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2810"/>
         <source>Custom Edit</source>
         <translation>Kohanda</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2796"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2872"/>
         <source>User Job</source>
         <translation>Kasutaja töö</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2844"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2920"/>
         <source>Recording file contains no data</source>
         <translation>Salvestusfailis pole andmeid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2884"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2960"/>
         <source>Play from...</source>
         <translation>Mängi alates...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2863"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2893"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2939"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2969"/>
         <source>Remove from Playlist</source>
         <translation>Eemalda esitusnimekirjast</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2868"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2896"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2944"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2972"/>
         <source>Add to Playlist</source>
         <translation>Lisa esitusnimekirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2910"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2986"/>
         <source>Stop Recording</source>
         <translation>Peata salvestamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2493"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2689"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2918"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2569"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2765"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2994"/>
         <source>Storage Options</source>
-        <translation>Hoidlasätted</translation>
+        <translation>Hoidla valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2845"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2920"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2921"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2996"/>
         <source>Recording Options</source>
-        <translation>Salvestamissätted</translation>
+        <translation>Salvestamise valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2815"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4109"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4294"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4337"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4535"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2891"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4195"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4380"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4423"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4621"/>
         <source>Default</source>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2185"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2252"/>
         <source>Change Group Filter</source>
         <translation>Vaheta grupifiltrit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2204"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2271"/>
         <source>Add this Group to Playlist</source>
         <translation>Lisa see grupp esitusnimekirja</translation>
     </message>
@@ -4199,42 +4227,42 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation type="obsolete">elemente</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="521"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4088"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="520"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4174"/>
         <source>Groups</source>
         <translation>Grupid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4167"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4253"/>
         <source>Categories</source>
         <translation>Kategooriad</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2511"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2701"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2587"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2777"/>
         <source>Disable Auto Expire</source>
         <translation>Keela automaatne aegumine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2513"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2704"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2589"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2780"/>
         <source>Enable Auto Expire</source>
         <translation>Luba automaatne aegumine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2731"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2807"/>
         <source>Change Recording Title</source>
         <translation>Muuda salvestuspealkirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2509"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2695"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2585"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2771"/>
         <source>Change Playback Group</source>
         <translation>Muuda esitlusgruppi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2728"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2856"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2804"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2932"/>
         <source>Show Program Details</source>
         <translation>Näita saate üksikasju</translation>
     </message>
@@ -4243,204 +4271,204 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation type="obsolete">Otse eetris</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2816"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2892"/>
         <source>Autodetect</source>
         <translation>Automaattuvastus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2818"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2894"/>
         <source>High Quality</source>
         <translation>Kõrgkvaliteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2820"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2896"/>
         <source>Medium Quality</source>
         <translation>Keskkvaliteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2822"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2898"/>
         <source>Low Quality</source>
         <translation>Madalkvaliteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2914"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2990"/>
         <source>Mark as Unwatched</source>
         <translation>Märgi mittevaadatuks</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2916"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2992"/>
         <source>Mark as Watched</source>
         <translation>Märgi vaadatuks</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="349"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="344"/>
         <source>Watch List</source>
         <translation>Esitusnimekiri</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1230"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1297"/>
         <source>There are no recordings in your current view</source>
         <translation>Näidatavas vaates pole ühtegi salvestist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1229"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1296"/>
         <source>There are no recordings available</source>
         <translation>Salvestisi pole saadaval</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1453"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1520"/>
         <source>_NO_TITLE_</source>
         <translation>_POLE_PEALKIRJA_</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1464"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4140"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4142"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4146"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4157"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1531"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4226"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4228"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4232"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4243"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2214"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2281"/>
         <source>Help (Status Icons)</source>
         <translation>Abi(Oleku ikoonid)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2498"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2574"/>
         <source>Delete, and allow re-record</source>
         <translation>Kustuta ja luba uuesti salvestada</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2725"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2801"/>
         <source>Allow this program to re-record</source>
         <translation>Luba seda saadet uuestui salvestada</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2930"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3006"/>
         <source>Undelete</source>
         <translation>Taasta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2932"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3008"/>
         <source>Delete Forever</source>
         <translation>Kustuta täielikult</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4110"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4298"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4196"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4384"/>
         <source>Deleted</source>
         <translation>Kustutatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="562"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="561"/>
         <source>Password for group &apos;%1&apos;:</source>
         <translation>Grupi &apos;%1&apos; parool:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2316"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2392"/>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
         <translation>Salvestusfail puudub
 Oled kindel, et soovid kustutada:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2380"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2456"/>
         <source>Yes, stop recording</source>
         <translation>Jah, peata salvestus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2404"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2480"/>
         <source>No, keep it</source>
         <translation>Ei, jäta alles</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2408"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2484"/>
         <source>No, continue recording</source>
         <translation>Ei, jätka salvestust</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2434"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2440"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2510"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2516"/>
         <source>Recording Available
 </source>
         <translation>Salvestus saadaval
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2059"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2435"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2126"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2511"/>
         <source>This recording is currently in use by:</source>
         <translation>Seda salvestist kasutab hetkel:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2441"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2517"/>
         <source>This recording is currently Available</source>
         <translation>See salvestis pole hetkel kättesaadav</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2446"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2450"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2455"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2460"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2465"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2522"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2526"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2531"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2536"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2541"/>
         <source>Recording Unavailable
 </source>
         <translation>Salvestus puudub</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2447"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2523"/>
         <source>This recording is currently being deleted and is unavailable</source>
         <translation>Seda salvestist hetkel kustutatakse ning see pole kättesaadav</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2456"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2532"/>
         <source>The file for this recording can not be found</source>
         <translation>Selle salvestise fail on kadunud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2461"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2537"/>
         <source>The file for this recording is empty.</source>
         <translation>Selle salvestuse fail on tühi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2466"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2542"/>
         <source>This recording is not yet available.</source>
         <translation>Salvestus pole veel saadaval</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2486"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2562"/>
         <source>Toggle playlist for this Group</source>
         <translation>Vaheta grupi esitusloendit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2578"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2769"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2654"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2845"/>
         <source>Begin Commercial Detection</source>
         <translation>Algab reklaamide tuvastamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2581"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2769"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2657"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2845"/>
         <source>Stop Commercial Detection</source>
         <translation>Peata reklaamide tuvastamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2812"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2888"/>
         <source>Transcoding profiles</source>
         <translation>Transkodeerimis profiilid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2842"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2918"/>
         <source>Recording file can not be found</source>
         <translation>Salvestusfaili ei leitud</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4113"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4120"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4148"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4159"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4300"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4199"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4206"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4234"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4245"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4386"/>
         <source>%1 [%n item(s)]</source>
         <translation>
             <numerusform>%1 [%n element(i)]</numerusform>
@@ -4448,12 +4476,12 @@ Oled kindel, et soovid kustutada:</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4177"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4263"/>
         <source>Change Filter</source>
         <translation>Muuda filtrit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4282"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4368"/>
         <source>Add New</source>
         <translation>Lisa uus</translation>
     </message>
@@ -4465,17 +4493,17 @@ Oled kindel, et soovid kustutada:</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4304"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4390"/>
         <source>Select Recording Group</source>
         <translation>Vali salvestusgrupp</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4348"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4434"/>
         <source>Select Playback Group</source>
         <translation>Vali esitlusgrupp</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4469"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4555"/>
         <source>New Recording Group</source>
         <translation>Uute salvestuste grupp</translation>
     </message>
@@ -4572,7 +4600,7 @@ Oled kindel, et soovid kustutada:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1188"/>
         <source>Deblocking filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Blokieemaldus</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1189"/>
@@ -4592,12 +4620,12 @@ Oled kindel, et soovid kustutada:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1192"/>
         <source>Primary deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Peamine üleralaotuse eemaldaja</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1193"/>
         <source>Fallback deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Reserv ülerealaotuse eemaldaja</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1194"/>
@@ -4988,91 +5016,91 @@ Oled kindel, et soovid kustutada:</translation>
 <context>
     <name>ProgFinder</name>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="85"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="87"/>
         <source>Starts With</source>
         <translation>Algab tekstiga</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="86"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="88"/>
         <source>Programs</source>
         <translation>Rrogrammid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="87"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="89"/>
         <source>Times</source>
         <translation>Ajad</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="222"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="224"/>
         <source>Options</source>
         <translation>Valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="232"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="279"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="234"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="281"/>
         <source>Clear Search</source>
         <translation>Puhasta otsing</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="233"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="287"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="235"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="289"/>
         <source>Edit Search</source>
         <translation>Muuda otsingut</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="236"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="299"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="238"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="301"/>
         <source>Toggle Record</source>
         <translation>Lülita salvestust</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="237"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="303"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="239"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="305"/>
         <source>Program Details</source>
         <translation>Saate üksikasjad</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="238"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="307"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="240"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="309"/>
         <source>Upcoming</source>
         <translation>Tulevased</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="239"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="311"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="241"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="313"/>
         <source>Custom Edit</source>
         <translation>Kohanda</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="240"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="315"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="242"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="317"/>
         <source>Program Guide</source>
         <translation>Saatekava</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="242"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="244"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="348"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="381"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="350"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="383"/>
         <source>No Programs</source>
         <translation>Saateid pole</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="350"/>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="383"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="352"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="385"/>
         <source>There are no available programs under this search. Please select another search.</source>
         <translation>Selle otsinguga ei leitud ühtegi saadet. Proovi otsida midagi muud.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="356"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="358"/>
         <source>Select a letter...</source>
         <translation>Vali täht...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="358"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="360"/>
         <source>Pick the first letter of the program name, then press SELECT or the right arrow.</source>
         <translation>Vali saate algustäht ning vajuta SELECT või noolt paremale.</translation>
     </message>
@@ -5081,12 +5109,12 @@ Oled kindel, et soovid kustutada:</translation>
         <translation type="obsolete">Vali täht millega saade algab, siis vajuta SELECT või parem nool.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="367"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="369"/>
         <source>Select a program...</source>
         <translation>Vali saade...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progfind.cpp" line="369"/>
+        <location filename="../programs/mythfrontend/progfind.cpp" line="371"/>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation>Vali selle saate pealkiri, mida soovid otsida. Tagasi saad vasaku nooleklahviga. Vajuta SELECT salvestamise planeerimiseks.</translation>
     </message>
@@ -5171,7 +5199,17 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Kustuta osa</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1062"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="976"/>
+        <source>%n star(s)</source>
+        <translation>%n täht(e)</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="981"/>
+        <source>%n star(s) and above</source>
+        <translation>%n täht(e) ja rohkem</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1040"/>
         <source>Time</source>
         <translation>Aeg</translation>
     </message>
@@ -5358,69 +5396,62 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Hinnanguta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="992"/>
         <source>At least ***/</source>
-        <translation>Vähemalt ***/</translation>
+        <translation type="obsolete">Vähemalt ***/</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="994"/>
         <source>At least ***</source>
-        <translation>Vähemalt ***</translation>
+        <translation type="obsolete">Vähemalt ***</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="996"/>
         <source>At least **/</source>
-        <translation>Vähemalt **/</translation>
+        <translation type="obsolete">Vähemalt **/</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="998"/>
         <source>At least **</source>
-        <translation>Vähemalt **</translation>
+        <translation type="obsolete">Vähemalt **</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1000"/>
         <source>At least */</source>
-        <translation>Vähemalt */</translation>
+        <translation type="obsolete">Vähemalt */</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1002"/>
         <source>At least *</source>
-        <translation>Vähemalt *</translation>
+        <translation type="obsolete">Vähemalt *</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1004"/>
         <source>At least /</source>
-        <translation>Vähemalt /</translation>
+        <translation type="obsolete">Vähemalt /</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1019"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="997"/>
         <source>Power Recording Rule</source>
         <translation>Võimsa otsingu reegel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1065"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1043"/>
         <source>Reverse Time</source>
         <translation>Sorteeri aja järgi tagurpidi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1068"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1046"/>
         <source>Title</source>
         <translation>Pealkiri</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1071"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1049"/>
         <source>Reverse Title</source>
         <translation>Sorteeri pealkirja järgi tagurpidi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1404"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1382"/>
         <source>^(The |A |An )</source>
         <comment>Regular Expression for what to ignore when sorting</comment>
         <translation>^(The |A |An )</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1552"/>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1581"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1530"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1559"/>
         <source>%1 of %2</source>
         <comment>Current position in list where %1 is the position, %2 is the total count</comment>
         <translation>%1 %2-st</translation>
@@ -5544,40 +5575,40 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Sordi keskmise ajavahe järgi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1234"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1230"/>
         <source>^(The |A |An )</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1453"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1457"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1461"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1594"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1602"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1590"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1598"/>
         <source>Default</source>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1478"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1485"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1492"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1633"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1644"/>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1655"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1474"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1481"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1488"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1629"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1640"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1651"/>
         <source>Any</source>
         <translation>Iga</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1551"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1547"/>
         <source>Recording %1 of %2</source>
         <translation>%1 salvestamine %2-st</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="973"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="969"/>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Kustutan &apos;%1&apos; %2 reegli?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1578"/>
+        <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1574"/>
         <source> + %1 automatic priority (%2hr)</source>
         <translation> + %1 automatne prioriteet (%2t)</translation>
     </message>
@@ -5585,7 +5616,7 @@ Oled kindel, et soovid kustutada:</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="91"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="93"/>
         <source>DVD/Video contains a bookmark</source>
         <translation>DVD/Video sisaldab järjehoidjat</translation>
     </message>
@@ -5680,7 +5711,7 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Kanalite valikud - Video 4 Linux</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4262"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4301"/>
         <source>Commercial Free</source>
         <translation>Reklaamivaba</translation>
     </message>
@@ -5751,7 +5782,7 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Kanalite valikud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1336"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1349"/>
         <source>TXT</source>
         <translation>Teletekst (TXT)</translation>
     </message>
@@ -5761,58 +5792,54 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Ei saa luua heliväljundit.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="51"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="55"/>
         <source>cut point</source>
         <translation>lõikekoht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="52"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="56"/>
         <source>keyframe</source>
         <translation>võtmekaader</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="53"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="57"/>
         <source>1 frame</source>
         <translation>1 kaader</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="54"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="58"/>
         <source>0.5 seconds</source>
         <translation>0,5 sekundit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="61"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="65"/>
         <source>error</source>
         <translation>viga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="92"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="96"/>
         <source>cut</source>
         <translation>lõika</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9206"/>
         <source>Delete this cut point</source>
-        <translation>Kustuta see lõikekoht</translation>
+        <translation type="obsolete">Kustuta see lõikekoht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9208"/>
         <source>Move this cut point to the current position</source>
-        <translation>Nihuta see lõikekoht praegusele kohale</translation>
+        <translation type="obsolete">Nihuta see lõikekoht praegusele kohale</translation>
     </message>
     <message>
         <source>Flip directions - delete to the </source>
         <translation type="obsolete">Keera ümber - kustuta </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9211"/>
         <source>right</source>
-        <translation>paremalt</translation>
+        <translation type="obsolete">paremalt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9211"/>
         <source>left</source>
-        <translation>vasakult</translation>
+        <translation type="obsolete">vasakult</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="878"/>
@@ -5826,28 +5853,25 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9218"/>
         <source>Insert a new cut point?</source>
-        <translation>Lisa uus lõikekoht</translation>
+        <translation type="obsolete">Lisa uus lõikekoht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9219"/>
         <source>Delete before this frame</source>
-        <translation>Kustuta enne seda kaadrit</translation>
+        <translation type="obsolete">Kustuta enne seda kaadrit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9221"/>
         <source>Delete after this frame</source>
-        <translation>Kustuta peale seda kaadrit</translation>
+        <translation type="obsolete">Kustuta peale seda kaadrit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4106"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4171"/>
         <source>%1 of %2</source>
         <translation>%1 %2-st</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/commbreakmap.cpp" line="230"/>
-        <location filename="../libs/libmythtv/commbreakmap.cpp" line="351"/>
+        <location filename="../libs/libmythtv/commbreakmap.cpp" line="355"/>
         <source>Skip %1</source>
         <translation>Jäta vahele %1</translation>
     </message>
@@ -5857,7 +5881,7 @@ Oled kindel, et soovid kustutada:</translation>
         <translation>Reklaam: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2551"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2575"/>
         <source>Not Flagged</source>
         <translation>Pole tähistatud</translation>
     </message>
@@ -5874,7 +5898,7 @@ Oled kindel, et soovid kustutada:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/commbreakmap.cpp" line="290"/>
-        <location filename="../libs/libmythtv/commbreakmap.cpp" line="329"/>
+        <location filename="../libs/libmythtv/commbreakmap.cpp" line="334"/>
         <source>At End, can not Skip.</source>
         <translation>Lõpus, ei saa vahele jätta.</translation>
     </message>
@@ -5959,7 +5983,7 @@ Oled kindel, et soovid kustutada:</translation>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="347"/>
         <source>Bitrate Settings</source>
-        <translation>Bitikiiruse sätted</translation>
+        <translation>Bitikiiruse seaded</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="397"/>
@@ -6052,17 +6076,17 @@ Oled kindel, et soovid kustutada:</translation>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="598"/>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video; however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Märkimisel kasutab MPEG4 ülekattega (interlaced) DCT kodeerimist. Tõenäoliselt vajad sa seda, kui kodeerid ülekattega videot. See on alles eksperimentaalne ning võib rikkuda su video täiesti.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="612"/>
         <source>Enable interlaced motion estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Luba ülekattega liikumise hindamine</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="614"/>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video; however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Märkimisel kasutab MPEG4 kodeerija ülekattega (interlaced) liikumise hindamist (motion estimation). Seda on tõenäoliselt vaja, kui kodeerid ülekattega videot. See on alles eksperimentaalne ning võib rikkuda su video täiesti.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="628"/>
@@ -6317,12 +6341,12 @@ Oled kindel, et soovid kustutada:</translation>
     <message>
         <location filename="../libs/libmythtv/channelscan/modulationsetting.h" line="85"/>
         <source>Constellation</source>
-        <translation type="unfinished"></translation>
+        <translation>Tähtkuju</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/modulationsetting.h" line="86"/>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tähtkuju (Constellation) (Vaikimisi: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/modulationsetting.h" line="102"/>
@@ -6332,7 +6356,7 @@ Oled kindel, et soovid kustutada:</translation>
     <message>
         <location filename="../libs/libmythtv/channelscan/modulationsetting.h" line="103"/>
         <source>Most DVB-S transponders use QPSK, DVB-S2 8PSK QAM-16 is not available for DVB-S2 transports.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enamik DVB-S saatjaid kasutab QPSK, DVB-S2 8PSK QAM-16 pole saadaval DVB-S2 jaoks.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="219"/>
@@ -6370,16 +6394,16 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="225"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1350"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1363"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="548"/>
         <source>On</source>
         <translation>Sees</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="226"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1312"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1325"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="549"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="930"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="944"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="181"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="245"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="754"/>
@@ -6621,7 +6645,7 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="685"/>
         <source>Transport Options</source>
-        <translation>Transpordi sätted</translation>
+        <translation>Transpordi valikud</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="212"/>
@@ -6670,8 +6694,8 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="498"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="627"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1878"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2266"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2666"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2257"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2657"/>
         <source>Default</source>
         <translation>Vaikimisi</translation>
     </message>
@@ -6739,8 +6763,8 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="997"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="1045"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2379"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2390"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2377"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2388"/>
         <source>(None)</source>
         <translation>(Puudub)</translation>
     </message>
@@ -6887,90 +6911,90 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2093"/>
         <source>Capture Card Setup</source>
-        <translation>Salvestuskaardi sätted</translation>
+        <translation>Salvestuskaardi seadistus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2284"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2282"/>
         <source>Card type</source>
         <translation>Kaardi tüüp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2285"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2283"/>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
         <translation>Sea kaarditüüp vastavusse konfigureeritava salvestuskaardi tüübiga.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2296"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2294"/>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation>MJPEG salvestuskaart (Matrox G200, DC10)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2329"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2327"/>
         <source>Network recorder</source>
         <translation>Võrgusalvesti</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2332"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2330"/>
         <source>Import test recorder</source>
         <translation>Impordi test salvestaja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2333"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2331"/>
         <source>Demo test recorder</source>
         <translation>Demo test salvestaja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2342"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2340"/>
         <source>Capture device</source>
         <translation>Salvestusseade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2363"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2361"/>
         <source>Display name (optional)</source>
         <translation>Näita nime (pole kohustuslik)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2364"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2362"/>
         <source>This name is displayed on screen when Live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
         <translation>Seda nime näidatakse otse eetri vaatamise alustamisel ja valitud sisendi või kaardi vahetamisel. Selle kasutamisel veendu, et info oleks erinev igal sisendil.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2378"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2376"/>
         <source>Video source</source>
         <translation>Video allikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2401"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2399"/>
         <source>Input</source>
         <translation>Sisend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2412"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2410"/>
         <source>Input group</source>
         <translation>Sisendigrupp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2535"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2533"/>
         <source>If enabled, MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
         <translation>Lubamise korral häälestub MythTV ainult MPEG kanali numbri järgi. Kanali numbrid vahetuvad sagedamini kui DVB või ATSC häälestusparameetrid, seega on valik vähem usaldusväärne. See keelab samuti EIT hankimise otse eetri ja salvestamise korral.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2553"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2551"/>
         <source>External channel change command</source>
         <translation>Väline käsk kanali vahetusseks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2555"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2553"/>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
         <translation>Kui on määratud, siis käivitatakse see käsk välisevastuvõtja kanali vahetamisel. Esimeseks argumendiks antakse kanali number.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2569"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2567"/>
         <source>Preset tuner to channel</source>
         <translation>Eelhäälestatud kanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2571"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2569"/>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>Kasuta vaid juhul, kui su sisendkaardiga on ühendatud väline vastuvõtja. Sel juhul pead sa valima kanali, mida kasutatakse (tavalisel 3 või 4).</translation>
     </message>
@@ -6980,89 +7004,184 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <translation>Algkanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2665"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2663"/>
         <source>Connect source to input</source>
         <translation>Ühenda allikas sisendiga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3018"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3016"/>
         <source>(New capture card)</source>
         <translation>(Uus salvestuskaart)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3163"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3161"/>
         <source>(New video source)</source>
         <translation>(Uus video allikas)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1724"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3541"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3539"/>
         <source>Recorder Options</source>
-        <translation>Salvestaja sätted</translation>
+        <translation>Salvestaja valikud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="931"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="945"/>
         <source>30m</source>
         <translation>30 m</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="932"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="946"/>
         <source>1h</source>
         <translation>1 tund</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="933"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="947"/>
         <source>1h30m</source>
         <translation>1 tund 30 min</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="934"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="948"/>
         <source>2h</source>
         <translation>2 tundi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8167"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8214"/>
         <source>MythTV was set to sleep after %1 minutes and will exit in %d seconds.
 Do you wish to continue watching?</source>
         <translation>MythTV on seatud uinuma peale %1 minutit ja seiskub %d sekundi pärast.
 Soovid edasi vaadata?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8233"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8280"/>
         <source>MythTV has been idle for %1 minutes and will exit in %d seconds. Are you still watching?</source>
         <translation>MythTV on jõude %1 minutit ja sulgub %d sekundi pärats. Kas Sa vaatad veel midagi?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11668"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9250"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9330"/>
+        <source>Edit Cut Points</source>
+        <translation>Muuda lõikekohti</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9256"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9291"/>
+        <source>Move Previous Cut End Here</source>
+        <translation>Liiguta eelmise lõike lõpp siia</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9261"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9295"/>
+        <source>Cut to Beginning</source>
+        <translation>Lõika alguseni</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9266"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9299"/>
+        <source>Cut to End</source>
+        <translation>Lõika lõpuni</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9270"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9303"/>
+        <source>Move Next Cut Start Here</source>
+        <translation>Liiguta järgmise lõike algus siia</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9277"/>
+        <source>Move Start of Cut Here</source>
+        <translation>Liiguta lõike algus siia</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9280"/>
+        <source>Move End of Cut Here</source>
+        <translation>Liiguta lõike lõpp siia</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9284"/>
+        <source>Delete This Cut</source>
+        <translation>Kustuta lõige</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9306"/>
+        <source>Add New Cut</source>
+        <translation>Lisa uus lõige</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9311"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9317"/>
+        <source>Cut List Options</source>
+        <translation>Lõikeloendi valikud</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9318"/>
+        <source>Clear Cut List</source>
+        <translation>Puhasta lõikeloend</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9320"/>
+        <source>Invert Cut List</source>
+        <translation>Pööra lõikeloend</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9322"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9343"/>
+        <source>Undo Changes</source>
+        <translation>Võta tagasi</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9324"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9339"/>
+        <source>Exit Without Saving</source>
+        <translation>Välju salvestamata</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9326"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9341"/>
+        <source>Save Cut List</source>
+        <translation>Salvesta lõikeloend</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9328"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9337"/>
+        <source>Save Cut List and Exit</source>
+        <translation>Salvesta lõikeloend ja välju</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9336"/>
+        <source>Exit Cut List Editor</source>
+        <translation>Välju lõikeloendi toimetajast</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11833"/>
         <source>Can not delete program</source>
         <translation>Ei saa kanalit kustutada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11674"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11839"/>
         <source>because it is not a recording.</source>
         <translation>sest see pole salvestis.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11678"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11843"/>
         <source>because it is in use by</source>
         <translation>sest seda kasutab</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1443"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="1448"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1453"/>
         <location filename="../libs/libmyth/programtypes.cpp" line="182"/>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1445"/>
         <source>Repeat</source>
         <translation>Kordus</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1369"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1374"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2440"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2443"/>
         <source>File transfer</source>
         <translation>Failiedastus</translation>
     </message>
@@ -7250,7 +7369,7 @@ Soovid edasi vaadata?</translation>
         <translation>salvestatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2438"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2441"/>
         <location filename="../libs/libmyth/programtypes.cpp" line="160"/>
         <source>Recording</source>
         <translation>salvestatan</translation>
@@ -7316,8 +7435,8 @@ Soovid edasi vaadata?</translation>
         <translation>mitteaktiivne</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2427"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3542"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2430"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3581"/>
         <location filename="../libs/libmyth/programtypes.cpp" line="201"/>
         <location filename="../libs/libmythtv/jobqueue.h" line="23"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="134"/>
@@ -7445,7 +7564,7 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmyth/dbsettings.cpp" line="83"/>
         <location filename="../libs/libmyth/dbsettings.cpp" line="167"/>
         <source>Database Configuration</source>
-        <translation>Andmebaasi sätted</translation>
+        <translation>Andmebaasi seaded</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="89"/>
@@ -7528,8 +7647,8 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="213"/>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="381"/>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="402"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="367"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="388"/>
         <source>Wake command</source>
         <translation>Äratuse käsk</translation>
     </message>
@@ -7620,7 +7739,7 @@ Soovid edasi vaadata?</translation>
         <translation>Kui on lubatud, antakse peataustaserverile täielik kontroll videokataloogis leiduvate failide edastamiseks ning kustutamiseks. Kasulik juhul kui faile hoitakse keskses hoidlas (näiteks NFS) ning alamserver(id) ei jookse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="372"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="358"/>
         <source>Number of times the frontend will try to wake up the master backend.</source>
         <translation>Peataustaserveri äratamise katsete arv enne kui kasutajaliides loobub.</translation>
     </message>
@@ -7669,7 +7788,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Mitu sekundit enne salvestamise lagust peab peataustaserver üles tõusma.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="468"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="454"/>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="139"/>
         <source>Wakeup time format</source>
         <translation>Äratusaja formaat</translation>
@@ -7679,12 +7798,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">&apos;setWakeuptime Command&apos; käsu $time muutuja ajaformaat. Lisainfot vaata QT::QDateTime.toString() kohta. &apos;time_t&apos; kasutamine annab sekundid epohhist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="490"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="476"/>
         <source>Server halt command</source>
         <translation>Serveri seiskamiskäsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="492"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="478"/>
         <source>The command used to halt the backends.</source>
         <translation>Seda käsu kasutatakse peataustaserveri seiskamiseks.</translation>
     </message>
@@ -7693,7 +7812,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Enne seiskumist käivitatav käsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="512"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="498"/>
         <source>Block shutdown before client connected</source>
         <translation>Peata seiskamine kuni klient on ühendatud</translation>
     </message>
@@ -7702,22 +7821,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel keelatakse automaatne seiskamine kuni klient ühendub.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="522"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="508"/>
         <source>Startup command</source>
         <translation>Käivituskäsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="524"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="510"/>
         <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
         <translation>See käsk täidetakse kohe peale taustaserveri käivitamist. Parameeter &apos;$status&apos; ok kas &apos;auto&apos;, kui masin käivitus automaatselt, või &apos;user&apos;, kui selle lülitas sisse kasutaja.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="535"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="521"/>
         <source>Maximum simultaneous jobs on this backend</source>
         <translation>Maksimaalne arv samaaegseid töid selles taustaserveris</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="536"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="522"/>
         <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
         <translation>Tööjärjekord selles taustaserveris piiratakse niipaljude üheaegsete töödega.</translation>
     </message>
@@ -7734,12 +7853,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Protsessori kasutus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="556"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="542"/>
         <source>Low</source>
         <translation>väike</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="557"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="543"/>
         <source>Medium</source>
         <translation>keskmine</translation>
     </message>
@@ -7747,7 +7866,7 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="40"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="42"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="44"/>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="558"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="544"/>
         <source>High</source>
         <translation>suur</translation>
     </message>
@@ -7792,7 +7911,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kasutaja töökäsu kirjeldus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="628"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="614"/>
         <source>The command to run whenever this User Job number is scheduled.</source>
         <translation>Kasutaja töökäsu täitmisel käivitatav käsk.</translation>
     </message>
@@ -7805,22 +7924,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Luba sellel taustaserveril antud tüüpi tööd.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="977"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="963"/>
         <source>Host Address Backend Setup</source>
-        <translation>Masinaspetsiifilised taustaserveri sätted</translation>
+        <translation>Masinaspetsiifilised taustaserveri seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1040"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1025"/>
         <source>Shutdown/Wakeup Options</source>
         <translation>Seiskamis- ja äratusvalikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1102"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1087"/>
         <source>Job Queue (Global)</source>
         <translation>Tööjärjekord (üldine)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1112"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1097"/>
         <source>Job Queue (Job Commands)</source>
         <translation>Tööjärjekord (töökäsud)</translation>
     </message>
@@ -7987,23 +8106,23 @@ Soovid edasi vaadata?</translation>
         <translation>Märkimisel otsitakse täpselt õiget kaadrit (aeglasem).</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4277"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4316"/>
         <source>Blank Frame + Scene Change</source>
         <translation>Tühja kaadri + stseeni muutuse avastamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4285"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4324"/>
         <source>Scene Change Detection</source>
         <translation>Stseeni muutuse avastamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4287"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4326"/>
         <source>Logo Detection</source>
         <translation>Logo avastamine</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="92"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2389"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2380"/>
         <source>All</source>
         <translation>Kõik</translation>
     </message>
@@ -8320,7 +8439,7 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1873"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2892"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2880"/>
         <source>Menu theme</source>
         <translation>Menüü kujundus</translation>
     </message>
@@ -8406,17 +8525,17 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">MythTV kuulab mahamängimise ajal sellel pordil &quot;mythtvosd&quot; ja &quot;mythudprelay&quot; teateid.  Lisainformatsiooni vaata README failist contrib/mythnotify kataloogis.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2150"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2141"/>
         <source>Action on playback exit</source>
         <translation>Tegevus mahamängimise  lõpetamisel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2151"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2142"/>
         <source>Just exit</source>
         <translation>Lihtsalt välju</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2152"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2143"/>
         <source>Save position and exit</source>
         <translation>Salvesta asukoht ja välju</translation>
     </message>
@@ -8425,7 +8544,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel kuvatakse mahamängimisest lahkumisel menüü.  Valida saab Asukoha salvestamise, salvestise kustutamise või vaatamise jätkamise vahel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2166"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2157"/>
         <source>Prompt at end of recording</source>
         <translation>Menüü salvestamise lõpetamisel</translation>
     </message>
@@ -8498,7 +8617,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">MythTV on ette nähtud pidevalt käima. Väljumiseks võib kasutada ESC klahvi üksi või koos muuteklahviga. Ära vali kombinatsiooni, mis aknahalduris juba kasutusel on.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2265"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2256"/>
         <source>Customize exit menu options</source>
         <translation>Muuda väljumis menüü valikuid</translation>
     </message>
@@ -8511,12 +8630,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">MythTV küsib väljumisel kinnitust.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2305"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2296"/>
         <source>Halt command</source>
         <translation>Seiskamiskäsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2336"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2327"/>
         <source>External application or script to run when a keypress is received by LIRC.</source>
         <translation>Kaugjuhtimispuldi klahvivajutuse peale käivitatav väline rakendus või skript.</translation>
     </message>
@@ -8545,7 +8664,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel ei saa siia menüüsse ega PIN koodi kustutada ilma PIN koodi sisestamata.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2392"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2383"/>
         <source>Run on the specified screen or spanning all screens.</source>
         <translation>Käivita antud ekraanil või üle kõikide ekraanide.</translation>
     </message>
@@ -8566,7 +8685,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Ära ületa oma kuvari maksimaalset kuvalahendust. 0 paneb automaatselt täisekraanile.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2482"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2473"/>
         <source>GUI X offset</source>
         <translation>Graafilise kasutajaliidese horisontaalne nihe</translation>
     </message>
@@ -8575,7 +8694,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Võib töötada ainult juhul kui on käivitatud aknas.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2492"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2483"/>
         <source>GUI Y offset</source>
         <translation>Graafilise kasutajaliidese vertikaalne nihe</translation>
     </message>
@@ -8592,62 +8711,62 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Ekraani suurus - kõrgus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2526"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2517"/>
         <source>Use GUI size for TV playback</source>
         <translation>Kasuta TV vaatamisel graafilise kasutajaliidese suurust</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2528"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2519"/>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
         <translation>Märkimisel kasutatakse eelnevat suurust TV vaatamisel. Mittemärkimisel kasutatakse kogu ekraani.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2537"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2528"/>
         <source>Separate video modes for GUI and TV playback</source>
         <translation>Erinevad videorežiimid graafilise kasutajaliidese ning TV vaatamiseks</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2539"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2530"/>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
         <translation>Muuda X Window videorežiimi TV vaatamisel. Vajab &quot;xrandr&quot; tuge.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2548"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2539"/>
         <source>In X</source>
         <translation>Horisontaalne</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2551"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2542"/>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
         <translation>Horisontaalne kuvatihedus videopildile, mis vajab näitamiseks erilist kuvatihedust.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2560"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2551"/>
         <source>In Y</source>
         <translation>Vertikaalne</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2563"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2554"/>
         <source>Vertical resolution of video which needs a special output resolution.</source>
         <translation>Vertikaalne kuvatihedus videopildile, mis vajab näitamiseks erilist kuvatihedust.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2571"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2562"/>
         <source>GUI</source>
         <translation>Graafiline kasutajaliides</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2573"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2564"/>
         <source>Resolution of screen when not watching a video.</source>
         <translation>Ekraani kuvatihedus kui videot ei vaadata.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2603"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2594"/>
         <source>Default screen resolution when watching a video.</source>
         <translation>Vaikimisi ekraani kuvatihedus video vaatamisel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2605"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2596"/>
         <source>Screen resolution when watching a video at a specific resolution.</source>
         <translation>Vaikimisi ekraani kuvatihedus erilise kuvatihedusega video vaatamisel.</translation>
     </message>
@@ -8656,22 +8775,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Video väljund</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2612"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2603"/>
         <source>Output</source>
         <translation>Väljund</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2639"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2630"/>
         <source>Rate</source>
         <translation>Sagedus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2651"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2642"/>
         <source>Aspect ratio when watching a video.</source>
         <translation>Kuvasuhe video vaatamisel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2658"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2649"/>
         <source>Aspect</source>
         <translation>Kuvasuhe</translation>
     </message>
@@ -8680,12 +8799,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Vaikimisi valitakse monitori poolt raporteeritud kuvasuhe. Määra 16:9 või 4:3 erilise kuvasuhte pealesundimiseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2678"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2669"/>
         <source>Video Mode Settings</source>
-        <translation>Videorežiimi sätted</translation>
+        <translation>Videorežiimi seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2742"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2733"/>
         <source>Toggles between windowed and borderless operation.</source>
         <translation>Kasutajaliidese üle ekraani või aknas töötamise valik.</translation>
     </message>
@@ -8698,12 +8817,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kasuta igal MythTV käivitamisel erinevat kujundust.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2763"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2754"/>
         <source>Date format</source>
         <translation>Kuupäeva formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2796"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2787"/>
         <source>Your preferred date format.</source>
         <translation>Eelistatud kuupäeva formaat.</translation>
     </message>
@@ -8712,388 +8831,387 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Lühike kuupeva formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2835"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2826"/>
         <source>Your preferred short date format.</source>
         <translation>Eelistatud lühike kuupäeva formaat.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2843"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2834"/>
         <source>Time format</source>
         <translation>Kellaaja formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2980"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2968"/>
         <source>Long channel format</source>
         <translation>Pikk kanali formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2994"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2982"/>
         <source>Avoid conflicts between Live TV and scheduled shows</source>
         <translation>Väldi otse eetri ja salvestamise vahelisi konflikte</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2997"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2985"/>
         <source>If enabled, Live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
         <translation>Kui on lubatud, ei valita otse eetri vaatamiseks parimat vastuvõtjat vaid vastuvõtja, mida salvestamisel kõige tõenäolisemalt ei kasutata (tavalisel nimekirja viimane).</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3006"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2994"/>
         <source>Allow Live TV to move scheduled shows</source>
         <translation>Luba otse eetril muuta salvestuste planeeringuid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3008"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2996"/>
         <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that Live TV will not be interrupted.</source>
         <translation>Lubades liigutatakse salvestused teisele kaardile(kui võimalik), et otse eetri vaatamist mitte katkestada.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3018"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3006"/>
         <source>Display genre colors</source>
         <translation>Näita žanri värve</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3019"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3007"/>
         <source>Colorize program guide using genre colors (not available for all grabbers).</source>
         <translation>Värvi saatekavas žanrid eri värvi (kõik saatekava hankijad seda ei toeta).</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3061"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3049"/>
         <source>Browse/change channels from Channel Group</source>
         <translation>Sirvi/muuda kanaleid kanaligrupis</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3062"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3050"/>
         <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
         <translation>Lubades saad otse eetris vahetada või sirvida kanaleid valitud kanaligrupis. Kõigi kanalite sirvimiseks vali &quot;Kõik kanalid&quot; grupp.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3097"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3085"/>
         <source>Reschedule higher priorities</source>
         <translation>Ajasta ümber tähtsamad salvestamised</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3098"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3086"/>
         <source>Move higher priority programs to other cards and showings when resolving conflicts. This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
         <translation>Konfliktide lahendamisel liiguta kõrgemate prioriteetidega saateid teistele kaartidele ja aegadele.  Sellega võimaldatakse salvestada madalamate prioriteetidega saateid, mis jääksid muidu salvestamata. Samas tekib risk, et kõrgema prioriteediga saade jääb salvestamata, kui saatekava peaks vahepeal muutuma.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3110"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3098"/>
         <source>Avoid back to back recordings</source>
         <translation>Väldi kokku jooksvaid salvestusi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3111"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3099"/>
         <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
         <translation>Lubades ei panda sama ühe saate lõpu ja teise alguse ajaga saateid ühele kaardile. Kui vajalik, siis konfliktide vältimiseks lubatakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3116"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3104"/>
         <source>Different Channels</source>
         <translation>Erinevad kanalid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3155"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3143"/>
         <source>Preferred input priority</source>
         <translation>Eelistatud sisendi prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3166"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3154"/>
         <source>HDTV recording priority</source>
         <translation>HDTV salvestusprioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3176"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3164"/>
         <source>Widescreen recording priority</source>
         <translation>Laiekraani salvestus prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3186"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3174"/>
         <source>Automatic priority range (+/-)</source>
         <translation>Automaatne prioriteedivahemik (+/-)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3199"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3187"/>
         <source>Sign language recording priority</source>
         <translation>Keele salvestus proriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3221"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3209"/>
         <source>Subtitles/CC recording priority</source>
         <translation>Subtiitlid/teletekst salvestus prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3233"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3221"/>
         <source>Hard of hearing priority</source>
         <translation>Kõva kuulmise prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3245"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3233"/>
         <source>Audio described priority</source>
         <translation>Heli kirjelduse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3256"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3244"/>
         <source>Single recordings priority</source>
         <translation>Ühekordse salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3257"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3245"/>
         <source>Single recordings will receive this additional recording priority value.</source>
         <translation>Ühekordsed salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3267"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3255"/>
         <source>Weekslot recordings priority</source>
         <translation>Iganädalase salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3268"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3256"/>
         <source>Weekslot recordings will receive this additional recording priority value.</source>
         <translation>Iganädalased salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3278"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3266"/>
         <source>Timeslot recordings priority</source>
         <translation>Ajapilu salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3279"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3267"/>
         <source>Timeslot recordings will receive this additional recording priority value.</source>
         <translation>Ajapilu salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3289"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3277"/>
         <source>Channel recordings priority</source>
         <translation>Kanali salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3290"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3278"/>
         <source>Channel recordings will receive this additional recording priority value.</source>
         <translation>Kanali salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3300"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3288"/>
         <source>All recordings priority</source>
         <translation>Kõigi salvestuste prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3301"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3289"/>
         <source>The &apos;All&apos; recording type will receive this additional recording priority value.</source>
         <translation>&apos;Kõik&apos; salvestustüüp saab lisa salvestus prioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3311"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3299"/>
         <source>Find one recordings priority</source>
         <translation>Ühekordse otsitud salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3323"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3311"/>
         <source>Override recordings priority</source>
         <translation>Muudetud salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3324"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3312"/>
         <source>Override recordings will receive this additional recording priority value.</source>
         <translation>Muudetud salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3335"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3323"/>
         <source>The program guide starts on this channel if it is run from outside of Live TV mode.</source>
         <translation>Saatekava näitab väljaspool otse eetri vaatamist esimesena antud kanalit.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3343"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3331"/>
         <source>Record threshold</source>
         <translation>Salvestuse lävi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3345"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3333"/>
         <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
         <translation>Valides saate, mis on vähemalt nii palju minuteid tulevikus planeerib salvestamise.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3435"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3423"/>
         <source>Guide language #%1</source>
         <translation>Kava keel #%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3440"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3428"/>
         <source>Your #%1 preferred language for Program Guide data and captions.</source>
         <translation>Sinu #%1. keele eelistus saatekava ning subtiitrite jaoks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3458"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3446"/>
         <source>Network Remote Control port</source>
         <translation>Võrgust juhtimise port</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3460"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3448"/>
         <source>This specifies what port the network remote Control interface will listen on for new connections.</source>
         <translation>Määrab pordi, mille kaudu kasutajaliidest juhtida.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3502"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3490"/>
         <source>Ignore devices</source>
         <translation>Ignoreeri seadmeid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3537"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3525"/>
         <source>Sort titles</source>
         <translation>Sorteeri pealkirjad</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3540"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3528"/>
         <source>By recording priority</source>
         <translation>salvestusprioriteedi järgi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3542"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3530"/>
         <source>Sets the title sorting order when the view is set to Titles only.</source>
         <translation>Pealkirjade järjestamine ainult pealkirjade näitamise korral.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3564"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3552"/>
         <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
         <translation>Valimisel näidatakse alati &apos;Esitusnimekirja&apos; kui lähed &apos;Vaata salvestisi&apos; menüsse</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3575"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3563"/>
         <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
         <translation>Kasuta juhul kui automaatne aegumine puudub vaid salvestistel, mis on vaadatud ning mida peaks säilitama. Sellel juhul ei näidata neid &quot;Vaatlusnimekirjas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3635"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3623"/>
         <source>If supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
         <translation>Kui sinu riistvara ning ajurid seda toetavad, saab MythTV kasutada OpenGL kaadrisagedust video kaadrite täpsemaks ajastuseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3646"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3634"/>
         <source>Display time</source>
         <translation>Kuva aeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3655"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3643"/>
         <source>Display recording status</source>
         <translation>Kuva salvestamisolek</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3665"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3653"/>
         <source>Display menus</source>
         <translation>Kuva menüü</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3674"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3662"/>
         <source>Menu pop-up time</source>
         <translation>Hüpikmenüü aeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3675"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3663"/>
         <source>How many seconds the menu will remain visible after navigation.</source>
         <translation>Menüü näitamise aeg sekundites peale navigeerimist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3684"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3672"/>
         <source>Display music artist and title</source>
         <translation>Kuva muusika esitajat ja pealkirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3704"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3692"/>
         <source>Display channel information</source>
         <translation>Kuva kanaliinfot</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3713"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3701"/>
         <source>Display volume information</source>
         <translation>Kuva helitugevuse infot</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3723"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3711"/>
         <source>Display generic information</source>
         <translation>Kuva üldist informatsiooni</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3732"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3720"/>
         <source>Backlight always on</source>
         <translation>Taustavalgus alati sees</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3742"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3730"/>
         <source>Heartbeat always on</source>
         <translation>Olekuteave alati näha</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3751"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3739"/>
         <source>Display large clock</source>
         <translation>Näita suurt kella</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3760"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3748"/>
         <source>LCD key order</source>
         <translation>LCD nupud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3833"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3821"/>
         <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
         <translation>Märkimisel parandab QuickTime videogammat vastavalt monitorile.  Selle keelamine hoiab kokku mõned protsessori tsüklid.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3844"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3832"/>
         <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
         <translation>Märkimisel skaleeritakse video aken kogu ekraani suuruseks. Mittemärkimisel ei teisendata videot kunagi suuremaks kui on selle originaalsuurus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3868"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3856"/>
         <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Märkimisel näidatakse videot graafilise kasutajaliidese peaaknas. Keela ainult juhul, kui soovid videot töölauale või liikuvasse aknasse. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3924"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3912"/>
         <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Märkimisel näidatakse videot liikuvas aknas. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3979"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3967"/>
         <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Märkimisel näidatakse videot dokiikoonil. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4019"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4007"/>
         <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Märkimisel näidatakse videot töölaual otsinguikoonide all. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4246"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4254"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4233"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4241"/>
         <source>Mac OS X Video Settings</source>
-        <translation>Mac OS X video sätted</translation>
+        <translation>Mac OS X video seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4272"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4259"/>
         <source>On-screen Display</source>
         <translation>Ekraanimenüü</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4283"/>
         <source>Closed Captions</source>
-        <translation>Teleteksti font</translation>
+        <translation type="obsolete">Teleteksti font</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4309"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4296"/>
         <source>General (Auto-Expire)</source>
         <translation>Üldine (automaatne aegumine)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4357"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4344"/>
         <source>Default Job Queue Settings for New Scheduled Recordings</source>
         <translation>Vaikimisi tööjärjekorra seaded uutele salvestus planeeringutele</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4372"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4359"/>
         <source>General (Channel Groups)</source>
         <translation>Üldine (Kanaligrupid)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4431"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4418"/>
         <source>Theme</source>
         <translation>Kujundus</translation>
     </message>
@@ -9110,32 +9228,32 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Töölaua stiil</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2966"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2954"/>
         <source>Channel format</source>
         <translation>Kanali formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2967"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2981"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2955"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2969"/>
         <source>number</source>
         <translation>number</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2968"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2982"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2956"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2970"/>
         <source>number callsign</source>
         <translation>number kutsung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2969"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2983"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2957"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2971"/>
         <source>number name</source>
         <translation>number nimi</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1965"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2970"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2984"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2958"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2972"/>
         <source>callsign</source>
         <translation>kutsung</translation>
     </message>
@@ -9536,8 +9654,17 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1921"/>
+        <source>Subtitle text zoom percentage</source>
+        <translation>Subtiitlite teksti suurendamise protsent</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1923"/>
+        <source>Use this to enlarge or shrink text based subtitles.</source>
+        <translation>Kasuta tekstipõhiste subtiitlite suuruse muutmiseks.</translation>
+    </message>
+    <message>
         <source>ATSC caption text zoom percentage</source>
-        <translation>ATSC teksti suumi protsent</translation>
+        <translation type="obsolete">ATSC teksti suumi protsent</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1935"/>
@@ -9550,293 +9677,290 @@ Soovid edasi vaadata?</translation>
         <translation>Teksti subtiitrite kasutatav font.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2014"/>
         <source>If enabled, MythTV will always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
-        <translation>Valides esitab MythTV salvestisi taustaserverist voogedastusena, mitte ei ürita faili otse lugeda kui see on lokaalselt kätte saadav.</translation>
+        <translation type="obsolete">Valides esitab MythTV salvestisi taustaserverist voogedastusena, mitte ei ürita faili otse lugeda kui see on lokaalselt kätte saadav.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2038"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2026"/>
         <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
         <translation>Kui on lubatud, näidatakse salvestiste või otse-eetri vaatamisel teleteksti subtiitreid. Subtiitreid saab sisse-välja lülitada vajutades klahvile &quot;T&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2052"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2040"/>
         <source>If enabled, the newer EIA-708 captions will be preferred over the older EIA-608 captions in ATSC streams.</source>
         <translation>Lubades eelistatakse ATSC voo puhul uuemat EIA-708 teleteksti vanemale EIA-608.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2062"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2050"/>
         <source>Enable interactive TV</source>
         <translation>Luba interaktiivne TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2064"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2052"/>
         <source>If enabled, interactive TV applications (MHEG) will be activated. This is used for teletext and logos for radio and channels that are currently off-air.</source>
         <translation>Interaktiivse TV (MHEG) lubamine.Kasutatakse eetriväliseks logode ning teleteksti tõmbamiseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2074"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2062"/>
         <source>Always use browse mode in Live TV</source>
         <translation>Otse eetri puhul kasuta alati sirvimist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2077"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2065"/>
         <source>If enabled, browse mode will automatically be activated whenever you use channel up/down while watching Live TV.</source>
         <translation>Otse-eetri vaatamise ajal aktiveerub üles-alla nupu vajutusega automaatselt lehitsemine.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2101"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2089"/>
         <source>If enabled, automatically clear the bookmark on a recording when the recording is played back. If disabled, you can mark the beginning with rewind then save position.</source>
         <translation>Kustuta taasesitamisel järjehoidja automaatselt. Kui on keelatud, saad märkida alguse kerides ja positsiooni salvestades.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2113"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2101"/>
         <source>During playback the SELECT key (Enter or Space) will alternate between &quot;Bookmark Saved&quot; and &quot;Bookmark Cleared&quot;. If disabled, the SELECT key will save the current position for each keypress.</source>
         <translation>Taasesitamisel vahetab valiku nupp (Enter või tühik) &quot;Järjehoidja salvestatud&quot; ja &quot;Järjehoidja kustutatud&quot; vahel. Kui on keelatud, salvestab valiku nupp asukoha iga vajutuse korral.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2138"/>
         <source>UDP notify port</source>
-        <translation>UDP märguannete port</translation>
+        <translation type="obsolete">UDP märguannete port</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2140"/>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port. For additional information, see http://www.mythtv.org/wiki/MythNotify .</source>
-        <translation>MythTV kuulab mahamängimise ajal sellel pordil &quot;mythtvosd&quot; ja &quot;mythudprelay&quot; teateid.  Lisainformatsiooni vaata README failist contrib/mythnotify kataloogis.</translation>
+        <translation type="obsolete">MythTV kuulab mahamängimise ajal sellel pordil &quot;mythtvosd&quot; ja &quot;mythudprelay&quot; teateid.  Lisainformatsiooni vaata README failist contrib/mythnotify kataloogis.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2156"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2147"/>
         <source>If set to prompt, a menu will be displayed when you exit playback mode. The options available will allow you to save your position, delete the recording, or continue watching.</source>
         <translation>Valimisel kuvatakse mahamängimisest lahkumisel menüü.  Valida saab Asukoha salvestamise, salvestise kustutamise või vaatamise jätkamise vahel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2168"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2159"/>
         <source>If enabled, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
         <translation>Märkimisel kuvatakse mahamängimise lõpetamisel menüü, kus saab salvestise kustutada.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2177"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2168"/>
         <source>Jump to program OSD</source>
         <translation>Lülitu saate OSD menüüle</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2179"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2170"/>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</source>
         <translation>Vali kas hetke salvestusgruppi näidatakse OSD(Onscreen display) menüüs või näidatakse &apos;Vaata salvestusi&apos; ekraani kui &apos;Lülitu saatele&apos; on aktiveeritud. Valiku korral näidatakse salvestisi OSD-l</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2191"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2182"/>
         <source>Continue playback when embedded</source>
         <translation>Siirdudes taustale jätka esitamist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2193"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2184"/>
         <source>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
         <translation>Valides jätkab TV peale akna tulevaste saadete või salvestuste  listi taustale saatmist mängimist. Vaikimisi mängimini peatatakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2206"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2197"/>
         <source>If enabled, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
         <translation>Valimisel märgitakse saate lõpu lähedall väljumisel saade vaadatuks. Selline automaatika pole kaugeltki täpne ning kui soovid, et tegelikul lõpuni vaatamata saateid ei märgitaks vaadatuks, ära seda automaatikat kasuta.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2217"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2208"/>
         <source>Live TV idle timeout (mins)</source>
         <translation>Otse eetri jõude ajapiir (min)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2219"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2210"/>
         <source>Exit Live TV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
         <translation>Välju otse eetriist kui see on jõude märgitud arv minuteid. 0 keelab väljumise.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2256"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2247"/>
         <source>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</source>
         <translation>Lubab väljade sisestamisel kasutada virtuaalset klaviatuuri. Klaviatuur tekitatakse väljal olles OK või valikuklahvi vajutamisel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2282"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2273"/>
         <source>Confirm exit</source>
         <translation>Väljumiskinnitus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2284"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2275"/>
         <source>If enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
         <translation>MythTV küsib väljumisel kinnitust.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2295"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2286"/>
         <source>Optional. Script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
         <translation>Pole kohustuslik. Käsk või skript mis käivitatakse valides menüüst taaskäivituse. Et väljumis menüüd näha peab väljumisklahv olema defineeritud.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2307"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2298"/>
         <source>Optional. Script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
         <translation>Pole kohustuslik. Käsk või skript mis käivitatakse valides menüüst seiskamise. Et väljumis menüüd näha peab väljumisklahv olema defineeritud.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2317"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2308"/>
         <source>LIRC daemon socket</source>
         <translation>LIRC deemoni socket</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2334"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2325"/>
         <source>LIRC keypress application</source>
         <translation>LIRC nupuvajutuste rakendus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2344"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2335"/>
         <source>Screen shot path</source>
         <translation>Ekraanitõmmiste asukoht</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2353"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2344"/>
         <source>Use arrow key accelerators</source>
         <translation>Kasuta nooleklahvidega liikumist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2355"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2346"/>
         <source>If enabled, arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
         <translation>Kasuta vasakule noolt lahkumiseks ning paremale noolt valikute tegemiseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2364"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2355"/>
         <source>Setup PIN code</source>
         <translation>Seadete PIN kood</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2365"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2356"/>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable.</source>
         <translation>See PIN kood on vajalik seadete menüüsse pöördumiseks. Kõige lihtsam oleks siin kasutada numbreid. Keelamiseks jäta tühjaks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2375"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2366"/>
         <source>Require setup PIN</source>
         <translation>Küsi seadete PIN koodi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2377"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2368"/>
         <source>If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>Märkimisel ei saa siia menüüsse ega PIN koodi kustutada ilma PIN koodi sisestamata.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2401"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2392"/>
         <source>Monitor aspect ratio</source>
         <translation>Monitori kuvasuhe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2414"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2405"/>
         <source>Letterboxing color</source>
         <translation>Letterbox-i värv</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2429"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2420"/>
         <source>Video aspect override</source>
         <translation>Video suhte mittearvestamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2460"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2451"/>
         <source>GUI width (pixels)</source>
         <translation>Kasutajaliidese laius (pikselites)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2462"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2453"/>
         <source>The width of the GUI. Do not make the GUI wider than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
         <translation>Ära ületa oma ekraani maksimaalset laiust. 0 paneb automaatselt täisekraanile.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2471"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2462"/>
         <source>GUI height (pixels)</source>
         <translation>Kasutajaliidese kõrgus (pikselites)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2473"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2464"/>
         <source>The height of the GUI. Do not make the GUI taller than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
         <translation>Ära ületa ekraani maksimaalset kõrgust. 0 paneb automaatselt täisekraanile.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2484"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2475"/>
         <source>The horizontal offset where the GUI will be displayed. May only work if run in a window.</source>
         <translation>Horisontaalne nihe. Võib töötada ainult juhul kui on käivitatud aknas.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2494"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2485"/>
         <source>The vertical offset where the GUI will be displayed.</source>
         <translation>Vertikaalne nihe. Võib töötada ainult juhul kui on käivitatud aknas.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2503"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2494"/>
         <source>Display size - width</source>
         <translation>Ekraani suurus - laius</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2514"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2505"/>
         <source>Display size - height</source>
         <translation>Ekraani suurus - kõrgus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2611"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2602"/>
         <source>Video output</source>
         <translation>Video väljund</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2663"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2654"/>
         <source>Leave at &quot;Default&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation>Vaikimisi valitakse monitori poolt raporteeritud kuvasuhe. Määra 16:9 või 4:3 erilise kuvasuhte pealesundimiseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2727"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2718"/>
         <source>Hide mouse cursor in MythTV</source>
         <translation>Peida MythTV-s hiire kursor</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2753"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2744"/>
         <source>If disabled, the video playback window can be resized</source>
         <translation>Kui on keelatud, saab akna suurust muuta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2804"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2795"/>
         <source>Short date format</source>
         <translation>Lühike kuupäeva formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2854"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2845"/>
         <source>Your preferred time format. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>Ajaformaadi eelistus.  Formaat ilma &quot;AM&quot; või &quot;PM&quot; tähistuseta on 24-tunnine.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2863"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2854"/>
         <source>Paint engine</source>
         <translation>Graafikamootor</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2865"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2856"/>
         <source>Direct3D</source>
         <translation>Direct3D</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2874"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2862"/>
         <source>This selects what MythTV uses to draw. If you have decent hardware, select OpenGL.</source>
         <translation>Siin valitakse mida MythTV kuvamiseks kasutab. Uuema riistvara korral vali OpenGL.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2887"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2875"/>
         <source>UI theme</source>
         <translation>Liidese teema</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2971"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2985"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2959"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2973"/>
         <source>name</source>
         <translation>nimi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2972"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2960"/>
         <source>Your preferred channel format.</source>
         <translation>Eelistatav kanali formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4440"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4427"/>
         <source>Screen Settings</source>
         <translation>Ekraani seaded</translation>
     </message>
@@ -9845,7 +9969,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Pikk kanali formaat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2986"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2974"/>
         <source>Your preferred long channel format.</source>
         <translation>Eelistatav pikk kanali formaat.</translation>
     </message>
@@ -9966,7 +10090,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Ühekordse otsitud salvestuse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3312"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3300"/>
         <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
         <translation>Üksiku, iganädalase ja päevase otsingu salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
@@ -9979,7 +10103,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Muudetud salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3333"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3321"/>
         <source>Guide starts at channel</source>
         <translation>Kava algkanal</translation>
     </message>
@@ -10013,7 +10137,7 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1422"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3384"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3372"/>
         <source>Language</source>
         <translation>Keel</translation>
     </message>
@@ -10022,12 +10146,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Luba Xbox riistvara</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3468"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3456"/>
         <source>Enable realtime priority threads</source>
         <translation>Luba reaalajaprioriteetidega lõimed</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3469"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3457"/>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
         <translation>mythfrontend-i juurkasutaja õigustes käivitamisel saavad mõned lõimed lisaprioriteedi. Keela juhul kui mythfrontend video mängimisel hangub.</translation>
     </message>
@@ -10076,12 +10200,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kui tihti (sekundites) kontrollitakse salvestamise toimumist Xbox-i LED-i muutmiseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3480"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3468"/>
         <source>Monitor CD/DVD</source>
         <translation>Jälgi CD/DVD mängijat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3482"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3470"/>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
         <translation>Jälgitakse CD/DVD seadet ning uue ketta sisestamisel käivitatakse vastav rakendus.</translation>
     </message>
@@ -10106,12 +10230,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">TV heli ainult läbi PVR-350</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="747"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="733"/>
         <source>Log MythTV events to database</source>
         <translation>Logi MythTV sündmused andmebaasi</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="749"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="735"/>
         <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
         <translation>MythTV moodulid salvestavad sündmuste detailid andmebaasi, kust saab neid vaadata MythLog-iga või saata e-kirjaga perioodiliselt administraatorile.</translation>
     </message>
@@ -10136,27 +10260,27 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Logi puhastamissagedus (päevades)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="782"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="768"/>
         <source>The number of days between log cleanup runs.</source>
         <translation>Mitme päeva tagant logi puhastatakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="789"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="775"/>
         <source>Number of days to keep acknowledged log entries</source>
         <translation>Kinnitatud logikannete hoidmise aeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="792"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="778"/>
         <source>The number of days before a log entry that has been acknowledged will be deleted by the log cleanup process.</source>
         <translation>Mitu päeva hoida alles kinnitatud logikandeid enne kui need logipuhastamisel kustutatakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="801"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="787"/>
         <source>Number of days to keep unacknowledged log entries</source>
         <translation>Kinnitamata logikannete hoidmise aeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="804"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="790"/>
         <source>The number of days before a log entry that has NOT been acknowledged will be deleted by the log cleanup process.</source>
         <translation>Mitu päeva hoida alles kinnitamata logikandeid enne kui need logipuhastamisel kustutatakse.</translation>
     </message>
@@ -10205,12 +10329,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Keela näidatav väljund</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="824"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="810"/>
         <source>This controls what messages will be printed out as well as being logged to the database.</source>
         <translation>Määrab, milliseid teateid näidatakse ning andmebaasi logitakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="832"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="818"/>
         <source>Automatically run mythfilldatabase</source>
         <translation>Käivita mythfilldatabase automaatselt</translation>
     </message>
@@ -10223,7 +10347,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">mythfilldatabase käivitussagedus (päevades)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="844"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="830"/>
         <source>The number of days between mythfilldatabase runs.</source>
         <translation>Mitme päeva tagant mythfilldatabase käivitatakse.</translation>
     </message>
@@ -10260,7 +10384,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Myth andmebaasi logimine</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="953"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="939"/>
         <source>Mythfilldatabase</source>
         <translation>mythfilldatabase</translation>
     </message>
@@ -10273,17 +10397,17 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Hüpikmenüü näitamise aeg sekundites.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3773"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3761"/>
         <source>Enable LCD device</source>
         <translation>Luba LCD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3786"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3774"/>
         <source>LCD device display</source>
         <translation>LCD seade</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3831"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3819"/>
         <source>Enable gamma correction for video</source>
         <translation>Luba video gammakorrektsioon</translation>
     </message>
@@ -10292,7 +10416,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel parandab QuickTime videogammat vastavalt monitorile.  Selle keelamine hoiab kokku mõned protsessori tsüklid.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3842"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3830"/>
         <source>Scale video as necessary</source>
         <translation>Vajadusel skaleeri videot</translation>
     </message>
@@ -10301,18 +10425,18 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel skaleeritakse video aken kogu ekraani suuruseks. Mittemärkimisel ei teisendata videot kunagi suuremaks kui on selle originaalsuurus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3853"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3841"/>
         <source>Frames to skip in fullscreen mode</source>
         <translation>Täisekraanirežiimis vahelejäetavaid kaadreid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3855"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3843"/>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
         <translation>Video näitamisel täisekraani- või mitte-aknarežiimil jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;. Kasutatav ainult juhul, kui pole valitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ega &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3866"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3903"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3854"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3891"/>
         <source>Video in main window</source>
         <translation>Video peaaknas</translation>
     </message>
@@ -10321,32 +10445,32 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel näidatakse videot graafilise kasutajaliidese peaaknas. Keela ainult juhul, kui soovid videot töölauale või liikuvasse aknasse. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3879"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3934"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3989"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4029"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3867"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3922"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3977"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4017"/>
         <source>Frames to skip</source>
         <translation>Kaadrite vahelejätmine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3881"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3869"/>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video näitamisel peaaknas jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3890"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3945"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3878"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3933"/>
         <source>Opacity</source>
         <translation>Läbipaistvus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3892"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3880"/>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Peaakna läbipaistvus vahemikus 0 (täiesti läbipaistev) kuni 100 (täiesti läbipaistmatu).</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3922"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3958"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3910"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3946"/>
         <source>Video in floating window</source>
         <translation>Video liikuvas aknas</translation>
     </message>
@@ -10355,18 +10479,18 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel näidatakse videot liikuvas aknas. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3936"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3924"/>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video näitamisel liikuvas aknas jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3947"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3935"/>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Liikuva akna läbipaistvus vahemikus 0 (täiesti läbipaistev) kuni 100 (täiesti läbipaistmatu).</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3977"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4002"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3965"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3990"/>
         <source>Video in the dock</source>
         <translation>Viideo dokis</translation>
     </message>
@@ -10375,13 +10499,13 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel näidatakse videot dokiikoonil. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3991"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3979"/>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video näitamisel dokiikoonil jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4017"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4042"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4005"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4030"/>
         <source>Video on the desktop</source>
         <translation>Video töölaual</translation>
     </message>
@@ -10390,38 +10514,38 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Märkimisel näidatakse videot töölaual otsinguikoonide all. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4031"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4019"/>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Video näitamisel töölaual jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4058"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4046"/>
         <source>Show the program guide when starting Live TV</source>
         <translation>Näita otse eetri vaatamise alustamisel saatekava</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4059"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4047"/>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation>See avab otse eetri vaatamise valikul koheselt saatekava.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4082"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4070"/>
         <source>General</source>
         <translation>Üldine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4198"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4218"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4185"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4205"/>
         <source>View Recordings</source>
         <translation>Salvestiste vaatamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4225"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4212"/>
         <source>Seeking</source>
         <translation>Otsimine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4234"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4221"/>
         <source>Commercial Skip</source>
         <translation>Reklaamide vahelejätmine</translation>
     </message>
@@ -10434,7 +10558,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Mac OS X video sätted</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4382"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4369"/>
         <source>Program Guide</source>
         <translation>Saatekava</translation>
     </message>
@@ -10443,7 +10567,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Ekraani sätted</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4483"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4470"/>
         <source>Localization</source>
         <translation>Lokaliseerimine</translation>
     </message>
@@ -10456,7 +10580,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Xbox</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="768"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="769"/>
         <source>Directed By</source>
         <translation>Lavastanud</translation>
     </message>
@@ -10512,7 +10636,7 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1074"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3468"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3466"/>
         <location filename="../libs/libmythtv/videosource.h" line="359"/>
         <source>Default input</source>
         <translation>Vaikimisi sisend</translation>
@@ -10571,7 +10695,12 @@ Soovid edasi vaadata?</translation>
         <translation>Signaalitugevus</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1416"/>
+        <location filename="../libs/libmythtv/signalmonitor.cpp" line="497"/>
+        <source>Error: channel change failed</source>
+        <translation>Viga: kanalivahetus ebaõnnestus</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1421"/>
         <source>Re-Record</source>
         <translation>Ülesalvestamine</translation>
     </message>
@@ -10743,14 +10872,14 @@ Soovid edasi vaadata?</translation>
         <translation>Kreeka</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2442"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2445"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1502"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1719"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11304"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11462"/>
         <source>Channel Change Error</source>
         <translation>Kanali vahetamise viga</translation>
     </message>
@@ -10872,22 +11001,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">HDHomeRun seadme ID ja vastuvõtja number.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2294"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2292"/>
         <source>Analog V4L capture card</source>
         <translation>V4L analoogsalvestuskaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2309"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2307"/>
         <source>DVB DTV capture card (v3.x)</source>
         <translation>DVB DTV salvestuskaart (v3.x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2314"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2312"/>
         <source>FireWire cable box</source>
         <translation>FireWire salvestuskaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2319"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2317"/>
         <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
         <translation>USB MPEG-4 kodeerija (Plextor ConvertX, jt)</translation>
     </message>
@@ -10896,12 +11025,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">DBox2 TCP/IP TV-boks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3021"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3019"/>
         <source>(Delete all capture cards)</source>
         <translation>(Kustuta kõik salvestuskaardid)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3164"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3162"/>
         <source>(Delete all video sources)</source>
         <translation>(Kustuta kõik videoallikad)</translation>
     </message>
@@ -11065,23 +11194,23 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="184"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2402"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2393"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="186"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2403"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2394"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2404"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2395"/>
         <source>16:10</source>
         <translation>16:10</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3401"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3389"/>
         <source>Your preferred language for the user interface.</source>
         <translation>Kasutajaliidese eelistatud keel.</translation>
     </message>
@@ -11106,7 +11235,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Tavaliselt lastakse PVR-350 heli helikaarti. Siin saab määrata, et see pole nii tehtud. Sellisel juhul ei saa MythTV helitugevust muuta.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3633"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3621"/>
         <source>Enable OpenGL vertical sync for timing</source>
         <translation>Kasuta ajastuseks OpenGL kaadrisagedust</translation>
     </message>
@@ -11119,7 +11248,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva kell</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3647"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3635"/>
         <source>Display current time on idle LCD display. </source>
         <translation>Kuva LCD jõudeolekus kellaaega. </translation>
     </message>
@@ -11128,7 +11257,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva salvestamisolekut</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3656"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3644"/>
         <source>Display current recordings information on LCD display.</source>
         <translation>Kuva LCD ekraanil informatsiooni hetkel käiva salvestamise kohta.</translation>
     </message>
@@ -11137,7 +11266,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva menüüsid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3666"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3654"/>
         <source>Display selected menu on LCD display. </source>
         <translation>Kuva valitud menüü LCD ekraanile. </translation>
     </message>
@@ -11146,27 +11275,27 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva muusika esitajat ja pealkirja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3685"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3673"/>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
         <translation>Kuva MythMusic esitaja ja loo pealkiri LCD ekraanile.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3694"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3682"/>
         <source>Items</source>
         <translation>Elemente</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3695"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3683"/>
         <source>Artist - Title</source>
         <translation>Esitaja - Pealkiri</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3696"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3684"/>
         <source>Artist [Album] Title</source>
         <translation>Esitaja [Album] Pealkiri</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3697"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3685"/>
         <source>Which items to show when playing music.</source>
         <translation>Milliseid elemente muusika mängimisel kuvada.</translation>
     </message>
@@ -11175,7 +11304,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva kanaliinfot</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3705"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3693"/>
         <source>Display tuned channel information on LCD display.</source>
         <translation>Kuva näidatava kanali info LCD ekraanile.</translation>
     </message>
@@ -11184,7 +11313,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva helitugevuse infot</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3714"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3702"/>
         <source>Display volume level information on LCD display.</source>
         <translation>Kuva helitugevuse info LCD ekraanile.</translation>
     </message>
@@ -11193,7 +11322,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kuva üldist informatsiooni</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3724"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3712"/>
         <source>Display generic information on LCD display.</source>
         <translation>Kuva LCD ekraanil üldist infot.</translation>
     </message>
@@ -11202,7 +11331,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Taustavalgus alati sees</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3733"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3721"/>
         <source>Turn on the backlight permanently on the LCD display.</source>
         <translation>Lülita LCD ekraani taustavalgus alaliselt sisse.</translation>
     </message>
@@ -11211,7 +11340,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Südamelöögid alati näha</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3743"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3731"/>
         <source>Turn on the LCD heartbeat.</source>
         <translation>Lülita sisse LCD südamelöökide näitamine.</translation>
     </message>
@@ -11220,27 +11349,27 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">LCD nupud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3762"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3750"/>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
         <translation>Sisesta LCD nuppude koodid sellises järjekorras: üles, alla, vasakule, paremale, jah, ei (vaata lcdproc/server/drivers/hd44780.c/keyMapMatrix[] või oma ekraani maatriksist)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3774"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3762"/>
         <source>Use an LCD display to view MythTV status information.</source>
         <translation>Kasuta MythTV olekuinfo kuvamiseks LCD ekraani.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4300"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4287"/>
         <source>General (Basic)</source>
         <translation>Üldine (lihtne)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4335"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4322"/>
         <source>General (Jobs)</source>
         <translation>Üldine (tööd)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4365"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4352"/>
         <source>General (Advanced)</source>
         <translation>Üldine (edasijõudnud)</translation>
     </message>
@@ -11312,7 +11441,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Saateinfo ekraaniteate aeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2254"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2245"/>
         <source>Use line edit virtual keyboards</source>
         <translation>Virtuaalne klaviatuur väljade sisestamiseks</translation>
     </message>
@@ -11331,7 +11460,7 @@ Soovid edasi vaadata?</translation>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="97"/>
         <source>MythWelcome Settings</source>
-        <translation>MythWelcome sätted</translation>
+        <translation>MythWelcome seaded</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="131"/>
@@ -11440,7 +11569,7 @@ Soovid edasi vaadata?</translation>
         <translation>Esialgne mahamängimiskiirus koos kohandatud heliga.  Normaalne kiirus on 100, 50 on poole väiksem ning 200 topeltkiirus.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2431"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2434"/>
         <source>Playing</source>
         <translation>Mängimine</translation>
     </message>
@@ -11449,12 +11578,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Reklaamide märkimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2446"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2449"/>
         <source>Transcoding</source>
         <translation>Transkodeerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2433"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2436"/>
         <source>PIP</source>
         <translation>Pilt pildis</translation>
     </message>
@@ -11532,7 +11661,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Teleteksti font</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="878"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="864"/>
         <source>Run mythfilldatabase at time suggested by the grabber.</source>
         <translation>Käivita mythfilldatabase tõmbaja soovitatud ajal.</translation>
     </message>
@@ -11623,17 +11752,17 @@ Soovid edasi vaadata?</translation>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="205"/>
         <source>MythShutdown/MythWelcome Settings</source>
-        <translation>MythShutdown/MythWelcome sätted</translation>
+        <translation>MythShutdown/MythWelcome seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2767"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2808"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2758"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2799"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Näites on toodud tänane kuupäev.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2773"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2814"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2764"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2805"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Näites on toodud homne kuupäev.</translation>
     </message>
@@ -11659,12 +11788,12 @@ Soovid edasi vaadata?</translation>
         <translation>Hispaania</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3448"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3436"/>
         <source>Enable Network Remote Control interface</source>
         <translation>Luba juhtida üle võrgu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3449"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3437"/>
         <source>This enables support for controlling mythfrontend over the network.</source>
         <translation>See lubab kasutajaliidest juhtida üle võrgu.</translation>
     </message>
@@ -11677,22 +11806,19 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Määrab pordi, mille kaudu kasutajaliidest juhtida.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9204"/>
         <source>You are close to an existing cut point. Would you like to:</source>
-        <translation>Oled olemasolevale lõikekohale väga lähedal. Kas soovid:</translation>
+        <translation type="obsolete">Oled olemasolevale lõikekohale väga lähedal. Kas soovid:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9210"/>
         <source>Flip directions - delete to the %1</source>
-        <translation>Muuda suunda - kustuta kuni %1</translation>
+        <translation type="obsolete">Muuda suunda - kustuta kuni %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9213"/>
         <source>Insert a new cut point</source>
-        <translation>Lisa uus lõikekoht</translation>
+        <translation type="obsolete">Lisa uus lõikekoht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/commbreakmap.cpp" line="347"/>
+        <location filename="../libs/libmythtv/commbreakmap.cpp" line="351"/>
         <source>Too Far %1</source>
         <translation>Liiga kaugel %1</translation>
     </message>
@@ -11707,12 +11833,12 @@ Soovid edasi vaadata?</translation>
         <translation>Automaatse kõrguse kasutamisel arvutatakse see laiusest ning salvestise kuvasuhtest.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4275"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4314"/>
         <source>All Available Methods</source>
         <translation>Kõik võimalikud meetodid</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4283"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4322"/>
         <source>Blank Frame Detection</source>
         <translation>Tühja kaadri avastamine</translation>
     </message>
@@ -11744,12 +11870,12 @@ Soovid edasi vaadata?</translation>
         <translation>Mac puhul püütakse kasutada riistvaralist graafikaprotsessorit - see võib Mac-i kokku jooksutada!</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="666"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="652"/>
         <source>Transcoder command</source>
         <translation>Transkooderi käsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="668"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="654"/>
         <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
         <translation>Transkodeerimiseks kasutatav rakendus. Puuduva väärtuse puhul kasutatakse vaikimisi käsku &quot;mythtranscode&quot;.</translation>
     </message>
@@ -11782,7 +11908,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Kasuta DishNetilt tulevat saatekava</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2634"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2632"/>
         <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
         <translation>Kui võtad vastu DishNeti satelliitidelt, on võimalik saada sealt ka pikaajalist saatekava. Parima tulemuse saavutamiseks tuleks lubada ka EIT.</translation>
     </message>
@@ -12339,18 +12465,24 @@ Soovid edasi vaadata?</translation>
         <translation>Teleteksti menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1289"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1140"/>
+        <source>Text</source>
+        <comment>Text stream</comment>
+        <translation>Tekst</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1301"/>
         <source>TXT CAP</source>
         <translation>TXT CAP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1419"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1432"/>
         <source>No captions</source>
         <comment>CC/Teletext/Subtitle text not available</comment>
         <translation>Subtiitrid puuduvad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3369"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3372"/>
         <source>No Seektable</source>
         <translation>Pole keritav</translation>
     </message>
@@ -12371,7 +12503,7 @@ Soovid edasi vaadata?</translation>
         <translation>IRC kaabel-tv</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9490"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9622"/>
         <source>UNKNOWN%1</source>
         <comment>Synthesized callsign</comment>
         <translation>TUNDMATU %1</translation>
@@ -12390,32 +12522,32 @@ Soovid edasi vaadata?</translation>
         <translation>Vastuvõtja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2325"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2323"/>
         <source>HDHomeRun DTV tuner box</source>
         <translation>HDHomeRun DTV vastuvõtja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2615"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2613"/>
         <source>Input priority</source>
         <translation>Sisendi prioriteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2617"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2615"/>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
         <translation>Kui sisendite prioriteedid pole võrdsed, võib planeerija salvestada saate hiljem, et saada see kõrgema prioriteediga sisendist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2631"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2629"/>
         <source>Use DishNet long-term EIT data</source>
         <translation>Kasuta DishNetilt tulevat pikaajalist EIT saatekava</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2716"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2714"/>
         <source>Input groups are only needed when two or more cards share the same resource such as a FireWire card and an analog card input controlling the same set top box.</source>
         <translation>Sisendgrupid on vajalikud ainult juhul kui üle ühe kaardi jagab sana ressurssi. Näiteks firewire kaart ja analoogkaardi sisend sama STB-d.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3019"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3017"/>
         <source>(Delete all capture cards on %1)</source>
         <translation>(Kustuta kõik masina %1 salvestuskaardid)</translation>
     </message>
@@ -12456,7 +12588,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Parema kontrastsuse saavutamiseks näidatakse analoogkanalite subtiitreid mustal taustal. Vaikimisi näidatakse teksti lihtsalt pildi peal.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2036"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2024"/>
         <source>Always display closed captioning or subtitles</source>
         <translation>Näita alati subtiitreid</translation>
     </message>
@@ -12473,12 +12605,12 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Graafikamootor</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2867"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2858"/>
         <source>Qt</source>
         <translation>Qt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2869"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2860"/>
         <source>OpenGL</source>
         <translation>OpenGL</translation>
     </message>
@@ -12496,23 +12628,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Ristsisendite EIT</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="335"/>
         <source>If enabled, listings data collected on one Video Source will be applied to the first matching DVB channel on any Video Source. This is sometimes useful for DVB-S, but may insert bogus data into any ATSC listings stored in the same database.</source>
-        <translation>Kui on lubatud, kasutatakse ühest videosisendist tulevat saatekava suvalise teise videosisendi sobivale DVB kanalile. See on mõnikord kasulik DVB-S kasutajatele kuid võib samas andmebaasis olevatesse ATSC kavadesse lisada valeandmeid.</translation>
+        <translation type="obsolete">Kui on lubatud, kasutatakse ühest videosisendist tulevat saatekava suvalise teise videosisendi sobivale DVB kanalile. See on mõnikord kasulik DVB-S kasutajatele kuid võib samas andmebaasis olevatesse ATSC kavadesse lisada valeandmeid.</translation>
     </message>
     <message>
         <source>Backend Idle Before EIT Crawl (seconds)</source>
         <translation type="obsolete">Taustaserveri viide enne EIT korjamist (sek)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="349"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="335"/>
         <source>The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.</source>
         <translation>Minimaalne salvestuskaardi jõudeoleku aeg peale mida võib MythTV hakata korjama EIT saatekavu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1032"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1018"/>
         <source>EIT Scanner Options</source>
-        <translation>EIT skaneerimisparameetrid</translation>
+        <translation>EIT skaneerija valikud</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="181"/>
@@ -12530,8 +12661,8 @@ Soovid edasi vaadata?</translation>
         <translation>Kasuta kanali eelistamiseks positiivset numbrit ning kanali vältimiseks negatiivset numbrit.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1307"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1333"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1320"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1346"/>
         <source>Text subtitles</source>
         <translation>subtiitrid</translation>
     </message>
@@ -12540,8 +12671,8 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Subtiitrid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="218"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2977"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="220"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3001"/>
         <source>Position</source>
         <translation>Asukoht</translation>
     </message>
@@ -12574,22 +12705,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">AC3 ja DTS otse läbilaske helikaart. Vaikimisi kasutatakse valitud helikaarti. Kasutatav ainult ALSA helikaartidega.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3126"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3114"/>
         <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
         <translation>Uute reeglite &quot;Alusta varem&quot; vaikimisi aeg minutites</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3128"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3116"/>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
         <translation>Sisesta nullist erinev number vaid juhul, kui suurem osa saatekavade aegu ei lange kokku tegelike saadete aegadega. See määrab algse varem või hiljem alustamise aja uute salvestusreeglite loomisel. Iga reegli juures saab neid hiljem muuta.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3141"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3129"/>
         <source>Default &apos;End Late&apos; minutes for new recording rules</source>
         <translation>Uute reeglite &quot;Lõpeta hiljem&quot; vaikimisi aeg minutites</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3143"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3131"/>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
         <translation>Sisesta nullist erinev number vaid juhul, kui suurem osa saatekavade aegu ei lange kokku tegelike saadete aegadega. See määrab algse varem või hiljem lõpetamise aja uute salvestusreeglite loomisel. Iga reegli juures saab neid hiljem muuta.</translation>
     </message>
@@ -12606,7 +12737,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Eelistatud sisendi prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3156"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3144"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
         <translation>Lisaprioriteet, mis antakse juhul kui saade tuleb &quot;Planeerimissätete&quot; alt eelistusena valitud sisendist.</translation>
     </message>
@@ -12615,7 +12746,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">HDTV salvestusprioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3167"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3155"/>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
         <translation>Lisaprioriteet kavas HDTV-ks märgitud saadetele.</translation>
     </message>
@@ -12624,7 +12755,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Sorteeri pealkirjad</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3538"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3526"/>
         <source>Alphabetically</source>
         <translation>tähestikuliselt</translation>
     </message>
@@ -12633,22 +12764,22 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">prioriteedi järgi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4393"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4380"/>
         <source>Scheduler Options</source>
-        <translation>Planeerija sätted</translation>
+        <translation>Planeerija valikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4406"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4393"/>
         <source>Accessibility Options</source>
         <translation>Hõlbustusvalikud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4416"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4403"/>
         <source>Recording Type Priority Settings</source>
-        <translation>Salvestustüüpide prioriteetide sätted</translation>
+        <translation>Salvestustüüpide prioriteetide seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="334"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="329"/>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
     </message>
@@ -12678,7 +12809,7 @@ Soovid edasi vaadata?</translation>
         <translation type="obsolete">Näita suurt kella</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3752"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3740"/>
         <source>On multiline displays try and display the time as large as possible.</source>
         <translation>Mitmerealistel ekraanidel proovi näidata aega nii suurena kui võimalik.</translation>
     </message>
@@ -12691,7 +12822,7 @@ Check if the video exists</source>
 Kontrolli, kas video on olemas</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4290"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4329"/>
         <source>Experimental</source>
         <translation>Eksperimentaalne</translation>
     </message>
@@ -12784,17 +12915,17 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Maksimaalselt puhverdatavate kujunduste arv.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3550"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3538"/>
         <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="unfinished">Lisa &quot;Vaatlusnimekirja&quot; grupp</translation>
+        <translation>Kaasa &quot;Vaatlusnimekirja&quot; grupp</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3552"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3540"/>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
         <translation>Vaatlusnimekiri on lühendatud nimekiri salvestistest, mis vajavad tähelepanu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3573"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3561"/>
         <source>Exclude recordings not set for Auto-Expire</source>
         <translation>Automaatse aegumiseta salvestiste väljajätmine</translation>
     </message>
@@ -12803,22 +12934,22 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Kasuta juhul kui automaatne aegumine puudub vaid salvestistel, mis on vaadatud ning mida peaks säilitama. Sellel juhul ei näidata neid &quot;Vaatlusnimekirjas&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3585"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3573"/>
         <source>Maximum days counted in the score</source>
         <translation>Maksimaalne punktipäevade arv</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3587"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3575"/>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
         <translation>Vaatlusnimekirja punktide arvestamisel annab iga salvestamisest möödunud päev ühe punkti. Sellega saab piirata maksimaalset punktide arvu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3597"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3585"/>
         <source>Days to exclude weekly episodes after delete</source>
         <translation>Peale kustutamist väljajäetavate osade vahe päevades</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3599"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3587"/>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
         <translation>Kui osa on kustutatud või vaadatuks märgitud, ei näidata vaatlusnimekirjas teisi sellise ajavahemiku jooksul salvestatud osasid. Igapäevased saated saavad ka vastavalt sellele valikule väiksem ajavahemiku.</translation>
     </message>
@@ -12906,7 +13037,7 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">mythfilldatabase rakendus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="893"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="879"/>
         <source>Use &apos;mythfilldatabase&apos; or the name of a custom script that will populate the program guide info for all your video sources.</source>
         <translation>Vajadusel saad kasutada kavade andmebaasi lisamiseks &apos;mythfilldatabase&apos; asemel oma kohandatud skripti.</translation>
     </message>
@@ -12984,7 +13115,7 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>QAM Auto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="408"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="410"/>
         <source>DVD Menu Not Available</source>
         <translation>DVD menüü puudub</translation>
     </message>
@@ -13022,7 +13153,7 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1270"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2457"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2455"/>
         <source>Generic</source>
         <translation>Üldine</translation>
     </message>
@@ -13032,26 +13163,25 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>800 Mbps</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2531"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2529"/>
         <source>Use quick tuning</source>
         <translation>Kasuta kiirhäälestust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2532"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3115"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2530"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3103"/>
         <source>Never</source>
         <translation>Kunagi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2534"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3117"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2532"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3105"/>
         <source>Always</source>
         <translation>Alati</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2012"/>
         <source>Always stream recordings from the backend</source>
-        <translation>Taasesita salvestusi taustaserverist alati voogedastusena</translation>
+        <translation type="obsolete">Taasesita salvestusi taustaserverist alati voogedastusena</translation>
     </message>
     <message>
         <source>Enable this setting if you want MythTV to always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
@@ -13066,7 +13196,7 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation type="obsolete">Vali kas hetke salvestusgruppi näidatakse OSD(Onscreen display) menüüs või näidatakse &apos;Vaata salvestusi&apos; ekraani kui &apos;Lülitu saatele&apos; on aktiveeritud. Valiku korral näidatakse salvestisi OSD-l</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3562"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3550"/>
         <source>Start from the Watch List view</source>
         <translation>Alusta Esitusnimekirja vaatest</translation>
     </message>
@@ -13079,8 +13209,8 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation type="obsolete">Osad failisüsteemid kasutavad suurte failide kustutamisel palju ressurssi. See valik paneb MythTV faile aeglaselt kustutama, et mitte häirida teisi protsesse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/checksetup.cpp" line="62"/>
-        <location filename="../programs/mythtv-setup/checksetup.cpp" line="87"/>
+        <location filename="../programs/mythtv-setup/checksetup.cpp" line="63"/>
+        <location filename="../programs/mythtv-setup/checksetup.cpp" line="88"/>
         <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
         <translation>Säilitusgruppidele pole kausta defineeritud. Pead lisama vähemalt ühe kausta vaikimisi säilitusgrupi jaoks kuhu uued salvestised salvestatakse.</translation>
     </message>
@@ -13104,7 +13234,7 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Muuda reklaamide tuvastamise meetodit sellel kanalil või keela reklaamide tuvastamine märkides kanali reklaamivabaks.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4264"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4303"/>
         <source>Use Global Setting</source>
         <translation>Kasuta üldisi seadistusi</translation>
     </message>
@@ -13114,7 +13244,7 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Kanali valikud - Filtrid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2652"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2643"/>
         <source>Aspect ratio when watching a video at a specific resolution.</source>
         <translation>Kuvasuhe kindla resolutsiooniga video puhul.</translation>
     </message>
@@ -13224,12 +13354,12 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Salvesta see vaikimisi taustaserveriks või andmebaasiks?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1235"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1239"/>
         <source>The connection to the master backend server has gone away for some reason. Is it running?</source>
         <translation>Mingil põhjusel on katkenud ühendus peamise taustserveriga.. Kas see ikka käib?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1239"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1243"/>
         <source>Could not connect to the master backend server. Is it running?  Is the IP address set for it in mythtv-setup correct?</source>
         <translation>Ei õnnestunud ühenduda peamise taustserveriga. Kas see on ikka käivitatud?  Kas seadistamisrakenduses on õige IP aadress?</translation>
     </message>
@@ -13238,13 +13368,13 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation type="obsolete">Ei õnnestunud ühenduda peamise taustserveriga -- kas see on ikka käivitatud?  Kas seadistamisrakenduses on õige IP aadress?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1266"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1270"/>
         <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
         <translation>Server kasutab võrguprotokolli versiooni %1,kuid klient oskab ainult versiooni %2. Kontrolli, et kasutad ainult omavahel sobivaid kliendi-serveri versioone.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1337"/>
-        <location filename="../libs/libmythdb/mythcorecontext.cpp" line="173"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1341"/>
+        <location filename="../libs/libmythdb/mythcorecontext.cpp" line="174"/>
         <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
         <translation>Rakendus pole ühilduv installitud MythTV teekidega. Kompileeri uusti peale &quot;make distclean&quot;-i</translation>
     </message>
@@ -13253,12 +13383,12 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation type="obsolete">Mingil põhjusel on katkenud ühendus peamise taustserveriga.. Kas see ikka käib?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1421"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1425"/>
         <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
         <translation>Plugin pole ühilduv installitud MythTV teekidega. Kompileeri uusti peale &quot;make distclean&quot;-i</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3365"/>
+        <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3491"/>
         <source>Subtitle</source>
         <translation>Alapealkiri</translation>
     </message>
@@ -13315,12 +13445,12 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Pealkiri: %1 peatükk %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4110"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4175"/>
         <source>%1 of %2 (%3 behind)</source>
         <translation>%1 %2-st (%3 tehtud)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4115"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4180"/>
         <source>%1 of %2 (%3 remaining)</source>
         <translation>%1 %2-st (%3 teha)</translation>
     </message>
@@ -13339,7 +13469,7 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>selles ajaaknas salvestatakse osa erineval kanalil.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2931"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2919"/>
         <source>Widescreen</source>
         <translation>Laiekraan</translation>
     </message>
@@ -13375,23 +13505,23 @@ Enamik DVB saatjaid edastab 27,5 millionit sümbolit sekundis.</translation>
         <translation>Häälestun %1-le mplexid(%2)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1600"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1614"/>
         <source>MythTV wants to record these programs in %d seconds:</source>
         <translation>MythTV soovib järgnevaid saateid %n sekundi pärast salvestada:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1626"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1640"/>
         <source>&quot;%1&quot; on %2</source>
         <translation>&quot;%1&quot; %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1324"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1639"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1653"/>
         <source>Do you want to:</source>
         <translation>Kas soovid:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_rec.cpp" line="3756"/>
+        <location filename="../libs/libmythtv/tv_rec.cpp" line="3754"/>
         <source>On known multiplex...</source>
         <translation>Teada multiplekser...</translation>
     </message>
@@ -13721,12 +13851,12 @@ Enamik DVB saatjaid edastab 27,5 millionit sümbolit sekundis.</translation>
         <translation type="obsolete">Sisendigrupp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2414"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2412"/>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
         <translation>Kuni see sisend pole teiste seadmetega jagatud Jäta &apos;Üldine&apos;. Ainult üks sisend sisendgrupis saab samaaegselt salvestada.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2533"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2531"/>
         <source>Live TV only</source>
         <translation>Ainult otse eeter</translation>
     </message>
@@ -13735,12 +13865,12 @@ Enamik DVB saatjaid edastab 27,5 millionit sümbolit sekundis.</translation>
         <translation type="obsolete">Lubamise korral häälestub MythTV ainult MPEG saate numbri järgi. Saate numbrid vahetuvad sagedamini kui DVB või ATSC häälestusparameetrid, seega on valik vähem usaldusväärne. See keelab samuti EIT hankimise otse eetri ja salvestamise korral.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2710"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2708"/>
         <source>Interactions between inputs</source>
         <translation>Sisendite vaheline koosmõju</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2714"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2712"/>
         <source>Create a New Input Group</source>
         <translation>Loo uus sisendgrupp</translation>
     </message>
@@ -14237,30 +14367,30 @@ Enamik DVB saatjaid edastab 27,5 millionit sümbolit sekundis.</translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="221"/>
-        <location filename="../programs/mythfilldatabase/filldata.cpp" line="445"/>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="541"/>
+        <location filename="../programs/mythfilldatabase/filldata.cpp" line="421"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="554"/>
         <source>currently running.</source>
         <translation>hetkel käib.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/filldata.cpp" line="465"/>
-        <location filename="../programs/mythfilldatabase/filldata.cpp" line="1051"/>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="585"/>
+        <location filename="../programs/mythfilldatabase/filldata.cpp" line="441"/>
+        <location filename="../programs/mythfilldatabase/filldata.cpp" line="1027"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="598"/>
         <source>Successful.</source>
         <translation>Õnnestus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/filldata.cpp" line="474"/>
+        <location filename="../programs/mythfilldatabase/filldata.cpp" line="450"/>
         <source>FAILED: xmltv ran but was interrupted.</source>
         <translation>EBAÕNNESTUS: xmltv käivitus, kuid katkestati.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/filldata.cpp" line="478"/>
+        <location filename="../programs/mythfilldatabase/filldata.cpp" line="454"/>
         <source>FAILED: xmltv returned error code %1.</source>
         <translation>EBAÕNNESTUS: xmltv tagastas veateate %1.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/filldata.cpp" line="1044"/>
+        <location filename="../programs/mythfilldatabase/filldata.cpp" line="1020"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
         <translation>mythfilldatabase käivitus, kuid ei lisanud midagi kavasse alika(te) %1 2%-st kohta. See võib olla mingi kava hankija probleem.</translation>
     </message>
@@ -14405,7 +14535,7 @@ Enamik DVB saatjaid edastab 27,5 millionit sümbolit sekundis.</translation>
         <translation>kui reso.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="97"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="101"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1501"/>
         <source>Edit</source>
         <translation>Muuda</translation>
@@ -14463,9 +14593,8 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Kui kaua OSD näitab saate infot.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1923"/>
         <source>Use this to enlarge or shrink captions.</source>
-        <translation>Kasuta seda subtiitrite suurendamiseks-vähendamiseks.</translation>
+        <translation type="obsolete">Kasuta seda subtiitrite suurendamiseks-vähendamiseks.</translation>
     </message>
     <message>
         <source>ATSC Caption Settings</source>
@@ -14500,17 +14629,17 @@ ei saa olla tühi.</translation>
         <translation>Sea kui pilt ei täida ekraani horisontaalselt. Vahemik -100% kuni 100%</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2024"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2012"/>
         <source>Black background for closed captioning</source>
         <translation>Teletekstile must taust</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2026"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2014"/>
         <source>If enabled, captions will be displayed as white text over a black background for better contrast.</source>
         <translation>Lubades näidatakse teleteksti valgena musta tausta peal, et saavutada suuremat kontrasti.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2049"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2037"/>
         <source>Prefer EIA-708 over EIA-608 captions</source>
         <translation>Eelista EIA-708 teleteksti EIA-608-le</translation>
     </message>
@@ -14519,27 +14648,27 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Lubades eelistatakse ATSC voo puhul uuemat EIA-708 teleteksti vanemale EIA-608.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2125"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2113"/>
         <source>Enable picture controls</source>
         <translation>Luba pildikontroll</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2128"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2116"/>
         <source>If enabled, MythTV attempts to initialize picture controls (brightness, contrast, etc.) that are applied during playback.</source>
         <translation>Lubades üritab MythTV taastada pildi kontrolli väärtused (kontrast, heledus, värvi küllastus jne.) nii nagu need varem vaadates olid seatud.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2153"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2144"/>
         <source>Always prompt (excluding Live TV)</source>
         <translation>Küsi alati (väljaarvatud otse eeter)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2154"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2145"/>
         <source>Always prompt (including Live TV)</source>
         <translation>Küsi alati (kaasaarvatud otse eeter)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2155"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2146"/>
         <source>Prompt for Live TV only</source>
         <translation>Küsi ainult otse eetri puhul</translation>
     </message>
@@ -14552,7 +14681,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Valides jätkab TV peale akna tulevaste saadete või salvestuste  listi taustale saatmist mängimist. Vaikimisi mängimini peatatakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2204"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2195"/>
         <source>Automatically mark a recording as watched</source>
         <translation>Märgi salvestis automaatselt vaadatuks</translation>
     </message>
@@ -14565,42 +14694,42 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Välju otse eetriist kui see on jõude märgitud arv minuteid. 0 keelab väljumise.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2267"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2258"/>
         <source>Show quit</source>
         <translation>Näita välju</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2268"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2259"/>
         <source>Show quit and shutdown</source>
         <translation>Näita välju ja seiska</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2269"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2260"/>
         <source>Show quit, reboot and shutdown</source>
         <translation>Näita välju, seiska ja taaskäivita</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2270"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2261"/>
         <source>Show shutdown</source>
         <translation>Näita seiska</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2271"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2262"/>
         <source>Show reboot</source>
         <translation>Näita taaskäivita</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2272"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2263"/>
         <source>Show reboot and shutdown</source>
         <translation>Näiat taaskäivita ja seiska</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2273"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2264"/>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
         <translation>Vaikimisi näitavad ainnult kaugkliendid seiskamise valikut väljumis menüüs. Siin saad valida mida näidatakse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2293"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2284"/>
         <source>Reboot command</source>
         <translation>Taaskäivitus käsk</translation>
     </message>
@@ -14613,7 +14742,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Käsk või skript mis käivitatakse valides menüüst seiskamise. Et väljumis menüüd näha peab väljumisklahv olema defineeritud.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2405"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2396"/>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
         <translation>Xinerama kuvasuhet ei saa kindlaks teha, seeg tuleb see ise sisestada.</translation>
     </message>
@@ -14622,12 +14751,12 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Letterbox-i värv</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2418"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2409"/>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
         <translation>Vaikimisi kasutab MythTV kui pilt kogu ekraani ei kata äärte jaoks musta värvi. Plasmaekraani kasutajad võivad pildi &quot;sissepõlemise&quot; vältimiseks eelistada näiteks halli.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2422"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2413"/>
         <source>Currently only works with XVideo video renderer.</source>
         <translation>Hetkel töötab ainult XVideo renderdajaga.</translation>
     </message>
@@ -14636,37 +14765,37 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Video suhte mittearvestamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2432"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2423"/>
         <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
         <translation>Lubades ei arvestata kuvasuhtega, mida edastaja videovooga kaasa saadab.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2442"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2433"/>
         <source>Zoom</source>
         <translation>Suurend</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2449"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2440"/>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
         <translation>Lubades rakendatakse eeldefineeritud suurendus video taasesitusele kogu MythTV-s.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2505"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2496"/>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation>Monitori/TV horisontaalne suurus ekraani tegeliku kuva suhte arvutamiseks. See kirjutab üle süsteemilt saadud  ekraani suuruse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2516"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2507"/>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation>Monitori/TV vertikaalne suurus ekraani tegeliku kuva suhte arvutamiseks. See kirjutab üle süsteemilt saadud  ekraani suuruse.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2630"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2621"/>
         <source>Default refresh rate when watching a video. Leave at &quot;Any&quot; to automatically use the best available</source>
         <translation>Vaikimisi värskendussagedus video vaatamisel. Parima automaatseks valikuks jäta &quot;Mistahes&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2633"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2624"/>
         <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Any&quot; to automatically use the best available</source>
         <translation>Värskendussagedus video vaatamisel. Parima automaatseks valikuks jäta &quot;Mistahes&quot;</translation>
     </message>
@@ -14675,7 +14804,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Peida MythTV-s hiire kursor</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2729"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2720"/>
         <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
         <translation>Muudab hiire kursori näitamist. Enamus MythTV interfeisist ei toeta hiireklikke. Kasuta seda valikut, kui ei taha oma kursorit &quot;ära kaotada&quot;.</translation>
     </message>
@@ -14720,23 +14849,23 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Näita saatekavas kanali logosid. Täpsemalt vaata installijuhendist kuidas logosid hankida.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3028"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3076"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3016"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3064"/>
         <source>Remember last channel group</source>
         <translation>Jäta viimane kanaligrupp meelde</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3029"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3017"/>
         <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
         <translation>Lubades näitab kava ainult viimase kanaligrupi kanaleid. 4 vajutades vahetatakse kanaligruppe.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3039"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3027"/>
         <source>Default channel group</source>
         <translation>Vaikimisi kanaligrupp</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3052"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3040"/>
         <source>Default channel group to be shown in the the EPGPressing GUIDE key will toggle channel group.</source>
         <translation>Vaikimisi kanaligrupp, mida näidatakse kavas. GUIDE nupp vahetab gruppe.</translation>
     </message>
@@ -14761,7 +14890,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Laiekraani salvestus prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3177"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3165"/>
         <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
         <translation>Lisaprioriteet kui saade on märgitud kavas laiekraan.</translation>
     </message>
@@ -14770,17 +14899,17 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Keele salvestus proriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3200"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3188"/>
         <source>Additional priority when a showing is marked as having in-vision sign language.</source>
         <translation>Lisaprioriteet saadel on kavas märge in-vision keele kohta.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3210"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3198"/>
         <source>In-vision Subtitles Recording Priority</source>
         <translation>In-vision subtiitlite prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3211"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3199"/>
         <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
         <translation>Lisaprioriteet saadel on kavas märge in-vision subtiitlite kohta.</translation>
     </message>
@@ -14789,7 +14918,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Subtiitlid/teletekst salvestus prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3222"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3210"/>
         <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
         <translation>Lisa prioriteet saadel on kavas märge teleteksti või subtiitlite kohta.</translation>
     </message>
@@ -14798,7 +14927,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Kõva kuulmise prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3234"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3222"/>
         <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
         <translation>Lisab prioriteeti kui saadel on kavas märge toele kõva kuulmisega inimestele.</translation>
     </message>
@@ -14807,7 +14936,7 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Audio kirjelduse prioriteet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3246"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3234"/>
         <source>Additional priority when a showing is marked as being Audio Described.</source>
         <translation>Lisa b prioriteeti kui saatel on kavas märge audiokirjelduse kohta.</translation>
     </message>
@@ -14816,17 +14945,17 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">&apos;Kõik&apos; salvestustüüp saab lisa salvestus prioriteedi.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3481"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3469"/>
         <source> (and other removable devices)</source>
         <translation> (ja teised eemaldatavad seadmed)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3492"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3480"/>
         <source>Use new media</source>
         <translation>Kasuta uut meediat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3493"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3481"/>
         <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
         <translation>MythTV lülitub vastavale pluginale kui uus meedia sisestatakse.</translation>
     </message>
@@ -14835,12 +14964,12 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Ignoreeri seadmeid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3504"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3492"/>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
         <translation>Kui mingeid seadmeid ei peaks jälgima, siis kirjuta need komaga eraldatult siia. Plugin ignoreerib neid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3516"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3504"/>
         <source>MythMediaMonitor</source>
         <translation></translation>
     </message>
@@ -14853,23 +14982,23 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Fail mida kasutatakse mythfilldatabase rakenduse logimiseks. Logimise keelamiseks jäta tühjaks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4071"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4059"/>
         <source>Settings Access</source>
         <translation>Ligipääs seadetele</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4103"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4091"/>
         <source>Shutdown/Reboot Settings</source>
         <translation>Seiskamis/taaskäivitus seadistused</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4131"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4165"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4119"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4152"/>
         <source>General Playback</source>
         <translation>Üldine taasesitus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4209"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4196"/>
         <source>Recording Groups</source>
         <translation>Salvestusgrupp</translation>
     </message>
@@ -14886,17 +15015,17 @@ ei saa olla tühi.</translation>
         <translation type="obsolete">Vaikimisi tööjärjekorra seaded uutele salvestus planeeringutele</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="92"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="94"/>
         <source>Play from bookmark</source>
         <translation>Mängi järjehoidjast</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="93"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="95"/>
         <source>Play from beginning</source>
         <translation>Mängi algusest</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="716"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="728"/>
         <source>Failed to open 
  &apos;%1&apos; in %2 
 Check if the video exists</source>
@@ -14943,7 +15072,7 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Kasutatakse kui XMLTV andmed tulevad erinevast ajavööndist. &apos;Auto&apos; konverdib XMLTV ajad arvuti ajavööndi järgi. &apos;ÜKSKI&apos; ignoreerib XMLTV ajavööndit ja tõlgendab seda lokaalsena.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="359"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="345"/>
         <source>Delay between wake attempts (secs)</source>
         <translation>Ärkamis katsete vaheline aeg (sek)</translation>
     </message>
@@ -14962,7 +15091,7 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Uinaku käsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="393"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="379"/>
         <source>The command used to put this slave to sleep. If set, the master backend will use this command to put this slave to sleep when it is not needed for recording.</source>
         <translation>Käsk mida kasutatakse varu taustaserveri unakusse panemiseks. Peataustaserver kasutab seda siis kui salvestamiseks pole varu taustaserverit vaja.</translation>
     </message>
@@ -14971,7 +15100,7 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Käsk varutaustaserveri äratamiseks. Seda ei kasutata peataustaserveris.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="435"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="421"/>
         <source>Idle shutdown timeout (secs)</source>
         <translation>Jõude väljalülitamise ajapiir (sek)</translation>
     </message>
@@ -14980,7 +15109,7 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Käsk ärkamisaja seadmiseks</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="482"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="468"/>
         <source>The command used to set the wakeup time (passed as $time) for the Master Backend</source>
         <translation>Käsk ärkamisaja seadmiseks (saadetakse muutujana $time) pea taustaserveri jaoks</translation>
     </message>
@@ -14997,17 +15126,17 @@ Kontrolli, kas video on olemas</translation>
         <translation type="obsolete">Kasutaja tegevus #%1 kirjeldus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="638"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="624"/>
         <source>User Job #%1</source>
         <translation>Kasutaja tegevus #%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="688"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="674"/>
         <source>Allow %1 jobs</source>
         <translation>Luba %1 tööd</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="737"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="723"/>
         <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
         <translation>See sunnib WMP klientidele näitama salvestuste või videote loendit kui nad küsivad video loendit</translation>
     </message>
@@ -15167,430 +15296,429 @@ Kontrolli, kas video on olemas</translation>
         <translation>Peataustaserveri tühistamine</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="333"/>
         <source>Cross source EIT</source>
-        <translation>Ristsisendite EIT</translation>
+        <translation type="obsolete">Ristsisendite EIT</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="347"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="333"/>
         <source>Backend idle before EIT crawl (secs)</source>
         <translation>Taustaserveri jõude enne EIT korjamist (sek)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="361"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="347"/>
         <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your master backend needs to startup. Set to 0 to disable.</source>
         <translation>Kaua klient ootab taustaserveri äratamise katsete vahel. See peaks olema aeg mis kulub peataustaserveri käivitumiseks. Keelamiseks 0.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="371"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="357"/>
         <source>Wake attempts</source>
         <translation>Äratamise katseid</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="383"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="369"/>
         <source>The command used to wake up your master backend server (e.g. sudo /etc/init.d/mythtv-backend restart).</source>
         <translation>Käsk peamise taustaserveri äratamiseks (näit. sudo /etc/init.d/mythtv-backend restart).</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="391"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="377"/>
         <source>Sleep command</source>
         <translation>Uinaku käsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="404"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="390"/>
         <source>The command used to wake up this slave from sleep. This setting is not used on the master backend.</source>
         <translation>Käsk varutaustaserveri äratamiseks. Seda ei kasutata peataustaserveris.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="413"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="399"/>
         <source>Backend stop command</source>
         <translation>Taustaserveri peatamiskäsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="415"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="401"/>
         <source>The command used to stop the backend when running on the master backend server (e.g. sudo /etc/init.d/mythtv-backend stop)</source>
         <translation>Käsk mida kasutatakse peamise taustaserveri peatamiseks (näiteks. sudo /etc/init.d/mythtv-backend stop)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="424"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="410"/>
         <source>Backend start command</source>
         <translation>Taustaserveri käivituskäsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="426"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="412"/>
         <source>The command used to start the backend when running on the master backend server (e.g. sudo /etc/init.d/mythtv-backend start).</source>
         <translation>Käsk mida kasutatakse peamise taustaserveri käivitamiseks (näiteks. sudo /etc/init.d/mythtv-backend start).</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="437"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="423"/>
         <source>The number of seconds the master backend idles before it shuts down all other backends. Set to 0 to disable automatic shutdown.</source>
         <translation>Kaua peataustaserver on jõude enne, kui ta seiskab kõik teised alamserverid. Sisesta &quot;0&quot; automaatse seiskamise keelamiseks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="446"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="432"/>
         <source>Maximum wait for recording (mins)</source>
         <translation>Maksimaalne salvestise ooteaeg (min)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="448"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="434"/>
         <source>The number of minutes the master backend waits for a recording. If it&apos;s idle but a recording starts within this time period, the backends won&apos;t shut down.</source>
         <translation>Nii kaua ootab peataustaserver salvestamist. Server ei seiska ennast, kui ta on jõude kuid selle aja jooksul hakkab salvestama.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="458"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="444"/>
         <source>Startup before recording (secs)</source>
         <translation>Salvestamisele eelnev käivitamine (sek)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="460"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="446"/>
         <source>The number of seconds the master backend will be woken up before a recording starts.</source>
         <translation>Mitu sekundit enne salvestamise lagust peab peataustaserver käivituma.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="470"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="456"/>
         <source>The format of the time string passed to the &apos;Command to set wakeup time&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
         <translation>&apos;setWakeuptime Command&apos; käsu $time muutuja ajaformaat. Lisainfot vaata QT::QDateTime.toString() kohta. &apos;time_t&apos; kasutamine annab sekundid epohhist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="480"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="466"/>
         <source>Command to set wakeup time</source>
         <translation>Käsk ärkamisaja seadistamiseks</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="499"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="485"/>
         <source>Pre-shutdown-check command</source>
         <translation>Enne seiskumist käivitatav käsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="514"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="500"/>
         <source>If enabled, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation>Märkimisel keelatakse automaatne seiskamine kuni klient ühendub.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="545"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="531"/>
         <source>Job Queue check frequency (secs)</source>
         <translation>Tööjärjekorra kontrolli sagedus (sek)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="546"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="532"/>
         <source>When looking for new jobs to process, the Job Queue will wait this many seconds between checks.</source>
         <translation>Tööjärjekorrast uute tööde vaatamisel oodatakse nii kaua enne järgmist vaatamist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="555"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="541"/>
         <source>CPU usage</source>
         <translation>Protsessori kasutus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="559"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="545"/>
         <source>This setting controls approximately how much CPU jobs in the queue may consume. On &apos;High&apos;, all available CPU time may be used, which could cause problems on slower systems.</source>
         <translation>See määrab ligikaudu, kui palju protsessori ressursse tööjärjekod kasutada saab. Suure kasutuse puhul võetakse kogu olemasolev protsessori võimsus kasutusele ning see võib tekitada probleeme aeglasemate masinate puhul.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="569"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="555"/>
         <source>Job Queue start time</source>
         <translation>Tööjärjekorra algusaeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="570"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="556"/>
         <source>This setting controls the start of the Job Queue time window, which determines when new jobs will be started.</source>
         <translation>Uute tööde täitmahakkamise ajapilu algus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="579"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="565"/>
         <source>Job Queue end time</source>
         <translation>Tööjärjekorra lõpusaeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="580"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="566"/>
         <source>This setting controls the end of the Job Queue time window, which determines when new jobs will be started.</source>
         <translation>Uute tööde täitmahakkamise ajapilu lõpp.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="589"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="575"/>
         <source>Run jobs only on original recording backend</source>
         <translation>Käivita tööd ainult originaalses salvestavas taustaserveris</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="591"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="577"/>
         <source>If enabled, jobs in the queue will be required to run on the backend that made the original recording.</source>
         <translation>Valimisel käivitatakse tööjärjekorras olevad tööd algse salvestuse teinud serveris.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="600"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="586"/>
         <source>Run transcode jobs before auto commercial detection</source>
         <translation>Käivita transkodeerimistööd enne automaatset reklaamide märgistamist</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="603"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="589"/>
         <source>If enabled, and if both auto-transcode and commercial detection are turned ON for a recording, transcoding will run first; otherwise, commercial detection runs first.</source>
         <translation>Valimisel ning juhul kui salvestusel on sisse lülitatud nii automaatne transkodeerimine kui ka automaatne reklaamide märgistamine, siis tehakse transkodeerimine esimesena. Vastasel juhul tehakse ennem reklaamide märgistamine.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="613"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="599"/>
         <source>Start auto-commercial-detection jobs when the recording starts</source>
         <translation>Alusta automaatset reklaamide märkimist kohe salvestamise alustamisel</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="616"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="602"/>
         <source>If enabled, and Auto Commercial Detection is ON for a recording, the flagging job will be started as soon as the recording starts. NOT recommended on underpowered systems.</source>
         <translation>Valimisel ning kui automaatne reklaamide märkimine on sees, alusta reklaamide märkimist kohe peale salvestamise alustamist.  Ei soovitata lahjade masinate puhul.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="626"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="612"/>
         <source>User Job #%1 command</source>
         <translation>Kasutaja tegevus #%1 käsk</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="637"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="623"/>
         <source>User Job #%1 description</source>
         <translation>Kasutaja tegevus #%1 kirjeldus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="639"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="625"/>
         <source>The description for this User Job.</source>
         <translation>Kasutaja töökäsu kirjeldus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="646"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="632"/>
         <source>Allow commercial-detection jobs</source>
         <translation>Luba reklaamiavastustööd</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="648"/>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="658"/>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="700"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="634"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="644"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="686"/>
         <source>If enabled, allow jobs of this type to run on this backend.</source>
         <translation>Luba sellel taustaserveril antud tüüpi tööd.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="656"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="642"/>
         <source>Allow transcoding jobs</source>
         <translation>Luba transkodeerimistööd</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="676"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="662"/>
         <source>Commercial-detection command</source>
         <translation>Reklaamide tuvastamise meetod</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="678"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="664"/>
         <source>The program used to detect commercials in a recording. The default is &apos;mythcommflag&apos; if this setting is empty.</source>
         <translation>Reklaamide avastamiseks kasutatav rakendus. Puuduva väärtuse puhul kasutatakse vaikimisi käsku &quot;mythcommflag&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="709"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="695"/>
         <source>Include recordings in video list</source>
         <translation>Lisa salvestised video loendisse</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="711"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="697"/>
         <source>If enabled, the master backend will include the list of recorded shows in the list of videos  This is mainly to accommodate UPnP players which do not allow more than 1 video section.</source>
         <translation>Lubades lisab taustaserver salvestised videote loendisse. See on vajalik UPnP mängijate jaoks, mis ei luba rohkem kui 1 video sektsiooni.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="722"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="708"/>
         <source>UPnP media update time</source>
         <translation>UPnP meedia värskendusaeg</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="723"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="709"/>
         <source>The number of minutes between mythbackend checking for new videos to serve via UPnP. 0 = Off. </source>
         <translation>Mitme minuti järel taustaserver kontrollib uusi upnp kaudu edastatavaid videosid. 0 = väljas.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="733"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="719"/>
         <source>Video content to show a WMP client</source>
         <translation>Videod mida näidatakse WMP kliendile</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="758"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="744"/>
         <source>Maximum number of entries per module</source>
         <translation>Maksimaalne kirjete arv mooduli kohta</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="760"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="746"/>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number. Set to 0 to disable.</source>
         <translation>Peale sellise hulga kirjete tekkimist hakatakse antud mooduli kirjetest vanimaid maha kustutama.  0 keelab kustutamise.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="769"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="755"/>
         <source>Automatic log cleaning enabled</source>
         <translation>Automaatne logi kustutamine lubatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="771"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="757"/>
         <source>If enabled, a periodic cleanup of the events stored in the MythTV database occurs (see &quot;Log MythTV events to database&quot;).</source>
         <translation>See lubab perioodiliselt puhastada MythTV andmepaasi sinna salvestatud sündmustest (vaata &quot;Logi MythTV sündmused andmebaasi&quot;).</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="780"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="766"/>
         <source>Log cleanup frequency (days)</source>
         <translation>Logi puhastamissagedus (päevades)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="813"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="799"/>
         <source>Log print threshold</source>
         <translation>Logi väljastamise lävi</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="814"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="800"/>
         <source>All messages</source>
         <translation>Kõik teated</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="815"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="801"/>
         <source>Debug and higher</source>
         <translation>Silumine ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="816"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="802"/>
         <source>Info and higher</source>
         <translation>Info ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="817"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="803"/>
         <source>Notice and higher</source>
         <translation>Märkused ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="818"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="804"/>
         <source>Warning and higher</source>
         <translation>Hoiatused ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="819"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="805"/>
         <source>Error and higher</source>
         <translation>Vead ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="820"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="806"/>
         <source>Critical and higher</source>
         <translation>Kriitilised vead ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="821"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="807"/>
         <source>Alert and higher</source>
         <translation>Häired ja kõrgem</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="822"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="808"/>
         <source>Emergency only</source>
         <translation>Ainult hädaolukorrad</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="823"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="809"/>
         <source>Disable printed output</source>
         <translation>Keela näidatav väljund</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="834"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="820"/>
         <source>If enabled, execution of mythfilldatabase occurs automatically.</source>
         <translation>Lubab mythfilldatabase automaatse käivitamise.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="842"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="828"/>
         <source>mythfilldatabase run frequency (days)</source>
         <translation>mythfilldatabase käivitussagedus (päevades)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="852"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="838"/>
         <source>mythfilldatabase execution start</source>
         <translation>mythfilldatabase käivitamise algus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="854"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="840"/>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run. For example, setting start to 11 and end to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
         <translation>See ning järgmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="865"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="851"/>
         <source>mythfilldatabase execution end</source>
         <translation>mythfilldatabase käivitamise lõpp</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="867"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="853"/>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run. For example, setting start to 11 and end to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
         <translation>See ning eelmine säte määravad ajavahemiku, mil on lubatud mythfilldatabase käivitamine.  Näiteks seades alguse 11 ja lõpu 13 peale käivitatakse mythfilldatabase ainult kella 11:00 ja 13:00 vahel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="881"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="867"/>
         <source>If enabled, allow a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. mythfilldatabase Execution Start/End times are also ignored.</source>
         <translation>See seadistus võimaldab DataDirect kava edastajal määrata kava tõmbamise aja, et vältide serverite ülekoormust. Valides ignoreeritakse mythfilldatabase käivitus/seiskamis aegu.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="891"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="877"/>
         <source>mythfilldatabase program</source>
         <translation>mythfilldatabase rakendus</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="903"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="889"/>
         <source>mythfilldatabase arguments</source>
         <translation>mythfilldatabase  argumendid</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="905"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="891"/>
         <source>Any arguments you want passed to the mythfilldatabase program. See mythfilldatabase --help</source>
         <translation>mythfilldatabase käivitamisel kasutatavad argumendid. Vaata mythfilldatabase --help</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="913"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="899"/>
         <source>mythfilldatabase log path</source>
         <translation>mythfilldatabase  logiväljundi asukoht</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="915"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="901"/>
         <source>File or directory to use for logging output from the mythfilldatabase program. Leave blank to disable logging.</source>
         <translation>Fail mida kasutatakse mythfilldatabase rakenduse logimiseks. Logimise keelamiseks jäta tühjaks.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="926"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="912"/>
         <source>MythTV Database Logging</source>
         <translation>Myth andmebaasi logimine</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="995"/>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1056"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="981"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1041"/>
         <source>Master Backend</source>
         <translation>Pea taustaserver</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1006"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="992"/>
         <source>Locale Settings</source>
         <translation>Lokaadi seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1014"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1000"/>
         <source>Miscellaneous Settings</source>
         <translation>Erinevad seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1016"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1002"/>
         <source>File Management Settings</source>
         <translation>Failihalduse seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1053"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1038"/>
         <source>Backend Wakeup settings</source>
         <translation>Taustaserveri äratuse seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1063"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1048"/>
         <source>Slave Backends</source>
         <translation>Varu taustaserver</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1070"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1055"/>
         <source>Backend Control</source>
         <translation>Taustaserveri juhtimine</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1076"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1061"/>
         <source>Job Queue (Backend-Specific)</source>
         <translation>Tööjärjrkord (Taustaserveri spetsiifiline)</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1124"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="1109"/>
         <source>UPnP Server Settings</source>
         <translation>UPnP serveri seaded</translation>
     </message>
@@ -15631,91 +15759,91 @@ You may have to use the eject button under its tray.</source>
 kasuta väljastamise nuppu seadmel.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1140"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1142"/>
         <source>TXT File</source>
         <comment>Text File</comment>
         <translation>TXT fail</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="500"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="501"/>
         <source>Unable to create null video out</source>
         <translation>Null video väljundi loomine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="525"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="526"/>
         <source>&apos;tv playback&apos; widget missing.</source>
         <translation>&apos;TV näitamise&apos; vidin on kadunud.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="560"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="561"/>
         <source>Failed to initialize video output</source>
         <translation>Videoväljundi aktiveerimine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="655"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="656"/>
         <source>Failed to reinitialize video output</source>
         <translation>Videoväljundi uuesti aktiveerimine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="637"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="638"/>
         <source>Need to switch video renderer.</source>
         <translation>On vaja lülituda mõnele teisele video renderdajale.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1638"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1653"/>
         <source>Failed to initialize A/V Sync</source>
         <translation>A/V sünk. ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1696"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1815"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1711"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1830"/>
         <source>Serious error detected in Video Output</source>
         <translation>Video väljundis on tõsine viga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1880"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1895"/>
         <source>Video frame buffering failed too many times.</source>
         <translation>Video kaadri puhverdamine on liiga palju ebaõnnestunud.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2172"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2190"/>
         <source>Error opening switch program buffer</source>
         <translation>Lüliti programmi puhvri avamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2196"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2214"/>
         <source>Error opening switch program file</source>
         <translation>Lüliti programmi faili avamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2292"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2316"/>
         <source>Error opening jump program file buffer</source>
         <translation>Hüppe programmi faili puhvri avamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2301"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2325"/>
         <source>Error opening jump program file</source>
         <translation>Hüppe programmi faili avamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2310"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2334"/>
         <source>Error reopening video decoder</source>
         <translation>Video dekoodri taasavamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2489"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2513"/>
         <source>Irrecoverable recorder error</source>
         <translation>Parandamatu salvestaja viga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="219"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2978"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="221"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3002"/>
         <source>Bookmark Saved</source>
         <translation>Järjehoidja salvestatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="227"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2990"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="229"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3014"/>
         <source>Bookmark Cleared</source>
         <translation>Järjehoidja kustutatud</translation>
     </message>
@@ -16035,17 +16163,17 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Uus meremaa</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4279"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4318"/>
         <source>Blank Frame + Logo Detection</source>
         <translation>Tühi kaader + logo tuvastamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4281"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4320"/>
         <source>Scene Change + Logo Detection</source>
         <translation>Stseeni muutus + logo tuvastamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelutil.cpp" line="1237"/>
+        <location filename="../libs/libmythtv/channelutil.cpp" line="1238"/>
         <source>UNKNOWN</source>
         <comment>Synthesized callsign</comment>
         <translation>TUNDMATU</translation>
@@ -16103,8 +16231,8 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>VIGA: voohaldur suri</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmyth/programinfo.cpp" line="1388"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="1393"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1398"/>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="457"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="991"/>
         <source>%n hour(s)</source>
@@ -16114,11 +16242,11 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmyth/programinfo.cpp" line="1377"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1386"/>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="58"/>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="59"/>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="60"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1382"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1391"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="62"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="63"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="64"/>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="448"/>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="452"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="992"/>
@@ -16129,12 +16257,12 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="821"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="826"/>
         <source>Manual Record</source>
         <translation>Kohandatud salvestamine</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmyth/programinfo.cpp" line="1465"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1470"/>
         <source>%n star(s)</source>
         <translation>
             <numerusform>%n täht(e)</numerusform>
@@ -16142,136 +16270,136 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2444"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2447"/>
         <source>Commercial Detection</source>
         <translation>Reklaamide tuvastamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2448"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2451"/>
         <source>Preview Generation</source>
         <translation>Eelvaate tekitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2450"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2453"/>
         <source>User Job</source>
         <translation>Kasutaja töö</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3737"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3776"/>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3738"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3777"/>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
         <translation>Kõrgkvaliteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3739"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3778"/>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
         <translation>Otse eeter</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3740"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3779"/>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
         <translation>Madal kvaliteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3741"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3780"/>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
         <translation>Keskmine kvaliteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3742"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3781"/>
         <source>MPEG-2</source>
         <comment>Recording Profile MPEG-2</comment>
         <translation>MPEG-2</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3743"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3782"/>
         <source>RTjpeg/MPEG-4</source>
         <comment>Recording Profile RTjpeg/MPEG-4</comment>
         <translation>RTjpeg/MPEG-4</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3765"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3804"/>
         <source>Software Encoders (V4L based)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Tarkvaralised kodeerijad (v4l põhised)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3769"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3808"/>
         <source>USB MPEG-4 Encoder (Plextor ConvertX, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>USB MPEG-4 kodeerijad (Plextor ConvertX, jne.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3775"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3814"/>
         <source>Live TV</source>
         <comment>Recording Group Live TV</comment>
         <translation>Otse eeter</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3781"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3820"/>
         <source>Live TV</source>
         <comment>Storage Group Name</comment>
         <translation>Otse eeter</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3747"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3786"/>
         <source>CRC IP Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>CRC IP salvestid</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3749"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3788"/>
         <source>FireWire Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>FireWire sisend</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3751"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3790"/>
         <source>Freebox Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Freebox sisend</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3753"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3792"/>
         <source>Hardware DVB Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Riistvaralised DVB enkoodrid</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3755"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3794"/>
         <source>Hardware HDTV</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Riistvaraline HDTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3757"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3796"/>
         <source>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Riistvaralised MJPEG ekoodrid (Matrox G200-TV, Miro DC10, ine.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3759"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3798"/>
         <source>HD-PVR Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HD-PVR salvestid</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3761"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3800"/>
         <source>HDHomeRun Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HDHomeRun salvestid</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3763"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3802"/>
         <source>MPEG-2 Encoders (PVR-x50, PVR-500)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>MPEG-2enkoodrid (PVR-x50, PVR-500)</translation>
@@ -16282,7 +16410,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Tarkvaralised enkoodrid (v4l põhised)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3767"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3806"/>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Transkoodrid</translation>
@@ -16293,13 +16421,13 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">USB Mpeg-4 enkooder (Plextor ConvertX, ine.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3773"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3812"/>
         <source>All Programs</source>
         <comment>Recording Group All Programs</comment>
         <translation>Kõik saated</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3774"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3813"/>
         <source>All</source>
         <comment>Recording Group All Programs -- short form</comment>
         <translation>Kõik</translation>
@@ -16310,19 +16438,19 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Otse eetris</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3776"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3815"/>
         <source>Default</source>
         <comment>Recording Group Default</comment>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3777"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3816"/>
         <source>Deleted</source>
         <comment>Recording Group Deleted</comment>
         <translation>Kustutatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3780"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3819"/>
         <source>Default</source>
         <comment>Storage Group Name</comment>
         <translation>Vaikimisi</translation>
@@ -16333,25 +16461,25 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Otse eetris</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3782"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3821"/>
         <source>Thumbnails</source>
         <comment>Storage Group Name</comment>
         <translation>Pisipildid</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3783"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3822"/>
         <source>DB Backups</source>
         <comment>Storage Group Name</comment>
         <translation>DB varukoopiad</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3786"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3825"/>
         <source>Default</source>
         <comment>Playback Group Name</comment>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4292"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4331"/>
         <source>Pre &amp; Post Roll</source>
         <translation>Enne &amp; pärast &quot;roll&quot;</translation>
     </message>
@@ -16388,7 +16516,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Kõrge resolutsioon</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tvremoteutil.cpp" line="370"/>
+        <location filename="../libs/libmythtv/tvremoteutil.cpp" line="362"/>
         <source>Error querying recorder state</source>
         <translation>Salvestaja oleku päring nurjus</translation>
     </message>
@@ -16507,17 +16635,17 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Kui ei ole &quot;Ükski&quot;, muudab audio säplimiskiirust salvestusprofiilis kui seda kaarti kasutatakse. Kasuta seda kui hõivekaart ei toeta kõiki standard kiirusi.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2299"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2297"/>
         <source>IVTV MPEG-2 encoder card</source>
         <translation>IVTV MPEG-2 enkooder kaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2303"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2301"/>
         <source>H.264 encoder card (HD-PVR)</source>
         <translation>H.264 enkooder kaart (HD-PVR)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3497"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3495"/>
         <source>Audio input</source>
         <translation>Audio sisend</translation>
     </message>
@@ -16526,12 +16654,12 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Myth ei leia menüü faili %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="600"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="601"/>
         <source>MythTV could not locate the menu file %1</source>
         <translation>Myth ei leia menüü faili %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="617"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="618"/>
         <source>The menu file %1 is incomplete.</source>
         <translation>Menüü fail %1 pole täielik.</translation>
     </message>
@@ -16628,7 +16756,7 @@ kasuta väljastamise nuppu seadmel.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="29"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3396"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3402"/>
         <location filename="../programs/mythcommflag/main.cpp" line="457"/>
         <source>Paused</source>
         <translation>Peatatud</translation>
@@ -16675,7 +16803,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Käivitatud</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="581"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="594"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
         <translation>mythfilldatabase käivitus, kuid ei lisanud midagi kavasse. See võib olla mingi kava hankija probleem.</translation>
     </message>
@@ -16729,17 +16857,17 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Otse eetri puhul kasuta alati sirvimist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2086"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2074"/>
         <source>Browse all channels</source>
         <translation>Sirvi kõiki kanaleid</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2089"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2077"/>
         <source>If enabled, browse mode will shows channels on all available recording devices, instead of showing channels on just the current recorder.</source>
         <translation>Lubades näidatakse sirvides kanaleid kõigilt salvestusseadmetelt. Mitte ainult hetkel kasutusel olevast seadmest.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2099"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2087"/>
         <source>Clear bookmark on playback</source>
         <translation>Kustuta taasesitanisel järjehoidja</translation>
     </message>
@@ -16748,7 +16876,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Kustuta taasesitamisel järjehoidja automaatselt. Kui on keelatud, saad märkida alguse kerides ja positsiooni salvestades.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2111"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2099"/>
         <source>Alternate clear and save bookmark</source>
         <translation>Alternatiivne järjehoidja kustutamine ja salvestamine</translation>
     </message>
@@ -16777,7 +16905,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">LIRC deemoni &quot;socket&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2324"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2315"/>
         <source>UNIX socket or IP address[:port] to connect in order to communicate with the LIRC Daemon.</source>
         <translation>UNIX socket või Ip aadress[:port] LIRC deemoniga ühendumiseks.</translation>
     </message>
@@ -16790,27 +16918,27 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Ekraanitõmmiste asukoht</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2346"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2337"/>
         <source>Path to screenshot storage location. Should be writable by the frontend</source>
         <translation>Kus ekraanitõmmised asuvad. Peab olema kliendi poolt kirjutatav</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2390"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2381"/>
         <source>Display on screen</source>
         <translation>Näita ekraanil</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2699"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2690"/>
         <source>Overrides for specific video sizes</source>
         <translation>UUed väärtused kindlatele videosuurustele</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2740"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2731"/>
         <source>Use window border</source>
         <translation>Kasuta akna äärist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2751"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2742"/>
         <source>Use fixed window size</source>
         <translation>Kasuta kindlat akna suurust</translation>
     </message>
@@ -16827,7 +16955,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Automaatne prioriteedivahemik (+/-)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3187"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3175"/>
         <source>Up to this number of priority points may be added for titles that are usually watched soon after recording or subtracted for titles that are often watched several days or weeks later.</source>
         <translation>Niipalju prioriteedipunkte lisatakse kui saadet vaadatakse tavaliselt kohe peale salvestust või vähendatakse kui saadet vaadatakse tavaliselt palju aega peale salvestamist.</translation>
     </message>
@@ -16845,27 +16973,27 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Audio töötlemis võimalused</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3357"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3345"/>
         <source>Audio Mixer</source>
         <translation>Audio mikser</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4090"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4078"/>
         <source>Media Monitor</source>
         <translation>Meedia jälgija</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4097"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4085"/>
         <source>Program Exit</source>
         <translation>Saatest väljumine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4113"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4101"/>
         <source>Remote Control</source>
         <translation>Kaug kontroll</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="1364"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="1376"/>
         <source>MythTV Frontend</source>
         <translation>MythTV klient</translation>
     </message>
@@ -16898,7 +17026,7 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Kaua klient ootab taustaserveri äratamise katsete vahel. See peaks olema aeg mis kulub peataustaserveri käivitumiseks. Keelamiseks 0.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="501"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="487"/>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idling, 2 - reset the backend to wait for a frontend.</source>
         <translation>Enne taustaserveri välja lülitamist käivitatav käsk. Tagastatav väärtus näitab kas taustaserver võib välja lülituda. 0 - jah, 1- taaskäivitamine jõude, 2 - taustaserver peab kliendi järel ootama.</translation>
     </message>
@@ -16923,17 +17051,17 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">Videod mida näidatakse WMP kliendile</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="734"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="720"/>
         <source>Recordings</source>
         <translation>Salvestised</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="735"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="721"/>
         <source>Videos</source>
         <translation>Videod</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="979"/>
+        <location filename="../programs/mythtv-setup/backendsettings.cpp" line="965"/>
         <source>Local Backend</source>
         <translation>Lokaalne taustaserver</translation>
     </message>
@@ -16942,36 +17070,37 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation type="obsolete">UPnP serveri seaded</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/checksetup.cpp" line="22"/>
+        <location filename="../programs/mythtv-setup/checksetup.cpp" line="23"/>
         <source>Path &quot;%1&quot; doesn&apos;t exist.</source>
         <translation>Asukohta &quot;%1&quot; pole olemas.</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/checksetup.cpp" line="31"/>
+        <location filename="../programs/mythtv-setup/checksetup.cpp" line="32"/>
         <source>Unable to create file &quot;%1&quot; - directory is not writable?</source>
         <translation>Ei saa luua faili &quot;%1&quot; - kaust pole kirjutatav?</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/checksetup.cpp" line="160"/>
+        <location filename="../programs/mythtv-setup/checksetup.cpp" line="161"/>
         <source>You have a Video Storage Group, but have not set up all Image Groups.  If you continue, video image downloads will be saved in your Videos Storage Group.  Do you want to store them in their own groups?</source>
         <translation>Videote säilitusgrupp on olemas, kuid puuduvad pildigrupid. Kui jätkad salvestatakse videode pildid videote säilitusgruppi. Soovid äkki nei oma gruppi salvestada?</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/checksetup.cpp" line="218"/>
+        <location filename="../programs/mythtv-setup/checksetup.cpp" line="219"/>
         <source>Card %1 (type %2) is set to start on channel %3, which does not exist.</source>
         <translation>Kaart %1 (tüüp %2) on seatud käivituma kanalil %3, mida ei eksisteeri.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/myththemedmenu.cpp" line="242"/>
-        <location filename="../programs/mythtv-setup/main.cpp" line="584"/>
+        <location filename="../libs/libmythui/myththemedmenu.cpp" line="243"/>
+        <location filename="../programs/mythtv-setup/main.cpp" line="583"/>
         <source>MythTV Setup</source>
         <translation>MythTV seadistus</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/deletemap.cpp" line="55"/>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="56"/>
-        <location filename="../libs/libmythtv/deletemap.cpp" line="57"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4102"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="59"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="60"/>
+        <location filename="../libs/libmythtv/deletemap.cpp" line="61"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4167"/>
+        <location filename="../libs/libmythtv/osd.cpp" line="677"/>
         <source>%n second(s)</source>
         <translation>
             <numerusform>%n sekund(it)</numerusform>
@@ -16979,12 +17108,12 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/playercontext.cpp" line="824"/>
+        <location filename="../libs/libmythtv/playercontext.cpp" line="818"/>
         <source>Play</source>
         <translation>Esita</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="2435"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="2438"/>
         <source>PBP</source>
         <translation></translation>
     </message>
@@ -17057,8 +17186,8 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelgroup.cpp" line="203"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3045"/>
+        <location filename="../libs/libmythtv/channelgroup.cpp" line="201"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3033"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1420"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1654"/>
         <source>All Channels</source>
@@ -17206,7 +17335,7 @@ Soovid edasi vaadata?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythbdplayer.cpp" line="116"/>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="487"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="489"/>
         <source>Angle %1</source>
         <translation>Nurk %1</translation>
     </message>
@@ -17229,6 +17358,21 @@ Soovid edasi vaadata?</translation>
         <location filename="../programs/mythcommflag/PrePostRollFlagger.cpp" line="157"/>
         <source>Waiting for recording to finish</source>
         <translation>Ootan salvestamise lõppu</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythupnp/mythxmlclient.cpp" line="75"/>
+        <source>Error Requesting Connection Info</source>
+        <translation>Viga ühenduse info hankimisel</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythupnp/mythxmlclient.cpp" line="113"/>
+        <source>Unexpected Response</source>
+        <translation>Ootamatu vastus</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythupnp/mythxmlclient.cpp" line="124"/>
+        <source>Access Denied</source>
+        <translation>Juurdepääs keelatu</translation>
     </message>
 </context>
 <context>
@@ -17473,7 +17617,7 @@ Soovid edasi vaadata?</translation>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="263"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="512"/>
         <source>Modify Recording Options</source>
-        <translation>Muuda salvestamise seadeid</translation>
+        <translation>Muuda salvestamise valikuid</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="246"/>
@@ -17481,7 +17625,7 @@ Soovid edasi vaadata?</translation>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="475"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="522"/>
         <source>Edit Options</source>
-        <translation>Muuda parameetreid</translation>
+        <translation>Muuda valikuid</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="252"/>
@@ -17839,7 +17983,7 @@ is located in %2</source>
 <context>
     <name>StartingChannel</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2592"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2590"/>
         <source>Please add channels to this source</source>
         <translation>Lisa sellele sisendile kanalid</translation>
     </message>
@@ -17877,6 +18021,11 @@ No other details</source>
         <translation>%1 %2 %3.%4-st
 %5
 Rohkem andmeid pole</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="860"/>
+        <source>Job Queue shows any jobs currently in MythTV&apos;s Job Queue such as a commercial detection job.</source>
+        <translation>Tööjärjekord näitab kõiki töid, mis on hetkel MythTV-s ootel. Näiteks reklaamide tuvastamine.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="888"/>
@@ -18095,9 +18244,8 @@ Rohkem andmeid pole</translation>
         <translation>vaatab otse eetrit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="860"/>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial detection job.</source>
-        <translation>Tööjärjekord näitab Mythi tööjärjekorras olevaid töid nagu näiteks reklaamide märkimine.</translation>
+        <translation type="obsolete">Tööjärjekord näitab Mythi tööjärjekorras olevaid töid nagu näiteks reklaamide märkimine.</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1315"/>
@@ -18479,138 +18627,138 @@ Kaust säilitusgrupist?</translation>
 <context>
     <name>TV</name>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1463"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1477"/>
         <source>Record and watch while it records</source>
         <translation>Salvesta ning vaata samal ajal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1464"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1478"/>
         <source>Let it record and go back to the Main Menu</source>
         <translation>Jäta salvestama ning mine tagasi peamenüüsse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1468"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1482"/>
         <source>Don&apos;t let it record, I want to watch TV</source>
         <translation>Ära hakka salvestama, ma tahan vaadata TV-d</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5695"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5742"/>
         <source>Forward</source>
         <translation>Edasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4620"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5712"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5714"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4667"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5759"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5761"/>
         <source>Skip Ahead</source>
         <translation>Edasikerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5694"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5741"/>
         <source>Rewind</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4622"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5707"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4669"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5754"/>
         <source>Skip Back</source>
         <translation>Tagasikerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="3996"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4372"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5751"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11471"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4029"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4419"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5798"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11636"/>
         <source>Jump Back</source>
         <translation>Tagasi hüppamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4005"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4388"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5749"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11516"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4038"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4435"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5796"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11681"/>
         <source>Jump Ahead</source>
         <translation>Edasi hüppamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4035"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4618"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4068"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4665"/>
         <source>Jump to Beginning</source>
         <translation>Algusesse hüppamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11611"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11776"/>
         <source>Save this position and go to the menu</source>
         <translation>Salvesta see asukoht ning mine menüüsse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11613"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11778"/>
         <source>Do not save, just exit to the menu</source>
         <translation>Ära salvesta, mine lihtsalt menüüsse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11624"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11789"/>
         <source>Keep watching</source>
         <translation>Jätka vaatamist</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11621"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11786"/>
         <source>Delete this recording</source>
         <translation>Kustuta see salvestis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5592"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5639"/>
         <source>Paused</source>
         <translation>Peatatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7040"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7087"/>
         <source>Position</source>
         <translation>Asukoht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4629"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5767"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4676"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5814"/>
         <source>Jump To</source>
         <translation>Hüppa</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5803"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5850"/>
         <source>Speed 3X</source>
         <translation>Kiirus 3X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5804"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5851"/>
         <source>Speed 2X</source>
         <translation>Kiirus 2X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5806"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5853"/>
         <source>Speed 1/3X</source>
         <translation>Kiirus 1/3X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5807"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5854"/>
         <source>Speed 1/8X</source>
         <translation>Kiirus 1/8X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5808"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5855"/>
         <source>Speed 1/16X</source>
         <translation>Kiirus 1/16X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5954"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6001"/>
         <source>Stopping Transcode</source>
         <translation>Transkodeerimise peatamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5972"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6019"/>
         <source>Transcoding</source>
         <translation>Transkodeerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5965"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6012"/>
         <source>Try Again</source>
         <translation>Proovi uuesti</translation>
     </message>
@@ -18619,13 +18767,13 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Otsimine...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6150"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6197"/>
         <source>Skip</source>
         <translation>Jäta vahele</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10181"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10226"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10313"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10358"/>
         <source>Adjust Picture</source>
         <translation>Pildi kohandamine</translation>
     </message>
@@ -18634,9 +18782,9 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Helitugevus %1 %</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4663"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7949"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9090"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4710"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7996"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9140"/>
         <source>Adjust Volume</source>
         <translation>Helitugevuse muutmine</translation>
     </message>
@@ -18645,71 +18793,71 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Aja skaleerimine %1X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8013"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10769"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10793"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8060"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10927"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10951"/>
         <source>Adjust Time Stretch</source>
         <translation>Aja skaleerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8121"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8168"/>
         <source>Mute Off</source>
         <translation>Summutus väljas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8122"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8169"/>
         <source>Mute On</source>
         <translation>Summutus sees</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8123"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8170"/>
         <source>Left Channel Muted</source>
         <translation>Vasak kanal summutatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8124"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8171"/>
         <source>Right Channel Muted</source>
         <translation>Parem kanal summutatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8152"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8199"/>
         <source>Sleep </source>
         <translation>Uinak</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8944"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8967"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8994"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9017"/>
         <source>Record</source>
         <translation>Salvesta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9285"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9413"/>
         <source>This program is currently being edited</source>
         <translation>Seda toimetatakse hetkel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9288"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9416"/>
         <source>Continue Editing</source>
         <translation>Jätka toimetamist</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9289"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9417"/>
         <source>Do not edit</source>
         <translation>Ära toimeta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10899"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11057"/>
         <source>Program Guide</source>
         <translation>Kava</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10774"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10831"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10932"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10989"/>
         <source>Picture-in-Picture</source>
         <translation>Pilt pildis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10850"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11008"/>
         <source>Change Active Window</source>
         <translation>Vaheta aktiivset akent</translation>
     </message>
@@ -18718,198 +18866,198 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Lehitsemise lubamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10457"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10605"/>
         <source>Previous Channel</source>
         <translation>Eelmine kanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10726"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10884"/>
         <source>Edit Recording</source>
         <translation>Salvestise toimetamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10731"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10889"/>
         <source>Stop Transcoding</source>
         <translation>Transkodeerimise peatamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10735"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10744"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10893"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10902"/>
         <source>Begin Transcoding</source>
         <translation>Transkodeerimise alustamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10445"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10534"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10593"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10682"/>
         <source>Commercial Auto-Skip</source>
         <translation>Reklaamide auto-vahelejätt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10727"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10885"/>
         <source>Turn Auto-Expire OFF</source>
         <translation>Automaatne aegumine välja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10728"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10886"/>
         <source>Turn Auto-Expire ON</source>
         <translation>Automaatne aegumine sisse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10172"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10193"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10304"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10325"/>
         <source>Change Aspect Ratio</source>
         <translation>Kuvasuhte muutmine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10178"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10310"/>
         <source>Manual Zoom Mode</source>
         <translation>Kohandatud suurendamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10796"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10954"/>
         <source>Adjust</source>
         <translation>Kohanda</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10797"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10955"/>
         <source>0.5X</source>
         <translation>0,5X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10798"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10956"/>
         <source>0.9X</source>
         <translation>0,9X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10799"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10957"/>
         <source>1.0X</source>
         <translation>1,0X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10800"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10958"/>
         <source>1.1X</source>
         <translation>1,1X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10801"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10959"/>
         <source>1.2X</source>
         <translation>1,2X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10802"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10960"/>
         <source>1.3X</source>
         <translation>1,3X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10803"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10961"/>
         <source>1.4X</source>
         <translation>1,4X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10804"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10962"/>
         <source>1.5X</source>
         <translation>1,5X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10778"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10809"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11260"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11262"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10936"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10967"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11418"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11420"/>
         <source>Sleep</source>
         <translation>Uinak</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10811"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10969"/>
         <source>Sleep Off</source>
         <translation>Uinak väljas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11034"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11192"/>
         <source>Auto-Expire OFF</source>
         <translation>Automaatselt ei aegu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11039"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11197"/>
         <source>Auto-Expire ON</source>
         <translation>Aegub automaatselt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9804"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9936"/>
         <source>Zoom Mode ON</source>
         <translation>Suurendamine sees</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11463"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11628"/>
         <source>Previous Chapter</source>
         <translation>Eelmine peatükk</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11505"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11670"/>
         <source>Next Chapter</source>
         <translation>Järgmine peatükk</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4020"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4053"/>
         <source>Jump to Bookmark</source>
         <translation>Hüppa järjehoidjasse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5911"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5958"/>
         <source>Forward %1X</source>
         <translation>Edasi %1X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5916"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5963"/>
         <source>Rewind %1X</source>
         <translation>Tagasi %1X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7250"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7297"/>
         <source>Partial Lock</source>
         <translation>Osaliselt leitud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7250"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7297"/>
         <source>No Lock</source>
         <translation>Ei leidnud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7251"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7298"/>
         <source>Lock</source>
         <translation>Leitud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7253"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7300"/>
         <source>Signal %1%</source>
         <translation>Signaal %1%</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7352"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11299"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11440"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11693"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7399"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11457"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11605"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11858"/>
         <source>OK</source>
         <translation>Valmis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8081"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8128"/>
         <source>Audio Resync</source>
         <translation>Heli taassünkroniseerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8085"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8132"/>
         <source>Audio Sync</source>
         <translation>Helinihe</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8087"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10110"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8134"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10242"/>
         <source>Adjust Audio Sync</source>
         <translation>Sünkroniseeri heli</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10107"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10116"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10239"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10248"/>
         <source>Select Audio Track</source>
         <translation>Vali helirada</translation>
     </message>
@@ -18918,69 +19066,69 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Kõik vastuvõtjad on juba kasutusel. Kui soovid vaadata käimasolevat salvestist, vali see mahamängimismenüüst.  Kui soovid otse-eetrit vaadata, katkesta mõni pooleliolev salvestamine kustutusmenüüst.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="3962"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="3995"/>
         <source>Seek:</source>
         <translation>Keri:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6564"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6611"/>
         <source>CC:</source>
         <translation>Teletekst:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="2156"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="2170"/>
         <source>%1 Settings</source>
-        <translation>%1 sätted</translation>
+        <translation>%1 seadistused</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6564"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6611"/>
         <source>TXT:</source>
         <translation>TXT:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6568"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6615"/>
         <source>Seek:</source>
         <comment>seek to location</comment>
         <translation>Keri:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7255"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7302"/>
         <source>S/N %1dB</source>
         <translation>S/N %1dB</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7257"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7304"/>
         <source>BE %1</source>
         <comment>Bit Errors</comment>
         <translation>BE %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8979"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9029"/>
         <source>Cancel Record</source>
         <translation>Katkesta salvestamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5801"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5848"/>
         <source>Speed 16X</source>
         <translation>Kiirus 16X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5802"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5849"/>
         <source>Speed 8X</source>
         <translation>Kiirus 8X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11496"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11661"/>
         <source>Skip Still Frame</source>
         <translation>Jäta vahele muutumatu kaader</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11525"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11690"/>
         <source>Next Title</source>
         <translation>Järgmine pealkiri</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10451"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10599"/>
         <source>DVD Root Menu</source>
         <translation>DVD peamenüü</translation>
     </message>
@@ -18989,22 +19137,22 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Salvestamiste planeerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10900"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11058"/>
         <source>Program Finder</source>
         <translation>Saateleidja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10902"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11060"/>
         <source>Edit Recording Schedule</source>
         <translation>Salvestuskava muutmine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11480"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11645"/>
         <source>Previous Title</source>
         <translation>Eelmine pealkiri</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11455"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11620"/>
         <source>Skip Back Not Allowed</source>
         <translation>Tagasi vahelejätmine pole lubatud</translation>
     </message>
@@ -19037,39 +19185,39 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">[O]k</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10609"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10634"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10757"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10792"/>
         <source>Jump to Program</source>
         <translation>Lülitu saatele</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10635"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10919"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10793"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11077"/>
         <source>Recorded Program</source>
         <translation>Salvestatud saade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10745"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10903"/>
         <source>Default</source>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10746"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10904"/>
         <source>Autodetect</source>
         <translation>Automaattuvastus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10747"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10905"/>
         <source>High Quality</source>
         <translation>Kõrgkvaliteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10748"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10906"/>
         <source>Medium Quality</source>
         <translation>Keskkvaliteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10749"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10907"/>
         <source>Low Quality</source>
         <translation>Madalkvaliteet</translation>
     </message>
@@ -19078,68 +19226,68 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Teleteksti subtiitrite lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10353"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10491"/>
         <source>Toggle Teletext Menu</source>
         <translation>Teleteksti menüü lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10795"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10953"/>
         <source>Toggle</source>
         <translation>Vaheta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10246"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10378"/>
         <source>(I)</source>
         <comment>Interlaced (Normal)</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10250"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10382"/>
         <source>(P)</source>
         <comment>Progressive</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10186"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10239"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10318"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10371"/>
         <source>Video Scan</source>
         <translation>Video laotus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10256"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10388"/>
         <source>Detect</source>
         <translation>Tuvasta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10258"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10390"/>
         <source>Progressive</source>
         <translation>Progressiivne</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10260"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10392"/>
         <source>Interlaced (Normal)</source>
         <translation>Ülerealine (tavaline)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10262"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10394"/>
         <source>Interlaced (Reversed)</source>
         <translation>Ülerealine (vastupidine)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10324"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10358"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10462"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10496"/>
         <source>Select Subtitle</source>
         <translation>Subtiitrite valimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10342"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10386"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10480"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10534"/>
         <source>Select VBI CC</source>
         <translation>VBI subtiitrid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10336"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10375"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10474"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10523"/>
         <source>Select ATSC CC</source>
         <translation>ATSC subtiitrid</translation>
     </message>
@@ -19152,173 +19300,175 @@ Kaust säilitusgrupist?</translation>
         <translation type="obsolete">Lülita sisse-välja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10248"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10380"/>
         <source>(i)</source>
         <comment>Interlaced (Reversed)</comment>
         <translatorcomment>ülerealaotus</translatorcomment>
         <translation>(ü)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7259"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7306"/>
         <source>Rotor %1%</source>
         <translation>Rootor %1%</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="3203"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="3217"/>
         <source>End Of Recording</source>
         <translation>Salvestise lõpp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="2702"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="2716"/>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
         <translation>Viimane saade: %1 ei eksisteeri</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4398"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11770"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4445"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11935"/>
         <source>Delete this recording?</source>
         <translation>Kustuta see salvestis?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10453"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10601"/>
         <source>DVD Chapter Menu</source>
         <translation>DVD peatükkide menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11864"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12029"/>
         <source>&apos;%1&apos; Group Password:</source>
         <translation>Grupi &quot;%1&quot; parool:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11876"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12041"/>
         <source>Password Failed</source>
         <translation>Vale parool</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="323"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="325"/>
         <source>Chan %1: %2</source>
         <translation>Kanal %1: %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="332"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="334"/>
         <source>All Tuners are Busy.
 Select a Current Recording</source>
         <translation>Kõik vastuvõtjad on hõivatud
 Vali praegune salvestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7419"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7466"/>
         <source>DVD</source>
         <translation>DVD</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7422"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7469"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7424"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7471"/>
         <source>Still Frame</source>
         <translation>Kaader</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7434"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7481"/>
         <source>Title: %1 (%2)</source>
         <translation>Pealkiri: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7435"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7482"/>
         <source>Chapter: %1/%2</source>
         <translation>Peatükk: %1/%2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11440"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11575"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11605"/>
         <source>Screen Shot</source>
         <translation>Ekraani tõmmis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="310"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="312"/>
         <source>Exit</source>
         <translation>Välju</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1460"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1474"/>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
         <translation>MythTV soovib %d sekundi pärast salvestada %2-s &quot;%1&quot;. Kas see sobib:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1465"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1479"/>
         <source>Let them record and go back to the Main Menu</source>
         <translation>Las salvestab, mine tagasi peamenüsse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1466"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1480"/>
         <source>Record it later, I want to watch TV</source>
         <translation>Salvesta hiljem, vaatanTV-d edasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1467"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1481"/>
         <source>Record them later, I want to watch TV</source>
         <translation>Salvesta hiljem, vaatan TV-d edasi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="1469"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="1483"/>
         <source>Don&apos;t let them record, I want to watch TV</source>
         <translation>Ära hakka salvestama, ma tahan vaadata TV-d</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8174"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8239"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8221"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8286"/>
         <source>Yes</source>
         <translation>Jah</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10175"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10208"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10307"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10340"/>
         <source>Adjust Fill</source>
         <translation>Ekraanitäide</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10619"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10650"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10777"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10808"/>
         <source>Switch Input</source>
         <translation>Muuda sisendit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10669"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10827"/>
         <source>C</source>
         <comment>Card</comment>
         <translation>K</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10670"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10828"/>
         <source>I</source>
         <comment>Input</comment>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10626"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10681"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10784"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10839"/>
         <source>Switch Source</source>
         <translation>Muuda allikat</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10901"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11059"/>
         <source>Upcoming Recordings</source>
         <translation>Tulevased salvestused</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11440"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11575"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11605"/>
         <source>Error</source>
         <translation>Viga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11607"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11772"/>
         <source>You are exiting %1</source>
         <translation>Soovid sulgeda %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11617"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11782"/>
         <source>Exit %1</source>
         <translation>Sulge %1</translation>
     </message>
@@ -19327,12 +19477,12 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Otse eeter, kanal %1: %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="3761"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="3794"/>
         <source>Zoom Committed</source>
         <translation>Suurendatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="3779"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="3812"/>
         <source>Zoom Ignored</source>
         <translation>Suurendus ignoreeritud</translation>
     </message>
@@ -19345,321 +19495,320 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Kahjuks toetab PIP ainult %1 video voogu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5078"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5125"/>
         <source>Sorry, can not mix PBP and PIP views</source>
         <translation>PBP ja PIP vaateid ei saa ühildada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5095"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5142"/>
         <source>Creating PBP</source>
         <translation>Loon PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5095"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5142"/>
         <source>Creating PIP</source>
         <translation>Loon PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5096"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5143"/>
         <source>Cannot create PBP</source>
         <translation>PBP loomine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5096"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5143"/>
         <source>Cannot create PIP</source>
         <translation>PIP loomine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5115"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5162"/>
         <source>Stopping PIP</source>
         <translation>PIP peatamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5115"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5162"/>
         <source>Stopping PBP</source>
         <translation>PBP peatamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5125"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5172"/>
         <source>Stopping all PIPs</source>
         <translation>Kõik PIP-d peatatakse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5125"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5172"/>
         <source>Stopping all PBPs</source>
         <translation>Kõik PBP-d peatatakse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5173"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5220"/>
         <source>Too many views to switch</source>
         <translation>Lülitamiseks on liiga palju vaateid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5594"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5641"/>
         <source>Aux Paused</source>
         <translation>Aux peatatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6017"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6064"/>
         <source>Jump Chapter</source>
         <translation>Järgmine peatükk</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6018"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6108"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6151"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6065"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6155"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6198"/>
         <source>Searching</source>
         <translation>Otsimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6107"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6154"/>
         <source>Jump Title</source>
         <translation>Mine pealkirjale</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6128"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6175"/>
         <source>Switch Angle</source>
         <translation>Muuda nurka</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6129"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6176"/>
         <source>Switching</source>
         <translation>Lülitun</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7343"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7390"/>
         <source>You should have received a channel lock by now. You can continue to wait for a signal, or you can change the channel with %1 or %2, change video source (%3), inputs (%4), etc.</source>
         <translation>Kanal peaks olema praeguseks lukustunud. Võid jääda signaali ootama või muuta kanalit vajutades %1 või %2, vahetada video allikat (%3), sisendit (%4), jne.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8013"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8060"/>
         <source>Time Stretch</source>
         <translation>Aja skaleerimine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8031"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8078"/>
         <source>Upmixer On</source>
         <translation>Stereo &gt; 5.1 sees</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8033"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8080"/>
         <source>Upmixer Off</source>
         <translation>Stereo &gt; 5.1 väljas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8175"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8240"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8222"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8287"/>
         <source>No</source>
         <translation>Ei</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8434"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8481"/>
         <source>PiP</source>
         <comment>Picture-in-Picture</comment>
         <translation>PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8435"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8482"/>
         <source>PbP</source>
         <comment>Picture-by-Picture</comment>
         <translation>PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8437"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8484"/>
         <source>Disabling %1 for recording</source>
         <translation>Keelan salvestamiseks %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9176"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9226"/>
         <source>Active Changed</source>
         <translation>Aktiivne muudetud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9227"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9348"/>
         <source>Edit</source>
         <translation>Muuda</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10058"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10190"/>
         <source>Playback Menu</source>
         <translation>Taasesitus menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10099"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10106"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10231"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10238"/>
         <source>Audio</source>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10162"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10169"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10294"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10301"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10310"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10318"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10448"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10456"/>
         <source>Subtitles</source>
         <translation>Subtiitrid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10321"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10459"/>
         <source>Toggle Subtitles</source>
         <translation>Subtiitrite lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10330"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10369"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10468"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10507"/>
         <source>Text Subtitles</source>
         <translation>Subtiitrid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10348"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10397"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10486"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10545"/>
         <source>Select Teletext CC</source>
         <translation>Vali teleteksti subtiitrid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10370"/>
         <source>Toggle Text Subtitles</source>
-        <translation>Subtiitlite lülitamine</translation>
+        <translation type="obsolete">Subtiitlite lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10435"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10442"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10583"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10590"/>
         <source>Navigate</source>
         <translation>Navigeeri</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10452"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10600"/>
         <source>DVD Title Menu</source>
         <translation>DVD pealkirja menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10466"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10520"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10614"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10668"/>
         <source>Angle</source>
         <translation>Nurk</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10471"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10503"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10619"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10651"/>
         <source>Title</source>
         <translation>Pealkiri</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10602"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10608"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10750"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10756"/>
         <source>Source</source>
         <translation>Allikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10703"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10710"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10861"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10868"/>
         <source>Jobs</source>
         <translation>Tööd</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10722"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10880"/>
         <source>Edit Channel</source>
         <translation>Muuda kanalit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10111"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10243"/>
         <source>Toggle Audio Upmixer</source>
         <translation>Stereo &gt; 5.1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10783"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10820"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10941"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10978"/>
         <source>Channel Groups</source>
         <translation>Kanalite grupid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10821"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10979"/>
         <source>All Channels</source>
         <translation>Kõik kanalid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10461"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10478"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10609"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10626"/>
         <source>Chapter</source>
         <translation>Peatükk</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10838"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10996"/>
         <source>Open Live TV PIP</source>
         <translation>Ava otse eetri PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10840"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10998"/>
         <source>Open Live TV PBP</source>
         <translation>Ava OtseTV PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10844"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11002"/>
         <source>Open Recording PIP</source>
         <translation>Ava salvestav PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10846"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11004"/>
         <source>Open Recording PBP</source>
         <translation>Ava salvestav PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10857"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11015"/>
         <source>Close PBP</source>
         <translation>Sulge PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10857"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11015"/>
         <source>Close PIP</source>
         <translation>Sulge PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10861"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11019"/>
         <source>Close PBPs</source>
         <translation>Sulge PBP-d</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10861"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11019"/>
         <source>Close PIPs</source>
         <translation>Sulge PIP-d</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10865"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10870"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11023"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11028"/>
         <source>Swap Windows</source>
         <translation>Vaheta aknad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10878"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11036"/>
         <source>Switch to PIP</source>
         <translation>Lülitu PIP-le</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10878"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11036"/>
         <source>Switch to PBP</source>
         <translation>Lülitu PBP-le</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10212"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10344"/>
         <source>Auto Detect</source>
         <translation>Tuvasta automaatselt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="318"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="320"/>
         <source>Live TV, chan %1: %2</source>
         <translation>Otse eeter, kanal %1: %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4663"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7949"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4710"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7996"/>
         <source>Volume</source>
         <translation>Helitugevus</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5066"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5113"/>
         <source>Sorry, PBP only supports %n video stream(s)</source>
         <translation>
             <numerusform>Kahjuks toetab PBP ainult %n video voogu</numerusform>
@@ -19667,7 +19816,7 @@ Vali praegune salvestus</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5073"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5120"/>
         <source>Sorry, PIP only supports %n video stream(s)</source>
         <translation>
             <numerusform>Kahjuks toetab PBP ainult %n video voogu</numerusform>
@@ -19675,99 +19824,157 @@ Vali praegune salvestus</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10762"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10768"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10509"/>
+        <source>Toggle External Subtitles</source>
+        <translation>Väliste subtiitlite lülitamine</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10920"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10926"/>
         <source>Playback</source>
         <translation>Taasesitus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10788"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10946"/>
         <source>Toggle Browse Mode</source>
         <translation>Lehitsemise lülitamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10891"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10898"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11049"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11056"/>
         <source>Schedule</source>
         <translation>Planeering</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11273"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11431"/>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch Live TV, cancel one of the in-progress recordings from the delete menu.</source>
         <translation>Kõik vastuvõtjad on juba kasutusel. Kui soovid vaadata käimasolevat salvestist, vali see mahamängimismenüüst.  Kui soovid otse-eetrit vaadata, katkesta mõni pooleliolev salvestamine kustutusmenüüst.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11282"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11440"/>
         <source>Error: MythTV is using all inputs, but there are no active recordings?</source>
         <translation>VIGA: MythTV kasutab kõiki sisendeid, kuid ühtegi aktiivset salvestust pole?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11286"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11444"/>
         <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
         <translation>MythTV-s pole salvestuskaarte defineeritud. Käivita mythtv-setup.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11591"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11756"/>
         <source>Live TV</source>
         <translation>Otse eeter</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11593"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11758"/>
         <source>this DVD</source>
         <translation>see DVD</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11597"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11762"/>
         <source>this Video</source>
         <translation>see video</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11601"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11766"/>
         <source>this recording</source>
         <translation>see salvestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11718"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11883"/>
         <source>Delete it, but allow it to re-record</source>
         <translation>Kustuta see kuid luba uuesti salvestada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11720"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11885"/>
         <source>Delete it</source>
         <translation>Kustuta see</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11722"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11887"/>
         <source>Save it so I can watch it again</source>
         <translation>Salvesta nii, et saaksin uuesti vaadata</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11727"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11892"/>
         <source>Yes, and allow re-record</source>
         <translation>Jah ja luba uuesti salvestada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11729"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11894"/>
         <source>Yes, delete it</source>
         <translation>Jah, kustuta see</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11731"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11896"/>
         <source>No, keep it, I changed my mind</source>
         <translation>Ei, hoia alles, mõtlesin ümber</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7399"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7500"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10812"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10813"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10814"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10815"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7446"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7547"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10970"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10971"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10972"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10973"/>
         <source>%n minute(s)</source>
         <translation>
             <numerusform>%n minut(it)</numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>ThemeChooser</name>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="341"/>
+        <source>Theme Chooser Menu</source>
+        <translation>Teema valiku menüü</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="360"/>
+        <source>Toggle Fullscreen Preview</source>
+        <translation>Täisekraani eelvaate lülitamine</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="364"/>
+        <source>Hide Downloadable Themes</source>
+        <translation>Peida allalaetavad teemad</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="367"/>
+        <source>Show Downloadable Themes</source>
+        <translation>Näita allalaetavaid teemasid</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="370"/>
+        <source>Select Current Theme</source>
+        <translation>Vali kasutatav teema</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="463"/>
+        <source>Downloading %1 Theme</source>
+        <translation>Laen alla teemat %1</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="583"/>
+        <source>Copying %1 Theme Package</source>
+        <translation>Kopeerin teema %1 pakki</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="591"/>
+        <source>ERROR downloading theme package on master backend.</source>
+        <translation>VIGA teema paki peamisse taustaserverisse laadimisel.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="611"/>
+        <source>Installing %1 Theme</source>
+        <translation>Paigaldan teemat %1</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="617"/>
+        <source>ERROR downloading theme package from master backend.</source>
+        <translation>VIGA teema paki tõmbamisel peamisest taustaserverist.</translation>
     </message>
 </context>
 <context>
@@ -19777,17 +19984,17 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Planeeritud salvestused:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="291"/>
+        <location filename="../themes/themestrings.h" line="331"/>
         <source>(1) All  (2) Important</source>
         <translation>(1) kõiki  (2) tähtsaid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="288"/>
+        <location filename="../themes/themestrings.h" line="256"/>
         <source>Showing:</source>
         <translation>Näitamine:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="637"/>
+        <location filename="../themes/themestrings.h" line="634"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
         <translation>Sa pole planeerinud ühegi saate salvestamist</translation>
     </message>
@@ -19800,7 +20007,7 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Vali &apos;telekava&apos; või &apos;saate otsija&apos;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="214"/>
+        <location filename="../themes/themestrings.h" line="262"/>
         <source>Channel Recording Priorities</source>
         <translation>Kanalite salvestusprioriteedid</translation>
     </message>
@@ -19809,12 +20016,12 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">(1) Kanal    (2) Prioriteet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="217"/>
+        <location filename="../themes/themestrings.h" line="260"/>
         <source>Source:</source>
         <translation>Allikas:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="96"/>
+        <location filename="../themes/themestrings.h" line="109"/>
         <source>Priority:</source>
         <translation>Prioriteet:</translation>
     </message>
@@ -19823,7 +20030,7 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Saadete salvestusprioriteedid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="216"/>
+        <location filename="../themes/themestrings.h" line="264"/>
         <source>Priority</source>
         <translation>Prioriteet</translation>
     </message>
@@ -19840,7 +20047,7 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Salvestuse tüüp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="89"/>
+        <location filename="../themes/themestrings.h" line="102"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
@@ -19889,7 +20096,7 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Selle otsinguga ei leitud ühtegi saadet. Proovi otsida midagi muud.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="294"/>
+        <location filename="../themes/themestrings.h" line="332"/>
         <source>Program Listings</source>
         <translation>Saatekava</translation>
     </message>
@@ -19898,12 +20105,12 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Eetriaeg:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="85"/>
+        <location filename="../themes/themestrings.h" line="98"/>
         <source>Description:</source>
         <translation>Kirjeldus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="197"/>
+        <location filename="../themes/themestrings.h" line="307"/>
         <source>This screen displays the status of various system components</source>
         <translation>Siin näidatakse süsteemi erinevate komponentide olekuid</translation>
     </message>
@@ -19912,222 +20119,214 @@ Vali praegune salvestus</translation>
         <translation type="obsolete">Salvestuskava muudatuste eelvaade:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="387"/>
+        <location filename="../themes/themestrings.h" line="405"/>
         <source>General</source>
         <translation>Üldine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="388"/>
+        <location filename="../themes/themestrings.h" line="406"/>
         <source>Core MythTV behavior and system settings</source>
         <translation>MythTV peamised ja süsteemi seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="389"/>
+        <location filename="../themes/themestrings.h" line="407"/>
         <source>Appearance</source>
         <translation>Välimus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="390"/>
+        <location filename="../themes/themestrings.h" line="408"/>
         <source>pick the theme, font, size, and locale</source>
         <translation>vali teema, font, suurus ja lokaat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="391"/>
+        <location filename="../themes/themestrings.h" line="409"/>
         <source>Screen Setup Wizards</source>
         <translation>Ekraani seadistuse abimees</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="392"/>
+        <location filename="../themes/themestrings.h" line="410"/>
         <source>Compensate for TVs with overscan</source>
         <translation>Kompenseeri ülelaotusega(overscan) TV</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="393"/>
+        <location filename="../themes/themestrings.h" line="411"/>
         <source>TV Settings</source>
         <translation>TV seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="394"/>
+        <location filename="../themes/themestrings.h" line="412"/>
         <source>Settings for TV recording and playback</source>
         <translation>TV salvestuse ja taasesituse seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="395"/>
+        <location filename="../themes/themestrings.h" line="413"/>
         <source>Music Settings</source>
         <translation>Muusika seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="396"/>
+        <location filename="../themes/themestrings.h" line="414"/>
         <source>Configure playback and CD ripping</source>
         <translation>Seadista taasesitust ja CD rippimist</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="397"/>
+        <location filename="../themes/themestrings.h" line="415"/>
         <source>Videos Settings</source>
         <translation>Video seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="398"/>
+        <location filename="../themes/themestrings.h" line="416"/>
         <source>Configure playback and DVD ripping</source>
         <translation>Seadista taasesitust ja DVD rippimist</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="399"/>
         <source>Radio Settings</source>
-        <translation>Raadio seaded</translation>
+        <translation type="obsolete">Raadio seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="400"/>
+        <location filename="../themes/themestrings.h" line="417"/>
         <source>Images Settings</source>
         <translation>Pildi seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="401"/>
+        <location filename="../themes/themestrings.h" line="418"/>
         <source>Configure display of image gallery</source>
         <translation>Pildi albumi seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="402"/>
+        <location filename="../themes/themestrings.h" line="419"/>
         <source>Game Settings</source>
         <translation>Mängude seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="403"/>
+        <location filename="../themes/themestrings.h" line="420"/>
         <source>Configure playback of games</source>
         <translation>Mängude töö seadistamine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="404"/>
+        <location filename="../themes/themestrings.h" line="421"/>
         <source>Weather Settings</source>
         <translation>Ilma seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="405"/>
+        <location filename="../themes/themestrings.h" line="422"/>
         <source>Weather locale and sources</source>
         <translation>Ilma lokaat ja allikad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="406"/>
+        <location filename="../themes/themestrings.h" line="423"/>
         <source>News Settings</source>
         <translation>Uudiste seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="407"/>
+        <location filename="../themes/themestrings.h" line="424"/>
         <source>Choose which news sources interest you</source>
         <translation>Vali millised uudiste allikad Sind huvitavad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="408"/>
+        <location filename="../themes/themestrings.h" line="425"/>
         <source>Web Settings</source>
         <translation>Veebi seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="409"/>
+        <location filename="../themes/themestrings.h" line="426"/>
         <source>Manage web bookmarks</source>
         <translation>Halda veebi järjehooidjaid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="410"/>
+        <location filename="../themes/themestrings.h" line="427"/>
         <source>Recipe Settings</source>
         <translation>Retsepti seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="411"/>
         <source>Phone Settings</source>
-        <translation>Telefoni seaded</translation>
+        <translation type="obsolete">Telefoni seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="412"/>
         <source>Configure SIP-based VoIP phone</source>
-        <translation>Konfi SIP VoIP telefon</translation>
+        <translation type="obsolete">Konfi SIP VoIP telefon</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="413"/>
         <source>Movie Time Settings</source>
-        <translation>Filmi aja seaded</translation>
+        <translation type="obsolete">Filmi aja seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="414"/>
         <source>Select local movie theaters</source>
-        <translation>Vali lokaalsed kinod</translation>
+        <translation type="obsolete">Vali lokaalsed kinod</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="415"/>
         <source>Xbox Settings</source>
-        <translation>Xboxi seaded</translation>
+        <translation type="obsolete">Xboxi seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="416"/>
         <source>NetFlix Settings</source>
-        <translation>NetFlix seaded</translation>
+        <translation type="obsolete">NetFlix seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="417"/>
         <source>Choose the genres that interest you</source>
-        <translation>Vali Sulle huvi pakkuvad žanrid</translation>
+        <translation type="obsolete">Vali Sulle huvi pakkuvad žanrid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="418"/>
+        <location filename="../themes/themestrings.h" line="428"/>
         <source>Archive Files Settings</source>
         <translation>Arhiivifailide seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="419"/>
+        <location filename="../themes/themestrings.h" line="429"/>
         <source>Configure how to archive video to DVD</source>
         <translation>Seadista video DVD-la arhiveerimine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="420"/>
+        <location filename="../themes/themestrings.h" line="430"/>
         <source>ZoneMinder Settings</source>
         <translation>ZoneMinder-i seadistamine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="421"/>
+        <location filename="../themes/themestrings.h" line="431"/>
         <source>Set up surveillance software</source>
         <translation>Seadista valve tarkvara</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="280"/>
+        <location filename="../themes/themestrings.h" line="240"/>
         <source>Watch Recordings</source>
         <translation>Vaata salvestusi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="422"/>
+        <location filename="../themes/themestrings.h" line="432"/>
         <source>Play Recordings</source>
         <translation>Esita salvestusi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="362"/>
+        <location filename="../themes/themestrings.h" line="384"/>
         <source>Upcoming Recordings</source>
         <translation>Tulevased salvestused</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="423"/>
+        <location filename="../themes/themestrings.h" line="433"/>
         <source>See what will be recorded next</source>
         <translation>Vaata, mis järgmisena salvestatakse</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="335"/>
+        <location filename="../themes/themestrings.h" line="354"/>
         <source>Schedule Recordings</source>
-        <translation type="unfinished">Salvestamise planeerimine</translation>
+        <translation>Salvestamise planeerimine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="424"/>
+        <location filename="../themes/themestrings.h" line="434"/>
         <source>Pick shows to record</source>
         <translation>Vali salvestatavad saated</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="425"/>
+        <location filename="../themes/themestrings.h" line="435"/>
         <source>Recording Priorities</source>
         <translation>Salvestamise prioriteedid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="426"/>
+        <location filename="../themes/themestrings.h" line="436"/>
         <source>Prioritize some shows over others</source>
         <translation>Sea mõned saated olulisemaks</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="169"/>
+        <location filename="../themes/themestrings.h" line="181"/>
         <source>System Status</source>
         <translation>Süsteemi olek</translation>
     </message>
@@ -20153,256 +20352,306 @@ Vali praegune salvestus</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="12"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="13"/>
         <source>Go up a level</source>
         <translation>Tase üles</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="15"/>
+        <location filename="../themes/themestrings.h" line="16"/>
         <source>Please Wait...</source>
         <translation>Oota veidi...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="16"/>
+        <location filename="../themes/themestrings.h" line="17"/>
         <source>Twitter Timeline</source>
         <translation>Twitteri ajalugu</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="19"/>
+        <location filename="../themes/themestrings.h" line="20"/>
         <source>Edit Channels</source>
         <translation>Muuda kanaleid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="20"/>
+        <location filename="../themes/themestrings.h" line="21"/>
         <source>Modify, Add, and Delete television channels.</source>
         <translation>Muuda, lisa ja eemalda kanaleid.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="23"/>
+        <location filename="../themes/themestrings.h" line="24"/>
         <source>Delete Source</source>
         <translation>Kustuta allikas</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="25"/>
+        <location filename="../themes/themestrings.h" line="26"/>
         <source>Import Icons</source>
         <translation>Impordi logosid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="28"/>
+        <location filename="../themes/themestrings.h" line="29"/>
         <source>Edit On Screen Display</source>
         <translation>Muuda ekraaniteateid(OSD)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="29"/>
+        <location filename="../themes/themestrings.h" line="30"/>
         <source>Select the menu items you want to see by playback mode.</source>
         <translation>Vali menüüelemendid, mida soovid taasesitusel näha.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="30"/>
+        <location filename="../themes/themestrings.h" line="31"/>
         <source>OSD Context</source>
         <translation>OSD kontekst</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="31"/>
+        <location filename="../themes/themestrings.h" line="32"/>
         <source>OSD Menu Items</source>
         <translation>OSD menüü elemendid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="32"/>
+        <location filename="../themes/themestrings.h" line="33"/>
         <source>Edit Key Bindings</source>
         <translation>Muuda klahviseoseid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="33"/>
+        <location filename="../themes/themestrings.h" line="34"/>
         <source>Assign custom keys to MythTV shortcuts.</source>
         <translation>Lisa kohandatud klahve MythTV kiirkorraldustele.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="34"/>
+        <location filename="../themes/themestrings.h" line="36"/>
+        <source>Rated %1</source>
+        <translation>Hinnatud %1</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="37"/>
         <source>Select Archive Items</source>
         <translation>Vali arhiivielemente</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="35"/>
+        <location filename="../themes/themestrings.h" line="38"/>
         <source>Select the recordings and videos you wish to save.</source>
         <translation>Vali videod ja salvestused, mid soovid salvestada.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="36"/>
+        <location filename="../themes/themestrings.h" line="39"/>
         <source>No files are selected for archive</source>
         <translation>Arhiivi jaoks pole faile valitud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="37"/>
+        <location filename="../themes/themestrings.h" line="40"/>
         <source>Add Recording</source>
         <translation>Lisa salvestus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="38"/>
+        <location filename="../themes/themestrings.h" line="41"/>
         <source>Add Video</source>
         <translation>Lisa video</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="39"/>
+        <location filename="../themes/themestrings.h" line="42"/>
         <source>Previous</source>
         <translation>Eelmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="41"/>
+        <location filename="../themes/themestrings.h" line="44"/>
         <source>File Finder</source>
         <translation>Faili otsija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="42"/>
+        <location filename="../themes/themestrings.h" line="45"/>
         <source>Select the file you wish to use.</source>
         <translation>Vali fail, mida soovid kasutada.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="44"/>
+        <location filename="../themes/themestrings.h" line="47"/>
         <source>Select Associated Channel</source>
         <translation>Vali seostattud kanal</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="45"/>
+        <location filename="../themes/themestrings.h" line="48"/>
         <source>Archived Channel</source>
         <translation>Arhiveeritud kanal</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="46"/>
+        <location filename="../themes/themestrings.h" line="49"/>
         <source>Chan. ID:</source>
         <translation>Kanali ID:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="47"/>
+        <location filename="../themes/themestrings.h" line="50"/>
         <source>Chan. No:</source>
         <translation>Kanali Nr:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="49"/>
+        <location filename="../themes/themestrings.h" line="52"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="50"/>
+        <location filename="../themes/themestrings.h" line="53"/>
         <source>Local Channel</source>
         <translation>Lokaalne kanal</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="51"/>
+        <location filename="../themes/themestrings.h" line="54"/>
         <source>Search Channel</source>
         <translation>Otsi kanalit</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="52"/>
+        <location filename="../themes/themestrings.h" line="55"/>
         <source>Search Callsign</source>
         <translation>Otsi kutsungit</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="53"/>
+        <location filename="../themes/themestrings.h" line="56"/>
         <source>Search Name</source>
         <translation>Otsi nime</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="54"/>
+        <location filename="../themes/themestrings.h" line="57"/>
         <source>Prev</source>
         <translation>Eelmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="55"/>
+        <location filename="../themes/themestrings.h" line="58"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="56"/>
+        <location filename="../themes/themestrings.h" line="59"/>
+        <source>(%CHANNUM%) %TITLE%</source>
+        <translation>(%CHANNUM%) %TITLE%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="60"/>
+        <source>%STARTTIME%-%ENDTIME%, %RECSTARTDATE%</source>
+        <translation>%STARTTIME%-%ENDTIME%, %RECSTARTDATE%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="61"/>
+        <source>%DESCRIPTION% %VALUE%%UNITS%</source>
+        <translation>%DESCRIPTION% %VALUE%%UNITS%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="63"/>
+        <source>Edit the details about this channel.</source>
+        <translation>Muuda selle kanali andmeid.</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="64"/>
+        <source>Channel #:</source>
+        <translation>Kanali nr:</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="65"/>
+        <source>Chan Name:</source>
+        <translation>Kanali nimi:</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="66"/>
+        <source>XMLTV #:</source>
+        <translation>XMLTV NR:</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="68"/>
+        <source>Frame %1</source>
+        <translation>%1 kaader</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="69"/>
         <source>Recording...</source>
         <translation>Salvestan...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="57"/>
+        <location filename="../themes/themestrings.h" line="70"/>
         <source>Transcoding...</source>
         <translation>Transkodeerin...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="58"/>
+        <location filename="../themes/themestrings.h" line="71"/>
         <source>Original Airdate: %1</source>
         <translation>Esmane eetriaeg: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="59"/>
+        <location filename="../themes/themestrings.h" line="72"/>
         <source>Custom Export</source>
         <translation>Kohandatud otsing</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="60"/>
+        <location filename="../themes/themestrings.h" line="73"/>
         <source>Directory Format</source>
         <translation>Kausta formaat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="63"/>
+        <location filename="../themes/themestrings.h" line="76"/>
         <source>File Format</source>
         <translation>Faili formaat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="64"/>
+        <location filename="../themes/themestrings.h" line="77"/>
         <source>Export</source>
         <translation>Ekspordi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="65"/>
+        <location filename="../themes/themestrings.h" line="78"/>
         <source>Change Group View</source>
         <translation>Vaheta grupi vaadet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="66"/>
+        <location filename="../themes/themestrings.h" line="79"/>
         <source>Enable and disable the checkboxes below to filter the way recordings are displayed.</source>
         <translation>Luba või keela allolevaid valikuid salvestuste kuvamise muutmiseks.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="67"/>
+        <location filename="../themes/themestrings.h" line="80"/>
         <source>Show Program Titles</source>
         <translation>Näita saate pealkirju</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="68"/>
+        <location filename="../themes/themestrings.h" line="81"/>
         <source>Show Program Categories</source>
         <translation>Näita saadete kategooriaid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="72"/>
+        <location filename="../themes/themestrings.h" line="85"/>
         <source>Show Live TV</source>
         <translation>Näita otseTV-d</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="75"/>
+        <location filename="../themes/themestrings.h" line="88"/>
         <source>Change Group Password</source>
         <translation>Vaheta grupi parooli</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="76"/>
+        <location filename="../themes/themestrings.h" line="89"/>
         <source>Old:</source>
         <translation>Vana:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="77"/>
+        <location filename="../themes/themestrings.h" line="90"/>
         <source>New:</source>
         <translation>Uus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="78"/>
+        <location filename="../themes/themestrings.h" line="91"/>
         <source>Change Filter</source>
         <translation>Muud filtrit</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="79"/>
+        <location filename="../themes/themestrings.h" line="92"/>
         <source>Status Icon Help</source>
         <translation>Oleku ikoonide seletus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="80"/>
+        <location filename="../themes/themestrings.h" line="93"/>
         <source>These icons represent information about your recordings.</source>
         <translation>Need ikoonid näitavad infot salvestuste kohta.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="82"/>
+        <location filename="../themes/themestrings.h" line="95"/>
         <source>Using the text areas below, you can change the recording title, subtitle, and description.
 
 Once you have completed your modifications, click the &quot;OK&quot; button.</source>
@@ -20411,69 +20660,68 @@ Once you have completed your modifications, click the &quot;OK&quot; button.</so
 Kui oled lõpetanud vajuta &quot;OK&quot; nuppu</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="86"/>
+        <location filename="../themes/themestrings.h" line="99"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</source>
         <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="87"/>
+        <location filename="../themes/themestrings.h" line="100"/>
         <source>Manually Schedule A Recording</source>
         <translation>Kohandatud salvestuse planeerimine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="88"/>
+        <location filename="../themes/themestrings.h" line="101"/>
         <source>To manually schedule a recording, enter a title (optional).  Then set the channel, date, start time, and duration of your recording.  Note that this recording will not have any listings data or other information provided by an EPG.</source>
         <translation>Salvestamiseks sisesta pealkiri(pole vajalik). Siis vali salvestuse kanal,kuupäev, algusaeg, kestvus. Pane tähele, et salvestusele ei lisata mingit infot saatekavast.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="90"/>
+        <location filename="../themes/themestrings.h" line="103"/>
         <source>Date:</source>
         <translation>Kuupäev:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="91"/>
+        <location filename="../themes/themestrings.h" line="104"/>
         <source>Hour:</source>
         <translation>Tund:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="92"/>
+        <location filename="../themes/themestrings.h" line="105"/>
         <source>Minute:</source>
         <translation>Minut:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="94"/>
+        <location filename="../themes/themestrings.h" line="107"/>
         <source>No Recordings Scheduled...</source>
         <translation>Salvestusi pole planeeritud...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="95"/>
+        <location filename="../themes/themestrings.h" line="108"/>
         <source>Filter: %1</source>
         <translation>Filter: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="97"/>
+        <location filename="../themes/themestrings.h" line="110"/>
         <source>To give greater or lesser priority to a channel in your lineup, select it from the list.  To increase the channel&apos;s priority, press the right arrow.  To decrease its priority, press the left arrow.</source>
         <translation>Vali loendist kanal prioriteedi muutmiseks. Prioriteedi suurendamisek vajuta paremale noolt ja langetamiseks vasakule.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="98"/>
+        <location filename="../themes/themestrings.h" line="111"/>
         <source>Program Title</source>
         <translation>Saate pealkiri</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="99"/>
+        <location filename="../themes/themestrings.h" line="112"/>
         <source>Program/Final Priority</source>
         <translation>Saate/lõplik prioriteet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="101"/>
         <source>Sort By:
 (1) Title (2) Priority (4) Type</source>
-        <translation>Sordi:
+        <translation type="obsolete">Sordi:
 (1) Pealkiri (2) Prioriteet (4) Tüüp</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="105"/>
+        <location filename="../themes/themestrings.h" line="117"/>
         <source>To create a custom priority rule, enter a name and priority adjustment.  You can them select from existing priority templates or create one of your own using SQL syntax in the &quot;Clause SQL&quot; edit box.
 
 Once you have completed your rule, can can Test, Delete, or Install it right away.</source>
@@ -20482,32 +20730,32 @@ Once you have completed your rule, can can Test, Delete, or Install it right awa
 Kui reegel on loodud saad seda kohe testida, kustutada või paigaldada.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="106"/>
+        <location filename="../themes/themestrings.h" line="118"/>
         <source>Existing:</source>
         <translation>Olemasolev:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="108"/>
+        <location filename="../themes/themestrings.h" line="120"/>
         <source>Clause:</source>
         <translation>Klausel:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="109"/>
+        <location filename="../themes/themestrings.h" line="121"/>
         <source>Clause SQL:</source>
         <translation>SQL klausel:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="110"/>
+        <location filename="../themes/themestrings.h" line="122"/>
         <source>Click to add clause...</source>
         <translation>Klõpsa klausli lisamiseks...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="116"/>
+        <location filename="../themes/themestrings.h" line="128"/>
         <source>Edit Power Search</source>
         <translation>Muuda võimsat otsingut</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="117"/>
+        <location filename="../themes/themestrings.h" line="129"/>
         <source>You can specify basic criteria to create powerful search and record rules.  Below, you may enter title, subtitle, and description phrases (all optional), as well as category, genre, and channel values to refine a complex search for programs.
 
 When you have completed your configuration, press &quot;OK&quot; to search.</source>
@@ -20516,27 +20764,27 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
 Kui oled seadistamise lõpetanud vajuta otsimiseks &quot;OK&quot;.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="121"/>
+        <location filename="../themes/themestrings.h" line="133"/>
         <source>Below you will find the program details of the selected item.  There are two available screens.  You can toggle between them by pressing INFO.</source>
         <translation>Allpool näed valitud saate üksikasju. Valida on kaks vaadet. vajutades &quot;INFO&quot; nuppu saad nende vahel valida.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="122"/>
+        <location filename="../themes/themestrings.h" line="134"/>
         <source>First Letter:</source>
         <translation>Esimen täht:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="127"/>
+        <location filename="../themes/themestrings.h" line="139"/>
         <source>Preview Schedule</source>
         <translation>Planeeringu eelvaade</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="128"/>
+        <location filename="../themes/themestrings.h" line="140"/>
         <source>Select the options for this recording.</source>
         <translation>Selle salvestuse valikud.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="129"/>
+        <location filename="../themes/themestrings.h" line="141"/>
         <source>-%n</source>
         <translation>
             <numerusform>-%n</numerusform>
@@ -20544,12 +20792,12 @@ Kui oled seadistamise lõpetanud vajuta otsimiseks &quot;OK&quot;.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="130"/>
+        <location filename="../themes/themestrings.h" line="142"/>
         <source>Normal</source>
         <translation>Normaalne</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="131"/>
+        <location filename="../themes/themestrings.h" line="143"/>
         <source>+%n</source>
         <translation>
             <numerusform>+%n</numerusform>
@@ -20557,17 +20805,17 @@ Kui oled seadistamise lõpetanud vajuta otsimiseks &quot;OK&quot;.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="132"/>
+        <location filename="../themes/themestrings.h" line="144"/>
         <source>Input:</source>
         <translation>Sisend:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="133"/>
+        <location filename="../themes/themestrings.h" line="145"/>
         <source>Start Offset:</source>
         <translation>Algusaja nihe:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="134"/>
+        <location filename="../themes/themestrings.h" line="146"/>
         <source>%n minute(s) late</source>
         <translation>
             <numerusform>%n minut(it) hiljem</numerusform>
@@ -20575,12 +20823,12 @@ Kui oled seadistamise lõpetanud vajuta otsimiseks &quot;OK&quot;.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="135"/>
+        <location filename="../themes/themestrings.h" line="147"/>
         <source>Start on time</source>
         <translation>Alusta õigeaegselt</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="136"/>
+        <location filename="../themes/themestrings.h" line="148"/>
         <source>%n minute(s) early</source>
         <translation>
             <numerusform>%n minut(it) varem</numerusform>
@@ -20588,107 +20836,107 @@ Kui oled seadistamise lõpetanud vajuta otsimiseks &quot;OK&quot;.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="137"/>
+        <location filename="../themes/themestrings.h" line="149"/>
         <source>End Offset:</source>
         <translation>Lõpetamise viide:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="138"/>
+        <location filename="../themes/themestrings.h" line="150"/>
         <source>End on time</source>
         <translation>Lõpeta õigeaegselt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="139"/>
+        <location filename="../themes/themestrings.h" line="151"/>
         <source>Dup Method:</source>
         <translation>Dup otsing:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="140"/>
+        <location filename="../themes/themestrings.h" line="152"/>
         <source>Dup Scope:</source>
         <translation>Duplikaadi ulatus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="141"/>
+        <location filename="../themes/themestrings.h" line="153"/>
         <source>Recording Rule is Active</source>
         <translation>Salvestusreegel on aktiivne</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="142"/>
+        <location filename="../themes/themestrings.h" line="154"/>
         <source>Select how the recording file should be treated.</source>
         <translation>Vali kuidas salvestusfaili töödeldakse.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="143"/>
+        <location filename="../themes/themestrings.h" line="155"/>
         <source>Rec. Profile:</source>
         <translation>Salv. profiil:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="144"/>
+        <location filename="../themes/themestrings.h" line="156"/>
         <source>Rec. Group:</source>
         <translation>Salv. grupp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="145"/>
+        <location filename="../themes/themestrings.h" line="157"/>
         <source>Strg. Group:</source>
         <translation>Säil. grupp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="146"/>
+        <location filename="../themes/themestrings.h" line="158"/>
         <source>Play Group:</source>
         <translation>Esit. grupp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="147"/>
+        <location filename="../themes/themestrings.h" line="159"/>
         <source>Max to Keep:</source>
         <translation>Maks. säilitada:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="148"/>
+        <location filename="../themes/themestrings.h" line="160"/>
         <source>Max Newest:</source>
         <translation>Maks. uuemaid:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="149"/>
+        <location filename="../themes/themestrings.h" line="161"/>
         <source>Allow Recordings to Auto-Expire</source>
         <translation>Luba salvestustel automaatselt aeguda</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="150"/>
+        <location filename="../themes/themestrings.h" line="162"/>
         <source>Post Processing Options</source>
         <translation>Järeltöötluse valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="151"/>
+        <location filename="../themes/themestrings.h" line="163"/>
         <source>Select any jobs you want run on the recording.</source>
         <translation>Vali salvestisega tehtavad tegevused.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="152"/>
+        <location filename="../themes/themestrings.h" line="164"/>
         <source>Automatically Commercial Flag Recordings</source>
         <translation>Märgi reklaamid automaatselt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="153"/>
+        <location filename="../themes/themestrings.h" line="165"/>
         <source>Automatically Transcode Recordings</source>
         <translation>Transkodeeri salvestis automaatselt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="155"/>
+        <location filename="../themes/themestrings.h" line="167"/>
         <source>Run User Job #2</source>
         <translation>Käivita kasutaja tegevus #2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="158"/>
+        <location filename="../themes/themestrings.h" line="170"/>
         <source>Last Recorded/Priority</source>
         <translation>Viimati salvestatud/prioriteet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="162"/>
+        <location filename="../themes/themestrings.h" line="174"/>
         <source>Create a Custom Recording Rule</source>
         <translation>Loo kohandatud salvestus reegel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="163"/>
+        <location filename="../themes/themestrings.h" line="175"/>
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information.
 
 Finally, you can test, immediately activate, store, or cancel your rule.</source>
@@ -20697,189 +20945,278 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
 Lõpetuseks saad reeglit testida, aktiveerida, salvestada, või tühistada.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="164"/>
+        <location filename="../themes/themestrings.h" line="176"/>
         <source>Rule Type:</source>
         <translation>Reegli tüüp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="165"/>
+        <location filename="../themes/themestrings.h" line="177"/>
         <source>Rule SQL:</source>
         <translation>Reegli SQL:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="166"/>
+        <location filename="../themes/themestrings.h" line="178"/>
         <source>Tables:</source>
         <translation>Tabelid:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="168"/>
+        <location filename="../themes/themestrings.h" line="180"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded...</source>
         <translation>Sa ei ole ühtegi saadet salvestamiseks planeerinud...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="170"/>
+        <location filename="../themes/themestrings.h" line="182"/>
         <source>Learn what your system is up to.</source>
         <translation>Uuri mida su süsteem suudab.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="171"/>
+        <location filename="../themes/themestrings.h" line="183"/>
         <source>Arclight is a sleek theme meant for widescreen HD screens.  It is high contrast and uses shapes and attractive layout to convey information simply, consistently, and attractively.</source>
         <translation>Arclight teema on mõeldud laiekraan HD ekraanile. Teema on kontrastne, üritab effektselt, lihtsalt ja atraktiivselt vajalikku infot esile tuua.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="172"/>
+        <location filename="../themes/themestrings.h" line="184"/>
         <source>Type your tweet below.  Select &quot;Send&quot; to submit it.</source>
         <translation>Sisesta alla oma säutsatus. Saatmiseks vali &quot;saada&quot;.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="173"/>
+        <location filename="../themes/themestrings.h" line="185"/>
         <source>Send</source>
         <translation>Saada</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="174"/>
+        <location filename="../themes/themestrings.h" line="186"/>
         <source>Enter Your Twitter Login Details</source>
         <translation>Sisesta twitteri sisse logimis andmed</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="175"/>
+        <location filename="../themes/themestrings.h" line="187"/>
         <source>Login:</source>
         <translation>Kasutaja:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="176"/>
+        <location filename="../themes/themestrings.h" line="188"/>
         <source>Password:</source>
         <translation>Parool:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="177"/>
+        <location filename="../themes/themestrings.h" line="189"/>
         <source>Send a Tweet</source>
         <translation>Saada säutsatus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="179"/>
+        <location filename="../themes/themestrings.h" line="191"/>
         <source>MythTV is idle and will shut down shortly.</source>
         <translation>MythTV on jõude ja lülitub varsti välja.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="180"/>
+        <location filename="../themes/themestrings.h" line="192"/>
         <source>Current Recording(s):</source>
         <translation>Hetke salvestus(ed):</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="182"/>
+        <location filename="../themes/themestrings.h" line="193"/>
+        <source>Retrieving Recording Status...</source>
+        <translation>Salvestuste olekuinfo hankimine ...</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="194"/>
         <source>Next Scheduled Recording(s):</source>
         <translation>Järgmised planeeritud salvestus(ed):</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="188"/>
+        <location filename="../themes/themestrings.h" line="195"/>
+        <source>Retrieving Scheduled Recordings...</source>
+        <translation>Uurin planeeritud salvestisi...</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="202"/>
+        <source>Up</source>
+        <translation>Üles</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="203"/>
+        <source>Please wait...</source>
+        <translation>Oota veidi...</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="204"/>
+        <source>Icon Downloader</source>
+        <translation>Logode hankija</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="209"/>
+        <source>State</source>
+        <translation>Olek</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="210"/>
+        <source>[x]</source>
+        <translation>[x]</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="211"/>
+        <source>Menu Item</source>
+        <translation>Menüükirje</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="223"/>
+        <source>Program Search</source>
+        <translation>Saate otsing</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="225"/>
+        <source>Optical</source>
+        <translation>Optiline</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="227"/>
+        <source>Info Center</source>
+        <translation>Infokeskus</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="228"/>
+        <source>Rating:</source>
+        <translation>Hinnang:</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="229"/>
+        <source>Running Time:</source>
+        <translation>Töötamise aeg:</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="230"/>
+        <source>Show Times:</source>
+        <translation>Näidatud kordi::</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="259"/>
+        <source>Channel Priorities</source>
+        <translation>Kanali eelistused</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="267"/>
+        <source>Hello</source>
+        <translation>Hallo</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="278"/>
+        <source>Program List</source>
+        <translation>Saatekava</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="303"/>
+        <source>My first attempt at a theme, aimed at creating a theme suitable for children.</source>
+        <translation>Minu esimene teemakatsetus tingituna vajadusest lastepärase teema järgi.</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="304"/>
         <source>Filename</source>
         <translation>Faili nimi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="189"/>
+        <location filename="../themes/themestrings.h" line="305"/>
         <source>Select an Icon</source>
         <translation>Vali logo</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="190"/>
+        <location filename="../themes/themestrings.h" line="306"/>
         <source>Icon Download Status...</source>
         <translation>Logo alla laadimis olek...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="198"/>
+        <location filename="../themes/themestrings.h" line="308"/>
         <source>%|&quot;SUBTITLE|&quot;%</source>
-        <translation>%|&quot;ALAPEALKIRI|&quot;%</translation>
+        <translation>%|&quot;SUBTITLE|&quot;%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="199"/>
+        <location filename="../themes/themestrings.h" line="309"/>
         <source>No Recordings Present...</source>
         <translation>Salvestusi pole saadaval...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="206"/>
+        <location filename="../themes/themestrings.h" line="311"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
         <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="213"/>
+        <location filename="../themes/themestrings.h" line="313"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
         <translation>Salvestamiseks pole ühtegi saadet planeeritud
 Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate otsija&apos;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="224"/>
+        <location filename="../themes/themestrings.h" line="314"/>
         <source>Search Term</source>
         <translation>Otsitav</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="226"/>
+        <location filename="../themes/themestrings.h" line="315"/>
         <source>Edit</source>
         <translation>Muuda</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="232"/>
+        <location filename="../themes/themestrings.h" line="317"/>
         <source>Show Name:</source>
         <translation>Näita nime:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="233"/>
+        <location filename="../themes/themestrings.h" line="318"/>
         <source>Air Date:</source>
         <translation>Eetriaeg:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="247"/>
+        <location filename="../themes/themestrings.h" line="320"/>
         <source>Dupe Method:</source>
         <translation>Duplikaadi otsing:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="248"/>
+        <location filename="../themes/themestrings.h" line="321"/>
         <source>Dupe Scope:</source>
         <translation>Duplikaadi ulatus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="251"/>
+        <location filename="../themes/themestrings.h" line="322"/>
         <source>Rec Profile:</source>
         <translation>Salvestus profiil:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="252"/>
+        <location filename="../themes/themestrings.h" line="323"/>
         <source>Rec Group:</source>
         <translation>Salvestus grupp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="253"/>
+        <location filename="../themes/themestrings.h" line="324"/>
         <source># to Keep:</source>
-        <translation># jätta alles:</translation>
+        <translation>Mitu säilitada:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="256"/>
+        <location filename="../themes/themestrings.h" line="325"/>
         <source>Limit Handling:</source>
         <translation>Piirangud:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="259"/>
+        <location filename="../themes/themestrings.h" line="326"/>
         <source>Graphite is a theme emphasizing MythUI interface improvements such as alpha, animation, unique layouts, and user-supplied backdrop content.  It is extremely memory-hungry.</source>
         <translation>Graphite teema rõhub MythTV interfeisi uuendustele nagu animatsioonid eriline välimus, kasutaja lisatud sisu. Teema võtab palju mäluressurssi.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="268"/>
         <source>A basic blue theme.</source>
-        <translation>Sinine põhiteema.</translation>
+        <translation type="obsolete">Sinine põhiteema.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="273"/>
+        <location filename="../themes/themestrings.h" line="231"/>
         <source>title goes here</source>
         <translation>Pealkiri läheb siia</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="274"/>
+        <location filename="../themes/themestrings.h" line="232"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
         <translation>sep 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="275"/>
+        <location filename="../themes/themestrings.h" line="233"/>
         <source>description goes here.</source>
         <translation>kirjeldus läheb siia.</translation>
     </message>
@@ -20896,27 +21233,27 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation type="obsolete">0 mb</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="279"/>
+        <location filename="../themes/themestrings.h" line="237"/>
         <source>File Finder To Import</source>
         <translation>Imporditava faili otsija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="282"/>
+        <location filename="../themes/themestrings.h" line="329"/>
         <source>No Recordings available, or screen loading...</source>
         <translation>Salvestusi pole või kuva laadimine...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="305"/>
+        <location filename="../themes/themestrings.h" line="341"/>
         <source>Schedule Options Editor</source>
         <translation>Planeerimise valikute muutja</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="306"/>
+        <location filename="../themes/themestrings.h" line="342"/>
         <source>Storage Options Editor</source>
         <translation>Säilitamise valikute muutja</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="308"/>
+        <location filename="../themes/themestrings.h" line="343"/>
         <source>Post Processing Editor</source>
         <translation>Järeltöötluse muutja</translation>
     </message>
@@ -20925,622 +21262,612 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation type="obsolete">Mythbuntu põhineb ProjectGrayhem-il, tume, särav teema, mis on inspireeritud XBMC ProjectMayhem teemast</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="315"/>
+        <location filename="../themes/themestrings.h" line="370"/>
         <source>%SUBTITLE|&quot;|&quot; %%DESCRIPTION%</source>
         <translation>%SUBTITLE|&quot;|&quot; %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="316"/>
+        <location filename="../themes/themestrings.h" line="371"/>
         <source>(%STARTTIME% - %ENDTIME%)  %LENMINS%</source>
         <translation>(%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="317"/>
+        <location filename="../themes/themestrings.h" line="372"/>
         <source>%CHANNUM%</source>
         <translation>%CHANNUM%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="318"/>
+        <location filename="../themes/themestrings.h" line="373"/>
         <source>%CALLSIGN%</source>
         <translation>%CALLSIGN%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="319"/>
         <source>A glossy black look to go with the ProjectGrayhem UI theme.</source>
-        <translation>Läikiv välimus ProjectGrayhem UI teema.</translation>
+        <translation type="obsolete">Läikiv välimus ProjectGrayhem UI teema.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="320"/>
         <source>(%STARTDATE%)  %LENMINS%</source>
-        <translation>(%STARTDATE%)  %LENMINS%</translation>
+        <translation type="obsolete">(%STARTDATE%)  %LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="321"/>
         <source>A graded blue theme with orange text.</source>
-        <translation>Tasandatud sinine teema oranži tekstiga.</translation>
+        <translation type="obsolete">Tasandatud sinine teema oranži tekstiga.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="322"/>
         <source>%LONGREPEAT%%STARS%%DESCRIPTION%</source>
-        <translation>%LONGREPEAT%%STARS%%DESCRIPTION%</translation>
+        <translation type="obsolete">%LONGREPEAT%%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="323"/>
         <source>%STARTTIME%-%ENDTIME% (%LENMINS%)</source>
-        <translation>%STARTTIME%-%ENDTIME% (%LENMINS%)</translation>
+        <translation type="obsolete">%STARTTIME%-%ENDTIME% (%LENMINS%)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="324"/>
         <source>Browsing</source>
-        <translation>Sirvimine</translation>
+        <translation type="obsolete">Sirvimine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="325"/>
         <source>Transparent blue.</source>
-        <translation>Läbipaistev sinine.</translation>
+        <translation type="obsolete">Läbipaistev sinine.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="326"/>
         <source>A two tone blue theme matching the blootube family of UI themes.</source>
-        <translation>Kahetooniline sinine teema, mis sobib blootube perekonna UI teemadega.</translation>
+        <translation type="obsolete">Kahetooniline sinine teema, mis sobib blootube perekonna UI teemadega.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="327"/>
         <source>%TITLE% (%STARTTIME% %LENMINS%)</source>
-        <translation>%TITLE% (%STARTTIME% %LENMINS%)</translation>
+        <translation type="obsolete">%TITLE% (%STARTTIME% %LENMINS%)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="328"/>
         <source>Red and blue.</source>
-        <translation>Punane ja sinine.</translation>
+        <translation type="obsolete">Punane ja sinine.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="329"/>
+        <location filename="../themes/themestrings.h" line="349"/>
         <source>Key Configuration</source>
         <translation>Võtme seadistus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="331"/>
+        <location filename="../themes/themestrings.h" line="350"/>
         <source>Utilities</source>
         <translation>Tööriistad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="333"/>
+        <location filename="../themes/themestrings.h" line="352"/>
         <source>Information</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="334"/>
+        <location filename="../themes/themestrings.h" line="353"/>
         <source>Optical Media</source>
         <translation>Optiline meedia</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="338"/>
+        <location filename="../themes/themestrings.h" line="355"/>
         <source>Photographs</source>
         <translation>Pildid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="340"/>
+        <location filename="../themes/themestrings.h" line="356"/>
         <source>Media Setup</source>
         <translation>Meedia seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="341"/>
+        <location filename="../themes/themestrings.h" line="357"/>
         <source>Info Setup</source>
         <translation>Infi seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="342"/>
+        <location filename="../themes/themestrings.h" line="358"/>
         <source>TV Setup</source>
         <translation>TV seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="343"/>
+        <location filename="../themes/themestrings.h" line="359"/>
         <source>DVD</source>
         <translation>DVD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="344"/>
+        <location filename="../themes/themestrings.h" line="360"/>
         <source>Music Setup</source>
         <translation>Muusika seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="345"/>
+        <location filename="../themes/themestrings.h" line="361"/>
         <source>Video Setup</source>
         <translation>Video seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="346"/>
+        <location filename="../themes/themestrings.h" line="362"/>
         <source>Game Setup</source>
         <translation>Mängude seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="348"/>
+        <location filename="../themes/themestrings.h" line="364"/>
         <source>Archive</source>
         <translation>Arhiiv</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="351"/>
+        <location filename="../themes/themestrings.h" line="367"/>
         <source>NetFlix Browser</source>
         <translation>NetFlix sirvija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="352"/>
+        <location filename="../themes/themestrings.h" line="368"/>
         <source>NetFlix Queue</source>
         <translation>NetFlix päring</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="353"/>
+        <location filename="../themes/themestrings.h" line="369"/>
         <source>MythFlix Configuration</source>
         <translation>MythFlix seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="354"/>
+        <location filename="../themes/themestrings.h" line="67"/>
         <source>Probe</source>
         <translation>Uuri</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="355"/>
+        <location filename="../themes/themestrings.h" line="249"/>
         <source>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</source>
         <translation>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="356"/>
+        <location filename="../themes/themestrings.h" line="378"/>
         <source>No recordings exist</source>
         <translation>Salvestused puuduvad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="358"/>
+        <location filename="../themes/themestrings.h" line="381"/>
         <source>New Password</source>
         <translation>Uus parool</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="361"/>
+        <location filename="../themes/themestrings.h" line="383"/>
         <source>Manual Recording</source>
         <translation>Kohandatud salvestamine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="363"/>
+        <location filename="../themes/themestrings.h" line="385"/>
         <source>%YEARSTARS| %%DESCRIPTION%%| LONGREPEAT%</source>
         <translation>%YEARSTARS| %%DESCRIPTION%%| LONGREPEAT%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="365"/>
+        <location filename="../themes/themestrings.h" line="386"/>
         <source>Programme Finder</source>
         <translation>Saate otsija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="366"/>
+        <location filename="../themes/themestrings.h" line="387"/>
         <source>Programme Guide</source>
         <translation>Saatekava</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="368"/>
+        <location filename="../themes/themestrings.h" line="389"/>
         <source>(1) Time (2) Title</source>
         <translation>(1) Aeg (2) Pealkiri</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="369"/>
+        <location filename="../themes/themestrings.h" line="390"/>
         <source>No programs matched this search.</source>
         <translation>Otsingule vastavat saadet ei leitud.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="370"/>
+        <location filename="../themes/themestrings.h" line="391"/>
         <source>A brushed metal and glass effect theme with a choice of colour schemes.</source>
         <translation>Värvivaliku võimalusega metalli ja klaasi effektidega teema.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="371"/>
+        <location filename="../themes/themestrings.h" line="392"/>
         <source>Start Frontend</source>
         <translation>Käivita kasutajaliides</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="378"/>
+        <location filename="../themes/themestrings.h" line="399"/>
         <source>7. System Events</source>
         <translation>7. Süsteemi teated</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="384"/>
         <source>%SUBTITLE|&quot;|&quot; %%ORIGINALAIRDATE|(|) %%YEARSTARS|| %%DESCRIPTION%</source>
-        <translation>%SUBTITLE|&quot;|&quot; %%ORIGINALAIRDATE|(|) %%YEARSTARS|| %%DESCRIPTION%</translation>
+        <translation type="obsolete">%SUBTITLE|&quot;|&quot; %%ORIGINALAIRDATE|(|) %%YEARSTARS|| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="385"/>
         <source>%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%</source>
-        <translation>%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
+        <translation type="obsolete">%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="386"/>
         <source>The BlackCurves theme was influenced by both the blootube and gray osd themes.</source>
-        <translation>BlackCurves teema on mõjutatud nii blootube kui ka gray osd teemadest.</translation>
+        <translation type="obsolete">BlackCurves teema on mõjutatud nii blootube kui ka gray osd teemadest.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="427"/>
+        <location filename="../themes/themestrings.h" line="437"/>
         <source>What your system is doing right now</source>
         <translation>Millega süsteem hetkel tegeleb</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="428"/>
+        <location filename="../themes/themestrings.h" line="438"/>
         <source>Utilities / Setup</source>
         <translation>Tööriistad/Seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="429"/>
+        <location filename="../themes/themestrings.h" line="439"/>
         <source>Settings for TV, Images, Music, Video, Weather, etc.</source>
         <translation>TV, piltide, muusika, video, ilma jne. seaded.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="430"/>
+        <location filename="../themes/themestrings.h" line="440"/>
         <source>Set Recording Priorities</source>
         <translation>Seadista salvestuse prioriteete</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="431"/>
+        <location filename="../themes/themestrings.h" line="441"/>
         <source>Settings to prioritize some shows over others</source>
         <translation>Sea mõned saated olulisemaks</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="432"/>
+        <location filename="../themes/themestrings.h" line="442"/>
         <source>Set Channel Recording Priorities</source>
         <translation>Kanalite salvestusprioriteedid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="433"/>
+        <location filename="../themes/themestrings.h" line="443"/>
         <source>Settings to prioritize some channels over others</source>
         <translation>Sea mõned kanalid olulisemaks</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="434"/>
+        <location filename="../themes/themestrings.h" line="444"/>
         <source>Custom Priority</source>
         <translation>Kohandatud prioriteet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="435"/>
+        <location filename="../themes/themestrings.h" line="445"/>
         <source>Most used DVR options are found on the main menu. Plugin options are in the utilities menu.</source>
         <translation>Enamik DVR valikuid on põhimenüüs. Pluginate valikud on tööriistade menüüs.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="436"/>
+        <location filename="../themes/themestrings.h" line="446"/>
         <source>New Titles</source>
         <translation>Uued pealkirjad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="437"/>
+        <location filename="../themes/themestrings.h" line="447"/>
         <source>Pick a program to record for a list of new titles</source>
         <translation>Vali salvestatav saade uute pealkirjade loendist</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="438"/>
+        <location filename="../themes/themestrings.h" line="448"/>
         <source>Movies</source>
         <translation>Filmid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="439"/>
+        <location filename="../themes/themestrings.h" line="449"/>
         <source>Pick a movie to record</source>
         <translation>Vali salvestatav film</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="440"/>
+        <location filename="../themes/themestrings.h" line="450"/>
         <source>Categories</source>
         <translation>KategooriadKategooriad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="441"/>
+        <location filename="../themes/themestrings.h" line="451"/>
         <source>Pick a program based on category</source>
         <translation>Vali saade vastavalt kategooriale</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="442"/>
+        <location filename="../themes/themestrings.h" line="452"/>
         <source>Channels</source>
         <translation>Kanalid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="443"/>
+        <location filename="../themes/themestrings.h" line="453"/>
         <source>Pick a program on a given channel</source>
         <translation>Vali saade mõnelt kanalilt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="444"/>
+        <location filename="../themes/themestrings.h" line="454"/>
         <source>Time</source>
         <translation>Aeg</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="445"/>
+        <location filename="../themes/themestrings.h" line="455"/>
         <source>Pick a program based on time</source>
         <translation>Vali saade aja järgi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="446"/>
+        <location filename="../themes/themestrings.h" line="248"/>
         <source>Program Guide</source>
         <translation>Kava</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="447"/>
+        <location filename="../themes/themestrings.h" line="456"/>
         <source>Choose programs from a grid-style list</source>
         <translation>Vali saatekavast</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="448"/>
+        <location filename="../themes/themestrings.h" line="279"/>
         <source>Program Finder</source>
         <translation>Saate otsija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="449"/>
+        <location filename="../themes/themestrings.h" line="457"/>
         <source>Choose programs from an alphabetical index</source>
         <translation>Vali saade tähestikulisest loendist</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="349"/>
+        <location filename="../themes/themestrings.h" line="365"/>
         <source>Search Words</source>
         <translation>Otsi sõnu</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="450"/>
+        <location filename="../themes/themestrings.h" line="458"/>
         <source>Find programs matching search words</source>
         <translation>Otsi saade vastavalt otsingusõnadele</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="350"/>
+        <location filename="../themes/themestrings.h" line="366"/>
         <source>Search Lists</source>
         <translation>Otsingu loend</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="451"/>
+        <location filename="../themes/themestrings.h" line="327"/>
+        <source>Theater name</source>
+        <translation>Teatri nimi</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="459"/>
         <source>Pick a program to record from a set of lists</source>
         <translation>Vali saate loendist</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="452"/>
+        <location filename="../themes/themestrings.h" line="460"/>
         <source>Custom Record</source>
         <translation>Kohandatud salvestus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="453"/>
+        <location filename="../themes/themestrings.h" line="461"/>
         <source>Advanced program finder</source>
         <translation>Laiendatud saate otsija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="454"/>
+        <location filename="../themes/themestrings.h" line="462"/>
         <source>Manual Schedule</source>
         <translation>Kohandatud planeering</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="455"/>
+        <location filename="../themes/themestrings.h" line="463"/>
         <source>VCR-like recording scheduler</source>
         <translation>Videomaki sarnane salvestuse planeerija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="456"/>
+        <location filename="../themes/themestrings.h" line="464"/>
         <source>Titles</source>
         <translation>Pealkirjad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="457"/>
+        <location filename="../themes/themestrings.h" line="465"/>
         <source>Find a program based on title</source>
         <translation>Vali saade pealkirja järgi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="458"/>
+        <location filename="../themes/themestrings.h" line="466"/>
         <source>Keywords</source>
         <translation>Märksõnad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="459"/>
+        <location filename="../themes/themestrings.h" line="467"/>
         <source>Find a program matching a keyword</source>
         <translation>Otsi saade vastavalt märksõnadele</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="460"/>
+        <location filename="../themes/themestrings.h" line="468"/>
         <source>People</source>
         <translation>Inimesed</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="461"/>
+        <location filename="../themes/themestrings.h" line="469"/>
         <source>Find a program including a given person</source>
         <translation>Vali saade inimeste järgi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="462"/>
+        <location filename="../themes/themestrings.h" line="470"/>
         <source>Advanced</source>
         <translation>Laiendatud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="463"/>
+        <location filename="../themes/themestrings.h" line="471"/>
         <source>Combine more than one word search</source>
         <translation>Kombineeri rohkem kui ühe sõna otsing</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="464"/>
+        <location filename="../themes/themestrings.h" line="472"/>
         <source>Stored Searches</source>
         <translation>Salvestatud otsingud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="465"/>
+        <location filename="../themes/themestrings.h" line="473"/>
         <source>Results of searches you have saved</source>
         <translation>Otsingud mis on salvestatud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="466"/>
+        <location filename="../themes/themestrings.h" line="474"/>
         <source>TV navigation and recording preferences</source>
         <translation>TV salvestuse ja navigeerimise seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="467"/>
+        <location filename="../themes/themestrings.h" line="475"/>
         <source>Guide appearance and behavior</source>
         <translation>Kava välimus ja käitumine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="468"/>
+        <location filename="../themes/themestrings.h" line="476"/>
         <source>Playback</source>
         <translation>Taasesitus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="469"/>
+        <location filename="../themes/themestrings.h" line="477"/>
         <source>Settings for viewing and playing TV</source>
         <translation>TV vaate ja taasesituse seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="470"/>
+        <location filename="../themes/themestrings.h" line="478"/>
         <source>Playback OSD</source>
         <translation>Taasesitus OSD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="471"/>
+        <location filename="../themes/themestrings.h" line="479"/>
         <source>Theme and settings for OSD</source>
         <translation>OSD teemad ja seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="194"/>
+        <location filename="../themes/themestrings.h" line="208"/>
         <source>OSD Menu Editor</source>
         <translation>OSD menüü muutmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="472"/>
+        <location filename="../themes/themestrings.h" line="480"/>
         <source>Playback Groups</source>
         <translation>Esitusgrupid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="473"/>
+        <location filename="../themes/themestrings.h" line="481"/>
         <source>Adjust settings for different playback styles</source>
         <translation>Seadista erinevaid taasesitus stiile</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="474"/>
+        <location filename="../themes/themestrings.h" line="482"/>
         <source>Channel Groups</source>
         <translation>Kanaligrupid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="475"/>
+        <location filename="../themes/themestrings.h" line="483"/>
         <source>Recording Profiles</source>
         <translation>Salvestusprofiilid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="476"/>
+        <location filename="../themes/themestrings.h" line="484"/>
         <source>Global recording priority and scheduling</source>
         <translation>Üldised salvestus prioriteedid ja planeerimine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="477"/>
+        <location filename="../themes/themestrings.h" line="485"/>
         <source>Watch TV</source>
         <translation>Vaata TV-d</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="478"/>
+        <location filename="../themes/themestrings.h" line="486"/>
         <source>Watch live television</source>
         <translation>Vaata televisiooni otse</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="479"/>
+        <location filename="../themes/themestrings.h" line="379"/>
         <source>Delete Recordings</source>
         <translation>Kustuta salvestis</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="480"/>
+        <location filename="../themes/themestrings.h" line="487"/>
         <source>Remove television recordings</source>
         <translation>Kustuta TV salvestus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="367"/>
+        <location filename="../themes/themestrings.h" line="388"/>
         <source>Previously Recorded</source>
         <translation>Varem salvestatud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="481"/>
+        <location filename="../themes/themestrings.h" line="488"/>
         <source>See what you have recorded before</source>
         <translation>Vaata, mida sa oled varem salvestanud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="482"/>
+        <location filename="../themes/themestrings.h" line="489"/>
         <source>TV Utilities</source>
         <translation>TV tööriistad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="337"/>
+        <location filename="../themes/themestrings.h" line="217"/>
         <source>Music</source>
         <translation>Muusika</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="483"/>
+        <location filename="../themes/themestrings.h" line="219"/>
         <source>Videos</source>
         <translation>Videod</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="484"/>
         <source>Radio</source>
-        <translation>Raadio</translation>
+        <translation type="obsolete">Raadio</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="485"/>
+        <location filename="../themes/themestrings.h" line="490"/>
         <source>Images</source>
         <translation>Pildid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="486"/>
+        <location filename="../themes/themestrings.h" line="220"/>
         <source>Games</source>
         <translation>Mängud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="487"/>
+        <location filename="../themes/themestrings.h" line="221"/>
         <source>Weather</source>
         <translation>Ilm</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="488"/>
+        <location filename="../themes/themestrings.h" line="491"/>
         <source>News Feeds</source>
         <translation>Uudised</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="489"/>
+        <location filename="../themes/themestrings.h" line="492"/>
         <source>Web</source>
         <translation>Veeb</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="490"/>
         <source>Phone</source>
-        <translation>Telefon</translation>
+        <translation type="obsolete">Telefon</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="491"/>
+        <location filename="../themes/themestrings.h" line="493"/>
         <source>Burn DVD</source>
         <translation>Kõrveta DVD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="492"/>
+        <location filename="../themes/themestrings.h" line="494"/>
         <source>Recipes</source>
         <translation>Retseptid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="493"/>
+        <location filename="../themes/themestrings.h" line="495"/>
         <source>Archive Files</source>
         <translation>Arhiivifailid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="494"/>
+        <location filename="../themes/themestrings.h" line="496"/>
         <source>Zone Minder</source>
         <translation>Zone Minder</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="495"/>
+        <location filename="../themes/themestrings.h" line="35"/>
         <source>Movie Times</source>
         <translation>Kinokava</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="347"/>
+        <location filename="../themes/themestrings.h" line="363"/>
         <source>NetFlix</source>
         <translation>NetFlix</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="496"/>
+        <location filename="../themes/themestrings.h" line="212"/>
         <source>Edit Keys</source>
         <translation>Muuda klahve</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="339"/>
+        <location filename="../themes/themestrings.h" line="224"/>
         <source>Setup</source>
         <translation>Seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="502"/>
+        <location filename="../themes/themestrings.h" line="499"/>
         <source>A blue theme.</source>
         <translation>Sinine teema.</translation>
     </message>
@@ -21549,17 +21876,17 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation type="obsolete">Salvestuskava see ei mõjuta.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="638"/>
+        <location filename="../themes/themestrings.h" line="636"/>
         <source>(1)Time (2)Title</source>
         <translation>(1) Aeg (2) Pealkiri</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="295"/>
+        <location filename="../themes/themestrings.h" line="333"/>
         <source>No listings found for this program.</source>
         <translation>Seda saadet kavast ei leitud.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="561"/>
+        <location filename="../themes/themestrings.h" line="559"/>
         <source>Heading</source>
         <translation>Pealkiri</translation>
     </message>
@@ -21569,7 +21896,7 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="14"/>
+        <location filename="../themes/themestrings.h" line="15"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
@@ -21584,22 +21911,22 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Impordi logosid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="191"/>
+        <location filename="../themes/themestrings.h" line="205"/>
         <source>Search terms:</source>
         <translation>Otsitav</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="17"/>
+        <location filename="../themes/themestrings.h" line="18"/>
         <source>Search</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="18"/>
+        <location filename="../themes/themestrings.h" line="19"/>
         <source>Skip</source>
         <translation>Jäta vahele</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="260"/>
+        <location filename="../themes/themestrings.h" line="62"/>
         <source>Channel Editor</source>
         <translation>Kanaliredaktor</translation>
     </message>
@@ -21609,12 +21936,12 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Loendi valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="21"/>
+        <location filename="../themes/themestrings.h" line="22"/>
         <source>Sort By:</source>
         <translation>Sordi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="27"/>
+        <location filename="../themes/themestrings.h" line="28"/>
         <source>Hide Channels without channel number.</source>
         <translation>Peida ilma kanalinumbrita kanalid.</translation>
     </message>
@@ -21629,17 +21956,17 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Üldised valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="24"/>
+        <location filename="../themes/themestrings.h" line="25"/>
         <source>Channel Scan</source>
         <translation>Kanali otsing</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="193"/>
+        <location filename="../themes/themestrings.h" line="207"/>
         <source>Icon Download</source>
         <translation>Logode alla laadimine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="26"/>
+        <location filename="../themes/themestrings.h" line="27"/>
         <source>Edit Transports</source>
         <translation>Muuda ülekandeid</translation>
     </message>
@@ -21649,162 +21976,152 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Tehtud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="571"/>
+        <location filename="../themes/themestrings.h" line="570"/>
         <source>Play Games</source>
         <translation>Mängi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="572"/>
+        <location filename="../themes/themestrings.h" line="571"/>
         <source>System:</source>
         <translation>Süsteem:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="504"/>
+        <location filename="../themes/themestrings.h" line="501"/>
         <source>Year:</source>
         <translation>Aasta:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="118"/>
+        <location filename="../themes/themestrings.h" line="130"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="573"/>
+        <location filename="../themes/themestrings.h" line="572"/>
         <source>Favorite:</source>
         <translation>Lemmik:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="574"/>
+        <location filename="../themes/themestrings.h" line="573"/>
         <source>Yes</source>
         <translation>Jah</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="575"/>
+        <location filename="../themes/themestrings.h" line="574"/>
         <source>No</source>
         <translation>Ei</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="577"/>
+        <location filename="../themes/themestrings.h" line="215"/>
         <source>Television</source>
         <translation>TV</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="330"/>
+        <location filename="../themes/themestrings.h" line="216"/>
         <source>Main Menu</source>
         <translation>Põhimenüü</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="578"/>
+        <location filename="../themes/themestrings.h" line="218"/>
         <source>Gallery</source>
         <translation>Pildialbum</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="579"/>
+        <location filename="../themes/themestrings.h" line="222"/>
         <source>Schedule</source>
         <translation>Planeering</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="580"/>
+        <location filename="../themes/themestrings.h" line="576"/>
         <source>Programme Searches</source>
         <translation>Saate otsingud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="581"/>
+        <location filename="../themes/themestrings.h" line="577"/>
         <source>CD/DVD Options</source>
         <translation>CD/DVD valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="336"/>
+        <location filename="../themes/themestrings.h" line="226"/>
         <source>Media Library</source>
         <translation>Meedia salv</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="582"/>
+        <location filename="../themes/themestrings.h" line="578"/>
         <source>Info Centre</source>
         <translation>Infokeskus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="583"/>
-        <source>P</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../themes/themestrings.h" line="584"/>
-        <source>S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../themes/themestrings.h" line="585"/>
+        <location filename="../themes/themestrings.h" line="579"/>
         <source>Playing:</source>
         <translation>Esitan:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="586"/>
+        <location filename="../themes/themestrings.h" line="580"/>
         <source>None</source>
         <translation>Puudub</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="591"/>
+        <location filename="../themes/themestrings.h" line="586"/>
         <source>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="592"/>
+        <location filename="../themes/themestrings.h" line="587"/>
         <source>Change Displayed Groups</source>
         <translation>Muuda kuvatud gruppe</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="201"/>
+        <location filename="../themes/themestrings.h" line="242"/>
         <source>Show Titles</source>
         <translation>Näita pealkirju</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="202"/>
+        <location filename="../themes/themestrings.h" line="243"/>
         <source>Show Categories</source>
         <translation>Näita kategooriaid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="69"/>
+        <location filename="../themes/themestrings.h" line="82"/>
         <source>Show Recording Groups</source>
         <translation>Näita salvestusgruppe</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="70"/>
+        <location filename="../themes/themestrings.h" line="83"/>
         <source>Show Watch List</source>
         <translation>Näita esitusnimekirja</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="71"/>
+        <location filename="../themes/themestrings.h" line="84"/>
         <source>Show Searches</source>
         <translation>Näita otsinguid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="203"/>
+        <location filename="../themes/themestrings.h" line="244"/>
         <source>Show LiveTV</source>
         <translation>Näita TV-d</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="593"/>
+        <location filename="../themes/themestrings.h" line="588"/>
         <source>Show Watched Recordings</source>
         <translation>Näita vaadatud salvestusi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="74"/>
+        <location filename="../themes/themestrings.h" line="87"/>
         <source>Save</source>
         <translation>Salvesta</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="283"/>
+        <location filename="../themes/themestrings.h" line="245"/>
         <source>Change Recording Group Password</source>
         <translation>Muuda salvestusgrupi parooli</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="357"/>
+        <location filename="../themes/themestrings.h" line="380"/>
         <source>Old Password</source>
         <translation>Vana parool</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="205"/>
+        <location filename="../themes/themestrings.h" line="247"/>
         <source>New Password:</source>
         <translation>Uus parool:</translation>
     </message>
@@ -21814,259 +22131,258 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="81"/>
+        <location filename="../themes/themestrings.h" line="94"/>
         <source>Edit Recording Metadata</source>
         <translation>Muuda salvestise andmeid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="359"/>
+        <location filename="../themes/themestrings.h" line="266"/>
         <source>Title</source>
         <translation>Pealkiri</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="360"/>
+        <location filename="../themes/themestrings.h" line="382"/>
         <source>Subtitle</source>
         <translation>Alapealkiri</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="286"/>
+        <location filename="../themes/themestrings.h" line="250"/>
         <source>Manual Recording Schedule</source>
         <translation>Kohandatud salvestuse planeering</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="207"/>
+        <location filename="../themes/themestrings.h" line="251"/>
         <source>Title (Optional):</source>
         <translation>Pealkiri (pole kohustuslik):</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="208"/>
+        <location filename="../themes/themestrings.h" line="252"/>
         <source>Date, or day of week:</source>
         <translation>Kuupäev või nädalapäev:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="209"/>
+        <location filename="../themes/themestrings.h" line="239"/>
         <source>Start Time:</source>
         <translation>Käivitusaeg:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="210"/>
+        <location filename="../themes/themestrings.h" line="253"/>
         <source>Hour</source>
         <translation>Tund</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="211"/>
+        <location filename="../themes/themestrings.h" line="254"/>
         <source>Minute</source>
         <translation>Minut</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="93"/>
+        <location filename="../themes/themestrings.h" line="106"/>
         <source>Duration:</source>
         <translation>Kestvus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="40"/>
+        <location filename="../themes/themestrings.h" line="43"/>
         <source>Next</source>
         <translation>Järgmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="287"/>
+        <location filename="../themes/themestrings.h" line="255"/>
         <source>Scheduled Recordings</source>
         <translation>Planeeritud salvestused</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="594"/>
+        <location filename="../themes/themestrings.h" line="589"/>
         <source>Schedules Overview</source>
         <translation>Planeeringute ülevaade</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="595"/>
+        <location filename="../themes/themestrings.h" line="590"/>
         <source>First Conflict:</source>
         <translation>Esimene konflikt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="119"/>
+        <location filename="../themes/themestrings.h" line="131"/>
         <source>Filter:</source>
         <translation>Filter:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="290"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Salvestamiseks pole ühtegi saadet planeeritud
+        <translation type="obsolete">Salvestamiseks pole ühtegi saadet planeeritud
 Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate otsija&apos;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="48"/>
+        <location filename="../themes/themestrings.h" line="51"/>
         <source>Callsign:</source>
         <translation>Kutsung:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="215"/>
+        <location filename="../themes/themestrings.h" line="261"/>
         <source>(1) Channel (2) Priority</source>
         <translation>(1) Kanal    (2) Prioriteet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="292"/>
+        <location filename="../themes/themestrings.h" line="263"/>
         <source>Schedule Priorities</source>
         <translation>Planeeringu prioriteedid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="218"/>
+        <location filename="../themes/themestrings.h" line="265"/>
         <source>Final</source>
         <translation>Lõplik</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="102"/>
+        <location filename="../themes/themestrings.h" line="114"/>
         <source>Type Priority:</source>
         <translation>Tüübi prioriteet:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="103"/>
+        <location filename="../themes/themestrings.h" line="115"/>
         <source>Final Priority:</source>
         <translation>Lõplik prioriteet:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="219"/>
+        <location filename="../themes/themestrings.h" line="268"/>
         <source>(1) Title (2) Priority (4) Type</source>
         <translation>(1) pealkiri (2) prioriteet (3) tüüp</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="104"/>
+        <location filename="../themes/themestrings.h" line="116"/>
         <source>Custom Priority Rules</source>
         <translation>Kohandatud prioriteedi reeglid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="220"/>
+        <location filename="../themes/themestrings.h" line="269"/>
         <source>Existing Rules:</source>
         <translation>Olemasolevad reeglid:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="107"/>
+        <location filename="../themes/themestrings.h" line="119"/>
         <source>Rule Name:</source>
         <translation>Reegli nimi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="221"/>
+        <location filename="../themes/themestrings.h" line="270"/>
         <source>Priority Change:</source>
         <translation>Prioriteedi muutus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="222"/>
+        <location filename="../themes/themestrings.h" line="271"/>
         <source>Select a clause from the list.</source>
         <translation>Vali klausel loendist.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="223"/>
+        <location filename="../themes/themestrings.h" line="272"/>
         <source>Add Clause</source>
         <translation>Lisa klausel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="112"/>
+        <location filename="../themes/themestrings.h" line="124"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="111"/>
+        <location filename="../themes/themestrings.h" line="123"/>
         <source>Test</source>
         <translation>Proovi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="113"/>
+        <location filename="../themes/themestrings.h" line="125"/>
         <source>Install</source>
         <translation>Installi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="293"/>
+        <location filename="../themes/themestrings.h" line="201"/>
         <source>Phrase</source>
         <translation>Fraas</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="115"/>
+        <location filename="../themes/themestrings.h" line="127"/>
         <source>Select Time</source>
         <translation>Vali aeg</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="225"/>
+        <location filename="../themes/themestrings.h" line="273"/>
         <source>Select Search</source>
         <translation>Vali otsing</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="227"/>
+        <location filename="../themes/themestrings.h" line="274"/>
         <source>Edit Power Search Fields</source>
         <translation>Muuda võimsa otsingu väljasid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="228"/>
+        <location filename="../themes/themestrings.h" line="275"/>
         <source>Optional title phrase:</source>
         <translation>Pealkirja lisafraas:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="229"/>
+        <location filename="../themes/themestrings.h" line="276"/>
         <source>Optional subtitle phrase:</source>
         <translation>Alapealkirja lisafraas:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="230"/>
+        <location filename="../themes/themestrings.h" line="277"/>
         <source>Optional description phrase:</source>
         <translation>Kirjelduse lisafraas:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="598"/>
+        <location filename="../themes/themestrings.h" line="593"/>
         <source>List Overview</source>
         <translation>Loendi ülevaade</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="599"/>
+        <location filename="../themes/themestrings.h" line="594"/>
         <source>Current View:</source>
         <translation>Hetke vaade:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="600"/>
+        <location filename="../themes/themestrings.h" line="595"/>
         <source>Position:</source>
         <translation>Asukoht:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="304"/>
+        <location filename="../themes/themestrings.h" line="340"/>
         <source>Schedule Editor</source>
         <translation>Planeeringu muutmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="601"/>
+        <location filename="../themes/themestrings.h" line="596"/>
         <source>Rule Overview</source>
         <translation>Reegli ülevaade</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="236"/>
+        <location filename="../themes/themestrings.h" line="281"/>
         <source>Select the recording rule</source>
         <translation>Vali salvestusreegel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="123"/>
+        <location filename="../themes/themestrings.h" line="135"/>
         <source>Schedule Options</source>
         <translation>Planeeringu valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="124"/>
+        <location filename="../themes/themestrings.h" line="136"/>
         <source>Storage Options</source>
         <translation>Säilitus valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="125"/>
+        <location filename="../themes/themestrings.h" line="137"/>
         <source>Post Processing</source>
         <translation>Järeltöötlus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="126"/>
+        <location filename="../themes/themestrings.h" line="138"/>
         <source>Schedule Info</source>
         <translation>Planeerimisinfo</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="237"/>
+        <location filename="../themes/themestrings.h" line="282"/>
         <source>Preview</source>
         <translation>Eelvaade</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="238"/>
+        <location filename="../themes/themestrings.h" line="283"/>
         <source>Reduce priority by %n</source>
         <translation>
             <numerusform>Vähenda prioriteeti %n võrra</numerusform>
@@ -22074,12 +22390,12 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="239"/>
+        <location filename="../themes/themestrings.h" line="284"/>
         <source>Normal recording priority</source>
         <translation>Tavaline salvestusprioriteet</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="240"/>
+        <location filename="../themes/themestrings.h" line="285"/>
         <source>Raise priority by %n</source>
         <translation>
             <numerusform>Tõsta prioriteeti %n võrra</numerusform>
@@ -22087,7 +22403,7 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="241"/>
+        <location filename="../themes/themestrings.h" line="286"/>
         <source>Start recording %n minute(s) late</source>
         <translation>
             <numerusform>Alusta salvestus %n minut(it) hiljem</numerusform>
@@ -22095,12 +22411,12 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="242"/>
+        <location filename="../themes/themestrings.h" line="287"/>
         <source>Start recording on time</source>
         <translation>Alusta salvestamist õigeaegselt</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="243"/>
+        <location filename="../themes/themestrings.h" line="288"/>
         <source>Start recording %n minute(s) early</source>
         <translation>
             <numerusform>Alusta salvestus %n minut(it) varem</numerusform>
@@ -22108,7 +22424,7 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="244"/>
+        <location filename="../themes/themestrings.h" line="289"/>
         <source>End recording %n minute(s) early</source>
         <translation>
             <numerusform>Lõpeta salvestus %n minut(it) varem</numerusform>
@@ -22116,12 +22432,12 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="245"/>
+        <location filename="../themes/themestrings.h" line="290"/>
         <source>End recording on time</source>
         <translation>Lõpeta salvestamine õigeaegselt</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="246"/>
+        <location filename="../themes/themestrings.h" line="291"/>
         <source>End recording %n minute(s) late</source>
         <translation>
             <numerusform>Lõpeta salvestus %n minut(it) hiljem</numerusform>
@@ -22129,22 +22445,22 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="249"/>
+        <location filename="../themes/themestrings.h" line="292"/>
         <source>Recording Rule Active</source>
         <translation>Salvestusreegel on aktiivne</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="250"/>
+        <location filename="../themes/themestrings.h" line="238"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="254"/>
+        <location filename="../themes/themestrings.h" line="293"/>
         <source>No episode limit</source>
         <translation>Osade arv pole piiratud</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="255"/>
+        <location filename="../themes/themestrings.h" line="294"/>
         <source>Keep at most %n episode(s)</source>
         <translation>
             <numerusform>Säilita vähemalt %n osa</numerusform>
@@ -22152,187 +22468,183 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="276"/>
+        <location filename="../themes/themestrings.h" line="234"/>
         <source>x.xx GB</source>
         <translation>x.xx Gb</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="277"/>
+        <location filename="../themes/themestrings.h" line="235"/>
         <source>xxxxx MB</source>
         <translation>xxxxx MB</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="278"/>
+        <location filename="../themes/themestrings.h" line="236"/>
         <source>0 MB</source>
         <translation>0 MB</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="307"/>
+        <location filename="../themes/themestrings.h" line="295"/>
         <source>Allow recordings to expire?</source>
         <translation>Luba salvestustel aeguda?</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="311"/>
+        <location filename="../themes/themestrings.h" line="345"/>
         <source>Mythbuntu is based on ProjectGrayhem - a dark, shiny theme originally inspired by XBMC&apos;s ProjectMayhem skin</source>
         <translation>Mythbuntu põhineb ProjectGrayhem-il, tume, särav teema, mis on inspireeritud XBMC ProjectMayhem teemast</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="497"/>
         <source>(%TIMEDATE%)  %LENMINS%</source>
-        <translation>(%TIMEDATE%)  %LENMINS%</translation>
+        <translation type="obsolete">(%TIMEDATE%)  %LENMINS%</translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot; %</source>
+        <translation type="obsolete">%SUBTITLE|&quot;|&quot; %</translation>
+    </message>
+    <message>
+        <source>%TITLE%</source>
+        <translation type="obsolete">%TITLE%</translation>
+    </message>
+    <message>
+        <source>A transparent dark grey theme.</source>
+        <translation type="obsolete">Läbipaistev tume hall teema.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="498"/>
-        <source>%SUBTITLE|&quot;|&quot; %</source>
-        <translation>%SUBTITLE|&quot;|&quot; %</translation>
-    </message>
-    <message>
-        <location filename="../themes/themestrings.h" line="499"/>
-        <source>%TITLE%</source>
-        <translation>%TITLE%</translation>
-    </message>
-    <message>
-        <location filename="../themes/themestrings.h" line="500"/>
-        <source>A transparent dark grey theme.</source>
-        <translation>Läbipaistev tume hall teema.</translation>
-    </message>
-    <message>
-        <location filename="../themes/themestrings.h" line="501"/>
         <source>Search For</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="505"/>
+        <location filename="../themes/themestrings.h" line="502"/>
         <source>User Rating:</source>
         <translation>Kasutaja hinnang:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="508"/>
+        <location filename="../themes/themestrings.h" line="505"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
         <translation>Pole ühtegi videot või lihtsalt ei leitud midagi. Kui videokaust on seadistatud vajuta &quot;M&quot; või &quot;MENÜÜ&quot; nuppu ja vali &quot;Otsi muudatusi&quot;.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="511"/>
+        <location filename="../themes/themestrings.h" line="508"/>
         <source>Parental Level:</source>
         <translation>Vanemlik tase:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="517"/>
+        <location filename="../themes/themestrings.h" line="514"/>
         <source>Plot:</source>
         <translation>Süžee:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="520"/>
+        <location filename="../themes/themestrings.h" line="517"/>
         <source>Video Num.:</source>
         <translation>Video Num.:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="521"/>
+        <location filename="../themes/themestrings.h" line="518"/>
         <source>Directed by</source>
         <translation>Lavastanud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="526"/>
+        <location filename="../themes/themestrings.h" line="523"/>
         <source>MythVideo File Associations</source>
         <translation>MythVideo failiseaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="531"/>
+        <location filename="../themes/themestrings.h" line="528"/>
         <source>Edit Video Information</source>
         <translation>Muuda video infot</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="535"/>
+        <location filename="../themes/themestrings.h" line="532"/>
         <source>Item has been watched:</source>
         <translation>Video on vaadatud:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="542"/>
+        <location filename="../themes/themestrings.h" line="539"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/tee/pildini/pilt.jpg</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="543"/>
+        <location filename="../themes/themestrings.h" line="540"/>
         <source>Filters video list</source>
         <translation>Videoloendi filter</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="545"/>
+        <location filename="../themes/themestrings.h" line="542"/>
         <source>Category :</source>
         <translation>Kategooria:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="546"/>
+        <location filename="../themes/themestrings.h" line="543"/>
         <source>Genre :</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="547"/>
+        <location filename="../themes/themestrings.h" line="544"/>
         <source>Country :</source>
         <translation>:Riik</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="548"/>
+        <location filename="../themes/themestrings.h" line="545"/>
         <source>Actor/Actress :</source>
         <translation>Näitleja:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="549"/>
+        <location filename="../themes/themestrings.h" line="546"/>
         <source>Year :</source>
         <translation>Aasta:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="550"/>
+        <location filename="../themes/themestrings.h" line="547"/>
         <source>Runtime :</source>
         <translation>Esmaesitus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="551"/>
+        <location filename="../themes/themestrings.h" line="548"/>
         <source>User Rating :</source>
         <translation>Kasutaja hinnang:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="552"/>
+        <location filename="../themes/themestrings.h" line="549"/>
         <source>Browse :</source>
         <translation>Sirvi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="553"/>
+        <location filename="../themes/themestrings.h" line="550"/>
         <source>InetRef :</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="554"/>
+        <location filename="../themes/themestrings.h" line="551"/>
         <source>Cover File :</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="555"/>
+        <location filename="../themes/themestrings.h" line="552"/>
         <source>Sort by :</source>
         <translation>Sordi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="556"/>
+        <location filename="../themes/themestrings.h" line="553"/>
         <source>Watched :</source>
         <translation>Vaadatud:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="557"/>
+        <location filename="../themes/themestrings.h" line="554"/>
         <source>Result</source>
         <translation>Tulem</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="558"/>
+        <location filename="../themes/themestrings.h" line="555"/>
         <source>Save as default</source>
         <translation>Salvesta vaikimisi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="559"/>
+        <location filename="../themes/themestrings.h" line="556"/>
         <source>Sample Clauses:</source>
         <translation>Näidis klauslid:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="560"/>
+        <location filename="../themes/themestrings.h" line="557"/>
         <source> This was adapted from the Jeroen Brosens&apos; MythCenter theme. The fonts have been changed to freely redistributable ones and layout changes have been made to make this theme look good on 1280x720 and 1920x1080 screens with a 1:1 pixel aspect ratio. </source>
         <translation>See on üle võetud Jeroen Brosens&apos; MythCenter teemast. Fondid on vahetatud vabalt levitatavate vastu ja kujundus on tehtud sobivaks 1280x720 ja 1920x1080 resolutsiooni jaoks 1:1 piksli suhtega.</translation>
     </message>
@@ -22351,397 +22663,396 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Veebileht</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="570"/>
+        <location filename="../themes/themestrings.h" line="569"/>
         <source>No images found in configured directory.  Are you sure you have set up the plugin properly?</source>
         <translation>Seadistatud kaustas pole pilte. Oled kindel, et plugin on õieti seadistatud?</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="576"/>
+        <location filename="../themes/themestrings.h" line="575"/>
         <source>Emulator:</source>
         <translation>Emulaator:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="587"/>
+        <location filename="../themes/themestrings.h" line="582"/>
         <source>Internet Video Browser</source>
         <translation>Interneti video sirvija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="588"/>
+        <location filename="../themes/themestrings.h" line="583"/>
         <source>No sites configured!</source>
         <translation>Midagi pole seadistatud!</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="596"/>
+        <location filename="../themes/themestrings.h" line="591"/>
         <source>Recording Rule Priorities</source>
         <translation>Salvestusreeglite prioriteet</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="597"/>
+        <location filename="../themes/themestrings.h" line="592"/>
         <source>Type</source>
         <translation>TüüpTüüp</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="602"/>
+        <location filename="../themes/themestrings.h" line="597"/>
         <source>Post-Processing Options</source>
         <translation>Järeltöötluse valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="257"/>
+        <location filename="../themes/themestrings.h" line="296"/>
         <source>Commercial Flag new recordings</source>
         <translation>Märgi reklaamid uutes salvestistes</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="258"/>
+        <location filename="../themes/themestrings.h" line="297"/>
         <source>Transcode new recordings</source>
         <translation>Transkodeeri uued salvestised</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="298"/>
+        <location filename="../themes/themestrings.h" line="336"/>
         <source>Search For:</source>
         <translation>Otsi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="603"/>
+        <location filename="../themes/themestrings.h" line="598"/>
         <source>Search Results</source>
         <translation>Otsingu tulemused</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="604"/>
+        <location filename="../themes/themestrings.h" line="599"/>
         <source>Cast Members</source>
         <translation>Osatäitjad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="605"/>
+        <location filename="../themes/themestrings.h" line="600"/>
         <source>Full Plot</source>
         <translation>Kogu süžee</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="606"/>
+        <location filename="../themes/themestrings.h" line="601"/>
         <source>Video List Filters</source>
         <translation>Videoloendi filter</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="544"/>
+        <location filename="../themes/themestrings.h" line="541"/>
         <source>Text Filter:</source>
         <translation>Teksti filter:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="607"/>
+        <location filename="../themes/themestrings.h" line="602"/>
         <source>Category</source>
         <translation>Kategooria</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="608"/>
+        <location filename="../themes/themestrings.h" line="603"/>
         <source>Genre</source>
         <translation>Žanr</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="609"/>
+        <location filename="../themes/themestrings.h" line="604"/>
         <source>Country</source>
         <translation>Riik</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="610"/>
+        <location filename="../themes/themestrings.h" line="605"/>
         <source>Actor/Actress</source>
         <translation>Näitleja:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="523"/>
+        <location filename="../themes/themestrings.h" line="520"/>
         <source>Year</source>
         <translation>Aasta</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="522"/>
+        <location filename="../themes/themestrings.h" line="519"/>
         <source>Runtime</source>
         <translation>Esmaesitus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="524"/>
+        <location filename="../themes/themestrings.h" line="521"/>
         <source>User Rating</source>
         <translation>Kasutaja hinnang</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="611"/>
+        <location filename="../themes/themestrings.h" line="606"/>
         <source>Browse</source>
         <translation>Sirvi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="612"/>
+        <location filename="../themes/themestrings.h" line="607"/>
         <source>InetRef</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="613"/>
+        <location filename="../themes/themestrings.h" line="608"/>
         <source>Cover File</source>
         <translation>Kaanepilt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="614"/>
+        <location filename="../themes/themestrings.h" line="609"/>
         <source>Sort by</source>
         <translation>Sordi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="615"/>
+        <location filename="../themes/themestrings.h" line="610"/>
         <source>Watched</source>
         <translation>Vaadatud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="616"/>
+        <location filename="../themes/themestrings.h" line="611"/>
         <source>Make default</source>
         <translation>Sea vaikimisi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="617"/>
+        <location filename="../themes/themestrings.h" line="612"/>
         <source>Video Manager</source>
         <translation>Video toimetaja</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="509"/>
+        <location filename="../themes/themestrings.h" line="506"/>
         <source>Director:</source>
         <translation>Lavastaja:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="618"/>
+        <location filename="../themes/themestrings.h" line="613"/>
         <source>Parental:</source>
         <translation>Vanemlik tase:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="512"/>
+        <location filename="../themes/themestrings.h" line="509"/>
         <source>Lowest</source>
         <translation>Väikseim</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="513"/>
+        <location filename="../themes/themestrings.h" line="510"/>
         <source>Low</source>
         <translation>Väike</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="514"/>
+        <location filename="../themes/themestrings.h" line="511"/>
         <source>Medium</source>
         <translation>Keskmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="515"/>
+        <location filename="../themes/themestrings.h" line="512"/>
         <source>High</source>
         <translation>Suur</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="510"/>
+        <location filename="../themes/themestrings.h" line="507"/>
         <source>Rated:</source>
         <translation>Hinnatud:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="516"/>
+        <location filename="../themes/themestrings.h" line="513"/>
         <source>Browsable:</source>
         <translation>Sirvitav:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="506"/>
+        <location filename="../themes/themestrings.h" line="503"/>
         <source>Runtime:</source>
         <translation>Esmaesitus:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="518"/>
+        <location filename="../themes/themestrings.h" line="515"/>
         <source>Filename:</source>
         <translation>Faili nimi:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="519"/>
+        <location filename="../themes/themestrings.h" line="516"/>
         <source>Cover File:</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="619"/>
+        <location filename="../themes/themestrings.h" line="614"/>
         <source>IMDB ID:</source>
         <translation>IMDB ID:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="620"/>
+        <location filename="../themes/themestrings.h" line="615"/>
         <source>Video Browser</source>
         <translation>Video sirvija</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="589"/>
+        <location filename="../themes/themestrings.h" line="584"/>
         <source>Videos - Gallery</source>
         <translation>Videod - Album</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="590"/>
+        <location filename="../themes/themestrings.h" line="585"/>
         <source>Videos - Tree</source>
         <translation>Videod - puu</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="525"/>
+        <location filename="../themes/themestrings.h" line="522"/>
         <source>Parental Level</source>
         <translation>Vanemlik tase</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="621"/>
+        <location filename="../themes/themestrings.h" line="616"/>
         <source>Video File Associations</source>
         <translation>Video failiseaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="527"/>
+        <location filename="../themes/themestrings.h" line="524"/>
         <source>Extension:</source>
         <translation>Laiend:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="528"/>
+        <location filename="../themes/themestrings.h" line="525"/>
         <source>Command:</source>
         <translation>Käsk:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="529"/>
+        <location filename="../themes/themestrings.h" line="526"/>
         <source>Use default player:</source>
         <translation>Kasuta vaikimisi mängijat:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="530"/>
+        <location filename="../themes/themestrings.h" line="527"/>
         <source>Ignore:</source>
         <translation>Ignoreeri:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="622"/>
+        <location filename="../themes/themestrings.h" line="617"/>
         <source>Edit Video Metadata</source>
         <translation>Muuda video andmeid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="83"/>
+        <location filename="../themes/themestrings.h" line="96"/>
         <source>Title:</source>
         <translation>Pealkiri:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="84"/>
+        <location filename="../themes/themestrings.h" line="97"/>
         <source>Subtitle:</source>
         <translation>Alapealkiri:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="61"/>
+        <location filename="../themes/themestrings.h" line="74"/>
         <source>Season:</source>
         <translation>Hooaeg:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="62"/>
+        <location filename="../themes/themestrings.h" line="75"/>
         <source>Episode:</source>
         <translation>Osa:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="100"/>
+        <location filename="../themes/themestrings.h" line="113"/>
         <source>Category:</source>
         <translation>Kategooria:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="532"/>
+        <location filename="../themes/themestrings.h" line="529"/>
         <source>Parental Control:</source>
         <translation>Vanemlik kontroll:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="533"/>
+        <location filename="../themes/themestrings.h" line="530"/>
         <source>File to Always Play Next:</source>
         <translation>Alati järgmisena mängitav fail:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="534"/>
+        <location filename="../themes/themestrings.h" line="531"/>
         <source>Include while Browsing:</source>
         <translation>Lisa kui sirvin:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="623"/>
+        <location filename="../themes/themestrings.h" line="618"/>
         <source>Item has been Watched:</source>
         <translation>Videot vaadati:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="536"/>
+        <location filename="../themes/themestrings.h" line="533"/>
         <source>Cover Art:</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="537"/>
+        <location filename="../themes/themestrings.h" line="534"/>
         <source>Screenshot:</source>
         <translation>Ekraani tõmmis:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="538"/>
+        <location filename="../themes/themestrings.h" line="535"/>
         <source>Banner:</source>
         <translation>Bänner:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="539"/>
+        <location filename="../themes/themestrings.h" line="536"/>
         <source>Fanart:</source>
         <translation>Plakat:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="540"/>
+        <location filename="../themes/themestrings.h" line="537"/>
         <source>Trailer:</source>
         <translation>Treiler:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="541"/>
+        <location filename="../themes/themestrings.h" line="538"/>
         <source>Unique Player Command:</source>
         <translation>Mängija käsk:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="503"/>
+        <location filename="../themes/themestrings.h" line="500"/>
         <source>Directed by:</source>
         <translation>Lavastanud:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="507"/>
+        <location filename="../themes/themestrings.h" line="504"/>
         <source>Play</source>
         <translation>Esita</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="624"/>
         <source>Change mythtv key bindings.</source>
-        <translation>Muuda klahviseoseid.</translation>
+        <translation type="obsolete">Muuda klahviseoseid.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="625"/>
+        <location filename="../themes/themestrings.h" line="620"/>
         <source>MythStream Settings</source>
         <translation>MythStream seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="626"/>
+        <location filename="../themes/themestrings.h" line="621"/>
         <source>Weather Station Settings</source>
         <translation>Ilmajaama seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="627"/>
+        <location filename="../themes/themestrings.h" line="622"/>
         <source>TV</source>
         <translation>TV</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="629"/>
+        <location filename="../themes/themestrings.h" line="624"/>
         <source>Play Online Streams</source>
         <translation>Esita online vooge</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="630"/>
+        <location filename="../themes/themestrings.h" line="625"/>
         <source>Weather Station</source>
         <translation>Ilmajaamad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="631"/>
+        <location filename="../themes/themestrings.h" line="626"/>
         <source>A long menu which breaks down the options by their category. TV, Music, Video etc</source>
         <translation>Pikk menüü mis eraldab valikud kategooriate kaupa. TV, muusika, Video jne.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="632"/>
+        <location filename="../themes/themestrings.h" line="627"/>
         <source>Search Listings</source>
         <translation>Otsi kavast</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="633"/>
+        <location filename="../themes/themestrings.h" line="301"/>
         <source>Recording Rules</source>
         <translation>Salvestusreeglid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="634"/>
+        <location filename="../themes/themestrings.h" line="628"/>
         <source>Edit or delete any recording rule</source>
         <translation>Muuda või kustuta salvestusreegleid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="635"/>
+        <location filename="../themes/themestrings.h" line="629"/>
         <source>Play TV Recordings</source>
         <translation>Esita salvestusi</translation>
     </message>
@@ -22751,17 +23062,17 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Välimuse nõustaja</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="185"/>
+        <location filename="../themes/themestrings.h" line="198"/>
         <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
         <translation>Liiguta valitud nool TV ekraani nurka.Teise noole muutmiseks vajuta SELECT. Salvestamata väljumiseks või seadistamise kalibreerimiseks vajuta MENU.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="186"/>
+        <location filename="../themes/themestrings.h" line="199"/>
         <source>1280 x 720</source>
         <translation>1280 x 720</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="187"/>
+        <location filename="../themes/themestrings.h" line="200"/>
         <source>0 x 0</source>
         <translation>0 x 0</translation>
     </message>
@@ -22771,12 +23082,12 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>1 piksel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="43"/>
+        <location filename="../themes/themestrings.h" line="46"/>
         <source>Up Level</source>
         <translation>Tase üles</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="13"/>
+        <location filename="../themes/themestrings.h" line="14"/>
         <source>Home</source>
         <translation>Kodu</translation>
     </message>
@@ -22785,445 +23096,435 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation type="obsolete">Oota veidi...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="192"/>
+        <location filename="../themes/themestrings.h" line="206"/>
         <source>Sort Mode:</source>
         <translation>Sortimise meetod:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="22"/>
+        <location filename="../themes/themestrings.h" line="23"/>
         <source>Video Source:</source>
         <translation>Video allikas:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="195"/>
+        <location filename="../themes/themestrings.h" line="213"/>
         <source>Contexts</source>
         <translation>Kontekst</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="196"/>
+        <location filename="../themes/themestrings.h" line="214"/>
         <source>Actions</source>
         <translation>Tegevused</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="281"/>
+        <location filename="../themes/themestrings.h" line="328"/>
         <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="200"/>
+        <location filename="../themes/themestrings.h" line="310"/>
         <source>Change View</source>
         <translation>Muuda välimust</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="73"/>
+        <location filename="../themes/themestrings.h" line="86"/>
         <source>Show Watched Programs</source>
         <translation>Näita vaadatud saateid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="204"/>
+        <location filename="../themes/themestrings.h" line="246"/>
         <source>Old Password:</source>
         <translation>Vana parool:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="284"/>
+        <location filename="../themes/themestrings.h" line="241"/>
         <source>Status Icons</source>
         <translation>Oleku ikoon</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="285"/>
+        <location filename="../themes/themestrings.h" line="330"/>
         <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
         <translation>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="289"/>
+        <location filename="../themes/themestrings.h" line="257"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="364"/>
+        <location filename="../themes/themestrings.h" line="258"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
         <translation>Salvestamiseks pole ühtegi saadet planeeritud
 Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate otsija&apos;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="299"/>
+        <location filename="../themes/themestrings.h" line="337"/>
         <source>Manage Recording Rules</source>
         <translation>Toimeta salvestusreegleid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="300"/>
+        <location filename="../themes/themestrings.h" line="338"/>
         <source>Channel</source>
         <translation>Kanal</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="301"/>
+        <location filename="../themes/themestrings.h" line="339"/>
         <source>Last Recorded</source>
         <translation>Viimati salvestatud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="159"/>
+        <location filename="../themes/themestrings.h" line="171"/>
         <source>Recording Group:</source>
         <translation>Salvestusgrupp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="160"/>
+        <location filename="../themes/themestrings.h" line="172"/>
         <source>Storage Group:</source>
         <translation>Säilitusgrupp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="161"/>
+        <location filename="../themes/themestrings.h" line="173"/>
         <source>Recording Profile:</source>
         <translation>Salvestusprofiil:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="231"/>
+        <location filename="../themes/themestrings.h" line="316"/>
         <source>Program Details:</source>
         <translation>Saate üksikasjad:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="296"/>
+        <location filename="../themes/themestrings.h" line="334"/>
         <source>Enter Search Text</source>
         <translation>Sisesta otsingu tekst</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="297"/>
+        <location filename="../themes/themestrings.h" line="335"/>
         <source>Close</source>
         <translation>Sulge</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="234"/>
+        <location filename="../themes/themestrings.h" line="319"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="302"/>
+        <location filename="../themes/themestrings.h" line="298"/>
         <source>Custom Record Rules</source>
         <translation>Kohandatud salvestusreeglid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="303"/>
+        <location filename="../themes/themestrings.h" line="299"/>
         <source>Additional Tables:</source>
         <translation>Lisatabelid:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="114"/>
+        <location filename="../themes/themestrings.h" line="126"/>
         <source>Record</source>
         <translation>Salvesta</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="167"/>
+        <location filename="../themes/themestrings.h" line="179"/>
         <source>Store</source>
         <translation>Säilita</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="235"/>
+        <location filename="../themes/themestrings.h" line="280"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="310"/>
+        <location filename="../themes/themestrings.h" line="302"/>
         <source>Details</source>
         <translation>Üksikasjad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="154"/>
+        <location filename="../themes/themestrings.h" line="166"/>
         <source>Run User Job #1</source>
         <translation>Käivita kasutaja tegevus #1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="309"/>
+        <location filename="../themes/themestrings.h" line="344"/>
         <source>Run User job #2</source>
         <translation>Käivita kasutaja tegevus #2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="156"/>
+        <location filename="../themes/themestrings.h" line="168"/>
         <source>Run User Job #3</source>
         <translation>Käivita kasutaja tegevus #3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="157"/>
+        <location filename="../themes/themestrings.h" line="169"/>
         <source>Run User Job #4</source>
         <translation>Käivita kasutaja tegevus #4</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="639"/>
+        <location filename="../themes/themestrings.h" line="637"/>
         <source>Keep up with the news</source>
         <translation>Hoia uudistega kursis</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="642"/>
         <source>See when local movies are playing</source>
-        <translation>Vaata kohalikku filmikava</translation>
+        <translation type="obsolete">Vaata kohalikku filmikava</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="643"/>
+        <location filename="../themes/themestrings.h" line="640"/>
         <source>Local weather forecast</source>
         <translation>Kohalik ilmateade</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="644"/>
         <source>Manage your NetFlix queue</source>
-        <translation>Toimeta oma NetFlix päringuid</translation>
+        <translation type="obsolete">Toimeta oma NetFlix päringuid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="645"/>
+        <location filename="../themes/themestrings.h" line="641"/>
         <source>Browse the web</source>
         <translation>Sirvi veebi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="646"/>
+        <location filename="../themes/themestrings.h" line="642"/>
         <source>Start cooking!</source>
         <translation>Küpsetama!</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="648"/>
+        <location filename="../themes/themestrings.h" line="644"/>
         <source>Home surveillance</source>
         <translation>Koduvalve</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="649"/>
+        <location filename="../themes/themestrings.h" line="645"/>
         <source>Hardware profile</source>
         <translation>Seadme profiil</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="650"/>
+        <location filename="../themes/themestrings.h" line="646"/>
         <source>Tell us what hardware you have so we can support it</source>
         <translation>Ütle meile, mis seadmeid kasutad, et saaksime neid toetada</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="702"/>
+        <location filename="../themes/themestrings.h" line="693"/>
         <source>Play recordings</source>
         <translation>Esita salvestus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="652"/>
+        <location filename="../themes/themestrings.h" line="648"/>
         <source>Watch Videos</source>
         <translation>Vaata videoid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="703"/>
+        <location filename="../themes/themestrings.h" line="694"/>
         <source>Play videos</source>
         <translation>Esita videoid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="654"/>
+        <location filename="../themes/themestrings.h" line="650"/>
         <source>Listen to Music</source>
         <translation>Kuula muusikat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="656"/>
         <source>Listen to the radio</source>
-        <translation>Kuula raadiot</translation>
+        <translation type="obsolete">Kuula raadiot</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="569"/>
+        <location filename="../themes/themestrings.h" line="197"/>
         <source>Image Gallery</source>
         <translation>Pildialbum</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="661"/>
+        <location filename="../themes/themestrings.h" line="656"/>
         <source>Look at Pictures</source>
         <translation>Vaata pilte</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="662"/>
+        <location filename="../themes/themestrings.h" line="657"/>
         <source>Play video games</source>
         <translation>Mängi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="664"/>
+        <location filename="../themes/themestrings.h" line="659"/>
         <source>Media Settings</source>
         <translation>Meedia seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="665"/>
+        <location filename="../themes/themestrings.h" line="660"/>
         <source>Settings for all non-TV media</source>
         <translation>Seadista kogu mitte TV meediat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="666"/>
+        <location filename="../themes/themestrings.h" line="661"/>
         <source>Info Center Settings</source>
         <translation>Infokeskuse seaded</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="667"/>
+        <location filename="../themes/themestrings.h" line="662"/>
         <source>Configure weather, news, movie info, web, and recipes</source>
         <translation>Seadista ilma, uudiseid, filmi infot, veebi ja retsepte</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="670"/>
+        <location filename="../themes/themestrings.h" line="665"/>
         <source>Play any of your media</source>
         <translation>Vaata või kuula midagi meediavaramust</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="332"/>
+        <location filename="../themes/themestrings.h" line="351"/>
         <source>Manage Recordings</source>
         <translation>Toimeta salvestisi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="700"/>
+        <location filename="../themes/themestrings.h" line="691"/>
         <source>Pick and prioritize shows to record</source>
         <translation>Vali ja prioritiseeri salvestatavaid sarju</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="672"/>
+        <location filename="../themes/themestrings.h" line="667"/>
         <source>Information Center</source>
         <translation>Infokeskus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="673"/>
+        <location filename="../themes/themestrings.h" line="668"/>
         <source>Information and Communications</source>
         <translation>Info ja kommunikatsioon</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="674"/>
+        <location filename="../themes/themestrings.h" line="669"/>
         <source>Optical Disks</source>
         <translation>Optilised kettad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="675"/>
+        <location filename="../themes/themestrings.h" line="670"/>
         <source>Play or import CDs and DVDs</source>
         <translation>Esita või impordi CD/DVD-sid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="676"/>
+        <location filename="../themes/themestrings.h" line="671"/>
         <source>Configure MythTV and plugins</source>
         <translation>Seadista MythTV-d ja pluginaid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="678"/>
+        <location filename="../themes/themestrings.h" line="673"/>
         <source>Set Priorities</source>
         <translation>Sea prioriteete</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="679"/>
+        <location filename="../themes/themestrings.h" line="674"/>
         <source>Play DVD</source>
         <translation>Esita DVD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="705"/>
+        <location filename="../themes/themestrings.h" line="696"/>
         <source>Play the video on a movie DVD</source>
         <translation>Filmid DVD plaadi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="681"/>
+        <location filename="../themes/themestrings.h" line="676"/>
         <source>Play VCD</source>
         <translation>Esita VCD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="682"/>
+        <location filename="../themes/themestrings.h" line="677"/>
         <source>Play the video on a VCD</source>
         <translation>Filmid VCD plaadil</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="683"/>
+        <location filename="../themes/themestrings.h" line="678"/>
         <source>Import DVD</source>
         <translation>Impordi DVD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="684"/>
+        <location filename="../themes/themestrings.h" line="679"/>
         <source>Import video from a movie DVD</source>
         <translation>Impordi film DVD-lt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="685"/>
+        <location filename="../themes/themestrings.h" line="680"/>
         <source>Write video to a data DVD</source>
         <translation>Kirjuta video andme DVD-le</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="686"/>
+        <location filename="../themes/themestrings.h" line="681"/>
         <source>Import CD</source>
         <translation>Impordi CD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="687"/>
+        <location filename="../themes/themestrings.h" line="682"/>
         <source>Import music from an audio CD</source>
         <translation>Impordi muusikat audio CD-lt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="688"/>
+        <location filename="../themes/themestrings.h" line="683"/>
         <source>Eject media</source>
         <translation>Väljasta plaat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="689"/>
+        <location filename="../themes/themestrings.h" line="684"/>
         <source>Eject CD or DVD from drive</source>
         <translation>Väljasta CD/DVD seadmest</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="695"/>
+        <location filename="../themes/themestrings.h" line="689"/>
         <source>Music Tools</source>
         <translation>Muusika tööriistad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="696"/>
+        <location filename="../themes/themestrings.h" line="690"/>
         <source>Select, import, or play music</source>
         <translation>Vali, impordi või esita muusikat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="269"/>
         <source>%SUBTITLE%%BR%%DESCRIPTION%</source>
-        <translation>%SUBTITLE%%BR%%DESCRIPTION%</translation>
+        <translation type="obsolete">%SUBTITLE%%BR%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="212"/>
+        <location filename="../themes/themestrings.h" line="312"/>
         <source>%DESCRIPTION%</source>
         <translation>%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="270"/>
         <source>%STARTDATE%</source>
-        <translation>%STARTDATE%</translation>
+        <translation type="obsolete">%STARTDATE%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="261"/>
+        <location filename="../themes/themestrings.h" line="374"/>
         <source>Callsign</source>
         <translation>Kutsung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="262"/>
+        <location filename="../themes/themestrings.h" line="375"/>
         <source>Channel #</source>
         <translation>Kanali nr</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="263"/>
+        <location filename="../themes/themestrings.h" line="376"/>
         <source>Channel Name</source>
         <translation>Kanali nimi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="264"/>
+        <location filename="../themes/themestrings.h" line="377"/>
         <source>XMLTV ID</source>
         <translation>XMLTV ID</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="265"/>
         <source>[P]robe</source>
-        <translation>[P]roovi</translation>
+        <translation type="obsolete">[P]roovi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="266"/>
         <source>[O]k</source>
-        <translation>[O]k</translation>
+        <translation type="obsolete">[O]k</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="267"/>
         <source>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</source>
-        <translation>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</translation>
+        <translation type="obsolete">%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="271"/>
         <source>%CALLSIGN% - %CHANNUM%</source>
-        <translation>%CALLSIGN% - %CHANNUM%</translation>
+        <translation type="obsolete">%CALLSIGN% - %CHANNUM%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="272"/>
         <source>A simple transparent black and white theme.</source>
-        <translation>Lihtne läbipaistev must-valge teema.</translation>
+        <translation type="obsolete">Lihtne läbipaistev must-valge teema.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="562"/>
@@ -23231,267 +23532,316 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation>Taasesitus käivitub...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="628"/>
+        <location filename="../themes/themestrings.h" line="623"/>
         <source>Internet Video</source>
         <translation>Interneti video</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="636"/>
+        <location filename="../themes/themestrings.h" line="300"/>
         <source>Preview Schedule Changes</source>
         <translation>Planeeringu muudatuste eelvaade</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="640"/>
+        <location filename="../themes/themestrings.h" line="497"/>
+        <source>%TIME%</source>
+        <translation>%TIME%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="558"/>
+        <source>dddd
+dd MMMM yyyy</source>
+        <translation>pppp
+pp KKKK aaaa</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="560"/>
+        <source>%DATE%</source>
+        <translation type="unfinished">%DATE%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="561"/>
+        <source>hh:mm</source>
+        <translation>tt:mm</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="581"/>
+        <source>%TITLE%  by  %ARTIST%</source>
+        <translation>%TITLE%  %ARTIST% järgi</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="630"/>
+        <source>Select the country in which you currently reside</source>
+        <translation>Vali asukoha riik</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="631"/>
+        <source>Language</source>
+        <translation>KeelKeel</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="632"/>
+        <source>Select your preferred language</source>
+        <translation>Vali eelistatud keel</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="633"/>
+        <source>%STARTTIME%-%ENDTIME% : %LENMINS%</source>
+        <translation>%STARTTIME%-%ENDTIME% : %LENMINS%</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="635"/>
+        <source>dddd
+dd MMM yyyy</source>
+        <translation>pppp
+pp KKK aaaa</translation>
+    </message>
+    <message>
+        <location filename="../themes/themestrings.h" line="638"/>
         <source>Twitter</source>
         <translation>Twitter</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="641"/>
+        <location filename="../themes/themestrings.h" line="639"/>
         <source>Send and receive tweets</source>
         <translation>Säutsu ja võta säutse vastu</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="647"/>
+        <location filename="../themes/themestrings.h" line="643"/>
         <source>See what your system is doing</source>
         <translation>Millega süsteem hetkel tegeleb</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="651"/>
+        <location filename="../themes/themestrings.h" line="647"/>
         <source>Browse your recordings</source>
         <translation>Sirvi salvestusi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="653"/>
+        <location filename="../themes/themestrings.h" line="649"/>
         <source>Browse your video library</source>
         <translation>Sirvi videoid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="655"/>
+        <location filename="../themes/themestrings.h" line="651"/>
         <source>Browse your music library</source>
         <translation>Sirvi muusikat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="657"/>
+        <location filename="../themes/themestrings.h" line="652"/>
         <source>Search Internet Video</source>
         <translation>Otsi interneti videoid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="658"/>
+        <location filename="../themes/themestrings.h" line="653"/>
         <source>Search popular video sites</source>
         <translation>Otsi populaarseid videosaite</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="659"/>
+        <location filename="../themes/themestrings.h" line="654"/>
         <source>Browse Internet Video</source>
         <translation>Sirvi interneti videoid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="660"/>
+        <location filename="../themes/themestrings.h" line="655"/>
         <source>Browse highlights and entire sites</source>
         <translation>Sirvi esiletõstetuid ja kogu saite</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="663"/>
+        <location filename="../themes/themestrings.h" line="658"/>
         <source>Pick the theme, font, size, and locale</source>
         <translation>Vali teema, font, suurus ja lokaat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="668"/>
+        <location filename="../themes/themestrings.h" line="663"/>
         <source>System Event Handlers</source>
         <translation>Süsteemi märguannete käitlejad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="669"/>
+        <location filename="../themes/themestrings.h" line="664"/>
         <source>Configure System Event handler commands</source>
         <translation>Seadista süsteemi märguannete käitlejate käske</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="671"/>
+        <location filename="../themes/themestrings.h" line="666"/>
         <source>Pick and prioritize recordings</source>
         <translation>Vali ja prioritiseeri salvestisi</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="677"/>
+        <location filename="../themes/themestrings.h" line="672"/>
         <source>See what you have recorded</source>
         <translation>Vaata mida oled salvestanud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="680"/>
+        <location filename="../themes/themestrings.h" line="675"/>
         <source>Play a film on DVD</source>
         <translation>Esita film DVD-lt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="690"/>
+        <location filename="../themes/themestrings.h" line="685"/>
         <source>Prioritize some channels over others</source>
         <translation>Sea mõned kanalid olulisemaks</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="691"/>
+        <location filename="../themes/themestrings.h" line="686"/>
         <source>Prioritize some recordings over others</source>
         <translation>Sea mõned salvestised olulisemaks</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="692"/>
         <source>Choose which menu options appear during playback</source>
-        <translation>Vali milliseid menüü valikuid taasesitamisel näidatakse</translation>
+        <translation type="obsolete">Vali milliseid menüü valikuid taasesitamisel näidatakse</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="693"/>
+        <location filename="../themes/themestrings.h" line="687"/>
         <source>Group your favorite channels together</source>
         <translation>Grupeeri lemmikkanalid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="694"/>
+        <location filename="../themes/themestrings.h" line="688"/>
         <source>Change the quality of your recordings</source>
         <translation>Muuda salvestuse kvaliteeti</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="697"/>
+        <location filename="../themes/themestrings.h" line="619"/>
         <source>Change MythTV key bindings.</source>
         <translation>Muuda MythTV klahviseoseid.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="698"/>
         <source>(%STARTDATE% %STARTTIME% - %ENDTIME%)  %LENMINS%</source>
-        <translation>(%STARTDATE% %STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
+        <translation type="obsolete">(%STARTDATE% %STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="699"/>
         <source>A very simple blue and black theme.</source>
-        <translation>Väga lihtne sini-must teema.</translation>
+        <translation type="obsolete">Väga lihtne sini-must teema.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="701"/>
+        <location filename="../themes/themestrings.h" line="692"/>
         <source>Play or import audio or video CDs or DVDs</source>
         <translation>Esita või impordi audio või video CD/DVD-sid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="704"/>
+        <location filename="../themes/themestrings.h" line="695"/>
         <source>Watch A DVD</source>
         <translation>Vaata DVD-d</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="706"/>
+        <location filename="../themes/themestrings.h" line="697"/>
         <source>Watch Live TV</source>
         <translation>Vaata TV-d</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="707"/>
+        <location filename="../themes/themestrings.h" line="698"/>
         <source>Watch Online Streams</source>
         <translation>Vaata online vooge</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="708"/>
+        <location filename="../themes/themestrings.h" line="699"/>
         <source>Plugins</source>
         <translation>Pluginad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="709"/>
+        <location filename="../themes/themestrings.h" line="700"/>
         <source>Other Plugins</source>
         <translation>Muud pluginad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="710"/>
+        <location filename="../themes/themestrings.h" line="701"/>
         <source>Advanced Options</source>
         <translation>Laiendatud valikud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="711"/>
+        <location filename="../themes/themestrings.h" line="702"/>
         <source>A &quot;Media Center&quot; menu theme. This menu theme is basically meant to bring the common &quot;media player/DVR&quot; functionality to the forefront, organize the plugins, and to make some of myth&apos;s more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in &quot;Plugins.&quot; Puts all setup and scheduling in &quot;Advanced.&quot; The top two menu levels will seem new, the ones beneath Advanced-&gt;Setup are as in the default menu.</source>
         <translation>&quot;Media Center&quot; menüü teema. See teema on mõeldud toomaks meedia mängija(DVR) funktsionaalsust kasutajaliidesesse, organíseerida pluginaid, paigutada mõnesid MythTV valikuid kavalamalt. Põhilised meediaelemendid on avakuval(Salvestused, videod, TV, DVD, muusika). Kõik infopluginad on &quot;Lisad&quot;-e all. Seadistused on &quot;Laiendatud&quot; all.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="120"/>
+        <location filename="../themes/themestrings.h" line="132"/>
         <source>Program Details</source>
         <translation>Saate üksikasjad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="372"/>
+        <location filename="../themes/themestrings.h" line="393"/>
         <source>1. General</source>
         <translation>1. Üldine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="373"/>
+        <location filename="../themes/themestrings.h" line="394"/>
         <source>2. Capture cards</source>
         <translation>2. Hõivekaardid</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="374"/>
+        <location filename="../themes/themestrings.h" line="395"/>
         <source>3. Video sources</source>
         <translation>3. Video allikad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="375"/>
+        <location filename="../themes/themestrings.h" line="396"/>
         <source>4. Input connections</source>
         <translation>4. Sisendite ühendused</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="376"/>
+        <location filename="../themes/themestrings.h" line="397"/>
         <source>5. Channel Editor</source>
         <translation>5. Kanalite muutmine</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="377"/>
+        <location filename="../themes/themestrings.h" line="398"/>
         <source>6. Storage Directories</source>
         <translation>6. Säilitus kaustad</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="379"/>
+        <location filename="../themes/themestrings.h" line="400"/>
         <source>%alert_text%</source>
         <translation>%alert_text%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="380"/>
+        <location filename="../themes/themestrings.h" line="401"/>
         <source>LINE #%caller_line%</source>
         <translation>LIINI nr%caller_line%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="381"/>
+        <location filename="../themes/themestrings.h" line="402"/>
         <source>NAME: %caller_name%</source>
         <translation>NIMI: %caller_name%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="382"/>
+        <location filename="../themes/themestrings.h" line="403"/>
         <source>NUM : %caller_number%</source>
         <translation>NUM : %caller_number%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="383"/>
+        <location filename="../themes/themestrings.h" line="404"/>
         <source>DATE: %caller_date% TIME : %caller_time%</source>
         <translation>KUUPÄEV: %caller_date% AEG : %caller_time%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="178"/>
+        <location filename="../themes/themestrings.h" line="190"/>
         <source>Welcome to MythTV</source>
         <translation>MythTV tervitab</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="312"/>
+        <location filename="../themes/themestrings.h" line="346"/>
         <source>MythTV is idle and will shutdown shortly.</source>
         <translation>MythTV on jõude ning seiskub peagi.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="313"/>
+        <location filename="../themes/themestrings.h" line="347"/>
         <source>Current Recording(s)</source>
         <translation>juba salvestatud</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="181"/>
         <source>Retrieving Recording Status ...</source>
-        <translation>Salvestuste olekuinfo tõmbamine ...</translation>
+        <translation type="obsolete">Salvestuste olekuinfo tõmbamine ...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="314"/>
+        <location filename="../themes/themestrings.h" line="348"/>
         <source>Next Scheduled Recording(s)</source>
         <translation>Järgmised planeeritud salvestus(ed)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="183"/>
         <source>Retrieving Scheduled Recordings ...</source>
-        <translation>Uurin planeeritud salvestisi...</translation>
+        <translation type="obsolete">Uurin planeeritud salvestisi...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="184"/>
+        <location filename="../themes/themestrings.h" line="196"/>
         <source>WARNING: There are conflicting scheduled recordings!</source>
         <translation>HOIATUS! planeeritud salvestused on konfliktis!</translation>
     </message>
@@ -23707,7 +24057,7 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
 <context>
     <name>VideoSourceEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3180"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3178"/>
         <source>Video Source Menu</source>
         <translation>Video allika menüü</translation>
     </message>
@@ -23720,43 +24070,43 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Saate
         <translation type="obsolete">Kustuta..</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3223"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3221"/>
         <source>Are you sure you want to delete this video source?</source>
         <translation>Oled sa kindel, et soovid selle video allika kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3225"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3223"/>
         <source>Yes, delete video source</source>
         <translation>Jah, kustuta video allikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3202"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3226"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3200"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3224"/>
         <source>No, don&apos;t</source>
         <translation>Ei, ära kustuta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3138"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3136"/>
         <source>Video sources</source>
         <translation>Video allikad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3181"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3179"/>
         <source>Edit...</source>
         <translation>Muuda...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3182"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3180"/>
         <source>Delete...</source>
         <translation>Kustuta...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3199"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3197"/>
         <source>Are you sure you want to delete ALL video sources?</source>
         <translation>Oled sa kindel, et soovid kustutada KÕIK video allikad?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3201"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3199"/>
         <source>Yes, delete video sources</source>
         <translation>Jah, kustuta video allikad</translation>
     </message>

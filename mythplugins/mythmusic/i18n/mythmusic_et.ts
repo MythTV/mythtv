@@ -598,142 +598,142 @@ Ei õnnestu faili kopeerida: %1</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythmusic/main.cpp" line="456"/>
+        <location filename="../mythmusic/main.cpp" line="503"/>
         <source>Play music</source>
         <translation>Esita muusikat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="458"/>
+        <location filename="../mythmusic/main.cpp" line="505"/>
         <source>Select music playlists</source>
         <translation>Vali esitusloend</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="460"/>
+        <location filename="../mythmusic/main.cpp" line="507"/>
         <source>Rip CD</source>
         <translation>Ripi CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="462"/>
+        <location filename="../mythmusic/main.cpp" line="509"/>
         <source>Scan music</source>
         <translation>Otsi muusikat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="464"/>
+        <location filename="../mythmusic/main.cpp" line="511"/>
         <source>Show Music Miniplayer</source>
         <translation>Näita minimängijat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="467"/>
+        <location filename="../mythmusic/main.cpp" line="514"/>
         <source>Move to the next track</source>
         <translation>Järgmisele rajale</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="469"/>
+        <location filename="../mythmusic/main.cpp" line="516"/>
         <source>Move to the previous track</source>
         <translation>Eelmisele rajale</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="471"/>
+        <location filename="../mythmusic/main.cpp" line="518"/>
         <source>Fast forward</source>
         <translation>Kiirkerimine</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="473"/>
+        <location filename="../mythmusic/main.cpp" line="520"/>
         <source>Rewind</source>
         <translation>Tagasi kerimine</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="475"/>
+        <location filename="../mythmusic/main.cpp" line="522"/>
         <source>Pause/Start playback</source>
         <translation>Peata/alusta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="477"/>
+        <location filename="../mythmusic/main.cpp" line="524"/>
         <source>Start playback</source>
         <translation>Alusta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="479"/>
+        <location filename="../mythmusic/main.cpp" line="526"/>
         <source>Stop playback</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="481"/>
+        <location filename="../mythmusic/main.cpp" line="528"/>
         <source>Volume down</source>
         <translation>Vaiksemaks</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="483"/>
+        <location filename="../mythmusic/main.cpp" line="530"/>
         <source>Volume up</source>
         <translation>Valjemaks</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="485"/>
+        <location filename="../mythmusic/main.cpp" line="532"/>
         <source>Mute</source>
         <translation>Vaigista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="487"/>
+        <location filename="../mythmusic/main.cpp" line="534"/>
         <source>Toggle audio upmixer</source>
         <translation>Lülita heli mitmekanaliliseks konvertimist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="489"/>
+        <location filename="../mythmusic/main.cpp" line="536"/>
         <source>Cycle visualizer mode</source>
         <translation>Võimalikud visualiseerijad</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="491"/>
+        <location filename="../mythmusic/main.cpp" line="538"/>
         <source>Blank screen</source>
         <translation>Tühi ekraan</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="493"/>
+        <location filename="../mythmusic/main.cpp" line="540"/>
         <source>Increase rating</source>
         <translation>Tõsta hinnangut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="495"/>
+        <location filename="../mythmusic/main.cpp" line="542"/>
         <source>Decrease rating</source>
         <translation>Langeta hinnangut</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="497"/>
+        <location filename="../mythmusic/main.cpp" line="544"/>
         <source>Refresh music tree</source>
         <translation>Värskenda muusikapuud</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="499"/>
+        <location filename="../mythmusic/main.cpp" line="546"/>
         <source>Filter All My Music</source>
         <translation>Filtreeri kogu muusika</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="501"/>
+        <location filename="../mythmusic/main.cpp" line="548"/>
         <source>Show incremental search dialog</source>
         <translation>Näita täienevat otsingu dialoogi</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="503"/>
+        <location filename="../mythmusic/main.cpp" line="550"/>
         <source>Incremental search find next match</source>
         <translation>Täienev otsing leiab järgmise vaste</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="505"/>
+        <location filename="../mythmusic/main.cpp" line="552"/>
         <source>Increase Play Speed</source>
         <translation>Tõsta esituskiirust</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="507"/>
+        <location filename="../mythmusic/main.cpp" line="554"/>
         <source>Decrease Play Speed</source>
         <translation>Vähenda esituskiirust</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="510"/>
+        <location filename="../mythmusic/main.cpp" line="557"/>
         <source>MythMusic Media Handler 1/2</source>
         <translation>MythMusicu meediahaldur 1/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="513"/>
+        <location filename="../mythmusic/main.cpp" line="560"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>MythMusicu meediahaldur 2/2</translation>
     </message>
@@ -753,12 +753,12 @@ Ei õnnestu faili kopeerida: %1</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="136"/>
         <source>3 Edit Playlist</source>
-        <translation>3 Muuda esitusloendit</translation>
+        <translation>3 Esitusloend</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="138"/>
         <source>4 Visualize</source>
-        <translation>4 Visualiseerimine</translation>
+        <translation>4 Visualiseeri</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="621"/>
@@ -1416,27 +1416,27 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="576"/>
         <source>CD Recording Settings</source>
-        <translation>CD salvestamise sätted</translation>
+        <translation>CD salvestamise seaded</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="589"/>
         <source>Playback Settings</source>
-        <translation>Mahamängimise sätted</translation>
+        <translation>Mahamängimise seaded</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="608"/>
         <source>Visualization Settings</source>
-        <translation>Visualiseerijate sätted</translation>
+        <translation>Visualiseerijate seaded</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="640"/>
         <source>CD Ripper Settings</source>
-        <translation>CD rippimise sätted</translation>
+        <translation>CD rippimise seaded</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="649"/>
         <source>CD Ripper Settings (part 2)</source>
-        <translation>CD rippimise sätted (2 osa)</translation>
+        <translation>CD rippimise seaded (2 osa)</translation>
     </message>
     <message>
         <location filename="../mythmusic/filescanner.cpp" line="557"/>
@@ -2141,12 +2141,12 @@ Soovid olemasoleva loo eemaldada?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="2159"/>
         <source>7 OK</source>
-        <translation>7 Valmis</translation>
+        <translation>7 OK</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="2161"/>
         <source>OK</source>
-        <translation>Valmis</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -2356,9 +2356,9 @@ Soovid olemasoleva loo eemaldada?</translation>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="2"/>
         <source>Please Wait...</source>
-        <translation>Palun oota...</translation>
+        <translation>Oota veidi...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
@@ -2421,49 +2421,44 @@ Soovid olemasoleva loo eemaldada?</translation>
         <translation>Failinimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Already in database</source>
         <translation>Juba andmebaasis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Search</source>
         <translation>Otsimine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Cover Art</source>
         <translation>Kaanepilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Play</source>
         <translation>Esita</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Add</source>
         <translation>Lisa</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Next New</source>
         <translation>Järgmine vaade</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Add All New</source>
         <translation>Lisa kõik uued</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Copy</source>
         <translation>Kopeeri</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="2"/>
-        <source>Please Wait ...</source>
-        <translation>Palun oota...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -2486,12 +2481,12 @@ Soovid olemasoleva loo eemaldada?</translation>
         <translation>Tüüp:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Metadata</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Done</source>
         <translation>Tehtud</translation>
     </message>
@@ -2501,282 +2496,336 @@ Soovid olemasoleva loo eemaldada?</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Quality:</source>
         <translation>Kvaliteet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Multi-Artist:</source>
         <translation>Mitu esitajat:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Switch Titles</source>
         <translation>Vaheta pealkirju</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Track</source>
         <translation>Lugu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Title</source>
         <translation>Pealkiri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Artist</source>
         <translation>Esitaja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Length</source>
         <translation>Pikkus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Scan CD</source>
         <translation>Skanneeri CD-d</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Rip CD</source>
         <translation>Ripi CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Importing CD</source>
         <translation>Impordi CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Encoding Track</source>
         <translation>Kodeerin rada</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Import Music</source>
         <translation>Impordi muusikat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Location:</source>
         <translation>Asukoht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Import Cover Art</source>
         <translation>Impordi kaanepilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="22"/>
         <source>File:</source>
         <translation>Fail:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Destination:</source>
         <translation>Sihtkoht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Image Type:</source>
         <translation>Pildi tüüp:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="77"/>
+        <source>Volume</source>
+        <translation>Helitugevus</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="78"/>
+        <source>0%</source>
+        <translation>0%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="79"/>
+        <source>Length:</source>
+        <translation>Pikkus:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="80"/>
+        <source>Last Played:</source>
+        <translation>Viimati esitatud:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="81"/>
+        <source>Last Value</source>
+        <translation>Viimane väärtus</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="82"/>
+        <source>Played:</source>
+        <translation>Esitatud:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="83"/>
+        <source>%playcount% times</source>
+        <translation>%playcount% korda</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="84"/>
         <source>General Settings</source>
         <translation>Üldised seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Player Settings</source>
         <translation>Mängija seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Ripper Settings</source>
         <translation>Rippija seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Play Music</source>
         <translation>Esita muusikat</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
         <source>Import Coverart</source>
         <translation>Impordi kaanepilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Browse cover images on your system.</source>
         <translation>Lehitse kaanepilte oma süsteemis.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Previous</source>
         <translation>Eelmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Next</source>
         <translation>Järgmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Import local music files.</source>
         <translation>Impordi lokaalseid muusika faile.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Track is part of a compilation</source>
         <translation>Lugu on kooste osa</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Click to browse directories...</source>
         <translation>Kliki kaustade lehitsemiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Choose Coverart</source>
         <translation>Vali kaanekujundus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Rip A CD</source>
         <translation>Ripi CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Input metadata for the CD you have inserted.</source>
         <translation>Sisesta metaandmed sisestatud CD kohta.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Album Name:</source>
         <translation>Plaadi nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Album Year:</source>
         <translation>Plaadi väljalase:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Album is a compilation</source>
         <translation>Plaat on koostatud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Click here to search existing artists...</source>
         <translation>Kliki esitaja otsimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Click here to search existing albums...</source>
         <translation>Kliki plaadi otsimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Click here to search existing genres...</source>
         <translation>Kliki žanri otsimiseks...</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>Scan</source>
+        <translation>Skanneeri</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="60"/>
+        <source>Album</source>
+        <translation>Album</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>Genre</source>
+        <translation>Žanr</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="68"/>
         <source>Edit Playlist</source>
         <translation>Esitusloendi muutmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Edit Metadata</source>
         <translation>Metaandmete muutmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Edit AlbumArt</source>
         <translation>Kaanepildi muutmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Ripping CD</source>
         <translation>CD rippimine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Directory Finder</source>
         <translation>Kausta leidja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="75"/>
         <source>/some/file/goes/here/test.mp3</source>
         <translation>/mingi/fail/test.mp3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="76"/>
         <source>123 of 345</source>
         <translation>123 345-st</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="57"/>
         <source>All ready in database</source>
         <translation>Andmebaasis juba olemas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
         <source>%1%</source>
-        <translation>%1%</translation>
+        <translation type="obsolete">%1%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Music folders and general options</source>
         <translation>Muusikakaustad ja üldised valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Music playback options</source>
         <translation>Muusika esitamis valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="89"/>
         <source>CD copying options</source>
         <translation>CD kopeerimis valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Select Music</source>
         <translation>Vali muusikat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Import CD</source>
         <translation>Impordi CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Import Files</source>
         <translation>Impordi failid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Scan for New Music</source>
         <translation>Skanni uut muusikat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Eject media</source>
         <translation>Väljasta plaat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Music Settings</source>
         <translation>Muusika seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Configure playback and CD ripping</source>
         <translation>Seadista esitamist ja rippimist</translation>
     </message>

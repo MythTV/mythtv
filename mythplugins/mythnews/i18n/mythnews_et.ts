@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="27"/>
+        <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
         <translation>RSS uudiste lugeja</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="31"/>
+        <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
         <translation>Uuenda uudiseid</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="33"/>
+        <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
         <translation>Uuenda kohe uudiseid</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="35"/>
+        <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
         <translation>Peata uudiste uuendamine</translation>
     </message>
@@ -168,11 +168,16 @@
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
         <source>Edit RSS News Feeds</source>
         <translation>Muuda RSS uudisvoogusid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="4"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -180,93 +185,113 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="6"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Icon:</source>
         <translation>Ikoon:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Podcast:</source>
         <translation>Podcast:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>News Subscriptions</source>
         <translation>Tellitud uudised</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Vali uudised mida soovid lugeda.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="16"/>
+        <source>News Settings</source>
+        <translation>Uudiste seaded</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Category</source>
+        <translation>Kategooria</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>[x]</source>
+        <translation>[x]</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Web Site</source>
+        <translation>Veebileht</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
         <source>Edit RSS News Feed</source>
         <translation>Muuda RSS uudisvoogusid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Contexts</source>
         <translatorcomment>Kontekst</translatorcomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Actions</source>
         <translation>Tegevused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="24"/>
         <source>RSS Feeds</source>
         <translation>RSS uudisvood</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="25"/>
         <source>MythNews Configuration</source>
         <translation>MythNews seadistamine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Minutes</source>
         <translation>Minutit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="15"/>
         <source>News Feeds</source>
         <translation>Uudisvood</translation>
     </message>
