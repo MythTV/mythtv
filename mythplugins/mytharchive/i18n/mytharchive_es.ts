@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="es_ES">
 <context>
     <name>ArchiveFileSelector</name>
     <message>
         <source>Find File To Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar Fichero para Importar</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Siguiente</translation>
+        <translation>Siguiente</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Atrás</translation>
+        <translation>Atrás</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished">Inicio</translation>
+        <translation>Inicio</translation>
     </message>
     <message>
         <source>The selected item is not a valid archive file!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡El ítem seleccionado no es fichero de archivo válido!</translation>
     </message>
 </context>
 <context>
@@ -40,46 +40,46 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Terminar</translation>
+        <translation>Terminar</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Grabación</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Video</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡Necesitas al menos un ítem para archivar!</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Eliminar Elemento</translation>
+        <translation>Eliminar Elemento</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡No tienes ningún video!</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
@@ -106,54 +106,54 @@
     </message>
     <message>
         <source>Find File</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar fichero</translation>
     </message>
     <message>
         <source>Find Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar Directorio</translation>
     </message>
     <message>
         <source>Find Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar Ficheros</translation>
     </message>
 </context>
 <context>
     <name>ImportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Terminar</translation>
+        <translation>Terminar</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="unfinished">¡Necesita seleccionar un IDcanal válido!</translation>
+        <translation>¡Necesita seleccionar un IDcanal válido!</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished">No fue posible importar el Archivo.  Un error ocurrió al ejecutar &apos;mytharchivehelper&apos;</translation>
+        <translation>No fue posible importar el Archivo.  Un error ocurrió al ejecutar &apos;mytharchivehelper&apos;</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="unfinished">Elija un IDcanal</translation>
+        <translation>Elija un IDcanal</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="unfinished">Elija un NºCanal</translation>
+        <translation>Elija un NºCanal</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="unfinished">Elija un Nombre Canal</translation>
+        <translation>Elija un Nombre de Canal</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="unfinished">Elija un Callsign</translation>
+        <translation>Elija un Callsign</translation>
     </message>
 </context>
 <context>
@@ -172,144 +172,144 @@
     </message>
     <message>
         <source>Show Progress Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar un registro del Progreso</translation>
     </message>
     <message>
         <source>Show Full Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar todo el Registro</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>No auto-actualizarse</translation>
     </message>
     <message>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-actualizarse</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
     <name>MythBurn</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Terminar</translation>
+        <translation>Terminar</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Grabación</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Video</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Fichero</translation>
     </message>
     <message>
         <source>Using Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Usando Lista de Corte</translation>
     </message>
     <message>
         <source>Not Using Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Sin Usar lista de corte</translation>
     </message>
     <message>
         <source>No Cut List</source>
-        <translation type="unfinished"></translation>
+        <translation>Sin Lista de Corte</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡Necesitas al menos un ítem para archivar!</translation>
     </message>
     <message>
         <source>Retrieving File Information. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Obteniendo Información de Fichero. Espere por Favor...</translation>
     </message>
     <message>
         <source>Encoder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Encodeador:</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Don&apos;t Use Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>No Usar Lista de Corte</translation>
     </message>
     <message>
         <source>Use Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar Lista de Corte</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Eliminar Elemento</translation>
+        <translation>Eliminar Elemento</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation type="unfinished">Editar Detalles</translation>
+        <translation>Editar Detalles</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar el Perfil del Encodeador</translation>
     </message>
     <message>
         <source>Edit Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Miniaturas</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="unfinished">No ha sido posible crear el DVD. Un error ha ocurrido mientras se ejecutaban los scripts</translation>
+        <translation>No ha sido posible crear el DVD. Un error ha ocurrido mientras se ejecutaban los scripts</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Toggle use cut list state for selected program</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar el estado de la lista de corte para el programa seleccionado</translation>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear DVD</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear Archivo</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar Archivo</translation>
     </message>
     <message>
         <source>View Archive Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver el Registro del Archivo</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducir el DVD Creado</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar DVD</translation>
     </message>
 </context>
 <context>
     <name>ProfileDialog</name>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -481,159 +481,162 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidad de escritura de la unidad DVD</translation>
     </message>
     <message>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta es la velocidad de escritura a usar cuando se graba un DVD. Seleccionando 0 permite a growisofs elegir la velocidad más rápida disponible.</translation>
     </message>
     <message>
         <source>Command to play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando para reproducir un DVD</translation>
     </message>
     <message>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando a ejecutar cuando se prueba un DVD creado. &apos;Internal&apos; utlizará el reproductor interno de MythTV. %f será reemplazado por la ruta a la estructura del DVD creado ej: &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si se selecciona, los ficheros mpeg2 serán tratados por mythtranscode para limpiar cualquier error. Puede ayudar a solucionar algunos problemas de audio. Ignorado si se selecciona &apos;Usar ProjectX&apos;.</translation>
     </message>
     <message>
         <source>Use ProjectX</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar ProjectX</translation>
     </message>
     <message>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si se selecciona, Project X será usado para quitar anuncios y dividir ficheros mpeg2 en vez de mythtranscode y mythreplex.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation>El script usará FIFOs para pasar la salida de mplex en dvdauthor en vez de crear ficheros intermedios. Ahorra tiempo y espacio en disco durante las operaciones de multiplex pero no está soportado en sistemas Windows</translation>
     </message>
     <message>
         <source>Add Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Subtítulos</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si se activa esta opción se añadirán subtítulos al DVD final. Requiere que &apos;Usar ProjectX&apos; esté activo.</translation>
     </message>
     <message>
         <source>Date format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato de Fecha</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Los ejemplos se muestran con la fecha de hoy.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Los ejemplos se muestran con la fecha de mañana.</translation>
     </message>
     <message>
         <source>Your preferred date format to use on DVD menus.</source>
-        <translation type="unfinished"></translation>
+        <translation>Su formato de fecha preferido para usar en los menús del DVD.</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato de Hora</translation>
     </message>
     <message>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>El formato de fecha preferido para mostrar en los menús del DVD. Debes elegir entre un formato con &quot;AM&quot; o &quot;PM&quot;, si no el tiempo se mostrará en formato de 24h o tiempo &quot;militar&quot;.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfil del Encodeador por Defecto</translation>
     </message>
     <message>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfil de encodeador por defecto para usar si un fichero necesita ser reencodeado.</translation>
     </message>
     <message>
         <source>jpeg2yuv command</source>
-        <translation type="unfinished"></translation>
+        <translation>comando jpeg2yuv</translation>
     </message>
     <message>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando para ejecutar jpeg2yuv. Parte del paquete mjpegtools</translation>
     </message>
     <message>
         <source>projectx command</source>
-        <translation type="unfinished"></translation>
+        <translation>comando projectx</translation>
     </message>
     <message>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando para ejecutar ProjectX. Se usará para quitar anuncios y dividir ficheros mpeg en vez de mythtranscode y mythreplex.</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones del Menu de DVD</translation>
     </message>
     <message>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
-        <translation type="unfinished"></translation>
+        <translation>No se encuentra el directorio de trabajo de MythArchive.
+¿Has seleccionado la ruta correcta en las opciones?</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo crear el DVD. Un error ocurrió durante la ejecución de los scripts</translation>
     </message>
     <message>
         <source>Cannot find any logs to show!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡No se encuentro ningún registro para mostrar!</translation>
     </message>
     <message>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
-        <translation type="unfinished"></translation>
+        <translation>¡Se encontro un bloqueo de fichero pero el proceso que lo posee no se está ejecutando!
+Eliminando el estado de fichero bloqueado.</translation>
     </message>
     <message>
         <source>Last run did not create a playable DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>La última ejecución no creo un DVD reproducible.</translation>
     </message>
     <message>
         <source>Last run failed to create a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>La última ejecución falló al crear un DVD.</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡No tienes ningún video!</translation>
     </message>
     <message>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo grabar el DVD.
+La última ejecución falló al crear el DVD.</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar DVD</translation>
     </message>
     <message>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Coloca un DVD virgen en la unidad y selecciona una opción.</translation>
     </message>
     <message>
         <source>Burn DVD Rewritable</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar DVD Reescribible</translation>
     </message>
     <message>
         <source>Burn DVD Rewritable (Force Erase)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar DVD Reescribible (Forzar Borrado)</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>No ha sido posible ejecutar mytharchivehelper para grabar el DVD.</translation>
     </message>
 </context>
 <context>
@@ -660,363 +663,363 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Recuperando Lista de Grabaciones. Espero por favor...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡No hay grabaciones o no estan disponibles localmente!</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
     <name>SelectDestination</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Siguiente</translation>
+        <translation>Siguiente</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar...</translation>
     </message>
     <message>
         <source>Single Layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD de una capa</translation>
     </message>
     <message>
         <source>Single Layer DVD (4482Mb)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD de una capa (4482Mb)</translation>
     </message>
     <message>
         <source>Dual Layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD de doble capa</translation>
     </message>
     <message>
         <source>Dual Layer DVD (8964Mb)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD de doble capa (8964Mb)</translation>
     </message>
     <message>
         <source>DVD +/- RW</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD +/- RW</translation>
     </message>
     <message>
         <source>Rewritable DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Reescribible</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichero</translation>
     </message>
     <message>
         <source>Any file accessable from your filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cualquier fichero accesible por tu sistema de ficheros.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconocido</translation>
     </message>
 </context>
 <context>
     <name>ThemeSelector</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Siguiente</translation>
+        <translation>Siguiente</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Select Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecciona Destino</translation>
     </message>
     <message>
         <source>description goes here.</source>
-        <translation type="unfinished"></translation>
+        <translation>la descripción va aquí.</translation>
     </message>
     <message>
         <source>Free Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Espacio libre:</translation>
     </message>
     <message>
         <source>0.00Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>0.00Gb</translation>
     </message>
     <message>
         <source>Make ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear imagen ISO</translation>
     </message>
     <message>
         <source>Burn to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar en DVD</translation>
     </message>
     <message>
         <source>Force Overwrite of DVD-RW Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Forzar borrado de DVD-RW</translation>
     </message>
     <message>
         <source>Select Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecciona Grabaciones</translation>
     </message>
     <message>
         <source>Show Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Grabaciones</translation>
     </message>
     <message>
         <source>File Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscador de Ficheros</translation>
     </message>
     <message>
         <source>Select Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar Videos</translation>
     </message>
     <message>
         <source>Video Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorías de Video</translation>
     </message>
     <message>
         <source>title goes here</source>
-        <translation type="unfinished"></translation>
+        <translation>el título va aquí</translation>
     </message>
     <message>
         <source>x.xx Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>x.xx Gb</translation>
     </message>
     <message>
         <source>PL:</source>
-        <translation type="unfinished"></translation>
+        <translation>PL:</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>No videos available</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay videos disponibles</translation>
     </message>
     <message>
         <source>Log Viewer</source>
-        <translation type="unfinished">Visor Logs</translation>
+        <translation>Visor Registro</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar el Perfil del Encodeador</translation>
     </message>
     <message>
         <source>12.34GB</source>
-        <translation type="unfinished"></translation>
+        <translation>12.34GB</translation>
     </message>
     <message>
         <source>DVD Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema del Menu del DVD</translation>
     </message>
     <message>
         <source>Select a theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecciona un tema</translation>
     </message>
     <message>
         <source>Intro</source>
-        <translation type="unfinished"></translation>
+        <translation>Introducción</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menú Principal</translation>
     </message>
     <message>
         <source>Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu de Capitulos</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalles</translation>
     </message>
     <message>
         <source>Select Archive Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar Archivos</translation>
     </message>
     <message>
         <source>No files are selected for archive</source>
-        <translation type="unfinished"></translation>
+        <translation>No se han seleccionado ficheros para archivar</translation>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation type="unfinished"></translation>
+        <translation>xxxxx mb</translation>
     </message>
     <message>
         <source>0 mb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 mb</translation>
     </message>
     <message>
         <source>Archive Item Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalles del Archivo</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Título:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Subtítulo:</translation>
     </message>
     <message>
         <source>Start Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fecha de inicio:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hora:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Descripción:</translation>
     </message>
     <message>
         <source>Thumb Image Selector</source>
-        <translation type="unfinished"></translation>
+        <translation>Selector de Imágen Reducida</translation>
     </message>
     <message>
         <source>Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posición Actual</translation>
     </message>
     <message>
         <source>0:00:00.00</source>
-        <translation type="unfinished"></translation>
+        <translation>0:00:00.00</translation>
     </message>
     <message>
         <source>Seek Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidad de búsqueda</translation>
     </message>
     <message>
         <source>Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Frame</translation>
     </message>
     <message>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="unfinished"></translation>
+        <translation>sep 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
         <source>File Finder To Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar Fichero para Importar</translation>
     </message>
     <message>
         <source>Start Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hora de Comienzo:</translation>
     </message>
     <message>
         <source>Select Associated Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar Canal Asociado</translation>
     </message>
     <message>
         <source>Archived Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal Archivado</translation>
     </message>
     <message>
         <source>Chan. ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>IDCanal:</translation>
     </message>
     <message>
         <source>Chan. No:</source>
-        <translation type="unfinished"></translation>
+        <translation>NºCanal:</translation>
     </message>
     <message>
         <source>Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation>Callsign:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre:</translation>
     </message>
     <message>
         <source>Local Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal Local</translation>
     </message>
     <message>
         <source>A high quality profile giving approx. 1 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Un perfil de alta calidad provee aprox. 1 hora de video para un DVD de una capa</translation>
     </message>
     <message>
         <source>A standard play profile giving approx. 2 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Un perfil de calidad estandard provee aprox. 2 horas de video para un DVD de una capa</translation>
     </message>
     <message>
         <source>A long play profile giving approx. 4 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Un perfil de larga reproducción provee aprox. 4 horas de video para un DVD de una capa</translation>
     </message>
     <message>
         <source>A extended play profile giving approx. 6 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Un perfil de reproducción extendida provee aprox. 6 horas de video para un DVD de una capa</translation>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear un DVD</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear Archivo</translation>
     </message>
     <message>
         <source>Encode Video File</source>
-        <translation type="unfinished"></translation>
+        <translation>Encodear Archivo de Video</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar Archivo</translation>
     </message>
     <message>
         <source>Archive Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilidades de Archivo</translation>
     </message>
     <message>
         <source>Show Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Visor de Registro</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducir el DVD Creado</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar DVD</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Guardar</translation>
+        <translation>Guardar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Salir, Grabar Miniaturas</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Salir, No Grabar Miniaturas</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
@@ -1047,7 +1050,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 </TS>
