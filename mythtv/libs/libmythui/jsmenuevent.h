@@ -10,6 +10,8 @@
 #include <QEvent>
 #include <QString>
 
+#include "mythexp.h"
+
 class JoystickKeycodeEvent : public QEvent
 {
   public:
@@ -46,7 +48,7 @@ class JoystickMenuMuteEvent : public QEvent
     bool m_muteJsmenuEvents;
 };
 
-class JoystickMenuEventLock
+class MPUBLIC JoystickMenuEventLock
 {
   public:
     JoystickMenuEventLock(bool lock_events = true);

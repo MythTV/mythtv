@@ -6,6 +6,8 @@
 #include <QEvent>
 #include <QString>
 
+#include "mythexp.h"
+
 class LircKeycodeEvent : public QEvent
 {
   public:
@@ -52,7 +54,7 @@ class LircMuteEvent : public QEvent
     bool m_muteLircEvents;
 };
 
-class LircEventLock
+class MPUBLIC LircEventLock
 {
   public:
     LircEventLock(bool lock_events = true);
