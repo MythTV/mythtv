@@ -40,19 +40,19 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythweather/main.cpp" line="31"/>
+        <location filename="../mythweather/main.cpp" line="51"/>
         <source>Weather forecasts</source>
         <translation>Weather forecasts</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="33"/>
+        <location filename="../mythweather/main.cpp" line="53"/>
         <source>Pause current page</source>
         <translation>Pause current page</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="35"/>
-        <location filename="../mythweather/main.cpp" line="37"/>
-        <location filename="../mythweather/main.cpp" line="39"/>
+        <location filename="../mythweather/main.cpp" line="55"/>
+        <location filename="../mythweather/main.cpp" line="57"/>
+        <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
         <translation>Search List</translation>
     </message>
@@ -1210,45 +1210,50 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="88"/>
+        <location filename="../mythweather/weather.cpp" line="97"/>
         <source>Paused</source>
         <translation>Paused</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weather.cpp" line="210"/>
+        <source>None of the configured screens are complete in this theme (missing copyright information).</source>
+        <translation>None of the configured screens are complete in this theme (missing copyright information).</translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="197"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="207"/>
         <source>Sunday</source>
         <translation>Sunday</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="200"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="210"/>
         <source>Monday</source>
         <translation>Monday</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="203"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="213"/>
         <source>Tuesday</source>
         <translation>Tuesday</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="206"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="216"/>
         <source>Wednesday</source>
         <translation>Wednesday</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="209"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="219"/>
         <source>Thursday</source>
         <translation>Thursday</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="212"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="222"/>
         <source>Friday</source>
         <translation>Friday</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="215"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="225"/>
         <source>Saturday</source>
         <translation>Saturday</translation>
     </message>

@@ -253,18 +253,18 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
-        <source>Myth Archive Temp Directory</source>
-        <translation>MythArchive Temp Directory</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/archivesettings.cpp" line="20"/>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
         <translation>Location where MythArchive should create its temporory work files. LOTS of free space required here.</translation>
     </message>
     <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
+        <source>MythArchive Temp Directory</source>
+        <translation>MythArchive Temp Directory</translation>
+    </message>
+    <message>
         <location filename="../mytharchive/archivesettings.cpp" line="28"/>
-        <source>Myth Archive Share Directory</source>
+        <source>MythArchive Share Directory</source>
         <translation>MythArchive Share Directory</translation>
     </message>
     <message>
