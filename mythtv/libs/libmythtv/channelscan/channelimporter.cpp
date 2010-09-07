@@ -1017,6 +1017,44 @@ QString ChannelImporter::FormatChannel(
     return msg;
 }
 
+QString ChannelImporter::SimpleFormatChannel(
+    const ScanDTVTransport          &transport,
+    const ChannelInsertInfo         &chan)
+{
+    QString msg;
+    QTextStream ssMsg(&msg);
+
+    QString si_standard = (chan.si_standard=="opencable") ?
+        QString("scte") : chan.si_standard;
+
+    if (si_standard == "atsc" || si_standard == "scte")
+    {
+        ssMsg << (QString("%1-%2")
+                  .arg(chan.atsc_major_channel)
+                  .arg(chan.atsc_minor_channel)).toAscii().constData();
+
+        if (!chan.callsign.isEmpty())
+        {
+            ssMsg << (QString(" (%1")
+                  .arg(chan.callsign)).toAscii().constData();
+            if (!chan.chan_num.isEmpty())
+                ssMsg << (QString(" %1)")
+                    .arg(chan.chan_num)).toAscii().constData();
+            else
+                ssMsg << (QString(")")).toAscii().constData();
+        }
+    }
+    else if (si_standard == "dvb")
+        ssMsg << (QString("%1 (%2 %3)")
+                  .arg(chan.service_name).arg(chan.chan_num)
+                  .arg(chan.netid)).toAscii().constData();
+    else
+        ssMsg << (QString("%1 (%2)")
+                  .arg(chan.callsign).arg(chan.chan_num))
+                  .toAscii().constData();
+
+    return msg;
+}
 
 QString ChannelImporter::FormatChannels(
     const ScanDTVTransportList      &transports,
