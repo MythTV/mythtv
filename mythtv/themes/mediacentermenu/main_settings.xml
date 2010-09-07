@@ -16,6 +16,13 @@
     </button>
 
     <button>
+        <type>SETTINGS_THEMECHOOSER</type>
+        <text>Theme Chooser</text>
+        <description>Chose a local theme or download new ones</description>
+        <action>SETTINGS THEMECHOOSER</action>
+    </button>
+
+    <button>
         <type>SCREENSETUPWIZARD</type>
         <text>Screen Setup Wizards</text>
         <description>Compensate for TVs with overscan</description>
