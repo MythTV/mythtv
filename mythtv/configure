@@ -774,7 +774,7 @@ EOF
 
 check_cxxflags(){
     log check_cxxflags "$@"
-    check_cxx $@ <<EOF && add_cxxflags "$@" || echolog "WARNING! An unknown C++ compiler flag in: \"$@\". Option(s) will be ignored."
+    check_cxx "$@" <<EOF && add_cxxflags "$@" || echolog "WARNING! An unknown C++ compiler flag in: \"$@\". Option(s) will be ignored."
 class X {};
 int x;
 EOF
@@ -2471,6 +2471,15 @@ fi
 test -n "$cc_type" && enable $cc_type ||
     warn "Unknown C compiler $cc, unable to select optimal CFLAGS"
 
+
+if   $cxx -v 2>&1 | grep -qi ^gcc; then
+    cxx_type=gxx
+    gxx_version=$($cxx -dumpversion)
+fi
+
+test -n "$cxx_type" && enable $cxx_type ||
+    warn "Unknown C++ compiler $cxx, unable to select optimal CXXFLAGS"
+
 : ${as_default:=$cc}
 : ${dep_cc_default:=$cc}
 : ${ld_default:=$cc}
@@ -3860,7 +3869,6 @@ check_cxxflags -Wpointer-arith
 check_cxxflags -Wredundant-decls
 check_cxxflags -Wno-non-virtual-dtor
 check_cxxflags -funit-at-a-time
-check_cxxflags -Wmissing-declarations
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
 check_cxxflags -D__STDC_LIMIT_MACROS
@@ -3884,20 +3892,6 @@ EOF
 __asm__(".symver ff_foo,av_foo@VERSION");
 void ff_foo(void) {}
 EOF
-fi
-
-# GCC version
-gcc_version=$($cc -dumpversion)
-GCC_MAJOR=$(echo ${gcc_version} | cut -s -d'.' -f1)
-GCC_MINOR=$(echo ${gcc_version} | cut -s -d'.' -f2)
-
-if enabled symbol_visibility; then
-    if test x"$GCC_MAJOR" = x"4" ; then
-        check_cxxflags -fvisibility-inlines-hidden
-        append CCONFIG "use_hidesyms"
-    else
-        echo "Warning: --enable-symbol-visibility requires gcc 4.x"
-    fi
 fi
 
 if enabled dvb; then
@@ -4131,6 +4125,21 @@ elif enabled armcc; then
     add_cflags -Wrvct,--diag_suppress=1207
 elif enabled tms470; then
     add_cflags -pds=824 -pds=837
+fi
+
+if enabled gxx; then
+    if enabled symbol_visibility; then
+        if expr "$gxx_version" : '^4' > /dev/null; then
+            check_cxxflags -fvisibility-inlines-hidden
+            append CCONFIG "use_hidesyms"
+        else
+            disable symbol_visibility
+            warn "--enable-symbol-visibility requires gcc 4.x"
+        fi
+    fi
+    if expr "$gxx_version" : '^4\.[3-9]' > /dev/null; then
+        check_cxxflags -Wmissing-declarations
+    fi
 fi
 
 # Check for python dependencies
@@ -4724,14 +4733,6 @@ fi
 
 if test x"$CONFIG_INCLUDEPATH" != x"" ; then
   echo "CONFIG_INCLUDEPATH=$CONFIG_INCLUDEPATH" >> $MYTH_CONFIG_MAK
-fi
-
-if test x"$GCC_MAJOR" != x"" ; then
-  echo "GCC_MAJOR=$GCC_MAJOR" >> $MYTH_CONFIG_MAK
-fi
-
-if test x"$GCC_MINOR" != x"" ; then
-  echo "GCC_MINOR=$GCC_MINOR" >> $MYTH_CONFIG_MAK
 fi
 
 echo "#endif /* MYTHTV_CONFIG_H */" >> $TMPH
