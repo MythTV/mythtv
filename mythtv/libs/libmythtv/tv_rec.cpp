@@ -122,7 +122,7 @@ TVRec::TVRec(int capturecardnum)
       stateChangeLock(QMutex::Recursive),
       pendingRecLock(QMutex::Recursive),
       internalState(kState_None), desiredNextState(kState_None),
-      changeState(false), pauseNotify(true),
+      changeState(false), m_SMpending(false), pauseNotify(true),
       stateFlags(0), lastTuningRequest(0),
       triggerEventLoopLock(QMutex::NonRecursive),
       triggerEventLoopSignal(false),
@@ -1618,7 +1618,7 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
         stateChangeLock.lock();
 
         // verify that we were triggered.
-        ok = (tuningRequests.empty() && !changeState);
+        ok = (tuningRequests.empty() && !m_SMpending && !changeState);
     }
     return ok;
 }
@@ -3507,6 +3507,8 @@ void TVRec::HandleTuning(void)
 
         // The dequeue isn't safe to do until now because we
         // release the stateChangeLock to teardown a recorder
+        if (request.flags & kFlagRecording)
+            m_SMpending = true;
         tuningRequests.dequeue();
 
         // Now we start new stuff
@@ -3541,6 +3543,8 @@ void TVRec::HandleTuning(void)
     MPEGStreamData *streamData = NULL;
     if (HasFlags(kFlagWaitingForSignal) && !(streamData = TuningSignalCheck()))
         return;
+
+    m_SMpending = false;
 
     if (HasFlags(kFlagNeedToStartRecorder))
     {
@@ -3788,36 +3792,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     if (!channum.isEmpty())
     {
         if (!input.isEmpty())
-            ok = channel->SelectInput(input, channum, true);
+            channel->SelectInput(input, channum, true);
         else
-        {
             channel->SelectChannel(channum, true);
-            ok = true;
-        }
-    }
-
-    if (!ok)
-    {
-        if (!(request.flags & kFlagLiveTV) || !(request.flags & kFlagEITScan))
-        {
-            if (curRecording)
-                curRecording->SetRecordingStatus(rsFailed);
-
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Failed to set channel to %1. "
-                            "Reverting to kState_None")
-                    .arg(channum));
-            if (kState_None != internalState)
-                ChangeState(kState_None);
-            else
-                tuningRequests.enqueue(TuningRequest(kFlagKillRec));
-            return;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Failed to set channel to %1.").arg(channum));
-        }
     }
 
     // Start signal (or channel change) monitoring
