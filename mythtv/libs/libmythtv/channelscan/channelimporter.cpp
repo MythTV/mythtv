@@ -1453,8 +1453,8 @@ OkCancelType ChannelImporter::QueryUserResolve(
     ChannelInsertInfo               &chan)
 {
     QString msg = QObject::tr(
-        "This channel '%1' was found to be in conflict with other channels. ")
-        .arg(FormatChannel(transport, chan));
+        "Channel %1 was found to be in conflict with other channels. ")
+        .arg(SimpleFormatChannel(transport, chan));
 
     OkCancelType ret = kOCTCancel;
 
@@ -1534,8 +1534,8 @@ OkCancelType ChannelImporter::QueryUserInsert(
     ChannelInsertInfo               &chan)
 {
     QString msg = QObject::tr(
-        "You chose to manually insert this channel '%1'.")
-        .arg(FormatChannel(transport, chan));
+        "You chose to manually insert channel %1.")
+        .arg(SimpleFormatChannel(transport, chan));
 
     OkCancelType ret = kOCTCancel;
 
