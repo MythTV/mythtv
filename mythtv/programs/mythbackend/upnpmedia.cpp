@@ -140,14 +140,21 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
         QString fName = Info.fileName();
         QString fPath = Info.filePath();
 
-        if (fName == "." ||
-            fName == "..")
-        {
+        // We don't want . or .. or something that specifically globs to 
+        // either.  The "??" and "?" cases can happen when the backend is
+        // running in a non-UTF-8 locale and comes across a UTF-8 filename
+        if (fName == "."  || fName == ".." || fName == "?" || fName == "??" ||
+            fName == ".?" || fName == "?.")
             continue;
-        }
 
         if (Info.isDir())
         {
+            // If we are about to recurse into the current directory (which
+            // will cause an infinite recursive loop!), skip this entry.
+            QDir subDir(fPath);
+            if( subDir.canonicalPath() == vidDir.canonicalPath() ) 
+                continue;
+
             itemID++;
 
             query.prepare("INSERT INTO upnpmedia "
@@ -168,7 +175,7 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
             if (!query.exec())
                 MythDB::DBError("UPnpMedia::buildFileList", query);
 
-            itemID = buildFileList(Info.filePath(), 0, itemID, query);
+            itemID = buildFileList(fPath, 0, itemID, query);
             continue;
 
         }
