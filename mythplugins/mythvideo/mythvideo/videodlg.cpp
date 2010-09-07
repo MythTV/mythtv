@@ -3746,49 +3746,7 @@ void VideoDialog::ResetMetadata()
     if (metadata)
     {
         metadata->Reset();
-        QString inetref = metadata->GetInetRef();
-        QString filename = metadata->GetFilename();
-        QString title = metadata->GetTitle();
-        int season = metadata->GetSeason();
-        QString host = metadata->GetHost();
-        int episode = metadata->GetEpisode();
-
-        QString cover_file;
-        if (GetLocalVideoImage(inetref, filename,
-                        QStringList(m_d->m_artDir), cover_file,
-                        title, season, host, "Coverart", episode))
-        {
-            metadata->SetCoverFile(cover_file);
-        }
-
-        QString screenshot_file;
-        if (GetLocalVideoImage(inetref, filename,
-                        QStringList(m_d->m_sshotDir), screenshot_file,
-                        title, season, host, "Screenshots", episode,
-                        true))
-        {
-            metadata->SetScreenshot(screenshot_file);
-        }
-
-
-        QString fanart_file;
-        if (GetLocalVideoImage(inetref, filename,
-                        QStringList(m_d->m_fanDir), fanart_file,
-                        title, season, host, "Fanart", episode))
-        {
-            metadata->SetFanart(fanart_file);
-        }
-
-        QString banner_file;
-        if (GetLocalVideoImage(inetref, filename,
-                        QStringList(m_d->m_banDir), banner_file,
-                        title, season, host, "Banners", episode))
-        {
-            metadata->SetBanner(banner_file);
-        }
-
         metadata->UpdateDatabase();
-
         UpdateItem(item);
     }
 }
