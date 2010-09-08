@@ -432,9 +432,16 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                             .arg(chan.atsc_major_channel)
                             .arg(chan.atsc_minor_channel);
                     }
+                    else if (chan.si_standard == "dvb")
+                    {
+                        chan.chan_num = QString("%1")
+                                            .arg(chan.service_id);
+                    }
                     else
                     {
-                        chan.chan_num = QString("%1").arg(chan.service_id);
+                        chan.chan_num = QString("%1-%2")
+                                            .arg(chan.freqid)
+                                            .arg(chan.service_id);
                     }
 
                     conflicting = ChannelUtil::IsConflicting(
@@ -582,7 +589,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
 
                 if (chan.chan_num.isEmpty() || renameChannels ||
                     ChannelUtil::IsConflicting(
-                        chan.chan_num, chan.service_id, chan.channel_id))
+                        chan.chan_num, chan.source_id, chan.channel_id))
                 {
                     if (kATSCNonConflicting == type)
                     {
@@ -590,13 +597,20 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                             .arg(chan.atsc_major_channel)
                             .arg(chan.atsc_minor_channel);
                     }
+                    else if (chan.si_standard == "dvb")
+                    {
+                        chan.chan_num = QString("%1")
+                                            .arg(chan.service_id);
+                    }
                     else
                     {
-                        chan.chan_num = QString("%1").arg(chan.service_id);
+                        chan.chan_num = QString("%1-%2")
+                                            .arg(chan.freqid)
+                                            .arg(chan.service_id);
                     }
 
                     conflicting = ChannelUtil::IsConflicting(
-                        chan.chan_num, chan.service_id, chan.channel_id);
+                        chan.chan_num, chan.source_id, chan.channel_id);
                 }
 
                 if (conflicting)
@@ -1029,28 +1043,27 @@ QString ChannelImporter::SimpleFormatChannel(
 
     if (si_standard == "atsc" || si_standard == "scte")
     {
-        ssMsg << (QString("%1-%2")
+
+        if (si_standard == "atsc")
+            ssMsg << (QString("%1-%2")
                   .arg(chan.atsc_major_channel)
                   .arg(chan.atsc_minor_channel)).toAscii().constData();
+        else
+            ssMsg << (QString("%1-%2")
+                  .arg(chan.freqid)
+                  .arg(chan.service_id)).toAscii().constData();
 
         if (!chan.callsign.isEmpty())
-        {
-            ssMsg << (QString(" (%1")
+            ssMsg << (QString(" (%1)")
                   .arg(chan.callsign)).toAscii().constData();
-            if (!chan.chan_num.isEmpty())
-                ssMsg << (QString(" %1)")
-                    .arg(chan.chan_num)).toAscii().constData();
-            else
-                ssMsg << (QString(")")).toAscii().constData();
-        }
     }
     else if (si_standard == "dvb")
         ssMsg << (QString("%1 (%2 %3)")
-                  .arg(chan.service_name).arg(chan.chan_num)
+                  .arg(chan.service_name).arg(chan.service_id)
                   .arg(chan.netid)).toAscii().constData();
     else
-        ssMsg << (QString("%1 (%2)")
-                  .arg(chan.chan_num).arg(chan.callsign))
+        ssMsg << (QString("%1-%2")
+                  .arg(chan.freqid).arg(chan.service_id))
                   .toAscii().constData();
 
     return msg;
@@ -1191,7 +1204,17 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
         .arg(chan.atsc_minor_channel);
 
     if (!chan.atsc_minor_channel)
-        chan_num = QString("%1").arg(chan.service_id);
+    {
+        if (chan.si_standard == "dvb")
+        {
+            chan_num = QString("%1")
+                          .arg(chan.service_id);
+        }
+        else
+            chan_num = QString("%1-%2")
+                          .arg(chan.freqid)
+                          .arg(chan.service_id);
+    }
 
     if (!ChannelUtil::IsConflicting(chan_num, chan.source_id))
         return chan_num;
