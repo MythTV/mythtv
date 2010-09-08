@@ -179,9 +179,9 @@ class MPUBLIC ChannelUtil
     static bool    IsConflicting(const QString &channum,
                                  uint sourceid = 0, uint excluded_chanid = 0)
     {
-        vector<uint> cardids = GetConflicting(channum, sourceid);
-        return (cardids.size() > 1) ||
-            ((1 == cardids.size()) && (cardids[0] != excluded_chanid));
+        vector<uint> chanids = GetConflicting(channum, sourceid);
+        return (chanids.size() > 1) ||
+            ((1 == chanids.size()) && (chanids[0] != excluded_chanid));
     }
 
     static vector<uint> GetConflicting(const QString &channum,

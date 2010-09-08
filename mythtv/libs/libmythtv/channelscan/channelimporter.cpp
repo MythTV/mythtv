@@ -1050,7 +1050,7 @@ QString ChannelImporter::SimpleFormatChannel(
                   .arg(chan.netid)).toAscii().constData();
     else
         ssMsg << (QString("%1 (%2)")
-                  .arg(chan.callsign).arg(chan.chan_num))
+                  .arg(chan.chan_num).arg(chan.callsign))
                   .toAscii().constData();
 
     return msg;
