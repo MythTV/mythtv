@@ -1365,6 +1365,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;
+    progMap["channame"] = channame;
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
 
