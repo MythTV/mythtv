@@ -1917,7 +1917,7 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 new_pos = fi.size() - off_end;
             }
         }
-        else if (abs(new_pos-readpos) > 100000000)
+        else if (abs(new_pos-readpos) > 100000000LL)
         {
             if (remotefile)
             {
@@ -1929,7 +1929,7 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 off_end = fi.size() - new_pos;
             }
         }
-        if (off_end < 300000)
+        if (off_end == 250000)
         {
             VERBOSE(VB_FILE, LOC +
                     QString("Seek(): offset from end: %1").arg(off_end) +
@@ -1937,7 +1937,7 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
 
             ignorereadpos = new_pos;
             errno = EINVAL;
-            int ret;
+            long long ret;
             if (remotefile)
                 ret = remotefile->Seek(ignorereadpos, SEEK_SET);
             else
@@ -1946,10 +1946,8 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
             if (ret < 0)
             {
                 int tmp_eno = errno;
-                QString cmd = QString("Seek(%1, %2) ign ")
-                    .arg(ignorereadpos)
-                    .arg((SEEK_SET == whence) ? "SEEK_SET" :
-                         ((SEEK_CUR == whence) ?"SEEK_CUR" : "SEEK_END"));
+                QString cmd = QString("Seek(%1, SEEK_SET) ign ")
+                    .arg(ignorereadpos);
 
                 ignorereadpos = -1;
 
@@ -1962,10 +1960,8 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                     ret = lseek64(fd2, internalreadpos, SEEK_SET);
                 if (ret < 0)
                 {
-                    QString cmd = QString("Seek(%1, %2) int ")
-                        .arg(internalreadpos)
-                        .arg((SEEK_SET == whence) ? "SEEK_SET" :
-                             ((SEEK_CUR == whence) ?"SEEK_CUR" : "SEEK_END"));
+                    QString cmd = QString("Seek(%1, SEEK_SET) int ")
+                        .arg(internalreadpos);
                     VERBOSE(VB_IMPORTANT, LOC_ERR + cmd + " Failed" + ENO);
                 }
                 else
