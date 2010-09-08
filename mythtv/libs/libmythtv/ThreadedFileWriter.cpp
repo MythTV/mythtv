@@ -178,8 +178,26 @@ bool ThreadedFileWriter::Open(void)
 
         tfw_buf_size = TFW_DEF_BUF_SIZE;
         tfw_min_write_size = TFW_MIN_WRITE_SIZE;
-        pthread_create(&writer, NULL, boot_writer, this);
-        pthread_create(&syncer, NULL, boot_syncer, this);
+
+        bool res = 0;
+        res = pthread_create(&writer, NULL, boot_writer, this);
+        if (res)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Starting writer thread. ") +
+                    safe_eno_to_string(res));
+            return false;
+        }
+
+        res = pthread_create(&syncer, NULL, boot_syncer, this);
+        if (res)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Starting syncer thread. ") +
+                    safe_eno_to_string(res));
+            return false;
+        }
+
         return true;
     }
 }
