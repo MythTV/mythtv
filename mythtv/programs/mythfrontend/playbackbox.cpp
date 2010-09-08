@@ -1080,17 +1080,30 @@ void PlaybackBox::UpdateUsageUI(void)
 
     // If the theme doesn't have these widgets,
     // don't waste time querying the backend...
-    if (!freereportText && !usedProgress)
+    if (!freereportText && !usedProgress && !GetChild("diskspacetotal") &&
+        !GetChild("diskspaceused") && !GetChild("diskspacefree") &&
+        !GetChild("diskspacepercentused") && !GetChild("diskspacepercentfree"))
         return;
 
     double freeSpaceTotal = (double) m_helper.GetFreeSpaceTotalMB();
     double freeSpaceUsed  = (double) m_helper.GetFreeSpaceUsedMB();
+
+    InfoMap usageMap;
+    usageMap["diskspacetotal"] = QString().sprintf("%0.2f",
+                                                   freeSpaceTotal / 1024.0);
+    usageMap["diskspaceused"] = QString().sprintf("%0.2f",
+                                                  freeSpaceUsed / 1024.0);
+    usageMap["diskspacefree"] = QString().sprintf("%0.2f",
+                                    (freeSpaceTotal - freeSpaceUsed) / 1024.0);
 
     QString usestr;
 
     double perc = 0.0;
     if (freeSpaceTotal > 0.0)
         perc = (100.0 * freeSpaceUsed) / freeSpaceTotal;
+
+    usageMap["diskspacepercentused"] = QString().number((int)perc);
+    usageMap["diskspacepercentfree"] = QString().number(100 - (int)perc);
 
     usestr.sprintf("%d", (int)perc);
     usestr = usestr + tr("% used");
@@ -1108,6 +1121,8 @@ void PlaybackBox::UpdateUsageUI(void)
         usedProgress->SetTotal((int)freeSpaceTotal);
         usedProgress->SetUsed((int)freeSpaceUsed);
     }
+
+    SetTextFromMap(usageMap);
 }
 
 /*
