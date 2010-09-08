@@ -2378,7 +2378,12 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     UpdatePosition();
 
     if (m_d->m_currentNode)
+    {
         CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
+        CheckedSet(this, "foldername", m_d->m_currentNode->getString());
+    }
+
+
 
     if (node && node->getInt() == kSubFolder)
         CheckedSet(this, "childcount",
@@ -3653,7 +3658,7 @@ void VideoDialog::OnManualVideoUID(QString video_uid)
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     MythGenericTree *node = GetNodePtrFromButton(GetItemCurrent());
- 
+
    if (video_uid.length() && node && metadata)
     {
         MetadataLookup *lookup = new MetadataLookup();
