@@ -190,7 +190,7 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
     QLinearGradient gradient;
     QString gradientStart = element.attribute("start", "");
     QString gradientEnd = element.attribute("end", "");
-    int gradientAlpha = element.attribute("alpha", "100").toInt();
+    int gradientAlpha = element.attribute("alpha", "255").toInt();
     QString direction = element.attribute("direction", "vertical");
 
     float x1, y1, x2, y2 = 0.0;
