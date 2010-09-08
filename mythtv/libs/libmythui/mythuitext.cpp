@@ -91,6 +91,9 @@ void MythUIText::SetText(const QString &text)
     if (newtext == m_Message)
         return;
 
+    if (newtext.isEmpty())
+        m_Message = m_DefaultMessage;
+
     m_Message = newtext;
     m_CutMessage.clear();
     FillCutMessage();
@@ -631,8 +634,8 @@ bool MythUIText::ParseElement(
             m_Message = parseText(element);
         }
 
-        SetText(m_Message);
         m_DefaultMessage = m_Message;
+        SetText(m_Message);
     }
     else if (element.tagName() == "template")
     {
@@ -733,9 +736,9 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_AltDisplayRect = text->m_AltDisplayRect;
     m_drawRect = text->m_drawRect;
 
+    m_DefaultMessage = text->m_DefaultMessage;
     SetText(text->m_Message);
     m_CutMessage = text->m_CutMessage;
-    m_DefaultMessage = text->m_DefaultMessage;
     m_TemplateText = text->m_TemplateText;
 
     m_Cutdown = text->m_Cutdown;
