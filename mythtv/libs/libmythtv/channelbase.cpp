@@ -719,16 +719,15 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
 
     QString command = QString("%1 %2").arg(changer).arg(channum);
 
-    int  flags = 0;
-    MythSystemLocks locks;
+    uint  flags = kMSNone;
     uint result;
 
     // Use myth_system, but since we need abort support, do it in pieces
-    myth_system_pre_flags(flags, locks);
+    myth_system_pre_flags(flags);
     m_changer_pid = myth_system_fork(command, result); 
     if( result == GENERIC_EXIT_RUNNING )
         result = myth_system_wait(m_changer_pid, 30);
-    myth_system_post_flags(flags, locks);
+    myth_system_post_flags(flags);
 
     return( result == 0 );
 #endif // !USING_MINGW

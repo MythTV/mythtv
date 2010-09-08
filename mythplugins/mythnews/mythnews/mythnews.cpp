@@ -822,7 +822,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
             cmd.replace(";","\\;");
 
             GetMythMainWindow()->AllowInput(false);
-            myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+            myth_system(cmd, kMSDontDisableDrawing);
             GetMythMainWindow()->AllowInput(true);
             return;
         }

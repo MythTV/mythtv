@@ -240,9 +240,8 @@ bool PreviewGenerator::Run(void)
 
         command += " > /dev/null";
 
-        int ret = myth_system(command, MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                                       MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
-                                       MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        int ret = myth_system(command, kMSDontBlockInputDevs |
+                                       kMSDontDisableDrawing);
         if (ret)
         {
             msg = QString("Encountered problems running '%1'").arg(command);

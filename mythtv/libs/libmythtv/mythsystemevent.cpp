@@ -43,8 +43,7 @@ class SystemEventThread : public QRunnable
      */
     void run()
     {
-        int flags =
-            MYTH_SYSTEM_DONT_BLOCK_LIRC | MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU;
+        uint flags = kMSDontBlockInputDevs;
 
         m_event.detach();
         m_command.detach();

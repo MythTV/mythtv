@@ -1180,9 +1180,7 @@ bool IsPulseAudioRunning(void)
 #else
     const char *command = "ps -ae | grep pulseaudio > /dev/null";
 #endif
-    bool res = myth_system(command,
-                           MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                           MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    bool res = myth_system(command, kMSDontBlockInputDevs);
     return !res;
 }
 

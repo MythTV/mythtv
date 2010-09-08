@@ -35,8 +35,6 @@ unix {
     QMAKE_CXXFLAGS += -fno-strict-aliasing
 }
 
-INCLUDEPATH += ../libmythui ..
-
 # Install headers to same location as libmyth to make things easier
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythexp.h mythdb.h

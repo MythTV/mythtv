@@ -121,9 +121,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg(m_DevicePath);
     
         VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
-        if (0 == myth_system(MountCommand,
-                             MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                             MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU))
+        if (0 == myth_system(MountCommand, kMSDontBlockInputDevs))
         {
             if (DoMount)
             {
@@ -280,7 +278,7 @@ MediaError MythMediaDevice::eject(bool open_close)
 
     QString  command = "disktool -e " + m_DevicePath + " &";
 
-    if (myth_system(command, MYTH_SYSTEM_RUN_BACKGROUND) > 0)
+    if (myth_system(command, kMSRunBackground) > 0)
         return MEDIAERR_FAILED;
 
     return MEDIAERR_OK;

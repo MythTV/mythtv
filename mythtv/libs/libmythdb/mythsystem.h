@@ -5,36 +5,21 @@
 #include <unistd.h>  // for pid_t
 
 #include "mythexp.h"
-#include "mythconfig.h"
-#if CONFIG_LIRC
-#  include "lircevent.h"
-#endif
-#if CONFIG_JOYSTICK_MENU
-#  include "jsmenuevent.h"
-#endif
 
+typedef enum MythSystemMask {
+    kMSNone                     = 0x00000000,
+    kMSDontBlockInputDevs       = 0x00000001, //< avoid blocking LIRC & Joystick Menu
+    kMSDontDisableDrawing       = 0x00000002, //< avoid disabling UI drawing
+    kMSRunBackground            = 0x00000004, //< run child in the background
+    kMSInUi                     = 0x00000008, //< the parent is in the UI
+} MythSystemFlag;
 
-typedef struct {
-    bool                    ready_to_lock;
-#if CONFIG_LIRC
-    LircEventLock          *lirc;
-#endif
-#if CONFIG_JOYSTICK_MENU
-    JoystickMenuEventLock  *jsmenu;
-#endif
-} MythSystemLocks;
-
-
-#define MYTH_SYSTEM_DONT_BLOCK_LIRC          0x1 //< myth_system() flag to avoid blocking LIRC
-#define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU 0x2 //< myth_system() flag to avoid blocking Joystick Menu
-#define MYTH_SYSTEM_DONT_BLOCK_PARENT        0x4 //< myth_system() flag to avoid blocking
-#define MYTH_SYSTEM_RUN_BACKGROUND           0x8 //< myth_system() flag to run the child in the background
-
-MPUBLIC unsigned int myth_system(const QString &command, int flags = 0,
+MPUBLIC unsigned int myth_system(const QString &command, 
+                                 uint flags = kMSNone,
                                  uint timeout = 0);
 
-MPUBLIC void myth_system_pre_flags(int &flags, MythSystemLocks &locks);
-MPUBLIC void myth_system_post_flags(int &flags, MythSystemLocks &locks);
+MPUBLIC void myth_system_pre_flags(uint &flags);
+MPUBLIC void myth_system_post_flags(uint &flags);
 #ifndef USING_MINGW
 MPUBLIC pid_t myth_system_fork(const QString &command, uint &result);
 MPUBLIC uint myth_system_wait(pid_t pid, uint timeout, bool background = false);

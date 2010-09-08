@@ -56,6 +56,8 @@ class MPUBLIC MythEvent : public QEvent
     static Type kDisableDrawingEventType;
     static Type kPushDisableDrawingEventType;
     static Type kPopDisableDrawingEventType;
+    static Type kLockInputDevicesEventType;
+    static Type kUnlockInputDevicesEventType;
 
   private:
     QString message;

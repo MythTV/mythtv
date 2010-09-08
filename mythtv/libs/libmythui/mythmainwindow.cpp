@@ -1961,11 +1961,6 @@ void MythMainWindow::customEvent(QEvent *ce)
                 QCoreApplication::sendEvent(key_target, &key);
         }
     }
-    else if (ce->type() == LircMuteEvent::kEventType)
-    {
-        LircMuteEvent *lme = static_cast<LircMuteEvent *>(ce);
-        d->ignore_lirc_keys = lme->eventsMuted();
-    }
 #endif
 #ifdef USE_JOYSTICK_MENU
     else if (ce->type() == JoystickKeycodeEvent::kEventType &&
@@ -2007,11 +2002,6 @@ void MythMainWindow::customEvent(QEvent *ce)
                             "mappings.")
                     .arg(jke->getJoystickMenuText().toLocal8Bit().constData()));
         }
-    }
-    else if (ce->type() == JoystickMenuMuteEvent::kEventType)
-    {
-        JoystickMenuMuteEvent *jme = static_cast<JoystickMenuMuteEvent *>(ce);
-        d->ignore_joystick_keys = jme->eventsMuted();
     }
 #endif
     else if (ce->type() == ScreenSaverEvent::kEventType)
@@ -2057,6 +2047,14 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::kEnableDrawingEventType)
     {
         SetDrawEnabled(true);
+    }
+    else if (ce->type() == MythEvent::kLockInputDevicesEventType)
+    {
+        LockInputDevices(true);
+    }
+    else if (ce->type() == MythEvent::kUnlockInputDevicesEventType)
+    {
+        LockInputDevices(false);
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
     {
@@ -2219,6 +2217,22 @@ void MythMainWindow::StartLIRC(void)
         d->lircThread->deleteLater();
         d->lircThread = NULL;
     }
+#endif
+}
+
+void MythMainWindow::LockInputDevices( bool locked )
+{
+    if( locked )
+        VERBOSE(VB_IMPORTANT, "Locking input devices");
+    else
+        VERBOSE(VB_IMPORTANT, "Unlocking input devices");
+
+#ifdef USE_LIRC
+    d->ignore_lirc_keys = locked;
+#endif
+
+#ifdef USE_JOYSTICK_MENU
+    d->ignore_joystick_keys = locked;
 #endif
 }
 

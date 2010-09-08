@@ -383,7 +383,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
         cmd.replace(";","\\;");
 
         GetMythMainWindow()->AllowInput(false);
-        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        myth_system(cmd, kMSDontDisableDrawing);
         GetMythMainWindow()->AllowInput(true);
 
         // we need to reload the bookmarks incase the user added/deleted
@@ -603,7 +603,7 @@ void BookmarkManager::slotShowMarked(void)
         cmd.replace(";","\\;");
 
         GetMythMainWindow()->AllowInput(false);
-        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        myth_system(cmd, kMSDontDisableDrawing);
         GetMythMainWindow()->AllowInput(true);
 
         // we need to reload the bookmarks incase the user added/deleted

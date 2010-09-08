@@ -14,5 +14,9 @@ QEvent::Type MythEvent::kPushDisableDrawingEventType =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MythEvent::kPopDisableDrawingEventType =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythEvent::kLockInputDevicesEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythEvent::kUnlockInputDevicesEventType =
+    (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ExternalKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

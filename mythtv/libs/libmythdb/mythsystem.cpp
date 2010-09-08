@@ -42,14 +42,6 @@
 #include "mythverbose.h"
 #include "exitcodes.h"
 
-#if CONFIG_LIRC
-#include "lircevent.h"
-#endif
-
-#if CONFIG_JOYSTICK_MENU
-#include "jsmenuevent.h"
-#endif
-
 #ifndef USING_MINGW
 typedef struct {
     QMutex  mutex;
@@ -190,7 +182,9 @@ uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background )
 
     if( !background ) {
         /* Now we wait for the thread to see the SIGCHLD */
-        pidData->mutex.lock();
+        while( !pidData->mutex.tryLock(100) )
+            qApp->processEvents();
+
         result = pidData->result;
         delete pidData;
 
@@ -233,24 +227,23 @@ uint MythSystemReaper::abortPid( pid_t pid )
 
 
 
-/** \fn myth_system(const QString&, int, uint)
+/** \fn myth_system(const QString&, uint, uint)
  *  \brief Runs a system command inside the /bin/sh shell.
  *
  *  Note: Returns GENERIC_EXIT_NOT_OK if it can not execute the command.
  *  \return Exit value from command as an unsigned int in range [0,255].
  */
-uint myth_system(const QString &command, int flags, uint timeout)
+uint myth_system(const QString &command, uint flags, uint timeout)
 {
     uint            result;
-    MythSystemLocks locks;
 
-    if( !(flags & MYTH_SYSTEM_RUN_BACKGROUND) && command.endsWith("&") )
+    if( !(flags & kMSRunBackground) && command.endsWith("&") )
     {
         VERBOSE(VB_IMPORTANT, "Adding background flag");
-        flags |= MYTH_SYSTEM_RUN_BACKGROUND;
+        flags |= kMSRunBackground;
     }
 
-    myth_system_pre_flags( flags, locks );
+    myth_system_pre_flags( flags );
 
 #ifndef USING_MINGW
     pid_t   pid;
@@ -258,8 +251,7 @@ uint myth_system(const QString &command, int flags, uint timeout)
     pid    = myth_system_fork( command, result );
 
     if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait( pid, timeout, 
-                                   (flags & MYTH_SYSTEM_RUN_BACKGROUND) );
+        result = myth_system_wait( pid, timeout, (flags & kMSRunBackground) );
 #else
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -293,69 +285,65 @@ uint myth_system(const QString &command, int flags, uint timeout)
     }
 #endif
 
-    myth_system_post_flags( flags, locks );
+    myth_system_post_flags( flags );
 
     return result;
 }
 
 
-void myth_system_pre_flags(int &flags, MythSystemLocks &locks)
+void myth_system_pre_flags(uint &flags)
 {
-    // Clear out the locks structure to be sure
-    memset( &locks, 0x00, sizeof(locks) );
+    bool isInUi = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
+    if( isInUi )
+    {
+        flags |= kMSInUi;
+    }
+    else
+    {
+        // These locks only happen in the UI, and only if the flags are cleared
+        // so as we are not in the UI, set the flags to simplify logic further
+        // down
+        flags &= ~kMSInUi;
+        flags |= kMSDontBlockInputDevs;
+        flags |= kMSDontDisableDrawing;
+    }
 
-    locks.ready_to_lock = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
-
-#if CONFIG_LIRC
-    if( !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC) && locks.ready_to_lock )
-        locks.lirc = new LircEventLock(true);
-#endif
-
-#if CONFIG_JOYSTICK_MENU
-    if( !(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU) && locks.ready_to_lock )
-        locks.jsmenu = new JoystickMenuEventLock(true);
-#endif
-
-#ifdef BSD
-    // Darwin waitpid() frequently fails EINTR (interrupted system call) -
-    // I think because the parent is being toggled between kernel sleep/wake.
-    // This seems to work around whatever is causing this 
-    flags |= MYTH_SYSTEM_DONT_BLOCK_PARENT;
-#endif
+    // This needs to be a send event so that the MythUI locks the input devices
+    // immediately instead of after existing events are processed
+    // since this function could be called inside one of those events.
+    if( !(flags & kMSDontBlockInputDevs) )
+    {
+        QEvent event(MythEvent::kLockInputDevicesEventType);
+        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+    }
 
     // This needs to be a send event so that the MythUI m_drawState change is
     // flagged immediately instead of after existing events are processed
     // since this function could be called inside one of those events.
-    if (locks.ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
+    if( !(flags & kMSDontDisableDrawing) )
     {
         QEvent event(MythEvent::kPushDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
     }
 }
 
-void myth_system_post_flags(int &flags, MythSystemLocks &locks)
+void myth_system_post_flags(uint &flags)
 {
-#if CONFIG_JOYSTICK_MENU
-    if( locks.jsmenu ) {
-        delete locks.jsmenu;
-        locks.jsmenu = NULL;
-    }
-#endif
-
-#if CONFIG_LIRC
-    if( locks.lirc ) {
-        delete locks.lirc;
-        locks.lirc = NULL;
-    }
-#endif
-
     // This needs to be a send event so that the MythUI m_drawState change is
     // flagged immediately instead of after existing events are processed
     // since this function could be called inside one of those events.
-    if (locks.ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
+    if( !(flags & kMSDontDisableDrawing) )
     {
         QEvent event(MythEvent::kPopDisableDrawingEventType);
         QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+    }
+
+    // This needs to be a post event so that the MythUI unlocks input devices
+    // after all existing (blocked) events are processed and ignored.
+    if( !(flags & kMSDontBlockInputDevs) )
+    {
+        QEvent *event = new QEvent(MythEvent::kUnlockInputDevicesEventType);
+        QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 }
 

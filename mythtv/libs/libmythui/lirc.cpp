@@ -546,7 +546,7 @@ void LIRC::SpawnApp(void)
 
     QString command = m_externalApp + " &";
 
-    int status = myth_system(command, MYTH_SYSTEM_RUN_BACKGROUND);
+    uint status = myth_system(command, kMSRunBackground);
 
     if (status > 0)
     {

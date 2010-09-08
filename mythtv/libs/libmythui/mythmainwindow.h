@@ -142,6 +142,8 @@ class MPUBLIC MythMainWindow : public QWidget
 
     void SetDrawEnabled(bool enable);
 
+    void LockInputDevices(bool locked);
+
     MythMainWindowPrivate *d;
 };
 

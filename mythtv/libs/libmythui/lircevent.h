@@ -6,8 +6,6 @@
 #include <QEvent>
 #include <QString>
 
-#include "mythexp.h"
-
 class LircKeycodeEvent : public QEvent
 {
   public:
@@ -37,33 +35,6 @@ class LircKeycodeEvent : public QEvent
     Qt::KeyboardModifiers m_modifiers;
     QString               m_text;
     QString               m_lirctext;
-};
-
-class LircMuteEvent : public QEvent
-{
-  public:
-    LircMuteEvent(bool mute_events) : QEvent(kEventType),
-            m_muteLircEvents(mute_events) {}
-
-    bool eventsMuted() const { return m_muteLircEvents; }
-
-  public:
-    static Type kEventType;
-
-  private:
-    bool m_muteLircEvents;
-};
-
-class MPUBLIC LircEventLock
-{
-  public:
-    LircEventLock(bool lock_events = true);
-    ~LircEventLock();
-    void lock();
-    void unlock();
-
-  private:
-    bool events_locked;
 };
 
 #endif
