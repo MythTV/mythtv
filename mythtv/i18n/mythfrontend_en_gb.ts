@@ -6081,10 +6081,10 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="878"/>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="40"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1374"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1395"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1452"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1536"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1412"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1433"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1490"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1574"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1154"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
@@ -6745,8 +6745,8 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="712"/>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="39"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1372"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1394"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1410"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1432"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1153"/>
         <location filename="../programs/mythfrontend/viewschedulediff.cpp" line="145"/>
         <source>OK</source>
@@ -11541,7 +11541,7 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
         <translation>&quot;%1&quot; on %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1324"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1362"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="1639"/>
         <source>Do you want to:</source>
         <translation>Do you want to:</translation>
@@ -13548,11 +13548,11 @@ You may have to use the eject button under its tray.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="39"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1190"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1252"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1309"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1432"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1513"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1228"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1290"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1347"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1470"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1551"/>
         <source>Channel Importer</source>
         <translation>Channel Importer</translation>
     </message>
@@ -13567,49 +13567,49 @@ You may have to use the eject button under its tray.</translation>
         <translation>Failed to find any channels.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1042"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1080"/>
         <source>Channels: FTA Enc Dec
 </source>
         <translation>Channels: FTA Enc Dec
 </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1056"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1094"/>
         <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </source>
         <translation>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1059"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1097"/>
         <source>Max atsc major count: %1</source>
         <translation>Max atsc major count: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1181"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1219"/>
         <source>Delete all</source>
         <translation>Delete all</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1182"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1220"/>
         <source>Set all invisible</source>
         <translation>Set all invisible</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1244"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1282"/>
         <source>Insert all</source>
         <translation>Insert all</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1245"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1283"/>
         <source>Insert manually</source>
         <translation>Insert manually</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1184"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1246"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1303"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1330"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1222"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1284"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1341"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1368"/>
         <source>Ignore all</source>
         <translation>Ignore all</translation>
     </message>
@@ -13662,7 +13662,7 @@ You may have to use the eject button under its tray.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1041"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1079"/>
         <source>Found %n transport(s):
 </source>
         <translation>
@@ -13673,56 +13673,56 @@ You may have to use the eject button under its tray.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1301"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1326"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1339"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1364"/>
         <source>Update all</source>
         <translation>Update all</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1302"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1328"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1340"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1366"/>
         <source>Update manually</source>
         <translation>Update manually</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1347"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1385"/>
         <source>Please enter either 1, 2, or 3:</source>
         <translation>Please enter either 1, 2, or 3:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1373"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1411"/>
         <source>Suggest</source>
         <translation>Suggest</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1375"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1396"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1453"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1537"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1413"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1434"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1491"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1575"/>
         <source>Cancel All</source>
         <translation>Cancel All</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1417"/>
-        <source>This channel &apos;%1&apos; was found to be in conflict with other channels. </source>
-        <translation>This channel &apos;%1&apos; was found to be in conflict with other channels. </translation>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1455"/>
+        <source>Channel %1 was found to be in conflict with other channels. </source>
+        <translation>Channel %1 was found to be in conflict with other channels. </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1428"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1509"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1536"/>
+        <source>You chose to manually insert channel %1.</source>
+        <translation>You chose to manually insert channel %1.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1466"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1547"/>
         <source>Please enter a unique channel number. </source>
         <translation>Please enter a unique channel number. </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1454"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1538"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1492"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1576"/>
         <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
         <translation>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1498"/>
-        <source>You chose to manually insert this channel &apos;%1&apos;.</source>
-        <translation>You chose to manually insert this channel &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="245"/>
