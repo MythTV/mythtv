@@ -1202,9 +1202,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     m_recordingList->Reset();
 
-    if (groupname == "default")
-        groupname.clear();
-
     ProgramMap::iterator pmit = m_progLists.find(groupname);
     if (pmit == m_progLists.end())
         return;
