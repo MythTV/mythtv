@@ -19,8 +19,8 @@
 /*
  This part of code was taken by me from Linux-2.4.3 and slightly modified
 for MMX, MMX2, SSE instruction set. I have done it since linux uses page aligned
-blocks but mplayer uses weakly ordered data and original sources can not
-speedup them. Only using PREFETCHNTA and MOVNTQ together have effect!
+blocks but mplayer uses weakly ordered data and original sources cannot
+speed them up. Only using PREFETCHNTA and MOVNTQ together have effect!
 
 >From IA-32 Intel Architecture Software Developer's Manual Volume 1,
 

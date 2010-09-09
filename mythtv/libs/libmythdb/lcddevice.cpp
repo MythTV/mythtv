@@ -810,14 +810,14 @@ bool LCD::startLCDServer(void)
             if (dup2(fd, 0) < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Can not redirect /dev/null to standard input,"
+                        "Cannot redirect /dev/null to standard input,"
                         "\n\t\t\tfailed to duplicate file descriptor." + ENO);
             }
             close(fd);
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Can not redirect /dev/null "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot redirect /dev/null "
                     "to standard input, failed to open." + ENO);
         }
 

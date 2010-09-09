@@ -1678,7 +1678,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
     QSize disp_dim = window.GetDisplayDim();
     float disp_aspect;
 
-    // If we are using Xinerama the display dimensions can not be trusted.
+    // If we are using Xinerama the display dimensions cannot be trusted.
     // We need to use the Xinerama monitor aspect ratio from the DB to set
     // the physical screen width. This assumes the height is correct, which
     // is more or less true in the typical side-by-side monitor setup.

@@ -73,7 +73,7 @@ class DTVTunerType : public DTVParamHelper
     static const DTVParamHelperStruct parseTable[];
 
   public:
-    // WARNING: kTunerTypes can not be defined by a C++03 enum
+    // WARNING: kTunerTypes cannot be defined by a C++03 enum
     // because gcc 4.3.3 will reportedly promote an enum inconsistently
     // to int on IA-32 platforms. I don't know whether this is
     // correct or not, it comes down to interpretation of section

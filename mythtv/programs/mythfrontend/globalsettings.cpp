@@ -1764,7 +1764,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
             {
                 msg = (name.isEmpty()) ?
                     QObject::tr(
-                        "Sorry, playback group\nname can not be blank.") :
+                        "Sorry, playback group\nname cannot be blank.") :
                     QObject::tr(
                         "Sorry, playback group name\n"
                         "'%1' is already being used.").arg(name);
@@ -2394,7 +2394,7 @@ static HostComboBox *XineramaMonitorAspectRatio()
     gc->addSelection(QObject::tr("16:9"),  "1.7777");
     gc->addSelection(QObject::tr("16:10"), "1.6");
     gc->setHelpText(QObject::tr(
-                        "The aspect ratio of a Xinerama display can not be "
+                        "The aspect ratio of a Xinerama display cannot be "
                         "queried from the display, so it must be specified."));
     return gc;
 }

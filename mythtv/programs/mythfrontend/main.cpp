@@ -1039,7 +1039,7 @@ static int log_rotate(int report_error)
         /* If we can't open the new logfile, send data to /dev/null */
         if (report_error)
         {
-            VERBOSE(VB_IMPORTANT, QString("Can not open logfile '%1'")
+            VERBOSE(VB_IMPORTANT, QString("Cannot open logfile '%1'")
                     .arg(logfile));
             return -1;
         }

@@ -463,7 +463,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                 break;
             case 4:
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "OpenFile(): Can not seek in file.");
+                        "OpenFile(): Cannot seek in file.");
                 break;
             default:
                 break;

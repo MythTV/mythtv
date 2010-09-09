@@ -111,7 +111,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     if (!Open())
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
-                "will not open, can not change channels.");
+                "will not open, cannot change channels.");
 
         return false;
     }

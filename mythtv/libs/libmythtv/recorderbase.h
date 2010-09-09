@@ -168,7 +168,7 @@ class MPUBLIC RecorderBase
 
     /** \brief Returns closest keyframe position before the desired frame.
      *
-     *   This returns -1 if a keyframe position can not be found
+     *   This returns -1 if a keyframe position cannot be found
      *   for a frame. This could be true if the keyframe has not
      *   yet been seen by the recorder(unlikely), or if a keyframe
      *   map does not exist or is not up to date. The latter can

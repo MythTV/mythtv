@@ -717,7 +717,7 @@ bool CustomEdit::checkSyntax(void)
     }
     else if (desc.contains(';'))
     {
-        msg  = tr("Power Search rules can not include semicolon ( ; ) ");
+        msg  = tr("Power Search rules cannot include semicolon ( ; ) ");
         msg += tr("statement terminators.");
     }
     else

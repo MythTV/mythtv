@@ -349,7 +349,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     if (offset>181)
     {
         VERBOSE(VB_IMPORTANT, "Error: offset>181, pes length & "
-                "current can not be queried");
+                "current cannot be queried");
         return 0;
     }
 
@@ -412,7 +412,7 @@ bool MPEGStreamData::CreatePATSingleProgram(
         }
         VERBOSE(VB_IMPORTANT,
                 QString("Desired program #%1 not found in PAT."
-                        "\n\t\t\tCan Not create single program PAT.")
+                        "\n\t\t\tCannot create single program PAT.")
                 .arg(_desired_program));
         SetPATSingleProgram(NULL);
         return false;

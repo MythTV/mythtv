@@ -410,7 +410,7 @@ class OldRecorded( DBDataWrite, RECSTATUS, CMPRecord ):
         FileOps(db=self._db).reschedule(0)
 
     def update(self, *args, **keywords):
-        """OldRecorded entries can not be altered"""
+        """OldRecorded entries cannot be altered"""
         return
     def delete(self):
         """OldRecorded entries cannot be deleted"""

@@ -527,7 +527,7 @@ class MPUBLIC ProgramInfo
     void MarkAsInUse(bool inuse, QString usedFor = "");
     void UpdateInUseMark(bool force = false);
 
-    // Extremely slow functions that can not be called from the UI thread.
+    // Extremely slow functions that cannot be called from the UI thread.
     QString DiscoverRecordingDirectory(void) const;
     QString GetPlaybackURL(bool checkMaster = false,
                            bool forceCheckLocal = false) const;

@@ -2225,7 +2225,7 @@ void CaptureCard::Save(void)
     QString init_dev = CardUtil::GetVideoDevice(cardid);
     if (init_dev.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, QString("Can not clone card #%1 with empty"
+        VERBOSE(VB_IMPORTANT, QString("Cannot clone card #%1 with empty"
                                       " videodevice").arg(cardid));
         return;
     }
@@ -2781,7 +2781,7 @@ void CardInput::CreateNewInputGroup(void)
         {
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), tr("Error"),
-                tr("Sorry, this Input Group name can not be blank."));
+                tr("Sorry, this Input Group name cannot be blank."));
             continue;
         }
 

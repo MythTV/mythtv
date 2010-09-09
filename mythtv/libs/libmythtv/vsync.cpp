@@ -367,7 +367,7 @@ OpenGLVideoSync::~OpenGLVideoSync()
 
 /** \fn OpenGLVideoSync::TryInit(void)
  *  \brief Try to create an OpenGL surface so we can use glXWaitVideoSyncSGI:
- *  \return true if this method can be employed, false if it can not.
+ *  \return true if this method can be employed, false if it cannot.
  */
 bool OpenGLVideoSync::TryInit(void)
 {

@@ -342,7 +342,7 @@ bool CustomPriority::checkSyntax(void)
     }
     else if (desc.contains(';'))
     {
-        msg  = "Power Priority rules can not include semicolon ( ; ) ";
+        msg  = "Power Priority rules cannot include semicolon ( ; ) ";
         msg += "statement terminators.";
     }
     else

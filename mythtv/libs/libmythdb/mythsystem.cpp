@@ -230,7 +230,7 @@ uint MythSystemReaper::abortPid( pid_t pid )
 /** \fn myth_system(const QString&, uint, uint)
  *  \brief Runs a system command inside the /bin/sh shell.
  *
- *  Note: Returns GENERIC_EXIT_NOT_OK if it can not execute the command.
+ *  Note: Returns GENERIC_EXIT_NOT_OK if it cannot execute the command.
  *  \return Exit value from command as an unsigned int in range [0,255].
  */
 uint myth_system(const QString &command, uint flags, uint timeout)
@@ -384,14 +384,14 @@ pid_t myth_system_fork(const QString &command, uint &result)
             if (dup2(fd, 0) < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Can not redirect /dev/null to standard input,"
+                        "Cannot redirect /dev/null to standard input,"
                         "\n\t\t\tfailed to duplicate file descriptor." + ENO);
             }
             close(fd);
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Can not redirect /dev/null "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot redirect /dev/null "
                     "to standard input, failed to open." + ENO);
         }
 

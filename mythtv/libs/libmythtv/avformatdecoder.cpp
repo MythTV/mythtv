@@ -3606,15 +3606,15 @@ static int filter_max_ch(const AVFormatContext *ic,
  *      recalled as the Nth stream in the preferred language
  *      or the Nth substream when audio is in dual language
  *      format (each channel contains a different language track)
- *      If it can not be located we attempt to find a stream
+ *      If it cannot be located we attempt to find a stream
  *      in the same language.
  *
- *   2) If we can not reselect the last user selected stream,
+ *   2) If we cannot reselect the last user selected stream,
  *      then for each preferred language from most preferred
  *      to least preferred, we try to find a new stream based
  *      on the algorithm below.
  *
- *   3) If we can not select a stream in a preferred language
+ *   3) If we cannot select a stream in a preferred language
  *      we try to select a stream irrespective of language
  *      based on the algorithm below.
  *

@@ -142,7 +142,7 @@ class DRMVideoSync : public VideoSync
  *
  *   Special care must be taken with this video sync method due 
  *   to a bad interaction between some pthread implementations
- *   and OpenGL. OpenGL DIRECT contexts can not be shared between
+ *   and OpenGL. OpenGL DIRECT contexts cannot be shared between
  *   processes. And some pthread implementations, notably a common
  *   one on Linux, treat each thread as a seperate process.
  *   Hence Start(void), Stop(void) and WaitForFrame(void) must all be called

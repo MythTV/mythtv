@@ -1247,7 +1247,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Can not open DD cache file in '" +
+                    "Cannot open DD cache file in '" +
                     tmpDir + "' for writing!");
         }
         else
@@ -1550,7 +1550,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     if (!lfile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("<<lineupid<<") failed -- "
-                <<QString("can not open file '%1'")
+                <<QString("cannot open file '%1'")
                 .arg(get_cache_filename(lineupid)));
         return cache_dt;
     }

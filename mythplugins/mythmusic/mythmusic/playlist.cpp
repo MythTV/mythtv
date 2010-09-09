@@ -365,7 +365,7 @@ Playlist& Playlist::operator=(const Playlist& rhs)
         delete songs.front();
         songs.pop_front();
     }
-#error Can not safely copy Playlist.. Track does not have a deep copy constructor
+#error Cannot safely copy Playlist.. Track does not have a deep copy constructor
 
     return *this;
 }

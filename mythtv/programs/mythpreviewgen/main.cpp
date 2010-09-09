@@ -108,7 +108,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
         if (!pginfo->GetChanID())
         {
             VERBOSE(VB_IMPORTANT, QString(
-                        "Can not locate recording made on '%1' at '%2'")
+                        "Cannot locate recording made on '%1' at '%2'")
                     .arg(chanid).arg(starttime));
             delete pginfo;
             return PREVIEWGEN_EXIT_NOT_OK;
@@ -120,7 +120,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
         if (!QFileInfo(infile).isReadable())
         {
             VERBOSE(VB_IMPORTANT, QString(
-                        "Can not read this file '%1'").arg(infile));
+                        "Cannot read this file '%1'").arg(infile));
             return PREVIEWGEN_EXIT_NOT_OK;
         }
         pginfo = new ProgramInfo(
@@ -130,7 +130,7 @@ int preview_helper(const QString &_chanid, const QString &starttime,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Can not locate recording to preview");
+        VERBOSE(VB_IMPORTANT, "Cannot locate recording to preview");
         return PREVIEWGEN_EXIT_NOT_OK;
     }
 

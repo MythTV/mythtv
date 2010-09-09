@@ -549,7 +549,7 @@ ProgInfo *XMLTVParser::parseProgram(
             int season_int = season.toInt();
             if (season_int > 35)
             {
-                // Can not represent season as a single base-36 character, so
+                // Cannot represent season as a single base-36 character, so
                 // remove the programid and fall back to normal dup matching.
                 if (kCategoryMovie != pginfo->categoryType)
                     programid.clear();

@@ -226,7 +226,7 @@ with:
 # $0 --partial_restore
 
 Include the --with_plugin_data argument if you would like to keep the data used
-by MythTV plugins.  Note that this approach can not be used to "merge"
+by MythTV plugins.  Note that this approach cannot be used to "merge"
 databases from different MythTV databases nor to import recordings from other
 MythTV databases.
 

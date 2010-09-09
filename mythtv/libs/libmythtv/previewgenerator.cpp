@@ -60,7 +60,7 @@
  *   the file can be found on the file system for local preview
  *   generation. When called by the backend 'local_only' should be set
  *   to true, otherwise the backend may deadlock if the PreviewGenerator
- *   can not find the file.
+ *   cannot find the file.
  *
  *  \param pginfo     ProgramInfo for the recording we want a preview of.
  *  \param local_only If set to true, the preview will only be generated
@@ -213,7 +213,7 @@ bool PreviewGenerator::Run(void)
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Run() can not generate preview locally for: '%1'")
+                    QString("Run() cannot generate preview locally for: '%1'")
                     .arg(pathname));
             msg = "Failed, local preview requested for remote file.";
         }

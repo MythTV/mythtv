@@ -88,7 +88,7 @@ typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 //
 // Note: Taking a middle lock such as askAllowLock, without taking a
 // playerLock first does not violate these rules, but once you are
-// holding it, you can not later lock playerLock.
+// holding it, you cannot later lock playerLock.
 //
 // It goes without saying that any locks outside of this class should only
 // be taken one at a time, and should be taken last and released first of

@@ -496,7 +496,7 @@ int main(int argc, char *argv[])
             cout << "   This text\n";
             cout << "\n";
             cout << "\n";
-            cout << "  --manual and --update can not be used together.\n";
+            cout << "  --manual and --update cannot be used together.\n";
             cout << "\n";
             return FILLDB_EXIT_INVALID_CMDLINE;
         }

@@ -774,7 +774,7 @@ QObject itself is pretty safe because when you assign one QObject to
 another you make a copy. Qt's container classes, including QString
 do not make a copy but rather pass a reference counted pointer to
 the data when you assign one to another. This reference counter is
-not protected by a mutex so you can not use regular assignment when
+not protected by a mutex so you cannot use regular assignment when
 passing a QString or other Qt container from one thread to another.
 
 In order to use these classes safely you must use
@@ -797,7 +797,7 @@ for the ones it doesn't support you will have to copy manually.
 
 \section qobject_inheritence QObject inheritence
 
-You can not inherit more than one QObject derived class.
+You cannot inherit more than one QObject derived class.
 This is because of how signals and slots are implemented. What
 happens is that each slot is transformed into an integer that
 is used to find the right function pointer quickly when a signal
@@ -806,7 +806,7 @@ tree the integers will alias so that signals intended for the
 second slot in parent class B might get sent to the second slot
 in parent class A instead. Badness ensues.
 
-For the similar reason you can not inherit a QObject derived
+For the similar reason you cannot inherit a QObject derived
 class virtually, in this case the badness is a little more
 complicated. The result is the same however, signals arrive
 at the wrong slot. Usually, what happens is that the developer

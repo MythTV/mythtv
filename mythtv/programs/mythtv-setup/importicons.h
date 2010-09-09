@@ -141,7 +141,7 @@ class ImportIconsWizard : public MythScreenType
     bool initialLoad(QString name="");
 
     /*! \brief attempts to move the iteration on one/more than one
-     * \return true if we can go again or false if we can not
+     * \return true if we can go again or false if we cannot
      */
     bool doLoad();
 

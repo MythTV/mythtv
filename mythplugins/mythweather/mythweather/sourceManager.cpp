@@ -337,7 +337,7 @@ bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
     if (!screen)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Can not connect nonexistent screen "<<screen);
+                "Cannot connect nonexistent screen "<<screen);
 
         return false;
     }
@@ -346,7 +346,7 @@ bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
     if (it == m_sourcemap.end())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Can not connect nonexistent source '%1'").arg(id));
+                QString("Cannot connect nonexistent source '%1'").arg(id));
 
         return false;
     }
@@ -361,7 +361,7 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
     if (!screen)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Can not disconnect nonexistent screen "<<screen);
+                "Cannot disconnect nonexistent screen "<<screen);
 
         return false;
     }
@@ -370,7 +370,7 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
     if (it == m_sourcemap.end())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Can not disconnect nonexistent source "<<screen->getId());
+                "Cannot disconnect nonexistent source "<<screen->getId());
 
         return false;
     }

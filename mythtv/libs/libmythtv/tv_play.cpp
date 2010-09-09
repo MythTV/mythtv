@@ -5122,7 +5122,7 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
     }
 
     if ((player.size() > 1) && (wantPBP ^ actx->IsPBP()))
-        err_msg = tr("Sorry, can not mix PBP and PIP views");
+        err_msg = tr("Sorry, cannot mix PBP and PIP views");
 
     if (!err_msg.isEmpty())
     {
@@ -11823,14 +11823,14 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
 
     if (!ctx->playingInfo->QueryIsDeleteCandidate(true))
     {
-        VERBOSE(VB_IMPORTANT, "This program can not be deleted at this time.");
+        VERBOSE(VB_IMPORTANT, "This program cannot be deleted at this time.");
         ProgramInfo pginfo(*ctx->playingInfo);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         OSD *osd = GetOSDLock(ctx);
         if (osd && !osd->DialogVisible())
         {
-            QString message = QObject::tr("Can not delete program") +
+            QString message = QObject::tr("Cannot delete program") +
                 QString("%1 %2 ")
                 .arg(pginfo.GetTitle()).arg(pginfo.GetSubtitle());
 

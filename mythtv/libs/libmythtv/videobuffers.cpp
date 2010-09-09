@@ -87,7 +87,7 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
  *  is being held by VideoOutput and we don't want to lose
  *  it if the stream is reset. The displayed state indicates
  *  that DoneDisplayingFrame() has been called for the frame,
- *  but it can not yet be added to available because it is
+ *  but it cannot yet be added to available because it is
  *  still being displayed. VideoOutputXv calls
  *  DiscardFrame(VideoFrame*) on the frames no longer
  *  being displayed at the end of the next

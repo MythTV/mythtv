@@ -22,9 +22,9 @@ VideoFilter *LoadFilter(FilterInfo *Filt, VideoFrameType inpixfmt,
                         VideoFrameType outpixfmt, int &width,
                         int &height, char *opts):
 Returns a pointer to a single VideoFilter, corresponding to the given
-FilterInfo, or NULL if the filter can not be loaded.  Inpixfmt and
+FilterInfo, or NULL if the filter cannot be loaded.  Inpixfmt and
 outpixfmt give the input and output pixel formats requested of the
-filter.  The filter load will fail if the filter can not provide the
+filter.  The filter load will fail if the filter cannot provide the
 requested format conversion.  Width and height are the dimensions of the
 video which will be input to the filter.  If the filter alters the frame
 dimensions of the video, width and height will be modified accordingly.
@@ -35,7 +35,7 @@ FilterChain *LoadFilters(QString filters, VideoFrameType &inpixfmt,
                          VideoFrameType &outpixfmt, int &width,
                          int &height, int &bufsize):
 Returns a pointer to a FilterChain object for the requested filters, or
-NULL if such a chain can not be built.  Filters is a comma-separated
+NULL if such a chain cannot be built.  Filters is a comma-separated
 list of filter names, which may each optionally be followed by
 =<options> to specify filter options.  Inpixfmt and outpixfmt specify
 input and output pixelf formats for the filter chain.  If either is set
@@ -156,7 +156,7 @@ VideoFilter structure will be freed by the FilterChain into which the
 filter is loaded.
 
 Here's the filter function from the invert filter.  It's very simple,
-and can invert video in most formats, but can not convert between
+and can invert video in most formats, but cannot convert between
 formats.
 
 int invert(VideoFilter *vf, VideoFrame *frame)

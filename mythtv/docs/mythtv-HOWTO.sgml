@@ -18,7 +18,7 @@ necessary.
 <img src="stop.png">
 <caption>
 <bf>NOTE</bf>: Please note that I, Robert Kulagowski, am <em>NOT</em> the
-author/programmer of the MythTV application!  I can not give you
+author/programmer of the MythTV application!  I cannot give you
 personalized installation support.  If you are having issues installing
 MythTV you should examine the archives, or post your question to the
 MythTV-users mailing list.  If you send me "Does MythTV work with 'X'"?
@@ -3133,7 +3133,7 @@ schedule.
 
 <itemize>
 <item>Currently recording beats not currently recording -- A recording
-in progress can not be moved to another input or time so it "wins"
+in progress cannot be moved to another input or time so it "wins"
 its current timeslot.
 
 <item>Single, Daily, or Weekly rules with no match are marked Not Listed --
@@ -3141,7 +3141,7 @@ If these or Overrides do not match the current listings because the
 listings have changed, they are added to the schedule and marked to
 indicate that they will not record.
 
-<item>Rules that could record beat rules that can not record a showing --
+<item>Rules that could record beat rules that cannot record a showing --
 If two rules match the same showing of a program, a rule marked as inactive
 or a showing marked as a repeat, for example, yield to the other rule.
 
@@ -3685,7 +3685,7 @@ to the same set top cable box.
 </verb></tscreen>
 
 Input 1 and input 2 receive content from the same set top box and the
-channels can not be tuned independently. Therefore only one of these two
+channels cannot be tuned independently. Therefore only one of these two
 inputs should be used at any given time. The solution is to create an "Input
 Group" with <bf>mythtv-setup</bf> in "Input connections". Including these
 two inputs in the same Input Group will tell the scheduler that these are
@@ -5068,7 +5068,7 @@ You can now continue troubleshooting using <bf>gdb</bf> as detailed in the
 instructions.
 
 <sect2>MythTV is crashing your system
-<p>When run as a non-privileged user, MythTV <em>can not</em> crash your
+<p>When run as a non-privileged user, MythTV <em>cannot</em> crash your
 system.  If your system is crashing when you run MythTV, then you have some
 issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
@@ -5272,7 +5272,7 @@ often appear to hang, when in fact it is trying to manipulate the audio
 subsystem and failing.  You may or may not receive error messages indicating
 that the source of the error is the audio subsystem.
 
-You can not use <bf>xawtv</bf> to determine if your audio is working
+You cannot use <bf>xawtv</bf> to determine if your audio is working
 correctly, since <bf>xawtv</bf> is simply using the analog sound patched
 through line-in to line-out. It doesn't need to digitize the sound unless
 you are using the recording function.
@@ -5639,7 +5639,7 @@ by the settings for the television set. Many sets have these adjustments in
 a 'service mode'. If you cannot make these adjustments, there will be black
 borders around the edges of the X desktop, MythTV GUI and TV playback.
 
-MythTV has settings for "Overscan" in Setup->Playback. These can not, and do
+MythTV has settings for "Overscan" in Setup->Playback. These cannot, and do
 not, cause the image to display beyond the edge of the X display area. The
 purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
@@ -6063,7 +6063,7 @@ content even if the slave backend that recorded a program is not available.
 another.  The transcoder has three primary uses; it can transcode MPEG-2
 files captured using a hardware encoder (PVR cards, DVB cards, ATSC HD,
 etc.) to MPEG-4, it can be used to transcode RTjpeg files (usually only used
-on systems that can not real-time encode to MPEG-4 using a framegrabber) to
+on systems that cannot real-time encode to MPEG-4 using a framegrabber) to
 MPEG-4, and finally it can be used to remove commercials from a MPEG-2 file
 while leaving the file in MPEG-2 format.
 

@@ -71,14 +71,14 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     bool ok;
     _channel->HasLock(&ok);
     if (!ok)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can not read DVB status" + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot read DVB status" + ENO);
 
     uint64_t rmflags = 0;
 
 #define DVB_IO(FLAG, METHOD, MSG) \
   do { if (HasFlags(FLAG)) { bool ok; _channel->METHOD(&ok); \
           if (!ok) { \
-              VERBOSE(VB_IMPORTANT, LOC_WARN+"Can not "+MSG+ENO); \
+              VERBOSE(VB_IMPORTANT, LOC_WARN+"Cannot "+MSG+ENO); \
               rmflags |= FLAG; } \
           else { \
               VERBOSE(VB_CHANNEL, LOC + "Can " + MSG); } } } while (false)

@@ -547,7 +547,7 @@ bool LinuxFirewireDevice::OpenAVStream(void)
     if (!GetInfoPtr() || !GetInfoPtr()->IsPortOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC +
-                "Can not open AVStream without open IEEE 1394 port");
+                "Cannot open AVStream without open IEEE 1394 port");
 
         return false;
     }

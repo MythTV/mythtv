@@ -1838,7 +1838,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     if (!runningJobs[jobID].pginfo)
     {
         VERBOSE(VB_JOBQUEUE, LOC_ERR +
-                "The JobQueue can not currently transcode files that do not "
+                "The JobQueue cannot currently transcode files that do not "
                 "have a chanid/starttime in the recorded table.");
         ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
         RemoveRunningJob(jobID);
@@ -2068,7 +2068,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     if (!runningJobs[jobID].pginfo)
     {
         VERBOSE(VB_JOBQUEUE, LOC_ERR +
-                "The JobQueue can not currently commflag files that do not "
+                "The JobQueue cannot currently commflag files that do not "
                 "have a chanid/starttime in the recorded table.");
         ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
         RemoveRunningJob(jobID);
@@ -2088,7 +2088,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     {
         QString msg = QString("Commercial Detection failed.  Could not open "
                               "new database connection for %1. "
-                              "Program can not be flagged.")
+                              "Program cannot be flagged.")
                               .arg(details.constData());
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 

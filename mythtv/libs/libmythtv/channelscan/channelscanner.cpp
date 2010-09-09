@@ -380,7 +380,7 @@ void ChannelScanner::PreScanCommon(
         do_test_decryption);
 
     // If we know the channel types we can give the signal montior a hint.
-    // Since we unfortunately do not record this info in the DB, we can not
+    // Since we unfortunately do not record this info in the DB, we cannot
     // do this for the other scan types and have to guess later on...
     switch (scantype)
     {

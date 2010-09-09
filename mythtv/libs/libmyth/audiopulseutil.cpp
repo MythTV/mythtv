@@ -188,7 +188,7 @@ static void pau_context_state_callback(pa_context *c, void *userdata)
             else
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Sound server is not local, can not suspend.");
+                        "Sound server is not local, cannot suspend.");
 
                 pau_set_value(kPA_not_suspended_remote_server);
                 pau_quit(0);
@@ -202,7 +202,7 @@ static void pau_context_state_callback(pa_context *c, void *userdata)
         case PA_CONTEXT_FAILED:
         default:
             VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Can not connect to sound server, can not suspend." +
+                    "Cannot connect to sound server, cannot suspend." +
                     QString("\n\t\t\t%1")
                     .arg(pa_strerror(pa_context_errno(c))));
 

@@ -438,7 +438,7 @@ void AutoExpire::ExpireRecordings(void)
         if ((fsit->totalSpaceKB == -1) || (fsit->usedSpaceKB == -1))
         {
             VERBOSE(VB_FILE, LOC_ERR + QString("fsID #%1 has invalid info, "
-                    "AutoExpire can not run for this filesystem.  "
+                    "AutoExpire cannot run for this filesystem.  "
                     "Continuing on to next...").arg(fsit->fsID));
             VERBOSE(VB_FILE, QString("Directories on filesystem ID %1:")
                     .arg(fsit->fsID));
@@ -459,7 +459,7 @@ void AutoExpire::ExpireRecordings(void)
         {
             VERBOSE(VB_FILE, QString(
                 "    fsid %1 has a truncating delete in progress,  AutoExpire "
-                "can not run for this filesystem until the delete has "
+                "cannot run for this filesystem until the delete has "
                 "finished.  Continuing on to next...").arg(fsit->fsID));
             continue;
         }

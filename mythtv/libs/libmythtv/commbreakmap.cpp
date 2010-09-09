@@ -287,7 +287,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
          ((totalFrames) &&
           ((commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))))
     {
-        comm_msg = QObject::tr("At End, can not Skip.");
+        comm_msg = QObject::tr("At End, cannot Skip.");
         return false;
     }
 
@@ -331,7 +331,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
                  ((commBreakIter.key() + (10 * video_frame_rate)) >
                                                                 totalFrames)))
             {
-                comm_msg = QObject::tr("At End, can not Skip.");
+                comm_msg = QObject::tr("At End, cannot Skip.");
                 return false;
             }
         }

@@ -645,7 +645,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         else
         {
             result = QString("ERROR: Unable to change to PlaybackBox from "
-                             "%1, can not play requested file.")
+                             "%1, cannot play requested file.")
                              .arg(GetMythUI()->GetCurrentLocation());
         }
     }

@@ -60,7 +60,7 @@ bool Action::HasKey(const QString &key) const
 /** \fn Action::AddKey(const QString&)
  *  \brief Add a key sequence to this action.
  *
- *   We don't add empty keys nor duplicates, and can not
+ *   We don't add empty keys nor duplicates, and cannot
  *   add more than kMaximumNumberOfBindings. If any of
  *   these restrictions are a problem we return false and
  *   do not add the binding.

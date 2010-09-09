@@ -22,7 +22,7 @@ QString VideoMetaDataUtil::GetArtPath(const QString &pathname, const QString &ty
     if (basename == pathname)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "Programmer Error: Can not determine art path\n\t\t\t"
+                "Programmer Error: Cannot determine art path\n\t\t\t"
                 "until the ProgramInfo pathname has been fully resolved.");
         return QString();
     }
