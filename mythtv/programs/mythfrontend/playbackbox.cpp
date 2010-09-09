@@ -2114,7 +2114,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
                 QString("availability status: %1 ")
                 .arg(pginfo->GetAvailableStatus()));
 
-        ShowOkPopup(tr("Can not delete\n") +
+        ShowOkPopup(tr("Cannot delete\n") +
                     tr("This recording is already being deleted"));
     }
     else if (!pginfo->QueryIsDeleteCandidate())
@@ -2129,12 +2129,12 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
 
         if (byWho.isEmpty())
         {
-            ShowOkPopup(tr("Can not delete\n") +
+            ShowOkPopup(tr("Cannot delete\n") +
                         tr("This recording is already being deleted"));
         }
         else
         {
-            ShowOkPopup(tr("Can not delete\n") +
+            ShowOkPopup(tr("Cannot delete\n") +
                         tr("This recording is currently in use by:") + "\n" +
                         byWho);
         }
@@ -2927,7 +2927,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 {
     QString label =
         (asFileNotFound == pginfo.GetAvailableStatus()) ?
-        tr("Recording file can not be found") :
+        tr("Recording file cannot be found") :
         (asZeroByte     == pginfo.GetAvailableStatus()) ?
         tr("Recording file contains no data") :
         tr("Recording Options");

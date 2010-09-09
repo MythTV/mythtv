@@ -625,7 +625,7 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
 
     if (KeyBindings::kKeyBindingError == error_level)
     {
-        m_menuPopup->AddButton(tr("Ok"));
+        m_menuPopup->AddButton(tr("OK"));
     }
     else
     {
