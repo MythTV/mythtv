@@ -331,7 +331,7 @@
         </button>
         <button name="ok" from="probe">
             <position>305,367</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
     </window>
 

@@ -901,7 +901,7 @@
 
         <button name="ok" from="basebutton">
             <position>338,110</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
     </window>
 
@@ -924,7 +924,7 @@
 
         <button name="ok" from="basebutton">
             <position>110,110</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
     </window>
 
@@ -974,7 +974,7 @@
 
         <button name="ok" from="basebutton">
             <position>316,436</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
 
     </window>
@@ -1070,7 +1070,7 @@
 
         <button name="ok" from="basebutton">
             <position>530,440</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
 
     </window>

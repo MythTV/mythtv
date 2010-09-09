@@ -630,7 +630,7 @@
 
         <button name="ok" from="basebutton">
             <position>653,360</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
     </window>
 
@@ -656,7 +656,7 @@
 
         <button name="ok" from="basebutton">
             <position>528,360</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
     </window>
 
@@ -830,7 +830,7 @@
 
         <button name="ok" from="basebutton">
             <position>573,495</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
 
         <imagetype name="preview">
