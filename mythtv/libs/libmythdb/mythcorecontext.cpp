@@ -754,9 +754,9 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
     if (HasGUI() && IsUIThread())
     {
         QString msg = "SendReceiveStringList(";
-        for (uint i=0; i<(uint)strlist.size(); i++)
+        for (uint i=0; i<(uint)strlist.size() && i<2; i++)
             msg += (i?",":"") + strlist[i];
-        msg += ")";
+        msg += (strlist.size() > 2) ? "...)" : ")";
         msg += " called from UI thread";
         VERBOSE(VB_IMPORTANT, msg);
     }
