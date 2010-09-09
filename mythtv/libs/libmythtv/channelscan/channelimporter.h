@@ -201,6 +201,10 @@ class MPUBLIC ChannelImporter
         const ChannelInsertInfo         &chan,
         const ChannelImporterBasicStats *info = NULL);
 
+    static QString SimpleFormatChannel(
+        const ScanDTVTransport          &transport,
+        const ChannelInsertInfo         &chan);
+
     static QString GetSummary(
         uint                                  transport_count,
         const ChannelImporterBasicStats      &info,
