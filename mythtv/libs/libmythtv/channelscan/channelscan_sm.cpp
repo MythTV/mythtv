@@ -1168,7 +1168,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         for (uint i = 0; i < descs.size(); i++)
         {
             RegistrationDescriptor reg(descs[i]);
-            if (reg.FormatIdentifierString() == "CUEI")
+            if (reg.FormatIdentifierString() == "CUEI" ||
+                reg.FormatIdentifierString() == "SCTE")
                 info.is_opencable = true;
         }
 

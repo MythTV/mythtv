@@ -80,7 +80,8 @@ QString ScanStreamData::GetSIStandard(QString guess) const
         for (uint i = 0; i < descs.size(); i++)
         {
             RegistrationDescriptor reg(descs[i]);
-            if (reg.FormatIdentifierString() == "CUEI")
+            if (reg.FormatIdentifierString() == "CUEI" ||
+                reg.FormatIdentifierString() == "SCTE")
                 return "opencable";
         }
     }
