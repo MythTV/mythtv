@@ -112,7 +112,7 @@ class FreeToAirOnly : public CheckBoxSetting, public TransientStorage
     FreeToAirOnly() : CheckBoxSetting(this)
     {
         setValue(true);
-        setLabel(QObject::tr("Only Free"));
+        setLabel(QObject::tr("Unencrypted Only"));
         setHelpText(
             QObject::tr(
                 "If set, only non-encrypted channels will be "
