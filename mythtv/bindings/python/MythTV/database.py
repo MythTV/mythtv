@@ -54,6 +54,7 @@ class DBData( DictData, MythSchema ):
             Raw list as returned by 'select * from mytable'
     """
     _field_type = 'Pass'
+    _field_order = []
     _logmodule = None
 
     _table = None
@@ -69,7 +70,7 @@ class DBData( DictData, MythSchema ):
             cls._table = cls.__name__.lower()
         if cls._logmodule is None:
             cls._logmodule = 'Python %s' % cls.__name__
-        if cls._field_order is None:
+        if cls._field_order == []:
             cls._field_order = db.tablefields[cls._table]
 
 
@@ -121,38 +122,20 @@ class DBData( DictData, MythSchema ):
         pass
 
     def _setDefs(self):
-        cls = self.__class__
-        if self._table is None:
-            cls._table = cls.__name__.lower()
-        if self._logmodule is None:
-            cls._logmodule = 'Python %s' % cls.__name__
-        if self._field_order == []:
-            cls._field_order = self._db.tablefields[self._table]
-
+        self.__class__._setClassDefs(self._db)
         self._log = MythLog(self._logmodule)
-
-        if (self._setwheredat is None) or (self._where is None):
-            if self._key is None:
-                with self._db.cursor(self._log) as cursor:
-                    cursor.execute("""SHOW KEYS FROM %s
-                                      WHERE Key_name='PRIMARY'""" \
-                                            % self._table)
-                    self._key = [k[4] for k in sorted(cursor.fetchall(),
-                                                     key=lambda x: x[3])]
-            gen = lambda j,s,l: j.join([s % k for k in l])
-            self._where = gen(' AND ', '%s=%%s', self._key)
-            self._setwheredat = gen('', 'self.%s,', self._key)
-
         self._fillNone()
 
     def __init__(self, data, db=None):
         dict.__init__(self)
-        if self._field_order is None:
-            self.__class__._field_order = []
         self._db = DBCache(db)
         self._db._check_schema(self._schema_value, self._schema_local,
                                 self._schema_name, self._schema_update)
         self._setDefs()
+
+        if self._key is not None:
+            if len(self._key) == 1:
+                data = (data,)
 
         if data is None: pass
         elif None in data: pass
@@ -255,11 +238,9 @@ class DBDataWrite( DBData ):
                 if 'auto_increment' in \
                         db.tablefields[cls._table][cls._key[0]].extra:
                     cls.create = cls._create_autoincrement
-                    cls.__init__ = cls._init_autoincrement
                     cls._defaults[cls._key[0]] = None
                     return
         cls.create = cls._create_normal
-        cls.__init__ = cls._init_normal
 
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
@@ -288,11 +269,8 @@ class DBDataWrite( DBData ):
         DBData._evalwheredat(self, wheredat)
         self._origdata = dict.copy(self)
 
-    def _init_normal(self, data=None, db=None):
+    def __init__(self, data=None, db=None):
         DBData.__init__(self, data, db)
-
-    def _init_autoincrement(self, id=None, db=None):
-        DBData.__init__(self, (id,), db)
 
     def _import(self, data=None):
         if data is not None:
@@ -333,6 +311,7 @@ class DBDataWrite( DBData ):
         self._create(data)
         self._evalwheredat()
         self._pull()
+        self._postinit()
         return self
 
     def _create_autoincrement(self, data=None):
@@ -345,6 +324,7 @@ class DBDataWrite( DBData ):
         intid = self._create(data)
         self._evalwheredat([intid])
         self._pull()
+        self._postinit()
         return self
 
     def _pull(self):

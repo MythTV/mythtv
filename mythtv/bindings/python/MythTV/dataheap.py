@@ -187,12 +187,9 @@ class Recorded( DBDataWrite, CMPRecord ):
                 data = [data[0], datetime.duck(data[1])]
         DBDataWrite.__init__(self, data, db)
 
-    def _evalwheredat(self, wheredat=None):
-        DBDataWrite._evalwheredat(self, wheredat)
+    def _postinit(self):
         self.seek = self._Seek(self._wheredat, self._db)
         self.markup = self._Markup(self._wheredat, self._db)
-
-    def _postinit(self):
         wheredat = (self.chanid, self.progstart)
         self.cast = self._Cast(wheredat, self._db)
         self.rating = self._Rating(wheredat, self._db)
@@ -527,8 +524,7 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
                  'watched':False,            'category':0,
                  'browse':True,              'hash':u'',
                  'season':0,                 'episode':0,
-                 'releasedate':date(1,1,1),  'childid':-1,
-                 'studio':u''}
+                 'releasedate':date(1,1,1),  'childid':-1}
     _cm_toid, _cm_toname = DictInvertCI.createPair({0:'none'})
 
     class _open(object):
@@ -638,15 +634,12 @@ class Video( VideoSchema, DBDataWrite, CMPVideo ):
             res += u' - '+self.subtitle
         return u"<Video '%s' at %s>" % (res, hex(id(self)))
 
-    def _evalwheredat(self, wheredat=None):
-        DBDataWrite._evalwheredat(self, wheredat)
+    def _postinit(self):
         self._fill_cm()
         self._cat_toname()
-        if wheredat is None:
-            wheredat = [self.intid]
-        self.cast = self._Cast(wheredat, self._db)
-        self.genre = self._Genre(wheredat, self._db)
-        self.country = self._Country(wheredat, self._db)
+        self.cast = self._Cast(self._wheredat, self._db)
+        self.genre = self._Genre(self._wheredat, self._db)
+        self.country = self._Country(self._wheredat, self._db)
         self.markup = self._Markup((self.filename,), self._db)
 
     def create(self, data=None):

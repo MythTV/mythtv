@@ -3,7 +3,7 @@
 __all_exceptions__  = ['MythError', 'MythDBError', 'MythBEError', \
                        'MythFEError', 'MythFileError']
 
-__all_utility__     = ['schemaUpdate', 'databaseSearch']
+__all_utility__     = ['SchemaUpdate', 'databaseSearch']
 
 __all_system__      = ['System', 'Grabber', 'Metadata', 'VideoMetadata', \
                        'MusicMetadata', 'GameMetadata', 'InternetMetadata', \
