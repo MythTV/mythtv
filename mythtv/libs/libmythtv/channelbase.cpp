@@ -583,6 +583,9 @@ bool ChannelBase::IsInputAvailable(int inputid, uint &mplexid_restriction) const
     if (inputid < 0)
         return false;
 
+    if (!m_pParent)
+        return false;
+
     // Check each input to make sure it doesn't belong to an
     // input group which is attached to a busy recorder.
     QMap<uint,bool>           busygrp;
