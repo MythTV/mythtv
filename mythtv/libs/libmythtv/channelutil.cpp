@@ -190,10 +190,6 @@ static uint insert_dtv_multiplex(
 
     query.prepare((mplex) ? updateStr : insertStr);
 
-    VERBOSE(VB_CHANSCAN, "insert_dtv_multiplex -- "
-            <<((mplex) ? "update" : "insert") << " " << mplex
-            <<endl<<((mplex) ? updateStr : insertStr)<<endl);
-
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
     query.bindValue(":FREQUENCY1",        QString::number(frequency));
@@ -256,6 +252,10 @@ static uint insert_dtv_multiplex(
         MythDB::DBError("Adding transport to Database.", query);
         return 0;
     }
+    else
+        VERBOSE(VB_CHANSCAN, "insert_dtv_multiplex -- "
+                <<((mplex) ? "update" : "insert") << " " << mplex
+                <<endl<<(query.executedQuery())<<endl);
 
     if (mplex)
         return mplex;
