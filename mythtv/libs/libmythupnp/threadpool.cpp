@@ -300,6 +300,9 @@ ThreadPool::ThreadPool( const QString &sName )
 
     m_nInitialThreadCount = min( m_nInitialThreadCount, m_nMaxThreadCount );
 
+    VERBOSE(VB_IMPORTANT, QString("ThreadPool:%1: Initial %2, Max %3, Timeout %4")
+        .arg(sName) .arg(m_nInitialThreadCount) .arg(m_nMaxThreadCount)
+        .arg(m_nIdleTimeout) );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -390,7 +393,10 @@ WorkerThread *ThreadPool::GetWorkerThread()
                 mutex.lock();
 
                 if (m_threadAvail.wait( &mutex, 5000 ) == false )
+                {
+                    VERBOSE(VB_IMPORTANT, QString("ThreadPool:%1: thread pool exhausted (max %2 threads)") .arg(m_sName) .arg(m_nMaxThreadCount));
                     return( NULL );     // timeout exceeded.
+                }
             }
         }
     }
