@@ -186,13 +186,13 @@ static int _queue_event(BLURAY *bd, BD_EVENT ev)
         if (new_in != eq->out) {
             eq->ev[eq->in] = ev;
             eq->in = new_in;
-            return 0;
+            return 1;
         }
 
         DEBUG(DBG_BLURAY|DBG_CRIT, "_queue_event(%d, %d): queue overflow !\n", ev.event, ev.param);
     }
 
-    return -1;
+    return 0;
 }
 
 /*
@@ -820,11 +820,19 @@ int bd_read(BLURAY *bd, unsigned char *buf, int len)
  * select title / angle
  */
 
-static int _open_playlist(BLURAY *bd, const char *f_name)
+static void _close_playlist(BLURAY *bd)
 {
+    _close_m2ts(&bd->st0);
+
     if (bd->title) {
         nav_title_close(bd->title);
+        bd->title = NULL;
     }
+}
+
+static int _open_playlist(BLURAY *bd, const char *f_name)
+{
+    _close_playlist(bd);
 
     bd->title = nav_title_open(bd->device_path, f_name);
     if (bd->title == NULL) {

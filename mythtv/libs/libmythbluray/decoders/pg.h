@@ -20,6 +20,8 @@
 #if !defined(_BD_PG_H_)
 #define _BD_PG_H_
 
+#include "overlay.h"
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -66,13 +68,6 @@ typedef struct {
 } BD_PG_COMPOSITION_OBJECT;
 
 typedef struct {
-    uint8_t Y;
-    uint8_t Cr;
-    uint8_t Cb;
-    uint8_t T;
-} BD_PG_PALETTE_ENTRY;
-
-typedef struct {
     int64_t pts;
 
     uint8_t id;
@@ -80,11 +75,6 @@ typedef struct {
 
     BD_PG_PALETTE_ENTRY entry[256];
 } BD_PG_PALETTE;
-
-typedef struct {
-    uint8_t  color;
-    uint16_t len;
-} BD_PG_RLE_ELEM;
 
 typedef struct {
     int64_t pts;
