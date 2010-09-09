@@ -90,7 +90,7 @@ bool MythNewsEditor::Create(void)
     if (m_podcastLabelText)
         m_podcastLabelText->SetText(tr("Podcast:"));
 
-    m_okButton->SetText(tr("Ok"));
+    m_okButton->SetText(tr("OK"));
     m_cancelButton->SetText(tr("Cancel"));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));

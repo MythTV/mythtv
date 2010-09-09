@@ -64,7 +64,7 @@ bool FunctionDialog::Create()
 
     m_captionText->SetText(m_monitor->name);
 
-    m_okButton->SetText(tr("Ok"));
+    m_okButton->SetText(tr("OK"));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(setMonitorFunction()));
 
