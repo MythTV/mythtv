@@ -1281,6 +1281,23 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             info.chan_num = QString::number(*it);
     }
 
+    // Get QAM/SCTE/MPEG channel numbers
+    for (dbchan_it = pnum_to_dbchan.begin();
+         dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
+    {
+        ChannelInsertInfo &info = *dbchan_it;
+
+        if (!info.chan_num.isEmpty())
+            continue;
+
+        if ((info.si_standard == "mpeg") ||
+            (info.si_standard == "scte") ||
+            (info.si_standard == "opencable"))
+            info.chan_num = QString("%1-%2")
+                              .arg(info.freqid)
+                              .arg(info.service_id);
+    }
+
     // Check for decryption success
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)

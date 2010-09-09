@@ -1130,12 +1130,12 @@ bool ChannelImporter::IsType(
 
         case kMPEGNonConflicting:
             return ((chan.si_standard == "mpeg") &&
-                    (info.prognum_cnt[chan.service_id] == 1));
+                    (info.channum_cnt[map_str(chan.chan_num)] == 1));
 
         case kSCTENonConflicting:
             return (((chan.si_standard == "scte") ||
-                     (chan.si_standard == "opencable")) &&
-                    (info.prognum_cnt[chan.service_id] == 1));
+                    (chan.si_standard == "opencable")) &&
+                    (info.channum_cnt[map_str(chan.chan_num)] == 1));
 
         case kNTSCNonConflicting:
             return ((chan.si_standard == "ntsc") &&
@@ -1153,12 +1153,12 @@ bool ChannelImporter::IsType(
 
         case kMPEGConflicting:
             return ((chan.si_standard == "mpeg") &&
-                    (info.prognum_cnt[chan.service_id] != 1));
+                    (info.channum_cnt[map_str(chan.chan_num)] != 1));
 
         case kSCTEConflicting:
             return (((chan.si_standard == "scte") ||
-                     (chan.si_standard == "opencable")) &&
-                    (info.prognum_cnt[chan.service_id] != 1));
+                    (chan.si_standard == "opencable")) &&
+                    (info.channum_cnt[map_str(chan.chan_num)] != 1));
 
         case kNTSCConflicting:
             return ((chan.si_standard == "ntsc") &&
