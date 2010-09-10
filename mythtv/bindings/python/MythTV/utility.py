@@ -30,20 +30,30 @@ class SchemaUpdate( object ):
     _schema_name = None
     def __init__(self, db):
         self.db = db
-        self.log = MythLog('Schema Update')
+        self.log = MythLog('Schema Update (%s)' % self._schema_name)
 
     def run(self):
         if self._schema_name is None:
             raise MythDBError('Schema update failed, variable name not set')
-        schema = int(self.db.settings.NULL[self._schema_name])
+        origschema = int(self.db.settings.NULL[self._schema_name])
+        schema = origschema
         try:
             while True:
-                schema = eval('self.up%d()' % schema)
+                newschema = eval('self.up%d()' % schema)
+                self.log(MythLog.DATABASE,
+                         'successfully updated from %d to %d' %\
+                                (schema, newschema))
+                schema = newschema
                 self.db.settings.NULL[self._schema_name] = schema
         except AttributeError, e:
+            self.log(MythLog.DATABASE|MythLog.IMPORTANT,
+                     'failed at %d' % schema, 'no handler method')
             raise MythDBError('Schema update failed, ' 
                     "SchemaUpdate has no function 'up%s'" % schema)
         except StopIteration:
+            if schema != origschema:
+                self.log(MythLog.DATABASE,
+                         '%s update complete' % self._schema_name)
             pass
         except Exception, e:
             raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)

@@ -30,6 +30,8 @@ class MSearch( object ):
                     port += 1
                 else:
                     raise MythError(MythError.SOCKET, e)
+        self.log(MythLog.UPNP|MythLog.SOCKET,
+                    'Port %d opened for UPnP search.' % port)
         self.sock.setblocking(0.1)
 
     def __del__(self):

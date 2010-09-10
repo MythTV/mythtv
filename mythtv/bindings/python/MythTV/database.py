@@ -66,26 +66,35 @@ class DBData( DictData, MythSchema ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
+        log = MythLog('DBData Setup (%s)' % cls.__name__)
         if cls._table is None:
             cls._table = cls.__name__.lower()
+            log(log.DATABASE|log.EXTRA,
+                'set _table to %s' % cls._table)
         if cls._logmodule is None:
             cls._logmodule = 'Python %s' % cls.__name__
+            log(log.DATABASE|log.EXTRA,
+                'set _logmodule to %s' % cls._logmodule)
         if cls._field_order == []:
             cls._field_order = db.tablefields[cls._table]
 
-
         if (cls._setwheredat is None) or (cls._where is None):
             if cls._key is None:
-                log = MythLog(cls._logmodule)
                 with db.cursor(log) as cursor:
                     cursor.execute("""SHOW KEYS FROM %s
                                       WHERE Key_name='PRIMARY'""" \
                                             % cls._table)
                     cls._key = [k[4] for k in sorted(cursor.fetchall(),
                                                      key=lambda x: x[3])]
+                log(log.DATABASE|log.EXTRA,
+                    'set _key to %s' % str(cls._key))
             gen = lambda j,s,l: j.join([s % k for k in l])
             cls._where = gen(' AND ', '%s=%%s', cls._key)
             cls._setwheredat = gen('', 'self.%s,', cls._key)
+            log(log.DATABASE|log.EXTRA,
+                'set _where to %s' % cls._where)
+            log(log.DATABASE|log.EXTRA,
+                'set _setwheredat to %s' % cls._setwheredat)
 
     @classmethod
     def getAllEntries(cls, db=None):
@@ -878,12 +887,12 @@ class DBCache( MythSchema ):
         self.settings = None
         if db is not None:
             # load existing database connection
-            self.log(MythLog.DATABASE, "Loading existing connection",
-                                    str(db.dbconn))
+            self.log(MythLog.DATABASE|MythLog.EXTRA,
+                            "Loading existing connection", db.ident)
             dbconn.update(db.dbconn)
         if args is not None:
             # load user defined arguments (takes dict, or key/value tuple)
-            self.log(MythLog.DATABASE, "Loading user settings", str(args))
+            self.log(MythLog.DATABASE, "Loading user settings")
             dbconn.update(args)
         if 'SecurityPin' not in dbconn:
             dbconn['SecurityPin'] = 0
@@ -907,7 +916,7 @@ class DBCache( MythSchema ):
                 dbconn.update(self._readXML(conffile))
 
                 if self._check_dbconn(dbconn):
-                    self.log(MythLog.IMPORTANT|MythLog.DATABASE,
+                    self.log(MythLog.DATABASE,
                            "Using connection settings from %s" % conffile)
                     break
             else:

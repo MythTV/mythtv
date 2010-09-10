@@ -3,7 +3,7 @@
 
 from __future__ import with_statement
 
-from static import SCHEMA_VERSION, PROTO_VERSION, BACKEND_SEP
+from static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN
 from msearch import MSearch
 from logging import MythLog
 from exceptions import *
@@ -147,7 +147,7 @@ class DBConnection( object ):
 
         try:
             self.log(MythLog.DATABASE, "Attempting connection", 
-                                                str(dbconn))
+                '\n'.join(["'%s': '%s'" % (k,v) for k,v in dbconn.items()]))
             for i in range(self._poolsize):
                 self._pool.append(self.connect())
         except:
@@ -160,7 +160,8 @@ class DBConnection( object ):
             conn.close()
 
     def connect(self):
-        self.log(MythLog.DATABASE, 'Spawning new database connection')
+        self.log(MythLog.DATABASE|MythLog.EXTRA,
+                        'Spawning new database connection')
         dbconn = self.dbconn
         db = MySQLdb.connect(  user=   dbconn['DBUserName'],
                                host=   dbconn['DBHostName'],
@@ -180,7 +181,8 @@ class DBConnection( object ):
         try:
             conn = self._pool.pop(0)
             self._inuse[id(conn)] = conn
-            self.log(MythLog.DATABASE, 'Acquiring database connection from pool')
+            self.log(MythLog.DATABASE|MythLog.EXTRA,
+                        'Acquiring database connection from pool')
         except IndexError:
             conn = self.connect()
         return conn
@@ -192,10 +194,12 @@ class DBConnection( object ):
         try:
             conn = self._inuse.pop(id)
             self._pool.append(conn)
-            self.log(MythLog.DATABASE, 'Releasing database connection to pool')
+            self.log(MythLog.DATABASE|MythLog.EXTRA,
+                        'Releasing database connection to pool')
         except KeyError:
             conn.close()
-            self.log(MythLog.DATABASE, 'Closing spare database connection')
+            self.log(MythLog.DATABASE|MythLog.EXTRA,
+                        'Closing spare database connection')
 
     def cursor(self, log=None, type=LoggedCursor):
         """
