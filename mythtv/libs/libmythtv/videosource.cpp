@@ -3240,7 +3240,10 @@ CardInputEditor::CardInputEditor() : listbox(new ListBoxSetting(this))
 DialogCode CardInputEditor::exec(void)
 {
     while (ConfigurationDialog::exec() == kDialogCodeAccepted)
-        cardinputs[listbox->getValue().toInt()]->exec();
+    {
+        if (cardinputs[listbox->getValue().toInt()])
+            cardinputs[listbox->getValue().toInt()]->exec();
+    }
 
     return kDialogCodeRejected;
 }
