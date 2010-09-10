@@ -3244,6 +3244,9 @@ DialogCode CardInputEditor::exec(void)
         if (!listbox)
             return kDialogCodeRejected;
 
+        if (cardinputs.size() == 0)
+            return kDialogCodeRejected;
+
         int val = listbox->getValue().toInt();
 
         if (cardinputs[val])
