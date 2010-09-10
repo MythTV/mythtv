@@ -1578,7 +1578,7 @@ bool PlaybackBox::UpdateUILists(void)
                     sTitle = construct_sort_title(
                         p->GetTitle(), m_viewMask, titleSort,
                         p->GetRecordingPriority(), m_prefixes);
-                    sTitle = sTitle.toLower();
+                    sTitle = sTitle.toLower().simplified();
 
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->GetTitle();
