@@ -75,7 +75,7 @@ StatusBox::~StatusBox(void)
 {
     if (m_logList)
         gCoreContext->SaveSetting("StatusBoxItemCurrent",
-                                                    m_logList->GetCurrentPos());
+                                  m_logList->GetCurrentPos());
 }
 
 bool StatusBox::Create()
@@ -381,7 +381,7 @@ void StatusBox::customEvent(QEvent *event)
                 query.bindValue(":LOGID", sql);
                 if (!query.exec())
                     MythDB::DBError("StatusBox::customEvent -- LogAck", query);
-                doLogEntries();
+                m_logList->RemoveItem(m_logList->GetItemCurrent());
             }
         }
         else if (resultid == "LogAckAll")
@@ -404,7 +404,8 @@ void StatusBox::customEvent(QEvent *event)
             {
                 int jobID = dce->GetData().toInt();
                 JobQueue::DeleteJob(jobID);
-                doJobQueueStatus();
+
+                m_logList->RemoveItem(m_logList->GetItemCurrent());
             }
         }
         else if (resultid == "JobRequeue")
@@ -444,6 +445,7 @@ void StatusBox::customEvent(QEvent *event)
                 RemoteDeleteRecording(
                     rec->GetChanID(), rec->GetRecordingStartTime(),
                     false, false);
+                m_logList->RemoveItem(m_logList->GetItemCurrent());
             }
             else if (buttonnum == 1)
             {
@@ -463,8 +465,8 @@ void StatusBox::customEvent(QEvent *event)
                         *rec = ri;
                     }
                 }
+                doAutoExpireList();
             }
-            doAutoExpireList();
         }
 
     }
@@ -900,8 +902,8 @@ void StatusBox::doJobQueueStatus()
                 detail += '\n' + (*it).comment;
 
             line = QString("%1 @ %2").arg(pginfo.GetTitle())
-                .arg(pginfo.GetRecordingStartTime()
-                     .toString(m_timeDateFormat));
+                                     .arg(pginfo.GetRecordingStartTime()
+                                        .toString(m_timeDateFormat));
 
             QString font;
             if ((*it).status == JOB_ERRORED)
