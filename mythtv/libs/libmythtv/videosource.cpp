@@ -3241,8 +3241,13 @@ DialogCode CardInputEditor::exec(void)
 {
     while (ConfigurationDialog::exec() == kDialogCodeAccepted)
     {
-        if (cardinputs[listbox->getValue().toInt()])
-            cardinputs[listbox->getValue().toInt()]->exec();
+        if (!listbox)
+            return kDialogCodeRejected;
+
+        int val = listbox->getValue().toInt();
+
+        if (cardinputs[val])
+            cardinputs[val]->exec();
     }
 
     return kDialogCodeRejected;
