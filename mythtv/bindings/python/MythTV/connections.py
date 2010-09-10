@@ -3,7 +3,7 @@
 
 from __future__ import with_statement
 
-from static import SCHEMA_VERSION, PROTO_VERSION
+from static import SCHEMA_VERSION, PROTO_VERSION, BACKEND_SEP
 from msearch import MSearch
 from logging import MythLog
 from exceptions import *
