@@ -790,11 +790,6 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
 static void gotoMainMenu(void)
 {
-    // If we got to this callback, we're back on the menu.  So, send a CTRL-L
-    // to cause the menu to reload
-    QKeyEvent *event =
-        new QKeyEvent(QEvent::KeyPress, Qt::Key_L, Qt::ControlModifier);
-    QCoreApplication::postEvent((QObject*)(GetMythMainWindow()), event);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
