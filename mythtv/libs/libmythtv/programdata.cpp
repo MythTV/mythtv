@@ -431,7 +431,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 
         if (mv > match_val)
         {
-            VERBOSE(VB_EIT, QString("GM : %1 new best match %2 with score %3").arg(title.left(25))
+            VERBOSE(VB_EIT+VB_EXTRA, QString("GM : %1 new best match %2 with score %3").arg(title.left(25))
                     .arg(programs[i].title.left(25)).arg(mv));
             bestmatch = i;
             match_val = mv;
