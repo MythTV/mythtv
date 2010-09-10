@@ -959,7 +959,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["commflagged"] = FL_COMMFLAG;
     iconMap["cutlist"]     = FL_CUTLIST;
     iconMap["autoexpire"]  = FL_AUTOEXP;
-    iconMap["processing"]  = FL_EDITING;
+    iconMap["processing"]  = FL_COMMPROCESSING;
+    iconMap["editing"]     = FL_EDITING;
     iconMap["bookmark"]    = FL_BOOKMARK;
     iconMap["inuse"]       = (FL_INUSERECORDING |
                               FL_INUSEPLAYING |
