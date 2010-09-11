@@ -30,8 +30,8 @@ void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
                        ProgramInfo *pginfo);
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
                        frm_pos_map_t &posMap, int jobID);
-void CompleteJob(int jobID, ProgramInfo *pginfo,
-                 bool useCutlist, int &resultCode);
+void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
+                 frm_dir_map_t *deleteMap, int &resultCode);
 void UpdateJobQueue(float percent_done);
 int CheckJobQueue();
 static int glbl_jobID = -1;
@@ -669,7 +669,7 @@ int main(int argc, char *argv[])
     }
 
     if (jobID >= 0)
-        CompleteJob(jobID, pginfo, useCutlist, exitcode);
+        CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode);
 
     transcode->deleteLater();
 
@@ -747,7 +747,92 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
     return unlink(filename.toLocal8Bit().constData());
 }
 
-void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode)
+uint64_t ComputeNewBookmark(uint64_t oldBookmark,
+                            frm_dir_map_t *deleteMap)
+{
+    if (deleteMap == NULL)
+        return oldBookmark;
+    uint64_t subtraction = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t delMap = *deleteMap;
+    bool withinCut = false;
+    while (delMap.count() && delMap.begin().key() <= oldBookmark)
+    {
+        if (delMap.begin().data() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = delMap.begin().key();
+        }
+        else if (delMap.begin().data() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            subtraction += (delMap.begin().key() - startOfCutRegion);
+        }
+        delMap.remove(delMap.begin());
+    }
+    if (withinCut)
+        subtraction += (oldBookmark - startOfCutRegion);
+    return oldBookmark - subtraction;
+}
+
+uint64_t ReloadBookmark(ProgramInfo *pginfo)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    uint64_t currentBookmark = 0;
+    query.prepare("SELECT DISTINCT mark FROM recordedmarkup "
+                  "WHERE chanid = :CHANID "
+                  "AND starttime = :STARTIME "
+                  "AND type = :MARKTYPE ;");
+    query.bindValue(":CHANID", pginfo->GetChanID());
+    query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
+    query.bindValue(":MARKTYPE", MARK_BOOKMARK);
+    if (query.exec() && query.next())
+    {
+        currentBookmark = query.value(0).toLongLong();
+    }
+    return currentBookmark;
+}
+
+void WaitToDelete(ProgramInfo *pginfo)
+{
+    VERBOSE(VB_GENERAL,
+            "Transcode: delete old file: "
+            "waiting while program is in use.");
+    bool inUse = true;
+    MSqlQuery query(MSqlQuery::InitCon());
+    while (inUse)
+    {
+        query.prepare("SELECT count(*) FROM inuseprograms "
+                      "WHERE chanid = :CHANID "
+                      "AND starttime = :STARTTIME "
+                      "AND recusage = 'player' ;");
+        query.bindValue(":CHANID", pginfo->GetChanID());
+        query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
+        if (!query.exec() || !query.next())
+        {
+            VERBOSE(VB_GENERAL,
+                    "Transcode: delete old file: in-use query failed;");
+            inUse = false;
+        }
+        else
+        {
+            inUse = (query.value(0).toUInt() != 0);
+        }
+
+        if (inUse)
+        {
+            const unsigned kSecondsToWait = 10;
+            VERBOSE(VB_GENERAL,
+                    QString("Transcode: program in use, "
+                            "rechecking in %1 seconds.").arg(kSecondsToWait));
+            sleep(kSecondsToWait);
+        }
+    }
+    VERBOSE(VB_GENERAL, "Transcode: program is no longer in use.");
+}
+
+void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
+                 frm_dir_map_t *deleteMap, int &resultCode)
 {
     int status = JobQueue::GetJobStatus(jobID);
 
@@ -758,11 +843,19 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         return;
     }
 
+    WaitToDelete(pginfo);
+
     const QString filename = pginfo->GetPlaybackURL(false, true);
     const QByteArray fname = filename.toLocal8Bit();
 
     if (status == JOB_STOPPING)
     {
+        // Transcoding may take several minutes.  Reload the bookmark
+        // in case it changed, then save its translated value back.
+        uint64_t previousBookmark =
+            ComputeNewBookmark(ReloadBookmark(pginfo), deleteMap);
+        pginfo->SaveBookmark(previousBookmark);
+
         const QString jobArgs = JobQueue::GetJobArgs(jobID);
 
         const QString tmpfile = filename + ".tmp";
@@ -908,19 +1001,20 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         {
             query.prepare("DELETE FROM recordedmarkup "
                           "WHERE chanid = :CHANID "
-                          "AND starttime = :STARTTIME ");
+                          "AND starttime = :STARTTIME "
+                          "AND type != :BOOKMARK ");
             query.bindValue(":CHANID", pginfo->GetChanID());
             query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
+            query.bindValue(":BOOKMARK", MARK_BOOKMARK);
 
             if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
 
             query.prepare("UPDATE recorded "
-                          "SET cutlist = :CUTLIST, bookmark = :BOOKMARK "
+                          "SET cutlist = :CUTLIST "
                           "WHERE chanid = :CHANID "
                           "AND starttime = :STARTTIME ;");
             query.bindValue(":CUTLIST", "0");
-            query.bindValue(":BOOKMARK", "0");
             query.bindValue(":CHANID", pginfo->GetChanID());
             query.bindValue(":STARTTIME", pginfo->GetRecordingStartTime());
 
