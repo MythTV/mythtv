@@ -829,7 +829,7 @@ QString PlayerContext::GetPlayMessage(void) const
         else if (ts_normal == 0.0625)
             mesg += QString(" 1/16x");
         else
-            mesg += QString(" %1X").arg(ts_normal);
+            mesg += QString(" %1x").arg(ts_normal);
     }
 
     if (0)
