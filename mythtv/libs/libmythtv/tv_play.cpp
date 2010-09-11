@@ -9328,8 +9328,6 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                              "DIALOG_CUTPOINT_SAVEMAP_0");
         osd->DialogAddButton(QObject::tr("Save Cut List and Exit"),
                              "DIALOG_CUTPOINT_SAVEEXIT_0");
-        osd->DialogAddButton(QObject::tr("Edit Cut Points"),
-                             "DIALOG_CUTPOINT_EDITCUTPOINTS_0", true);
     }
     else if ("EXIT_EDIT_MODE" == type)
     {
@@ -9358,12 +9356,7 @@ bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame)
         return res;
 
     OSD *osd = GetOSDLock(ctx);
-    if (action == "EDITCUTPOINTS" && osd)
-    {
-        ShowOSDCutpoint(ctx, "EDIT_CUT_POINTS");
-        res = false;
-    }
-    else if (action == "CUTLISTOPTIONS" && osd)
+    if (action == "CUTLISTOPTIONS" && osd)
     {
         ShowOSDCutpoint(ctx, "CUT_LIST_OPTIONS");
         res = false;
