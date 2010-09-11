@@ -28,6 +28,7 @@ const int maxID = 1024 * 1024;
 
 QReadWriteLock            m_fileWrapperLock;
 QHash <int, RingBuffer *> m_ringbuffers;
+QHash <int, RemoteFile *> m_remotefiles;
 QHash <int, int>          m_localfiles;
 QHash <int, QString>      m_filenames;
 
@@ -50,7 +51,9 @@ static int getNextFileID(void)
 
     for (; id < maxID; ++id)
     {
-        if (!m_localfiles.contains(id) && !m_ringbuffers.contains(id))
+        if ((!m_localfiles.contains(id)) &&
+            (!m_remotefiles.contains(id)) &&
+            (!m_ringbuffers.contains(id)))
             break;
     }
 
@@ -73,6 +76,8 @@ int mythfile_check(int id)
 
     m_fileWrapperLock.lockForWrite();
     if (m_localfiles.contains(id))
+        result = 1;
+    else if (m_remotefiles.contains(id))
         result = 1;
     else if (m_ringbuffers.contains(id))
         result = 1;
@@ -109,21 +114,42 @@ int mythfile_open(const char *pathname, int flags)
     else
     {
         RingBuffer *rb = NULL;
-        if (flags & O_WRONLY)
-            rb = new RingBuffer(pathname, true, false, -1); // Writeable
+        RemoteFile *rf = NULL;
+
+        if ((fileinfo.st_size < 51200) &&
+            (fileinfo.st_mtime < (time(NULL) - 300)))
+        {
+            if (flags & O_WRONLY)
+                rf = new RemoteFile(pathname, true, false); // Writeable
+            else
+                rf = new RemoteFile(pathname, false, true); // Read-Only
+
+            if (!rf)
+                return -1;
+        }
         else
-            rb = new RingBuffer(pathname, false, true, -1); // Read-Only
+        {
+            if (flags & O_WRONLY)
+                rb = new RingBuffer(pathname, true, false, -1); // Writeable
+            else
+                rb = new RingBuffer(pathname, false, true, -1); // Read-Only
 
-        if (!rb)
-            return -1;
+            if (!rb)
+                return -1;
 
-        rb->SetStreamOnly(true);
-        rb->OpenFile(pathname);
-        rb->Start();
+            rb->SetStreamOnly(true);
+            rb->OpenFile(pathname);
+            rb->Start();
+        }
 
         m_fileWrapperLock.lockForWrite();
         fileID = getNextFileID();
-        m_ringbuffers[fileID] = rb;
+
+        if (rf)
+            m_remotefiles[fileID] = rf;
+        else if (rb)
+            m_ringbuffers[fileID] = rb;
+
         m_filenames[fileID] = pathname;
         m_fileWrapperLock.unlock();
     }
@@ -143,6 +169,14 @@ int mythfile_close(int fileID)
         RingBuffer *rb = m_ringbuffers[fileID];
         m_ringbuffers.remove(fileID);
         delete rb;
+
+        result = 0;
+    }
+    else if (m_remotefiles.contains(fileID))
+    {
+        RemoteFile *rf = m_remotefiles[fileID];
+        m_remotefiles.remove(fileID);
+        delete rf;
 
         result = 0;
     }
@@ -167,6 +201,8 @@ off_t mythfile_seek(int fileID, off_t offset, int whence)
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
         result = m_ringbuffers[fileID]->Seek(offset, whence);
+    else if (m_remotefiles.contains(fileID))
+        result = m_remotefiles[fileID]->Seek(offset, whence);
     else if (m_localfiles.contains(fileID))
 #ifdef USING_MINGW
         result = lseek64(m_localfiles[fileID], offset, whence);
@@ -187,6 +223,8 @@ off_t mythfile_tell(int fileID)
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
         result = m_ringbuffers[fileID]->Seek(0, SEEK_CUR);
+    else if (m_remotefiles.contains(fileID))
+        result = m_remotefiles[fileID]->Seek(0, SEEK_CUR);
     else if (m_localfiles.contains(fileID))
 #ifdef USING_MINGW
         result = lseek64(m_localfiles[fileID], 0, SEEK_CUR);
@@ -208,6 +246,8 @@ ssize_t mythfile_read(int fileID, void *buf, size_t count)
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
         result = m_ringbuffers[fileID]->Read(buf, count);
+    else if (m_remotefiles.contains(fileID))
+        result = m_remotefiles[fileID]->Read(buf, count);
     else if (m_localfiles.contains(fileID))
         result = read(m_localfiles[fileID], buf, count);
     m_fileWrapperLock.unlock();
@@ -225,6 +265,8 @@ ssize_t mythfile_write(int fileID, void *buf, size_t count)
     m_fileWrapperLock.lockForRead();
     if (m_ringbuffers.contains(fileID))
         result = m_ringbuffers[fileID]->Write(buf, count);
+    else if (m_remotefiles.contains(fileID))
+        result = m_remotefiles[fileID]->Write(buf, count);
     else if (m_localfiles.contains(fileID))
         result = write(m_localfiles[fileID], buf, count);
     m_fileWrapperLock.unlock();
