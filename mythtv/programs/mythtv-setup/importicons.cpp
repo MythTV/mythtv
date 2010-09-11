@@ -161,6 +161,8 @@ void ImportIconsWizard::manualSearch()
     QString str = m_manualEdit->GetText();
     if (!search(escape_csv(str)))
         m_statusText->SetText(tr("No matches found for %1") .arg(str));
+    else
+        m_statusText->SetText("");
 }
 
 void ImportIconsWizard::skip()
@@ -421,24 +423,34 @@ bool ImportIconsWizard::initialLoad(QString name)
 bool ImportIconsWizard::doLoad()
 {
     VERBOSE(VB_CHANNEL, QString("Icons: Found %1 / Missing %2")
-                                    .arg(m_missingCount)
-                                    .arg(m_missingMaxCount));
-    if (m_missingCount >= m_missingMaxCount)
+            .arg(m_missingCount).arg(m_missingMaxCount));
+
+    // skip over empty entries
+    while (m_missingIter != m_missingEntries.end() &&
+           (*m_missingIter).strName.isEmpty())
+    {
+        m_missingCount++;
+        m_missingIter++;
+    }
+
+    if (m_missingIter == m_missingEntries.end())
     {
         VERBOSE(VB_CHANNEL, "doLoad Icon search complete");
         enableControls(STATE_DISABLED);
         return false;
     }
+
+    // Look for the next missing icon
+    m_nameText->SetText(tr("Choose icon for channel %1")
+                        .arg((*m_missingIter).strName));
+    m_manualEdit->SetText((*m_missingIter).strName);
+    if (!search((*m_missingIter).strNameCSV))
+        m_statusText->SetText(tr("No matches found for %1")
+                              .arg((*m_missingIter).strName));
     else
-    {
-        // Look for the next missing icon
-        m_nameText->SetText(tr("Choose icon for channel %1").arg((*m_missingIter).strName));
-        if (!search((*m_missingIter).strNameCSV))
-            m_statusText->SetText(tr("No matches found for %1")
-                                    .arg((*m_missingIter).strName));
-        m_manualEdit->SetText((*m_missingIter).strName);
-        return true;
-    }
+        m_statusText->SetText("");
+
+    return true;
 }
 
 QString ImportIconsWizard::escape_csv(const QString& str)
