@@ -109,8 +109,10 @@ typedef enum TranscodingStatuses {
     TRANSCODING_RUNNING        = 2
 } TranscodingStatus;
 
-/// If you change these please update modules/tv/classes/Program.php
-/// at around line 179 where $this->progflag is referenced directly.
+/// If you change these please update:
+/// mythplugins/mythweb/modules/tv/classes/Program.php
+/// mythtv/bindings/perl/MythTV/Program.pm
+/// (search for "Assign the program flags" in both)
 typedef enum FlagMask {
     FL_NONE           = 0x00000000,
     FL_COMMFLAG       = 0x00000001,

@@ -92,15 +92,15 @@ package MythTV::Program;
         }
 
     # Assign the program flags
-        $self->{'has_commflag'}   = ($self->{'progflags'} & 0x001) ? 1 : 0;     # FL_COMMFLAG       = 0x001
-        $self->{'has_cutlist'}    = ($self->{'progflags'} & 0x002) ? 1 : 0;     # FL_CUTLIST        = 0x002
-        $self->{'auto_expire'}    = ($self->{'progflags'} & 0x004) ? 1 : 0;     # FL_AUTOEXP        = 0x004
-        $self->{'is_editing'}     = ($self->{'progflags'} & 0x008) ? 1 : 0;     # FL_EDITING        = 0x008
-        $self->{'bookmark'}       = ($self->{'progflags'} & 0x010) ? 1 : 0;     # FL_BOOKMARK       = 0x010
-        $self->{'is_recording'}   = ($self->{'progflags'} & 0x020) ? 1 : 0;     # FL_INUSERECORDING = 0x020
-        $self->{'is_playing'}     = ($self->{'progflags'} & 0x040) ? 1 : 0;     # FL_INUSEPLAYING   = 0x040
-                                                                                # FL_TRANSCODED     = 0x400
-        $self->{'is_watched'}     = ($self->{'progflags'} & 0x800) ? 1 : 0;     # FL_WATCHED        = 0x800
+        $self->{'has_commflag'}   = ($self->{'progflags'} & 0x00000001) ? 1 : 0; # FL_COMMFLAG       = 0x00000001
+        $self->{'has_cutlist'}    = ($self->{'progflags'} & 0x00000002) ? 1 : 0; # FL_CUTLIST        = 0x00000002
+        $self->{'auto_expire'}    = ($self->{'progflags'} & 0x00000004) ? 1 : 0; # FL_AUTOEXP        = 0x00000004
+        $self->{'is_editing'}     = ($self->{'progflags'} & 0x00000008) ? 1 : 0; # FL_EDITING        = 0x00000008
+        $self->{'bookmark'}       = ($self->{'progflags'} & 0x00000010) ? 1 : 0; # FL_BOOKMARK       = 0x00000010
+        $self->{'is_recording'}   = ($self->{'progflags'} & 0x00100000) ? 1 : 0; # FL_INUSERECORDING = 0x00100000
+        $self->{'is_playing'}     = ($self->{'progflags'} & 0x00200000) ? 1 : 0; # FL_INUSEPLAYING   = 0x00200000
+                                                                                 # FL_TRANSCODED     = 0x00000100
+        $self->{'is_watched'}     = ($self->{'progflags'} & 0x00000200) ? 1 : 0; # FL_WATCHED        = 0x00000200
 
     # Assign shortcut names to the new audio/video/subtitle property flags
         $self->{'stereo'}         = $self->{'audio_props'}   & 0x01;
