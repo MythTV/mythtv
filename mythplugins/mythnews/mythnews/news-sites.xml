@@ -6,7 +6,7 @@
 
     <item> 
         <title>BBC News - Entertainment</title> 
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss.xml</url> 
+        <url>http://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml</url> 
     </item> 
 
     <item> 
@@ -50,7 +50,7 @@
 
     <item> 
         <title>BBC News - Business</title> 
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/business/rss.xml</url> 
+        <url>http://feeds.bbci.co.uk/news/business/rss.xml</url> 
     </item> 
 
     <item> 
@@ -105,7 +105,7 @@
 
     <item> 
         <title>BBC News - Technology</title> 
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/technology/rss.xml</url> 
+        <url>http://feeds.bbci.co.uk/news/technology/rss.xml</url> 
     </item> 
 
     <item> 
@@ -301,6 +301,15 @@
     </item>
 
 </category> 
+
+<category name="Education">
+
+    <item>
+        <title>BBC News - Education</title>
+        <url>http://feeds.bbci.co.uk/news/education/rss.xml</url>
+    </item>
+    
+</category>
 
 <category name="Electronic Frontier Foundation">
 
@@ -602,7 +611,7 @@
 
     <item>
         <title>BBC News - Health</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/health/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/health/rss.xml</url>
     </item>
     
     <item>
@@ -642,7 +651,7 @@
 
     <item>
         <title>BBC News (World Edition)</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/rss.xml</url>
     </item>
 
     <item>
@@ -1003,7 +1012,7 @@
 
     <item>
         <title>BBC News - Talking Point</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/talking_point/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/have_your_say/rss.xml</url>
     </item>
 
     <item>
@@ -1020,6 +1029,15 @@
     <item>
         <title>Sydsvenskan opinion (SE)</title>
         <url>http://sydsvenskan.se/rss/opinion</url>
+    </item>
+
+</category>
+
+<category name="Politics (non-US)">
+
+    <item>
+        <title>BBC News - Politics</title>
+        <url>http://feeds.bbci.co.uk/news/politics/rss.xml</url>
     </item>
 
 </category>
@@ -1070,37 +1088,62 @@
 
     <item>
         <title>BBC News - Africa</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/africa/rss.xml</url>
-    </item>
-
-    <item>
-        <title>BBC News - Americas</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/americas/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/world/africa/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Asia-Pacific</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/asia-pacific/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/world/asia_pacific/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - England</title>
+        <url>http://feeds.bbci.co.uk/news/england/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Europe</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/europe/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/world/europe/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Latin America and Caribbean</title>
+        <url>http://feeds.bbci.co.uk/news/world/latin_america/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - Middle East</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/middle_east/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/world/middle_east/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Northern Ireland</title>
+        <url>http://feeds.bbci.co.uk/news/northern_ireland/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Scotland</title>
+        <url>http://feeds.bbci.co.uk/news/scotland/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - South Asia</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/world/south_asia/rss.xml</url>
     </item>
 
     <item>
         <title>BBC News - UK</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/uk_news/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/uk/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - US and Canada</title>
+        <url>http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Wales</title>
+        <url>http://feeds.bbci.co.uk/news/wales/rss.xml</url>
     </item>
 
     <item>
@@ -1690,7 +1733,7 @@
 
     <item>
         <title>BBC News - Science</title>
-        <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/science/nature/rss.xml</url>
+        <url>http://feeds.bbci.co.uk/news/science_and_environment/rss.xml</url>
     </item>
     
     <item>
@@ -1881,6 +1924,20 @@
         <url>http://youtube.com/rss/global/top_rated.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
+
+</category>
+
+<category name="Weather (non-US)">
+
+    <item>
+        <title>BBC Weather - Weather News</title>
+        <url>http://newsrss.bbc.co.uk/rss/weather/news/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Weather - UK Weather Warnings</title>
+        <url>http://newsrss.bbc.co.uk/rss/weather/uk_warnings/rss.xml</url>
+    </item>
 
 </category>
 
@@ -2227,10 +2284,6 @@
         <url>http://www.weather.gov/alerts/wy.rss</url>
         <ico>http://www.weather.gov/favicon.ico</ico>
     </item>
-
-</category>
-
-<category name="Weather (non-US)">
 
 </category>
 
