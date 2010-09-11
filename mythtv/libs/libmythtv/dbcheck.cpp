@@ -17,6 +17,7 @@ using namespace std;
 
 /* If currentDatabaseVersion gets updated, the following files need updated:
    mythtv/bindings/python/MythTV/static.py
+   mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
 const QString currentDatabaseVersion = "1263";

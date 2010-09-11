@@ -108,6 +108,13 @@ package MythTV;
 # changed on a fixes branch ongoing.
     our $PROTO_VERSION = "61";
 
+# currentDatabaseVersion is defined in libmythtv in
+# mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core
+# schema version supported in the main code.  We need to check that the schema
+# version in the database is as expected by the bindings, which are expected
+# to be kept in sync with the main code.
+    our $SCHEMA_VERSION = "1263";
+
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
@@ -351,6 +358,13 @@ EOF
                                       $self->{'db_user'},
                                       $self->{'db_pass'})
             or die "Cannot connect to database: $!\n\n";
+
+    # Check for supported schema version
+        $self->{'schema_version'} = $self->backend_setting('DBSchemaVer');
+        if( $self->{'schema_version'} != $SCHEMA_VERSION ) {
+            die "Database schema $self->{'schema_version'} not supported.\n" .
+                "Bindings support schema version $SCHEMA_VERSION\n";
+        }
 
     # Load the master host and port
         $self->{'master_host'} = $self->backend_setting('MasterServerIP');
@@ -845,3 +859,5 @@ EOF
 
 # Return true
 1;
+
+# vim:ts=4:sw=4:ai:et:si:sts=4
