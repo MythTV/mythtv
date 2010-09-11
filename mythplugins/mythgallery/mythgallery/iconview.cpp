@@ -271,8 +271,11 @@ void IconView::LoadDirectory(const QString &dir)
     if (m_noImagesText)
         m_noImagesText->SetVisible((m_itemList.size() == 0));
 
-    UpdateText(m_imageList->GetItemCurrent());
-    UpdateImage(m_imageList->GetItemCurrent());
+    if (m_itemList.size() != 0)
+    {
+        UpdateText(m_imageList->GetItemCurrent());
+        UpdateImage(m_imageList->GetItemCurrent());
+    }
 }
 
 void IconView::LoadThumbnail(ThumbItem *item)
@@ -1545,3 +1548,7 @@ int ChildCountThread::getChildCount(const QString &filepath)
 
     return count;
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */
