@@ -3492,6 +3492,11 @@ uint ProgramInfo::QueryTranscoderID(void) const
     return 0;
 }
 
+/**
+ *
+ *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
+ *        call and so should not be called from the UI thread.
+ */
 QString ProgramInfo::DiscoverRecordingDirectory(void) const
 {
     if (!IsLocal())
@@ -3542,8 +3547,12 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
 }
 
 #include <cassert>
-/// Tracks a recording's in use status, to prevent deletion and to
-/// allow the storage scheduler to perform IO load balancing.
+/** Tracks a recording's in use status, to prevent deletion and to
+ *  allow the storage scheduler to perform IO load balancing.
+ *
+ *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
+ *        call and so should not be called from the UI thread.
+ */
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
     if (!IsRecording())
@@ -3854,6 +3863,8 @@ QString ProgramInfo::i18n(const QString &msg)
 /** \fn ProgramInfo::SubstituteMatches(QString &str)
  *  \brief Subsitute %MATCH% type variable names in the given string
  *  \param str QString to substitute matches in
+ *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
+ *        call and so should not be called from the UI thread.
  */
 void ProgramInfo::SubstituteMatches(QString &str)
 {
