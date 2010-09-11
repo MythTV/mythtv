@@ -3204,9 +3204,10 @@ append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-DNDEBUG"
     enable debug
+    disable stripping
 elif test x$compile_type = x"debug"; then
     enable debug
-    disable optimizations
+    disable optimizations stripping
 fi
 
 enabled silent_cc && append CCONFIG "silent"
