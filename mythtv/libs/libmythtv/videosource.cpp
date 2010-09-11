@@ -3567,6 +3567,11 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     cardnum  = new DVBCardNum(parent);
     cardname = new DVBCardName();
     cardtype = new DVBCardType();
+    bool showDiSEqC = false;
+
+    if (cardtype->getValue() == "DVB-S" ||
+        cardtype->getValue() == "DVB-S2")
+        showDiSEqC = true;
 
     signal_timeout = new SignalTimeout(parent, 500, 250);
     channel_timeout = new ChannelTimeout(parent, 3000, 1750);
@@ -3585,16 +3590,20 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     addChild(new DVBAudioDevice(parent));
     addChild(new DVBVbiDevice(parent));
 
-    TransButtonSetting *buttonDiSEqC = new TransButtonSetting();
-    buttonDiSEqC->setLabel(tr("DiSEqC"));
-    buttonDiSEqC->setHelpText(tr("Input and satellite settings."));
-
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));
 
     HorizontalConfigurationGroup *advcfg =
         new HorizontalConfigurationGroup(false, false, true, true);
-    advcfg->addChild(buttonDiSEqC);
+    if (showDiSEqC)
+    {
+        TransButtonSetting *buttonDiSEqC = new TransButtonSetting();
+        buttonDiSEqC->setLabel(tr("DiSEqC"));
+        buttonDiSEqC->setHelpText(tr("Input and satellite settings."));
+        advcfg->addChild(buttonDiSEqC);
+        connect(buttonDiSEqC, SIGNAL(pressed()),
+                this,         SLOT(  DiSEqCPanel()));
+    }
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
 
@@ -3608,8 +3617,6 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
-    connect(buttonDiSEqC, SIGNAL(pressed()),
-            this,         SLOT(  DiSEqCPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
             this,         SLOT(  DVBExtraPanel()));
 }
