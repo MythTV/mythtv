@@ -44,6 +44,7 @@ class ThemeChooser : public MythScreenType
     void saveAndReload(void);
     void toggleFullscreenPreview(void);
     void toggleDownloadableThemes(void);
+    void removeTheme(void);
 
   signals:
     void themeChanged(void);
@@ -60,6 +61,7 @@ class ThemeChooser : public MythScreenType
     ThemeInfo *loadThemeInfo(QFileInfo &theme);
     void showPopupMenu(void);
     void updateProgressBar(int bytesReceived, int bytesTotal);
+    void removeThemeDir(const QString &dirname);
 
     MythUIButtonList *m_themes;
     MythUIImage      *m_preview;

@@ -136,6 +136,8 @@ bool ThemeChooser::Create(void)
 
 void ThemeChooser::Load(void)
 {
+    QStringList parts = QString(myth_source_path).split("/");
+    QString MythVersion = parts[parts.size() - 1];
     QStringList themesSeen;
     QDir themes(GetConfDir() + "/themes");
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -171,63 +173,90 @@ void ThemeChooser::Load(void)
 
     if (m_includeDownloadableThemes)
     {
-        // Get the list of downloadable themes
-        QStringList parts = QString(myth_source_path).split("/");
-        QString MythVersion = parts[parts.size() - 1];
         QString site = QString("http://themes.mythtv.org/themes/repository/%1")
                                .arg(MythVersion);
-        QString url = QString("%1/index").arg(site);
-        QFileInfo finfo;
-        QByteArray data;
-        bool result = GetMythDownloadManager()->download(url, &data);
-        if (result)
+        QString url = site;
+        url.append("/themes.zip");
+        QString destdir = GetMythUI()->GetThemeCacheDir();
+        destdir.append("/themechooser");
+        QDir dir;
+        dir.mkpath(destdir);
+        QString localFile = GetConfDir();
+        localFile.append("/tmp/themes.zip");
+        bool result = GetMythDownloadManager()->download(url, localFile);
+
+        if (result && extractZIP(localFile, destdir))
         {
-            QString themeURL;
-            QStringList tokens;
-            QStringList lines = QString(data).split("\n");
-            QStringList::iterator lineIt = lines.begin();
-            for (; lineIt != lines.end(); ++lineIt)
+            QString themesPath = destdir;
+            themesPath.append("/").append(MythVersion);
+            themes.setPath(themesPath);
+
+            QFileInfoList downloadableThemes = themes.entryInfoList();
+            for( QFileInfoList::iterator it =  downloadableThemes.begin();
+                                         it != downloadableThemes.end();
+                                       ++it )
             {
-                tokens = (*lineIt).split("\t");
-                if (tokens.size() == 2)
+                QString dirName = (*it).fileName();
+                QString themeName = dirName;
+                QString remoteDir = site;
+                remoteDir.append("/").append(dirName);
+                QString localDir = themes.absolutePath();
+                localDir.append("/").append(dirName);
+
+                if (themesSeen.contains(dirName))
                 {
-                    themeURL = site + "/" + tokens[1];
-                    if (themesSeen.contains(tokens[1]))
+                    ThemeInfo remoteTheme((*it).absoluteFilePath());
+                    ThemeInfo *localTheme = m_themeNameInfos[dirName];
+
+                    themeName = remoteTheme.GetName();
+
+                    int rmtMaj = remoteTheme.GetMajorVersion();
+                    int rmtMin = remoteTheme.GetMinorVersion();
+                    int locMaj = localTheme->GetMajorVersion();
+                    int locMin = localTheme->GetMinorVersion();
+
+                    if ((rmtMaj > locMaj) ||
+                        ((rmtMaj == locMaj) &&
+                         (rmtMin > locMin)))
                     {
-                        ThemeInfo remoteTheme(themeURL);
-                        ThemeInfo *localTheme = m_themeNameInfos[tokens[1]];
-
-                        int rmtMaj = remoteTheme.GetMajorVersion();
-                        int rmtMin = remoteTheme.GetMinorVersion();
-                        int locMaj = localTheme->GetMajorVersion();
-                        int locMin = localTheme->GetMinorVersion();
-
-                        if ((rmtMaj > locMaj) ||
-                            ((rmtMaj == locMaj) &&
-                             (rmtMin > locMin)))
+                        if (loadThemeInfo(*it))
                         {
-                            finfo.setFile(themeURL);
-                            loadThemeInfo(finfo);
-                            m_infoList << finfo;
-                            m_themeStatuses[tokens[1]] = "updateavailable";
-                        }
-                        else if ((rmtMaj == locMaj) &&
-                                 (rmtMin == locMin))
-                        {
-                            m_themeStatuses[tokens[1]] = "uptodate";
+                            m_infoList << *it;
+                            m_themeStatuses[themeName] = "updateavailable";
+
+                            QFileInfo finfo(remoteTheme.GetPreviewPath());
+                            GetMythDownloadManager()->queueDownload(
+                                remoteDir.append("/").append(finfo.fileName()),
+                                localDir.append("/").append(finfo.fileName()),
+                                NULL);
                         }
                     }
-                    else
+                    else if ((rmtMaj == locMaj) &&
+                             (rmtMin == locMin))
                     {
-                        themesSeen << tokens[1];
-                        finfo.setFile(themeURL);
-                        loadThemeInfo(finfo);
-                        m_infoList << finfo;
-                        m_themeStatuses[finfo.fileName()] = "updateavailable";
+                        m_themeStatuses[themeName] = "uptodate";
+                    }
+                }
+                else
+                {
+                    ThemeInfo *remoteTheme = loadThemeInfo(*it);
+                    if (remoteTheme)
+                    {
+                        themeName = remoteTheme->GetName();
+                        themesSeen << dirName;
+                        m_infoList << *it;
+                        m_themeStatuses[themeName] = "updateavailable";
+
+                        QFileInfo finfo(remoteTheme->GetPreviewPath());
+                        GetMythDownloadManager()->queueDownload(
+                            remoteDir.append("/").append(finfo.fileName()),
+                            localDir.append("/").append(finfo.fileName()),
+                            NULL);
                     }
                 }
             }
         }
+        QFile::remove(localFile);
     }
 
     qSort(m_infoList.begin(), m_infoList.end(), sortThemeNames);
@@ -262,7 +291,7 @@ void ThemeChooser::Init(void)
         item = new MythUIButtonListItem(m_themes, buttonText);
         if (item)
         {
-            if (theme.exists())
+            if (themeinfo->GetDownloadURL().isEmpty())
                 item->DisplayState("local", "themelocation");
             else
                 item->DisplayState("remote", "themelocation");
@@ -278,9 +307,9 @@ void ThemeChooser::Init(void)
 
             QString thumbnail = themeinfo->GetPreviewPath();
             QFileInfo fInfo(thumbnail);
-            // Downloadable themes have thumbnail copies of their preview images
-            if (!thumbnail.startsWith("/"))
-                thumbnail = thumbnail.append(".thumb.png");
+            // Downloadable themeinfos have thumbnail copies of their preview images
+            if (!themeinfo->GetDownloadURL().isEmpty())
+                thumbnail = thumbnail.append(".thumb.jpg");
             item->SetImage(thumbnail);
 
             if (curTheme == themeinfo->GetDirectoryName())
@@ -323,12 +352,6 @@ ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
     m_themeFileNameInfos[theme.filePath()] = themeinfo;
     m_themeNameInfos[theme.fileName()] = themeinfo;
 
-    QString preview = themeinfo->GetPreviewPath();
-    if ((preview.startsWith("http://")) ||
-        (preview.startsWith("https://")) ||
-        (preview.startsWith("ftp://")))
-        GetMythDownloadManager()->preCache(preview);
-
     return themeinfo;
 }
 
@@ -367,8 +390,22 @@ void ThemeChooser::showPopupMenu(void)
         m_popupMenu->AddButton(tr("Show Downloadable Themes"),
                                SLOT(toggleDownloadableThemes()));
 
-    m_popupMenu->AddButton(tr("Select Current Theme"),
-                           SLOT(saveAndReload()));
+    MythUIButtonListItem *current = m_themes->GetItemCurrent();
+    if (current)
+    {
+        m_popupMenu->AddButton(tr("Select Theme"),
+                               SLOT(saveAndReload()));
+
+        ThemeInfo *info = qVariantValue<ThemeInfo *>(current->GetData());
+        if (info)
+        {
+            QString themeDir = GetConfDir() + "/themes/";
+
+            if (info->GetPreviewPath().startsWith(themeDir))
+                m_popupMenu->AddButton(tr("Delete Theme"),
+                                       SLOT(removeTheme()));
+        }
+    }
 }
 
 void ThemeChooser::popupClosed(QString which, int result)
@@ -395,6 +432,8 @@ bool ThemeChooser::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
             showPopupMenu();
+        else if (action == "DELETE")
+            removeTheme();
         else if ((action == "ESCAPE") &&
                  (m_fullScreenPreview) &&
                  (!m_fullScreenPreview->GetFilename().isEmpty()))
@@ -480,11 +519,14 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
     if (!info)
         return;
 
+    QFileInfo preview(info->GetPreviewPath());
     QHash<QString, QString> infomap;
     info->ToMap(infomap);
     SetTextFromMap(infomap);
     if (m_preview)
     {
+        if (!preview.exists())
+            m_preview->Reset();
         m_preview->SetFilename(info->GetPreviewPath());
         m_preview->Load();
     }
@@ -492,20 +534,22 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
     {
         if (!m_fullScreenPreview->GetFilename().isEmpty())
         {
+            if (!preview.exists())
+                m_fullScreenPreview->Reset();
             m_fullScreenPreview->SetFilename(info->GetPreviewPath());
             m_fullScreenPreview->Load();
             m_fullScreenName->SetText(info->GetName());
         }
     }
 
-    MythUIStateType *jobState =
+    MythUIStateType *themeLocation =
                     dynamic_cast<MythUIStateType*>(GetChild("themelocation"));
-    if (jobState)
+    if (themeLocation)
     {
-        if (info->GetPreviewPath().startsWith("http://"))
-            jobState->DisplayState("remote");
+        if (info->GetDownloadURL().isEmpty())
+            themeLocation->DisplayState("local");
         else
-            jobState->DisplayState("local");
+            themeLocation->DisplayState("remote");
     }
 
     MythUIStateType *aspectState =
@@ -632,6 +676,71 @@ void ThemeChooser::customEvent(QEvent *e)
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
     }
+}
+
+void ThemeChooser::removeTheme(void)
+{
+    MythUIButtonListItem *current = m_themes->GetItemCurrent();
+    if (!current)
+    {
+        ShowOkPopup(tr("Error, no theme selected."));
+        return;
+    }
+
+    ThemeInfo *info = qVariantValue<ThemeInfo *>(current->GetData());
+    if (!info)
+    {
+        ShowOkPopup(tr("Error, unable to find current theme."));
+        return;
+    }
+
+    QString themeDir = GetConfDir() + "/themes/";
+
+    if (!info->GetPreviewPath().startsWith(themeDir))
+    {
+        ShowOkPopup(tr("%1 is not a user-installed theme and can not "
+                       "be deleted.").arg(info->GetName()));
+        return;
+    }
+
+    themeDir.append(info->GetDirectoryName());
+    removeThemeDir(themeDir);
+
+    LoadInBackground();
+}
+
+void ThemeChooser::removeThemeDir(const QString &dirname)
+{
+    QString themeDir = GetConfDir() + "/themes/";
+
+    if (!dirname.startsWith(themeDir))
+        return;
+
+    QDir dir(dirname);
+
+    if (!dir.exists())
+        return;
+
+    QFileInfoList list = dir.entryInfoList();
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    while (it != list.end())
+    {
+        fi = &(*it++);
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+        if (fi->isFile() && !fi->isSymLink())
+        {
+            QFile::remove(fi->absoluteFilePath());
+        }
+        else if (fi->isDir() && !fi->isSymLink())
+        {
+            removeThemeDir(fi->absoluteFilePath());
+        }
+    }
+
+    dir.rmdir(dirname);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
