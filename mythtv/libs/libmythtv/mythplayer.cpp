@@ -3384,6 +3384,10 @@ bool MythPlayer::EnableEdit(void)
     deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
                         player_ctx, osd);
     deleteMap.SetFileEditing(player_ctx, true);
+    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (player_ctx->playingInfo)
+        player_ctx->playingInfo->SaveEditing(true);
+    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     return deleteMap.IsEditing();
 }
 
@@ -3396,6 +3400,10 @@ void MythPlayer::DisableEdit(bool save)
         deleteMap.LoadMap(totalFrames, player_ctx);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
     deleteMap.SetFileEditing(player_ctx, false);
+    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+    if (player_ctx->playingInfo)
+        player_ctx->playingInfo->SaveEditing(false);
+    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     if (!pausedBeforeEdit)
         Play();
     else
