@@ -85,6 +85,7 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
   public:
     // initializers
     RecordingProfile(QString profName = NULL);
+    ~RecordingProfile();
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype);
     virtual bool loadByGroup(const QString &name, const QString &group);

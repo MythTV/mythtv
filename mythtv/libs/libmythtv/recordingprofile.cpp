@@ -1216,6 +1216,13 @@ RecordingProfile::RecordingProfile(QString profName)
     addChild(profile);
 };
 
+RecordingProfile::~RecordingProfile()
+{
+    id->deleteLater();
+    delete name;
+    name = NULL;
+}
+
 void RecordingProfile::ResizeTranscode(bool resize)
 {
     MythWizard *wizard = (MythWizard *)dialog;
