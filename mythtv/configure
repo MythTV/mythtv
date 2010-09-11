@@ -2968,8 +2968,6 @@ check_cxx -D_LARGEFILE_SOURCE <<EOF && add_cxxppflags -D_LARGEFILE_SOURCE
 #include <stdlib.h>
 EOF
 
-check_cxxflags -std=c++98
-
 check_host_cflags -std=c99
 
 case "$arch" in
