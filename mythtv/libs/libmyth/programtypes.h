@@ -109,6 +109,8 @@ typedef enum TranscodingStatuses {
     TRANSCODING_RUNNING        = 2
 } TranscodingStatus;
 
+/// If you change these please update modules/tv/classes/Program.php
+/// at around line 179 where $this->progflag is referenced directly.
 typedef enum FlagMask {
     FL_NONE           = 0x00000000,
     FL_COMMFLAG       = 0x00000001,
