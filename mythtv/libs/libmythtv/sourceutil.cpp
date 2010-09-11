@@ -423,5 +423,8 @@ bool SourceUtil::DeleteAllSources(void)
             query.exec("TRUNCATE TABLE inputgroup") &&
             query.exec("TRUNCATE TABLE diseqc_config") &&
             query.exec("TRUNCATE TABLE diseqc_tree") &&
+            query.exec("TRUNCATE TABLE eit_cache") &&
+            query.exec("TRUNCATE TABLE channelgroup") &&
+            query.exec("TRUNCATE TABLE channelgroupnames") &&
             query.exec("TRUNCATE TABLE cardinput"));
 }
