@@ -165,10 +165,11 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void itemVisible(MythUIButtonListItem* item);
 
   protected:
-    enum ScrollStyle  { ScrollFree, ScrollCenter, ScrollGroupCenter };
-    enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
-    enum ArrangeType  { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
-    enum WrapStyle    { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems };
+    enum ScrollStyle { ScrollFree, ScrollCenter, ScrollGroupCenter };
+    enum LayoutType  { LayoutVertical, LayoutHorizontal, LayoutGrid };
+    enum ArrangeType { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
+    enum WrapStyle   { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
+                       WrapFlowing };
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
