@@ -28,6 +28,7 @@ class MPUBLIC MSqlDatabase
     bool KickDatabase(void);
     QString GetConnectionName(void) const { return m_name; }
     QSqlDatabase db(void) const { return m_db; }
+    bool Reconnect(void);
 
   private:
     QString m_name;
