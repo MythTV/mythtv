@@ -714,7 +714,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         QString token2 = nc->getArg(2).toLower();
         if ((token2.contains(QRegExp("^\\-*\\d+x$"))) ||
             (token2.contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
-            (token2.contains(QRegExp("^\\d*\\.\\d+x$"))))
+            (token2.contains(QRegExp("^\\-*\\d*\\.\\d+x$"))))
             message = QString("NETWORK_CONTROL SPEED %1").arg(token2);
         else if (is_abbrev("normal", token2))
             message = QString("NETWORK_CONTROL SPEED 1x");
@@ -1024,15 +1024,11 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "play speed pause      - Pause playback\r\n"
             "play speed normal     - Playback at normal speed\r\n"
             "play speed 1x         - Playback at normal speed\r\n"
-            "play speed -1x        - Playback at normal speed in reverse\r\n"
-            "play speed 1/16x      - Playback at 1/16x speed\r\n"
+            "play speed SPEEDx     - Playback where SPEED must be a decimal\r\n"
             "play speed 1/8x       - Playback at 1/8x speed\r\n"
             "play speed 1/4x       - Playback at 1/4x speed\r\n"
+            "play speed 1/3x       - Playback at 1/3x speed\r\n"
             "play speed 1/2x       - Playback at 1/2x speed\r\n"
-            "play speed 2x         - Playback at 2x speed\r\n"
-            "play speed 4x         - Playback at 4x speed\r\n"
-            "play speed 8x         - Playback at 8x speed\r\n"
-            "play speed 16x        - Playback at 16x speed\r\n"
             "play stop             - Stop playback\r\n";
     }
     else if (is_abbrev("query", command))

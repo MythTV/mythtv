@@ -4532,112 +4532,107 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             if (!ctx->paused)
                 DoTogglePause(ctx, true);
         }
-        else if (tokens[2].contains(QRegExp("^\\-*\\d+x$")))
+        else
         {
-            QString speed = tokens[2].left(tokens[2].length()-1);
+            float tmpSpeed;
             bool ok = false;
-            int tmpSpeed = speed.toInt(&ok);
-            int searchSpeed = abs(tmpSpeed);
-            unsigned int index;
 
-            if (ctx->paused)
-                DoTogglePause(ctx, true);
-
-            if (tmpSpeed == 1)
+            if (tokens[2].contains(QRegExp("^\\-*\\d+x$")))
             {
-                StopFFRew(ctx);
-                ctx->ts_normal = 1.0f;
-                ChangeTimeStretch(ctx, 0, false);
-
-                ReturnPlayerLock(ctx);
-                return;
+                QString speed = tokens[2].left(tokens[2].length()-1);
+                tmpSpeed = speed.toFloat(&ok);
             }
-
-            NormalSpeed(ctx);
-
-            for (index = 0; index < ff_rew_speeds.size(); index++)
-                if (ff_rew_speeds[index] == searchSpeed)
-                    break;
-
-            if ((index < ff_rew_speeds.size()) &&
-                (ff_rew_speeds[index] == searchSpeed))
+            else if (tokens[2].contains(QRegExp("^\\-*\\d*\\.\\d+x$")))
             {
-                if (tmpSpeed < 0)
-                    ctx->ff_rew_state = -1;
-                else if (tmpSpeed > 1)
-                    ctx->ff_rew_state = 1;
-                else
-                    StopFFRew(ctx);
-
-                if (ctx->ff_rew_state)
-                    SetFFRew(ctx, index);
+                QString speed = tokens[2].left(tokens[2].length() - 1);
+                tmpSpeed = speed.toFloat(&ok);
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Couldn't find %1 speed in "
-                    "FFRewSpeed settings array, changing to default speed "
-                    "of 1x").arg(searchSpeed));
+                QRegExp re = QRegExp("^(\\-*\\d+)\\/(\\d+)x$");
+                if (tokens[2].contains(re))
+                {
+                    QStringList matches = re.capturedTexts();
 
-                ctx->ff_rew_state = 0;
-                SetFFRew(ctx, kInitFFRWSpeed);
+                    int numerator, denominator;
+                    numerator = matches[1].toInt(&ok);
+                    denominator = matches[2].toInt(&ok);
+
+                    if (ok && denominator != 0)
+                        tmpSpeed = static_cast<float>(numerator) /
+                                   static_cast<float>(denominator);
+                    else
+                        ok = false;
+                }
             }
-        }
-        else if (tokens[2].contains(QRegExp("^\\d*\\.\\d+x$")))
-        {
-            QString tmpSpeed = tokens[2].left(tokens[2].length() - 1);
 
-            if (ctx->paused)
-                DoTogglePause(ctx, true);
-
-            StopFFRew(ctx);
-
-            bool floatRead;
-            float stretch = tmpSpeed.toFloat(&floatRead);
-            if (floatRead &&
-                stretch <= 2.0 &&
-                stretch >= 0.48)
+            if (ok)
             {
-                ctx->ts_normal = stretch;   // alter speed before display
-                ChangeTimeStretch(ctx, 0, false);
+                float searchSpeed = fabs(tmpSpeed);
+                unsigned int index;
+
+                if (ctx->paused)
+                    DoTogglePause(ctx, true);
+
+                if (tmpSpeed == 0.0f)
+                {
+                    NormalSpeed(ctx);
+                    StopFFRew(ctx);
+
+                    if (!ctx->paused)
+                        DoTogglePause(ctx, true);
+                }
+                else if (tmpSpeed == 1.0f)
+                {
+                    StopFFRew(ctx);
+                    ctx->ts_normal = 1.0f;
+                    ChangeTimeStretch(ctx, 0, false);
+
+                    ReturnPlayerLock(ctx);
+                    return;
+                }
+
+                NormalSpeed(ctx);
+
+                for (index = 0; index < ff_rew_speeds.size(); index++)
+                    if (float(ff_rew_speeds[index]) == searchSpeed)
+                        break;
+
+                if ((index < ff_rew_speeds.size()) &&
+                    (float(ff_rew_speeds[index]) == searchSpeed))
+                {
+                    if (tmpSpeed < 0)
+                        ctx->ff_rew_state = -1;
+                    else if (tmpSpeed > 1)
+                        ctx->ff_rew_state = 1;
+                    else
+                        StopFFRew(ctx);
+
+                    if (ctx->ff_rew_state)
+                        SetFFRew(ctx, index);
+                }
+                else if (0.48 <= tmpSpeed && tmpSpeed <= 2.0) {
+                    StopFFRew(ctx);
+
+                    ctx->ts_normal = tmpSpeed;   // alter speed before display
+                    ChangeTimeStretch(ctx, 0, false);
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, QString("Couldn't find %1 speed"
+                                                  "Setting Speed to"
+                                                  "1x").arg(searchSpeed));
+
+                    ctx->ff_rew_state = 0;
+                    SetFFRew(ctx, kInitFFRWSpeed);
+                }
             }
-        }
-        else if (tokens[2].contains(QRegExp("^\\d+\\/\\d+x$")))
-        {
-            if (ctx->buffer && ctx->buffer->InDVDMenuOrStillFrame())
+            else
             {
-                ReturnPlayerLock(ctx);
-                return;
+                VERBOSE(VB_IMPORTANT,
+                        QString("Found an unknown speed of %1").arg(tokens[2]));
             }
-
-            if (ctx->paused)
-                DoTogglePause(ctx, true);
-
-            if (tokens[2] == "16x")
-                ChangeSpeed(ctx, 5 - ctx->ff_rew_speed);
-            else if (tokens[2] == "8x")
-                ChangeSpeed(ctx, 4 - ctx->ff_rew_speed);
-            else if (tokens[2] == "4x")
-                ChangeSpeed(ctx, 3 - ctx->ff_rew_speed);
-            else if (tokens[2] == "3x")
-                ChangeSpeed(ctx, 2 - ctx->ff_rew_speed);
-            else if (tokens[2] == "2x")
-                ChangeSpeed(ctx, 1 - ctx->ff_rew_speed);
-            else if (tokens[2] == "1x")
-                ChangeSpeed(ctx, 0 - ctx->ff_rew_speed);
-            else if (tokens[2] == "1/2x")
-                ChangeSpeed(ctx, -1 - ctx->ff_rew_speed);
-            else if (tokens[2] == "1/3x")
-                ChangeSpeed(ctx, -2 - ctx->ff_rew_speed);
-            else if (tokens[2] == "1/4x")
-                ChangeSpeed(ctx, -3 - ctx->ff_rew_speed);
-            else if (tokens[2] == "1/8x")
-                ChangeSpeed(ctx, -4 - ctx->ff_rew_speed);
-            else if (tokens[2] == "1/16x")
-                ChangeSpeed(ctx, -5 - ctx->ff_rew_speed);
         }
-        else
-            VERBOSE(VB_IMPORTANT,
-                QString("Found an unknown speed of %1").arg(tokens[2]));
     }
     else if (tokens.size() == 2 && tokens[1] == "STOP")
     {
@@ -4723,24 +4718,27 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         {
             QString speedStr;
 
-            switch (ctx->ff_rew_speed)
+            if (ctx->paused)
             {
-                case  4: speedStr = "16x"; break;
-                case  3: speedStr = "8x";  break;
-                case  2: speedStr = "3x";  break;
-                case  1: speedStr = "2x";  break;
-                case  0: speedStr = "1x";  break;
-                case -1: speedStr = "1/3x"; break;
-                case -2: speedStr = "1/8x"; break;
-                case -3: speedStr = "1/16x"; break;
-                case -4: speedStr = "0x"; break;
-                default: speedStr = "1x"; break;
+                speedStr = "pause";
             }
-
-            if (ctx->ff_rew_state == -1)
-                speedStr = QString("-%1").arg(speedStr);
-            else if (ctx->ts_normal != 1.0)
-                speedStr = QString("%1X").arg(ctx->ts_normal);
+            else if (ctx->ff_rew_state)
+            {
+                speedStr = QString("%1x").arg(ctx->ff_rew_speed);
+            }
+            else
+            {
+                QRegExp re = QRegExp("Play (.*)x");
+                if (QString(ctx->GetPlayMessage()).contains(re))
+                {
+                    QStringList matches = re.capturedTexts();
+                    speedStr = QString("%1x").arg(matches[1]);
+                }
+                else
+                {
+                    speedStr = "1x";
+                }
+            }
 
             osdInfo info;
             ctx->CalcPlayerSliderPosition(info, true);
@@ -5958,11 +5956,13 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
     {
         mesg = tr("Forward %1X").arg(ff_rew_speeds[ctx->ff_rew_index]);
         speed = ff_rew_speeds[ctx->ff_rew_index];
+        ctx->ff_rew_speed = speed;
     }
     else
     {
         mesg = tr("Rewind %1X").arg(ff_rew_speeds[ctx->ff_rew_index]);
         speed = -ff_rew_speeds[ctx->ff_rew_index];
+        ctx->ff_rew_speed = speed;
     }
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);

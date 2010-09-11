@@ -817,7 +817,20 @@ QString PlayerContext::GetPlayMessage(void) const
 {
     QString mesg = QObject::tr("Play");
     if (ts_normal != 1.0)
-        mesg += QString(" %1X").arg(ts_normal);
+    {
+        if (ts_normal == 0.5)
+            mesg += QString(" 1/2x");
+        else if (0.32 < ts_normal && ts_normal < 0.34)
+            mesg += QString(" 1/3x");
+        else if (ts_normal == 0.25)
+            mesg += QString(" 1/4x");
+        else if (ts_normal == 0.125)
+            mesg += QString(" 1/8x");
+        else if (ts_normal == 0.0625)
+            mesg += QString(" 1/16x");
+        else
+            mesg += QString(" %1X").arg(ts_normal);
+    }
 
     if (0)
     {
