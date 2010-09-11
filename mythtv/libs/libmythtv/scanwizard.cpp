@@ -70,7 +70,10 @@ void ScanWizard::SetPage(const QString &pageTitle)
 {
     VERBOSE(VB_CHANSCAN, QString("SetPage(%1)").arg(pageTitle));
     if (pageTitle != ChannelScannerGUI::kTitle)
+    {
+        scannerPane->quitScanning();
         return;
+    }
 
     QMap<QString,QString> start_chan;
     DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;

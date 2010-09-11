@@ -75,7 +75,7 @@ class ChannelScannerGUI :
   public:
     static QString kTitle;
 
-  protected slots:
+  public slots:
     void quitScanning(void);
 
   private:
