@@ -851,16 +851,24 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
-    if (item != sel_item)
+    if ((item != sel_item) && pginfo && item->GetImage("preview").isEmpty() &&
+        (asAvailable == pginfo->GetAvailableStatus()))
     {
-        if (pginfo && item->GetImage("preview").isEmpty())
-            m_preview_tokens.insert(m_helper.GetPreviewImage(*pginfo));
-    }
+        QString token = m_helper.GetPreviewImage(*pginfo, true);
+        if (token.isEmpty())
+            return;
 
-    // make sure selected item is still at the top of the queue
-    ProgramInfo *sel_pginfo = qVariantValue<ProgramInfo*>(item->GetData());
-    if (sel_pginfo && sel_item->GetImage("preview").isEmpty())
-        m_preview_tokens.insert(m_helper.GetPreviewImage(*sel_pginfo));
+        m_preview_tokens.insert(token);
+        // now make sure selected item is still at the top of the queue
+        ProgramInfo *sel_pginfo =
+            qVariantValue<ProgramInfo*>(sel_item->GetData());
+        if (sel_pginfo && sel_item->GetImage("preview").isEmpty() &&
+            (asAvailable == sel_pginfo->GetAvailableStatus()))
+        {
+            m_preview_tokens.insert(
+                m_helper.GetPreviewImage(*sel_pginfo, false));
+        }
+    }
 }
 
 

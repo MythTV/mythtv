@@ -53,7 +53,7 @@ class PlaybackBoxHelper : public QThread
     void UndeleteRecording(uint chanid, const QDateTime &recstartts);
     void CheckAvailability(const ProgramInfo&,
                            CheckAvailabilityType cat = kCheckForCache);
-    QString GetPreviewImage(const ProgramInfo&);
+    QString GetPreviewImage(const ProgramInfo&, bool check_availibility = true);
 
     QString LocateArtwork(const QString &seriesid, const QString &title,
                           ArtworkType, const QString &host,

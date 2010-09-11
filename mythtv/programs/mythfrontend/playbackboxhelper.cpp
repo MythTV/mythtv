@@ -278,8 +278,9 @@ bool PBHEventHandler::event(QEvent *e)
         else if (me->Message() == "GET_PREVIEW")
         {
             QString token = me->ExtraData(0);
+            bool check_avail = (bool) me->ExtraData(1).toInt();
             QStringList list = me->ExtraDataList();
-            QStringList::const_iterator it = list.begin()+1;
+            QStringList::const_iterator it = list.begin()+2;
             ProgramInfo evinfo(it, list.end());
             if (!evinfo.HasPathname())
                 return true;
@@ -287,7 +288,9 @@ bool PBHEventHandler::event(QEvent *e)
             list.clear();
             evinfo.ToStringList(list);
             list += QString::number(kCheckForCache);
-            if (asAvailable != CheckAvailability(list))
+            if (check_avail && (asAvailable != CheckAvailability(list)))
+                return true;
+            else if (asAvailable != evinfo.GetAvailableStatus())
                 return true;
 
             // Now we can actually request the preview...
@@ -596,8 +599,12 @@ QString PlaybackBoxHelper::LocateArtwork(
     return QString();
 }
 
-QString PlaybackBoxHelper::GetPreviewImage(const ProgramInfo &pginfo)
+QString PlaybackBoxHelper::GetPreviewImage(
+    const ProgramInfo &pginfo, bool check_availability)
 {
+    if (!check_availability && pginfo.GetAvailableStatus() != asAvailable)
+        return QString();
+
     if (pginfo.GetAvailableStatus() == asPendingDelete)
         return QString();
 
@@ -605,6 +612,7 @@ QString PlaybackBoxHelper::GetPreviewImage(const ProgramInfo &pginfo)
         .arg(pginfo.MakeUniqueKey()).arg(rand());
 
     QStringList extra(token);
+    extra.push_back(check_availability?"1":"0");
     pginfo.ToStringList(extra);
     MythEvent *e = new MythEvent("GET_PREVIEW", extra);
     QCoreApplication::postEvent(m_eventHandler, e);
