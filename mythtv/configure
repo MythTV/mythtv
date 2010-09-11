@@ -3202,7 +3202,8 @@ append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
 
 append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
-    PROFILEFLAGS="-DNDEBUG"
+    add_cflags   -DNDEBUG
+    add_cxxflags -DNDEBUG
     enable debug
     disable stripping
 elif test x$compile_type = x"debug"; then
@@ -4478,7 +4479,6 @@ CPPFLAGS=$CPPFLAGS
 CFLAGS=$CFLAGS
 ASFLAGS=$ASFLAGS
 CC_O=$CC_O
-PROFILEFLAGS=$PROFILEFLAGS
 CXXPPFLAGS=$CXXPPFLAGS
 ECXXFLAGS=$ECXXFLAGS
 LDFLAGS=$LDFLAGS
