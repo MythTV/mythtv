@@ -295,6 +295,11 @@
             <area>364,444,480,30</area>
         </textarea>
 
+        <textarea name="filesize_str" from="basetextarea">
+            <area>710,444,190,30</area>
+            <align>right</align>
+        </textarea>
+
         <textarea name="description" from="basetextarea">
             <area>24,484,890,220</area>
             <multiline>yes</multiline>
@@ -315,6 +320,7 @@
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
+
     </window>
 
     <window name="deleterecordings">
