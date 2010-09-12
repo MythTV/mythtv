@@ -1146,8 +1146,10 @@ void IconView::HandleShowDevices(void)
         delete m_itemList.takeFirst();
 
     m_itemHash.clear();
+    m_imageList->Reset();
 
     m_thumbGen->cancel();
+    m_childCountThread->cancel();
 
     // add gallery directory
     ThumbItem *item = new ThumbItem("Gallery", m_galleryDir, true);
@@ -1176,6 +1178,18 @@ void IconView::HandleShowDevices(void)
         }
     }
 #endif
+
+    ThumbItem *thumbitem;
+    for (int x = 0; x < m_itemList.size(); x++)
+    {
+        thumbitem = m_itemList.at(x);
+
+        thumbitem->InitCaption(m_showcaption);
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), 0,
+                                     true, MythUIButtonListItem::NotChecked);
+        item->SetData(qVariantFromValue(thumbitem));
+    }
 
     // exit from menu on show devices action..
     SetFocusWidget(m_imageList);
