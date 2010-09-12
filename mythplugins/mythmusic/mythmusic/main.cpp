@@ -349,6 +349,7 @@ static void MusicCallback(void *data, QString &selection)
     {
         if ("" != gMusicData->startdir)
         {
+            loadMusic();
             FileScanner *fscan = new FileScanner();
             fscan->SearchDir(gMusicData->startdir);
             RebuildMusicTree();
