@@ -636,6 +636,27 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QSt
     SendUpdateEvent();
 }
 
+/* \fn RecordingInfo::ApplyTranscoderProfileChangeById(int id)
+ * \brief Sets the transcoder profile for a recording
+ * \param profileid is the 'id' field from recordingprofiles table.
+ */
+void RecordingInfo::ApplyTranscoderProfileChangeById(int id)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded "
+            "SET transcoder = :PROFILEID "
+            "WHERE chanid = :CHANID "
+            "AND starttime = :START");
+    query.bindValue(":PROFILEID",  id);
+    query.bindValue(":CHANID",  chanid);
+    query.bindValue(":START",  recstartts);
+
+    if (!query.exec())
+        MythDB::DBError(LOC + "unable to update transcoder "
+                "in recorded table", query);
+}
+
 /** \brief Sets the transcoder profile for a recording
  *  \param profile Descriptive name of the profile. ie: Autodetect
  */

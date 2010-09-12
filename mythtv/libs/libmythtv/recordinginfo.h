@@ -208,6 +208,7 @@ class MPUBLIC RecordingInfo : public ProgramInfo
     void ApplyRecordRecTitleChange(const QString &newTitle,
                                    const QString &newSubtitle);
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
+    void ApplyTranscoderProfileChangeById(int);
 
     static void signalChange(int recordid);
 

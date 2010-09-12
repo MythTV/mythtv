@@ -2909,26 +2909,54 @@ void PlaybackBox::showTranscodingProfiles()
     if (!CreatePopupMenu(tr("Transcoding profiles")))
         return;
 
-    m_popupMenu->AddButton(tr("Default"), SLOT(doBeginTranscoding()));
-    m_popupMenu->AddButton(tr("Autodetect"),
-                                    SLOT(changeProfileAndTranscodeAuto()));
-    m_popupMenu->AddButton(tr("High Quality"),
-                                    SLOT(changeProfileAndTranscodeHigh()));
-    m_popupMenu->AddButton(tr("Medium Quality"),
-                                    SLOT(changeProfileAndTranscodeMedium()));
-    m_popupMenu->AddButton(tr("Low Quality"),
-                                    SLOT(changeProfileAndTranscodeLow()));
+    m_popupMenu->AddButton(tr("Default"), qVariantFromValue(-1));
+    m_popupMenu->AddButton(tr("Autodetect"), qVariantFromValue(0));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT r.name, r.id "
+                  "FROM recordingprofiles r, profilegroups p "
+                  "WHERE p.name = 'Transcoders' "
+                  "AND r.profilegroup = p.id "
+                  "AND r.name != 'RTjpeg/MPEG4' "
+                  "AND r.name != 'MPEG2' ");
+
+    if (!query.exec())
+    {
+        MythDB::DBError(LOC + "unable to query transcoders", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        QString transcoder_name = query.value(0).toString();
+        int transcoder_id = query.value(1).toInt();
+
+        // Translatable strings for known profiles
+        if (transcoder_name == "High Quality")
+            transcoder_name = tr("High Quality");
+        else if (transcoder_name == "Medium Quality")
+            transcoder_name = tr("Medium Quality");
+        else if (transcoder_name == "Low Quality")
+            transcoder_name = tr("Low Quality");
+
+        m_popupMenu->AddButton(transcoder_name,
+                               qVariantFromValue(transcoder_id));
+    }
+    m_popupMenu->SetReturnEvent(this, "transcode");
 }
 
-void PlaybackBox::changeProfileAndTranscode(const QString &profile)
+void PlaybackBox::changeProfileAndTranscode(int id)
 {
-   ProgramInfo *pginfo = CurrentItem();
+    ProgramInfo *pginfo = CurrentItem();
 
     if (!pginfo)
         return;
 
-    const RecordingInfo ri(*pginfo);
-    ri.ApplyTranscoderProfileChange(profile);
+    if (id >= 0)
+    {
+        RecordingInfo ri(*pginfo);
+        ri.ApplyTranscoderProfileChangeById(id);
+    }
     doBeginTranscoding();
 }
 
@@ -3717,7 +3745,19 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 
 void PlaybackBox::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+
+        if (!dce)
+            return;
+
+        QString resultid = dce->GetId();
+
+        if (resultid == "transcode" && dce->GetResult() >= 0)
+            changeProfileAndTranscode(dce->GetData().toInt());
+    }
+    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
@@ -4552,7 +4592,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
 
-        UpdateUIListItem(item, true);
+        UpdateUIListItem(item, true); // Why?
     }
 
     RecordingInfo ri(*pginfo);

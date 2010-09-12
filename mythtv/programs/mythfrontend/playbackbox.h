@@ -159,15 +159,7 @@ class PlaybackBox : public ScheduleCommon
     void showRecordingPopup();
     void showJobPopup();
     void showTranscodingProfiles();
-    void changeProfileAndTranscode(const QString &profile);
-    void changeProfileAndTranscodeAuto()
-             { changeProfileAndTranscode("Autodetect"); }
-    void changeProfileAndTranscodeHigh()
-             { changeProfileAndTranscode("High Quality"); }
-    void changeProfileAndTranscodeMedium()
-             { changeProfileAndTranscode("Medium Quality"); }
-    void changeProfileAndTranscodeLow()
-             { changeProfileAndTranscode("Low Quality"); }
+    void changeProfileAndTranscode(int id);
     void showStoragePopup();
     void showPlaylistPopup();
     void showPlaylistStoragePopup();
