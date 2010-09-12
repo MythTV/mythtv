@@ -288,11 +288,11 @@
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>24,444,160,30</area>
+            <area>24,444,256,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>194,444,480,30</area>
+            <area>364,444,480,30</area>
         </textarea>
 
         <textarea name="description" from="basetextarea">
@@ -603,7 +603,7 @@
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>24,444,160,30</area>
+            <area>24,444,256,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
@@ -617,7 +617,7 @@
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>24,484,890,220</area>
+            <area>24,480,890,200</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
             <template>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</template>
@@ -652,7 +652,8 @@
 
         <textarea name="freereport">
             <area>24,666,526,34</area>
-            <font>baselarge</font>
+            <align>center</align>
+            <font>basemedium</font>
         </textarea>
 
     </window>
