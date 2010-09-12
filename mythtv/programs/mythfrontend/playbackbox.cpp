@@ -1542,7 +1542,8 @@ bool PlaybackBox::UpdateUILists(void)
 
             if ((((p->GetRecordingGroup() == m_recGroup) ||
                   ((m_recGroup == "All Programs") &&
-                   (p->GetRecordingGroup() != "Deleted")) ||
+                   (p->GetRecordingGroup() != "Deleted") &&
+                   (p->GetRecordingGroup() != "LiveTV")) ||
                   (p->GetRecordingGroup() == "LiveTV" &&
                    (m_viewMask & VIEW_LIVETVGRP))) &&
                  (m_recGroupPwCache[m_recGroup] == m_curGroupPassword)) ||
@@ -1595,7 +1596,8 @@ bool PlaybackBox::UpdateUILists(void)
                 }
 
                 if ((m_viewMask & VIEW_RECGROUPS) &&
-                    !p->GetRecordingGroup().isEmpty()) // Show recording groups
+                    !p->GetRecordingGroup().isEmpty() &&
+                    p->GetRecordingGroup() != "LiveTV") // Show recording groups
                 {
                     sortedList[p->GetRecordingGroup().toLower()] =
                         p->GetRecordingGroup();
