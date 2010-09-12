@@ -112,6 +112,9 @@ class Ripper : public MythScreenType
     void toggleTrackActive(MythUIButtonListItem *);
     void showEditMetadataDialog(MythUIButtonListItem *);
 
+  signals:
+    void ripFinished(void);
+
   private:
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);

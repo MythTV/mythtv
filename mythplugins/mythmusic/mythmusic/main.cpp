@@ -281,7 +281,9 @@ static void startRipper(void)
     else
         delete rip;
 
-//   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
+    QObject::connect(rip, SIGNAL(ripFinished()),
+                     gMusicData, SLOT(reloadMusic()),
+                     Qt::QueuedConnection);
 }
 
 static void startImport(void)
@@ -297,35 +299,9 @@ static void startImport(void)
     else
         delete import;
 
-//   connect(import, SIGNAL(Changed()), SLOT(RebuildMusicTree()));
-}
-
-static void RebuildMusicTree(void)
-{
-    if (!gMusicData->all_music || !gMusicData->all_playlists)
-        return;
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = QObject::tr("Rebuilding music tree");
-
-    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
-                                                  "musicscanbusydialog");
-                                                  
-    if (busy->Create())
-        popupStack->AddScreen(busy, false);
-    else
-        busy = NULL;
-
-    gMusicData->all_music->startLoading();
-    while (!gMusicData->all_music->doneLoading())
-    {
-        qApp->processEvents();
-        usleep(50000);
-    }
-    gMusicData->all_playlists->postLoad();
-    
-    if (busy)
-        busy->Close();
+    QObject::connect(import, SIGNAL(importFinished()),
+                     gMusicData, SLOT(reloadMusic()),
+                     Qt::QueuedConnection);
 }
 
 static void MusicCallback(void *data, QString &selection)
@@ -352,7 +328,7 @@ static void MusicCallback(void *data, QString &selection)
             loadMusic();
             FileScanner *fscan = new FileScanner();
             fscan->SearchDir(gMusicData->startdir);
-            RebuildMusicTree();
+            gMusicData->reloadMusic();
             delete fscan;
         }
     }
@@ -429,7 +405,9 @@ static void runRipCD(void)
     else
         delete rip;
 
-//   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
+    QObject::connect(rip, SIGNAL(ripFinished()),
+                     gMusicData, SLOT(reloadMusic()),
+                     Qt::QueuedConnection);
 }
 
 static void runScan(void)
@@ -440,7 +418,7 @@ static void runScan(void)
     {
         FileScanner *fscan = new FileScanner();
         fscan->SearchDir(gMusicData->startdir);
-        RebuildMusicTree();
+        gMusicData->reloadMusic();
         delete fscan;
     }
 }

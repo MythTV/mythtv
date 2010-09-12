@@ -400,13 +400,19 @@ class AllMusic
 
 //----------------------------------------------------------------------------
 
-class MusicData
+class MusicData : public QObject
 {
+  Q_OBJECT
+
   public:
 
     MusicData();
     ~MusicData();
 
+  public slots:
+    void reloadMusic(void);
+
+  public:
     QString             paths;
     QString             startdir;
     PlaylistContainer  *all_playlists;

@@ -498,6 +498,9 @@ Ripper::~Ripper(void)
             mon->StartMonitoring();
     }
 #endif
+
+    if (m_somethingwasripped)
+        emit ripFinished();
 }
 
 bool Ripper::Create(void)

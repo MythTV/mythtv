@@ -2,7 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
-
+ 
 QT += xml sql opengl qt3support network
 
 !exists( config.pro ) {

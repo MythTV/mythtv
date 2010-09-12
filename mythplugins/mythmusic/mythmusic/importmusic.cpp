@@ -93,6 +93,9 @@ ImportMusicDialog::~ImportMusicDialog()
         gCoreContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
 
     delete m_tracks;
+
+    if (m_somethingWasImported)
+        emit importFinished();
 }
 
 void ImportMusicDialog::fillWidgets()

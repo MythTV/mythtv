@@ -80,6 +80,9 @@ class ImportMusicDialog : public MythScreenType
     void setTitleWordCaps(void);
     void setTitleInitialCap(void);
 
+  signals:
+    void importFinished(void);
+
   private:
     void fillWidgets();
     void scanDirectory(QString &directory, vector<TrackInfo*> *tracks);

@@ -8,6 +8,7 @@
 #include <mythcontext.h>
 #include <mythwidgets.h>
 #include <mythdb.h>
+#include <mythprogressdialog.h>
 
 // mythmusic
 #include "metadata.h"
@@ -1666,4 +1667,32 @@ MusicData::~MusicData(void)
     }
 }
 
+/// reload music after a scan, rip or import
+void MusicData::reloadMusic(void)
+{
+    if (!all_music || !all_playlists)
+        return;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    QString message = QObject::tr("Rebuilding music tree");
+
+    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
+                                                  "musicscanbusydialog");
+
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+        busy = NULL;
+
+    all_music->startLoading();
+    while (!all_music->doneLoading())
+    {
+        qApp->processEvents();
+        usleep(50000);
+    }
+    all_playlists->postLoad();
+
+    if (busy)
+        busy->Close();
+}
 
