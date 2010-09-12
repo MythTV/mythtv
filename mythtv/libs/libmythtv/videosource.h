@@ -593,17 +593,18 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
     void DVBExtraPanel(void);
 
   private:
-    CaptureCard        &parent;
+    CaptureCard                  &parent;
 
-    DVBCardNum         *cardnum;
-    DVBInput           *defaultinput;
-    DVBCardName        *cardname;
-    DVBCardType        *cardtype;
-    SignalTimeout      *signal_timeout;
-    ChannelTimeout     *channel_timeout;
-    TransButtonSetting *buttonAnalog;
-    DVBTuningDelay     *tuning_delay;
-    DiSEqCDevTree      *diseqc_tree;
+    DVBCardNum                   *cardnum;
+    DVBInput                     *defaultinput;
+    DVBCardName                  *cardname;
+    DVBCardType                  *cardtype;
+    SignalTimeout                *signal_timeout;
+    ChannelTimeout               *channel_timeout;
+    TransButtonSetting           *buttonAnalog;
+    DVBTuningDelay               *tuning_delay;
+    DiSEqCDevTree                *diseqc_tree;
+    TransButtonSetting           *diseqc_btn;
 };
 
 class FirewireGUID;

@@ -114,6 +114,7 @@ class DiSEqCDevTree
     uint CreateFakeDiSEqCID(void)       { return m_previous_fake_diseqcid++; }
 
     static bool IsFakeDiSEqCID(uint id) { return id >= kFirstFakeDiSEqCID; }
+    static bool Exists(int id);
 
   protected:
     bool ApplyVoltage(const DiSEqCDevSettings &settings,

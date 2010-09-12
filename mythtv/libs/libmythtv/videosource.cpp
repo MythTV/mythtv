@@ -3585,18 +3585,23 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     addChild(new DVBAudioDevice(parent));
     addChild(new DVBVbiDevice(parent));
 
-    TransButtonSetting *buttonDiSEqC = new TransButtonSetting();
-    buttonDiSEqC->setLabel(tr("DiSEqC"));
-    buttonDiSEqC->setHelpText(tr("Input and satellite settings."));
-
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));
 
     HorizontalConfigurationGroup *advcfg =
         new HorizontalConfigurationGroup(false, false, true, true);
-    advcfg->addChild(buttonDiSEqC);
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
+
+    diseqc_btn = new TransButtonSetting();
+    diseqc_btn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
+    diseqc_btn->setHelpText(tr("Input and satellite settings."));
+
+    HorizontalConfigurationGroup *diseqc_cfg =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    diseqc_cfg->addChild(diseqc_btn);
+    diseqc_btn->setVisible(false);
+    addChild(diseqc_cfg);
 
     defaultinput = new DVBInput(parent);
     addChild(defaultinput);
@@ -3608,7 +3613,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
-    connect(buttonDiSEqC, SIGNAL(pressed()),
+    connect(diseqc_btn,   SIGNAL(pressed()),
             this,         SLOT(  DiSEqCPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
             this,         SLOT(  DVBExtraPanel()));
@@ -3637,6 +3642,12 @@ void DVBConfigurationGroup::Load(void)
     VerticalConfigurationGroup::Load();
     diseqc_tree->Load(parent.getCardID());
     defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
+    if (cardtype->getValue() == "DVB-S" ||
+        cardtype->getValue() == "DVB-S2" ||
+        DiSEqCDevTree::Exists(parent.getCardID()))
+    {
+        diseqc_btn->setVisible(true);
+    }
 }
 
 void DVBConfigurationGroup::Save(void)

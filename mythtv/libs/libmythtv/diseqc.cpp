@@ -364,6 +364,34 @@ bool DiSEqCDevTree::Load(uint cardid)
     return m_root;
 }
 
+/** \fn DiSEqCDevTree::Exists(uint)
+ *  \brief Check if a Diseqc device tree exists.
+ *  \param cardid Capture card id.
+ *  \return True if exists.
+ */
+bool DiSEqCDevTree::Exists(int cardid)
+{
+    // lookup configuration for this card
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT diseqcid "
+        "FROM capturecard "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("DiSEqCDevTree::Load", query);
+    }
+    else if (query.next())
+    {
+        if (query.value(0).toUInt() > 0)
+            return true;
+    }
+
+    return false;
+}
+
 /** \fn DiSEqCDevTree::Store(uint)
  *  \brief Stores the device tree to the database.
  *  \param cardid Capture card id.
