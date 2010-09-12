@@ -197,17 +197,14 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(void)
 }
 
 /**
- * Test if we can output digital audio
- * willreencode = true ; test if AC reencoding is permitted
- * willreencore = false; test if straight passthrough is supported
- *                       need to independantly check if AC3 or DTS is supported
- *
+ * Test if we can output digital audio and if sample rate is supported
  */
-bool AudioOutputBase::CanPassthrough(bool willreencode) const
+bool AudioOutputBase::CanPassthrough(int samplerate) const
 {
     bool ret = false;
     ret = output_settings->IsSupportedFormat(FORMAT_S16);
-    ret &= willreencode ? output_settings->canAC3() : !need_resampler;
+    ret &= output_settings->IsSupportedRate(samplerate);
+
     return ret;
 }
 
@@ -403,12 +400,15 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     /* Encode to AC-3 if we're allowed to passthru but aren't currently
        and we have more than 2 channels but multichannel PCM is not supported
        or if the device just doesn't support the number of channels */
-    enc = (CanPassthrough() && !passthru &&
+    enc = (!passthru &&
+           output_settings->IsSupportedFormat(FORMAT_S16) &&
+           output_settings->canAC3() &&
            ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
-    VBAUDIO(QString("enc(%1), canAC3(%2), canDTS(%3), canLPCM(%4), "
-                    "configured_channels(%5), %6 channels supported(%7)")
+    VBAUDIO(QString("enc(%1), passthru(%2), canAC3(%3), canDTS(%4), canLPCM(%5)"
+                    ", configured_channels(%6), %7 channels supported(%8)")
             .arg(enc)
+            .arg(passthru)
             .arg(output_settings->canAC3())
             .arg(output_settings->canDTS())
             .arg(output_settings->canLPCM())

@@ -249,6 +249,7 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
  * Returns capabilities supported by the audio device
  * amended to take into account the digital audio
  * options (AC3 and DTS)
+ * Warning: do not call it twice in a row, will lead to invalid settings
  */
 AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
 {
@@ -269,7 +270,10 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
 
     aosettings->m_LPCM = (mchannels > 2);
     if (mchannels == 2 && m_passthrough >= 0)
+    {
+        VERBOSE(VB_AUDIO, LOC + QString("AC3 or DTS capable"));
         aosettings->AddSupportedChannels(6);
+    }
     aosettings->m_DTS = aosettings->m_AC3 = (m_passthrough >= 0);
 
     return aosettings;
@@ -279,10 +283,16 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
  * Returns capabilities supported by the audio device
  * amended to take into account the digital audio
  * options (AC3 and DTS) as well as the user settings
+ * If newcopy = false, assume GetCleaned was called before hand
  */
 AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
 {
-    AudioOutputSettings* aosettings = GetCleaned(newcopy);
+    AudioOutputSettings* aosettings;
+
+    if (newcopy)
+        aosettings = GetCleaned(newcopy);
+    else
+        aosettings = this;
 
     if (aosettings->m_invalid)
         return aosettings;

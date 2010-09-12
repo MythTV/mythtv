@@ -4578,13 +4578,13 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
     bool passthru = false;
 
     if (ctx->codec_id == CODEC_ID_AC3)
-        passthru = m_audio->CanAC3() &&
-            ctx->channels >= (int)m_audio->GetMaxChannels() &&
-                   !internal_vol;
+        passthru = m_audio->CanAC3();
     else if (ctx->codec_id == CODEC_ID_DTS)
-        passthru = m_audio->CanDTS() && !internal_vol;
-
-    passthru &= m_audio->CanPassthrough();
+        passthru = m_audio->CanDTS();
+    passthru &= m_audio->CanPassthrough(ctx->sample_rate);
+        // Will downmix if we can't support the amount of channels
+    passthru &= ctx->channels >= (int)m_audio->GetMaxChannels();
+    passthru &= !internal_vol;
     passthru &= !transcoding && !disable_passthru;
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams

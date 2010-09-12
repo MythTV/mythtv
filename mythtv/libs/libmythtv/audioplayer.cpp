@@ -315,11 +315,11 @@ uint AudioPlayer::GetMaxChannels(void)
     return ret;
 }
 
-bool AudioPlayer::CanPassthrough(void)
+bool AudioPlayer::CanPassthrough(int samplerate)
 {
     bool ret = false;
     if (m_audioOutput)
-        ret = m_audioOutput->CanPassthrough(false);
+        ret = m_audioOutput->CanPassthrough(samplerate);
     return ret;
 }
 

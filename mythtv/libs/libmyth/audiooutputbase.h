@@ -50,7 +50,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const;
 
-    virtual bool CanPassthrough(bool willreencode=true) const;
+    virtual bool CanPassthrough(int samplerate) const;
     virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);

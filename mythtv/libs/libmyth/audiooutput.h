@@ -63,8 +63,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         { return new AudioOutputSettings; }
     virtual AudioOutputSettings* GetOutputSettingsUsers(void)
         { return new AudioOutputSettings; }
-    virtual bool CanPassthrough(bool willreencode __attribute__ ((unused))) const
-        { return false; }
+    virtual bool CanPassthrough(int samplerate) const = 0;
 
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate) = 0;

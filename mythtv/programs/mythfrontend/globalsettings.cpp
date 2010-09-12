@@ -431,7 +431,7 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
 HostCheckBox *AudioConfigSettings::MPCM()
 {
     HostCheckBox *gc = new HostCheckBox("MultiChannelPCM");
-    gc->setValue(true);
+    gc->setValue(false);
     return gc;
 }
 
