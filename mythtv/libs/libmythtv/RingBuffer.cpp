@@ -1917,7 +1917,11 @@ long long RingBuffer::Seek(long long pos, int whence, bool has_lock)
                 new_pos = fi.size() - off_end;
             }
         }
+#ifdef __FreeBSD__
+        else if (llabs(new_pos-readpos) > 100000000LL)
+#else
         else if (abs(new_pos-readpos) > 100000000LL)
+#endif
         {
             if (remotefile)
             {
