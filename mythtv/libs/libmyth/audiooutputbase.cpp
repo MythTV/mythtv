@@ -960,8 +960,8 @@ bool AudioOutputBase::AddFrames(void *buffer, int frames, long long timecode)
               .arg(needs_upmix));
 
     /* See if we're waiting for new samples to be buffered before we unpause
-       post channel change, seek, etc. Wait for 2 fragments to be buffered */
-    if (unpause_when_ready && pauseaudio && audioready() > fragment_size << 1)
+       post channel change, seek, etc. Wait for 4 fragments to be buffered */
+    if (unpause_when_ready && pauseaudio && audioready() > fragment_size << 2)
     {
         unpause_when_ready = false;
         Pause(false);
