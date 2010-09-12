@@ -10,6 +10,13 @@
             <value>Watch Recordings</value>
         </textarea>
 
+        <clock name="clock">
+            <area>1050,10,250,30</area>
+            <font>basesmall_normal</font>
+            <align>vcenter,left</align>
+            <format>%DATE% %TIME%</format>
+        </clock>
+
         <imagetype name="listbackground">
             <filename>reclist_background.png</filename>
             <position>0,60</position>
