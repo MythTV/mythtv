@@ -57,7 +57,6 @@ class AudioInputALSA : public AudioInput
     QByteArray          alsa_device;
     snd_pcm_t*          pcm_handle;
     snd_pcm_uframes_t   period_size;
-    uint                periods;
     int                 myth_block_bytes;
 };
 #endif /* _AUDIOINPUTALSA_H_ */

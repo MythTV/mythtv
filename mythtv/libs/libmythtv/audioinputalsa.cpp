@@ -192,55 +192,26 @@ bool AudioInputALSA::PrepHwParams(void)
     }
     uint buffer_time = 64000; // 64 msec
     uint period_time = buffer_time / 4;
-    if (!AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams,
-                 &buffer_time, NULL), "initial buffer time setting failed"))
-    {
-        snd_pcm_uframes_t buffer_size;
-        if (AlsaBad(snd_pcm_hw_params_get_buffer_size(hwparams, &buffer_size),
-                    "failed to get buffer size"))
-            return false;
-        if (AlsaBad(snd_pcm_hw_params_get_buffer_time(hwparams, &buffer_time, NULL),
-                    "failed to get buffer_time setting"))
-            return false;
-        if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams,
-                                                           &period_time, NULL),
-                    "failed to set period time"))
-            return false;
-        if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size,
-                                                      NULL),
-                    "failed to get period size"))
-            return false;
-    }
-    else
-    {
-        VERBOSE(VB_AUDIO, LOC + "hwparams settings, Plan B");
-        if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams,
-                    &period_time, NULL), "failed to set period time"))
-            return false;
-        if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size,
-                    NULL), "failed to get period size"))
-            return false;
-        snd_pcm_uframes_t buffer_size = period_size * 4;
-        if (AlsaBad(snd_pcm_hw_params_set_buffer_size_near(pcm_handle, hwparams,
-                    &buffer_size), "failed to set buffer size"))
-            return false;
-        if (AlsaBad(snd_pcm_hw_params_get_buffer_size(hwparams, &buffer_size),
-                    "failed to get buffer size"))
-            return false;
-    }
+    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams, &period_time, NULL), 
+                "failed to set period time"))
+        return false;
+    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams, &buffer_time, NULL), 
+                "failed to set buffer time"))
+        return false;
+    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size, NULL), 
+                "failed to get period size"))
+        return false;
+
     if (AlsaBad(snd_pcm_hw_params (pcm_handle, hwparams),
                 "failed to set hwparams"))
-        return false;
-    if (AlsaBad(snd_pcm_hw_params_get_periods(hwparams, &periods, NULL),
-                "failed to get periods"))
         return false;
 
     myth_block_bytes = snd_pcm_frames_to_bytes(pcm_handle, period_size);
     VERBOSE(VB_AUDIO, LOC_DEV
             + QString("channels %1, sample rate %2, buffer_time %3 msec, period "
-                      "size %4, periods %5").arg(m_audio_channels)
+                      "size %4").arg(m_audio_channels)
             .arg(m_audio_sample_rate).arg(buffer_time / 1000.0, -1, 'f', 1)
-            .arg(period_size).arg(periods));
+            .arg(period_size));
     VERBOSE(VB_AUDIO+VB_EXTRA, LOC_DEV + QString("myth block size %1")
             .arg(myth_block_bytes));
     return true;
