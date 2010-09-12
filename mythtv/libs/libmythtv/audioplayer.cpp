@@ -53,13 +53,15 @@ QString AudioPlayer::ReinitAudio(void)
                 .arg(m_format).arg(m_channels).arg(m_samplerate));
 
         no_audio_in = no_audio_out = true;
-        DeleteOutput();
     }
 
     no_audio_in = false;
 
-    if (!m_audioOutput && want_audio)
+    if (no_audio_out && want_audio)
     {
+        if (m_audioOutput)
+            DeleteOutput();
+
         bool setVolume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
         m_audioOutput = AudioOutput::OpenAudio(m_main_device,
                                                m_passthru_device,
@@ -76,11 +78,6 @@ QString AudioPlayer::ReinitAudio(void)
         {
             VERBOSE(VB_IMPORTANT, LOC + "Disabling Audio" +
                     QString(", reason is: %1").arg(errMsg));
-            if (m_audioOutput)
-            {
-                delete m_audioOutput;
-                m_audioOutput = NULL;
-            }
             no_audio_out = true;
         }
         else if (no_audio_out)
@@ -95,7 +92,7 @@ QString AudioPlayer::ReinitAudio(void)
         }
     }
 
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
     {
         const AudioSettings settings(m_format, m_channels, m_codec,
                                      m_samplerate, m_passthru);
@@ -119,7 +116,7 @@ bool AudioPlayer::Pause(bool pause)
 {
     bool result = false;
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
     {
         m_audioOutput->Pause(pause);
         result = true;
@@ -132,7 +129,7 @@ bool AudioPlayer::IsPaused(void)
 {
     bool paused = false;
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         paused = m_audioOutput->IsPaused();
     m_lock.unlock();
     return paused;
@@ -141,7 +138,7 @@ bool AudioPlayer::IsPaused(void)
 void AudioPlayer::PauseAudioUntilBuffered()
 {
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         m_audioOutput->PauseUntilBuffered();
     m_lock.unlock();
 }
@@ -157,7 +154,7 @@ uint AudioPlayer::GetVolume(void)
 {
     uint res = 0;
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         res = m_audioOutput->GetCurrentVolume();
     m_lock.unlock();
     return res;
@@ -196,7 +193,7 @@ void AudioPlayer::SetAudioParams(AudioFormat format, int orig_channels,
 void AudioPlayer::SetEffDsp(int dsprate)
 {
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         m_audioOutput->SetEffDsp(dsprate);
     m_lock.unlock();
 }
@@ -206,13 +203,13 @@ bool AudioPlayer::SetMuted(bool mute)
     QMutexLocker lock(&m_lock);
     bool is_muted = IsMuted();
 
-    if (m_audioOutput && !is_muted && mute &&
+    if (m_audioOutput && !no_audio_out && !is_muted && mute &&
         (kMuteAll == SetMuteState(kMuteAll)))
     {
         VERBOSE(VB_AUDIO, "muting sound " <<IsMuted());
         return true;
     }
-    else if (m_audioOutput && is_muted && !mute &&
+    else if (m_audioOutput && !no_audio_out && is_muted && !mute &&
              (kMuteOff == SetMuteState(kMuteOff)))
     {
         VERBOSE(VB_AUDIO, "unmuting sound "<<IsMuted());
@@ -227,7 +224,7 @@ bool AudioPlayer::SetMuted(bool mute)
 MuteState AudioPlayer::SetMuteState(MuteState mstate)
 {
     QMutexLocker lock(&m_lock);
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         return m_audioOutput->SetMuteState(mstate);
     return kMuteAll;
 }
@@ -236,7 +233,7 @@ MuteState AudioPlayer::IncrMuteState(void)
 {
     QMutexLocker lock(&m_lock);
     MuteState mstate = kMuteAll;
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         mstate = SetMuteState(VolumeBase::NextMuteState(GetMuteState()));
     return mstate;
 }
@@ -244,7 +241,7 @@ MuteState AudioPlayer::IncrMuteState(void)
 MuteState AudioPlayer::GetMuteState(void)
 {
     QMutexLocker lock(&m_lock);
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         return m_audioOutput->GetMuteState();
     return kMuteAll;
 }
@@ -252,16 +249,16 @@ MuteState AudioPlayer::GetMuteState(void)
 uint AudioPlayer::AdjustVolume(int change)
 {
     QMutexLocker lock(&m_lock);
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         m_audioOutput->AdjustCurrentVolume(change);
     return GetVolume();
 }
 
-long long AudioPlayer::GetAudioTime(void)
+int64_t AudioPlayer::GetAudioTime(void)
 {
-    long long time = 0;
+    int64_t time = 0;
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         time = m_audioOutput->GetAudiotime();
     m_lock.unlock();
     return time;
@@ -281,7 +278,7 @@ void AudioPlayer::SetStretchFactor(float factor)
 {
     m_stretchfactor = factor;
     m_lock.lock();
-    if (m_audioOutput)
+    if (m_audioOutput && !no_audio_out)
         m_audioOutput->SetStretchFactor(m_stretchfactor);
     m_lock.unlock();
 }
@@ -325,7 +322,8 @@ bool AudioPlayer::CanPassthrough(int samplerate)
 
 void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
 {
-    if (m_parent->PrepareAudioSample(timecode) && m_audioOutput)
+    if (m_parent->PrepareAudioSample(timecode) && m_audioOutput &&
+        !no_audio_out)
         m_audioOutput->Drain();
     int samplesize = m_channels * AudioOutputSettings::SampleSize(m_format);
     if ((samplesize <= 0) || !m_audioOutput)
@@ -339,7 +337,7 @@ void AudioPlayer::AddAudioData(char *buffer, int len, int64_t timecode)
 bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
 {
     fill = total = 0;
-    if (!m_audioOutput)
+    if (!m_audioOutput || no_audio_out)
         return false;
     m_audioOutput->GetBufferStatus(fill, total);
     return true;

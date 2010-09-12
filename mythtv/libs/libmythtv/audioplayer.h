@@ -43,7 +43,7 @@ class MPUBLIC AudioPlayer
     bool  CanAC3(void);
     bool  CanDTS(void);
     uint  GetMaxChannels(void);
-    long long GetAudioTime(void);
+    int64_t GetAudioTime(void);
 
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
     bool      SetMuted(bool mute);

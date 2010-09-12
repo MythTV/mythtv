@@ -1112,7 +1112,7 @@ VideoFrame *MythPlayer::GetNextVideoFrame(bool allow_unsafe)
     return videoOutput->GetNextFreeFrame(false, allow_unsafe);
 }
 
-/** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*,long long)
+/** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
  *  \brief Places frame on the queue of frames ready for display.
  */
 void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
@@ -1763,7 +1763,7 @@ void MythPlayer::AVSync(bool limit_delay)
 
     if (audio.HasAudioOut() && normal_speed)
     {
-        long long currentaudiotime = audio.GetAudioTime();
+        int64_t currentaudiotime = audio.GetAudioTime();
         VERBOSE(VB_TIMESTAMP, QString(
                     "A/V timecodes audio %1 video %2 frameinterval %3 "
                     "avdel %4 avg %5 tcoffset %6")
