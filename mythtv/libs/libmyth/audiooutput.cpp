@@ -328,7 +328,8 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
     }
 #endif
-#ifdef USING_COREAUDIO
+#if CONFIG_DARWIN
+
     {
         QString name = "CoreAudio:";
         QString desc = "CoreAudio output";

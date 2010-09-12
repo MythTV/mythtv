@@ -68,7 +68,7 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     QString dflt = "ALSA:default";
 #elif USING_PULSEOUTPUT
     QString dflt = "PulseAudio:default";
-#elif USING_COREAUDIO
+#elif CONFIG_DARWIN
     QString dflt = "CoreAudio:";
 #elif USING_MINGW
     QString dflt = "Windows:";
