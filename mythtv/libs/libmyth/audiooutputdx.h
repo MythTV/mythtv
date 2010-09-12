@@ -1,6 +1,8 @@
 #ifndef AUDIOOUTPUTDX
 #define AUDIOOUTPUTDX
 
+#include <QMap>
+
 // MythTV headers
 #include "audiooutputbase.h"
 #include "audiooutputsettings.h"
@@ -16,6 +18,7 @@ class AudioOutputDX : public AudioOutputBase
 
     virtual int  GetVolumeChannel(int channel) const;
     virtual void SetVolumeChannel(int channel, int volume);
+    static QMap<int, QString> *GetDXDevices(void);
 
   protected:
     virtual bool OpenDevice(void);

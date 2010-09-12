@@ -97,6 +97,7 @@ class AudioOutputDXPrivate
         GUID                deviceGUID,     *chosenGUID;
         int                 device_count,   device_num;
         QString             device_name;
+        QMap<int, QString>  device_list;
 };
 
 
@@ -149,6 +150,7 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
         context->device_num  = device_count;
     }
 
+    context->device_list.insert(device_count, enum_desc);
     context->device_count++;
     return 1;
 }
@@ -172,6 +174,7 @@ void AudioOutputDXPrivate::ResetDirectSound(void)
     chosenGUID   = NULL;
     device_count = 0;
     device_num   = 0;
+    device_list.clear();
 }
 
 int AudioOutputDXPrivate::InitDirectSound(void)
@@ -189,7 +192,8 @@ int AudioOutputDXPrivate::InitDirectSound(void)
         goto error;
     }
 
-    device_name = parent->m_UseSPDIF ?
+    if (parent)  // parent can be NULL only when called from GetDXDevices()
+        device_name = parent->m_UseSPDIF ?
                       parent->passthru_device : parent->main_device;
     device_name = device_name.section(':', 1);
     device_num  = device_name.toInt(&ok, 10);
@@ -596,6 +600,15 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
     }
 
     VBAUDIO(QString("Set volume %1").arg(dxVolume));
+}
+
+QMap<int, QString> *AudioOutputDX::GetDXDevices(void)
+{
+    AudioOutputDXPrivate *tmp_priv = new AudioOutputDXPrivate(NULL);
+    tmp_priv->InitDirectSound();
+    QMap<int, QString> *dxdevs = new QMap<int, QString>(tmp_priv->device_list);
+    delete tmp_priv;
+    return dxdevs;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

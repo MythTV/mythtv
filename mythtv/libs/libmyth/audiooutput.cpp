@@ -351,14 +351,24 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
             delete adc;
         }
 
-        name = "DirectX:Primary Sound Driver";
-        desc = "";
-        adc = GetAudioDeviceConfig(name, desc);
-        if (adc)
+        QMap<int, QString> *dxdevs = AudioOutputDX::GetDXDevices();
+
+        if (!dxdevs->empty())
         {
-            list->append(*adc);
-            delete adc;
+            for (QMap<int, QString>::const_iterator i = dxdevs->begin();
+                 i != dxdevs->end(); ++i)
+            {
+                QString desc = i.value();
+                QString devname = QString("DirectX:%1").arg(desc);
+
+                adc = GetAudioDeviceConfig(devname, desc);
+                if (!adc)
+                    continue;
+                list->append(*adc);
+                delete adc;
+            }
         }
+        delete dxdevs;
     }
 #endif
 
