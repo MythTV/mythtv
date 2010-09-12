@@ -256,16 +256,16 @@
 
     <!-- Base definition of a buttonlist in wide configuration -->
     <buttonlist name="basebuttonlist2">
-        <area>0,0,1240,356</area>
+        <area>0,0,1240,380</area>
         <layout>vertical</layout>
         <spacing>4</spacing>
         <wrapstyle>selection</wrapstyle>
-        <buttonarea>0,0,1200,356</buttonarea>
+        <buttonarea>0,0,1200,376</buttonarea>
         <statetype name="buttonitem">
             <area>0,0,1200,26</area>
             <state name="active">
                 <textarea name="buttontext">
-                    <area>34,2,1138,24</area>
+                    <area>34,2,1156,24</area>
                     <font>basesmall_normal</font>
                     <font state="disabled">basesmall_disabled</font>
                     <font state="error">basesmall_error</font>
@@ -277,14 +277,14 @@
             </state>
             <state name="selectedactive" from="active">
                 <shape name="selectbar">
-                    <area>28,0,1144,30</area>
+                    <area>20,0,1156,30</area>
                     <type>roundbox</type>
                     <line color="#00FF00" alpha="255" width="1" />
                     <fill color="#43b038" alpha="128" />
                     <cornerradius>4</cornerradius>
                 </shape>
                 <textarea name="buttontext">
-                    <area>34,2,1138,26</area>
+                    <area>34,2,1156,24</area>
                     <font>base_normal_selected</font>
                     <font state="disabled">basesmall_disabled_selected</font>
                     <font state="error">basesmall_error_selected</font>
@@ -363,10 +363,12 @@
 
     <!-- Base definition of a wide button -->
     <button name="basewidebutton">
+        <area>0,0,291,44</area>
         <position>0,0</position>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="background">
+                    <area>0,0,290,44</area>
                     <position>0,0</position>
                     <filename>wide_button_background.png</filename>
                 </imagetype>
@@ -380,14 +382,14 @@
             </state>
             <state name="selected" from="active">
                 <imagetype name="background">
-                    <area>2,2,282,43</area>
+                    <area>0,0,290,44</area>
                     <filename>wide_button_selected_background.png</filename>
                 </imagetype>
             </state>
             <state name="disabled" from="active" />
             <state name="pushed" from="active">
                 <imagetype name="background">
-                    <area>0,0,282,43</area>
+                    <area>0,0,290,44</area>
                     <filename>wide_button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
@@ -399,15 +401,15 @@
 
     <!-- Base definition of a very wide button -->
     <button name="baseverywidebutton">
-        <area>0,0,496,44</area>
+        <area>0,0,696,44</area>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="background">
-                    <area>0,0,495,43</area>
+                    <area>0,0,696,44</area>
                     <filename>very_wide_button_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <area>2,2,492,40</area>
+                    <area>2,2,692,42</area>
                     <align>allcenter</align>
                     <font>basesmall_normal_button</font>
                     <font state="selected">basesmall_selected_button</font>
@@ -416,14 +418,14 @@
             </state>
             <state name="selected" from="active">
                 <imagetype name="background">
-                    <area>0,0,495,43</area>
+                    <area>0,0,696,44</area>
                     <filename>very_wide_button_selected_background.png</filename>
                 </imagetype>
             </state>
             <state name="disabled" from="active" />
             <state name="pushed" from="active">
                 <imagetype name="background">
-                    <area>0,0,495,43</area>
+                    <area>0,0,696,44</area>
                     <filename>very_wide_button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
@@ -564,14 +566,14 @@
 
     <!-- Base definition of a wide spinbox (room for strings) -->
     <spinbox name="basewidespinbox" from="basespinbox">
-        <area>0,0,496,44</area>
+        <area>0,0,696,44</area>
         <layout>horizontal</layout>
-        <buttonarea>0,0,476,44</buttonarea>
+        <buttonarea>0,0,676,44</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,476,44</area>
+                <area>0,0,676,44</area>
                 <textarea name="buttontext">
-                    <area>4,4,468,36</area>
+                    <area>4,4,672,36</area>
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
@@ -580,10 +582,10 @@
             <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>480,2</position>
+            <position>680,2</position>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>480,22</position>
+            <position>680,22</position>
         </statetype>
     </spinbox>
 
@@ -642,13 +644,13 @@
 
     <!-- Base definition of a list in wide 'selector' configuration -->
     <buttonlist name="basewideselector" from="baseselector">
-        <area>0,0,496,44</area>
-        <buttonarea>0,0,476,44</buttonarea>
+        <area>0,0,696,44</area>
+        <buttonarea>0,0,676,44</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,476,44</area>
+                <area>0,0,676,44</area>
                 <textarea name="buttontext">
-                    <area>14,2,448,40</area>
+                    <area>14,2,648,40</area>
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
@@ -657,21 +659,21 @@
             <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>480,2</position>
+            <position>680,2</position>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>480,22</position>
+            <position>680,22</position>
         </statetype>
     </buttonlist>
 
     <buttonlist name="baseverywideselector" from="baseselector">
-        <area>0,0,506,44</area>
-        <buttonarea>0,0,496,44</buttonarea>
+        <area>0,0,710,44</area>
+        <buttonarea>0,0,696,44</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,496,44</area>
+                <area>0,0,696,44</area>
                 <textarea name="buttontext">
-                    <area>2,2,492,40</area>
+                    <area>2,2,692,40</area>
                     <align>allcenter</align>
                 </textarea>
             </state>
@@ -681,10 +683,10 @@
             <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>500,2</position>
+            <position>700,2</position>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>500,22</position>
+            <position>700,22</position>
         </statetype>
     </buttonlist>
 
