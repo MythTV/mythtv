@@ -56,6 +56,7 @@ main_settings.xml
       6. SETTINGS_XBOX
       7. PHONE
       8. ZONEMINDER
+      9. SETTINGS_THEMECHOOSER
 
 manage_recordings.xml
 
