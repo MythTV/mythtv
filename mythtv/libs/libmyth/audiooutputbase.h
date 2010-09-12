@@ -31,6 +31,18 @@ class FreeSurround;
 class AudioOutputDigitalEncoder;
 struct AVCodecContext;
 
+class AsyncLooseLock
+{
+public:
+    AsyncLooseLock() { head = tail = 0; }
+    void Clear() { head = tail = 0; }
+    void Ref() { head++; }
+    bool TestAndDeref() { bool r; if ((r=(head != tail))) tail++; return r; }
+private:
+    int head;
+    int tail;
+};
+
 class AudioOutputBase : public AudioOutput, public QThread
 {
  public:
@@ -59,9 +71,9 @@ class AudioOutputBase : public AudioOutput, public QThread
     int GetSWVolume(void);
 
     // timecode is in milliseconds.
-    virtual bool AddFrames(void *buffer, int frames, long long timecode);
+    virtual bool AddFrames(void *buffer, int frames, int64_t timecode);
 
-    virtual void SetTimecode(long long timecode);
+    virtual void SetTimecode(int64_t timecode);
     virtual bool IsPaused(void) const { return actually_paused; }
     virtual void Pause(bool paused);
     void PauseUntilBuffered(void);
@@ -69,8 +81,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     // Wait for all data to finish playing
     virtual void Drain(void);
 
-    virtual int GetAudiotime(void);
-    virtual int GetAudioBufferedTime(void);
+    virtual int64_t GetAudiotime(void);
+    virtual int64_t GetAudioBufferedTime(void);
 
     // Send output events showing current progress
     virtual void Status(void);
@@ -85,8 +97,8 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     static const uint kAudioSRCInputSize  = 16384<<1;
     static const uint kAudioSRCOutputSize = 16384<<3;
-    /// Audio Buffer Size -- should be divisible by 12,10,8,6,4,2..
-    static const uint kAudioRingBufferSize   = 1536000;
+    /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
+    static const uint kAudioRingBufferSize   = 3072000;
 
  protected:
     // Following function must be called from subclass constructor
@@ -107,7 +119,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
-    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer);
+    int GetAudioData(uchar *buffer, int buf_size, bool fill_buffer, int *local_raud = NULL);
 
     void OutputAudioLoop(void);
 
@@ -142,6 +154,7 @@ class AudioOutputBase : public AudioOutput, public QThread
     bool passthru, enc, reenc;
 
     float stretchfactor;
+    int  eff_stretchfactor;     // scaled to 100000 as effdsp is
     AudioOutputSource source;
 
     bool killaudio;
@@ -156,6 +169,7 @@ class AudioOutputBase : public AudioOutput, public QThread
 
  private:
     int CopyWithUpmix(char *buffer, int frames, int &org_waud);
+    void SetAudiotime(int frames, int64_t timecode);
     AudioOutputSettings *output_settingsraw;
     AudioOutputSettings *output_settings;
     bool need_resampler;
@@ -177,7 +191,7 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     bool processing;
 
-    long long frames_buffered;
+    int64_t frames_buffered;
 
     bool audio_thread_exists;
 
@@ -190,12 +204,13 @@ class AudioOutputBase : public AudioOutput, public QThread
     QMutex avsync_lock;
 
     // timecode of audio leaving the soundcard (same units as timecodes)
-    long long audiotime;
+    int64_t audiotime;
 
     /* Audio circular buffer */
     int raud, waud;     /* read and write positions */
     // timecode of audio most recently placed into buffer
-    long long audbuf_timecode;
+    int64_t audbuf_timecode;
+    AsyncLooseLock reset_active;
 
     QMutex killAudioLock;
 

@@ -29,34 +29,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using namespace std;
 
 #include "compat.h"
+#include "mythverbose.h"
 #include "freesurround.h"
 #include "el_processor.h"
 
 #include <QString>
 #include <QDateTime>
-
-#if 0
-#define VERBOSE(args...) \
-    do { \
-        QDateTime dtmp = QDateTime::currentDateTime(); \
-        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-        std::cout << dtime.toLocal8Bit().constData() << " " \
-            << QString(args).toLocal8Bit().constData() << std::endl; \
-    } while (0)
-#else
-#define VERBOSE(args...)
-#endif
-#if 0
-#define VERBOSE1(args...) \
-    do { \
-        QDateTime dtmp = QDateTime::currentDateTime(); \
-        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-        std::cout << dtime.toLocal8Bit().constData() << " " \
-            << QString(args).toLocal8Bit().constData() << std::endl; \
-    } while (0)
-#else
-#define VERBOSE1(args...)
-#endif
 
 // our default internal block size, in floats
 static const unsigned default_block_size = 8192;
@@ -161,7 +139,8 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     processed_size(0),
     surround_mode(smode)
 {
-    VERBOSE(QString("FreeSurround::FreeSurround rate %1 moviemode %2")
+    VERBOSE(VB_AUDIO+VB_EXTRA,
+            QString("FreeSurround::FreeSurround rate %1 moviemode %2")
             .arg(srate).arg(moviemode));
 
     if (moviemode)
@@ -193,10 +172,12 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     channel_select++;
     if (channel_select>=6)
         channel_select = 0;
-    VERBOSE(QString("FreeSurround::FreeSurround channel_select %1")
+    VERBOSE(VB_AUDIO+VB_EXTRA,
+            QString("FreeSurround::FreeSurround channel_select %1")
             .arg(channel_select));
 #endif
-    VERBOSE(QString("FreeSurround::FreeSurround done"));
+    VERBOSE(VB_AUDIO+VB_EXTRA,
+            QString("FreeSurround::FreeSurround done"));
 }
 
 void FreeSurround::SetParams()
@@ -224,14 +205,14 @@ FreeSurround::fsurround_params::fsurround_params(int32_t center_width,
 
 FreeSurround::~FreeSurround()
 {
-    VERBOSE(QString("FreeSurround::~FreeSurround"));
+    VERBOSE(VB_AUDIO+VB_EXTRA, QString("FreeSurround::~FreeSurround"));
     close();
     if (bufs)
     {
         bp.release((void*)1);
         bufs = NULL;
     }
-    VERBOSE(QString("FreeSurround::~FreeSurround done"));
+    VERBOSE(VB_AUDIO+VB_EXTRA, QString("FreeSurround::~FreeSurround done"));
 }
 
 uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
@@ -289,19 +270,26 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     break;
             }
             ic += numFrames;
-            in_count = ic;
             processed = process;
             if (ic != bs)
+            {
+                // dont modify unless no processing is to be done
+                // for audiotime consistency
+                in_count = ic;
                 break;
-            in_count = 0;
+            }
+            // process_block takes some time so dont update in and out count
+            // before its finished so that Audiotime is correctly calculated
             if (process)
                 process_block();
+            in_count = 0;
             out_count = bs;
             processed_size = bs;
             break;
     }
 
-    VERBOSE1(QString("FreeSurround::putFrames %1 %2 used %4 generated %5")
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP+VB_EXTRA,
+            QString("FreeSurround::putFrames %1 #ch %2 used %4 generated %5")
             .arg(numFrames).arg(numChannels).arg(i).arg(out_count));
 
     return i;
@@ -318,7 +306,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
     switch (surround_mode)
     {
         case SurroundModePassive:
-            for (uint i = 0; i < maxFrames; i++) 
+            for (i = 0; i < maxFrames; i++) 
             {
                 *output++ = bufs->l[outindex];
                 *output++ = bufs->r[outindex];
@@ -341,7 +329,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
                 float *ls  = &outputs[3][outindex];
                 float *rs  = &outputs[4][outindex];
                 float *lfe = &outputs[5][outindex];
-                for (uint i = 0; i < maxFrames; i++) 
+                for (i = 0; i < maxFrames; i++) 
                 {
                     *output++ = *l++;
                     *output++ = *r++;
@@ -361,7 +349,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
                 float *ls  = &bufs->ls[outindex];
                 float *rs  = &bufs->rs[outindex];
                 float *lfe = &bufs->lfe[outindex];
-                for (uint i = 0; i < maxFrames; i++) 
+                for (i = 0; i < maxFrames; i++) 
                 {
                     *output++ = *l++;
                     *output++ = *r++;
@@ -376,7 +364,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             break;
     }
     out_count = oc;
-    VERBOSE1(QString("FreeSurround::receiveFrames %1").arg(maxFrames));
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP+VB_EXTRA, QString("FreeSurround::receiveFrames %1").arg(maxFrames));
     return maxFrames;
 }
 
