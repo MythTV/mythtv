@@ -2017,7 +2017,7 @@ static long long getFrameCount(AVFormatContext *inputFC, int vid_id)
     return count;
 }
 
-static long long getCutFrames(const QString &filename)
+static long long getCutFrames(const QString &filename, long long lastFrame)
 {
     // only wont the filename
     QString basename = filename;
@@ -2060,7 +2060,21 @@ static long long getCutFrames(const QString &filename)
                 end = it.key();
                 it++;
             }
+            else
+                end = lastFrame;
         }
+        else if (it.value() == MARK_CUT_END)
+        {
+            start = 0;
+            end = it.key();
+            it++;
+        }
+        else
+        {
+            it++;
+            continue;
+        }
+
         frames += end - start;
     }
 
@@ -2235,6 +2249,8 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 // video stream we use to calc the duration
                 if (duration == 0)
                 {
+                    long long frameCount = 0;
+
                     switch (lenMethod)
                     {
                         case 0:
@@ -2246,6 +2262,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                                 root.setAttribute("duration", duration);
                                 VERBOSE(VB_JOBQUEUE, QString("duration = %1")
                                         .arg(duration));
+                                frameCount = (long long)(duration * fps);
                             }
                             else
                                 root.setAttribute("duration", "N/A");
@@ -2254,9 +2271,9 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         case 1:
                         {
                             // calc duration of the file by counting the video frames
-                            long long frames = getFrameCount(inputFC, i);
-                            VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
-                            duration = (uint)(frames / fps);
+                            frameCount = getFrameCount(inputFC, i);
+                            VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frameCount));
+                            duration = (uint)(frameCount / fps);
                             VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
                             root.setAttribute("duration", duration);
                             break;
@@ -2265,9 +2282,9 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         {
                             // use info from pos map in db
                             // (only useful if the file is a myth recording)
-                            long long frames = getFrameCount(inFile, fps);
-                            VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
-                            duration = (uint)(frames / fps);
+                            frameCount = getFrameCount(inFile, fps);
+                            VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frameCount));
+                            duration = (uint)(frameCount / fps);
                             VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
                             root.setAttribute("duration", duration);
                             break;
@@ -2278,9 +2295,9 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                     }
 
                     // add duration after all cuts are removed
-                    long long frames = getCutFrames(inFile);
-                    VERBOSE(VB_JOBQUEUE, QString("cutframes = %1").arg(frames));
-                    int cutduration = (int)(frames / fps);
+                    long long cutFrames = getCutFrames(inFile, frameCount);
+                    VERBOSE(VB_JOBQUEUE, QString("cutframes = %1").arg(cutFrames));
+                    int cutduration = (int)(cutFrames / fps);
                     VERBOSE(VB_JOBQUEUE, QString("cutduration = %1").arg(cutduration));
                     root.setAttribute("cutduration", duration - cutduration);
                 }
