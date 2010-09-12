@@ -382,7 +382,7 @@ int AudioOutputCA::GetBufferedOnSoundcard(void) const
 /** Reimplement the base class's version of GetAudiotime()
  *  so that we don't use gettimeofday or Qt mutexes.
  */
-int AudioOutputCA::GetAudiotime(void)
+int64_t AudioOutputCA::GetAudiotime(void)
 {
     int audbuf_timecode = GetBaseAudBufTimeCode();
 

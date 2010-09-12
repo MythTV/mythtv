@@ -20,7 +20,7 @@ public:
     
     AudioOutputSettings* GetOutputSettings(void);
 
-    virtual int GetAudiotime(void);
+    virtual int64_t GetAudiotime(void);
 
     // callback for delivering audio to output device
     bool RenderAudio(unsigned char *aubuf, int size,
