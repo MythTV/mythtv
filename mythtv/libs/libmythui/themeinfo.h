@@ -9,6 +9,8 @@
 
 #include "mythexp.h"
 
+#include "xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
+
 typedef enum {
     THEME_UNKN  = 0x00,
     THEME_UI    = 0x01,
@@ -16,7 +18,7 @@ typedef enum {
     THEME_MENU  = 0x04
 } ThemeType;
 
-class MPUBLIC ThemeInfo
+class MPUBLIC ThemeInfo : public XMLParseBase
 {
   public:
     ThemeInfo(QString theme);
