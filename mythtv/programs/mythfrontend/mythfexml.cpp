@@ -13,6 +13,7 @@
 
 #include "mythmainwindow.h"
 
+#include <QCoreApplication>
 #include <QTextStream>
 #include <QDir>
 #include <QFile>
@@ -116,14 +117,11 @@ void MythFEXML::GetScreenShot( HTTPRequest *pRequest )
 
     // Read Icon file path from database
 
-    QString sFileName = QString("/%1/myth-screenshot-XML.jpg")
+    QString sFileName = QString("/%1/myth-screenshot-XML.png")
                     .arg(gCoreContext->GetSetting("ScreenShotPath","/tmp/"));
 
-    if (!GetMythMainWindow()->screenShot(sFileName,nWidth, nHeight))
-    {
-        VERBOSE(VB_GENERAL, "MythFEXML: Failed to take screenshot. Aborting");
-        return;
-    }
+    MythMainWindow *window = GetMythMainWindow();
+    emit window->remoteScreenShot(sFileName, nWidth, nHeight);
 
     pRequest->m_sFileName = sFileName;
 }

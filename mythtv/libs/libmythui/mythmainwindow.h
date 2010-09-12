@@ -90,6 +90,7 @@ class MPUBLIC MythMainWindow : public QWidget
     bool screenShot(int x, int y, int x2, int y2);
     bool screenShot(QString fname, int w, int h);
     bool screenShot(void);
+    void remoteScreenShot(QString fname, int w, int h);
 
     void AllowInput(bool allow);
 
@@ -121,6 +122,10 @@ class MPUBLIC MythMainWindow : public QWidget
 
   protected slots:
     void animate();
+    void doRemoteScreenShot(QString fname, int w, int h);
+
+  signals:
+    void signalRemoteScreenShot(QString fname, int w, int h);
 
   protected:
     MythMainWindow(const bool useDB = true);

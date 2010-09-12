@@ -468,6 +468,10 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->repaintRegion = QRegion(QRect(0,0,0,0));
 
     d->m_drawEnabled = true;
+
+    connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
+            this, SLOT(doRemoteScreenShot(QString,int,int)),
+            Qt::BlockingQueuedConnection);
 }
 
 MythMainWindow::~MythMainWindow()
@@ -791,6 +795,19 @@ bool MythMainWindow::screenShot(QString fname, int w, int h)
     return false;
 }
 
+void MythMainWindow::remoteScreenShot(QString fname, int w, int h)
+{
+    // This will be running from the MythFEXML handler, primarily
+    // Since QPixmap must be running in the GUI thread, we need to cross
+    // threads here.
+    emit signalRemoteScreenShot(fname, w, h);
+}
+
+void MythMainWindow::doRemoteScreenShot(QString fname, int w, int h)
+{
+    // This will be running in the GUI thread
+    screenShot(fname, w, h);
+}
 
 bool MythMainWindow::screenShot(void)
 {
