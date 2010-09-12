@@ -406,6 +406,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     enc = (CanPassthrough() && !passthru &&
            ((!output_settings->canLPCM() && configured_channels > 2) ||
             !output_settings->IsSupportedChannels(channels)));
+    VBAUDIO(QString("enc(%1), canAC3(%2), canDTS(%3), canLPCM(%4), "
+                    "configured_channels(%5), %6 channels supported(%7)")
+            .arg(enc)
+            .arg(output_settings->canAC3())
+            .arg(output_settings->canDTS())
+            .arg(output_settings->canLPCM())
+            .arg(configured_channels)
+            .arg(channels).arg(output_settings->IsSupportedChannels(channels)));
 
     int dest_rate = 0;
 
