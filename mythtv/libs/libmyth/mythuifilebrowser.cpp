@@ -508,6 +508,15 @@ void MythUIFileBrowser::updateRemoteFileList()
     while (it != slist.end())
     {
         QStringList tokens = (*it).split("::");
+        if (tokens.size() < 2)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("MythUIFileBrowser::updateRemoteFileList(): ") +
+                    QString("failed to parse '%1'.").arg(*it));
+            ++it;
+            continue;
+        }
+
         displayName = tokens[1];
 
         if (tokens[0] == "sgdir")
