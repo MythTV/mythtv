@@ -100,8 +100,9 @@ class ScanDVBSModulation: public ComboBoxSetting, public TransientStorage
         setLabel(QObject::tr("Modulation"));
         setHelpText(
             QObject::tr("Modulation, QPSK, 8PSK, QAM-16") + " " +
-            QObject::tr("Most DVB-S transponders use QPSK, DVB-S2 8PSK "
-                        "QAM-16 is not available for DVB-S2 transports."));
+            QObject::tr("Most DVB-S transponders use QPSK, while "
+                        "DVB-S2 use 8PSK. QAM-16 is not available "
+                        "for DVB-S2 transports."));
     }
 };
 

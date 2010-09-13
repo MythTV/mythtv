@@ -126,9 +126,9 @@ AudioConfigSettings::AudioConfigSettings() :
         // Rescan button
     TransButtonSetting *rescan = new TransButtonSetting("rescan");
     rescan->setLabel(QObject::tr("Scan for audio devices"));
-    rescan->setHelpText(QObject::tr("Scan for the available audio devices "
-                                    "available. Custom entry will be scanned "
-                                    "and capability entries populated."));
+    rescan->setHelpText(QObject::tr("Scan for available audio devices. "
+                                    "Custom entry will be scanned and "
+                                    "capability entries populated."));
     addChild(rescan);
     connect(rescan, SIGNAL(pressed()), this, SLOT(AudioRescan()));
 

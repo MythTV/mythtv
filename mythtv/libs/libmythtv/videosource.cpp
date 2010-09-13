@@ -1036,7 +1036,7 @@ class AudioRateLimit : public ComboBoxSetting, public CaptureCardDBStorage
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "audioratelimit")
     {
-        setLabel(QObject::tr("Audio sampling rate limit"));
+        setLabel(QObject::tr("Force audio sampling rate"));
         setHelpText(
             QObject::tr("If non-zero, override the audio sampling "
                         "rate in the recording profile when this card is "

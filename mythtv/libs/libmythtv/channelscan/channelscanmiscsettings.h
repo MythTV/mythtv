@@ -86,7 +86,7 @@ class DesiredServices : public ComboBoxSetting, public TransientStorage
                         "TV - Adds A/V services only, "
                         "TV+Radio - Adds all services with audio, "
                         "All - Adds all services "
-                        "(including data only serices)."));
+                        "(including data only services)."));
         addSelection(QObject::tr("TV"),       "tv", true);
         addSelection(QObject::tr("TV+Radio"), "audio");
         addSelection(QObject::tr("All"),      "all");
