@@ -136,17 +136,17 @@
         </imagetype>
 
         <buttonlist name="menu">
-            <area>160,160,600,450</area>
+            <area>160,160,650,450</area>
             <layout>vertical</layout>
             <spacing>6</spacing>
             <wrapstyle>selection</wrapstyle>
-            <buttonarea>0,0,480,400</buttonarea>
+            <buttonarea>0,0,550,400</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,480,60</area>
+                    <area>0,0,550,60</area>
                     <imagetype name="background" />
                     <textarea name="buttontext">
-                        <area>14,4,450,50</area>
+                        <area>14,4,530,50</area>
                         <font>menufont</font>
                         <align>left,vcenter</align>
                         <cutdown>yes</cutdown>
@@ -159,7 +159,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>500,4</position>
+                <position>570,4</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -168,7 +168,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>500,354</position>
+                <position>570,354</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">

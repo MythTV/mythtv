@@ -1597,15 +1597,15 @@
     <window name="customedit">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,30,760,40</area>
+            <area>70,30,760,40</area>
             <font>baselarge</font>
             <value>Custom Record Rules</value>
         </textarea>
 
         <textarea name="ruleslabel" from="basetextarea">
-            <area>30,90,220,40</area>
+            <area>0,92,280,40</area>
             <font>basemedium</font>
-            <align>right</align>
+            <align>right,vcenter</align>
             <value>Existing Rules:</value>
         </textarea>
 
@@ -1615,7 +1615,7 @@
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
-            <area>30,140,220,40</area>
+            <area>0,142,280,40</area>
             <value>Rule Name:</value>
         </textarea>
 
@@ -1671,9 +1671,9 @@
         </textedit>
 
         <textarea name="subtitlelabel" from="ruleslabel">
-            <area>50,520,250,86</area>
+            <area>0,520,300,86</area>
             <value>Additional Tables:</value>
-            <align>left</align>
+            <align>right</align>
         </textarea>
 
         <textedit name="subtitle">

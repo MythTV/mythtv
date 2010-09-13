@@ -179,7 +179,7 @@
                     </fill>
                 </shape>
                 <textarea name="buttontext">
-                    <area>6,0,85%,30</area>
+                    <area>6,0,95%,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
                     <align>left,vcenter</align>
@@ -588,7 +588,7 @@
             <position>680,22</position>
         </statetype>
     </spinbox>
-
+ 
     <!-- Base definition of a list in 'selector' configuration -->
     <buttonlist name="baseselector">
         <area>0,0,220,40</area>
