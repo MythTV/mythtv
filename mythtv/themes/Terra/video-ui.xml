@@ -952,60 +952,70 @@
     </window>
 
     <window name="file_associations">
-        <imagetype name="topbar" from="basetopbar" />
+        <area>0,42,1280,515</area>
+        <shape name="fade" from="basefadebackground" />
 
-        <textarea name="heading" from="baseheading">
+        <imagetype name="backimg">
+            <position>236,58</position>
+            <filename>popups/largemenubackground.png</filename>
+        </imagetype>
+
+<!--        <textarea name="heading" from="baseheading">
             <value>Video File Associations</value>
-        </textarea>
+        </textarea>-->
 
         <textarea name="extension_text" from="basetextarea">
-            <area>90,200,200,40</area>
+            <area>300,97,200,30</area>
             <value>Extension:</value>
             <align>right,vcenter</align>
         </textarea>
 
+        <buttonlist name="extension_select" from="baseselector">
+            <position>520,95</position>
+        </buttonlist>
+
         <textarea name="command_text" from="extension_text">
-            <position>90,260</position>
+            <position>300,160</position>
             <value>Command:</value>
         </textarea>
 
+        <textedit name="command" from="basetextedit">
+            <position>520,155</position>
+        </textedit>
+
         <textarea name="default_text" from="extension_text">
-            <position>90,320</position>
+            <position>300,215</position>
             <value>Use default player:</value>
         </textarea>
 
+        <checkbox name="default_check" from="basecheckbox">
+            <position>520,215</position>
+        </checkbox>
+
         <textarea name="ignore_text" from="extension_text">
-            <position>90,380</position>
+            <position>300,275</position>
             <value>Ignore:</value>
         </textarea>
 
-        <buttonlist name="extension_select" from="baseselector">
-            <position>300,195</position>
-        </buttonlist>
-
-        <textedit name="command" from="basetextedit">
-            <position>300,255</position>
-        </textedit>
-
-        <checkbox name="default_check" from="basecheckbox">
-            <position>300,315</position>
-        </checkbox>
-
         <checkbox name="ignore_check" from="basecheckbox">
-            <position>300,375</position>
+            <position>520,275</position>
         </checkbox>
 
-        <button name="done_button" from="basebutton">
-            <position>700,550</position>
+        <button name="new_button" from="basewidebutton">
+            <position>453,385</position>
+            <value>New</value>
         </button>
 
-        <button name="new_button" from="basebutton">
-            <position>600,550</position>
+        <button name="delete_button" from="basewidebutton">
+            <position>453,442</position>
+            <value>Delete</value>
         </button>
 
-        <button name="delete_button" from="basebutton">
-            <position>0,550</position>
+        <button name="done_button" from="basewidebutton">
+            <position>453,500</position>
+            <value>Save</value>
         </button>
+
     </window>
 
     <window name="edit_metadata">

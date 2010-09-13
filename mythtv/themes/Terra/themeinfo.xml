@@ -7,6 +7,7 @@
     <types>
         <!-- Type. Legal Values are one or more of: UI, OSD and Menu -->
         <type>UI</type>
+        <type>OSD</type>
     </types>
    
     <!-- Aspect ratio of the theme. (Required)
