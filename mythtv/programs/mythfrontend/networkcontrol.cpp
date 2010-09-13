@@ -20,6 +20,7 @@
 #include "mythverbose.h"
 #include "mythuihelper.h"
 #include "mythsystemevent.h"
+#include "mythdirs.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -304,6 +305,8 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = processQuery(nc);
     else if (is_abbrev("set", nc->getArg(0)))
         result = processSet(nc);
+    else if (is_abbrev("screenshot", nc->getArg(0)))
+        result = saveScreenshot(nc);
     else if (is_abbrev("help", nc->getArg(0)))
         result = processHelp(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
@@ -1015,8 +1018,12 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "                      - Play program with chanid & starttime\r\n"
             "play program CHANID yyyy-MM-ddThh:mm:ss resume\r\n"
             "                      - Resume program with chanid & starttime\r\n"
-            "play save screenshot FILENAME\r\n"
-            "                      - Save screenshot from current position\r\n"
+            "play save preview\r\n"
+            "                      - Save preview image from current position\r\n"
+            "play save preview FILENAME\r\n"
+            "                      - Save preview image to FILENAME\r\n"
+            "play save preview FILENAME WxH\r\n"
+            "                      - Save preview image of size WxH\r\n"
             "play seek beginning   - Seek to the beginning of the recording\r\n"
             "play seek forward     - Skip forward in the video\r\n"
             "play seek backward    - Skip backwards in the video\r\n"
@@ -1058,6 +1065,13 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "                          use 'set verbose default' to revert\r\n"
             "                          back to the default level of\r\n";
     }
+    else if (is_abbrev("screenshot", command))
+    {
+        helpText +=
+            "screenshot               - Takes a screenshot and saves it as screenshot.png\r\n"
+            "screenshot FILENAME      - Saves the screenshot as FILENAME\r\n"
+            "screenshot FILENAME WxH  - Saves the screenshot as a WxH size image\r\n";
+    }
     else if (command == "exit")
     {
         helpText +=
@@ -1078,6 +1092,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         "play               - Playback related commands\r\n"
         "query              - Queries\r\n"
         "set                - Changes\r\n"
+        "screenshot         - Capture screenshot\r\n"
         "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";
@@ -1351,15 +1366,31 @@ QString NetworkControl::listChannels(const uint start, const uint limit) const
 
 QString NetworkControl::saveScreenshot(NetworkCommand *nc)
 {
-    QString result;
-    int64_t frameNumber = 150;
+    QString outFile = GetConfDir() + "/screenshot.png";
+    int width = 0;
+    int height = 0;
 
     QString location = GetMythUI()->GetCurrentLocation();
 
     if (location != "Playback")
     {
-        return "ERROR: Not in playback mode, unable to save screenshot";
+        if (nc->getArgCount() >= 2)
+            outFile = nc->getArg(1);
+
+        if (nc->getArgCount() >= 3)
+        {
+            QStringList size = nc->getArg(2).split('x');
+            width  = size[0].toInt();
+            height = size[1].toInt();
+        }
+
+        MythMainWindow *window = GetMythMainWindow(); 
+        emit window->remoteScreenShot(outFile, width, height);
+        return "OK";
     }
+
+    QString result;
+    int64_t frameNumber = 150;
 
     gotAnswer = false;
     QString message = QString("NETWORK_CONTROL QUERY POSITION");
@@ -1373,8 +1404,6 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
 
     if (gotAnswer)
     {
-        int width = -1;
-        int height = -1;
         QStringList results = answer.simplified().split(" ");
         if (results.size() < 8)
             return "ERROR: Invalid network control command";
@@ -1385,8 +1414,6 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
         if (!pginfo.GetChanID())
             return "ERROR: Unable to find program info for current program";
 
-        QString outFile = QDir::homePath() + "/.mythtv/screenshot.png";
-
         if (nc->getArgCount() >= 4)
             outFile = nc->getArg(3);
 
@@ -1396,11 +1423,16 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
             width  = size[0].toInt();
             height = size[1].toInt();
         }
+        else
+        {
+            width = -1;
+            height = -1;
+        }
 
         frameNumber = results[7].toLongLong();
 
         PreviewGenerator *previewgen = new PreviewGenerator(
-            &pginfo, QString(), PreviewGenerator::kLocal);
+            &pginfo, QString(), PreviewGenerator::kForceLocal);
         previewgen->SetPreviewTimeAsFrameNumber(frameNumber);
         previewgen->SetOutputFilename(outFile);
         previewgen->SetOutputSize(QSize(width, height));

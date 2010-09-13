@@ -195,7 +195,8 @@ bool PreviewGenerator::Run(void)
     QTime tm = QTime::currentTime();
     bool ok = false;
     QString command = GetInstallPrefix() + "/bin/mythpreviewgen";
-    bool local_ok = (IsLocal() && !!(mode & kLocal) &&
+    bool local_ok = ((IsLocal() || !!(mode & kForceLocal)) &&
+                     (!!(mode & kLocal)) &&
                      QFileInfo(command).isExecutable());
     if (!local_ok)
     {

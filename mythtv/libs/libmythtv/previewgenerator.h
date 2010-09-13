@@ -41,7 +41,8 @@ class MPUBLIC PreviewGenerator : public QThread
         kLocal          = 0x1,
         kRemote         = 0x2,
         kLocalAndRemote = 0x3,
-        kModeMask       = 0x3,
+        kForceLocal     = 0x5,
+        kModeMask       = 0x7,
     } Mode;
 
   public:
