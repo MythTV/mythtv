@@ -228,7 +228,8 @@ bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
 
     if (!pfile.open(QIODevice::ReadOnly))
     {
-        VBERROR(QString("Error opening %1").arg(pf));
+        VBERROR(QString("Error opening %1. Try doing as root: "
+                        "echo 512 > %1").arg(pf));
         return false;
     }
 
