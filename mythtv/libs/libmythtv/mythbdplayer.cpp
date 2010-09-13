@@ -10,8 +10,11 @@ MythBDPlayer::MythBDPlayer(bool muted) : MythPlayer(muted)
 
 int MythBDPlayer::GetNumChapters(void)
 {
+    int num = 0;
     if (player_ctx->buffer->BD() && player_ctx->buffer->BD()->IsOpen())
-        return player_ctx->buffer->BD()->GetNumChapters();
+        num = player_ctx->buffer->BD()->GetNumChapters();
+    if (num > 1)
+        return num;
     return 0;
 }
 

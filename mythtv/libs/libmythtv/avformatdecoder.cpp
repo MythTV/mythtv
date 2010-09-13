@@ -433,7 +433,9 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
 
 int AvFormatDecoder::GetNumChapters()
 {
-    return ic->nb_chapters;
+    if (ic->nb_chapters > 1)
+        return ic->nb_chapters;
+    return 0;
 }
 
 void AvFormatDecoder::GetChapterTimes(QList<long long> &times)
