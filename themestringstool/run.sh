@@ -5,14 +5,20 @@
 # the plugins, instead of simply putting all of them into the themestrings.h
 # file in mythfrontend.
 #
+# The script also downloads the latest third party themes from mythtv.org and
+# extracts their descriptions for translation.
+#
 # It should be sufficient to run this script once without any arguments, to
 # update all themestrings for mythfrontend and the plugins.
 #
 
+set -e
+
 TS=`pwd`/themestrings
 MYTHTHEMES=`ls ../myththemes/ --file-type |grep "/$"`
-XMLPLUGINS="browser-ui.xml dvd-ui.xml gallery-ui.xml game-ui.xml \
-         music-ui.xml mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
+MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
+XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
+         mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
          news-ui.xml video-ui.xml zoneminder-ui.xml weather-ui.xml"
 
 if [ ! -e ${TS} ]; then
@@ -24,7 +30,8 @@ fi
 
 if [ `id -u` -eq 0 ]; then
     echo ""
-    echo "ERROR: You need to run this script as a regular user, you cannot run it with root/sudo."
+    echo "ERROR: You need to run this script as a regular user, you\
+          cannot run it with root/sudo."
     echo ""
     exit 1
 fi
@@ -40,6 +47,11 @@ pushd ..
     done
 popd > /dev/null
 
+# Download third party themes to extract their description
+mkdir temp_download
+wget ${MYTHTHEMES_DL} -O temp_download/themes.zip
+unzip temp_download/themes.zip -d temp_download/
+
 echo "-------------------------------------------------------------------------"
 echo "\"Can't open [plugin-specific xml-file]\" error messages are expected below"
 echo "-------------------------------------------------------------------------"
@@ -50,6 +62,7 @@ popd > /dev/null
 echo "-------------------------------------------------------------------------"
 echo "...until this point"
 echo "-------------------------------------------------------------------------"
+rm -rf temp_download
 
 pushd ..
     chmod a+x mythplugins
@@ -90,7 +103,7 @@ updateplugin mythgame game-ui.xml
 updateplugin mythmusic music-ui.xml
 updateplugin mythnetvision netvision-ui.xml
 updateplugin mythnews news-ui.xml
-updateplugin mythvideo dvd-ui.xml video-ui.xml
+updateplugin mythvideo video-ui.xml
 updateplugin mythweather weather-ui.xml
 #updateplugin mythzoneminder zoneminder-ui.xml  #zoneminder-ui.xml doesn't exist at the moment, but it's included for future use
 
