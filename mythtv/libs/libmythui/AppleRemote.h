@@ -51,7 +51,6 @@ protected:
     AppleRemote(); // will be a singleton class
 
     static AppleRemote*      _instance;
-    static const char* const AppleRemoteDeviceName;
     static const int         REMOTE_SWITCH_COOKIE;
 
 
@@ -65,7 +64,6 @@ private:
     Listener*              _listener;
 
     void        _initCookieMap();
-    io_object_t _findAppleRemoteDevice();
     bool        _initCookies();
     bool        _createDeviceInterface(io_object_t hidDevice);
     bool        _openDevice();

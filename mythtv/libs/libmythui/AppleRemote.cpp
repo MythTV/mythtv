@@ -20,10 +20,11 @@
 #include "mythverbose.h"
 
 AppleRemote*      AppleRemote::_instance = 0;
-const char* const AppleRemote::AppleRemoteDeviceName = "AppleIRController";
 const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
 
 const QString     LOC = "AppleRemote::";
+
+static io_object_t _findAppleRemoteDevice(const char *devName);
 
 AppleRemote::Listener::~Listener()
 {
@@ -57,18 +58,20 @@ void AppleRemote::startListening()
     if (queue != NULL)   // already listening
         return;
 
-    io_object_t hidDevice = _findAppleRemoteDevice();
+    io_object_t hidDevice = _findAppleRemoteDevice("AppleIRController");
 
-    if (hidDevice == 0) goto error;
-    if (!_createDeviceInterface(hidDevice)) goto error;
-    if (!_initCookies()) goto error;
-    if (!_openDevice()) goto error;
-    goto cleanup;
+    if (!hidDevice)
+        hidDevice = _findAppleRemoteDevice("AppleTVIRReceiver");
 
-  error:
-    stopListening();
+    if (!hidDevice ||
+        !_createDeviceInterface(hidDevice) ||
+        !_initCookies() || !_openDevice())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "startListening() failed");
+        stopListening();
+        return;
+    }
 
-  cleanup:
     IOObjectRelease(hidDevice);
 }
 
@@ -184,8 +187,7 @@ void AppleRemote::_initCookieMap()
     cookieToButtonMapping["37_33_21_20_2_37_33_21_20_2_"] = PlaySleep;
 }
 
-// private
-io_object_t AppleRemote::_findAppleRemoteDevice()
+static io_object_t _findAppleRemoteDevice(const char *devName)
 {
     CFMutableDictionaryRef hidMatchDictionary = 0;
     io_iterator_t          hidObjectIterator = 0;
@@ -193,7 +195,7 @@ io_object_t AppleRemote::_findAppleRemoteDevice()
     IOReturn               ioReturnValue;
 
 
-    hidMatchDictionary = IOServiceMatching(AppleRemoteDeviceName);
+    hidMatchDictionary = IOServiceMatching(devName);
 
     // check for matching devices
     ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault,
@@ -202,6 +204,9 @@ io_object_t AppleRemote::_findAppleRemoteDevice()
 
     if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0))
         hidDevice = IOIteratorNext(hidObjectIterator);
+    else
+        VERBOSE(VB_IMPORTANT, (LOC + "_findAppleRemoteDevice(%1) failed")
+                              .arg(devName));
 
     // IOServiceGetMatchingServices consumes a reference to the dictionary,
     // so we don't need to release the dictionary ref.
