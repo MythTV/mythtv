@@ -2633,6 +2633,9 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
     QStringList strlist;
 
     BackendQueryDiskSpace(strlist, allHosts, allHosts);
+    if (strlist.isEmpty())
+        VERBOSE(VB_IMPORTANT, "No directories found for file storage. Please "
+                "check the Storage Groups setting for this backend.");
 
     SendResponse(pbs->getSocket(), strlist);
 }
