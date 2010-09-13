@@ -25,10 +25,8 @@ using namespace std;
 #include "remotefile.h"
 #include "mythtranslation.h"
 
-void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
-                 frm_dir_map_t *deleteMap, int &resultCode);
-void UpdateJobQueue(float percent_done);
-int CheckJobQueue();
+static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
+                        frm_dir_map_t *deleteMap, int &resultCode);
 
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
@@ -114,6 +112,23 @@ static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
         if (jobID >= 0)
             JobQueue::ChangeJobComment(jobID,
                 QString(QObject::tr("Transcode Completed")));
+    }
+    return 0;
+}
+
+static void UpdateJobQueue(float percent_done)
+{
+    JobQueue::ChangeJobComment(glbl_jobID,
+                               QString("%1% " + QObject::tr("Completed"))
+                               .arg(percent_done, 0, 'f', 1));
+}
+
+static int CheckJobQueue()
+{
+    if (JobQueue::GetJobCmd(glbl_jobID) == JOB_STOP)
+    {
+        VERBOSE(VB_IMPORTANT, "Transcoding stopped by JobQueue");
+        return 1;
     }
     return 0;
 }
@@ -827,7 +842,7 @@ static void WaitToDelete(ProgramInfo *pginfo)
     VERBOSE(VB_GENERAL, "Transcode: program is no longer in use.");
 }
 
-void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
+static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                  frm_dir_map_t *deleteMap, int &resultCode)
 {
     int status = JobQueue::GetJobStatus(jobID);
@@ -1060,22 +1075,5 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
                                       "Unrecoverable error");
     }
-}
-
-void UpdateJobQueue(float percent_done)
-{
-    JobQueue::ChangeJobComment(glbl_jobID,
-                               QString("%1% " + QObject::tr("Completed"))
-                               .arg(percent_done, 0, 'f', 1));
-}
-
-int CheckJobQueue()
-{
-    if (JobQueue::GetJobCmd(glbl_jobID) == JOB_STOP)
-    {
-        VERBOSE(VB_IMPORTANT, "Transcoding stopped by JobQueue");
-        return 1;
-    }
-    return 0;
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
