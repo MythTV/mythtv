@@ -403,8 +403,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     // Don't try to do anything if audio hasn't been
     // initialized yet (e.g. rubbish was provided)
-    if (codec == CODEC_ID_NONE || source_channels <= 0 ||
-        format <= 0 || samplerate <= 0)
+    if (source_channels <= 0 || format <= 0 || samplerate <= 0)
     {
         Error("Aborting Audio Reconfigure. Invalid audio parameters");
         return;
