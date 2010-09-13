@@ -931,9 +931,12 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     }
     else if (strlist[0] == "REJECT" && strlist.size() >= 2)
     {
-        VERBOSE(VB_GENERAL, QString("Protocol version mismatch (frontend=%1,"
-                                    "backend=%2)\n")
-                                    .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
+        VERBOSE(VB_GENERAL, QString("Protocol version or token mismatch "
+                                    "(frontend=%1/%2,"
+                                    "backend=%3/??)\n")
+                                    .arg(MYTH_PROTO_VERSION)
+                                    .arg(MYTH_PROTO_TOKEN)
+                                    .arg(strlist[1]));
 
         if (error_dialog_desired && d->m_GUIcontext)
         {
