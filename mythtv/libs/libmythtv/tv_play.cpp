@@ -7918,9 +7918,9 @@ void TV::DoEditSchedule(int editType)
     MythMainWindow *mwnd = GetMythMainWindow();
     if (!db_use_gui_size_for_tv || !db_use_fixed_size)
     {
+        mwnd->setFixedSize(saved_gui_bounds.size());
         mwnd->setGeometry(saved_gui_bounds.left(), saved_gui_bounds.top(),
                           saved_gui_bounds.width(), saved_gui_bounds.height());
-        mwnd->setFixedSize(saved_gui_bounds.size());
     }
 
     // Actually show the pop-up UI
