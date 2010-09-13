@@ -25,10 +25,6 @@ using namespace std;
 #include "remotefile.h"
 #include "mythtranslation.h"
 
-void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
-                       ProgramInfo *pginfo);
-int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
-                       frm_pos_map_t &posMap, int jobID);
 void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                  frm_dir_map_t *deleteMap, int &resultCode);
 void UpdateJobQueue(float percent_done);
@@ -74,6 +70,52 @@ static void usage(char *progname)
     cerr << "\t                        values in the database.\n";
     cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
     cerr << "\t--help           or -h: Prints this help statement.\n";
+}
+
+static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
+                       ProgramInfo *pginfo)
+{
+    if (pginfo && mapfile.isEmpty())
+    {
+        pginfo->ClearPositionMap(MARK_KEYFRAME);
+        pginfo->ClearPositionMap(MARK_GOP_START);
+        pginfo->SavePositionMap(posMap, MARK_GOP_BYFRAME);
+    }
+    else if (!mapfile.isEmpty())
+    {
+        FILE *mapfh = fopen(mapfile.toLocal8Bit().constData(), "w");
+        if (!mapfh)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Could not open map file '%1'")
+                    .arg(mapfile) + ENO);
+            return;
+        }
+        frm_pos_map_t::const_iterator it;
+        fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
+        for (it = posMap.begin(); it != posMap.end(); ++it)
+            fprintf(mapfh, "%lld %lld\n",
+                    (unsigned long long)it.key(), (unsigned long long)*it);
+        fclose(mapfh);
+    }
+}
+
+static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
+                       frm_pos_map_t &posMap, int jobID)
+{
+    if (jobID < 0 || JobQueue::GetJobCmd(jobID) != JOB_STOP)
+    {
+        if (jobID >= 0)
+            JobQueue::ChangeJobComment(jobID,
+                QString(QObject::tr("Generating Keyframe Index")));
+        int err = m2f->BuildKeyframeIndex(infile, posMap);
+        if (err)
+            return err;
+        if (jobID >= 0)
+            JobQueue::ChangeJobComment(jobID,
+                QString(QObject::tr("Transcode Completed")));
+    }
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -675,52 +717,6 @@ int main(int argc, char *argv[])
 
     delete gContext;
     return exitcode;
-}
-
-void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
-                       ProgramInfo *pginfo)
-{
-    if (pginfo && mapfile.isEmpty())
-    {
-        pginfo->ClearPositionMap(MARK_KEYFRAME);
-        pginfo->ClearPositionMap(MARK_GOP_START);
-        pginfo->SavePositionMap(posMap, MARK_GOP_BYFRAME);
-    }
-    else if (!mapfile.isEmpty())
-    {
-        FILE *mapfh = fopen(mapfile.toLocal8Bit().constData(), "w");
-        if (!mapfh)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Could not open map file '%1'")
-                    .arg(mapfile) + ENO);
-            return;
-        }
-        frm_pos_map_t::const_iterator it;
-        fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
-        for (it = posMap.begin(); it != posMap.end(); ++it)
-            fprintf(mapfh, "%lld %lld\n",
-                    (unsigned long long)it.key(), (unsigned long long)*it);
-        fclose(mapfh);
-    }
-}
-
-int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
-                       frm_pos_map_t &posMap, int jobID)
-{
-    if (jobID < 0 || JobQueue::GetJobCmd(jobID) != JOB_STOP)
-    {
-        if (jobID >= 0)
-            JobQueue::ChangeJobComment(jobID,
-                QString(QObject::tr("Generating Keyframe Index")));
-        int err = m2f->BuildKeyframeIndex(infile, posMap);
-        if (err)
-            return err;
-        if (jobID >= 0)
-            JobQueue::ChangeJobComment(jobID,
-                QString(QObject::tr("Transcode Completed")));
-    }
-    return 0;
 }
 
 static int transUnlink(QString filename, ProgramInfo *pginfo)
