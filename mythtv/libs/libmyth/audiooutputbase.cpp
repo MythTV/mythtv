@@ -396,19 +396,19 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     was_paused = true;
     internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
+    VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
+            .arg(ff_codec_id_string((CodecID)codec))
+            .arg(output_settings->FormatToString(format))
+            .arg(samplerate/1000).arg(source_channels));
+
     // Don't try to do anything if audio hasn't been
     // initialized yet (e.g. rubbish was provided)
     if (codec == CODEC_ID_NONE || source_channels <= 0 ||
         format <= 0 || samplerate <= 0)
     {
-        Error("Aborting Audio Reconfigure: nothing to play");
+        Error("Aborting Audio Reconfigure. Invalid audio parameters");
         return;
     }
-
-    VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
-            .arg(ff_codec_id_string((CodecID)codec))
-            .arg(output_settings->FormatToString(format))
-            .arg(samplerate/1000).arg(source_channels));
 
     /* Encode to AC-3 if we're allowed to passthru but aren't currently
        and we have more than 2 channels but multichannel PCM is not supported
