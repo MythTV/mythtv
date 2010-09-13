@@ -56,7 +56,7 @@ void AppleRemote::startListening()
 {
     if (queue != NULL)   // already listening
         return;
- 
+
     io_object_t hidDevice = _findAppleRemoteDevice();
 
     if (hidDevice == 0) goto error;
@@ -139,6 +139,38 @@ void AppleRemote::_initCookieMap()
     cookieToButtonMapping["35_31_18_35_31_18_"]   = PlaySleep;
     cookieToButtonMapping["39_"]                  = ControlSwitched;
 
+    // ATV 1.0, 2.0-2.02
+    cookieToButtonMapping["14_12_11_6_"]          = VolumePlus;
+    cookieToButtonMapping["14_13_11_6_"]          = VolumeMinus;
+    cookieToButtonMapping["14_7_6_14_7_6_"]       = Menu;
+    cookieToButtonMapping["14_8_6_14_8_6_"]       = Play;
+    cookieToButtonMapping["14_9_6_14_9_6_"]       = Right;
+    cookieToButtonMapping["14_10_6_14_10_6_"]     = Left;
+    cookieToButtonMapping["14_6_4_2_"]            = RightHold;
+    cookieToButtonMapping["14_6_3_2_"]            = LeftHold;
+    cookieToButtonMapping["14_6_14_6_"]           = MenuHold;
+    cookieToButtonMapping["18_14_6_18_14_6_"]     = PlaySleep;
+
+    // ATV 1.0, 2.1-2.2
+    cookieToButtonMapping["15_13_12_"]            = VolumePlus;
+    cookieToButtonMapping["15_14_12_"]            = VolumeMinus;
+    cookieToButtonMapping["15_8_15_8_"]           = Menu;
+    cookieToButtonMapping["15_9_15_9_"]           = Play;
+    cookieToButtonMapping["15_10_15_10_"]         = Right;
+    cookieToButtonMapping["15_11_15_11_"]         = Left;
+    cookieToButtonMapping["15_5_3_"]              = RightHold;
+    cookieToButtonMapping["15_4_3_"]              = LeftHold;
+    cookieToButtonMapping["15_6_15_6_"]           = MenuHold;
+    cookieToButtonMapping["19_15_19_15_"]         = PlaySleep;
+
+    // ATV 2.30
+    cookieToButtonMapping["80"]                   = VolumePlus;
+    cookieToButtonMapping["48"]                   = VolumeMinus;
+    cookieToButtonMapping["64"]                   = Menu;
+    cookieToButtonMapping["32"]                   = Play;
+    cookieToButtonMapping["96"]                   = Right;
+    cookieToButtonMapping["16"]                   = Left;
+
     // 10.6 sequences:
     cookieToButtonMapping["33_31_30_21_20_2_"]    = VolumePlus;
     cookieToButtonMapping["33_32_30_21_20_2_"]    = VolumeMinus;
@@ -150,7 +182,6 @@ void AppleRemote::_initCookieMap()
     cookieToButtonMapping["33_21_20_13_12_2_"]    = LeftHold;
     cookieToButtonMapping["33_21_20_2_33_21_20_2_"] = MenuHold;
     cookieToButtonMapping["37_33_21_20_2_37_33_21_20_2_"] = PlaySleep;
-    cookieToButtonMapping["19_"]                  = ControlSwitched;
 }
 
 // private
@@ -165,8 +196,8 @@ io_object_t AppleRemote::_findAppleRemoteDevice()
     hidMatchDictionary = IOServiceMatching(AppleRemoteDeviceName);
 
     // check for matching devices
-    ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, 
-                                                 hidMatchDictionary, 
+    ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault,
+                                                 hidMatchDictionary,
                                                  &hidObjectIterator);
 
     if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0))
@@ -278,7 +309,7 @@ bool AppleRemote::_openDevice()
     if (result != S_OK || !queue)
         VERBOSE(VB_IMPORTANT, LOC + "_openDevice() - error creating queue");
 
-    for (std::vector<int>::iterator iter = cookies.begin(); 
+    for (std::vector<int>::iterator iter = cookies.begin();
          iter != cookies.end();
          ++iter)
     {
@@ -309,7 +340,7 @@ bool AppleRemote::_openDevice()
     return true;
 }
 
-void AppleRemote::QueueCallbackFunction(void* target, IOReturn result, 
+void AppleRemote::QueueCallbackFunction(void* target, IOReturn result,
                                    void* refcon, void* sender)
 {
     AppleRemote* remote = static_cast<AppleRemote*>(target);
@@ -347,7 +378,7 @@ void AppleRemote::_queueCallbackFunction(IOReturn result,
     _handleEventWithCookieString(cookieString.str(), sumOfValues);
 }
 
-void AppleRemote::_handleEventWithCookieString(std::string cookieString, 
+void AppleRemote::_handleEventWithCookieString(std::string cookieString,
                                           SInt32 sumOfValues)
 {
     std::map<std::string,AppleRemote::Event>::iterator ii;
