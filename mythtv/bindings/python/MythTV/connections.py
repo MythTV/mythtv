@@ -3,7 +3,7 @@
 
 from __future__ import with_statement
 
-from static import SCHEMA_VERSION, PROTO_VERSION, BACKEND_SEP
+from static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
 from msearch import MSearch
 from logging import MythLog
 from exceptions import *
@@ -362,8 +362,8 @@ class BEConnection( object ):
         self.hostname = self.backendCommand('QUERY_HOSTNAME')
 
     def check_version(self):
-        res = self.backendCommand('MYTH_PROTO_VERSION %s' \
-                    % PROTO_VERSION).split(BACKEND_SEP)
+        res = self.backendCommand('MYTH_PROTO_VERSION %s %s' \
+                    % (PROTO_VERSION, PROTO_TOKEN)).split(BACKEND_SEP)
         if res[0] == 'REJECT':
             self.log(MythLog.IMPORTANT|MythLog.NETWORK, 
                             "Backend has version %s, and we speak %s" %\

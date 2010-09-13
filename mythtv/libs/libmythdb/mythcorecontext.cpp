@@ -916,8 +916,8 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     if (!socket)
         return false;
 
-    QStringList strlist(QString("MYTH_PROTO_VERSION %1")
-                        .arg(MYTH_PROTO_VERSION));
+    QStringList strlist(QString("MYTH_PROTO_VERSION %1 %2")
+                        .arg(MYTH_PROTO_VERSION).arg(MYTH_PROTO_TOKEN));
     socket->writeStringList(strlist);
 
     if (!socket->readStringList(strlist, timeout_ms) || strlist.empty())

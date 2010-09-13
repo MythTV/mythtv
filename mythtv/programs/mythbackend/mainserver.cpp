@@ -329,7 +329,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         if (tokens.size() < 2)
             VERBOSE(VB_IMPORTANT, "Bad MYTH_PROTO_VERSION command");
         else
-            HandleVersion(sock,tokens[1]);
+            HandleVersion(sock, tokens);
         return;
     }
     else if (command == "ANN")
@@ -1159,20 +1159,44 @@ void MainServer::customEvent(QEvent *e)
 
 /**
  * \addtogroup myth_network_protocol
- * \par        MYTH_PROTO_VERSION \e version
- * Checks that \e version matches the backend's version.
+ * \par        MYTH_PROTO_VERSION \e version \e token
+ * Checks that \e version and \e token match the backend's version.
  * If it matches, the stringlist of "ACCEPT" \e "version" is returned.
  * If it does not, "REJECT" \e "version" is returned,
  * and the socket is closed (for this client)
  */
-void MainServer::HandleVersion(MythSocket *socket, QString version)
+void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
 {
     QStringList retlist;
+    QString version = slist[1];
     if (version != MYTH_PROTO_VERSION)
     {
         VERBOSE(VB_GENERAL,
                 "MainServer::HandleVersion - Client speaks protocol version "
                 + version + " but we speak " + MYTH_PROTO_VERSION + '!');
+        retlist << "REJECT" << MYTH_PROTO_VERSION;
+        socket->writeStringList(retlist);
+        HandleDone(socket);
+        return;
+    }
+
+    if (slist.size() < 3)
+    {
+        VERBOSE(VB_GENERAL,
+                "MainServer::HandleVersion - Client did not pass protocol "
+                "token. Refusing connection." + '!');
+        retlist << "REJECT" << MYTH_PROTO_VERSION;
+        socket->writeStringList(retlist);
+        HandleDone(socket);
+        return;
+    }
+
+    QString token = slist[2];
+    if (token != MYTH_PROTO_TOKEN)
+    {
+        VERBOSE(VB_GENERAL,
+                "MainServer::HandleVersion - Client sent incorrect protocol"
+                " token for protocol version. Refusing connection." + '!');
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);

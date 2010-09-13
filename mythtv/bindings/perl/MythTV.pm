@@ -106,7 +106,8 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "61";
+    our $PROTO_VERSION = "62";
+    our $PROTO_TOKEN = "78B5631E";
 
 # currentDatabaseVersion is defined in libmythtv in
 # mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core
@@ -659,7 +660,7 @@ EOF
             return $proto_cache{$host}{$port};
         }
     # Query the version
-        my $response = $self->backend_command('MYTH_PROTO_VERSION '.$PROTO_VERSION,
+        my $response = $self->backend_command('MYTH_PROTO_VERSION '.$PROTO_VERSION.' '.$PROTO_TOKEN,
                                               $host, $port);
         my ($code, $vers) = split($BACKEND_SEP_rx, $response);
     # Deal with the response

@@ -158,7 +158,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleSetBookmark(QStringList &tokens, PlaybackSock *pbs);
     void HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs);
     void HandleSetSetting(QStringList &tokens, PlaybackSock *pbs);
-    void HandleVersion(MythSocket *socket, QString version);
+    void HandleVersion(MythSocket *socket, const QStringList &slist);
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
     void HandleQueryUptime(PlaybackSock *pbs);
