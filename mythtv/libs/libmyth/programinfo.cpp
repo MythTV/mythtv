@@ -3375,6 +3375,7 @@ void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
     query.bindValue(":FLAGS",      vid_flags);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  recstartts);
+    query.exec();
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= (uint16_t) ~(VID_1080|VID_720);
