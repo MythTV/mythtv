@@ -174,6 +174,7 @@ MythSocket *RemoteFile::openSocket(bool control)
 
 bool RemoteFile::Open(void)
 {
+    QMutexLocker locker(&lock);
     controlSock = openSocket(true);
     sock = openSocket(false);
     return isOpen();
@@ -322,32 +323,34 @@ QString RemoteFile::GetFileHash(const QString &url)
 
 void RemoteFile::Reset(void)
 {
+    QMutexLocker locker(&lock);
     if (!sock)
     {
         VERBOSE(VB_NETWORK, "RemoteFile::Reset(): Called with no socket");
         return;
     }
 
-    while (sock->bytesAvailable() > 0)
+    while (sock && (sock->bytesAvailable() > 0))
     {
         int avail;
         char *trash;
 
-        lock.lock();
         avail = sock->bytesAvailable();
         trash = new char[avail + 1];
         sock->readBlock(trash, avail);
         delete [] trash;
-        lock.unlock();
 
         VERBOSE(VB_NETWORK, QString ("%1 bytes available during reset.")
                                       .arg(avail));
+        locker.unlock();
         usleep(30000);
+        locker.relock();
     }
 }
 
 long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
+    lock.lock();
     if (!sock)
     {
         VERBOSE(VB_NETWORK, "RemoteFile::Seek(): Called with no socket");
@@ -369,7 +372,6 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     else
         encodeLongLong(strlist, readposition);
 
-    lock.lock();
     controlSock->writeStringList(strlist);
     controlSock->readStringList(strlist);
     lock.unlock();
@@ -397,6 +399,7 @@ int RemoteFile::Write(const void *data, int size)
         return -1;
     }
 
+    QMutexLocker locker(&lock);
     if (!sock)
     {
         VERBOSE(VB_NETWORK, "RemoteFile::Write(): Called with no socket");
@@ -408,8 +411,6 @@ int RemoteFile::Write(const void *data, int size)
    
     if (!controlSock->isOpen() || controlSock->error())
         return -1;
-    
-    lock.lock();
     
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "WRITE_BLOCK";
@@ -455,8 +456,6 @@ int RemoteFile::Write(const void *data, int size)
         }
     }
 
-    lock.unlock();
-
     VERBOSE(VB_NETWORK,
             QString("RemoteFile::Write(): reqd=%1, sent=%2, rept=%3, error=%4")
                     .arg(size).arg(sent).arg(recv).arg(error));
@@ -474,10 +473,10 @@ int RemoteFile::Read(void *data, int size)
 {
     int recv = 0;
     int sent = 0;
-    unsigned zerocnt = 0;
     bool error = false;
     bool response = false;
    
+    QMutexLocker locker(&lock);
     if (!sock)
     {
         VERBOSE(VB_NETWORK, "RemoteFile::Read(): Called with no socket");
@@ -489,8 +488,6 @@ int RemoteFile::Read(void *data, int size)
    
     if (!controlSock->isOpen() || controlSock->error())
         return -1;
-    
-    lock.lock();
     
     if (sock->bytesAvailable() > 0)
     {
@@ -566,8 +563,6 @@ int RemoteFile::Read(void *data, int size)
         }
     }
 
-    lock.unlock();
-
     VERBOSE(VB_NETWORK, QString("Read(): reqd=%1, rcvd=%2, rept=%3, error=%4")
                                 .arg(size).arg(recv).arg(sent).arg(error));
 
@@ -596,6 +591,7 @@ void RemoteFile::SetTimeout(bool fast)
     if (timeoutisfast == fast)
         return;
 
+    QMutexLocker locker(&lock);
     if (!sock)
     {
         VERBOSE(VB_NETWORK, "RemoteFile::SetTimeout(): Called with no socket");
@@ -612,10 +608,8 @@ void RemoteFile::SetTimeout(bool fast)
     strlist << "SET_TIMEOUT";
     strlist << QString::number((int)fast);
 
-    lock.lock();
     controlSock->writeStringList(strlist);
     controlSock->readStringList(strlist);
-    lock.unlock();
 
     timeoutisfast = fast;
 }
