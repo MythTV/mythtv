@@ -25,7 +25,6 @@ using namespace std;
 #include "remotefile.h"
 #include "mythtranslation.h"
 
-void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
                        ProgramInfo *pginfo);
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
@@ -34,8 +33,9 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                  frm_dir_map_t *deleteMap, int &resultCode);
 void UpdateJobQueue(float percent_done);
 int CheckJobQueue();
+
 static int glbl_jobID = -1;
-QString recorderOptions = "";
+static QString recorderOptions = "";
 
 static void usage(char *progname)
 {
@@ -747,7 +747,7 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
     return unlink(filename.toLocal8Bit().constData());
 }
 
-uint64_t ComputeNewBookmark(uint64_t oldBookmark,
+static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
                             frm_dir_map_t *deleteMap)
 {
     if (deleteMap == NULL)
@@ -775,7 +775,7 @@ uint64_t ComputeNewBookmark(uint64_t oldBookmark,
     return oldBookmark - subtraction;
 }
 
-uint64_t ReloadBookmark(ProgramInfo *pginfo)
+static uint64_t ReloadBookmark(ProgramInfo *pginfo)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     uint64_t currentBookmark = 0;
@@ -793,7 +793,7 @@ uint64_t ReloadBookmark(ProgramInfo *pginfo)
     return currentBookmark;
 }
 
-void WaitToDelete(ProgramInfo *pginfo)
+static void WaitToDelete(ProgramInfo *pginfo)
 {
     VERBOSE(VB_GENERAL,
             "Transcode: delete old file: "
