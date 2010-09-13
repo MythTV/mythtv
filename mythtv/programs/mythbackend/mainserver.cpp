@@ -1184,7 +1184,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
     {
         VERBOSE(VB_GENERAL,
                 "MainServer::HandleVersion - Client did not pass protocol "
-                "token. Refusing connection." + '!');
+                "token. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
@@ -1196,7 +1196,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
     {
         VERBOSE(VB_GENERAL,
                 "MainServer::HandleVersion - Client sent incorrect protocol"
-                " token for protocol version. Refusing connection." + '!');
+                " token for protocol version. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
