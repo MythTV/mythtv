@@ -15,21 +15,24 @@
 class AppleRemote : public QThread
 {
 public:
-    enum Event {
-        VolumePlus = 0,
-        VolumeMinus,
+    enum Event
+    { // label/meaning on White ... and Aluminium remote
+        Up = 0,        // VolumePlus    Up
+        Down,          // VolumeMinus   Down
         Menu,
-        Play,
+        Select,        // Play          Select
         Right,
         Left,
         RightHold,
         LeftHold,
         MenuHold,
-        PlaySleep,
-        ControlSwitched
+        PlayHold,  // was PlaySleep
+        ControlSwitched,
+        PlayPause      // Play or Pause
     };
 
-    class Listener {
+    class Listener
+    {
     public:
         virtual      ~Listener();
         virtual void appleRemoteButton(Event button, bool pressedDown) = 0;

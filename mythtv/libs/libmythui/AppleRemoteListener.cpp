@@ -18,18 +18,18 @@ void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
 
     switch (button)
     {
-        case AppleRemote::VolumePlus:
+        case AppleRemote::Up:
             code="Up";
             separateRelease=true;
             break;
-        case AppleRemote::VolumeMinus:
+        case AppleRemote::Down:
             code="Down";
             separateRelease=true;
             break;
         case AppleRemote::Menu:
             code="Esc";
             break;
-        case AppleRemote::Play:
+        case AppleRemote::Select:
             code="Enter";
             break;
         case AppleRemote::Right:
@@ -49,7 +49,8 @@ void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
         case AppleRemote::MenuHold:
             code="M";
             break;
-        case AppleRemote::PlaySleep:
+        case AppleRemote::PlayPause:
+        case AppleRemote::PlayHold:
             code="P";
             break;
         case AppleRemote::ControlSwitched:
