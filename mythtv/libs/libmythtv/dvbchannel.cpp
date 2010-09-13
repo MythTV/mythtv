@@ -431,6 +431,24 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
     return SetChannelByString((*it)->startChanNum);
 }
 
+
+/** \fn DVBChannel::CheckFrequency(uint64_t) const
+ *  \brief Checks tuning frequency
+ */
+void DVBChannel::CheckFrequency(uint64_t frequency) const
+{
+    if (frequency_minimum && frequency_maximum &&
+        (frequency_minimum <= frequency_maximum) &&
+        (frequency < frequency_minimum || frequency > frequency_maximum))
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                QString("Your frequency setting (%1) is "
+                        "out of range. (min/max:%2/%3)")
+                .arg(frequency)
+                .arg(frequency_minimum).arg(frequency_maximum));
+    }
+}
+
 /** \fn DVBChannel::CheckOptions(DTVMultiplex&) const
  *  \brief Checks tuning for problems, and tries to fix them.
  */
@@ -446,24 +464,9 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
         tuning.inversion = DTVInversion::kInversionAuto;
     }
 
-    uint64_t frequency = tuning.frequency;
-    if (diseqc_tree)
-    {
-        DiSEqCDevLNB* lnb = diseqc_tree->FindLNB(diseqc_settings);
-        if (lnb)
-            frequency = lnb->GetIntermediateFrequency(diseqc_settings, tuning);
-    }
-
-    if (frequency_minimum && frequency_maximum &&
-        (frequency_minimum <= frequency_maximum) &&
-        (frequency < frequency_minimum || frequency > frequency_maximum))
-    {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Your frequency setting (%1) is "
-                        "out of range. (min/max:%2/%3)")
-                .arg(frequency)
-                .arg(frequency_minimum).arg(frequency_maximum));
-    }
+    // DVB-S needs a fully initialized diseqc tree and is checked later in Tune
+    if (!diseqc_tree)
+        CheckFrequency(tuning.frequency);
 
     if (tunerType.IsFECVariable() &&
         symbol_rate_minimum && symbol_rate_maximum &&
@@ -805,6 +808,10 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         // if card can auto-FEC, use it -- sometimes NITs are inaccurate
         if (capabilities & FE_CAN_FEC_AUTO)
             can_fec_auto = true;
+
+        // Check DVB-S intermediate frequency here since it requires a fully
+        // initialized diseqc tree
+        CheckFrequency(intermediate_freq);
     }
 
     VERBOSE(VB_CHANNEL, LOC + "Old Params: " +

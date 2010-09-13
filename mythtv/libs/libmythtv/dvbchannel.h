@@ -105,6 +105,7 @@ class DVBChannel : public DTVChannel
     int  GetChanID(void) const;
 
     void CheckOptions(DTVMultiplex &t) const;
+    void CheckFrequency(uint64_t frequency) const;
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;
 
