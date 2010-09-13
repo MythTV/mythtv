@@ -10230,9 +10230,12 @@ void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
         // TODO Add mute and volume
         backaction = "MAIN";
         currenttext = tr("Audio");
-        osd->DialogAddButton(tr("Select Audio Track"),
-                             "DIALOG_MENU_AUDIOTRACKS_0", true,
-                             selected == "AUDIOTRACKS");
+        if (tracks.size() > 1)
+        {
+            osd->DialogAddButton(tr("Select Audio Track"),
+                                 "DIALOG_MENU_AUDIOTRACKS_0", true,
+                                 selected == "AUDIOTRACKS");
+        }
         osd->DialogAddButton(tr("Adjust Audio Sync"),    "TOGGLEAUDIOSYNC");
         osd->DialogAddButton(tr("Toggle Audio Upmixer"), "TOGGLEUPMIX");
     }
