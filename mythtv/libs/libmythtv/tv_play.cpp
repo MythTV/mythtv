@@ -7160,7 +7160,7 @@ void TV::UpdateOSDProgInfo(const PlayerContext *ctx, const char *whichInfo)
     if (osd)
     {
         osd->HideAll();
-        osd->SetText(whichInfo, infoMap, kOSDTimeout_Med);
+        osd->SetText(whichInfo, infoMap, kOSDTimeout_Long);
     }
     ReturnOSDLock(ctx, osd);
 }
