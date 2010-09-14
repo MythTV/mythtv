@@ -1026,6 +1026,10 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
 
     bookmarkseek = GetBookmark();
 
+    if (player_ctx->playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
+        gCoreContext->SaveSetting("DefaultChanid",
+                                  player_ctx->playingInfo->GetChanID());
+
     return IsErrored() ? -1 : 0;
 }
 

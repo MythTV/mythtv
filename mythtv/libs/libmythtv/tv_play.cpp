@@ -1950,8 +1950,54 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         lockTimerOn = false;
 
         SET_NEXT();
+
+        uint chanid = gCoreContext->GetNumSetting("DefaultChanid", 0);
+
+        if (chanid && !IsTunable(ctx, chanid))
+            chanid = 0;
+
+        QString channum = "";
+
+        if (chanid)
+        {
+            QStringList reclist;
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT channum FROM channel "
+                          "WHERE chanid = :CHANID");
+            query.bindValue(":CHANID", chanid);
+            if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+                channum = query.value(0).toString();
+            else
+                channum = QString::number(chanid);
+
+            bool getit = ctx->recorder->ShouldSwitchToAnotherCard(
+                QString::number(chanid));
+
+            if (getit)
+                reclist = ChannelUtil::GetValidRecorderList(chanid, channum);
+
+            if (reclist.size())
+            {
+                RemoteEncoder *testrec = NULL;
+                testrec = RemoteRequestFreeRecorderFromList(reclist);
+                if (testrec && testrec->IsValidRecorder())
+                {
+                    ctx->SetRecorder(testrec);
+                    ctx->recorder->Setup();
+                }
+            }
+            else if (getit)
+                chanid = 0;
+        }
+
         VERBOSE(VB_IMPORTANT, "Spawning LiveTV Recorder -- begin");
-        ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, "");
+
+        if (chanid && !channum.isEmpty())
+            ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, channum);
+        else
+            ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, "");
+
         VERBOSE(VB_IMPORTANT, "Spawning LiveTV Recorder -- end");
 
         if (!ctx->ReloadTVChain())
