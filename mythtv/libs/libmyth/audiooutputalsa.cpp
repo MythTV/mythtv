@@ -19,9 +19,6 @@ using namespace std;
 #undef assert
 #define assert(x)
 
-#define IECSTATUS_AUDIO     true
-#define IECSTATUS_NONAUDIO  false
-
 #define CHANNELS_MIN 1
 #define CHANNELS_MAX 8
 
@@ -44,6 +41,18 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     m_mixer.elem = NULL;
 
     // Set everything up
+    if (passthru_device == "auto")
+    {
+        passthru_device = main_device;
+        if (!passthru_device.contains(":"))
+            passthru_device += ":AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2";
+        else
+        {
+            passthru_device = passthru_device.insert(
+                passthru_device.indexOf(":") + 1,
+                "AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2,");
+        }
+    }
     InitSettings(settings);
     if (settings.init)
         Reconfigure(settings);
@@ -54,7 +63,6 @@ AudioOutputALSA::~AudioOutputALSA()
     if (pbufsize > 0)
         SetPreallocBufferSize(pbufsize);
     KillAudio();
-    SetIECStatus(IECSTATUS_AUDIO);
 }
 
 int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
@@ -98,85 +106,6 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
 
     return 0;
  }
-
-int AudioOutputALSA::SetIECStatus(bool audio)
-{
-    snd_ctl_t *ctl;
-    const char *spdif_str = SND_CTL_NAME_IEC958("", PLAYBACK, DEFAULT);
-    int spdif_index = -1;
-    snd_ctl_elem_list_t *clist;
-    snd_ctl_elem_id_t *cid;
-    snd_ctl_elem_value_t *cval;
-    snd_aes_iec958_t iec958;
-    int cidx, controls, err, card, device, subdevice;
-
-    VBAUDIO(QString("Setting IEC958 status: %1")
-            .arg(audio ? "audio" : "non-audio"));
-
-    QString pdevice = passthru || enc ? passthru_device : main_device;
-
-    // Open PCM for GetPCMInfo
-    if (pcm_handle)
-    {
-        snd_pcm_close(pcm_handle);
-        pcm_handle = NULL;
-    }
-    QByteArray dev_ba = pdevice.toAscii();
-    err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
-                       SND_PCM_STREAM_PLAYBACK, OPEN_FLAGS);
-    CHECKERR(QString("snd_pcm_open(\"%1\")").arg(pdevice));
-
-    err = GetPCMInfo(card, device, subdevice);
-    snd_pcm_close(pcm_handle);
-    pcm_handle = NULL;
-    if (err < 0)
-        return err;
-
-    // Now open the ctl
-    QByteArray ctln = QString("hw:CARD=%1").arg(card).toAscii();
-
-    err = snd_ctl_open(&ctl, ctln.constData(), 0);
-    CHECKERR(QString("Can't open CTL %1").arg(ctln.constData()));
-
-    // Find the iec958 playback control
-    snd_ctl_elem_list_alloca(&clist);
-    snd_ctl_elem_list(ctl, clist);
-    snd_ctl_elem_list_alloc_space(clist, snd_ctl_elem_list_get_count(clist));
-    snd_ctl_elem_list(ctl, clist);
-    controls = snd_ctl_elem_list_get_used(clist);
-
-    for (cidx = 0; cidx < controls; cidx++)
-    {
-        if (!strcmp(snd_ctl_elem_list_get_name(clist, cidx), spdif_str))
-            if (spdif_index < 0 ||
-                snd_ctl_elem_list_get_index(clist, cidx) == (uint)spdif_index)
-                    break;
-    }
-
-    if (cidx >= controls)
-        return 0;
-
-    snd_ctl_elem_id_alloca(&cid);
-    snd_ctl_elem_list_get_id(clist, cidx, cid);
-    snd_ctl_elem_value_alloca(&cval);
-    snd_ctl_elem_value_set_id(cval, cid);
-    snd_ctl_elem_read(ctl,cval);
-    snd_ctl_elem_value_get_iec958(cval, &iec958);
-
-    // Set audio / non copyright-mode
-    if (!audio)
-    {
-        iec958.status[0] |= IEC958_AES0_NONAUDIO;
-        iec958.status[0] |= IEC958_AES0_CON_NOT_COPYRIGHT;
-    }
-    else
-        iec958.status[0] &= ~IEC958_AES0_NONAUDIO;
-
-    snd_ctl_elem_value_set_iec958(cval, &iec958);
-    snd_ctl_elem_write(ctl, cval);
-    snd_ctl_close(ctl);
-    return 0;
-}
 
 bool AudioOutputALSA::SetPreallocBufferSize(int size)
 {
@@ -378,13 +307,11 @@ bool AudioOutputALSA::OpenDevice()
 
     if (passthru || enc)
     {
-        real_device = passthru_device;
-        SetIECStatus(IECSTATUS_NONAUDIO);
+        real_device = passthru_device;        
     }
     else
     {
         real_device = main_device;
-        SetIECStatus(IECSTATUS_AUDIO);
     }
 
     VERBOSE(VB_GENERAL, QString("Opening ALSA audio device '%1'.")

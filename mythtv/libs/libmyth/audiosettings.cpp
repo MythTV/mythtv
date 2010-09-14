@@ -104,13 +104,14 @@ AudioSettings::AudioSettings(
 void AudioSettings::FixPassThrough(void)
 {
     if (passthru_device.isEmpty() || passthru_device.toLower() == "default")
-        passthru_device = GetMainDevice();
+        passthru_device = "auto";
 }
 
 void AudioSettings::TrimDeviceType(void)
 {
     main_device.remove(0, 5);
-    passthru_device.remove(0, 5);
+    if (passthru_device != "auto")
+        passthru_device.remove(0, 5);
 }
 
 QString AudioSettings::GetMainDevice(void) const

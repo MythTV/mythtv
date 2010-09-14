@@ -32,7 +32,6 @@ class AudioOutputALSA : public AudioOutputBase
 
   private:
     int GetPCMInfo(int &card, int &device, int &subdevice);
-    int SetIECStatus(bool audio);
     bool SetPreallocBufferSize(int size);
     bool IncPreallocBufferSize(int buffer_time);
     inline int SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
