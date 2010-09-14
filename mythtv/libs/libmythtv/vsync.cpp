@@ -102,11 +102,13 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 #ifndef _WIN32
     TESTVIDEOSYNC(DRMVideoSync);
 #ifdef USING_OPENGL_VSYNC
+/*
     if (gCoreContext->GetNumSetting("UseOpenGLVSync", 1) &&
        (getenv("NO_OPENGL_VSYNC") == NULL))
     {
         TESTVIDEOSYNC(OpenGLVideoSync);
     }
+*/
 #endif
 #endif // _WIN32
 #ifdef __linux__

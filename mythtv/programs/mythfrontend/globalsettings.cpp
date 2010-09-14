@@ -3615,6 +3615,7 @@ class WatchListSettings : public TriggeredConfigurationGroup
 };
 
 #ifdef USING_OPENGL_VSYNC
+/*
 static HostCheckBox *UseOpenGLVSync()
 {
     HostCheckBox *gc = new HostCheckBox("UseOpenGLVSync");
@@ -3626,6 +3627,7 @@ static HostCheckBox *UseOpenGLVSync()
                         "video timing, reducing frame jitter."));
     return gc;
 }
+*/
 #endif
 
 static HostCheckBox *LCDShowTime()
@@ -4140,7 +4142,7 @@ PlaybackSettings::PlaybackSettings()
     general1->addChild(columns);
     general1->addChild(LiveTVIdleTimeout());
 #ifdef USING_OPENGL_VSYNC
-    general1->addChild(UseOpenGLVSync());
+    //general1->addChild(UseOpenGLVSync());
 #endif // USING_OPENGL_VSYNC
 #if defined(USING_XV) || defined(USING_OPENGL_VIDEO) || defined(USING_VDPAU)
     general1->addChild(UsePicControls());
