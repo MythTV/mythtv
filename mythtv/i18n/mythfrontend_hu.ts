@@ -114,7 +114,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="361"/>
         <source>Shall I attempt to connect to this host with default database parameters?</source>
-        <translation type="unfinished"></translation>
+        <translation>Valóban az alapértelmezett adatbázis paraméterekkel csatlakozik ehhez a géphez?</translation>
     </message>
 </context>
 <context>
@@ -198,12 +198,12 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2626"/>
         <source>Fetch channels from listings source</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornák viszgálata a listázott forrásokból</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2628"/>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezt a csatornák listásához lehet használni. Így a bemenet csatornákat szolgáltat.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2630"/>
@@ -358,12 +358,12 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="548"/>
         <source>Icon Import Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon import opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
         <source>Download icon for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon letöltése ehhez: %1</translation>
     </message>
 </context>
 <context>
@@ -525,7 +525,7 @@
         <location filename="../programs/mythfrontend/customedit.cpp" line="204"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="211"/>
         <source>Match this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Epizód egyeztetése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="221"/>
@@ -540,22 +540,22 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="237"/>
         <source>New episodes only</source>
-        <translation type="unfinished">Csak az új epizódok</translation>
+        <translation>Csak az új epizódok</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="243"/>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">Az azonosítatlan epizódok kivételével</translation>
+        <translation>Az azonosítatlan epizódok kivételével</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="249"/>
         <source>First showing of each episode</source>
-        <translation type="unfinished">Egy epizód első sugárzáása</translation>
+        <translation>Egy epizód első sugárzáása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="255"/>
         <source>Last showing of each episode</source>
-        <translation type="unfinished">Egy epizód utolsó sugárzáása</translation>
+        <translation>Egy epizód utolsó sugárzáása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="261"/>
@@ -610,22 +610,22 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="328"/>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished">Csak a reklám mentesnek jelölt csatornák</translation>
+        <translation>Csak a reklám mentesnek jelölt csatornák</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="335"/>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished">Csak a HDTV-nek jelölt műsorok</translation>
+        <translation>Csak a HDTV-nek jelölt műsorok</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="341"/>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak a szélesvásznúnak jelölt műsor</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="347"/>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kivéve a H264 kódolású folyamokat (csak EIT)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="353"/>
@@ -660,7 +660,7 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="397"/>
         <source>or</source>
-        <translation type="unfinished"></translation>
+        <translation>vagy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="403"/>
@@ -720,7 +720,7 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="722"/>
         <source>An error was found when checking</source>
-        <translation type="unfinished">Hibát találtam ellenőrzéskor</translation>
+        <translation>Hibát találtam ellenőrzéskor</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="724"/>
@@ -730,46 +730,46 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="739"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="682"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="830"/>
         <source>Delete</source>
-        <translation type="unfinished">Töröl</translation>
+        <translation>Töröl</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="686"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="834"/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégse</translation>
+        <translation>Mégse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="673"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="836"/>
         <source>as a search</source>
-        <translation type="unfinished"></translation>
+        <translation>mint keresés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="665"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="837"/>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Csere</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="648"/>
         <source>Current Example</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelenlegi példa</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="663"/>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="676"/>
         <source>as an example</source>
-        <translation type="unfinished"></translation>
+        <translation>mint egy példa</translation>
     </message>
 </context>
 <context>
@@ -807,7 +807,7 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="162"/>
         <source>Only channels that carry a specific station</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak azok a csatornák, melyek egy bizonyos állomásról érkeznek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="164"/>
@@ -963,7 +963,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="343"/>
         <source>Fetching lineups from %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>A felállás behozatala a(z) %1-ről...</translation>
     </message>
 </context>
 <context>
@@ -1010,7 +1010,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="83"/>
         <source>Description</source>
-        <translation type="unfinished">Leírás</translation>
+        <translation>Leírás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="84"/>
@@ -1055,7 +1055,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="155"/>
         <source>DiSEqC</source>
-        <translation type="unfinished">DiSEqC</translation>
+        <translation>DiSEqC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="158"/>
@@ -1368,7 +1368,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="1274"/>
         <source>DTV Device Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>DTV eszköz konfiguráció</translation>
     </message>
 </context>
 <context>
@@ -2090,27 +2090,27 @@
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="262"/>
         <source>Options</source>
-        <translation type="unfinished">Opciók</translation>
+        <translation>Opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="275"/>
         <source>Save</source>
-        <translation type="unfinished">Mentés</translation>
+        <translation>Mentés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="286"/>
         <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilépés annak ellenére, hogy vannak még el nem mentett változások. Mi szeretne elsősorban?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="300"/>
         <source>Save then Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Mentés és kilépés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="301"/>
         <source>Exit without saving changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilépés a változások mentése nélkül</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="599"/>
@@ -2121,280 +2121,280 @@
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="613"/>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="647"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="626"/>
         <source>This key binding conflicts with %1 in the %2 context.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a gomb hozzárendelés a(z) %1-el ütközik a %2 kifejezésben.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="630"/>
         <source> Unable to bind key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet billentyűt hozzárendelni.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="632"/>
         <source> Do you want to bind it anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyébként hozzárendeli?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="652"/>
         <source>Bind Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Billentyű hozzárendelése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="756"/>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="763"/>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="771"/>
         <source>Contexts</source>
-        <translation type="unfinished">Kifejezés</translation>
+        <translation>Kifejezés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="757"/>
         <source>Actions</source>
-        <translation type="unfinished">Műveletek</translation>
+        <translation>Műveletek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="764"/>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="770"/>
         <source>Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Billentyűk</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="914"/>
         <source>Reload Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Téma újratöltése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="916"/>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Főmenü</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="918"/>
         <source>Program Guide</source>
-        <translation type="unfinished">Műsorfüzet</translation>
+        <translation>Műsorfüzet</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="920"/>
         <source>Program Finder</source>
-        <translation type="unfinished">Műsor kereső</translation>
+        <translation>Műsor kereső</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="923"/>
         <source>Manage Recordings / Fix Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételek kezelése / Ütközések javítása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="925"/>
         <source>Program Recording Priorities</source>
-        <translation type="unfinished">Műsor felvételi prioritások</translation>
+        <translation>Műsor felvételi prioritások</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="927"/>
         <source>Manage Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi szabályok kezelése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="929"/>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished">Csatorna felvételi prioritások</translation>
+        <translation>Csatorna felvételi prioritások</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="931"/>
         <source>TV Recording Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>TV felvétel lejátszása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="933"/>
         <source>TV Recording Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation>TV felvétel törlése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="935"/>
         <source>Live TV</source>
-        <translation type="unfinished">Élő TV adás</translation>
+        <translation>Élő TV adás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="937"/>
         <source>Live TV In Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Élő TV adás a műsorfüzetben</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="939"/>
         <source>Status Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Állapot lap</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="941"/>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Korábbi felvételek</translation>
+        <translation>Korábbi felvételek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="944"/>
         <source>ScreenShot</source>
-        <translation type="unfinished"></translation>
+        <translation>Pillanatkép</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="975"/>
         <source>MythTV&apos;s native media player.</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV natív média lejátszója.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="428"/>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="375"/>
         <source>Page Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás fel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="430"/>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="377"/>
         <source>Page Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás le</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="432"/>
         <source>Play Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsor lejátszása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="434"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="526"/>
         <source>Toggle recording status of current program</source>
-        <translation type="unfinished"></translation>
+        <translation>A jelenlegi műsor felvételi állapotán váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="436"/>
         <source>Page the program guide back one day</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozzon vissza egy napot a műsorfüzetben</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="438"/>
         <source>Page the program guide forward one day</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozzon előre egy napot a műsorfüzetben</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="440"/>
         <source>Page the program guide left</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozza balra a műsorfüzetet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="442"/>
         <source>Page the program guide right</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozza jobbra a műsorfüzetet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="444"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="528"/>
         <source>Toggle the current channel as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>A jelenlegi csatorna kedvencnek jelölése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="446"/>
         <source>Reverse the channel order in the program guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Fordított csatorna sorrend a műsorfüzetben</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="448"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="641"/>
         <source>Show the Program Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsorfüzet mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="450"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="643"/>
         <source>Show the Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsorkereső mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="452"/>
         <source>Cycle through channel groups and all channels in the program guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornák és csatornacsoportok körbefuttatása a műsorfüzetben.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="455"/>
         <source>Switch channels without exiting guide in Live TV mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornák váltása élő TV adás módban a műsörfüzetből való kilépés nélkül.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="457"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="530"/>
         <source>Volume down</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangerő le</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="459"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="532"/>
         <source>Volume up</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangerő fel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="461"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="534"/>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>Némítás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="463"/>
         <source>Increase program or channel rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna vagy műsor besorolásának növelése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="465"/>
         <source>Decrease program or channel rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna vagy műsor besorolásának csökkentése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="467"/>
         <source>List upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Az elkövetkező epizódok felsorolása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="469"/>
         <source>Show program details</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsor részleteinek mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="471"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="473"/>
         <source>Switch Capture Card view</source>
-        <translation type="unfinished"></translation>
+        <translation>Vevőkártya nézet váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="475"/>
         <source>Edit Custom Record Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyéni felvételi szabály szerkesztése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="477"/>
         <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna felvételi csoport váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="479"/>
         <source>Change Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Csoportnézet váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="482"/>
         <source>Clear OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD törlése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="484"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Szünet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="486"/>
         <source>Fast Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyors előre</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="488"/>
         <source>Rewind</source>
-        <translation type="unfinished">Vissza</translation>
+        <translation>Vissza</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="490"/>
@@ -2404,267 +2404,267 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="492"/>
         <source>Channel up</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna fel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="494"/>
         <source>Channel down</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna le</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="496"/>
         <source>Switch to the next favorite channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Váltás a következő kedvenc csatornára</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="498"/>
         <source>Switch to the previous channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Váltás az előző csatornára</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="500"/>
         <source>Jump ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás előre</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="502"/>
         <source>Jump back</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás vissza</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="504"/>
         <source>Jump to bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás a könyvjelzőhöz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="506"/>
         <source>Fast Forward (Sticky) or Forward one frame while paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyors előre (Sticky) vagy előre egy képkockát amíg szüneten van</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="508"/>
         <source>Rewind (Sticky) or Rewind one frame while paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyorsan vissza (Sticky) vagy hátra egy képkockát amíg szüneten van</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="510"/>
         <source>Next Video Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő videó forrás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="512"/>
         <source>Previous Video Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző videó forrás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="514"/>
         <source>Next Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő bemenet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="516"/>
         <source>Next Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő kártya</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="518"/>
         <source>Skip Commercial</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklám átlépése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="520"/>
         <source>Skip Commercial (Reverse)</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklám átlépése (Visszafelé)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="522"/>
         <source>Jump to the start of the recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás a felvétel elejére.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="524"/>
         <source>Toggle channel browse mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna böngészés mód váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="536"/>
         <source>Toggle Picture-in-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>PIP nézet ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="538"/>
         <source>Toggle Picture-by-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>PBP nézet ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="540"/>
         <source>Create Picture-in-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>PIP nézet indítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="542"/>
         <source>Create Picture-by-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>PBP nézet indítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="544"/>
         <source>Toggle active PIP/PBP window</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktív PIP/PBP ablak váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="546"/>
         <source>Swap PBP/PIP Windows</source>
-        <translation type="unfinished"></translation>
+        <translation>PBP/PIP ablakok megfordítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="548"/>
         <source>Change PxP view</source>
-        <translation type="unfinished"></translation>
+        <translation>PxP nézet váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="550"/>
         <source>Toggle the video aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó képarány váltása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="552"/>
         <source>Next Preconfigured Zoom mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő előkonfigurált nagyító</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="554"/>
         <source>Toggle any captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Bármely felirat ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="556"/>
         <source>Toggle Teletext Captions</source>
-        <translation type="unfinished">Teletext feliratozás ki/be</translation>
+        <translation>Teletext feliratozás ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="558"/>
         <source>Toggle Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Feliratozás ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="560"/>
         <source>Toggle VBI CC</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI CC ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="562"/>
         <source>Toggle ATSC CC</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC CC ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="564"/>
         <source>Toggle Teletext Menu</source>
-        <translation type="unfinished">Teletext menu ki/be</translation>
+        <translation>Teletext menu ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="567"/>
         <source>Play audio track 1</source>
-        <translation type="unfinished"></translation>
+        <translation>1-es hangsáv lejátszása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="569"/>
         <source>Play audio track 2</source>
-        <translation type="unfinished"></translation>
+        <translation>2-es hangsáv lejátszása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="571"/>
         <source>Display subtitle 1</source>
-        <translation type="unfinished"></translation>
+        <translation>1-es felirat mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="573"/>
         <source>Display subtitle 2</source>
-        <translation type="unfinished"></translation>
+        <translation>2-es felirat mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="575"/>
         <source>Display VBI CC1</source>
-        <translation type="unfinished"></translation>
+        <translation>1-es VBI CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="577"/>
         <source>Display VBI CC2</source>
-        <translation type="unfinished"></translation>
+        <translation>2-es VBI CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="579"/>
         <source>Display VBI CC3</source>
-        <translation type="unfinished"></translation>
+        <translation>3-as VBI CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="581"/>
         <source>Display VBI CC4</source>
-        <translation type="unfinished"></translation>
+        <translation>4-es VBI CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="583"/>
         <source>Display ATSC CC1</source>
-        <translation type="unfinished"></translation>
+        <translation>1-es ATSC CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="585"/>
         <source>Display ATSC CC2</source>
-        <translation type="unfinished"></translation>
+        <translation>2-es ATSC CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="587"/>
         <source>Display ATSC CC3</source>
-        <translation type="unfinished"></translation>
+        <translation>3-as ATSC CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="589"/>
         <source>Display ATSC CC4</source>
-        <translation type="unfinished"></translation>
+        <translation>4-es ATSC CC mutatása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="592"/>
         <source>Next audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő hangsáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="594"/>
         <source>Previous audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző hangsáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="596"/>
         <source>Next subtitle track</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő feliratsáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="598"/>
         <source>Previous subtitle track</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző feliratsáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="600"/>
         <source>Next VBI CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő VBI CC sáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="602"/>
         <source>Previous VBI CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző VBI CC sáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="604"/>
         <source>Next ATSC CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő ATSC CC sáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="606"/>
         <source>Previous ATSC CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző ATSC CC sáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="608"/>
         <source>Next of any captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Bármely következő felirat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="611"/>
@@ -2674,216 +2674,216 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="613"/>
         <source>Queue the current recording for transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>A jelenlegi felvétel átkódolásra ütemezése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="615"/>
         <source>Increase the playback speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási sebesség növelése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="617"/>
         <source>Decrease the playback speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási sebesség csökkentése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="619"/>
         <source>Turn on time stretch control</source>
-        <translation type="unfinished"></translation>
+        <translation>Időszéhúzás vezérlő bekapcsolása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="621"/>
         <source>Increase time stretch speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Időszéthúzási sebesség növelése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="623"/>
         <source>Decrease time stretch speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Időszéthúzási sebesség csökkentése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="625"/>
         <source>Toggle time stretch speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Időszéthúzási sebesség ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="627"/>
         <source>Turn on audio sync adjustment controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangsáv szinkron igazítás vezérlő be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="630"/>
         <source>Playback picture adjustments</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási kép igazítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="633"/>
         <source>Recording picture adjustments for this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi kép igazítása ehhez a csatornához</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="636"/>
         <source>Recording picture adjustments for this recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi kép igazítása ehhez a rögzítőhöz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="639"/>
         <source>Cycle Commercial Skip mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámok átlépése ciklikusan</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="645"/>
         <source>Toggle the Sleep Timer</source>
-        <translation type="unfinished"></translation>
+        <translation>Elalváskapcsoló ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="647"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="649"/>
         <source>Jump to previously played recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás a korábban lejátszott felvételre</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="651"/>
         <source>Display menu of recorded programs to jump to</source>
-        <translation type="unfinished"></translation>
+        <translation>Menü megjelenítése a rögzített műsorokhoz, ahová ugorhat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="653"/>
         <source>Display scheduled recording list</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezett felvételek listázása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="655"/>
         <source>Monitor Signal Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelminőség megfigyelése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="658"/>
         <source>Jump to the DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás a DVD alapmenühöz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="660"/>
         <source>Exit Show without any prompts</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilépés a műsorból figyelmeztetés nélkül</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="663"/>
         <source>Save screenshot of current video frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Pillanatkép mentése a jelenlegi képkockáról</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="667"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="709"/>
         <source>Menu Red</source>
-        <translation type="unfinished"></translation>
+        <translation>Vörös menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="669"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="711"/>
         <source>Menu Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Zöld menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="671"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="713"/>
         <source>Menu Yellow</source>
-        <translation type="unfinished"></translation>
+        <translation>Sárga menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="673"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="715"/>
         <source>Menu Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>Kék menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="675"/>
         <source>Menu Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilépés menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="677"/>
         <source>Menu Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Szöveg menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="679"/>
         <source>Menu EPG</source>
-        <translation type="unfinished"></translation>
+        <translation>EPG menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="683"/>
         <source>Clear editing cut points</source>
-        <translation type="unfinished"></translation>
+        <translation>Vágáspontok törlése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="685"/>
         <source>Invert Begin/End cut points</source>
-        <translation type="unfinished"></translation>
+        <translation>A kezdő/vég vágási pont megfordítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="687"/>
         <source>Load cut list from commercial skips</source>
-        <translation type="unfinished"></translation>
+        <translation>Vágáslista betöltése a reklámdetektorból</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="689"/>
         <source>Jump to the next cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás a következő vágásponthoz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="691"/>
         <source>Jump to the previous cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás az előző vágásponthoz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="693"/>
         <source>Jump back 10x the normal amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás vissza a normál 10x-ével</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="695"/>
         <source>Jump forward 10x the normal amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás előre a normál 10x-ével</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="699"/>
         <source>Next Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő lap</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="701"/>
         <source>Previous Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző lap</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="703"/>
         <source>Next Subpage</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő al lap</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="705"/>
         <source>Previous Subpage</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző al lap</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="707"/>
         <source>Toggle Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>Teletext ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="717"/>
         <source>Menu White</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehér menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="720"/>
         <source>Toggle Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Háttér ki/be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="721"/>
@@ -2893,162 +2893,162 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="348"/>
         <source>Up Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel nyíl</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="350"/>
         <source>Down Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Le nyíl</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="352"/>
         <source>Left Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Balra nyíl</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="354"/>
         <source>Right Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbra nyíl</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="356"/>
         <source>Move to next widget</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozgatás a következő widget-re</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="358"/>
         <source>Move to preview widget</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozgatás a előző widget-re</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="360"/>
         <source>Select</source>
-        <translation type="unfinished">Választás</translation>
+        <translation>Választás</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="362"/>
         <source>Backspace</source>
-        <translation type="unfinished"></translation>
+        <translation>Backspace</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="364"/>
         <source>Escape</source>
-        <translation type="unfinished"></translation>
+        <translation>Escape</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="366"/>
         <source>Pop-up menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Előugró menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="368"/>
         <source>More information</source>
-        <translation type="unfinished"></translation>
+        <translation>Több információ</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="370"/>
         <source>Delete</source>
-        <translation type="unfinished">Töröl</translation>
+        <translation>Töröl</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="372"/>
         <source>Edit</source>
-        <translation type="unfinished">Szerkeszt</translation>
+        <translation>Szerkeszt</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="379"/>
         <source>Page to top of list</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás a lista tetejére</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="381"/>
         <source>Page to middle of list</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás a lista közepére</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="383"/>
         <source>Page to bottom of list</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás a lista aljára</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="386"/>
         <source>Previous View</source>
-        <translation type="unfinished"></translation>
+        <translation>Korábbi nézet</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="388"/>
         <source>Next View</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő nézet</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="391"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Súgó</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="393"/>
         <source>Eject Removable Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Eltávolítható média kiadása</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="396"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="397"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="398"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="399"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="400"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="401"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="402"/>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="403"/>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="404"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="405"/>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="408"/>
         <source>Zoom in on browser window</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészőablak nagyítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="410"/>
         <source>Zoom out on browser window</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészőablak kicsinyítése</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="412"/>
@@ -3058,87 +3058,87 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="415"/>
         <source>Move mouse pointer up</source>
-        <translation type="unfinished"></translation>
+        <translation>Egér pointer mozgatása fel</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="417"/>
         <source>Move mouse pointer down</source>
-        <translation type="unfinished"></translation>
+        <translation>Egér pointer mozgatása le</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="419"/>
         <source>Move mouse pointer left</source>
-        <translation type="unfinished"></translation>
+        <translation>Egér pointer mozgatása balra</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="421"/>
         <source>Move mouse pointer right</source>
-        <translation type="unfinished"></translation>
+        <translation>Egér pointer mozgatása jobbra</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="423"/>
         <source>Mouse Left button click</source>
-        <translation type="unfinished"></translation>
+        <translation>Bal egérgomb kattintás</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="426"/>
         <source>Scroll down half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás egy fél oldalt lefelé</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="428"/>
         <source>Scroll up half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás egy fél oldalt felfelé</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="430"/>
         <source>Scroll left half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás egy fél oldalt balra</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="432"/>
         <source>Scroll right half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Lapozás egy fél oldalt jobbra</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="435"/>
         <source>Move selection to next link</source>
-        <translation type="unfinished"></translation>
+        <translation>A kiválasztott mozgatása a következő linkhez</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="437"/>
         <source>Move selection to previous link</source>
-        <translation type="unfinished"></translation>
+        <translation>A kiválasztott mozgatása a előző linkhez</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="439"/>
         <source>Follow selected link</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiválasztott link követése</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="441"/>
         <source>Go back to previous page</source>
-        <translation type="unfinished"></translation>
+        <translation>Menjünk vissza az előző lapra</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="443"/>
         <source>Go forward to previous page</source>
-        <translation type="unfinished"></translation>
+        <translation>Menjünk előre az előző lapra</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="40"/>
         <source>Open an Xterm window</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy Xterm ablak megnyitása</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="42"/>
         <source>Show Mythshutdown settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythshutdown beállítások mutatása</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="44"/>
         <source>Start Mythtv-Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythtv-Setup indítása</translation>
     </message>
 </context>
 <context>
@@ -3406,63 +3406,63 @@ Visszatérés a korábbi menupontba.</translation>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="281"/>
         <source>Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézetlista</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="464"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3965"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Csoportok</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="465"/>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="515"/>
         <source>Password for group &apos;%1&apos;:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelszó a(z) &apos;%1&apos; csoporthoz:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="591"/>
         <source>There are %1 recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; felvétel van a megjelenített csoportban</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="595"/>
         <source>There is one recording in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak egy felvétel van a megjelenített csoportban</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="598"/>
         <source>There are no recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs felvétel a megjelenített csoportban</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="906"/>
         <source>% used</source>
-        <translation type="unfinished"></translation>
+        <translation>% használt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="910"/>
         <source>, %1 GB free</source>
-        <translation type="unfinished"></translation>
+        <translation>, %1 GB szabad</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1128"/>
         <source>There are no recordings in your current view</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs felvétel ebben a nézetben</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1129"/>
         <source>There are no recordings available</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs elérhető felvétel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1251"/>
         <source>_NO_TITLE_</source>
-        <translation type="unfinished"></translation>
+        <translation>_NINCS_CÍM_</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1260"/>
@@ -3471,7 +3471,7 @@ Visszatérés a korábbi menupontba.</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4029"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4041"/>
         <source>Unknown</source>
-        <translation type="unfinished">Ismeretlen</translation>
+        <translation>Ismeretlen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1281"/>
@@ -3479,106 +3479,107 @@ Visszatérés a korábbi menupontba.</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3989"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4189"/>
         <source>LiveTV</source>
-        <translation type="unfinished">Élő TV adás</translation>
+        <translation>Élő TV adás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1840"/>
         <source>Recording List Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi lista menü</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1858"/>
         <source>Change Group Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Csoportszűrő váltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1861"/>
         <source>Change Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Csoportnézet váltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1865"/>
         <source>Change Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Csoport jelszavának megváltoztatása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1870"/>
         <source>Playlist options</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszólista opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1877"/>
         <source>Add this Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Csoport hozzáadása a lejátszási listához</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1882"/>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel hozzáadása a lejátszási listához</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1887"/>
         <source>Help (Status Icons)</source>
-        <translation type="unfinished"></translation>
+        <translation>Súgó (Állapot ikonok)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2205"/>
         <source>Are you sure you want to delete:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valóban törölni szeretné:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2207"/>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvételi fájl nem elérhető. Valóban törölni szeretné:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2211"/>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valóban megállítja:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2241"/>
         <source>Yes, and allow re-record</source>
-        <translation type="unfinished">Igen és rögzítse újra</translation>
+        <translation>Igen és rögzítse újra</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2249"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2253"/>
         <source>Yes, delete it</source>
-        <translation type="unfinished">Igen, töröljük</translation>
+        <translation>Igen, töröljük</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2257"/>
         <source>Yes, stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Igen, megállítom</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2274"/>
         <source>No, keep it</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem, tartsuk meg</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2278"/>
         <source>No, continue recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne, folytassuk a felvételt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2303"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2309"/>
         <source>Recording Available
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel elérhető
+</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2304"/>
         <source>This recording is currently in use by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezt a felvétel jelenleg a következő használja:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2310"/>
         <source>This recording is currently Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a felvétel jelenleg elérhető</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2315"/>
@@ -3587,132 +3588,132 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2330"/>
         <source>Recording Unavailable
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel nem elérhető</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2316"/>
         <source>This recording is currently being deleted and is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Ennek a felvételnek a törlése már megkezdődött és már nem érhető el</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2321"/>
         <source>The file for this recording can not be found</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvételhez tartozó fájl nem található</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2326"/>
         <source>The file for this recording is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvételhez tartozó fájl üres.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2331"/>
         <source>This recording is not yet available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a felvétel még nem elérhető.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2344"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2776"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2345"/>
         <source>Shuffle Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Véletlen lejátszás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2346"/>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszólista törlése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2351"/>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszólista váltása ehhez a kategóriához/címhez</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2354"/>
         <source>Toggle playlist for this Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási lista váltása ehhez a csoporthoz</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2358"/>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási lista váltása ehhez a felvételhez</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2361"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2578"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2799"/>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2363"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2632"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2803"/>
         <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladat opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2365"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2815"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2831"/>
         <source>Delete</source>
-        <translation type="unfinished">Töröl</translation>
+        <translation>Töröl</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2366"/>
         <source>Delete, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Törli és újra rögzíti</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2378"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2581"/>
         <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi csoport váltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2380"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2584"/>
         <source>Change Playback Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási csoport váltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2382"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2591"/>
         <source>Disable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-lejárat letiltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2384"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2594"/>
         <source>Enable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-lejárat engedélyezése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2436"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2647"/>
         <source>Begin Transcoding</source>
-        <translation type="unfinished">Átkódolás elkezdése</translation>
+        <translation>Átkódolás elkezdése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2439"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2644"/>
         <source>Stop Transcoding</source>
-        <translation type="unfinished">Átkódolás leállítása</translation>
+        <translation>Átkódolás leállítása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2442"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2655"/>
         <source>Begin Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámok jelölésének elkezdése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2445"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2652"/>
         <source>Stop Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámok jelölésének befejezése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2454"/>
@@ -3724,7 +3725,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2696"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2710"/>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2457"/>
@@ -3736,22 +3737,22 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2693"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2707"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Állj</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2566"/>
         <source>Play Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2569"/>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás a könyvjelzőtől</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2570"/>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás az elejétől</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2598"/>
@@ -3766,28 +3767,28 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2611"/>
         <source>Scheduling Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezési opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2614"/>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished">˘Ütemezett felvétel szerkesztése</translation>
+        <translation>Ütemezett felvétel szerkesztése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2617"/>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezen műsor újra rögzítésének engedélyezése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2620"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2829"/>
         <source>Show Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsor részleteinek mutatása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2623"/>
         <source>Change Recording Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi cím változtatása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2661"/>
@@ -3795,12 +3796,12 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2689"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2703"/>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói feladat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2720"/>
         <source>Transcoding profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolási profilok</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2723"/>
@@ -3809,88 +3810,88 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4242"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4417"/>
         <source>Default</source>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2724"/>
         <source>Autodetect</source>
-        <translation type="unfinished">Auto felismerés</translation>
+        <translation>Auto felismerés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2726"/>
         <source>High Quality</source>
-        <translation type="unfinished">Magas minőség</translation>
+        <translation>Magas minőség</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2728"/>
         <source>Medium Quality</source>
-        <translation type="unfinished">Közepes minőség</translation>
+        <translation>Közepes minőség</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2730"/>
         <source>Low Quality</source>
-        <translation type="unfinished">Alacsony minőség</translation>
+        <translation>Alacsony minőség</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2751"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2801"/>
         <source>Recording Options</source>
-        <translation type="unfinished">Felvételi opciók</translation>
+        <translation>Felvételi opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2764"/>
         <source>Start As PIP</source>
-        <translation type="unfinished"></translation>
+        <translation>Indítás PIP-ként</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2766"/>
         <source>Start As PBP</source>
-        <translation type="unfinished"></translation>
+        <translation>Indítás PBP-ként</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2773"/>
         <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás innen...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2779"/>
         <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Eltávolítás a lejátszólistából</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2782"/>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Hozzáadás a lejátszólistához</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2791"/>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel megállítása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2795"/>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem látottnek jelölés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2797"/>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Látottnak jelölés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2810"/>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2811"/>
         <source>Delete Forever</source>
-        <translation type="unfinished"></translation>
+        <translation>Végleges törlés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2825"/>
         <source>Recording file can not be found</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvételi fájl nem található</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3979"/>
@@ -3899,7 +3900,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4043"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4194"/>
         <source>item</source>
-        <translation type="unfinished"></translation>
+        <translation>tétel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3979"/>
@@ -3908,49 +3909,49 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4043"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4196"/>
         <source>items</source>
-        <translation type="unfinished"></translation>
+        <translation>tétel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3988"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4191"/>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Törölve</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4053"/>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategóriák</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4063"/>
         <source>Change Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Szűrő váltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4174"/>
         <source>Add New</source>
-        <translation type="unfinished">Új hozzáadása</translation>
+        <translation>Új hozzáadása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4206"/>
         <source>Select Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi csoport választása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4256"/>
         <source>Select Playback Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási csoport választása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4355"/>
         <source>New Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Új felvételi csoport</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2555"/>
         <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Van %n tétel a lejátszási listában. A műveletek kihatnak a lejátszó lista összes elemére</numerusform>
         </translation>
     </message>
 </context>
@@ -4029,7 +4030,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="875"/>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vegye ki a pipát, ha a videó villog az OSD elhalványulása közben.</translation>
     </message>
 </context>
 <context>
@@ -4108,7 +4109,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="289"/>
         <source>Title</source>
-        <translation type="unfinished">Cím</translation>
+        <translation>Cím</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="291"/>
@@ -4130,22 +4131,22 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="314"/>
         <source>Mono</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="316"/>
         <source>Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="318"/>
         <source>Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="320"/>
         <source>Dolby Sound</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="322"/>
@@ -4160,43 +4161,43 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="327"/>
         <source>HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="329"/>
         <source>Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Széles képernyő</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="331"/>
         <source>AVC/H.264</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="333"/>
         <source>720p Resolution</source>
-        <translation type="unfinished">720p felbontás</translation>
+        <translation>720p felbontás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="335"/>
         <source>1080i/p Resolution</source>
-        <translation type="unfinished">1080i/p Felbontás</translation>
+        <translation>1080i/p Felbontás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="338"/>
         <source>CC</source>
         <comment>Closed Captioned</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="340"/>
         <source>Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Felirat elérhető</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="342"/>
         <source>Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>Feliratozva</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="344"/>
@@ -4206,58 +4207,58 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="347"/>
         <source>Unidentified Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Azonosítatlan rész</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="349"/>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismét</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="357"/>
         <source>Description</source>
-        <translation type="unfinished">Leírás</translation>
+        <translation>Leírás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="377"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategória</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="388"/>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tipus</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="390"/>
         <source>Episode Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Epizód száma</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="397"/>
         <source>Original Airdate</source>
-        <translation type="unfinished"></translation>
+        <translation>Eredeti sugárzás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="399"/>
         <source>Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsor ID</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="488"/>
         <source>Actors</source>
-        <translation type="unfinished">Színészek</translation>
+        <translation>Színészek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="489"/>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendező</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="490"/>
         <source>Producer</source>
-        <translation type="unfinished"></translation>
+        <translation>Producer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="491"/>
@@ -4267,89 +4268,89 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="492"/>
         <source>Writer</source>
-        <translation type="unfinished">Írta</translation>
+        <translation>Forgatókönyv</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="493"/>
         <source>Guest Star</source>
-        <translation type="unfinished"></translation>
+        <translation>Vendégszereplő</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="494"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Gép</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="495"/>
         <source>Adapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Adapter</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="496"/>
         <source>Presenter</source>
-        <translation type="unfinished"></translation>
+        <translation>Előadó</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="497"/>
         <source>Commentator</source>
-        <translation type="unfinished"></translation>
+        <translation>Narrátor</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="498"/>
         <source>Guest</source>
-        <translation type="unfinished"></translation>
+        <translation>Vendég</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="553"/>
         <source>Status</source>
-        <translation type="unfinished">Állapot</translation>
+        <translation>Állapot</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="583"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n óra</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="596"/>
         <source>Auto-expire off</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-lejárat ki</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="599"/>
         <source>Marked as &apos;watched&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Látott&apos;-nak jelölés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="602"/>
         <source>Not the earliest episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem a legkorábbi epizód</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="605"/>
         <source>Recently deleted episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyakran törölt epizód</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="616"/>
         <source>Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi szabály</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="617"/>
         <source>Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Utoljára rögzítve</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="618"/>
         <source>Next Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő felvétel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="619"/>
         <source>Average Time Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>Átlagos idő késleltetés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="620"/>
@@ -4369,48 +4370,48 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="631"/>
         <source>Find ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID keresése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="646"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="666"/>
         <source>Recording Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítő gép</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="667"/>
         <source>Recorded File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi fájlnév</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="668"/>
         <source>Recorded File Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi fájl méret</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="669"/>
         <source>Recording Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi profil</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="670"/>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi csoport</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="671"/>
         <source>Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló csoport</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="672"/>
         <source>Playback Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási csoport</translation>
     </message>
 </context>
 <context>
@@ -4502,7 +4503,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="359"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vegyen fel egy betűt, mellyel a műsor kezdődhet, azután nyomjon VÁLASZT vagy jobbra nyil gombot.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="368"/>
@@ -4512,7 +4513,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="370"/>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished">Válassza ki a műsorcímet, melyet keres. Ha végzett, akkor a bal nyil gombal visszatérhet. Nyomjon SELECT gombot a felvétel ütemezéséhez.</translation>
+        <translation>Válassza ki a műsorcímet, melyet keres. Ha végzett, akkor a bal nyil gombal visszatérhet. Nyomjon SELECT gombot a felvétel ütemezéséhez.</translation>
     </message>
 </context>
 <context>
@@ -4556,7 +4557,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/proglist.cpp" line="155"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="156"/>
         <source>Power Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Erőteljes keresés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="157"/>
@@ -4686,7 +4687,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="429"/>
         <source>Select Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Étékelés választása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="430"/>
@@ -4791,7 +4792,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="988"/>
         <source>Unrated</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem értékelt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1006"/>
@@ -4831,7 +4832,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1033"/>
         <source>Power Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Erős felvételi szabály</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1076"/>
@@ -4865,123 +4866,123 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="440"/>
         <source>Schedule Priorities</source>
-        <translation type="unfinished">Prioritások ütemezése</translation>
+        <translation>Prioritások ütemezése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="604"/>
         <source>Options</source>
-        <translation type="unfinished">Opciók</translation>
+        <translation>Opciók</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="613"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="671"/>
         <source>Increase Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritás növelése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="614"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="675"/>
         <source>Decrease Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritás csökkentése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="615"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="679"/>
         <source>Sort</source>
-        <translation type="unfinished">Sorbarendez</translation>
+        <translation>Sorbarendez</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="616"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="683"/>
         <source>Program Details</source>
-        <translation type="unfinished">Műsor részletek</translation>
+        <translation>Műsor részletek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="617"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="687"/>
         <source>Upcoming</source>
-        <translation type="unfinished">Hamarosan</translation>
+        <translation>Hamarosan</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="618"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="692"/>
         <source>Custom Edit</source>
-        <translation type="unfinished">Egyéni szerkesztés</translation>
+        <translation>Egyéni szerkesztés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="619"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="697"/>
         <source>Delete Rule</source>
-        <translation type="unfinished">Szabály törlése</translation>
+        <translation>Szabály törlése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="620"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="649"/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégse</translation>
+        <translation>Mégse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="632"/>
         <source>Sort Options</source>
-        <translation type="unfinished">Opciók sorbarendezése</translation>
+        <translation>Opciók sorbarendezése</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="641"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="705"/>
         <source>Reverse Sort Order</source>
-        <translation type="unfinished">Fordított sorrend</translation>
+        <translation>Fordított sorrend</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="642"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="710"/>
         <source>Sort By Title</source>
-        <translation type="unfinished">Rendezése cím alapján</translation>
+        <translation>Rendezése cím alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="643"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="721"/>
         <source>Sort By Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezés prioritás alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="644"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="732"/>
         <source>Sort By Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezés tipus alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="645"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="743"/>
         <source>Sort By Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezés számláló alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="646"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="756"/>
         <source>Sort By Record Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezés felvételszámláló alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="647"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="767"/>
         <source>Sort By Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel az utoljára rögzíttek alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="648"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="778"/>
         <source>Sort By Average Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezés az átlagos késleltetés alapján</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="949"/>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Törli a(z) &apos;%1&apos; %2 szabályt?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1202"/>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1426"/>
@@ -4989,7 +4990,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1559"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1567"/>
         <source>Default</source>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1447"/>
@@ -4999,17 +5000,17 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1609"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1620"/>
         <source>Any</source>
-        <translation type="unfinished">Bármely</translation>
+        <translation>Bármely</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1516"/>
         <source>Recording %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel %1 a(z) %2-ből</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1543"/>
         <source> + %1 automatic priority (%2hr)</source>
-        <translation type="unfinished"></translation>
+        <translation> + %1 automatikus prioritás (%2óra)</translation>
     </message>
 </context>
 <context>
@@ -5017,270 +5018,270 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="797"/>
         <source>DVD/Video contains a bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>A DVD/Video könyvjelzőt tartalmaz</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="584"/>
         <source>Searching for icons for channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikonok keresése a(z) %1 csatornához</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="53"/>
         <location filename="../libs/libmyth/dbsettings.cpp" line="170"/>
         <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Használjon egyéni azonosítót a frontend beállításaihoz</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="68"/>
         <source>Backend Server Wakeup settings</source>
-        <translation type="unfinished"></translation>
+        <translation>A háttérszerver ébresztő beállításai</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="83"/>
         <location filename="../libs/libmyth/dbsettings.cpp" line="167"/>
         <source>Database Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatbázis konfiguráció</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="89"/>
         <source>All database settings take effect when you restart this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az összes adatbázis beállítás megváltozhat, amikor a programot újraindítja.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="92"/>
         <source>Myth could not connect to the database. Please verify your database settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>A Myth nem tudott az adatbázishoz csatlakozni. Kérem ellenőrizze az adatbázis beállításait alább.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="98"/>
         <source>Database Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatbázis szerver beállítások</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="100"/>
         <location filename="../libs/libmythtv/profilegroup.h" line="68"/>
         <source>Hostname</source>
-        <translation type="unfinished"></translation>
+        <translation>Gépnév</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="101"/>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Annak a gépnek neve vagy IP címe, amely az adatbázist kiszolgálja. Szükséges információ.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="110"/>
         <source>Ping test server?</source>
-        <translation type="unfinished"></translation>
+        <translation>A szerver tesztelése ping-el?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="111"/>
         <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="unfinished"></translation>
+        <translation>Az alapvető gépkapcsolat tesztelése a ping parancs használatával. Kapcsolja ki, ha a gép vagy a hálózat nem támogatja a (ICMP ECHO) csomagokat</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="125"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="26"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="60"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="126"/>
         <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation type="unfinished"></translation>
+        <translation>Az a portszám, melyen az adatbázis fut.  Hagyja üresen, ha az alapértelmezett portot szeretné használni (3306).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="132"/>
         <source>Database name</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatbázis név</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="133"/>
         <source>The name of the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az adatbázis neve. Szükséges információ.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="138"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználónév</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="139"/>
         <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az a felhasználnónév, melyet az adatbázis kapcsolathoz használhat. Szükséges információ.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="145"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="326"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelszó</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="146"/>
         <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az a Jelszó, melyet az adatbázis kapcsolathoz használhat. Szükséges információ.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="172"/>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha ennek a frontendnek a gép neve gyakran változik, jelölje be ezt a négyzetet és adjon meg egy egyedi nevet az azonosításhoz. Ha nincs bejelölve, a frontend gép helyi neve lesz felhasználva a beállítások adatbázisba mentéséhez.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="182"/>
         <source>Custom identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi azonosító</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="183"/>
         <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy azonosító, melyet a frontend beállításainak mentésére használhat.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="196"/>
         <source>Enable Database Server Wakeup</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatbázis szerver ébresztés engedélyezése</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="197"/>
         <source>If checked, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve a frontend ébreszési paraméterekket használ az adatbázis szerverhez való újracsatlakozáshoz.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="202"/>
         <source>Reconnect time</source>
-        <translation type="unfinished"></translation>
+        <translation>Újracsatlakozási idő</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="203"/>
         <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Idő másodperben megadva, ameddig várakozik a szerver ébresztése előtt.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="207"/>
         <source>Retry attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>Próbálkozások száma</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="208"/>
         <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Újrapróbálkozások száma, mellyel megpróbálja a szervert feléleszteni, mielőtt a frontend betöltődne.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="213"/>
         <source>Wake command</source>
-        <translation type="unfinished"></translation>
+        <translation>Ébresztési parancs</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="214"/>
         <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation type="unfinished"></translation>
+        <translation>A parancs, mely ezen a frontenden lesz elindítva az adatbázis ébresztése érdekében (pl.  sudo /etc/init.d/mysql restart).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="243"/>
         <source>Required fields are marked with an asterisk (*).</source>
-        <translation type="unfinished"></translation>
+        <translation>A szükséges mezők csillaggal vannak jelölve (*).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/langsettings.cpp" line="20"/>
         <source>Select your preferred language</source>
-        <translation type="unfinished"></translation>
+        <translation>Válassza ki a kedvenc nyelvezetét</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/managedlist.cpp" line="268"/>
         <location filename="../libs/libmyth/managedlist.cpp" line="367"/>
         <source>Go Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Menjünk vissza</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/managedlist.cpp" line="399"/>
         <source>No Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs változás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="203"/>
         <source>Could not find specified tuner (%1).</source>
-        <translation type="unfinished"></translation>
+        <translation>A meghatározott tuner (%1) nem található.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="206"/>
         <source>Specified tuner (%1) is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>A meghatározott tuner (%1) már használatban van.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="211"/>
         <source>All tuners are currently in use. If you want to watch TV, you can cancel one of the in-progress recordings from the delete menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Már használatban van az összes tuner. Ha szeretne TV-t nézni, dobjon el egy felvételi folyamatot a törlés menüben</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="227"/>
         <source>Failed to configure plugin %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehetett a(z) %1 plugin-t konfigurálni</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="235"/>
         <source>The plugin %1 has failed to run for some reason...</source>
-        <translation type="unfinished"></translation>
+        <translation>A(z) %1 plugin futtatása jó néhányszort meghiúsult...</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="840"/>
         <source>Cannot find (ping) database host %1 on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem található (ping) a(z) %1 adatbázis gép a hálózaton</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="850"/>
         <source>Cannot connect to port %1 on database host %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehett a(z) %1 porton csatlakozni a(z) %2 adatbázis gépre</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="863"/>
         <source>Cannot login to database?</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet az adabázisba bejelentkezni?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1019"/>
         <source>Save database details</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatbázis részletek mentése</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1020"/>
         <source>Save backend details</source>
-        <translation type="unfinished"></translation>
+        <translation>Háttér részletek mentése</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1021"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne legyen mentve</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1023"/>
         <source>Save that backend or database as the default?</source>
-        <translation type="unfinished"></translation>
+        <translation>Mentsük alapból a hátteret vagy az adatbázist?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1282"/>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem sikerült csatlakozni a mester háttér szerverhez -- egyáltalán fut?  Az IP cím beállítása a setup programban megfelelő?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1350"/>
         <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>A szerver %1 hálózati protokolt használ, de a kliens csak a %2-t ismeri.  Győződjön meg arról, hogy kompatibilis változatokat használ a háttér és a frontend gépeken.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1447"/>
         <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az alkalmazás nem kompatibilis a telepített MythTV könyvtárakkal. Kérem fordítassa újra, miután kiadott egy make distclean-t</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="2097"/>
         <location filename="../libs/libmyth/mythcontext.cpp" line="2107"/>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation type="unfinished"></translation>
+        <translation>A kapcsolat a mester háttérszerverrel jó néhányszol elszállt.. Egyáltalán fut?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="2287"/>
         <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
-        <translation type="unfinished"></translation>
+        <translation>A(z) %1 plugin nem kompatibilis a telepített MythTV könyvtárakal. Kérem, fordítassa újra, miután kiadott egy make distclean-t</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="709"/>
@@ -5290,7 +5291,7 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1153"/>
         <location filename="../libs/libmythtv/viewschdiff.cpp" line="334"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="875"/>
@@ -5301,20 +5302,22 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1521"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1154"/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégse</translation>
+        <translation>Mégse</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="237"/>
         <source>Unable to open or close the empty drive %1.
 
 You may have to use the eject button under its tray.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet megnyitni vagy bezárni az üres %1 meghajtót.
+
+Használhatja a kiadás gombot a tálca alatt.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="754"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmyth/programinfo.cpp" line="770"/>
@@ -5326,7 +5329,7 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="452"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="982"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n perc</numerusform>
         </translation>
     </message>
@@ -5335,14 +5338,14 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="457"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="981"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n óra</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="803"/>
         <source>Re-Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Újravétel</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="843"/>
@@ -5350,14 +5353,14 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmyth/programinfo.cpp" line="2900"/>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1427"/>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismét</translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmyth/programinfo.cpp" line="864"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="871"/>
         <source>%n star(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n sztár</numerusform>
         </translation>
     </message>
     <message>
@@ -5370,264 +5373,264 @@ You may have to use the eject button under its tray.</source>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3441"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="944"/>
         <source>Unknown</source>
-        <translation type="unfinished">Ismeretlen</translation>
+        <translation>Ismeretlen</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1857"/>
         <source>Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1859"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="2878"/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1861"/>
         <source>Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámok jelölése</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1863"/>
         <source>Transcoding</source>
-        <translation type="unfinished">Átkódolás</translation>
+        <translation>Átkódolás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1865"/>
         <source>PIP</source>
-        <translation type="unfinished"></translation>
+        <translation>PIP</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1867"/>
         <source>PBP</source>
-        <translation type="unfinished"></translation>
+        <translation>PBP</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2748"/>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2750"/>
         <source>T</source>
         <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>T</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2752"/>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="unfinished">V</translation>
+        <translation>V</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2754"/>
         <source>C</source>
         <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2756"/>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2758"/>
         <source>F</source>
         <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>F</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2760"/>
         <source>d</source>
         <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>d</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2762"/>
         <source>w</source>
         <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>w</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2765"/>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>O</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2780"/>
         <source>Single Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyszeri felvétel</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2782"/>
         <source>Record Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Napi felvétel</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2784"/>
         <source>Record Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Heti felvétel</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2786"/>
         <source>Channel Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna felvétel</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2788"/>
         <source>Record All</source>
-        <translation type="unfinished"></translation>
+        <translation>Az összes felvétele</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2790"/>
         <source>Find One</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyszeri keresés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2792"/>
         <source>Find Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Napi keresés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2794"/>
         <source>Find Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Heti keresés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2797"/>
         <source>Override Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel felülbírálata</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2799"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="2868"/>
         <source>Not Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs rögzítés alatt</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2811"/>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2813"/>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
-        <translation type="unfinished"></translation>
+        <translation>R</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2818"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="2826"/>
         <source>R</source>
         <comment>RecStatusChar rsCurrentRecording</comment>
-        <translation type="unfinished"></translation>
+        <translation>R</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2822"/>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2824"/>
         <source>P</source>
         <comment>RecStatusChar rsPreviousRecording</comment>
-        <translation type="unfinished"></translation>
+        <translation>P</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2828"/>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2830"/>
         <source>T</source>
         <comment>RecStatusChar rsTooManyRecordings</comment>
-        <translation type="unfinished"></translation>
+        <translation>T</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2832"/>
         <source>c</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation type="unfinished"></translation>
+        <translation>c</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2834"/>
         <source>M</source>
         <comment>RecStatusChar rsMissed</comment>
-        <translation type="unfinished"></translation>
+        <translation>M</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2836"/>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2838"/>
         <source>L</source>
         <comment>RecStatusChar rsLaterShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation>L</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2840"/>
         <source>r</source>
         <comment>RecStatusChar rsRepeat</comment>
-        <translation type="unfinished"></translation>
+        <translation>r</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2842"/>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
-        <translation type="unfinished"></translation>
+        <translation>x</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2844"/>
         <source>K</source>
         <comment>RecStatusChar rsLowDiskSpace</comment>
-        <translation type="unfinished"></translation>
+        <translation>K</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2846"/>
         <source>B</source>
         <comment>RecStatusChar rsTunerBusy</comment>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2848"/>
         <source>f</source>
         <comment>RecStatusChar rsFailed</comment>
-        <translation type="unfinished"></translation>
+        <translation>f</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2850"/>
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
-        <translation type="unfinished"></translation>
+        <translation>N</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2852"/>
         <source>V</source>
         <comment>RecStatusChar rsNeverRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>V</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2854"/>
         <source>F</source>
         <comment>RecStatusChar rsOffLine</comment>
-        <translation type="unfinished"></translation>
+        <translation>F</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2856"/>
         <source>O</source>
         <comment>RecStatusChar rsOtherShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation>O</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2874"/>
@@ -5637,461 +5640,461 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2876"/>
         <source>Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítve</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2880"/>
         <source>Will Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítve lesz</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2882"/>
         <source>Don&apos;t Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem rögzíti</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2884"/>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Korábbi felvételek</translation>
+        <translation>Korábbi felvételek</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2886"/>
         <source>Currently Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelenleg rögzítve</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2888"/>
         <source>Earlier Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Korábbi műsor</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2890"/>
         <source>Max Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Max felvételek</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2892"/>
         <source>Manual Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kézi eldobás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2894"/>
         <source>Missed</source>
-        <translation type="unfinished"></translation>
+        <translation>Kihagyva</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2896"/>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütközés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2898"/>
         <source>Later Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Későbbi sugárzás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2902"/>
         <source>Inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkaktív</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2904"/>
         <source>Low Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Kevés lemez tárterület</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2906"/>
         <source>Tuner Busy</source>
-        <translation type="unfinished"></translation>
+        <translation>A tuner foglalt</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2908"/>
         <source>Recorder Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvétel meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2910"/>
         <source>Not Listed</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs listázva</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2912"/>
         <source>Never Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Sosem rögzíti</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2914"/>
         <source>Recorder Off-Line</source>
-        <translation type="unfinished"></translation>
+        <translation>A rögzítő kapcsolat nélkül</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2916"/>
         <source>Other Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyéb műsor</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2938"/>
         <source>This showing will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a műsor rögzítve lesz.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2941"/>
         <source>This showing is being recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>A műsor rögzítése elkezdődött.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2944"/>
         <source>This showing was recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a műsor rögzítve lett.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2947"/>
         <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a műsor rögzítve lett de megszakadt, mielőtt a felvétel teljesült volna.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2951"/>
         <source>This showing was not recorded because it was scheduled after it would have ended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a műsor nem lett rögzítve, mivel azután lett betütemzve, miután véget ért.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2955"/>
         <source>This showing was not recorded because it was manually cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>A műsor nem lett rögzítve, mert kézileg meg lett állítva.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2959"/>
         <source>there wasn&apos;t enough disk space available.</source>
-        <translation type="unfinished"></translation>
+        <translation>nem volt elegendő szabad tárterület.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2962"/>
         <source>the tuner card was already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>a tuner kártya már használatban volt.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2965"/>
         <source>the recorder failed to record.</source>
-        <translation type="unfinished"></translation>
+        <translation>a rögzítő meghiúsította a felvételt.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2968"/>
         <source>The status of this showing is unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>A műsor állaporta ismeretlen.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2975"/>
         <source>This showing will not be recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a műsor nem lesz rögzítve, mivel </translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2977"/>
         <source>This showing was not recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a műsor nem lett rögzítve, mivel </translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2982"/>
         <source>it was manually set to not record.</source>
-        <translation type="unfinished"></translation>
+        <translation>kézileg lett nem rögzítendőre állítva.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2985"/>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez az epizód már korábban rögzítve lett, így a cím megfelelt a duplikálási irányelveknek.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2990"/>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez az epizód korábban rögzítve lett és még elérhető a felvételek listájában.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2995"/>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez az epizód e helyett korábban lesz rögzítve.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2999"/>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>ebből a műsorból túl sok felvétel lett rögzítve.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3003"/>
         <source>another program with a higher priority will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>más műsor magasabb prioritással lesz felvéve.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3007"/>
         <source>this episode will be recorded at a later time.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez az epizód később lesz rögzítve.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3011"/>
         <source>this episode is a repeat.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez az epizód egy ismétlés.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3014"/>
         <source>this recording rule is inactive.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez a felvételi szabály inaktív.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3017"/>
         <source>this rule does not match any showings in the current program listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez a szabály nem egyezik egyetlen műsorral sem a jelenlegi műsorok listájában.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3021"/>
         <source>it was marked to never be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>korábban sosem rögzítendőnek lett jelölve.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3024"/>
         <source>the backend recorder is off-line.</source>
-        <translation type="unfinished"></translation>
+        <translation>a háttér rögzítő kapcsolat nélkül van.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3027"/>
         <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation>ez az epizód eyg másik csatornáról lesz rögzítve, ebben az időkeretben.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3031"/>
         <source>you should never see this.</source>
-        <translation type="unfinished"></translation>
+        <translation>nem láthatta még ezt.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3402"/>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3403"/>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
-        <translation type="unfinished">Magas minőség</translation>
+        <translation>Magas minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3404"/>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
-        <translation type="unfinished">Élő TV adás</translation>
+        <translation>Élő TV adás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3405"/>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
-        <translation type="unfinished">Alacsony minőség</translation>
+        <translation>Alacsony minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3406"/>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
-        <translation type="unfinished">Közepes minőség</translation>
+        <translation>Közepes minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3407"/>
         <source>MPEG2</source>
         <comment>Recording Profile MPEG2</comment>
-        <translation type="unfinished"></translation>
+        <translation>MPEG2</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3408"/>
         <source>RTjpeg/MPEG4</source>
         <comment>Recording Profile RTjpeg/MPEG4</comment>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg/MPEG4</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3412"/>
         <source>CRC IP Recorders</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>CRC IP rögzítők</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3414"/>
         <source>DBOX2 Input</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 bemenet</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3416"/>
         <source>FireWire Input</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>FireWire bemenet</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3418"/>
         <source>Freebox Input</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Freebox bemenet</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3420"/>
         <source>Hardware DVB Encoders</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Hardveres DVB kódoló</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3422"/>
         <source>Hardware HDTV</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Hardveres HDTV</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3424"/>
         <source>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Hardveres MJPEG kódolók (Matrox G200-TV, Miro DC10, stb)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3426"/>
         <source>HD-PVR Recorders</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>HD-PVR rögzítők</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3428"/>
         <source>HDHomeRun Recorders</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>HDHomeRun rögzítők</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3430"/>
         <source>MPEG-2 Encoders (PVR-x50, PVR-500)</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-2 kódolók (PVR-x50, PVR-500)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3432"/>
         <source>Software Encoders (v4l based)</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Szoftveres kódolók (v4l alapúak)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3434"/>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolók</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3436"/>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>USB Mpeg-4 kódoló (Plextor ConvertX, stb)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3440"/>
         <source>All Programs</source>
         <comment>Recording Group All Programs</comment>
-        <translation type="unfinished"></translation>
+        <translation>Minden műsor</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3441"/>
         <source>LiveTV</source>
         <comment>Recording Group LiveTV</comment>
-        <translation type="unfinished">Élő TV adás</translation>
+        <translation>Élő TV adás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3442"/>
         <source>Default</source>
         <comment>Recording Group Default</comment>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3443"/>
         <source>Deleted</source>
         <comment>Recording Group Deleted</comment>
-        <translation type="unfinished"></translation>
+        <translation>Törölve</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3446"/>
         <source>Default</source>
         <comment>Storage Group Name</comment>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3447"/>
         <source>LiveTV</source>
         <comment>Storage Group Name</comment>
-        <translation type="unfinished">Élő TV adás</translation>
+        <translation>Élő TV adás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3448"/>
         <source>Thumbnails</source>
         <comment>Storage Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Indexképek</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3449"/>
         <source>DB Backups</source>
         <comment>Storage Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>DB bizt.mentések</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3452"/>
         <source>Default</source>
         <comment>Playback Group Name</comment>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3505"/>
         <source>Commercial Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámmentes</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3507"/>
         <source>Use Global Setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Globális beállítás használata</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3518"/>
         <source>All Available Methods</source>
-        <translation type="unfinished"></translation>
+        <translation>Minden lehetséges módon</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3520"/>
         <source>Blank Frame + Scene Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Üres kép + jelenetváltozás</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3522"/>
         <source>Blank Frame + Logo Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Üres kép + Logo felismerés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3524"/>
         <source>Scene Change + Logo Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelenet változás + Logo felismerés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3526"/>
         <source>Blank Frame Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Üres kép felismerés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3528"/>
         <source>Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelenet változás felismerése</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3530"/>
         <source>Logo Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Logo felismerés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3533"/>
         <source>Experimental</source>
-        <translation type="unfinished"></translation>
+        <translation>Kísérleti</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3535"/>
         <source>Pre &amp; Post Roll</source>
-        <translation type="unfinished"></translation>
+        <translation>Elő &amp; utó görgetés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/settings.cpp" line="786"/>
         <source>Any</source>
-        <translation type="unfinished">Bármely</translation>
+        <translation>Bármely</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroup.cpp" line="705"/>
@@ -6104,97 +6107,97 @@ You may have to use the eject button under its tray.</source>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1580"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2627"/>
         <source>Default</source>
-        <translation type="unfinished">Alapértelmezett</translation>
+        <translation>Alapértelmezett</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/DVDRingBuffer.cpp" line="160"/>
         <source>Title %1 chapter %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím %1 fejezet %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="99"/>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Sáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="102"/>
         <source>Audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangsáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="104"/>
         <source>Subtitle track</source>
-        <translation type="unfinished"></translation>
+        <translation>Felirat sáv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="106"/>
         <source>CC</source>
         <comment>EIA-608 closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="108"/>
         <source>ATSC CC</source>
         <comment>EIA-708 closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>ATSC CC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="110"/>
         <source>TT CC</source>
         <comment>Teletext closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>TT CC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="112"/>
         <source>TT Menu</source>
         <comment>Teletext Menu</comment>
-        <translation type="unfinished"></translation>
+        <translation>TT Menü</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="114"/>
         <source>TXT File</source>
         <comment>Text File</comment>
-        <translation type="unfinished"></translation>
+        <translation>TXT fájl</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="710"/>
         <source>Unable to create null video out</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet null videó kimenetet előállítani</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="736"/>
         <source>&apos;tv playback&apos; widget missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;tv lejátszás&apos; widget hiány.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="759"/>
         <source>Failed to initialize video output</source>
-        <translation type="unfinished"></translation>
+        <translation>A videókimenet inicializálása meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="845"/>
         <source>Failed to reinitialize video output</source>
-        <translation type="unfinished"></translation>
+        <translation>A videókimenet újra inicializálása meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="852"/>
         <source>Need to switch video renderer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó renderer váltás szükséges.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="918"/>
         <source>Unable to create AudioOutput.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet hangkimenetet képezni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="1806"/>
         <source>TXT CAP</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT CAP</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="1823"/>
         <source>Text subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Szöveges feliratok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="1838"/>
@@ -6206,55 +6209,55 @@ You may have to use the eject button under its tray.</source>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3633"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3646"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Ki</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="1858"/>
         <source>Text Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Szöveges feliratok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="1861"/>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="1890"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="548"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Be</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="2025"/>
         <source>No captions</source>
         <comment>CC/Teletext/Subtitle text not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>Nincs felirat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="2452"/>
         <source>Failed to initialize A/V Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>Az A/V szinkron inicializálása meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="2514"/>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="2695"/>
         <source>Serious error detected in Video Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorozatos hiba felderítve a videó kimeneten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="2762"/>
         <source>Video frame buffering failed too many times.</source>
-        <translation type="unfinished"></translation>
+        <translation>A videó képbufferelés túl sokszor hiúsult meg.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="3306"/>
         <source>Error opening switch program buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a műsor puffer váltásakor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="3330"/>
         <source>Error opening switch program file</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a műsorfájl megnyitásakor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="3431"/>
@@ -6269,42 +6272,42 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="3452"/>
         <source>Error reopening video decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a videó dekóder újranyitásakor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="3689"/>
         <source>Irrecoverable recorder error</source>
-        <translation type="unfinished"></translation>
+        <translation>Helyreállíthatatlan rögzítői hiba</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="4346"/>
         <source>Bookmark Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvjelző mentve</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="4350"/>
         <source>Position</source>
-        <translation type="unfinished">Pozíció</translation>
+        <translation>Pozíció</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="4375"/>
         <source>Bookmark Cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvjelző törölve</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5012"/>
         <source>No Seektable</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs csúsztatótábla</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5389"/>
         <source>cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>vágáspont</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5390"/>
         <source>keyframe</source>
-        <translation type="unfinished"></translation>
+        <translation>kulcskép</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5391"/>
@@ -6321,199 +6324,199 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5394"/>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5395"/>
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n másodperc</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5399"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>hiba</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5428"/>
         <source>cut</source>
-        <translation type="unfinished"></translation>
+        <translation>vágás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5479"/>
         <source>You are close to an existing cut point. Would you like to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Közel van egy meglévő vágásponthoz. Szeretné:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5481"/>
         <source>Delete this cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>törölni ezt a vágáspontot</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5482"/>
         <source>Move this cut point to the current position</source>
-        <translation type="unfinished"></translation>
+        <translation>mozgatni ezt a vágáspontot a mostani helyre</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5484"/>
         <source>Flip directions - delete to the </source>
-        <translation type="unfinished"></translation>
+        <translation>az irányokat megfordítani - törölni a(z)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5486"/>
         <source>right</source>
-        <translation type="unfinished"></translation>
+        <translation>jobb oldalt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5488"/>
         <source>left</source>
-        <translation type="unfinished"></translation>
+        <translation>bal oldalt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5489"/>
         <source>Insert a new cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Új vágáspont beszúrása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5504"/>
         <source>Insert a new cut point?</source>
-        <translation type="unfinished"></translation>
+        <translation>Beszúr egy új vágáspontot?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5505"/>
         <source>Delete before this frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Töröljük az ezen képkocka előtti részeket</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5506"/>
         <source>Delete after this frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Töröljük az ezen képkocka utáni részeket</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6497"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>másodperc</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6502"/>
         <source>%1 of %2</source>
-        <translation type="unfinished">%1 a(z) %2-ből</translation>
+        <translation>%1 a(z) %2-ből</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6506"/>
         <source>%1 of %2 (%3 behind)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a(z) %2-ből (%3 kész)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6511"/>
         <source>%1 of %2 (%3 remaining)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a(z) %2-ből (%3 van még hátra)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6612"/>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6815"/>
         <source>Skip %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 átlépése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6617"/>
         <source>Commercial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklám: %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6664"/>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs jelölve</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6684"/>
         <source>Skipping Back.</source>
-        <translation type="unfinished"></translation>
+        <translation>Visszalépés.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6710"/>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6752"/>
         <source>Start of program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsor kezdete.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6729"/>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6784"/>
         <source>At End, can not Skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>A végén, nem lehet átlépni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6809"/>
         <source>Too Far %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 túl távol van</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="7581"/>
         <source>DVD Menu Not Available</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menü nem elérhető</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="2895"/>
         <source>Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Felirat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1532"/>
         <source>Could not query inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet a bemenetet lekérdezni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1562"/>
         <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>HIBA. Fordíttassa le a V4L támogatást a bemenet lekérdezéséhez</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1594"/>
         <source>ERROR, Compile with V4L support to query audio inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>HIBA. Fordíttassa le a V4L támogatást a hangbemenet lekérdezéséhez</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1658"/>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1691"/>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet a(z) &apos;%1&apos; bemenetet tesztelésre megnyitni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1732"/>
         <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>HIBA. Fordíttassa DVB támogatással a bemenet lekérdezéséhez</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1831"/>
         <source>New Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Új bemenet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1994"/>
         <source>Unable to connect to device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet az eszközhöz csatlakozni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="2008"/>
         <source>Invalid Device ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen eszköz ID</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="2018"/>
         <source>Invalid Device ID or address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen eszköz ID vagy cím.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="2030"/>
         <source>, firmware: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>, firmware: %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1349"/>
         <source>Education</source>
-        <translation type="unfinished"></translation>
+        <translation>Oktatás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1350"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="293"/>
         <source>Entertainment</source>
-        <translation type="unfinished"></translation>
+        <translation>Szórakozás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1351"/>
@@ -6527,31 +6530,31 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="282"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="284"/>
         <source>Movie</source>
-        <translation type="unfinished"></translation>
+        <translation>Film</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1352"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="287"/>
         <source>News</source>
-        <translation type="unfinished"></translation>
+        <translation>Hírek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1353"/>
         <source>Religious</source>
-        <translation type="unfinished"></translation>
+        <translation>Vallásos</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1354"/>
         <location filename="../libs/libmythtv/eithelper.cpp" line="458"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="298"/>
         <source>Sports</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1355"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3621"/>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyéb</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1356"/>
@@ -6561,322 +6564,322 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1357"/>
         <source>Advertisement</source>
-        <translation type="unfinished"></translation>
+        <translation>Hirdetés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1358"/>
         <source>Animated</source>
-        <translation type="unfinished"></translation>
+        <translation>Animációs</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1359"/>
         <source>Anthology</source>
-        <translation type="unfinished"></translation>
+        <translation>Csillagászat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1360"/>
         <source>Automobile</source>
-        <translation type="unfinished"></translation>
+        <translation>Autós</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1361"/>
         <source>Awards</source>
-        <translation type="unfinished"></translation>
+        <translation>Díjátadó</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1362"/>
         <source>Baseball</source>
-        <translation type="unfinished"></translation>
+        <translation>Baseball</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1363"/>
         <source>Basketball</source>
-        <translation type="unfinished"></translation>
+        <translation>Kosárlabda</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1364"/>
         <source>Bulletin</source>
-        <translation type="unfinished"></translation>
+        <translation>Lövészet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1365"/>
         <source>Business</source>
-        <translation type="unfinished"></translation>
+        <translation>Üzlet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1366"/>
         <source>Classical</source>
-        <translation type="unfinished"></translation>
+        <translation>Hagyományos</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1367"/>
         <source>College</source>
-        <translation type="unfinished"></translation>
+        <translation>Főiskola</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1368"/>
         <source>Combat</source>
-        <translation type="unfinished"></translation>
+        <translation>Katonai</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1369"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="277"/>
         <source>Comedy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabaré</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1370"/>
         <source>Commentary</source>
-        <translation type="unfinished"></translation>
+        <translation>Közvetítés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1371"/>
         <source>Concert</source>
-        <translation type="unfinished"></translation>
+        <translation>Koncert</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1372"/>
         <source>Consumer</source>
-        <translation type="unfinished"></translation>
+        <translation>Fogyasztói</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1373"/>
         <source>Contemporary</source>
-        <translation type="unfinished"></translation>
+        <translation>Kortárs</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1374"/>
         <source>Crime</source>
-        <translation type="unfinished"></translation>
+        <translation>Krimi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1375"/>
         <source>Dance</source>
-        <translation type="unfinished"></translation>
+        <translation>Tánc</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1376"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="290"/>
         <source>Documentary</source>
-        <translation type="unfinished"></translation>
+        <translation>Dokumentum</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1377"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="369"/>
         <source>Drama</source>
-        <translation type="unfinished"></translation>
+        <translation>Dráma</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1378"/>
         <source>Elementary</source>
-        <translation type="unfinished"></translation>
+        <translation>Alapfokú</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1379"/>
         <source>Erotica</source>
-        <translation type="unfinished"></translation>
+        <translation>Erotikus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1380"/>
         <source>Exercise</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyakorlat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1381"/>
         <source>Fantasy</source>
-        <translation type="unfinished"></translation>
+        <translation>Fantázia</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1382"/>
         <source>Farm</source>
-        <translation type="unfinished"></translation>
+        <translation>Farm</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1383"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="339"/>
         <source>Fashion</source>
-        <translation type="unfinished"></translation>
+        <translation>Divat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1384"/>
         <source>Fiction</source>
-        <translation type="unfinished"></translation>
+        <translation>Fikció</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1385"/>
         <source>Food</source>
-        <translation type="unfinished"></translation>
+        <translation>Étel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1386"/>
         <source>Football</source>
-        <translation type="unfinished"></translation>
+        <translation>Foci</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1387"/>
         <source>Foreign</source>
-        <translation type="unfinished"></translation>
+        <translation>Külföldi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1388"/>
         <source>Fund Raiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Befektetés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1389"/>
         <source>Game/Quiz</source>
-        <translation type="unfinished"></translation>
+        <translation>Játék/kvíz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1390"/>
         <source>Garden</source>
-        <translation type="unfinished"></translation>
+        <translation>Kert</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1391"/>
         <source>Golf</source>
-        <translation type="unfinished"></translation>
+        <translation>Golf</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1392"/>
         <source>Government</source>
-        <translation type="unfinished"></translation>
+        <translation>Közigazgatás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1393"/>
         <source>Health</source>
-        <translation type="unfinished"></translation>
+        <translation>Egészség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1394"/>
         <source>High School</source>
-        <translation type="unfinished"></translation>
+        <translation>Középiskola</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1395"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>Történelem</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1396"/>
         <source>Hobby</source>
-        <translation type="unfinished"></translation>
+        <translation>Hobbi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1397"/>
         <source>Hockey</source>
-        <translation type="unfinished"></translation>
+        <translation>Jégkorong</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1398"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Otthon</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1399"/>
         <source>Horror</source>
-        <translation type="unfinished"></translation>
+        <translation>Horror</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1400"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Információ</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1401"/>
         <source>Instruction</source>
-        <translation type="unfinished"></translation>
+        <translation>Utasítás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1402"/>
         <source>International</source>
-        <translation type="unfinished"></translation>
+        <translation>Nemzetközi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1403"/>
         <source>Interview</source>
-        <translation type="unfinished"></translation>
+        <translation>Interjú</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1404"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3526"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyelvészet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1405"/>
         <source>Legal</source>
-        <translation type="unfinished"></translation>
+        <translation>Jogi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1406"/>
         <source>Live</source>
-        <translation type="unfinished"></translation>
+        <translation>Élet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1407"/>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation>Helyi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1408"/>
         <source>Math</source>
-        <translation type="unfinished"></translation>
+        <translation>Meccs</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1409"/>
         <source>Medical</source>
-        <translation type="unfinished"></translation>
+        <translation>Orvosi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1410"/>
         <source>Meeting</source>
-        <translation type="unfinished"></translation>
+        <translation>Találkozó</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1411"/>
         <source>Military</source>
-        <translation type="unfinished"></translation>
+        <translation>Katonai</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1412"/>
         <source>Miniseries</source>
-        <translation type="unfinished"></translation>
+        <translation>Rövidfilmek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1413"/>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenei</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1414"/>
         <source>Mystery</source>
-        <translation type="unfinished"></translation>
+        <translation>Misztikus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1415"/>
         <source>National</source>
-        <translation type="unfinished"></translation>
+        <translation>Nemzeti</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1416"/>
         <source>Nature</source>
-        <translation type="unfinished"></translation>
+        <translation>Természet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1417"/>
         <source>Police</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendőségi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1418"/>
         <source>Politics</source>
-        <translation type="unfinished"></translation>
+        <translation>Politikai</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1419"/>
         <source>Premiere</source>
-        <translation type="unfinished"></translation>
+        <translation>Premier</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1420"/>
@@ -6886,108 +6889,108 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1421"/>
         <source>Product</source>
-        <translation type="unfinished"></translation>
+        <translation>Termékbemutató</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1422"/>
         <source>Professional</source>
-        <translation type="unfinished"></translation>
+        <translation>Szakmai</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1423"/>
         <source>Public</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyilvános</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1424"/>
         <source>Racing</source>
-        <translation type="unfinished"></translation>
+        <translation>Verseny</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1425"/>
         <source>Reading</source>
-        <translation type="unfinished"></translation>
+        <translation>Olvasás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1426"/>
         <source>Repair</source>
-        <translation type="unfinished"></translation>
+        <translation>Javítás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1428"/>
         <source>Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Bemutató</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1429"/>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="281"/>
         <source>Romance</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerelmes</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1430"/>
         <source>Science</source>
-        <translation type="unfinished"></translation>
+        <translation>Tudományos</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1431"/>
         <source>Series</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorozat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1432"/>
         <source>Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Szolgátatás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1433"/>
         <source>Shopping</source>
-        <translation type="unfinished"></translation>
+        <translation>Vásárlás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1434"/>
         <source>Soap Opera</source>
-        <translation type="unfinished"></translation>
+        <translation>Szappanopera</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1435"/>
         <source>Special</source>
-        <translation type="unfinished"></translation>
+        <translation>Különleges</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1436"/>
         <source>Suspense</source>
-        <translation type="unfinished"></translation>
+        <translation>Felfüggesztés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1437"/>
         <source>Talk</source>
-        <translation type="unfinished"></translation>
+        <translation>Beszélgetős</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1438"/>
         <source>Technical</source>
-        <translation type="unfinished"></translation>
+        <translation>Technikai</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1439"/>
         <source>Tennis</source>
-        <translation type="unfinished"></translation>
+        <translation>Tenisz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1440"/>
         <source>Travel</source>
-        <translation type="unfinished"></translation>
+        <translation>Utazás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1441"/>
         <source>Variety</source>
-        <translation type="unfinished"></translation>
+        <translation>Válaszék</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1442"/>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1443"/>
@@ -6997,7 +7000,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1444"/>
         <source>Western</source>
-        <translation type="unfinished"></translation>
+        <translation>Vadnyugati</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroup.cpp" line="197"/>
@@ -7005,22 +7008,22 @@ You may have to use the eject button under its tray.</source>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1286"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1519"/>
         <source>All Channels</source>
-        <translation type="unfinished">Összes csatorna</translation>
+        <translation>Összes csatorna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="88"/>
         <source>Select/Unselect channels for this channel group</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna ki/be választása ebbe a csatorna csoportba</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="110"/>
         <source>Channel Group - Page </source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna csoport - lap</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="111"/>
         <source>of</source>
-        <translation type="unfinished"></translation>
+        <translation>ból</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="39"/>
@@ -7030,81 +7033,84 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1417"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1498"/>
         <source>Channel Importer</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna importáló</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="41"/>
         <source>Failed to find any new channels!</source>
-        <translation type="unfinished"></translation>
+        <translation>Meghiúsult az új csatorna keresése!</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="42"/>
         <source>Failed to find any channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Meghiúsult a csatornakeresés.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="164"/>
         <source>Found %1 off-air channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nem légi csatornát található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="242"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="247"/>
         <source>Found %1 unused transports.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 használaton kívüli adó található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="306"/>
         <source>Found %1 new non-conflicting %2 channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 új nem ütköző %2 csatona található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="298"/>
         <source>Found %1 old %2 channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 régi %2 csatorna található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="341"/>
         <source>Found %1 new conflicting %2 channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 új ütköző %2 csatorna található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="350"/>
         <source>Found %1 conflicting old %2 channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ütköző %2 régi csatorna található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1026"/>
         <source>Found %1 transports:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 átjátszó adó található:
+</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1027"/>
         <source>Channels: FTA Enc Dec
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornák: FTA Enc Dec
+</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1041"/>
         <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi: prog %1 atsc %2 atsc minor %3 csatornaszám %4
+</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1044"/>
         <source>Max atsc major count: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Max atsc major száma: %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1166"/>
         <source>Delete all</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes törlése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1167"/>
         <source>Set all invisible</source>
-        <translation type="unfinished"></translation>
+        <translation>Legyen az összes láthatatlan</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1169"/>
@@ -7112,45 +7118,45 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1288"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1315"/>
         <source>Ignore all</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes kihagyása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1229"/>
         <source>Insert all</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes beszúrása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1230"/>
         <source>Insert manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Kézi beszúrás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1286"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1311"/>
         <source>Update all</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes frissítése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1287"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1313"/>
         <source>Update manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Kézi frissítés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1309"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="1510"/>
         <source>Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szeretné:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1332"/>
         <source>Please enter either 1, 2, or 3:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem gépeljen 1,2 vagy 3-at:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1358"/>
         <source>Suggest</source>
-        <translation type="unfinished"></translation>
+        <translation>Felajánlás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1360"/>
@@ -7158,184 +7164,184 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1438"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1522"/>
         <source>Cancel All</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes eldobása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1402"/>
         <source>This channel &apos;%1&apos; was found to be in conflict with other channels. </source>
-        <translation type="unfinished"></translation>
+        <translation>Ezt a(z) &apos;%1&apos; csatornát találtam, mely más csatornával ütközik. </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1413"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1494"/>
         <source>Please enter a unique channel number. </source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem, adjon egy egyedi azonosító számot. </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1439"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1523"/>
         <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem, adjon egy nem ütköző csatornaszámot (vagy gépeljen %1-t az átlépéshez, %2-t az összes kihagyásához): </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1483"/>
         <source>You chose to manually insert this channel &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>A(z) &apos;%1&apos; csatorna kézi beszúrását választotta.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="233"/>
         <source>Updated Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 csatorna frissítve</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="258"/>
         <source>Added Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 csatorna hozzáadva</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="259"/>
         <source>Failed to add channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 csatorna hozzáadása meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="465"/>
         <source>%1 -- Testing decryption of program %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 -- %2 Műsor dekódolásának tesztelése </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="734"/>
         <source>Program %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 műsor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="735"/>
         <source>Unknown decryption status</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen dekódolási állapot</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="737"/>
         <source>Encrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Titkosított</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="739"/>
         <source>Decrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Felszabadított</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="774"/>
         <source>%1 -- Timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 -- lejárt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="796"/>
         <source>%1 possible channels</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 lehetséges csatorna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="797"/>
         <source>no channels</source>
-        <translation type="unfinished"></translation>
+        <translation>nincs csatorna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="808"/>
         <source>%1, no signal</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, nincs jel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="813"/>
         <source>%1 -- Found %2 probable channels</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 -- %2 tesztelt csatorna található</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="955"/>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1462"/>
         <source> offset %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 eltolás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1466"/>
         <source>Tuning to %1 mplexid(%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1-re hangolás, mplexid(%2)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1480"/>
         <source>: Found %1</source>
-        <translation type="unfinished"></translation>
+        <translation>: %1 találat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1695"/>
         <source>Frequency %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 frekvencia</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1758"/>
         <location filename="../libs/libmythtv/channelscan/multiplexsetting.cpp" line="71"/>
         <source>ATSC Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ATSC csatorna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1834"/>
         <source>as</source>
-        <translation type="unfinished"></translation>
+        <translation>mint</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1839"/>
         <source>Skipping %1, not in imported channel map</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 átlépése, nincs az importált csatorna térképen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="178"/>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="210"/>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet az adóra hangolni</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="223"/>
         <source>Programmer Error: Failed to handle tune complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Programozási hiba: meghiúsult a hangoló egység kezelése.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="256"/>
         <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; elemzése meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="259"/>
         <source>Failed to open &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; megnyitása meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="286"/>
         <source>Error starting scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a heresés elindításánál</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="307"/>
         <source>Programmer Error: No Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Programozási hiba: Nincs eszköz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="360"/>
         <source>Programmer Error: Channel not created</source>
-        <translation type="unfinished"></translation>
+        <translation>Programozási hiba: csatorna nem készült el</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="371"/>
         <source>Channel could not be opened.</source>
-        <translation type="unfinished"></translation>
+        <translation>A csatorna nem volt megnyitható.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="37"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="1308"/>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Sugárzás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="38"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="44"/>
         <source>Cable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kábel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="39"/>
@@ -7343,103 +7349,103 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="43"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="555"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Magas</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="40"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="45"/>
         <source>Cable HRC</source>
-        <translation type="unfinished"></translation>
+        <translation>Kábeles HRC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="42"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="46"/>
         <source>Cable IRC</source>
-        <translation type="unfinished"></translation>
+        <translation>Kábeles IRC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="48"/>
         <source>Frequency Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvencia tábla</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="49"/>
         <source>Frequency table to use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Használandó frekvencia tábla.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="50"/>
         <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
-        <translation type="unfinished"></translation>
+        <translation>A csak a magas frekvenciájú csatornák keresése hasznos, mivel a legtöbb digitális csatorna magasabb frekvencián található.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="79"/>
         <source>Australia</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausztrália</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="80"/>
         <source>Finland</source>
-        <translation type="unfinished"></translation>
+        <translation>Finnország</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="81"/>
         <source>Sweden</source>
-        <translation type="unfinished"></translation>
+        <translation>Svédország</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="82"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="101"/>
         <source>United Kingdom</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyesült Királyság</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="83"/>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="102"/>
         <source>Germany</source>
-        <translation type="unfinished"></translation>
+        <translation>Németország</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="84"/>
         <source>Spain</source>
-        <translation type="unfinished"></translation>
+        <translation>Spanyolország</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="85"/>
         <source>New Zealand</source>
-        <translation type="unfinished"></translation>
+        <translation>Új Zéland</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="86"/>
         <source>France</source>
-        <translation type="unfinished"></translation>
+        <translation>Franciaország</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="216"/>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="255"/>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation>A kártya tesztelése meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="220"/>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="253"/>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation>A kártya megnyitása meghiúsult</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="40"/>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornanév</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="50"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Csatora száma</translation>
+        <translation>Csatora száma</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="61"/>
         <source>Video Source</source>
-        <translation type="unfinished">Video forrás</translation>
+        <translation>Video forrás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="79"/>
@@ -7449,32 +7455,32 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="114"/>
         <source>Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Hívójel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="121"/>
         <source>TV Format</source>
-        <translation type="unfinished"></translation>
+        <translation>TV formátum</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="123"/>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha ez a csatorna más formátumot használ mint ami az általános háttér beállítási lapon szerepel, akkor azt itt állítsa be.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="162"/>
         <source>DataDirect</source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirect</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="162"/>
         <source>Time Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Időcsúsztatás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="163"/>
         <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csúsztatás (percben), mely a műsorfüzetre lesz alkalmazva importáláskor.  Ez akkor használatos, amikor a bizonyos csatornákat más időzóból sugároznak.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="167"/>
@@ -7484,52 +7490,52 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="178"/>
         <source>Priority</source>
-        <translation type="unfinished">Prioritás</translation>
+        <translation>Prioritás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="180"/>
         <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritási pontok, melyeket ezen a csatornán bármely felvételhez hozzá lehet adni ütemezéskor.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="182"/>
         <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Használjon pozitív számot prioritásnak, ha szerete előnyben részesíŧeni egy csatornát, vagy negatívot, ha inkább hátra sorolná.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="194"/>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="195"/>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
-        <translation type="unfinished"></translation>
+        <translation>Képfájl, mely ezen csatorna logojaként használható a különböző MythTV kijelzőkön.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="206"/>
         <source>Video filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó szűrők</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="207"/>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szűrők, melyeket erről a csatornáról való felvételéhez használhat.  Nem használható hardveres kódoló kártyákhoz.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="221"/>
         <source>Playback filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszási szűrő</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="222"/>
         <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szűrők melyek ezen csatorna felvételinek lejátszásakor használhatóak.  A globális szűrök elejéhez hozzácsatolódnak.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="236"/>
         <source>XMLTV ID</source>
-        <translation type="unfinished">XMLTV ID</translation>
+        <translation>XMLTV ID</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="237"/>
@@ -7540,12 +7546,12 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="251"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="407"/>
         <source>Commercial Flagging Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámjelölő eljárás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="252"/>
         <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
-        <translation type="unfinished"></translation>
+        <translation>A reklámfelderítési eljárás megváltoztatása, melyet az adott csatorna felvételeinek vagy az átlépések megjelölésére használhat a reklámmentesítéshez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="272"/>
@@ -7555,93 +7561,93 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="273"/>
         <source>If set, the channel will be visible in the EPG.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve a csatorna látható lesz az EPG-ben.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="284"/>
         <source>Use on air guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Használjon sugárzott műsorfüzetet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="285"/>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve a műsorinformációk a sugárzott műsorújságból lesznek megjelenítve.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="300"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="447"/>
         <source>Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvencia</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="300"/>
         <source>or</source>
-        <translation type="unfinished"></translation>
+        <translation>vagy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="301"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="302"/>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Meghatározhat egy frekvenciát kHz-ben vag egy érvényes csatornát a &apos;TV formátumhoz&apos;.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="315"/>
         <source>Finetune</source>
-        <translation type="unfinished"></translation>
+        <translation>Finomhangolás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="316"/>
         <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hozzáadott érték, melyet kHz-ben kell megadni a finomhangoláshoz.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="328"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="277"/>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontraszt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="339"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="275"/>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Fényerősség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="350"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="279"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Szín</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="360"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="281"/>
         <source>Hue</source>
-        <translation type="unfinished"></translation>
+        <translation>Színárnyalat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="368"/>
         <source>Channel Options - Common</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna opciók - Közös</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="469"/>
         <source>Channel Options - Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna opciók - Szűrők</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="479"/>
         <source>Channel Options - Video 4 Linux</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna opciók - Video 4 Linux</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelutil.cpp" line="1237"/>
         <source>UNKNOWN</source>
         <comment>Synthesized callsign</comment>
-        <translation type="unfinished"></translation>
+        <translation>ISMERETLEN</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dtvsignalmonitor.cpp" line="28"/>
@@ -7652,7 +7658,7 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/dtvsignalmonitor.cpp" line="33"/>
         <location filename="../libs/libmythtv/dtvsignalmonitor.cpp" line="34"/>
         <source>Seen</source>
-        <translation type="unfinished"></translation>
+        <translation>Látott</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dtvsignalmonitor.cpp" line="35"/>
@@ -7663,82 +7669,82 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/dtvsignalmonitor.cpp" line="40"/>
         <location filename="../libs/libmythtv/dtvsignalmonitor.cpp" line="41"/>
         <source>Matching</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyezik</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dvbsignalmonitor.cpp" line="48"/>
         <source>Signal To Noise</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeltől zajig</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dvbsignalmonitor.cpp" line="50"/>
         <source>Bit Error Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Bit hiba arány</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dvbsignalmonitor.cpp" line="52"/>
         <source>Uncorrected Blocks</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem javitott blokkok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dvbsignalmonitor.cpp" line="54"/>
         <source>Rotor Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor folyamat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/dvbsignalmonitor.cpp" line="218"/>
         <source>Error: stream handler died</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba: a folyamkezelő meghalt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="124"/>
         <source>Downloading Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszólista letöltése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="139"/>
         <source>Processing Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszólista készítése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="146"/>
         <source>Adding Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna hozzáadása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="154"/>
         <source>Channel #%1 : %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna #%1 : %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="162"/>
         <source>Adding %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 hozzáadása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="175"/>
         <source>Updating %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 frissítése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="188"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Kész</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="294"/>
         <source>ERROR: M3U channel list is malformed</source>
-        <translation type="unfinished"></translation>
+        <translation>HIBA: M3U csatona lista hibás formátumú</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="320"/>
         <source>Encountered malformed channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Megszámlált hibásan formázott csatorna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/iptv/iptvchannelfetcher.cpp" line="325"/>
         <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna elemzés #%1 : %2 : %3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="111"/>
@@ -7756,59 +7762,59 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="77"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="532"/>
         <source>Analog</source>
-        <translation type="unfinished"></translation>
+        <translation>Ananlóg</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="112"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="192"/>
         <source>SCTE mode 1</source>
-        <translation type="unfinished"></translation>
+        <translation>SCTE 1 mód</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="112"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="192"/>
         <source>SCTE mode 2</source>
-        <translation type="unfinished"></translation>
+        <translation>SCTE 2 mód</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="113"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="193"/>
         <source>ATSC 8-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 8-VSB</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="113"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="193"/>
         <source>ATSC 16-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 16-VSB</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="119"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="198"/>
         <source>ATSC TV</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC TV</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="119"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="198"/>
         <source>ATSC Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Hang</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="120"/>
         <location filename="../libs/libmythtv/mpeg/atsctables.cpp" line="199"/>
         <source>ATSC Data</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Adat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="271"/>
         <source>Detective/Thriller</source>
-        <translation type="unfinished"></translation>
+        <translation>Detektív / Thriller</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="273"/>
         <source>Adventure/Western/War</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaland/vadnyugat/háborús</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="275"/>
@@ -7829,17 +7835,17 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="285"/>
         <source>Adult</source>
         <comment>Adult Movie</comment>
-        <translation type="unfinished"></translation>
+        <translation>Felnőtt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="288"/>
         <source>News/weather report</source>
-        <translation type="unfinished"></translation>
+        <translation>Hírek/időjárás-jelentés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="289"/>
         <source>News magazine</source>
-        <translation type="unfinished"></translation>
+        <translation>Hírmagazin</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="291"/>
@@ -7864,37 +7870,37 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="300"/>
         <source>Special Events (World Cup, World Series..)</source>
-        <translation type="unfinished"></translation>
+        <translation>Különleges események (Világkupa, Világ sorozatok..)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="301"/>
         <source>Sports Magazines</source>
-        <translation type="unfinished"></translation>
+        <translation>Sport magazinok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="302"/>
         <source>Football (Soccer)</source>
-        <translation type="unfinished"></translation>
+        <translation>Foci</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="303"/>
         <source>Tennis/Squash</source>
-        <translation type="unfinished"></translation>
+        <translation>Tenisz / Squash</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="305"/>
         <source>Misc. Team Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyéb csoport sportok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="306"/>
         <source>Athletics</source>
-        <translation type="unfinished"></translation>
+        <translation>Atlétika</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="307"/>
         <source>Motor Sport</source>
-        <translation type="unfinished"></translation>
+        <translation>Motorsport</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="308"/>
@@ -7904,7 +7910,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="309"/>
         <source>Winter Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Téli sportok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="310"/>
@@ -7919,32 +7925,32 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="313"/>
         <source>Kids</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyermekműsorok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="314"/>
         <source>Pre-School Children&apos;s Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Iskolai előkészítő műsorok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="315"/>
         <source>Entertainment Programmes for 6 to 14</source>
-        <translation type="unfinished"></translation>
+        <translation>Szórakoztató műsor 6-14 éveseknek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="316"/>
         <source>Entertainment Programmes for 10 to 16</source>
-        <translation type="unfinished"></translation>
+        <translation>Szórakoztató műsor 10-16 éveseknek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="317"/>
         <source>Informational/Educational</source>
-        <translation type="unfinished"></translation>
+        <translation>Információs/oktató</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="318"/>
         <source>Cartoons/Puppets</source>
-        <translation type="unfinished"></translation>
+        <translation>Rajzfilm/bábfilm</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="320"/>
@@ -7954,12 +7960,12 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="321"/>
         <source>Rock/Pop</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="322"/>
         <source>Classical Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Klasszikus zene</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="323"/>
@@ -7974,7 +7980,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="325"/>
         <source>Musical/Opera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="326"/>
@@ -7984,7 +7990,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="328"/>
         <source>Arts/Culture</source>
-        <translation type="unfinished"></translation>
+        <translation>Művészet/kultúra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="329"/>
@@ -7994,12 +8000,12 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="330"/>
         <source>Fine Arts</source>
-        <translation type="unfinished"></translation>
+        <translation>Képzőművészet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="331"/>
         <source>Religion</source>
-        <translation type="unfinished"></translation>
+        <translation>Vallás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="332"/>
@@ -8014,7 +8020,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="334"/>
         <source>Film/Cinema</source>
-        <translation type="unfinished"></translation>
+        <translation>Film/mozi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="335"/>
@@ -8024,12 +8030,12 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="336"/>
         <source>Broadcasting/Press</source>
-        <translation type="unfinished"></translation>
+        <translation>Adás/nyomtatás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="337"/>
         <source>New Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Új média</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="338"/>
@@ -8094,22 +8100,22 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="353"/>
         <source>Languages</source>
-        <translation type="unfinished"></translation>
+        <translation>Nelvek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="355"/>
         <source>Leisure/Hobbies</source>
-        <translation type="unfinished"></translation>
+        <translation>Szabadidő/hobbi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="356"/>
         <source>Tourism/Travel</source>
-        <translation type="unfinished"></translation>
+        <translation>Turizmus/utazás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="357"/>
         <source>Handicraft</source>
-        <translation type="unfinished"></translation>
+        <translation>Kézműves</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="358"/>
@@ -8124,58 +8130,58 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="360"/>
         <source>Cooking</source>
-        <translation type="unfinished"></translation>
+        <translation>Főzés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="361"/>
         <source>Advertizement/Shopping</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklám/vásárlás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="362"/>
         <source>Gardening</source>
-        <translation type="unfinished"></translation>
+        <translation>Kertészet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="364"/>
         <source>Original Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Eredeti nyelv</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="365"/>
         <source>Black &amp; White</source>
-        <translation type="unfinished"></translation>
+        <translation>Fekete&amp;fehér</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="366"/>
         <source>&quot;Unpublished&quot; Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem nyilvános programok</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mpeg/dvbdescriptors.cpp" line="367"/>
         <source>Live Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Élő adás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/osdtypeteletext.cpp" line="1218"/>
         <source>Page Not Available</source>
         <comment>Requested Teletext page not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>Lap nem elérhető</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playercontext.cpp" line="833"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="43"/>
         <source>Title match (regex)</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím egyezés (regex)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="44"/>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatikus beállít új felvételi szabályt ehhez a csoporthoz, ha a cím egyezik az állandó kifejezéssel  Például, &quot;(News|CNN&quot;) egyezik bármely címmel, amiben a &quot;News&quot; vagy a &quot;CNN&quot; megjelenik.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="57"/>
@@ -8184,68 +8190,68 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/playgroup.cpp" line="98"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1804"/>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>alapértelmezett</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="59"/>
         <source>Skip ahead (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Léptetés előre (másodperc)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="60"/>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ennyi másodpercet lépjen előre gyorstekerésnél.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="73"/>
         <source>Skip back (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Visszalépés (másodperc)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="74"/>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ennyi másodpercet lépjen vissza visszaléptetéskor.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="87"/>
         <source>Jump amount (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugrás előre (percben)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="88"/>
         <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ennyi percet ugorjon előre vagy hátra, amikor az ugrás gombot megnyomják.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="102"/>
         <source>Time stretch (speed x 100)</source>
-        <translation type="unfinished"></translation>
+        <translation>Idő széthúzás (sebesség x 100)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="103"/>
         <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdeti lejátszási sebesség igazított hangal.  Használjon 100-at a normál sebességhez, 50-et a fél és 200-at a dupla sebességhez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="132"/>
         <source>Group</source>
         <comment>Play Group</comment>
-        <translation type="unfinished"></translation>
+        <translation>Csoport</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="53"/>
         <source>ProfileGroup</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilcsoport</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="109"/>
         <source>Transcoders</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolók</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="175"/>
         <source>New Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Új profilcsoport név</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="240"/>
@@ -8255,38 +8261,38 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="293"/>
         <source>Delete profile group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilcsoport törlése:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="299"/>
         <source>Yes, delete group</source>
-        <translation type="unfinished"></translation>
+        <translation>Igen, törlöm a csoportot</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.cpp" line="300"/>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem, mégsem törlöm a csoportot</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.h" line="57"/>
         <source>Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilcsoport név</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.h" line="80"/>
         <source>Card-Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kártya tipus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="79"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="474"/>
         <source>Codec</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="90"/>
         <source>MP3 Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>MP3 minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="92"/>
@@ -8302,27 +8308,27 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="107"/>
         <source>Recording volume of the capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>A vevőkártya felvételi hangereje</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="117"/>
         <source>Sampling rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Mintavételezési sebesség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="118"/>
         <source>Sets the audio sampling rate for your DSP. Ensure that you choose a sampling rate appropriate for your device.  btaudio may only allow 32000.</source>
-        <translation type="unfinished"></translation>
+        <translation>Itt beállíthatja a hang mintavételezési sebességet. Egyeztesse a kiválasztott sebességet a használt eszközzel.  A btaudio csak a 32000-et teszi lehetővé.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="181"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="198"/>
         <source>Sets the audio type</source>
-        <translation type="unfinished"></translation>
+        <translation>A hang tipusának beállítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="245"/>
@@ -8330,14 +8336,14 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="301"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="524"/>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitsebesség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="262"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="290"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="318"/>
         <source>Sets the audio bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>A hang bitsebességének beállítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="332"/>
@@ -8347,332 +8353,332 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="347"/>
         <source>Bitrate Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bisebesség beállítások</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="372"/>
         <source>SAP/Bilingual</source>
-        <translation type="unfinished"></translation>
+        <translation>SAP/kétnyelvű</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="374"/>
         <source>Main Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Fő nyelvezet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="375"/>
         <source>SAP Language</source>
-        <translation type="unfinished"></translation>
+        <translation>SAP nyelvezet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="376"/>
         <source>Dual</source>
-        <translation type="unfinished"></translation>
+        <translation>Kettős</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="379"/>
         <source>Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual).Requires ivtv 0.4.0 or later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Választhat nyelve(ke)t felvételre, amikor két nyelvet is sugároznak. Csak a Layer II támogatja a felvételekt két különbőöző nyelven (Kettős). ivtv 0.4.0 vagy későbbi szükséges.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="397"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="399"/>
         <source>Audio Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangminőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="485"/>
         <source>RTjpeg Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="487"/>
         <source>Higher is better quality.</source>
-        <translation type="unfinished"></translation>
+        <translation>A magasabb jobb minőséget eredményez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="498"/>
         <source>Luma filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Luma szűrő</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="500"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="513"/>
         <source>Lower is better.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az alacsonyabb jobb.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="511"/>
         <source>Chroma filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Chroma szűrő</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="526"/>
         <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitsebesség kilobit/másodperben.  2200Kbps átlagosan 1 Gigabájltot foglal el óránként.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="538"/>
         <source>Scale bitrate for frame size</source>
-        <translation type="unfinished"></translation>
+        <translation>Igazítsa a bitsebességet a képmérethez</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="540"/>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve a bitsebesség a 640x480-hoz lesz igazítva.  Más felbontás esetén a bitsebesség igazítva lesz a képmérethez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="553"/>
         <source>Minimum quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimális minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="555"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="569"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="584"/>
         <source>Modifying the default may have severe consequences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az alapértelmezett érték módosítása komoly következményekkel járhat.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="567"/>
         <source>Maximum quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximális minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="582"/>
         <source>Max quality difference between frames</source>
-        <translation type="unfinished"></translation>
+        <translation>Két képkocka közötti maximális minőségkülönbség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="596"/>
         <source>Enable interlaced DCT encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Váltottsoros DCT kódolás engedélyezése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="598"/>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve az MPEG4 kódoló váltottsoros DCT kódolást használ. Erre szükség lehet váltottsoros videó kódolásnál. Ettől sérülhet a felvétel.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="612"/>
         <source>Enable interlaced motion estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>A váltottsoros mozgás átlagolás engedélyezése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="614"/>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve az MPEG4 kódoló váltottsoros mozgás átlagolát végez. Erre szükség lehet a váltottsoros videók kódolásánál. Ettől sérülhet a felvétel.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="628"/>
         <source>Enable high-quality encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>A legmagasabb minőségű kódolás engedélyezése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="630"/>
         <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve az MPEG4 kódoló a kódolást a legmagasabb minőséen végzi.  Ehhez több számításra van szükség, de jobb minőségű videót eredményezhet.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="643"/>
         <source>Enable 4MV encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>4MV kódolás engedélyezése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="645"/>
         <source>If set, the MPEG4 encoder will use &apos;4MV&apos; motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelölve az MPEG4 kódoló 4MV tipusú mozgás vektor kódolást végez.  Ez számíŧásigényesebb feladat, de jobb minőségű videót kaphat eredményük. Különösen ajánlott a HQ opció engedélyezése a 4MV opció mellé.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="661"/>
         <source>Number of threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Szálak száma</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="664"/>
         <source>Threads to use for software encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szoftveres kódolás esetén a használt szálak száma.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="665"/>
         <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Állítsa az értéket kisebb vagy egyenlő értékre a processzor(magok) számával, ahol a háttérszerver a kódolást végzi.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="683"/>
         <source>Avg. Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Átl. bitsebesség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="686"/>
         <source>Average bit rate in kilobits/second. 2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Átlagos bitsebesség kilobit/másodperben.  2200Kbps átlagosan 1 Gigabájltot foglal el óránként.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="704"/>
         <source>Max. Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. bitsebesség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="707"/>
         <source>Maximum bit rate in kilobits/second. 2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximális bitsebesség kilobit/másodperben.  2200Kbps átlagosan 1 Gigabájltot foglal el óránként.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="719"/>
         <source>Stream Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatfolyam tipusa</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="731"/>
         <source>Sets the type of stream generated by your PVR.</source>
-        <translation type="unfinished"></translation>
+        <translation>Állítsa be az adatfolyam tipusát, melyet a PVR generál.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="743"/>
         <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Képarány</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="745"/>
         <source>Square</source>
-        <translation type="unfinished"></translation>
+        <translation>Négyszög</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="750"/>
         <source>Sets the aspect ratio of stream generated by your PVR.</source>
-        <translation type="unfinished"></translation>
+        <translation>Állítsa be az adatfolyam képarányát, melyet a PVR generál.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="762"/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="775"/>
         <source>Horizontal Decimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Vizszintes tizedelés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="790"/>
         <source>Vertical Decimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Fóggőleges tizedelés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="806"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="808"/>
         <source>Video Compression</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó tömörítés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="816"/>
         <source>RTjpeg Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg paraméterek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="824"/>
         <source>MPEG-4 Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-4 paraméterek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="848"/>
         <source>MPEG-2 Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-2 paraméterek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="862"/>
         <source>Hardware MJPEG Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Hardveres MJPEG paraméterek</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="870"/>
         <source>MPEG-2 Hardware Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-2 hardveres kódoló</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="879"/>
         <source>MPEG-4 AVC Hardware Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-4 AVC hardveres kódoló</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="882"/>
         <source>Low Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Alacsony felbontás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="890"/>
         <source>Medium Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Közepes felbontás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="898"/>
         <source>High Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Magas felbontás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="949"/>
         <source>Enable auto-transcode after recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel után automatikusan kódolja át</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="951"/>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatikus átkódolás, amikor egy felvétel elkészül, melyet ebben a profilban állított be és a felvétel ütemezésekor engedélyezte az átkódolást.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="964"/>
         <source>Resize Video while transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó átméretezése átkódoláskor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="966"/>
         <source>Allows the transcoder to resize the video during transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lehetővé teszi az átméretezést átkódolás közben.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="978"/>
         <source>Lossless transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Alacsony veszteségű átkódolás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="980"/>
         <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak a feltétlenül szükséges részt kódolja újra (normál esetben a vágáspontok körül)..Máskülönben megtartja az eredeti videót és hangot.  Ez eredményezheti a legjobb minőséget, de nem takarít meg vele több helyet.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="995"/>
         <source>Recording Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel tipusa</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="997"/>
         <source>This option allows you to filter out unwanted streams. &apos;Normal&apos; will record all relevant streams including interactive television data. &apos;TV Only&apos; will record only audio, video and subtitle streams. </source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az opció lehetővé teszt a szükségtelen adatfolyamok kiszűrését. A &apos;normál&apos; rögzíti az összes releváns adatfolyamot az interaktív adatokkal együtt. A &apos;Csak TV&apos; csak a hang, video és felirat folyamokat foja rögzíteni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1004"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normál</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1005"/>
         <source>TV Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak TV</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1006"/>
         <source>Audio Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak hang</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1018"/>
         <source>Custom Filters</source>
-        <translation type="unfinished">Egyéni szűrők</translation>
+        <translation>Egyéni szűrők</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1019"/>
         <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation type="unfinished"></translation>
+        <translation>Szűrők, melyeket ezen profilban az átkódoláshoz használhat. Ennek az értéknek üresnek kell lennie az alacsony veszteségű kódoláshoz.  Formátum: [[&lt;szűrő&gt;=&lt;opció&gt;,]...]</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1038"/>
@@ -8684,7 +8690,7 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="650"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="664"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1041"/>
@@ -8694,158 +8700,158 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1045"/>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha a szélességet &apos;Auto&apos;-ra állítja, akkor a szélesség a magasság alapján lesz kiszámítva.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1048"/>
         <source>Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szélesség a kódolához. Megj.: A PVR-x50 kártyák szellemképet idézhetnek elő ha nem 720-ra vagy 768-ra van állítva az NTSC-hez vagy a PAL-hoz.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1068"/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Magasság</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1072"/>
         <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha a magasságot &apos;Auto&apos;-ra állítja, akkor a magasság a szélesség alapján lesz kiszámítva.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1075"/>
         <source>Height to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 480 or 576 for NTSC and PAL, respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>Magasság a kódolához. Megj.: A PVR-x50 kártyák szellemképet idézhetnek elő ha nem 480-ra vagy 576-ra van állítva az NTSC-hez vagy a PAL-hoz.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1091"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1093"/>
         <source>Image size</source>
-        <translation type="unfinished"></translation>
+        <translation>Képméret</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1181"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1183"/>
         <source>Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1516"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2232"/>
         <source>Autodetect</source>
-        <translation type="unfinished">Auto felismerés</translation>
+        <translation>Auto felismerés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1531"/>
         <location filename="../programs/mythtranscode/transcode.cpp" line="280"/>
         <source>Autodetect from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto felismerés a(z) %1-ből</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1579"/>
         <source>Transcode using Autodetect</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolás auto felismerés használatval</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1592"/>
         <source>Transcode using &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Átkódolás a(z) &quot;%1&quot; használatával</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1598"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1614"/>
         <source>Record using the &quot;%1&quot; profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel a(z) &quot;%1&quot; profil használatával</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.h" line="68"/>
         <source>Profile name</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilnév</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="212"/>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="253"/>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="257"/>
         <source>Power Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Erőteljes keresés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="215"/>
         <source>Title Search</source>
-        <translation type="unfinished">Cím keresése</translation>
+        <translation>Cím keresése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="218"/>
         <source>Keyword Search</source>
-        <translation type="unfinished">Kulcsszó keresése</translation>
+        <translation>Kulcsszó keresése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="221"/>
         <source>People Search</source>
-        <translation type="unfinished">Személy keresése</translation>
+        <translation>Személy keresése</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="224"/>
         <source>Unknown Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Isemeretlen keresés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="480"/>
         <source>(%1 or later) %3</source>
         <comment>e.g. (Sunday or later) program subtitle</comment>
-        <translation type="unfinished"></translation>
+        <translation>(%1 vagy későbbi) %3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/signalmonitor.cpp" line="164"/>
         <location filename="../libs/libmythtv/signalmonitorvalue.cpp" line="25"/>
         <source>Signal Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelzár</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/signalmonitor.cpp" line="166"/>
         <source>Signal Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelerősség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/signalmonitorvalue.cpp" line="21"/>
         <source>Could not open tuner device</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehetett a vevőeszközt megnyitni</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/signalmonitorvalue.cpp" line="22"/>
         <source>Bad connection to backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Rossz a kapcsolat a háttérszerverrel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="89"/>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a szakasz kilistáz egy adót, melyről a MythTV-nek tudomása van. A megjelenített mezők a videó forrás, moduláció, frekvencia, valamint a lényeges szimbólikus sebesség, hálózati azonosító és adóazonosító.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="180"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="205"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="236"/>
         <source>Transport Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Adószerkesztő</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="181"/>
         <source>Sorry, the Transport Editor can only be used to edit transports which are connected to a card input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elnézést, az adószerkesztő csak a kártyabemenetre csatlakoztatott adók szerkesztésére használható.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="206"/>
         <source>Failed to probe a capture card connected to this transport&apos;s video source. Please make sure the backend is not running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Meghiúsult a videó forráshoz kapcsolt adóhoz tartozó vevőkártya tesztelése. Kérem, győzödjön meg arról, hogy a háttérszerver (backend) nem fut.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="237"/>
         <source>The Video Sources to which this Transport is connected are incompatible, please create seperate video sources for these cards. </source>
-        <translation type="unfinished"></translation>
+        <translation>A videó forrás, melyet a adóhoz használ, nem kompatibilis. Kérem készítsen egy különálló videó forrást ehhez a kártyához.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="422"/>
         <source>Digital TV Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>Digitális TV szabvány</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="423"/>
@@ -8855,74 +8861,76 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="428"/>
         <source>DVB</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="432"/>
         <source>ATSC</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="433"/>
         <source>OpenCable</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenCable</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="436"/>
         <source>MPEG</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="448"/>
         <source>Frequency (Option has no default).
 The frequency for this channel in</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvencia (Nincs alap érték).
+Ennek a csatornának a frekvenciája</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="460"/>
         <source>Symbol Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Szimbólikus sebesség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="462"/>
         <source>Symbol Rate (symbols/second).
 Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szimbólikus sebesség (szimbólum/másodperc).
+A legtöbb DVB adó 27.5 millió szimbólumot sugároz másodpercenként.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="481"/>
         <source>Polarity</source>
-        <translation type="unfinished"></translation>
+        <translation>Polaritás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="482"/>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Polaritás (Nincs alapérték)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="483"/>
         <source>Horizontal</source>
-        <translation type="unfinished"></translation>
+        <translation>Vizszintes</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="484"/>
         <source>Vertical</source>
-        <translation type="unfinished"></translation>
+        <translation>Függőleges</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="485"/>
         <source>Right Circular</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbra körkörös</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="486"/>
         <source>Left Circular</source>
-        <translation type="unfinished"></translation>
+        <translation>Balra körkörös</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="501"/>
         <source>Modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>Moduláció</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="502"/>
@@ -8932,43 +8940,44 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="511"/>
         <source>QAM Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>QAM Auto</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="543"/>
         <source>Inversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Inverzió</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="544"/>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inverzió (Alapérték: Auto):
+A legtöbb kártya kées automatikus felismerni, ezért hagyja &apos;Auto&apos;-n, amíg működik.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="559"/>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Sávszélesség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="560"/>
         <source>Bandwidth (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sávszélesség (Alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="562"/>
         <source>6 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>6 MHz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="563"/>
         <source>7 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>7 MHz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="564"/>
         <source>8 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation>8 MHz</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="575"/>
@@ -8978,77 +8987,77 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1631"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2193"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="595"/>
         <source>FEC</source>
-        <translation type="unfinished"></translation>
+        <translation>FEC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="596"/>
         <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Előre haladó hibakorrekció(FEC, alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="608"/>
         <source>LP Coderate</source>
-        <translation type="unfinished"></translation>
+        <translation>LP kódarány</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="609"/>
         <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alacsony prioritású kódarány (Alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="621"/>
         <source>HP Coderate</source>
-        <translation type="unfinished"></translation>
+        <translation>HP kódarány</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="622"/>
         <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Magas prioritású kódarány (Alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="632"/>
         <source>Guard Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Felügyeleti intervallum</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="633"/>
         <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Felügyeleti intervallum (Alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="648"/>
         <source>Trans. Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Átviteli mód</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="649"/>
         <source>Transmission Mode (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Átviteli mód (Alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="662"/>
         <source>Hierarchy</source>
-        <translation type="unfinished"></translation>
+        <translation>Felépítés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="663"/>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Felépítés (Alapérték: Auto)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="685"/>
         <source>Transport Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Adó opciók</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="758"/>
         <source>DVB Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB adó</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="57"/>
@@ -9058,33 +9067,33 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="58"/>
         <source>(REC)</source>
-        <translation type="unfinished"></translation>
+        <translation>(REC)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="72"/>
         <source>Adjust Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás igazítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="73"/>
         <location filename="../libs/libmythtv/tv.cpp" line="74"/>
         <source>Adjust Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítő igazítása</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="87"/>
         <source>Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-átlépés KI</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="88"/>
         <source>Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-átlépés BE</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="89"/>
         <source>Auto-Skip Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-átlépés értesítés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="882"/>
@@ -9109,135 +9118,136 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="1471"/>
         <source>MythTV wants to record these programs in %d seconds:</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV rögzíteni akarja a következő műsort %d másdopercen belül:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="1497"/>
         <source>&quot;%1&quot; on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; a(z) %2-n</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8234"/>
         <source>MythTV has was set to sleep for %1 minutes and will exit in %2 seconds.
 Do you wish to continue watching?</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV %1 perce elalvásra lett állítva és ki fog lépni %2 másodpercen belül.
+Szeretné folytatni a műsor nézését?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8280"/>
         <source>MythTV has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV %1 perce várakozik és ki fog lépni %2 másodpercen belül. Még mindig nézi a műsort?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9485"/>
         <source>UNKNOWN%1</source>
         <comment>Synthesized callsign</comment>
-        <translation type="unfinished"></translation>
+        <translation>ISMERETLEN%1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10950"/>
         <source>Channel Change Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornaváltási hiba</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_rec.cpp" line="3749"/>
         <source>On known multiplex...</source>
-        <translation type="unfinished"></translation>
+        <translation>Az ismert multiplexen...</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tvremoteutil.cpp" line="380"/>
         <source>Error querying recorder state</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba történt a rögzítő állapotának lekérdezésekor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="631"/>
         <source>Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>Szabvány</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="632"/>
         <source>libmpeg2</source>
-        <translation type="unfinished"></translation>
+        <translation>libmpeg2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="633"/>
         <source>Standard XvMC</source>
-        <translation type="unfinished"></translation>
+        <translation>Szabványos XvMC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="634"/>
         <source>VIA XvMC</source>
-        <translation type="unfinished"></translation>
+        <translation>VIA XvMC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="635"/>
         <source>Mac hardware acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac hardveres gyorsítás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="636"/>
         <source>PVR-350 decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 dekódoló</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="637"/>
         <source>NVidia VDPAU acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>NVidia VDPAU gyorsítás</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="652"/>
         <source>Decoder to use to play back MPEG2 video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dekóder, amelyet az MPEG2 videó lejátszásra használhat.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="660"/>
         <source>Standard will use ffmpeg library.</source>
-        <translation type="unfinished"></translation>
+        <translation>A szabványos az ffmpeg könyvtárat fogja használni.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="663"/>
         <source>libmpeg2 is slower on almost all processors than ffmpeg and breaks caption decoding. Use at your own risk!</source>
-        <translation type="unfinished"></translation>
+        <translation>A libmpeg2 lassabb szinte minden processzoron, mint az ffmpeg és megáll a felirat dekódolásánál. Csak saját felelősségére használja!</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="668"/>
         <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
-        <translation type="unfinished"></translation>
+        <translation>A szabványos XvMC az XvMC API 1.0-t használja a videók lejátszására; ez ugyan gyorsabb, de nem működik jól HDTV méretű képeknél.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="674"/>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
-        <translation type="unfinished"></translation>
+        <translation>A VIA XvMC a VIA VLD XvMC kitarjesztést használja.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="678"/>
         <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
-        <translation type="unfinished"></translation>
+        <translation>A Mac hardvere megpróbálja a grafikus processzort használni - ez a Mac lefagyásához vagy összeomlásához vezethet!</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="683"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3834"/>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and configured properly.</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV használhatja a PVR-350-es TV kimenetét és MPEG dekóderét a magas minőségű lejátszáshoz.  Ehhez az ivtv-fb-kernel modulnak betöltve és konfigurálva kell lennie.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="689"/>
         <source>VDPAU will attempt to use the graphics hardware to accelerate video decoding and playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>A VDPAU megpróbálja a grafikus hardvert használni a videó dekódolás és lejátszás gyorsításához.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="701"/>
         <source>Linear blend</source>
-        <translation type="unfinished"></translation>
+        <translation>Keverés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="703"/>
         <source>Kernel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="705"/>
         <source>Kernel (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (2x)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="707"/>
@@ -9252,228 +9262,228 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="711"/>
         <source>Yadif</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="713"/>
         <source>Yadif (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif (2x)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="715"/>
         <source>Bob (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="717"/>
         <source>One field</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy mező</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="719"/>
         <source>Interlaced (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Váltottsoros (2x)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="721"/>
         <source>Linear blend (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Keverés (HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="723"/>
         <source>Kernel (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="725"/>
         <source>Bob (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x, HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="727"/>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy mező (HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="729"/>
         <source>Kernel (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (2x, HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="731"/>
         <source>Linear blend (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Keverés (2x, HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="733"/>
         <source>Interlaced (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Váltottsoros (2x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="735"/>
         <source>Yadif (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif (2x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="737"/>
         <source>Yadif (Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif (Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="739"/>
         <source>One Field (1x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy mező (1x, HW)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="741"/>
         <source>Bob (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="743"/>
         <source>Temporal (1x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Átmeneti (1x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="745"/>
         <source>Temporal (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Átmeneti (2x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="747"/>
         <source>Advanced (1x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejlett (1x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="749"/>
         <source>Advanced (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejlett (2x, Hw)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1016"/>
         <source>CPU++</source>
         <comment>Sample: No hardware assist</comment>
-        <translation type="unfinished"></translation>
+        <translation>CPU++</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1026"/>
         <source>CPU+</source>
         <comment>Sample: Hardware assist HD only</comment>
-        <translation type="unfinished"></translation>
+        <translation>CPU+</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1045"/>
         <source>CPU--</source>
         <comment>Sample: Hardware assist all</comment>
-        <translation type="unfinished"></translation>
+        <translation>CPU--</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1067"/>
         <source>High Quality</source>
         <comment>Sample: high quality</comment>
-        <translation type="unfinished">Magas minőség</translation>
+        <translation>Magas minőség</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1083"/>
         <source>Normal</source>
         <comment>Sample: average quality</comment>
-        <translation type="unfinished"></translation>
+        <translation>Normál</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1099"/>
         <source>Slim</source>
         <comment>Sample: low CPU usage</comment>
-        <translation type="unfinished"></translation>
+        <translation>Vékony</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1138"/>
         <source>Video rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó renderelési metódus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1144"/>
         <source>Render video offscreen. Used internally.</source>
-        <translation type="unfinished"></translation>
+        <translation>A videó renderelése képernyőn kívül. Belsőleg használatos.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1148"/>
         <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
-        <translation type="unfinished"></translation>
+        <translation>X11 pixel másolást használ a videó rendereléshez. Nem ajánlott, amíg más opció elérhető. A videó nem lesz a képrenyő méretéhez skálázva. Ez az összes X11 szerverrel működik, helyben és távolin is.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1155"/>
         <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>X11 megosztott memória pixel átvitelt használ a videó rendereléshez. Ez csak az X11 pixel másoló renderer felett használható. A videó nem lesz a képrenyő méretéhez skálázva. Ez az összes X11 szerverrel működik, helyben és távolin is.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1162"/>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a szabványos videó renderer az X11-es rendszerekhez.  Ez XVideo hardveres rásegítést használ a skálázás, színegyensúly használatához, amennyiben a hardver segítséget nyújt a képvezérléshez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1168"/>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a szabványos videó renderer az XvMC dekóderekhez. Ez az XVideo hardveres rásegítést használja a skálázáshoz és a színegysúlyhoz és elérhetővé teszi az XVideo képvezérlést.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1174"/>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a videó renderer DirectFB-t használ a skálázáshoz és a színegyensúlyhoz. Ez nem olyan jellemző, mint amilyen a szabványos videó rendererben van, de a Linuxos hardveren X11 szerver nélkül is fut.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1180"/>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>A Windows videó renderer a Direct3D-n alapul. Ehhez egy Direct3D 9 kompatibilis kártya szükséges. Ez az előnyben részesített renderer a jelenlegi Windows rendszereken.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1186"/>
         <source>This is the standard video render for Macintosh OS X systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a szabványos videó renderer a Macintosh OS X rendszereken.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1190"/>
         <source>This is the only video renderer for the MacAccel decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az egyetlen videó renderer a MacAccel dekóderhez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1194"/>
         <source>This is only video renderer for the PVR-350 decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az egyetlen renderer a PVR-350-es dekóderhez.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1199"/>
         <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a videó renderer OpenGL-t használ a skálázáshoz és a színegyensúlyhoz, valamint korlátozott képvezérlésre ad lehetőséget. Ehhez gyorsabb GPU-ra van szükség, mint az XVideo-hoz. továbbá, engedélyezve több erőforrás szükséges.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1208"/>
         <source>This is the only video renderer for NVidia VDPAU decoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez az egyetlen videó renderer az NVidia VDPAU dekódoláshoz.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1243"/>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ehhez a váltottsor-megszűntetőhöz kétszeres képsebesség szükséges a videó forráshoz képest.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1248"/>
         <source>Perform no deinterlacing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem történik váltottsorosság megszüntetés.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1249"/>
         <source>Use this with an interlaced display whose resolution exactly matches the video size. This is incompatible with MythTV zoom modes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Használjon ezzel egy váltottsoros kijelzőt, aminek a felbontása pontosan megegyezik a videó méretével. Nem kompatibilis a MythTV nagyítójával.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1254"/>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak az egyik mező kerül a képkockából megjelenítésre. Ez jól nézhet ki, amikor gyors mozgású 1080i tipusú kép jelenik meg egy 720p tipusú kijelzőn.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1259"/>
         <source>Shows one field of the frame followed by the other field displaced vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak az egyik mező jelenik meg, melyet más, függőlegesen nem megjelenített mező követ.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1264"/>
@@ -14875,7 +14885,7 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="342"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="431"/>
         <source>Record anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítse egyébként</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="347"/>
@@ -14949,7 +14959,7 @@ Check if the video exists</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="216"/>
         <source>Power Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Erőteljes keresés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="219"/>
@@ -15002,102 +15012,107 @@ Check if the video exists</source>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="130"/>
         <source>%1 database schema is old. Waiting to see if DB is being upgraded.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 adatbázis séma elavult. Várakozás, ameddig az adatbázis frissítése befejeződik.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="197"/>
         <source>Exit</source>
-        <translation type="unfinished">Kilépés</translation>
+        <translation>Kilépés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="199"/>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>Frissítés</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="201"/>
         <source>Use current schema</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelenlegi téma használata</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="277"/>
         <source>There are also other clients using this database. They should be shut down first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Van még egy kliens, amely ezt az adatbázist használja. Előbb le kell azt állitani.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="280"/>
         <source>Error: This version of Myth%1 requires MySQL %2.%3.%4 or later.  You seem to be running MySQL version %5.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba: A Myth%1 ezen változata megköveteli a MySQL %2.%3.%4 vagy újabb jelenlétét.  Úgy túnik, hogy ön a MySQL %5 változatát futtatja.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="338"/>
         <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
 
 Please shut them down before upgrading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba: A MythTV nem tudja frissíteni az adatbázis sémát, mivel más kliens jelenleg hasznája azt.
+
+Kérem, zárja azt előbb be, mielőtt frissít.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="345"/>
         <source>Warning: MythTV wants to upgrade your database,</source>
-        <translation type="unfinished"></translation>
+        <translation>Figyelem: A MythTV fel fogja frissíteni az adatbázist,</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="346"/>
         <source>for the %1 schema, from %2 to %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 sémáról %3 sémára, a(z) %1 sémának.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="349"/>
         <source>You can try using the old schema, but that may cause problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Megpróbálhatja a régi sémát használni, de ez problémákat okozhat.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="360"/>
         <source>This version of MythTV requires an updated database. </source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV ezen verziójához frissített adatbázisra van szükség.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="361"/>
         <source>(schema is %1 versions behind)</source>
-        <translation type="unfinished"></translation>
+        <translation>(a séma %1 változattal korábbi)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="362"/>
         <source>Please run mythtv-setup or mythbackend to update your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem futtassa a mythtv-setup vagy mythbackend programot az adatbázis frissítéséhez.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="369"/>
         <source>Warning: MythTV database has newer %1 schema (%2) than expected (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>Figyelem: A MythTV adatbázis %1 újabb sémájú (%2), mint az elvárt (%3).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="373"/>
         <source>Error: MythTV database has newer %1 schema (%2) than expected (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba: A MythTV adatbázis %1 újabb sémájú (%2), mint az elvárt (%3).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="380"/>
         <source>MythTV was unable to backup your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV nem tudott biztonsági mentést készíteni az adatbázisról.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="387"/>
         <source>Database Host: %1
 Database Name: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Adatbázis gép: %1
+Adatbázis név: %2</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="417"/>
         <source>If your system becomes unstable, a database backup file called
 %1
 is located in %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha a rendszere instabillá válik, egy adatbázis biztonsági mentés, melyet
+%1-nek
+hívnak és a(z) %2 könyvtárban található</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="422"/>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezt nem lehetett véghezvinni, így az adatbázis biztonsági mentése lehet a jó megoldás.</translation>
     </message>
 </context>
 <context>
@@ -15185,377 +15200,377 @@ is located in %2</source>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="140"/>
         <source>Machine Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Gép állapot</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="144"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="331"/>
         <source>AutoExpire List</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-lejárati lista</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="197"/>
         <source>Acknowledge all log entries at this priority level or lower?</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyugtázza az összes naplóbejegyzést ezen vagy alacsonyabb prioritási szinten?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="213"/>
         <source>Setting priority level to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>A prioritási szint %1-re állítása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="262"/>
         <source>Acknowledge this log entry?</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyugtázza ezt a napló bejegyzést?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="282"/>
         <source>Delete Job?</source>
-        <translation type="unfinished"></translation>
+        <translation>Törli a feladatot?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="298"/>
         <source>Job Queue Actions:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezett feladat műveletek:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="311"/>
         <source>Resume</source>
-        <translation type="unfinished"></translation>
+        <translation>Tovább</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="313"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Szünet</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="314"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Megállít</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="315"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="358"/>
         <source>No Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs változás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="319"/>
         <source>Requeue Job?</source>
-        <translation type="unfinished"></translation>
+        <translation>Újraütemezi a feladatot?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="337"/>
         <source>AutoExpire Actions:</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-lejárati művelet:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="347"/>
         <source>Delete Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Törlés most</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="350"/>
         <source>Move to Default group</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozgassa az alapértelmezett csoportba</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="354"/>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>Visszaállítás</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="356"/>
         <source>Disable AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-lejárat tiltása</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="474"/>
         <source>Listings Status shows the latest status information from mythfilldatabase</source>
-        <translation type="unfinished"></translation>
+        <translation>Az állapot lista megmutatja a a mythfilldatabase legutóbbi állapotának információit</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="502"/>
         <source>Mythfrontend version: %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythfrontend változat: %1 (%2)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="504"/>
         <source>Last mythfilldatabase guide update:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythfilldatabase utoljára fissített:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="505"/>
         <source>Started:   %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdte:   %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="508"/>
         <source>Finished: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Befejezte: %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="510"/>
         <source>Result: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Eredmény: %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="514"/>
         <source>Suggested Next: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Javasolt következő: %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="520"/>
         <source>There&apos;s no guide data available!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs elérhető műsoradat!</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="521"/>
         <source>Have you run mythfilldatabase?</source>
-        <translation type="unfinished"></translation>
+        <translation>Lefuttatta a mythfilldatabase-t?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="525"/>
         <source>There is guide data until %1</source>
-        <translation type="unfinished"></translation>
+        <translation>A műsoradatok %1-ig elérhetőek</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="529"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n nap</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="533"/>
         <source>WARNING: is mythfilldatabase running?</source>
-        <translation type="unfinished"></translation>
+        <translation>FIGYELEM: a mythfilldatabase fut?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="537"/>
         <source>DataDirect Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirect állapot: </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="548"/>
         <source>Schedule Status shows current statistics from the scheduler.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az ütemezési állapot megmutatja az ütemező jelenlegi statisztikáit.</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="556"/>
         <source>%n standard rule(s) (is) defined</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n rendes szabály van definiálva</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="569"/>
         <source>%n search rule(s) are defined</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n keresőszabály van definiálva</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="629"/>
         <source>%n matching showing(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n műsorral egyezik</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="680"/>
         <source>marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>HDTV-nek jelölt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="689"/>
         <source>from source</source>
-        <translation type="unfinished"></translation>
+        <translation>forrásból</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="699"/>
         <source>on input</source>
-        <translation type="unfinished"></translation>
+        <translation>bemeneten</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="710"/>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
-        <translation type="unfinished"></translation>
+        <translation>A tuner állapot a háttérszerver vevőkártyáinak állapotáról ad információkat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="747"/>
         <source>is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>nem elérhető</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="749"/>
         <source>is asleep</source>
-        <translation type="unfinished"></translation>
+        <translation>alszik</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="754"/>
         <source>is watching live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>élő TV adást néz</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="757"/>
         <source>is recording</source>
-        <translation type="unfinished"></translation>
+        <translation>műsort rögzít</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="759"/>
         <source>is not recording</source>
-        <translation type="unfinished"></translation>
+        <translation>nem rögzít</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="761"/>
         <source>Tuner %1 %2 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuner %1 %2 %3</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="793"/>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>A naplóbejegyzések megmutatják a még olvasatlan bejegyzéseket, amennyiben a naplózás engedélyezve van</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="812"/>
         <source>On %1 %2 from %3.%4
 %5
 %6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="822"/>
         <source>On %1 %2 from %3.%4
 %5
 No other details</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="835"/>
         <source>No items found at priority level %1 or lower.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs a(z) %1 vagy alacsonyabb prioritási szinten tétel.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="837"/>
         <source>Use 1-8 to change priority level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Használja az 1-8 gombokat a prioritási szint változtatáshoz.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="847"/>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
-        <translation type="unfinished"></translation>
+        <translation>A feladatütemező megmutat bármely, a Myth-ben ütemezett feladatot, mint például a reklámjelölő feladat.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="878"/>
         <source>Job:</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladat:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="880"/>
         <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>Állapot:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="887"/>
         <source>Scheduled Run Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezett futási idő:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="906"/>
         <source>Job Queue is currently empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>A feladatütemező jelenleg üres.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1052"/>
         <source>average</source>
-        <translation type="unfinished"></translation>
+        <translation>átlagos</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1068"/>
         <source>maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>maximum</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1086"/>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>A gép állapota megmutat néhány operációs rendszer szintű statisztikát erről a gépről</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1089"/>
         <source>and the MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>és a MythTV szerver</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1099"/>
         <source>System:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszer:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1101"/>
         <source>This machine:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a gép:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1110"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1158"/>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Terhelés</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1113"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1117"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1168"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>ismeretlen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1113"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1117"/>
         <source>failed</source>
-        <translation type="unfinished"></translation>
+        <translation>meghiúsult</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1135"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1178"/>
         <source>RAM</source>
-        <translation type="unfinished"></translation>
+        <translation>RAM</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1141"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1186"/>
         <source>Swap</source>
-        <translation type="unfinished"></translation>
+        <translation>Swap</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1149"/>
         <source>MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV szerver</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1219"/>
         <source>Total Disk Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Teljes lemez tárterület:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1224"/>
         <source>MythTV Drive #%1:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV meghajtó #%1:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1231"/>
         <source>Directories:</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtárak:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1239"/>
         <source>Directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1262"/>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az auto-lejárati lista megmutatja az összes felvételt, mely lejáratható azok lejárati sorrendjében. A lista tetején lévő felvételek fognak először lejárni.</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1301"/>
@@ -16279,7 +16294,7 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9351"/>
         <source>Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Hívójel</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9352"/>
@@ -16577,42 +16592,42 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10454"/>
         <source>0.5X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10457"/>
         <source>0.9X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10460"/>
         <source>1.0X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10463"/>
         <source>1.1X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10466"/>
         <source>1.2X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10469"/>
         <source>1.3X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10472"/>
         <source>1.4X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10475"/>
         <source>1.5X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10496"/>
@@ -16635,7 +16650,7 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10508"/>
         <source>Video Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó megjelenítés</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10510"/>
@@ -16812,7 +16827,7 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11272"/>
         <source>Keep watching</source>
-        <translation type="unfinished"></translation>
+        <translation>Maradjon látható</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11321"/>
@@ -16880,7 +16895,7 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="149"/>
         <source>To schedule a recording, exit this screen and</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel ütemezéséhez lépjek ki ebből a lapból és</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="150"/>
@@ -16895,7 +16910,7 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="152"/>
         <source>The recording schedule would not be affected.</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvétel ütemezés nem lesz hatással.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="153"/>
@@ -17049,7 +17064,7 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="420"/>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a lap megmutatja a különböző rendszerösszetevők állapotát</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="410"/>
@@ -17099,782 +17114,782 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="2"/>
         <source>1. General</source>
-        <translation type="unfinished"></translation>
+        <translation>1. Általános</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="3"/>
         <source>2. Capture cards</source>
-        <translation type="unfinished"></translation>
+        <translation>2. Vevőkártyák</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="4"/>
         <source>3. Video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>3. Videó források</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="5"/>
         <source>4. Input connections</source>
-        <translation type="unfinished"></translation>
+        <translation>4. Bemeneti kapcsolatok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="6"/>
         <source>5. Channel Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>5. Csatorna szerkesztő</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="7"/>
         <source>6. Storage Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>6. Tároló könyvtárak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="8"/>
         <source>%alert_text%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="9"/>
         <source>LINE #%caller_line%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="10"/>
         <source>NAME: %caller_name%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="11"/>
         <source>NUM : %caller_number%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="12"/>
         <source>DATE: %caller_date% TIME : %caller_time%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="20"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Általános</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="21"/>
         <source>Core MythTV behavior and system settings</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV és a rendszerbeállítások magja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="22"/>
         <source>Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>Megjelenés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="23"/>
         <source>pick the theme, font, size, and locale</source>
-        <translation type="unfinished"></translation>
+        <translation>válasszon témát, betűtipust, méretet és helyet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="24"/>
         <source>Screen Setup Wizards</source>
-        <translation type="unfinished"></translation>
+        <translation>Képernyő beállítása varázsló</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="25"/>
         <source>Compensate for TVs with overscan</source>
-        <translation type="unfinished"></translation>
+        <translation>TV overscan ellensúlyozása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="26"/>
         <source>TV Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>TV beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="27"/>
         <source>Settings for TV recording and playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítások a TV műsor felvételhez és lejátszáshoz</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="28"/>
         <source>Music Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenei beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="29"/>
         <source>Configure playback and CD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>CD rippelés és lejátszás konfigurálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="30"/>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="31"/>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD ripperlés és lejátszás beállítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="32"/>
         <source>Radio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Rádió beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="33"/>
         <source>Images Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Képgaléria beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="34"/>
         <source>Configure display of image gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>A képgaléria megjelenésének beállításai</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="35"/>
         <source>Game Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Játék beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="36"/>
         <source>Configure playback of games</source>
-        <translation type="unfinished"></translation>
+        <translation>Játékok indításának konfigurálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="37"/>
         <source>Weather Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Időjárás-jelentés beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="38"/>
         <source>Weather locale and sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Időjárási helyek és források</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="39"/>
         <source>News Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Friss hírek beállíŧása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="40"/>
         <source>Choose which news sources interest you</source>
-        <translation type="unfinished"></translation>
+        <translation>Válassza ki az önt érdeklő hírforrást</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="41"/>
         <source>Web Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Web beállíŧások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="42"/>
         <source>Manage web bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Web könyvjelzők kezelése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="43"/>
         <source>Recipe Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Főzés recept beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="44"/>
         <source>Phone Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefon beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="45"/>
         <source>Configure SIP-based VoIP phone</source>
-        <translation type="unfinished"></translation>
+        <translation>SIP alapú VoIP telefon konfigurálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="46"/>
         <source>Movie Time Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Moziműsor beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="47"/>
         <source>Select local movie theaters</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon a helyi mozik közül</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="48"/>
         <source>Xbox Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Xbox beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="49"/>
         <source>NetFlix Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Netflix beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="50"/>
         <source>Choose the genres that interest you</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon az ont érdeklő műfaj közül</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="51"/>
         <source>Archive Files Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Arhív fájlok beállításai</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="52"/>
         <source>Configure how to archive video to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállíthatja, hogyan archíváljon DVD-re videófilmet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="53"/>
         <source>ZoneMinder Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ZoneMinder beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="54"/>
         <source>Set up surveillance software</source>
-        <translation type="unfinished"></translation>
+        <translation>Megfigyelő rendszer szoftver beállítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="55"/>
         <source>Watch Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételek megtekintése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="56"/>
         <source>Play Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételek lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="57"/>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished">Ütemezett felvételek</translation>
+        <translation>Ütemezett felvételek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="58"/>
         <source>See what will be recorded next</source>
-        <translation type="unfinished"></translation>
+        <translation>Megnézheti, mik lesznek legközelebb rögzítve</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="59"/>
         <source>Schedule Recordings</source>
-        <translation type="unfinished">Ütemezett felvételek</translation>
+        <translation>Ütemezett felvételek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="60"/>
         <source>Pick shows to record</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon rögzítendő műsort</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="61"/>
         <source>Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi prioritások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="62"/>
         <source>Prioritize some shows over others</source>
-        <translation type="unfinished"></translation>
+        <translation>Részesítsen előnyben néhány műsort másokkal szemben</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="63"/>
         <source>System Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszer állapot</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="64"/>
         <source>What your system is doing right now</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit csinál épp a rendszer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="65"/>
         <source>Utilities / Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök / Beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="66"/>
         <source>Settings for TV, Images, Music, Video, Weather, etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítások a TV, Képgaléria, Zene, Videó, időjáráshoz, stb.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="67"/>
         <source>Set Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi prioritás beállítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="68"/>
         <source>Settings to prioritize some shows over others</source>
-        <translation type="unfinished"></translation>
+        <translation>Előnyben részesíthet néhány műsort másokkal szemben</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="69"/>
         <source>Set Channel Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna felvételi prioritások beállítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="70"/>
         <source>Settings to prioritize some channels over others</source>
-        <translation type="unfinished"></translation>
+        <translation>Előnyben részesíthet néhány csatornát másokkal szemben</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="71"/>
         <source>Custom Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyéni prioritás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="72"/>
         <source>Most used DVR options are found on the main menu. Plugin options are in the utilities menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>A legtöbbször használt DVR opciók a főmenüben megtalálhatóak. A pluginok opciói az eszközök menüben találhatóak.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="73"/>
         <source>New Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Új címek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="74"/>
         <source>Pick a program to record for a list of new titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön ki rögzíŧendő műsort az új címek listázásához</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="75"/>
         <source>Movies</source>
-        <translation type="unfinished">Mozifilmek</translation>
+        <translation>Mozifilmek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="76"/>
         <source>Pick a movie to record</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön ki egy filmet rögzítésre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="77"/>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategóriák</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="78"/>
         <source>Pick a program based on category</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön ki egy műsort kategória alapján</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="79"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatornák</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="80"/>
         <source>Pick a program on a given channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön ki műsort egy bejövő csatornán</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="81"/>
         <source>Time</source>
-        <translation type="unfinished">Időrend</translation>
+        <translation>Időrend</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="82"/>
         <source>Pick a program based on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön ki műsort idő alapon</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="83"/>
         <source>Program Guide</source>
-        <translation type="unfinished">Műsorfüzet</translation>
+        <translation>Műsorfüzet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="84"/>
         <source>Choose programs from a grid-style list</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon műsort háló stílusú listából</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="85"/>
         <source>Program Finder</source>
-        <translation type="unfinished">Műsor kereső</translation>
+        <translation>Műsor kereső</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="86"/>
         <source>Choose programs from an alphabetical index</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon műsort abc indexból</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="87"/>
         <source>Search Words</source>
-        <translation type="unfinished"></translation>
+        <translation>Szókeresés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="88"/>
         <source>Find programs matching search words</source>
-        <translation type="unfinished"></translation>
+        <translation>Keressen műsort, mely a keresőszóval egyezik</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="89"/>
         <source>Search Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Kereső lista</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="90"/>
         <source>Pick a program to record from a set of lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön műsort rögzítésre listából</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="91"/>
         <source>Custom Record</source>
-        <translation type="unfinished">Egyéni felvétel</translation>
+        <translation>Egyéni felvétel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="92"/>
         <source>Advanced program finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejlett műsorkereső</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="93"/>
         <source>Manual Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Kézi ütemezés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="94"/>
         <source>VCR-like recording scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>VCR-hez hasonló felvétel ütemező</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="95"/>
         <source>Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Címek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="96"/>
         <source>Find a program based on title</source>
-        <translation type="unfinished"></translation>
+        <translation>Keressen műsort a címe alapján</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="97"/>
         <source>Keywords</source>
-        <translation type="unfinished"></translation>
+        <translation>Kulcsszavak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="98"/>
         <source>Find a program matching a keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>Keressen műsort kulcsszó egyeztetésével</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="99"/>
         <source>People</source>
-        <translation type="unfinished"></translation>
+        <translation>Szinészek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="100"/>
         <source>Find a program including a given person</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsor keresése adott személy figyelembevételével</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="101"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Továbbiak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="102"/>
         <source>Combine more than one word search</source>
-        <translation type="unfinished"></translation>
+        <translation>Kombináljon több mint egy keresőszót</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="103"/>
         <source>Stored Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Tárolt keresések</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="104"/>
         <source>Results of searches you have saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Korábban elmentett keresési eredmények</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="105"/>
         <source>TV navigation and recording preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>TV navigáció és felvételi beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="106"/>
         <source>Guide appearance and behavior</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsorfüzet megjelenése és viselkedése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="107"/>
         <source>Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="108"/>
         <source>Settings for viewing and playing TV</source>
-        <translation type="unfinished"></translation>
+        <translation>TV lejátszás és megjeleníŧés beállításai</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="109"/>
         <source>Playback OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD lejátszás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="110"/>
         <source>Theme and settings for OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD témaválasztás és beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="111"/>
         <source>OSD Menu Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD menü szerkesztő</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="112"/>
         <source>Playback Groups</source>
-        <translation type="unfinished">Lejátszási csoportok</translation>
+        <translation>Lejátszási csoportok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="113"/>
         <source>Adjust settings for different playback styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítások igazítása különböző lejátszási stílusokhoz</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="114"/>
         <source>Channel Groups</source>
-        <translation type="unfinished">Csatorna csoportok</translation>
+        <translation>Csatorna csoportok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="115"/>
         <source>Recording Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi profilok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="116"/>
         <source>Global recording priority and scheduling</source>
-        <translation type="unfinished"></translation>
+        <translation>Globális felvételi prioriás és ütemezés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="117"/>
         <source>Watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>TV nézés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="118"/>
         <source>Watch live television</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézze meg, mi megy a TV-ben</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="119"/>
         <source>Delete Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel törlése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="120"/>
         <source>Remove television recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>TV felvételek törlése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="121"/>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Korábbi felvételek</translation>
+        <translation>Korábbi felvételek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="122"/>
         <source>See what you have recorded before</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézze meg, mit rögzített korábban</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="123"/>
         <source>TV Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>TV eszközök</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="124"/>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Zene</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="125"/>
         <source>Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="126"/>
         <source>Radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Rádió</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="127"/>
         <source>Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Képgaléria</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="128"/>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Játékok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="129"/>
         <source>Weather</source>
-        <translation type="unfinished">Időjárás</translation>
+        <translation>Időjárás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="130"/>
         <source>News Feeds</source>
-        <translation type="unfinished"></translation>
+        <translation>Friss hírek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="131"/>
         <source>Web</source>
-        <translation type="unfinished"></translation>
+        <translation>Web</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="132"/>
         <source>Phone</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefon</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="133"/>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD írás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="134"/>
         <source>Recipes</source>
-        <translation type="unfinished"></translation>
+        <translation>Receptek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="135"/>
         <source>Archive Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Archívált fájlok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="136"/>
         <source>Zone Minder</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone Minder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="137"/>
         <source>Movie Times</source>
-        <translation type="unfinished"></translation>
+        <translation>Moziműsor</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="138"/>
         <source>NetFlix</source>
-        <translation type="unfinished"></translation>
+        <translation>NetFlix</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="139"/>
         <source>Edit Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Billenyűk szerkesztése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="140"/>
         <source>Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="141"/>
         <source>A blue theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy kék téma.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="142"/>
         <source>%SUBTITLE|&quot;|&quot;%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="143"/>
         <source>%STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="147"/>
         <source>%SUBTITLE|&quot;|&quot; %%STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="162"/>
         <source>[</source>
-        <translation type="unfinished"></translation>
+        <translation>[</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="163"/>
         <source>]</source>
-        <translation type="unfinished"></translation>
+        <translation>]</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="164"/>
         <source>]  =</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="178"/>
         <source>No listings found for this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs mit listázni ehhez a műsorhoz.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="182"/>
         <source>Show:  (1) All  (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Mutat:  (1) Mindent  () Fontosakat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="183"/>
         <source>(1) Sort by Title  (2) Sort by Priority  (4) Sort by Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Rendezés cím szerint  (2) Rendezése prioritás szerint  (4) Rendezés tipus alapján</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="184"/>
         <source>] =</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="185"/>
         <source>%SUBTITLE|&quot;|&quot;% %STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="186"/>
         <source>(4) Program Guide  (6) Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>(4) Műsorfüzet  (6) Műsorkereső</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="187"/>
         <source>Select a letter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon billentyűt.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="188"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon betűt, mely a műsort elindítja, azután nyomjon VÁLASZT gombot vagy jobbra nyilat.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="189"/>
         <source>Select a program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon műsor.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="190"/>
         <source>No Programs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs műsor.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="191"/>
         <source>(1) Sort by Time    (2) Sort by Title</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Időrend szerint    (2) Rendezés cím szerint</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="192"/>
         <source>Heading</source>
-        <translation type="unfinished"></translation>
+        <translation>Keresés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="193"/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégse</translation>
+        <translation>Mégse</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="194"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="195"/>
         <source>0%</source>
-        <translation type="unfinished"></translation>
+        <translation>0%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="196"/>
         <source>Playback starting ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás indul...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="197"/>
         <source>Icon Importer</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon importáló</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="198"/>
@@ -17884,182 +17899,182 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="199"/>
         <source>Search</source>
-        <translation type="unfinished">Keresés</translation>
+        <translation>Keresés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="200"/>
         <source>Skip</source>
-        <translation type="unfinished">Átlép</translation>
+        <translation>Átlép</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="201"/>
         <source>Channel Editor</source>
-        <translation type="unfinished">Csatorna szerkesztő</translation>
+        <translation>Csatorna szerkesztő</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="202"/>
         <source>List Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciók listázása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="203"/>
         <source>Sort By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorbarendezés:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="204"/>
         <source>Hide Channels without channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejtse el a számozás nélküli csatornákat.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="205"/>
         <source>Delete All</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes törlése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="206"/>
         <source>Global Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Globális opciók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="207"/>
         <source>Channel Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna keresés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="208"/>
         <source>Icon Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon letöltése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="209"/>
         <source>Edit Transports</source>
-        <translation type="unfinished"></translation>
+        <translation>Adó szerkesztése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="210"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Kész</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="211"/>
         <source>Play Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Játék indítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="212"/>
         <source>System:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszer:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="213"/>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Év:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="214"/>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Műfaj:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="215"/>
         <source>Favorite:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kedvenc:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="216"/>
         <source>Yes</source>
-        <translation type="unfinished">Igen</translation>
+        <translation>Igen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="217"/>
         <source>No</source>
-        <translation type="unfinished">Nem</translation>
+        <translation>Nem</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="218"/>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>Televízió</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="219"/>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Főmenü</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="220"/>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galéria</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="221"/>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="222"/>
         <source>Programme Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Műsorok keresése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="223"/>
         <source>CD/DVD Options</source>
-        <translation type="unfinished"></translation>
+        <translation>CD/DVD opciók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="224"/>
         <source>Media Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Média könyvtár</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="225"/>
         <source>Info Centre</source>
-        <translation type="unfinished"></translation>
+        <translation>Info központ</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="226"/>
         <source>P</source>
-        <translation type="unfinished"></translation>
+        <translation>P</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="227"/>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="228"/>
         <source>Playing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="229"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="230"/>
         <source>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="231"/>
         <source>Change Displayed Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Megjelenített csoport váltása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="232"/>
         <source>Show Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Címek mutatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="233"/>
         <source>Show Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategóriák mutatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="234"/>
         <source>Show Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi csoport mutatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="235"/>
@@ -18069,178 +18084,179 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="236"/>
         <source>Show Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Keresések mutatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="237"/>
         <source>Show LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Élő TV adás mutatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="238"/>
         <source>Show Watched Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Látott felvételek mutatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="239"/>
         <source>Save</source>
-        <translation type="unfinished">Mentés</translation>
+        <translation>Mentés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="240"/>
         <source>Change Recording Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi csoport jelszó megváltoztatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="241"/>
         <source>Old Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Régi jelszó</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="242"/>
         <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Új jelszó:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="243"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="244"/>
         <source>Edit Recording Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi meta adatok szerkesztése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="245"/>
         <source>Title</source>
-        <translation type="unfinished">Cím</translation>
+        <translation>Cím</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="246"/>
         <source>Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Alcím</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="247"/>
         <source>Manual Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Kézi felvételi ütemezés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="248"/>
         <source>Title (Optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím (Opcionális):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="249"/>
         <source>Date, or day of week:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dátum, vagy a hét napja:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="250"/>
         <source>Start Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdési idő:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="251"/>
         <source>Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>Óra</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="252"/>
         <source>Minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Perc</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="253"/>
         <source>Duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Időtartam:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="254"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Következő</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="255"/>
         <source>Scheduled Recordings</source>
-        <translation type="unfinished">Ütemezett felvételek</translation>
+        <translation>Ütemezett felvételek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="256"/>
         <source>Schedules Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezések áttekintése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="257"/>
         <source>First Conflict:</source>
-        <translation type="unfinished"></translation>
+        <translation>Első ütközés:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="258"/>
         <source>Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szűrő:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="259"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyetlen műsor sincs felvételre ütemezve
+ Felvétel ütemezéséhez lépje ki ebből lapból és válassza a műsorfüzetet vagy a műsorkeresőt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="260"/>
         <source>Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hívójel:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="261"/>
         <source>(1) Channel (2) Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Csatorna (2) Prioritás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="262"/>
         <source>Schedule Priorities</source>
-        <translation type="unfinished">Prioritások ütemezése</translation>
+        <translation>Prioritások ütemezése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="263"/>
         <source>Final</source>
-        <translation type="unfinished"></translation>
+        <translation>Utolsó</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="264"/>
         <source>Type Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritás bevitele:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="265"/>
         <source>Final Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Utolsó prioritás:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="266"/>
         <source>(1) Title (2) Priority (4) Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Cím (2) Prioritás (4) Tipus</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="267"/>
         <source>Custom Priority Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi prioritási szabályok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="268"/>
         <source>Existing Rules:</source>
-        <translation type="unfinished"></translation>
+        <translation>Meglévő szabályok:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="269"/>
         <source>Rule Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szabály neve:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="270"/>
         <source>Priority Change:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriás változás:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="271"/>
@@ -18255,231 +18271,231 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="273"/>
         <source>Delete</source>
-        <translation type="unfinished">Töröl</translation>
+        <translation>Töröl</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="274"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Tesztelés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="275"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>Telepítés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="276"/>
         <source>Phrase</source>
-        <translation type="unfinished">Mondat</translation>
+        <translation>Mondat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="277"/>
         <source>Select Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Idő választás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="278"/>
         <source>Select Search</source>
-        <translation type="unfinished">Keresés válaszása</translation>
+        <translation>Keresés válaszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="279"/>
         <source>Edit Power Search Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Erőteljes keresőmező szerkesztése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="280"/>
         <source>Optional title phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcionális cím mondat:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="281"/>
         <source>Optional subtitle phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcionális alcím mondat:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="282"/>
         <source>Optional description phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcionális leírás mondat:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="283"/>
         <source>List Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Áttekintés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="284"/>
         <source>Current View:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelenlegi nézet:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="285"/>
         <source>Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozició:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="287"/>
         <source>Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerkesztések ütemezése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="288"/>
         <source>Rule Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Szabályok áttekintése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="289"/>
         <source>Select the recording rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi szabály választása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="290"/>
         <source>Schedule Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezési opciók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="291"/>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló opciók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="292"/>
         <source>Post Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Utófeldolgozás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="293"/>
         <source>Schedule Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezés info</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="294"/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Előnézet</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="295"/>
         <source>Reduce priority by %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Csökkentse a prioritást %n-el</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="296"/>
         <source>Normal recording priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Normál felvételi prioritás</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="297"/>
         <source>Raise priority by %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Növelje a prioritást %n-el</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="298"/>
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>A felvétel indítása %n percel később</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="299"/>
         <source>Start recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel indítása időben</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="300"/>
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>A felvétel indítása %n percel korábban</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="301"/>
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>A felvétel befejezése %n percel korábban</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="302"/>
         <source>End recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel befejezése időben</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="303"/>
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>A felvétel befejezése %n percel később</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="304"/>
         <source>Recording Rule Active</source>
-        <translation type="unfinished"></translation>
+        <translation>A felvételi szabály aktív</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="305"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Vissza</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="306"/>
         <source>No episode limit</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs epizód korlát</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="307"/>
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Tartsa meg a legtöbb %n epizódot</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="308"/>
         <source>Allow recordings to expire?</source>
-        <translation type="unfinished"></translation>
+        <translation>Engedélyezi a a felvételek lejáratását?</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="309"/>
         <source>Post-Processing Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Utófeldolgozási opciók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="310"/>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklámok jelölése az új felvételeken</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="311"/>
         <source>Transcode new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kódolja át az új felvételeket</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="312"/>
         <source>123</source>
-        <translation type="unfinished"></translation>
+        <translation>123</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="313"/>
         <source>Search For:</source>
-        <translation type="unfinished"></translation>
+        <translation>Keresse ezt:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="314"/>
         <source>%SUBTITLE|&quot;|&quot; %%REPEAT%%STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="315"/>
         <source>Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Keresési eredmények</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="316"/>
         <source>Cast Members</source>
-        <translation type="unfinished"></translation>
+        <translation>Tagkeresés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="317"/>
@@ -18489,52 +18505,52 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
         <source>Video List Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó lista szűrók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="319"/>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szövegszűrő:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="320"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategória</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="321"/>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Műfaj</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="322"/>
         <source>Country</source>
-        <translation type="unfinished">Ország</translation>
+        <translation>Ország</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="323"/>
         <source>Actor/Actress</source>
-        <translation type="unfinished"></translation>
+        <translation>Színész</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="324"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Év</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="325"/>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Futásidő</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="326"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói értékelés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="327"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="328"/>
@@ -18544,197 +18560,197 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="329"/>
         <source>Cover File</source>
-        <translation type="unfinished"></translation>
+        <translation>Boritó fájl</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="330"/>
         <source>Sort by</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorbarendezés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="331"/>
         <source>Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Látott</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="332"/>
         <source>Make default</source>
-        <translation type="unfinished"></translation>
+        <translation>Legyen alapértelmezett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="333"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó kezelő</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="334"/>
         <source>Director:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendező:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="335"/>
         <source>Parental:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="336"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Legalacsonyabb</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="337"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Alacsony</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="338"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Közepes</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="339"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Magas</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="340"/>
         <source>Rated:</source>
-        <translation type="unfinished"></translation>
+        <translation>Értékelve:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="341"/>
         <source>Browsable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészhető:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="342"/>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Futásidő:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="343"/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájlnév:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="344"/>
         <source>Cover File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Boritó fájl:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="345"/>
         <source>IMDB ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>IMDB ID:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="346"/>
         <source>Video Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó böngésző</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="347"/>
         <source>Videos - Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Videók - Galéria</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="348"/>
         <source>Videos - Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Videók - Fa struktúra</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="349"/>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyeleti szint</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="350"/>
         <source>Video File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó fájl társítás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="351"/>
         <source>Extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiterjesztés:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="352"/>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Parancs:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="353"/>
         <source>Use default player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Használjon alapértlemeztett lejátszót:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="354"/>
         <source>Ignore:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kihagy:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="355"/>
         <source>Edit Video Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó metaadat szerkesztése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="356"/>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cím:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="357"/>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alcím:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="358"/>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation>Évad:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="359"/>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Epizód:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="360"/>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategória:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="361"/>
         <source>Parental Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szülői felügyelet:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="362"/>
         <source>File to Always Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájl, melyet mindig következőként játszik:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="363"/>
         <source>Include while Browsing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Böngészés alattit beleértve:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="364"/>
         <source>Item has been Watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tétel megtekintve:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="365"/>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Boritórajz:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="366"/>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pillanatkép:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="367"/>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Banner:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="368"/>
@@ -18744,600 +18760,601 @@ Válasszon a jelenlegi felvételek közül</translation>
     <message>
         <location filename="../themes/themestrings.h" line="369"/>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bemutató:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="370"/>
         <source>Unique Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi lejátszó parancs:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="371"/>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendezte:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="372"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="373"/>
         <source>Change mythtv key bindings.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV billentyű hozzárendelés változtatása.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="374"/>
         <source>MythStream Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythStream beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="375"/>
         <source>Weather Station Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Időjárás állomás beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="376"/>
         <source>TV</source>
-        <translation type="unfinished"></translation>
+        <translation>TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="377"/>
         <source>Play Online Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Online folyam lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="378"/>
         <source>Weather Station</source>
-        <translation type="unfinished"></translation>
+        <translation>Időjárás-mérő állomás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="379"/>
         <source>A long menu which breaks down the options by their category. TV, Music, Video etc</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy hosszú menü, mely megáll a saját kategóriájánál. TV, Zene, Videó, stb</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="380"/>
         <source>Search Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Keresés listázása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="381"/>
         <source>Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi szabályok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="382"/>
         <source>Edit or delete any recording rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Bármely felvételi szabály szerkesztése vagy törlése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="383"/>
         <source>Play TV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>TV felvétel lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="384"/>
         <source>Appearance Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Megjelenítés varázsló</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="385"/>
         <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozgassa a kiválasztott nyilat a TV képernyő sarkához.  Nyomjon VÁLASZT gombot más nyilak szerkesztéshez.  Nyomjon MENÜ gombot az opciókhoz vagy ESC-t a kilépéshez.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="386"/>
         <source>1280 x 720</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="387"/>
         <source>0 x 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="388"/>
         <source>1 pixel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="389"/>
         <source>Up Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Felső szint</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="390"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="391"/>
         <source>Please Wait....</source>
-        <translation type="unfinished"></translation>
+        <translation>Kis türelmet...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="392"/>
         <source>Sort Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorbarendezés mód:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="393"/>
         <source>Video Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Video forrás:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="394"/>
         <source>Contexts</source>
-        <translation type="unfinished">Kifejezés</translation>
+        <translation>Kifejezés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="395"/>
         <source>Actions</source>
-        <translation type="unfinished">Műveletek</translation>
+        <translation>Műveletek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="396"/>
         <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="397"/>
         <source>Change View</source>
-        <translation type="unfinished">Nézet váltás</translation>
+        <translation>Nézet váltás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="398"/>
         <source>Show Watched Programs</source>
-        <translation type="unfinished"></translation>
+        <translation>Mutassa a már látott műsorokat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="399"/>
         <source>Old Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Régi jelszó:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="400"/>
         <source>Status Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Állapot ikonok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="401"/>
         <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="402"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="403"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyetlen műsor sincs felvételre ütemezve
+ Felvétel ütemezéséhez lépje ki ebből lapból és válassza a műsorfüzetet vagy a műsorkeresőt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="404"/>
         <source>Manage Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi szabályok kezelése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="405"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="406"/>
         <source>Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Utoljára rögzítve</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="407"/>
         <source>Recording Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi csoport:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="408"/>
         <source>Storage Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló csoport:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="409"/>
         <source>Recording Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételi profil:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="411"/>
         <source>Enter Search Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Keresett szöveg bevitele</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="412"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezárás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="413"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="414"/>
         <source>Custom Record Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi felvételi szabály</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="415"/>
         <source>Additional Tables:</source>
-        <translation type="unfinished"></translation>
+        <translation>További táblák:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="416"/>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="417"/>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Tároló</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="418"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="419"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Részletek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="421"/>
         <source>Run User Job #1</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói feladat #1 futtatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="422"/>
         <source>Run User job #2</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói feladat #2 futtatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="423"/>
         <source>Run User Job #3</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói feladat #3 futtatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="424"/>
         <source>Run User Job #4</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználói feladat #4 futtatása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="425"/>
         <source>Make or accept a VoIP call</source>
-        <translation type="unfinished"></translation>
+        <translation>Indítson vagy fogadjon VoIP hívást</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="426"/>
         <source>Keep up with the news</source>
-        <translation type="unfinished"></translation>
+        <translation>Legyen naprakész a hírekkel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="427"/>
         <source>See when local movies are playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekintse meg a helyi mozik kínálatát</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="428"/>
         <source>Local weather forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Helyi időjárás-jelentés</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="429"/>
         <source>Manage your NetFlix queue</source>
-        <translation type="unfinished"></translation>
+        <translation>NetFlix ütemezések kezelése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="430"/>
         <source>Browse the web</source>
-        <translation type="unfinished"></translation>
+        <translation>Web böngészése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="431"/>
         <source>Start cooking!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdjen el főzni!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="432"/>
         <source>Home surveillance</source>
-        <translation type="unfinished"></translation>
+        <translation>Házi megfigyelő rendszer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="433"/>
         <source>Hardware profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Hardver profil</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="434"/>
         <source>Tell us what hardware you have so we can support it</source>
-        <translation type="unfinished"></translation>
+        <translation>Mondja el nekünk, mely hardvert kéne támogatnunk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="435"/>
         <source>Play recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvétel lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="436"/>
         <source>Watch Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videózás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="437"/>
         <source>Play videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videók lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="438"/>
         <source>Listen to Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenehallgatás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="439"/>
         <source>Listen to the radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Rádió hallgatás</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="440"/>
         <source>Image Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Képgaléria</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="441"/>
         <source>Look at Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Nézegessen képeket</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="442"/>
         <source>Play video games</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó játékok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="443"/>
         <source>Media Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Média beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="444"/>
         <source>Settings for all non-TV media</source>
-        <translation type="unfinished"></translation>
+        <translation>Minden nem TV-s média beállítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="445"/>
         <source>Info Center Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Info központ beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="446"/>
         <source>Configure weather, news, movie info, web, and recipes</source>
-        <translation type="unfinished"></translation>
+        <translation>Időjárás, hírek, film info, web és recept beállítások</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="447"/>
         <source>Play any of your media</source>
-        <translation type="unfinished"></translation>
+        <translation>Bármely média lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="448"/>
         <source>Manage Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Felvételek kezelése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="449"/>
         <source>Pick and prioritize shows to record</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelöljön ki és priorizáljon műsort felvételre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="450"/>
         <source>Information Center</source>
-        <translation type="unfinished"></translation>
+        <translation>Információs központ</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="451"/>
         <source>Information and Communications</source>
-        <translation type="unfinished"></translation>
+        <translation>Információ és kommunikáció</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="452"/>
         <source>Optical Disks</source>
-        <translation type="unfinished"></translation>
+        <translation>Optikai lemez</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="453"/>
         <source>Play or import CDs and DVDs</source>
-        <translation type="unfinished"></translation>
+        <translation>CD és DVD importálása vagy lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="454"/>
         <source>Configure MythTV and plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>A MythTV és pluginok konfigurálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="455"/>
         <source>Set Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritások beállítása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="456"/>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="457"/>
         <source>Play the video on a movie DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó lejátszása film DVD-ről</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="458"/>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>VCD lejátszása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="459"/>
         <source>Play the video on a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó lejátszása VCD-ről</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="460"/>
         <source>Import DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD importálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="461"/>
         <source>Import video from a movie DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Film DVD importálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="462"/>
         <source>Write video to a data DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Írjon videót adat DVD-re</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="463"/>
         <source>Import CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD importálása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="464"/>
         <source>Import music from an audio CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Zene importálása zenei CD-ről</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="465"/>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Média kiadása</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="466"/>
         <source>Eject CD or DVD from drive</source>
-        <translation type="unfinished"></translation>
+        <translation>CD vagy DVD kiadása a meghajtóból</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="467"/>
         <source>Music Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenei eszközök</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="468"/>
         <source>Select, import, or play music</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenét választ, importál vagy lejátszik</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="469"/>
         <source>Scan for new videos, edit metadata, or delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Új videók keresése, metaadat szerkesztése vagy törlése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="470"/>
         <source>%SUBTITLE%%BR%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="471"/>
         <source>%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="472"/>
         <source>%STARTDATE%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="473"/>
         <source>Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Hívójel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="474"/>
         <source>Channel #</source>
-        <translation type="unfinished">Csatorna #</translation>
+        <translation>Csatorna #</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="475"/>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatorna név</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="476"/>
         <source>XMLTV ID</source>
-        <translation type="unfinished">XMLTV ID</translation>
+        <translation>XMLTV ID</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="477"/>
         <source>[P]robe</source>
-        <translation type="unfinished">[P]robe</translation>
+        <translation>[P]robe</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="478"/>
         <source>[O]k</source>
-        <translation type="unfinished">[O]k</translation>
+        <translation>[O]k</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="479"/>
         <source>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="480"/>
         <source>%CALLSIGN% - %CHANNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="481"/>
         <source>A simple transparent black and white theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy egyszerű, átlátszó fekete-fehér téma.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="482"/>
         <source>Play or import audio or video CDs or DVDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Importál vagy lejátszik videó CD-t vagy DVD-t</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="483"/>
         <source>Watch A DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD megtekintése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="484"/>
         <source>Watch Live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Élő TV adás megtekintése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="485"/>
         <source>Watch Online Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Online folyam megtekintése</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="486"/>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluginek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="487"/>
         <source>Other Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyéb pluginek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="488"/>
         <source>Advanced Options</source>
-        <translation type="unfinished"></translation>
+        <translation>További opciók</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="489"/>
         <source>A &quot;Media Center&quot; menu theme. This menu theme is basically meant to bring the common &quot;media player/DVR&quot; functionality to the forefront, organize the plugins, and to make some of myth&apos;s more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in &quot;Plugins.&quot; Puts all setup and scheduling in &quot;Advanced.&quot; The top two menu levels will seem new, the ones beneath Advanced-&gt;Setup are as in the default menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Egy &apos;Média Center&apos; menü téma. Ez a menü téma alapvetően egy közös média lejátszó/DVR (digitális videó rögzítő) funnkiókkal bír egy frontenden, beilleszt plugineket és jó néhány myth opciót, mely még kényelmesebbé, használhatóbbá teszi. Elsődlegesen a közös média tételek vannak a felső szinten ( felvételek, videók, TV, DVD, zene), megad minden információt a pluginekről a plugin menüben. Könnyen elvégezheti az összes beállítást és ütemezést. A két menü legfelső szintje lesz először látható, ezek egyike a Továbbiak-&gt;Beállítások az alapértelmezett menüben.</translation>
     </message>
 </context>
 <context>
