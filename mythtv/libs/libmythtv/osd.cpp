@@ -862,7 +862,8 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
         {
             MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
             if (dialog)
-                dialog->ResetButtons();
+                dialog->Reset();
+
             DialogSetText(text);
         }
     }

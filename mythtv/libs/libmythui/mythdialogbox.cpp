@@ -169,12 +169,6 @@ void MythDialogBox::AddButton(const QString &title, const char *slot,
         m_buttonList->SetItemCurrent(button);
 }
 
-void MythDialogBox::ResetButtons(void)
-{
-    if (m_buttonList)
-        m_buttonList->Reset();
-}
-
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))
