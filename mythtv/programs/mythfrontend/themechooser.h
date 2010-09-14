@@ -66,6 +66,7 @@ class ThemeChooser : public MythScreenType
     MythUIButtonList *m_themes;
     MythUIImage      *m_preview;
 
+    bool              m_fullPreviewShowing;
     MythUIStateType  *m_fullPreviewStateType;
     MythUIText       *m_fullScreenName;
     MythUIImage      *m_fullScreenPreview;

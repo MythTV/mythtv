@@ -69,6 +69,10 @@ class ThemeExtractThread : public QRunnable
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
                            const QString name) :
     MythScreenType(parent, name),
+    m_fullPreviewShowing(false),
+    m_fullPreviewStateType(NULL),
+    m_fullScreenName(NULL),
+    m_fullScreenPreview(NULL),
     m_includeDownloadableThemes(false),
     m_downloadTheme(NULL),
     m_downloadState(dsIdle),
@@ -99,8 +103,6 @@ bool ThemeChooser::Create(void)
 
     UIUtilW::Assign(this, m_preview, "preview");
     UIUtilW::Assign(this, m_fullPreviewStateType, "fullpreviewstate");
-    UIUtilW::Assign(this, m_fullScreenName, "fullscreenname");
-    UIUtilW::Assign(this, m_fullScreenPreview, "fullscreenpreview");
 
     if (m_fullPreviewStateType)
     {
@@ -379,9 +381,15 @@ void ThemeChooser::showPopupMenu(void)
 
     m_popupMenu->SetReturnEvent(this, "popupmenu");
 
-    if (m_fullScreenName && m_fullScreenPreview)
-        m_popupMenu->AddButton(tr("Toggle Fullscreen Preview"),
-                               SLOT(toggleFullscreenPreview()));
+    if (m_fullPreviewStateType)
+    {
+        if (m_fullPreviewShowing)
+            m_popupMenu->AddButton(tr("Hide Fullscreen Preview"),
+                                   SLOT(toggleFullscreenPreview()));
+        else
+            m_popupMenu->AddButton(tr("Show Fullscreen Preview"),
+                                   SLOT(toggleFullscreenPreview()));
+    }
 
     if (m_includeDownloadableThemes)
         m_popupMenu->AddButton(tr("Hide Downloadable Themes"),
@@ -435,8 +443,7 @@ bool ThemeChooser::keyPressEvent(QKeyEvent *event)
         else if (action == "DELETE")
             removeTheme();
         else if ((action == "ESCAPE") &&
-                 (m_fullScreenPreview) &&
-                 (!m_fullScreenPreview->GetFilename().isEmpty()))
+                 (m_fullPreviewShowing))
         {
             toggleFullscreenPreview();
         }
@@ -452,27 +459,37 @@ bool ThemeChooser::keyPressEvent(QKeyEvent *event)
 
 void ThemeChooser::toggleFullscreenPreview(void)
 {
-    if (m_fullScreenPreview && m_fullScreenName)
+    if (m_fullPreviewStateType)
     {
-        if (m_fullScreenPreview->GetFilename().isEmpty())
+        if (m_fullPreviewShowing)
+        {
+            if (m_fullScreenPreview)
+                m_fullScreenPreview->Reset();
+
+            if (m_fullScreenName)
+                m_fullScreenName->Reset();
+
+            m_fullPreviewStateType->Reset();
+            m_fullPreviewShowing = false;
+        }
+        else
         {
             MythUIButtonListItem *item = m_themes->GetItemCurrent();
             ThemeInfo *info = qVariantValue<ThemeInfo*>(item->GetData());
             if (info)
             {
-                m_fullScreenPreview->SetFilename(info->GetPreviewPath());
-                m_fullScreenPreview->Load();
-                m_fullScreenName->SetText(info->GetName());
-                if (m_fullPreviewStateType)
-                    m_fullPreviewStateType->DisplayState("fullscreen");
+                if (m_fullScreenPreview)
+                {
+                    m_fullScreenPreview->SetFilename(info->GetPreviewPath());
+                    m_fullScreenPreview->Load();
+                }
+
+                if (m_fullScreenName)
+                    m_fullScreenName->SetText(info->GetName());
+
+                m_fullPreviewStateType->DisplayState("fullscreen");
+                m_fullPreviewShowing = true;
             }
-        }
-        else
-        {
-            m_fullScreenPreview->Reset();
-            m_fullScreenName->Reset();
-            if (m_fullPreviewStateType)
-                m_fullPreviewStateType->Reset();
         }
     }
 }
@@ -530,16 +547,18 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
         m_preview->SetFilename(info->GetPreviewPath());
         m_preview->Load();
     }
-    if (m_fullScreenPreview && m_fullScreenName)
+    if (m_fullPreviewShowing && m_fullPreviewStateType)
     {
-        if (!m_fullScreenPreview->GetFilename().isEmpty())
+        if (m_fullScreenPreview)
         {
             if (!preview.exists())
                 m_fullScreenPreview->Reset();
             m_fullScreenPreview->SetFilename(info->GetPreviewPath());
             m_fullScreenPreview->Load();
-            m_fullScreenName->SetText(info->GetName());
         }
+
+        if (m_fullScreenName)
+            m_fullScreenName->SetText(info->GetName());
     }
 
     MythUIStateType *themeLocation =
