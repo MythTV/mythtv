@@ -4695,7 +4695,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 {
                     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
                     return;
-                } 
+                }
 
                 vol -= ctx->player->GetVolume();
                 vol = ctx->player->AdjustVolume(vol);
@@ -7125,6 +7125,7 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
+        osd->ResetWindow("osd_status");
         osd->SetValues("osd_status", info.values, timeout);
         osd->SetText("osd_status",   info.text, timeout);
         if (type != kOSDFunctionalType_Default)
@@ -10902,7 +10903,7 @@ void TV::FillOSDMenuJobs(const PlayerContext *ctx, OSD *osd,
         osd->DialogAddButton(tr("High Quality"),  "QUEUETRANSCODE_HIGH");
         osd->DialogAddButton(tr("Medium Quality"),"QUEUETRANSCODE_MEDIUM");
         osd->DialogAddButton(tr("Low Quality"),   "QUEUETRANSCODE_LOW");
-    }  
+    }
 }
 
 void TV::FillOSDMenuPlayback(const PlayerContext *ctx, OSD *osd,

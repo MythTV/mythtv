@@ -727,7 +727,7 @@ void OSD::ResetWindow(const QString &window)
     if (!m_Children.contains(window))
         return;
 
-    m_Children.value(window)->DeleteAllChildren();
+    m_Children.value(window)->Reset();
 }
 
 void OSD::PositionWindow(MythScreenType *window)
