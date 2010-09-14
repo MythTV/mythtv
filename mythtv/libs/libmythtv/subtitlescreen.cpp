@@ -565,13 +565,12 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
         return;
     }
 
-    QFontMetrics font(*(gTextSubFont->GetFace()));
-
     vector<CC608Text*>::iterator i = textlist->buffers.begin();
     bool teletextmode = (*i)->teletextmode;
     int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
     gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / (yscale * 1.2));
+    QFontMetrics font(*(gTextSubFont->GetFace()));
     QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
 
     for (; i != textlist->buffers.end(); i++)
