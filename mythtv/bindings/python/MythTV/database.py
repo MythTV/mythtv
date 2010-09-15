@@ -654,7 +654,6 @@ class DBDataCRef( DBDataRef ):
         diff = self^self._origdata
         if len(diff) == 0:
             return
-        c = self._db.cursor()
 
         with self._db as cursor:
             # add new cross-references
