@@ -10,7 +10,7 @@ trans.files += mythgame_nl.qm mythgame_de.qm mythgame_da.qm
 trans.files += mythgame_pt.qm mythgame_sv.qm mythgame_sl.qm
 trans.files += mythgame_fr.qm mythgame_fi.qm mythgame_et.qm
 trans.files += mythgame_nb.qm mythgame_hu.qm mythgame_en_gb.qm
-trans.files += mythgame_en_us.qm
+trans.files += mythgame_ru.qm mythgame_en_us.qm 
 
 INSTALLS += trans
 

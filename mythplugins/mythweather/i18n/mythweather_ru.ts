@@ -322,7 +322,7 @@
     <message>
         <location filename="strings.h" line="40"/>
         <source>AM Showers</source>
-        <translation type="unfinished">Утром ливень</translation>
+        <translation>Утром ливень</translation>
     </message>
     <message>
         <location filename="strings.h" line="41"/>
@@ -337,12 +337,12 @@
     <message>
         <location filename="strings.h" line="43"/>
         <source>Mostly Sunny</source>
-        <translation type="unfinished">Обычно солнечно</translation>
+        <translation>Переменная облачность</translation>
     </message>
     <message>
         <location filename="strings.h" line="44"/>
         <source>Sunny</source>
-        <translation>Солнечно</translation>
+        <translation>Ясно</translation>
     </message>
     <message>
         <location filename="strings.h" line="45"/>
@@ -357,7 +357,7 @@
     <message>
         <location filename="strings.h" line="47"/>
         <source>Isolated T-Storms</source>
-        <translation type="unfinished">Местами грозы</translation>
+        <translation>Местами грозы</translation>
     </message>
     <message>
         <location filename="strings.h" line="48"/>
@@ -367,12 +367,12 @@
     <message>
         <location filename="strings.h" line="49"/>
         <source>PM Showers</source>
-        <translation type="unfinished">Вечером ливень</translation>
+        <translation>Вечером ливень</translation>
     </message>
     <message>
         <location filename="strings.h" line="50"/>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished">Вечером ливень/ветер</translation>
+        <translation>Вечером ливень/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="51"/>
@@ -397,7 +397,7 @@
     <message>
         <location filename="strings.h" line="55"/>
         <source>Mostly Cloudy/Windy</source>
-        <translation type="unfinished">Обычно облачно/ветрено</translation>
+        <translation>Облачно с прояснениями/ветрено</translation>
     </message>
     <message>
         <location filename="strings.h" line="56"/>
@@ -408,7 +408,7 @@
         <location filename="strings.h" line="57"/>
         <location filename="strings.h" line="134"/>
         <source>Partly Cloudy/Windy</source>
-        <translation type="unfinished">Отчасти облачно/ветрено</translation>
+        <translation>Переменная облачность/ветрено</translation>
     </message>
     <message>
         <location filename="strings.h" line="58"/>
@@ -428,7 +428,7 @@
     <message>
         <location filename="strings.h" line="61"/>
         <source>Mostly Sunny/Wind</source>
-        <translation type="unfinished">Обычно солнечно/ветер</translation>
+        <translation>Переменая облачность/ветер</translation>
     </message>
     <message>
         <location filename="strings.h" line="62"/>
@@ -463,7 +463,7 @@
     <message>
         <location filename="strings.h" line="68"/>
         <source>Sunny/Windy</source>
-        <translation>солнечно/ветрено</translation>
+        <translation type="unfinished">Ясно/ветрено</translation>
     </message>
     <message>
         <location filename="strings.h" line="69"/>
@@ -800,7 +800,7 @@
     <message>
         <location filename="strings.h" line="139"/>
         <source>Smoke</source>
-        <translation type="unfinished">Смог</translation>
+        <translation>Туман</translation>
     </message>
     <message>
         <location filename="strings.h" line="140"/>
@@ -991,78 +991,78 @@
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Last Updated %1</source>
-        <translation type="unfinished">Последнее обновление %1</translation>
+        <translation>Последнее обновление %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>High Temperature:  %1</source>
-        <translation type="unfinished">Макс. температура:  %1</translation>
+        <translation>Макс. температура:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Low Temperature:  %1</source>
-        <translation type="unfinished">Мин. температура:  %1</translation>
+        <translation>Мин. температура:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>Temperature:  %1</source>
-        <translation type="unfinished">Температура:  %1</translation>
+        <translation>Температура:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Chance of Precipitation:  %1</source>
-        <translation type="unfinished">Вероятность осадков:  %1</translation>
+        <translation>Вероятность осадков:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Weather Screen Settings</source>
-        <translation type="unfinished">Настройки экрана погоды</translation>
+        <translation>Настройки экрана погоды</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
-        <translation type="unfinished">Этот экран регулирует поведение экранов погоды. Вы можете включить фоновое обновление прогноза погоды, которое будет работать независимо от того отображается или нет экран погоды, а также настроить сколько секунд будет отображаться каждый экране.
+        <translation>Этот экран регулирует поведение экранов погоды. Вы можете включить фоновое обновление прогноза погоды, которое будет работать независимо от того отображается или нет экран погоды, а также настроить сколько секунд будет отображаться каждый экран.
 
 Когда вы закончите настройку плагина погоды, нажмите кнопку &quot;Закончить&quot;.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Retrieve data in background:</source>
-        <translation type="unfinished">Получить даты в фоновом режиме:</translation>
+        <translation>Получить данные в фоновом режиме:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>OK</source>
-        <translation type="unfinished">ОК</translation>
+        <translation>ОК</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Weather Setup</source>
-        <translation type="unfinished">Настройка погоды</translation>
+        <translation>Настройка погоды</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Available Screens</source>
-        <translation type="unfinished">Доступные экраны</translation>
+        <translation>Доступные экраны</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Active Screens</source>
-        <translation type="unfinished">Активные экраны</translation>
+        <translation>Активные экраны</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Weather Script Settings</source>
-        <translation type="unfinished">Настройки скриптов погоды</translation>
+        <translation>Настройки скриптов погоды</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
-        <translation type="unfinished">Этот экран настроек регулирует поведение отдельных скриптов погоды. Выберите срипт, чье поведение вам требуется изменить, и нажмите стрелку вправо. Настройте интервал, через которые извлекаются данные, а также тайм-аут для доступа к сайту.
+        <translation>Этот экран настроек регулирует поведение отдельных скриптов погоды. Выберите срипт, чье поведение вам требуется изменить, и нажмите стрелку вправо. Настройте интервал, через которые извлекаются данные, а также тайм-аут для доступа к сайту.
 
 Когда вы закончите свои изменения, нажмите кнопку &quot;Закончить&quot;, чтобы продолжить.</translation>
     </message>
@@ -1074,17 +1074,17 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Finish</source>
-        <translation type="unfinished">Закончить</translation>
+        <translation>Закончить</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Search</source>
-        <translation type="unfinished">Искать</translation>
+        <translation>Искать</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Enter Current Location</source>
-        <translation type="unfinished">Введите местоположение</translation>
+        <translation>Введите местоположение</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
@@ -1104,32 +1104,32 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Weather Screen Setup</source>
-        <translation type="unfinished">Настройка экрана погоды</translation>
+        <translation>Настройка экрана погоды</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Weather Source Setup</source>
-        <translation type="unfinished">Настройка источников погоды</translation>
+        <translation>Настройка источников погоды</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>Source</source>
-        <translation type="unfinished">Источиник</translation>
+        <translation>Источник</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Weather Location Search</source>
-        <translation type="unfinished">Поиск местоположения</translation>
+        <translation>Поиск местоположения</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Weather</source>
-        <translation type="unfinished">Погода</translation>
+        <translation>Погода</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Global Setup</source>
-        <translation type="unfinished">Глобальные настройки</translation>
+        <translation>Глобальные настройки</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
@@ -1217,7 +1217,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="../mythweather/weather.cpp" line="210"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
-        <translation type="unfinished">Ни один из экранов в данной теме не завершен (отсутсвует информация об авторских правах).</translation>
+        <translation>Ни один из экранов в данной теме не завершен (отсутсвует информация об авторских правах).</translation>
     </message>
 </context>
 <context>
