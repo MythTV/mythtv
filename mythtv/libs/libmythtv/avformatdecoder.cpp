@@ -1277,7 +1277,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         if (special_decode & kAVSpecialDecode_SingleThreaded)
             enc->thread_count = 1;
 
-        enc->flags |= CODEC_FLAG2_FAST;
+        enc->flags2 |= CODEC_FLAG2_FAST;
 
         if ((CODEC_ID_MPEG2VIDEO == codec->id) ||
             (CODEC_ID_MPEG1VIDEO == codec->id))
