@@ -2,85 +2,6 @@
 <!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
-    <!-- Base Font Definitions -->
-    <fontdef name="osdsmall" face="Liberation Sans">
-        <pixelsize>19</pixelsize>
-        <color>#DDDDDD</color>
-    </fontdef>
-
-    <fontdef name="osdmedium" from="osdsmall">
-        <pixelsize>22</pixelsize>
-    </fontdef>
-
-    <fontdef name="osdlarge" from="osdsmall">
-        <pixelsize>29</pixelsize>
-    </fontdef>
-
-    <fontdef name="osdextralarge" from="osdsmall">
-        <pixelsize>31</pixelsize>
-        <shadowcolor>#000000</shadowcolor>
-        <shadowoffset>4,4</shadowoffset>
-        <shadowalpha>64</shadowalpha>
-        <weight>bold</weight>
-    </fontdef>
-
-    <!-- Colour variations on osd fonts -->
-    <fontdef name="osdsmallbrown" from="osdsmall">
-        <color>#484537</color>
-    </fontdef>
-
-    <fontdef name="osdsmallgrey" from="osdsmall">
-        <color>#999999</color>
-    </fontdef>
-
-    <fontdef name="osdsmallpurple" from="osdsmall">
-        <color>#9999cc</color>
-    </fontdef>
-
-    <fontdef name="osdsmallblack" from="osdsmall">
-        <color>#000000</color>
-    </fontdef>
-
-    <fontdef name="osdsmallyellow" from="osdsmall">
-        <color>#FFFF33</color>
-    </fontdef>
-
-    <fontdef name="osdsmallgreen" from="osdsmall">
-        <color>#80d400</color>
-    </fontdef>
-
-    <fontdef name="osdsmallblue" from="osdsmall">
-        <color>#0492A7</color>
-    </fontdef>
-
-    <fontdef name="osdsmallred" from="osdsmall">
-        <color>#800900</color>
-    </fontdef>
-
-    <fontdef name="osdmediumgrey" from="osdmedium">
-        <color>#999999</color>
-    </fontdef>
-
-    <fontdef name="osdmediumgreen" from="osdmedium">
-        <color>#80d400</color>
-    </fontdef>
-
-    <fontdef name="osdmediumred" from="osdmedium">
-        <color>#800900</color>
-    </fontdef>
-
-    <fontdef name="osdmediumpurple" from="osdmedium">
-        <color>#9999cc</color>
-    </fontdef>
-
-    <fontdef name="osdmediumbrown" from="osdmedium">
-        <color>#484537</color>
-    </fontdef>
-
-    <fontdef name="osdlargebrown" from="osdlarge">
-        <color>#484537</color>
-    </fontdef>
-
     <window name="program_info">
         <area>0,480,1280,253</area>
 
@@ -91,13 +12,13 @@
 
         <textarea name="heading">
             <area>20,9,650,36</area>
-            <font>osdlargebrown</font>
+            <font>baselargebrown</font>
             <value>Info</value>
         </textarea>
 
         <textarea name="title">
             <area>150,51,710,35</area>
-            <font>osdlarge</font>
+            <font>baselarge</font>
         </textarea>
 
         <statetype name="ratingstate">
@@ -145,14 +66,14 @@
         <textarea name="description">
             <area>150,96,1095,105</area>
             <multiline>yes</multiline>
-            <font>osdsmall</font>
+            <font>basesmall</font>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="year">
             <area>150,213,190,30</area>
-            <font>osdsmall</font>
+            <font>basesmall</font>
         </textarea>
 
         <statetype name="videodescrip">
@@ -177,12 +98,12 @@
         <textarea name="lentime">
             <area>1035,213,200,30</area>
             <align>right</align>
-            <font>osdsmall</font>
+            <font>basesmall</font>
         </textarea>
 
         <textarea name="channum">
             <area>15,95,120,30</area>
-            <font>osdextralarge</font>
+            <font>baseextralarge</font>
             <align>hcenter</align>
             <value>%CHANNUM%</value>
         </textarea>
@@ -191,14 +112,14 @@
             <area>15,65,120,90</area>
         </imagetype>
 
-        <fontdef name="osdtimefont" from="osdlarge">
+        <fontdef name="timefont" from="baselarge">
             <pixelsize>26</pixelsize>
             <weight>bold</weight>
         </fontdef>
 
         <clock name="time">
             <area>15,177,120,35</area>
-            <font>osdtimefont</font>
+            <font>timefont</font>
             <cutdown>no</cutdown>
             <align>allcenter</align>
             <template>hh:mm</template>
@@ -215,13 +136,13 @@
 
         <textarea name="heading">
             <area>20,9,650,36</area>
-            <font>osdlargebrown</font>
+            <font>baselargebrown</font>
             <value>Browse</value>
         </textarea>
 
         <textarea name="title">
             <area>150,51,710,35</area>
-            <font>osdlarge</font>
+            <font>baselarge</font>
         </textarea>
 
         <statetype name="ratingstate">
@@ -269,14 +190,14 @@
         <textarea name="description">
             <area>150,96,1095,105</area>
             <multiline>yes</multiline>
-            <font>osdsmall</font>
+            <font>basesmall</font>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="year">
             <area>150,213,190,30</area>
-            <font>osdsmall</font>
+            <font>basesmall</font>
         </textarea>
 
         <statetype name="videodescrip">
@@ -301,12 +222,12 @@
         <textarea name="lentime">
             <area>1035,213,200,30</area>
             <align>right</align>
-            <font>osdsmall</font>
+            <font>basesmall</font>
         </textarea>
 
         <textarea name="channum">
             <area>15,95,120,30</area>
-            <font>osdextralarge</font>
+            <font>baseextralarge</font>
             <align>hcenter</align>
             <value>%CHANNUM%</value>
         </textarea>
@@ -315,14 +236,14 @@
             <area>15,65,120,90</area>
         </imagetype>
 
-        <fontdef name="osdtimefont" from="osdlarge">
+        <fontdef name="timefont" from="baselarge">
             <pixelsize>26</pixelsize>
             <weight>bold</weight>
         </fontdef>
 
         <clock name="time">
             <area>15,177,120,35</area>
-            <font>osdtimefont</font>
+            <font>timefont</font>
             <cutdown>no</cutdown>
             <align>allcenter</align>
             <template>hh:mm</template>
@@ -340,7 +261,7 @@
 
         <textarea name="title">
             <area>20,5,280,55</area>
-            <font>osdlarge</font>
+            <font>baselarge</font>
             <multiline>true</multiline>
             <align>vcenter</align>
         </textarea>
@@ -348,7 +269,7 @@
         <textarea name="value">
             <area>310,5,280,50</area>
             <multiline>true</multiline>
-            <font>osdmedium</font>
+            <font>basemedium</font>
             <align>right,vcenter</align>
             <template>%VALUE%%UNITS%</template>
         </textarea>
@@ -356,7 +277,7 @@
         <textarea name="playedtime">
             <area>310,6,280,50</area>
             <multiline>true</multiline>
-            <font>osdsmall</font>
+            <font>basesmall</font>
             <align>allcenter</align>
             <template>%PLAYEDTIME% of %TOTALTIME%\n(%REMAININGTIME%%BEHINDTIME% remaining)</template> <!-- behind -->
         </textarea>
@@ -388,7 +309,7 @@
             <filename>osd/messagebackground.png</filename>
         </imagetype>
         <textarea name="message_text">
-            <font>osdlarge</font>
+            <font>baselarge</font>
             <area>10,6,514,35</area>
             <align>allcenter</align>
         </textarea>
@@ -479,7 +400,7 @@
             <area>12,93,378,125</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <font>osdsmall</font>
+            <font>basesmall</font>
         </textarea>
 
         <buttonlist name="list">
@@ -498,7 +419,7 @@
                     <textarea name="buttontext">
                         <area>18,0,324,50</area>
                         <align>allcenter</align>
-                        <font>osdmedium</font>
+                        <font>basemedium</font>
                     </textarea>
                     <imagetype name="buttonarrow">
                         <area>346,16,10,19</area>
@@ -513,7 +434,7 @@
                         <filename>popups/selected_item_arrow.png</filename>
                     </imagetype>
                     <textarea name="buttontext">
-                        <font>osdmediumbrown</font>
+                        <font>basemediumbrown</font>
                     </textarea>
                 </state>
             </statetype>
