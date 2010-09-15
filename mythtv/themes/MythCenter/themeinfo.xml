@@ -21,10 +21,10 @@
     <!-- Theme Author Details (Optional)-->
     <author>
         <!-- Your name -->
-        <name></name>
-
+        <name>Jeroen Brosens</name>
+    
         <!-- Your Email Address -->
-        <email></email>
+        <email>jeroen@fotoniq.nl</email>
     </author>
 
     <!-- The Versioning Info (Required) -->
@@ -48,7 +48,7 @@
         <!-- A description of the theme, including general colours and
              style. The description should include any details that
              may help to locate your theme in a search. -->
-        <description>A blue theme.</description>
+        <description>A blue theme.  Originally designed before the MythUI rewrite, MythCenter has been updated to take advantage of the new UI library while still maintaining the look and feel that long-time MythTV users are used to.</description>
 
         <!-- Errata. A list of known faults, missing elements or unfinished
              areas. e.g. "mythgallery not themed" -->

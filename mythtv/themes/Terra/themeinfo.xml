@@ -49,7 +49,7 @@
         <!-- A description of the theme, including general colours and
              style. The description should include any details that
              may help to locate your theme in a search. -->
-        <description></description>
+        <description>An earth toned theme, Terra was the first theme to use MythTV's new MythUI library and is designed to showcase some of the capabilities of the new user interface.</description>
        
         <!-- Errata. A list of known faults, missing elements or unfinished
              areas. e.g. "mythgallery not themed" -->
