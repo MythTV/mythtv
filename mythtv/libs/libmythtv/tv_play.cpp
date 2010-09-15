@@ -10762,31 +10762,38 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
         InfoMap info;
         ctx->recorder->GetChannelInfo(info);
         sourceid = info["sourceid"].toUInt();
-    }
 
-    if ((category == "SOURCESWITCHING") && ctx->recorder)
-    {
-        vector<uint>::const_iterator it = cardids.begin();
-        for (; it != cardids.end(); ++it)
+        if (category != "INPUTSWITCHING")
         {
-            vector<InputInfo> inputs = RemoteRequestFreeInputList(
-                                                    *it, excluded_cardids);
-
-            if (inputs.empty())
-                continue;
-
-            for (uint i = 0; i < inputs.size(); i++)
+            // Get sources available on other cards
+            vector<uint>::const_iterator it = cardids.begin();
+            for (; it != cardids.end(); ++it)
             {
-                if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                    ((cardid == inputs[i].cardid) &&
-                     (cardid != sources[inputs[i].sourceid].cardid)))
+                vector<InputInfo> inputs =
+                        RemoteRequestFreeInputList(*it, excluded_cardids);
+                if (inputs.empty())
+                    continue;
+
+                for (uint i = 0; i < inputs.size(); i++)
+                    if (!sources.contains(inputs[i].sourceid))
+                       sources[inputs[i].sourceid] = inputs[i];
+            }
+            // Get other sources available on this card
+            vector<uint> currentinputs = CardUtil::GetInputIDs(cardid);
+            if (!currentinputs.empty())
+            {
+                for (uint i = 0; i < currentinputs.size(); i++)
                 {
-                    sources[inputs[i].sourceid] = inputs[i];
+                    InputInfo info;
+                    info.inputid = currentinputs[i];
+                    if (CardUtil::GetInputInfo(info))
+                        if (!sources.contains(info.sourceid))
+                            sources[info.sourceid] = info;
                 }
             }
+            // delete current source from list
+            sources.remove(sourceid);
         }
-        // delete current source from list
-        sources.remove(sourceid);
     }
 
     if (category == "MAIN")
@@ -10877,7 +10884,7 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
             }
         }
     }
-    else if (category == "SOURCESWITCHING" && !sources.empty())
+    else if (category == "SOURCESWITCHING")
     {
         backaction = "SOURCE";
         currenttext = tr("Switch Source");
