@@ -8662,6 +8662,7 @@ void TV::customEvent(QEvent *e)
             if (tc && !signalList.empty())
             {
                 UpdateOSDSignal(ctx, signalList);
+                UpdateOSDTimeoutMessage(ctx);
             }
         }
         ReturnPlayerLock(mctx);
