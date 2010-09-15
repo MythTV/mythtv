@@ -553,7 +553,7 @@ bool MythPlayer::InitVideo(void)
             CheckExtraAudioDecode();
         }
     }
-    
+
     if (!videoOutput)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -1016,7 +1016,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
     }
 
     audio.CheckFormat();
-    
+
     if (ret > 0)
     {
         hasFullPositionMap = true;
@@ -2730,7 +2730,7 @@ void MythPlayer::DecoderLoop(bool pause)
                     !GetDecoder()->GetTrackCount(kTrackTypeVideo);
 
         DecoderPauseCheck();
-        
+
         if (forcePositionMapSync)
         {
             forcePositionMapSync = false;
@@ -2802,7 +2802,7 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
     bool ret = false;
     if (!videoOutput)
         return false;
-    
+
     // Wait for frames to be available for decoding onto
     if (!videoOutput->EnoughFreeFrames() && !unsafe && !killdecoder)
     {
@@ -4097,7 +4097,10 @@ int MythPlayer::GetSecondsBehind(void) const
 void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
 {
     bool islive = false;
-    info.text.insert("description", "");
+    int chapter = GetCurrentChapter() + 1;
+    int title = GetCurrentTitle() + 1;
+    info.text.insert("chapteridx", chapter ? QString().number(chapter) : QString());
+    info.text.insert("titleidx", title ? QString().number(title) : QString());
     info.values.insert("position",   0);
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
@@ -4181,17 +4184,10 @@ void MythPlayer::calcSliderPosPriv(osdInfo &info, bool paddedFields,
     }
 
     info.text["description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
-
-    if (islive)
-    {
-        info.text["extdescription"] = QObject::tr("%1 of %2 (%3 behind)")
-                .arg(text1).arg(text2).arg(text3);
-    }
-    else
-    {
-        info.text["extdescription"] = QObject::tr("%1 of %2 (%3 remaining)")
-                .arg(text1).arg(text2).arg(text3);
-    }
+    info.text["playedtime"] = text1;
+    info.text["totaltime"] = text2;
+    info.text["remainingtime"] = islive ? QString() : text3;
+    info.text["behindtime"] = islive ? text3 : QString();
 }
 
 int MythPlayer::GetNumChapters()
@@ -4234,7 +4230,7 @@ bool MythPlayer::DoJumpChapter(int chapter)
     VERBOSE(VB_PLAYBACK, LOC +
             QString("DoJumpChapter: current %1 want %2 (frame %3)")
             .arg(current).arg(chapter).arg(desiredFrame));
-                                       
+
     if (desiredFrame < 0)
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + QString("DoJumpChapter failed."));
