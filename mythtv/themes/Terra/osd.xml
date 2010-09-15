@@ -6,31 +6,59 @@
         <area>0,480,1280,253</area>
 
         <imagetype name="background">
-            <area>0,0,1280,253</area>
+            <area>0,0,1280,238</area>
             <filename>osd/infobackground.png</filename>
         </imagetype>
 
         <textarea name="heading">
-            <area>20,11,830,38</area>
+            <area>20,9,650,36</area>
             <font>baselargebrown</font>
             <value>Info</value>
         </textarea>
 
         <textarea name="title">
-            <area>150,55,830,38</area>
-            <font>baseextralarge</font>
+            <area>150,51,710,35</area>
+            <font>baselarge</font>
         </textarea>
 
+        <statetype name="ratingstate" from="baserating">
+            <position>1196,50</position>
+        </statetype>
+
         <textarea name="description">
-            <area>150,105,1100,120</area>
+            <area>150,96,1095,105</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
-        <textarea name="lentime">
-            <area>990,65,250,30</area>
+        <textarea name="year">
+            <area>150,213,190,30</area>
             <font>basesmall</font>
+        </textarea>
+
+        <statetype name="videodescrip">
+            <position>647,216</position>
+            <state name="default">
+            </state>
+            <state name="HD_1080_P">
+                <imagetype name="hdtv">
+                    <area>0,0,86,16</area>
+                    <filename>shared/icons/hd_1080.png</filename>
+                </imagetype>
+            </state>
+            <state name="HD_1080_I" from="HD_1080_P" />
+            <state name="HD_720_P">
+                <imagetype name="hdtv">
+                    <area>4,0,76,16</area>
+                    <filename>shared/icons/hd_720.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <textarea name="lentime" from="basetextarea">
+            <area>1035,213,200,30</area>
             <align>right</align>
         </textarea>
 
@@ -45,11 +73,17 @@
             <area>15,65,120,90</area>
         </imagetype>
 
+        <fontdef name="osdtimefont" from="baselarge">
+            <pixelsize>26</pixelsize>
+            <weight>bold</weight>
+        </fontdef>
+
         <clock name="time">
             <area>15,177,120,35</area>
-            <font>basemedium</font>
-            <align>hcenter</align>
-            <template>%TIME%</template>
+            <font>osdtimefont</font>
+            <cutdown>no</cutdown>
+            <align>allcenter</align>
+            <template>hh:mm</template>
         </clock>
     </window>
 
@@ -57,31 +91,103 @@
         <area>0,480,1280,253</area>
 
         <imagetype name="background">
-            <area>0,0,1280,253</area>
+            <area>0,0,1280,238</area>
             <filename>osd/infobackground.png</filename>
         </imagetype>
 
         <textarea name="heading">
-            <area>20,11,830,38</area>
+            <area>20,9,650,36</area>
             <font>baselargebrown</font>
-            <value>Browse</value>
+            <value>Info</value>
         </textarea>
 
         <textarea name="title">
-            <area>150,55,830,38</area>
-            <font>baseextralarge</font>
+            <area>150,51,710,35</area>
+            <font>baselarge</font>
         </textarea>
 
+        <statetype name="ratingstate">
+            <position>1196,50</position>
+            <showempty>yes</showempty>
+            <state name="default">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/black_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="0">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/black_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="1">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/black_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="2" from="1" />
+            <state name="3">
+                <imagetype name="stars">
+                    <filename>shared/bronze_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="4" from="3" />
+            <state name="5">
+                <imagetype name="stars">
+                    <filename>shared/silver_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="6" from="5" />
+            <state name="7">
+                <imagetype name="stars">
+                    <filename>shared/gold_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="8" from="7" />
+            <state name="9">
+                <imagetype name="stars">
+                    <filename>shared/super_gold_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="10" from="9" />
+        </statetype>
+
         <textarea name="description">
-            <area>150,105,1100,120</area>
+            <area>150,96,1095,105</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
-        <textarea name="lentime">
-            <area>990,65,250,30</area>
+        <textarea name="year">
+            <area>150,213,190,30</area>
             <font>basesmall</font>
+        </textarea>
+
+        <statetype name="videodescrip">
+            <position>647,216</position>
+            <state name="default">
+            </state>
+            <state name="HD_1080_P">
+                <imagetype name="hdtv">
+                    <area>0,0,86,16</area>
+                    <filename>shared/icons/hd_1080.png</filename>
+                </imagetype>
+            </state>
+            <state name="HD_1080_I" from="HD_1080_P" />
+            <state name="HD_720_P">
+                <imagetype name="hdtv">
+                    <area>4,0,76,16</area>
+                    <filename>shared/icons/hd_720.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <textarea name="lentime" from="basetextarea">
+            <area>1035,213,200,30</area>
             <align>right</align>
         </textarea>
 
@@ -96,11 +202,17 @@
             <area>15,65,120,90</area>
         </imagetype>
 
+        <fontdef name="osdtimefont" from="baselarge">
+            <pixelsize>26</pixelsize>
+            <weight>bold</weight>
+        </fontdef>
+
         <clock name="time">
             <area>15,177,120,35</area>
-            <font>basemedium</font>
-            <align>hcenter</align>
-            <template>%TIME%</template>
+            <font>osdtimefont</font>
+            <cutdown>no</cutdown>
+            <align>allcenter</align>
+            <template>hh:mm</template>
         </clock>
 
     </window>
@@ -113,23 +225,46 @@
             <filename>popups/progress_dialog_background.png</filename>
         </imagetype>
 
-        <textarea name="title" from="basetextarea">
-            <area>20,5,210,55</area>
-            <font>basemediumbrown</font>
+        <textarea name="title">
+            <area>20,5,280,55</area>
+            <font>baselarge</font>
             <multiline>true</multiline>
             <align>vcenter</align>
         </textarea>
 
-        <textarea name="extdescription" from="basetextarea">
-            <area>240,5,350,55</area>
+        <textarea name="value">
+            <area>310,5,280,50</area>
             <multiline>true</multiline>
+            <font>basemedium</font>
+            <align>right,vcenter</align>
+            <template>%VALUE%%UNITS%</template>
+        </textarea>
+
+        <textarea name="playedtime">
+            <area>310,6,280,50</area>
+            <multiline>true</multiline>
+            <font>basesmall</font>
             <align>allcenter</align>
+            <template>%PLAYEDTIME% of %TOTALTIME%\n(%REMAININGTIME%%BEHINDTIME% remaining)</template> <!-- behind -->
         </textarea>
 
         <progressbar name="position" from="baseprogressbar">
             <position>45,62</position>
         </progressbar>
 
+    </window>
+
+    <window name="osd_message">
+        <area>-1,0,534,58</area>
+        <imagetype name="background">
+            <area>0,0,534,58</area>
+            <filename>osd/messagebackground.png</filename>
+        </imagetype>
+        <textarea name="message_text">
+            <font>baselarge</font>
+            <area>10,6,514,35</area>
+            <align>allcenter</align>
+        </textarea>
     </window>
 
     <window name="osd_program_editor">

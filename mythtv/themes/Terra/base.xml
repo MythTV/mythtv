@@ -397,36 +397,41 @@
 
     <!-- Base definition of a rating statetype -->
     <statetype name="baserating">
-        <position>1193,433</position>
+        <area>1193,433,39,38</area>
         <showempty>yes</showempty>
         <state name="0">
         </state>
         <state name="1">
             <imagetype name="stars">
+                <area>0,0,39,38</area>
                 <filename>shared/black_star.png</filename>
             </imagetype>
         </state>
         <state name="2" from="1" />
         <state name="3">
             <imagetype name="stars">
+                <area>0,0,39,38</area>
                 <filename>shared/bronze_star.png</filename>
             </imagetype>
         </state>
         <state name="4" from="3" />
         <state name="5">
             <imagetype name="stars">
+                <area>0,0,39,38</area>
                 <filename>shared/silver_star.png</filename>
             </imagetype>
         </state>
         <state name="6" from="5" />
         <state name="7">
             <imagetype name="stars">
+                <area>0,0,39,38</area>
                 <filename>shared/gold_star.png</filename>
             </imagetype>
         </state>
         <state name="8" from="7" />
         <state name="9">
             <imagetype name="stars">
+                <area>0,0,39,38</area>
                 <filename>shared/super_gold_star.png</filename>
             </imagetype>
         </state>
