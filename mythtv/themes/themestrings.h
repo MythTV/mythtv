@@ -12,7 +12,6 @@ void strings_null() {
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("Go up a level");
     ThemeUI::tr("Home");
-    ThemeUI::tr("Ok");
     ThemeUI::tr("Please Wait...");
     ThemeUI::tr("Twitter Timeline");
     ThemeUI::tr("Search");
@@ -178,9 +177,12 @@ void strings_null() {
     ThemeUI::tr("Tables:");
     ThemeUI::tr("Store");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded...");
+    ThemeUI::tr("By %1");
+    ThemeUI::tr("Native Resolution: %1");
+    ThemeUI::tr("Version %1");
     ThemeUI::tr("System Status");
     ThemeUI::tr("Learn what your system is up to.");
-    ThemeUI::tr("Arclight is a sleek theme meant for widescreen HD screens.  It is high contrast and uses shapes and attractive layout to convey information simply, consistently, and attractively.");
+    ThemeUI::tr("Arclight is a sleek theme meant for widescreen HD displays.  It is high contrast and uses shapes and an attractive layout to convey information simply and consistently.");
     ThemeUI::tr("Type your tweet below.  Select \"Send\" to submit it.");
     ThemeUI::tr("Send");
     ThemeUI::tr("Enter Your Twitter Login Details");
@@ -300,7 +302,7 @@ void strings_null() {
     ThemeUI::tr("Preview Schedule Changes");
     ThemeUI::tr("Recording Rules");
     ThemeUI::tr("Details");
-    ThemeUI::tr("My first attempt at a theme, aimed at creating a theme suitable for children.");
+    ThemeUI::tr("Childish is the first MythTV theme designed specifically with children in mind.  It was the winner of MythTV's v0.23 theming contest.");
     ThemeUI::tr("Filename");
     ThemeUI::tr("Select an Icon");
     ThemeUI::tr("Icon Download Status...");
@@ -358,15 +360,13 @@ void strings_null() {
     ThemeUI::tr("TV Setup");
     ThemeUI::tr("DVD");
     ThemeUI::tr("Music Setup");
+    ThemeUI::tr("Weather Setup");
     ThemeUI::tr("Video Setup");
     ThemeUI::tr("Game Setup");
     ThemeUI::tr("NetFlix");
     ThemeUI::tr("Archive");
     ThemeUI::tr("Search Words");
     ThemeUI::tr("Search Lists");
-    ThemeUI::tr("NetFlix Browser");
-    ThemeUI::tr("NetFlix Queue");
-    ThemeUI::tr("MythFlix Configuration");
     ThemeUI::tr("%SUBTITLE|\"|\" %%DESCRIPTION%");
     ThemeUI::tr("(%STARTTIME% - %ENDTIME%)  %LENMINS%");
     ThemeUI::tr("%CHANNUM%");
@@ -406,6 +406,8 @@ void strings_null() {
     ThemeUI::tr("Core MythTV behavior and system settings");
     ThemeUI::tr("Appearance");
     ThemeUI::tr("pick the theme, font, size, and locale");
+    ThemeUI::tr("Theme Chooser");
+    ThemeUI::tr("Choose a local theme or download new ones");
     ThemeUI::tr("Screen Setup Wizards");
     ThemeUI::tr("Compensate for TVs with overscan");
     ThemeUI::tr("TV Settings");
@@ -496,7 +498,7 @@ void strings_null() {
     ThemeUI::tr("Zone Minder");
     ThemeUI::tr("%TIME%");
     ThemeUI::tr("Search For");
-    ThemeUI::tr("A blue theme.");
+    ThemeUI::tr("A blue theme.  Originally designed before the MythUI rewrite, MythCenter has been updated to take advantage of the new UI library while still maintaining the look and feel that long-time MythTV users are used to.");
     ThemeUI::tr("Directed by:");
     ThemeUI::tr("Year:");
     ThemeUI::tr("User Rating:");
@@ -554,7 +556,23 @@ void strings_null() {
     ThemeUI::tr("Result");
     ThemeUI::tr("Save as default");
     ThemeUI::tr("Sample Clauses:");
-    ThemeUI::tr(" This was adapted from the Jeroen Brosens' MythCenter theme. The fonts have been changed to freely redistributable ones and layout changes have been made to make this theme look good on 1280x720 and 1920x1080 screens with a 1:1 pixel aspect ratio. ");
+    ThemeUI::tr("This was adapted from the Jeroen Brosens' MythCenter theme.  The fonts have been changed to freely redistributable ones and layout changes have been made to make this theme look good on 1280x720 and 1920x1080 screens with a 1:1 pixel aspect ratio.");
+    ThemeUI::tr("Coverart:");
+    ThemeUI::tr("Find Online...");
+    ThemeUI::tr("Player Settings");
+    ThemeUI::tr("Default Player:");
+    ThemeUI::tr("DVD Player:");
+    ThemeUI::tr("DVD Drive:");
+    ThemeUI::tr("VCD Player:");
+    ThemeUI::tr("VCD Drive:");
+    ThemeUI::tr("Enable Alternate Player:");
+    ThemeUI::tr("Alternate Player:");
+    ThemeUI::tr("Video Metadata Settings");
+    ThemeUI::tr("Perform metadata update after video scan");
+    ThemeUI::tr("Enable Random Trailer Playback");
+    ThemeUI::tr("Display unknown file types");
+    ThemeUI::tr("Enable metadata in file browse mode");
+    ThemeUI::tr("Trailers to Play:");
     ThemeUI::tr("dddd\ndd MMMM yyyy");
     ThemeUI::tr("Heading");
     ThemeUI::tr("%DATE%");
@@ -583,7 +601,9 @@ void strings_null() {
     ThemeUI::tr("No sites configured!");
     ThemeUI::tr("Videos - Gallery");
     ThemeUI::tr("Videos - Tree");
+    ThemeUI::tr("Info");
     ThemeUI::tr("%|\"SUBTITLE|\"% %DESCRIPTION%");
+    ThemeUI::tr("Browse");
     ThemeUI::tr("Change Displayed Groups");
     ThemeUI::tr("Show Watched Recordings");
     ThemeUI::tr("Schedules Overview");
@@ -595,6 +615,7 @@ void strings_null() {
     ThemeUI::tr("Position:");
     ThemeUI::tr("Rule Overview");
     ThemeUI::tr("Post-Processing Options");
+    ThemeUI::tr("An earth toned theme, Terra was the first theme to use MythTV's new MythUI library and is designed to showcase some of the capabilities of the new user interface.");
     ThemeUI::tr("Search Results");
     ThemeUI::tr("Cast Members");
     ThemeUI::tr("Full Plot");
@@ -603,7 +624,6 @@ void strings_null() {
     ThemeUI::tr("Genre");
     ThemeUI::tr("Country");
     ThemeUI::tr("Actor/Actress");
-    ThemeUI::tr("Browse");
     ThemeUI::tr("InetRef");
     ThemeUI::tr("Cover File");
     ThemeUI::tr("Sort by");
@@ -613,7 +633,6 @@ void strings_null() {
     ThemeUI::tr("Parental:");
     ThemeUI::tr("IMDB ID:");
     ThemeUI::tr("Video Browser");
-    ThemeUI::tr("Video File Associations");
     ThemeUI::tr("Edit Video Metadata");
     ThemeUI::tr("Item has been Watched:");
     ThemeUI::tr("Change MythTV key bindings.");
@@ -631,6 +650,7 @@ void strings_null() {
     ThemeUI::tr("Language");
     ThemeUI::tr("Select your preferred language");
     ThemeUI::tr("%STARTTIME%-%ENDTIME% : %LENMINS%");
+    ThemeUI::tr("%VIDEOWIDTH%x%VIDEOHEIGHT%, %VIDEOFRAMERATE%fps, %VIDEOCODECDESC%");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded");
     ThemeUI::tr("dddd\ndd MMM yyyy");
     ThemeUI::tr("(1)Time (2)Title");
@@ -675,8 +695,6 @@ void strings_null() {
     ThemeUI::tr("Play a film on DVD");
     ThemeUI::tr("Play VCD");
     ThemeUI::tr("Play the video on a VCD");
-    ThemeUI::tr("Import DVD");
-    ThemeUI::tr("Import video from a movie DVD");
     ThemeUI::tr("Write video to a data DVD");
     ThemeUI::tr("Import CD");
     ThemeUI::tr("Import music from an audio CD");
@@ -700,4 +718,8 @@ void strings_null() {
     ThemeUI::tr("Other Plugins");
     ThemeUI::tr("Advanced Options");
     ThemeUI::tr("A \"Media Center\" menu theme. This menu theme is basically meant to bring the common \"media player/DVR\" functionality to the forefront, organize the plugins, and to make some of myth's more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in \"Plugins.\" Puts all setup and scheduling in \"Advanced.\" The top two menu levels will seem new, the ones beneath Advanced->Setup are as in the default menu.");
+    ThemeUI::tr("A MythTV theme based off the LCARS interface as featured in a well-known Sci-Fi franchise. LCARS took second place in MythTV's v0.23 theming contest.");
+    ThemeUI::tr("Retro is a generally blue 'Retro' styled theme.  This is a port of the original theme to the new MythUI engine while maintaining nearly the same exact look and feel.");
+    ThemeUI::tr("MythTV's first 16:10 theme, TransBlue is a simplistic theme designed to allow the user to drop in their own choice of background while not negatively affecting the look and feel of the theme.  TransBlue took third place in MythTV's v0.23 theming contest.");
+    ThemeUI::tr("Blue-Abstract uses more of the classic MythTV screen layouts updated to take advantage of MythUI's features and set against an abstract blue background.");
 }

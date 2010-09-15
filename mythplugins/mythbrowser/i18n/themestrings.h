@@ -20,7 +20,6 @@ void strings_null() {
     ThemeUI::tr("Name");
     ThemeUI::tr("URL");
     ThemeUI::tr("Browser Command:");
-    ThemeUI::tr("Ok");
     ThemeUI::tr("Find...");
     ThemeUI::tr("Find");
 }

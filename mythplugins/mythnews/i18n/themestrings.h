@@ -18,7 +18,6 @@ void strings_null() {
     ThemeUI::tr("[x]");
     ThemeUI::tr("Web Site");
     ThemeUI::tr("Edit RSS News Feed");
-    ThemeUI::tr("Ok");
     ThemeUI::tr("Contexts");
     ThemeUI::tr("Actions");
     ThemeUI::tr("RSS Feeds");
