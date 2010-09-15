@@ -44,11 +44,11 @@ DisplayInfo MythDisplay::GetDisplayInfo(void)
     }
 
     CGSize size_in_mm = CGDisplayScreenSize(disp);
-    ret.res = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
+    ret.size = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
 
     uint width  = (uint)CGDisplayPixelsWide(disp);
     uint height = (uint)CGDisplayPixelsHigh(disp);
-    ret.size   = QSize(width, height);
+    ret.res     = QSize(width, height);
 
 #elif defined(Q_WS_WIN)
     HDC hdc = GetDC(GetWindowID());
