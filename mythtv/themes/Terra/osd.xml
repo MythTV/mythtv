@@ -2,6 +2,85 @@
 <!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
+    <!-- Base Font Definitions -->
+    <fontdef name="osdsmall" face="Liberation Sans">
+        <pixelsize>19</pixelsize>
+        <color>#DDDDDD</color>
+    </fontdef>
+
+    <fontdef name="osdmedium" from="osdsmall">
+        <pixelsize>22</pixelsize>
+    </fontdef>
+
+    <fontdef name="osdlarge" from="osdsmall">
+        <pixelsize>29</pixelsize>
+    </fontdef>
+
+    <fontdef name="osdextralarge" from="osdsmall">
+        <pixelsize>31</pixelsize>
+        <shadowcolor>#000000</shadowcolor>
+        <shadowoffset>4,4</shadowoffset>
+        <shadowalpha>64</shadowalpha>
+        <weight>bold</weight>
+    </fontdef>
+
+    <!-- Colour variations on osd fonts -->
+    <fontdef name="osdsmallbrown" from="osdsmall">
+        <color>#484537</color>
+    </fontdef>
+
+    <fontdef name="osdsmallgrey" from="osdsmall">
+        <color>#999999</color>
+    </fontdef>
+
+    <fontdef name="osdsmallpurple" from="osdsmall">
+        <color>#9999cc</color>
+    </fontdef>
+
+    <fontdef name="osdsmallblack" from="osdsmall">
+        <color>#000000</color>
+    </fontdef>
+
+    <fontdef name="osdsmallyellow" from="osdsmall">
+        <color>#FFFF33</color>
+    </fontdef>
+
+    <fontdef name="osdsmallgreen" from="osdsmall">
+        <color>#80d400</color>
+    </fontdef>
+
+    <fontdef name="osdsmallblue" from="osdsmall">
+        <color>#0492A7</color>
+    </fontdef>
+
+    <fontdef name="osdsmallred" from="osdsmall">
+        <color>#800900</color>
+    </fontdef>
+
+    <fontdef name="osdmediumgrey" from="osdmedium">
+        <color>#999999</color>
+    </fontdef>
+
+    <fontdef name="osdmediumgreen" from="osdmedium">
+        <color>#80d400</color>
+    </fontdef>
+
+    <fontdef name="osdmediumred" from="osdmedium">
+        <color>#800900</color>
+    </fontdef>
+
+    <fontdef name="osdmediumpurple" from="osdmedium">
+        <color>#9999cc</color>
+    </fontdef>
+
+    <fontdef name="osdmediumbrown" from="osdmedium">
+        <color>#484537</color>
+    </fontdef>
+
+    <fontdef name="osdlargebrown" from="osdlarge">
+        <color>#484537</color>
+    </fontdef>
+
     <window name="program_info">
         <area>0,480,1280,253</area>
 
@@ -12,30 +91,68 @@
 
         <textarea name="heading">
             <area>20,9,650,36</area>
-            <font>baselargebrown</font>
+            <font>osdlargebrown</font>
             <value>Info</value>
         </textarea>
 
         <textarea name="title">
             <area>150,51,710,35</area>
-            <font>baselarge</font>
+            <font>osdlarge</font>
         </textarea>
 
-        <statetype name="ratingstate" from="baserating">
-            <position>1196,50</position>
+        <statetype name="ratingstate">
+            <area>1196,50,39,38</area>
+            <showempty>yes</showempty>
+            <state name="0">
+            </state>
+            <state name="1">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/black_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="2" from="1" />
+            <state name="3">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/bronze_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="4" from="3" />
+            <state name="5">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/silver_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="6" from="5" />
+            <state name="7">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/gold_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="8" from="7" />
+            <state name="9">
+                <imagetype name="stars">
+                    <area>0,0,39,38</area>
+                    <filename>shared/super_gold_star.png</filename>
+                </imagetype>
+            </state>
+            <state name="10" from="9" />
         </statetype>
 
         <textarea name="description">
             <area>150,96,1095,105</area>
             <multiline>yes</multiline>
-            <font>basesmall</font>
+            <font>osdsmall</font>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="year">
             <area>150,213,190,30</area>
-            <font>basesmall</font>
+            <font>osdsmall</font>
         </textarea>
 
         <statetype name="videodescrip">
@@ -57,14 +174,15 @@
             </state>
         </statetype>
 
-        <textarea name="lentime" from="basetextarea">
+        <textarea name="lentime">
             <area>1035,213,200,30</area>
             <align>right</align>
+            <font>osdsmall</font>
         </textarea>
 
         <textarea name="channum">
             <area>15,95,120,30</area>
-            <font>baseextralarge</font>
+            <font>osdextralarge</font>
             <align>hcenter</align>
             <value>%CHANNUM%</value>
         </textarea>
@@ -73,7 +191,7 @@
             <area>15,65,120,90</area>
         </imagetype>
 
-        <fontdef name="osdtimefont" from="baselarge">
+        <fontdef name="osdtimefont" from="osdlarge">
             <pixelsize>26</pixelsize>
             <weight>bold</weight>
         </fontdef>
@@ -97,29 +215,19 @@
 
         <textarea name="heading">
             <area>20,9,650,36</area>
-            <font>baselargebrown</font>
-            <value>Info</value>
+            <font>osdlargebrown</font>
+            <value>Browse</value>
         </textarea>
 
         <textarea name="title">
             <area>150,51,710,35</area>
-            <font>baselarge</font>
+            <font>osdlarge</font>
         </textarea>
 
         <statetype name="ratingstate">
-            <position>1196,50</position>
+            <area>1196,50,39,38</area>
             <showempty>yes</showempty>
-            <state name="default">
-                <imagetype name="stars">
-                    <area>0,0,39,38</area>
-                    <filename>shared/black_star.png</filename>
-                </imagetype>
-            </state>
             <state name="0">
-                <imagetype name="stars">
-                    <area>0,0,39,38</area>
-                    <filename>shared/black_star.png</filename>
-                </imagetype>
             </state>
             <state name="1">
                 <imagetype name="stars">
@@ -130,24 +238,28 @@
             <state name="2" from="1" />
             <state name="3">
                 <imagetype name="stars">
+                    <area>0,0,39,38</area>
                     <filename>shared/bronze_star.png</filename>
                 </imagetype>
             </state>
             <state name="4" from="3" />
             <state name="5">
                 <imagetype name="stars">
+                    <area>0,0,39,38</area>
                     <filename>shared/silver_star.png</filename>
                 </imagetype>
             </state>
             <state name="6" from="5" />
             <state name="7">
                 <imagetype name="stars">
+                    <area>0,0,39,38</area>
                     <filename>shared/gold_star.png</filename>
                 </imagetype>
             </state>
             <state name="8" from="7" />
             <state name="9">
                 <imagetype name="stars">
+                    <area>0,0,39,38</area>
                     <filename>shared/super_gold_star.png</filename>
                 </imagetype>
             </state>
@@ -157,14 +269,14 @@
         <textarea name="description">
             <area>150,96,1095,105</area>
             <multiline>yes</multiline>
-            <font>basesmall</font>
+            <font>osdsmall</font>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="year">
             <area>150,213,190,30</area>
-            <font>basesmall</font>
+            <font>osdsmall</font>
         </textarea>
 
         <statetype name="videodescrip">
@@ -186,14 +298,15 @@
             </state>
         </statetype>
 
-        <textarea name="lentime" from="basetextarea">
+        <textarea name="lentime">
             <area>1035,213,200,30</area>
             <align>right</align>
+            <font>osdsmall</font>
         </textarea>
 
         <textarea name="channum">
             <area>15,95,120,30</area>
-            <font>baseextralarge</font>
+            <font>osdextralarge</font>
             <align>hcenter</align>
             <value>%CHANNUM%</value>
         </textarea>
@@ -202,7 +315,7 @@
             <area>15,65,120,90</area>
         </imagetype>
 
-        <fontdef name="osdtimefont" from="baselarge">
+        <fontdef name="osdtimefont" from="osdlarge">
             <pixelsize>26</pixelsize>
             <weight>bold</weight>
         </fontdef>
@@ -227,7 +340,7 @@
 
         <textarea name="title">
             <area>20,5,280,55</area>
-            <font>baselarge</font>
+            <font>osdlarge</font>
             <multiline>true</multiline>
             <align>vcenter</align>
         </textarea>
@@ -235,7 +348,7 @@
         <textarea name="value">
             <area>310,5,280,50</area>
             <multiline>true</multiline>
-            <font>basemedium</font>
+            <font>osdmedium</font>
             <align>right,vcenter</align>
             <template>%VALUE%%UNITS%</template>
         </textarea>
@@ -243,13 +356,27 @@
         <textarea name="playedtime">
             <area>310,6,280,50</area>
             <multiline>true</multiline>
-            <font>basesmall</font>
+            <font>osdsmall</font>
             <align>allcenter</align>
             <template>%PLAYEDTIME% of %TOTALTIME%\n(%REMAININGTIME%%BEHINDTIME% remaining)</template> <!-- behind -->
         </textarea>
 
-        <progressbar name="position" from="baseprogressbar">
-            <position>45,62</position>
+        <progressbar name="position">
+            <area>45,62,519,16</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <area>0,0,100%,100%</area>
+                <filename>popups/progress_bar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,100%</area>
+                <filename>popups/progress_bar_fill.png</filename>
+            </imagetype>
+            <imagetype name="overlay">
+                <area>0,0,100%,100%</area>
+                <filename>popups/progress_bar_overlay.png</filename>
+            </imagetype>
         </progressbar>
 
     </window>
@@ -261,7 +388,7 @@
             <filename>osd/messagebackground.png</filename>
         </imagetype>
         <textarea name="message_text">
-            <font>baselarge</font>
+            <font>osdlarge</font>
             <area>10,6,514,35</area>
             <align>allcenter</align>
         </textarea>
@@ -352,7 +479,7 @@
             <area>12,93,378,125</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <font>basesmall</font>
+            <font>osdsmall</font>
         </textarea>
 
         <buttonlist name="list">
@@ -371,7 +498,7 @@
                     <textarea name="buttontext">
                         <area>18,0,324,50</area>
                         <align>allcenter</align>
-                        <font>basemedium</font>
+                        <font>osdmedium</font>
                     </textarea>
                     <imagetype name="buttonarrow">
                         <area>346,16,10,19</area>
@@ -386,7 +513,7 @@
                         <filename>popups/selected_item_arrow.png</filename>
                     </imagetype>
                     <textarea name="buttontext">
-                        <font>basemediumbrown</font>
+                        <font>osdmediumbrown</font>
                     </textarea>
                 </state>
             </statetype>
