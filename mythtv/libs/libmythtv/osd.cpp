@@ -347,7 +347,7 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
     if (!win)
         return;
 
-    if (map.contains("ratingstate"))
+    if (map.contains("numstars"))
     {
         MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("ratingstate"));
         if (state)
