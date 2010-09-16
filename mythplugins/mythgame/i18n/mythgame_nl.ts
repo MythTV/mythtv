@@ -6,67 +6,67 @@
     <message>
         <location filename="../mythgame/gameui.cpp" line="125"/>
         <source>All Games</source>
-        <translation type="unfinished">Alle spellen</translation>
+        <translation>Alle spellen</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="130"/>
         <source>-   By Genre</source>
-        <translation type="unfinished">-   Op genre</translation>
+        <translation>-   Op genre</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="135"/>
         <source>-   By Year</source>
-        <translation type="unfinished">-   Op jaar</translation>
+        <translation>-   Op jaar</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="140"/>
         <source>-   By Name</source>
-        <translation type="unfinished">-   Op naam</translation>
+        <translation>-   Op naam</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="145"/>
         <source>-   By Publisher</source>
-        <translation type="unfinished">-   Op uitgever</translation>
+        <translation>-   Op uitgever</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="242"/>
         <source>Choose System for</source>
-        <translation type="unfinished"></translation>
+        <translation>Systeem kiezen voor</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="259"/>
         <location filename="../mythgame/gameui.cpp" line="491"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="406"/>
         <location filename="../mythgame/gameui.cpp" line="479"/>
         <source>Show Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informatie tonen</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="408"/>
         <location filename="../mythgame/gameui.cpp" line="484"/>
         <source>Remove Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoriet verwijderen</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="410"/>
         <location filename="../mythgame/gameui.cpp" line="483"/>
         <source>Make Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoriet maken</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="411"/>
         <location filename="../mythgame/gameui.cpp" line="475"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadata bewerken</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="438"/>
         <source>Game Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Spel zoeken</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
     <message>
         <location filename="../mythgame/main.cpp" line="96"/>
         <source>Toggle the current game as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige spel als favoriet aan/uit</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="98"/>
@@ -102,12 +102,12 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="312"/>
         <source>Edit..</source>
-        <translation>Bewerken...</translation>
+        <translation>Bewerken..</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="312"/>
         <source>Delete..</source>
-        <translation>Verwijderen...</translation>
+        <translation>Verwijderen..</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="336"/>
@@ -189,7 +189,7 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="65"/>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Zorgt dat er gevraagd wordt of verwijderde roms uit de database verwijderd mogen worden.</translation>
+        <translation>Zorgt dat er gevraagd wordt of verwijderde roms uit de database verwijderd mogen worden tijdens een spellen zoeken</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="75"/>
@@ -204,7 +204,7 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="92"/>
         <source>Directory where Game Screenshots are stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Map waar spelscreenshots bewaard worden</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="94"/>
@@ -264,7 +264,7 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="205"/>
         <source>Location of the ROM files for this emulator</source>
-        <translation>Map waarin de roms voor deze emulator bewaard worden.</translation>
+        <translation>Map waarin de roms voor deze emulator bewaard worden</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="215"/>
@@ -274,7 +274,7 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="216"/>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation>Voor het uitvoeren van het spel wordt er naar deze map overgeschakeld. Leeg laten is meestal goed.</translation>
+        <translation>Voor het uitvoeren van het spel wordt er naar deze map overgeschakeld. Leeg laten is meestal goed</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="226"/>
@@ -462,7 +462,7 @@ zeker dat u dit wil?</translation>
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Spellen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
@@ -487,32 +487,32 @@ zeker dat u dit wil?</translation>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>No</source>
-        <translation type="unfinished">Neen</translation>
+        <translation>Nee</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Edit Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Spelinformatie bewerken</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>Game Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spelnaam:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Country:</source>
-        <translation type="unfinished"></translation>
+        <translation>Land:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>Publisher:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitgever:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
@@ -522,7 +522,7 @@ zeker dat u dit wil?</translation>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Screenshot:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
@@ -537,37 +537,37 @@ zeker dat u dit wil?</translation>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/pad/naar/het/ding.jpg</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Gedaan</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Game:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spel:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Type:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsnaam:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Rompath:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rompad:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>System(s):</source>
-        <translation type="unfinished"></translation>
+        <translation>Syste(e)m(en):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
@@ -582,32 +582,32 @@ zeker dat u dit wil?</translation>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Speel</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Spelinformatie</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Algemene instellingen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Game Players</source>
-        <translation type="unfinished">Spelers</translation>
+        <translation>Spelers</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Scan for Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar spellen zoeken</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Clear Game Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Speldata legen</translation>
     </message>
 </context>
 </TS>

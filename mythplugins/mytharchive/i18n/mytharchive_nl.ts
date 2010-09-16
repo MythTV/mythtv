@@ -5,23 +5,23 @@
     <name>ArchiveFileSelector</name>
     <message>
         <source>Find File To Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Te importeren bestand vinden</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Volgende</translation>
+        <translation>Volgende</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Vorige</translation>
+        <translation>Vorige</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Terug</translation>
+        <translation>Terug</translation>
     </message>
     <message>
         <source>Home</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>The selected item is not a valid archive file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Het geselecteerde item is geen geldig archiefbestand!</translation>
     </message>
 </context>
 <context>
@@ -40,46 +40,46 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Voltooien</translation>
+        <translation>Voltooien</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Vorige</translation>
+        <translation>Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished">Opname toevoegen</translation>
+        <translation>Opname toevoegen</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished">Video toevoegen</translation>
+        <translation>Video toevoegen</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished">U moet minstens 1 item toevoegen om te archiveren!</translation>
+        <translation>U moet minstens 1 item toevoegen om te archiveren!</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Verwijder Item</translation>
+        <translation>Item verwijderen</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished">U heeft geen video&apos;s!</translation>
+        <translation>U heeft geen video&apos;s!</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
@@ -106,54 +106,54 @@
     </message>
     <message>
         <source>Find File</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand vinden</translation>
     </message>
     <message>
         <source>Find Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Map vinden</translation>
     </message>
     <message>
         <source>Find Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestanden vinden</translation>
     </message>
 </context>
 <context>
     <name>ImportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Voltooien</translation>
+        <translation>Voltooien</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Vorige</translation>
+        <translation>Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="unfinished">U moet een geldig kanaal ID selecteren!</translation>
+        <translation>U moet een geldig kanaal ID selecteren!</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished">Het is niet mogelijk om het Archief te importeren. Er trad een fout op tijdens het uitvoeren van &apos;mytharchivehelper&apos;</translation>
+        <translation>Het is niet mogelijk om het Archief te importeren. Er trad een fout op tijdens het uitvoeren van &apos;mytharchivehelper&apos;</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="unfinished">Selecteer een kanaal ID</translation>
+        <translation>Selecteer een kanaal ID</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="unfinished">Selecteer een kanaal nummer</translation>
+        <translation>Selecteer een kanaal nummer</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="unfinished">Selecteer een kanaal naam</translation>
+        <translation>Selecteer een kanaal naam</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="unfinished">Selecteer een verkorte zendernaam</translation>
+        <translation>Selecteer een verkorte zendernaam</translation>
     </message>
 </context>
 <context>
@@ -188,34 +188,34 @@
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
     <name>MythBurn</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Voltooien</translation>
+        <translation>Voltooien</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Vorige</translation>
+        <translation>Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished">Opname toevoegen</translation>
+        <translation>Opname toevoegen</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished">Video toevoegen</translation>
+        <translation>Video toevoegen</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation type="unfinished">Bestand toevoegen</translation>
+        <translation>Bestand toevoegen</translation>
     </message>
     <message>
         <source>Using Cutlist</source>
@@ -231,19 +231,19 @@
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished">U moet minstens 1 item toevoegen om te archiveren!</translation>
+        <translation>U moet minstens 1 item toevoegen om te archiveren!</translation>
     </message>
     <message>
         <source>Retrieving File Information. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsinformatie ontvangen. Even geduld a.u.b...</translation>
     </message>
     <message>
         <source>Encoder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Encoder: </translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Don&apos;t Use Cutlist</source>
@@ -255,23 +255,23 @@
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Verwijder Item</translation>
+        <translation>Item verwijderen</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation type="unfinished">Bewerk Details</translation>
+        <translation>Details bewerken</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Coderingsprofiel veranderen</translation>
     </message>
     <message>
         <source>Edit Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Thumbnails bewerken</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="unfinished">Het was niet mogelijk om de DVD te maken. Er trad een fout op tijden het uitvoeren van de scripts</translation>
+        <translation>Het was niet mogelijk om de DVD te maken. Er trad een fout op tijden het uitvoeren van de scripts</translation>
     </message>
 </context>
 <context>
@@ -282,34 +282,34 @@
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD maken</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archief maken</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archief importeren</translation>
     </message>
     <message>
         <source>View Archive Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Archieflog bekijken</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemaakte DVD afspelen</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD branden</translation>
     </message>
 </context>
 <context>
     <name>ProfileDialog</name>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -574,7 +574,7 @@ Dit kan een paar minuten duren.</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished">U heeft geen video&apos;s!</translation>
+        <translation>U heeft geen video&apos;s!</translation>
     </message>
     <message>
         <source>Cannot find the MythArchive work directory.
@@ -583,11 +583,11 @@ Have you set the correct path in the settings?</source>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>Het was niet mogelijk om de DVD te maken. Er trad een fout op tijden het uitvoeren van de scripts</translation>
     </message>
     <message>
         <source>Cannot find any logs to show!</source>
@@ -613,7 +613,7 @@ The last run failed to create a DVD.</source>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD branden</translation>
     </message>
     <message>
         <source>
@@ -630,7 +630,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
@@ -661,7 +661,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnamelijst aan het ontvangen. Even geduld a.u.b...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
@@ -669,26 +669,26 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
     <name>SelectDestination</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Volgende</translation>
+        <translation>Volgende</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Vorige</translation>
+        <translation>Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken...</translation>
     </message>
     <message>
         <source>Single Layer DVD</source>
@@ -708,7 +708,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>DVD +/- RW</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD +/- RW</translation>
     </message>
     <message>
         <source>Rewritable DVD</source>
@@ -716,7 +716,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand</translation>
     </message>
     <message>
         <source>Any file accessable from your filesystem.</source>
@@ -724,22 +724,22 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekend</translation>
     </message>
 </context>
 <context>
     <name>ThemeSelector</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Volgende</translation>
+        <translation>Volgende</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Vorige</translation>
+        <translation>Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
 </context>
 <context>
@@ -754,11 +754,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Free Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschikbare ruimte:</translation>
     </message>
     <message>
         <source>0.00Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>0.00Gb</translation>
     </message>
     <message>
         <source>Make ISO Image</source>
@@ -766,7 +766,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Burn to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar DVD branden</translation>
     </message>
     <message>
         <source>Force Overwrite of DVD-RW Media</source>
@@ -798,7 +798,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>x.xx Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>x.xx Gb</translation>
     </message>
     <message>
         <source>PL:</source>
@@ -806,15 +806,15 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>No videos available</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen video&apos;s beschikbaar</translation>
     </message>
     <message>
         <source>Log Viewer</source>
-        <translation type="unfinished">Logboek</translation>
+        <translation>Logboek</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
@@ -822,31 +822,31 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>12.34GB</source>
-        <translation type="unfinished"></translation>
+        <translation>12.34GB</translation>
     </message>
     <message>
         <source>DVD Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menu thema</translation>
     </message>
     <message>
         <source>Select a theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een thema</translation>
     </message>
     <message>
         <source>Intro</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoofdmenu</translation>
     </message>
     <message>
         <source>Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoofdstukmenu</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details</translation>
     </message>
     <message>
         <source>Select Archive Items</source>
@@ -858,11 +858,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation type="unfinished"></translation>
+        <translation>xxxxx mb</translation>
     </message>
     <message>
         <source>0 mb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 mb</translation>
     </message>
     <message>
         <source>Archive Item Details</source>
@@ -870,23 +870,23 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertitel:</translation>
     </message>
     <message>
         <source>Start Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Startdatum:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving:</translation>
     </message>
     <message>
         <source>Thumb Image Selector</source>
@@ -894,11 +894,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige positie</translation>
     </message>
     <message>
         <source>0:00:00.00</source>
-        <translation type="unfinished"></translation>
+        <translation>0:00:00.00</translation>
     </message>
     <message>
         <source>Seek Amount</source>
@@ -906,7 +906,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Frame</translation>
     </message>
     <message>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
@@ -942,7 +942,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam:</translation>
     </message>
     <message>
         <source>Local Channel</source>
@@ -966,11 +966,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD maken</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archief maken</translation>
     </message>
     <message>
         <source>Encode Video File</source>
@@ -978,46 +978,46 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archief importeren</translation>
     </message>
     <message>
         <source>Archive Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>Archief hulpmiddelen</translation>
     </message>
     <message>
         <source>Show Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Logboek tonen</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemaakte DVD afspelen</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD branden</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Bewaar</translation>
+        <translation>Bewaar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten, thumbnails opslaan</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten, thumbnails niet opslaan</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
@@ -1048,7 +1048,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 </TS>

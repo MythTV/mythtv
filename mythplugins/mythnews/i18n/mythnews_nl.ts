@@ -6,22 +6,23 @@
     <message>
         <location filename="../mythnews/main.cpp" line="27"/>
         <source>RSS News feed reader</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Inspiratie van Liferea</translatorcomment>
+        <translation>RSS nieuwsverzamelaar</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="31"/>
         <source>Update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwsitems updaten</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="33"/>
         <source>Force update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwsitems update forceren</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="35"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwsitems update annuleren</translation>
     </message>
 </context>
 <context>
@@ -44,38 +45,38 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="913"/>
         <source>Edit News Site</source>
-        <translation>Bewerk Nieuws Site</translation>
+        <translation>Nieuwssite bewerken</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="125"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythNews is niet ingesteld om sites te gebruiken.</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="455"/>
         <location filename="../mythnews/mythnews.cpp" line="714"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van %2 (%3 procent)</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="786"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen browseropdracht ingesteld! MythNews is afhankelijk van de installatie van MythBrowser.</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="914"/>
         <source>Add News Site</source>
-        <translation>Voeg Nieuws Site Toe</translation>
+        <translation>Voeg nieuwssite toe</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="916"/>
         <source>Delete News Site</source>
-        <translation>Verwijder Nieuws Site</translation>
+        <translation>Nieuwssite verwijderen</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="899"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opties</translation>
     </message>
 </context>
 <context>
@@ -83,42 +84,42 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation type="unfinished">Bewerk Site Details</translation>
+        <translation>Sitesetails bewerken</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation type="unfinished">Geef Site Details</translation>
+        <translation>Sitedetails invoeren</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
         <source>Name:</source>
-        <translation type="unfinished">Naam:</translation>
+        <translation>Naam:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Icon:</source>
-        <translation type="unfinished">Icoon:</translation>
+        <translation>Icoon:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podcast:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
 </context>
 <context>
@@ -133,22 +134,22 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>No Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen nieuws in cache.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="245"/>
         <source>Failed to read downloaded file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lezen van gedownload bestand mislukt.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuws in cach tonen.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation type="unfinished"></translation>
+        <translation>XML bestand is geen geldige RSS-feed</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="218"/>
@@ -169,12 +170,12 @@
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>

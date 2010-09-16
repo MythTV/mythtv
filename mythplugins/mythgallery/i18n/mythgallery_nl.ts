@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythgallery/glsingleview.cpp" line="239"/>
         <source>Press SELECT to play again</source>
-        <translation type="unfinished"></translation>
+        <translation>Druk SELECTEER om opnieuw af te spelen</translation>
     </message>
 </context>
 <context>
@@ -44,12 +44,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="184"/>
         <source>No images found in this directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen afbeelingen in deze map gevonden.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="375"/>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van %2</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="386"/>
@@ -69,7 +69,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="853"/>
         <source>Meta Data Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadatamenu</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="854"/>
@@ -79,12 +79,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="855"/>
         <source>File Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsmenu</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="872"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadata opties</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="887"/>
@@ -94,12 +94,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="902"/>
         <source>File Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsopties</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="912"/>
         <source>Eject</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitwerpen</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="916"/>
@@ -179,12 +179,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1332"/>
         <source>Moving marked images...</source>
-        <translation>Bezig met verplaatsen van de gemarkeerde afbeeldingen</translation>
+        <translation>Bezig met verplaatsen van de gemarkeerde afbeeldingen...</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1332"/>
         <source>Copying marked images...</source>
-        <translation>Bezig met kopieren van de gemarkeerde afbeeldingen</translation>
+        <translation>Bezig met kopieren van de gemarkeerde afbeeldingen...</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="918"/>
@@ -446,75 +446,77 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="185"/>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation>Foto instellingen (Diashow)</translation>
+        <translation>Foto instellingen (diashow)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="215"/>
         <source>MythGallery Settings (General)</source>
-        <translation>Foto instellingen (Algemeen)</translation>
+        <translation>Foto instellingen (dlgemeen)</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="39"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery kan de startmap niet vinden.
+%1
+Controleer of de map bestaat, leesbaar is en of de instelling correct is op MythGallerys instellingenpagina.</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="127"/>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Map:</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="128"/>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Aangemaakt:</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="129"/>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerkt:</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="131"/>
         <source>Bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="132"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Breedte</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="133"/>
         <location filename="../mythgallery/thumbview.cpp" line="135"/>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>pixels</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="134"/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoogte</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="136"/>
         <source>Pixel Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Pixelaantal</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="137"/>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>megapixels</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="139"/>
         <source>Rotation Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotatiehoek</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="140"/>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>graden</translation>
     </message>
 </context>
 <context>
@@ -522,7 +524,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     <message>
         <location filename="../mythgallery/singleview.cpp" line="222"/>
         <source>Press SELECT to play again</source>
-        <translation type="unfinished"></translation>
+        <translation>Druk SELECTEER om opnieuw af te spelen</translation>
     </message>
 </context>
 </TS>
