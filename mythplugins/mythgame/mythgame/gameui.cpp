@@ -648,7 +648,7 @@ void GameUI::customEvent(QEvent *event)
 
         if (resultid == "showMenuPopup")
         {
-            if (resulttext == tr("Edit Metadata"))
+            if (resulttext == tr("Edit Details"))
             {
                 edit();
             }
