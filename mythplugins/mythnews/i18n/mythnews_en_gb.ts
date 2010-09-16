@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="27"/>
+        <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
         <translation>RSS News feed reader</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="31"/>
+        <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
         <translation>Update news items</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="33"/>
+        <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
         <translation>Force update news items</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="35"/>
+        <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
         <translation>Cancel news item updating</translation>
     </message>
@@ -112,7 +112,7 @@
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
-        <source>Ok</source>
+        <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
@@ -262,31 +262,26 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source>Ok</source>
-        <translation>OK</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="22"/>
         <source>Contexts</source>
         <translation>Contexts</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="23"/>
         <source>RSS Feeds</source>
         <translation>RSS Feeds</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="24"/>
         <source>MythNews Configuration</source>
         <translation>MythNews Configuration</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Minutes</source>
         <translation>Minutes</translation>
     </message>
