@@ -10165,7 +10165,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             DoSwitchAngle(actx, angle);
         }
         else if (action == "EDIT")
+        {
             StartProgramEditMode(actx);
+            hide = false;
+        }
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire(actx);
         else if (action.left(14) == "TOGGLECOMMSKIP")
