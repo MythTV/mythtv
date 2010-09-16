@@ -10,7 +10,7 @@ trans.files += mythbrowser_sv.qm mythbrowser_nl.qm mythbrowser_nb.qm
 trans.files += mythbrowser_fi.qm mythbrowser_es.qm mythbrowser_pt_br.qm
 trans.files += mythbrowser_et.qm mythbrowser_ru.qm mythbrowser_da.qm
 trans.files += mythbrowser_cs.qm mythbrowser_sl.qm mythbrowser_en_gb.qm
-trans.files += mythbrowser_hu.qm mythbrowser_en_us.qm
+trans.files += mythbrowser_hu.qm mythbrowser_en_us.qm mythbrowser_el.qm
 
 INSTALLS += trans
 

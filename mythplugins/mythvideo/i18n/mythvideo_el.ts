@@ -2,80 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="el_GR">
 <context>
-    <name></name>
-    <message>
-        <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Configurar este valor para todos los números te hará la vida mucho más facil.</translation>
-    </message>
-    <message>
-        <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
-        <translation type="obsolete">Traté de escribir %1, pero parece ser un redireccionador HTML (tamaño de archivo %2).</translation>
-    </message>
-    <message>
-        <source>Error writing image to file %1.</source>
-        <translation type="obsolete">Error escribiendo la imagen al archivo %1.</translation>
-    </message>
-    <message>
-        <source>Error writing data to file %1.</source>
-        <translation type="obsolete">Error escribiendo datos en el archivo %1.</translation>
-    </message>
-    <message>
-        <source>Error: file error &apos;%1&apos; for file %2</source>
-        <translation type="obsolete">Error: error de archivo &apos;%1&apos; para el archivo %2</translation>
-    </message>
-    <message>
-        <source>No command to run.</source>
-        <translation type="obsolete">No hay comandos por ejecutar.</translation>
-    </message>
-</context>
-<context>
-    <name>DVDRipBox</name>
-    <message>
-        <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation type="obsolete">Η σύνδεσή σας στην υπηρεσία Μετατροπής του Myth χάθηκε. Δεν είναι κάτι καλό.</translation>
-    </message>
-    <message>
-        <source>Job %1 of %2</source>
-        <translation type="obsolete">Εργασία %1 από %2</translation>
-    </message>
-    <message>
-        <source>No Jobs. Checking and/or waiting for DVD.</source>
-        <translation type="obsolete">Δεν υπάρχουν Εργασίες. Ψάχνω ή περιμένω το DVD.</translation>
-    </message>
-    <message>
-        <source>Cancelling ...</source>
-        <translation type="obsolete">Ακυρώνω...</translation>
-    </message>
-    <message>
-        <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation type="obsolete">Δεν υπάρχουν εργασίες και δεν έχω τι να κάνω. Θα μπορούσατε να αντιγράψετε DVD.</translation>
-    </message>
-    <message>
-        <source>New Rip</source>
-        <translation type="obsolete">Νέα Αντιγραφή</translation>
-    </message>
-    <message>
-        <source>Cancel Job</source>
-        <translation type="obsolete">Ακύρωση Εργασίας</translation>
-    </message>
-    <message>
-        <source>Attempting to launch mtd...</source>
-        <translation type="obsolete">Προσπαθώ να τρέξω την υπηρεσία Μετατροπής...</translation>
-    </message>
-    <message>
-        <source>Cannot connect to your Myth Transcoding Daemon.</source>
-        <translation type="obsolete">Δεν μπορώ να συνδεθώ στην Υπηρεσία Μετατροπής.</translation>
-    </message>
-    <message>
-        <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
-        <translation type="obsolete">Προσπαθώντας να συνδεθώ στην Υπηρ. Μετατρ. δεν εντόπισα τον Η/Υ. Δεν μπορώ να συνεχίσω.</translation>
-    </message>
-    <message>
-        <source>Unknown connection error.</source>
-        <translation type="obsolete">Άγνωστο σφάλμα σύνδεσης.</translation>
-    </message>
-</context>
-<context>
     <name>EditMetadataDialog</name>
     <message>
         <location filename="../mythvideo/editmetadata.cpp" line="497"/>
@@ -104,26 +30,7 @@
     </message>
 </context>
 <context>
-    <name>ExecuteExternalCommand</name>
-    <message>
-        <source>No command to run.</source>
-        <translation type="obsolete">Δεν υπάρχει εντολή για εκτέλεση.</translation>
-    </message>
-</context>
-<context>
     <name>FileAssocDialog</name>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Hecho</translation>
-    </message>
-    <message>
-        <source>New</source>
-        <translation type="obsolete">Nuevo</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Borrar</translation>
-    </message>
     <message>
         <location filename="../mythvideo/fileassoc.cpp" line="430"/>
         <source>Enter the new extension:</source>
@@ -131,38 +38,7 @@
     </message>
 </context>
 <context>
-    <name>ImageDownloadProxy</name>
-    <message>
-        <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
-        <translation type="obsolete">Προσπάθησα να γράψω το % αλλά μάλλον πρόκειται για ανακατεύθυνση HTML (μέγεθος αρχείου %2).</translation>
-    </message>
-    <message>
-        <source>Error writing image to file %1.</source>
-        <translation type="obsolete">Σφάλμα εγγραφής εικόνας στο αρχείο %1.</translation>
-    </message>
-    <message>
-        <source>Error writing data to file %1.</source>
-        <translation type="obsolete">Σφάλμα εγγραφής δεδομένων στο αρχείο %1.</translation>
-    </message>
-    <message>
-        <source>Error: file error &apos;%1&apos; for file %2</source>
-        <translation type="obsolete">Σφάλμα: Αρχειακό σφάλμα &apos;%1&apos; στο αρχείο %2</translation>
-    </message>
-</context>
-<context>
     <name>MetadataSettings</name>
-    <message>
-        <source>Searching for Grabbers...</source>
-        <translation type="obsolete">Ψάχνω για προγράμματα λήψης...</translation>
-    </message>
-    <message>
-        <source>This is the script used to search for and download Movie Metadata.</source>
-        <translation type="obsolete">Αυτό είναι το σκριπτάκι που ψάνχνει και κατεβάζει δεδομένα Ταινιών.</translation>
-    </message>
-    <message>
-        <source>This is the script used to search for and download Television Metadata.</source>
-        <translation type="obsolete">Αυτό είναι το σκριπτάκι που ψάχνει και κατεβάζει Δεδομένα Τηλεόρασης.</translation>
-    </message>
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="148"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
@@ -174,13 +50,9 @@
         <translation>Το πλήθος των τρέιλερ που θα παιχτούν πριν από μια ταινία.</translation>
     </message>
     <message>
-        <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored.</source>
-        <translation type="obsolete">Εαν επιλεγεί θα εμφανίζονται όλα τα αρχεία κάτω από το φάκελο του Myth εκτός και αν η κατάληξή τους δηλωθεί συγκεκριμένα ως εξαιρούμενη.</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="155"/>
         <source>If set, all files below the MythVideo directory will be displayed unless their extension is explicitly set to be ignored.</source>
-        <translation>Εαν επιλεγεί θα εμφανίζονται όλα τα αρχεία κάτω από το φάκελο του Myth εκτός και αν η κατάληξή τους δηλωθεί συγκεκριμένα ως εξαιρούμενη.</translation>
+        <translation>Εαν επιλεγεί, θα εμφανίζονται όλα τα αρχεία κάτω από το φάκελο του Myth εκτός και αν η κατάληξή τους δηλωθεί συγκεκριμένα ως εξαιρούμενη.</translation>
     </message>
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="159"/>
@@ -300,10 +172,6 @@
         <source>MythDVD VCD Media Handler</source>
         <translation>Διαχείριση μέσων VCD</translation>
     </message>
-    <message>
-        <source>Import a DVD into your MythVideo database</source>
-        <translation type="obsolete">Εισάγει ένα DVD στην βάση δεδομένων του προγράμματος</translation>
-    </message>
 </context>
 <context>
     <name>PlayerSettings</name>
@@ -376,26 +244,6 @@
         <translation>Εάν επιλεγεί, δεν θα μπορείτε να γυρίσετε σ΄αυτή την οθόνη και να μηδενίσετε το Γονικό PIN χωρίς πρώτα να δώσετε το παρόν PIN. Σας προειδοποίησα.</translation>
     </message>
     <message>
-        <source>Show Unknown File Types</source>
-        <translation type="obsolete">Visualizar ficheros de tipo desconocido</translation>
-    </message>
-    <message>
-        <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation type="obsolete">Si esta activo, todos los ficheros por debajo del directorio de MythVideo serán visualizados excepto los que tengan una extensión que explícitamente los oculte.</translation>
-    </message>
-    <message>
-        <source>Player Settings</source>
-        <translation type="obsolete">Configuración de reproducción</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">PIN de control parental:</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Χωρίς Εξώφυλλο</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/videofilter.cpp" line="790"/>
         <source>Unknown</source>
         <translation>Άγνωστο</translation>
@@ -404,30 +252,6 @@
         <location filename="../mythvideo/videofilter.cpp" line="797"/>
         <source>None</source>
         <translation>Κανένα</translation>
-    </message>
-    <message>
-        <source>Newly scanned files are browsable by default</source>
-        <translation type="obsolete">Los ficheros nuevos son listados por defecto</translation>
-    </message>
-    <message>
-        <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="obsolete">Si está activado, los nuevos ficheros serán marcados como listables y aparecerán en el menú &apos;Navegación&apos;.</translation>
-    </message>
-    <message>
-        <source>Command to search for movie listings</source>
-        <translation type="obsolete">Comando para buscar listados de películas</translation>
-    </message>
-    <message>
-        <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="obsolete">Este comando debe ser ejecutable para el usuario corriendo MythVideo.</translation>
-    </message>
-    <message>
-        <source>Command to search for movie posters</source>
-        <translation type="obsolete">Comando para buscar posters</translation>
-    </message>
-    <message>
-        <source>Command to extract data for movies</source>
-        <translation type="obsolete">Comando para extraer datos de películas</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="93"/>
@@ -444,49 +268,9 @@
         <translation>Ο φάκελος πρέπει να υπάρχει και ο χρήστης που τρέχει το πρόγραμμα πρέπει να έχει δικαιώματα ανάγνωσης/εγγραφής σ΄αυτόν.</translation>
     </message>
     <message>
-        <source>Video Manager</source>
-        <translation type="obsolete">Gestor Vídeos</translation>
-    </message>
-    <message>
-        <source>Default View</source>
-        <translation type="obsolete">Vista por defecto</translation>
-    </message>
-    <message>
-        <source>Gallery</source>
-        <translation type="obsolete">Galería</translation>
-    </message>
-    <message>
-        <source>Browser</source>
-        <translation type="obsolete">Navegador</translation>
-    </message>
-    <message>
-        <source>Listings</source>
-        <translation type="obsolete">Listado</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="70"/>
         <source>Aggressive Parental Control</source>
         <translation>Αυστηρός Γονικός Έλεγχος</translation>
-    </message>
-    <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="obsolete">Este es el comando usado para cualquier fichero cuya extensión no esté específicamente definida. También puede entrar el nombre de uno de los plugins internos como &apos;Internal&apos;.</translation>
-    </message>
-    <message>
-        <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="obsolete">La vista por defecto de MythVideo. Otras vistas pueden ser seleccionadas por el menú emergente de la tecla MENU.</translation>
-    </message>
-    <message>
-        <source>Video List Loads Video Meta Data</source>
-        <translation type="obsolete">La Lista Videos carga metadatos</translation>
-    </message>
-    <message>
-        <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation type="obsolete">Si se selecciona, No se distingue entre mayúsculas y minúsculas al ordenar las entradas de una vista.</translation>
-    </message>
-    <message>
-        <source>^(The |A |An )</source>
-        <translation type="obsolete">^(Ο |Η |Το )</translation>
     </message>
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="670"/>
@@ -551,158 +335,6 @@
         <translation>Καλά, θα τρέξω το Setup</translation>
     </message>
     <message>
-        <source>Location of VCD device</source>
-        <translation type="obsolete">Localización del dispositivo de VCD</translation>
-    </message>
-    <message>
-        <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation type="obsolete">Este dispositivo debe de existir y el usuario de MythDVD requiere permiso de lectura sobre él.</translation>
-    </message>
-    <message>
-        <source>Location of DVD device</source>
-        <translation type="obsolete">Localización del dispositivo de DVD</translation>
-    </message>
-    <message>
-        <source>DVD Player Command</source>
-        <translation type="obsolete">Comando para reproducir DVD</translation>
-    </message>
-    <message>
-        <source>VCD Player Command</source>
-        <translation type="obsolete">Comando para reproducir VCD</translation>
-    </message>
-    <message>
-        <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation type="obsolete">Puede especificarse cualquier comando para reproducir VCD (por ej: mplayer, xine...). Si se especifica %s se sustituirá por el dispositivo de VCD (por ej: /dev/cdrom).</translation>
-    </message>
-    <message>
-        <source>Directory to hold temporary files</source>
-        <translation type="obsolete">Φάκελος για προσωρινά αρχεία</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation type="obsolete">Ο φάκελος πρέπει να υπάρχει και ο χρήστης που τρέχει το πρόγραμμα πρέπει να έχει δικαιώματα εγγραφής σ΄αυτόν.</translation>
-    </message>
-    <message>
-        <source>Title Playing Command</source>
-        <translation type="obsolete">Εντολή Αναπαραγωγής Τίτλου</translation>
-    </message>
-    <message>
-        <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation type="obsolete">Είναι η εντολή που χρησιμοποιείται για προεπισκόπηση ενός τίτλου DVD. Εάν υπάρχουν, το %t είναι ο τίτλος, %d η συσκευή, %a το ίχνος του ήχου, %c για κανάλια ήχου.</translation>
-    </message>
-    <message>
-        <source>Subtitle arguments:</source>
-        <translation type="obsolete">Παράμετροι υποτίτλων:</translation>
-    </message>
-    <message>
-        <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation type="obsolete">Εάν επιλέξετε υπότιτλους για αντιγραφή, η εντολή θα προστεθεί στο τέλος της Εντολής Αναπαραγωγής ώστε να φαίνονται οι υπότιτλοι. Εάν υπάρχει, η παράμετρος %s θα πάρει την τιμή του ίχνους υποτίτλων.</translation>
-    </message>
-    <message>
-        <source>Base transcode command</source>
-        <translation type="obsolete">Βασική εντολή μετατροπής</translation>
-    </message>
-    <message>
-        <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="obsolete">Η βασική (χωρίς παραμέτρους) εντολή που τρέχει το transcode στο σύστημά σας.</translation>
-    </message>
-    <message>
-        <source>MTD port number</source>
-        <translation type="obsolete">Θύρα MTD</translation>
-    </message>
-    <message>
-        <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation type="obsolete">Ο αριθμός θύρας για επικοινωνία με την Υπηρεσία Μετατροπής του Myth</translation>
-    </message>
-    <message>
-        <source>MTD logs to terminal window</source>
-        <translation type="obsolete">Οι Καταγραφές MTD στο τερματικό</translation>
-    </message>
-    <message>
-        <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation type="obsolete">Εάν οριστεί, η Υπηρεσία Μετατροπής θα καταγράφει τα συμβάντα στο τερματικό από όπου ξεκίνησε. Αλλιώς, θα τα καταγράφει σε αρχείο με όνομα mtd.log στον φάκελο αντιγραφής.</translation>
-    </message>
-    <message>
-        <source>Transcode AC3 Audio</source>
-        <translation type="obsolete">Μετατροπή ήχου AC3</translation>
-    </message>
-    <message>
-        <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation type="obsolete">Εαν επιλεγεί, θα διατηρείται ο Ήχος AC3 (Dolby Digital) στα μετατρεπόμενα αρχεία.</translation>
-    </message>
-    <message>
-        <source>Use xvid rather than divx</source>
-        <translation type="obsolete">Χρήση xvid αντί του divx</translation>
-    </message>
-    <message>
-        <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation type="obsolete">Εάν επιλεγεί, θα χρησιμοποιείται ο (ανοικτού κώδικα, δωρεάν) xvid codec αντί για τον divx, όπου αυτό είναι δυνατόν.</translation>
-    </message>
-    <message>
-        <source>Nice level for MTD</source>
-        <translation type="obsolete">Προτεραιότητα λειτουργίας (nice) για MTD</translation>
-    </message>
-    <message>
-        <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation type="obsolete">Αποφασίζει την προτεραιότητα της Υπηρεσίας Μετατροπής. Υψηλότερα νούμερα σημαίνουν χαμηλότερη προτεραιότητα (δίνει περισσότερη CPU στα άλλα προγράμματα).</translation>
-    </message>
-    <message>
-        <source>Ripped video segments</source>
-        <translation type="obsolete">Τμήματα αντιγραμμένης ταινίας</translation>
-    </message>
-    <message>
-        <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation type="obsolete">Αν δεν είναι 0, οι αντιγραμένοι τίτλοι θα χωριστούν σε αρχεία αυτού του μεγέθους σε ΜΒ. Εφαρμόζεται τόσο στα τελικά αρχεία όσο και στα προσωρινά.</translation>
-    </message>
-    <message>
-        <source>DVD Ripper Settings</source>
-        <translation type="obsolete">Ρυθμίσεις αντιγραφής DVD</translation>
-    </message>
-    <message>
-        <source>MTD Settings</source>
-        <translation type="obsolete">Ρυθμίσεις MTD</translation>
-    </message>
-    <message>
-        <source>Waiting For Access to DVD</source>
-        <translation type="obsolete">Αναμένω πρόσβαση στο DVD</translation>
-    </message>
-    <message>
-        <source>Ripping to file ~</source>
-        <translation type="obsolete">Αντιγράφω στο αρχείο ~</translation>
-    </message>
-    <message>
-        <source>Perfect DVD Rip of %1</source>
-        <translation type="obsolete">Τέλεια αντιγραφή DVD για το %1</translation>
-    </message>
-    <message>
-        <source>Transcode of %1</source>
-        <translation type="obsolete">Μετατροπή του %1</translation>
-    </message>
-    <message>
-        <source>Waiting for Permission to Start Transcoding</source>
-        <translation type="obsolete">Περιμένω άδεια να ξεκινήσω τη μετατροπή</translation>
-    </message>
-    <message>
-        <source>Transcoding Pass 1 of 2 ~</source>
-        <translation type="obsolete">Πέρασμα Μετατροπής 1 από 2 ~ </translation>
-    </message>
-    <message>
-        <source>Transcoding Pass 2 of 2 ~</source>
-        <translation type="obsolete">Πέρασμα Μετατροπής 2 από 2 ~ </translation>
-    </message>
-    <message>
-        <source>Transcoding ~</source>
-        <translation type="obsolete">Μετατρέπω ~ </translation>
-    </message>
-    <message>
-        <source>Simultaneous Transcode Jobs</source>
-        <translation type="obsolete">Ταυτόχρονες Εργασίες Μετατροπής</translation>
-    </message>
-    <message>
-        <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation type="obsolete">Καθορίζει τον αριθμό των ταυτόχρονων εργασιών μετατροπής. Αν τεθεί σε 1 (προεπιλογή) θα γίνεται μόνο μία εργασία τη φορά.</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="154"/>
         <source>On DVD insertion</source>
         <translation>Κατά την εισαγωγή DVD</translation>
@@ -718,41 +350,9 @@
         <translation>Αναπαραγωγή DVD</translation>
     </message>
     <message>
-        <source>Rip DVD</source>
-        <translation type="obsolete">Αντιγραφή DVD</translation>
-    </message>
-    <message>
-        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation type="obsolete">El Monitor de Medios debe estar activado para permitir esta función (Configuración -&gt; General -&gt; Monitor CD/DVD</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="155"/>
         <source>Display mythdvd menu</source>
         <translation>Εμφάνιση των Επιλογών mythdvd</translation>
-    </message>
-    <message>
-        <source>ISO copy of %1</source>
-        <translation type="obsolete">Αντιγραφή του %1σε αρχείο ISO</translation>
-    </message>
-    <message>
-        <source>Waiting for access to DVD</source>
-        <translation type="obsolete">Περιμένω για πρόσβαση στο DVD</translation>
-    </message>
-    <message>
-        <source>Default Video Player</source>
-        <translation type="obsolete">Reproductor de Video por Omisión</translation>
-    </message>
-    <message>
-        <source>Enable DVD Bookmark Support</source>
-        <translation type="obsolete">Να υποστηρίζονται Σελιδοδείκτες DVD</translation>
-    </message>
-    <message>
-        <source>DVD Bookmark Prompt</source>
-        <translation type="obsolete">Ερώτημα για Σελιδοδείκτη DVD</translation>
-    </message>
-    <message>
-        <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation type="obsolete">Mostrar un dialogo para elegir si reproducir el DVD desde el comienzo o desde el bookmark</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="320"/>
@@ -773,10 +373,6 @@
         <location filename="../mythvideo/videolist.cpp" line="1352"/>
         <source>videos</source>
         <translation>ταινίες</translation>
-    </message>
-    <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Δεν υπάρχει διαθέσιμη ταξινόμηση.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="39"/>
@@ -809,10 +405,6 @@
         <translation>Χρησιμοποιείται για είσοδο σε Γονικό Έλεγχο Επιπέδου 2.</translation>
     </message>
     <message>
-        <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="obsolete">Si se selecciona, la posición actual en el tree de video persiste.</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="82"/>
         <source>Directories that hold videos</source>
         <translation>Φάκελοι που περιέχουν ταινίες</translation>
@@ -826,14 +418,6 @@
         <location filename="../mythvideo/globalsettings.cpp" line="176"/>
         <source>DVD Drive Speed</source>
         <translation>Ταχύτητα συσκευής DVD</translation>
-    </message>
-    <message>
-        <source>Let transcode determine frame rate</source>
-        <translation type="obsolete">Ο μετατροπέας καθορίζει τα καρέ ανά δευτ/πτο</translation>
-    </message>
-    <message>
-        <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
-        <translation type="obsolete">Εάν επιλεγεί, ο μετατροπέας αποφασίζει αυτόματα το ρυθμό των καρέ. Αν δεν επιλεγεί, χρησιμοποιούνται 23,976.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="234"/>
@@ -856,89 +440,9 @@
         <translation>Ταξινομήσεις που περιέχουν αυτές τις λέξεις (χωρισμένες με :) θα καταχωρούνται στο Γονικό Επίπεδο %1.</translation>
     </message>
     <message>
-        <source>Command</source>
-        <translation type="obsolete">Εντολή</translation>
-    </message>
-    <message>
-        <source>Transcode is thinking</source>
-        <translation type="obsolete">Ο Μετατροπέας είναι υπό σκέψη</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/dbcheck.cpp" line="39"/>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
         <translation>Σφάλμα: Απέτυχε η προσθήκη νέου τύπου αρχείου &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
-        <translation type="obsolete">Si se selecciona junto con &apos;Browse Files&apos;, la lista de video cargará cualquier metadata de video conocida desde la base de datos. Si no se selecciona puede aumentar considerablemente la velocidad de carga de la lista de videos.</translation>
-    </message>
-    <message>
-        <source>Enable Metadata Browse Modes</source>
-        <translation type="obsolete">Habilitar modos de búsqueda de metadatos</translation>
-    </message>
-    <message>
-        <source>Group based on</source>
-        <translation type="obsolete">Agrupar con respecto a</translation>
-    </message>
-    <message>
-        <source>Folder</source>
-        <translation type="obsolete">Directorio</translation>
-    </message>
-    <message>
-        <source>Genres</source>
-        <translation type="obsolete">Géneros</translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation type="obsolete">Categoría</translation>
-    </message>
-    <message>
-        <source>Director</source>
-        <translation type="obsolete">Director</translation>
-    </message>
-    <message>
-        <source>Cast</source>
-        <translation type="obsolete">Reparto</translation>
-    </message>
-    <message>
-        <source>Date Added</source>
-        <translation type="obsolete">Fecha en que se agregó</translation>
-    </message>
-    <message>
-        <source>TV/Movies</source>
-        <translation type="obsolete">TV/Películas</translation>
-    </message>
-    <message>
-        <source>Group videos in the tree</source>
-        <translation type="obsolete">Agrupar videos en el tree</translation>
-    </message>
-    <message>
-        <source>Command to search for movie fanart</source>
-        <translation type="obsolete">Comando para buscar por fanart de películas</translation>
-    </message>
-    <message>
-        <source>Command to search for TV shows in MythVideo</source>
-        <translation type="obsolete">Commando para buscar por shows de TV en MythVideo</translation>
-    </message>
-    <message>
-        <source>Command to search for TV Season posters</source>
-        <translation type="obsolete">Comando para buscar por posters de temporada (TV)</translation>
-    </message>
-    <message>
-        <source>Command to search for TV fanart</source>
-        <translation type="obsolete">Comando para buscar fanart de TV</translation>
-    </message>
-    <message>
-        <source>Command to search for TV banners</source>
-        <translation type="obsolete">Comando para buscar banners de TV</translation>
-    </message>
-    <message>
-        <source>Command to search for TV Screenshots</source>
-        <translation type="obsolete">Comando para buscar screenshots de TV</translation>
-    </message>
-    <message>
-        <source>Command to extract data for TV Episodes</source>
-        <translation type="obsolete">Comando para extraer datos para los episodios de TV</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="104"/>
@@ -961,33 +465,9 @@
         <translation>Φάκελος με trailers</translation>
     </message>
     <message>
-        <source>Enable Alternate Video Player</source>
-        <translation type="obsolete">Habilitar Reproductor Alternativo de Video</translation>
-    </message>
-    <message>
-        <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
-        <translation type="obsolete">Si está seleccionado, puedes elegir un reproductor de videos alternativo en caso que el por omisión falle.</translation>
-    </message>
-    <message>
-        <source>Alternate Player</source>
-        <translation type="obsolete">Reproductor Alternativo</translation>
-    </message>
-    <message>
-        <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
-        <translation type="obsolete">Si por alguna razón el reproductor por omisión no reproduce un video puedes reproducirlo con un reproductor alternativo seleccionando &apos;Reproducir en el reproductor alternativo&apos;</translation>
-    </message>
-    <message>
-        <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="obsolete">&apos;default&apos; permitirá que MediaMonitor elija un dispositivo.</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="166"/>
         <source>Remove DVD Bookmarks Older than (days)</source>
         <translation>Αφαίρεση σελιδοδεικτών DVD παλαιότερους των (ημέρες)</translation>
-    </message>
-    <message>
-        <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
-        <translation type="obsolete">Eliminar bookmarks de DVD que son más antiguos que el número de días señalado</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="178"/>
@@ -995,29 +475,9 @@
         <translation>Θέτει την ταχύτητα της συσκευής DVD κατά την αναπαραγωγή. Η ταχύτητα είναι σε πολλαπλάσια των 177KB/s. Χαμηλότερες ταχύτητες μειώνουν το θόρυβο αλλά σε μερικές περιπτώσεις προκαλούν διακοπές στην αναπαραγωγή.</translation>
     </message>
     <message>
-        <source>Enable random trailers before videos</source>
-        <translation type="obsolete">Habilitar trailer aleatorio antes de los videos</translation>
-    </message>
-    <message>
-        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation type="obsolete">Si se selecciona, se habilitará un botón llamado &apos;Mirar con trailers&apos; que reproducirá un número definido por el usuario de trailers antes de la película.</translation>
-    </message>
-    <message>
-        <source>Number of trailers to play</source>
-        <translation type="obsolete">Número de trailers a reproducir</translation>
-    </message>
-    <message>
-        <source>Television in MythVideo</source>
-        <translation type="obsolete">Televisión en MythVideo</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/main.cpp" line="32"/>
         <source>Loading videos ...</source>
         <translation>Φόρτωση ταινιών ...</translation>
-    </message>
-    <message>
-        <source>No directory %1 - DVD importing will fail</source>
-        <translation type="obsolete">Δεν υπάρχει ο φάκελος %1 - Θα αποτύχει η εισαγωγή του DVD</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="105"/>
@@ -1028,26 +488,6 @@
         <location filename="../mythvideo/main.cpp" line="378"/>
         <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
         <translation>Προειδοποίηση Αυστηρού Γονικού Ελέγχου: λάθος κωδικός. Απετράπη προσπάθεια εισαγωγής στην οθόνη ρυθμίσεων του MythVideo.</translation>
-    </message>
-    <message>
-        <source>Season</source>
-        <translation type="obsolete">Κύκλος</translation>
-    </message>
-    <message>
-        <source>Episode</source>
-        <translation type="obsolete">Επεισόδιο</translation>
-    </message>
-    <message>
-        <source>%1 failed
-
-%2
-
-Check VideoManager Settings</source>
-        <translation type="obsolete">%1 απέτυχε!
-
-%2
-
-Ελέγξτε τις ρυθμίσεις της Διαχείρισης Ταινιών</translation>
     </message>
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="804"/>
@@ -1101,21 +541,9 @@ Check VideoManager Settings</source>
         <translation>Διαγράφονται οι Σελιδοδείκτες των DVD που είναι παλαιότεροι των ημερών που ορίζονται.</translation>
     </message>
     <message>
-        <source>Enable the setting and skipping to of a bookmark in DVD playback.</source>
-        <translation type="obsolete">Επιλέξτε αυτή τη ρύθμιση για να μεταφέρεστε σε σελιδοδείκτη DVD κατά την αναπαραγωγή.</translation>
-    </message>
-    <message>
-        <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark.</source>
-        <translation type="obsolete">Εμφανίζει ερώτημα για επιλογή αναπαραγωγής DVD από την αρχή ή από το σελιδοδείκτη.</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="304"/>
         <source>Parental Control Settings</source>
         <translation>Ρυθμίσεις Γονικού Ελέγχου</translation>
-    </message>
-    <message>
-        <source>Parental PIN:</source>
-        <translation type="obsolete">Γονικό PIN:</translation>
     </message>
 </context>
 <context>
@@ -1148,167 +576,162 @@ Check VideoManager Settings</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Director:</source>
         <translation>Σκην/της:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Year:</source>
         <translation>Έτος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="128"/>
         <source>Rated:</source>
         <translation>Ταξινόμηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Parental Level:</source>
         <translation>Γονικό Επίπεδο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Runtime:</source>
         <translation>Διάρκεια:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Plot:</source>
         <translation>Υπόθεση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="129"/>
         <source>Filename:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="130"/>
         <source>Cover File:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="192"/>
+        <location filename="themestrings.h" line="158"/>
         <source>Directed by</source>
         <translation>Σκην/σία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="195"/>
+        <location filename="themestrings.h" line="161"/>
         <source>MythVideo File Associations</source>
         <translation>Συσχετισμοί αρχείων του MythVideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Extension:</source>
         <translation>Κατάληξη:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Command:</source>
         <translation>Εντολή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="122"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Use default player:</source>
         <translation>Χρήση προεπιλεγμένου προγράμματος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="123"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Ignore:</source>
         <translation>Αγνόηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="198"/>
+        <location filename="themestrings.h" line="164"/>
         <source>Edit Video Information</source>
         <translation>Επεξεργασία Πληροφοριών Ταινίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
-        <source>Name:</source>
-        <translation>Όνομα:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="126"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Parental Control:</source>
         <translation>Γονικός Έλεγχος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="199"/>
+        <location filename="themestrings.h" line="165"/>
         <source>File to Always Play Next:</source>
         <translation>Αρχείο που πάντα θα προβάλεται μετά:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="128"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Include while Browsing:</source>
         <translation>Να περιλαμβάνεται κατά την Περιήγηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Cover Art:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="130"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Unique Player Command:</source>
         <translation>Ατομική εντολή αναπαραγωγής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="137"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/διαδρομή/στο/αρχείο.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Browsable:</source>
         <translation>Να εμφανίζεται:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Category:</source>
         <translation>Κατηγορία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="196"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Filters video list</source>
         <translation>Φίλτρα λίστας ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="138"/>
         <source>Category :</source>
         <translation>Κατηγορία :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="139"/>
         <source>Genre :</source>
         <translation>Είδος :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="140"/>
         <source>Country :</source>
         <translation>Χώρα :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="142"/>
         <source>Year :</source>
         <translation>Έτος :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="143"/>
         <source>Runtime :</source>
         <translation>Διάρκεια :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="144"/>
         <source>User Rating :</source>
         <translation>Ταξινόμηση χρήστη :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="145"/>
         <source>Browse :</source>
         <translation>Περιήγηση :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="148"/>
         <source>Sort by :</source>
         <translation>Ταξινόμηση κατά :</translation>
     </message>
@@ -1317,327 +740,183 @@ Check VideoManager Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="139"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Year</source>
         <translation>Έτος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="140"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Runtime</source>
         <translation>Διάρκεια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="141"/>
+        <location filename="themestrings.h" line="107"/>
         <source>User Rating</source>
         <translation>Ταξινόμηση Χρήστη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
-        <source>Rip/Transcode</source>
-        <translation>Αντιγραφή/Μετατροπή</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="20"/>
-        <source>Job 1 of 1</source>
-        <translation>Εργασία 1 από 1</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Length:</source>
         <translation>Διάρκεια:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
-        <source>Select:</source>
-        <translation>Επιλογή:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="24"/>
-        <source>Quality:</source>
-        <translation>Ποιότητα:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="8"/>
-        <source>Audio Track:</source>
-        <translation>Ίχνος ήχου:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="25"/>
-        <source>AC3 Audio:</source>
-        <translation>Ήχος AC3:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="26"/>
-        <source>Subtitles:</source>
-        <translation>Υπότιτλοι:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="37"/>
-        <source>View:</source>
-        <translation>Προβολή:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="13"/>
-        <source>Title 1 of 1</source>
-        <translation>Τίτλος 1 από 1</translation>
+        <source>Delete</source>
+        <oldsource>Select:</oldsource>
+        <translation>Διαγραφή</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
-        <source>0:00:00</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="42"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="132"/>
         <source>Directed by:</source>
         <translation>Σκην/σία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="42"/>
         <source>User Rating:</source>
         <translation>Ταξινόμηση Χρήστη:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="124"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Done</source>
         <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Play</source>
         <translation>Αναπαραγωγή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Lowest</source>
         <translation>Χαμηλότερη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Low</source>
         <translation>Χαμηλή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="154"/>
         <source>Medium</source>
         <translation>Μεσαία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="189"/>
+        <location filename="themestrings.h" line="155"/>
         <source>High</source>
         <translation>Υψηλή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="131"/>
         <source>Video Num.:</source>
         <translation>Αριθ. Ταινίας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="194"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Parental Level</source>
         <translation>Γονικό Επίπεδο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Title:</source>
         <translation>Τίτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Subtitle:</source>
         <translation>Υπότιτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Season:</source>
         <translation>Κύκλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Episode:</source>
         <translation>Επεισόδιο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="200"/>
+        <location filename="themestrings.h" line="166"/>
         <source>Item has been watched:</source>
         <translation>Το έχετε δει:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Screenshot:</source>
         <translation>Στιγμιότυπο:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Select a Title to Rip</source>
-        <translation>Επιλέξτε Τίτλο για Αντιγραφή</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="3"/>
-        <source>Select the parts of the DVD you wish to copy.</source>
-        <translation>Επιλέξτε τα τμήματα του DVD που θέλετε να αντιγράψετε.</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="4"/>
-        <source>Film Name:</source>
-        <translation>Όνομα Ταινίας:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="5"/>
-        <source>Track Length:</source>
-        <translation>Διάρκεια:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>Rip AC-3 Audio</source>
-        <translation>Αντιγραφή ήχου AC-3</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="11"/>
-        <source>Preview this title</source>
-        <translation>Προεπισκόπιση τίτλου</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="12"/>
-        <source>Rip This Track</source>
-        <translation>Αντιγραφή Ίχνους</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="14"/>
-        <source>Previous Title</source>
-        <translation>Προηγούμενος Τίτλος</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="15"/>
-        <source>Next Title</source>
-        <translation>Επόμενος Τίτλος</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="16"/>
-        <source>Begin Ripping</source>
-        <translation>Εκκίνηση Αντιγραφής</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="18"/>
-        <source>Overall Progress</source>
-        <translation>Συνολική Πρόοδος</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="19"/>
-        <source>Job Progress</source>
-        <translation>Πρόοδος Εργασίας</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="27"/>
-        <source>Preview Track</source>
-        <translation>Προεπισκόπιση Ίχνους</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="28"/>
-        <source>No Current Jobs</source>
-        <translation>Καμία Τρέχουσα Εργασία</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="29"/>
-        <source>Select a Track to Rip</source>
-        <translation>Επιλέξτε Ίχνος για Αντιγραφή</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="31"/>
-        <source>Selected track length:</source>
-        <translation>Μήκος επιλεγμένου ίχνους:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="32"/>
-        <source>Check this box to select this track:</source>
-        <translation>Τικάρετε το πλαίσιο για επιλογή του ίχνους:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>Check to rip AC-3 audio:</source>
-        <translation>Επιλέξτε για αντιγραφή ήχου AC-3:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="34"/>
-        <source>Press to view excerpt:</source>
-        <translation>Πατήστε για να δείτε απόσπασμα:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>Previous</source>
-        <translation>Προηγούμενο</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="36"/>
-        <source>Next</source>
-        <translation>Επόμενο</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="38"/>
         <source>Released %1</source>
         <translation>Βγήκε %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="3"/>
         <source>User Rating: %1</source>
         <translation>Ταξινόμηση Χρήστη: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="4"/>
         <source>Cast</source>
         <translation>Πρωταγωνιστές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Plot</source>
         <translation>Υπόθεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Season/Episode: %1</source>
         <translation>Κύκλος/Επεισόδιο: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Starring: %1</source>
         <translation>Πρωταγ: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Parental Level 0</source>
         <translation>Γονικό Επίπεδο 0</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Parental Level 1</source>
         <translation>Γονικό Επίπεδο 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Parental Level 2</source>
         <translation>Γονικό Επίπεδο 2</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="13"/>
+        <source>Parental Level 3</source>
+        <translation>Γονικό Επίπεδο 3</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
         <source>Parental Level 4</source>
         <translation>Γονικό Επίπεδο 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Add New File Types</source>
         <translation>Προσθήκη Νέων Τύπων Αρχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="16"/>
         <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
 
 If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
@@ -1646,650 +925,599 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
 Αν επιλέξετε &quot;Χρήση Προεπιλεγμένου Προγράμματος&quot;, θα αγνοηθεί η εντολή προγράμματος της επέκτασης. Η &quot;Αγνόηση του Τύπου Αρχείου&quot; εμποδίζει την εμφάνιση τους κατά την ανίχνευση.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Use Default Player</source>
         <translation>Χρήση προεπιλεγμένου προγράμματος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Ignore This File Type</source>
         <translation>Αγνόηση Τύπου Αρχείου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="21"/>
         <source>New</source>
         <translation>Νέα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
-        <source>Delete</source>
-        <translation>Διαγραφή</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Tagline:</source>
         <translation>Ετικέτα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Rating:</source>
         <translation>Ταξινόμηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="28"/>
         <source>TMDB Number:</source>
         <translation>Αριθμός TMDB:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Banner:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Fanart:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Trailer:</source>
         <translation>Τρέιλερ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Homepage:</source>
         <translation>Ιστοσελίδα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Custom Player:</source>
         <translation>Προσαρμ. Πρόγραμμα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Watched:</source>
         <translation>Το είδα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Next File:</source>
         <translation>Επόμενο Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Click here to search existing coverart...</source>
         <translation>Πατήστε εδώ για αναζήτηση σε υπάρχοντα εξώφυλλα...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Click to select from online coverart...</source>
         <translation>Πατήστε για επιλογή εξωφύλλων στο internet...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Πατήστε εδώ για αναζήτηση σε υπάρχοντα στιγμιότυπα...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Click to select from online screenshots...</source>
         <translation>Πατήστε για επιλογή στιγμιοτύπων στο internet...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Click here to search existing banners...</source>
         <translation>Πατήστε εδώ για αναζήτηση σε υπάρχοντα εξώφυλλα...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Click to select from online banners...</source>
         <translation>Πατήστε για επιλογή εξωφύλλων στο internet...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Click here to search existing fanart...</source>
         <translation>Πατήστε εδώ για αναζήτηση σε υπάρχουσες εικόνες χρηστών...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Click to select from online fanart...</source>
         <translation>Πατήστε για επιλογή εικόνων χρηστών στο internet...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Click here to search existing trailers...</source>
         <translation>Πατήστε εδώ για αναζήτηση σε υπάρχοντα trailers...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Filter Videos</source>
         <translation>Φίλτρα Ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Genre:</source>
         <translation>Είδος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Country:</source>
         <translation>Χώρα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Actor/Actress:</source>
         <translation>Ηθοποιός:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Browse:</source>
         <translation>Περιήγηση :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="62"/>
         <source>TMDB/TVDB #:</source>
         <translation>TMDB/TVDB #:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Coverart:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Sort By:</source>
         <translation>Ταξινόμηση κατά :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Text Filter:</source>
         <translation>Φίλτρο κειμένου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Save</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Directed by %1</source>
         <translation>Σκηνοθεσία %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="69"/>
         <source>This item was released on %1.</source>
         <translation>Η ταινία προβλήθηκε στις %1.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="70"/>
         <source>It was added to your collection on %1.</source>
         <translation>Προστέθηκε στη συλλογή σας στις %1.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Video Player Settings</source>
         <translation>Επιλογές Προγράμματος Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Default:</source>
         <translation>Προεπιλογή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="75"/>
         <source>DVD Player:</source>
         <translation>Για DVD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="76"/>
         <source>DVD Drive:</source>
         <translation>Συσκευή DVD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="77"/>
         <source>VCD Player:</source>
         <translation>Για VCD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="78"/>
         <source>VCD Drive:</source>
         <translation>Συσκευή VCD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Enable Alternate Player</source>
         <translation>Χρήση Εφεδρ. Αναπαραγωγέα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="114"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Alt. Player:</source>
         <translation>Εφεδρ. Αναπ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="115"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Video Metadata Settings</source>
         <translation>Ρυθμίσεις Μεταπληροφοριών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="116"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Update metadata after video scan</source>
         <translation>Ενημέρωση μεταπληροφοριών μετά την ανίχνευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="117"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Display unknown file types</source>
         <translation>Εμφάνιση άγνωστων τύπων αρχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="118"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Enable metadata in file browse mode</source>
         <translation>Ενεργοποίηση μεταπληροφοριών στην περιήγηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="119"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Enable Random Trailer Playback</source>
         <translation>Αναπαραγωγή τυχαίου trailer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="120"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Trailer #:</source>
         <translation>Τρέιλερ #:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="121"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Video File Associations</source>
         <translation>Συσχετισμοί Αρχείων Ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="125"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Edit Video Metadata</source>
         <translation>Επεξεργασία Μεταπληροφοριών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
+        <location filename="themestrings.h" line="93"/>
         <source>File to Play Next:</source>
         <translation>Αρχείο για προβολή Μετά:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="129"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Item has been Watched:</source>
         <translation>Το έχω δει:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="131"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Search Results</source>
         <translation>Αποτελέσματα Αναζήτησης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="132"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Cast Members</source>
         <translation>Ηθοποιοί</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="133"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Full Plot</source>
         <translation>Πλήρης Υπόθεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="134"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Video List Filters</source>
         <translation>Φίλτρα Λίστας Ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="135"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Category</source>
         <translation>Κατηγορία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="136"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Genre</source>
         <translation>Είδος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="137"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Country</source>
         <translation>Χώρα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="138"/>
+        <location filename="themestrings.h" line="104"/>
         <source>Actor/Actress</source>
         <translation>Ηθοποιός</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="142"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Browse</source>
         <translation>Περιήγηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="143"/>
+        <location filename="themestrings.h" line="109"/>
         <source>InetRef</source>
         <translation>Αναγνωριστικό</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="144"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Cover File</source>
         <translation>Αρχείο Εξωφύλλου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="145"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Sort by</source>
         <translation>Ταξινόμηση κατά</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="146"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Watched</source>
         <translation>Το είδα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="147"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Make default</source>
         <translation>Ως προεπιλογή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="148"/>
+        <location filename="themestrings.h" line="114"/>
         <source>Videos - Manager</source>
         <translation>Ταινίες - Διαχείριση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="149"/>
+        <location filename="themestrings.h" line="115"/>
         <source>Cast:</source>
         <translation>Πρωταγωνιστές:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="150"/>
+        <location filename="themestrings.h" line="116"/>
         <source>Videos - Browser</source>
         <translation>Ταινίες - Περιήγηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="151"/>
+        <location filename="themestrings.h" line="117"/>
         <source>Videos - Gallery</source>
         <translation>Ταινίες - Γκαλερί</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="118"/>
         <source>Videos - Tree</source>
         <translation>Ταινίες - Δένδρο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="120"/>
         <source>Default Player:</source>
         <translation>Προεπιλεγμένο Πρόγραμμα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="121"/>
         <source>Enable Alternate Player:</source>
         <translation>Ενεργοποίηση Εναλλακτικού Αναπαραγωγέα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="122"/>
         <source>Alternate Player:</source>
         <translation>Εναλλακτικός Αναπαραγωγέας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="123"/>
         <source>Metadata Settings</source>
         <translation>Ρυθμίσεις Μεταπληροφοριών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="124"/>
         <source>Movie Grabber:</source>
         <translation>Κατεβαστής Ταινιών:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="125"/>
         <source>TV Grabber:</source>
         <translation>Κατεβαστής TV:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="126"/>
         <source>Trailers to Play:</source>
         <translation>Τρέιλερς για Αναπαραγωγή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="127"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
         <translation>Δεν υπάρχουν ταινίες στην ταινιοθήκη ή δεν βρέθηκαν αρχεία. Αν έχετε ορίσει φάκελο για ταινίες, πατήστε το &quot;M&quot; (ή το κουμπί ΕΠΙΛΟΓΕΣ) και επιλέξτε &quot;Αναζήτηση Αλλαγών&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="133"/>
         <source>TMDB:</source>
         <translation>TMDB:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="134"/>
         <source>Parental Lvl:</source>
         <translation>Γονικό Επίπ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="135"/>
         <source>Browseable</source>
         <translation>Να εμφανίζεται</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="136"/>
         <source>Player Command:</source>
         <translation>Εντολή Αναπαραγωγέα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="141"/>
         <source>Actor/Actress :</source>
         <translation>Ηθοποιός:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="146"/>
         <source>InetRef :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="147"/>
         <source>Cover File :</source>
         <translation>Αρχείο Εξωφύλου :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="149"/>
         <source>Watched :</source>
         <translation>Προβλήθηκε :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="188"/>
+        <source>Configure video and DVD playback</source>
+        <translation>Ρυθμίζει την αναπαραγωγή ταινιών και DVD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="66"/>
         <source>Result</source>
         <translation>Αποτέλεσμα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="206"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Save as default</source>
         <translation>Αποθήκευση ως προεπιλογή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="209"/>
+        <location filename="themestrings.h" line="175"/>
         <source>General Settings</source>
         <translation>Γενικες Επιλογες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="119"/>
         <source>Player Settings</source>
         <translation>Επιλογες Προγρ. Προβολης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="213"/>
+        <location filename="themestrings.h" line="179"/>
         <source>File Types</source>
         <translation>Τυποι Αρχειων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="215"/>
-        <source>Rip Settings</source>
-        <translation>Επιλογες Αντιγραφης</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="217"/>
+        <location filename="themestrings.h" line="181"/>
         <source>Browse Videos</source>
         <translation>Περιηγηση Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="218"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Video List</source>
         <translation>Λιστα Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="193"/>
+        <location filename="themestrings.h" line="159"/>
         <source>Video Gallery</source>
         <translation>Γκαλερι Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="150"/>
         <source>Text Filter :</source>
         <translation>Φίλτρο Κειμένου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="151"/>
         <source>Seas/Ep:</source>
         <translation>Κύκλ/Επ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="190"/>
+        <location filename="themestrings.h" line="156"/>
         <source>SELECT: Edit</source>
         <translation>ΕΠΙΛΟΓΗ: Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="191"/>
+        <location filename="themestrings.h" line="157"/>
         <source>INFO - Action Menu</source>
         <translation>ΠΛΗΡΟΦ - Επιλογές Ενέργειας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="197"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Background:</source>
         <translation>Φόντο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="201"/>
+        <location filename="themestrings.h" line="167"/>
         <source>Visible:</source>
         <translation>Ορατό:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="202"/>
+        <location filename="themestrings.h" line="168"/>
         <source>Coverart</source>
         <translation>Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="203"/>
+        <location filename="themestrings.h" line="169"/>
         <source>Screenshots</source>
         <translation>Στιγμιότυπα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="204"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Banners</source>
         <translation>Εξώφυλλα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="205"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Fanart</source>
         <translation>Εικόνες Χρηστών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="207"/>
+        <location filename="themestrings.h" line="173"/>
         <source>Perform metadata update after video scan</source>
         <translation>Ενημέρωση μεταπληροφοριών μετά την ανίχνευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="208"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Find Online...</source>
         <translation>Εύρεση στο Internet...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="210"/>
+        <location filename="themestrings.h" line="176"/>
         <source>File Paths and general options</source>
         <translation>Διαδρομές αρχείων και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="211"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Player Applications and DVD/VCD Drives</source>
         <translation>Προγράμματα αναπαραγωγής και συσκευές DVD/VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="212"/>
+        <location filename="themestrings.h" line="178"/>
         <source>Grabber Setup and display preferences</source>
         <translation>Ρυθμίσεις κατεβάσματος και επιλογές εμφάνισης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="214"/>
+        <location filename="themestrings.h" line="180"/>
         <source>Associate new file extensions</source>
         <translation>Συσχετισμοί νέων επεκτάσεων αρχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="216"/>
-        <source>DVD Rip and Transcode options</source>
-        <translation>Επιλογές αντιγραφής και μετατροπής DVD</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="219"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Video Manager</source>
         <translation>Διαχειριση Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="220"/>
+        <location filename="themestrings.h" line="184"/>
         <source>Play DVD</source>
         <translation>Αναπαραγωγη DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="221"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Play VCD</source>
         <translation>Αναπαραγωγη VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="222"/>
-        <source>Rip DVD</source>
-        <translation>Αντιγραφη DVD</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="223"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Eject media</source>
         <translation>Εξαγωγη Μεσου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="224"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Videos Settings</source>
         <translation>Ρυθμισεις ταινιων</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="225"/>
-        <source>Configure playback and DVD ripping</source>
-        <translation>Ρυθμίζει την αναπαραγωγή και την αντιγραφή DVD</translation>
-    </message>
-</context>
-<context>
-    <name>TitleDialog</name>
-    <message>
-        <source>%1 - Title %2</source>
-        <translation type="obsolete">%1 - Τίτλος %2</translation>
-    </message>
-    <message>
-        <source>Perfect</source>
-        <translation type="obsolete">Τέλειο</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Κανένας</translation>
-    </message>
-    <message>
-        <source>Title %1 of %2</source>
-        <translation type="obsolete">Τίτλος %1 από %2</translation>
-    </message>
-    <message>
-        <source>ISO Image</source>
-        <translation type="obsolete">Αρχείο ISO</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Άγνωστο</translation>
-    </message>
-    <message>
-        <source>Begin Ripping</source>
-        <translation type="obsolete">Έναρξη Αντιγραφής</translation>
     </message>
 </context>
 <context>
@@ -2376,10 +1604,6 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <location filename="../mythvideo/videodlg.cpp" line="2685"/>
         <source>Video Info</source>
         <translation>Πληροφορίες Ταινίας</translation>
-    </message>
-    <message>
-        <source>Metadata Options</source>
-        <translation type="obsolete">Επιλογές Μεταπληροφοριών</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2440"/>
@@ -2550,33 +1774,9 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <translation>Να εμφανίζεται κατά την Περιήγηση</translation>
     </message>
     <message>
-        <source>Manage Metadata</source>
-        <translation type="obsolete">Διαχείριση Μεταπληροφοριών</translation>
-    </message>
-    <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Επεξεργασία Μεταπληροφοριών</translation>
-    </message>
-    <message>
-        <source>Download Metadata</source>
-        <translation type="obsolete">Κατέβασμα Μεταπληροφοριών</translation>
-    </message>
-    <message>
-        <source>Search TV by Title/Subtitle</source>
-        <translation type="obsolete">Αναζήτηση TV κατά Τίτλο/Υπότιτλο</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/videodlg.cpp" line="2756"/>
         <source>Manually Enter Video #</source>
         <translation>Εισαγωγή Προσαρμοσμένου # ταινίας</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="obsolete">Εισαγωγή Προσαρμοσμένου Τίτλου</translation>
-    </message>
-    <message>
-        <source>Reset Metadata</source>
-        <translation type="obsolete">Διαγραφή Μεταπληροφοριών</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3003"/>
@@ -2599,10 +1799,6 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <translation>Δώστε μοναδικό αναγνωριστικό Ταινίας:</translation>
     </message>
     <message>
-        <source>Enter Video Title:</source>
-        <translation type="obsolete">Δώστε Τίτλο Ταινίας:</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/videodlg.cpp" line="3698"/>
         <source>Are you sure you want to delete:
 %1</source>
@@ -2613,20 +1809,6 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <location filename="../mythvideo/videodlg.cpp" line="3736"/>
         <source>Failed to delete file</source>
         <translation>Αποτυχία διαγραφής αρχείου</translation>
-    </message>
-    <message>
-        <source>%1 download finished: %2 %3</source>
-        <translation type="obsolete">% κατέβασμα τελείωσε: %2 %3</translation>
-    </message>
-    <message>
-        <source>%1 exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation type="obsolete">Υπάρχει %1 γι΄αυτή την ταινία αλλά δεν μπόρεσα να το κατεβάσω εντός χρονικού ορίου.
-</translation>
-    </message>
-    <message>
-        <source>No matches were found.</source>
-        <translation type="obsolete">Δεν βρέθηκε κάτι.</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="1151"/>
@@ -2706,10 +1888,6 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
 </context>
 <context>
     <name>VideoFilterDialog</name>
-    <message>
-        <source>Result of this filter : %1 video(s)</source>
-        <translation type="obsolete">Resultado de este filtro : %1 vídeo(s)</translation>
-    </message>
     <message numerus="yes">
         <location filename="../mythvideo/videofilter.cpp" line="629"/>
         <source>Result of this filter : %n video(s)</source>
@@ -2728,32 +1906,6 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <location filename="../mythvideo/videofilter.cpp" line="751"/>
         <source>minutes</source>
         <translation>λεπτά</translation>
-    </message>
-</context>
-<context>
-    <name>VideoScanner</name>
-    <message>
-        <source>Failed to Scan SG Video Hosts</source>
-        <translation type="obsolete">Απέτυχε η αναζήτηση στους Υπολογιστές που έχουν τις Ομάδες Αποθήκευσης</translation>
-    </message>
-    <message>
-        <source>If they no longer exist please remove them</source>
-        <translation type="obsolete">Εάν δεν υπάρχουν πλέον παρακαλώ διαγράψτε τους</translation>
-    </message>
-</context>
-<context>
-    <name>VideoScannerThread</name>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Αναζητώ αρχεία ταινιών</translation>
-    </message>
-    <message>
-        <source>Verifying video files</source>
-        <translation type="obsolete">Έλεγχος αρχείων ταινιών</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Ενημερώνω την βάση δεδομένων</translation>
     </message>
 </context>
 </TS>

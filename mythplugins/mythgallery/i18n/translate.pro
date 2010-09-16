@@ -8,4 +8,4 @@ TRANSLATIONS += mythgallery_pt.ts mythgallery_sv.ts mythgallery_fr.ts
 TRANSLATIONS += mythgallery_ja.ts mythgallery_sl.ts mythgallery_nb.ts
 TRANSLATIONS += mythgallery_fi.ts mythgallery_et.ts mythgallery_ru.ts
 TRANSLATIONS += mythgallery_cs.ts mythgallery_hu.ts mythgallery_en_gb.ts
-TRANSLATIONS += mythgallery_en_us.ts
+TRANSLATIONS += mythgallery_en_us.ts mythgallery_el.ts
