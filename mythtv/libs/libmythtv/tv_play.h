@@ -58,6 +58,7 @@ class TvPlayWindow;
 class TV;
 class OSDListTreeItemEnteredEvent;
 class OSDListTreeItemSelectedEvent;
+class TVBrowseHelper;
 struct osdInfo;
 
 typedef QMap<QString,InfoMap>    DDValueMap;
@@ -78,7 +79,7 @@ typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 //            -> timerIdLock
 //            -> mainLoopCondLock
 //            -> stateChangeCondLock
-//            -> browseLock
+//            -> channelGroupLock
 //
 // When holding one of these locks, you may lock any lock of  the locks to
 // the right of the current lock, but may not lock any lock to the left of
@@ -169,6 +170,7 @@ class MPUBLIC TV : public QThread
     friend class PlaybackBox;
     friend class GuideGrid;
     friend class TvPlayWindow;
+    friend class TVBrowseHelper;
 
     Q_OBJECT
   public:
@@ -192,6 +194,7 @@ class MPUBLIC TV : public QThread
     void ProcessKeypress(PlayerContext*, QKeyEvent *e);
     void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
     void customEvent(QEvent *e);
+    bool event(QEvent *e);
     bool HandleTrackAction(PlayerContext*, const QString &action);
 
     // LiveTV commands
@@ -263,10 +266,6 @@ class MPUBLIC TV : public QThread
                             const QStringList &actions,
                             bool isDVD, bool isDVDStillFrame);
 
-    void GetNextProgram(RemoteEncoder *enc,
-                        BrowseDirection direction, InfoMap &infoMap) const;
-    void GetNextProgram(BrowseDirection direction, InfoMap &infoMap) const;
-
     // static functions
     static void InitKeys(void);
     static void ResetKeys(void);
@@ -285,7 +284,6 @@ class MPUBLIC TV : public QThread
     void HandleUDPNotifyEvent(void);
 
     // Channel Groups
-    void SaveChannelGroup(void);
     void UpdateChannelList(int groupID);
 
   public slots:
@@ -362,6 +360,7 @@ class MPUBLIC TV : public QThread
     void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
                    bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
 
+    void ToggleChannelFavorite(PlayerContext *ctx);
     void ToggleChannelFavorite(PlayerContext*, QString);
     void ChangeChannel(PlayerContext*, int direction);
     void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
@@ -515,12 +514,7 @@ class MPUBLIC TV : public QThread
 
     void ToggleAutoExpire(PlayerContext*);
 
-    void BrowseStart(PlayerContext*);
-    void BrowseEnd(PlayerContext*, bool change_channel);
-    void BrowseDispInfo(PlayerContext*, BrowseDirection direction);
-    void BrowseChannel(PlayerContext*, const QString &channum);
     bool BrowseHandleAction(PlayerContext*, const QStringList &actions);
-    uint BrowseAllGetChanId(const QString &chan) const;
 
     void ToggleRecord(PlayerContext*);
 
@@ -652,11 +646,8 @@ class MPUBLIC TV : public QThread
     // Configuration variables from database
     QString baseFilters;
     QString db_channel_format;
-    QString db_time_format;
-    QString db_short_date_format;
     uint    db_idle_timeout;
     uint    db_udpnotify_port;
-    uint    db_browse_max_forward;
     int     db_playback_exit_prompt;
     uint    db_autoexpire_default;
     bool    db_auto_set_watched;
@@ -670,7 +661,9 @@ class MPUBLIC TV : public QThread
     bool    db_use_fixed_size;
     bool    db_browse_always;
     bool    db_browse_all_tuners;
-    DBChanList db_browse_all_channels;
+    bool    db_use_channel_groups;
+    bool    db_remember_last_channel_group;
+    ChannelGroupList db_channel_groups;
 
     bool    arrowAccel;
 
@@ -763,11 +756,7 @@ class MPUBLIC TV : public QThread
     QDateTime lastLockSeenTime;
 
     // Channel browsing state variables
-    bool       browsemode;
-    QString    browsechannum;
-    uint       browsechanid;
-    QString    browsestarttime;
-    mutable QMutex browseLock; // protects db_browse_all_channels
+    TVBrowseHelper *browsehelper;
 
     // Program Info for currently playing video
     // (or next video if InChangeState() is true)
@@ -834,10 +823,12 @@ class MPUBLIC TV : public QThread
 #endif // PLAY_FROM_RECORDER
 
     // Channel group stuff
-    int channel_group_id;
-    uint browse_changrp;
-    ChannelGroupList m_changrplist;
-    DBChanList m_channellist;
+    /// \brief Lock necessary when modifying channel group variables.
+    /// These are only modified in UI thread, so no lock is needed
+    /// to read this value in the UI thread.
+    mutable QMutex channelGroupLock;
+    volatile int   channelGroupId;
+    DBChanList     channelGroupChannelList;
 
     // Network Control stuff
     MythDeque<QString> networkControlCommands;

@@ -255,14 +255,14 @@ using_frontend {
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
     HEADERS += BDRingBuffer.h           mythbdplayer.h
-    HEADERS += mythiowrapper.h
+    HEADERS += mythiowrapper.h          tvbrowsehelper.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += mythdvdplayer.cpp        audioplayer.cpp
     SOURCES += DVDRingBuffer.cpp        playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
     SOURCES += BDRingBuffer.cpp         mythbdplayer.cpp
-    SOURCES += mythiowrapper.cpp
+    SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
 
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h

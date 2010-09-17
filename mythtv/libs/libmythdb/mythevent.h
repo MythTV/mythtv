@@ -1,9 +1,10 @@
 #ifndef MYTHEVENT_H_
 #define MYTHEVENT_H_
 
-#include <QString>
 #include <QStringList>
 #include <QEvent>
+#include <QHash>
+
 #include "mythexp.h"
 
 /** \class MythEvent
@@ -58,6 +59,7 @@ class MPUBLIC MythEvent : public QEvent
     static Type kPopDisableDrawingEventType;
     static Type kLockInputDevicesEventType;
     static Type kUnlockInputDevicesEventType;
+    static Type kUpdateBrowseInfoEventType;
 
   private:
     QString message;
@@ -76,6 +78,14 @@ class MPUBLIC ExternalKeycodeEvent : public QEvent
 
   private:
     int keycode;
+};
+
+class MPUBLIC UpdateBrowseInfoEvent : public QEvent
+{
+  public:
+    UpdateBrowseInfoEvent(const QHash<QString,QString> &infoMap) :
+        QEvent(MythEvent::kUpdateBrowseInfoEventType), im(infoMap) {}
+    QHash<QString,QString> im;
 };
 
 #endif /* MYTHEVENT_H */
