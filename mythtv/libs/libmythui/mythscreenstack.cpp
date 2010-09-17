@@ -266,11 +266,11 @@ void MythScreenStack::CheckNewFadeTransition(void)
     if (m_newTop->GetAlpha() >= 255)
     {
         m_InNewTransition = false;
+        if (!m_newTop->IsInitialized())
+            m_DoInit = true;
         m_newTop = NULL;
 
         RecalculateDrawOrder();
-        if (!m_newTop->IsInitialized())
-            m_DoInit = true;
     }
 }
 
