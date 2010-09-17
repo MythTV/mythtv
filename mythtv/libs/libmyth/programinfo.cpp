@@ -3302,7 +3302,7 @@ void ProgramInfo::SaveResolution(uint64_t frame, uint width, uint height)
 }
 
 static uint load_markup_datum(
-    MarkTypes type, uint chanid, const QDateTime &startts)
+    MarkTypes type, uint chanid, const QDateTime &recstartts)
 {
     QString qstr = QString(
         "SELECT recordedmarkup.data "
@@ -3325,7 +3325,7 @@ static uint load_markup_datum(
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(qstr);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", startts);
+    query.bindValue(":STARTTIME", recstartts);
 
     if (!query.exec())
     {
@@ -3342,7 +3342,7 @@ static uint load_markup_datum(
  */
 uint ProgramInfo::QueryAverageHeight(void) const
 {
-    return load_markup_datum(MARK_VIDEO_HEIGHT, chanid, startts);
+    return load_markup_datum(MARK_VIDEO_HEIGHT, chanid, recstartts);
 }
 
 /** \brief If present in recording this loads average width of the
@@ -3351,7 +3351,7 @@ uint ProgramInfo::QueryAverageHeight(void) const
  */
 uint ProgramInfo::QueryAverageWidth(void) const
 {
-    return load_markup_datum(MARK_VIDEO_WIDTH, chanid, startts);
+    return load_markup_datum(MARK_VIDEO_WIDTH, chanid, recstartts);
 }
 
 /** \brief If present in recording this loads average frame rate of the
@@ -3360,7 +3360,7 @@ uint ProgramInfo::QueryAverageWidth(void) const
  */
 uint ProgramInfo::QueryAverageFrameRate(void) const
 {
-    return load_markup_datum(MARK_VIDEO_RATE, chanid, startts);
+    return load_markup_datum(MARK_VIDEO_RATE, chanid, recstartts);
 }
 
 void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
@@ -3375,7 +3375,7 @@ void ProgramInfo::SaveResolutionProperty(VideoProperty vid_flags)
     query.bindValue(":OTHERFLAGS", ~(VID_1080|VID_720));
     query.bindValue(":FLAGS",      vid_flags);
     query.bindValue(":CHANID",     chanid);
-    query.bindValue(":STARTTIME",  recstartts);
+    query.bindValue(":STARTTIME",  startts);
     query.exec();
 
     uint videoproperties = GetVideoProperties();
