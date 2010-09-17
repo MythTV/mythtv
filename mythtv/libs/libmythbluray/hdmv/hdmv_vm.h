@@ -40,6 +40,7 @@ typedef enum {
 
     HDMV_EVENT_STILL,          /* param: boolean */
 
+    HDMV_EVENT_SET_BUTTON_PAGE,
     HDMV_EVENT_ENABLE_BUTTON,
     HDMV_EVENT_DISABLE_BUTTON,
     HDMV_EVENT_POPUP_OFF,

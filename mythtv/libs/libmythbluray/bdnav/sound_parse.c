@@ -105,16 +105,16 @@ static int _sound_read_samples(BITSTREAM *bs, SOUND_OBJECT *obj)
     return 1;
 }
 
-void sound_free(SOUND_DATA *sounds)
+void sound_free(SOUND_DATA **p)
 {
-    if (sounds) {
+    if (p && *p) {
 
-        int i;
-        for (i = 0 ; i < sounds->num_sounds; i++) {
-            X_FREE(sounds->sounds[i].samples);
+        unsigned i;
+        for (i = 0 ; i < (*p)->num_sounds; i++) {
+            X_FREE((*p)->sounds[i].samples);
         }
 
-        X_FREE(sounds);
+        X_FREE(*p);
     }
 }
 
@@ -184,7 +184,7 @@ SOUND_DATA *sound_parse(const char *file_name)
     return data;
 
  error:
-    sound_free(data);
+    sound_free(&data);
     X_FREE(data_offsets);
     file_close(fp);
     return NULL;

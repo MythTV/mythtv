@@ -26,6 +26,7 @@
 #include "file/file.h"
 
 #include <unistd.h>
+#include <stdio.h>
 
 #include "mythiowrapper.h"
 

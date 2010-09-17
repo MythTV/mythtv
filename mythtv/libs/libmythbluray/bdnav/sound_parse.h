@@ -44,7 +44,7 @@ typedef struct {
 
 
 BD_PRIVATE SOUND_DATA* sound_parse(const char *path); /* parse sound.bdmv */
-BD_PRIVATE void        sound_free(SOUND_DATA *sound);
+BD_PRIVATE void        sound_free(SOUND_DATA **sound);
 
 #ifdef __cplusplus
 };
