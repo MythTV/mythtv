@@ -252,10 +252,6 @@ static uint insert_dtv_multiplex(
         MythDB::DBError("Adding transport to Database.", query);
         return 0;
     }
-    else
-        VERBOSE(VB_CHANSCAN, "insert_dtv_multiplex -- "
-                <<((mplex) ? "update" : "insert") << " " << mplex
-                <<endl<<(query.executedQuery())<<endl);
 
     if (mplex)
         return mplex;
