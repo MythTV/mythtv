@@ -784,9 +784,29 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // DVB-S(2) Thor 0.8W Norwegian
     fix[70U << 16] = EITFixUp::kFixNO;
 
+    // DVB-T NTV/NRK (Norway)
+    fix[910LL << 32 | 8770U  << 16 | 0x006f] = EITFixUp::kFixNRK_DVBT;  //NRK Folkemusikk
+    fix[910LL << 32 | 8770U  << 16 | 0x0070] = EITFixUp::kFixNRK_DVBT;  //NRK Stortinget
+    fix[910LL << 32 | 8770U  << 16 | 0x0071] = EITFixUp::kFixNRK_DVBT;  //NRK Super
+    fix[910LL << 32 | 8770U  << 16 | 0x0072] = EITFixUp::kFixNRK_DVBT;  //NRK Sport
+    fix[910LL << 32 | 8770U  << 16 | 0x0073] = EITFixUp::kFixNRK_DVBT;  //NRK Gull
+    fix[910LL << 32 | 8770U  << 16 | 0x0074] = EITFixUp::kFixNRK_DVBT;  //NRK Jazz
+    fix[910LL << 32 | 8770U  << 16 | 0x0067] = EITFixUp::kFixNRK_DVBT;  //NRK Super / NRK3
+    fix[910LL << 32 | 8770U  << 16 | 0x0068] = EITFixUp::kFixNRK_DVBT;  //NRK Tegnspr�
+    fix[910LL << 32 | 8770U  << 16 | 0x0069] = EITFixUp::kFixNRK_DVBT;  //NRK P2
+    fix[910LL << 32 | 8770U  << 16 | 0x006a] = EITFixUp::kFixNRK_DVBT;  //NRK P3
+    fix[910LL << 32 | 8770U  << 16 | 0x006b] = EITFixUp::kFixNRK_DVBT;  //NRK Alltid Nyheter
+    fix[910LL << 32 | 8770U  << 16 | 0x006c] = EITFixUp::kFixNRK_DVBT;  //NRK mP3
+    fix[910LL << 32 | 8770U  << 16 | 0x006d] = EITFixUp::kFixNRK_DVBT;  //NRK Klassisk
+    fix[910LL << 32 | 8770U  << 16 | 0x006e] = EITFixUp::kFixNRK_DVBT;  //NRK S�i Radio
+    fix[910LL << 32 | 8770U  << 16 | 0x0066] = EITFixUp::kFixNRK_DVBT;  //NRK2
+    fix[910LL << 32 | 8770U  << 16 | 0x03f0] = EITFixUp::kFixNRK_DVBT;  //NRK1 M�e og Romsdal
+    fix[910LL << 32 | 8770U  << 16 | 0x0455] = EITFixUp::kFixNRK_DVBT;  //NRK P1 Tr�delag
+    fix[910LL << 32 | 8770U  << 16 | 0x03f1] = EITFixUp::kFixNRK_DVBT;  //NRK1 Midtnytt
+
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
-    // transport_id<<32 | netword_id<<16 | service_id
+    // transport_id<<32 | network_id<<16 | service_id
 
     // Bell Express VU Canada
     fix[ 256U << 16] |= EITFixUp::kEFixForceISO8859_1;

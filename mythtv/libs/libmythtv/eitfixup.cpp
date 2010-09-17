@@ -102,6 +102,12 @@ EITFixUp::EITFixUp()
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
       m_noRerun(" \\(R\\)"),
+      m_noColonSubtitle("^([^:]+): (.+)"),
+      m_noNRKCategories("^(Supersommer|Superjul|Barne-tv|Fantorangen|Supermorgen|Julemorgen|Sommermorgen|"
+                        "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
+                        "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorgen|"
+                        "Radioteatret|Opera|P2-Akademiet|Nyhetsmorgen i P2 og Alltid Nyheter:): (.+)"),
+      m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere)!?$"),
       m_Stereo("\\b\\(?[sS]tereo\\)?\\b")
 
 {
@@ -156,6 +162,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixNO & event.fixup)
         FixNO(event);
+
+    if (kFixNRK_DVBT & event.fixup)
+        FixNRK_DVBT(event);
 
     if (kFixCategory & event.fixup)
         FixCategory(event);
@@ -1513,3 +1522,50 @@ void EITFixUp::FixNO(DBEventEIT &event) const
       event.title = event.title.replace(m_noRerun, "");
     }
 }
+
+/** \fn EITFixUp::FixNRK_DVBT(DBEventEIT&) const
+ *  \brief Use this to clean DVB-T guide in Norway (NRK)
+ */
+void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
+{
+    int        position;
+    QRegExp    tmpExp1;
+    tmpExp1 =  m_noNRKCategories;
+    // Check for "title (R)" in the title
+    position = event.title.indexOf(m_noRerun);
+    if (position != -1)
+    {
+      event.previouslyshown = true;
+      event.title = event.title.replace(m_noRerun, "");
+    }
+    // Move colon separated category from program-titles into description
+    // Have seen "NRK2s historiekveld: Film: bla-bla"
+    while (((position = tmpExp1.indexIn(event.title)) != -1) && (tmpExp1.cap(2).length() > 1)){
+        event.title  = tmpExp1.cap(2);
+        event.description = "(" + tmpExp1.cap(1) + ") " + event.description;
+    }
+    // Remove season premiere markings
+    tmpExp1 = m_noPremiere;
+    if ((position = tmpExp1.indexIn(event.title)) >=3){
+        event.title.remove(m_noPremiere);
+    }
+    // Try to find colon-delimited subtitle in title, only tested for NRK channels
+    tmpExp1 = m_noColonSubtitle;
+    if (!event.title.startsWith("CSI:") &&
+        !event.title.startsWith("CD:") &&
+        !event.title.startsWith("Distriktsnyheter: fra"))
+    {
+        if ((position = tmpExp1.indexIn(event.title)) != -1)
+        {
+
+            if (event.subtitle.length() <= 0)
+            {
+                event.title    = tmpExp1.cap(1);
+                event.subtitle = tmpExp1.cap(2);
+            } else if (event.subtitle == tmpExp1.cap(2)) {
+                event.title    = tmpExp1.cap(1);
+            }
+        }
+    }
+}
+

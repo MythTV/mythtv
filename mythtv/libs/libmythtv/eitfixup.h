@@ -49,6 +49,7 @@ class EITFixUp
         kFixNL         = 0x1000,
         kFixCategory   = 0x8000,
         kFixNO         = 0x10000,
+        kFixNRK_DVBT   = 0x20000,
 
         // Early fixups
         kEFixForceISO8859_1  = 0x2000,
@@ -87,6 +88,7 @@ class EITFixUp
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
     void FixCategory(DBEventEIT &event) const;      // Generic Category fixes
     void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
+    void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
@@ -175,6 +177,9 @@ class EITFixUp
     const QRegExp m_nlCat;
     const QRegExp m_nlOmroep;
     const QRegExp m_noRerun;
+    const QRegExp m_noColonSubtitle;
+    const QRegExp m_noNRKCategories;
+    const QRegExp m_noPremiere;
     const QRegExp m_Stereo;
 };
 
