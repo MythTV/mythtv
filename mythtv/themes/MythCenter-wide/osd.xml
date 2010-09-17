@@ -1,6 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
+
 <mythuitheme>
+
+    <window name="program_info">
+        <fontdef name="small" face="Droid Sans">
+            <pixelsize>22</pixelsize>
+            <color>#EEEEEE</color>
+        </fontdef>
+        <fontdef name="medium" from="small">
+            <pixelsize>28</pixelsize>
+        </fontdef>
+        <fontdef name="large" from="small">
+            <pixelsize>34</pixelsize>
+            <weight>bold</weight>
+        </fontdef>
+        <area>50,0,1180,720</area>
+        <imagetype name="background1">
+            <area>0,0,1180,124</area>
+            <filename>osd/prog_top.png</filename>
+        </imagetype>
+        <imagetype name="background2">
+            <area>0,520,1180,200</area>
+            <filename>osd/prog_bot.png</filename>
+        </imagetype>
+        <textarea name="title">
+            <font>large</font>
+            <area>20,40,860,70</area>
+            <align>left,bottom</align>
+        </textarea>
+        <shape name="divider1">
+            <area>890,20,2,100</area>
+            <fill color="#FFFFFF" alpha="200" />
+        </shape>
+        <textarea name="starttime">
+            <area>880,40,280,70</area>
+            <font>medium</font>
+            <template>%LENMINS%</template>
+            <align>hcenter,bottom</align>
+        </textarea>
+        <shape name="divider2">
+            <area>890,520,2,180</area>
+            <fill color="#FFFFFF" alpha="200" />
+        </shape>
+        <statetype name="tvstate">
+            <state name="WatchingLiveTV">
+                <imagetype name="image">
+                    <area>925,480,80,80</area>
+                    <filename>osd/tv.png</filename>
+                </imagetype>
+            </state>
+            <state name="WatchingPreRecorded">
+                <imagetype name="image">
+                    <area>925,480,80,80</area>
+                    <filename>osd/recording.png</filename>
+                </imagetype>
+            </state>
+            <state name="WatchingVideo">
+                <imagetype name="image">
+                    <area>925,480,80,80</area>
+                    <filename>osd/video.png</filename>
+                </imagetype>
+            </state>
+            <state name="WatchingDVD">
+                <imagetype name="image">
+                    <area>925,480,80,80</area>
+                    <filename>osd/dvd.png</filename>
+                </imagetype>
+            </state>
+            <state name="WatchingBD">
+                <imagetype name="image">
+                    <area>925,480,80,80</area>
+                    <filename>osd/bd.png</filename>
+                </imagetype>
+            </state>
+            <state name="WatchingRecording">
+                <imagetype name="image">
+                    <area>925,480,80,80</area>
+                    <filename>osd/recording.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="videodescrip">
+            <state name="SD">
+                <imagetype name="image">
+                    <area>942,580,46,30</area>
+                    <filename>osd/sd.png</filename>
+                </imagetype>
+            </state>
+            <state name="HD_720_P">
+                <imagetype name="image">
+                    <area>942,580,46,30</area>
+                    <filename>hd720.png</filename>
+                </imagetype>
+            </state>
+            <state name="HD_1080_I">
+                <imagetype name="image">
+                    <area>942,580,46,30</area>
+                    <filename>hd1080.png</filename>
+                </imagetype>
+            </state>
+            <state name="HD_1080_P">
+                <imagetype name="image">
+                    <area>942,580,46,30</area>
+                    <filename>hd1080.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <textarea name="description">
+            <font>small</font>
+            <area>20,540,860,150</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+        </textarea>
+        <imagetype name="iconpath">
+            <area>1030,500,130,100</area>
+        </imagetype>
+        <imagetype name="coverart">
+            <area>1045,500,100,150</area>
+        </imagetype>
+        <clock name="clock">
+            <area>900,630,280,70</area>
+            <font>medium</font>
+            <template>%TIME%</template>
+            <align>bottom,hcenter</align>
+        </clock>
+    </window>
+
+    <window name="osd_status">
+        <fontdef name="medium" face="Droid Sans">
+            <pixelsize>28</pixelsize>
+            <color>#EEEEEE</color>
+            <weight>bold</weight>
+        </fontdef>
+        <area>50,520,1180,100</area>
+        <imagetype name="background1">
+            <area>0,0,1180,100</area>
+            <filename>osd/info.png</filename>
+        </imagetype>
+        <shape name="divider1">
+            <area>890,0,2,95</area>
+            <fill color="#FFFFFF" alpha="200" />
+        </shape>
+        <textarea name="title">
+            <font>medium</font>
+            <area>10,10,870,40</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="description">
+            <font>medium</font>
+            <area>10,10,870,40</area>
+            <align>right,vcenter</align>
+            <template>%DESCRIPTION% %VALUE%%UNITS%</template>
+        </textarea>
+        <clock name="clock">
+            <area>900,0,280,100</area>
+            <font>medium</font>
+            <template>%TIME%</template>
+            <align>vcenter,hcenter</align>
+        </clock>
+        <progressbar name="position">
+            <area>10,50,870,38</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <area>0,0,100%,100%</area>
+                <filename>osd/progressbar_bg.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,100%</area>
+                <filename>osd/progressbar_fill.png</filename>
+            </imagetype>
+        </progressbar>
+    </window>
+
+    <window name="browse_info">
+        <fontdef name="medium" face="Droid Sans">
+            <pixelsize>28</pixelsize>
+            <color>#EEEEEE</color>
+            <weight>bold</weight>
+        </fontdef>
+        <area>50,520,1180,100</area>
+        <imagetype name="background1">
+            <area>0,0,1180,100</area>
+            <filename>osd/info.png</filename>
+        </imagetype>
+        <shape name="divider1">
+            <area>890,0,2,95</area>
+            <fill color="#FFFFFF" alpha="200" />
+        </shape>
+        <textarea name="title">
+            <font>medium</font>
+            <area>10,10,870,40</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="starttime">
+            <font>medium</font>
+            <area>10,10,870,40</area>
+            <align>right,top</align>
+            <template>%STARTTIME%-%ENDTIME%</template>
+        </textarea>
+        <imagetype name="iconpath">
+            <area>980,10,110,80</area>
+        </imagetype>
+    </window>
+
+    <window name="osd_input">
+        <fontdef name="medium" face="Droid Sans">
+            <pixelsize>28</pixelsize>
+            <color>#EEEEEE</color>
+            <weight>bold</weight>
+        </fontdef>
+        <area>50,124,200,80</area>
+        <imagetype name="background">
+            <area>0,0,200,80</area>
+            <filename>osd/input.png</filename>
+        </imagetype>
+        <textarea name="osd_number_entry">
+            <font>medium</font>
+            <area>20,20,160,40</area>
+            <align>hcenter,vcenter</align>
+        </textarea>
+    </window>
+
+    <window name="osd_message">
+        <fontdef name="medium" face="Droid Sans">
+            <pixelsize>28</pixelsize>
+            <color>#EEEEEE</color>
+            <weight>bold</weight>
+        </fontdef>
+        <area>680,124,550,80</area>
+        <imagetype name="background">
+            <area>0,0,550,80</area>
+            <filename>osd/message.png</filename>
+        </imagetype>
+        <textarea name="message_text">
+            <font>medium</font>
+            <area>20,20,510,40</area>
+            <align>hcenter,vcenter</align>
+        </textarea>
+    </window>
+
     <window name="MythPopupBox">
         <fontdef name="basesmall" face="Droid Sans">
             <pixelsize>22</pixelsize>
@@ -122,5 +363,56 @@
             </statetype>
         </buttonlist>
     </window>
+
+    <window name="osd_program_editor">
+        <fontdef name="medium" face="Droid Sans">
+            <pixelsize>28</pixelsize>
+            <color>#EEEEEE</color>
+            <weight>bold</weight>
+        </fontdef>
+        <area>50,520,1180,100</area>
+        <imagetype name="background1">
+            <area>0,0,1180,100</area>
+            <filename>osd/info.png</filename>
+        </imagetype>
+        <shape name="divider1">
+            <area>890,0,2,95</area>
+            <fill color="#FFFFFF" alpha="200" />
+        </shape>
+        <textarea name="title">
+            <font>medium</font>
+            <area>10,10,870,40</area>
+            <align>left,vcenter</align>
+        </textarea>
+        <textarea name="seekamount" from="title">
+            <area>10,10,870,40</area>
+            <align>right,vcenter</align>
+        </textarea>
+        <textarea name="timedisplay" from="title">
+            <area>900,10,280,40</area>
+            <align>vcenter,hcenter</align>
+        </textarea>
+        <textarea name="framedisplay" from="title">
+            <area>900,50,280,40</area>
+            <align>vcenter,hcenter</align>
+        </textarea>
+        <editbar name="editbar">
+            <area>10,50,870,38</area>
+            <imagetype name="keep">
+                <area>0,0,100%,100%</area>
+                <filename>osd/progressbar_fill.png</filename>
+            </imagetype>
+            <imagetype name="cut">
+                <area>0,0,100%,100%</area>
+                <filename>osd/progressbar_cut.png</filename>
+            </imagetype>
+            <shape name="position">
+                <area>0,0,4,100%</area>
+                <fill color="#FFFFFF" alpha="255" />
+                <alphapulse min="180" max="255" change="4" />
+            </shape>
+        </editbar>
+    </window>
+
 </mythuitheme>
 
