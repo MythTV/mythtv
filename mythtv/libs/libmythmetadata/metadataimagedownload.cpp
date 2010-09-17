@@ -111,6 +111,15 @@ void MetadataImageDownload::run()
             if (lookup->GetHost().isEmpty())
             {
                 QString path = getLocalWritePath(lookup->GetType(), type);
+                QDir dirPath(path);
+                if (!dirPath.exists())
+                    if (!dirPath.mkpath(path))
+                    {
+                        VERBOSE(VB_GENERAL,
+                             QString("Metadata Image Download: Unable to create "
+                                     "path %1, aborting download.").arg(path));
+                        continue;
+                    }
                 QString finalfile = path + "/" + filename;
                 QString oldurl = info.url;
                 info.url = finalfile;
