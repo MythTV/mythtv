@@ -38,7 +38,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="updatetime" from="basetextarea">
+        <textarea name="update_text" from="basetextarea">
             <area>30,531,740,33</area>
             <align>vcenter</align>
         </textarea>
