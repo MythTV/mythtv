@@ -374,9 +374,9 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
 
     }
 
-    int64_t chd_timestamp = 0; // 100ns units
+    uint64_t chd_timestamp = 0; // msec units
     if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
-        chd_timestamp = (int64_t)(av_q2d(stream->time_base) * pkt->pts * 100000000000LL);
+        chd_timestamp = (uint64_t)(av_q2d(stream->time_base) * pkt->pts * 1000);
 
     // TODO check for busy state and available buffer size
     INIT_ST
@@ -410,7 +410,7 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     VideoFrame *frame = m_decoded_frames.takeLast();
     *got_picture_ptr = 1;
     picture->reordered_opaque = (int64_t)(frame->timecode / av_q2d(stream->time_base) 
-                                                          / 100000000);
+                                                          / 1000);
     picture->interlaced_frame = frame->interlaced_frame;
     picture->top_field_first  = frame->top_field_first;
     picture->repeat_pict      = frame->repeat_pict;
@@ -486,7 +486,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
         unsigned char* buf  = new unsigned char[size];
         m_frame = new VideoFrame();
         init(m_frame, FMT_YV12, buf, out_width, out_height, size);
-        m_frame->timecode = (uint64_t)((double)out->PicInfo.timeStamp / 1000.0f);
+        m_frame->timecode = (int64_t)out->PicInfo.timeStamp;
         m_frame->frameNumber = out->PicInfo.picture_number;
     }
 
