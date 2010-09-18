@@ -194,18 +194,19 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                     m_tokenToKeyMap.erase(kit);
                 list.push_back(*tit);
             }
-            if (list.size() == 4)
-                list.push_back(token);
 
-            QSet<QObject*>::iterator sit = m_listeners.begin();
-            for (; sit != m_listeners.end(); ++sit)
+            if (list.size() > 4)
             {
-                MythEvent *e = new MythEvent(me->Message(), list);
-                QCoreApplication::postEvent(*sit, e);
+                QSet<QObject*>::iterator sit = m_listeners.begin();
+                for (; sit != m_listeners.end(); ++sit)
+                {
+                    MythEvent *e = new MythEvent(me->Message(), list);
+                    QCoreApplication::postEvent(*sit, e);
+                }
+                (*it).tokens.clear();
             }
-            (*it).tokens.clear();
 
-            m_running--;
+            m_running = (m_running > 0) ? m_running - 1 : 0;
         }
 
         UpdatePreviewGeneratorThreads();
