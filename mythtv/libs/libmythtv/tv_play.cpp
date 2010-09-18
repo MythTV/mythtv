@@ -3629,7 +3629,7 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                     handled = true;
                 }
                 else
-                    handled |= actx->player->HandleProgrameEditorActions(
+                    handled |= actx->player->HandleProgramEditorActions(
                                                       actions, current_frame);
             }
         }
@@ -9091,7 +9091,7 @@ bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame)
     else if (osd)
     {
         QStringList actions(action);
-        if (!ctx->player->HandleProgrameEditorActions(actions, frame))
+        if (!ctx->player->HandleProgramEditorActions(actions, frame))
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Unrecognised cutpoint action");
         else
             editmode = ctx->player->GetEditMode();

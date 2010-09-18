@@ -294,7 +294,7 @@ class MPUBLIC MythPlayer
 
     // Edit mode stuff
     bool EnableEdit(void);
-    bool HandleProgrameEditorActions(QStringList &actions, long long frame = -1);
+    bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
     bool GetEditMode(void) { return deleteMap.IsEditing(); }
     void DisableEdit(bool save = true);
     bool IsInDelete(uint64_t frame);

@@ -3414,7 +3414,7 @@ void MythPlayer::DisableEdit(bool save)
         SetOSDStatus(QObject::tr("Paused"), kOSDTimeout_None);
 }
 
-bool MythPlayer::HandleProgrameEditorActions(QStringList &actions,
+bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
                                              long long frame)
 {
     bool handled = false;
