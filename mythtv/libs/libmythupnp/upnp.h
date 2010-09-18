@@ -129,6 +129,7 @@ class UPNP_PUBLIC UPnp
 
         bool Initialize( int nServicePort, HttpServer *pHttpServer );
         bool Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer );
+        bool InitializeSSDPOnly( void );
 
         virtual void Start();
 

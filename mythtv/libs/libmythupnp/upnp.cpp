@@ -151,6 +151,19 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     return true;
 }
 
+bool UPnp::InitializeSSDPOnly( void )
+{
+    VERBOSE(VB_UPNP, "UPnp::InitializeSSDPOnly - Creating SSDP Thread at port "
+                     + QString::number(m_nServicePort));
+
+    g_pSSDP = new SSDP( m_nServicePort );
+    g_pSSDP->start();
+
+    VERBOSE(VB_UPNP, "UPnp::InitializeSSDPOnly - End");
+
+    return true;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Delay startup of Discovery Threads until all Extensions are registered.
 //////////////////////////////////////////////////////////////////////////////

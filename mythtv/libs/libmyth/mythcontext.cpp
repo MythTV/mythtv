@@ -890,28 +890,7 @@ bool MythContextPrivate::InitUPnP(void)
     m_UPnP = new UPnp();
     m_UPnP->SetConfiguration(m_XML);
 
-    int port=6549;
-    m_HTTP = new HttpServer();
-
-    if (!m_HTTP->listen(QHostAddress::Any,port))
-    {
-        VERBOSE(VB_IMPORTANT, "MCP::InitUPnP() - HttpServer Create Error");
-        DeleteUPnP();
-        return false;
-    }
-
-    if (!m_UPnP->Initialize(port, m_HTTP))
-    {
-        VERBOSE(VB_IMPORTANT, "MCP::InitUPnP() - UPnp::Initialize() Error");
-        DeleteUPnP();
-        return false;
-    }
-
-    // Create a dummy device description
-    UPnpDevice   &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
-    device.m_sDeviceType = "urn:schemas-upnp-org:device:MythContextClient:1";
-
-    m_UPnP->Start();
+    m_UPnP->InitializeSSDPOnly();
 
     return true;
 }
