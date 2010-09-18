@@ -2743,7 +2743,7 @@ void ProgramInfo::ClearMarkupMap(
     if (max_frame >= 0)
         comp += QString(" AND mark <= %1 ").arg(max_frame);
 
-    if (type != -100)
+    if (type != MARK_ALL)
         comp += QString(" AND type = :TYPE ");
 
     if (IsVideo())
