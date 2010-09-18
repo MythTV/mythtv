@@ -850,6 +850,10 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
 {
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
 
+    // Job status (recording, transcoding, flagging)
+    QString job = extract_job_state(*pginfo);
+    item->DisplayState(job, "jobstate");
+
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
     if ((item != sel_item) && pginfo && item->GetImage("preview").isEmpty() &&
         (asAvailable == pginfo->GetAvailableStatus()))
