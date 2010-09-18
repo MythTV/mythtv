@@ -2495,15 +2495,20 @@ bool ProgramInfo::QueryIsDeleteCandidate(bool one_playback_allowed) const
     QStringList byWho;
     if (QueryIsInUse(byWho) && !byWho.isEmpty())
     {
-        uint play_cnt = 0;
-        for (uint i = 0; (i+2 < (uint)byWho.size()) && ok; i++)
+        uint play_cnt = 0, ft_cnt = 0, jq_cnt = 0;
+        for (uint i = 0; (i+2 < (uint)byWho.size()) && ok; i+=3)
         {
             play_cnt += byWho[i].contains(kPlayerInUseID) ? 1 : 0;
+            ft_cnt += (byWho[i].contains(kFlaggerInUseID) ||
+                       byWho[i].contains(kTranscoderInUseID)) ? 1 : 0;
+            jq_cnt += (byWho[i].contains(kJobQueueInUseID)) ? 1 : 0;
             ok = ok && (byWho[i].contains(kRecorderInUseID)   ||
                         byWho[i].contains(kFlaggerInUseID)    ||
                         byWho[i].contains(kTranscoderInUseID) ||
+                        byWho[i].contains(kJobQueueInUseID)   ||
                         (one_playback_allowed && (play_cnt <= 1)));
         }
+        ok = ok && (ft_cnt == jq_cnt);
     }
 
     return ok;
