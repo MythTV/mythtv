@@ -6,7 +6,6 @@ using namespace std;
 
 #include <QCoreApplication>
 #include <QFile>
-#include <QTcpSocket>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -269,38 +268,6 @@ static int getStatus(bool bWantRecStatus)
     {
         VERBOSE(VB_IMPORTANT, "Has queued or pending jobs");
         res += 32;
-    }
-
-    if (isRunning("mtd"))
-    {
-        VERBOSE(VB_GENERAL, "MTD seems to be running. Let's see if it is busy");
-        int port = gCoreContext->GetNumSetting("MTDPort", 2442);
-        QAbstractSocket *connection = new QTcpSocket();
-        connection->connectToHost(QString("localhost"), port);
-        if (!connection->waitForConnected(1000))
-        {
-            VERBOSE(VB_IMPORTANT, "Could not connect to mtd");
-        }
-        else
-        {
-            connection->write(QByteArray("status\n"));
-            if (connection->waitForBytesWritten(1000) && connection->waitForReadyRead(1000))
-            {
-                VERBOSE(VB_NETWORK, "MTD status:");
-                QString status = connection->readLine();
-                VERBOSE(VB_NETWORK, status);
-                if (status != QString("status dvd summary 0\n"))
-                {
-                    // Tiny hack, return 1 (Transcoding) even though
-                    // that might not be quite accurate.
-                    res += 1;
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "Could not read from MTD socket!");
-            }
-        }
     }
 
     QDateTime dtPeriod1Start = getDailyWakeupTime("DailyWakeupStartPeriod1");
