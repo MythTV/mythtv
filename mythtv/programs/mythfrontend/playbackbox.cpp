@@ -916,7 +916,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
         QString tokens("\n\t\t\ttokens: ");
         for (uint i = 4; i < (uint) list.size(); i++)
             tokens += list[i] + ", ";
-        VERBOSE(VB_IMPORTANT, LOC +
+        VERBOSE(VB_GENERAL, LOC +
                 "Ignoring PREVIEW_SUCCESS, no matcing token" + tokens);
         return;
     }
@@ -936,7 +936,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
 
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        VERBOSE(VB_GENERAL, LOC +
                 "Ignoring PREVIEW_SUCCESS, item no longer on screen.");
     }
 
