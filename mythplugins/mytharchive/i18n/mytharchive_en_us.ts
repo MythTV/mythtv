@@ -253,19 +253,19 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
-        <source>Myth Archive Temp Directory</source>
-        <translation>Myth Archive Temp Directory</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/archivesettings.cpp" line="20"/>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
         <translation>Location where MythArchive should create its temporory work files. LOTS of free space required here.</translation>
     </message>
     <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
+        <source>MythArchive Temp Directory</source>
+        <translation>MythArchive Temp Directory</translation>
+    </message>
+    <message>
         <location filename="../mytharchive/archivesettings.cpp" line="28"/>
-        <source>Myth Archive Share Directory</source>
-        <translation>Myth Archive Share Directory</translation>
+        <source>MythArchive Share Directory</source>
+        <translation>MythArchive Share Directory</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="30"/>
@@ -501,14 +501,6 @@
         <location filename="../mytharchive/archivesettings.cpp" line="287"/>
         <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
         <translation>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</translation>
-    </message>
-    <message>
-        <source>tcrequant command</source>
-        <translation type="obsolete">tcrequant command</translation>
-    </message>
-    <message>
-        <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation type="obsolete">Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="294"/>
@@ -775,450 +767,465 @@ Place a blank DVD in the drive and select an option below.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
         <source>Select Destination</source>
         <translation>Select Destination</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Choose where you would like your files archived.</source>
         <translation>Choose where you would like your files archived.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Output Type:</source>
         <translation>Output Type:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Destination:</source>
         <translation>Destination:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Free Space:</source>
         <translation>Free Space:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Click here to find an output location...</source>
         <translation>Click here to find an output location...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Make ISO Image</source>
         <translation>Make ISO Image</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Burn to DVD</source>
         <translation>Burn to DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Erase DVD-RW before burning</source>
         <translation>Erase DVD-RW before burning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Previous</source>
         <translation>Previous</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Next</source>
         <translation>Next</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Filter:</source>
         <translation>Filter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="21"/>
         <source>File Finder</source>
         <translation>File Finder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Select the file you wish to use.</source>
         <translation>Select the file you wish to use.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Back</source>
         <translation>Back</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Home</source>
         <translation>Home</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="25"/>
         <source>No videos available</source>
         <translation>No videos available</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Log Viewer</source>
         <translation>Log Viewer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="27"/>
         <source>See logs from your archive runs.</source>
         <translation>See logs from your archive runs.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Update</source>
         <translation>Update</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="30"/>
         <source>description goes here.</source>
         <translation>description goes here.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="32"/>
         <source>0.00 GB</source>
         <oldsource>0.00Gb</oldsource>
         <translation>0.00 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Force Overwrite of DVD-RW Media</source>
         <translation>Force Overwrite of DVD-RW Media</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Select Recordings</source>
         <translation>Select Recordings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Show Recordings</source>
         <translation>Show Recordings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Select Videos</source>
         <translation>Select Videos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="37"/>
+        <source>Video Category:</source>
+        <translation>Video Category:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
         <source>Video Category</source>
         <translation>Video Category</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="38"/>
         <source>title goes here</source>
         <translation>title goes here</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="75"/>
         <source>x.xx GB</source>
         <oldsource>x.xx Gb</oldsource>
         <translation>x.xx GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="39"/>
         <source>PL:</source>
         <translation>PL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="40"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="42"/>
+        <source>x.xx Gb</source>
+        <translation>x.xx Gb</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
         <source>Change Encoding Profile</source>
         <translation>Change Encoding Profile</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>12.34 GB</source>
         <oldsource>12.34GB</oldsource>
         <translation>12.34 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="45"/>
         <source>DVD Menu Theme</source>
         <translation>DVD Menu Theme</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Choose the appearance of your DVD.</source>
         <translation>Choose the appearance of your DVD.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Theme:</source>
         <translation>Theme:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Intro</source>
         <translation>Intro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Main Menu</source>
         <translation>Main Menu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Chapter Menu</source>
         <translation>Chapter Menu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Details</source>
         <translation>Details</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Select Archive Items</source>
         <translation>Select Archive Items</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Select the recordings and videos you wish to save.</source>
         <translation>Select the recordings and videos you wish to save.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="54"/>
         <source>No files are selected for archive</source>
         <translation>No files are selected for archive</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Add Recording</source>
         <translation>Add Recording</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Add Video</source>
         <translation>Add Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Add File</source>
         <translation>Add File</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Archive Item Details</source>
         <translation>Archive Item Details</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Title:</source>
         <translation>Title:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Subtitle:</source>
         <translation>Subtitle:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Start Date:</source>
         <translation>Start Date:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Time:</source>
         <translation>Time:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Description:</source>
         <translation>Description:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Thumb Image Selector</source>
         <translation>Thumb Image Selector</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Current Position</source>
         <translation>Current Position</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="66"/>
         <source>0:00:00.00</source>
         <translation>0:00:00.00</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Seek Amount</source>
         <translation>Seek Amount</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Frame</source>
         <translation>Frame</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Select a theme</source>
         <translation>Select a theme</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="71"/>
         <source>xxxxx MB</source>
         <oldsource>xxxxx mb</oldsource>
         <translation>xxxxx MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
-        <source>0 mb</source>
-        <translation>0 mb</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Find</source>
         <translation>Find</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="72"/>
+        <source>0 MB</source>
+        <translation>0 MB</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="73"/>
         <source>Prev</source>
         <translation>Prev</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="74"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
         <translation>sep 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="76"/>
         <source>File Finder To Import</source>
         <translation>File Finder To Import</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Start Time:</source>
         <translation>Start Time:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Select Associated Channel</source>
         <translation>Select Associated Channel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Archived Channel</source>
         <translation>Archived Channel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Chan. ID:</source>
         <translation>Chan. ID:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Chan. No:</source>
         <translation>Chan. No:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Callsign:</source>
         <translation>Callsign:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Local Channel</source>
         <translation>Local Channel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Search Channel</source>
         <translation>Search Channel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Search Callsign</source>
         <translation>Search Callsign</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Search Name</source>
         <translation>Search Name</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Finish</source>
         <translation>Finish</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Add video</source>
         <translation>Add video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Create DVD</source>
         <translation>Create DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Create Archive</source>
         <translation>Create Archive</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Encode Video File</source>
         <translation>Encode Video File</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Import Archive</source>
         <translation>Import Archive</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Archive Utilities</source>
         <translation>Archive Utilities</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Show Log Viewer</source>
         <translation>Show Log Viewer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Play Created DVD</source>
         <translation>Play Created DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Burn DVD</source>
         <translation>Burn DVD</translation>
     </message>
