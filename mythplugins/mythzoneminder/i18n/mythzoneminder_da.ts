@@ -5,24 +5,24 @@
     <name>FunctionDialog</name>
     <message>
         <location filename="../mythzoneminder/zmconsole.cpp" line="67"/>
-        <source>Ok</source>
-        <translation>Ok</translation>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="41"/>
+        <location filename="../mythzoneminder/main.cpp" line="129"/>
         <source>ZoneMinder Console</source>
         <translation>ZoneMinder konsol</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="43"/>
+        <location filename="../mythzoneminder/main.cpp" line="131"/>
         <source>ZoneMinder Live View</source>
         <translation>ZoneMinder direkte visning</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="45"/>
+        <location filename="../mythzoneminder/main.cpp" line="133"/>
         <source>ZoneMinder Events</source>
         <translation>ZoneMinder events</translation>
     </message>
@@ -363,6 +363,16 @@
         <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Sletter %1 events i denne visning.</translation>
+    </message>
+</context>
+<context>
+    <name>ZMLivePlayer</name>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="127"/>
+        <source>Can&apos;t show live view.
+You don&apos;t have any monitors defined!</source>
+        <translation>Kan ikke vise direkte visning.
+Du har ikke nogen skærme defineret!</translation>
     </message>
 </context>
 <context>
