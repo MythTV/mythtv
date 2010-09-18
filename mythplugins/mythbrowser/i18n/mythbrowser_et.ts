@@ -298,12 +298,12 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <translation>Klõpsa olemasolevatest kategooriatest valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Find</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Find...</source>
         <translation>Otsi...</translation>
     </message>
@@ -323,9 +323,8 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>

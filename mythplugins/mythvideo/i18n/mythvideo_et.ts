@@ -608,7 +608,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="33"/>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation>Ainult numbrite kasutamine teeb edaspidi elu palju lihtsamaks.</translation>
+        <translation>Ainult numbrite kasutamine teeb elu edaspidi palju lihtsamaks.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="158"/>
@@ -1166,492 +1166,468 @@ Kontolli videohalduse seadeid</translation>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Director:</source>
         <translation>Lavastaja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Year:</source>
         <translation>Aasta:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="6"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="132"/>
         <source>Directed by:</source>
         <translation>Režissöör:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="42"/>
         <source>User Rating:</source>
         <translation>Hinnang:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="124"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Done</source>
         <translation>Valmis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Play</source>
         <translation>Esita</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="128"/>
         <source>Rated:</source>
         <translation>Hinnatud:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Parental Level:</source>
         <translation>Vanemlik tase:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Lowest</source>
         <translation>Madalaim</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Low</source>
         <translation>Madal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="154"/>
         <source>Medium</source>
         <translation>Keskmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="189"/>
+        <location filename="themestrings.h" line="155"/>
         <source>High</source>
         <translation>Kõrge</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Browsable:</source>
         <translation>Lehitsetav:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Runtime:</source>
         <translation>Pikkus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Plot:</source>
         <translation>Süžee:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="129"/>
         <source>Filename:</source>
         <translation>Failinimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="130"/>
         <source>Cover File:</source>
         <translation>Kaanepildi fail:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="192"/>
+        <location filename="themestrings.h" line="158"/>
         <source>Directed by</source>
         <translation>Lavastaja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="139"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Year</source>
         <translation>Aasta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="140"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Runtime</source>
         <translation>Pikkus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="141"/>
+        <location filename="themestrings.h" line="107"/>
         <source>User Rating</source>
         <translation>Kasutaja reiting</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="195"/>
+        <location filename="themestrings.h" line="161"/>
         <source>MythVideo File Associations</source>
         <translation>MythVideo failiseosed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Extension:</source>
         <translation>Laiend:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Command:</source>
         <translation>Käsk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="122"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Use default player:</source>
         <translation>Kasuta vaikimisi mängijat:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="123"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Ignore:</source>
         <translation>Ignoreeri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="198"/>
+        <location filename="themestrings.h" line="164"/>
         <source>Edit Video Information</source>
         <translation>Muuda videoinfot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
         <source>Name:</source>
-        <translation>Nimi:</translation>
+        <translation type="obsolete">Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="131"/>
         <source>Video Num.:</source>
         <translation>Video num.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="194"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Parental Level</source>
         <translation>Vanemlik tase</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Title:</source>
         <translation>Pealkiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Subtitle:</source>
         <translation>Alapealkiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Season:</source>
         <translation>Hooaeg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Episode:</source>
         <translation>Osa:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Category:</source>
         <translation>Kategooria:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="150"/>
         <source>Text Filter :</source>
         <translation>Tekstifilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="151"/>
         <source>Seas/Ep:</source>
         <translation>Hooaeg/osa:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="190"/>
+        <location filename="themestrings.h" line="156"/>
         <source>SELECT: Edit</source>
         <translation>VALI: Muuda</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="191"/>
+        <location filename="themestrings.h" line="157"/>
         <source>INFO - Action Menu</source>
         <translation>INFO - Tegevuste menüü</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="197"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Background:</source>
         <translation>Taust:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="126"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Parental Control:</source>
         <translation>Vanemlik kontroll:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="199"/>
+        <location filename="themestrings.h" line="165"/>
         <source>File to Always Play Next:</source>
         <translation>Fail, mida alati järgmisena mängida:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="128"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Include while Browsing:</source>
         <translation>Lisa lehitsemisse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="200"/>
+        <location filename="themestrings.h" line="166"/>
         <source>Item has been watched:</source>
         <translation>On juba vaadatud:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Cover Art:</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Screenshot:</source>
         <translation>Kuvatõmmis:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Banner:</source>
         <translation>Bänner:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Fanart:</source>
         <translation>Kinoplakat:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Trailer:</source>
         <translation>Treiler:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="130"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Unique Player Command:</source>
         <translation>Unikaalne mängija käsk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="137"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/faili/tee/pildini.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="196"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Filters video list</source>
         <translation>Filtri videonimekiri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Text Filter:</source>
         <translation>Tekstifilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
         <source>Select a Title to Rip</source>
-        <translation>Vali ripitav pealkiri</translation>
+        <translation type="obsolete">Vali ripitav pealkiri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
         <source>Select the parts of the DVD you wish to copy.</source>
-        <translation>Vali kopeeritav DVD osa.</translation>
+        <translation type="obsolete">Vali kopeeritav DVD osa.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
         <source>Film Name:</source>
-        <translation>Filmi nimi:</translation>
+        <translation type="obsolete">Filmi nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
         <source>Track Length:</source>
-        <translation>Raja pikkus:</translation>
+        <translation type="obsolete">Raja pikkus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
         <source>Rip Quality:</source>
-        <translation>Rippimise kvaliteet:</translation>
+        <translation type="obsolete">Rippimise kvaliteet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
         <source>Rip AC-3 Audio</source>
-        <translation>Ripi AC-3 heli</translation>
+        <translation type="obsolete">Ripi AC-3 heli</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
         <source>Preview this title</source>
-        <translation>Pealkirja eelvaade</translation>
+        <translation type="obsolete">Pealkirja eelvaade</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
         <source>Rip This Track</source>
-        <translation>Ripi see rada</translation>
+        <translation type="obsolete">Ripi see rada</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
         <source>Previous Title</source>
-        <translation>Eelmine pealkiri</translation>
+        <translation type="obsolete">Eelmine pealkiri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
         <source>Next Title</source>
-        <translation>Järgmine pealkiri</translation>
+        <translation type="obsolete">Järgmine pealkiri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
         <source>Begin Ripping</source>
-        <translation>Alusta rippimist</translation>
+        <translation type="obsolete">Alusta rippimist</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
         <source>Overall Progress</source>
-        <translation>Üldine edenemine</translation>
+        <translation type="obsolete">Üldine edenemine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
         <source>Job Progress</source>
-        <translation>Toimingu edenemine</translation>
+        <translation type="obsolete">Toimingu edenemine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
         <source>Preview Track</source>
-        <translation>Raja eelvaade</translation>
+        <translation type="obsolete">Raja eelvaade</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
         <source>No Current Jobs</source>
-        <translation>Hetkel tööd puuduvad</translation>
+        <translation type="obsolete">Hetkel tööd puuduvad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
         <source>Select a Track to Rip</source>
-        <translation>Vali ripitav rada</translation>
+        <translation type="obsolete">Vali ripitav rada</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Name of Film:</source>
-        <translation>Filmi nimi:</translation>
+        <translation type="obsolete">Filmi nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
         <source>Selected track length:</source>
-        <translation>Valitud raja pikkus:</translation>
+        <translation type="obsolete">Valitud raja pikkus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
         <source>Check this box to select this track:</source>
-        <translation>Raja valimiseks tee siin valik:</translation>
+        <translation type="obsolete">Raja valimiseks tee siin valik:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
         <source>Check to rip AC-3 audio:</source>
-        <translation>Vali AC-3 heli rippimiseks:</translation>
+        <translation type="obsolete">Vali AC-3 heli rippimiseks:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
         <source>Press to view excerpt:</source>
-        <translation>Klõpsa väljavõtte nägemiseks:</translation>
+        <translation type="obsolete">Klõpsa väljavõtte nägemiseks:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
         <source>Previous</source>
-        <translation>Eelmine</translation>
+        <translation type="obsolete">Eelmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
         <source>Next</source>
-        <translation>Järgmine</translation>
+        <translation type="obsolete">Järgmine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="2"/>
         <source>Released %1</source>
         <translation>Avaldatud %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="3"/>
         <source>User Rating: %1</source>
         <translation>Kasutaja hinnang: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="4"/>
         <source>Cast</source>
         <translation>Näitleja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Plot</source>
         <translation>Süžee</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Season/Episode: %1</source>
         <translation>Hooaeg/osa: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Tagline:</source>
         <translation>Siltide nimekiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Click to select from online coverart...</source>
         <translation>Kliki siin võrgust kaanepildi valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Click to select from online screenshots...</source>
         <translation>Kliki siin võrgust kuvatõmmise valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Click to select from online banners...</source>
         <translation>Kliki siin võrgust bänneri valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Click to select from online fanart...</source>
         <translation>Kliki siin võrgust plakati valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Filter Videos</source>
         <translation>Filtreeri videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Directed by %1</source>
         <translation>Režissöör %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Starring: %1</source>
         <translation>Peaosades: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Parental Level 0</source>
         <translation>Vanemlik tase 0</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Parental Level 1</source>
         <translation>Vanemlik tase 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Parental Level 2</source>
         <translation>Vanemlik tase 2</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Parental Level 3</source>
         <translation>Vanemlik tase 3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Parental Level 4</source>
         <translation>Vanemlik tase 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Add New File Types</source>
         <translation>Lisa uusi failitüüpe</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="16"/>
         <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
 
 If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
@@ -1660,22 +1636,22 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
 Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi mängijat&quot;. &quot;Ignoreeri seda faili tüüpi&quot; välistab faili leidmise skanneri poolt.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Use Default Player</source>
         <translation>Kasuta vaikimisi mängijat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Ignore This File Type</source>
         <translation>Ignoreeri seda faili tüüpi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="21"/>
         <source>New</source>
         <translation>Uus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
@@ -1688,22 +1664,22 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">Muuda filmi metaandmeid.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Rating:</source>
         <translation>Hinnang:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="28"/>
         <source>TMDB Number:</source>
         <translation>TMDB number:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Homepage:</source>
         <translation>Koduleht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Custom Player:</source>
         <translation>Valitud mängija:</translation>
     </message>
@@ -1716,137 +1692,137 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">Film on lehitsetav</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Next File:</source>
         <translation>Järgmine fail:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Click here to search existing coverart...</source>
         <translation>Kliki siin kaanepildi otsimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Kliki siin olemasoleva kuvatõmmise otsimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Click here to search existing banners...</source>
         <translation>Kliki siin olemasoleva bänneri otsimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Click here to search existing fanart...</source>
         <translation>Kliki siin olemasoleva plakati leidmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Click here to search existing trailers...</source>
         <translation>Kliki siin olemasoleva treileri leidmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Country:</source>
         <translation>Riik:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Actor/Actress:</source>
         <translation>Näitleja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Browse:</source>
         <translation>Lehitse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="62"/>
         <source>TMDB/TVDB #:</source>
         <translation>TMDB/TVDB #:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Coverart:</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Sort By:</source>
         <translation>Sorteeri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Watched:</source>
         <translation>Vaadatud:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Save</source>
         <translation>Salvesta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="69"/>
         <source>This item was released on %1.</source>
         <translation>Avaldatud %1.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="70"/>
         <source>It was added to your collection on %1.</source>
         <translation>Lisatud  %1.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Video Player Settings</source>
         <translation>Mängija seadistused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Default:</source>
         <translation>Vaikimisi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="75"/>
         <source>DVD Player:</source>
         <translation>DVD mängija:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="76"/>
         <source>DVD Drive:</source>
         <translation>DVD seade:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="77"/>
         <source>VCD Player:</source>
         <translation>VCD seade:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="78"/>
         <source>VCD Drive:</source>
         <translation>VCD seade:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Enable Alternate Player</source>
         <translation>Luba alternatiivne mängija</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="114"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Alt. Player:</source>
         <translation>Alt mängija:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="115"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Video Metadata Settings</source>
         <translation>Video metaandmete seaded</translation>
     </message>
@@ -1859,459 +1835,446 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">TV tõmbaja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="117"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Display unknown file types</source>
         <translation>Näita tundmatuid failitüüpe</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="118"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Enable metadata in file browse mode</source>
         <translation>Luba metaandmed sirvimis vaates</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="119"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Enable Random Trailer Playback</source>
         <translation>Luba suvalise treileri mängimine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="120"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Trailer #:</source>
         <translation>Treiler #:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="127"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
         <translation>Meediavaramus pole videosid või ei leitud midagi. Kui videokataloog on seadistatud, klõpsa &quot;M&quot; (või Menüü nupp) ja vali &quot;Skanneeri muudatusi.&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="133"/>
         <source>TMDB:</source>
         <translation>TMDB:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="134"/>
         <source>Parental Lvl:</source>
         <translation>Vanemlik tase:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="135"/>
         <source>Browseable</source>
         <translation>Lehitsetav</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="146"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Watched</source>
         <translation>Vaadatud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="116"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Update metadata after video scan</source>
         <translation>Uuenda peale videote skanneerimist metaandmeid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="121"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Video File Associations</source>
         <translation>Videofailide seosed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="125"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Edit Video Metadata</source>
         <translation>Muuda video metaandmeid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
+        <location filename="themestrings.h" line="93"/>
         <source>File to Play Next:</source>
         <translation>Järgmisena esitatav fail:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="129"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Item has been Watched:</source>
         <translation>On juba vaadatud:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="131"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Search Results</source>
         <translation>Otsingu tulemused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="132"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Cast Members</source>
         <translation>Näitlejad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="133"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Full Plot</source>
         <translation>Kogu süžee</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="135"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Category</source>
         <translation>Kategooria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="136"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Genre</source>
         <translation>Žanr</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="137"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Country</source>
         <translation>Riik</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="138"/>
+        <location filename="themestrings.h" line="104"/>
         <source>Actor/Actress</source>
         <translation>Näitleja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="142"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Browse</source>
         <translation>Sirvi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="143"/>
+        <location filename="themestrings.h" line="109"/>
         <source>InetRef</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="144"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Cover File</source>
         <translation>Kaanepilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="145"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Sort by</source>
         <translation>Sorteeri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="147"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Make default</source>
         <translation>Sea vaikimisi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="148"/>
+        <location filename="themestrings.h" line="114"/>
         <source>Videos - Manager</source>
         <translation>Videod - haldur</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="149"/>
+        <location filename="themestrings.h" line="115"/>
         <source>Cast:</source>
         <translation>Näitlejatest:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="150"/>
+        <location filename="themestrings.h" line="116"/>
         <source>Videos - Browser</source>
         <translation>Videod - lehitseja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="151"/>
+        <location filename="themestrings.h" line="117"/>
         <source>Videos - Gallery</source>
         <translation>Videod - album</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="118"/>
         <source>Videos - Tree</source>
         <translation>Videod - puu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="136"/>
         <source>Player Command:</source>
         <translation>Mängija käsk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="138"/>
         <source>Category :</source>
         <translation>Kategooria:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="139"/>
         <source>Genre :</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="140"/>
         <source>Country :</source>
         <translation>Riik:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="141"/>
         <source>Actor/Actress :</source>
         <translation>Näitleja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="142"/>
         <source>Year :</source>
         <translation>Aasta:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="143"/>
         <source>Runtime :</source>
         <translation>Pikkus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="144"/>
         <source>User Rating :</source>
         <translation>Kasutaja hinnang:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="145"/>
         <source>Browse :</source>
         <translation>Lehitse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="146"/>
         <source>InetRef :</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="147"/>
         <source>Cover File :</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="148"/>
         <source>Sort by :</source>
         <translation>Sorteeri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="149"/>
         <source>Watched :</source>
         <translation>Vaadatud:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="188"/>
+        <source>Configure video and DVD playback</source>
+        <translation>Seadista videote ja DVD-de esitamist</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="66"/>
         <source>Result</source>
         <translation>Tulem</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="206"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Save as default</source>
         <translation>Salvesta vaikimisi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="209"/>
+        <location filename="themestrings.h" line="175"/>
         <source>General Settings</source>
         <translation>Üldised seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="119"/>
         <source>Player Settings</source>
         <translation>Mängija seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="213"/>
+        <location filename="themestrings.h" line="179"/>
         <source>File Types</source>
         <translation>Failitüübid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="215"/>
         <source>Rip Settings</source>
-        <translation>Rippimis seaded</translation>
+        <translation type="obsolete">Rippimis seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="217"/>
+        <location filename="themestrings.h" line="181"/>
         <source>Browse Videos</source>
         <translation>Sirvi videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="218"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Video List</source>
         <translation>Video loend</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="193"/>
+        <location filename="themestrings.h" line="159"/>
         <source>Video Gallery</source>
         <translation>Video album</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="134"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Video List Filters</source>
         <translation>Video loandi filtrid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="120"/>
         <source>Default Player:</source>
         <translation>Vaikimisi mängija:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="121"/>
         <source>Enable Alternate Player:</source>
         <translation>Luba alternatiivne mängija:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="122"/>
         <source>Alternate Player:</source>
         <translation>Alternatiivne mängija:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="124"/>
         <source>Movie Grabber:</source>
         <translation>Filmi tõmbaja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="125"/>
         <source>TV Grabber:</source>
         <translation>TV tõmbaja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="126"/>
         <source>Trailers to Play:</source>
         <translation>Esitatavd treilerid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="210"/>
+        <location filename="themestrings.h" line="176"/>
         <source>File Paths and general options</source>
         <translation>Faili asukohad ja peamised valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="211"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Player Applications and DVD/VCD Drives</source>
         <translation>Mängija rakendused ja DVD/VCD seadmed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="123"/>
         <source>Metadata Settings</source>
         <translation>Info seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="201"/>
+        <location filename="themestrings.h" line="167"/>
         <source>Visible:</source>
         <translation>Nähtav:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="202"/>
+        <location filename="themestrings.h" line="168"/>
         <source>Coverart</source>
         <translation>Kaanepilt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="203"/>
+        <location filename="themestrings.h" line="169"/>
         <source>Screenshots</source>
         <translation>Kuvatõmmis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="204"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Banners</source>
         <translation>Bännerid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="205"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Fanart</source>
         <translation>Kinoplakat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="207"/>
+        <location filename="themestrings.h" line="173"/>
         <source>Perform metadata update after video scan</source>
         <translation>Uuenda peale videote skanneerimist metaandmeid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="208"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Find Online...</source>
         <translation>Otsi võrgust...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="212"/>
+        <location filename="themestrings.h" line="178"/>
         <source>Grabber Setup and display preferences</source>
         <translation>Tõmbaja seadistamine ja kuva eelistused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="214"/>
+        <location filename="themestrings.h" line="180"/>
         <source>Associate new file extensions</source>
         <translation>Lisa uus faililaiend</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="216"/>
         <source>DVD Rip and Transcode options</source>
-        <translation>DVD rippimise ja transkodeerimise valikud</translation>
+        <translation type="obsolete">DVD rippimise ja transkodeerimise valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="219"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Video Manager</source>
         <translation>Videohaldur</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="220"/>
+        <location filename="themestrings.h" line="184"/>
         <source>Play DVD</source>
         <translation>Esita DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="221"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Play VCD</source>
         <translation>Esita VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="222"/>
         <source>Rip DVD</source>
-        <translation>Ripi DVD</translation>
+        <translation type="obsolete">Ripi DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="223"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Eject media</source>
         <translation>Väljasta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="224"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Videos Settings</source>
         <translation>Video seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="225"/>
         <source>Configure playback and DVD ripping</source>
-        <translation>Seadista taasesitus ja DVD rippimine</translation>
+        <translation type="obsolete">Seadista taasesitus ja DVD rippimine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
         <source>Rip/Transcode</source>
-        <translation>Ripi / transkodeeri</translation>
+        <translation type="obsolete">Ripi / transkodeeri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
         <source>Job 1 of 1</source>
-        <translation>Töö 1 1-st</translation>
+        <translation type="obsolete">Töö 1 1-st</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Length:</source>
         <translation>Pikkus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
-        <source>Select:</source>
-        <translation>Valik:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="24"/>
         <source>Quality:</source>
-        <translation>Kvaliteet:</translation>
+        <translation type="obsolete">Kvaliteet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
         <source>Audio Track:</source>
-        <translation>Helirada:</translation>
+        <translation type="obsolete">Helirada:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
         <source>AC3 Audio:</source>
-        <translation>AC3 heli:</translation>
+        <translation type="obsolete">AC3 heli:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
         <source>Subtitles:</source>
-        <translation>Subtiitrid:</translation>
+        <translation type="obsolete">Subtiitrid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
         <source>View:</source>
-        <translation>Vaata:</translation>
+        <translation type="obsolete">Vaata:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
         <source>0:00:00</source>
-        <translation>0:00:00</translation>
+        <translation type="obsolete">0:00:00</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
         <source>Title 1 of 1</source>
-        <translation>Pealkiri 1 1-st</translation>
+        <translation type="obsolete">Pealkiri 1 1-st</translation>
     </message>
 </context>
 <context>
@@ -2348,17 +2311,17 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2541"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2546"/>
         <source>Switch to Browse View</source>
         <translation>Lülitu lehitsemise vaatele</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2545"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2550"/>
         <source>Switch to Gallery View</source>
         <translation>Lülitu galerii vaatele</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2549"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2554"/>
         <source>Switch to List View</source>
         <translation>Lülitu nimekirja vaatele</translation>
     </message>
@@ -2372,39 +2335,39 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation>%1 %2-st</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2432"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2680"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2685"/>
         <source>Video Info</source>
         <translation>Video info</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2433"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
         <source>Change Video Details</source>
         <translation>Muuda video andmeid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2500"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2505"/>
         <source>Scan For Changes</source>
         <translation>Skaneeri muudatusi</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2531"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2511"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2536"/>
         <source>Change View</source>
         <translation>Muuda vaadet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2502"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
         <source>Filter Display</source>
         <translation>Filtri vaade</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2552"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2557"/>
         <source>Switch to Manage View</source>
         <translation>Lülitu halduse vaatele</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2509"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2514"/>
         <source>Disable File Browse Mode</source>
         <translation>Keela failide lehitsemine</translation>
     </message>
@@ -2425,7 +2388,7 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation>Vide otsing</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2403"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2408"/>
         <source>Video Options
 %1
 %2</source>
@@ -2434,39 +2397,39 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
 %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2406"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2411"/>
         <source>Video Options
 %1</source>
         <translation>Video valikud
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2409"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2434"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2710"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2414"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2715"/>
         <source>Video Options</source>
         <translation>Video valikud</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2425"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2430"/>
         <source>Play...</source>
         <translation>Esita...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2427"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2463"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2432"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2468"/>
         <source>Play</source>
         <translation>Esita</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2429"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2722"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2434"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2727"/>
         <source>Mark as Unwatched</source>
         <translation>Märgi mitte vaadatuks</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2431"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2724"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2436"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2729"/>
         <source>Mark as Watched</source>
         <translation>Märgi vaadatuks</translation>
     </message>
@@ -2475,204 +2438,204 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">Info valikud</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2435"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2443"/>
         <source>Play Folder</source>
         <translation>Esita kaust</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2452"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2457"/>
         <source>Playback Options
 %1</source>
         <translation>Taasesituse valikud
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2467"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2472"/>
         <source>Play in Alternate Player</source>
         <translation>Esita alternatiivse mängijaga</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2472"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2477"/>
         <source>Play With Trailers</source>
         <translation>Esita treileritega</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2480"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2485"/>
         <source>Play Trailer</source>
         <translation>Esita treiler</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2491"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2496"/>
         <source>Video Display Menu</source>
         <translation>Video ekraanimenüü</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2501"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
         <source>Retrieve All Details</source>
         <translation>Tõmba kõik andmed</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2504"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2509"/>
         <source>Browse By...</source>
         <translation>Sirvi...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2512"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2517"/>
         <source>Enable File Browse Mode</source>
         <translation>Luba failide sirvimine</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2516"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2521"/>
         <source>Disable Flat View</source>
         <translation>Keela lame vaade</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2519"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2524"/>
         <source>Enable Flat View</source>
         <translation>Luba lame vaade</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2522"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2527"/>
         <source>Settings</source>
         <translation>Seaded</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2562"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2567"/>
         <source>Video Settings</source>
         <translation>Video seaded</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2571"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2576"/>
         <source>Player Settings</source>
         <translation>Mängija seadistused</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2572"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2577"/>
         <source>Metadata Settings</source>
         <translation>Info seaded</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2573"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2578"/>
         <source>File Type Settings</source>
         <translation>Failitüübi seaded</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2624"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2629"/>
         <source>Browse By</source>
         <translation>Sirvi</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2634"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2639"/>
         <source>Cast</source>
         <translation>Näitleja</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2638"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2643"/>
         <source>Category</source>
         <translation>Kategooria</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2642"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2647"/>
         <source>Date Added</source>
         <translation>Lisamise kuupäev</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2646"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2651"/>
         <source>Director</source>
         <translation>Režissöör</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2650"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2655"/>
         <source>Studio</source>
         <translation>Stuudio</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2654"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2659"/>
         <source>Folder</source>
         <translation>Kaust</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2658"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2663"/>
         <source>Genre</source>
         <translation>Žanr</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2662"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2667"/>
         <source>TV/Movies</source>
         <translation>TV/film</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2666"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2671"/>
         <source>User Rating</source>
         <translation>Hinnang</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2670"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2675"/>
         <source>Year</source>
         <translation>Aasta</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2690"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2695"/>
         <source>View Details</source>
         <translation>Vaata detaile</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2692"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2697"/>
         <source>View Full Plot</source>
         <translation>Vaata kogu süžeed</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2698"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2703"/>
         <source>View Cast</source>
         <translation>Vaata näitlejaid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2700"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2705"/>
         <source>View Homepage</source>
         <translation>Vaata kodulehte</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2727"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2732"/>
         <source>Mark as Non-Browseable</source>
         <translation>Märgi sirvimatuks</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2729"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2734"/>
         <source>Mark as Browseable</source>
         <translation>Märgi sirvitavaks</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2738"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2743"/>
         <source>Manage Video Details</source>
         <translation>Muuda video andmeid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2749"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2754"/>
         <source>Edit Details</source>
         <translation>Muuda andmeid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2750"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2755"/>
         <source>Retrieve Details</source>
         <translation>Tõmba andmeid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2754"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2759"/>
         <source>Allow Updates</source>
         <translation>Luba uuendusi</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2761"/>
         <source>Disable Updates</source>
         <translation>Keela uuendused</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2757"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
         <source>Reset Details</source>
         <translation>Tühista andmed</translation>
     </message>
@@ -2697,9 +2660,9 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">Otsi sarju Pealkirja/alampealkirja järgi</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2751"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
         <source>Manually Enter Video #</source>
-        <translation>Sisesta käsitsi video nr.</translation>
+        <translation>Sisesta käsitsi video #</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
@@ -2710,7 +2673,7 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">Tühista info</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3693"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3698"/>
         <source>Are you sure you want to delete:
 %1</source>
         <translation>Soovid ikka kindlasti kustutada
@@ -2727,27 +2690,27 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
 </translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2998"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3003"/>
         <source>An error occurred when switching views.</source>
         <translation>Vaadete muutmisel tekkis viga.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3071"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3076"/>
         <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
         <translation>Brauseri käsk pole seadistatud! MythVideo vajab MythBrowserit kodulehe näitamiseks.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3547"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3552"/>
         <source>Fetching details for %1</source>
         <translation>Tõmbain %1 andmeid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3552"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3557"/>
         <source> %1x%2</source>
         <translation> %1x%2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3640"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3645"/>
         <source>Enter Video Unique ID:</source>
         <translation>Sisesta videole ainuomane id:</translation>
     </message>
@@ -2756,7 +2719,7 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation type="obsolete">Sisesta video pealkiri:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3731"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3736"/>
         <source>Failed to delete file</source>
         <translation>Faili kustutamine ebaõnnestus</translation>
     </message>
@@ -2775,8 +2738,8 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <location filename="../mythvideo/videofilter.cpp" line="629"/>
         <source>Result of this filter : %n video(s)</source>
         <translation>
-            <numerusform>Filtri tulem: %n video(t)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Filtri tulem: %n video</numerusform>
+            <numerusform>Filtri tulem: %n videot</numerusform>
         </translation>
     </message>
     <message>

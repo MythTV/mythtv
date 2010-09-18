@@ -112,8 +112,12 @@
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <source>OK</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
@@ -260,33 +264,32 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <translation>Muuda RSS uudisvoogusid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Contexts</source>
         <translatorcomment>Kontekst</translatorcomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Actions</source>
         <translation>Tegevused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="23"/>
         <source>RSS Feeds</source>
         <translation>RSS uudisvood</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="24"/>
         <source>MythNews Configuration</source>
         <translation>MythNews seadistamine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Minutes</source>
         <translation>Minutit</translation>
     </message>

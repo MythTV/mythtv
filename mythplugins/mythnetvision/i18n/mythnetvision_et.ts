@@ -54,7 +54,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="275"/>
         <source>Manage Search Scripts</source>
-        <translation>Halda otsinguskripte</translation>
+        <translation>Muuda otsinguskripte</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="357"/>
@@ -130,7 +130,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="518"/>
         <source>Scan/Manage Subscriptions</source>
-        <translation>Otsi/halda liitumisi</translation>
+        <translation>Otsi/muuda liitumisi</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="519"/>
@@ -160,12 +160,12 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="561"/>
         <source>Subscription Management</source>
-        <translation>Liitumiste haldamine</translation>
+        <translation>Liitumiste muutmine</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="572"/>
         <source>Update Site Maps</source>
-        <translation>Uuenda saidikaarte</translation>
+        <translation>Uuenda allikaid</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="573"/>
@@ -175,22 +175,22 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="574"/>
         <source>Manage Site Subscriptions</source>
-        <translation>Halda saidi liitumisi</translation>
+        <translation>Muuda allikaid</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="575"/>
         <source>Manage RSS Subscriptions</source>
-        <translation>Halda RSS-i liitumisi</translation>
+        <translation>Muuda RSS-i liitumisi</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="577"/>
         <source>Enable Automatic Site Updates</source>
-        <translation>Luba automaatne saidi uuendus</translation>
+        <translation>Luba automaatne allikate uuendamine</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="579"/>
         <source>Disable Automatic Site Updates</source>
-        <translation>Keela automaatne saidi uuendus</translation>
+        <translation>Keela automaatne allikate uuendamine</translation>
     </message>
     <message>
         <source>Enable Automatic RSS Updates</source>
@@ -230,7 +230,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1240"/>
         <source>Updating Site Maps.  This could take a while...</source>
-        <translation>Uuendan saidikaarte. See võib natuke aega võtta...</translation>
+        <translation>Uuendan allikaid. See võib natuke aega võtta...</translation>
     </message>
 </context>
 <context>
@@ -327,7 +327,7 @@
 For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;</source>
         <translation>Sisesta allpool RSS 2.0 meedia voo URL. Salvestamiseks/liitumiseks klõpsa &quot;Salvesta&quot;
 
-Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta&quot;.</translation>
+Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -405,7 +405,7 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta&quot;.</tra
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Manage Site Subscriptions</source>
-        <translation>Halda lehtedele liitumisi</translation>
+        <translation>Muuda allikatega liitumisi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
@@ -425,7 +425,7 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta&quot;.</tra
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Manage RSS Subscriptions</source>
-        <translation>Halda RSS liitumisi</translation>
+        <translation>Muuda RSS liitumisi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
@@ -476,12 +476,12 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta&quot;.</tra
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>Hetkel pole ühtegi voogu/lehte lisatud! Lisamiseks klõpsa MENÜÜ ja vali &quot;Otsi/halda liitumisi&quot;, siis &quot;Halda lehe liitumisi&quot;.</translation>
+        <translation>Hetkel pole ühtegi voogu/lehte lisatud! Lisamiseks klõpsa MENÜÜ ja vali &quot;Otsi/muuda liitumisi&quot;, siis &quot;Muuda allikatega liitumisi.&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Manage Subscriptions</source>
-        <translation>Halda liitumisi</translation>
+        <translation>Muuda liitumisi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>

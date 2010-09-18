@@ -70,13 +70,13 @@
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="587"/>
+        <location filename="../mythgame/gameui.cpp" line="651"/>
         <source>Edit Details</source>
         <translation>Muuda andmeid</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="651"/>
         <source>Edit Metadata</source>
-        <translation>Muuda infot</translation>
+        <translation type="obsolete">Muuda infot</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="1053"/>

@@ -369,7 +369,7 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="20"/>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation>Siia kataloogi tekitab MythArchive ajutised tööfailid. Siin peab olema VÄGA PALJU ruumi!</translation>
+        <translation>Siia kataloogi tekitab MythArchive ajutised tööfailid. Siin peab olema VÄGA PALJU ruumi.</translation>
     </message>
     <message>
         <source>Myth Archive Share Directory</source>
@@ -498,7 +498,7 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="269"/>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
-        <translation>Käsk mkisofs-i käivitamiseks. Kasutatakse ISO tõmmiste valmistamiseks.</translation>
+        <translation>Käsk mkisofs-i käivitamiseks. (Kasutatakse ISO tõmmiste valmistamiseks)</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="276"/>
@@ -508,7 +508,7 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="278"/>
         <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
-        <translation>Käsk growisofs-i käivitamiseks. Kasutatakse DVD-de kirjutamiseks.</translation>
+        <translation>Käsk growisofs-i käivitamiseks. (Kasutatakse DVD-de kirjutamiseks)</translation>
     </message>
     <message>
         <source>tcrequant command</source>

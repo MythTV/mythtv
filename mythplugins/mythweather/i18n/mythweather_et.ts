@@ -222,7 +222,7 @@
     <message>
         <location filename="../mythweather/sourceManager.cpp" line="301"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation>Skript %1 töötab veel. Äkki on hangunud, kontrolli ajalimiitide korrektsust.</translation>
+        <translation>Skript %1 töötab veel. Äkki on hangunud, kontrolli ajalimiitide korrektsust. Vaata kas aegumisväärtused on mõistlikud</translation>
     </message>
 </context>
 <context>
