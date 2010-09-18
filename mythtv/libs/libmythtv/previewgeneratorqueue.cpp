@@ -194,6 +194,8 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                     m_tokenToKeyMap.erase(kit);
                 list.push_back(*tit);
             }
+            if (list.size() == 4)
+                list.push_back(token);
 
             QSet<QObject*>::iterator sit = m_listeners.begin();
             for (; sit != m_listeners.end(); ++sit)
