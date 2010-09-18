@@ -2491,11 +2491,6 @@ Soovid olemasoleva loo eemaldada?</translation>
         <translation>Tehtud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="43"/>
         <source>Quality:</source>
         <translation>Kvaliteet:</translation>

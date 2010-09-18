@@ -2366,11 +2366,6 @@ Do you want to remove the existing track?</source>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
         <source>Quality:</source>
         <translation type="unfinished"></translation>
     </message>

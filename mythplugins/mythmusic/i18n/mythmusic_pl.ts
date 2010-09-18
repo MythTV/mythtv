@@ -1828,10 +1828,6 @@ Chcesz usunąć istniejący utwór?</translation>
         <translation>Typ:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Quality:</source>
         <translation>Jakość:</translation>
     </message>

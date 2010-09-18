@@ -2340,10 +2340,6 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
         <translation>Type : </translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="43"/>
         <source>Quality:</source>
         <translation>Qualité : </translation>

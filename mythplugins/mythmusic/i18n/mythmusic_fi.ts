@@ -2309,10 +2309,6 @@ Poistetaanko olemassaoleva tiedosto?</translation>
         <translation>Kuvan tyyppi:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Metadata</source>
         <translation>Metatieto</translation>
     </message>
