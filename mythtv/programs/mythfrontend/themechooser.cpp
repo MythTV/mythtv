@@ -542,19 +542,25 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
     SetTextFromMap(infomap);
     if (m_preview)
     {
-        if (!preview.exists())
+        if (preview.exists())
+        {
+            m_preview->SetFilename(info->GetPreviewPath());
+            m_preview->Load();
+        }
+        else
             m_preview->Reset();
-        m_preview->SetFilename(info->GetPreviewPath());
-        m_preview->Load();
     }
     if (m_fullPreviewShowing && m_fullPreviewStateType)
     {
         if (m_fullScreenPreview)
         {
-            if (!preview.exists())
+            if (preview.exists())
+            {
+                m_fullScreenPreview->SetFilename(info->GetPreviewPath());
+                m_fullScreenPreview->Load();
+            }
+            else
                 m_fullScreenPreview->Reset();
-            m_fullScreenPreview->SetFilename(info->GetPreviewPath());
-            m_fullScreenPreview->Load();
         }
 
         if (m_fullScreenName)
