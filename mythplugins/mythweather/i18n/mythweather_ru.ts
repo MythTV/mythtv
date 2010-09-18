@@ -115,7 +115,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="233"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation>Для добавления экрана к списку активных нажмите SELECT.</translation>
+        <translation type="unfinished">Для добавления экрана к списку активных нажмите ВЫБОР.</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="236"/>
@@ -158,17 +158,17 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="267"/>
         <source>Press SELECT to </source>
-        <translation>Нажмите SELECT для </translation>
+        <translation>Нажмите ВЫБОР для </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="269"/>
         <source>change location; </source>
-        <translation>измения местоположения; </translation>
+        <translation type="unfinished">изменения местоположения; </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="271"/>
         <source>change units; </source>
-        <translation>измения системы измерений; </translation>
+        <translation type="unfinished">изменения системы измерений; </translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="272"/>
@@ -296,12 +296,12 @@
     <message>
         <location filename="strings.h" line="35"/>
         <source>Mostly Cloudy</source>
-        <translation>Обычно облачно</translation>
+        <translation>Облачно с прояснениями</translation>
     </message>
     <message>
         <location filename="strings.h" line="36"/>
         <source>Partly Cloudy</source>
-        <translation>Частичная облачность</translation>
+        <translation type="unfinished">Переменная облачность</translation>
     </message>
     <message>
         <location filename="strings.h" line="37"/>
@@ -820,7 +820,7 @@
     <message>
         <location filename="strings.h" line="143"/>
         <source>Clear</source>
-        <translation>Чисто</translation>
+        <translation>Ясно</translation>
     </message>
     <message>
         <location filename="strings.h" line="144"/>
@@ -1255,7 +1255,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="../mythweather/weatherScreen.cpp" line="225"/>
         <source>Saturday</source>
-        <translation>Субота</translation>
+        <translation>Суббота</translation>
     </message>
 </context>
 </TS>
