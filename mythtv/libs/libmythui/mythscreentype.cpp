@@ -286,6 +286,12 @@ void MythScreenType::LoadInForeground(void)
     m_IsLoading = false;
 }
 
+void MythScreenType::ReloadInBackground(void)
+{
+    m_IsInitialized = false;
+    LoadInBackground();
+}
+
 void MythScreenType::OpenBusyPopup(QString message)
 {
     if (m_BusyPopup)

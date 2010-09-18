@@ -497,7 +497,7 @@ void ThemeChooser::toggleFullscreenPreview(void)
 void ThemeChooser::toggleDownloadableThemes(void)
 {
     m_includeDownloadableThemes = !m_includeDownloadableThemes;
-    LoadInBackground();
+    ReloadInBackground();
 }
 
 void ThemeChooser::saveAndReload(void)
@@ -725,7 +725,7 @@ void ThemeChooser::removeTheme(void)
     themeDir.append(info->GetDirectoryName());
     removeThemeDir(themeDir);
 
-    LoadInBackground();
+    ReloadInBackground();
 }
 
 void ThemeChooser::removeThemeDir(const QString &dirname)
