@@ -7824,12 +7824,14 @@ void TV::DoEditSchedule(int editType)
 
     pause_active |= kScheduledRecording == editType;
     pause_active |= kViewSchedule == editType;
+    pause_active |= kScheduleProgramFinder == editType;
     pause_active |=
         !isLiveTV && (!db_continue_embedded || isNearEnd);
     pause_active |= actx->paused;
     vector<bool> do_pause;
     do_pause.insert(do_pause.begin(), true, player.size());
     do_pause[find_player_index(actx)] = pause_active;
+    VERBOSE(VB_IMPORTANT, QString("pause_active: %1").arg(pause_active));
 
     saved_pause = DoSetPauseState(actx, do_pause);
 
