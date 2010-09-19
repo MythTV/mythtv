@@ -1620,8 +1620,9 @@ void MythPlayer::InitAVSync(void)
 
         QString msg = QString("Video timing method: %1").arg(timing_type);
         VERBOSE(VB_GENERAL, LOC + msg);
-        msg = QString("Refresh rate: %1, frame interval: %2")
-                       .arg(refreshrate).arg(frame_interval);
+        msg = QString("Display Refresh Rate: %1 Video Frame Rate: %2")
+                       .arg(1000000.0 / refreshrate, 0, 'f', 3)
+                       .arg(1000000.0 / frame_interval, 0, 'f', 3);
         VERBOSE(VB_PLAYBACK, LOC + msg);
 
         // try to get preferential scheduling, but ignore if we fail to.
