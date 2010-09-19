@@ -2983,44 +2983,6 @@ static GlobalCheckBox *LiveTVPriority()
     return bc;
 }
 
-static HostSpinBox *QtFontBig()
-{
-    HostSpinBox *gs = new HostSpinBox("QtFontBig", 1, 48, 1);
-    gs->setLabel(QObject::tr("\"Big\" font"));
-    gs->setValue(25);
-    gs->setHelpText(QObject::tr("Default size is 25."));
-    return gs;
-}
-
-static HostSpinBox *QtFontMedium()
-{
-    HostSpinBox *gs = new HostSpinBox("QtFontMedium", 1, 48, 1);
-    gs->setLabel(QObject::tr("\"Medium\" font"));
-    gs->setValue(16);
-    gs->setHelpText(QObject::tr("Default size is 16."));
-    return gs;
-}
-
-static HostSpinBox *QtFontSmall()
-{
-    HostSpinBox *gs = new HostSpinBox("QtFontSmall", 1, 48, 1);
-    gs->setLabel(QObject::tr("\"Small\" font"));
-    gs->setValue(12);
-    gs->setHelpText(QObject::tr("Default size is 12."));
-    return gs;
-}
-
-static HostSpinBox *QtFonTweak()
-{
-    HostSpinBox *gs = new HostSpinBox("QtFonTweak", -30, 30, 1);
-    gs->setLabel(QObject::tr("Fine tune font size (\%)"));
-    gs->setValue(0);
-    gs->setHelpText(QObject::tr("Fine tune all font sizes by this percentage. "
-                    "Font sizes should be the correct relative size if the "
-                    "X11 DPI (dots per inch) is set to 100."));
-    return gs;
-}
-
 // EPG settings
 static HostCheckBox *EPGShowCategoryColors()
 {
@@ -4646,10 +4608,6 @@ AppearanceSettings::AppearanceSettings()
 
     VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
     qttheme->setLabel(QObject::tr("QT"));
-    qttheme->addChild(QtFontSmall());
-    qttheme->addChild(QtFontMedium());
-    qttheme->addChild(QtFontBig());
-    qttheme->addChild(QtFonTweak());
     qttheme->addChild(PlayBoxTransparency());
     qttheme->addChild(PlayBoxShading());
     qttheme->addChild(UseVirtualKeyboard());

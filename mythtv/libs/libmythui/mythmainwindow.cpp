@@ -861,8 +861,6 @@ bool MythMainWindow::event(QEvent *e)
 
 void MythMainWindow::Init(void)
 {
-    fonTweak = GetMythDB()->GetNumSetting("QtFonTweak", 0);
-
     bool hideCursor = GetMythDB()->GetNumSetting("HideMouseCursor", 1);
 #ifdef QWS
     QWSServer::setCursorVisible(!hideCursor);
@@ -1945,8 +1943,6 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     floatSize = floatSize * desired / logicalDpiY;
     // adjust for myth GUI size relative to 800x600
     floatSize = floatSize * d->hmult;
-    // adjust by the configurable fine tuning percentage
-    floatSize = floatSize * ((100.0 + fonTweak) / 100.0);
     // round to the nearest point size
     pointSize = (int)(floatSize + 0.5);
 
