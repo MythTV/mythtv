@@ -244,7 +244,7 @@ void TVBrowseHelper::GetNextProgram(
         infoMap["enddate"] = endts.toString(db_short_date_format);
     }
 
-    infoMap["lenmins"] = tr("%n minute(s)", "", 0);
+    infoMap["lenmins"] = TV::tr("%n minute(s)", "", 0);
     infoMap["lentime"] = "0:00";
     if (begts.isValid() && endts.isValid())
     {
