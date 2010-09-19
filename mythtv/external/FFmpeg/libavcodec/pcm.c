@@ -407,6 +407,13 @@ static int pcm_decode_frame(AVCodecContext *avctx,
         dst_int32_t = data;
         n /= avctx->channels;
         switch (avctx->bits_per_coded_sample) {
+        case 16:
+            while (n--) {
+                c = avctx->channels;
+                while (c--)
+                    *dst_int32_t++ = bytestream_get_be16(&src) << 16;
+            }
+            break;
         case 20:
             while (n--) {
                 c = avctx->channels;
@@ -430,7 +437,9 @@ static int pcm_decode_frame(AVCodecContext *avctx,
             }
             break;
         default:
-            av_log(avctx, AV_LOG_ERROR, "PCM DVD unsupported sample depth\n");
+            av_log(avctx, AV_LOG_ERROR,
+                   "PCM DVD unsupported sample depth %i\n",
+                   avctx->bits_per_coded_sample);
             return -1;
             break;
         }
