@@ -3402,7 +3402,24 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     if (QEvent::KeyPress == e->type())
         return ignoreKeyPresses?false:event(e);
 
-    return QThread::eventFilter(o,e);
+    if (e->type() == MythEvent::MythEventMessage)
+    {
+        customEvent(e);
+        return true;
+    }
+
+    switch (e->type())
+    {
+        case QEvent::Paint:
+        case QEvent::UpdateRequest:
+        case QEvent::Enter:
+        {
+            event(e);
+            return false;
+        }
+        default:
+            return false;
+    }
 }
 
 /// This handles all standard events
@@ -7880,13 +7897,10 @@ void TV::DoEditSchedule(int editType)
 
 void TV::EditSchedule(const PlayerContext *ctx, int editType)
 {
-    // post the request to the main UI thread
-    // it will be caught in eventFilter and processed as CustomEvent
-    // this will create the program guide window (widget)
-    // on the main thread and avoid a deadlock on Win32
+    // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1").arg(editType);
     MythEvent* me = new MythEvent(message);
-    qApp->postEvent(GetMythMainWindow(), me);
+    qApp->postEvent(this, me);
 }
 
 void TV::ChangeVolume(PlayerContext *ctx, bool up)
