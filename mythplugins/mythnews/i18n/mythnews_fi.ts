@@ -1,98 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="fi_FI">
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="27"/>
+        <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS Uutissyötteidenlukija</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="31"/>
+        <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitä uutiset</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="33"/>
+        <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Pakota uutisten päivitys</translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="35"/>
+        <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Peru uutisten päivitys</translation>
     </message>
 </context>
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="437"/>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
         <source>Updated</source>
         <translation>Päivitetty</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="444"/>
+        <location filename="../mythnews/mythnews.cpp" line="462"/>
         <source>Unknown</source>
         <translation>Tuntematon</translation>
     </message>
     <message>
-        <source>Edit Site Details</source>
-        <translation type="obsolete">Muokkaa Lähteen Yksityiskohtia</translation>
-    </message>
-    <message>
-        <source>Enter Site Details</source>
-        <translation type="obsolete">Anna Lähteen Yksityiskohdat</translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation type="obsolete">Nimi:</translation>
-    </message>
-    <message>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <source>Icon:</source>
-        <translation type="obsolete">Ikoni:</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="917"/>
+        <location filename="../mythnews/mythnews.cpp" line="936"/>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="913"/>
+        <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Edit News Site</source>
         <translation>Muokkaa Uutislähdettä</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="455"/>
-        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <location filename="../mythnews/mythnews.cpp" line="473"/>
+        <location filename="../mythnews/mythnews.cpp" line="732"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 of %2 (%3 prosenttia)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <location filename="../mythnews/mythnews.cpp" line="805"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selainkomento asettamatta! MythNews vaatii että MythBrowser on asennettu.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="914"/>
+        <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Add News Site</source>
         <translation>Lisää Uusi Uutislähde</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="916"/>
+        <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Delete News Site</source>
         <translation>Poista Uutislähde</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="899"/>
+        <location filename="../mythnews/mythnews.cpp" line="918"/>
         <source>Options</source>
         <translation>Asetukset</translation>
     </message>
@@ -103,70 +79,46 @@
     </message>
 </context>
 <context>
-    <name>MythNewsConfig</name>
-    <message>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">Paina MENU asettaaksesi päivitysvälin.</translation>
-    </message>
-    <message>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Aseta päivitysväli käyttäen ylös/alas nuolinäppäimiä.</translation>
-    </message>
-    <message>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">Paina MENU palataksesi valintaan.</translation>
-    </message>
-    <message>
-        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
-        <translation type="obsolete">Anna päivitysväli käyttäen nuolinäppäimiä. Pienin arvo on 30 minuuttia.</translation>
-    </message>
-    <message>
-        <source>Press Escape or Menu to exit.</source>
-        <translation type="obsolete">Paina Escape tai Menu poistuaksesi.</translation>
-    </message>
-</context>
-<context>
     <name>MythNewsEditor</name>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation type="unfinished">Muokkaa Lähteen Yksityiskohtia</translation>
+        <translation>Muokkaa lähteen yksityiskohtia</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation type="unfinished">Anna Lähteen Yksityiskohdat</translation>
+        <translation>Anna lähteen yksityiskohdat</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
         <source>Name:</source>
-        <translation type="unfinished">Nimi:</translation>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Icon:</source>
-        <translation type="unfinished">Ikoni:</translation>
+        <translation>Ikoni:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 <context>
@@ -176,61 +128,38 @@ The minimum allowed value is 30 Minutes.</source>
         <location filename="../mythnews/newssite.cpp" line="234"/>
         <location filename="../mythnews/newssite.cpp" line="243"/>
         <source>Failed to retrieve news</source>
-        <translation type="unfinished">Ei saatu haettua uutisia</translation>
+        <translation>Ei saatu haettua uutisia</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>No Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei uutisia puskurissa.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="245"/>
         <source>Failed to read downloaded file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Virhe luettaessa haettua tiedostoa.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytetään puskuroitua uutista.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
-        <translation type="unfinished">Haku Epäonnistui. </translation>
-    </message>
-    <message>
-        <source>No Cached News</source>
-        <translation type="obsolete">Ei Puskuroituja Uutisia</translation>
-    </message>
-    <message>
-        <source>Failed to read downloaded file</source>
-        <translation type="obsolete">Virhe luettaessa haettua tiedostoa</translation>
-    </message>
-    <message>
-        <source>Showing Cached News</source>
-        <translation type="obsolete">Näytetään Puskuroitua Uutista</translation>
+        <translation>Haku Epäonnistui. </translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation type="unfinished">XML-tiedosto ei ole käypä RSS-syöte</translation>
+        <translation>XML-tiedosto ei ole käypä RSS-syöte</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>MythNews</source>
-        <translation type="obsolete">MythUutiset</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this news site
-
-%1</source>
-        <translation type="obsolete">Poistetaanko varmasti tämä uutislähde
-%1</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="705"/>
         <source>Downloading media...</source>
         <translation>Ladataan uutisia...</translation>
     </message>
@@ -238,18 +167,128 @@ The minimum allowed value is 30 Minutes.</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>Minutes</source>
-        <translation type="obsolete">Minuuttia</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <source>%DATE%, %TIME%</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <source>Edit RSS News Feeds</source>
+        <translation>Muokkaa RSS uutissyötteitä</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Tässä ruudussa voit muokata nimeä, URL:ia ja ikonipolkua valitulle RSS syötteelle.Voit myös asettaa kohteen podcastiksi.
+
+Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Name:</source>
+        <translation>Nimi:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Icon:</source>
+        <translation>Ikoni:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Podcast:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Genre:</source>
+        <translation>Laji:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Channel:</source>
+        <translation>Kanava:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>News Subscriptions</source>
+        <translation>Uutistilaukset</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Choose the news sites you would like to read.</source>
+        <translation>Valitse uutispalvelut joita haluat lukea.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>News Feeds</source>
+        <translation>Uutissyötteet</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>News Settings</source>
+        <translation>Uutisten asetukset</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Category</source>
+        <translation>Kategoria</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>[x]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Web Site</source>
+        <translation>Nettisivusto</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Edit RSS News Feed</source>
+        <translation>Muokkaa RSS uutissyötteitä</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Contexts</source>
+        <translation>Sisällöt</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Actions</source>
+        <translation>Toiminnot</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>RSS Feeds</source>
+        <translation>RSS syötteet</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>MythNews Configuration</source>
+        <translation>MythNews asetukset</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Minutes</source>
+        <translation>Minuuttia</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
     </message>
 </context>
 </TS>
