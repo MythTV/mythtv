@@ -118,7 +118,8 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
         QString newText = GetTemplateText();
         if (newText.isEmpty())
             newText = GetDefaultText();
-        QRegExp regexp("\%(([^\\|\%]+)?\\||\\|(.))?(\\w+)(\\|(.+?))?\%");
+
+        QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
         regexp.setMinimal(true);
         if (newText.contains(regexp))
         {
