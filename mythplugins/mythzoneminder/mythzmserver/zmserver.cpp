@@ -854,7 +854,7 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     }
     else
     {
-        cout << "Failed to get mysql row" << endl;
+        cout << "handleGetAnalyseFrame: Failed to get mysql row for frameNo " << frameNo << endl;
         sendError(ERROR_MYSQL_ROW);
         return;
     }
@@ -1020,7 +1020,7 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
         }
         else
         {
-            cout << "Failed to get mysql row" << endl;
+            cout << "handleGetFrameList: Failed to get mysql row " << x << endl;
             sendError(ERROR_MYSQL_ROW);
             return;
         }
@@ -1066,7 +1066,7 @@ void ZMServer::handleGetCameraList(void)
         }
         else
         {
-            cout << "Failed to get mysql row" << endl;
+            cout << "handleGetCameraList: Failed to get mysql row " << x << endl;
             sendError(ERROR_MYSQL_ROW);
             return;
         }
