@@ -380,7 +380,7 @@
         <textarea name="high-0" from="basetextarea">
             <area>45,282,223,30</area>
             <font>baselarge</font>
-            <align>left, top</align>
+            <align>left,top</align>
         </textarea>
         <textarea name="high-1" from="high-0">
             <position>288,282</position>
@@ -401,7 +401,7 @@
         <textarea name="low-0" from="basetextarea">
             <area>45,282,223,30</area>
             <font>baselarge</font>
-            <align>right, top</align>
+            <align>right,top</align>
         </textarea>
         <textarea name="low-1" from="low-0">
             <position>288,282</position>
@@ -602,7 +602,7 @@
         <textarea name="temp-0" from="basetextarea">
             <area>45,282,223,30</area>
             <font>baselarge</font>
-            <align>left, top</align>
+            <align>left,top</align>
         </textarea>
         <textarea name="temp-1" from="temp-0">
             <position>288,282</position>
@@ -623,7 +623,7 @@
         <textarea name="pop-0" from="basetextarea">
             <area>45,282,223,30</area>
             <font>baselarge</font>
-            <align>right, top</align>
+            <align>right,top</align>
         </textarea>
         <textarea name="pop-1" from="pop-0">
             <position>288,282</position>
