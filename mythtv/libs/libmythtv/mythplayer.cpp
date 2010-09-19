@@ -4192,17 +4192,22 @@ void MythPlayer::calcSliderPosPriv(osdInfo &info, bool paddedFields,
 
 int MythPlayer::GetNumChapters()
 {
-    return GetDecoder()->GetNumChapters();
+    if (GetDecoder())
+        return GetDecoder()->GetNumChapters();
+    return 0;
 }
 
 int MythPlayer::GetCurrentChapter()
 {
-    return GetDecoder()->GetCurrentChapter(framesPlayed);
+    if (GetDecoder())
+        return GetDecoder()->GetCurrentChapter(framesPlayed);
+    return 0;
 }
 
 void MythPlayer::GetChapterTimes(QList<long long> &times)
 {
-    return GetDecoder()->GetChapterTimes(times);
+    if (GetDecoder())
+        return GetDecoder()->GetChapterTimes(times);
 }
 
 bool MythPlayer::DoJumpChapter(int chapter)
@@ -4247,7 +4252,9 @@ bool MythPlayer::DoJumpChapter(int chapter)
 
 int64_t MythPlayer::GetChapter(int chapter)
 {
-    return GetDecoder()->GetChapter(chapter);
+    if (GetDecoder())
+        return GetDecoder()->GetChapter(chapter);
+    return 0;
 }
 
 InteractiveTV *MythPlayer::GetInteractiveTV(void)
