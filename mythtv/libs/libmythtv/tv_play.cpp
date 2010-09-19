@@ -3415,7 +3415,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         case QEvent::Enter:
         {
             event(e);
-            return false;
+            return true;
         }
         default:
             return false;
