@@ -27,7 +27,6 @@
         <textarea name="status" from="basetextarea">
             <area>270,670,740,38</area>
             <align>left,vcenter</align>
-            <multiline>no</multiline>
         </textarea>
     </window>
 
@@ -35,7 +34,6 @@
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,38</area>
             <align>allcenter</align>
-            <multiline>no</multiline>
             <value>Bookmark Manager</value>
             <font>baselarge</font>
         </textarea>
@@ -162,7 +160,7 @@
                                 <filename>lb-check-full.png</filename>
                             </imagetype>
                         </state>
-                    </statetype> 
+                    </statetype>
                     <textarea name="name">
                         <area>40,0,350,30</area>
                         <font>basesmall</font>

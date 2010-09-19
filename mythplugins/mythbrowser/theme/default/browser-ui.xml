@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
-
-    <font name="title" from="baselarge">
-        <color>#ffff00</color>
-        <bold>yes</bold>
-    </font>
 
     <window name="browser">
         <buttonlist name="pagelist" from="baseselector">
@@ -32,7 +28,6 @@
         <textarea name="status" from="basetextarea">
             <area>30,550,740,38</area>
             <align>left,vcenter</align>
-            <multiline>no</multiline>
         </textarea>
     </window>
 
@@ -40,7 +35,6 @@
         <textarea name="title" from="basetextarea">
             <area>0,10,800,38</area>
             <align>allcenter</align>
-            <multiline>no</multiline>
             <value>Bookmark Manager</value>
             <font>baselarge</font>
         </textarea>
@@ -114,12 +108,12 @@
         </textarea>
 
         <textarea name="namelabel" from="label">
-            <area>80,160,130,30</area>
+            <position>80,160</position>
             <value>Name</value>
         </textarea>
 
         <textarea name="urllabel" from="label">
-            <area>335,160,130,30</area>
+            <position>335,160</position>
             <value>URL</value>
         </textarea>
 
@@ -156,7 +150,7 @@
                                 <filename>lb-check-full.png</filename>
                             </imagetype>
                         </state>
-                    </statetype> 
+                    </statetype>
                     <textarea name="name">
                         <area>40,0,250,30</area>
                         <font>basesmall</font>
