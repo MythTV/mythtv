@@ -279,7 +279,7 @@
             <multiline>true</multiline>
             <font>basesmall</font>
             <align>allcenter</align>
-            <template>%PLAYEDTIME% of %TOTALTIME%\n(%REMAININGTIME%%BEHINDTIME% remaining)</template> <!-- behind -->
+            <template>%PLAYEDTIME% of %TOTALTIME%\n%(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</template>
         </textarea>
 
         <progressbar name="position">
