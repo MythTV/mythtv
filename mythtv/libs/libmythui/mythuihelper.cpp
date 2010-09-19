@@ -1441,7 +1441,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         {
             // Check Memory Cache
             ret = GetImageFromCache(label);
-            if (!ret && (!!(kCacheNormal & cacheMode)))
+
+            if (!ret && (cacheMode == kCacheNormal))
             {
                 // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();
