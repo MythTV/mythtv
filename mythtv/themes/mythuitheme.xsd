@@ -284,15 +284,6 @@
                 <xs:element name="filename" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="preserveaspect" type="boolean" minOccurs="0" maxOccurs="1" />
                 <xs:element name="crop" type="area" minOccurs="0" maxOccurs="1" />
-                <!-- REMOVE ME -->
-                <xs:element name="gradient" minOccurs="0" maxOccurs="1">
-                    <xs:complexType>
-                        <xs:attribute name="start" type="color" />
-                        <xs:attribute name="end" type="color" />
-                        <xs:attribute name="alpha" type="alpha" />
-                    </xs:complexType>
-                </xs:element>
-                <!-- END REMOVE ME -->
                 <xs:element name="mask" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="reflection" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
