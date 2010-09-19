@@ -76,7 +76,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     source_bytes_per_frame(0),
     needs_upmix(false),         needs_downmix(false),
     surround_mode(QUALITY_LOW), old_stretchfactor(1.0f),
-    volume(80),                 volumeControl(NULL),
+    volume(80),                 volumeControl(QString()),
 
     processing(false),
 
