@@ -919,6 +919,7 @@ TV::TV(void)
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL),               weDisabledGUI(false),
+      disableDrawUnusedRects(false),
       isEmbedded(false),            ignoreKeyPresses(false),
       // Timers
       lcdTimerId(0),                keyListTimerId(0),
@@ -3415,7 +3416,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         case QEvent::Enter:
         {
             event(e);
-            return true;
+            return false;
         }
         default:
             return false;
@@ -7729,7 +7730,7 @@ void TV::StopEmbedding(PlayerContext *ctx)
 
 void TV::DrawUnusedRects(void)
 {
-    if (!weDisabledGUI)
+    if (disableDrawUnusedRects)
         return;
 
     VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- begin");
@@ -7884,6 +7885,9 @@ void TV::DoEditSchedule(int editType)
             break;
         }
     }
+
+    // If the video is paused, don't paint it's unused rects & chromakey
+    disableDrawUnusedRects = pause_active;
 
     // We are embedding in a mythui window so assuming no one
     // else has disabled painting show the MythUI window again.
@@ -8615,6 +8619,7 @@ void TV::customEvent(QEvent *e)
         }
 
         DoSetPauseState(actx, saved_pause); // Restore pause states
+        disableDrawUnusedRects = false;
 
         GetMythMainWindow()->GetPaintWindow()->hide();
         GetMythMainWindow()->GetPaintWindow()->clearMask();

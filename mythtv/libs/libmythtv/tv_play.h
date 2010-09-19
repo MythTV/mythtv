@@ -804,6 +804,8 @@ class MPUBLIC TV : public QThread
     QRect saved_gui_bounds;
     /// true if this instance disabled MythUI drawing.
     bool  weDisabledGUI;
+    /// true if video chromakey and frame should not be drawn
+    bool  disableDrawUnusedRects;
 
     // embedded status
     bool         isEmbedded;       ///< are we currently embedded
