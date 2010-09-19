@@ -30,17 +30,14 @@
         <textarea name="size" from="basetextarea">
             <font>basemedium</font>
             <area>100,270,500,50</area>
-            <value>1280 x 720</value>
         </textarea>
 
         <textarea name="offsets" from="size">
             <area>100,320,500,140</area>
-            <value>0 x 0</value>
         </textarea>
 
         <textarea name="changeamount" from="size">
             <area>100,520,500,140</area>
-            <value>1 pixel</value>
         </textarea>
 
     </window>

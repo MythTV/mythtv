@@ -2,15 +2,8 @@
 <!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
     <window name="appearance">
-
-        <fontdef name="title" face="Droid Sans">
-            <color>#ffffff</color>
-            <pixelsize>26</pixelsize>
-            <weight>bold</weight>
-        </fontdef>
-
         <textarea name="part">
-            <font>title</font>
+            <font>baselarge</font>
             <area>20,20,800,40</area>
             <value>Appearance Wizard</value>
             <align>center</align>
@@ -27,28 +20,25 @@
         </imagetype>
 
         <textarea name="part1">
-            <font>title</font>
+            <font>baselarge</font>
             <area>100,140,600,170</area>
             <value>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</value>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="size">
-            <font>title</font>
+            <font>baselarge</font>
             <area>100,270,500,50</area>
-            <value>1280 x 720</value>
         </textarea>
 
         <textarea name="offsets">
-            <font>title</font>
+            <font>baselarge</font>
             <area>100,320,500,140</area>
-            <value>0 x 0</value>
         </textarea>
 
         <textarea name="changeamount">
-            <font>title</font>
+            <font>baselarge</font>
             <area>100,520,500,140</area>
-            <value>1 pixel</value>
         </textarea>
 
     </window>
