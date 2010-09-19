@@ -1034,10 +1034,6 @@ Check VideoManager Settings</source>
         <translation>並び換え:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Year</source>
         <translation>年</translation>
     </message>

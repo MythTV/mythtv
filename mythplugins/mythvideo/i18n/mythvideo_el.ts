@@ -736,10 +736,6 @@
         <translation>Ταξινόμηση κατά :</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="105"/>
         <source>Year</source>
         <translation>Έτος</translation>

@@ -1034,10 +1034,6 @@ Check VideoManager Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Year</source>
         <translation type="unfinished"></translation>
     </message>

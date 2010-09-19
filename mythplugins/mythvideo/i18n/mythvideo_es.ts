@@ -1038,10 +1038,6 @@ Revisa la configuración del VideoManager</translation>
         <translation>Ordenar :</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Year</source>
         <translation>Año</translation>
     </message>

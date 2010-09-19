@@ -938,10 +938,6 @@ Check VideoManager Settings</source>
         <translation>Ovitek:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Directed by</source>
         <translation>Režiser</translation>
     </message>

@@ -1034,10 +1034,6 @@ Check VideoManager Settings</source>
         <translation>Ordina per:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Year</source>
         <translation>Anno</translation>
     </message>

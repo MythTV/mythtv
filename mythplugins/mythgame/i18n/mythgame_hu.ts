@@ -159,11 +159,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="453"/>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamehandler.cpp" line="231"/>
         <location filename="../mythgame/gamehandler.cpp" line="622"/>
         <source>No</source>

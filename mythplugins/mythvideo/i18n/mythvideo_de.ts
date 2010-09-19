@@ -1385,10 +1385,6 @@ Prüfen Sie die VideoManager-Einstellungen</translation>
         <translation>Sortierung :</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="35"/>
         <source>Year</source>
         <translation>Jahr</translation>

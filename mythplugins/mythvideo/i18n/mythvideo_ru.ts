@@ -1176,10 +1176,6 @@ Check VideoManager Settings</source>
         <translation>Сортировать по :</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="105"/>
         <source>Year</source>
         <translation>Год</translation>
