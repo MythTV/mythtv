@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 
 Common MythArchive window definitions
@@ -6,27 +7,6 @@ Common MythArchive window definitions
 <mythuitheme>
 
     <window name="selectdestination">
-
-        <fontdef name="description" from="basesmall">
-            <color>#ffffff</color>
-            <size>18</size>
-        </fontdef>
-
-        <fontdef name="detail" from="basesmall">
-            <color>#ffffff</color>
-            <size>14</size>
-        </fontdef>
-
-        <fontdef name="detailtitle" from="basesmall">
-            <color>#ffff00</color>
-            <size>14</size>
-        </fontdef>
-
-        <fontdef name="label" from="basesmall">
-            <color>#ffff00</color>
-            <size>16</size>
-            <weight>bold</weight>
-        </fontdef>
 
         <!--
             destination selector
@@ -37,14 +17,14 @@ Common MythArchive window definitions
 
         <textarea name="title1" from="basetextarea">
             <area>0,10,1280,50</area>
-            <font>title</font>
-            <align>center</align>
+            <font>baseextralarge</font>
+            <align>hcenter</align>
             <value>Select Destination</value>
         </textarea>
 
         <textarea name="title2" from="basetextarea">
             <area>60,70,500,50</area>
-            <font>label</font>
+            <font>basesmallyellow</font>
             <value>Select Destination</value>
         </textarea>
 
@@ -54,8 +34,6 @@ Common MythArchive window definitions
 
         <textarea name="destination_text" from="basetextarea">
             <area>60,160,1190,90</area>
-            <font>detail</font>
-            <value>description goes here.</value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -70,13 +48,12 @@ Common MythArchive window definitions
 
         <textarea name="freespace_label" from="basetextarea">
             <area>60,280,150,50</area>
-            <font>label</font>
+            <font>basesmallyellow</font>
             <value>Free Space:</value>
         </textarea>
         <textarea name="freespace_text" from="basetextarea">
             <area>235,280,200,50</area>
-            <font>description</font>
-            <value>0.00 GB</value>
+            <font>basemedium</font>
         </textarea>
 
         <shape name="bottombackground" from="basebackground">
@@ -85,7 +62,7 @@ Common MythArchive window definitions
 
         <textarea name="title" from="basetextarea">
             <area>95,390,500,50</area>
-            <font>description</font>
+            <font>basemedium</font>
             <value>Make ISO Image</value>
         </textarea>
 
@@ -95,7 +72,7 @@ Common MythArchive window definitions
 
         <textarea name="burntodvdr_text" from="basetextarea">
             <area>95,435,500,50</area>
-            <font>description</font>
+            <font>basemedium</font>
             <value>Burn to DVD</value>
         </textarea>
 
@@ -105,7 +82,7 @@ Common MythArchive window definitions
 
         <textarea name="erasedvdrw_text" from="basetextarea">
             <area>95,480,500,50</area>
-            <font>description</font>
+            <font>basemedium</font>
             <value>Force Overwrite of DVD-RW Media</value>
         </textarea>
 
@@ -130,7 +107,7 @@ Common MythArchive window definitions
 
     </window>
 
-  <!-- 
+  <!--
       Recording Selector
   -->
   <window name="recording_selector">
@@ -169,14 +146,20 @@ Common MythArchive window definitions
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallpurple</font>
                     </textarea>
@@ -191,21 +174,16 @@ Common MythArchive window definitions
         <textarea name="progtitle" from="basetextarea">
             <area>60,395,640,30</area>
             <font>basesmallyellow</font>
-            <value></value>
-            <multiline>no</multiline>
         </textarea>
 
         <textarea name="progdatetime" from="basetextarea">
             <area>680,395,530,30</area>
             <font>basesmallyellow</font>
             <align>right</align>
-            <value></value>
-            <multiline>no</multiline>
         </textarea>
 
         <textarea name="progdescription" from="basetextarea">
             <area>60,420,900,150</area>
-            <value></value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -217,7 +195,6 @@ Common MythArchive window definitions
         <textarea name="filesize" from="basetextarea">
             <area>1110,600,100,40</area>
             <align>right</align>
-            <value></value>
         </textarea>
 
         <imagetype name="preview_image">
@@ -283,14 +260,20 @@ Common MythArchive window definitions
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallpurple</font>
                     </textarea>
@@ -315,21 +298,13 @@ Common MythArchive window definitions
   -->
   <window name="video_selector">
 
-        <fontdef name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <weight>bold</weight>
-        </fontdef>
-
         <shape name="topbackground" from="basebackground">
             <area>30,60,1220,340</area>
         </shape>
 
         <textarea name="title1" from="basetextarea">
             <area>0,10,1280,50</area>
-            <font>title</font>
+            <font>baseextralarge</font>
             <align>allcenter</align>
             <value>Select Videos</value>
         </textarea>
@@ -357,14 +332,20 @@ Common MythArchive window definitions
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallpurple</font>
                     </textarea>
@@ -376,23 +357,19 @@ Common MythArchive window definitions
             <area>30,420,1030,210</area>
         </shape>
 
-        <textarea name="videotitle">
+        <textarea name="videotitle" from="basetextarea">
             <area>60,430,640,30</area>
             <font>basesmallyellow</font>
-            <value>title goes here</value>
-            <multiline>no</multiline>
         </textarea>
 
         <textarea name="videoplot" from="basetextarea">
             <area>60,480,800,130</area>
-            <value>description goes here.</value>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="filesize" from="basetextarea">
             <area>940,600,100,40</area>
             <align>right</align>
-            <value>x.xx Gb</value>
         </textarea>
 
         <imagetype name="cover_background">
@@ -413,7 +390,6 @@ Common MythArchive window definitions
 
         <textarea name="parentallevel_text" from="basetextarea">
             <area>1190,350,20,40</area>
-            <value>1</value>
         </textarea>
 
         <textarea name="warning_text" from="basetextarea">
@@ -423,7 +399,7 @@ Common MythArchive window definitions
         </textarea>
 
         <button name="cancel_button" from="basebutton">
-            <position>55,650</position >
+            <position>55,650</position>
             <value>Cancel</value>
         </button>
 
@@ -439,7 +415,7 @@ Common MythArchive window definitions
         <textarea name="title1" from="basetextarea">
             <area>0,10,1280,50</area>
             <font>baselarge</font>
-            <align>center</align>
+            <align>hcenter</align>
             <value>Log Viewer</value>
         </textarea>
 
@@ -488,7 +464,6 @@ Common MythArchive window definitions
 
         <textarea name="logitem_text" from="basetextarea">
             <area>45,515,1190,120</area>
-            <value></value>
             <multiline>yes</multiline>
         </textarea>
 

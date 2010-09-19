@@ -8,6 +8,10 @@
         <color>#FFFFFF</color>
     </fontdef>
 
+    <fontdef name="basetiny" from="basesmall">
+        <pixelsize>14</pixelsize>
+    </fontdef>
+
     <fontdef name="basemedium" from="basesmall">
         <pixelsize>22</pixelsize>
     </fontdef>
@@ -29,6 +33,10 @@
     </fontdef>
 
     <!-- Colour variations on base fontdefs -->
+    <fontdef name="basetinyred" from="basetiny">
+        <color>#ff6b48</color>
+    </fontdef>
+
     <fontdef name="basesmallgrey" from="basesmall">
         <color>#666666</color>
     </fontdef>

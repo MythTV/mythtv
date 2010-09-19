@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 
 MythTV Archive GUI theme
@@ -10,43 +11,6 @@ MythTV Archive GUI theme
     -->
 
     <window name="exportnative">
-
-        <font name="description" from="basesmall">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="detail" from="basesmall">
-            <color>#ffffff</color>
-            <size>14</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="detailtitle" from="basesmall">
-            <color>#ffff00</color>
-            <size>14</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="label" from="basesmall">
-            <color>#ffff00</color>
-            <size>16</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="smallstatsfont" from="basesmall">
-            <color>#ffffff</color>
-            <size>10</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="statserror" from="basesmall">
-            <color>#ff0000</color>
-            <size>10</size>
-            <bold>no</bold>
-        </font>
-
         <shape name="topbackground" from="basebackground">
             <area>30,55,740,260</area>
         </shape>
@@ -64,7 +28,7 @@ MythTV Archive GUI theme
         <textarea name="nofiles" from="basetextarea">
             <area>50,70,695,175</area>
             <align>allcenter</align>
-            <font>description</font>
+            <font>basemedium</font>
             <value>No files are selected for archive</value>
         </textarea>
 
@@ -84,31 +48,23 @@ MythTV Archive GUI theme
 
         <textarea name="progtitle" from="basetextarea">
             <area>40,340,440,30</area>
-            <font>detailtitle</font>
-            <value>title goes here</value>
-            <multiline>no</multiline>
+            <font>basesmallyellow</font>
         </textarea>
 
-        <textarea name="progdatetime">
+        <textarea name="progdatetime" from="basetextarea">
             <area>490,340,165,30</area>
-            <font>detailtitle</font>
+            <font>basesmallyellow</font>
             <align>right</align>
-            <value>sep 13, 2004 11:00 pm (1h 15m)</value>
-            <multiline>no</multiline>
         </textarea>
 
         <textarea name="progdescription" from="basetextarea">
             <area>40,370,610,130</area>
-            <font>detail</font>
-            <value>description goes here.</value>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="filesize" from="basetextarea">
             <area>550,505,100,40</area>
-            <font>detail</font>
             <align>right</align>
-            <value>x.xx GB</value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -126,26 +82,22 @@ MythTV Archive GUI theme
 
         <textarea name="maxsize" from="basetextarea">
             <area>710,380,100,30</area>
-            <font>smallstatsfont</font>
-            <value>xxxxx MB</value>
+            <font>basetiny</font>
         </textarea>
 
         <textarea name="minsize" from="basetextarea">
             <area>710,520,100,30</area>
-            <font>smallstatsfont</font>
-            <value>0 MB</value>
+            <font>basetiny</font>
         </textarea>
 
         <textarea name="currentsize" from="basetextarea">
             <area>710,445,100,30</area>
-            <font>smallstatsfont</font>
-            <value>xxxxx MB</value>
+            <font>basetiny</font>
         </textarea>
 
         <textarea name="currentsize_error" from="basetextarea">
             <area>710,445,100,30</area>
-            <font>statserror</font>
-            <value>xxxxx MB</value>
+            <font>basetinyred</font>
         </textarea>
 
         <button name="cancel_button" from="basebutton">
@@ -206,14 +158,20 @@ MythTV Archive GUI theme
                     </statetype>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallpurple</font>
                     </textarea>
@@ -232,12 +190,12 @@ MythTV Archive GUI theme
         </textarea>
 
         <textarea name="label2" from="label1">
-            <area>30,455,160,40</area>
+            <position>30,455</position>
             <value>Subtitle:</value>
         </textarea>
 
         <textarea name="label3" from="label1">
-            <area>30,495,160,40</area>
+            <position>30,495</position>
             <value>Start Time:</value>
         </textarea>
 
@@ -316,7 +274,7 @@ MythTV Archive GUI theme
         <textarea name="label1" from="basetextarea">
             <area>50,230,690,50</area>
             <font>basemedium</font>
-            <align>center</align>
+            <align>hcenter</align>
             <value>Archived Channel</value>
         </textarea>
 
@@ -331,35 +289,34 @@ MythTV Archive GUI theme
         </textarea>
 
         <textarea name="label3" from="label2">
-            <area>50,320,500,50</area>
-            <font>label</font>
+            <position>50,320</position>
             <value>Chan. No:</value>
         </textarea>
 
-        <textarea name="channo" from="basetextarea">
-            <area>190,325,500,50</area>
+        <textarea name="channo" from="chanid">
+            <position>190,325</position>
         </textarea>
 
         <textarea name="label4" from="label2">
-            <area>350,280,500,50</area>
+            <position>350,280</position>
             <value>Callsign:</value>
         </textarea>
 
-        <textarea name="callsign" from="basetextarea">
-            <area>480,285,500,50</area>
+        <textarea name="callsign" from="chanid">
+            <position>480,285</position>
         </textarea>
 
         <textarea name="label5" from="label2">
-            <area>350,320,500,50</area>
+            <position>350,320</position>
             <value>Name:</value>
         </textarea>
 
-        <textarea name="name" from="basetextarea">
-            <area>480,325,500,50</area>
+        <textarea name="name" from="chanid">
+            <position>480,325</position>
         </textarea>
 
         <!--
-            local file channel 
+            local file channel
          -->
 
         <shape name="bottombackground" from="basebackground">
@@ -367,17 +324,17 @@ MythTV Archive GUI theme
         </shape>
 
         <textarea name="label6" from="label1">
-            <area>50,385,690,50</area>
+            <position>50,385</position>
             <value>Local Channel</value>
         </textarea>
 
         <textarea name="label7" from="label2">
-            <area>50,440,500,50</area>
+            <position>50,440</position>
             <value>Chan. ID:</value>
         </textarea>
 
-        <textarea name="local_chanid" from="basetextarea">
-            <area>190,444,500,50</area>
+        <textarea name="local_chanid" from="chanid">
+            <position>190,444</position>
         </textarea>
 
         <button name="searchchanid_button">
@@ -402,13 +359,13 @@ MythTV Archive GUI theme
             </statetype>
         </button>
 
-        <textarea name="labe8" from="label2">
-            <area>50,480,500,50</area>
+        <textarea name="label8" from="label2">
+            <position>50,480</position>
             <value>Chan. No:</value>
         </textarea>
 
-        <textarea name="local_channo" from="basetextarea">
-            <area>190,484,500,50</area>
+        <textarea name="local_channo" from="chanid">
+            <position>190,484</position>
         </textarea>
 
         <button name="searchchanno_button" from="searchchanid_button">
@@ -417,12 +374,12 @@ MythTV Archive GUI theme
         </button>
 
         <textarea name="label9" from="label2">
-            <area>350,440,500,50</area>
+            <position>350,440</position>
             <value>Callsign:</value>
         </textarea>
 
-        <textarea name="local_callsign" from="basetextarea">
-            <area>480,445,500,50</area>
+        <textarea name="local_callsign" from="chanid">
+            <position>480,445</position>
         </textarea>
 
         <button name="searchcallsign_button" from="searchchanid_button">
@@ -431,12 +388,12 @@ MythTV Archive GUI theme
         </button>
 
         <textarea name="label10" from="label2">
-            <area>350,480,500,50</area>
+            <position>350,480</position>
             <value>Name:</value>
         </textarea>
 
-        <textarea name="local_name" from="basetextarea">
-            <area>480,485,500,50</area>
+        <textarea name="local_name" from="chanid">
+            <position>480,485</position>
         </textarea>
 
         <button name="searchname_button" from="searchchanid_button">

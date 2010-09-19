@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 
 MythTV Archive GUI theme
@@ -11,57 +12,13 @@ MythTV Archive GUI theme
 
     <window name="exportnative">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="description" from="basesmall">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="detail" from="basesmall">
-            <color>#ffffff</color>
-            <size>14</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="detailtitle" from="basesmall">
-            <color>#ffff00</color>
-            <size>14</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="label" from="basesmall">
-            <color>#ffff00</color>
-            <size>16</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="smallstatsfont" from="basesmall">
-            <color>#ffffff</color>
-            <size>10</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="statserror" from="basesmall">
-            <color>#ff0000</color>
-            <size>10</size>
-            <bold>no</bold>
-        </font>
-
         <shape name="topbackground" from="basebackground">
             <area>30,60,1220,300</area>
         </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,50</area>
-            <font>title</font>
+            <font>baseextralarge</font>
             <align>allcenter</align>
             <value>Select Archive Items</value>
         </textarea>
@@ -73,7 +30,7 @@ MythTV Archive GUI theme
         <textarea name="nofiles" from="basetextarea">
             <area>60,80,1140,200</area>
             <align>allcenter</align>
-            <font>description</font>
+            <font>basemedium</font>
             <value>No files are selected for archive</value>
         </textarea>
 
@@ -93,31 +50,23 @@ MythTV Archive GUI theme
 
         <textarea name="progtitle" from="basetextarea">
             <area>60,400,440,30</area>
-            <font>detailtitle</font>
-            <value>title goes here</value>
-            <multiline>no</multiline>
+            <font>basesmallyellow</font>
         </textarea>
 
         <textarea name="progdatetime">
             <area>890,400,220,30</area>
-            <font>detailtitle</font>
+            <font>basesmallyellow</font>
             <align>right</align>
-            <value>sep 13, 2004 11:00 pm (1h 15m)</value>
-            <multiline>no</multiline>
         </textarea>
 
         <textarea name="progdescription" from="basetextarea">
             <area>60,420,1060,130</area>
-            <font>detail</font>
-            <value>description goes here.</value>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="filesize" from="basetextarea">
             <area>1010,555,100,40</area>
-            <font>detail</font>
             <align>right</align>
-            <value>x.xx GB</value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -135,26 +84,22 @@ MythTV Archive GUI theme
 
         <textarea name="maxsize" from="basetextarea">
             <area>1190,425,100,30</area>
-            <font>smallstatsfont</font>
-            <value>xxxxx MB</value>
+            <font>basetiny</font>
         </textarea>
 
         <textarea name="minsize" from="basetextarea">
             <area>1190,565,100,30</area>
-            <font>smallstatsfont</font>
-            <value>0 MB</value>
+            <font>basetiny</font>
         </textarea>
 
         <textarea name="currentsize" from="basetextarea">
             <area>1190,480,100,30</area>
-            <font>smallstatsfont</font>
-            <value>xxxxx MB</value>
+            <font>basetiny</font>
         </textarea>
 
         <textarea name="currentsize_error" from="basetextarea">
             <area>1190,480,100,30</area>
-            <font>statserror</font>
-            <value>xxxxx MB</value>
+            <font>basetinyred</font>
         </textarea>
 
         <button name="cancel_button" from="basebutton">
@@ -179,17 +124,10 @@ MythTV Archive GUI theme
     -->
 
     <window name="archivefile_selector">
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
 
         <textarea name="title" from="basetextarea">
             <area>0,0,1280,45</area>
-            <font>title</font>
+            <font>baseextralarge</font>
             <align>allcenter</align>
             <value>File Finder To Import</value>
         </textarea>
@@ -220,14 +158,20 @@ MythTV Archive GUI theme
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
-                    </imagetype>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext">
                         <font>basesmallpurple</font>
                     </textarea>
@@ -289,17 +233,10 @@ MythTV Archive GUI theme
    -->
 
   <window name="importnative">
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
 
         <textarea name="title1" from="basetextarea">
             <area>0,10,1280,50</area>
-            <font>title</font>
+            <font>baseextralarge</font>
             <align>allcenter</align>
             <value>Select Associated Channel</value>
         </textarea>
@@ -340,7 +277,7 @@ MythTV Archive GUI theme
         <textarea name="label1" from="basetextarea">
             <area>60,330,1170,50</area>
             <font>basemedium</font>
-            <align>center</align>
+            <align>hcenter</align>
             <value>Archived Channel</value>
         </textarea>
 
@@ -356,7 +293,7 @@ MythTV Archive GUI theme
 
         <textarea name="label3" from="label2">
             <area>260,420,500,50</area>
-            <font>label</font>
+            <font>basesmallyellow</font>
             <value>Chan. No:</value>
         </textarea>
 
@@ -383,7 +320,7 @@ MythTV Archive GUI theme
         </textarea>
 
         <!--
-            local file channel 
+            local file channel
          -->
 
         <shape name="bottombackground" from="basebackground">

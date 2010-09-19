@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
     <!-- music selection screen -->
@@ -1027,7 +1028,7 @@
                 <state name="selectedactive" from="active">
                     <shape name="buttonbackground">
                         <area>0,0,100%,100%</area>
-                        <fill type="gradient">
+                        <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" />
                         </fill>
                     </shape>
