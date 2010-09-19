@@ -621,6 +621,18 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
             VERBOSE(VB_PLAYBACK, LOC +
                         QString("XV_SET_DEFAULTS is %1supported on this port")
                         .arg(xvsetdefaults ? "" : "not "));
+
+            bool xv_vsync = xv_is_attrib_supported(disp, port,
+                                                   "XV_SYNC_TO_VBLANK");
+            VERBOSE(VB_PLAYBACK, LOC + QString("XV_SYNC_TO_VBLANK %1supported")
+                    .arg(xv_vsync ? "" : "not "));
+            if (xv_vsync)
+            {
+                VERBOSE(VB_PLAYBACK, LOC + QString("XVideo Sync to VBlank %1set")
+                    .arg(xv_set_attrib(disp, port, "XV_SYNC_TO_VBLANK", 1) ?
+                         "" : "NOT "));
+            }
+
             break;
         }
     }
