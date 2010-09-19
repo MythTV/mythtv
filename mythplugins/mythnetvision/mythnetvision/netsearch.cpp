@@ -44,9 +44,9 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_thumbImage(NULL),            m_downloadable(NULL),
       m_progress(NULL),              m_busyPopup(NULL),
       m_okPopup(NULL),               m_popupStack(),
-      m_netSearch(),                 m_currentSearch(NULL),
-      m_currentGrabber(0),           m_currentCmd(NULL),
-      m_currentDownload(NULL),       m_pagenum(0),
+      m_netSearch(),                 m_currentSearch(QString()),
+      m_currentGrabber(0),           m_currentCmd(QString()),
+      m_currentDownload(QString()),  m_pagenum(0),
       m_lock(QMutex::Recursive)
 {
     m_playing = false;
