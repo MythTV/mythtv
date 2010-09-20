@@ -317,7 +317,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     VERBOSE(VB_COMMFLAG, LOC + QString("CommFlagFast: %1").arg(x));
     if (x == 0)
         special_decode = kAVSpecialDecode_None;
-    VERBOSE(VB_PLAYBACK, LOC + QString("Special Decode Flags: 0x%1")
+    VERBOSE(VB_COMMFLAG, LOC + QString("Special Decode Flags: 0x%1")
         .arg(special_decode, 0, 16));
 }
 
