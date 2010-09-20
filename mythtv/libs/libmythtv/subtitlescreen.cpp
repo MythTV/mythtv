@@ -10,6 +10,9 @@
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
+#define PAD_WIDTH  0.20
+#define PAD_HEIGHT 0.04
+
 static MythFontProperties* gTextSubFont;
 static QHash<int, MythFontProperties*> gCC708Fonts;
 
@@ -428,7 +431,8 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
                                        uint64_t start, uint64_t duration)
 {
     QFontMetrics font(*(gTextSubFont->GetFace()));
-    int height = font.height();
+    int height = font.height() * (1 + PAD_HEIGHT);
+    int pad_width = font.maxWidth() * PAD_WIDTH;
     int y = m_safeArea.height() - (height * wrappedsubs.size());
     int centre = m_safeArea.width() / 2;
     QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
@@ -436,8 +440,8 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
     {
         if (subtitle.isEmpty())
             continue;
-        int width = font.width(subtitle);
-        int x = centre - (width / 2);
+        int width = font.width(subtitle) + pad_width * 2;
+        int x = centre - (width / 2) - pad_width;
         QRect rect(x, y, width, height);
 
         if (m_useBackground)
@@ -572,6 +576,8 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     gTextSubFont->GetFace()->setPixelSize(m_safeArea.height() / (yscale * 1.2));
     QFontMetrics font(*(gTextSubFont->GetFace()));
     QBrush bgfill = QBrush(QColor(0, 0, 0), Qt::SolidPattern);
+    int height = font.height() * (1 + PAD_HEIGHT);
+    int pad_width = font.maxWidth() * PAD_WIDTH;
 
     for (; i != textlist->buffers.end(); i++)
     {
@@ -579,8 +585,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
         if (cc && (cc->text != QString::null))
         {
-            int width  = font.width(cc->text);
-            int height = font.height();
+            int width  = font.width(cc->text) + pad_width * 2;
             int x = teletextmode ? cc->y : (cc->x + 3);
             int y = teletextmode ? cc->x : cc->y;
             x = (int)(((float)x / (float)xscale) * (float)m_safeArea.width());
@@ -699,9 +704,10 @@ void SubtitleScreen::Display708Strings(const CC708Window &win, int num,
                 display = true;
 
             QFontMetrics font(*(mythfont->GetFace()));
-            uint height = (uint)font.height();
+            uint height = (uint)font.height() * (1 + PAD_HEIGHT);
 
-            row_width += font.width(list[i]->str);
+            row_width += font.width(list[i]->str) +
+                         (font.maxWidth() * PAD_WIDTH * 2);
             max_row_height = max(max_row_height, height);
         }
 
@@ -765,7 +771,7 @@ void SubtitleScreen::Display708Strings(const CC708Window &win, int num,
                 continue;
 
             QFontMetrics font(*(mythfont->GetFace()));
-            uint height = (uint)font.height();
+            uint height = (uint)font.height() * (1 + PAD_HEIGHT);
             maxheight   = max(maxheight, height);
             uint spacewidth = font.width(QString(" "));
             uint textwidth  = font.width(trimmed);
@@ -786,6 +792,11 @@ void SubtitleScreen::Display708Strings(const CC708Window &win, int num,
                 leading  *= spacewidth;
                 trailing *= spacewidth;
             }
+
+            if (!leading)
+                textwidth += spacewidth * PAD_WIDTH;
+            if (!trailing)
+                textwidth += spacewidth * PAD_WIDTH;
 
             bool background = list[i]->attr.GetBGAlpha();
             QBrush bgfill = QBrush((list[i]->attr.GetBGColor(), Qt::SolidPattern));
