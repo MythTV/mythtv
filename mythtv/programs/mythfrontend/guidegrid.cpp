@@ -297,7 +297,7 @@ bool GuideGrid::Create()
     if (videoImage && m_embedVideo)
         m_videoRect = videoImage->GetArea();
     else
-        m_videoRect = QRect(0,0,1,1);
+        m_videoRect = QRect(0,0,0,0);
 
     m_channelCount = m_guideGrid->getChannelCount();
     m_timeCount = m_guideGrid->getTimeCount() * 6;
@@ -2175,26 +2175,22 @@ void GuideGrid::EmbedTVWindow(void)
     MythEvent *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
     qApp->postEvent(this, me);
 
-    if (m_embedVideo)
-    {
-        PlayerContext *ctx =
-            m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-        m_usingNullVideo =
+    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+    m_usingNullVideo =
             !m_player->StartEmbedding(ctx, GetMythMainWindow()->GetPaintWindow()->winId(), m_videoRect);
-        if (!m_usingNullVideo)
-        {
-            QRegion r1 = QRegion(m_Area);
-            QRegion r2 = QRegion(m_videoRect);
-            GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
-            m_player->DrawUnusedRects();
-        }
-        else
-        {
-            me = new MythEvent("START_VIDEO_REFRESH_TIMER");
-            qApp->postEvent(this, me);
-        }
-        m_player->ReturnPlayerLock(ctx);
+    if (!m_usingNullVideo)
+    {
+        QRegion r1 = QRegion(m_Area);
+        QRegion r2 = QRegion(m_videoRect);
+        GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
+        m_player->DrawUnusedRects();
     }
+    else
+    {
+        me = new MythEvent("START_VIDEO_REFRESH_TIMER");
+        qApp->postEvent(this, me);
+    }
+    m_player->ReturnPlayerLock(ctx);
 }
 
 void GuideGrid::refreshVideo(void)
