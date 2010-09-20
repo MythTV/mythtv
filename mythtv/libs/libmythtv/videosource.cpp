@@ -2596,10 +2596,19 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // (selecting the old start channel if it is there).
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(channels, order);
+    bool has_visible = false, found_existing = false;
+    for (uint i = 0; i < channels.size() && !has_visible; i++)
+        has_visible |= channels[i].visible;
+
     for (uint i = 0; i < channels.size(); i++)
     {
         const QString channum = channels[i].channum;
-        addSelection(channum, channum, channum == startChan);
+        bool sel = channum == startChan;
+        if (!has_visible || channels[i].visible || sel)
+        {
+            addSelection(channum, channum, sel);
+            found_existing |= sel;
+        }
     }
 }
 
