@@ -173,6 +173,11 @@ class UPNP_PUBLIC  StateVariable : public StateVariableBase
 
 //////////////////////////////////////////////////////////////////////////////
 
+template<typename T>
+inline T state_var_init(const T*) { return (T)(0); }
+template<>
+inline QString state_var_init(const QString*) { return QString(); }
+
 class UPNP_PUBLIC StateVariables
 {   
     protected:
@@ -231,9 +236,10 @@ class UPNP_PUBLIC StateVariables
         template < class T >
         T GetValue( const QString &sName )
         {
+            T *dummy = NULL;
             SVMap::iterator it = m_map.find(sName);
             if (it == m_map.end())
-                return T(0);
+                return state_var_init(dummy);
 
             StateVariable< T > *pVariable =
                 dynamic_cast< StateVariable< T > *>( *it );
@@ -241,7 +247,7 @@ class UPNP_PUBLIC StateVariables
             if (pVariable != NULL)
                 return pVariable->GetValue();
 
-            return T(0);
+            return state_var_init(dummy);
         }
 
         uint BuildNotifyBody(QTextStream &ts, TaskTime ttLastNotified) const;
