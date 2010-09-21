@@ -43,7 +43,7 @@ Watching TV or a recording
 - W   Cycle through zoom modes: Half, Full, Stretch
 - Ctrl-W Force aspect ratio of video to be treated as either 4:3 or 16:9
 - S   Toggle display of the Program Guide (EPG).
-- F6  Display the Program Finder.
+- #  Display the Program Finder.
 - F8  Cycle through sleep timer settings Off->30m->1hr->1hr30m->2hr->Off
 - Left arrow  Skip back the configured number of seconds (default is 5)
 - Right arrow Skip ahead the configured number of seconds (default is 30)
