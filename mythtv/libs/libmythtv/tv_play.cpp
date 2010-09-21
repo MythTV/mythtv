@@ -9243,16 +9243,6 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
 
     // Assuming the data is valid, try to load DataDirect listings.
     uint sourceid = chanEditMap["sourceid"].toUInt();
-    if (sourceid && (sourceid != ddMapSourceId))
-    {
-        ddMapLoaderRunning = true;
-        if (!pthread_create(&ddMapLoader, NULL, load_dd_map_thunk,
-                            new load_dd_map(this, sourceid)))
-        {
-            ddMapLoaderRunning = false;
-        }
-        return;
-    }
 
     // Update with XDS and DataDirect Info
     ChannelEditAutoFill(ctx, chanEditMap);
@@ -9265,6 +9255,16 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
         osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
     }
     ReturnOSDLock(ctx, osd);
+
+    if (sourceid && (sourceid != ddMapSourceId))
+    {
+        ddMapLoaderRunning = true;
+        if (!pthread_create(&ddMapLoader, NULL, load_dd_map_thunk,
+                            new load_dd_map(this, sourceid)))
+        {
+            ddMapLoaderRunning = false;
+        }
+    }
 }
 
 /** \fn TV::ChannelEditKey(const PlayerContext*, const QKeyEvent *e)
@@ -9519,32 +9519,21 @@ void TV::RunLoadDDMap(uint sourceid)
 
     // Startup channel editor gui early, with "Loading..." text
     const PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-    OSD *osd = GetOSDLock(actx);
-    if (osd)
-    {
-        InfoMap tmp;
-        insert_map(tmp, chanEditMap);
-        for (uint i = 0; i < 4; i++)
-            tmp[keys[i]] = "Loading...";
-        osd->DialogShow(OSD_DLG_EDITOR);
-        osd->SetText(OSD_DLG_EDITOR, tmp, kOSDTimeout_None);
-    }
-    ReturnOSDLock(actx, osd);
-    ReturnPlayerLock(actx);
 
     // Load DataDirect info
     LoadDDMap(sourceid);
 
     // Update with XDS and DataDirect Info
-    actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
     ChannelEditAutoFill(actx, chanEditMap);
 
-    // Set proper initial values for channel editor, and make it visible..
-    osd = GetOSDLock(actx);
+    OSD *osd = GetOSDLock(actx);
     if (osd)
     {
-        osd->DialogShow(OSD_DLG_EDITOR);
-        osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
+        if (osd->DialogVisible(OSD_DLG_EDITOR))
+            osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
+        else
+            VERBOSE(VB_IMPORTANT, LOC + "No channel editor visible. Failed "
+                                        "to update data direct channel info.");
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);
