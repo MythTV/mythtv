@@ -214,7 +214,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     QColor       popupForegroundColor;
     int          hpadding, wpadding;
     bool         arrowAccel;
-};
+} MDEPRECATED;
 
 /** The MythTV progress bar dialog.
 
@@ -245,7 +245,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
     MythProgressDialog(const QString& message, int totalSteps = 0,
                        bool cancelButton = false,
                        const QObject * target = NULL,
-                       const char * slot = NULL);
+                       const char * slot = NULL) MDEPRECATED;
 
     /* \brief Close the dialog.
 
@@ -306,7 +306,7 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
     MythBusyDialog(const QString &title,
                    bool cancelButton = false,
                    const QObject * target = NULL,
-                   const char * slot = NULL);
+                   const char * slot = NULL) MDEPRECATED;
 
     /** \brief Setup a timer to 'move' the spinner
 
@@ -347,10 +347,10 @@ class MPUBLIC MythThemedDialog : public MythDialog
                      const QString  &window_name,
                      const QString  &theme_filename = QString(),
                      const char     *name = "MythThemedDialog",
-                     bool            setsize = true);
+                     bool            setsize = true) MDEPRECATED;
     MythThemedDialog(MythMainWindow *parent,
                      const char     *name = "MythThemedDialog",
-                     bool            setsize = true);
+                     bool            setsize = true) MDEPRECATED;
 
     virtual bool loadThemedWindow(QString window_name, QString theme_filename);
     virtual void loadWindow(QDomElement &);
@@ -443,7 +443,7 @@ class MPUBLIC MythPasswordDialog: public MythDialog
                        QString         target,
                        MythMainWindow *parent,
                        const char     *name = "MythPasswordDialog",
-                       bool            setsize = true);
+                       bool            setsize = true) MDEPRECATED;
   public slots:
 
     void checkPassword(const QString &);
@@ -466,7 +466,7 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
   public:
 
     MythSearchDialog(MythMainWindow *parent,
-                     const char     *name = "MythSearchDialog");
+                     const char     *name = "MythSearchDialog") MDEPRECATED;
 
   public:
     void setCaption(QString text);
