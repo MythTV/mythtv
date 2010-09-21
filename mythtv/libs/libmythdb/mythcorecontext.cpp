@@ -787,6 +787,9 @@ bool MythCoreContext::SendReceiveStringList(QStringList &strlist,
             d->m_serverSock->DownRef();
             d->m_serverSock = NULL;
 
+            d->m_eventSock->DownRef();
+            d->m_eventSock = NULL;
+
             bool blockingClient = GetNumSetting("idleTimeoutSecs",0);
             ConnectToMasterServer(blockingClient);
 
