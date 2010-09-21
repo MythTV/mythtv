@@ -4,8 +4,8 @@ ifdef INSTALL_ROOT
 	ROOT_FLAGS = --root="$(INSTALL_ROOT)"
 endif
 
-ifneq ($($(PREFIX):/=), /usr)
-	ifneq ($($(PREFIX):/=), /usr/local)
+ifneq ($(PREFIX:/=), /usr)
+	ifneq ($(PREFIX:/=), /usr/local)
 		PREFIX_FLAGS=--prefix="$(PREFIX)"
 	endif
 endif
