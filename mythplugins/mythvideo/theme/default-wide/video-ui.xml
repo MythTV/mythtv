@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <!-- Popups -->
@@ -740,7 +742,7 @@
                 </state>
             </statetype>
         </buttonlist>
-       
+
         <textarea name="subtitle" from="basetextarea">
             <area>500,15,350,40</area>
             <align>hcenter,vcenter</align>
@@ -751,7 +753,7 @@
             <area>870,15,100,40</area>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
-        </textarea>        
+        </textarea>
 
         <textarea name="position" from="basetextarea">
             <area>1000,15,200,40</area>
@@ -833,26 +835,26 @@
           <textarea name="director" from="basetextarea">
              <area>50,467,450,30</area>
           </textarea>
-  
+
           <textarea name="year" from="basetextarea">
              <area>500,467,80,30</area>
               <align>right</align>
           </textarea>
-  
+
           <textarea name="description" from="basetextarea">
              <area>40,495,530,80</area>
               <align>left,top</align>
               <multiline>yes</multiline>
               <cutdown>yes</cutdown>
           </textarea>
-  
+
           <textarea name="cast" from="basetextarea">
              <area>60,580,505,70</area>
               <align>left,top</align>
               <multiline>yes</multiline>
               <cutdown>no</cutdown>
           </textarea>
-  
+
           <textarea name="position" from="basetextarea">
              <area>266,655,266,40</area>
               <font>basemedium</font>
@@ -1526,14 +1528,14 @@
             <align>hcenter,vcenter</align>
             <font>baselarge</font>
         </textarea>
-        
+
         <textarea name="helptext" from="basetextarea">
             <area>90,400,1100,280</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <align>allcenter</align>
         </textarea>
-        
+
         <textarea name="autometacheck_text" from="basetextarea">
             <area>485,185,500,40</area>
             <value>Perform metadata update after video scan</value>
@@ -1564,7 +1566,7 @@
         </textarea>
 
     <!--Widgets-->
-        
+
         <checkbox name="autometaupdatecheck" from="basecheckbox">
             <position>445,187</position>
         </checkbox>

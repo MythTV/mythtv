@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <window name="functionpopup">
@@ -107,9 +109,9 @@
         <textarea name="status_text" from="basetextarea">
             <area>440,130,400,40</area>
             <align>allcenter</align>
-            <font>running</font> 
-            <font state="running">running</font> 
-            <font state="stopped">stopped</font> 
+            <font>running</font>
+            <font state="running">running</font>
+            <font state="stopped">stopped</font>
             <multiline>no</multiline>
             <value></value>
         </textarea>
@@ -170,12 +172,12 @@
                         <area>0,2,25,25</area>
                         <preserveaspect>yes</preserveaspect>
                     </imagetype>
-                    <shape name="buttonbackground"> 
-                        <area>0,0,1160,30</area> 
-                        <fill style="gradient"> 
-                            <gradient start="#505050" end="#000000" alpha="200" /> 
-                        </fill> 
-                    </shape> 
+                    <shape name="buttonbackground">
+                        <area>0,0,1160,30</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
                     <textarea name="buttontext" from="basetextarea">
                         <area>20,2,250,30</area>
                         <font>basesmallgrey</font>
@@ -195,10 +197,10 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <shape name="buttonbackground"> 
-                        <fill style="gradient"> 
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
                             <gradient start="#52CA38" end="#349838" alpha="255" />
-                        </fill> 
+                        </fill>
                     </shape>
 
                     <textarea name="buttontext">
@@ -572,7 +574,7 @@
                 </state>
             </statetype>
         </buttonlist>
-        
+
 
         <!--+++++++++++++++++++ layout 3 - grid view 6x2 +++++++++++++++++++++++++-->
 
@@ -822,9 +824,9 @@
             <area>640,125,320,70</area>
             <align>right</align>
             <font>idle</font>
-            <font state="idle">idle</font> 
-            <font state="alarm">alarm</font> 
-            <font state="alert">alert</font> 
+            <font state="idle">idle</font>
+            <font state="alarm">alarm</font>
+            <font state="alert">alert</font>
             <value></value>
         </textarea>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <window name="programguide">
@@ -1751,7 +1751,7 @@
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
-    
+
         <buttonlist name="rules" from="baseverywideselector">
             <helptext>Select the recording rule</helptext>
             <position>250,304</position>
@@ -1779,7 +1779,7 @@
             <position>250,490</position>
             <value>Schedule Info</value>
             <helptext></helptext>
-        </button>        
+        </button>
 
         <button name="preview" from="baseverywidebutton">
             <position>250,534</position>
@@ -2041,5 +2041,5 @@
             <value>Back</value>
         </button>
     </window>
-    
+
 </mythuitheme>

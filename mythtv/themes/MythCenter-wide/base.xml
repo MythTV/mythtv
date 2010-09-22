@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <!-- Base Font Definitions -->
@@ -41,7 +41,7 @@
     </fontdef>
 
     <fontdef name="baselargenormal" from="baselarge">
-        <weight>normal</weight> 
+        <weight>normal</weight>
     </fontdef>
 
     <fontdef name="baseextralarge" from="baselarge">
@@ -588,7 +588,7 @@
             <position>680,22</position>
         </statetype>
     </spinbox>
- 
+
     <!-- Base definition of a list in 'selector' configuration -->
     <buttonlist name="baseselector">
         <area>0,0,220,40</area>

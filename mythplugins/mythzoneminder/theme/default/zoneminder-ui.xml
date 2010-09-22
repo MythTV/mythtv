@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <window name="functionpopup">
@@ -120,9 +122,9 @@
         <textarea name="status_text" from="basetextarea">
             <area>250,110,300,40</area>
             <align>allcenter</align>
-            <font>running</font> 
-            <font state="running">running</font> 
-            <font state="stopped">stopped</font> 
+            <font>running</font>
+            <font state="running">running</font>
+            <font state="stopped">stopped</font>
             <multiline>no</multiline>
             <value></value>
         </textarea>
@@ -571,7 +573,7 @@
                 </state>
             </statetype>
         </buttonlist>
-        
+
 
         <!--+++++++++++++++++++ layout 3 - grid view 6x2 +++++++++++++++++++++++++-->
 
@@ -815,9 +817,9 @@
             <area>400,75,300,70</area>
             <align>right</align>
             <font>idle</font>
-            <font state="idle">idle</font> 
-            <font state="alarm">alarm</font> 
-            <font state="alert">alert</font> 
+            <font state="idle">idle</font>
+            <font state="alarm">alarm</font>
+            <font state="alert">alert</font>
             <value></value>
         </textarea>
 

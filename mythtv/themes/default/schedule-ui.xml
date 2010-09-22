@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <window name="programguide">
@@ -1505,7 +1505,7 @@
             <align>left,vcenter</align>
             <cutdown>yes</cutdown>
         </textarea>
-        
+
         <textedit name="description">
             <area>54,290,692,130</area>
             <statetype name="background">
@@ -1611,7 +1611,7 @@
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
-    
+
         <buttonlist name="rules" from="basewideselector">
             <position>215,210</position>
             <wrapstyle>selection</wrapstyle>
@@ -1640,7 +1640,7 @@
             <position>215,390</position>
             <value>Schedule Info</value>
             <helptext></helptext>
-        </button>        
+        </button>
 
         <button name="preview" from="baseverywidebutton">
             <position>215,435</position>

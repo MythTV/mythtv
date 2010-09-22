@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <window name="gallery">
@@ -9,7 +10,7 @@
             <cutdown>yes</cutdown>
             <font>baselarge</font>
         </textarea>
-        
+
         <!-- optional - shows path to current image -->
 <!--    <textarea name="breadcrumbs" from="basetextarea">
             <area>70,15,460,30</area>

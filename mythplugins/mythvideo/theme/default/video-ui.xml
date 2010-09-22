@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
     <!-- Popups -->
@@ -1418,14 +1420,14 @@
             <align>hcenter,vcenter</align>
             <font>baselarge</font>
         </textarea>
-        
+
         <textarea name="helptext" from="basetextarea">
             <area>50,350,700,280</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <align>allcenter</align>
         </textarea>
-        
+
         <textarea name="autometa_text" from="basetextarea">
             <area>285,170,400,40</area>
             <value>Perform metadata update after video scan</value>
@@ -1455,7 +1457,7 @@
         </textarea>
 
     <!--Widgets-->
-        
+
         <checkbox name="autometaupdatecheck" from="basecheckbox">
             <position>245,167</position>
         </checkbox>
