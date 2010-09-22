@@ -22,7 +22,8 @@ MPUBLIC void myth_system_pre_flags(uint &flags);
 MPUBLIC void myth_system_post_flags(uint &flags);
 #ifndef USING_MINGW
 MPUBLIC pid_t myth_system_fork(const QString &command, uint &result);
-MPUBLIC uint myth_system_wait(pid_t pid, uint timeout, bool background = false);
+MPUBLIC uint myth_system_wait(const QString &command, pid_t pid, uint timeout,
+                              bool background = false);
 MPUBLIC uint myth_system_abort(pid_t pid);
 #endif
 

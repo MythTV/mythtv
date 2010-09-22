@@ -6390,38 +6390,57 @@ void TV::SwitchCards(PlayerContext *ctx,
         return;
     }
 
-    // If we are switching to a channel not on the current recorder
-    // we need to find the next free recorder with that channel.
+    uint input_cardid = 0;
     QStringList reclist;
-    if (!channum.isEmpty())
-        reclist = ChannelUtil::GetValidRecorderList(chanid, channum);
-    else if (inputid)
+    if (inputid)
     {
-        uint cardid = CardUtil::GetCardID(inputid);
-        if (cardid)
-            reclist.push_back(QString::number(cardid));
-
-        // now we need to set our channel as the starting channel..
-        if (testrec && testrec->IsValidRecorder())
-        {
-            QString inputname("");
-            int cardid = testrec->GetRecorderNumber();
-            int cardinputid = CardUtil::GetCardInputID(
-                    cardid, channum, inputname);
-
-            VERBOSE(VB_CHANNEL, LOC + "Setting startchan: " +
-                    QString("cardid(%1) cardinputid(%2) channum(%3)")
-                    .arg(cardid).arg(cardinputid).arg(channum));
-
-            if (cardid >= 0 && cardinputid >=0 && !inputname.isEmpty())
-            {
-                CardUtil::SetStartChannel(cardinputid, channum);
-                CardUtil::SetStartInput(cardid, inputname);
-            }
-        }
+        // If we are switching to a specific input..
+        input_cardid = CardUtil::GetCardID(inputid);
+        if (input_cardid)
+            reclist.push_back(QString::number(input_cardid));
     }
+    else if (!channum.isEmpty())
+    {
+        // If we are switching to a channel not on the current recorder
+        // we need to find the next free recorder with that channel.
+        reclist = ChannelUtil::GetValidRecorderList(chanid, channum);
+    }
+
     if (!reclist.empty())
         testrec = RemoteRequestFreeRecorderFromList(reclist);
+
+    if (testrec && testrec->IsValidRecorder())
+    {
+        uint cardid = testrec->GetRecorderNumber();
+        int cardinputid = (int) inputid;
+        QString inputname;
+
+        // We are switching to a specific input..
+        if (inputid)
+            inputname = CardUtil::GetInputName(inputid);
+
+        // We are switching to a specific channel...
+        if (inputname.isEmpty() && (chanid || !channum.isEmpty()))
+        {
+            cardinputid = CardUtil::GetCardInputID(
+                cardid, channum, inputname);
+        }
+
+        if (cardid && cardinputid>0 && !inputname.isEmpty())
+        {
+            if (!channum.isEmpty())
+                CardUtil::SetStartChannel(cardinputid, channum);
+            CardUtil::SetStartInput(cardid, inputname);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("SwitchCards(%1,'%2',%3)")
+                    .arg(chanid).arg(channum).arg(inputid) +
+                    "\n\t\t\tWe should have been able to set a start "
+                    "channel or input but failed to do so.");
+        }
+    }
 
     // If we are just switching recorders find first available recorder.
     if (!testrec)

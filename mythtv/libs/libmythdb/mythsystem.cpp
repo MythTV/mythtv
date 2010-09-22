@@ -251,7 +251,8 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     pid    = myth_system_fork( command, result );
 
     if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait( pid, timeout, (flags & kMSRunBackground) );
+        result = myth_system_wait(
+            command, pid, timeout, (flags & kMSRunBackground));
 #else
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -367,10 +368,10 @@ pid_t myth_system_fork(const QString &command, uint &result)
     {
         /* Child */
         /* In case we forked WHILE it was locked */
-        bool unlocked = verbose_mutex.tryLock();
-        verbose_mutex.unlock();
-        if( !unlocked )
-            VERBOSE(VB_IMPORTANT, "Cleared parent's verbose lock");
+        //bool unlocked = verbose_mutex.tryLock();
+        //verbose_mutex.unlock();
+        //if( !unlocked )
+        //    VERBOSE(VB_IMPORTANT, "Cleared parent's verbose lock");
 
         /* Close all open file descriptors except stdout/stderr */
         for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
@@ -383,16 +384,21 @@ pid_t myth_system_fork(const QString &command, uint &result)
             // Note: dup2() will close old stdin descriptor.
             if (dup2(fd, 0) < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Cannot redirect /dev/null to standard input,"
-                        "\n\t\t\tfailed to duplicate file descriptor." + ENO);
+                //VERBOSE(VB_IMPORTANT, LOC_ERR +
+                //        "Cannot redirect /dev/null to standard input,"
+                //        "\n\t\t\tfailed to duplicate file descriptor." + ENO);
+                printf("Cannot redirect /dev/null to standard input,"
+                       "\n\t\t\tfailed to duplicate file descriptor. "
+                       "%s (%i)", strerror(errno), errno);
             }
             close(fd);
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot redirect /dev/null "
-                    "to standard input, failed to open." + ENO);
+            //VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot redirect /dev/null "
+            //        "to standard input, failed to open." + ENO);
+            printf("Cannot redirect /dev/null to standard input,"
+                   "\n\t\t\tfailed to open. %s (%i)", strerror(errno), errno);
         }
 
         /* Run command */
@@ -412,15 +418,17 @@ pid_t myth_system_fork(const QString &command, uint &result)
     return child;
 }
 
-uint myth_system_wait(pid_t pid, uint timeout, bool background)
+uint myth_system_wait(const QString &command, pid_t pid,
+                      uint timeout, bool background)
 {
     if( reaper == NULL )
     {
         reaper = new MythSystemReaper;
         reaper->start();
     }
-    VERBOSE(VB_IMPORTANT, QString("PID %1: launched%2") .arg(pid)
-        .arg(background ? " in the background, not waiting" : ""));
+    VERBOSE(VB_IMPORTANT, QString("PID %1: launched%2\n\t\t\tcmd: '%3'")
+            .arg(pid).arg(background ? " in the background, not waiting" : "")
+            .arg(command));
     return reaper->waitPid(pid, timeout, background);
 }
 
