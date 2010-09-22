@@ -89,9 +89,8 @@
 <!ELEMENT filepattern (#PCDATA)>
 <!ATTLIST filepattern low CDATA "0"
                        high CDATA #REQUIRED
-                       cycle (start|reverse) "start"
-                       delay CDATA "500">
-<!ELEMENT delay (#PCDATA)>  <!-- DEPRECATED -->
+                       cycle (start|reverse) "start"> <!-- delay CDATA "500" -->
+<!ELEMENT delay (#PCDATA)>  <!-- DEPRECATED in future? Should be attribute of filepattern. -->
 
 <!-- Shape Widget -->
 <!ELEMENT shape (%widget_common;|type|cornerradius|fill|line|%widgets;)*>
