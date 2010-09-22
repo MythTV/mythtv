@@ -1849,7 +1849,7 @@ def updateMythVideo(items):
                     logger.info(u"Simulation: DELETE videometadata for intid = %s" % (record[u'intid'],))
                     logger.info(u"Simulation: DELETE oldrecorded for title(%s), subtitle(%s)" % (record[u'title'], record[u'subtitle']))
                 else:
-                    Video(id=record[u'intid'], db=mythvideo).delete()
+                    Video(record[u'intid'], db=mythvideo).delete()
                     try: # An orphaned oldrecorded record may not exist
                         for oldrecorded in mythdb.searchOldRecorded(title=record[u'title'], subtitle=record[u'subtitle'] ):
                             delOldRecorded((channel_id, oldrecorded.starttime)).delete()
