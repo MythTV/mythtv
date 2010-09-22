@@ -736,7 +736,7 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("%systemroot%\\system32\\ping.exe -i %1 -n 1 %2>NUL")
                   .arg(timeout).arg(host);
 
-    if (myth_system(cmd))
+    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing))
         return false;
 #else
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
