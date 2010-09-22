@@ -9251,6 +9251,7 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     osd = GetOSDLock(ctx);
     if (osd)
     {
+        osd->DialogQuit();
         osd->DialogShow(OSD_DLG_EDITOR);
         osd->SetText(OSD_DLG_EDITOR, chanEditMap, kOSDTimeout_None);
     }
@@ -9815,7 +9816,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 switchToInputTimerId = StartTimer(1, __LINE__);
         }
         else if (action == "EDIT")
+        {
             StartChannelEditMode(actx);
+            hide = false;
+        }
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
