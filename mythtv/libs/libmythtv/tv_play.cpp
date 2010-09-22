@@ -9147,6 +9147,7 @@ void TV::ShowOSDAlreadyEditing(PlayerContext *ctx)
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
+        osd->DialogQuit();
         DoTogglePause(ctx, true);
 
         QString message = tr("This program is currently being edited");
