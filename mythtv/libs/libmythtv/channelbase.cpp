@@ -729,7 +729,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     myth_system_pre_flags(flags);
     m_changer_pid = myth_system_fork(command, result); 
     if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait(command, m_changer_pid, 30);
+        result = myth_system_wait(m_changer_pid, 30);
     myth_system_post_flags(flags);
 
     return( result == 0 );
