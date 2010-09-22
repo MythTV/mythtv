@@ -742,13 +742,13 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
                   .arg(timeout).arg(host);
 
-    if (myth_system(cmd))
+    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing))
     {
         // ping command may not like -t argument. Simplify:
 
         cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
 
-        if (myth_system(cmd))
+        if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing))
             return false;
     }
 #endif
@@ -1180,7 +1180,7 @@ bool IsPulseAudioRunning(void)
 #else
     const char *command = "ps -ae | grep pulseaudio > /dev/null";
 #endif
-    bool res = myth_system(command, kMSDontBlockInputDevs);
+    bool res = myth_system(command, kMSDontBlockInputDevs | kMSDontDisableDrawing);
     return !res;
 }
 
