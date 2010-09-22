@@ -46,7 +46,7 @@ if test "$E1" != 0 || test "$E2" = 0; then
     echo "such as bash or ksh."
     echo "THIS IS NOT A BUG IN FFMPEG, DO NOT REPORT IT AS SUCH."
     echo "Instead, install a working POSIX-compatible shell."
-    echo "Disabling this configure test will create a broken FFmpeg."
+    echo "Disabling this configure test will create a broken MythTV."
     if test "$BASH_VERSION" = '2.04.0(1)-release'; then
         echo "This bash version ($BASH_VERSION) is broken on your platform."
         echo "Upgrade to a later version if available."
