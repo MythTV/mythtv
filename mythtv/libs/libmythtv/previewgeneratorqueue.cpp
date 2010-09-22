@@ -273,8 +273,13 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         bool bookmark_updated = false;
 
         QDateTime bookmark_ts = pginfo.QueryBookmarkTimeStamp();
-        QDateTime cmp_ts = bookmark_ts.isValid() ?
-            bookmark_ts : pginfo.GetLastModifiedTime();
+        QDateTime cmp_ts;
+        if (bookmark_ts.isValid())
+            cmp_ts = bookmark_ts;
+        else if (QDateTime::currentDateTime() >= pginfo.GetRecordingEndTime())
+            cmp_ts = pginfo.GetLastModifiedTime();
+        else
+            cmp_ts = pginfo.GetRecordingStartTime();
 
         if (streaming)
         {
@@ -384,8 +389,9 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     else if (needs_gen)
     {
         VERBOSE(VB_PLAYBACK, LOC +
-                "Not requesting preview as it "
-                "is already being generated");
+                QString("Not requesting preview for %1,"
+                        "as it is already being generated")
+                .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)));
         IncPreviewGeneratorPriority(key, token);
     }
 
