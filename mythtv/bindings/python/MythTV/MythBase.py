@@ -735,7 +735,7 @@ class DBDataCRef( object ):
                                 % (self.table, self.t_ref), dat.cross)
         c.close()
 
-        index = self.hash.index[dat]
+        index = self.hash.index(dat)
         del self.hash[index]
         del self.data[index]
 
