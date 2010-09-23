@@ -66,9 +66,10 @@ class MythRenderOpenGL : public QGLContext, public MythRender
     MythRenderOpenGL(const QGLFormat& format);
     virtual ~MythRenderOpenGL();
 
-    virtual bool create(const QGLContext * shareContext = 0);
     virtual void makeCurrent();
     virtual void doneCurrent();
+
+    void  Init(void);
 
     int   GetMaxTextureSize(void)    { return m_max_tex_size;   }
     uint  GetFeatures(void)          { return m_exts_supported; }

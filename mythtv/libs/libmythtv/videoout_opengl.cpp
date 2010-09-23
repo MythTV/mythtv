@@ -224,6 +224,7 @@ bool VideoOutputOpenGL::SetupContext(void)
         gl_context  = new MythRenderOpenGL(fmt, device);
         if (gl_context && gl_context->create())
         {
+            gl_context->Init();
             success = true;
             VERBOSE(VB_GENERAL, LOC + QString("Created MythRenderOpenGL device."));
         }

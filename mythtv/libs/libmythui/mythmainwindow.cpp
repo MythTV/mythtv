@@ -936,6 +936,8 @@ void MythMainWindow::Init(void)
             delete d->paintwin;
             d->paintwin = NULL;
         }
+        else
+            d->render->Init();
     }
     else
 #endif

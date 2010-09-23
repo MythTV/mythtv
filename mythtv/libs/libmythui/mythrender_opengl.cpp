@@ -118,30 +118,14 @@ MythRenderOpenGL::~MythRenderOpenGL()
         delete m_lock;
 }
 
-bool MythRenderOpenGL::create(const QGLContext * shareContext)
+void MythRenderOpenGL::Init(void)
 {
-    if (!this->device())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "QGLContext has no paint device - "
-                                        "create will fail. Aborting.");
-        return false;
-    }
-
-    bool ok = QGLContext::create(shareContext);
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "QGLContext::create failed.");
-        return false;
-    }
-
     OpenGLLocker locker(this);
     InitProcs();
     Init2DState();
     InitFeatures();
 
-    if (ok)
-        VERBOSE(VB_GENERAL, LOC + "Initialised MythRenderOpenGL");
-    return ok;
+    VERBOSE(VB_GENERAL, LOC + "Initialised MythRenderOpenGL");
 }
 
 void MythRenderOpenGL::makeCurrent()

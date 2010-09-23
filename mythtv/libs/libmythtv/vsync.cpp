@@ -380,6 +380,7 @@ bool OpenGLVideoSync::TryInit(void)
     m_context = new MythRenderOpenGL(fmt, m_device);
     if (m_context && m_context->create())
     {
+        m_context->Init();
         if (m_context->HasGLXWaitVideoSyncSGI())
             return true;
 
