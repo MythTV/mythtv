@@ -272,26 +272,6 @@ MythTV's Configurable widgets also do save and restore their values
 from the database automagically when used in %MythTV's window classes.
  */
 
-/** \defgroup audio_subsystem       Audio Subsystem
-    \todo Ed W will be documenting the audio subsystem.
- */
-
-/** \defgroup lcd_subsystem         LCD Subsystem
-    \todo No one is working on documenting the LCD Subsystem
- */
-
-/** \defgroup osd_subsystem         OSD Subsystem
-    \todo No one is working on documenting the OSD Subsystem
- */
-
-/** \defgroup lirc_subsystem        LIRC Subsystem
-    \todo No one is working on documenting the LIRC Subsystem
- */
-
-/** \defgroup video_subsystem       Video Subsystem
-    \todo No one is working on documenting the video subsystem
- */
-
 /** \defgroup recorder_subsystem    Recorder Subsystem
 This line is filler that is ignored by Doxygen.
 
@@ -1007,10 +987,3 @@ currently supported, so the ImportRecorder is substituted for DEMO cards.
 /** \defgroup db_schema    MythTV Database Schema
 This line is filler that is ignored by Doxygen.
 */
-
-/**
- @defgroup filler1 .
- @defgroup filler2 .
- @defgroup filler3 Non-MythTV modules ...
- @defgroup filler4 .
- */
