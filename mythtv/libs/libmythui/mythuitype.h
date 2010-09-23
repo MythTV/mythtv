@@ -39,11 +39,14 @@ class MythUIWebBrowser;
  * - Painters & Renderers
  * - Input handling
  *
- * @{
  * \defgroup MythUI_Widgets MythUI Widget and theme handling
+ * \ingroup MythUI
+ *
  * \defgroup MythUI_Painters MythUI Painters and Renderers
+ * \ingroup MythUI
+ *
  * \defgroup MythUI_Input MythUI Input handling
- * @}
+ * \ingroup MythUI
  */
 
 /**
