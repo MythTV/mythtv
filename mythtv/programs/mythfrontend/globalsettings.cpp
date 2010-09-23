@@ -2864,90 +2864,6 @@ static HostComboBox *ThemePainter()
     return gc;
 }
 
-ThemeSelector::ThemeSelector(QString label):
-    HostImageSelect(label) {
-
-    ThemeType themetype = THEME_UI;
-
-    if (label == "Theme")
-    {
-        themetype = THEME_UI;
-        setLabel(QObject::tr("UI theme"));
-    }
-    else if (label == "MenuTheme")
-    {
-        themetype = THEME_MENU;
-        setLabel(QObject::tr("Menu theme"));
-    }
-
-    QDir themes(GetThemesParentDir());
-    themes.setFilter(QDir::Dirs);
-    themes.setSorting(QDir::Name | QDir::IgnoreCase);
-
-
-    QFileInfoList fil = themes.entryInfoList(QDir::Dirs);
-
-    for( QFileInfoList::iterator it =  fil.begin();
-                                 it != fil.end();
-                               ++it )
-    {
-        QFileInfo  &theme = *it;
-
-        if (theme.fileName() == "." || theme.fileName() == ".."
-                || theme.fileName() == "default"
-                || theme.fileName() == "default-wide")
-            continue;
-
-        QFileInfo preview;
-        QString name;
-
-        ThemeInfo *themeinfo = new ThemeInfo(theme.absoluteFilePath());
-
-        if (!themeinfo)
-            continue;
-
-        name = themeinfo->GetName();
-        preview = QFileInfo(themeinfo->GetPreviewPath());
-
-        if (name.isEmpty() || !(themeinfo->GetType() & themetype))
-        {
-            delete themeinfo;
-            continue;
-        }
-
-        if ((themeinfo->GetType() & THEME_UI) & themeinfo->IsWide())
-            name += QString(" (%1)").arg(QObject::tr("Widescreen"));
-
-        if (!preview.exists())
-        {
-            VERBOSE(VB_IMPORTANT, QString("Theme %1 missing preview image.")
-                                    .arg(theme.fileName()));
-            QString defaultpreview = themes.absolutePath();
-            if (themeinfo->IsWide())
-            {
-                defaultpreview += "/default-wide/preview.png";
-            }
-            else
-            {
-                defaultpreview += "/default/preview.png";
-            }
-            preview = QFileInfo(defaultpreview);
-        }
-
-        delete themeinfo;
-
-        QImage* previewImage = new QImage(preview.absoluteFilePath());
-        if (previewImage->width() == 0 || previewImage->height() == 0)
-            VERBOSE(VB_IMPORTANT, QString("Problem reading theme preview image"
-                                          " %1").arg(preview.filePath()));
-
-        addImageSelection(name, previewImage, theme.fileName());
-    }
-
-    if (themetype & THEME_UI)
-        setValue(DEFAULT_UI_THEME);
-}
-
 static HostComboBox *ChannelFormat()
 {
     HostComboBox *gc = new HostComboBox("ChannelFormat");
@@ -4416,17 +4332,11 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 
 AppearanceSettings::AppearanceSettings()
 {
-    VerticalConfigurationGroup* theme = new VerticalConfigurationGroup(false);
-    theme->setLabel(QObject::tr("Theme"));
-
-    theme->addChild(new ThemeSelector("Theme"));
-
-    theme->addChild(ThemePainter());
-    theme->addChild(MenuTheme());
-    addChild(theme);
-
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
-    screen->setLabel(QObject::tr("Screen Settings"));
+    screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
+
+    screen->addChild(ThemePainter());
+    screen->addChild(MenuTheme());
 
     if (GetNumberXineramaScreens() > 1)
     {
