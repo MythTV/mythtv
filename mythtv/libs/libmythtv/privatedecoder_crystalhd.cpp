@@ -228,6 +228,27 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
         return false;
     }
 
+    BC_INPUT_FORMAT fmt;
+    memset(&fmt, 0, sizeof(BC_INPUT_FORMAT));
+    fmt.OptFlags       = 0x80000000 | vdecFrameRateUnknown;
+    fmt.width          = avctx->coded_width;
+    fmt.height         = avctx->coded_height;
+    fmt.Progressive    = 1;
+    fmt.FGTEnable      = 0;
+    fmt.MetaDataEnable = 0;
+    fmt.metaDataSz     = avctx->extradata_size;
+    fmt.pMetaData      = avctx->extradata;
+    fmt.startCodeSz    = nalsize;
+    fmt.mSubtype       = sub_type;
+
+    st = DtsSetInputFormat(m_device, &fmt);
+    CHECK_ST
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, ERR + "Failed to set decoder input format");
+        return false;
+    }
+
     st = DtsOpenDecoder(m_device, BC_STREAM_TYPE_ES);
     CHECK_ST
     if (!ok)
@@ -248,27 +269,6 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
             VERBOSE(VB_PLAYBACK, LOC + QString("avcC nal size: %1")
                     .arg(nalsize));
         }
-    }
-
-    BC_INPUT_FORMAT fmt;
-    memset(&fmt, 0, sizeof(BC_INPUT_FORMAT));
-    fmt.OptFlags       = 0x80000000 | vdecFrameRateUnknown;
-    fmt.width          = avctx->coded_width;
-    fmt.height         = avctx->coded_height;
-    fmt.Progressive    = 1;
-    fmt.FGTEnable      = 0;
-    fmt.MetaDataEnable = 0;
-    fmt.metaDataSz     = avctx->extradata_size;
-    fmt.pMetaData      = avctx->extradata;
-    fmt.startCodeSz    = nalsize;
-    fmt.mSubtype       = sub_type;
-
-    st = DtsSetInputFormat(m_device, &fmt);
-    CHECK_ST
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to set decoder input format");
-        return false;
     }
 
     st = DtsSetColorSpace(m_device, m_pix_fmt);
