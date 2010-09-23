@@ -364,7 +364,7 @@ int Transcode::TranscodeFile(
     const QString &profileName,
     bool honorCutList, bool framecontrol,
     int jobID, QString fifodir,
-    const frm_dir_map_t &deleteMap)
+    frm_dir_map_t &deleteMap)
 {
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
@@ -411,17 +411,14 @@ int Transcode::TranscodeFile(
     {
         VERBOSE(VB_GENERAL, "Honoring the cutlist while transcoding");
 
-        frm_dir_map_t delMap;
         frm_dir_map_t::const_iterator it;
         QString cutStr;
         long long lastStart = 0;
 
-        if (deleteMap.size() > 0)
-            delMap = deleteMap;
-        else
-            m_proginfo->QueryCutList(delMap);
+        if (deleteMap.size() == 0)
+            m_proginfo->QueryCutList(deleteMap);
 
-        for (it = delMap.begin(); it != delMap.end(); ++it)
+        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
         {
             if (*it)
             {
