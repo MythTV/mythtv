@@ -876,6 +876,11 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         const QString oldfile = filename + ".old";
         const QByteArray aoldfile = oldfile.toLocal8Bit();
 
+        QFileInfo st(tmpfile);
+        qint64 newSize = 0;
+        if (st.exists()) 
+            newSize = st.size();
+
         QString cnf = filename;
         if ((jobArgs == "RENAME_TO_NUV") &&
             (filename.contains(QRegExp("mpg$"))))
@@ -1053,6 +1058,9 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
         }
+
+        if (newSize)
+            pginfo->SaveFilesize(newSize);
 
         JobQueue::ChangeJobStatus(jobID, JOB_FINISHED);
 
