@@ -17,6 +17,29 @@ typedef void                *HANDLE;
 #include <libcrystalhd/libcrystalhd_if.h>
 #include "privatedecoder.h"
 
+class PrivateDecoderCrystalHD;
+class FetcherThread : public QThread
+{
+    Q_OBJECT
+
+  public:
+    FetcherThread(PrivateDecoderCrystalHD *dec)
+      : QThread(NULL), m_dec(dec) { }
+
+  protected:
+    virtual void run(void);
+
+  private:
+    PrivateDecoderCrystalHD *m_dec;
+};
+
+typedef struct PacketBuffer_
+{
+    uint8_t *buf;
+    uint     size;
+    int64_t  pts;
+} PacketBuffer;
+
 enum BC_DEVICE_TYPE
 {
     BC_70012 = 0,
@@ -25,6 +48,8 @@ enum BC_DEVICE_TYPE
 
 class PrivateDecoderCrystalHD : public PrivateDecoder
 {
+    friend class FetcherThread;
+
   public:
     static void GetDecoders(render_opts &opts);
     PrivateDecoderCrystalHD();
@@ -38,9 +63,11 @@ class PrivateDecoderCrystalHD : public PrivateDecoder
                           AVFrame *picture,
                           int *got_picture_ptr,
                           AVPacket *pkt);
-    void         RetrieveFrame(void);
 
   private:
+    void FetchFrames(void);
+    bool StartFetcherThread(void);
+    int  ProcessPacket(AVStream *stream, AVPacket *pkt);
 
     bool CreateFilter(AVCodecContext *avctx);
     void FillFrame(BC_DTS_PROC_OUT *out);
@@ -53,6 +80,12 @@ class PrivateDecoderCrystalHD : public PrivateDecoder
     BC_DEVICE_TYPE     m_device_type;
     BC_OUTPUT_FORMAT   m_pix_fmt;
     QList<VideoFrame*> m_decoded_frames;
+    QList<PacketBuffer*> m_packet_buffers;
+    QMutex             m_decoded_frames_lock;
+    FetcherThread     *m_fetcher_thread;
+    bool               m_fetcher_pause;
+    bool               m_fetcher_paused;
+    bool               m_fetcher_stop;
     VideoFrame        *m_frame;
     AVBitStreamFilterContext *m_filter;
 };

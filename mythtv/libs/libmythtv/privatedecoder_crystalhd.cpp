@@ -5,6 +5,16 @@
 #define ERR  QString("CrystalHD Err: ")
 #define WARN QString("CrystalHD Warn: ")
 
+void FetcherThread::run(void)
+{
+    if (!m_dec)
+        return;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("Starting Fetcher thread."));
+    m_dec->FetchFrames();
+    VERBOSE(VB_PLAYBACK, LOC + QString("Stopping Fetcher thread."));
+}
+
 PixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt);
 QString device_to_string(BC_DEVICE_TYPE device);
 QString bcmerr_to_string(BC_STATUS err);
@@ -31,12 +41,29 @@ void PrivateDecoderCrystalHD::GetDecoders(render_opts &opts)
 
 PrivateDecoderCrystalHD::PrivateDecoderCrystalHD()
   : m_device(NULL), m_device_type(BC_70012),
-    m_pix_fmt(OUTPUT_MODE_INVALID), m_frame(NULL), m_filter(NULL)
+    m_pix_fmt(OUTPUT_MODE_INVALID), m_decoded_frames_lock(QMutex::Recursive),
+    m_fetcher_thread(NULL), m_fetcher_pause(false), m_fetcher_paused(false),
+    m_fetcher_stop(false),  m_frame(NULL), m_filter(NULL)
 {
 }
 
 PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
 {
+    if (m_fetcher_thread)
+    {
+        m_fetcher_pause = true;
+        m_fetcher_stop = true;
+        int tries = 0;
+        while (!m_fetcher_thread->wait(100) && (tries++ < 50))
+            VERBOSE(VB_PLAYBACK, WARN + "Waited 100ms for Fetcher to stop");
+
+        if (m_fetcher_thread->isRunning())
+            VERBOSE(VB_IMPORTANT, ERR + "Failed to stop Fetcher.");
+        else
+            VERBOSE(VB_PLAYBACK, LOC + "Stopped frame Fetcher.");
+        delete m_fetcher_thread;
+    }
+
     if (m_filter)
         av_bitstream_filter_close(m_filter);
 
@@ -64,7 +91,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     static bool debugged = false;
 
     uint32_t well_documented = DTS_PLAYBACK_MODE | DTS_LOAD_FILE_PLAY_FW |
-                               DTS_SINGLE_THREADED_MODE | DTS_SKIP_TX_CHK_CPB |
+                               DTS_SKIP_TX_CHK_CPB |
                                DTS_PLAYBACK_DROP_RPT_MODE |
                                DTS_DFLT_RESOLUTION(vdecRESOLUTION_CUSTOM);
     INIT_ST
@@ -167,14 +194,14 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
             if (codecs & BC_DEC_FLAGS_MPEG2)
                 sub_type = BC_MSUBTYPE_MPEG2VIDEO;
             break;
-        //case CODEC_ID_VC1:
-        //    if (codecs & BC_DEC_FLAGS_VC1)
-        //        sub_type = BC_MSUBTYPE_VC1;
-        //    break;
-        //case CODEC_ID_WMV3:
-        //    if (codecs & BC_DEC_FLAGS_VC1)
-        //        sub_type = BC_MSUBTYPE_WMV3;
-        //    break;
+        case CODEC_ID_VC1:
+            if (codecs & BC_DEC_FLAGS_VC1)
+                sub_type = BC_MSUBTYPE_VC1;
+            break;
+        case CODEC_ID_WMV3:
+            if (codecs & BC_DEC_FLAGS_VC1)
+                sub_type = BC_MSUBTYPE_WMV3;
+            break;
         case CODEC_ID_H264:
             if (codecs & BC_DEC_FLAGS_H264)
             {
@@ -225,7 +252,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
 
     BC_INPUT_FORMAT fmt;
     memset(&fmt, 0, sizeof(BC_INPUT_FORMAT));
-    fmt.OptFlags       = 0x80000000 | vdecFrameRateUnknown | 0x80;
+    fmt.OptFlags       = 0x80000000 | vdecFrameRateUnknown;
     fmt.width          = avctx->coded_width;
     fmt.height         = avctx->coded_height;
     fmt.Progressive    = 1;
@@ -313,14 +340,39 @@ void inline free_frame(VideoFrame* frame)
     }
 }
 
+void inline free_buffer(PacketBuffer* buffer)
+{
+    if (buffer)
+    {
+        if (buffer->buf)
+            delete [] buffer->buf;
+        delete buffer;
+    }
+}
+
 bool PrivateDecoderCrystalHD::Reset(void)
 {
+    if (m_fetcher_thread)
+    {
+        m_fetcher_pause = true;
+        int tries = 0;
+        while (!m_fetcher_paused && tries < 50)
+            usleep(10000);
+        if (m_fetcher_paused)
+            VERBOSE(VB_IMPORTANT, LOC + "Failed to pause fetcher thread");
+    }
+
+    QMutexLocker lock(&m_decoded_frames_lock);
     free_frame(m_frame);
     m_frame = NULL;
 
     for (int i = 0; i < m_decoded_frames.size(); i++)
         free_frame(m_decoded_frames[i]);
     m_decoded_frames.clear();
+
+    for (int i = 0; i < m_packet_buffers.size(); i++)
+        free_buffer(m_packet_buffers[i]);
+    m_packet_buffers.clear();
 
     if (!m_device)
         return true;
@@ -331,86 +383,132 @@ bool PrivateDecoderCrystalHD::Reset(void)
     return true;;
 }
 
+int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
+{
+    int result = -1;
+    AVCodecContext *avctx = stream->codec;
+    if (!avctx)
+        return result;
+
+    PacketBuffer *buffer = new PacketBuffer();
+    if (!buffer)
+        return result;
+
+    buffer->buf  = new unsigned char[pkt->size];
+    buffer->size = pkt->size;
+    buffer->pts  = pkt->pts;
+    memcpy(buffer->buf, pkt->data, pkt->size);
+
+    m_packet_buffers.insert(0, buffer);
+    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC +
+            QString("%1 packet buffers queued up").arg(m_packet_buffers.size()));
+
+    while (m_packet_buffers.size() > 0)
+    {
+
+        BC_DTS_STATUS drv_status;
+        INIT_ST
+        st = DtsGetDriverStatus(m_device, &drv_status);
+        CHECK_ST
+
+        PacketBuffer *buffer = m_packet_buffers.last();
+        if (drv_status.cpbEmptySize < buffer->size)
+        {
+            usleep(10000);
+            return 0;
+        }
+
+        buffer = m_packet_buffers.takeLast();
+        uint8_t* buf    = buffer->buf;
+        int size        = buffer->size;
+        bool free_buf   = false;
+        int outbuf_size = 0;
+        uint8_t *outbuf = NULL;
+
+        if (m_filter)
+        {
+            int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
+                                                 &outbuf_size, buf, size, 0);
+            if (res <= 0)
+            {
+                static int count = 0;
+                if (count == 0)
+                    VERBOSE(VB_IMPORTANT, ERR +
+                            QString("Failed to convert packet (%1)").arg(res));
+                count++;
+                if (count > 200)
+                    count = 0;
+            }
+
+            if (outbuf && (outbuf_size > 0))
+            {
+                free_buf = outbuf != buf;
+                size = outbuf_size;
+                buf  = outbuf;
+            }
+        }
+
+        usleep(1000);
+        uint64_t chd_timestamp = 0; // msec units
+        if (buffer->pts != (int64_t)AV_NOPTS_VALUE)
+            chd_timestamp = (uint64_t)(buffer->pts * 1000);
+
+        // TODO check for busy state
+        st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
+        CHECK_ST
+
+        if (free_buf)
+            delete buf;
+
+        free_buffer(buffer);
+        if (!ok)
+            VERBOSE(VB_IMPORTANT, ERR + "Failed to send packet to decoder.");
+        result = buffer->size;
+    }
+    return result;
+}
+
 int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
                                       AVFrame *picture,
                                       int *got_picture_ptr,
                                       AVPacket *pkt)
 {
     int result = -1;
-    if (!pkt || !pkt->size || !stream || !m_device || !picture)
+    if (!stream || !m_device || !picture)
         return result;
 
     AVCodecContext *avctx = stream->codec;
-    if (!avctx)
+    if (!avctx || !StartFetcherThread())
         return result;
 
-    uint8_t* buf    = pkt->data;
-    int size        = pkt->size;
-    bool free_buf   = false;
-    int outbuf_size = 0;
-    uint8_t *outbuf = NULL;
+    if (pkt && pkt->size)
+        result = ProcessPacket(stream, pkt);
+    if (result < 0)
+        return result;
 
-    if (m_filter)
-    {
-        int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
-                                             &outbuf_size, buf, size, 0);
-        if (res <= 0)
-        {
-            static int count = 0;
-            if (count == 0)
-                VERBOSE(VB_IMPORTANT, ERR +
-                        QString("Failed to convert packet (%1)").arg(res));
-            count++;
-            if (count > 200)
-                count = 0;
-        }
-
-        if (outbuf && (outbuf_size > 0))
-        {
-            free_buf = outbuf != buf;
-            size = outbuf_size;
-            buf  = outbuf;
-        }
-
-    }
-
-    uint64_t chd_timestamp = 0; // msec units
-    if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
-        chd_timestamp = (uint64_t)(av_q2d(stream->time_base) * pkt->pts * 1000);
-
-    // TODO check for busy state and available buffer size
-    INIT_ST
-    st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
-    CHECK_ST
-
-    // TODO why is this needed - possibly overruning CrystalHD decoder or too
-    // many buffered packets causing mythplayer problems?
-    usleep(10000);
-
-    if (free_buf)
-        delete buf;
-
-    if (!ok)
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to send packet to decoder.");
-    result = pkt->size;
-
-    RetrieveFrame();
-
-    if (!m_decoded_frames.size())
+    m_decoded_frames_lock.lock();
+    int available = m_decoded_frames.size();
+    m_decoded_frames_lock.unlock();
+    if (!available)
         return result;
 
     if (avctx->get_buffer(avctx, picture) < 0)
     {
         VERBOSE(VB_IMPORTANT, ERR +
                 QString("%1 decoded frames available but no video buffers.")
-                .arg(m_decoded_frames.size()));
+                .arg(available));
         return -1;
     }
 
+    m_decoded_frames_lock.lock();
     VideoFrame *frame = m_decoded_frames.takeLast();
+    m_decoded_frames_lock.unlock();
+
+    VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("Output PTS timecode (%1)")
+            .arg(frame->timecode * av_q2d(stream->time_base)));
+
     *got_picture_ptr = 1;
-    picture->reordered_opaque = (int64_t)(frame->timecode / av_q2d(stream->time_base) 
-                                                          / 1000);
+    picture->reordered_opaque = (int64_t)(frame->timecode / 1000);
     picture->interlaced_frame = frame->interlaced_frame;
     picture->top_field_first  = frame->top_field_first;
     picture->repeat_pict      = frame->repeat_pict;
@@ -424,39 +522,68 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     return result;
 }
 
-void PrivateDecoderCrystalHD::RetrieveFrame(void)
+void PrivateDecoderCrystalHD::FetchFrames(void)
 {
-    usleep(1000);
     INIT_ST
-    BC_DTS_STATUS status;
-    st = DtsGetDriverStatus(m_device, &status);
-    CHECK_ST
-
-    if (!status.ReadyListCount)
-        return;
-
-    BC_DTS_PROC_OUT out;
-    memset(&out, 0, sizeof(BC_DTS_PROC_OUT));
-    st = DtsProcOutputNoCopy(m_device, 1, &out);
-    if (BC_STS_FMT_CHANGE == st)
+    bool valid = false;
+    m_fetcher_paused = false;
+    while (!m_fetcher_stop)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Decoder reported format change.");
-        CheckProcOutput(&out);
-        return;
-    }
-    CHECK_ST
+        usleep(1000);
+        if (m_fetcher_pause)
+        {
+            m_fetcher_paused = true;
+            continue;
+        }
+        m_fetcher_paused = false;
 
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, ERR + "Failed to retrieve decoded frame");
-        return;
-    }
+        BC_DTS_STATUS status;
+        st = DtsGetDriverStatus(m_device, &status);
+        CHECK_ST
 
-    FillFrame(&out);
-    st = DtsReleaseOutputBuffs(m_device, NULL, false);
-    CHECK_ST
-    RetrieveFrame();
+        if (!status.ReadyListCount)
+            continue;
+
+        BC_DTS_PROC_OUT out;
+        memset(&out, 0, sizeof(BC_DTS_PROC_OUT));
+        st = DtsProcOutputNoCopy(m_device, valid ? 2000 : 20, &out);
+
+        if (BC_STS_FMT_CHANGE == st)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Decoder reported format change.");
+            CheckProcOutput(&out);
+            valid = true;
+            continue;
+        }
+        CHECK_ST
+
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, ERR + "Failed to fetch decoded frame");
+            continue;
+        }
+
+        if (ok && valid && (out.PoutFlags & BC_POUT_FLAGS_PIB_VALID))
+            FillFrame(&out);
+        st = DtsReleaseOutputBuffs(m_device, NULL, false);
+        CHECK_ST
+    }
 }
+
+bool PrivateDecoderCrystalHD::StartFetcherThread(void)
+{
+    m_fetcher_pause = false;
+    if (m_fetcher_thread)
+        return true;
+
+    m_fetcher_thread = new FetcherThread(this);
+    if (!m_fetcher_thread)
+        return false;
+
+    m_fetcher_thread->start();
+    return true;
+}
+
 
 void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
 {
@@ -540,22 +667,13 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
 
 void PrivateDecoderCrystalHD::AddFrameToQueue(void)
 {
-    int i = 0;
-// TODO is the following code needed
-#if 0
-    bool found = false;
-    for (; i < m_decoded_frames.size(); i++)
-    {
-        if (m_frame->timecode >= m_decoded_frames[i]->timecode)
-        {
-            found = true;
-            break;
-        }
-    }
-    if (!found)
-        i = m_decoded_frames.size();
-#endif
-    m_decoded_frames.insert(i, m_frame);
+    m_decoded_frames_lock.lock();
+    m_decoded_frames.insert(0, m_frame);
+    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Decoded frame queue size %1")
+            .arg(m_decoded_frames.size()));
+    VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("Inserting frame with timecode %1")
+            .arg(m_frame->timecode));
+    m_decoded_frames_lock.unlock();
     m_frame = NULL;
 }
 
