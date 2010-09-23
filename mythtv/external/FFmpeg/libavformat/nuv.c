@@ -52,7 +52,7 @@ static int nuv_probe(AVProbeData *p) {
  * \brief read until we found all data needed for decoding
  * \param vst video stream of which to change parameters
  * \param ast video stream of which to change parameters
- * \param myth set if this is a MythTVVideo format file
+ * \param myth set if this is a MythTV Video format file
  * \return 1 if all required codec data was found
  */
 static int get_codec_data(ByteIOContext *pb, AVStream *vst,
