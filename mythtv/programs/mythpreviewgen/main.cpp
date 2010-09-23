@@ -241,22 +241,22 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     gCoreContext->SetAppName(binname);
 
-        if (!gContext->Init(false))
-        {
-            VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
-            delete gContext;
-            gContext = NULL;
-            return PREVIEWGEN_EXIT_NO_MYTHCONTEXT;
-        }
-        gCoreContext->SetBackend(false); // TODO Required?
+    if (!gContext->Init(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext.");
+        delete gContext;
+        gContext = NULL;
+        return PREVIEWGEN_EXIT_NO_MYTHCONTEXT;
+    }
+    gCoreContext->SetBackend(false); // TODO Required?
 
-        int ret = preview_helper(
-            QString::number(cmdline.GetChanID()),
-            cmdline.GetStartTime().toString(Qt::ISODate),
-            cmdline.GetPreviewFrameNumber(), cmdline.GetPreviewSeconds(),
-            cmdline.GetPreviewSize(),
-            cmdline.GetInputFilename(), cmdline.GetOutputFilename());
-        return ret;
+    int ret = preview_helper(
+        QString::number(cmdline.GetChanID()),
+        cmdline.GetStartTime().toString(Qt::ISODate),
+        cmdline.GetPreviewFrameNumber(), cmdline.GetPreviewSeconds(),
+        cmdline.GetPreviewSize(),
+        cmdline.GetInputFilename(), cmdline.GetOutputFilename());
+    return ret;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
