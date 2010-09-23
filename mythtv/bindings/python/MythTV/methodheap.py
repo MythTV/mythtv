@@ -350,7 +350,7 @@ class BEEventMonitor( BEEvent ):
     def eventMonitor(self, event=None):
         if event is None:
             return re.compile('BACKEND_MESSAGE')
-        self.log(MythLog.ALL, event)
+        self.log(MythLog.ALL-MythLog.EXTRA, event)
 
 class MythSystemEvent( BEEvent ):
     class systemeventhandler( object ):
