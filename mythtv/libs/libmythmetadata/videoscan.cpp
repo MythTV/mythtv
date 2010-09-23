@@ -18,6 +18,7 @@
 #include "videometadatalistmanager.h"
 #include "videoscan.h"
 #include "videoutils.h"
+#include "remoteutil.h"
 
 namespace
 {
@@ -128,6 +129,8 @@ class VideoScannerThread : public QThread
         PurgeList db_remove;
         verifyFiles(fs_files, db_remove);
         m_DBDataChanged = updateDB(fs_files, db_remove);
+        if (m_DBDataChanged)
+            RemoteSendMessage("VIDEO_LIST_CHANGE");
     }
 
     void SetDirs(const QStringList &dirs)
