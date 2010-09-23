@@ -7,7 +7,7 @@ ifdef CONFIG_BINDINGS_PERL
     MAKE_SUBDIRS += bindings/perl
 endif
 
-ifdef CONFIG_BINDINGS_PERL
+ifdef CONFIG_BINDINGS_PYTHON
     MAKE_SUBDIRS += bindings/python
 endif
 
