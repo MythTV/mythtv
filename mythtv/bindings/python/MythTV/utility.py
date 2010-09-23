@@ -306,39 +306,52 @@ class deadlinesocket( socket.socket ):
     def setdeadline(self, deadline): self._deadline = deadline
 
     def dlrecv(self, bufsize, flags=0, deadline=None):
-        t = time()
+        # pull default timeout
         if deadline is None:
-            deadline = t + self._deadline
+            deadline = self._deadline
+        if deadline < 1000:
+            deadline += time()
 
         buff = StringIO()
         # loop until necessary data has been received
         while bufsize > buff.tell():
             # wait for data on the socket
-            if len(select([self],[],[], deadline-t)[0]) == 0:
+            t = time()
+            timeout = (deadline-t) if (deadline-t>0) else 0.0
+            if len(select([self],[],[], timeout)[0]) == 0:
                 # deadline reached, terminate
                 return u''
+
             # append response to buffer
             buff.write(self.recv(bufsize-buff.tell(), flags))
-            if t >= deadline:
+
+            if timeout == 0:
                 break
-            t = time()
         return buff.getvalue()
 
     def dlexpect(self, pattern, flags=0, deadline=None):
         """Loop recv listening for a provided regular expression."""
-        t = time()
+        # pull default timeout
         if deadline is None:
-            deadline = t + self._deadline
+            deadline = self._deadline
+        if deadline < 1000:
+            deadline += time()
 
         buff = StringIO()
         # loop until pattern has been found
         while not pattern.search(buff.getvalue()):
-            if len(select([self],[],[], deadline-t)[0]) == 0:
-                return ''
-            buff.write(self.recv(100, flags))
-            if t >= deadline:
-                break
+            # wait for data on the socket
             t = time()
+            timeout = (deadline-t) if (deadline-t>0) else 0.0
+            if len(select([self],[],[], timeout)[0]) == 0:
+                # deadline reached, terminate
+                return ''
+
+            # append response to buffer
+            buff.write(self.recv(100, flags))
+
+            if timeout == 0:
+                break
         return buff.getvalue()
 
     def recvheader(self, flags=0, deadline=None):
@@ -347,7 +360,8 @@ class deadlinesocket( socket.socket ):
             in the first 8 bytes.
         """
         try:
-            size = int(self.dlrecv(8, flags, deadline))
+            r = self.dlrecv(8, flags, deadline)
+            size = int(r)
         except:
             return ''
         data = self.dlrecv(size, flags, deadline)

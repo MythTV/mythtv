@@ -18,6 +18,7 @@ import MySQLdb, MySQLdb.cursors
 import lxml.etree as etree
 import weakref
 import socket
+import Queue
 import re
 
 class LoggedCursor( MySQLdb.cursors.Cursor ):
@@ -290,6 +291,7 @@ class BEConnection( object ):
         self.opts = opts
         if self.opts is None:
             self.opts = self.BEConnOpts()
+        self.eventqueue = Queue.Queue()
 
         try:
             self.connect()
@@ -386,10 +388,10 @@ class BEConnection( object ):
             return u''
 
         # pull default timeout
-        t = time()
         if deadline is None:
             deadline = self.socket.getdeadline()
-        deadline = t+deadline
+        if deadline < 1000:
+            deadline += time()
 
         # send command string
         if data is not None:
@@ -402,7 +404,9 @@ class BEConnection( object ):
             # loop waiting for proper response
             while True:
                 # wait timeout for data to be received on the socket
-                if len(select([self.socket],[],[], deadline-t)[0]) == 0:
+                t = time()
+                timeout = (deadline-t) if (deadline-t>0) else 0.0
+                if len(select([self.socket],[],[], timeout)[0]) == 0:
                     # no data, return
                     return u''
                 event = self.socket.recvheader(deadline=deadline)
@@ -414,23 +418,12 @@ class BEConnection( object ):
                     event = u''.join([event])
 
                 if event[:15] == 'BACKEND_MESSAGE':
-                    for r,f in self._regevents.items():
-                        # check for matches against registered handlers
-                        if r.match(event):
-                            try:
-                                f(event)
-                            except:
-                                pass
-                    if data is None:
-                        # no sent data, no further response expected
-                        return u''
+                    self.eventqueue.put(event)
                 else:
-                    if data is not None:
-                        return event
+                    return event
 
-                if t >= deadline:
-                    break
-                t = time()
+                if timeout == 0:
+                    return u''
 
     def registeruser(self, uuid, opts):
         self._regusers[uuid] = opts
@@ -444,7 +437,23 @@ class BEConnection( object ):
     def eventloop(self):
         self.threadrunning = True
         while (len(self._regevents) > 0) and self.connected:
-            self.backendCommand(deadline=0.001)
+            self.backendCommand(deadline=0.0)
+            while True:
+                try:
+                    event = self.eventqueue.get_nowait()
+                    for r,f in self._regevents.items():
+                        # check for matches against registered handlers
+                        if r.match(event):
+                            try:
+                                f(event)
+                            except KeyboardInterrupt:
+                                raise
+                            except EOFError:
+                                raise
+                            except:
+                                pass
+                except Queue.Empty:
+                    break
             sleep(0.1)
         self.threadrunning = False
 
