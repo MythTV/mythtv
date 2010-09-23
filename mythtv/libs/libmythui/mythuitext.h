@@ -19,6 +19,8 @@ class MythFontProperties;
  *
  *  Font, alignment, scrolling and color cycling effects may be applied to
  *  the text in this widget.
+ *
+ *  \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIText : public MythUIType, public StorageUser
 {

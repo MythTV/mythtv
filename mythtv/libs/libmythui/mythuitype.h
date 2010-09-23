@@ -31,9 +31,24 @@ class MythUITextEdit;
 class MythUIProgressBar;
 class MythUIWebBrowser;
 
+/**
+ * \defgroup MythUI MythTV User Interface Library
+ *
+ * MythUI has multiple components
+ * - Widgets and Theme handlers
+ * - Painters & Renderers
+ * - Input handling
+ *
+ * @{
+ * \defgroup MythUI_Widgets MythUI Widget and theme handling
+ * \defgroup MythUI_Painters MythUI Painters and Renderers
+ * \defgroup MythUI_Input MythUI Input handling
+ * @{
+ */
 
 /**
  * Base UI type.  Children are drawn/processed in order added
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIType : public QObject, public XMLParseBase
 {
@@ -144,7 +159,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     void Disabling();
     void FinishedMoving();
     void FinishedFading();
-    
+
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);

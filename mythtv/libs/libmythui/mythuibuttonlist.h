@@ -97,6 +97,15 @@ class MPUBLIC MythUIButtonListItem
     friend class MythUIButtonList;
 };
 
+/**
+ * \class MythUIButtonList
+ *
+ * \brief List widget, displays list items in a variety of themeable
+ *        arrangements and can trigger signals when items are highlighted or
+ *        clicked
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIButtonList : public MythUIType
 {
     Q_OBJECT

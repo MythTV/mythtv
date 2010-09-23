@@ -17,6 +17,8 @@ class ImageLoadThread;
  * \class MythUIImage
  *
  * \brief Image widget, displays a single image or multiple images in sequence
+ *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIImage : public MythUIType
 {
@@ -136,7 +138,7 @@ class MPUBLIC MythUIImage : public MythUIType
     AnimationCycle m_animationCycle;
     bool m_animationReverse;
     bool m_animatedImage;
-    
+
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
     friend class MythUIProgressBar;
