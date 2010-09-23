@@ -80,9 +80,9 @@ class MythGestureEvent : public QEvent
         Aux1Button,
         Aux2Button
     };
-    
+
     /**
-     * @brief Create a myth gesture.
+     * @brief Create a MythGesture
      * @param type The gesture type, as per the Type enumeration.
      * @sa Type
      */
@@ -119,7 +119,7 @@ class MythGestureEvent : public QEvent
     Gesture m_gesture;
     QPoint m_position;
     Button m_button;
-    
+
 };
 
 /* forward declaration of private information */
@@ -127,14 +127,14 @@ class MythGesturePrivate;
 
 /**
  * @class MythGesture
- * @brief Contains the points in a stroke, and translates them into 
+ * @brief Contains the points in a stroke, and translates them into
  * gestures.
  *
  * Because the indended use of the stop method is to be called by
  * either the expiration of a timer or when an event is called (or
  * both at the same time) it must have a mutex.
  */
-class MythGesture 
+class MythGesture
 {
   public:
     /**
