@@ -22,6 +22,7 @@ class MythFontProperties;
  *  %DATE% - Long date format, as defined in the locale settings
  *  %SHORTDATE% - Short date format, as defined in the locale settings
  *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIClock : public MythUIText
 {

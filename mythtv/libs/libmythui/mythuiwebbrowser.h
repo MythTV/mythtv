@@ -32,6 +32,12 @@ class MythWebView : public QWebView
     MythUIWebBrowser *m_parentBrowser;
 };
 
+/**
+ * \brief Web browsing widget. Can load and render local and remote html.
+ *        Supports netscape plugins.
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIWebBrowser : public MythUIType
 {
   Q_OBJECT

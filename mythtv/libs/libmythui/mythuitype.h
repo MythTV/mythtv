@@ -43,11 +43,14 @@ class MythUIWebBrowser;
  * \defgroup MythUI_Widgets MythUI Widget and theme handling
  * \defgroup MythUI_Painters MythUI Painters and Renderers
  * \defgroup MythUI_Input MythUI Input handling
- * @{
+ * @}
  */
 
 /**
- * Base UI type.  Children are drawn/processed in order added
+ * \brief The base class on which all widgets and screens are based.
+ *
+ * N.B. Children are drawn/processed in order added
+ *
  * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIType : public QObject, public XMLParseBase

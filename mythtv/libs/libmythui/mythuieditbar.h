@@ -5,6 +5,13 @@
 #include "mythuiimage.h"
 #include "mythuishape.h"
 
+/** \class MythUIEditBar
+ *
+ * \brief A narrow purpose widget used to represent cut positions and regions
+ *        when editing a video.
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIEditBar : public MythUIType
 {
   public:

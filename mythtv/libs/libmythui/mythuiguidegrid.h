@@ -15,6 +15,13 @@
 
 class MythFontProperties;
 
+/** \class MythUIGuideGrid
+ *
+ * \brief A narrow purpose widget used to show television programs and the
+ *        timeslots they occupy on channels. Used for scheduling of recordings.
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIGuideGrid : public MythUIType
 {
   public:

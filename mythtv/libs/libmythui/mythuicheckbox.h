@@ -9,6 +9,8 @@
  *
  * \brief A checkbox widget supporting three check states - on,off,half and two
  *        conditions - selected and unselected.
+ *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUICheckBox : public MythUIType
 {

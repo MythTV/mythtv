@@ -12,6 +12,14 @@
 
 class LIRCPriv;
 
+/**
+ * \class LIRC
+ *
+ * \brief Listens for input from the Linux Infrared Remote Control daemon and
+ *        translates it into internal input events.
+ *
+ * \ingroup MythUI_Input
+ */
 class LIRC : public QThread
 {
     Q_OBJECT
@@ -35,7 +43,7 @@ class LIRC : public QThread
     void SpawnApp(void);
     QList<QByteArray> GetCodes(void);
     void Process(const QByteArray &data);
-  
+
     mutable QMutex  lock;
     static  QMutex  lirclib_lock;
     QObject        *m_mainWindow;  ///< window to send key events to

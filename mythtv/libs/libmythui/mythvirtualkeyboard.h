@@ -23,6 +23,16 @@ struct KeyDefinition
     QString up, down, left, right;
 };
 
+/** \class MythUIVirtualKeyboard
+ *
+ * \brief A popup onscreen keyboard for easy alphanumeric and text entry using
+ *        a remote control or mouse.
+ *
+ * The virtual keyboard is invoked by MythUITextEdit when the user triggers the
+ * SELECT action. It is not normally necessary to use this widget explicitly.
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIVirtualKeyboard : public MythScreenType
 {
   Q_OBJECT

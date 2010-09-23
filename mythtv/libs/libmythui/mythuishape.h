@@ -12,6 +12,12 @@
 
 class MythImage;
 
+/** \class MythUIShape
+ *
+ * \brief A widget for rendering primitive shapes and lines.
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIShape : public MythUIType
 {
   public:
@@ -32,7 +38,7 @@ class MPUBLIC MythUIShape : public MythUIType
         const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
-    
+
     void DrawRect(const QRect &area, const QBrush &fillBrush,
                   const QPen &linePen);
     void DrawRoundRect(const QRect &area, int radius, const QBrush &fillBrush,

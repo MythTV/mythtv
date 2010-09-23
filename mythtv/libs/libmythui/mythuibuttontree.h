@@ -11,6 +11,7 @@ class MythUIButtonListItem;
  *
  * \brief A tree widget for displaying and navigating a MythGenericTree()
  *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIButtonTree : public MythUIType
 {

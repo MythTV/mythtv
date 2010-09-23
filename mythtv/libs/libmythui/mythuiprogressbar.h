@@ -9,8 +9,9 @@ class MythFontProperties;
 
 /** \class MythUIProgressBar
  *
- *  \brief Progress bar widget.
+ * \brief Progress bar widget.
  *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIProgressBar : public MythUIType
 {

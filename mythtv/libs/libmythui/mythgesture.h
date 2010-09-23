@@ -1,8 +1,8 @@
 /* -*- myth -*- */
 /**
- * @file mythgesture.h
- * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
- * @brief A C++ ripoff of the stroke library for MythTV.
+ * \file mythgesture.h
+ * \author Micah F. Galizia <mfgalizi@csd.uwo.ca>
+ * \brief A C++ ripoff of the stroke library for MythTV.
  *
  * Copyright (C) 2005 Micah Galizia
  *
@@ -32,14 +32,14 @@
 #include <QEvent>
 
 /**
- * @class MythGestureEvent
- * @brief A custom event that represents a mouse gesture.
+ * \class MythGestureEvent
+ * \brief A custom event that represents a mouse gesture.
  */
 class MythGestureEvent : public QEvent
 {
   public:
     /**
-     * @brief The types of gestures supported by myth
+     * \brief The types of gestures supported by myth
      */
     enum Gesture {
 
@@ -82,9 +82,9 @@ class MythGestureEvent : public QEvent
     };
 
     /**
-     * @brief Create a MythGesture
-     * @param type The gesture type, as per the Type enumeration.
-     * @sa Type
+     * \brief Create a MythGesture
+     * \param type The gesture type, as per the Type enumeration.
+     * \sa Type
      */
     MythGestureEvent(Gesture gesture, Button button = LeftButton) :
         QEvent(kEventType)
@@ -95,15 +95,15 @@ class MythGestureEvent : public QEvent
     }
 
     /**
-     * @brief Get the gesture type.
-     * @return The gesture value corresponding to the Gesture
+     * \brief Get the gesture type.
+     * \return The gesture value corresponding to the Gesture
      * enumeration.
      */
     inline Gesture gesture(void) const { return m_gesture; }
 
     /**
-     * @brief Get the symbolic name of the gesture.
-     * @return A string containing the symbolic name of the gesture.
+     * \brief Get the symbolic name of the gesture.
+     * \return A string containing the symbolic name of the gesture.
      */
     operator QString() const;
 
@@ -126,24 +126,26 @@ class MythGestureEvent : public QEvent
 class MythGesturePrivate;
 
 /**
- * @class MythGesture
- * @brief Contains the points in a stroke, and translates them into
+ * \class MythGesture
+ * \brief Contains the points in a stroke, and translates them into
  * gestures.
  *
  * Because the indended use of the stop method is to be called by
  * either the expiration of a timer or when an event is called (or
  * both at the same time) it must have a mutex.
+ *
+ * \ingroup MythUI_Input
  */
 class MythGesture
 {
   public:
     /**
-     * @brief Create a new stroke, specifying tuning values
-     * @param max_points The maximum number of points to record.
-     * @param min_points The minimum number of points to record.
-     * @param max_sequence The maximum producible sequence size.
-     * @param scale_ratio The stroke scale ratio
-     * @param bin_percent The bin count percentage required
+     * \brief Create a new stroke, specifying tuning values
+     * \param max_points The maximum number of points to record.
+     * \param min_points The minimum number of points to record.
+     * \param max_sequence The maximum producible sequence size.
+     * \param scale_ratio The stroke scale ratio
+     * \param bin_percent The bin count percentage required
      * to add to the sequence.
      */
     explicit MythGesture(size_t max_points = 10000, size_t min_points = 50,
@@ -152,12 +154,12 @@ class MythGesture
    ~MythGesture();
 
     /**
-     * @brief Start recording.
+     * \brief Start recording.
      */
     void start(void);
 
     /**
-     * @brief Stop recording.
+     * \brief Stop recording.
      *
      * This method stores the gesture, as it is, and resets all
      * information.
@@ -165,44 +167,44 @@ class MythGesture
     void stop(void);
 
     /**
-     * @brief Determine if the stroke is being recorded.
-     * @return True if recording is in progress, otherwise, false.
+     * \brief Determine if the stroke is being recorded.
+     * \return True if recording is in progress, otherwise, false.
      */
     bool recording(void) const;
 
     /**
-     * @brief Complete the gesture event of the last completed stroke.
-     * @return A new gesture event, or NULL on error.
+     * \brief Complete the gesture event of the last completed stroke.
+     * \return A new gesture event, or NULL on error.
      */
     MythGestureEvent *gesture(void) const;
 
     /**
-     * @brief Record a point.
-     * @param p The point to record.
-     * @return True if the point was recorded, otherwise, false.
+     * \brief Record a point.
+     * \param p The point to record.
+     * \return True if the point was recorded, otherwise, false.
      */
     bool record(const QPoint &p);
 
     /**
-     * @brief Determine if the stroke has the minimum required points.
-     * @return true if the gesture can be translated, otherwise, false.
+     * \brief Determine if the stroke has the minimum required points.
+     * \return true if the gesture can be translated, otherwise, false.
      */
     bool hasMinimumPoints(void) const { return (uint)points.size() >= min_points; }
 
   protected:
 
     /**
-     * @brief Translate the stroke into a sequence.
-     * @return The sequence string made by the mouse.
+     * \brief Translate the stroke into a sequence.
+     * \return The sequence string made by the mouse.
      *
-     * @note The points will be removed during this method.
+     * \note The points will be removed during this method.
      */
     QString translate(void);
 
     /**
-     * @brief Adjust horizontal and vertical extremes.
-     * @param x The new horizontal extreme.
-     * @param y The new vertical extreme
+     * \brief Adjust horizontal and vertical extremes.
+     * \param x The new horizontal extreme.
+     * \param y The new vertical extreme
      */
     void adjustExtremes(int x, int y);
 

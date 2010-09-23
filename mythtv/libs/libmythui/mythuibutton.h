@@ -11,11 +11,12 @@
 
 /** \class MythUIButton
  *
- *  \brief Single button widget
+ *  \brief A single button widget
  *
  *  Has multiple states with backgrounds and fonts, text and optional
  *  checkbox (dual/tri state)
  *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUIButton : public MythUIType
 {

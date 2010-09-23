@@ -44,7 +44,6 @@ typedef struct
  *  For axes, it's not very complicated.  For each axis (ie up/down or
  *  left/right), we define a range; the first time the joystick moves
  *  into that range, we send the assigned keystring.
- *
  */
 class JoystickMap
 {
@@ -71,9 +70,11 @@ class JoystickMap
 };
 
 /**
- *  \class JoystickMenuThread
+ * \class JoystickMenuThread
  *
- *  \brief Main object for injecting key strokes based on joystick movements
+ * \brief Main object for injecting key strokes based on joystick movements
+ *
+ * \ingroup MythUI_Input
  */
 class JoystickMenuThread : public QThread
 {

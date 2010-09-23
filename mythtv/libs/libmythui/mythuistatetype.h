@@ -7,8 +7,17 @@
 #include "mythuitype.h"
 #include "mythimage.h"
 
-// Image class that displays one of an array of images (either predefined states
-// or by typename).  Displays nothing if told to display a non-existent state
+/** \class MythUIStateType
+ *
+ * \brief This widget is used for grouping other widgets for display when a
+ *        particular named state is called. A statetype can contain any number
+ *        of state groups which can themselves contain any number of widgets.
+ *
+ * States are mutally exclusive, when one state is displayed the others are
+ * hidden.
+ *
+ * \ingroup MythUI_Widgets
+ */
 class MPUBLIC MythUIStateType : public MythUIType
 {
   public:

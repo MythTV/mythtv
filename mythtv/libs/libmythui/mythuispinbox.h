@@ -11,6 +11,7 @@
  * Where a list of specific values is required instead, then use
  * MythUIButtonList instead.
  *
+ * \ingroup MythUI_Widgets
  */
 class MPUBLIC MythUISpinBox : public MythUIButtonList
 {
@@ -34,7 +35,7 @@ class MPUBLIC MythUISpinBox : public MythUIButtonList
 
     virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
     virtual bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0);
-    
+
     bool m_hasTemplate;
     QString m_negativeTemplate;
     QString m_zeroTemplate;
