@@ -45,8 +45,8 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
         gCoreContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
     commDetectLogoSampleSpacing =
         gCoreContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
-    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
-                                  commDetectLogoSampleSpacing;
+    commDetectLogoSecondsNeeded = (int)(1.3 * commDetectLogoSamplesNeeded *
+                                              commDetectLogoSampleSpacing);
     commDetectLogoGoodEdgeThreshold =
         gCoreContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
         .toDouble();
