@@ -228,6 +228,20 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
         return false;
     }
 
+    int nalsize = 4;
+    if (avctx->codec_id == CODEC_ID_H264)
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("H.264 Profile: %1 RefFrames: %2 Slices: %3")
+                .arg(avctx->profile).arg(avctx->refs).arg(avctx->slice_count));
+        if (avctx->extradata[0] == 1)
+        {
+            nalsize = (avctx->extradata[4] & 0x03) + 1;
+            VERBOSE(VB_PLAYBACK, LOC + QString("avcC nal size: %1")
+                    .arg(nalsize));
+        }
+    }
+
     BC_INPUT_FORMAT fmt;
     memset(&fmt, 0, sizeof(BC_INPUT_FORMAT));
     fmt.OptFlags       = 0x80000000 | vdecFrameRateUnknown;
@@ -255,20 +269,6 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     {
         VERBOSE(VB_IMPORTANT, ERR + "Failed to open CrystalHD decoder");
         return false;
-    }
-
-    int nalsize = 4;
-    if (avctx->codec_id == CODEC_ID_H264)
-    {
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("H.264 Profile: %1 RefFrames: %2 Slices: %3")
-                .arg(avctx->profile).arg(avctx->refs).arg(avctx->slice_count));
-        if (avctx->extradata[0] == 1)
-        {
-            nalsize = (avctx->extradata[4] & 0x03) + 1;
-            VERBOSE(VB_PLAYBACK, LOC + QString("avcC nal size: %1")
-                    .arg(nalsize));
-        }
     }
 
     st = DtsSetColorSpace(m_device, m_pix_fmt);
