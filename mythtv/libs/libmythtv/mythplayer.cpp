@@ -3309,6 +3309,15 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                            (allpaused && !deleteMap.IsEditing()) ? true: after;
     GetDecoder()->setExactSeeks(before);
 
+    uint64_t max = totalFrames;
+    if ((livetv || (watchingrecording && player_ctx->recorder &&
+                   player_ctx->recorder->IsValidRecorder())))
+    {
+        max = (uint64_t)player_ctx->recorder->GetFramesWritten();
+    }
+    if (frame >= max)
+        frame = max - 1;
+
     decoderSeekLock.lock();
     decoderSeek = frame;
     decoderSeekLock.unlock();
