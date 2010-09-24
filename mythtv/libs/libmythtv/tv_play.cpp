@@ -9167,19 +9167,23 @@ void TV::ShowOSDAlreadyEditing(PlayerContext *ctx)
     if (osd)
     {
         osd->DialogQuit();
-        DoTogglePause(ctx, true);
+        bool was_paused = ctx->paused;
+        if (!was_paused)
+            DoTogglePause(ctx, true);
 
         QString message = tr("This program is currently being edited");
         osd->DialogShow(OSD_DLG_EDITING, message);
-        QString def = "DIALOG_EDITING_CONTINUE_0";
+        QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(was_paused);
         osd->DialogAddButton(tr("Continue Editing"), def, false, true);
-        osd->DialogAddButton(tr("Do not edit"), "DIALOG_EDITING_STOP_0");
+        osd->DialogAddButton(tr("Do not edit"),
+                             QString("DIALOG_EDITING_STOP_%1").arg(was_paused));
         osd->DialogBack("", def, true);
     }
     ReturnOSDLock(ctx, osd);
 }
 
-void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action)
+void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action,
+                                 bool was_paused)
 {
     if (!DialogIsVisible(ctx, OSD_DLG_EDITING))
         return;
@@ -9190,7 +9194,7 @@ void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action)
         if (ctx->playingInfo)
             ctx->playingInfo->SaveEditing(false);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        if (ctx->paused)
+        if (!was_paused && ctx->paused)
             DoTogglePause(ctx, true);
     }
     else // action == "CONTINUE"
@@ -9200,6 +9204,8 @@ void TV::HandleOSDAlreadyEditing(PlayerContext *ctx, QString action)
         {
             ctx->playingInfo->SaveEditing(false);
             editmode = ctx->player->EnableEdit();
+            if (!editmode && !was_paused && ctx->paused)
+                DoTogglePause(ctx, false);
         }
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
@@ -9655,7 +9661,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         }
         else if (valid && desc[0] == "EDITING")
         {
-            HandleOSDAlreadyEditing(actx, desc[1]);
+            HandleOSDAlreadyEditing(actx, desc[1], desc[2].toInt());
         }
         else if (valid && desc[0] == "ASKALLOW")
         {

@@ -556,7 +556,8 @@ class MPUBLIC TV : public QThread
 
     // Already editing dialog
     void ShowOSDAlreadyEditing(PlayerContext *ctx);
-    void HandleOSDAlreadyEditing(PlayerContext *ctx, QString action);
+    void HandleOSDAlreadyEditing(PlayerContext *ctx, QString action,
+                                 bool was_paused);
 
     // Sleep dialog handling
     void ShowOSDSleep(void);
