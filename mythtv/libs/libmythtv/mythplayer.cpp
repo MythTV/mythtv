@@ -607,6 +607,7 @@ void MythPlayer::ReinitOSD(void)
                                       scaling, 1.0f);
             if (osd->Bounds() != visible)
             {
+                bool audio_paused = audio.IsPaused();
                 bool was_paused = Pause();
                 uint old = textDisplayMode;
                 ToggleCaptions(old);
@@ -614,7 +615,7 @@ void MythPlayer::ReinitOSD(void)
                 SetupTeletextViewer();
                 EnableCaptions(old, false);
                 if (!was_paused)
-                    Play();
+                    Play(play_speed, normal_speed, !audio_paused);
             }
         }
 
