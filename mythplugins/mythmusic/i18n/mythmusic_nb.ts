@@ -2392,11 +2392,6 @@ Vil du slette det eksisterende sporet?</translation>
         <translation>Ferdig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="43"/>
         <source>Quality:</source>
         <translation>Kvalitet:</translation>
