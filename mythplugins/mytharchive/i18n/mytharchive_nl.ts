@@ -9,23 +9,23 @@
     </message>
     <message>
         <source>Next</source>
-        <translation>Volgende</translation>
+        <translation type="obsolete">Volgende</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Vorige</translation>
+        <translation type="obsolete">Vorige</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation>Terug</translation>
+        <translation type="obsolete">Terug</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished">Home</translation>
+        <translation type="obsolete">Home</translation>
     </message>
     <message>
         <source>The selected item is not a valid archive file!</source>
@@ -36,22 +36,22 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Cancel</source>
-        <translation>Annuleer</translation>
+        <translation type="obsolete">Annuleer</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
         <source>Finish</source>
-        <translation>Voltooien</translation>
+        <translation type="obsolete">Voltooien</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Vorige</translation>
+        <translation type="obsolete">Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -59,11 +59,11 @@
     </message>
     <message>
         <source>Add Recording</source>
-        <translation>Opname toevoegen</translation>
+        <translation type="obsolete">Opname toevoegen</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation>Video toevoegen</translation>
+        <translation type="obsolete">Video toevoegen</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
@@ -86,19 +86,19 @@
     <name>FileSelector</name>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleer</translation>
+        <translation type="obsolete">Annuleer</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation>Terug</translation>
+        <translation type="obsolete">Terug</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation>Home</translation>
+        <translation type="obsolete">Home</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
@@ -121,15 +121,15 @@
     <name>ImportNative</name>
     <message>
         <source>Finish</source>
-        <translation>Voltooien</translation>
+        <translation type="obsolete">Voltooien</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Vorige</translation>
+        <translation type="obsolete">Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
@@ -164,11 +164,11 @@
     </message>
     <message>
         <source>Update</source>
-        <translation>Ververs</translation>
+        <translation type="obsolete">Ververs</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Verlaten</translation>
+        <translation type="obsolete">Verlaten</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
@@ -195,11 +195,11 @@
     <name>MythBurn</name>
     <message>
         <source>Finish</source>
-        <translation>Voltooien</translation>
+        <translation type="obsolete">Voltooien</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Vorige</translation>
+        <translation type="obsolete">Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -207,15 +207,15 @@
     </message>
     <message>
         <source>Add Recording</source>
-        <translation>Opname toevoegen</translation>
+        <translation type="obsolete">Opname toevoegen</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation>Video toevoegen</translation>
+        <translation type="obsolete">Video toevoegen</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation>Bestand toevoegen</translation>
+        <translation type="obsolete">Bestand toevoegen</translation>
     </message>
     <message>
         <source>Using Cutlist</source>
@@ -309,18 +309,18 @@
     <name>ProfileDialog</name>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Myth Archive Temp Directory</source>
-        <translation>Tijdelijke folder voor Myth Archief</translation>
+        <translation type="obsolete">Tijdelijke folder voor Myth Archief</translation>
     </message>
     <message>
         <source>Myth Archive Share Directory</source>
-        <translation>Myth Archief Share Folder</translation>
+        <translation type="obsolete">Myth Archief Share Folder</translation>
     </message>
     <message>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
@@ -392,11 +392,11 @@
     </message>
     <message>
         <source>tcrequant command</source>
-        <translation>tcrequant Commando</translation>
+        <translation type="obsolete">tcrequant Commando</translation>
     </message>
     <message>
         <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation>Het commando om tcrequant (onderdeel van transcode) te starten. Optioneel - laat dit leeg als u transcode niet ge�stalleerd heeft.</translation>
+        <translation type="obsolete">Het commando om tcrequant (onderdeel van transcode) te starten. Optioneel - laat dit leeg als u transcode niet ge�stalleerd heeft.</translation>
     </message>
     <message>
         <source>spumux command</source>
@@ -583,7 +583,7 @@ Have you set the correct path in the settings?</source>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
@@ -636,6 +636,22 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>MythArchive Temp Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythArchive Share Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M2VRequantiser command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -653,7 +669,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -676,19 +692,19 @@ Place a blank DVD in the drive and select an option below.</source>
     <name>SelectDestination</name>
     <message>
         <source>Next</source>
-        <translation>Volgende</translation>
+        <translation type="obsolete">Volgende</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Vorige</translation>
+        <translation type="obsolete">Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation>Zoeken...</translation>
+        <translation type="obsolete">Zoeken...</translation>
     </message>
     <message>
         <source>Single Layer DVD</source>
@@ -731,15 +747,15 @@ Place a blank DVD in the drive and select an option below.</source>
     <name>ThemeSelector</name>
     <message>
         <source>Next</source>
-        <translation>Volgende</translation>
+        <translation type="obsolete">Volgende</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Vorige</translation>
+        <translation type="obsolete">Vorige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
 </context>
 <context>
@@ -758,7 +774,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>0.00Gb</source>
-        <translation>0.00Gb</translation>
+        <translation type="obsolete">0.00Gb</translation>
     </message>
     <message>
         <source>Make ISO Image</source>
@@ -818,11 +834,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Coderingsprofiel veranderen</translation>
     </message>
     <message>
         <source>12.34GB</source>
-        <translation>12.34GB</translation>
+        <translation type="obsolete">12.34GB</translation>
     </message>
     <message>
         <source>DVD Menu Theme</source>
@@ -858,11 +874,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation>xxxxx mb</translation>
+        <translation type="obsolete">xxxxx mb</translation>
     </message>
     <message>
         <source>0 mb</source>
-        <translation>0 mb</translation>
+        <translation type="obsolete">0 mb</translation>
     </message>
     <message>
         <source>Archive Item Details</source>
@@ -996,12 +1012,160 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Burn DVD</source>
         <translation>DVD branden</translation>
     </message>
+    <message>
+        <source>%DATE%, %TIME%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose where you would like your files archived.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Destination:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to find an output location...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erase DVD-RW before burning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Vorige</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Volgende</translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Select the file you wish to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">Terug</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished">Home</translation>
+    </message>
+    <message>
+        <source>See logs from your archive runs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished">Ververs</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Verlaten</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00 GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12.34 GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the appearance of your DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the recordings and videos you wish to save.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished">Opname toevoegen</translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished">Video toevoegen</translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation type="unfinished">Bestand toevoegen</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Bewaar</translation>
+    </message>
+    <message>
+        <source>xxxxx MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x.xx GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Callsign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished">Voltooien</translation>
+    </message>
+    <message>
+        <source>Add video</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation>Bewaar</translation>
+        <translation type="obsolete">Bewaar</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1036,7 +1200,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>All Videos</source>

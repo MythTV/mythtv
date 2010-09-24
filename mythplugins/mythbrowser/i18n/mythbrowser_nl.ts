@@ -6,32 +6,29 @@
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="56"/>
         <source>Edit Bookmark Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Bladwijzerdetails bewerken</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="58"/>
         <source>Enter Bookmark Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Bladwijzerdetails invoeren</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="77"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="78"/>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="79"/>
         <source>Find...</source>
-        <translation>Zoeken...</translation>
+        <translation type="obsolete">Zoeken...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="143"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
         <source>Select a category</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een categorie</translation>
     </message>
 </context>
 <context>
@@ -41,62 +38,64 @@
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen bladwijzer gedeinieerd.
+
+Gebruik de  &apos;Bladwijzer toevoegen&apos; menuoptie om nieuwe bladwijzers toe te voegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="268"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="267"/>
         <source>Actions</source>
         <translation>Acties</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
         <source>Add Bookmark</source>
         <translation>Bladwijzer toevoegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
         <source>Edit Bookmark</source>
         <translation>Bladwijzer bewerken</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
         <source>Delete Bookmark</source>
         <translation>Bladwijzer verwijderen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="289"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Show Bookmark</source>
         <translation>Bladwijzer tonen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="293"/>
         <source>Delete Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Markering verwijderen</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
+        <source>Show Marked</source>
+        <translation>Markering tonen</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
-        <source>Show Marked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="296"/>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Markering wissen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="299"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="298"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="476"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="475"/>
         <source>Are you sure you want to delete the selected bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Weet u zeker dat u de geselecteerd bladwijzer wilt verwijderen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="520"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="519"/>
         <source>Are you sure you want to delete the marked bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Weet u zeker dat u de gemarkeerde bladwijzer wilt verwijderen</translation>
     </message>
 </context>
 <context>
@@ -104,17 +103,15 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="42"/>
         <source>MythBrowser Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythBrowser instellingen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="63"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="64"/>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="115"/>
@@ -140,58 +137,58 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="104"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="103"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="348"/>
         <source>Enter URL</source>
         <translation>URL invoegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="240"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="239"/>
         <source>Loading...</source>
         <translation>Laden...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
         <source>Actions</source>
         <translation>Acties</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
         <source>Back</source>
         <translation>Terug</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Forward</source>
         <translation>Vooruit</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="356"/>
         <source>Zoom In</source>
         <translation>Inzoomen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom Out</source>
         <translation>Uitzoomen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>New Tab</source>
         <translation>Nieuw tabblad</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>Delete Tab</source>
         <translation>Tabblad verwijderen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
         <source>Add Bookmark</source>
         <translation>Bladwijzer toevoegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="365"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
@@ -201,85 +198,141 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     <message>
         <location filename="../mythbrowser/main.cpp" line="47"/>
         <source>Move to next browser tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar het volgende tabblad gaan</translation>
     </message>
     <message>
         <location filename="../mythbrowser/main.cpp" line="49"/>
         <source>Move to previous browser tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar het vorige tabblad gaan</translation>
     </message>
     <message>
         <location filename="../mythbrowser/main.cpp" line="52"/>
         <source>Internal Web Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Interne webbrowser</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Bookmark Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Bladwijzermanager</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Category</source>
         <translation>Categorie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="19"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Name</source>
         <translation>Naam</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="21"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Category:</source>
         <translation>Categorie:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Web Bookmarks</source>
+        <translation>Webbladwijzers</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Browse your favorite web sites.</source>
+        <translation>Blader door favoriete websites.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Browser:</source>
+        <translation>Browser:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="8"/>
-        <source>Find...</source>
-        <translation>Zoeken...</translation>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
-        <source>Name:</source>
-        <translation>Naam:</translation>
+        <source>Configure Web Browser</source>
+        <translation>Webbrowser configureren</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
-        <source>URL:</source>
-        <translation>URL:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="11"/>
-        <source>Cancel</source>
-        <translation>Annuleren</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="12"/>
-        <source>Ok</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="13"/>
-        <source>Browser Command:</source>
+        <source>You can edit the name, URL, and category for the selected Web Site on this screen.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
+        <source>Genre:</source>
+        <translation>Genre:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Channel:</source>
+        <translation>Kanaal:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Click to choose from existing categories...</source>
+        <translation>Klik om te kiezen uit bestaande categorieën...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Find...</source>
+        <translation>Zoeken...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>Find</source>
+        <translation>Zoeken</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Name:</source>
+        <translation>Naam:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="obsolete">Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Browser Command:</source>
+        <translation>Browseropdracht:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
         <source>Text Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstgrootte:</translation>
     </message>
 </context>
 <context>
