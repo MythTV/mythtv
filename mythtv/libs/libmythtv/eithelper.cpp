@@ -333,7 +333,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString subtitle      = QString("");
         QString description   = QString("");
         QString category      = QString("");
-        MythCategoryType category_type = kCategoryNone;
+        uint category_type = kCategoryNone;
         unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
         // Parse descriptors
@@ -368,19 +368,91 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         parse_dvb_component_descriptors(list, subtitle_type, audio_props,
                                         video_props);
 
+        QString programId = QString("");
+        QString seriesId  = QString("");
+        QString rating    = QString("");
+        QString rating_system = QString("");
+        QString advisory = QString("");
+        float stars = 0.0;
+
+        if (EITFixUp::kFixDish & fix)
+        {
+            const unsigned char *mpaa_data =
+                MPEGDescriptor::Find(list, DescriptorID::dish_event_mpaa);
+            if (mpaa_data)
+            {
+                DishEventMPAADescriptor mpaa(mpaa_data);
+                stars = mpaa.stars();
+
+                if (stars) // Only movies for now
+                {
+                    rating = mpaa.rating();
+                    rating_system = "MPAA";
+                    advisory = mpaa.advisory();
+                }
+            }
+
+            if (!stars) // Not MPAA rated, check VCHIP
+            {
+                const unsigned char *vchip_data =
+                    MPEGDescriptor::Find(list, DescriptorID::dish_event_vchip);
+                if (vchip_data)
+                {
+                    DishEventVCHIPDescriptor vchip(vchip_data);
+                    rating = vchip.rating();
+                    rating_system = "VCHIP";
+                    advisory = vchip.advisory();
+                }
+            }
+
+            if (!advisory.isEmpty() && !rating.isEmpty())
+                rating += ", " + advisory;
+            else if (!advisory.isEmpty())
+            {
+                rating = advisory;
+                rating_system = "advisory";
+            }
+
+            const unsigned char *tags_data =
+                MPEGDescriptor::Find(list, DescriptorID::dish_event_tags);
+            if (tags_data)
+            {
+                DishEventTagsDescriptor tags(tags_data);
+                seriesId  = tags.seriesid();
+                programId = tags.programid();
+            }
+
+            const unsigned char *properties_data =
+                MPEGDescriptor::Find(list, DescriptorID::dish_event_properties);
+            if (properties_data)
+            {
+                DishEventPropertiesDescriptor properties(properties_data);
+                subtitle_type |= properties.SubtitleProperties(descCompression);
+                audio_props   |= properties.AudioProperties(descCompression);
+            }
+        }
+
         const unsigned char *content_data =
             MPEGDescriptor::Find(list, DescriptorID::content);
         if (content_data)
         {
-            ContentDescriptor content(content_data);
-            category      = content.GetDescription(0);
-            category_type = content.GetMythCategory(0);
+            if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
+            {
+                DishContentDescriptor content(content_data);
+                category_type = content.GetTheme();
+                if (EITFixUp::kFixDish & fix)
+                    category  = content.GetCategory();
+            }
+            else
+            {
+                ContentDescriptor content(content_data);
+                category      = content.GetDescription(0);
+                category_type = content.GetMythCategory(0);
+            }
         }
 
         desc_list_t contentIds =
             MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
-        QString programId = QString("");
-        QString seriesId  = QString("");
         for (uint j = 0; j < contentIds.size(); j++)
         {
             DVBContentIdentifierDescriptor desc(contentIds[j]);
@@ -409,7 +481,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             starttime, endtime,       fix,
             subtitle_type,
             audio_props,
-            video_props,
+            video_props, stars,
             seriesId,  programId);
 
         db_events.enqueue(event);
@@ -516,7 +588,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 starttime, endtime,       fix,
                 subtitle_type,
                 audio_props,
-                video_props,
+                video_props, 0.0,
                 "",  "");
 
             db_events.enqueue(event);
