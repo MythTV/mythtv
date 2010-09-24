@@ -470,7 +470,8 @@ class MPUBLIC MythPlayer
                        bool seeks_wanted = false);
     bool DoRewind(uint64_t frames, bool override_seeks = false,
                   bool seeks_wanted = false);
-    void DoJumpToFrame(uint64_t frame);
+    void DoJumpToFrame(uint64_t frame, bool override_seeks = false,
+                       bool seeks_wanted = false);
 
     // Private seeking stuff
     void WaitForSeek(uint64_t frame, bool override_seeks = false,
