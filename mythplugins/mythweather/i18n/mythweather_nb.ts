@@ -4,6 +4,7 @@
 <context>
     <name>GlobalSetup</name>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="56"/>
         <source>Finish</source>
         <translation>Ferdig</translation>
     </message>
@@ -11,22 +12,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="964"/>
         <source>Search</source>
-        <translation>S√∏k</translation>
+        <translation>Søk</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="975"/>
         <source>Searching ...</source>
-        <translation>S√∏ker ...</translation>
+        <translation>Søker ...</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="997"/>
         <source>Searching ... Results: %1</source>
-        <translation>S√∏ker ... Resultater: %1</translation>
+        <translation>Søker ... Resultater: %1</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="1045"/>
         <source>Search Complete. Results: %1</source>
-        <translation>S√∏k ferdig. Resultater: %1</translation>
+        <translation>Søk ferdig. Resultater: %1</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="1066"/>
         <source>Source: %1</source>
         <translation>Kilde: %1</translation>
     </message>
@@ -34,45 +40,57 @@
 <context>
     <name>MythControls</name>
     <message>
+        <location filename="../mythweather/main.cpp" line="51"/>
         <source>Weather forecasts</source>
-        <translation>V√¶rvarsel</translation>
+        <translation>Værvarsel</translation>
     </message>
     <message>
+        <location filename="../mythweather/main.cpp" line="53"/>
         <source>Pause current page</source>
         <translation>Paus gjeldende side</translation>
     </message>
     <message>
+        <location filename="../mythweather/main.cpp" line="55"/>
+        <location filename="../mythweather/main.cpp" line="57"/>
+        <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
-        <translation>S√∏k i liste</translation>
+        <translation>Søk i liste</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="15"/>
         <source>Current Conditions</source>
-        <translation>V√¶ret n√•</translation>
+        <translation>Været nå</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="17"/>
         <source>Three Day Forecast</source>
-        <translation>Tredagers v√¶rvarsel</translation>
+        <translation>Tredagers værvarsel</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
         <source>18 Hour Forecast</source>
-        <translation>18 timers v√¶rvarsel</translation>
+        <translation>18 timers værvarsel</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="21"/>
         <source>Severe Weather Alerts</source>
         <translation>Spesialvarsler</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="23"/>
         <source>Six Day Forecast</source>
-        <translation>Seksdagers v√¶rvarsel</translation>
+        <translation>Seksdagers værvarsel</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
         <source>Static Map</source>
         <translation>Statisk kart</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Animated Map</source>
         <translation>Animert kart</translation>
     </message>
@@ -80,90 +98,116 @@
 <context>
     <name>ScreenSetup</name>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="151"/>
         <source>Active Screens</source>
         <translation>Aktive skjermbilder</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="155"/>
         <source>Inactive Screens</source>
         <translation>Inaktive skjermbilder</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="176"/>
         <source>Finish</source>
         <translation>Ferdig</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="233"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation>Legg til √∏nsket skjermbilde til listen over aktive skjerbilder ved √• trykke VELG.</translation>
+        <translation>Legg til ønsket skjermbilde til listen over aktive skjerbilder ved å trykke VELG.</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="236"/>
         <source>Sources</source>
         <translation>Kilder</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="252"/>
         <source>Units: </source>
         <translation>Enheter:</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="600"/>
         <source>English Units</source>
         <translation>Engelske enheter</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
         <source>SI Units</source>
         <translation>SI enheter</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="260"/>
         <source>Location: </source>
         <translation>Plassering:</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="261"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="264"/>
         <source>Not Defined</source>
         <translation>Ikke definert</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="263"/>
         <source>Source: </source>
         <translation>Kilde:</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="267"/>
         <source>Press SELECT to </source>
-        <translation>Trykk VELG for √•</translation>
+        <translation>Trykk VELG for å</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="269"/>
         <source>change location; </source>
         <translation>endre plassering;</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="271"/>
         <source>change units; </source>
-        <translation>endre enheter;</translation>
+        <translation>endre enheter; </translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="272"/>
         <source>move screen up or down; or remove screen.</source>
         <translation>flytte skjermbilde opp eller ned; eller fjerne skjermbilde.</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="507"/>
         <source>Manipulate Screen</source>
         <translation>Endre skjermbilde</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="521"/>
         <source>Move Up</source>
         <translation>Flytt opp</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
         <source>Move Down</source>
         <translation>Flytt ned</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
         <source>Remove</source>
         <translation>Fjern</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
         <source>Change Location</source>
         <translation>Endre plassering</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="526"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="587"/>
         <source>Change Units</source>
         <translation>Endre enheter</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -171,29 +215,35 @@
 <context>
     <name>SourceManager</name>
     <message>
+        <location filename="../mythweather/sourceManager.cpp" line="91"/>
         <source>Searching for scripts</source>
-        <translation>S√∏ker etter skript</translation>
+        <translation>Søker etter skript</translation>
     </message>
     <message>
+        <location filename="../mythweather/sourceManager.cpp" line="301"/>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation>Skript %1 kj√∏rer fremdeles under fors√∏k p√• oppdatering, sjekk at skriptet ikke henger, og at verdiene for tidsavbrudd er fornuftige... Skriptet blir ikke kj√∏rt denne gangen</translation>
+        <translation>Skript %1 kjører fremdeles under forsøk på oppdatering, sjekk at skriptet ikke henger, og at verdiene for tidsavbrudd er fornuftige... Skriptet blir ikke kjørt denne gangen</translation>
     </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="790"/>
         <source>Finish</source>
         <translation>Ferdig</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="904"/>
         <source>Author: </source>
         <translation>Forfatter: </translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="906"/>
         <source>Email: </source>
         <translation>E-post: </translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="907"/>
         <source>Version: </source>
         <translation>Versjon: </translation>
     </message>
@@ -201,532 +251,667 @@
 <context>
     <name>String::DayOfWeek</name>
     <message>
+        <location filename="strings.h" line="7"/>
         <source>MON</source>
         <translation>Man</translation>
     </message>
     <message>
+        <location filename="strings.h" line="8"/>
         <source>TUE</source>
         <translation>Tirs</translation>
     </message>
     <message>
+        <location filename="strings.h" line="9"/>
         <source>WED</source>
         <translation>Ons</translation>
     </message>
     <message>
+        <location filename="strings.h" line="10"/>
         <source>THU</source>
         <translation>Tors</translation>
     </message>
     <message>
+        <location filename="strings.h" line="11"/>
         <source>FRI</source>
         <translation>Fre</translation>
     </message>
     <message>
+        <location filename="strings.h" line="12"/>
         <source>SAT</source>
-        <translation>L√∏r</translation>
+        <translation>Lør</translation>
     </message>
     <message>
+        <location filename="strings.h" line="13"/>
         <source>SUN</source>
-        <translation>S√∏n</translation>
+        <translation>Søn</translation>
     </message>
 </context>
 <context>
     <name>String::WeatherType</name>
     <message>
+        <location filename="strings.h" line="34"/>
         <source>Cloudy</source>
         <translation>Skyet</translation>
     </message>
     <message>
+        <location filename="strings.h" line="35"/>
         <source>Mostly Cloudy</source>
         <translation>Overskyet</translation>
     </message>
     <message>
+        <location filename="strings.h" line="36"/>
         <source>Partly Cloudy</source>
         <translation>Delvis skyet</translation>
     </message>
     <message>
+        <location filename="strings.h" line="37"/>
         <source>Light Rain</source>
         <translation>Lett regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="38"/>
         <source>Showers</source>
         <translation>Regnbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="39"/>
+        <location filename="strings.h" line="131"/>
         <source>Rain</source>
         <translation>Regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="40"/>
         <source>AM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="41"/>
         <source>Fog</source>
-        <translation>T√•ke</translation>
+        <translation>Tåke</translation>
     </message>
     <message>
+        <location filename="strings.h" line="42"/>
         <source>Few Showers</source>
-        <translation>F√• regnbyger</translation>
+        <translation>Få regnbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="43"/>
         <source>Mostly Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Stort sett solskinn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="44"/>
         <source>Sunny</source>
         <translation>Sol</translation>
     </message>
     <message>
+        <location filename="strings.h" line="45"/>
         <source>Scattered Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Spredt snøfall</translation>
     </message>
     <message>
+        <location filename="strings.h" line="46"/>
         <source>AM Clouds/PM Sun</source>
-        <translation type="unfinished"></translation>
+        <translation>Sol på formiddagen/skyet på ettermiddagen</translation>
     </message>
     <message>
+        <location filename="strings.h" line="47"/>
         <source>Isolated T-Storms</source>
-        <translation>Isolerte tordenv√¶r</translation>
+        <translation>Noen tordenbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="48"/>
         <source>Scattered Thunderstorms</source>
-        <translation>Spredt tordenv√¶r</translation>
+        <translation>Spredt tordenvær</translation>
     </message>
     <message>
+        <location filename="strings.h" line="49"/>
         <source>PM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="50"/>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="51"/>
         <source>Rain/Snow Showers</source>
-        <translation>Regn/sn√∏byger</translation>
+        <translation>Regn/snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="52"/>
         <source>Few Snow Showers</source>
-        <translation>F√• sn√∏byger</translation>
+        <translation>Få snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="53"/>
         <source>Cloudy/Wind</source>
         <translation>Skyet/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="54"/>
         <source>Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Snøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="55"/>
         <source>Mostly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Stort sett overskyet/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="56"/>
         <source>Rain/Thunder</source>
         <translation>Regn/torden</translation>
     </message>
     <message>
+        <location filename="strings.h" line="57"/>
+        <location filename="strings.h" line="134"/>
         <source>Partly Cloudy/Windy</source>
         <translation>Delvis skyet/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="58"/>
         <source>AM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsbyger/snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="59"/>
         <source>Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett regn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="60"/>
         <source>Showers/Wind</source>
         <translation>Regnbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="61"/>
         <source>Mostly Sunny/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Stort sett solskinn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="62"/>
         <source>Flurries</source>
-        <translation>Sludd</translation>
+        <translation>Snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="63"/>
         <source>Rain/Wind</source>
         <translation>Regn/Vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="64"/>
         <source>Sct Flurries/Wind</source>
-        <translation>Spredt sludd/Vind</translation>
+        <translation>Spredte snøbyger/Vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="65"/>
         <source>Sct Strong Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Spredt sterk storm</translation>
     </message>
     <message>
+        <location filename="strings.h" line="66"/>
         <source>PM T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagstorden</translation>
     </message>
     <message>
+        <location filename="strings.h" line="67"/>
         <source>Thunderstorms</source>
-        <translation>Tordenv√¶r</translation>
+        <translation>Tordenvær</translation>
     </message>
     <message>
+        <location filename="strings.h" line="68"/>
         <source>Sunny/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Solskinn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="69"/>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagstorden</translation>
     </message>
     <message>
+        <location filename="strings.h" line="70"/>
         <source>AM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsregn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="71"/>
         <source>Iso T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Noen tordenbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="72"/>
         <source>Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn/Snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="73"/>
         <source>Sct T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Spredt torden/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="74"/>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="75"/>
         <source>Sct Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Spredte snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="76"/>
         <source>Snow to Ice/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Snø til is/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="77"/>
         <source>Snow to Rain</source>
-        <translation>Sn√∏ til regn</translation>
+        <translation>Snø til regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="78"/>
         <source>AM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett formiddagsregn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="79"/>
         <source>PM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett ettermiddagsregn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="80"/>
         <source>PM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsregn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="81"/>
         <source>Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="82"/>
         <source>Rain to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn til snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="83"/>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsregn/snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="84"/>
         <source>Few Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Noen byger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="85"/>
         <source>Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Snø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="86"/>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsregn/snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="87"/>
+        <location filename="strings.h" line="98"/>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsregn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="88"/>
         <source>Rain/Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn/snøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="89"/>
         <source>Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn/snø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="90"/>
         <source>Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett snøfall</translation>
     </message>
     <message>
+        <location filename="strings.h" line="91"/>
         <source>PM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddags-snøfall</translation>
     </message>
     <message>
+        <location filename="strings.h" line="92"/>
         <source>Few Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Noen snøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="93"/>
         <source>Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett snø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="94"/>
         <source>Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="95"/>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsregn og snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="96"/>
+        <location filename="strings.h" line="132"/>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig regn/underkjølt regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="97"/>
         <source>AM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett formiddagssnøfall</translation>
     </message>
     <message>
+        <location filename="strings.h" line="99"/>
         <source>Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn/underkjølt regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="100"/>
         <source>T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tordenbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="101"/>
         <source>Sprinkles</source>
-        <translation type="unfinished"></translation>
+        <translation>Skurer</translation>
     </message>
     <message>
+        <location filename="strings.h" line="102"/>
         <source>AM Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagssnøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="103"/>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Skyet på formiddagen/Sol på ettermiddagen/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="104"/>
         <source>AM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsregn/snø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="105"/>
         <source>Rain to Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn til snø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="106"/>
         <source>Snow to Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Snø til regn og snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="107"/>
         <source>PM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettrmiddagssnøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="108"/>
         <source>Snow and Ice to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Snø og is til regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="109"/>
         <source>Heavy Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig regn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="110"/>
         <source>AM Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsregn/is</translation>
     </message>
     <message>
+        <location filename="strings.h" line="111"/>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagssnøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="112"/>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett formiddagssnø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="113"/>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett ettermiddagsregn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="114"/>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett formiddagsregn og snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="115"/>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett ettermiddagssnø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="116"/>
         <source>Heavy Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig regn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="117"/>
         <source>PM Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagssnøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="118"/>
         <source>Snow to Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Snø til regn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="119"/>
         <source>PM Light Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett ettermiddagsregn/is</translation>
     </message>
     <message>
+        <location filename="strings.h" line="120"/>
         <source>AM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagssnø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="121"/>
         <source>Snow to Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Snø til is</translation>
     </message>
     <message>
+        <location filename="strings.h" line="122"/>
         <source>Wintry Mix/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og snø/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="123"/>
         <source>PM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett formiddagssnø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="124"/>
         <source>AM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsyr</translation>
     </message>
     <message>
+        <location filename="strings.h" line="125"/>
         <source>Strong Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Sterk storm/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="126"/>
         <source>PM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ettermiddagsyr</translation>
     </message>
     <message>
+        <location filename="strings.h" line="127"/>
         <source>Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Duskregn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="128"/>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett formiddagsregn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="129"/>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Formiddagsregn/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="130"/>
         <source>Wintry Mix to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og snø til snø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="133"/>
         <source>Snow Showers/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Snøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="135"/>
         <source>Light Rain Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Lette regnbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="136"/>
         <source>Light Rain with Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Lett regn med torden</translation>
     </message>
     <message>
+        <location filename="strings.h" line="137"/>
         <source>Light Drizzle</source>
         <translation>Lett duskregn</translation>
     </message>
     <message>
+        <location filename="strings.h" line="138"/>
         <source>Mist</source>
         <translation>Skodde</translation>
     </message>
     <message>
+        <location filename="strings.h" line="139"/>
         <source>Smoke</source>
-        <translation>R√∏yk</translation>
+        <translation>Røyk</translation>
     </message>
     <message>
+        <location filename="strings.h" line="140"/>
         <source>Haze</source>
         <translation>Dis</translation>
     </message>
     <message>
+        <location filename="strings.h" line="141"/>
         <source>Light Snow Shower</source>
-        <translation>Lette sn√∏byger</translation>
+        <translation>Lette snøbyger</translation>
     </message>
     <message>
+        <location filename="strings.h" line="142"/>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Lette sn√∏byger/vind</translation>
+        <translation>Lette snøbyger/vind</translation>
     </message>
     <message>
+        <location filename="strings.h" line="143"/>
         <source>Clear</source>
         <translation>Klart</translation>
     </message>
     <message>
+        <location filename="strings.h" line="144"/>
         <source>A Few Clouds</source>
-        <translation>Noe skyet</translation>
+        <translation>Noen skyer</translation>
     </message>
     <message>
+        <location filename="strings.h" line="145"/>
         <source>Fair</source>
-        <translation>Lettskyet</translation>
+        <translation>Pent</translation>
     </message>
 </context>
 <context>
     <name>String::WindDirection</name>
     <message>
+        <location filename="strings.h" line="16"/>
         <source>N</source>
-        <translation></translation>
+        <translation>N</translation>
     </message>
     <message>
+        <location filename="strings.h" line="17"/>
         <source>NNE</source>
-        <translation>NN√ò</translation>
+        <translation>NNØ</translation>
     </message>
     <message>
+        <location filename="strings.h" line="18"/>
         <source>NE</source>
-        <translation>N√ò</translation>
+        <translation>NØ</translation>
     </message>
     <message>
+        <location filename="strings.h" line="19"/>
         <source>ENE</source>
-        <translation>√òN√ò</translation>
+        <translation>ØNØ</translation>
     </message>
     <message>
+        <location filename="strings.h" line="20"/>
         <source>E</source>
-        <translation>√ò</translation>
+        <translation>Ø</translation>
     </message>
     <message>
+        <location filename="strings.h" line="21"/>
         <source>ESE</source>
-        <translation>√òS√ò</translation>
+        <translation>ØSØ</translation>
     </message>
     <message>
+        <location filename="strings.h" line="22"/>
         <source>SE</source>
-        <translation>S√ò</translation>
+        <translation>SØ</translation>
     </message>
     <message>
+        <location filename="strings.h" line="23"/>
         <source>SSE</source>
-        <translation>SS√ò</translation>
+        <translation>SSØ</translation>
     </message>
     <message>
+        <location filename="strings.h" line="24"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
+        <location filename="strings.h" line="25"/>
         <source>SSW</source>
         <translation>SSV</translation>
     </message>
     <message>
+        <location filename="strings.h" line="26"/>
         <source>SW</source>
         <translation>SV</translation>
     </message>
     <message>
+        <location filename="strings.h" line="27"/>
         <source>WSW</source>
         <translation>VSV</translation>
     </message>
     <message>
+        <location filename="strings.h" line="28"/>
         <source>W</source>
         <translation>V</translation>
     </message>
     <message>
+        <location filename="strings.h" line="29"/>
         <source>WNW</source>
         <translation>VNV</translation>
     </message>
     <message>
+        <location filename="strings.h" line="30"/>
         <source>NW</source>
         <translation>NV</translation>
     </message>
     <message>
+        <location filename="strings.h" line="31"/>
         <source>NNW</source>
         <translation>NNV</translation>
     </message>
@@ -734,146 +919,343 @@
 <context>
     <name>ThemeUI</name>
     <message>
+        <location filename="themestrings.h" line="3"/>
         <source>Humidity</source>
         <translation>Luftfuktighet</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="4"/>
         <source>Pressure</source>
         <translation>Trykk</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="5"/>
         <source>Wind(Gust)</source>
         <translation>Vind(i kastene)</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="6"/>
         <source>Wind Direction</source>
         <translation>Vindretning</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="7"/>
         <source>Visibility</source>
         <translation>Sikt</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="8"/>
         <source>Feels Like</source>
-        <translation>F√∏les som</translation>
+        <translation>Føles som</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Last Updated %1</source>
+        <translation>Sist oppdatert %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>High Temperature:  %1</source>
+        <translation>Høy temperatur:  %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Low Temperature:  %1</source>
+        <translation>Lav temperatur:  %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Temperature:  %1</source>
+        <translation>Temperatur:  %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Chance of Precipitation:  %1</source>
+        <translation>Sjangse for nedbør:  %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Weather Screen Settings</source>
+        <translation>Innstillinger for værskjermbilde</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
+        <translation>Dette skjermbildet styrer hvordan værskjermbildene oppfører seg.  Du kan slå på oppdatering av værinformasjon i bakgrunnen, som vil kjøre automatisk uavhengig om du viser skjermbilder, samt konfigurere hvor mange sekunder hvert skjermbilde skal vises.
+
+Når du er ferdig med å konfigurere værtillegget må du klikke «Ferdig» for å fortsette.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Retrieve data in background:</source>
+        <translation>Laste ned data i bakgrunnen:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Weather Setup</source>
+        <translation>Væroppsett</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Available Screens</source>
+        <translation>Tilgjengelige skjermbilder</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Active Screens</source>
+        <translation>Aktive skjermbilder</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Weather Script Settings</source>
+        <translation>Innstillinger for værskript</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
+
+When you have completed your changes, click &quot;Finish&quot; to continue.</source>
+        <translation>Dette skjermbildet styrer hvordan værskriptene oppfører seg.  Velg skriptet du vil endre på og trykk pil til høyre. Her kan du justere intervallet for datahenting, samt tidsavbruddet for nettstedet.
+
+Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Finish</source>
+        <translation>Ferdig</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>Search</source>
+        <translation>Søk</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>Enter Current Location</source>
+        <translation>Skriv inn gjeldende plassering</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="29"/>
         <source>Low</source>
         <translation>Lav</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="30"/>
         <source>High</source>
-        <translation>H√∏y</translation>
+        <translation>Høy</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="31"/>
         <source>Weather Alerts</source>
         <translation>Spesialvarsler</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="32"/>
         <source>Temp</source>
         <translation>Temp</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="33"/>
         <source>Precip</source>
-        <translation>Nedb√∏r</translation>
+        <translation>Nedbør</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="34"/>
         <source>Global Settings</source>
         <translation>Globale innstillinger</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="17"/>
         <source>Seconds to display each page:</source>
         <translation>Sekunder hver side skal vises:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="35"/>
         <source>Retrieve data in the background:</source>
         <translation>Last ned data i bakgrunnen:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="44"/>
         <source>Screen Setup</source>
         <translation>Skjermbildeoppsett</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
         <source>Source Setup</source>
         <translation>Kildeoppsett</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="24"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation>Datafangstintervall (minutter):</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="25"/>
         <source>Source Update Timeout (seconds):</source>
         <translation>Tidsavbrudd for kildeoppdatering (sekunder):</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="46"/>
         <source>Location Search</source>
-        <translation>Kildes√∏k</translation>
+        <translation>Kildesøk</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="39"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation>Skriv inn gjeldende plassering, n√¶rmeste sted eller by.</translation>
+        <translation>Skriv inn gjeldende plassering, nærmeste sted eller by.</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Weather Screen Setup</source>
+        <translation>Oppsett for værskjermbilder</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Weather Source Setup</source>
+        <translation>Instillinger for værkilder</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Source</source>
+        <translation>Kilde</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
         <source>Enter Location:</source>
         <translation>Skriv inn plassering:</translation>
     </message>
     <message>
-        <source>General weather plugin options</source>
-        <translation>Generelle innstillinger for v√¶rtillegg</translation>
+        <location filename="themestrings.h" line="41"/>
+        <source>Weather Location Search</source>
+        <translation>Søk etter værlokasjon</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Weather</source>
+        <translation>Vær</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Global Setup</source>
+        <translation>Globalt oppsett</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Humidity:</source>
+        <translation>Luftfuktighet:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>Pressure:</source>
+        <translation>Trykk:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>Wind(Gust):</source>
+        <translation>Vind(i kastene):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>Wind Direction:</source>
+        <translation>Vindretning:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>Visibility:</source>
+        <translation>Sikt:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>Feels Like:</source>
+        <translation>Føles som:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>General weather plugin options</source>
+        <translation>Generelle innstillinger for værtillegg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
         <source>Screen Settings</source>
         <translation>Skjermbildeinnstillinger</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="55"/>
         <source>Choose which weather forecasts to display</source>
-        <translation>Velg hvilke v√¶rvarsler som skal vises</translation>
+        <translation>Velg hvilke værvarsler som skal vises</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="56"/>
         <source>Source Settings</source>
         <translation>Kildeinnstillinger</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="57"/>
         <source>Configure the behavior of weather scripts</source>
-        <translation>Konfigurer oppsett for v√¶rskript</translation>
+        <translation>Konfigurer oppsett for værskript</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
+        <location filename="../mythweather/weather.cpp" line="97"/>
         <source>Paused</source>
         <translation>Pauset</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weather.cpp" line="210"/>
+        <source>None of the configured screens are complete in this theme (missing copyright information).</source>
+        <translation>Ingen konfigurerte skjermer er komplett for dette temaet (mangler informasjon om opphavsrett).</translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="207"/>
         <source>Sunday</source>
-        <translation>S√∏ndag</translation>
+        <translation>Søndag</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="210"/>
         <source>Monday</source>
         <translation>Mandag</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="213"/>
         <source>Tuesday</source>
         <translation>Tirsdag</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="216"/>
         <source>Wednesday</source>
         <translation>Onsdag</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="219"/>
         <source>Thursday</source>
         <translation>Torsdag</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="222"/>
         <source>Friday</source>
         <translation>Fredag</translation>
     </message>
     <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="225"/>
         <source>Saturday</source>
-        <translation>L√∏rdag</translation>
+        <translation>Lørdag</translation>
     </message>
 </context>
 </TS>
