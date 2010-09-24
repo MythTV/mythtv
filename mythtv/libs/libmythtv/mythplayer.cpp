@@ -3322,8 +3322,25 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
     decoderSeek = frame;
     decoderSeekLock.unlock();
 
+    int count = 0;
+    bool need_clear = false;
     while (decoderSeek >= 0)
+    {
         usleep(1000);
+
+        // provide some on screen feedback if seeking is slow
+        count++;
+        if (!(count % 150) && !hasFullPositionMap)
+        {
+            int num = (count / 150) % 4;
+            SetOSDMessage(QObject::tr("Searching") + QString().fill('.', num),
+                          kOSDTimeout_Short);
+            DisplayPauseFrame();
+            need_clear = true;
+        }
+    }
+    if (need_clear && osd)
+        osd->HideWindow("osd_message");
     GetDecoder()->setExactSeeks(after);
 }
 
