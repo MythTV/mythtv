@@ -176,10 +176,16 @@
     </window>
 
     <window name="browse_info">
-        <fontdef name="medium" face="Droid Sans">
-            <pixelsize>28</pixelsize>
+        <fontdef name="small" face="Droid Sans">
+            <pixelsize>22</pixelsize>
             <color>#EEEEEE</color>
+        </fontdef>
+        <fontdef name="medium" from="small">
+            <pixelsize>28</pixelsize>
             <weight>bold</weight>
+        </fontdef>
+        <fontdef name="large" from="medium">
+            <pixelsize>34</pixelsize>
         </fontdef>
         <area>50,520,1180,100</area>
         <imagetype name="background1">
@@ -195,14 +201,26 @@
             <area>10,10,870,40</area>
             <align>left,vcenter</align>
         </textarea>
+        <textarea name="description">
+            <font>small</font>
+            <area>10,50,870,40</area>
+            <align>left,vcenter</align>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+        </textarea>
         <textarea name="starttime">
             <font>medium</font>
             <area>10,10,870,40</area>
             <align>right,top</align>
             <template>%STARTTIME%-%ENDTIME%</template>
         </textarea>
+        <textarea name="channum">
+            <area>900,10,95,80</area>
+            <font>large</font>
+            <align>hcenter,vcenter</align>
+            <value>%CHANNUM%</value>
+        </textarea>
         <imagetype name="iconpath">
-            <area>980,10,110,80</area>
+            <area>1015,10,125,80</area>
         </imagetype>
     </window>
 
