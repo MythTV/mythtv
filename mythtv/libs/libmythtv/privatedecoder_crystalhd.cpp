@@ -383,6 +383,14 @@ bool PrivateDecoderCrystalHD::Reset(void)
     return true;;
 }
 
+bool PrivateDecoderCrystalHD::HasBufferedFrames(void)
+{
+    m_decoded_frames_lock.lock();
+    bool result = m_decoded_frames.size() > 0;
+    m_decoded_frames_lock.unlock();
+    return result;
+}
+
 int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 {
     int result = -1;
