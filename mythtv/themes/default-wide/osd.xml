@@ -295,7 +295,7 @@
         </textedit>
 
         <button name="probe">
-            <position>45,440</position>
+            <area>45,440,150,40</area>
             <value>Probe</value>
             <statetype name="buttonstate">
                 <state name="active">
