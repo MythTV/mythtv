@@ -3163,6 +3163,111 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
+// TODO this is a temporary implementation. Remove code duplication with
+// ProcessVideoPacket for 0.25
+bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
+{
+    int ret = 0, gotpicture = 0;
+    long long pts = 0;
+    AVCodecContext *context = stream->codec;
+
+    // Decode CEA-608 and CEA-708 captions
+    for (uint i = 0; i < (uint)mpa_pic->atsc_cc_len;
+    i += ((mpa_pic->atsc_cc_buf[i] & 0x1f) * 3) + 2)
+    {
+        DecodeDTVCC(mpa_pic->atsc_cc_buf + i,
+                    mpa_pic->atsc_cc_len - i);
+    }
+
+    VideoFrame *picframe = (VideoFrame *)(mpa_pic->opaque);
+
+    if (!directrendering)
+    {
+        AVPicture tmppicture;
+
+        VideoFrame *xf = picframe;
+        picframe = GetPlayer()->GetNextVideoFrame(false);
+
+        unsigned char *buf = picframe->buf;
+        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
+                       context->height);
+        tmppicture.data[0] = buf + picframe->offsets[0];
+        tmppicture.data[1] = buf + picframe->offsets[1];
+        tmppicture.data[2] = buf + picframe->offsets[2];
+        tmppicture.linesize[0] = picframe->pitches[0];
+        tmppicture.linesize[1] = picframe->pitches[1];
+        tmppicture.linesize[2] = picframe->pitches[2];
+
+        QSize dim = get_video_dim(*context);
+        sws_ctx = sws_getCachedContext(sws_ctx, context->width,
+                                       context->height, context->pix_fmt,
+                                       context->width, context->height,
+                                       PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                                       NULL, NULL, NULL);
+        if (!sws_ctx)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate sws context");
+            return false;
+        }
+        sws_scale(sws_ctx, mpa_pic->data, mpa_pic->linesize, 0, dim.height(),
+                  tmppicture.data, tmppicture.linesize);
+
+        if (xf)
+        {
+            // Set the frame flags, but then discard it
+            // since we are not using it for display.
+            xf->interlaced_frame = mpa_pic->interlaced_frame;
+            xf->top_field_first = mpa_pic->top_field_first;
+            xf->frameNumber = framesPlayed;
+            GetPlayer()->DiscardVideoFrame(xf);
+        }
+    }
+    else if (!picframe)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "NULL videoframe - direct rendering not"
+                "correctly initialized.");
+        return false;
+    }
+
+    pts = (long long)(av_q2d(stream->time_base) * mpa_pic->reordered_opaque * 1000);
+
+    long long temppts = pts;
+
+    // Validate the video pts against the last pts. If it's
+    // a little bit smaller, equal or missing, compute
+    // it from the last. Otherwise assume a wraparound.
+    if (!ringBuffer->isDVD() &&
+        temppts <= lastvpts &&
+        (temppts + 10000 > lastvpts || temppts <= 0))
+    {
+        temppts = lastvpts;
+        temppts += (long long)(1000 / fps);
+        // MPEG2/H264 frames can be repeated, update pts accordingly
+        temppts += (long long)(mpa_pic->repeat_pict * 500 / fps);
+    }
+
+    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
+            QString("ProcessVideoFrame timecode %1 %2 %3")
+            .arg(mpa_pic->reordered_opaque).arg(temppts).arg(lastvpts));
+
+    picframe->interlaced_frame = mpa_pic->interlaced_frame;
+    picframe->top_field_first = mpa_pic->top_field_first;
+    picframe->repeat_pict = mpa_pic->repeat_pict;
+
+    picframe->frameNumber = framesPlayed;
+    GetPlayer()->ReleaseNextVideoFrame(picframe, temppts);
+    if (private_dec && mpa_pic->data[3])
+        context->release_buffer(context, mpa_pic);
+
+    decoded_video_frame = picframe;
+    gotvideo = 1;
+    framesPlayed++;
+
+    lastvpts = temppts;
+
+    return true;
+}
+
 /** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
  *  \brief Process ivtv proprietary embedded vertical blanking
  *         interval captions.
@@ -4075,6 +4180,19 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     {
         othresh =  ((ototal>>1) + (ototal>>2));
         allowedquit = ofill > othresh;
+    }
+
+    if (private_dec && private_dec->HasBufferedFrames() &&
+       (selectedTrack[kTrackTypeVideo].av_stream_index > -1))
+    {
+        AVStream *stream = ic->streams[selectedTrack[kTrackTypeVideo]
+                                 .av_stream_index];
+        AVFrame mpa_pic;
+        avcodec_get_frame_defaults(&mpa_pic);
+        int got_picture = 0;
+        private_dec->GetFrame(stream, &mpa_pic, &got_picture, NULL);
+        if (got_picture)
+            ProcessVideoFrame(stream, &mpa_pic);
     }
 
     while (!allowedquit)
