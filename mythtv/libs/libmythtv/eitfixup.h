@@ -50,6 +50,7 @@ class EITFixUp
         kFixCategory   = 0x8000,
         kFixNO         = 0x10000,
         kFixNRK_DVBT   = 0x20000,
+        kFixDish       = 0x40000,
 
         // Early fixups
         kEFixForceISO8859_1  = 0x2000,
@@ -94,12 +95,22 @@ class EITFixUp
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;
+    const QRegExp m_bellPPVTitleAllDayHD;
     const QRegExp m_bellPPVTitleAllDay;
     const QRegExp m_bellPPVTitleHD;
     const QRegExp m_bellPPVSubtitleAllDay;
     const QRegExp m_bellPPVDescriptionAllDay;
     const QRegExp m_bellPPVDescriptionAllDay2;
     const QRegExp m_bellPPVDescriptionEventId;
+    const QRegExp m_dishPPVTitleHD;
+    const QRegExp m_dishPPVTitleColon;
+    const QRegExp m_dishPPVSpacePerenEnd;
+    const QRegExp m_dishDescriptionNew;
+    const QRegExp m_dishDescriptionFinale;
+    const QRegExp m_dishDescriptionFinale2;
+    const QRegExp m_dishDescriptionPremiere;
+    const QRegExp m_dishDescriptionPremiere2;
+    const QRegExp m_dishPPVCode;
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;
     const QRegExp m_ukCEPQ;

@@ -7,6 +7,7 @@
 #include "channelutil.h" // for GetDefaultAuthority()
 
 #include "programinfo.h" // for subtitle types and audio and video properties
+#include "dishdescriptors.h" // for dish_theme_type_to_string
 
 /*------------------------------------------------------------------------
  * Event Fix Up Scripts - Turned on by entry in dtv_privatetype table
@@ -15,12 +16,22 @@
 EITFixUp::EITFixUp()
     : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
       m_bellActors("\\set\\s|,"),
+      m_bellPPVTitleAllDayHD("\\s*\\(All Day\\, HD\\)\\s*$"),
       m_bellPPVTitleAllDay("\\s*\\(All Day.*\\)\\s*$"),
       m_bellPPVTitleHD("^HD\\s?-\\s?"),
-      m_bellPPVSubtitleAllDay("^All Day \\(.*\\sEastern\\)$"),
+      m_bellPPVSubtitleAllDay("^All Day \\(.*\\sEastern\\)\\s*$"),
       m_bellPPVDescriptionAllDay("^\\(.*\\sEastern\\)"),
       m_bellPPVDescriptionAllDay2("^\\([0-9].*am-[0-9].*am\\sET\\)"),
       m_bellPPVDescriptionEventId("\\([0-9]{5}\\)"),
+      m_dishPPVTitleHD("\\sHD\\s*$"),
+      m_dishPPVTitleColon("\\:\\s*$"),
+      m_dishPPVSpacePerenEnd("\\s\\)\\s*$"),
+      m_dishDescriptionNew("\\s*New\\.\\s*"),
+      m_dishDescriptionFinale("\\s*(Series|Season)\\sFinale\\.\\s*"),
+      m_dishDescriptionFinale2("\\s*Finale\\.\\s*"),
+      m_dishDescriptionPremiere("\\s*(Series|Season)\\s(Premier|Premiere)\\.\\s*"),
+      m_dishDescriptionPremiere2("\\s*(Premier|Premiere)\\.\\s*"),
+      m_dishPPVCode("\\s*\\(([A-Z]|[0-9]){5}\\)\\s*$"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
       m_ukCEPQ("[:\\!\\.\\?]"),
@@ -131,6 +142,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
         event.videoProps |= VID_HDTV;
 
     if (kFixBell & event.fixup)
+        FixBellExpressVu(event);
+
+    if (kFixDish & event.fixup)
         FixBellExpressVu(event);
 
     if (kFixUK & event.fixup)
@@ -253,23 +267,57 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     // you come up with an odd category
     if (position < 10)
     {
-        const QString stmp       = event.description;
-        event.description        = stmp.right(stmp.length() - position - 2);
-        event.category = stmp.left(position);
     }
     else
     {
         event.category = "Unknown";
     }
 
-    // When a channel is off air the category is "-"
-    // so leave the category as blank
-    if (event.category == "-")
-        event.category = "OffAir";
+    // If the content descriptor didn't come up with anything, try parsing the category
+    // out of the description.
+    if (event.category == "")
+    {
+        // Take out the content description which is
+        // always next with a period after it
+        position = event.description.indexOf(".");
+        if ((position + 1) < event.description.length())
+            position = event.description.indexOf(". ");
+        // Make sure they didn't leave it out and
+        // you come up with an odd category
+        if ((position > -1) && position < 20)
+        {
+            const QString stmp       = event.description;
+            event.description        = stmp.right(stmp.length() - position - 2);
+            event.category = stmp.left(position);
 
-    if (event.category.length() > 10)
-        event.category = "Unknown";
+            int position_p = event.category.indexOf("(");
+            if (position_p == -1)
+                event.description = stmp.right(stmp.length() - position - 2);
+            else
+                event.category    = "Unknown";
+        }
+        else
+        {
+            event.category = "Unknown";
+        }
 
+        // When a channel is off air the category is "-"
+        // so leave the category as blank
+        if (event.category == "-")
+            event.category = "OffAir";
+
+        if (event.category.length() > 20)
+            event.category = "Unknown";
+    }
+    else if (event.categoryType)
+    {
+        QString theme = dish_theme_type_to_string(event.categoryType);
+        event.description = event.description.replace(theme, "");
+        if (event.description.startsWith("."))
+            event.description = event.description.right(event.description.length() - 1);
+        if (event.description.startsWith(" "))
+            event.description = event.description.right(event.description.length() - 1);
+    }
 
     // See if a year is present as (xxxx)
     position = event.description.indexOf(m_bellYear);
@@ -280,7 +328,11 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
         bool ok;
         uint y = event.description.mid(position + 1, 4).toUInt(&ok);
         if (ok)
+        {
             event.originalairdate = QDate(y, 1, 1);
+            event.airdate = y;
+            event.previouslyshown = true;
+        }
 
         // Get the actors if they exist
         if (position > 3)
@@ -314,6 +366,14 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
         event.description = event.description.replace(m_Stereo, "");
     }
 
+    // Check for "title (All Day, HD)" in the title
+    position = event.title.indexOf(m_bellPPVTitleAllDayHD);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_bellPPVTitleAllDayHD, "");
+        event.videoProps |= VID_HDTV;
+     }
+
     // Check for "title (All Day)" in the title
     position = event.title.indexOf(m_bellPPVTitleAllDay);
     if (position != -1)
@@ -327,6 +387,110 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     {
         event.title = event.title.replace(m_bellPPVTitleHD, "");
         event.videoProps |= VID_HDTV;
+    }
+
+    // Check for (HD) in the decription
+    position = event.description.indexOf("(HD)");
+    if (position != -1)
+    {
+        event.description = event.description.replace("(HD)", "");
+        event.videoProps |= VID_HDTV;
+    }
+
+    // Check for (HD) in the title
+    position = event.title.indexOf("(HD)");
+    if (position != -1)
+    {
+        event.description = event.title.replace("(HD)", "");
+        event.videoProps |= VID_HDTV;
+    }
+
+    // Check for HD at the end of the title
+    position = event.title.indexOf(m_dishPPVTitleHD);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_dishPPVTitleHD, "");
+        event.videoProps |= VID_HDTV;
+    }
+
+    // Check for (DD) at the end of the description
+    position = event.description.indexOf("(DD)");
+    if (position != -1)
+    {
+        event.description = event.description.replace("(DD)", "");
+        event.audioProps |= AUD_DOLBY;
+        event.audioProps |= AUD_STEREO;
+    }
+
+    // Remove SAP from Dish descriptions
+    position = event.description.indexOf("(SAP)");
+    if (position != -1)
+    {
+        event.description = event.description.replace("(SAP", "");
+        event.subtitleType |= SUB_HARDHEAR;
+    }
+
+    // Remove any trailing colon in title
+    position = event.title.indexOf(m_dishPPVTitleColon);
+    if (position != -1)
+    {
+        event.title = event.title.replace(m_dishPPVTitleColon, "");
+    }
+
+    // Remove New at the end of the description
+    position = event.description.indexOf(m_dishDescriptionNew);
+    if (position != -1)
+    {
+        event.previouslyshown = false;
+        event.description = event.description.replace(m_dishDescriptionNew, "");
+    }
+
+    // Remove Series Finale at the end of the desciption
+    position = event.description.indexOf(m_dishDescriptionFinale);
+    if (position != -1)
+    {
+        event.previouslyshown = false;
+        event.description = event.description.replace(m_dishDescriptionFinale, "");
+    }
+
+    // Remove Series Finale at the end of the desciption
+    position = event.description.indexOf(m_dishDescriptionFinale2);
+    if (position != -1)
+    {
+        event.previouslyshown = false;
+        event.description = event.description.replace(m_dishDescriptionFinale2, "");
+    }
+
+    // Remove Series Premiere at the end of the description
+    position = event.description.indexOf(m_dishDescriptionPremiere);
+    if (position != -1)
+    {
+        event.previouslyshown = false;
+        event.description = event.description.replace(m_dishDescriptionPremiere, "");
+    }
+
+    // Remove Series Premiere at the end of the description
+    position = event.description.indexOf(m_dishDescriptionPremiere2);
+    if (position != -1)
+    {
+        event.previouslyshown = false;
+        event.description = event.description.replace(m_dishDescriptionPremiere2, "");
+    }
+
+    // Remove Dish's PPV code at the end of the description
+    QRegExp ppvcode = m_dishPPVCode;
+    ppvcode.setCaseSensitivity(Qt::CaseInsensitive);
+    position = event.description.indexOf(ppvcode);
+    if (position != -1)
+    {
+        event.description = event.description.replace(ppvcode, "");
+    }
+
+    // Remove trailing garbage
+    position = event.description.indexOf(m_dishPPVSpacePerenEnd);
+    if (position != -1)
+    {
+        event.description = event.description.replace(m_dishPPVSpacePerenEnd, "");
     }
 
     // Check for subtitle "All Day (... Eastern)" in the subtitle
