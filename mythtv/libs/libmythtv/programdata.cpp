@@ -162,6 +162,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     seriesId        = other.seriesId;
     programId       = other.programId;
     previouslyshown = other.previouslyshown;
+    ratings         = other.ratings;
 
     Squeeze();
 
@@ -257,7 +258,8 @@ uint DBEvent::GetOverlappingPrograms(
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "
         "       airdate,        originalairdate, "
-        "       previouslyshown,listingsource "
+        "       previouslyshown,listingsource, "
+        "       stars+0 "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -290,6 +292,7 @@ uint DBEvent::GetOverlappingPrograms(
             query.value(7).toUInt(),
             query.value(8).toUInt(),
             query.value(9).toUInt(),
+            query.value(19).toDouble(),
             query.value(10).toString(),
             query.value(11).toString(),
             query.value(18).toUInt());
@@ -690,7 +693,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         "  starttime,      endtime, "
         "  closecaptioned, stereo,         hdtv,            subtitled, "
         "  subtitletypes,  audioprop,      videoprop, "
-        "  partnumber,     parttotal, "
+        "  stars,          partnumber,     parttotal, "
         "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource, "
         "  seriesid,       programid,      previouslyshown ) "
@@ -700,7 +703,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         " :STARTTIME,     :ENDTIME, "
         " :CC,            :STEREO,        :HDTV,           :HASSUBTITLES, "
         " :SUBTYPES,      :AUDIOPROP,     :VIDEOPROP, "
-        " :PARTNUMBER,    :PARTTOTAL, "
+        " :STARS,         :PARTNUMBER,    :PARTTOTAL, "
         " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
         " :SERIESID,      :PROGRAMID,     :PREVSHOWN) ");
@@ -722,6 +725,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":SUBTYPES",    subtitleType);
     query.bindValue(":AUDIOPROP",   audioProps);
     query.bindValue(":VIDEOPROP",   videoProps);
+    query.bindValue(":STARS",       stars);
     query.bindValue(":PARTNUMBER",  partnumber);
     query.bindValue(":PARTTOTAL",   parttotal);
     query.bindValue(":SYNDICATENO", syndicatedepisodenumber);
@@ -769,7 +773,6 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     colorcode       = other.colorcode;
     clumpidx        = other.clumpidx;
     clumpmax        = other.clumpmax;
-    ratings         = other.ratings;
 
     squeeze_str(channel);
     squeeze_str(startts);
@@ -873,7 +876,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         return 0;
     }
 
-    QList<ProgRating>::const_iterator j = ratings.begin();
+    QList<EventRating>::const_iterator j = ratings.begin();
     for (; j != ratings.end(); ++j)
     {
         query.prepare(

@@ -60,6 +60,13 @@ class MPUBLIC DBPerson
 };
 typedef vector<DBPerson> DBCredits;
 
+class MPUBLIC EventRating
+{
+  public:
+    QString system;
+    QString rating;
+};
+
 class MPUBLIC DBEvent
 {
   public:
@@ -77,6 +84,7 @@ class MPUBLIC DBEvent
         subtitleType(0),
         audioProps(0),
         videoProps(0),
+        stars(0.0),
         categoryType(0/*kCategoryNone*/),
         seriesId(QString::null),
         programId(QString::null),
@@ -90,6 +98,7 @@ class MPUBLIC DBEvent
             unsigned char    _subtitleType,
             unsigned char    _audioProps,
             unsigned char    _videoProps,
+            float            _stars,
             const QString   &_seriesId,  const QString   &_programId,
             uint32_t         _listingsource) :
         title(_title),           subtitle(_subtitle),
@@ -102,6 +111,7 @@ class MPUBLIC DBEvent
         syndicatedepisodenumber(QString("")),
         subtitleType(_subtitleType),
         audioProps(_audioProps), videoProps(_videoProps),
+        stars(_stars),
         categoryType(_category_type),
         seriesId(_seriesId),
         programId(_programId),
@@ -152,11 +162,13 @@ class MPUBLIC DBEvent
     unsigned char subtitleType;
     unsigned char audioProps;
     unsigned char videoProps;
+    float         stars;
     unsigned char categoryType;
     QString       seriesId;
     QString       programId;
     bool          previouslyshown;
     uint32_t      listingsource;
+    QList<EventRating> ratings;
 };
 
 class MPUBLIC DBEventEIT : public DBEvent
@@ -171,10 +183,11 @@ class MPUBLIC DBEventEIT : public DBEvent
                unsigned char    _subtitleType,
                unsigned char    _audioProps,
                unsigned char    _videoProps,
+               float            _stars,
                const QString   &_seriesId,  const QString   &_programId) :
         DBEvent(_title, _subtitle, _desc, _category, _category_type,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
-                _seriesId, _programId, kListingSourceEIT),
+                _stars, _seriesId, _programId, kListingSourceEIT),
         chanid(_chanid), fixup(_fixup)
     {
     }
@@ -188,7 +201,7 @@ class MPUBLIC DBEventEIT : public DBEvent
                unsigned char    _videoProps) :
         DBEvent(_title, QString(""), _desc, QString(""), 0/*kCategoryNone*/,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
-                QString(""), QString(""), kListingSourceEIT),
+                0.0, QString(""), QString(""), kListingSourceEIT),
         chanid(_chanid), fixup(_fixup)
     {
     }
@@ -201,13 +214,6 @@ class MPUBLIC DBEventEIT : public DBEvent
   public:
     uint32_t      chanid;
     uint32_t      fixup;
-};
-
-class MPUBLIC ProgRating
-{
-  public:
-    QString system;
-    QString rating;
 };
 
 class MPUBLIC ProgInfo : public DBEvent
@@ -245,7 +251,6 @@ class MPUBLIC ProgInfo : public DBEvent
     QString       colorcode;
     QString       clumpidx;
     QString       clumpmax;
-    QList<ProgRating> ratings;
 };
 
 class MPUBLIC ProgramData

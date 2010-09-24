@@ -403,7 +403,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 QDomElement item = values.item(0).toElement();
                 if (item.isNull())
                     continue;
-                ProgRating rating;
+                EventRating rating;
                 rating.system = info.attribute("system", "");
                 rating.rating = getFirstText(item);
                 pginfo->ratings.append(rating);
