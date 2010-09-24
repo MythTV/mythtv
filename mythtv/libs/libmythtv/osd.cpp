@@ -44,12 +44,10 @@ bool ChannelEditor::Create(void)
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "ChannelEditor", this))
         return false;
 
-    MythUIText *messageText   = NULL;
     MythUIButton *probeButton = NULL;
     MythUIButton *okButton    = NULL;
 
     bool err = false;
-    UIUtilE::Assign(this, messageText,    "message",  &err);
     UIUtilE::Assign(this, m_callsignEdit, "callsign", &err);
     UIUtilE::Assign(this, m_channumEdit,  "channum",  &err);
     UIUtilE::Assign(this, m_channameEdit, "channame", &err);
@@ -63,7 +61,6 @@ bool ChannelEditor::Create(void)
         return false;
     }
 
-    messageText->SetText(tr("Channel Editor"));
     BuildFocusList();
     connect(okButton,    SIGNAL(Clicked()), SLOT(Confirm()));
     connect(probeButton, SIGNAL(Clicked()), SLOT(Probe()));

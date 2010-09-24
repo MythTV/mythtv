@@ -238,13 +238,9 @@
         </shape>
         <textarea name="title">
             <font>small</font>
-            <area>6,8,300,25</area>
-            <align>left,top</align>
-        </textarea>
-        <textarea name="message">
-            <font>small</font>
             <area>9,12,294,125</area>
             <align>allcenter</align>
+            <value>Channel Editor</value>
         </textarea>
 
         <textarea name="callsign_label">
