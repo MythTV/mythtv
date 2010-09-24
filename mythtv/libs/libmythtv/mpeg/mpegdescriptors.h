@@ -128,8 +128,13 @@ class DescriptorID
         content_advisory            = 0x87,
 
         // Dish Network
+        dish_event_rights           = 0x87,
+        dish_event_mpaa             = 0x89,
         dish_event_name             = 0x91,
         dish_event_description      = 0x92,
+        dish_event_properties       = 0x94,
+        dish_event_vchip            = 0x95,
+        dish_event_tags             = 0x96,
 
         // ATSC
         extended_channel_name       = 0xA0,
