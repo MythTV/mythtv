@@ -122,8 +122,9 @@ bool AudioOutputALSA::SetPreallocBufferSize(int size)
 
     if (!pfile.open(QIODevice::ReadWrite))
     {
-        VBERROR(QString("Error opening %1: %2")
-                .arg(pfile.fileName()).arg(pfile.errorString()));
+        VBERROR(QString("Error opening %1: %2. "
+                        "Try to increase it with: echo %3 | sudo tee %1")
+                .arg(pfile.fileName()).arg(pfile.errorString()).arg(size));
         return false;
     }
 
@@ -157,8 +158,7 @@ bool AudioOutputALSA::IncPreallocBufferSize(int buffer_time)
 
     if (!pfile.open(QIODevice::ReadOnly))
     {
-        VBERROR(QString("Error opening %1. Try doing as root: "
-                        "echo 512 > %1").arg(pf));
+        VBERROR(QString("Error opening %1. Fix reading permissions.").arg(pf));
         return false;
     }
 
