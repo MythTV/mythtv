@@ -460,6 +460,8 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         uint64_t chd_timestamp = 0; // 100 nsec units
         if (buffer->pts != (int64_t)AV_NOPTS_VALUE) 
             chd_timestamp = (uint64_t)(av_q2d(stream->time_base) * buffer->pts * 10000000); 
+        VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("decoder input timecode %1 ms")
+                .arg(chd_timestamp / 10000));
 
         // TODO check for busy state
         st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
@@ -513,6 +515,8 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     m_decoded_frames_lock.unlock();
 
     *got_picture_ptr = 1;
+    VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("decoder output timecode %1 ms")
+            .arg(frame->timecode / 10000));
     picture->reordered_opaque = (int64_t)(frame->timecode / av_q2d(stream->time_base)
                                                           / 10000000);
     picture->interlaced_frame = frame->interlaced_frame;
@@ -677,8 +681,6 @@ void PrivateDecoderCrystalHD::AddFrameToQueue(void)
     m_decoded_frames.insert(0, m_frame);
     VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Decoded frame queue size %1")
             .arg(m_decoded_frames.size()));
-    VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("Inserting frame with timecode %1")
-            .arg(m_frame->timecode));
     m_decoded_frames_lock.unlock();
     m_frame = NULL;
 }
