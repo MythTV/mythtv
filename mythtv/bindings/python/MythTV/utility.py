@@ -360,8 +360,7 @@ class deadlinesocket( socket.socket ):
             in the first 8 bytes.
         """
         try:
-            r = self.dlrecv(8, flags, deadline)
-            size = int(r)
+            size = int(self.dlrecv(8, flags, deadline))
         except:
             return ''
         data = self.dlrecv(size, flags, deadline)
