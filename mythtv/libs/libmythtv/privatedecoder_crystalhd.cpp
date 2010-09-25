@@ -492,9 +492,11 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
         return result;
 
     if (pkt && pkt->size)
+    {
         result = ProcessPacket(stream, pkt);
-    if (result < 0)
-        return result;
+        if (result < 0)
+            return result;
+    }
 
     m_decoded_frames_lock.lock();
     int available = m_decoded_frames.size();
