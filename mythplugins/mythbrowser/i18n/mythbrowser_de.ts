@@ -14,7 +14,7 @@
         <translation>Details zum Lesezeichen eingeben</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="139"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
         <source>Select a category</source>
         <translation>Kategorie wählen</translation>
     </message>
@@ -22,7 +22,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="155"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="158"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -31,57 +31,57 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="265"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="267"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="280"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
         <source>Add Bookmark</source>
         <translation>Lesezeichen anlegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
         <source>Edit Bookmark</source>
         <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
         <source>Delete Bookmark</source>
         <translation>Lesezeichen löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Show Bookmark</source>
         <translation>Lesezeichen anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="291"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="293"/>
         <source>Delete Marked</source>
         <translation>Alle markierten löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
         <source>Show Marked</source>
         <translation>Alle markierten anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="293"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
         <source>Clear Marked</source>
         <translation>Markierungen löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="296"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="298"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="473"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="475"/>
         <source>Are you sure you want to delete the selected bookmark</source>
         <translation>Möchten Sie das markierte Lesezeichen wirklich löschen?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="517"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="519"/>
         <source>Are you sure you want to delete the marked bookmarks</source>
         <translation>Möchten Sie die markierten Lesezeichen wirklich löschen?</translation>
     </message>
@@ -94,22 +94,22 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
         <translation>MythBrowser Einstellungen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="112"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="115"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Mit diesem Befehl wird der Webbrowser gestartet. Bei &quot;Internal&quot; wird der integrierte Browser verwendet. %ZOOM% und %URL% werden durch den Vergrößerungsfaktor und die URL-Liste ersetzt.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="116"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="119"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation>Dies bestimmt die Standardtextgrösse. Gültige Werte für den integrierten Browswer reichen von 0.3 bis 5.0. Dabei entspricht 1.0 einer normalen Grösse, kleinere Werte entsprechend kleiner und grössere Werte entsprechend grösser.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="121"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
         <source>Exit without saving settings</source>
         <translation>Beenden ohne zu speichern</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="126"/>
         <source>Save settings and Exit</source>
         <translation>Einstellungen speichern und Beenden</translation>
     </message>
@@ -117,58 +117,58 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="104"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="103"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="348"/>
         <source>Enter URL</source>
         <translation>URL eingeben</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="240"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="239"/>
         <source>Loading...</source>
         <translation>Lade...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="351"/>
         <source>Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
         <source>Forward</source>
         <translation>Vorwärts</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="356"/>
         <source>Zoom In</source>
         <translation>Hinein-Zoomen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom Out</source>
         <translation>Heraus-Zoomen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>New Tab</source>
         <translation>Neuer Tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>Delete Tab</source>
         <translation>Tab löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="363"/>
         <source>Add Bookmark</source>
         <translation>Lesezeichen anlegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="365"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -194,67 +194,125 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Bookmark Manager</source>
         <translation>Bookmarks verwalten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Category</source>
         <translation>Kategorie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="19"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="21"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Category:</source>
         <translation>Kategorie:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Web Bookmarks</source>
+        <translation>Lesezeichen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Browse your favorite web sites.</source>
+        <translation>Durchsuchen Sie Ihre Lesezeichen.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Browser:</source>
+        <translation>Browser:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="8"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Configure Web Browser</source>
+        <translation>Browser konfigurieren</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>You can edit the name, URL, and category for the selected Web Site on this screen.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Sie können den Namen, die URL und die Kategorie für die gewählte Webseite ändern.
+
+Wenn Sie fertig sind, wählen Sie &quot;OK&quot; zum Speichern und Beenden oder &quot;Abbrechen&quot; um ohne zu Speichern zu Beenden.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Genre:</source>
+        <translation>Genre:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Click to choose from existing categories...</source>
+        <translation>Kategorie auswählen...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
         <source>Find...</source>
         <translation>Suchen...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="24"/>
+        <source>Find</source>
+        <translation>Suchen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Browser Command:</source>
         <translation>Browser-Befehl:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Text Size:</source>
         <translation>Schriftgröße:</translation>
     </message>
