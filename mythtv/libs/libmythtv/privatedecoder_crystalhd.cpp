@@ -457,9 +457,9 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         }
 
         usleep(1000);
-        uint64_t chd_timestamp = 0; // msec units
-        if (buffer->pts != (int64_t)AV_NOPTS_VALUE)
-            chd_timestamp = (uint64_t)(buffer->pts * 1000);
+        uint64_t chd_timestamp = 0; // 100 nsec units
+        if (pkt->pts != (int64_t)AV_NOPTS_VALUE) 
+            chd_timestamp = (uint64_t)(av_q2d(stream->time_base) * pkt->pts * 10000000); 
 
         // TODO check for busy state
         st = DtsProcInput(m_device, buf, size, chd_timestamp, false);
@@ -512,11 +512,9 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     VideoFrame *frame = m_decoded_frames.takeLast();
     m_decoded_frames_lock.unlock();
 
-    VERBOSE(VB_TIMESTAMP|VB_EXTRA, LOC + QString("Output PTS timecode (%1)")
-            .arg(frame->timecode * av_q2d(stream->time_base)));
-
     *got_picture_ptr = 1;
-    picture->reordered_opaque = (int64_t)(frame->timecode / 1000);
+    picture->reordered_opaque = (int64_t)(frame->timecode / av_q2d(stream->time_base)
+                                                          / 10000000);
     picture->interlaced_frame = frame->interlaced_frame;
     picture->top_field_first  = frame->top_field_first;
     picture->repeat_pict      = frame->repeat_pict;
