@@ -57,6 +57,7 @@ class RECSEARCHTYPE( object ):
     kManualSearch       = 5
 
 class RECSTATUS( object ):
+    rsTuning            = -10
     rsFailed            = -9
     rsTunerBusy         = -8
     rsLowDiskSpace      = -7
@@ -80,6 +81,30 @@ class RECSTATUS( object ):
     rsNeverRecord       = 11
     rsOffline           = 12
     rsOtherShowing      = 13
+
+class AUDIO_PROPS( object ):
+    AUD_UNKNOWN         = 0x00
+    AUD_STEREO          = 0x01
+    AUD_MONO            = 0x02
+    AUD_SURROUND        = 0x04
+    AUD_DOLBY           = 0x08
+    AUD_HARDHEAR        = 0x10
+    AUD_VISUALIMPAIR    = 0x20
+
+class VIDEO_PROPS( object ):
+    VID_UNKNOWN         = 0x00
+    VID_HDTV            = 0x01
+    VID_WIDESCREEN      = 0x02
+    VID_AVC             = 0x04
+    VID_720             = 0x08
+    VID_1080            = 0x10
+
+class SUBTITLE_TYPES( object ):
+    SUB_UNKNOWN         = 0x00
+    SUB_HARDHEAR        = 0x01
+    SUB_NORMAL          = 0x02
+    SUB_ONSCREEN        = 0x04
+    SUB_SIGNED          = 0x08
 
 class JOBTYPE( object ):
     NONE         = 0x0000

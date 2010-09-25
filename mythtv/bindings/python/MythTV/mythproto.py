@@ -737,7 +737,8 @@ class FreeSpace( DictData, SplitInt ):
         self.usedspace = self.joinInt(self.us_high, self.us_low)
         self.freespace = self.totalspace - self.usedspace
 
-class Program( DictData, RECSTATUS, CMPRecord ):
+class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
+                         SUBTITLE_TYPES, CMPRecord ):
     """Represents a program with all detail returned by the backend."""
 
     _field_order = [ 'title',        'subtitle',     'description',
