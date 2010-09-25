@@ -1831,6 +1831,9 @@ void MythPlayer::AVSync(bool limit_delay)
 
 void MythPlayer::DisplayPauseFrame(void)
 {
+    if (!videoOutput || ! videosync)
+        return;
+
     if (videoOutput->IsErrored())
     {
         SetErrored(QObject::tr("Serious error detected in Video Output"));
