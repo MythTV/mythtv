@@ -90,6 +90,7 @@ class PlaybackSock
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
     RecStatusType StartRecording(int capturecardnum,
                                  const ProgramInfo *pginfo);
+    RecStatusType GetRecordingStatus(int capturecardnum);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);

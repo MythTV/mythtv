@@ -47,6 +47,9 @@ QString toUIState(RecStatusType recstatus)
     if (recstatus == rsRecording)
         return "running";
 
+    if (recstatus == rsTuning)
+        return "tuning";
+
     if (recstatus == rsConflict     || recstatus == rsOffLine      ||
         recstatus == rsTunerBusy    || recstatus == rsFailed       ||
         recstatus == rsAborted)
@@ -81,6 +84,9 @@ QChar toQChar(RecStatusType recstatus, uint cardid)
                 ret = QString::number(cardid);
             else
                 ret = QObject::tr("R", "RecStatusChar rsCurrentRecording");
+            break;
+        case rsTuning:
+            ret = QObject::tr("t", "RecStatusChar rsTuning");
             break;
         case rsWillRecord:
             ret = QString::number(cardid);
@@ -141,7 +147,7 @@ QChar toQChar(RecStatusType recstatus, uint cardid)
             break;
     }
 
-    return (ret.isEmpty()) ? QChar('-') : ret[0];        
+    return (ret.isEmpty()) ? QChar('-') : ret[0];
 }
 
 /// \brief Converts "recstatus" into a short human readable description.
@@ -158,6 +164,8 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Recorded");
         case rsRecording:
             return QObject::tr("Recording");
+        case rsTuning:
+            return QObject::tr("Tuning");
         case rsWillRecord:
             return QObject::tr("Will Record");
         case rsDontRecord:
@@ -216,6 +224,9 @@ QString toDescription(RecStatusType recstatus, const QDateTime &recstartts)
                 break;
             case rsRecording:
                 message = QObject::tr("This showing is being recorded.");
+                break;
+            case rsTuning:
+                message = QObject::tr("The channel is being tuned.");
                 break;
             case rsRecorded:
                 message = QObject::tr("This showing was recorded.");

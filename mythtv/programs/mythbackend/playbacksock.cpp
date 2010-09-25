@@ -443,6 +443,23 @@ RecStatusType PlaybackSock::StartRecording(int capturecardnum,
     return rsUnknown;
 }
 
+RecStatusType PlaybackSock::GetRecordingStatus(int capturecardnum)
+{
+    QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
+    strlist << "GET_RECORDING_STATUS";
+
+    if (!SendReceiveStringList(strlist, 1))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRecordingStatus: " +
+                QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
+                " did not respond.");
+
+        return rsUnknown;
+    }
+
+    return RecStatusType(strlist[0].toInt());
+}
+
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                                  int secsleft, bool hasLater)
 {

@@ -393,7 +393,31 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
                         "but the backend is not there anymore\n")
                 .arg(m_capturecardnum));
 
-    if (retval != rsRecording)
+    if (retval != rsRecording && retval != rsTuning)
+    {
+        endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+        startRecordingTime = endRecordingTime;
+        chanid = 0;
+    }
+
+    return retval;
+}
+
+RecStatusType EncoderLink::GetRecordingStatus(void)
+{
+    RecStatusType retval = rsAborted;
+
+    if (local)
+        retval = tv->GetRecordingStatus();
+    else if (sock)
+        retval = sock->GetRecordingStatus(m_capturecardnum);
+    else
+        VERBOSE(VB_IMPORTANT,
+                QString("Wanted to get status on recorder %1,\n\t\t\t"
+                        "but the backend is not there anymore\n")
+                .arg(m_capturecardnum));
+
+    if (retval != rsRecording && retval != rsTuning)
     {
         endRecordingTime = QDateTime::currentDateTime().addDays(-2);
         startRecordingTime = endRecordingTime;

@@ -106,8 +106,8 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "62";
-    our $PROTO_TOKEN = "78B5631E";
+    our $PROTO_VERSION = "63";
+    our $PROTO_TOKEN = "3875641D";
 
 # currentDatabaseVersion is defined in libmythtv in
 # mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core

@@ -3970,6 +3970,10 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
 
         retlist << QString::number(enc->StartRecording(&pginfo));
     }
+    else if (command == "GET_RECORDING_STATUS")
+    {
+        retlist << QString::number((int)enc->GetRecordingStatus());
+    }
     else if (command == "RECORD_PENDING" &&
              (slist.size() >= 4 + NUMPROGRAMLINES))
     {

@@ -1929,34 +1929,37 @@ void Scheduler::RunScheduler(void)
 
             nextRecording = *recIter;
 
-            if (nextRecording->GetRecordingStatus() != rsWillRecord)
+            if (nextRecording->GetRecordingStatus() != rsTuning)
             {
-                if (nextRecording->GetRecordingStatus() !=
-                    nextRecording->oldrecstatus &&
-                    nextRecording->GetRecordingStartTime() <= curtime)
-                    nextRecording->AddHistory(false);
-                continue;
-            }
-
-            nextrectime = nextRecording->GetRecordingStartTime();
-            secsleft = curtime.secsTo(nextrectime);
-            schedid = nextRecording->MakeUniqueSchedulerKey();
-
-            if (secsleft - prerollseconds < 60)
-            {
-                if (!recPendingList.contains(schedid))
+                if (nextRecording->GetRecordingStatus() != rsWillRecord)
                 {
-                    recPendingList[schedid] = false;
-
-                    livetvTime = (livetvTime < nextrectime) ?
-                                 nextrectime : livetvTime;
-
-                    Reschedule(0);
+                    if (nextRecording->GetRecordingStatus() !=
+                        nextRecording->oldrecstatus &&
+                        nextRecording->GetRecordingStartTime() <= curtime)
+                        nextRecording->AddHistory(false);
+                    continue;
                 }
-            }
 
-            if (secsleft - prerollseconds > 35)
-                break;
+                nextrectime = nextRecording->GetRecordingStartTime();
+                secsleft = curtime.secsTo(nextrectime);
+                schedid = nextRecording->MakeUniqueSchedulerKey();
+
+                if (secsleft - prerollseconds < 60)
+                {
+                    if (!recPendingList.contains(schedid))
+                    {
+                        recPendingList[schedid] = false;
+
+                        livetvTime = (livetvTime < nextrectime) ?
+                                     nextrectime : livetvTime;
+
+                        Reschedule(0);
+                    }
+                }
+
+                if (secsleft - prerollseconds > 35)
+                    break;
+            }
 
             if (m_tvList->find(nextRecording->GetCardID()) == m_tvList->end())
             {
@@ -1976,122 +1979,134 @@ void Scheduler::RunScheduler(void)
             // cerr << "nexttv = " << nextRecording->GetCardID();
             // cerr << " title: " << nextRecording->GetTitle() << endl;
 
-            if (nexttv->IsTunerLocked())
+            if (nextRecording->GetRecordingStatus() != rsTuning)
             {
-                msg = QString("SUPPRESSED recording \"%1\" on channel: "
-                              "%2 on cardid: %3, sourceid %4. Tuner "
-                              "is locked by an external application.")
-                      .arg(nextRecording->GetTitle())
-                      .arg(nextRecording->GetChanID())
-                      .arg(nextRecording->GetCardID())
-                      .arg(nextRecording->GetSourceID());
-                QByteArray amsg = msg.toLocal8Bit();
-                VERBOSE(VB_GENERAL, msg.constData());
-
-                QMutexLocker lockit(reclist_lock);
-                nextRecording->SetRecordingStatus(rsTunerBusy);
-                nextRecording->AddHistory(true);
-                statuschanged = true;
-                continue;
-            }
-
-            if (!IsBusyRecording(nextRecording))
-            {
-                // Will use pre-roll settings only if no other
-                // program is currently being recorded
-                secsleft -= prerollseconds;
-            }
-
-            //VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->GetTitle());
-
-            if (secsleft > 30)
-                continue;
-
-            if (nexttv->IsWaking())
-            {
-                if (secsleft > 0)
+                if (nexttv->IsTunerLocked())
                 {
-                    VERBOSE(VB_SCHEDULE,
-                            QString("WARNING: Slave Backend %1 has NOT come "
-                                    "back from sleep yet.  Recording can "
-                                    "not begin yet for: %2")
-                            .arg(nexttv->GetHostName())
-                            .arg(nextRecording->GetTitle()));
+                    msg = QString("SUPPRESSED recording \"%1\" on channel: "
+                                  "%2 on cardid: %3, sourceid %4. Tuner "
+                                  "is locked by an external application.")
+                          .arg(nextRecording->GetTitle())
+                          .arg(nextRecording->GetChanID())
+                          .arg(nextRecording->GetCardID())
+                          .arg(nextRecording->GetSourceID());
+                    QByteArray amsg = msg.toLocal8Bit();
+                    VERBOSE(VB_GENERAL, msg.constData());
+
+                    QMutexLocker lockit(reclist_lock);
+                    nextRecording->SetRecordingStatus(rsTunerBusy);
+                    nextRecording->AddHistory(true);
+                    statuschanged = true;
+                    continue;
                 }
-                else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
-                {
-                    VERBOSE(VB_SCHEDULE,
-                            QString("WARNING: Slave Backend %1 has NOT come "
-                                    "back from sleep yet. Setting slave "
-                                    "status to unknown and attempting "
-                                    "to reschedule around its tuners.")
-                            .arg(nexttv->GetHostName()));
 
-                    QMap<int, EncoderLink *>::Iterator enciter =
-                        m_tvList->begin();
-                    for (; enciter != m_tvList->end(); ++enciter)
+                if (!IsBusyRecording(nextRecording))
+                {
+                    // Will use pre-roll settings only if no other
+                    // program is currently being recorded
+                    secsleft -= prerollseconds;
+                }
+
+                //VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->GetTitle());
+
+                if (secsleft > 30)
+                    continue;
+
+                if (nexttv->IsWaking())
+                {
+                    if (secsleft > 0)
                     {
-                        EncoderLink *enc = *enciter;
-                        if (enc->GetHostName() == nexttv->GetHostName())
-                            enc->SetSleepStatus(sStatus_Undefined);
+                        VERBOSE(VB_SCHEDULE,
+                                QString("WARNING: Slave Backend %1 has NOT come "
+                                        "back from sleep yet.  Recording can "
+                                        "not begin yet for: %2")
+                                .arg(nexttv->GetHostName())
+                                .arg(nextRecording->GetTitle()));
+                    }
+                    else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
+                    {
+                        VERBOSE(VB_SCHEDULE,
+                                QString("WARNING: Slave Backend %1 has NOT come "
+                                        "back from sleep yet. Setting slave "
+                                        "status to unknown and attempting "
+                                        "to reschedule around its tuners.")
+                                .arg(nexttv->GetHostName()));
+
+                        QMap<int, EncoderLink *>::Iterator enciter =
+                            m_tvList->begin();
+                        for (; enciter != m_tvList->end(); ++enciter)
+                        {
+                            EncoderLink *enc = *enciter;
+                            if (enc->GetHostName() == nexttv->GetHostName())
+                                enc->SetSleepStatus(sStatus_Undefined);
+                        }
+
+                        Reschedule(0);
                     }
 
-                    Reschedule(0);
+                    continue;
                 }
 
-                continue;
-            }
+                if (nextRecording->GetPathname().isEmpty())
+                {
+                    QMutexLocker lockit(reclist_lock);
+                    QString recording_dir;
+                    fsID = FillRecordingDir(
+                                            nextRecording->GetTitle(),
+                                            nextRecording->GetHostname(),
+                                            nextRecording->GetStorageGroup(),
+                                            nextRecording->GetRecordingStartTime(),
+                                            nextRecording->GetRecordingEndTime(),
+                                            nextRecording->GetCardID(),
+                                            recording_dir,
+                                            reclist);
+                    nextRecording->SetPathname(recording_dir);
+                }
 
-            if (nextRecording->GetPathname().isEmpty())
-            {
+                if (!recPendingList[schedid])
+                {
+                    nexttv->RecordPending(nextRecording, max(secsleft, 0),
+                                          hasLaterList.contains(schedid));
+                    recPendingList[schedid] = true;
+                }
+
+                if (secsleft > -2)
+                    continue;
+
+                QDateTime recstartts = mythCurrentDateTime().addSecs(30);
+                recstartts.setTime
+                    (QTime(recstartts.time().hour(), recstartts.time().minute()));
+                nextRecording->SetRecordingStartTime(recstartts);
+
                 QMutexLocker lockit(reclist_lock);
-                QString recording_dir;
-                fsID = FillRecordingDir(
-                                        nextRecording->GetTitle(),
-                                        nextRecording->GetHostname(),
-                                        nextRecording->GetStorageGroup(),
-                                        nextRecording->GetRecordingStartTime(),
-                                        nextRecording->GetRecordingEndTime(),
-                                        nextRecording->GetCardID(),
-                                        recording_dir,
-                                        reclist);
-                nextRecording->SetPathname(recording_dir);
-            }
 
-            if (!recPendingList[schedid])
-            {
-                nexttv->RecordPending(nextRecording, max(secsleft, 0),
-                                      hasLaterList.contains(schedid));
-                recPendingList[schedid] = true;
-            }
-
-            if (secsleft > -2)
-                continue;
-
-            QDateTime recstartts = mythCurrentDateTime().addSecs(30);
-            recstartts.setTime
-                (QTime(recstartts.time().hour(), recstartts.time().minute()));
-            nextRecording->SetRecordingStartTime(recstartts);
-
-            QMutexLocker lockit(reclist_lock);
-
-            details = QString("%1: channel %2 on cardid %3, sourceid %4")
-                      .arg(nextRecording->toString(ProgramInfo::kTitleSubtitle))
-                      .arg(nextRecording->GetChanID())
-                      .arg(nextRecording->GetCardID())
-                      .arg(nextRecording->GetSourceID());
+                details = QString("%1: channel %2 on cardid %3, sourceid %4")
+                          .arg(nextRecording->toString(ProgramInfo::kTitleSubtitle))
+                          .arg(nextRecording->GetChanID())
+                          .arg(nextRecording->GetCardID())
+                          .arg(nextRecording->GetSourceID());
+            } // if (nextRecording->GetRecordingStatus() != rsTuning)
 
             if (schedulingEnabled && nexttv->IsConnected())
             {
-                nextRecording->SetRecordingStatus
-                    (nexttv->StartRecording(nextRecording));
+                RecStatusTypes recStatus;
 
-                nextRecording->AddHistory(false);
-                if (expirer)
+                if (nextRecording->GetRecordingStatus() == rsWillRecord)
                 {
-                    // activate auto expirer
-                    expirer->Update(nextRecording->GetCardID(), fsID, true);
+                    recStatus = nexttv->StartRecording(nextRecording);
+                    nextRecording->AddHistory(false);
+                    if (expirer)
+                    {
+                        // activate auto expirer
+                        expirer->Update(nextRecording->GetCardID(), fsID, true);
+                    }
                 }
+                else
+                    recStatus = nexttv->GetRecordingStatus();
+
+                nextRecording->SetRecordingStatus(recStatus);
+                if (recStatus == rsTuning)
+                    continue;
             }
             else
                 nextRecording->SetRecordingStatus(rsOffLine);
