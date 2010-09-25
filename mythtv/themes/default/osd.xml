@@ -154,7 +154,7 @@
             <area>125,83,537,150</area>
             <align>left,top</align>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
     </window>
 
@@ -214,7 +214,7 @@
             <area>125,83,537,150</area>
             <align>left,top</align>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
     </window>
 

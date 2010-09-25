@@ -203,7 +203,7 @@
         <textarea name="description"  from="basetextarea">
             <area>40,130,1200,90</area>
             <multiline>yes</multiline>
-            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
+            <template>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -425,7 +425,7 @@
         <textarea name="description"  from="basetextarea">
             <area>40,130,870,90</area>
             <multiline>yes</multiline>
-            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
+            <template>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -589,7 +589,7 @@
             <area>20,530,1240,160</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1181,7 +1181,7 @@
         <textarea name="description" from="basetextarea">
             <area>30,525,1200,150</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
         <textarea name="type" from="basetextarea">
             <area>30,670,560,30</area>
@@ -1374,7 +1374,7 @@
         <textarea name="description" from="basetextarea">
             <area>90,90,1040,155</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"%\n%LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
         <textarea name="rectypestatus" from="basetextarea">
             <area>90,290,650,35</area>
@@ -1683,7 +1683,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,1180,200</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
@@ -1756,7 +1756,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,1180,200</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <spinbox name="priority" from="basewidespinbox">
@@ -1836,7 +1836,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,1180,200</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <buttonlist name="recprofile" from="basewideselector">
@@ -1909,7 +1909,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,1180,200</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">
@@ -2041,7 +2041,7 @@
         <textarea name="description" from="basetextarea">
             <area>30,525,1200,150</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
         <textarea name="type" from="basetextarea">
             <area>30,670,560,30</area>

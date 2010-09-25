@@ -145,7 +145,7 @@
         <textarea name="description"  from="basetextarea">
             <area>30,110,740,60</area>
             <multiline>yes</multiline>
-            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
+            <template>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -361,7 +361,7 @@
         <textarea name="description"  from="basetextarea">
             <area>30,140,520,80</area>
             <multiline>yes</multiline>
-            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
+            <template>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -541,7 +541,7 @@
             <area>20,430,720,140</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1291,7 +1291,7 @@
         <textarea name="description" from="basetextarea">
             <area>30,475,720,90</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%YEARSTARS| %%DESCRIPTION%</template>
         </textarea>
         <textarea name="type" from="basetextarea">
             <area>30,560,560,30</area>
@@ -1486,7 +1486,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,700,120</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"%\n%LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|"\n%%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
         <textarea name="timedate" from="basetextarea">
             <area>50,180,440,27</area>
@@ -1668,7 +1668,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,700,100</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
@@ -1741,7 +1741,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,700,100</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <spinbox name="priority" from="basewidespinbox">
@@ -1821,7 +1821,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,700,100</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <buttonlist name="recprofile" from="basewideselector">
@@ -1894,7 +1894,7 @@
         <textarea name="description" from="basetextarea">
             <area>50,70,700,100</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">

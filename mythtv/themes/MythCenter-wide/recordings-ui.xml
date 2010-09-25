@@ -311,7 +311,7 @@
             <area>24,484,890,220</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <template>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <imagetype name="preview">
@@ -633,7 +633,7 @@
             <area>24,480,890,200</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <template>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <imagetype name="preview">

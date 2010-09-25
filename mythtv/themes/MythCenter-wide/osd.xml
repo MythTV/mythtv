@@ -112,7 +112,7 @@
             <area>20,540,860,150</area>
             <align>left,top</align>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
         <imagetype name="iconpath">
             <area>1030,500,130,100</area>
@@ -205,7 +205,7 @@
             <font>small</font>
             <area>10,50,870,40</area>
             <align>left,vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
         <textarea name="starttime">
             <font>medium</font>
