@@ -64,6 +64,7 @@ class PrivateDecoderCrystalHD : public PrivateDecoder
                           int *got_picture_ptr,
                           AVPacket *pkt);
     virtual bool HasBufferedFrames(void);
+    virtual bool NeedsReorderedPTS(void) { return true; }
 
   private:
     void FetchFrames(void);

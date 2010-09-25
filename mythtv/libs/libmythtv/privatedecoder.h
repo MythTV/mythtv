@@ -29,6 +29,7 @@ class PrivateDecoder
                           int *got_picture_ptr,
                           AVPacket *pkt) = 0;
     virtual bool HasBufferedFrames(void) { return false; }
+    virtual bool NeedsReorderedPTS(void) { return false; }
 };
 
 #endif // PRIVATEDECODER_H

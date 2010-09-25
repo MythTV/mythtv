@@ -3092,6 +3092,11 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
             pts = (long long)pkt->dts;
     }
+    else if (private_dec && private_dec->NeedsReorderedPTS() &&
+             mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+    {
+        pts = (long long)mpa_pic.reordered_opaque;
+    }
     else if ((force_reordered_opaque || faulty_pts <= faulty_dts ||
              pkt->dts == (int64_t)AV_NOPTS_VALUE) &&
              mpa_pic.reordered_opaque != (int64_t)AV_NOPTS_VALUE)
