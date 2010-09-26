@@ -198,7 +198,7 @@ class Grabber( System ):
     def command(self, *args):
         return self._processMetadata(System.command(self, *args))
 
-    def search(self, phrase, subtitle=None, tolerance=None):
+    def search(self, phrase, subtitle=None, tolerance=None, func=None):
         """
         obj.search(phrase, subtitle=None, tolerance=None) -> result generator
 
@@ -207,24 +207,28 @@ class Grabber( System ):
                 'subtitle' parameter, and an optional levenshtein
                 tolerance value can be given for filtering results.
         """
+        if not func:
+            if subtitle is not None:
+                func = lambda p,s,r: levenshtein(r.subtitle, s)
+            else:
+                func = lambda p,s,r: levenshtein('%s : %s' % \
+                                            (r.title,r.subtitle), p) \
+                                        if r.subtitle is not None else \
+                                            levenshtein(r.title, p)
+
         if tolerance is None:
             tolerance = int(self.db.settings.NULL.\
                                         get('MetadataLookupTolerance', 5))
         if subtitle is not None:
-            for res in self.command('-N', '"%s" "%s"' % (phrase, subtitle)):
-                res.levenshtein = levenshtein(res.subtitle, subtitle)
-                if res.levenshtein > tolerance:
-                    continue
-                yield res
+            res = self.command('-N', '"%s" "%s"' % (phrase, subtitle))
         else:
-            for res in self.command('-M', '"%s"' % phrase):
-                s = res.title
-                if res.subtitle:
-                    s += ': %s' % res.subtitle
-                res.levenshtein = levenshtein(s, phrase)
-                if res.levenshtein > tolerance:
-                    continue
-                yield res
+            res = self.command('-M', '"%s"' % phrase)
+
+        for r in res:
+            r.levenshtein = func(phrase, subtitle, r)
+            if r.levenshtein > tolerance:
+                continue
+            yield r
 
     def sortedSearch(self, phrase, subtitle=None, tolerance=None):
         """
