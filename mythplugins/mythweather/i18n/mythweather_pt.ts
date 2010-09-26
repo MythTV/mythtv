@@ -347,7 +347,7 @@
     <message>
         <location filename="strings.h" line="45"/>
         <source>Scattered Flurries</source>
-        <translation type="unfinished">Nuvens Dispersas</translation>
+        <translation>&quot;Flurries&quot; Dispersos</translation>
     </message>
     <message>
         <location filename="strings.h" line="46"/>
@@ -392,7 +392,7 @@
     <message>
         <location filename="strings.h" line="54"/>
         <source>Flurries/Wind</source>
-        <translation type="unfinished">Nuvens/Ventoso</translation>
+        <translation>&quot;Flurries&quot;/Vento</translation>
     </message>
     <message>
         <location filename="strings.h" line="55"/>
@@ -434,7 +434,7 @@
         <location filename="strings.h" line="62"/>
         <source>Flurries</source>
         <translatorcomment>Vendaval????</translatorcomment>
-        <translation type="unfinished">Nuvens</translation>
+        <translation>&quot;Flurries&quot;</translation>
     </message>
     <message>
         <location filename="strings.h" line="63"/>
@@ -444,7 +444,7 @@
     <message>
         <location filename="strings.h" line="64"/>
         <source>Sct Flurries/Wind</source>
-        <translation type="unfinished">Algumas Nuvens/Vento</translation>
+        <translation>&quot;Flurries&quot; Disp./Vento</translation>
     </message>
     <message>
         <location filename="strings.h" line="65"/>

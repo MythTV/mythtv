@@ -40,12 +40,12 @@
     <message>
         <location filename="../mythvideo/editmetadata.cpp" line="861"/>
         <source>Downloading selected artwork...</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarregando as ilustrações seleccionadas...</translation>
     </message>
     <message>
         <location filename="../mythvideo/editmetadata.cpp" line="915"/>
         <source>Searching for available artwork...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurando ilustrações disponíveis...</translation>
     </message>
 </context>
 <context>
@@ -83,17 +83,17 @@
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="155"/>
         <source>If set, all files below the MythVideo directory will be displayed unless their extension is explicitly set to be ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se estiver activo, todos os ficheiros sob a directoria de MythTV serão mostrados, a menos que tenham uma extensão definida explicitamente para ser ignorada.</translation>
     </message>
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="159"/>
         <source>If set, every time a scan for new videos is performed, a mass metadata update of the collection will also occur.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se estiver activo será feita uma actualização em massa de metadados, sempre que for feita uma busca de novos vídeos.</translation>
     </message>
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="163"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se seleccionado jutno com a opção Navegar Ficheiros a Lista de Vídeos carrega todas os metadados disponíveis na base de dados. Desligar esta opção pode acelerar o tempo que demora a carregar a árvore da Lista de Vídeos.</translation>
     </message>
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="168"/>
@@ -103,7 +103,7 @@
     <message>
         <location filename="../mythvideo/metadatasettings.cpp" line="170"/>
         <source>Save settings and Exit</source>
-        <translation>Guardar as configurações e Sair</translation>
+        <translation>Guardar configurações e Sair</translation>
     </message>
 </context>
 <context>
@@ -111,42 +111,42 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="285"/>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation>A vista de defeito de MythVideo</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="287"/>
         <source>The MythVideo video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>O gestor de vídeos MythVideo</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="289"/>
         <source>The MythVideo video browser</source>
-        <translation type="unfinished"></translation>
+        <translation>O navegador de vídeos MythVideo</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="291"/>
         <source>The MythVideo video listings</source>
-        <translation type="unfinished"></translation>
+        <translation>As listagens de vídeos MythVideo</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="293"/>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>A galeria de vídeos MythVideo</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="296"/>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation>Tocar o item alternativo no leitor alternativo</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="299"/>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir diálogo de navegação de ficheiros</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="302"/>
         <source>Change browsable in video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Mudar o estado &apos;navegável&apos; no gestor de vídeos</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="304"/>
@@ -161,17 +161,17 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="309"/>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar diálogo de Busca Incremental</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="311"/>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarregar metadados para este item</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="313"/>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Detalhes do Item</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="316"/>
@@ -244,7 +244,7 @@
     <message>
         <location filename="../mythvideo/playersettings.cpp" line="170"/>
         <source>Save settings and Exit</source>
-        <translation>Guardar as configurações e Sair</translation>
+        <translation>Guardar configurações e Sair</translation>
     </message>
 </context>
 <context>
@@ -272,7 +272,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="33"/>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation>Atribuir um número a este campo tornará tudo mais simples.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="72"/>
@@ -317,7 +317,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="93"/>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta com os cartazes</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="95"/>
@@ -326,7 +326,7 @@
         <location filename="../mythvideo/globalsettings.cpp" line="128"/>
         <location filename="../mythvideo/globalsettings.cpp" line="139"/>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta directoria tem de existir e o utilizador que corre o MythDVD tem de ter permissões para a ler e escrever nela.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="70"/>
@@ -373,7 +373,7 @@
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="808"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação do Utilizador</translation>
     </message>
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="810"/>
@@ -388,7 +388,7 @@
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="814"/>
         <source>Video ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID do Vídeo</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
@@ -550,12 +550,12 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="154"/>
         <source>On DVD insertion</source>
-        <translation type="unfinished"></translation>
+        <translation>Quando inserido um DVD</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="156"/>
         <source>Do nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Não fazer nada</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="157"/>
@@ -565,12 +565,12 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="155"/>
         <source>Display mythdvd menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar o menu mythdvd</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="320"/>
         <source>General Settings (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações Gerais (%1/%2)</translation>
     </message>
     <message>
         <source>NR</source>
@@ -579,17 +579,17 @@
     <message>
         <location filename="../mythvideo/videolist.cpp" line="915"/>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foram encontrados ficheiros</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1254"/>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Prefixo Desconhecido</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1352"/>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>vídeos</translation>
     </message>
     <message>
         <source>No rating available.</source>
@@ -603,7 +603,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="41"/>
         <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este PIN é usado para entrar em Nível de Controle Parental 4 e no Gestor de Vídeos.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="50"/>
@@ -613,7 +613,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="52"/>
         <source>This PIN is used to enter Parental Control Level 3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este PIN é usado para entrar em Nível de Controle Parental 3.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="60"/>
@@ -623,42 +623,42 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="62"/>
         <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este PIN é usado para entrar em Nível de Controle Parental 2.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="82"/>
         <source>Directories that hold videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Pastas com vídeos</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="84"/>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplas pastas podem ser separadas por &apos;:&apos;. Cada paste tem de estar legível para o utilizador a executar MythVideo.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="158"/>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
-        <translation type="unfinished"></translation>
+        <translation>A Monitorização tem de estar ligada para usar este recurso. (Setup -&gt; Geral -&gt; Monitor de CD/DVD).</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="168"/>
         <source>Delete DVD Bookmarks that are older than the number of days specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Apagar Marcadores de DVD que tenham mais do que o número de dias indicado.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="176"/>
         <source>DVD Drive Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidade da Unidade DVD</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="234"/>
         <source>Enable automatic Parental Level from rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar Nível Parental automático a partir da classificação</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="237"/>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se seleccionado as buscas ajustam automaticamente o Nível Parental ao que corresponde à classificação indicada.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="261"/>
@@ -668,42 +668,42 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="262"/>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificações contendo estes textos (separados por ;) terão o Nível Parental %1.</translation>
     </message>
     <message>
         <location filename="../mythvideo/dbcheck.cpp" line="39"/>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Erro: não pude adicionar o novo typo de ficheiro &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../mythvideo/dbcheck.cpp" line="77"/>
         <source>Error: failed to hash file &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Erro: falhou o cálculo da assinatura do ficheiro &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="104"/>
         <source>Directory that holds movie screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta com imagens dos filmes</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="115"/>
         <source>Directory that holds movie/TV Banners</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta com genéricos de filmes/programas</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="126"/>
         <source>Directory that holds movie fanart</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta com cartazes</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="137"/>
         <source>Directory that holds movie trailers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta com anúncios</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="166"/>
         <source>Remove DVD Bookmarks Older than (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Apagar marcadores de DVD mais antigos do que (dias)</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="178"/>
@@ -713,12 +713,12 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="32"/>
         <source>Loading videos ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Carregando vídeos ...</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="105"/>
         <source>You have no VCD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não tem o comando do leitor de VCD definido.</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="378"/>
@@ -728,33 +728,33 @@
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="804"/>
         <source>Season/Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporada/Episódio</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="905"/>
         <location filename="../mythvideo/videolist.cpp" line="913"/>
         <source>Video Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Base dos Vídeos</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1189"/>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>Televisão</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1192"/>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Filmes</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1204"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporada %1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1258"/>
         <source>Storage Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupos de Armazenamento</translation>
     </message>
 </context>
 <context>
@@ -763,25 +763,26 @@
         <location filename="../mythvideo/globalsettings.cpp" line="246"/>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation>Para todos</translation>
+        <translation>M/6</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="248"/>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Acompanhados dos Pais ????</translatorcomment>
+        <translation>AP</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="250"/>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation>Maiores de 12</translation>
+        <translation>M/12</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="252"/>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation>Maiores de 16</translation>
+        <translation>M/16</translation>
     </message>
 </context>
 <context>
@@ -819,7 +820,7 @@
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Plot:</source>
-        <translation>Resumo:</translation>
+        <translation>Enredo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="129"/>
@@ -829,27 +830,27 @@
     <message>
         <location filename="themestrings.h" line="130"/>
         <source>Cover File:</source>
-        <translation>Ficheiro de Capa:</translation>
+        <translation>Ficheiro da Capa:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="150"/>
         <source>Text Filter :</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro de Texto :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="151"/>
         <source>Seas/Ep:</source>
-        <translation type="unfinished"></translation>
+        <translation>Temp/Epis:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="156"/>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>SELECT: Editar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="157"/>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Menu Acção</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="158"/>
@@ -874,7 +875,7 @@
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>Use default player:</source>
-        <translation>Usar cliente padrão:</translation>
+        <translation>Usar leitor de defeito:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
@@ -884,7 +885,8 @@
     <message>
         <location filename="themestrings.h" line="163"/>
         <source>Background:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Bastidores?????</translatorcomment>
+        <translation>Fundo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="164"/>
@@ -913,7 +915,7 @@
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Cover Art:</source>
-        <translation>Imagem de Capa:</translation>
+        <translation>Imagem da Capa:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
@@ -923,7 +925,7 @@
     <message>
         <location filename="themestrings.h" line="137"/>
         <source>/path/to/the/thing.jpg</source>
-        <translation>/directoria/para/a/imagem.jpg</translation>
+        <translation>/caminho/para/a/coisa.jpg</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
@@ -933,7 +935,7 @@
     <message>
         <location filename="themestrings.h" line="162"/>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista de filtros vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="138"/>
@@ -963,17 +965,21 @@
     <message>
         <location filename="themestrings.h" line="144"/>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação do Utilizador:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="145"/>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="148"/>
         <source>Sort by :</source>
         <translation>Ordenar por :</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
@@ -988,7 +994,7 @@
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação do Utilizador</translation>
     </message>
     <message>
         <source>Rip/Transcode</source>
@@ -1044,7 +1050,7 @@
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>User Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação do Utilizador:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
@@ -1059,27 +1065,27 @@
     <message>
         <location filename="themestrings.h" line="152"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Mais baixo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="153"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Baixo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="154"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Médio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="155"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Alto</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="131"/>
         <source>Video Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Núm do Vídeo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="160"/>
@@ -1109,7 +1115,7 @@
     <message>
         <location filename="themestrings.h" line="166"/>
         <source>Item has been watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>O item foi visto:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
@@ -1119,12 +1125,12 @@
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Released %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Editado %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>User Rating: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação do Utilizador: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -1134,12 +1140,12 @@
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Enredo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
@@ -1149,7 +1155,7 @@
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Starring: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vedetas: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
@@ -1179,7 +1185,7 @@
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Add New File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar Novos Tipos de Ficheiros</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
@@ -1191,12 +1197,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Use Default Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar Leitor de Defeito</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Ignore This File Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar este Tipo de Ficheiro</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -1211,102 +1217,102 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Tagline:</source>
-        <translation type="unfinished"></translation>
+        <translation>Slogan:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>TMDB Number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Número TMDB:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genérico:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartazes:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anúncios:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Homepage:</source>
-        <translation type="unfinished"></translation>
+        <translation>Homepage:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Custom Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitor Personalizado:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Visto:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Next File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ficheiro Seguinte:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Click here to search existing coverart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar nas imagens existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Click to select from online coverart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar em imagens online...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Click here to search existing screenshots...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar nas capturas de écran existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Click to select from online screenshots...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar em capturas de écran online...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Click here to search existing banners...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar nos genéricos existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Click to select from online banners...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar em genéricos online...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Click here to search existing fanart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar nos cartazes existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Click to select from online fanart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar cartazes online...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Click here to search existing trailers...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar nos anúncios existentes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Filter Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
@@ -1321,32 +1327,32 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Actor/Actress:</source>
-        <translation type="unfinished"></translation>
+        <translation>Actor/Actriz:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Browse:</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>TMDB/TVDB #:</source>
-        <translation type="unfinished"></translation>
+        <translation># TMDB/TVDB:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Coverart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Imagem da Capa:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
         <source>Sort By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenar Por:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="65"/>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro de Texto:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="67"/>
@@ -1361,12 +1367,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>This item was released on %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este item foi editado em %1.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>It was added to your collection on %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Foi adicionado à sua colecção em %1.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
@@ -1376,112 +1382,112 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Video Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações do Leitor de Vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Default:</source>
-        <translation type="unfinished"></translation>
+        <translation>Defeito:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="75"/>
         <source>DVD Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitor DVD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="76"/>
         <source>DVD Drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidade DVD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>VCD Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitor VCD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>VCD Drive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidade VCD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>Enable Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar Leitor Alternativo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Alt. Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitor Alt.:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="81"/>
         <source>Video Metadata Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de Metadados de Vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Update metadata after video scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar metadados depois da busca de vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
         <source>Display unknown file types</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar ficheiros de tipo desconhecido</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Enable metadata in file browse mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar metadados em modo de navegação</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Enable Random Trailer Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar Leitura Aleatória de Anúncios</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>Trailer #:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anúncio #:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>Video File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>Associações do Ficheiro Vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Edit Video Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Metadados de Vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>File to Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>Próximo Ficheiro a Tocar:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="95"/>
         <source>Item has been Watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Item foi Visto:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="97"/>
         <source>Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultados da Busca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Cast Members</source>
-        <translation type="unfinished"></translation>
+        <translation>Elenco</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Enredo Completo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>Video List Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro de Lista de Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="101"/>
@@ -1501,97 +1507,97 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="104"/>
         <source>Actor/Actress</source>
-        <translation type="unfinished"></translation>
+        <translation>Actor/Actriz</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="108"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="109"/>
         <source>InetRef</source>
-        <translation type="unfinished"></translation>
+        <translation>InetRef</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="110"/>
         <source>Cover File</source>
-        <translation type="unfinished"></translation>
+        <translation>Ficheiro da Capa</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Sort by</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenar por</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Visto</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="113"/>
         <source>Make default</source>
-        <translation type="unfinished"></translation>
+        <translation>Tornar defeito</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="114"/>
         <source>Videos - Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Vídeos - Gestor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="115"/>
         <source>Cast:</source>
-        <translation type="unfinished"></translation>
+        <translation>Elenco:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="116"/>
         <source>Videos - Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Vídeos - Navegador</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="117"/>
         <source>Videos - Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Vídeos - Galeria</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="118"/>
         <source>Videos - Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Vídeos - Árvore</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="120"/>
         <source>Default Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitor de Defeito:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="121"/>
         <source>Enable Alternate Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar Leitor Alternativo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="122"/>
         <source>Alternate Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitor Alternativo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="123"/>
         <source>Metadata Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de Metadados</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="124"/>
         <source>Movie Grabber:</source>
-        <translation type="unfinished"></translation>
+        <translation>Recolha de Filmes:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="125"/>
         <source>TV Grabber:</source>
-        <translation type="unfinished"></translation>
+        <translation>Recolha de TV:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="126"/>
         <source>Trailers to Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anúncioa a Tocar:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="127"/>
@@ -1601,7 +1607,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="133"/>
         <source>TMDB:</source>
-        <translation type="unfinished"></translation>
+        <translation>TMDB:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="134"/>
@@ -1611,27 +1617,27 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="135"/>
         <source>Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Visionável</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando do Leitor:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="141"/>
         <source>Actor/Actress :</source>
-        <translation type="unfinished"></translation>
+        <translation>Actor/Actriz:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="146"/>
         <source>InetRef :</source>
-        <translation type="unfinished"></translation>
+        <translation>InetRef :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="147"/>
         <source>Cover File :</source>
-        <translation>Ficheiro de Capa :</translation>
+        <translation>Ficheiro da Capa :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="149"/>
@@ -1641,7 +1647,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="188"/>
         <source>Configure video and DVD playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurar leitura de vídeos e de DVDs</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="66"/>
@@ -1651,7 +1657,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="172"/>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar como defeito</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="175"/>
@@ -1671,17 +1677,17 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="181"/>
         <source>Browse Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="182"/>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista de Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="159"/>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galeria de Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="167"/>
@@ -1691,57 +1697,57 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="168"/>
         <source>Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation>Imagem da Capa</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="169"/>
         <source>Screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation>Capturas de écran</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="170"/>
         <source>Banners</source>
-        <translation type="unfinished"></translation>
+        <translation>Genéricos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="171"/>
         <source>Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartazes</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="173"/>
         <source>Perform metadata update after video scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar metadados depois de uma busca de vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="174"/>
         <source>Find Online...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurar Online...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="176"/>
         <source>File Paths and general options</source>
-        <translation type="unfinished"></translation>
+        <translation>Caminhos de Ficheiros e Opções Gerais</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="177"/>
         <source>Player Applications and DVD/VCD Drives</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplicações para leitura e unidades DVD/VCD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="178"/>
         <source>Grabber Setup and display preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuração da Recolha e preferências de afixação</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="180"/>
         <source>Associate new file extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Associar novas extensões</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="183"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestor de Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="184"/>
@@ -1792,17 +1798,17 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2546"/>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Passar a Modo Navegação</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2550"/>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Passar a Modo Galeria</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2554"/>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Passar a Modo Lista</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="1319"/>
@@ -1870,17 +1876,17 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <location filename="../mythvideo/videodlg.cpp" line="2437"/>
         <location filename="../mythvideo/videodlg.cpp" line="2685"/>
         <source>Video Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Informação do Vídeo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="1151"/>
         <source>Video dialog loading, or no videos available...</source>
-        <translation type="unfinished"></translation>
+        <translation>Carregando o diálogo de vídeos ou não há vídeos disponíveis...</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2438"/>
         <source>Change Video Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Alterar os Detalhes do Vídeo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2440"/>
@@ -1890,79 +1896,80 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2443"/>
         <source>Play Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Tocar a Pasta</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2457"/>
         <source>Playback Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Opções de Leituta
+%1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2472"/>
         <source>Play in Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Tocar num Leitor Alternativo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2477"/>
         <source>Play With Trailers</source>
-        <translation type="unfinished"></translation>
+        <translation>Tocar com Anúncios do Filme</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2485"/>
         <source>Play Trailer</source>
-        <translation>Tocar Anúncio</translation>
+        <translation>Tocar Anúncio do Filme</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2496"/>
         <source>Video Display Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu de Afixação de Vídeo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2505"/>
         <source>Scan For Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Verificar Alterações</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2506"/>
         <source>Retrieve All Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Recolher Todos os Detalhes</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2507"/>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar Afixação</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2509"/>
         <source>Browse By...</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar Por...</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2511"/>
         <location filename="../mythvideo/videodlg.cpp" line="2536"/>
         <source>Change View</source>
-        <translation type="unfinished"></translation>
+        <translation>Alterar Vista</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2514"/>
         <source>Disable File Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Desligar Modo de Navegação em Ficheiros</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2517"/>
         <source>Enable File Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ligar Modo de Navegação em Ficheiros</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2521"/>
         <source>Disable Flat View</source>
-        <translation type="unfinished"></translation>
+        <translation>Desligar Vista Simples</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2524"/>
         <source>Enable Flat View</source>
-        <translation type="unfinished"></translation>
+        <translation>Ligar Vista Simples</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2527"/>
@@ -1972,12 +1979,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2557"/>
         <source>Switch to Manage View</source>
-        <translation type="unfinished"></translation>
+        <translation>Passar a Modo Gestão</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2567"/>
         <source>Video Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de Vídeos</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2576"/>
@@ -1987,17 +1994,17 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2577"/>
         <source>Metadata Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de Metadados</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2578"/>
         <source>File Type Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de Tipos de Ficheiros</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2629"/>
         <source>Browse By</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar Por</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2639"/>
@@ -2012,7 +2019,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2647"/>
         <source>Date Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Data em que foi Adicionado</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2651"/>
@@ -2027,7 +2034,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2659"/>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2663"/>
@@ -2037,12 +2044,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2667"/>
         <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>TV/Filmes</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2671"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Classificação do Utilizador</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2675"/>
@@ -2052,37 +2059,37 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2695"/>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Detalhes</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2697"/>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Enredo Completo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2703"/>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Elenco</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2705"/>
         <source>View Homepage</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Homepage</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2732"/>
         <source>Mark as Non-Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcar como Não Navegável</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2734"/>
         <source>Mark as Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcar como Navegável</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2743"/>
         <source>Manage Video Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerir Detalhes do Vídeo</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2754"/>
@@ -2092,42 +2099,42 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2755"/>
         <source>Retrieve Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Recolher Detalhes</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2759"/>
         <source>Allow Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Permitir Actualizações</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2761"/>
         <source>Disable Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Inibir Actualizações</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2762"/>
         <source>Reset Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Repor Detalhes</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2756"/>
         <source>Manually Enter Video #</source>
-        <translation type="unfinished"></translation>
+        <translation>Introduzir o nº do vídeo manualmente</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3003"/>
         <source>An error occurred when switching views.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocorreu um erro ao alternar vistas.</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3076"/>
         <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não está definido o cmando do navegador! MythVideo necessita que MythBrowser para mostrar a HomePage.</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3552"/>
         <source>Fetching details for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Recolhendo detalhes para %1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3557"/>
@@ -2137,7 +2144,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3645"/>
         <source>Enter Video Unique ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Introduza a ID Única do Vídeo:</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3698"/>

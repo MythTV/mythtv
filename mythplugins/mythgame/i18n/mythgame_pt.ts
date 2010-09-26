@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythgame/gameui.cpp" line="272"/>
         <source>Favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoritos</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="286"/>
@@ -16,27 +16,27 @@
     <message>
         <location filename="../mythgame/gameui.cpp" line="291"/>
         <source>-   By Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Por Género</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="296"/>
         <source>-   By Year</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Por Ano</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="301"/>
         <source>-   By Name</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Por Nome</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="306"/>
         <source>-   By Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Por Editor</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="407"/>
         <source>Choose System for</source>
-        <translation type="unfinished"></translation>
+        <translation>Escolha o Sistema para</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="424"/>
@@ -48,45 +48,41 @@
         <location filename="../mythgame/gameui.cpp" line="581"/>
         <location filename="../mythgame/gameui.cpp" line="655"/>
         <source>Show Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Informação</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="583"/>
         <location filename="../mythgame/gameui.cpp" line="660"/>
         <source>Remove Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Apagar Favorito</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="585"/>
         <location filename="../mythgame/gameui.cpp" line="659"/>
         <source>Make Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Tornar Favorito</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="586"/>
         <location filename="../mythgame/gameui.cpp" line="664"/>
         <source>Retrieve Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Recolher Detalhes</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="587"/>
-        <source>Edit Details</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../mythgame/gameui.cpp" line="651"/>
-        <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <source>Edit Details</source>
+        <translation>Editar Detalhes</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="1053"/>
         <source>Fetching details for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Carragando detalhes para %1</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="615"/>
         <source>Game Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurar Jogo</translation>
     </message>
 </context>
 <context>
@@ -185,57 +181,58 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="27"/>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>?????????Translate system, year and gamename</translatorcomment>
+        <translation>Sequência de ordenação dos jogos - para todos os sistema: Opções disponíveis: system, year and gamename</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="36"/>
         <source>Favourite display order</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenação dos favoritos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="38"/>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Sequência de ordenação dos jogos marcados como favoritos - para todos os sistema: Opções disponíveis: system, year and gamename</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="48"/>
         <source>Indepth Game Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Análise Profunda do Jogo</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="49"/>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar invoca uma análise do jogo para recolher CRCs e tentar encontrar informação mais detalhada sobre o jogo. NOTA dependendo do número de jogos isto pode aumentar consideravelmente o tempo de busca.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="58"/>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pedir autorização para remover ROMs apagadas</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="59"/>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation type="unfinished"></translation>
+        <translation>Activa um pedido de autorização para apagar ROMs removidas da base de dados durante uma busca</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
         <source>Display Files Names in Game Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar os Nomes dos Ficheiros na Árvore de Jogos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="70"/>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Se estiver activado os nomes dos ficheiros são afixados na árvores de jogos em vez do nome truncado/lido</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="160"/>
         <source>Allow games to span multiple roms/disks</source>
-        <translation type="unfinished"></translation>
+        <translation>Permitir que os jogos estejam em várias ROMs/Discos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta configuração implica procurar itens como jogo.1.rom, jogo.rom.2 e considerá-los como um único jogo.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="171"/>
@@ -250,42 +247,42 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="188"/>
         <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de Jogo/Emulador. Para efeitos informativos, com pouco efeito na operação do sistema.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="198"/>
         <source>Rom Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Caminho para as ROMs</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="199"/>
         <source>Location of the ROM files for this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Localização dos ficheiros com as ROMs para este emulador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="209"/>
         <source>Working Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta de Trabalho</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="210"/>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta de onde lançar o emulador. Regra geral pode ser deixada em branco</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="220"/>
         <source>File Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensões dos Ficheiros</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="231"/>
         <source>Game Player Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuração do Jogador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="280"/>
         <source>(New Game Player)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Novo Jogo)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="23"/>
@@ -340,12 +337,12 @@
     <message>
         <location filename="../mythgame/gamesettings.h" line="104"/>
         <source>Player Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome do Jogador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="105"/>
         <source>Name of this Game and or Emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome deste Jogo e/ou Emulador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="158"/>
@@ -358,7 +355,7 @@
         <location filename="../mythgame/gamehandler.cpp" line="431"/>
         <source>0</source>
         <translatorcomment>????????????????</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="225"/>
@@ -385,13 +382,14 @@
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="233"/>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Falta o Ficheiro</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="234"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 parece faltar.
+Remover da base de dados?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="612"/>
@@ -403,7 +401,9 @@ Remove it from the database?</source>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vai apagar da base de ddados todos 
+os Metadados dos Jogo. Tem a certeza que
+quer fazer isso?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="33"/>
@@ -413,7 +413,7 @@ want to do this?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="221"/>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Uma lista de todas as extensões para este emulador, separadas por vírgulas. Em branco significa que qualquer ficheiro no &quot;Caminho para as ROMs&quot; pode ser usado com este emulador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="26"/>
@@ -423,62 +423,62 @@ want to do this?</source>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="398"/>
         <source>Updating %1(%2) ROM database</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizando a base de dados de ROMs %1(%2)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="516"/>
         <source>Verifying %1 files</source>
-        <translation type="unfinished"></translation>
+        <translation>Verificando os ficheiros %1</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="719"/>
         <source>Scanning for %1 game(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurando jogo(s) %1...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="77"/>
         <source>Hash filenames in display</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcular a assinatura dos ficheiros no écran</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="79"/>
         <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Activa o cálculo da assinatura dos nomes na árvore. Pode acelerar a navegação</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="172"/>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Parâmetros binários e opcionais. Comando múltiplos separados por &apos;;&apos;. Use %s para o nome da rom.  %d1, %d2, %d3 e %d4 são discos num jogo multi-disco. %s é acrescentado automaticamente se não for indicado</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="86"/>
         <source>Directory where Game Screenshots are stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta onde as Imagens dos Jogos são guardadas</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="88"/>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta de defeito na navegação ao atribuir cópias do écran.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="96"/>
         <source>Directory where Game Fanart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta onde os Cartazes são guardados</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="98"/>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta de defeito na naevgação ao atribuir cartazes.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="106"/>
         <source>Directory where Game Boxart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta onde as Imagens das Caixas são guardadas</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="108"/>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pasta de defeito na naevgação ao atribuir imagens de caixas.</translation>
     </message>
 </context>
 <context>
@@ -501,7 +501,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Favorite:</source>
-        <translation type="unfinished"></translation>
+        <translation>Favorito:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
@@ -516,12 +516,12 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Edit Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Informação sobre o Jogo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Game Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome do Jogo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
@@ -536,32 +536,32 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enredo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Imagem do Jogo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartazes:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Boxart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caixa:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/caminho/para/a/coisa.jpg</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Released %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Publicado %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -576,12 +576,12 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Metadados</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Modify your game&apos;s metadata.</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificar os metadados do seu jogo.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -591,52 +591,52 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Capa:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Game is a Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>O Jogo é um Favorito</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Click here to search existing coverart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar a capa...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Click here to search existing screenshots...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar imagens do jogo...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Click here to search existing fanart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique aqui para procurar cartazes...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Done</source>
-        <translation>Terminado</translation>
+        <translation>Acabou</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Play Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Jogar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>ROM Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome da ROM:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>ROM Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caminho para a ROM:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestor de Vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
@@ -656,17 +656,18 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Rompath:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caminho para a ROM:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>System(s):</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Sistemas:</translatorcomment>
+        <translation>Sistema:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>CRC:</source>
-        <translation type="unfinished"></translation>
+        <translation>CRC:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -676,12 +677,12 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>No Plot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não há Enredo.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Empty your game library</source>
-        <translation type="unfinished"></translation>
+        <translation>Apagar a sua biblioteca de jogos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
@@ -691,7 +692,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informação sobre o Jogo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="2"/>
@@ -706,7 +707,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Game folders and general options</source>
-        <translation type="unfinished"></translation>
+        <translation>Pastas de jogos e opções gerais</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
@@ -726,12 +727,12 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Add games to your library</source>
-        <translation type="unfinished"></translation>
+        <translation>Adcicionar jogos à biblioteca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Clear Game Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Apagar Dados dos Jogos</translation>
     </message>
 </context>
 </TS>

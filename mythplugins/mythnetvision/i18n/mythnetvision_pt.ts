@@ -6,12 +6,12 @@
     <message>
         <location filename="../mythnetvision/main.cpp" line="100"/>
         <source>Internet Television Client - Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliente Internet de Televisão - Busca</translation>
     </message>
     <message>
         <location filename="../mythnetvision/main.cpp" line="102"/>
         <source>Internet Television Client - Site/Tree View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliente Internet de Televisão - Vista Sites/Árvore</translation>
     </message>
 </context>
 <context>
@@ -24,7 +24,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="243"/>
         <source>Open Web Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir Link Web</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="257"/>
@@ -54,39 +54,40 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="275"/>
         <source>Manage Search Scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerir Scripts de Busca</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="357"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurando &quot;%2&quot; em %1...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="380"/>
         <location filename="../mythnetvision/netsearch.cpp" line="398"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mudando para a página %1 da busca &quot;%2&quot;...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="465"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Terminou o tempo para completar o pedido.  O API pode não estar acessível.</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="572"/>
         <source>No browser command set! MythNetVision needs MythBrowser installed to display the video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não está definido o comando do navegador! MythNetvision necessita que MythBrowser esteja instalado para mostrar vídeos.</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="616"/>
         <source>Are you sure you want to delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tem a certeza que quer apagar este ficheiro?</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="707"/>
         <source>This file already downloaded to:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Este ficheiro já foi descarregado para:
+%1</translation>
     </message>
 </context>
 <context>
@@ -94,57 +95,57 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="490"/>
         <source>Playback/Download Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opções de Leitura/Carregamento</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="512"/>
         <source>Open Web Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir Link Web</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="515"/>
         <source>Save This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar este Vídeo</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="518"/>
         <source>Scan/Manage Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Procurar/Gerir Subscrições</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="519"/>
         <source>Change View</source>
-        <translation type="unfinished"></translation>
+        <translation>Mudar Vista</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="533"/>
         <source>View Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opções de Vista</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="545"/>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Mudar para Vista em Lista</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="547"/>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Mudar para Vista Galeria</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="549"/>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Mudar para Vista Navegação</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="561"/>
         <source>Subscription Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestão de Subscrições</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="572"/>
         <source>Update Site Maps</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar Sites</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="573"/>
@@ -154,22 +155,22 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="574"/>
         <source>Manage Site Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestão de Subscrições de Sites</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="575"/>
         <source>Manage RSS Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestão de Subscrições RSS</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="577"/>
         <source>Enable Automatic Site Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Activa Actualização Automática de Sites</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="579"/>
         <source>Disable Automatic Site Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Desactiva Actualização Automática de Sites</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="646"/>
@@ -182,22 +183,22 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="839"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não está definido o comando do navegador! MythNetvision necessita que MythBrowser esteja instalado para mostrar vídeos.</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="893"/>
         <source>Are you sure you want to delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tem a certeza que quer apagar este ficheiro?</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1225"/>
         <source>Updating RSS.  This could take a while...</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizando RSS.  Pode demorar algum tempo...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1240"/>
         <source>Updating Site Maps.  This could take a while...</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizando Sites.  Pode demorar algum tempo...</translation>
     </message>
 </context>
 <context>
@@ -205,7 +206,7 @@
     <message>
         <location filename="../mythnetvision/rsseditor.cpp" line="535"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tem a certeza que quer cancelar a subscrição deste feed?</translation>
     </message>
 </context>
 <context>
@@ -213,7 +214,7 @@
     <message>
         <location filename="../mythnetvision/searcheditor.cpp" line="87"/>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation type="unfinished"></translation>
+        <translation>Inquirindo Fontes de Conteúo Internet ao Backend...</translation>
     </message>
 </context>
 <context>
@@ -226,7 +227,7 @@
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>No search scripts found!  This usually indicates missing prerequisites.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foram encontrados scripts de busca. Normalmente isto indica que faltam pré-requesitos.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -246,14 +247,16 @@
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Edit/Add a New RSS Feed</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar/Adicionar um &quot;Feed&quot; de Notícias RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Introduza a URL de um feed RSS 2.0. Ao editar um feed existente altere os valores que pretende e seleccione &quot;Guarda&quot; para guardar e subscrever.
+
+Para nova subscrições introduza a URL e seleccione &quot;Guardar&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -278,12 +281,12 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Download video from this feed automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarregar vídeo deste feed automaticamente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Select to change image...</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione para mudar de imagem...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
@@ -298,17 +301,17 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ainda não definiu Sites nem Feeds RSS! Para adicionar um site pressione MENU, escolha &quot;Procurar/Gerir Subscrições&quot; e depois &quot;Gestão de Subscrições de Sites&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Manage Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerir Subscrições</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Choose the sites you wish to browse/search.</source>
-        <translation type="unfinished"></translation>
+        <translation>Escolha o site onde quer navegar/procurar.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -323,17 +326,17 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Unsubscribe</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar Subscrições</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Search Net Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Procura de Vídeos na Net</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Search Term:</source>
-        <translation type="unfinished"></translation>
+        <translation>Termo de Busca:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
@@ -348,12 +351,12 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foram encontrados scripts de busca! Normalmente isto indica que faltam pré-requesitos.  Tente executar um script a partir da linha de comandos.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Manage Site Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestão de Subscrições de Sites</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
@@ -373,47 +376,47 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Manage RSS Subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Feed Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome do Feed:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Feed URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL do Feed:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Site Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrição do Site:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Feed Author:</source>
-        <translation type="unfinished"></translation>
+        <translation>Autor do Feed:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Download this feed automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarregar este feed automaticamente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>Choose Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Escolher Imagem</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Browse Net Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar Vídeos na Net</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Posted: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Afixado: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -433,22 +436,22 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>Search Internet Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Procura de Vídeos na Net</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Search popular video sites</source>
-        <translation type="unfinished"></translation>
+        <translation>Procura sites populares de Vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Browse Internet Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Procura de Vídeos na Net</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Browse highlights and entire sites</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegar pontos relevantes sites inteiros</translation>
     </message>
 </context>
 <context>
@@ -456,7 +459,7 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="../mythnetvision/treeeditor.cpp" line="95"/>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation type="unfinished"></translation>
+        <translation>Inquirindo Fontes de Conteúo Internet ao Backend...</translation>
     </message>
 </context>
 </TS>
