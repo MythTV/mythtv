@@ -3172,7 +3172,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 // ProcessVideoPacket for 0.25
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
-    int ret = 0, gotpicture = 0;
     long long pts = 0;
     AVCodecContext *context = stream->codec;
 
