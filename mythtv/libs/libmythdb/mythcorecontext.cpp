@@ -356,7 +356,8 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 d->m_WOLInProgress = we_attempted_wol = true;
             }
 
-            myth_system(WOLcmd, kMSDontDisableDrawing | kMSDontBlockInputDevs);
+            myth_system(WOLcmd, kMSDontDisableDrawing | kMSDontBlockInputDevs |
+                                kMSProcessEvents);
             sleepms = WOLsleepTime * 1000;
         }
 
@@ -540,7 +541,8 @@ bool MythCoreContext::BackendIsRunning(void)
     const char *command = "ps -ae | grep mythbackend > /dev/null";
 #endif
     bool res = myth_system(command, kMSDontBlockInputDevs |
-                                    kMSDontDisableDrawing);
+                                    kMSDontDisableDrawing |
+                                    kMSProcessEvents);
     return !res;
 }
 

@@ -56,7 +56,8 @@ class MythSystemReaper : public QThread
 {
     public:
         void run(void);
-        uint waitPid( pid_t pid, time_t timeout, bool background = false );
+        uint waitPid( pid_t pid, time_t timeout, bool background = false,
+                      bool processEvents = true );
         uint abortPid( pid_t pid );
     private:
         PidMap_t    m_pidMap;
@@ -163,7 +164,8 @@ void MythSystemReaper::run(void)
     }
 }
 
-uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background )
+uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background,
+                                bool processEvents )
 {
     PidData_t  *pidData = new PidData_t;
     uint        result;
@@ -183,7 +185,8 @@ uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background )
     if( !background ) {
         /* Now we wait for the thread to see the SIGCHLD */
         while( !pidData->mutex.tryLock(100) )
-            qApp->processEvents();
+            if (processEvents)
+                qApp->processEvents();
 
         result = pidData->result;
         delete pidData;
@@ -251,7 +254,8 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     pid    = myth_system_fork( command, result );
 
     if( result == GENERIC_EXIT_RUNNING )
-        result = myth_system_wait( pid, timeout, (flags & kMSRunBackground) );
+        result = myth_system_wait( pid, timeout, (flags & kMSRunBackground),
+                                   (flags & kMSProcessEvents) );
 #else
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -306,7 +310,11 @@ void myth_system_pre_flags(uint &flags)
         flags &= ~kMSInUi;
         flags |= kMSDontBlockInputDevs;
         flags |= kMSDontDisableDrawing;
+        flags &= ~kMSProcessEvents;
     }
+
+    if (flags & kMSRunBackground )
+        flags &= ~kMSProcessEvents;
 
     // This needs to be a send event so that the MythUI locks the input devices
     // immediately instead of after existing events are processed
@@ -412,7 +420,8 @@ pid_t myth_system_fork(const QString &command, uint &result)
     return child;
 }
 
-uint myth_system_wait(pid_t pid, uint timeout, bool background)
+uint myth_system_wait(pid_t pid, uint timeout, bool background, 
+                      bool processEvents)
 {
     if( reaper == NULL )
     {
@@ -421,7 +430,7 @@ uint myth_system_wait(pid_t pid, uint timeout, bool background)
     }
     VERBOSE(VB_IMPORTANT, QString("PID %1: launched%2") .arg(pid)
         .arg(background ? " in the background, not waiting" : ""));
-    return reaper->waitPid(pid, timeout, background);
+    return reaper->waitPid(pid, timeout, background, processEvents);
 }
 
 uint myth_system_abort(pid_t pid)

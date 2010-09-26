@@ -38,7 +38,8 @@ class ScreenSaverX11Private
         m_timeoutInterval(-1),        m_resetTimer(NULL),
         m_display(NULL)
     {
-        const uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing;
+        const uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                           kMSProcessEvents;
         m_xscreensaverRunning =
                 myth_system("xscreensaver-command -version >&- 2>&-",
                             flags) == 0;

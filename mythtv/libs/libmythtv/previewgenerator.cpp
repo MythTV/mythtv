@@ -242,7 +242,8 @@ bool PreviewGenerator::Run(void)
         command += " > /dev/null";
 
         int ret = myth_system(command, kMSDontBlockInputDevs |
-                                       kMSDontDisableDrawing);
+                                       kMSDontDisableDrawing |
+                                       kMSProcessEvents);
         if (ret)
         {
             msg = QString("Encountered problems running '%1'").arg(command);

@@ -11,7 +11,8 @@ typedef enum MythSystemMask {
     kMSDontBlockInputDevs       = 0x00000001, //< avoid blocking LIRC & Joystick Menu
     kMSDontDisableDrawing       = 0x00000002, //< avoid disabling UI drawing
     kMSRunBackground            = 0x00000004, //< run child in the background
-    kMSInUi                     = 0x00000008, //< the parent is in the UI
+    kMSProcessEvents            = 0x00000008, //< process events while waiting
+    kMSInUi                     = 0x00000010, //< the parent is in the UI
 } MythSystemFlag;
 
 MPUBLIC unsigned int myth_system(const QString &command, 
@@ -22,7 +23,8 @@ MPUBLIC void myth_system_pre_flags(uint &flags);
 MPUBLIC void myth_system_post_flags(uint &flags);
 #ifndef USING_MINGW
 MPUBLIC pid_t myth_system_fork(const QString &command, uint &result);
-MPUBLIC uint myth_system_wait(pid_t pid, uint timeout, bool background = false);
+MPUBLIC uint myth_system_wait(pid_t pid, uint timeout, bool background = false,
+                              bool processEvents = true);
 MPUBLIC uint myth_system_abort(pid_t pid);
 #endif
 

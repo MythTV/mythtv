@@ -736,19 +736,22 @@ bool ping(const QString &host, int timeout)
     QString cmd = QString("%systemroot%\\system32\\ping.exe -i %1 -n 1 %2>NUL")
                   .arg(timeout).arg(host);
 
-    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing))
+    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                         kMSProcessEvents))
         return false;
 #else
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
                   .arg(timeout).arg(host);
 
-    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing))
+    if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                         kMSProcessEvents))
     {
         // ping command may not like -t argument. Simplify:
 
         cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
 
-        if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing))
+        if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
+                             kMSProcessEvents))
             return false;
     }
 #endif
@@ -1180,7 +1183,9 @@ bool IsPulseAudioRunning(void)
 #else
     const char *command = "ps -ae | grep pulseaudio > /dev/null";
 #endif
-    bool res = myth_system(command, kMSDontBlockInputDevs | kMSDontDisableDrawing);
+    // Do NOT use kMSProcessEvents here, it will cause deadlock
+    bool res = myth_system(command, kMSDontBlockInputDevs | 
+                                    kMSDontDisableDrawing);
     return !res;
 }
 
