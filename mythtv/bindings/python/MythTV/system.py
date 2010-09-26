@@ -73,6 +73,7 @@ class System( DBCache ):
         return self._runcmd('%s %s' % (self.path, arg))
 
     def _runcmd(self, cmd):
+        self.log(MythLog.FILE, 'Running external command', cmd)
         fd = Popen(cmd, stdout=-1, stderr=-1, shell=True)
         self.returncode = fd.wait()
         stdout,self.stderr = fd.communicate()
@@ -211,8 +212,7 @@ class Grabber( System ):
                                         get('MetadataLookupTolerance', 5))
         if subtitle is not None:
             for res in self.command('-N', '"%s" "%s"' % (phrase, subtitle)):
-                res.levenshtein = levenshtein(res.title, phrase) + \
-                                  levenshtein(res.subtitle, subtitle)
+                res.levenshtein = levenshtein(res.subtitle, subtitle)
                 if res.levenshtein > tolerance:
                     continue
                 yield res
