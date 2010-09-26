@@ -9542,9 +9542,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
 void TV::RunLoadDDMap(uint sourceid)
 {
     QMutexLocker locker(&chanEditMapLock);
-    const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
 
-    // Startup channel editor gui early, with "Loading..." text
     const PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
     // Load DataDirect info
