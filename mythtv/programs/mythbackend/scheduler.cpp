@@ -1632,7 +1632,7 @@ void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
     int wakeThreshold = gCoreContext->GetNumSetting("WakeUpThreshold", 300);
-    int secsleft;
+    int secsleft = 0;
     EncoderLink *nexttv = NULL;
 
     RecordingInfo *nextRecording = NULL;
