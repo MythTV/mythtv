@@ -118,7 +118,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
         QString token;
         QSize outputsize;
         QString outputfile;
-        long long time;
+        long long time = -1LL;
         bool time_fmt_sec;
         if (it != list.end())
             token = (*it++);
