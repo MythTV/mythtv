@@ -2900,15 +2900,16 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                 QString tempString = newText;
                 while ((pos = regexp.indexIn(newText, pos)) != -1)
                 {
-                    QString key = regexp.cap(3).toLower().trimmed();
+                    QString key = regexp.cap(4).toLower().trimmed();
                     QString replacement;
                     QString value = m_strings.value(key).text;
                     if (!value.isEmpty())
                     {
                         replacement = QString("%1%2%3")
                                                 .arg(regexp.cap(2))
+                                                .arg(regexp.cap(3))
                                                 .arg(m_strings.value(key).text)
-                                                .arg(regexp.cap(5));
+                                                .arg(regexp.cap(6));
                     }
                     tempString.replace(regexp.cap(0), replacement);
                     pos += regexp.matchedLength();
