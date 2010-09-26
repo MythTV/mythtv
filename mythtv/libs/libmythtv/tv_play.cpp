@@ -6868,7 +6868,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
             }
             // Collect channel info
             const ProgramInfo pginfo(*ctx->playingInfo);
-            uint old_chanid = pginfo.GetChanID();
+            old_chanid = pginfo.GetChanID();
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
