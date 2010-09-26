@@ -14,7 +14,7 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">EN_GB</setting>
+    <setting name="Language">en_GB</setting>
     <setting name="ISO639Language0">eng</setting>
     <setting name="ISO639Language1">eng</setting>
 

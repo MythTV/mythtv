@@ -1153,7 +1153,7 @@ QString MythCoreContext::GetLanguage(void)
 QString MythCoreContext::GetLanguageAndVariant(void)
 {
     if (d->language.isEmpty())
-        d->language = GetSetting("Language", "EN_US").toLower();
+        d->language = GetSetting("Language", "en_US").toLower();
 
     return d->language;
 }

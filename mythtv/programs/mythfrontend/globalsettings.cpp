@@ -3290,15 +3290,15 @@ static HostComboBox *MythLanguage()
     QMap<QString, QString> langMap = MythTranslation::getLanguages();
     QStringList langs = langMap.values();
     langs.sort();
-    QString langCode = gCoreContext->GetSetting("Language");
+    QString langCode = gCoreContext->GetSetting("Language").toLower();
     if (langCode.isEmpty())
-        langCode = "en_us";
+        langCode = "en_US";
     gc->clearSelections();
     for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
     {
         QString label = *it;
         QString value = langMap.key(label);
-        gc->addSelection(label, value, (value == langCode));
+        gc->addSelection(label, value, (value.toLower() == langCode));
     }
 
     gc->setHelpText(
