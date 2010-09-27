@@ -154,7 +154,7 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
 {
     if (timestr.isEmpty())
     {
-        cerr << "Ignoring empty timestamp." << endl;
+        VERBOSE(VB_XMLTV, "Found empty Date/Time in XMLTV data, ignoring");
         return;
     }
 
@@ -413,10 +413,13 @@ ProgInfo *XMLTVParser::parseProgram(
                 pginfo->previouslyshown = true;
 
                 QString prevdate = info.attribute("start");
-                QDateTime date;
-                fromXMLTVDate(prevdate, date,
-                              localTimezoneOffset);
-                pginfo->originalairdate = date.date();
+                if (!prevdate.isEmpty())
+                {
+                    QDateTime date;
+                    fromXMLTVDate(prevdate, date,
+                                localTimezoneOffset);
+                    pginfo->originalairdate = date.date();
+                }
             }
             else if (info.tagName() == "credits")
             {
