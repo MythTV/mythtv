@@ -61,7 +61,7 @@ bool DisplayRes::Initialize(void)
     mode[DESKTOP].Init();
     mode[DESKTOP] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
     VERBOSE(VB_GENERAL, QString("Desktop video mode: %1x%2 %3 Hz")
-            .arg(tW).arg(tH).arg(tRate));
+            .arg(tW).arg(tH).arg(tRate, 0, 'f', 3));
 
     // Initialize GUI mode
     mode[GUI].Init();
@@ -132,7 +132,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     {
         VERBOSE(VB_PLAYBACK,
                 QString("Trying to match best refresh rate %1Hz")
-                .arg(frate));
+                .arg(frate, 0, 'f', 3));
         next.AddRefreshRate(frate);
     }
 
@@ -143,7 +143,8 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
         !(DisplayResScreen::compare_rates(last.RefreshRate(),target_rate));
 
     VERBOSE(VB_PLAYBACK, QString("Trying %1x%2 %3 Hz")
-            .arg(next.Width()).arg(next.Height()).arg(target_rate));
+            .arg(next.Width()).arg(next.Height())
+            .arg(target_rate, 0, 'f', 3));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
@@ -181,13 +182,14 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
                                                       target_rate)))); 
 
     VERBOSE(VB_GENERAL, QString("Trying %1x%2 %3 Hz")
-            .arg(next.Width()).arg(next.Height()).arg(target_rate));
+            .arg(next.Width()).arg(next.Height()).arg(target_rate, 0, 'f', 3));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("SwitchToGUI: xrandr failed for %1x%2 %3  Hz")
-                .arg(next.Width()).arg(next.Height()).arg(next.RefreshRate()));
+                .arg(next.Width()).arg(next.Height())
+                .arg(next.RefreshRate(), 0, 'f', 3));
         return false;
     }
 
@@ -195,7 +197,7 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     last = next;
 
     VERBOSE(VB_GENERAL, QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
-            .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate()));
+            .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate(), 0, 'f', 3));
 
     return chg;
 }
