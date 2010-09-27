@@ -1224,7 +1224,7 @@ void ClearMap(MetadataMap &metadataMap)
     metadataMap["subtitle"] = "";
     metadataMap["tagline"] = "";
     metadataMap["director"] = "";
-    metadataMap["studio"] == "";
+    metadataMap["studio"] = "";
     metadataMap["description"] = "";
     metadataMap["genres"] = "";
     metadataMap["countries"] = "";
