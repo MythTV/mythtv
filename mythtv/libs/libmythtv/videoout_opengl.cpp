@@ -573,11 +573,11 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool enable)
 
     if (enable)
     {
-        if (m_deintfiltername == "")
+        if (m_deintfiltername.isEmpty())
             return SetupDeinterlace(enable);
         if (m_deintfiltername.contains("opengl"))
         {
-            if (gl_videochain->GetDeinterlacer() == "")
+            if (gl_videochain->GetDeinterlacer().isEmpty())
                 return SetupDeinterlace(enable);
         }
         else if (!m_deintfiltername.contains("opengl"))

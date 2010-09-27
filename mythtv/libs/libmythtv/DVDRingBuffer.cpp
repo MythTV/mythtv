@@ -1236,7 +1236,7 @@ bool DVDRingBufferPriv::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
     _name    = QString(m_dvdname);
     _serial    = QString(m_serialnumber);
-    if (_name == "" && _serial == "")
+    if (_name.isEmpty() && _serial.isEmpty())
         return false;
     return true;
 }

@@ -207,7 +207,7 @@ class VideoScannerThread : public QThread
                 {
                     // If it's only in the database, and not on a host we cannot reach,
                     //  mark it as for removal later.
-                    if (lhost == "")
+                    if (lhost.isEmpty())
                     {
                         remove.push_back(std::make_pair((*p)->GetID(), lname));
                     }
