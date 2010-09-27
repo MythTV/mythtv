@@ -116,7 +116,7 @@ void MythFEXML::GetScreenShot( HTTPRequest *pRequest )
     int     nHeight   = pRequest->m_mapParams[ "height"    ].toInt();
     QString sFormat   = pRequest->m_mapParams[ "format"    ].toLower();
 
-    if (sFormat == "")
+    if (sFormat.isEmpty())
     {
         sFormat = "png";
     }

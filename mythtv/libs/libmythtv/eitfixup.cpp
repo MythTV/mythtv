@@ -245,7 +245,7 @@ QString EITFixUp::AddDVBEITAuthority(uint chanid, const QString &id)
  */
 void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 {
-    QString tmp = "";
+    QString tmp;
 
     // A 0x0D character is present between the content
     // and the subtitle if its present
@@ -275,7 +275,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 
     // If the content descriptor didn't come up with anything, try parsing the category
     // out of the description.
-    if (event.category == "")
+    if (event.category.isEmpty())
     {
         // Take out the content description which is
         // always next with a period after it

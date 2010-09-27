@@ -5495,7 +5495,7 @@ NULL
 
 // after 0.26
 /*
-    if (dbver == "")
+    if (dbver.isEmpty())
     {
         const char *updates[] = {
 "DELETE FROM settings WHERE value = 'EITIgnoresSource';",

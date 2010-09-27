@@ -35,7 +35,7 @@ QStringList iso639_get_language_list(void)
         {
             QString q = QString("ISO639Language%1").arg(i);
             QString lang = gCoreContext->GetSetting(q, "").toLower();
-            if (lang == "")
+            if (lang.isEmpty())
                 break;
             _languages << lang;
         }
