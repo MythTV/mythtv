@@ -347,9 +347,9 @@
                             <xs:element name="gradient" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="stop" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="stop" minOccurs="0" maxOccurs="unbounded">
                                             <xs:complexType>
-                                                <xs:attribute name="position" type="position" use="required" />
+                                                <xs:attribute name="position" type="percentage" use="required" />
                                                 <xs:attribute name="color" type="color" use="required" />
                                                 <xs:attribute name="alpha" type="alpha" />
                                             </xs:complexType>
