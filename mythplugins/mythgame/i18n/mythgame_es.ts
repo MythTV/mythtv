@@ -70,13 +70,13 @@
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="587"/>
+        <location filename="../mythgame/gameui.cpp" line="651"/>
         <source>Edit Details</source>
         <translation>Editar Detalles</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="651"/>
         <source>Edit Metadata</source>
-        <translation>Editar Metadatos</translation>
+        <translation type="obsolete">Editar Metadatos</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="1053"/>
@@ -94,7 +94,8 @@
     <message>
         <location filename="../mythgame/main.cpp" line="113"/>
         <source>Game frontend</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Mejor &quot;Frontal?&quot;</translatorcomment>
+        <translation>Frontend del juego</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="116"/>
@@ -109,7 +110,7 @@
     <message>
         <location filename="../mythgame/main.cpp" line="120"/>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Siguiente coincidencia de la búsqueda incremental</translation>
     </message>
     <message>
         <location filename="../mythgame/main.cpp" line="122"/>
@@ -152,7 +153,7 @@
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="265"/>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Número jugadores</translation>
     </message>
 </context>
 <context>
@@ -440,7 +441,7 @@ quiere hacerlo?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="77"/>
         <source>Hash filenames in display</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash nombres de fichero mostrados</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="79"/>
@@ -639,7 +640,7 @@ quiere hacerlo?</translation>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestor de vídeo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
@@ -689,7 +690,7 @@ quiere hacerlo?</translation>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Jugar</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -714,7 +715,7 @@ quiere hacerlo?</translation>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Número jugadores</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
