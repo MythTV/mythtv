@@ -1126,14 +1126,6 @@ void TVRec::TeardownRecorder(bool killFile)
         curRecording->SaveResolutionProperty(
             (avg_height > 1000) ? VID_1080 :
             ((avg_height > 700) ? VID_720 : VID_UNKNOWN));
-        VERBOSE(VB_IMPORTANT, "*********************************************");
-        VERBOSE(VB_IMPORTANT, "*********************************************");
-        VERBOSE(VB_IMPORTANT, QString("avg_height: %1").arg(avg_height));
-        VERBOSE(VB_IMPORTANT, QString("vidprop: 0x%1")
-                .arg((avg_height > 1000) ? VID_1080 :
-                     ((avg_height > 700) ? VID_720 : VID_UNKNOWN)));
-        VERBOSE(VB_IMPORTANT, "*********************************************");
-        VERBOSE(VB_IMPORTANT, "*********************************************");
 
         int secsSince = curRecording->GetRecordingStartTime()
             .secsTo(QDateTime::currentDateTime());
