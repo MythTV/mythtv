@@ -36,7 +36,7 @@ class FetcherThread : public QThread
 typedef struct PacketBuffer_
 {
     uint8_t *buf;
-    uint     size;
+    int      size;
     int64_t  pts;
 } PacketBuffer;
 
