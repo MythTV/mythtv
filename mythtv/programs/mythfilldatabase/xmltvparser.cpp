@@ -94,15 +94,15 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
             }
             else if (info.tagName() == "display-name")
             {
-                if (chaninfo->name.length() == 0)
+                if (chaninfo->name.isEmpty())
                 {
                     chaninfo->name = info.text();
                 }
-                else if (isJapan && chaninfo->callsign.length() == 0)
+                else if (isJapan && chaninfo->callsign.isEmpty())
                 {
                     chaninfo->callsign = info.text();
                 }
-                else if (chaninfo->chanstr.length() == 0)
+                else if (chaninfo->chanstr.isEmpty())
                 {
                     chaninfo->chanstr = info.text();
                 }
