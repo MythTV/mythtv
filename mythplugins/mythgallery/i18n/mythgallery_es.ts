@@ -1,319 +1,329 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="es_ES">
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="239"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="240"/>
         <source>Press SELECT to play again</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulse SELECT para reproducir nuevamente</translation>
     </message>
 </context>
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="532"/>
+        <location filename="../mythgallery/iconview.cpp" line="559"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="851"/>
+        <location filename="../mythgallery/iconview.cpp" line="886"/>
         <source>SlideShow</source>
         <translation>Presentación</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="881"/>
+        <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Rotate CW</source>
-        <translation>Rotar AR</translation>
+        <translation>Rotar CW</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="882"/>
+        <location filename="../mythgallery/iconview.cpp" line="917"/>
         <source>Rotate CCW</source>
-        <translation>Rotar CAR</translation>
+        <translation>Rotar CCW</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="913"/>
+        <location filename="../mythgallery/iconview.cpp" line="950"/>
         <source>Import</source>
         <translation>Importar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="856"/>
+        <location filename="../mythgallery/iconview.cpp" line="891"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="184"/>
+        <location filename="../mythgallery/iconview.cpp" line="187"/>
         <source>No images found in this directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se encontraron imágenes en este directorio.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="375"/>
+        <location filename="../mythgallery/iconview.cpp" line="384"/>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="386"/>
+        <location filename="../mythgallery/iconview.cpp" line="395"/>
         <source>Gallery Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="838"/>
+        <location filename="../mythgallery/iconview.cpp" line="873"/>
         <source>Gallery Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones de galería</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="852"/>
+        <location filename="../mythgallery/iconview.cpp" line="887"/>
         <source>Random</source>
         <translation>Aleatorio</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="853"/>
+        <location filename="../mythgallery/iconview.cpp" line="888"/>
         <source>Meta Data Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu de Metadatos</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="854"/>
+        <location filename="../mythgallery/iconview.cpp" line="889"/>
         <source>Marking Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="855"/>
+        <location filename="../mythgallery/iconview.cpp" line="890"/>
         <source>File Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menú de Archivos</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="872"/>
+        <location filename="../mythgallery/iconview.cpp" line="907"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones de Metadatos</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="887"/>
+        <location filename="../mythgallery/iconview.cpp" line="922"/>
         <source>Marking Options</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="902"/>
+        <location filename="../mythgallery/iconview.cpp" line="931"/>
+        <source>Select One</source>
+        <translation>Seleccionar uno</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="932"/>
+        <source>Clear One Marked</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="939"/>
         <source>File Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones de archivo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="912"/>
+        <location filename="../mythgallery/iconview.cpp" line="949"/>
         <source>Eject</source>
-        <translation type="unfinished"></translation>
+        <translation>Expulsar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="916"/>
+        <location filename="../mythgallery/iconview.cpp" line="953"/>
         <source>Delete</source>
         <translation>Borrar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="128"/>
+        <location filename="../mythgallery/iconview.cpp" line="131"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>El Directorio de MythGallery &apos;%1&apos; no existe o es ilegible.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="533"/>
+        <location filename="../mythgallery/iconview.cpp" line="560"/>
         <source>The selected device is no longer available</source>
         <translation>El dispositivo seleccionado ya no está disponible</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="896"/>
+        <location filename="../mythgallery/iconview.cpp" line="934"/>
         <source>Clear Marked</source>
         <translation>Borrar Marcas</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="897"/>
+        <location filename="../mythgallery/iconview.cpp" line="933"/>
         <source>Select All</source>
         <translation>Seleccionar Todo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="911"/>
+        <location filename="../mythgallery/iconview.cpp" line="948"/>
         <source>Show Devices</source>
         <translation>Mostrar Dispositivos</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="914"/>
+        <location filename="../mythgallery/iconview.cpp" line="951"/>
         <source>Copy here</source>
         <translation>Copiar Aquí</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="915"/>
+        <location filename="../mythgallery/iconview.cpp" line="952"/>
         <source>Move here</source>
         <translation>Mover Aquí</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="917"/>
+        <location filename="../mythgallery/iconview.cpp" line="954"/>
         <source>Create Dir</source>
         <translation>Crear Dir</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="968"/>
+        <location filename="../mythgallery/iconview.cpp" line="1005"/>
         <source>Delete Current File or Folder</source>
         <translation>Borrar Fichero o Carpeta Actual</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="970"/>
+        <location filename="../mythgallery/iconview.cpp" line="1007"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Borrando 1 carpeta, incluyendo las subcarpetas y ficheros.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="971"/>
+        <location filename="../mythgallery/iconview.cpp" line="1008"/>
         <source>Deleting 1 image.</source>
         <translation>Borrando 1 imagen.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1167"/>
+        <location filename="../mythgallery/iconview.cpp" line="1204"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Borrando %1 imágenes y carpetas, incluyendo subcarpetas y ficheros.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1214"/>
+        <location filename="../mythgallery/iconview.cpp" line="1267"/>
         <source>New Folder</source>
         <translation>Nueva Carpeta</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1216"/>
+        <location filename="../mythgallery/iconview.cpp" line="1269"/>
         <source>Create New Folder</source>
         <translation>Crear Nueva Carpeta</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1332"/>
+        <location filename="../mythgallery/iconview.cpp" line="1385"/>
         <source>Moving marked images...</source>
         <translation>Moviendo imágenes marcadas...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1332"/>
+        <location filename="../mythgallery/iconview.cpp" line="1385"/>
         <source>Copying marked images...</source>
         <translation>Copiando imágenes marcadas...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="918"/>
-        <location filename="../mythgallery/iconview.cpp" line="1245"/>
+        <location filename="../mythgallery/iconview.cpp" line="955"/>
+        <location filename="../mythgallery/iconview.cpp" line="1298"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Renombrar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1271"/>
+        <location filename="../mythgallery/iconview.cpp" line="1324"/>
         <source>Failed to rename directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al renombrar el directorio</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1273"/>
+        <location filename="../mythgallery/iconview.cpp" line="1326"/>
         <source>Failed to rename file</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al renombrar el archivo</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="63"/>
+        <location filename="../mythgallery/main.cpp" line="69"/>
         <source>Image viewer / slideshow</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="66"/>
-        <source>Start/Stop Slideshow</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="68"/>
-        <source>Go to the first image in thumbnail view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="70"/>
-        <source>Go to the last image in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Visor de imágen / presentación</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="72"/>
-        <source>Start Slideshow in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <source>Start/Stop Slideshow</source>
+        <translation>Iniciar/Detener presentación</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="74"/>
+        <source>Go to the first image in thumbnail view</source>
+        <translation>Ir a primera imagen en vista miniatura</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="76"/>
+        <source>Go to the last image in thumbnail view</source>
+        <translation>Ir a última imagen en vista miniatura</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="78"/>
+        <source>Start Slideshow in thumbnail view</source>
+        <translation>Iniciar presentación en vista miniatura</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="80"/>
         <source>Start Random Slideshow in thumbnail view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="77"/>
-        <source>Rotate image right 90 degrees</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="79"/>
-        <source>Rotate image left 90 degrees</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="81"/>
-        <source>Zoom image out</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciar presentación aleatoria en vista miniatura</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="83"/>
-        <source>Zoom image in</source>
-        <translation type="unfinished"></translation>
+        <source>Rotate image right 90 degrees</source>
+        <translation>Rotar imagen 90° CW</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="85"/>
-        <source>Scroll image up</source>
-        <translation type="unfinished"></translation>
+        <source>Rotate image left 90 degrees</source>
+        <translation>Rotar imagen 90° CCW</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="87"/>
-        <source>Scroll image left</source>
-        <translation type="unfinished"></translation>
+        <source>Zoom image out</source>
+        <translation>Alejar la imagen</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="89"/>
-        <source>Scroll image right</source>
-        <translation type="unfinished"></translation>
+        <source>Zoom image in</source>
+        <translation>Acercar la imagen</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="91"/>
-        <source>Scroll image down</source>
-        <translation type="unfinished"></translation>
+        <source>Scroll image up</source>
+        <translation>Desplazar la imagen hacia arriba</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="93"/>
-        <source>Recenter image</source>
-        <translation type="unfinished"></translation>
+        <source>Scroll image left</source>
+        <translation>Desplazar la imagen hacia la izquierda</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="95"/>
-        <source>Full-size (un-zoom) image</source>
-        <translation type="unfinished"></translation>
+        <source>Scroll image right</source>
+        <translation>Desplazar la imagen hacia la derecha</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="97"/>
-        <source>Go to the upper-left corner of the image</source>
-        <translation type="unfinished"></translation>
+        <source>Scroll image down</source>
+        <translation>Desplazar la imagen hacia abajo</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="99"/>
-        <source>Go to the lower-right corner of the image</source>
-        <translation type="unfinished"></translation>
+        <source>Recenter image</source>
+        <translation>Centrar imagen nuevamente</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="101"/>
-        <source>Mark image</source>
-        <translation type="unfinished"></translation>
+        <source>Full-size (un-zoom) image</source>
+        <translation>Imagen a tamaño completo (sin zoom)</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="103"/>
-        <source>Toggle scale to fullscreen/scale to fit</source>
-        <translation type="unfinished"></translation>
+        <source>Go to the upper-left corner of the image</source>
+        <translation>Ir a la esquina superior izquierda de la imagen</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="105"/>
-        <source>MythGallery Media Handler 1/2</source>
-        <translation type="unfinished"></translation>
+        <source>Go to the lower-right corner of the image</source>
+        <translation>Ir a la esquina inferior derecha de la imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="108"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
+        <source>Mark image</source>
+        <translation type="unfinished">Marcar imagen</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="109"/>
+        <source>Toggle scale to fullscreen/scale to fit</source>
+        <translation type="unfinished">Cambiar a pantalla completa/escalar para rellenar</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="111"/>
+        <source>MythGallery Media Handler 1/2</source>
+        <translation>Gestor de medios MythGallery 1/2</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="114"/>
         <source>MythGallery Media Handler 2/2</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestor de medios MythGallery 2/2</translation>
     </message>
 </context>
 <context>
@@ -446,83 +456,113 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="185"/>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes de MythGallery (Presentación)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="215"/>
         <source>MythGallery Settings (General)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes de MythGallery (General)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="39"/>
+        <location filename="../mythgallery/main.cpp" line="45"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythGallery no puede encontrar el directorio de inicio
+%1
+Compruebe que el directorio exista, sea legible y la configuración de MythGallery sea correcta.</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="127"/>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Directorio: </translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="128"/>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Creado: </translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="129"/>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Modificado: </translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="131"/>
         <source>Bytes</source>
-        <translation type="unfinished">Bytes</translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="132"/>
         <source>Width</source>
-        <translation type="unfinished">Ancho</translation>
+        <translation>Ancho</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="133"/>
         <location filename="../mythgallery/thumbview.cpp" line="135"/>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>píxeles</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="134"/>
         <source>Height</source>
-        <translation type="unfinished">Alto</translation>
+        <translation>Alto</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="136"/>
         <source>Pixel Count</source>
-        <translation type="unfinished">Número de Píxels</translation>
+        <translation>Número de píxeles</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="137"/>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>megapíxeles</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="139"/>
         <source>Rotation Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ángulo de rotación</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="140"/>
         <source>degrees</source>
-        <translation type="unfinished">grados</translation>
+        <translation>grados</translation>
     </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="222"/>
+        <location filename="../mythgallery/singleview.cpp" line="220"/>
         <source>Press SELECT to play again</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulse SELECT para reproducir nuevamente</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>%DATE%, %TIME%</source>
+        <translation>%FECHA%, %HORA%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>No images are present in the pictures folder.</source>
+        <translation type="unfinished">No existen imágenes en el directorio de imágenes.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Image Gallery</source>
+        <translation>Galería de imágenes</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>SELECT: View</source>
+        <translation>SELECCIONAR: Vista</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>MENU: Activate Menu</source>
+        <translation>MENU: Activar menú</translation>
     </message>
 </context>
 </TS>
