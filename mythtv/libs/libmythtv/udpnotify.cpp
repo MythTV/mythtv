@@ -155,7 +155,7 @@ void UDPNotify::ParseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
 UDPNotifyOSDSet *UDPNotify::ParseContainer(QDomElement &element)
 {
     QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
+    if (name.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Container needs a name");
         return NULL;
@@ -243,14 +243,14 @@ void UDPNotify::Process(const QByteArray &buf)
         }
 
         QString version = docElem.attribute("version", "");
-        if (version.isNull() || version.isEmpty())
+        if (version.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, "<mythnotify> missing 'version' attribute");
             return;
         }
 
         QString disptime = docElem.attribute("displaytime", "");
-        if (!disptime.isNull() && !disptime.isEmpty())
+        if (!disptime.isEmpty())
             displaytime = disptime.toInt();
     }
 

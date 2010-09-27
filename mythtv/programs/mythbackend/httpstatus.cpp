@@ -1056,7 +1056,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                        << startTs.toString(timeformat) << "-"
                        << endTs.toString(timeformat) << ")<br />";
 
-                    if ( !sSubTitle.isNull() && !sSubTitle.isEmpty())
+                    if (!sSubTitle.isEmpty())
                         os << "<em>" << sSubTitle << "</em><br /><br />";
 
                     os << "Job: " << JobQueue::JobText( nType ) << "<br />";
@@ -1076,7 +1076,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                     if ( nStatus != JOB_QUEUED)
                         os << "Host: " << sHostname << "<br />";
 
-                    if (!sComment.isNull() && !sComment.isEmpty())
+                    if (!sComment.isEmpty())
                         os << "<br />Comments:<br />" << sComment << "<br />";
 
                     os << "</span></a><hr />\r\n";
@@ -1338,7 +1338,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                 os << "    There's <strong>no guide data</strong> available! "
                    << "Have you run mythfilldatabase?";
 
-            if (!sMsg.isNull() && !sMsg.isEmpty())
+            if (!sMsg.isEmpty())
                 os << "<br />\r\n    DataDirect Status: " << sMsg;
         }
     }
