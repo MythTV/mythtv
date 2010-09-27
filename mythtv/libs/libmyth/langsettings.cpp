@@ -87,7 +87,8 @@ void LanguageSelection::Load(void)
         item->SetData(code);
 
          // We have to compare against locale for languages like en_GB
-        if (code == m_language || code == langCode || code == localeCode)
+        if (code.toLower() == m_language.toLower() ||
+            code == langCode || code == localeCode)
             m_languageList->SetItemCurrent(item);
     }
 
