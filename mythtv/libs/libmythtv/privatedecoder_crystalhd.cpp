@@ -356,7 +356,7 @@ bool PrivateDecoderCrystalHD::Reset(void)
     {
         m_fetcher_pause = true;
         int tries = 0;
-        while (!m_fetcher_paused && tries < 50)
+        while (!m_fetcher_paused && (tries++ < 50))
             usleep(10000);
         if (!m_fetcher_paused)
             VERBOSE(VB_IMPORTANT, LOC + "Failed to pause fetcher thread");
