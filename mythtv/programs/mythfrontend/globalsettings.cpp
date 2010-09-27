@@ -3333,9 +3333,9 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     }
 }
 
-static HostComboBox *ISO639PreferredLanguage(uint i)
+static GlobalComboBox *ISO639PreferredLanguage(uint i)
 {
-    HostComboBox *gc = new HostComboBox(QString("ISO639Language%1").arg(i));
+    GlobalComboBox *gc = new GlobalComboBox(QString("ISO639Language%1").arg(i));
     gc->setLabel(QObject::tr("Guide language #%1").arg(i+1));
     // We should try to get language from "MythLanguage"
     // then use code 2 to code 3 map in iso639.h
