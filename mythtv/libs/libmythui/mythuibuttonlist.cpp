@@ -2905,7 +2905,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                     QString value = m_strings.value(key).text;
                     if (!value.isEmpty())
                     {
-                        replacement = QString("%1%2%3")
+                        replacement = QString("%1%2%3%4")
                                                 .arg(regexp.cap(2))
                                                 .arg(regexp.cap(3))
                                                 .arg(m_strings.value(key).text)
