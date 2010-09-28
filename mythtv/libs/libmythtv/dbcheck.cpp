@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/perl/MythTV.pm
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1263";
+const QString currentDatabaseVersion = "1264";
 
 static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
@@ -5487,6 +5487,19 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1263", dbver))
+            return false;
+    }
+
+    if (dbver == "1263")
+    {
+        const char *updates[] = {
+"UPDATE settings SET hostname = NULL WHERE value='ISO639Language0' AND data != 'aar' AND hostname IS NOT NULL LIMIT 1;",
+"UPDATE settings SET hostname = NULL WHERE value='ISO639Language1' AND data != 'aar' AND hostname IS NOT NULL LIMIT 1;",
+"DELETE FROM settings WHERE value='ISO639Language0' AND hostname IS NOT NULL;",
+"DELETE FROM settings WHERE value='ISO639Language1' AND hostname IS NOT NULL;",
+NULL
+};
+        if (!performActualUpdate(updates, "1264", dbver))
             return false;
     }
 
