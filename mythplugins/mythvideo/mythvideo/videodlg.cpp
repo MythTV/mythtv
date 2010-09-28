@@ -1000,6 +1000,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_d = new VideoDialogPrivate(video_list, type, browse);
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
+    m_mainStack = GetMythMainWindow()->GetMainStack();
 
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
@@ -2584,10 +2585,10 @@ void VideoDialog::SettingsMenu()
  */
 void VideoDialog::ShowPlayerSettings()
 {
-    PlayerSettings *ps = new PlayerSettings(m_popupStack, "player settings");
+    PlayerSettings *ps = new PlayerSettings(m_mainStack, "player settings");
 
     if (ps->Create())
-        m_popupStack->AddScreen(ps);
+        m_mainStack->AddScreen(ps);
     else
         delete ps;
 }
@@ -2598,10 +2599,10 @@ void VideoDialog::ShowPlayerSettings()
  */
 void VideoDialog::ShowMetadataSettings()
 {
-    MetadataSettings *ms = new MetadataSettings(m_popupStack, "metadata settings");
+    MetadataSettings *ms = new MetadataSettings(m_mainStack, "metadata settings");
 
     if (ms->Create())
-        m_popupStack->AddScreen(ms);
+        m_mainStack->AddScreen(ms);
     else
         delete ms;
 }
@@ -2612,10 +2613,10 @@ void VideoDialog::ShowMetadataSettings()
  */
 void VideoDialog::ShowExtensionSettings()
 {
-    FileAssocDialog *fa = new FileAssocDialog(m_popupStack, "fa dialog");
+    FileAssocDialog *fa = new FileAssocDialog(m_mainStack, "fa dialog");
 
     if (fa->Create())
-        m_popupStack->AddScreen(fa);
+        m_mainStack->AddScreen(fa);
     else
         delete fa;
 }

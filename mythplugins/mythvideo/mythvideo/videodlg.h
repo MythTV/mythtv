@@ -186,6 +186,7 @@ class VideoDialog : public MythScreenType
     MythDialogBox    *m_menuPopup;
     MythUIBusyDialog *m_busyPopup;
     MythScreenStack  *m_popupStack;
+    MythScreenStack  *m_mainStack;
 
     MythUIButtonList *m_videoButtonList;
     MythUIButtonTree *m_videoButtonTree;
