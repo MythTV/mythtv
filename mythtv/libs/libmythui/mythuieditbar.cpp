@@ -295,3 +295,13 @@ void MythUIEditBar::CreateCopy(MythUIType *parent)
     MythUIEditBar *editbar = new MythUIEditBar(parent, objectName());
     editbar->CopyFrom(this);
 }
+
+/**
+ *  \copydoc MythUIType::Finalize()
+ */
+void MythUIEditBar::Finalize(void)
+{
+    MythUIType *position = GetChild("position");
+    if (position)
+        position->MoveToTop();
+}

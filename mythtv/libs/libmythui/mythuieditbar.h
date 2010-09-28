@@ -31,6 +31,7 @@ class MPUBLIC MythUIEditBar : public MythUIType
   protected:
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
 
   private:
 
