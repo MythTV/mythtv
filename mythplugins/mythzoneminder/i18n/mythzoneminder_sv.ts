@@ -4,27 +4,31 @@
 <context>
     <name>FunctionDialog</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="67"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="67"/>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="41"/>
+        <location filename="../mythzoneminder/main.cpp" line="129"/>
         <source>ZoneMinder Console</source>
-        <translation type="unfinished"></translation>
+        <translation>Övervakningsterminal</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="43"/>
+        <location filename="../mythzoneminder/main.cpp" line="131"/>
         <source>ZoneMinder Live View</source>
-        <translation type="unfinished"></translation>
+        <translation>Direktvisning av övervakning</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/main.cpp" line="45"/>
+        <location filename="../mythzoneminder/main.cpp" line="133"/>
         <source>ZoneMinder Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Övervakningshändelser</translation>
     </message>
 </context>
 <context>
@@ -275,17 +279,17 @@
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Show Console</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa övervakningsterminal</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Show Live View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Direktvisning</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Show Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa händelser</translation>
     </message>
 </context>
 <context>
@@ -304,12 +308,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="209"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="207"/>
         <source>Running</source>
         <translation>Kör</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="214"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="212"/>
         <source>Stopped</source>
         <translation>Stoppad</translation>
     </message>
@@ -317,74 +321,83 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="89"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="88"/>
         <source>Play</source>
         <translation>Visa</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="96"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="95"/>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="172"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="345"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="360"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="171"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="344"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="359"/>
         <source>All Cameras</source>
         <translation>Alla kameror</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="175"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="174"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="368"/>
         <source>All Dates</source>
         <translation>Alla datum</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="445"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="444"/>
         <source>Refresh</source>
         <translation>Uppdatera</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="446"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="445"/>
         <source>Change View</source>
         <translation>Ändra vy</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="447"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="446"/>
         <source>Delete All</source>
         <translation>Ta bort alla</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="458"/>
         <source>Delete All Events?</source>
         <translation>Ta bort alla händelser?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="460"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="459"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Tar bort %1 händelser i vyn.</translation>
     </message>
 </context>
 <context>
+    <name>ZMLivePlayer</name>
+    <message>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="127"/>
+        <source>Can&apos;t show live view.
+You don&apos;t have any monitors defined!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="105"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="106"/>
         <location filename="../mythzoneminder/zmplayer.cpp" line="288"/>
         <source>Pause</source>
         <translation>Paus</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="111"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="112"/>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="117"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="118"/>
         <source>Previous</source>
         <translation>Föregående</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="123"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="124"/>
         <source>Next</source>
         <translation>Nästa</translation>
     </message>
