@@ -175,7 +175,7 @@ static void dvd_read_name(char *name, char *serial, const char *device) {
     /* Read DVD name */
     fd = mythfile_open(device, O_RDONLY);
     if (fd > 0) {
-      off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
+      off = mythfile_seek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
       if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
         off = mythfile_read( fd, data, DVD_VIDEO_LB_LEN );
         if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
