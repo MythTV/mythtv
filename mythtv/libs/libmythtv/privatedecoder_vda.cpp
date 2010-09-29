@@ -111,7 +111,7 @@ void PrivateDecoderVDA::GetDecoders(render_opts &opts)
 
 PrivateDecoderVDA::PrivateDecoderVDA()
   : PrivateDecoder(), m_lib(NULL), m_decoder(NULL), m_size(QSize()),
-    m_frame_lock(QMutex::Recursive), m_num_ref_frames(0),
+    m_frame_lock(QMutex::Recursive), m_frames_decoded(0), m_num_ref_frames(0),
     m_annexb(false), m_slice_count(0)
 {        
 }
@@ -252,6 +252,7 @@ bool PrivateDecoderVDA::Reset(void)
     if (m_lib && m_decoder)
         m_lib->decoderFlush((VDADecoder)m_decoder, 0 /*dont emit*/);
 
+    m_frames_decoded = 0;
     m_frame_lock.lock();
     while (!m_decoded_frames.empty())
         PopDecodedFrame();
@@ -268,56 +269,72 @@ void PrivateDecoderVDA::PopDecodedFrame(void)
     m_decoded_frames.removeLast();
 }
 
+bool PrivateDecoderVDA::HasBufferedFrames(void)
+{
+    m_frame_lock.lock();
+    bool result = m_decoded_frames.size() > 0;
+    m_frame_lock.unlock();
+    return result;
+}
+
 int  PrivateDecoderVDA::GetFrame(AVStream *stream,
                                  AVFrame *picture,
                                  int *got_picture_ptr,
                                  AVPacket *pkt)
 {
-    CocoaAutoReleasePool pool;        
-    if (!m_lib || !stream || !pkt)
-        return -1;
+    if (!pkt)
+        
+    CocoaAutoReleasePool pool;
+    int result = -1;
+    if (!m_lib || !stream)
+        return result;
 
     AVCodecContext *avctx = stream->codec;
     if (!avctx)
-        return -1;
+        return result;
 
-    CFDataRef data;
-    CFDictionaryRef params;
-    if (m_annexb)
+    if (pkt)
     {
-        if (!RewritePacket(pkt->data, pkt->size, data))
-            return pkt->size;
+        CFDataRef data;
+        CFDictionaryRef params;
+        if (m_annexb)
+        {
+            if (!RewritePacket(pkt->data, pkt->size, data))
+                return -1;
+        }
+        else
+            data = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
+
+        CFStringRef keys[5] = { CFSTR("FRAME_DTS"), CFSTR("FRAME_PTS"),
+                                CFSTR("FRAME_INTERLACED"), CFSTR("FRAME_TFF"),
+                                CFSTR("FRAME_REPEAT") };
+        CFNumberRef values[5];
+        values[0] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
+                                   &pkt->dts);
+        values[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
+                                   &pkt->pts);
+        values[2] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+                                   &picture->interlaced_frame);
+        values[3] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+                                   &picture->top_field_first);
+        values[4] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+                                   &picture->repeat_pict);
+        params = CFDictionaryCreate(kCFAllocatorDefault, (const void **)&keys,
+                                    (const void **)&values, 5,
+                                    &kCFTypeDictionaryKeyCallBacks,
+                                    &kCFTypeDictionaryValueCallBacks);
+
+        INIT_ST
+        vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, data, params);
+        CHECK_ST
+        if (vda_st == kVDADecoderNoErr)
+            result = pkt->size;
+        CFRelease(data);
+        CFRelease(params);
     }
-    else
-        data = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
 
-    CFStringRef keys[5] = { CFSTR("FRAME_DTS"), CFSTR("FRAME_PTS"),
-                            CFSTR("FRAME_INTERLACED"), CFSTR("FRAME_TFF"),
-                            CFSTR("FRAME_REPEAT") };
-    CFNumberRef values[5];
-    values[0] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
-                               &pkt->dts);
-    values[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
-                               &pkt->pts);
-    values[2] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
-                               &picture->interlaced_frame);
-    values[3] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
-                               &picture->top_field_first);
-    values[4] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
-                               &picture->repeat_pict);
-    params = CFDictionaryCreate(kCFAllocatorDefault, (const void **)&keys,
-                                (const void **)&values, 5,
-                                &kCFTypeDictionaryKeyCallBacks,
-                                &kCFTypeDictionaryValueCallBacks);
-
-    INIT_ST
-    vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, data, params);
-    CHECK_ST
-    CFRelease(data);
-    CFRelease(params);
-
-    if (m_decoded_frames.size() <= m_num_ref_frames)
-        return pkt->size;
+    if (m_decoded_frames.size() < m_num_ref_frames)
+        return result;
 
     *got_picture_ptr = 1;
     m_frame_lock.lock();
@@ -362,7 +379,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     }
 
     CVPixelBufferRelease(vdaframe.buffer);
-    return pkt->size;
+    return result;
 }
 
 void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
@@ -471,6 +488,7 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         if (!found)
             i = decoder->m_decoded_frames.size();
         decoder->m_decoded_frames.insert(i, frame);
+        decoder->m_frames_decoded++;
     }
 }
 

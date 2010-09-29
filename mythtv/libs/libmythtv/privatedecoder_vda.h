@@ -62,6 +62,7 @@ class PrivateDecoderVDA : public PrivateDecoder
                           AVFrame *picture,
                           int *got_picture_ptr,
                           AVPacket *pkt);
+    virtual bool HasBufferedFrames(void);
 
     static void VDADecoderCallback(void *decompressionOutputRefCon,
                                    CFDictionaryRef frameInfo,
@@ -78,6 +79,7 @@ class PrivateDecoderVDA : public PrivateDecoder
     VDADecoder     *m_decoder;
     QSize           m_size;
     QMutex          m_frame_lock;
+    int32_t         m_frames_decoded;
     int32_t         m_num_ref_frames;
     QList<VDAFrame> m_decoded_frames;
     bool            m_annexb;
