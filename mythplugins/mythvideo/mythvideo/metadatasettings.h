@@ -30,8 +30,6 @@ class MetadataSettings : public MythScreenType
   private:
     MythUISpinBox      *m_trailerSpin;
 
-    MythUIText         *m_helpText;
-
     MythUICheckBox     *m_unknownFileCheck;
     MythUICheckBox     *m_autoMetaUpdateCheck;
     MythUICheckBox     *m_treeLoadsMetaCheck;
@@ -42,7 +40,6 @@ class MetadataSettings : public MythScreenType
 
   private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
     void toggleTrailers(void);
 };
 
