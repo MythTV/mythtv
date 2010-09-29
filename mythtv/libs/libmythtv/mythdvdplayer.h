@@ -9,7 +9,6 @@ class MythDVDPlayer : public MythPlayer
 {
   public:
     MythDVDPlayer(bool muted = false);
-    virtual int  OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     virtual void DisableCaptions(uint mode, bool osd_msg=true);

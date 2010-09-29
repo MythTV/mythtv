@@ -26,14 +26,6 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                         !player_ctx->buffer->InDVDMenuOrStillFrame());
 }
 
-int MythDVDPlayer::OpenFile(uint retries, bool allow_libmpeg2)
-{
-    MythPlayer::OpenFile(retries, allow_libmpeg2);
-    if (player_ctx->buffer->isDVD())
-        player_ctx->buffer->DVD()->JumpToTitle(true);
-    return IsErrored() ? -1 : 0;
-}
-
 void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
     if ((kDisplayAVSubtitle & mode) && player_ctx->buffer->isDVD())
@@ -238,8 +230,6 @@ uint64_t MythDVDPlayer::GetBookmark(void) const
     QString name;
     QString serialid;
     long long frames = 0;
-    bool delbookmark, jumptotitle;
-    delbookmark = jumptotitle = player_ctx->buffer->DVD()->JumpToTitle();
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
     {
@@ -249,23 +239,20 @@ uint64_t MythDVDPlayer::GetBookmark(void) const
             return 0;
         }
         dvdbookmark = player_ctx->playingInfo->QueryDVDBookmark(serialid,
-                                                                !delbookmark);
+                                                                false);
         if (!dvdbookmark.empty())
         {
             QStringList::Iterator it = dvdbookmark.begin();
             int title = (*it).toInt();
             frames = (long long)((*++it).toLongLong() & 0xffffffffLL);
-            if (jumptotitle)
-            {
-                player_ctx->buffer->DVD()->PlayTitleAndPart(title, 1);
-                int audiotrack    = (*++it).toInt();
-                int subtitletrack = (*++it).toInt();
-                player_ctx->buffer->DVD()->SetTrack(
-                    kTrackTypeAudio, audiotrack);
-                player_ctx->buffer->DVD()->SetTrack(
-                    kTrackTypeSubtitle, subtitletrack);
-                player_ctx->buffer->DVD()->JumpToTitle(false);
-            }
+            player_ctx->buffer->DVD()->PlayTitleAndPart(title, 1);
+            int audiotrack    = (*++it).toInt();
+            int subtitletrack = (*++it).toInt();
+            player_ctx->buffer->DVD()->SetTrack(kTrackTypeAudio, audiotrack);
+            player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle, subtitletrack);
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("Get Bookmark: title %1 audiotrack %2 subtrack %3 frame %4")
+                .arg(title).arg(audiotrack).arg(subtitletrack).arg(frames));
         }
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
@@ -429,6 +416,7 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
 {
     if (!player_ctx->buffer->isDVD())
         return;
+
     uint64_t framenum = frame;
     QStringList fields;
     QString name;
@@ -438,7 +426,12 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
     int audiotrack = -1;
     int subtitletrack = -1;
     if (!player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DVD has no name and serial number. "
+                        "Cannot set bookmark."));
         return;
+    }
 
     if (!player_ctx->buffer->InDVDMenuOrStillFrame() &&
         player_ctx->buffer->DVD()->GetTotalTimeOfTitle() > 120 && frame > 0)
@@ -464,6 +457,9 @@ void MythDVDPlayer::SetDVDBookmark(uint64_t frame)
         fields += QString("%1").arg(subtitletrack);
         fields += QString("%1").arg(framenum);
         player_ctx->playingInfo->SaveDVDBookmark(fields);
+        VERBOSE(VB_PLAYBACK, LOC +
+            QString("Set Bookmark: title %1 audiotrack %2 subtrack %3 frame %4")
+            .arg(title).arg(audiotrack).arg(subtitletrack).arg(framenum));
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }

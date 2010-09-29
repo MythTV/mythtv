@@ -67,7 +67,6 @@ class MPUBLIC DVDRingBufferPriv
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
                          const uint8_t * buf, int buf_size);
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
-    bool JumpToTitle(void) { return m_jumptotitle; }
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (m_part == 0); }
     bool EndOfTitle(void)   { return    ((!m_titleParts) ||
@@ -107,7 +106,6 @@ class MPUBLIC DVDRingBufferPriv
     void  SetTrack(uint type, int trackNo);
     int   GetTrack(uint type);
     uint8_t GetNumAudioChannels(int id);
-    void JumpToTitle(bool change) { m_jumptotitle = change; }
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);
     bool SwitchAngle(uint angle);
@@ -163,7 +161,6 @@ class MPUBLIC DVDRingBufferPriv
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
     bool           m_autoselectsubtitle;
-    bool           m_jumptotitle;
     long long      m_seekpos;
     int            m_seekwhence;
     const char    *m_dvdname;

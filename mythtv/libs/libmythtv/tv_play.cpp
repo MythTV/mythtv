@@ -4447,9 +4447,6 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
     {
         if (!islivetv || !CommitQueuedInput(ctx))
         {
-            if (isDVD && ctx->buffer && ctx->buffer->DVD())
-                ctx->buffer->DVD()->JumpToTitle(false);
-
             ctx->LockDeletePlayer(__FILE__, __LINE__);
             if (ctx->player)
             {

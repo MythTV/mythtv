@@ -54,7 +54,6 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_menupktpts(0), m_curAudioTrack(0),
       m_curSubtitleTrack(0),
       m_autoselectsubtitle(true),
-      m_jumptotitle(true),
       m_seekpos(0), m_seekwhence(0),
       m_dvdname(NULL), m_serialnumber(NULL),
       m_seeking(false), m_seektime(0),
@@ -228,7 +227,6 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         return true;
     }
 }
-
 
 void DVDRingBufferPriv::StartFromBeginning(void)
 {
