@@ -67,7 +67,7 @@
             <area>150,96,1095,105</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
@@ -191,7 +191,7 @@
             <area>150,96,1095,105</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
@@ -316,76 +316,81 @@
     </window>
 
     <window name="osd_program_editor">
-        <fontdef name="small" face="DejaVu Sans">
-            <pixelsize>22</pixelsize>
-            <color>#FFFFFF</color>
-            <shadowoffset>1,1</shadowoffset>
-            <shadowcolor>#000000</shadowcolor>
-        </fontdef>
-        <area>100,580,1080,90</area>
+        <area>0,625,1280,75</area>
+
+        <imagetype name="background">
+            <area>0,0,1280,75</area>
+            <filename>osd/editorbackground.png</filename>
+        </imagetype>
+<!--
         <shape name="background">
-            <area>0,0,100%,100%</area>
-            <type>roundbox</type>
-            <fill color="#000000" alpha="200" />
-            <line color="#222222" alpha="255" width="2" />
-            <cornerradius>12</cornerradius>
-        </shape>
-        <textarea name="title">
-            <area>10,10,600,30</area>
-            <align>left,top</align>
-            <font>small</font>
-        </textarea>
-        <textarea name="seekamount" from="title">
-            <area>770,10,300,30</area>
-            <align>right,top</align>
-        </textarea>
-        <textarea name="timedisplay" from="title">
-            <area>10,50,1060,30</area>
-            <align>hcenter,bottom</align>
-        </textarea>
-        <textarea name="cutindicator" from="title">
-            <area>10,50,300,30</area>
-            <align>left,bottom</align>
-        </textarea>
-        <textarea name="framedisplay" from="title">
-            <area>770,50,300,30</area>
-            <align>right,bottom</align>
-        </textarea>
+            <area>-8,0,1296,100%</area>
+            <fill color="#484537" alpha="210" />
+            <line color="#a7ac93" alpha="255" width="6" />
+        </shape>-->
+
         <editbar name="editbar">
-            <area>10,30,1060,30</area>
-            <shape name="position">
-                <area>0,0,8,100%</area>
-                <fill color="#FFFFFF" alpha="255" />
-            </shape>
+            <area>42,11,1196,25</area>
             <shape name="keep">
-                <area>0,11,100%,8</area>
-                <fill color="#00FF00" alpha="255" />
+                <area>0,7,100%,11</area>
+                <fill color="#00AA00" />
+                <line color="#009900" width="1" />
                 <type>roundbox</type>
-                <cornerradius>6</cornerradius>
+                <cornerradius>10</cornerradius>
             </shape>
             <shape name="cut">
-                <area>0,11,100%,8</area>
-                <fill color="#FF0000" alpha="255" />
+                <area>0,7,100%,11</area>
+                <fill color="#AA0000" />
+                <line color="#990000" width="1" />
                 <type>roundbox</type>
-                <cornerradius>6</cornerradius>
+                <cornerradius>10</cornerradius>
             </shape>
             <shape name="cuttoright">
-                <area>0,5,4,20</area>
-                <fill color="#FF0000" alpha="255" />
+                <area>0,0,5,25</area>
+                <fill color="#AA0000" />
+                <type>roundbox</type>
+                <cornerradius>2</cornerradius>
             </shape>
-            <shape name="cuttoleft">
-                <area>0,5,4,20</area>
-                <fill color="#FF0000" alpha="255" />
-            </shape>
+            <shape name="cuttoleft" from="cuttoright" />
             <shape name="keeptoright">
-                <area>0,5,4,20</area>
-                <fill color="#00FF00" alpha="255" />
+                <area>0,0,5,25</area>
+                <fill color="#00AA00" />
+                <type>roundbox</type>
+                <cornerradius>2</cornerradius>
             </shape>
-            <shape name="keeptoleft">
-                <area>0,5,4,20</area>
-                <fill color="#00FF00" alpha="255" />
+            <shape name="keeptoleft" from="keeptoright" />
+            <shape name="position">
+                <area>0,0,6,25</area>
+                <fill color="#000000" />
+                <type>roundbox</type>
+                <cornerradius>3</cornerradius>
             </shape>
         </editbar>
+
+<!--        <imagetype name="overlay">
+            <area>42,108,1196,16</area>
+            <filename>popups/progress_bar_overlay.png</filename>
+        </imagetype>-->
+
+        <textarea name="heading">
+            <area>50,35,200,30</area>
+            <font>basemedium</font>
+            <value>Video Editor</value>
+        </textarea>
+
+        <textarea name="timedisplay">
+            <area>540,38,200,30</area>
+            <font>basesmall</font>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="seekamount">
+            <area>935,38,300,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+            <template>Move by %1</template>
+        </textarea>
+
     </window>
 
     <window name="MythPopupBox">
@@ -439,6 +444,139 @@
                 </state>
             </statetype>
         </buttonlist>
+    </window>
+
+    <window name="osd_input">
+        <area>40,40,160,60</area>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#484537" alpha="210" />
+            <line color="#a7ac93" alpha="255" width="6" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="osd_number_entry">
+            <font>baselarge</font>
+            <area>10,10,140,40</area>
+            <align>allcenter</align>
+        </textarea>
+    </window>
+
+    <window name="ChannelEditor">
+        <area>-1,-1,814,555</area>
+
+        <imagetype name="backimg">
+            <area>0,0,814,555</area>
+            <filename>popups/edit_background.png</filename>
+        </imagetype>
+
+        <textarea name="title">
+            <area>15,30,774,90</area>
+            <value>Video List Filters</value>
+            <align>allcenter</align>
+            <font>basemedium</font>
+            <value>Channel Editor</value>
+        </textarea>
+
+        <textarea name="channum_label">
+            <area>20,200,270,30</area>
+            <value>Channel Number</value>
+            <font>basemedium</font>
+            <align>right</align>
+        </textarea>
+
+        <textedit name="channum">
+            <area>300,190,437,45</area>
+            <statetype name="background">
+                <area>0,0,100%,100%</area>
+                <state name="active">
+                    <area>0,0,100%,100%</area>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <type>roundbox</type>
+                        <cornerradius>8</cornerradius>
+                        <fill color="#e6e6e6" />
+                        <line color="#a7ac93" width="3" />
+                    </shape>
+                </state>
+                <state name="selected" from="active">
+                <shape name="background">
+                        <fill color="#f9f9f9" />
+                    </shape>
+                </state>
+                <state name="inactive" from="active"/>
+            </statetype>
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <area>8,10,421,35</area>
+                <font>basemediumbrown</font>
+            </textarea>
+        </textedit>
+
+        <textarea name="name_label" from="channum_label">
+            <position>20,260</position>
+            <value>Channel Name</value>
+        </textarea>
+
+        <textedit name="channame" from="channum">
+            <position>300,250</position>
+        </textedit>
+
+        <textarea name="callsign_label" from="channum_label">
+            <position>20,320</position>
+            <value>Callsign</value>
+        </textarea>
+
+        <textedit name="callsign" from="channum">
+            <position>300,310</position>
+        </textedit>
+
+        <textarea name="xmltv_label" from="channum_label">
+            <position>20,380</position>
+            <value>XMLTV ID</value>
+        </textarea>
+
+        <textedit name="XMLTV" from="channum">
+            <position>300,370</position>
+        </textedit>
+
+        <button name="probe">
+            <area>130,475,223,53</area>
+            <value>Probe</value>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>controls/button.png</filename>
+                    </imagetype>
+                    <textarea name="text">
+                        <area>5,5,213,43</area>
+                        <font>baselarge</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <textarea name="text">
+                        <font>baselargebrown</font>
+                    </textarea>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="selected">
+                    <imagetype name="background">
+                        <filename>controls/button_pushed.png</filename>
+                    </imagetype>
+                    <textarea name="text">
+                        <position>8,8</position>
+                    </textarea>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="ok" from="probe">
+            <position>460,475</position>
+            <value>OK</value>
+        </button>
     </window>
 
 </mythuitheme>

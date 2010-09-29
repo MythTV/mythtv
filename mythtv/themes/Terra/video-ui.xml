@@ -154,7 +154,7 @@
 
         <imagetype name="backimg">
             <position>236,40</position>
-            <filename>video/filters_background.png</filename>
+            <filename>popups/edit_background.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
@@ -1349,6 +1349,88 @@
         <button name="play_button" from="basebutton">
             <position>693,495</position>
             <value>Play</value>
+        </button>
+
+    </window>
+
+    <window name="metadatasettings">
+        <area>0,42,1280,555</area>
+
+        <shape name="fade" from="basefadebackground" />
+
+        <imagetype name="backimg">
+            <position>236,40</position>
+            <filename>popups/edit_background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>251,70,774,90</area>
+            <value>Video Metadata Settings</value>
+            <align>hcenter,vcenter</align>
+            <font>basemedium</font>
+        </textarea>
+
+<!--        <textarea name="helptext" from="title">
+            <area>251,120,1100,280</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>allcenter</align>
+        </textarea>--> <!-- May re-enable when I've come up with a suitable layout -->
+
+        <checkbox name="autometaupdatecheck" from="basecheckbox">
+            <position>435,207</position>
+        </checkbox>
+
+        <textarea name="autometacheck_text" from="basetextarea">
+            <area>475,205,500,30</area>
+            <value>Perform metadata update after video scan</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <checkbox name="unknownfilecheck" from="basecheckbox">
+            <position>435,267</position>
+        </checkbox>
+
+        <textarea name="unknownfilecheck_text" from="basetextarea">
+            <area>475,265,400,30</area>
+            <value>Display unknown file types</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <checkbox name="treeloadsmetacheck" from="basecheckbox">
+            <position>435,327</position>
+        </checkbox>
+
+        <textarea name="treeloadsmetacheck_text" from="basetextarea">
+            <area>475,325,400,30</area>
+            <value>Enable metadata in file browse mode</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <checkbox name="randomtrailercheck" from="basecheckbox">
+            <position>435,392</position>
+        </checkbox>
+
+        <textarea name="trailercheck_text" from="basetextarea">
+            <area>475,390,400,30</area>
+            <value>Enable random trailer playback</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <spinbox name="trailernum" from="basemediumspinbox">
+            <position>435,450</position>
+            <template type="zero">Play %n trailer(s)</template>
+            <template type="positive">Play %n trailer(s)</template>
+        </spinbox>
+
+        <button name="cancel" from="basebutton">
+            <position>363,520</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>693,520</position>
+            <value>OK</value>
         </button>
 
     </window>

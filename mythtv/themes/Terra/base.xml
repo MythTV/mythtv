@@ -136,7 +136,7 @@
 
     <!-- Base definition of a button -->
     <button name="basebutton">
-        <position>0,0</position>
+        <area>0,0,223,53</area>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="background">
@@ -167,7 +167,7 @@
 
     <!-- Base definition of a button -->
     <button name="basewidebutton">
-        <position>0,0</position>
+        <area>0,0,367,53</area>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="buttonbackground">
@@ -180,10 +180,6 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <imagetype name="selecteditemarrow">
-                    <position>5,16</position>
-                    <filename>popups/selected_item_arrow.png</filename>
-                </imagetype>
                 <textarea name="text">
                     <font>basemediumbrown</font>
                 </textarea>
@@ -244,7 +240,7 @@
         </statetype>
     </checkbox>
 
-    <!-- Base definition of a spinbox -->
+    <!-- Base definition of a spinbox in a small configuration -->
     <spinbox name="basespinbox">
         <area>0,0,108,35</area>
         <layout>horizontal</layout>
@@ -295,7 +291,31 @@
         </statetype>
     </spinbox>
 
-    <!-- Base definition of a spinbox in wide configuration -->
+    <!-- Base definition of a spinbox in medium sized configuration -->
+    <spinbox name="basemediumspinbox" from="basespinbox">
+        <area>0,0,401,35</area>
+        <buttonarea>18,0,363,100%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,363,35</area>
+                <textarea name="buttontext">
+                    <area>5,4,353,30</area>
+                    <align>allcenter</align>
+                </textarea>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+                </shape>
+            </state>
+            <state name="selectedinactive" from="active" />
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>380,0</position>
+        </statetype>
+    </spinbox>
+
+    <!-- Base definition of a spinbox in very wide configuration -->
     <spinbox name="basewidespinbox" from="basespinbox">
         <area>0,0,601,35</area>
         <buttonarea>18,0,563,100%</buttonarea>

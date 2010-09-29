@@ -345,7 +345,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1168,7 +1168,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1325,7 +1325,7 @@
             <area>48,527,1190,100</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="year" from="basetextarea">
@@ -1424,7 +1424,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1535,7 +1535,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1654,7 +1654,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1766,7 +1766,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1957,7 +1957,7 @@
         <textarea name="description" from="basetextarea">
             <area>48,117,1190,145</area>
             <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <template>%"|SUBTITLE|" %%DESCRIPTION%</template>
             <align>vcenter</align>
         </textarea>
 
@@ -1982,5 +1982,212 @@
         </textarea>
 
     </window>-->
+
+    <window name="managerecrules">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Recording Rules</value>
+        </textarea>
+
+        <shape name="titlecolumn">
+            <area>30,111,355,300</area>
+            <fill color="#767662" alpha="150" />
+        </shape>
+
+        <shape name="typecolumn" from="titlecolumn">
+            <area>420,111,200,300</area>
+        </shape>
+
+        <shape name="channelcolumn" from="typecolumn">
+            <position>650,111</position>
+        </shape>
+
+        <shape name="lastrecordedcolumn" from="typecolumn">
+            <area>880,111,270,300</area>
+        </shape>
+
+        <shape name="prioritycolumn" from="titlecolumn">
+            <area>1180,111,40,300</area>
+        </shape>
+
+        <buttonlist name="programs">
+            <area>0,111,1280,310</area>
+            <spacing>0</spacing>
+            <buttonarea>0,0,1280,300</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <shape name="background" />
+                    <statetype name="status">
+                        <position>4,0</position>
+                        <state name="disabled">
+                            <shape name="status">
+                                <area>0,0,20,30</area>
+                                <fill color="#9e9e9e" />
+                            </shape>
+                        </state>
+                        <state name="error" from="disabled">
+                            <shape name="status">
+                                <fill color="#e43e3e" />
+                            </shape>
+                        </state>
+                        <state name="warning" from="disabled">
+                            <shape name="status">
+                                <fill color="#ff9147" />
+                            </shape>
+                        </state>
+                        <state name="normal" from="disabled">
+                            <shape name="status">
+                                <fill color="#066aff" />
+                            </shape>
+                        </state>
+                        <state name="running" from="disabled">
+                            <shape name="status">
+                                <fill color="#33bf33" />
+                            </shape>
+                        </state>
+                    </statetype>
+                    <textarea name="title" from="basetextarea">
+                        <area>40,2,355,28</area>
+                        <align>vcenter</align>
+                    </textarea>
+                    <textarea name="rectype" from="title">
+                        <area>420,2,200,28</area>
+                        <align>allcenter</align>
+                    </textarea>
+                    <textarea name="channame" from="rectype">
+                        <area>640,2,200,28</area>
+                        <value>-</value>
+                    </textarea>
+                    <textarea name="lastrecorded" from="rectype">
+                        <area>880,2,270,28</area>
+                        <value>-</value>
+                    </textarea>
+                    <textarea name="progpriority" from="rectype">
+                        <area>1180,2,40,28</area>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background">
+                        <area>21,0,1218,32</area>
+                        <type>roundbox</type>
+                        <fill color="#92947E" alpha="215" />
+                        <line color="#a7ac93" width="4" />
+                    </shape>
+                    <textarea name="title">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="rectype">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="progpriority">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="channame">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="finalpriority">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>1250,0</position>
+                <state type="full">
+                    <imagetype name="up">
+                        <filename>shared/list_up_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1250,274</position>
+                <state type="full">
+                    <imagetype name="down">
+                        <filename>shared/list_down_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="listframe">
+            <position>0,65</position>
+            <filename>schedule/generic_list_frame.png</filename>
+        </imagetype>
+
+        <textarea name="titlelabel" from="basetextarea">
+            <area>50,77,120,40</area>
+            <align>left</align>
+            <value>Title</value>
+        </textarea>
+
+        <textarea name="typelabel" from="titlelabel">
+            <area>420,77,200,40</area>
+            <align>hcenter</align>
+            <value>Type</value>
+        </textarea>
+
+        <textarea name="channellabel" from="typelabel">
+            <position>640,77</position>
+            <value>Channel</value>
+        </textarea>
+
+        <textarea name="lastreclabel" from="typelabel">
+            <area>880,77,270,40</area>
+            <value>Last Recorded</value>
+        </textarea>
+
+        <textarea name="prioritylabel" from="typelabel">
+            <area>1150,77,100,40</area>
+            <value>Priority</value>
+        </textarea>
+
+        <shape name="textbackground" from="basetextbackground">
+            <position>30,433</position>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>48,438,810,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="scheduleinfo" from="basetextarea">
+            <area>880,447,340,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="recordinggrouplabel" from="basetextarea">
+            <area>30,530,190,30</area>
+            <value>Recording Group:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="recordinggroup" from="basetextarea">
+            <area>230,530,160,30</area>
+        </textarea>
+
+        <textarea name="recprofilelabel" from="recordinggrouplabel">
+            <position>30,560</position>
+            <value>Recording Profile:</value>
+        </textarea>
+
+        <textarea name="recordingprofile" from="recordinggroup">
+            <position>230,560</position>
+        </textarea>
+
+        <textarea name="storagegrouplabel" from="recordinggrouplabel">
+            <position>30,590</position>
+            <value>Storage Group:</value>
+        </textarea>
+
+        <textarea name="storagegroup" from="recordinggroup">
+            <position>230,590</position>
+        </textarea>
+
+
+    </window>
 
 </mythuitheme>
