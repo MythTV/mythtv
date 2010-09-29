@@ -18,7 +18,7 @@ PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
       m_defaultPlayerEdit(NULL),     m_dvdPlayerEdit(NULL),
       m_dvdDriveEdit(NULL),          m_vcdPlayerEdit(NULL),
       m_vcdDriveEdit(NULL),          m_altPlayerEdit(NULL),
-      m_helpText(NULL),              m_altCheck(NULL),
+      m_altCheck(NULL),
       m_okButton(NULL),              m_cancelButton(NULL)
 {
 }
@@ -40,7 +40,6 @@ bool PlayerSettings::Create()
     m_vcdDriveEdit = dynamic_cast<MythUITextEdit *> (GetChild("vcddrive"));
     m_altPlayerEdit = dynamic_cast<MythUITextEdit *> (GetChild("altplayer"));
 
-    m_helpText = dynamic_cast<MythUIText *> (GetChild("helptext"));
     m_altCheck = dynamic_cast<MythUICheckBox *> (GetChild("altcheck"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
@@ -81,14 +80,35 @@ bool PlayerSettings::Create()
 
     connect(m_altCheck, SIGNAL(valueChanged()), SLOT(toggleAlt()));
 
-    connect(m_defaultPlayerEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_dvdPlayerEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_dvdDriveEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_vcdPlayerEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_vcdDriveEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_altPlayerEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_okButton,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
-    connect(m_cancelButton, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    m_defaultPlayerEdit->SetHelpText(
+                 tr("This is the command used for any file "
+                 "whose extension is not specifically defined. "
+                 "You may also enter the name of one of the playback "
+                 "plugins such as 'Internal'."));
+    m_dvdPlayerEdit->SetHelpText(
+                 tr("This can be any command to launch a DVD "
+                 " player. Internal is the default.  For other players, %d "
+                 "will be substituted for the DVD device (e.g. /dev/dvd)."));
+    m_dvdDriveEdit->SetHelpText(
+                    tr("This device must exist, and the user "
+                    "playing the DVD needs to have read permission "
+                    "on the device.  'default' will let the "
+                    "MediaMonitor choose a device."));
+    m_vcdPlayerEdit->SetHelpText(
+               tr("This can be any command to launch a VCD "
+               "player. The Internal player will not play VCDs. "
+               "%d will be substituted for the VCD device (e.g. /dev/cdrom)."));
+    m_vcdDriveEdit->SetHelpText(
+                    tr("This device must exist, and the user "
+                    "playing the VCD needs to have read permission "
+                    "on the device.  'default' will let the "
+                    "MediaMonitor choose a device."));
+    m_altPlayerEdit->SetHelpText(
+                 tr("If for some reason the default player "
+                 "doesn't play a video, you can play it in an alternate "
+                 "player by selecting 'Play in Alternate Player.'"));
+    m_cancelButton->SetHelpText(tr("Exit without saving settings"));
+    m_okButton->SetHelpText(tr("Save settings and Exit"));
 
     BuildFocusList();
 
@@ -129,47 +149,6 @@ bool PlayerSettings::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
-}
-
-void PlayerSettings::slotFocusChanged(void)
-{
-    if (!m_helpText)
-        return;
-
-    QString msg = "";
-    if (GetFocusWidget() == m_defaultPlayerEdit)
-        msg = tr("This is the command used for any file "
-                 "whose extension is not specifically defined. "
-                 "You may also enter the name of one of the playback "
-                 "plugins such as 'Internal'.");
-    else if (GetFocusWidget() == m_dvdPlayerEdit)
-        msg = tr("This can be any command to launch a DVD "
-                 " player. Internal is the default.  For other players, %d "
-                 "will be substituted for the DVD device (e.g. /dev/dvd).");
-    else if (GetFocusWidget() == m_dvdDriveEdit)
-        msg = tr("This device must exist, and the user "
-                    "playing the DVD needs to have read permission "
-                    "on the device.  'default' will let the "
-                    "MediaMonitor choose a device.");
-    else if (GetFocusWidget() == m_vcdPlayerEdit)
-        msg = tr("This can be any command to launch a VCD "
-                 "player. The Internal player will not play VCDs. "
-                 "%d will be substituted for the VCD device (e.g. /dev/cdrom).");
-    else if (GetFocusWidget() == m_vcdDriveEdit)
-        msg = tr("This device must exist, and the user "   
-                    "playing the VCD needs to have read permission "
-                    "on the device.  'default' will let the "
-                    "MediaMonitor choose a device.");
-    else if (GetFocusWidget() == m_altPlayerEdit)
-        msg = tr("If for some reason the default player "
-                 "doesn't play a video, you can play it in an alternate "
-                 "player by selecting 'Play in Alternate Player.'");
-    else if (GetFocusWidget() == m_cancelButton)
-        msg = tr("Exit without saving settings");
-    else if (GetFocusWidget() == m_okButton)
-        msg = tr("Save settings and Exit");
-
-    m_helpText->SetText(msg);
 }
 
 void PlayerSettings::toggleAlt()

@@ -33,8 +33,6 @@ class PlayerSettings : public MythScreenType
     MythUITextEdit   *m_vcdDriveEdit;
     MythUITextEdit   *m_altPlayerEdit;
 
-    MythUIText       *m_helpText;
-
     MythUICheckBox   *m_altCheck;
 
     MythUIButton     *m_okButton;
@@ -42,7 +40,6 @@ class PlayerSettings : public MythScreenType
 
   private slots:
     void slotSave(void);
-    void slotFocusChanged(void);
     void toggleAlt(void);
 };
 
