@@ -581,7 +581,6 @@ bool PrivateDecoderVDA::RewritePacket(uint8_t *data, int len,
         const uint8_t* this_end = next;
         if (this_end != end)
         {
-            this_end--;
             while (((this_end - data) > 4) && *(this_end - 5) == 0)
                 this_end--;
             this_end -= 4;
