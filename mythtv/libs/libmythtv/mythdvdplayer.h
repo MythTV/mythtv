@@ -18,6 +18,7 @@ class MythDVDPlayer : public MythPlayer
     virtual bool JumpToFrame(uint64_t frame);
     virtual void EventStart(void);
     virtual void EventLoop(void);
+    virtual void InitialSeek(void);
     virtual void ResetPlaying(bool resetframes = true);
     virtual void EventEnd(void);
     virtual bool PrepareAudioSample(int64_t &timecode);

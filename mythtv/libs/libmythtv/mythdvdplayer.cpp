@@ -180,6 +180,20 @@ void MythDVDPlayer::EventLoop(void)
     }
 }
 
+void MythDVDPlayer::InitialSeek(void)
+{
+    if (bookmarkseek > 30)
+    {
+        // we need to trigger a dvd cell change to ensure the new title length
+        // is set and the position map updated accordingly
+        decodeOneFrame = true;
+        int count = 0;
+        while (count++ < 100 && decodeOneFrame)
+            usleep(50000);
+    }
+    MythPlayer::InitialSeek();
+}
+
 void MythDVDPlayer::ResetPlaying(bool resetframes)
 {
     MythPlayer::ResetPlaying(false);
