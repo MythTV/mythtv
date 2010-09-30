@@ -1493,6 +1493,9 @@ bool CardUtil::GetV4LInfo(
     }
 #endif // !USING_V4L
 
+    if (!driver.isEmpty())
+        driver.remove( QRegExp("\\[[0-9]\\]$") );
+
     return !card.isEmpty();
 }
 

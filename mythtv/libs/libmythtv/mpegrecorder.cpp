@@ -429,7 +429,6 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "\n\nNot ivtv or pvrusb2 or hdpvr driver\n\n");
             bufferSize    = 4096;
             usingv4l2     = has_v4l2_vbi = true;
             has_buggy_vbi = requires_special_pause = false;
@@ -811,19 +810,22 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     // Set controls
     if (driver != "hdpvr")
     {
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
-                     GetFilteredAudioSampleRate());
+        if (driver != "saa7164")
+        {
+            add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
+                         GetFilteredAudioSampleRate());
+
+            uint audio_layer = GetFilteredAudioLayer();
+            add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING,
+                         audio_layer - 1);
+
+            uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
+            add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_L2_BITRATE,
+                         audbitrate - 1);
+        }
 
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_ASPECT,
                      aspectratio - 1);
-
-        uint audio_layer = GetFilteredAudioLayer();
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING,
-                     audio_layer - 1);
-
-        uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_L2_BITRATE,
-                     audbitrate - 1);
 
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_STREAM_TYPE,
                      streamtype_ivtv_to_v4l2(GetFilteredStreamType()));
@@ -836,7 +838,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     }
     maxbitrate = std::max(maxbitrate, bitrate);
 
-    if (driver == "hdpvr")
+    if (driver == "hdpvr" || driver == "saa7164")
     {
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
                      (maxbitrate == bitrate) ?
@@ -901,7 +903,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
     if (!vbimode)
         return true;
 
-    if (driver == "hdpvr")
+    if (driver == "hdpvr" || driver == "saa7164")
         return true;
 
     if (has_buggy_vbi)

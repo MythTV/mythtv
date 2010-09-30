@@ -1959,7 +1959,7 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     input(new TunerCardInput(parent))
 {
     VideoDevice *device =
-        new VideoDevice(parent, 0, 15, QString::null, "ivtv");
+        new VideoDevice(parent, 0, 15, QString::null, "(ivtv|saa7164)");
 
     cardinfo->setLabel(tr("Probed info"));
 
