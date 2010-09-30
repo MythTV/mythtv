@@ -1066,12 +1066,15 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    float fps, stream_fps, container_fps, matroska_fps = 0.0f, estimated_fps;
+    float fps, stream_fps, container_fps, matroska_fps, estimated_fps;
+    stream_fps = container_fps = matroska_fps = estimated_fps = 0.0f;
 
-    if (QString(ic->iformat->name).contains("matroska"))
+    if (QString(ic->iformat->name).contains("matroska") &&
+        (stream->avg_frame_rate.den && stream->avg_frame_rate.num)) // fps
         matroska_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
 
-    stream_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
+    if (enc->time_base.den && enc->time_base.num) // tbc
+        stream_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
     if (stream_fps > 121.0f && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
@@ -1080,8 +1083,10 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
         if (av_q2d(enc->time_base) > 0)
             stream_fps = 1.0f / av_q2d(enc->time_base);
     }
-    container_fps = 1.0f / av_q2d(stream->time_base);
-    estimated_fps = av_q2d(stream->r_frame_rate);
+    if (stream->time_base.den && stream->time_base.num) // tbn
+        container_fps = 1.0f / av_q2d(stream->time_base);
+    if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
+        estimated_fps = av_q2d(stream->r_frame_rate);
 
     if (matroska_fps < 121.0f && matroska_fps > 3.0f)
         fps = matroska_fps;
