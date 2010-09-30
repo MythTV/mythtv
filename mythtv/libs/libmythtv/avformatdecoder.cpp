@@ -732,8 +732,7 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 
     if (reset_video_data)
     {
-        QMutexLocker locker(&m_positionMapLock);
-        m_positionMap.clear();
+        ResetPosMap();
         framesPlayed = 0;
         framesRead = 0;
         seen_gop = false;
@@ -746,10 +745,7 @@ void AvFormatDecoder::Reset()
     DecoderBase::Reset();
 
     if (ringBuffer->isDVD())
-    {
-        posmapStarted = false;
         SyncPositionMap();
-    }
 
 #if 0
 // This is causing problems, and may not be needed anymore since
@@ -4283,11 +4279,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
                 if (ringBuffer->DVD()->PGCLengthChanged())
                 {
-                    {
-                        QMutexLocker locker(&m_positionMapLock);
-                        posmapStarted = false;
-                        m_positionMap.clear();
-                    }
+                    ResetPosMap();
                     SyncPositionMap();
                 }
 

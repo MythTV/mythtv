@@ -142,6 +142,7 @@ class DecoderBase
     virtual MythCodecID GetVideoCodecID(void) const = 0;
     virtual void *GetVideoCodecPrivate(void) { return NULL; }
 
+    virtual void ResetPosMap(void);
     virtual bool SyncPositionMap(void);
     virtual bool PosMapFromDb(void);
     virtual bool PosMapFromEnc(void);

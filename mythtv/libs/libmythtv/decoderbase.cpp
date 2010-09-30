@@ -71,9 +71,7 @@ void DecoderBase::Reset(void)
 {
     SeekReset(0, 0, true, true);
 
-    QMutexLocker locker(&m_positionMapLock);
-    m_positionMap.clear();
-    posmapStarted = false;
+    ResetPosMap();
     framesPlayed = 0;
     framesRead = 0;
     dontSyncPositionMap = false;
@@ -580,6 +578,13 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     return true;
 }
 
+void DecoderBase::ResetPosMap(void)
+{
+    QMutexLocker locker(&m_positionMapLock);
+    posmapStarted = false;
+    m_positionMap.clear();
+}
+
 long long DecoderBase::GetLastFrameInPosMap(void) const
 {
     long long last_frame = 0;
@@ -798,10 +803,7 @@ void DecoderBase::UpdateFramesPlayed(void)
 
 void DecoderBase::FileChanged(void)
 {
-    {
-        QMutexLocker locker(&m_positionMapLock);
-        m_positionMap.clear();
-    }
+    ResetPosMap();
     framesPlayed = 0;
     framesRead = 0;
 
