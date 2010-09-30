@@ -287,7 +287,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       lastdvdtitle(-1),
       decodeStillFrame(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
-      dvdTitleChanged(false), mpeg_seq_end_seen(false)
+      dvdTitleChanged(false), mpeg_seq_end_seen(false),
+      m_fps(0.0f)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(&readcontext, sizeof(readcontext));
@@ -1097,10 +1098,15 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 
     // If it is still out of range, just assume NTSC...
     fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Selected FPS is %1 (matroska %2 stream %3 "
-                    "container %4 estimated %5)").arg(fps).arg(matroska_fps)
-                    .arg(stream_fps).arg(container_fps).arg(estimated_fps));
+    if (fps != m_fps)
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Selected FPS is %1 (matroska %2 stream %3 "
+                        "container %4 estimated %5)").arg(fps).arg(matroska_fps)
+                        .arg(stream_fps).arg(container_fps).arg(estimated_fps));
+        m_fps = fps;
+    }
+
     return fps;
 }
 
