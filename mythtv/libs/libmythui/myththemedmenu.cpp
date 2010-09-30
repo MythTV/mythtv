@@ -622,7 +622,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     f.close();
 
-    VERBOSE(VB_GENERAL, QString("Loading menu theme from %1").arg(filename));
+    VERBOSE(VB_GUI, QString("Loading menu theme from %1").arg(filename));
 
     QDomElement docElem = doc.documentElement();
 
