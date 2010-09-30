@@ -22,7 +22,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void ResetPlaying(bool resetframes = true);
     virtual void EventEnd(void);
     virtual bool PrepareAudioSample(int64_t &timecode);
-    virtual uint64_t GetBookmark(void) const;
+    virtual uint64_t GetBookmark(void);
     virtual void SetBookmark(void);
     virtual void ClearBookmark(bool message = true);
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
@@ -60,6 +60,11 @@ class MythDVDPlayer : public MythPlayer
     bool hidedvdbutton;
     bool dvd_stillframe_showing;
     int  need_change_dvd_track;
+
+    // additional bookmark seeking information
+    int m_initial_title;
+    int m_initial_audio_track;
+    int m_initial_subtitle_track;
 };
 
 #endif // MYTHDVDPLAYER_H

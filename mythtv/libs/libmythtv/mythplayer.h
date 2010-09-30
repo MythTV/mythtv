@@ -201,7 +201,7 @@ class MPUBLIC MythPlayer
     int     GetLength(void) const             { return totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
-    virtual  uint64_t GetBookmark(void) const;
+    virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
         { return (errorType & kError_Switch_Renderer); }

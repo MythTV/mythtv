@@ -10,7 +10,8 @@
 
 MythDVDPlayer::MythDVDPlayer(bool muted)
   : MythPlayer(muted), hidedvdbutton(true),
-    dvd_stillframe_showing(false), need_change_dvd_track(0)
+    dvd_stillframe_showing(false), need_change_dvd_track(0),
+    m_initial_title(-1), m_initial_audio_track(-1), m_initial_subtitle_track(-1)
 {
 }
 
@@ -182,8 +183,19 @@ void MythDVDPlayer::EventLoop(void)
 
 void MythDVDPlayer::InitialSeek(void)
 {
+    if (m_initial_title > -1)
+        player_ctx->buffer->DVD()->PlayTitleAndPart(m_initial_title, 1);
+
+    if (m_initial_audio_track > -1)
+        player_ctx->buffer->DVD()->SetTrack(kTrackTypeAudio,
+                                            m_initial_audio_track);
+    if (m_initial_subtitle_track > -1)
+        player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle,
+                                            m_initial_subtitle_track);
+
     if (bookmarkseek > 30)
     {
+
         // we need to trigger a dvd cell change to ensure the new title length
         // is set and the position map updated accordingly
         decodeOneFrame = true;
@@ -235,7 +247,7 @@ void MythDVDPlayer::ClearBookmark(bool message)
         SetOSDMessage(QObject::tr("Bookmark Cleared"), kOSDTimeout_Med);
 }
 
-uint64_t MythDVDPlayer::GetBookmark(void) const
+uint64_t MythDVDPlayer::GetBookmark(void)
 {
     if (gCoreContext->IsDatabaseIgnored() || !player_ctx->buffer->isDVD())
         return 0;
@@ -257,16 +269,14 @@ uint64_t MythDVDPlayer::GetBookmark(void) const
         if (!dvdbookmark.empty())
         {
             QStringList::Iterator it = dvdbookmark.begin();
-            int title = (*it).toInt();
+            m_initial_title = (*it).toInt();
             frames = (long long)((*++it).toLongLong() & 0xffffffffLL);
-            player_ctx->buffer->DVD()->PlayTitleAndPart(title, 1);
-            int audiotrack    = (*++it).toInt();
-            int subtitletrack = (*++it).toInt();
-            player_ctx->buffer->DVD()->SetTrack(kTrackTypeAudio, audiotrack);
-            player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle, subtitletrack);
+            m_initial_audio_track    = (*++it).toInt();
+            m_initial_subtitle_track = (*++it).toInt();
             VERBOSE(VB_PLAYBACK, LOC +
                 QString("Get Bookmark: title %1 audiotrack %2 subtrack %3 frame %4")
-                .arg(title).arg(audiotrack).arg(subtitletrack).arg(frames));
+                .arg(m_initial_title).arg(m_initial_audio_track)
+                .arg(m_initial_subtitle_track).arg(frames));
         }
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);

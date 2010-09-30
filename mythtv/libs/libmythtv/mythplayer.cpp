@@ -3033,7 +3033,7 @@ void MythPlayer::ClearBookmark(bool message)
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
-uint64_t MythPlayer::GetBookmark(void) const
+uint64_t MythPlayer::GetBookmark(void)
 {
     uint64_t bookmark = 0;
 
