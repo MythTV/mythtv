@@ -28,7 +28,6 @@ void strings_null() {
     ThemeUI::tr("ROM Name:");
     ThemeUI::tr("ROM Path:");
     ThemeUI::tr("/path/to/the/thing.jpg");
-    ThemeUI::tr("Video Manager");
     ThemeUI::tr("Game Information");
     ThemeUI::tr("Game:");
     ThemeUI::tr("Type:");
