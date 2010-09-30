@@ -1064,36 +1064,42 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     return recordingHasPositionMap;
 }
 
-static float normalized_fps(AVStream *stream, AVCodecContext *enc)
+float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    float fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
+    float fps, stream_fps, container_fps, matroska_fps = 0.0f, estimated_fps;
 
+    if (QString(ic->iformat->name).contains("matroska"))
+        matroska_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
+
+    stream_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
-    if (fps > 121.0f && (enc->time_base.den > 10000) &&
+    if (stream_fps > 121.0f && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
         if (av_q2d(enc->time_base) > 0)
-            fps = 1.0f / av_q2d(enc->time_base);
+            stream_fps = 1.0f / av_q2d(enc->time_base);
     }
-    // If it's still wonky, try the container's time_base
-    if (fps > 121.0f || fps < 3.0f)
-    {
-        float tmpfps = 1.0f / av_q2d(stream->time_base);
-        if (tmpfps > 20 && tmpfps < 70)
-            fps = tmpfps;
-    }
+    container_fps = 1.0f / av_q2d(stream->time_base);
+    estimated_fps = av_q2d(stream->r_frame_rate);
 
-    // and finally try the ffmpeg estimated rate
-    if (fps > 121.0f || fps < 3.0f)
-    {
-        float tmpfps = av_q2d(stream->r_frame_rate);
-        if (tmpfps > 20 && tmpfps < 70)
-            fps = tmpfps;
-    }
+    if (matroska_fps < 121.0f && matroska_fps > 3.0f)
+        fps = matroska_fps;
+    else if (stream_fps < 121.0f && stream_fps > 3.0f) 
+        fps = stream_fps;
+    else if (container_fps < 121.0f && container_fps > 3.0f) 
+        fps = container_fps;
+    else if (estimated_fps < 70.0f && estimated_fps > 20.0f) 
+        fps = estimated_fps;
+    else
+        fps = stream_fps;
 
     // If it is still out of range, just assume NTSC...
     fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("Selected FPS is %1 (matroska %2 stream %3 "
+                    "container %4 estimated %5)").arg(fps).arg(matroska_fps)
+                    .arg(stream_fps).arg(container_fps).arg(estimated_fps));
     return fps;
 }
 

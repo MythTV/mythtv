@@ -232,6 +232,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool GenerateDummyVideoFrame(void);
     bool HasVideo(const AVFormatContext *ic);
+    float normalized_fps(AVStream *stream, AVCodecContext *enc);
 
   private:
     PrivateDecoder *private_dec;
