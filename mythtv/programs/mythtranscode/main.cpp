@@ -767,6 +767,7 @@ static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
     uint64_t startOfCutRegion = 0;
     frm_dir_map_t delMap = *deleteMap;
     bool withinCut = false;
+    bool firstMark = true;
     while (delMap.count() && delMap.begin().key() <= oldBookmark)
     {
         if (delMap.begin().data() == MARK_CUT_START && !withinCut)
@@ -774,12 +775,17 @@ static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
             withinCut = true;
             startOfCutRegion = delMap.begin().key();
         }
+        else if (delMap.begin().data() == MARK_CUT_END && firstMark)
+        {
+            subtraction += delMap.begin().key();
+        }
         else if (delMap.begin().data() == MARK_CUT_END && withinCut)
         {
             withinCut = false;
             subtraction += (delMap.begin().key() - startOfCutRegion);
         }
         delMap.remove(delMap.begin());
+        firstMark = false;
     }
     if (withinCut)
         subtraction += (oldBookmark - startOfCutRegion);
