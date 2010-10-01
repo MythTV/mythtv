@@ -2035,7 +2035,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                     .arg(playbackURL).arg(ctx->tvchain->GetCardType(-1)));
 
             ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
-                                              opennow ? 2000 : -1));
+                               opennow ? RingBuffer::kDefaultOpenTimeout : -1));
             ctx->buffer->SetLiveMode(ctx->tvchain);
         }
 
@@ -6493,7 +6493,7 @@ void TV::SwitchCards(PlayerContext *ctx,
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
             ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
-                                              opennow ? 2000 : -1));
+                               opennow ? RingBuffer::kDefaultOpenTimeout : -1));
 
             ctx->tvchain->SetProgram(*ctx->playingInfo);
             ctx->buffer->SetLiveMode(ctx->tvchain);
