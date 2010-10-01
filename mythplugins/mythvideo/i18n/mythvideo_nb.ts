@@ -40,37 +40,37 @@
 <context>
     <name>MetadataSettings</name>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="148"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="84"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
         <translation>Hvis satt slår dette på en knapp kalt &quot;Se med trailere&quot;. Det vil da bli vist et brukerbestemt antall trailere før filmen.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="153"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="88"/>
         <source>Number of trailers to play before a film.</source>
         <translation>Antall trailere som skal spilles før filmen.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="155"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="90"/>
         <source>If set, all files below the MythVideo directory will be displayed unless their extension is explicitly set to be ignored.</source>
         <translation>Hvis satt vil alle filene under MythVideo folderen vises hvis ikke filendelsen deres eksplisitt er satt til å ignoreres.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="159"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="94"/>
         <source>If set, every time a scan for new videos is performed, a mass metadata update of the collection will also occur.</source>
         <translation>Hvis satt vil metadata for hele samlingen oppdateres hver gang det søkes etter nye videoer.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="163"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="98"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
         <translation>Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="168"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="102"/>
         <source>Exit without saving settings</source>
         <translation>Avslutt uten å lagre innstillingene</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="170"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="103"/>
         <source>Save settings and Exit</source>
         <translation>Lagre innstillingene og avslutt</translation>
     </message>
@@ -176,42 +176,42 @@
 <context>
     <name>PlayerSettings</name>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="141"/>
+        <location filename="../mythvideo/playersettings.cpp" line="84"/>
         <source>This is the command used for any file whose extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
         <translation>Denne kommandoen brukes for å spille av filer som ikke har en spesiell spiller angitt for sitt filformat. Det går òg an å bruke navnet på en av tilleggsmodulene for avspilling, f.eks. &apos;Internal&apos;.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="146"/>
+        <location filename="../mythvideo/playersettings.cpp" line="89"/>
         <source>This can be any command to launch a DVD  player. Internal is the default.  For other players, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
         <translation>Dette kan være en hvilken som helst kommando som starter en DVD-spiller. Internal er standard. %d vil bli erstattet av DVD enheten (f.eks /dev/dvd).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="150"/>
+        <location filename="../mythvideo/playersettings.cpp" line="93"/>
         <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
         <translation>Denne enheten må eksistere, og brukeren som skal spille av en DVD må ha leserettingheter til enheten. &apos;default&apos; vil la MediaMonitor funksjonen velge en enhet.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="155"/>
+        <location filename="../mythvideo/playersettings.cpp" line="98"/>
         <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
         <translation>Dette kan være en hvilken som helst kommando som starter en VCD-spiller. Den interne avspilleren (Internal) kan ikke spille av VCDer. %d vil bli erstattet av VCD enheten (f.eks /dev/cdrom).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="159"/>
+        <location filename="../mythvideo/playersettings.cpp" line="102"/>
         <source>This device must exist, and the user playing the VCD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
         <translation>Denne enheten må eksistere, og brukeren som skal spille av en VCD må ha leserettingheter til enheten. &apos;default&apos; vil la MediaMonitor funksjonen velge en enhet.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="164"/>
+        <location filename="../mythvideo/playersettings.cpp" line="107"/>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
         <translation>Hvis standardavspilleren ikke kan spille en gitt video, så kan du spille den av med den alternative avspilleren ved å velge &apos;Spill av i alternativ avspiller.&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="168"/>
+        <location filename="../mythvideo/playersettings.cpp" line="110"/>
         <source>Exit without saving settings</source>
         <translation>Avslutt uten å lagre innstillingene</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="170"/>
+        <location filename="../mythvideo/playersettings.cpp" line="111"/>
         <source>Save settings and Exit</source>
         <translation>Lagre innstillingene og avslutt</translation>
     </message>
@@ -622,7 +622,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Omslagsfil:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Directed by</source>
         <translation>Regissert av</translation>
     </message>
@@ -642,7 +642,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Rangering</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="167"/>
         <source>MythVideo File Associations</source>
         <translation>MythVideos filtilknytninger</translation>
     </message>
@@ -667,7 +667,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Ignorer:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="168"/>
         <source>Edit Video Information</source>
         <translation>Rediger videoinformasjon</translation>
     </message>
@@ -682,7 +682,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Forelderkontroll:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="169"/>
         <source>File to Always Play Next:</source>
         <translation>Fil som alltid skal spilles etterpå:</translation>
     </message>
@@ -707,7 +707,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>/sti/til/bildet.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="176"/>
         <source>Filters video list</source>
         <translation>Filtrerer videolisten</translation>
     </message>
@@ -788,22 +788,22 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Spill av</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Lowest</source>
         <translation>Lavest</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="154"/>
         <source>Low</source>
         <translation>Lav</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="155"/>
         <source>Medium</source>
         <translation>Medium</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="156"/>
         <source>High</source>
         <translation>Høy</translation>
     </message>
@@ -813,7 +813,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Video Nr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Parental Level</source>
         <translation>Foreldernivå</translation>
     </message>
@@ -838,7 +838,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Episode:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Item has been watched:</source>
         <translation>Element er sett:</translation>
     </message>
@@ -998,7 +998,17 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Sett :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="164"/>
+        <source>File Associations</source>
+        <translation>Filtilknytninger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="165"/>
+        <source>Video Filters</source>
+        <translation>Videofiltre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="191"/>
         <source>Configure video and DVD playback</source>
         <translation>Konfigurer video og DVD-avspilling</translation>
     </message>
@@ -1008,12 +1018,12 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Resultat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Save as default</source>
         <translation>Sett som standard</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="180"/>
         <source>General Settings</source>
         <translation>Generelle innstillinger</translation>
     </message>
@@ -1023,47 +1033,47 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Innstillinger for avspiller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="184"/>
         <source>File Types</source>
         <translation>Filtyper</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Browse Videos</source>
         <translation>Bla gjennom videoer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Video List</source>
         <translation>Videoliste</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="161"/>
         <source>Video Gallery</source>
         <translation>Videogalleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Video Manager</source>
         <translation>Videobehandler</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Play DVD</source>
         <translation>Spill av DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="188"/>
         <source>Play VCD</source>
         <translation>Spill av VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="189"/>
         <source>Eject media</source>
         <translation>Løs ut media</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="190"/>
         <source>Videos Settings</source>
         <translation>Videoinnstillinger</translation>
     </message>
@@ -1407,17 +1417,17 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
         <translation>Ses/Ep:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="157"/>
         <source>SELECT: Edit</source>
         <translation>VELG: Rediger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="158"/>
         <source>INFO - Action Menu</source>
         <translation>INFO - aksjonsmeny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="166"/>
         <source>Background:</source>
         <translation>Bakgrunn:</translation>
     </message>
@@ -1457,47 +1467,47 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
         <translation>Trailere som skal spilles:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Visible:</source>
         <translation>Synlig:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Coverart</source>
         <translation>Omslag</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="173"/>
         <source>Screenshots</source>
         <translation>Skjermbilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Banners</source>
         <translation>Bannere</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="175"/>
         <source>Fanart</source>
         <translation>Fankunst</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="178"/>
         <source>Perform metadata update after video scan</source>
         <translation>Oppdater metadata etter videosøk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="179"/>
         <source>Find Online...</source>
         <translation>Finn på nett...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="181"/>
         <source>File Paths and general options</source>
         <translation>Filstier og generelle opsjoner</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Player Applications and DVD/VCD Drives</source>
         <translation>Avspillingsprogrammer og DVD/VCD stasjoner</translation>
     </message>
@@ -1507,12 +1517,12 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
         <translation>Innstillinger for metadata</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Grabber Setup and display preferences</source>
         <translation>Grabberoppsett og visningsvalg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Associate new file extensions</source>
         <translation>Assosier ny filendinger</translation>
     </message>
@@ -1520,38 +1530,38 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2546"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2547"/>
         <source>Switch to Browse View</source>
         <translation>Bytt til bla-visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2550"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2551"/>
         <source>Switch to Gallery View</source>
         <translation>Bytt til galleri-visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2554"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2555"/>
         <source>Switch to List View</source>
         <translation>Bytt til liste-visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1319"/>
-        <location filename="../mythvideo/videodlg.cpp" line="1334"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1320"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1335"/>
         <source>Season</source>
         <translation>Sesong</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2261"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2262"/>
         <source>Video Search</source>
         <translation>Videosøk</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2322"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2323"/>
         <source>%1 of %2</source>
         <translation>%1 av %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2408"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2409"/>
         <source>Video Options
 %1
 %2</source>
@@ -1560,325 +1570,325 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
 %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2411"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2412"/>
         <source>Video Options
 %1</source>
         <translation>Videoinnstillinger
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2414"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2715"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2415"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2716"/>
         <source>Video Options</source>
         <translation>Videoinnstillinger</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2430"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2431"/>
         <source>Play...</source>
         <translation>Spill av...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2432"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2468"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2433"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2469"/>
         <source>Play</source>
         <translation>Spill av</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2434"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2727"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2435"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2728"/>
         <source>Mark as Unwatched</source>
         <translation>Merk som ikke sett</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2436"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2729"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2730"/>
         <source>Mark as Watched</source>
         <translation>Merk som sett</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2685"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2686"/>
         <source>Video Info</source>
         <translation>Videoinfo</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2441"/>
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2443"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2444"/>
         <source>Play Folder</source>
         <translation>Spill mappe</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2457"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2458"/>
         <source>Playback Options
 %1</source>
         <translation>Avspillingsinnstillinger
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2472"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2473"/>
         <source>Play in Alternate Player</source>
         <translation>Spill av i alternativ avspiller</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2477"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2478"/>
         <source>Play With Trailers</source>
         <translation>Spill med trailere</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2485"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2486"/>
         <source>Play Trailer</source>
         <translation>Vis trailere</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2496"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2497"/>
         <source>Video Display Menu</source>
         <translation>Meny for videovisning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2505"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
         <source>Scan For Changes</source>
         <translation>Søk etter endringer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
         <source>Retrieve All Details</source>
         <translation>Hent alle detaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2508"/>
         <source>Filter Display</source>
         <translation>Filtrer visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2509"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2510"/>
         <source>Browse By...</source>
         <translation>Bla basert på...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2511"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2536"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2512"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2537"/>
         <source>Change View</source>
         <translation>Endre visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2514"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2515"/>
         <source>Disable File Browse Mode</source>
         <translation>Slå av bla-modus for filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2517"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2518"/>
         <source>Enable File Browse Mode</source>
         <translation>Slå på bla-modus for filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2521"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2522"/>
         <source>Disable Flat View</source>
         <translation>Slå av flat visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2524"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2525"/>
         <source>Enable Flat View</source>
         <translation>Slå på flat visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2557"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2558"/>
         <source>Switch to Manage View</source>
         <translation>Bytt til videobehandler visning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2629"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2630"/>
         <source>Browse By</source>
         <translation>Bla basert på</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2639"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2640"/>
         <source>Cast</source>
         <translation>Skuespillere</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2643"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2644"/>
         <source>Category</source>
         <translation>Kategori</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2647"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2648"/>
         <source>Date Added</source>
         <translation>Dato lagt til</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2651"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2652"/>
         <source>Director</source>
         <translation>Regissør</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2655"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2656"/>
         <source>Studio</source>
         <translation>Studio</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2659"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2660"/>
         <source>Folder</source>
         <translation>Mappe</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2663"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2664"/>
         <source>Genre</source>
         <translation>Sjanger</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2667"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2668"/>
         <source>TV/Movies</source>
         <translation>TV/Filmer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2671"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2672"/>
         <source>User Rating</source>
         <translation>Rangering</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2675"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2676"/>
         <source>Year</source>
         <translation>År</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2695"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2696"/>
         <source>View Details</source>
         <translation>Vis detaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2697"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2698"/>
         <source>View Full Plot</source>
         <translation>Vis hele beskrivelsen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2703"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2704"/>
         <source>View Cast</source>
         <translation>Vis skuespillere</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2732"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2733"/>
         <source>Mark as Non-Browseable</source>
         <translation>Merk som ikke visbar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2734"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2735"/>
         <source>Mark as Browseable</source>
         <translation>Merk som visbar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2757"/>
         <source>Manually Enter Video #</source>
         <translation>Skriv inn videonr. manuelt</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3003"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3004"/>
         <source>An error occurred when switching views.</source>
         <translation>Det skjedde en feil under skifte av visning.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3552"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3553"/>
         <source>Fetching details for %1</source>
         <translation>Henter detaljer for %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3557"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3558"/>
         <source> %1x%2</source>
         <translation> %1x%2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3645"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3646"/>
         <source>Enter Video Unique ID:</source>
         <translation>Legg til unik video-id:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3698"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3699"/>
         <source>Are you sure you want to delete:
 %1</source>
         <translation>Er du sikker på at du vil slette:
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3736"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3737"/>
         <source>Failed to delete file</source>
         <translation>Klarte ikke å slette filen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1151"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1152"/>
         <source>Video dialog loading, or no videos available...</source>
         <translation>Video dialog lastes, eller ingen videoer tilgjengelig...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
         <source>Change Video Details</source>
         <translation>Endre videodetaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2527"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2528"/>
         <source>Settings</source>
         <translation>Innstillinger</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2567"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2568"/>
         <source>Video Settings</source>
         <translation>Videoinnstillinger</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2576"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2577"/>
         <source>Player Settings</source>
         <translation>Innstillinger for avspiller</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2577"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2578"/>
         <source>Metadata Settings</source>
         <translation>Innstillinger for metadata</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2578"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2579"/>
         <source>File Type Settings</source>
         <translation>Innstillinger for filtype</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2705"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2706"/>
         <source>View Homepage</source>
         <translation>Se hjemmeside</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2743"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2744"/>
         <source>Manage Video Details</source>
         <translation>Håndter videodetaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2754"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2755"/>
         <source>Edit Details</source>
         <translation>Rediger detaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2755"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
         <source>Retrieve Details</source>
         <translation>Hent detaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2759"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2760"/>
         <source>Allow Updates</source>
         <translation>Tillat oppdateringer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2761"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
         <source>Disable Updates</source>
         <translation>Deaktiver oppdateringer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2763"/>
         <source>Reset Details</source>
         <translation>Nullstill detaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3076"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3077"/>
         <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
         <translation>Ingen webleser-kommando er satt! MythVideo er avhengig av at MythBrowser er installert for å vise hjemmesiden.</translation>
     </message>
