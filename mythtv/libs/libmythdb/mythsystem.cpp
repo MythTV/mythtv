@@ -70,7 +70,9 @@ void MythSystemReaper::run(void)
 {
     VERBOSE(VB_IMPORTANT, "Starting reaper thread");
 
-    while( 1 ) {
+    // gCoreContext is set to NULL during shutdown, and we need this thread to
+    // exit during shutdown.
+    while( gCoreContext ) {
         usleep(100000);
 
         time_t              now = time(NULL);
