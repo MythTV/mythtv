@@ -305,22 +305,20 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
         else
             data = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
 
-        CFStringRef keys[5] = { CFSTR("FRAME_DTS"), CFSTR("FRAME_PTS"),
+        CFStringRef keys[4] = { CFSTR("FRAME_PTS"),
                                 CFSTR("FRAME_INTERLACED"), CFSTR("FRAME_TFF"),
                                 CFSTR("FRAME_REPEAT") };
         CFNumberRef values[5];
         values[0] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
-                                   &pkt->dts);
-        values[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type,
                                    &pkt->pts);
-        values[2] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+        values[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
                                    &picture->interlaced_frame);
-        values[3] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+        values[2] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
                                    &picture->top_field_first);
-        values[4] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
+        values[3] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type,
                                    &picture->repeat_pict);
         params = CFDictionaryCreate(kCFAllocatorDefault, (const void **)&keys,
-                                    (const void **)&values, 5,
+                                    (const void **)&values, 4,
                                     &kCFTypeDictionaryKeyCallBacks,
                                     &kCFTypeDictionaryValueCallBacks);
 
@@ -344,7 +342,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     if (avctx->get_buffer(avctx, picture) < 0)
         return -1;
 
-    picture->pts              = vdaframe.pts;
+    picture->reordered_opaque = vdaframe.pts;
     picture->interlaced_frame = vdaframe.interlaced_frame;
     picture->top_field_first  = vdaframe.top_field_first;
     picture->repeat_pict      = vdaframe.repeat_pict;
@@ -417,13 +415,10 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         return;
     }
 
-    int64_t dts = AV_NOPTS_VALUE;
     int64_t pts = AV_NOPTS_VALUE;
     int8_t interlaced = 0;
     int8_t topfirst   = 0;
     int8_t repeatpic  = 0;
-    CFNumberRef dtsref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
-                                                   CFSTR("FRAME_DTS"));
     CFNumberRef ptsref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
                                                    CFSTR("FRAME_PTS"));
     CFNumberRef intref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
@@ -433,11 +428,6 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
     CFNumberRef repref = (CFNumberRef)CFDictionaryGetValue(frameInfo,
                                                    CFSTR("FRAME_REPEAT"));
 
-    if (dtsref)
-    {
-        CFNumberGetValue(dtsref, kCFNumberSInt64Type, &dts);
-        CFRelease(dtsref);
-    }
     if (ptsref)
     {
         CFNumberGetValue(ptsref, kCFNumberSInt64Type, &pts);
@@ -459,9 +449,7 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         CFRelease(repref);
     }
 
-    int64_t time =  (pts != (int64_t)AV_NOPTS_VALUE) ? pts :
-                        (dts != (int64_t)AV_NOPTS_VALUE) ? dts : AV_NOPTS_VALUE;
-
+    int64_t time =  (pts != (int64_t)AV_NOPTS_VALUE) ? pts : 0;
     {
         QMutexLocker lock(&decoder->m_frame_lock);
         bool found = false;
@@ -469,14 +457,7 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         for (; i < decoder->m_decoded_frames.size(); i++)
         {
             int64_t pts = decoder->m_decoded_frames[i].pts;
-            int64_t dts = decoder->m_decoded_frames[i].dts;
             if (pts != (int64_t)AV_NOPTS_VALUE && time > pts)
-            {
-                found = true;
-                break;
-            }
-            if (pts == (int64_t)AV_NOPTS_VALUE &&
-                dts != (int64_t)AV_NOPTS_VALUE && time > dts)
             {
                 found = true;
                 break;
@@ -484,7 +465,7 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         }
 
         VDAFrame frame(CVPixelBufferRetain(imageBuffer), format_type,
-                       pts, dts, interlaced, topfirst, repeatpic);
+                       pts, interlaced, topfirst, repeatpic);
         if (!found)
             i = decoder->m_decoded_frames.size();
         decoder->m_decoded_frames.insert(i, frame);

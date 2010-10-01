@@ -32,16 +32,15 @@ class VDALibrary
 class VDAFrame
 {
   public:
-    VDAFrame(CVPixelBufferRef buf, FourCharCode fmt, int64_t pres, int64_t dec,
+    VDAFrame(CVPixelBufferRef buf, FourCharCode fmt, int64_t pres,
              int8_t interlaced, int8_t top_field, int8_t repeat)
-      : buffer(buf), format(fmt), pts(pres), dts(dec),
+      : buffer(buf), format(fmt), pts(pres),
         interlaced_frame(interlaced), top_field_first(top_field),
         repeat_pict(repeat) { }
 
     CVPixelBufferRef buffer;
     FourCharCode     format;
     int64_t          pts;
-    int64_t          dts;
     int8_t           interlaced_frame;
     int8_t           top_field_first;
     int8_t           repeat_pict;
@@ -63,6 +62,7 @@ class PrivateDecoderVDA : public PrivateDecoder
                           int *got_picture_ptr,
                           AVPacket *pkt);
     virtual bool HasBufferedFrames(void);
+    virtual bool NeedsReorderedPTS(void) { return true; }
 
     static void VDADecoderCallback(void *decompressionOutputRefCon,
                                    CFDictionaryRef frameInfo,
