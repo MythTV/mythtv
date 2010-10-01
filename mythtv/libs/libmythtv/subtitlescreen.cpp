@@ -494,7 +494,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     uint32_t *bgpalette = (uint32_t *)(hl_button->pict.data[1]);
 
     bool blank = true;
-    for (uint x = 0; x < w; x++)
+    for (uint x = 0; (x < w) && bgpalette; x++)
     {
         for (uint y = 0; y < h; y++)
         {
@@ -520,9 +520,12 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     QImage fg_image = bg_image.copy(buttonPos);
     QVector<unsigned int> fg_palette;
     uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->pict.data[1]);
-    for (int i = 0; i < AVPALETTE_COUNT; i++)
-        fg_palette.push_back(fgpalette[i]);
-    fg_image.setColorTable(fg_palette);
+    if (fgpalette)
+    {
+        for (int i = 0; i < AVPALETTE_COUNT; i++)
+            fg_palette.push_back(fgpalette[i]);
+        fg_image.setColorTable(fg_palette);
+    }
 
     // scale highlight image to match OSD size, if required
     QRect button = buttonPos.adjusted(0, 2, 0, 0);
