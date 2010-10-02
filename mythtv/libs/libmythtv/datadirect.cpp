@@ -1163,16 +1163,8 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
             NextSuggestedTime = newTime;
         }
 
-        MSqlQuery query(MSqlQuery::DDCon());
-        QString querystr =
-            QString("UPDATE settings SET data = '%1' WHERE value = '%2';");
-
-        query.prepare(querystr.arg(NextSuggestedTime.toString(Qt::ISODate))
-                      .arg("MythFillSuggestedRunTime"));
-
-        if (!query.exec())
-            MythDB::DBError("Updating DataDirect Suggested RunTime",
-                                 query);
+	gCoreContext->SaveSettingOnHost("MythFillSuggestedRunTime",
+            NextSuggestedTime.toString(Qt::ISODate), NULL);
     }
     return GotNextSuggestedTime;
 }
