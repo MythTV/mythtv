@@ -1,0 +1,40 @@
+<mythlocale>
+
+    <!-- Global Settings -->
+
+    <!--EIT, Subtitle, Audio Stream, Language Preferences --> 
+    <setting name="ISO639Language0" global="true">fre</setting>
+    <setting name="ISO639Language1" global="true">fre</setting>
+
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">SECAM</setting>
+    <setting name="FreqTable" global="true">france</setting>
+
+    <!-- Scheduling -->
+    <setting name="prefDupMethod" global="true">8</setting> <!-- Subtitle then description works best  -->
+
+    <!-- Per-host Settings -->
+
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language">fr</setting>
+
+    <!-- Date/Time format -->
+    <setting name="DateFormat">dddd d MMM</setting>
+    <setting name="TimeFormat">h:mm</setting>
+    <setting name="ShortDateFormat">dd/MM</setting>
+
+    <!-- Plugins -->
+
+    <!-- MythArchive -->
+    <setting name="MythArchiveDateFormat">%a %b %d %Y</setting>
+    <setting name="MythArchiveTimeFormat">%H %M</setting>
+    <setting name="MythArchiveVideoFormat">PAL</setting>
+
+    <!-- MythWelcome  -->
+    <setting name="MythWelcomeDateFormat">dddd\\ndd MMM yyyy</setting>
+
+    <!-- MythZoneMinder  -->
+    <setting name="ZoneMinderDateFormat">dddd d MMM yyyy</setting>
+    <setting name="ZoneMinderTimeFormat">hh:mm</setting>
+
+</mythlocale>
