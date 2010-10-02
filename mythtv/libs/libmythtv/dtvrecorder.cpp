@@ -355,7 +355,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     if (frameRate && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
-        VERBOSE(VB_GENERAL, QString("FindMPEG2Keyframes: frame rate = %1")
+        VERBOSE(VB_RECORD, QString("FindMPEG2Keyframes: frame rate = %1")
                 .arg(frameRate));
         FrameRateChange(frameRate, _frames_written_count);
     }
@@ -625,7 +625,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     if (frameRate != 0 && frameRate != m_frameRate)
     {
 
-        VERBOSE( VB_UPNP, QString("FindH264Keyframes: timescale: %1, tick: %2, framerate: %3") 
+        VERBOSE( VB_RECORD, QString("FindH264Keyframes: timescale: %1, tick: %2, framerate: %3") 
                       .arg( m_h264_parser.GetTimeScale() ) 
                       .arg( m_h264_parser.GetUnitsInTick() )
                       .arg( frameRate ) );
@@ -802,7 +802,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         if (frameRate && frameRate != m_frameRate)
         {
             m_frameRate = frameRate;
-            VERBOSE(VB_GENERAL, QString("FindPSKeyFrames: frame rate = %1")
+            VERBOSE(VB_RECORD, QString("FindPSKeyFrames: frame rate = %1")
                     .arg(frameRate));
             FrameRateChange(frameRate, _frames_written_count);
         }

@@ -686,7 +686,7 @@ void NuppelVideoRecorder::UpdateResolutions(void)
     if (frameRate && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
-        VERBOSE(VB_GENERAL, QString("NVR: frame rate = %1")
+        VERBOSE(VB_RECORD, QString("NVR: frame rate = %1")
                 .arg(frameRate));
         FrameRateChange(frameRate, 0);
     }
