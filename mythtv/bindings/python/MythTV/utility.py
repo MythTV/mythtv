@@ -35,6 +35,9 @@ class SchemaUpdate( object ):
     def run(self):
         if self._schema_name is None:
             raise MythDBError('Schema update failed, variable name not set')
+        if self.db.settings.NULL[self._schema_name] is None:
+            self.db.settings.NULL[self._schema_name] = self.create()
+
         origschema = int(self.db.settings.NULL[self._schema_name])
         schema = origschema
         try:
@@ -45,18 +48,24 @@ class SchemaUpdate( object ):
                                 (schema, newschema))
                 schema = newschema
                 self.db.settings.NULL[self._schema_name] = schema
+
         except AttributeError, e:
             self.log(MythLog.DATABASE|MythLog.IMPORTANT,
                      'failed at %d' % schema, 'no handler method')
             raise MythDBError('Schema update failed, ' 
                     "SchemaUpdate has no function 'up%s'" % schema)
+
         except StopIteration:
             if schema != origschema:
                 self.log(MythLog.DATABASE,
                          '%s update complete' % self._schema_name)
             pass
+
         except Exception, e:
             raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
+
+    def create(self):
+        raise MythDBError('Schema creation failed, method not defined.')
 
 class databaseSearch( object ):
     # decorator class for database searches
