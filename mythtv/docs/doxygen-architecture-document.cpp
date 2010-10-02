@@ -230,16 +230,14 @@ The database schema is documented \ref db_schema "here".
 
 \section fe_plugins Frontend Plugins
 <dl>
-  <dt>mytharchive <dd>Creates themed Video DVDs from recordings
-                      (and other video files).
+  <dt>mytharchive <dd>Creates themed video DVDs from recordings
+                      and other video files.
   <dt>mythbrowser <dd>Provides a simple web browser.
-  <dt>mythflix    <dd>An interface to the NetFlix DVD/BluRay rental service.
   <dt>mythgallery <dd>A simple picture viewer for your %TV.
-  <dt>mythgame    <dd>Launches the xmame classic game system emulator.
-  <dt>mythmovies  <dd>Looks up movie times at local cinemas.
+  <dt>mythgame    <dd>Launches PC games and game system emulators.
   <dt>mythmusic   <dd>A simple music player for your %TV.
   <dt>mythnews    <dd>Browses RSS news feeds.
-  <dt>mythvideo   <dd>Launch DVD players, and a Video Browser for other files
+  <dt>mythvideo   <dd>Launch DVD players, and a browser for other video files
                       (non-%MythTV recordings).
   <dt>mythweather <dd>Presents your local weather report.
   <dt>mythzoneminder<dd>Video surveilance system interface.
