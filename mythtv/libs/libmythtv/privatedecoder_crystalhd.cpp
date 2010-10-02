@@ -72,6 +72,11 @@ PrivateDecoderCrystalHD::~PrivateDecoderCrystalHD()
         return;
 
     INIT_ST
+    if (m_device_type != BC_70015)
+    {
+        st = DtsFlushRxCapture(m_device, false);
+        CHECK_ST
+    }
     st = DtsStopDecoder(m_device);
     CHECK_ST
     st = DtsCloseDecoder(m_device);
@@ -196,7 +201,12 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
             break;
         case CODEC_ID_VC1:
             if (codecs & BC_DEC_FLAGS_VC1)
-                sub_type = BC_MSUBTYPE_VC1;
+            {
+                if (avctx->codec_tag == MKTAG('W','V','C','1'))
+                    sub_type = BC_MSUBTYPE_WVC1;
+                else
+                    sub_type = BC_MSUBTYPE_VC1;
+            }
             break;
         case CODEC_ID_WMV3:
             if (codecs & BC_DEC_FLAGS_VC1)
@@ -232,8 +242,9 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     if (avctx->codec_id == CODEC_ID_H264)
     {
         VERBOSE(VB_PLAYBACK, LOC +
-                QString("H.264 Profile: %1 RefFrames: %2 Slices: %3")
-                .arg(avctx->profile).arg(avctx->refs).arg(avctx->slice_count));
+                QString("H.264 Profile: %1 RefFrames: %2 Codec tag: %3")
+                .arg(avctx->profile).arg(avctx->refs)
+                .arg(fourcc_str(avctx->codec_tag)));
         if (avctx->extradata[0] == 1)
         {
             nalsize = (avctx->extradata[4] & 0x03) + 1;
@@ -377,9 +388,12 @@ bool PrivateDecoderCrystalHD::Reset(void)
     if (!m_device)
         return true;
 
-    INIT_ST
-    st = DtsFlushInput(m_device, 4);
-    CHECK_ST
+    if (m_device_type != BC_70015)
+    {
+        INIT_ST
+        st = DtsFlushInput(m_device, 2);
+        CHECK_ST
+    }
     return true;;
 }
 
