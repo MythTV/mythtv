@@ -243,7 +243,7 @@ The database schema is documented \ref db_schema "here".
   <dt>mythzoneminder<dd>Video surveilance system interface.
 </dl>
 
-\section be_plugins Backend Plugins
+\section assoc_applications Associated Applications
 <dl>
   <dt>mythweb     <dd>Provides a PHP based web pages to control mythbackend.
 </dl>
