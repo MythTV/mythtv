@@ -289,7 +289,7 @@ class CMPRecord( CMPVideo ):
         with 'chanid' and 'starttime', falling back to 'title' and 'subtitle'.
     """
     def __cmp__(self, other):
-        if ('starttime' not in other) or ('video' not in other):
+        if ('starttime' not in other) or ('chanid' not in other):
             return CMPVideo.__cmd__(self, other)
         res = cmp(self.starttime, other.starttime)
         if res:
