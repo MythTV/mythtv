@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythzoneminder/zmconsole.cpp" line="67"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Valider</translation>
     </message>
 </context>
 <context>

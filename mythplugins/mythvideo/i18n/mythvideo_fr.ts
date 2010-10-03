@@ -41,38 +41,38 @@
 <context>
     <name>MetadataSettings</name>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="148"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="84"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
         <translation>Si coché, ceci activera un bouton appelé « Regarder avec bandes annonces » qui jouera un nombre de bandes annonce spécifié par l&apos;utilisateur avant chaque film.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="153"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="88"/>
         <source>Number of trailers to play before a film.</source>
         <translation>Nombre de bandes annonces à voir avant le film.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="155"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="90"/>
         <source>If set, all files below the MythVideo directory will be displayed unless their extension is explicitly set to be ignored.</source>
         <translation>Si coché, tous les fichiers sous le répertoire de MythVideo seront affichés à l&apos;exception des extensions explicitement ignorées.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="159"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="94"/>
         <source>If set, every time a scan for new videos is performed, a mass metadata update of the collection will also occur.</source>
         <translatorcomment>lomgueur?</translatorcomment>
         <translation>Si coché, chaque fois qu&apos;un balayage pour de nouveaux vidéos serait exécuté une mise à jour des métadonnées globale sera effectuée.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="163"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="98"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
         <translation>Si coché ainsi que &apos;Parcourir les fichiers&apos;, la liste des vidéos chargera toute métadonnée contenue dans la base de données. Décocher ceci peut grandement améliorer le temps nécessaire à charger l&apos;arborescence de la liste des vidéos.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="168"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="102"/>
         <source>Exit without saving settings</source>
         <translation>Sortir sans sauver les réglages</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="170"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="103"/>
         <source>Save settings and Exit</source>
         <translation>Sauver les réglages et sortir</translation>
     </message>
@@ -178,42 +178,42 @@
 <context>
     <name>PlayerSettings</name>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="141"/>
+        <location filename="../mythvideo/playersettings.cpp" line="84"/>
         <source>This is the command used for any file whose extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
         <translation>Cette commande est utilisée pour tous les fichiers dont l&apos;extension n&apos;est pas explicitement définie. Vous pouvez aussi entrer le nom d&apos;un lecteur tel que &apos;internal&apos;.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="146"/>
+        <location filename="../mythvideo/playersettings.cpp" line="89"/>
         <source>This can be any command to launch a DVD  player. Internal is the default.  For other players, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
         <translation>C&apos;est la ligne de lancement du lecteur DVD (i.e. MPlayer, xine, etc ...). Si %d est présent dans la ligne de commande, il sera remplacé par le périphérique DVD (i.e. /dev/cdrom).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="150"/>
+        <location filename="../mythvideo/playersettings.cpp" line="93"/>
         <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
         <translation>Ce périphérique doit exister et l&apos;utilisateur du lecteur DVD doit avoir la permission de lire ce périphérique. &apos;default&apos; laisse le &apos;mediamonitor&apos; choisir un périphérique.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="155"/>
+        <location filename="../mythvideo/playersettings.cpp" line="98"/>
         <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
         <translation>C&apos;est la ligne de lancement du lecteur VCD (i.e. MPlayer, xine, etc ...). Si %d est présent dans la ligne de commande, il sera remplacé par le périphérique VCD (i.e. /dev/cdrom).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="159"/>
+        <location filename="../mythvideo/playersettings.cpp" line="102"/>
         <source>This device must exist, and the user playing the VCD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
         <translation>Ce périphérique doit exister et l&apos;utilisateur du lecteur VCD doit avoir la permission de lire ce périphérique. &apos;default&apos; laisse le &apos;mediamonitor&apos; choisir un périphérique.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="164"/>
+        <location filename="../mythvideo/playersettings.cpp" line="107"/>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
         <translation>Si pour une quelconque raison, le lecteur par défaut ne lit pas une vidéo, vous pouvez la lire avec un lecteur alternatif en sélectionnant « Lire dans le lecteur alternatif »</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="168"/>
+        <location filename="../mythvideo/playersettings.cpp" line="110"/>
         <source>Exit without saving settings</source>
         <translation>Sortir sans sauvegarder les réglages</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="170"/>
+        <location filename="../mythvideo/playersettings.cpp" line="111"/>
         <source>Save settings and Exit</source>
         <translation>Sauvegarder les réglages et sortir</translation>
     </message>
@@ -238,7 +238,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="25"/>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation>C&apos;est le niveau à partir duquel MythVideo démarre. Toutes les vidéos avec un niveau inférieur ou égal à la valeur seront affiché dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi.</translation>
+        <translation>C&apos;est le niveau sur lequel MythVideo démarre. Toutes les vidéos ayant un niveau inférieur ou égal à la valeur choisie seront affichées dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="72"/>
@@ -525,7 +525,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="158"/>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
-        <translation>La surveillance des médias doit être activée pour utiliser cette fonction (Setup -&gt; General -&gt; Surveillance CD/DVD).</translation>
+        <translation>La surveillance des médias doit être activée pour utiliser cette fonction (Configuration -&gt; Général -&gt; Surveillance CD/DVD).</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="168"/>
@@ -623,12 +623,12 @@
         <translation>Fichier d&apos;affiche :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Directed by</source>
         <translation>Réalisé par</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="167"/>
         <source>MythVideo File Associations</source>
         <translation>Associations des fichiers de MythVideo</translation>
     </message>
@@ -653,7 +653,7 @@
         <translation>Ignoré :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="168"/>
         <source>Edit Video Information</source>
         <translation>Editer les informations de la vidéo</translation>
     </message>
@@ -663,9 +663,9 @@
         <translation>Niveau parental :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="169"/>
         <source>File to Always Play Next:</source>
-        <translation>Fichier à toujours lire ensuite :</translation>
+        <translation>Fichier à lire ensuite :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>
@@ -693,7 +693,7 @@
         <translation>Catégorie :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="176"/>
         <source>Filters video list</source>
         <translation>Liste des filtres vidéo</translation>
     </message>
@@ -789,22 +789,22 @@
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Lowest</source>
         <translation>Le plus bas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="154"/>
         <source>Low</source>
         <translation>Bas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="155"/>
         <source>Medium</source>
         <translation>Moyen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="156"/>
         <source>High</source>
         <translation>Haut</translation>
     </message>
@@ -814,7 +814,7 @@
         <translation>N° vidéo :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Parental Level</source>
         <translation>Niveau parental</translation>
     </message>
@@ -839,7 +839,7 @@
         <translation>Episode :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Item has been watched:</source>
         <translation>L&apos;élément a été vu :</translation>
     </message>
@@ -1007,7 +1007,22 @@
         <translation>Vu :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="159"/>
+        <source>Video Browser</source>
+        <translation>Navigateur vidéo</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="164"/>
+        <source>File Associations</source>
+        <translation>Associations des fichiers</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="165"/>
+        <source>Video Filters</source>
+        <translation>Filtres vidéos</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="191"/>
         <source>Configure video and DVD playback</source>
         <translation>Configurer la lecture de vidéo et DVD</translation>
     </message>
@@ -1017,12 +1032,12 @@
         <translation>Résultat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Save as default</source>
         <translation>Sauvegarder en valeur par défaut</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="180"/>
         <source>General Settings</source>
         <translation>Réglages généraux</translation>
     </message>
@@ -1032,82 +1047,82 @@
         <translation>Réglages du lecteur</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="184"/>
         <source>File Types</source>
         <translation>Types de fichier</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Browse Videos</source>
         <translation>Parcourir les vidéos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Video List</source>
         <translation>Liste des vidéos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="161"/>
         <source>Video Gallery</source>
         <translation>Galerie vidéo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Visible:</source>
         <translation>Visible :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Coverart</source>
         <translation>Affiches</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="173"/>
         <source>Screenshots</source>
         <translation>Captures d&apos;écran</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Banners</source>
         <translation>Bannières</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="175"/>
         <source>Fanart</source>
         <translation>Affiche personnalisée</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="178"/>
         <source>Perform metadata update after video scan</source>
         <translation>Mettre à jour les métadonnées après le balayage vidéo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="179"/>
         <source>Find Online...</source>
         <translation>Trouve en ligne...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Video Manager</source>
         <translation>Gestionnaire vidéos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Play DVD</source>
         <translation>Lire un DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="188"/>
         <source>Play VCD</source>
         <translation>Lire un VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="189"/>
         <source>Eject media</source>
         <translation>Éjecter un média</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="190"/>
         <source>Videos Settings</source>
         <translation>Réglages vidéos</translation>
     </message>
@@ -1197,12 +1212,12 @@
         <translation>Bandes annonces à jouer :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="181"/>
         <source>File Paths and general options</source>
         <translation>Chemins des fichiers et options générales</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Player Applications and DVD/VCD Drives</source>
         <translation>Applications de lecture et lecteurs DVD/VCD</translation>
     </message>
@@ -1212,12 +1227,12 @@
         <translation>Réglages de méta-données</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Grabber Setup and display preferences</source>
         <translation>Configuration des récupérateurs et options d&apos;affichage</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Associate new file extensions</source>
         <translation>Associer de nouvelles extensions de fichier</translation>
     </message>
@@ -1513,17 +1528,17 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
         <translation>Saison/Épisode : </translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="157"/>
         <source>SELECT: Edit</source>
         <translation>SELECTION : Éditer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="158"/>
         <source>INFO - Action Menu</source>
         <translation>INFO - Menu action</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="166"/>
         <source>Background:</source>
         <translation>Arriére-plan :</translation>
     </message>
@@ -1536,286 +1551,286 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2546"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2547"/>
         <source>Switch to Browse View</source>
         <translation>Passer en mode navigation</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2550"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2551"/>
         <source>Switch to Gallery View</source>
         <translation>Passer en mode galerie</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2554"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2555"/>
         <source>Switch to List View</source>
         <translation>Passer en mode liste</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2322"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2323"/>
         <source>%1 of %2</source>
         <translation>%1 sur %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2685"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2686"/>
         <source>Video Info</source>
         <translation>Info de la vidéo</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2505"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
         <source>Scan For Changes</source>
         <translation>Rechercher les modifications</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2511"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2536"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2512"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2537"/>
         <source>Change View</source>
         <translation>Modifier la vue</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2508"/>
         <source>Filter Display</source>
         <translation>Filtrer l&apos;affichage</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2557"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2558"/>
         <source>Switch to Manage View</source>
         <translation>Basculer vers la vue &apos;Gestion&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2514"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2515"/>
         <source>Disable File Browse Mode</source>
         <translation>Désactiver le mode &apos;Navigation&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2517"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2518"/>
         <source>Enable File Browse Mode</source>
         <translation>Activer le mode &apos;Navigation&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2521"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2522"/>
         <source>Disable Flat View</source>
         <translation>Désactiver la &apos;Vue À Plat&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2524"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2525"/>
         <source>Enable Flat View</source>
         <translation>Activer la &apos;Vue À Plat&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2695"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2696"/>
         <source>View Details</source>
         <translation>Voir les détails</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2697"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2698"/>
         <source>View Full Plot</source>
         <translation>Voir le synopsis complet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2703"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2704"/>
         <source>View Cast</source>
         <translation>Voir la distribution</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2757"/>
         <source>Manually Enter Video #</source>
         <translation>Entrer manuellement le n° de la vidéo</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3003"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3004"/>
         <source>An error occurred when switching views.</source>
         <translation>Une erreur est survenue lors du changement de vue.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3552"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3553"/>
         <source>Fetching details for %1</source>
         <translation>Récupérer les détails pour %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3557"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3558"/>
         <source> %1x%2</source>
         <translation> %1x%2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3645"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3646"/>
         <source>Enter Video Unique ID:</source>
         <translation>Entrez l&apos;ID unique de la vidéo :</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3736"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3737"/>
         <source>Failed to delete file</source>
         <translation>Échec de suppression du fichier</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2261"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2262"/>
         <source>Video Search</source>
         <translation>Recherche vidéo</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2411"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2412"/>
         <source>Video Options
 %1</source>
         <translation>Options vidéo
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2414"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2715"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2415"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2716"/>
         <source>Video Options</source>
         <translation>Options vidéo</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2430"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2431"/>
         <source>Play...</source>
         <translation>Lecture...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2432"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2468"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2433"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2469"/>
         <source>Play</source>
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2434"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2727"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2435"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2728"/>
         <source>Mark as Unwatched</source>
         <translation>Marquer comme Non Vu</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2436"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2729"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2730"/>
         <source>Mark as Watched</source>
         <translation>Marquer comme Vu</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2441"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2443"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2444"/>
         <source>Play Folder</source>
         <translation>Lecture du dossier</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2457"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2458"/>
         <source>Playback Options
 %1</source>
         <translation>Options de lecture
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2477"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2478"/>
         <source>Play With Trailers</source>
         <translation>Lecture avec bandes-annonces</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2485"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2486"/>
         <source>Play Trailer</source>
         <translation>Lecture de bande-annonce</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2496"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2497"/>
         <source>Video Display Menu</source>
         <translation>Menu d&apos;affichage des vidéos</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
         <source>Retrieve All Details</source>
         <translation>Récupérer tous les détails</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2509"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2510"/>
         <source>Browse By...</source>
         <translation>Parcourir par...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2629"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2630"/>
         <source>Browse By</source>
         <translation>Parcourir par</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2639"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2640"/>
         <source>Cast</source>
         <translation>Distribution</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2643"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2644"/>
         <source>Category</source>
         <translation>Catégorie</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2647"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2648"/>
         <source>Date Added</source>
         <translation>Date d&apos;ajout</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2651"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2652"/>
         <source>Director</source>
         <translation>Réalisateur</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2655"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2656"/>
         <source>Studio</source>
         <translation>Studio</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2659"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2660"/>
         <source>Folder</source>
         <translation>Dossier</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2663"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2664"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2671"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2672"/>
         <source>User Rating</source>
         <translation>Évaluation</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2675"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2676"/>
         <source>Year</source>
         <translation>Année</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2732"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2733"/>
         <source>Mark as Non-Browseable</source>
         <translation>Marquer comme Non affichable</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2734"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2735"/>
         <source>Mark as Browseable</source>
         <translation>Marquer comme Affichable</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3698"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3699"/>
         <source>Are you sure you want to delete:
 %1</source>
         <translation>Êtes-vous sûr de vouloir supprimer :
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1319"/>
-        <location filename="../mythvideo/videodlg.cpp" line="1334"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1320"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1335"/>
         <source>Season</source>
         <translation>Saison</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2472"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2473"/>
         <source>Play in Alternate Player</source>
         <translation>Lire dans le lecteur alternatif</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2667"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2668"/>
         <source>TV/Movies</source>
         <translation>TV/Films</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2408"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2409"/>
         <source>Video Options
 %1
 %2</source>
@@ -1824,80 +1839,80 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
 %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1151"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1152"/>
         <source>Video dialog loading, or no videos available...</source>
         <translation>Fenètre de dialogue vidéo ouverte ou aucune vidéo disponible...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
         <source>Change Video Details</source>
         <translation>Modifier les détails vidéos</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2527"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2528"/>
         <source>Settings</source>
         <translation>Réglages</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2567"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2568"/>
         <source>Video Settings</source>
         <translation>Réglages vidéo</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2576"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2577"/>
         <source>Player Settings</source>
         <translation>Réglages du lecteur</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2577"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2578"/>
         <source>Metadata Settings</source>
         <translation>Réglages de méta-données</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2578"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2579"/>
         <source>File Type Settings</source>
         <translation>Réglages des types de fichiers</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2705"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2706"/>
         <source>View Homepage</source>
         <translation>Vue de la page principale</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2743"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2744"/>
         <source>Manage Video Details</source>
         <translation>Gérer les détails vidéos</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2754"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2755"/>
         <source>Edit Details</source>
         <translation>Éditer les détails</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2755"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
         <source>Retrieve Details</source>
         <translatorcomment>A vérifier dans le contexte...</translatorcomment>
         <translation>Récupérer les détails</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2759"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2760"/>
         <source>Allow Updates</source>
         <translatorcomment>longueur?</translatorcomment>
         <translation>Permettre les mises à jour</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2761"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
         <source>Disable Updates</source>
         <translation>Désactiver les mises à jour</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2763"/>
         <source>Reset Details</source>
         <translatorcomment>longueur?</translatorcomment>
         <translation>Réinitialiser les détails</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3076"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3077"/>
         <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
         <translation>Aucune commande de navigateur définie ! MythVideo nécessite que MythBrowser soit installé pour afficher la page principale.</translation>
     </message>

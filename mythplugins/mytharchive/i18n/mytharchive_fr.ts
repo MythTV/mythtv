@@ -930,52 +930,51 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Trame</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation>13 sep 2004 11:00 pm (1h 15m)</translation>
+        <translation type="obsolete">13 sep 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="74"/>
         <source>File Finder To Import</source>
         <translation>Sélectionneur de fichiers à importer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Start Time:</source>
         <translation>Date de création :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Select Associated Channel</source>
         <translation>Sélectionner les chaînes associées</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Archived Channel</source>
         <translation>Chaîne archivée</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Chan. ID:</source>
         <translation>ID de chaîne :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Chan. No:</source>
         <translation>N° de chaîne :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Callsign:</source>
         <translation>Indicatif :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Name:</source>
         <translation>Nom :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Local Channel</source>
         <translation>Chaîne locale</translation>
     </message>
@@ -1000,42 +999,42 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Le profil &apos;Très Longue Durée&apos; correspond environ à 6 heures de vidéo par DVD simple face</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Create DVD</source>
         <translation>Créer un DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Create Archive</source>
         <translation>Créer une archive</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Encode Video File</source>
         <translation>Encoder un fichier vidéo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Import Archive</source>
         <translation>Importer une archive</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Archive Utilities</source>
         <translation>Utilitaires d&apos;archivage</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Show Log Viewer</source>
         <translation>Afficher le journal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Play Created DVD</source>
         <translation>Lire le DVD créé</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Burn DVD</source>
         <translation>Graver un DVD</translation>
     </message>
@@ -1105,27 +1104,27 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Search Channel</source>
         <translation>Rechercher une chaîne</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Search Callsign</source>
         <translation>Rechercher un indicatif</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Search Name</source>
         <translation>Rechercher un nom</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Finish</source>
         <translation>Terminer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Add video</source>
         <translation>Ajouter une vidéo</translation>
     </message>
@@ -1220,9 +1219,8 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>0 Mo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
         <source>x.xx GB</source>
-        <translation>x.xx Go</translation>
+        <translation type="obsolete">x.xx Go</translation>
     </message>
 </context>
 <context>

@@ -1217,7 +1217,7 @@ Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Te
     <message>
         <location filename="../mythweather/weather.cpp" line="210"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
-        <translation type="unfinished"></translation>
+        <translation>Les écrans configurés sont incomplets dans ce thème (absence d&apos;information de droit d&apos;auteur).</translation>
     </message>
 </context>
 <context>
