@@ -29,6 +29,33 @@ using namespace std;
 
 // filldata headers
 #include "filldata.h"
+namespace
+{
+    void cleanup()
+    {
+        delete gContext;
+        gContext = NULL;
+
+    }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
+}
 
 int main(int argc, char *argv[])
 {
@@ -520,11 +547,12 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
+    CleanupGuard callCleanup(cleanup);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        delete gContext;
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -535,7 +563,6 @@ int main(int argc, char *argv[])
     if (!UpgradeTVDatabaseSchema(false))
     {
         VERBOSE(VB_IMPORTANT, "Incorrect database schema");
-        delete gContext;
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
@@ -572,7 +599,6 @@ int main(int argc, char *argv[])
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
         {
-            delete gContext;
             return FILLDB_EXIT_GRAB_DATA_FAILED;
         }
 
@@ -659,14 +685,12 @@ int main(int argc, char *argv[])
                                      "Could not find any defined channel "
                                      "sources - did you run the setup "
                                      "program?");
-                  delete gContext;
                   return FILLDB_EXIT_NO_CHAN_SRC;
              }
         }
         else
         {
              MythDB::DBError("loading channel sources", sourcequery);
-             delete gContext;
              return FILLDB_EXIT_DB_ERROR;
         }
 
@@ -682,7 +706,6 @@ int main(int argc, char *argv[])
 
     if (fill_data.only_update_channels && !fill_data.need_post_grab_proc)
     {
-        delete gContext;
         return FILLDB_EXIT_OK;
     }
 
@@ -969,8 +992,6 @@ int main(int argc, char *argv[])
     RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
     SendMythSystemEvent("MYTHFILLDATABASE_RAN");
-
-    delete gContext;
 
     VERBOSE(VB_IMPORTANT, "mythfilldatabase run complete.");
 
