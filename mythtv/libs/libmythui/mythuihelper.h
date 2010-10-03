@@ -84,8 +84,6 @@ class MPUBLIC MythUIHelper
 
     void ThemeWidget(QWidget *widget);
 
-    int  NormalizeFontSize(const int pointSize);
-
     QString FindThemeDir(const QString &themename);
     QString FindMenuThemeDir(const QString &menuname);
     QString GetThemeDir(void);
