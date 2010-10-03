@@ -884,10 +884,9 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                                   ('h','%I'),('H','%H'),('i','%M'),('s','%S'),
                                   ('a','%p'),('A','%p') ):
                 path = path.replace(pre+tag, self[data].strftime(format))
-        airdate = date(*[int(a) for a in self.airdate.split('-')])
         for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
                               ('j','%d'),('d','%d')):
-            path = path.replace('%o'+tag, airdate.strftime(format))
+            path = path.replace('%o'+tag, self.airdate.strftime(format))
         path = path.replace('%-','-')
         path = path.replace('%%','%')
         path += '.'+self.filename.split('.')[-1]
@@ -910,7 +909,7 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
         for (tag, data) in (('STARTTIME','recstartts'),('ENDTIME','recendts'),
                             ('PROGSTART','starttime'),('PROGEND','endtime')):
             cmd = cmd.replace('%%%s%%' % tag, \
-                        self[data].strftime.mythformat())
+                        self[data].mythformat())
             cmd = cmd.replace('%%%sISO%%' % tag, \
                         self[data].isoformat())
             cmd = cmd.replace('%%%sISOUTC%%' % tag, \
