@@ -257,6 +257,10 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
         {
             aboutScreen();
         }
+        else if (action == "EJECT")
+        {
+            handleAction(action);
+        }
         else
             handled = false;
     }
