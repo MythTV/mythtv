@@ -214,7 +214,7 @@
     <message>
         <location filename="../mythnetvision/searcheditor.cpp" line="87"/>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Søker i Backend for innholdskilder på Internett...</translation>
+        <translation>Forespør hovedtjeneren om innholdskilder på Internett...</translation>
     </message>
 </context>
 <context>
@@ -459,7 +459,7 @@ For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&qu
     <message>
         <location filename="../mythnetvision/treeeditor.cpp" line="95"/>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Søker i Backend for innholdskilder på Internett...</translation>
+        <translation>Forespør hovedtjeneren om innholdskilder på Internett...</translation>
     </message>
 </context>
 </TS>

@@ -998,6 +998,11 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
         <translation>Sett :</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="159"/>
+        <source>Video Browser</source>
+        <translation>Videoutforsker</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="164"/>
         <source>File Associations</source>
         <translation>Filtilknytninger</translation>
