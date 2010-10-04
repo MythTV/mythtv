@@ -1063,12 +1063,11 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    float fps, stream_fps, container_fps, matroska_fps, estimated_fps;
-    stream_fps = container_fps = matroska_fps = estimated_fps = 0.0f;
+    float fps, avg_fps, stream_fps, container_fps, estimated_fps;
+    avg_fps = stream_fps = container_fps = estimated_fps = 0.0f;
 
-    if (QString(ic->iformat->name).contains("matroska") &&
-        (stream->avg_frame_rate.den && stream->avg_frame_rate.num)) // fps
-        matroska_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
+    if (stream->avg_frame_rate.den && stream->avg_frame_rate.num)
+        avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
 
     if (enc->time_base.den && enc->time_base.num) // tbc
         stream_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
@@ -1085,8 +1084,12 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
         estimated_fps = av_q2d(stream->r_frame_rate);
 
-    if (matroska_fps < 121.0f && matroska_fps > 3.0f)
-        fps = matroska_fps;
+    if (QString(ic->iformat->name).contains("matroska") && 
+        avg_fps < 121.0f && avg_fps > 3.0f)
+        fps = avg_fps; // matroska default_duration
+    else if (QString(ic->iformat->name).contains("avi") && 
+        container_fps < 121.0f && container_fps > 3.0f)
+        fps = container_fps; // avi uses container fps for timestamps
     else if (stream_fps < 121.0f && stream_fps > 3.0f) 
         fps = stream_fps;
     else if (container_fps < 121.0f && container_fps > 3.0f) 
@@ -1101,8 +1104,8 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if (fps != m_fps)
     {
         VERBOSE(VB_PLAYBACK, LOC +
-                QString("Selected FPS is %1 (matroska %2 stream %3 "
-                        "container %4 estimated %5)").arg(fps).arg(matroska_fps)
+                QString("Selected FPS is %1 (avg %2 stream %3 "
+                        "container %4 estimated %5)").arg(fps).arg(avg_fps)
                         .arg(stream_fps).arg(container_fps).arg(estimated_fps));
         m_fps = fps;
     }
