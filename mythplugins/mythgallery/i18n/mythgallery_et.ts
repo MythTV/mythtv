@@ -49,7 +49,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="894"/>
         <source>Settings</source>
-        <translation>Sätted</translation>
+        <translation>Seaded</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="131"/>
@@ -456,12 +456,12 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="185"/>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation>MythGallery sätted (slaidiprogramm)</translation>
+        <translation>MythGallery seaded (slaidiprogramm)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="215"/>
         <source>MythGallery Settings (General)</source>
-        <translation>MythGallery sätted (üldine)</translation>
+        <translation>MythGallery seaded (üldine)</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="45"/>

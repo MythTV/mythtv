@@ -9,64 +9,17 @@
         <translation>Vali importimiseks fail</translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation type="obsolete">Järgmine</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
-    <message>
-        <source>Back</source>
-        <translation type="obsolete">Tagasi</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Algusesse</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/importnative.cpp" line="260"/>
         <source>The selected item is not a valid archive file!</source>
         <translation>Valitud vail pole arhiivifail!</translation>
     </message>
 </context>
 <context>
-    <name>EditMetadataDialog</name>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-</context>
-<context>
     <name>ExportNative</name>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Lõpeta</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
     <message>
         <location filename="../mytharchive/exportnative.cpp" line="374"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation type="obsolete">Lisa salvestis</translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation type="obsolete">Lisa video</translation>
     </message>
     <message>
         <location filename="../mytharchive/exportnative.cpp" line="215"/>
@@ -92,22 +45,6 @@
 <context>
     <name>FileSelector</name>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">Valmis</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
-    <message>
-        <source>Back</source>
-        <translation type="obsolete">Tagasi</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Algusesse</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/fileselector.cpp" line="312"/>
         <source>The selected item is not a directory!</source>
         <translation>valitud element pole kataloog!</translation>
@@ -130,18 +67,6 @@
 </context>
 <context>
     <name>ImportNative</name>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Lõpeta</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="399"/>
         <source>You need to select a valid chanID!</source>
@@ -181,14 +106,6 @@
         <translation>Tühista</translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation type="obsolete">Uuenda</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="obsolete">Välju</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/logviewer.cpp" line="300"/>
         <source>Show Progress Log</source>
         <translation>Näita toimingu logi</translation>
@@ -217,29 +134,9 @@
 <context>
     <name>MythBurn</name>
     <message>
-        <source>Finish</source>
-        <translation type="obsolete">Lõpeta</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/mythburn.cpp" line="812"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation type="obsolete">Lisa salvestis</translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation type="obsolete">Lisa video</translation>
-    </message>
-    <message>
-        <source>Add File</source>
-        <translation type="obsolete">Lisa fail</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="330"/>
@@ -354,26 +251,11 @@
     </message>
 </context>
 <context>
-    <name>ProfileDialog</name>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
-    <message>
-        <source>Myth Archive Temp Directory</source>
-        <translation type="obsolete">Myth arhiveerija ajutine kataloog</translation>
-    </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="20"/>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
         <translation>Siia kataloogi tekitab MythArchive ajutised tööfailid. Siin peab olema VÄGA PALJU ruumi.</translation>
-    </message>
-    <message>
-        <source>Myth Archive Share Directory</source>
-        <translation type="obsolete">Myth arhiveerija jagatud kataloog</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="30"/>
@@ -433,7 +315,7 @@
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="109"/>
         <source>Always Use Mythtranscode</source>
-        <translation>Alati kasutatakse Mythtranscode&apos;i</translation>
+        <translation>Kasuta alati Mythtranscode-t</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="131"/>
@@ -509,14 +391,6 @@
         <location filename="../mytharchive/archivesettings.cpp" line="278"/>
         <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
         <translation>Käsk growisofs-i käivitamiseks. (Kasutatakse DVD-de kirjutamiseks)</translation>
-    </message>
-    <message>
-        <source>tcrequant command</source>
-        <translation type="obsolete">tcrequant käsk</translation>
-    </message>
-    <message>
-        <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation type="obsolete">Käsk tcrequant-i käivitamiseks (transcode paki osa). Pole kohustuslik - jäta tühjaks kui transcode pakki pole paigaldatud.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="303"/>
@@ -708,10 +582,6 @@ Have you set the correct path in the settings?</source>
 Sisestasid ikka õige asukoha seadistustes?</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/exportnative.cpp" line="469"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>DVD-d ei olnud võimalik luua. Skripti töös ilmnesid vead</translation>
@@ -800,10 +670,6 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">Valmis</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/recordingselector.cpp" line="99"/>
         <location filename="../mytharchive/recordingselector.cpp" line="403"/>
         <location filename="../mytharchive/recordingselector.cpp" line="475"/>
@@ -828,22 +694,6 @@ Place a blank DVD in the drive and select an option below.</source>
 </context>
 <context>
     <name>SelectDestination</name>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Järgmine</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
-    <message>
-        <source>Find...</source>
-        <translation type="obsolete">Otsi...</translation>
-    </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="30"/>
         <source>Single Layer DVD</source>
@@ -889,21 +739,6 @@ Place a blank DVD in the drive and select an option below.</source>
         <location filename="../mytharchive/selectdestination.cpp" line="328"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
-    </message>
-</context>
-<context>
-    <name>ThemeSelector</name>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Järgmine</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
     </message>
 </context>
 <context>
@@ -1129,11 +964,6 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>0 MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
-        <source>x.xx GB</source>
-        <translation>x.xx GB</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="44"/>
         <source>12.34 GB</source>
         <translation>12.34 GB</translation>
@@ -1255,51 +1085,46 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
-        <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="76"/>
         <source>File Finder To Import</source>
         <translation>Imporditav faili otsija</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Start Time:</source>
         <translation>Algusaeg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Select Associated Channel</source>
         <translation>Vali seotud kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Archived Channel</source>
         <translation>Arhiveeritud kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Chan. ID:</source>
         <translation>Kanali ID:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Chan. No:</source>
         <translation>Kanali nr.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Callsign:</source>
         <translation>Kutsung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Local Channel</source>
         <translation>Lokaalne kanal</translation>
     </message>
@@ -1324,77 +1149,73 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Laiendatud kauamängiv profiil mahutab ühekihilisele DVD-le umbes 6 tundi videot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Search Channel</source>
         <translation>Otsi kanalit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Search Callsign</source>
         <translation>Otsi kanali kutsungit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Search Name</source>
         <translation>Otsi nime</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Add video</source>
         <translation>Lisa video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Create DVD</source>
         <translation>Loo DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Create Archive</source>
         <translation>Loo arhiiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Encode Video File</source>
         <translation>Kodeeri video fail</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Import Archive</source>
         <translation>Impordi arhiiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Archive Utilities</source>
         <translation>Arhiivi tööriistad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Show Log Viewer</source>
         <translation>Vaata logi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Play Created DVD</source>
         <translation>Esita loodud DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Burn DVD</source>
         <translation>Kirjuta DVD</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
-    <message>
-        <source>Save</source>
-        <translation type="obsolete">Salvesta</translation>
-    </message>
     <message>
         <location filename="../mytharchive/thumbfinder.cpp" line="913"/>
         <source>Cancel</source>
@@ -1432,10 +1253,6 @@ Place a blank DVD in the drive and select an option below.</source>
         <location filename="../mytharchive/videoselector.cpp" line="150"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Valmis</translation>
     </message>
     <message>
         <location filename="../mytharchive/videoselector.cpp" line="348"/>

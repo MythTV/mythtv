@@ -166,10 +166,6 @@
         <source>Clear CD-RW Disk</source>
         <translation>CD-RW kustutamine</translation>
     </message>
-    <message>
-        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation type="obsolete">Kasutatav teema ei kasuta info väljasid muusika elemendis. Võid teema loojale sellest teada anda.</translation>
-    </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
@@ -390,98 +386,6 @@ Ei õnnestu faili kopeerida: %1</translation>
     </message>
 </context>
 <context>
-    <name>MiniPlayer</name>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Peatatud</translation>
-    </message>
-    <message>
-        <source>Mute: On</source>
-        <translation type="obsolete">Vaigistatud</translation>
-    </message>
-    <message>
-        <source>Mute: Off</source>
-        <translation type="obsolete">Vaigistamata</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbit/sek</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kanal</translation>
-    </message>
-    <message>
-        <source>%1  by  %2</source>
-        <comment>Music track &apos;title by artist&apos;</comment>
-        <translation type="obsolete">%1 %2-st</translation>
-    </message>
-    <message>
-        <source>Shuffle Mode: </source>
-        <translation type="obsolete">Suvaline:</translation>
-    </message>
-    <message>
-        <source>Smart</source>
-        <translation type="obsolete">Tark</translation>
-    </message>
-    <message>
-        <source>Rand</source>
-        <translation type="obsolete">Ringi</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Album</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Esineja</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Ükski</translation>
-    </message>
-    <message>
-        <source>Repeat Mode: </source>
-        <translation type="obsolete">Kordus:</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">Kõik</translation>
-    </message>
-    <message>
-        <source>Track</source>
-        <translation type="obsolete">Lugu</translation>
-    </message>
-    <message>
-        <source>Auto Show Player: </source>
-        <translation type="obsolete">Näita mängijat:</translation>
-    </message>
-    <message>
-        <source>On</source>
-        <translation type="obsolete">Sees</translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="obsolete">Väljas</translation>
-    </message>
-    <message>
-        <source>Volume: </source>
-        <translation type="obsolete">Helitugevus:</translation>
-    </message>
-    <message>
-        <source>(muted)</source>
-        <translation type="obsolete">(vaigistatud)</translation>
-    </message>
-    <message>
-        <source>Speed: </source>
-        <translation type="obsolete">Kiirus:</translation>
-    </message>
-</context>
-<context>
     <name>MusicCommon</name>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="621"/>
@@ -600,7 +504,7 @@ Ei õnnestu faili kopeerida: %1</translation>
     <message>
         <location filename="../mythmusic/main.cpp" line="482"/>
         <source>Play music</source>
-        <translation>Esita muusikat</translation>
+        <translation>Kuula</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="484"/>
@@ -1170,7 +1074,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="221"/>
         <source>File storage location</source>
-        <translation>Failisalvestusasukoht</translation>
+        <translation>Faili salvestuskoht</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="232"/>
@@ -1617,10 +1521,6 @@ Do you want to continue playing in the background?</source>
         <translation>Mahamängimisel kasutatav heliseade. &quot;vaikimisi&quot; seade kasutab MythTV määratud heliseadet</translation>
     </message>
     <message>
-        <source>Unknown Title</source>
-        <translation type="obsolete">Tundmatu pealkiri</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/playbackbox.cpp" line="1155"/>
         <source>Loading Music</source>
         <translation>Muusika laadimine</translation>
@@ -1638,7 +1538,7 @@ Do you want to continue playing in the background?</source>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="141"/>
         <source>Tag Encoding</source>
-        <translation>Märgendi kodeering</translation>
+        <translation>Siltide kodeering</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="142"/>
@@ -2538,7 +2438,7 @@ Soovid olemasoleva loo eemaldada?</translation>
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Importing CD</source>
-        <translation>Impordi CD</translation>
+        <translation>Impordin CD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="67"/>
@@ -2628,7 +2528,7 @@ Soovid olemasoleva loo eemaldada?</translation>
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>Play Music</source>
-        <translation>Esita muusikat</translation>
+        <translation>Kuula</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -2771,10 +2671,6 @@ Soovid olemasoleva loo eemaldada?</translation>
         <translation>Andmebaasis juba olemas</translation>
     </message>
     <message>
-        <source>%1%</source>
-        <translation type="obsolete">%1%</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="85"/>
         <source>Music folders and general options</source>
         <translation>Muusikakaustad ja üldised valikud</translation>
@@ -2792,12 +2688,12 @@ Soovid olemasoleva loo eemaldada?</translation>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>Select Music</source>
-        <translation>Vali muusikat</translation>
+        <translation>Vali</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>Import CD</source>
-        <translation>Impordi CD</translation>
+        <translation>Imordi CD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
@@ -2807,7 +2703,7 @@ Soovid olemasoleva loo eemaldada?</translation>
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Scan for New Music</source>
-        <translation>Skanni uut muusikat</translation>
+        <translation>Muusika otsing</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
@@ -2817,7 +2713,7 @@ Soovid olemasoleva loo eemaldada?</translation>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>Music Settings</source>
-        <translation>Muusika seaded</translation>
+        <translation>Seaded</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>

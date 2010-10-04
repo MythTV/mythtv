@@ -73,14 +73,6 @@
         <translation>Päringu ajalimiit lõppes. API võib maas olla.</translation>
     </message>
     <message>
-        <source>Web Only</source>
-        <translation type="obsolete">Ainult veeb</translation>
-    </message>
-    <message>
-        <source>Downloadable</source>
-        <translation type="obsolete">Allalaaditavad</translation>
-    </message>
-    <message>
         <location filename="../mythnetvision/netsearch.cpp" line="572"/>
         <source>No browser command set! MythNetVision needs MythBrowser installed to display the video.</source>
         <translation>MythBrowserBrauseri käsku pole sisestatud! MythNetVision vajab MythBrowser-it videote näitamiseks.</translation>
@@ -89,10 +81,6 @@
         <location filename="../mythnetvision/netsearch.cpp" line="616"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Soovid kindlasti selle faili kustutada?</translation>
-    </message>
-    <message>
-        <source>Download already running.  Try again when the download is finished.</source>
-        <translation type="obsolete">Alla laadimine juba käib. Proovi uuesti kui see on lõppenud.</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="707"/>
@@ -104,14 +92,6 @@
 </context>
 <context>
     <name>NetTree</name>
-    <message>
-        <source>Web Only</source>
-        <translation type="obsolete">Ainult veeb</translation>
-    </message>
-    <message>
-        <source>Downloadable</source>
-        <translation type="obsolete">Allalaaditavad</translation>
-    </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="490"/>
         <source>Playback/Download Options</source>
@@ -193,14 +173,6 @@
         <translation>Keela automaatne allikate uuendamine</translation>
     </message>
     <message>
-        <source>Enable Automatic RSS Updates</source>
-        <translation type="obsolete">Aktiver automatisk RSS opdatering</translation>
-    </message>
-    <message>
-        <source>Disable Automatic RSS Updates</source>
-        <translation type="obsolete">Deaktiver automatisk RSS opdatering</translation>
-    </message>
-    <message>
         <location filename="../mythnetvision/nettree.cpp" line="646"/>
         <location filename="../mythnetvision/nettree.cpp" line="665"/>
         <location filename="../mythnetvision/nettree.cpp" line="703"/>
@@ -219,10 +191,6 @@
         <translation>Soovid kindlasti selle faili kustutada?</translation>
     </message>
     <message>
-        <source>Download already running.  Try again when the download is finished.</source>
-        <translation type="obsolete">Alla laadimine juba käib. Proovi uuesti kui see on lõppenud.</translation>
-    </message>
-    <message>
         <location filename="../mythnetvision/nettree.cpp" line="1225"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Uuendan RSS-i. See võib natuke aega võtta...</translation>
@@ -234,45 +202,11 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Comments</source>
-        <translation type="obsolete">Kommentaarid</translation>
-    </message>
-    <message>
-        <source>Responses</source>
-        <translation type="obsolete">Vasted</translation>
-    </message>
-    <message>
-        <source>Backlinks</source>
-        <translation type="obsolete">Tagasiviited</translation>
-    </message>
-</context>
-<context>
     <name>RSSEditor</name>
     <message>
         <location filename="../mythnetvision/rsseditor.cpp" line="535"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Oled kindel, et ei soov seda voogu enam jälgida?</translation>
-    </message>
-</context>
-<context>
-    <name>RSSSite</name>
-    <message>
-        <source>Retrieve Failed. </source>
-        <translation type="obsolete">Viga hankimisel.</translation>
-    </message>
-    <message>
-        <source>Failed to read downloaded file.</source>
-        <translation type="obsolete">Viga alla laetud faili lugemisel.</translation>
-    </message>
-    <message>
-        <source>Showing Cached News.</source>
-        <translation type="obsolete">Näitan puhverdatud uudiseid.</translation>
-    </message>
-    <message>
-        <source>XML-file is not valid RSS-feed</source>
-        <translation type="obsolete">XML-fail pole korrektne RSS voog</translation>
     </message>
 </context>
 <context>
@@ -358,14 +292,6 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</tra
         <location filename="themestrings.h" line="14"/>
         <source>Select to change image...</source>
         <translation>Vali pildi muutmiseks...</translation>
-    </message>
-    <message>
-        <source>Manage Tree Subscriptions</source>
-        <translation type="obsolete">Halda liitumiste puud</translation>
-    </message>
-    <message>
-        <source>Choose the sites you wish to browse.</source>
-        <translation type="obsolete">Vali lehed, mida soovid sirvida.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -527,10 +453,6 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</tra
         <location filename="themestrings.h" line="47"/>
         <source>Browse highlights and entire sites</source>
         <translation>Sirvi esile tõstetuid ja kogu lehti</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
     </message>
 </context>
 <context>

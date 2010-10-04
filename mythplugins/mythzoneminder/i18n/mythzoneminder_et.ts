@@ -4,10 +4,6 @@
 <context>
     <name>FunctionDialog</name>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <location filename="../mythzoneminder/zmconsole.cpp" line="67"/>
         <source>OK</source>
         <translation></translation>

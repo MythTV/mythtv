@@ -116,10 +116,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
@@ -262,10 +258,6 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <location filename="themestrings.h" line="20"/>
         <source>Edit RSS News Feed</source>
         <translation>Muuda RSS uudisvoogusid</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>

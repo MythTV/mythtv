@@ -14,18 +14,6 @@
         <translation>Sisesta järjrhoidja üksikasjad</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
-    <message>
-        <source>Find...</source>
-        <translation type="obsolete">Otsi...</translation>
-    </message>
-    <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
         <source>Select a category</source>
         <translation>Vali kategooria</translation>
@@ -106,17 +94,9 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
         <translation>MythBrowser-i seaded</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
-    </message>
-    <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="115"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
-        <translation>Veebilehitseja käivitamise käsk. Kasuta &apos;Sisemine&apos; sisseehitatud lehitseja jaoks. %ZOOM% ja %URL% asendatakse suurendusväärtuse ja URL-ga.</translation>
+        <translation>Veebilehitseja käivitamise käsk. Kasuta &apos;Internal&apos; sisseehitatud lehitseja jaoks. %ZOOM% ja %URL% asendatakse suurendusväärtuse ja URL-ga.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="119"/>
@@ -321,10 +301,6 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <location filename="themestrings.h" line="7"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
