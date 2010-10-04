@@ -259,7 +259,7 @@ void DetectLetterbox::Detect(VideoFrame *frame)
         if (detectLetterboxDetectedMode != kAdjustFill_Full)
         {
             VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: Detected Letterbox "
-                    "on line: %1 (limit: %2) frame: %2").arg(minTop)
+                    "on line: %1 (limit: %2) frame: %3").arg(minTop)
                     .arg(fullLimit).arg(detectLetterboxPossibleFullFrame));
             detectLetterboxLock.lock();
             detectLetterboxConsecutiveCounter = 0;
