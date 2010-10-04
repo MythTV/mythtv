@@ -1997,7 +1997,7 @@ void MythPlayer::VideoStart(void)
     }
 
     SetPlaying(true);
-    ClearAfterSeek();
+    ClearAfterSeek(false);
 
     avsync_delay = 0;
     avsync_avg = 0;
