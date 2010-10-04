@@ -1635,7 +1635,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     {
         if (is_reload)
         {
-            VERBOSE(VB_IMPORTANT, LOC +
+            VERBOSE(VB_FILE, LOC +
                     QString("Updated pathname '%1':'%2' -> '%3'")
                     .arg(pathname).arg(GetBasename()).arg(new_basename));
         }
