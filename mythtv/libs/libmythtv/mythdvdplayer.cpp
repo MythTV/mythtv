@@ -87,11 +87,19 @@ void MythDVDPlayer::PreProcessNormalFrame(void)
 
 bool MythDVDPlayer::VideoLoop(void)
 {
+    if (!player_ctx->buffer->isDVD())
+    {
+        SetErrored("RingBuffer is not a DVD.");
+        return !IsErrored();
+    }
+
     int nbframes = 0;
     if (videoOutput)
         nbframes = videoOutput->ValidVideoFrames();
 
-    if (nbframes < 2 && player_ctx->buffer->isDVD())
+    // when DVDRingBuffer is waiting, we drain the video buffers and then
+    // clear the wait state before proceeding
+    if (nbframes < 2)
     {
         bool isWaiting  = player_ctx->buffer->DVD()->IsWaiting();
 
