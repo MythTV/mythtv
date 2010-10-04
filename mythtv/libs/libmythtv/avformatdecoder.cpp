@@ -2988,6 +2988,8 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     avcodeclock->lock();
     if (private_dec)
     {
+        if (QString(ic->iformat->name).contains("avi"))
+            pkt->pts = pkt->dts;
         if (decodeStillFrame)
         {
             int count = 0;
