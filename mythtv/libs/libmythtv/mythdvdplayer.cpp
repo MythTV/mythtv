@@ -332,17 +332,7 @@ void MythDVDPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     if (!player_ctx->buffer->isDVD())
         return;
     if (player_ctx->buffer->DVD()->IsInMenu())
-    {
-        long long rPos = player_ctx->buffer->GetReadPosition();
-        long long tPos = 1;//player_ctx->buffer->GetTotalReadPosition();
-
-        player_ctx->buffer->DVD()->GetDescForPos(info.text["description"]);
-
-        if (rPos)
-            info.values["position"] = (int)((rPos / tPos) * 1000.0);
-
         return;
-    }
 
     int playbackLen = totalLength;
     float secsplayed = 0.0f;
