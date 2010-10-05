@@ -138,7 +138,6 @@ class MPUBLIC DVDRingBufferPriv
     bool           m_audioStreamsChanged;
     bool           m_dvdWaiting;
     long long      m_titleLength;
-    MythTimer      m_stillFrameTimer;
     uint32_t       m_clut[16];
     uint8_t        m_button_color[4];
     uint8_t        m_button_alpha[4];

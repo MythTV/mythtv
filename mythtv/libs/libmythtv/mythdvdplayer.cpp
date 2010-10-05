@@ -11,7 +11,8 @@
 MythDVDPlayer::MythDVDPlayer(bool muted)
   : MythPlayer(muted), hidedvdbutton(true),
     dvd_stillframe_showing(false), need_change_dvd_track(0),
-    m_initial_title(-1), m_initial_audio_track(-1), m_initial_subtitle_track(-1)
+    m_initial_title(-1), m_initial_audio_track(-1), m_initial_subtitle_track(-1),
+    m_stillFrameLength(0xff)
 {
 }
 
@@ -49,6 +50,12 @@ void MythDVDPlayer::DisplayPauseFrame(void)
         SetScanType(kScan_Progressive);
     DisplayDVDButton();
     MythPlayer::DisplayPauseFrame();
+}
+
+void MythDVDPlayer::DecoderPauseCheck(void)
+{
+    StillFrameCheck();
+    MythPlayer::DecoderPauseCheck();
 }
 
 bool MythDVDPlayer::PrebufferEnoughFrames(bool pause_audio, int  min_buffers)
@@ -101,9 +108,7 @@ bool MythDVDPlayer::VideoLoop(void)
     // clear the wait state before proceeding
     if (nbframes < 2)
     {
-        bool isWaiting  = player_ctx->buffer->DVD()->IsWaiting();
-
-        if (isWaiting)
+        if (player_ctx->buffer->DVD()->IsWaiting())
         {
             player_ctx->buffer->DVD()->WaitSkip();
             return !IsErrored();
@@ -111,21 +116,23 @@ bool MythDVDPlayer::VideoLoop(void)
 
         if (player_ctx->buffer->InDVDMenuOrStillFrame())
         {
+            if (!videoPaused)
+            {
+                PauseVideo();
+                return !IsErrored();
+            }
+
+            StillFrameCheck();
+
             if (nbframes == 0)
             {
-                VERBOSE(VB_PLAYBACK+VB_EXTRA, LOC_ERR +
+                VERBOSE(VB_PLAYBACK, LOC_WARN +
                         "In DVD Menu: No video frames in queue");
-                if (videoPaused)
-                    UnpauseVideo();
                 usleep(10000);
                 return !IsErrored();
             }
 
-            if (!videoPaused && nbframes == 1)
-            {
-                dvd_stillframe_showing = true;
-                PauseVideo();
-            }
+            dvd_stillframe_showing = true;
         }
     }
 
@@ -532,3 +539,28 @@ bool MythDVDPlayer::SwitchAngle(int angle)
     return player_ctx->buffer->DVD()->SwitchAngle(angle);
 }
 
+void MythDVDPlayer::ResetStillFrameTimer(void)
+{
+    m_stillFrameTimerLock.lock();
+    m_stillFrameTimer.restart();
+    m_stillFrameTimerLock.unlock();
+}
+
+void MythDVDPlayer::SetStillFrameTimeout(int length)
+{
+    m_stillFrameLength = length;
+}
+
+void MythDVDPlayer::StillFrameCheck(void)
+{
+    if (player_ctx->buffer->isDVD() &&
+        player_ctx->buffer->DVD()->InStillFrame() &&
+        m_stillFrameLength < 0xff)
+    {
+        m_stillFrameTimerLock.lock();
+        int elapsedTime = m_stillFrameTimer.elapsed() / 1000;
+        m_stillFrameTimerLock.unlock();
+        if (elapsedTime >= m_stillFrameLength)
+            player_ctx->buffer->DVD()->SkipStillFrame();
+    }
+}

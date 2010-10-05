@@ -313,11 +313,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 m_pgStart   = cell_event->pg_start;
                 m_cellChanged = true;
 
-                if (dvdnav_get_next_still_flag(m_dvdnav) > 0)
-                {
-                    if (dvdnav_get_next_still_flag(m_dvdnav) < 0xff)
-                        m_stillFrameTimer.restart();
-                }
+                uint32_t still_time = dvdnav_get_next_still_flag(m_dvdnav);
+                if ((still_time > 0) && (still_time < 0xff) && m_parent)
+                    m_parent->ResetStillFrameTimer();
 
                 m_part = 0;
                 m_titleParts = 0;
@@ -335,10 +333,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         QString("DVDNAV_CELL_CHANGE: "
                                 "pg_length == %1, pgc_length == %2, "
                                 "cell_start == %3, pg_start == %4, "
-                                "title == %5, part == %6 titleParts %7")
+                                "title == %5, part == %6 titleParts %7, "
+                                "still_time == %8")
                             .arg(m_pgLength).arg(m_pgcLength)
                             .arg(m_cellStart).arg(m_pgStart)
-                            .arg(m_title).arg(m_part).arg(m_titleParts));
+                            .arg(m_title).arg(m_part).arg(m_titleParts)
+                            .arg(still_time));
 
                 m_buttonSelected = false;
                 if (m_runningCellStart)
@@ -546,14 +546,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     SkipStillFrame();
                 else
                 {
-                    int elapsedTime = 0;
-                    if (still->length  < 0xff)
-                    {
-                        elapsedTime = m_stillFrameTimer.elapsed() / 1000;
-                        if (elapsedTime >= still->length)
-                            SkipStillFrame();
-                    }
+                    if (m_parent)
+                        m_parent->SetStillFrameTimeout(still->length);
                 }
+
                 if (blockBuf != m_dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(m_dvdnav, blockBuf);

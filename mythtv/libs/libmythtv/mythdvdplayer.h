@@ -34,6 +34,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
     virtual bool PrebufferEnoughFrames(bool pause_audio = true,
                                        int  min_buffers = 0);
+    virtual void DecoderPauseCheck(void);
     virtual bool DecoderGetFrameFFREW(void);
     virtual bool DecoderGetFrameREW(void);
     virtual void ChangeSpeed(void);
@@ -47,6 +48,9 @@ class MythDVDPlayer : public MythPlayer
                                    bool absolute);
 
     void HideDVDButton(bool hide) { hidedvdbutton = hide; }
+    void ResetStillFrameTimer(void);
+    void SetStillFrameTimeout(int length);
+    void StillFrameCheck(void);
 
     virtual int GetNumAngles(void) const;
     virtual int GetCurrentAngle(void) const;
@@ -65,6 +69,11 @@ class MythDVDPlayer : public MythPlayer
     int m_initial_title;
     int m_initial_audio_track;
     int m_initial_subtitle_track;
+
+    // still frame timing
+    MythTimer m_stillFrameTimer;
+    int       m_stillFrameLength;
+    QMutex    m_stillFrameTimerLock;
 };
 
 #endif // MYTHDVDPLAYER_H
