@@ -1910,8 +1910,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 if (HAVE_THREADS && thread_count > 1)
                 {
+                    if (enc->thread_count > 1)
+                        avcodec_thread_free(enc);
                     avcodec_thread_init(enc, thread_count);
-                    enc->thread_count = thread_count;
                 }
 
                 InitVideoCodec(ic->streams[i], enc,
