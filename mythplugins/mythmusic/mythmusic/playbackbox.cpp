@@ -468,6 +468,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                                             160, 160);
                 mainvisual->setVisual(visual_modes[current_visual]);
                 bannerDisable();
+                updateTrackInfo(curMeta);
 
                 if (!m_parent->IsExitingToMain())
                     handled = true;
