@@ -1328,6 +1328,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     QString screenshot = GetScreenshot(node);
     QString banner     = GetBanner(node);
     QString fanart     = GetFanart(node);
+    int nodeInt = node->getInt();
 
     if (!screenshot.isEmpty() && parent && metadata &&
         ((QString::compare(parent->getString(),
@@ -1336,14 +1337,6 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     {
         item->SetImage(screenshot);
     }
-    else
-    {
-        if (coverimage.isEmpty())
-            coverimage = GetFirstImage(node, "Coverart");
-        item->SetImage(coverimage);
-    }
-
-    int nodeInt = node->getInt();
 
     if (coverimage.isEmpty() && nodeInt == kSubFolder)
         coverimage = GetFirstImage(node, "Coverart");
