@@ -54,13 +54,13 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     QString host = qurl.host();
     int port = qurl.port();
-   
+
     dir = qurl.path();
 
     if (qurl.hasQuery())
         dir += "?" + QUrl::fromPercentEncoding(qurl.encodedQuery());
-    
-    if (qurl.hasFragment()) 
+
+    if (qurl.hasFragment())
         dir += "#" + qurl.fragment();
 
     QString sgroup = qurl.userName();
@@ -87,7 +87,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         lsock->DownRef();
         return NULL;
     }
-    
+
     QString hostname = GetMythDB()->GetHostName();
 
     QStringList strlist;
@@ -163,21 +163,28 @@ MythSocket *RemoteFile::openSocket(bool control)
                      QString(", error was %1").arg(strlist[1]) :
                      QString(", remote error")));
         }
-
-        // Close the sockets if we received an error so that isOpen() will
-        // return false if the caller tries to use the RemoteFile.
-        Close();
     }
 
     return lsock;
-}    
+}
 
 bool RemoteFile::Open(void)
 {
     QMutexLocker locker(&lock);
     controlSock = openSocket(true);
+    if (!controlSock)
+        return false;
+
     sock = openSocket(false);
-    return isOpen();
+    if (!sock)
+    {
+        // Close the sockets if we received an error so that isOpen() will
+        // return false if the caller tries to use the RemoteFile.
+        locker.unlock();
+        Close();
+        return false;
+    }
+    return true;
 }
 
 void RemoteFile::Close(void)
@@ -194,19 +201,19 @@ void RemoteFile::Close(void)
     {
         VERBOSE(VB_IMPORTANT, "Remote file timeout.");
     }
-    
+
     if (sock)
     {
         sock->DownRef();
         sock = NULL;
-    }    
+    }
     if (controlSock)
     {
         controlSock->DownRef();
         controlSock = NULL;
-    } 
+    }
 
-    lock.unlock();   
+    lock.unlock();
 }
 
 bool RemoteFile::DeleteFile(const QString &url)
@@ -408,10 +415,10 @@ int RemoteFile::Write(const void *data, int size)
 
     if (!sock->isOpen() || sock->error())
         return -1;
-   
+
     if (!controlSock->isOpen() || controlSock->error())
         return -1;
-    
+
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "WRITE_BLOCK";
     strlist << QString::number(size);
@@ -475,7 +482,7 @@ int RemoteFile::Read(void *data, int size)
     int sent = 0;
     bool error = false;
     bool response = false;
-   
+
     QMutexLocker locker(&lock);
     if (!sock)
     {
@@ -485,13 +492,13 @@ int RemoteFile::Read(void *data, int size)
 
     if (!sock->isOpen() || sock->error())
         return -1;
-   
+
     if (!controlSock->isOpen() || controlSock->error())
         return -1;
-    
+
     if (sock->bytesAvailable() > 0)
     {
-        VERBOSE(VB_NETWORK, 
+        VERBOSE(VB_NETWORK,
                 "RemoteFile::Read(): Read socket not empty to start!");
         while (sock->waitForMore(5) > 0)
         {
@@ -501,15 +508,15 @@ int RemoteFile::Read(void *data, int size)
             delete [] trash;
         }
     }
-    
+
     if (controlSock->bytesAvailable() > 0)
     {
-        VERBOSE(VB_NETWORK, 
+        VERBOSE(VB_NETWORK,
                 "RemoteFile::Read(): Control socket not empty to start!");
         QStringList tempstrlist;
         controlSock->readStringList(tempstrlist);
     }
-    
+
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "REQUEST_BLOCK";
     strlist << QString::number(size);
@@ -520,7 +527,7 @@ int RemoteFile::Read(void *data, int size)
     int waitms = 10;
     MythTimer mtimer;
     mtimer.start();
-    
+
     while (recv < sent && !error && mtimer.elapsed() < 10000)
     {
         while (recv < sent && sock->waitForMore(waitms) > 0)
@@ -547,8 +554,8 @@ int RemoteFile::Read(void *data, int size)
             sent = strlist[0].toInt(); // -1 on backend error
             response = true;
         }
-    } 
-    
+    }
+
     if (!error && !response)
     {
         if (controlSock->readStringList(strlist, true))
@@ -557,7 +564,7 @@ int RemoteFile::Read(void *data, int size)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, 
+            VERBOSE(VB_IMPORTANT,
                    "RemoteFile::Read(): No response from control socket.");
             sent = -1;
         }
