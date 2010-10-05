@@ -65,7 +65,7 @@ struct bd_registers_s;
 typedef struct hdmv_vm_s HDMV_VM;
 
 BD_PRIVATE HDMV_VM *hdmv_vm_init(const char *disc_root, struct bd_registers_s *regs);
-BD_PRIVATE void     hdmv_vm_free(HDMV_VM *p);
+BD_PRIVATE void     hdmv_vm_free(HDMV_VM **p);
 
 BD_PRIVATE int      hdmv_vm_select_object(HDMV_VM *p, int object);
 BD_PRIVATE int      hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds);

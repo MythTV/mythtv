@@ -96,16 +96,16 @@ static int _mobj_parse_object(BITSTREAM *bs, MOBJ_OBJECT *obj)
     return 1;
 }
 
-void mobj_free(MOBJ_OBJECTS *objects)
+void mobj_free(MOBJ_OBJECTS **p)
 {
-    if (objects) {
+    if (p && *p) {
 
         int i;
-        for (i = 0 ; i < objects->num_objects; i++) {
-            X_FREE(objects->objects[i].cmds);
+        for (i = 0 ; i < (*p)->num_objects; i++) {
+            X_FREE((*p)->objects[i].cmds);
         }
 
-        X_FREE(objects);
+        X_FREE(*p);
     }
 }
 
@@ -152,7 +152,7 @@ MOBJ_OBJECTS *mobj_parse(const char *file_name)
     return objects;
 
  error:
-    mobj_free(objects);
+    mobj_free(&objects);
     file_close(fp);
     return NULL;
 }

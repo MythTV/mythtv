@@ -58,7 +58,7 @@ typedef void*   (*fptr_p_void)();
 typedef struct bd_event_queue_s {
     unsigned in;  /* next free slot */
     unsigned out; /* next event */
-    BD_EVENT ev[MAX_EVENTS];
+    BD_EVENT ev[MAX_EVENTS+1];
 } BD_EVENT_QUEUE;
 
 typedef enum {
@@ -532,10 +532,9 @@ void bd_close(BLURAY *bd)
         nav_title_close(bd->title);
     }
 
-    if (bd->hdmv_vm)
-        hdmv_vm_free(bd->hdmv_vm);
+    hdmv_vm_free(&bd->hdmv_vm);
 
-    indx_free(bd->index);
+    indx_free(&bd->index);
     bd_registers_free(bd->regs);
 
     X_FREE(bd->event_queue);
@@ -1374,8 +1373,7 @@ int bd_play(BLURAY *bd)
     bd->title_type = title_undef;
 
     if (bd->hdmv_vm) {
-        hdmv_vm_free(bd->hdmv_vm);
-        bd->hdmv_vm = NULL;
+        hdmv_vm_free(&bd->hdmv_vm);
         bd->hdmv_suspended = 1;
     }
 

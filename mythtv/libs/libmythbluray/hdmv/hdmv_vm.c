@@ -246,16 +246,19 @@ HDMV_VM *hdmv_vm_init(const char *disc_root, BD_REGISTERS *regs)
     return  p;
 }
 
-void hdmv_vm_free(HDMV_VM *p)
+void hdmv_vm_free(HDMV_VM **p)
 {
-    mobj_free(p->movie_objects);
+    if (p && *p) {
 
-    if (p->ig_object) {
-        X_FREE(p->ig_object->cmds);
-        X_FREE(p->ig_object);
+      mobj_free(&(*p)->movie_objects);
+
+        if ((*p)->ig_object) {
+            X_FREE((*p)->ig_object->cmds);
+            X_FREE((*p)->ig_object);
+        }
+
+        X_FREE(*p);
     }
-
-    X_FREE(p);
 }
 
 /*

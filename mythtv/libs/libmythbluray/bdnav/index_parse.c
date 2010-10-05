@@ -188,10 +188,10 @@ INDX_ROOT *indx_parse(const char *file_name)
     return NULL;
 }
 
-void indx_free(INDX_ROOT *index)
+void indx_free(INDX_ROOT **p)
 {
-    if (index) {
-        X_FREE(index->titles);
-        X_FREE(index);
+    if (p && *p) {
+        X_FREE((*p)->titles);
+        X_FREE(*p);
     }
 }

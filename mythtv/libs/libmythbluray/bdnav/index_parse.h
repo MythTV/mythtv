@@ -111,7 +111,7 @@ typedef struct indx_root_s {
 
 
 BD_PRIVATE INDX_ROOT* indx_parse(const char *path); /* parse index.bdmv */
-BD_PRIVATE void       indx_free(INDX_ROOT *index);
+BD_PRIVATE void       indx_free(INDX_ROOT **index);
 
 #ifdef __cplusplus
 };
