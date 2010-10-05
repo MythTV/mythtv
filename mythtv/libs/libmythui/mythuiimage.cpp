@@ -34,7 +34,7 @@ class ImageLoadThread;
                      .arg((uintptr_t)this,0,16)
 
 /*!
- * \class ImageLoadThread
+ * \class ImageLoadEvent
  */
 class ImageLoadEvent : public QEvent
 {
