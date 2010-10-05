@@ -5,6 +5,7 @@ using namespace std;
 #include <cstdlib>
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QPixmap>
 #include <QList>
 #include <QFile>
@@ -1113,7 +1114,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     value = qApp->translate("ThemeUI",
-                                            getFirstText(element).toUtf8(),
+                                            getFirstText(info).toUtf8(),
                                             NULL,
                                             QCoreApplication::UnicodeUTF8);
                 }
@@ -1253,7 +1254,7 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     value = qApp->translate("ThemeUI",
-                                            getFirstText(element).toUtf8(),
+                                            getFirstText(info).toUtf8(),
                                             NULL,
                                             QCoreApplication::UnicodeUTF8);
                 }
