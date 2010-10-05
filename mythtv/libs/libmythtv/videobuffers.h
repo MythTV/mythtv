@@ -114,15 +114,6 @@ class VideoBuffers
     VideoFrame *GetLastDecodedFrame(void) { return at(vpos); }
     VideoFrame *GetLastShownFrame(void) { return at(rpos); }
     void SetLastShownFrameToScratch() { rpos = size(); }
-    bool WaitForAvailable(uint w)
-    {
-        // Qt4 requires a QMutex as a parameter...
-        // not sure if this is the best solution.  Mutex Must be locked before wait.
-        QMutex mutex;
-        mutex.lock();
-
-        return available_wait.wait(&mutex, w);
-    }
 
     uint ValidVideoFrames(void) const { return size(kVideoBuffer_used); }
     uint FreeVideoFrames(void) const { return size(kVideoBuffer_avail); }
@@ -183,8 +174,6 @@ class VideoBuffers
     uchar_vector_t         allocated_arrays;  // for DeleteBuffers
     frame_map_t            parents;    // prev & future frames
     frame_map_t            children;   // frames that depend on a parent frame
-
-    QWaitCondition         available_wait;
 
     uint                   numbuffers;
     uint                   needfreeframes;

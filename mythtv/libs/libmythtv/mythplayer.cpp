@@ -2819,8 +2819,10 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
     // Wait for frames to be available for decoding onto
     if (!videoOutput->EnoughFreeFrames() && !unsafe && !killdecoder)
     {
-        if (!videoOutput->WaitForAvailable(10) &&
-            !videoOutput->EnoughFreeFrames())
+        int tries = 0;
+        while (!videoOutput->EnoughFreeFrames() && (tries++ < 10))
+            usleep(10000);
+        if (!videoOutput->EnoughFreeFrames())
         {
             if (++videobuf_retries >= 200)
             {

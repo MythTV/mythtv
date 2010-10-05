@@ -261,8 +261,6 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
                         "      %2")
                 .arg(DebugString(frame, true)).arg(GetStatus()));
         frame = used.dequeue();
-        if (EnoughFreeFrames())
-            available_wait.wakeAll();
     }
 
     if (frame)
@@ -393,8 +391,6 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
     {
         remove(kVideoBuffer_used, frame);
         enqueue(kVideoBuffer_avail, frame);
-        if (EnoughFreeFrames())
-            available_wait.wakeAll();
     }
 }
 
@@ -528,9 +524,6 @@ void VideoBuffers::enqueue(BufferType type, VideoFrame *frame)
     q->remove(frame);
     q->enqueue(frame);
     global_lock.unlock();
-
-    if (q == &available && EnoughFreeFrames())
-        available_wait.wakeAll();
 
     return;
 }
@@ -758,10 +751,6 @@ void VideoBuffers::ClearAfterSeek(void)
             vpos = rpos = 0;
         }
     }
-
-    if (EnoughFreeFrames())
-        available_wait.wakeAll();
-
 }
 
 void VideoBuffers::LockFrame(const VideoFrame *frame, const char* owner)
