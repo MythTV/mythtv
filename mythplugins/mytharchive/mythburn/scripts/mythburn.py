@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20100626-1"
+VERSION="0.1.20101006-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -803,8 +803,11 @@ def getDefaultParametersFromMythTVDB():
 
     write( "Obtaining MythTV settings from MySQL database for hostname " + configHostname)
 
-    #TVFormat is not dependant upon the hostname.
-    sqlstatement="""SELECT value, data FROM settings WHERE value IN('DBSchemaVer') 
+    #DBSchemaVer, ISO639Language0 ISO639Language1 are not dependant upon the hostname.
+    sqlstatement="""SELECT value, data FROM settings WHERE value IN(
+                        'DBSchemaVer',
+                        'ISO639Language0',
+                        'ISO639Language1') 
                     OR (hostname=%s AND value IN(
                         'VideoStartupDir',
                         'GalleryDir',
@@ -835,8 +838,6 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveTimeFormat',
                         'MythArchiveClearArchiveTable',
                         'MythArchiveDriveSpeed',
-                        'ISO639Language0',
-                        'ISO639Language1',
                         'JobQueueCPU'
                         )) ORDER BY value"""
 
