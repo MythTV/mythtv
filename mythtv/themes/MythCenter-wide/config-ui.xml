@@ -25,6 +25,7 @@
 
         <buttonlist name="channels" from="basebuttonlist2">
             <position>18,50</position>
+            <buttonarea>0,0,1200,364</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,1200,26</area>
                 <state name="active">
@@ -69,7 +70,7 @@
         </buttonlist>
 
         <button name="delete" from="basebutton">
-            <position>760,474</position>
+            <position>1000,474</position>
             <value>Delete</value>
         </button>
 
