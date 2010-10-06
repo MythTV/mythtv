@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythlocale>
+  <!-- Global Settings -->
+    <!-- EIT, Subtitle, Audio Stream Language Preferences -->
+    <setting name="ISO639Language0" global="true">rus</setting>
+    <setting name="ISO639Language1" global="true">rus</setting>
+
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">PAL</setting>
+    <setting name="VbiFormat" global="true">PAL Teletext</setting>
+    <setting name="FreqTable" global="true">europe-east</setting>
+
+    <!-- Scheduling -->
+
+
+    <!-- Advert Detection -->
+
+
+  <!-- Per-host Settings -->
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language">ru</setting>
+
+    <!-- Date/Time format -->
+    <setting name="DateFormat">ddd d MMM yyyy</setting>
+    <setting name="TimeFormat">hh:mm</setting>
+    <setting name="ShortDateFormat">dd.MM</setting>
+
+    <!-- Playback -->
+
+
+  <!-- Plugins -->
+    <!-- MythArchive -->
+    <setting name="MythArchiveVideoFormat">PAL</setting>
+</mythlocale>
