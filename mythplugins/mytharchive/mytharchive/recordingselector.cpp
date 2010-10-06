@@ -109,6 +109,8 @@ bool RecordingSelector::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_recordingButtonList);
+
     return true;
 }
 

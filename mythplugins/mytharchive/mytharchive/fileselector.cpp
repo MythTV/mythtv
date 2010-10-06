@@ -97,6 +97,8 @@ bool FileSelector::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_fileButtonList);
+
     updateSelectedList();
     updateFileList();
 

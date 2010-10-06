@@ -166,6 +166,8 @@ bool ThumbFinder::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_imageGrid);
+
     return true;
 }
 

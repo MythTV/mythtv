@@ -91,6 +91,8 @@ bool LogViewer::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_logList);
+
     return true;
 }
 

@@ -98,6 +98,8 @@ bool ExportNative::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_nextButton);
+
     loadConfiguration();
 
     return true;

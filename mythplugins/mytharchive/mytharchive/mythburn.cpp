@@ -128,6 +128,8 @@ bool MythBurn::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_nextButton);
+
     return true;
 }
 
@@ -1077,6 +1079,8 @@ bool ProfileDialog::Create()
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(save()));
 
     BuildFocusList();
+
+    SetFocusWidget(m_profile_list);
 
     return true;
 }

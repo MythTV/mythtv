@@ -89,6 +89,8 @@ bool SelectDestination::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_nextButton);
+
     loadConfiguration();
 
     return true;

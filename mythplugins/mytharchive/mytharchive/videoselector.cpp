@@ -84,6 +84,8 @@ bool VideoSelector::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_videoButtonList);
+
     updateSelectedList();
     updateVideoList();
 

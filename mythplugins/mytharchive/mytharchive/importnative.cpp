@@ -221,6 +221,8 @@ bool ArchiveFileSelector::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_fileButtonList);
+
     updateSelectedList();
     updateFileList();
 
@@ -360,6 +362,8 @@ bool ImportNative::Create(void)
                      m_details.chanName, m_details.callsign);
 
     BuildFocusList();
+
+    SetFocusWidget(m_finishButton);
 
     return true;
 }
