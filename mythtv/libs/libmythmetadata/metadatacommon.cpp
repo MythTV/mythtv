@@ -213,7 +213,6 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     tagline = item.firstChildElement("tagline").text();
     description = item.firstChildElement("description").text();
     album = item.firstChildElement("albumname").text();
-    system = item.firstChildElement("system").text();
     inetref = item.firstChildElement("inetref").text();
     tmsref = item.firstChildElement("tmsref").text();
     imdb = item.firstChildElement("imdb").text();
@@ -237,6 +236,14 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
         year = releasedate.toString("yyyy").toUInt();
     runtime = item.firstChildElement("runtime").text().toUInt();
     runtimesecs = item.firstChildElement("runtimesecs").text().toUInt();
+
+    QDomElement systems = item.firstChildElement("systems");
+    if (!systems.isNull())
+    {
+        QDomElement firstSystem = systems.firstChildElement("system");
+        if (!firstSystem.isNull())
+            system = firstSystem.text();
+    }
 
     // TODO: Once TMDB supports certification per-locale, come back and match
     // locale of myth to certification locale.
