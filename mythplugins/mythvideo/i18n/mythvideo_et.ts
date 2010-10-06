@@ -1347,7 +1347,7 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
     <message>
         <location filename="themestrings.h" line="159"/>
         <source>Video Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Videote sirvija</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="164"/>
