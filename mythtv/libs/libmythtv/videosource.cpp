@@ -53,7 +53,6 @@ using namespace std;
 #include "hdhomerun.h"
 #endif
 
-QMutex XMLTVFindGrabbers::list_lock;
 static const uint kDefaultMultirecCount = 2;
 
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
@@ -519,110 +518,6 @@ void NoGrabber_config::Save(void)
     useeit->Save();
 }
 
-Loading_config::Loading_config(const VideoSource& _parent) :
-    VerticalConfigurationGroup(false, false, false, false)
-{
-    TransLabelSetting *label = new TransLabelSetting();
-    label->setValue(QObject::tr("Loading XMLTV configuration..."));
-    addChild(label);
-}
-
-void XMLTVFindGrabbers::run(void)
-{
-    struct ScopedIgnoreQProcessWarning
-    {
-        ScopedIgnoreQProcessWarning(QProcess &process) : m_process(process) {}
-
-        ~ScopedIgnoreQProcessWarning()
-        {
-            if (m_process.state() != QProcess::NotRunning)
-            {
-                m_process.kill();
-                m_process.waitForFinished();
-            }
-        }
-
-      private:
-        QProcess &m_process;
-    };
-
-    QProcess find_grabber_proc;
-    ScopedIgnoreQProcessWarning proc_cleanup(find_grabber_proc);
-
-    QString loc = "XMLTVFindGrabbers: ";
-    QString loc_err = "XMLTVFindGrabbers, Error: ";
-
-    QMutexLocker locker(&list_lock);
-
-    static QStringList name_list;
-    static QStringList prog_list;
-
-    if (name_list.size())
-    {
-        VERBOSE(VB_GENERAL, loc + "Using existing list");
-        emit FoundXMLTVGrabbers(name_list, prog_list);
-        return;
-    }
-
-    QStringList args;
-    args += "baseline";
-    find_grabber_proc.start("tv_find_grabbers", args);
-    bool ok = find_grabber_proc.waitForStarted(250 /* milliseconds */);
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, loc + "Failed to run tv_find_grabbers");
-        emit FoundXMLTVGrabbers(name_list, prog_list);
-        return;
-    }
-
-    VERBOSE(VB_GENERAL,
-            loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
-
-    for (int i = 0; i < 100; ++i)
-    {
-        ok = find_grabber_proc.waitForFinished(250);
-        if (!ok)
-        {
-            QMutexLocker qml(&kill_grabber_search_lock);
-            if (kill_grabber)
-            {
-                VERBOSE(VB_GENERAL, loc + "tv_find_grabbers run interrupted.");
-                return;
-            }
-        }
-        else
-            break;
-    }
-
-    if (!ok)
-    {
-        VERBOSE(VB_IMPORTANT, loc + "We timed out waiting");
-        emit FoundXMLTVGrabbers(name_list, prog_list);
-        return;
-    }
-
-    find_grabber_proc.setReadChannel(QProcess::StandardOutput);
-
-    while (find_grabber_proc.canReadLine())
-    {
-        QByteArray tmp = find_grabber_proc.readLine();
-        QString grabber_list(tmp);
-        grabber_list = grabber_list.left(grabber_list.size() - 1);
-        QStringList grabber_split =
-            grabber_list.split("|", QString::SkipEmptyParts);
-        QString grabber_name = grabber_split[1] + " (xmltv)";
-        QFileInfo grabber_file(grabber_split[0]);
-
-        name_list.push_back(grabber_name);
-        prog_list.push_back(grabber_file.fileName());
-        VERBOSE(VB_GENERAL+VB_EXTRA, "Found " + grabber_split[0]);
-    }
-
-    emit FoundXMLTVGrabbers(name_list, prog_list);
-
-    VERBOSE(VB_GENERAL, loc + "Finished running tv_find_grabbers");
-};
-
 
 XMLTVConfig::XMLTVConfig(const VideoSource &aparent) :
     TriggeredConfigurationGroup(false, true, false, false),
@@ -634,20 +529,6 @@ XMLTVConfig::XMLTVConfig(const VideoSource &aparent) :
     // only save settings for the selected grabber
     setSaveAll(false);
 
-    connect(&findGrabbers, SIGNAL(FoundXMLTVGrabbers(QStringList,QStringList)),
-            this,          SLOT  (FoundXMLTVGrabbers(QStringList,QStringList)),
-            Qt::BlockingQueuedConnection);
-}
-
-XMLTVConfig::~XMLTVConfig()
-{
-    Stop();
-}
-
-void XMLTVConfig::Stop(void)
-{
-    findGrabbers.disconnect();
-    findGrabbers.stop();
 }
 
 void XMLTVConfig::Load(void)
@@ -670,27 +551,64 @@ void XMLTVConfig::Load(void)
     validValues += "schedulesdirect1";
     validValues += "eitonly";
     validValues += "/bin/true";
-    validValues += "LOADING";
 
     QString gname, d1, d2, d3;
-    bool ok = SourceUtil::GetListingsLoginData(
-        parent.getSourceID(), gname, d1, d2, d3);
+    SourceUtil::GetListingsLoginData(parent.getSourceID(), gname, d1, d2, d3);
 
-    if (ok && !validValues.contains(gname))
+    QProcess find_grabber_proc;
+
+    QString loc = "XMLTVConfig::Load: ";
+    QString loc_err = "XMLTVConfig::Load, Error: ";
+
+    QStringList name_list;
+    QStringList prog_list;
+
+    QStringList args;
+    args += "baseline";
+    find_grabber_proc.start("tv_find_grabbers", args);
+    bool ok = find_grabber_proc.waitForStarted(250 /* milliseconds */);
+    if (!ok)
+        VERBOSE(VB_IMPORTANT, loc + "Failed to run tv_find_grabbers");
+
+    VERBOSE(VB_GENERAL,
+            loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
+
+    for (int i = 0; i < 100; ++i)
     {
-        addTarget(gname, new Loading_config(parent));
-        grabber->addSelection(gname, gname, true);
+        ok = find_grabber_proc.waitForFinished(250);
+        if (ok)
+            break;
     }
 
-    addTarget("LOADING", new Loading_config(parent));
-    grabber->addSelection(QObject::tr("Loading..."), "LOADING");
+    if (!ok)
+        VERBOSE(VB_IMPORTANT, loc + "We timed out waiting");
+
+    find_grabber_proc.setReadChannel(QProcess::StandardOutput);
+
+    while (find_grabber_proc.canReadLine())
+    {
+        QByteArray tmp = find_grabber_proc.readLine();
+        QString grabber_list(tmp);
+        grabber_list = grabber_list.left(grabber_list.size() - 1);
+        QStringList grabber_split =
+            grabber_list.split("|", QString::SkipEmptyParts);
+        QString grabber_name = grabber_split[1] + " (xmltv)";
+        QFileInfo grabber_file(grabber_split[0]);
+
+        name_list.push_back(grabber_name);
+        prog_list.push_back(grabber_file.fileName());
+        VERBOSE(VB_GENERAL+VB_EXTRA, "Found " + grabber_split[0]);
+    }
+
+    VERBOSE(VB_GENERAL, loc + "Finished running tv_find_grabbers");
+
+    LoadXMLTVGrabbers(name_list, prog_list);
 
     TriggeredConfigurationGroup::Load();
 
-    findGrabbers.start();
 }
 
-void XMLTVConfig::FoundXMLTVGrabbers(
+void XMLTVConfig::LoadXMLTVGrabbers(
     QStringList name_list, QStringList prog_list)
 {
     if (name_list.size() != prog_list.size())
@@ -726,7 +644,6 @@ void XMLTVConfig::FoundXMLTVGrabbers(
     if (selIndex >= 0)
         grabber->setValue(selIndex);
 
-    repaint();
 }
 
 void XMLTVConfig::Save(void)
@@ -753,11 +670,6 @@ VideoSource::VideoSource()
     group->addChild(xmltv = new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
     addChild(group);
-}
-
-VideoSource::~VideoSource()
-{
-    xmltv->Stop();
 }
 
 bool VideoSourceEditor::cardTypesInclude(const int &sourceID,

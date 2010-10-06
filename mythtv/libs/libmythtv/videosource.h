@@ -201,41 +201,6 @@ protected:
     UseEIT *useeit;
 };
 
-class Loading_config: public VerticalConfigurationGroup
-{
-  public:
-    Loading_config(const VideoSource &_parent);
-
-    virtual void Save(void) { }
-    virtual void Save(QString) { }
-};
-
-class XMLTVFindGrabbers : public QThread
-{
-    Q_OBJECT
-
-  public:
-    XMLTVFindGrabbers() : kill_grabber(false) {}
-
-    virtual void run(void);
-    virtual void stop()
-    {
-        {
-            QMutexLocker qml(&kill_grabber_search_lock);
-            kill_grabber = true;
-        }
-        wait();
-    }
-
-  signals:
-    void FoundXMLTVGrabbers(QStringList,QStringList);
-
-  private:
-    QMutex             kill_grabber_search_lock;
-    bool               kill_grabber;
-
-    static QMutex      list_lock;
-};
 
 class XMLTVGrabber;
 class XMLTVConfig : public TriggeredConfigurationGroup
@@ -244,27 +209,21 @@ class XMLTVConfig : public TriggeredConfigurationGroup
 
   public:
     XMLTVConfig(const VideoSource &aparent);
-    ~XMLTVConfig();
 
     virtual void Load(void);
     virtual void Save(void);
 
-    void Stop(void);
-
-  public slots:
-    void FoundXMLTVGrabbers(QStringList,QStringList);
-
   private:
     const VideoSource &parent;
     XMLTVGrabber      *grabber;
-    XMLTVFindGrabbers  findGrabbers;
+
+    void LoadXMLTVGrabbers(QStringList name_list, QStringList prog_list);
 };
 
 class VideoSource : public ConfigurationWizard {
 public:
     VideoSource();
-    ~VideoSource();
-        
+
     int getSourceID(void) const { return id->intValue(); };
 
     void loadByID(int id);
