@@ -2326,12 +2326,13 @@ void LCDProcClient::removeWidgets()
     sendToServer("widget_del Volume topWidget");
     sendToServer("screen_del Volume");
 
-    sendToServer("screen_del Menu topWidget");
-    sendToServer("screen_del Menu menuWidget1");
-    sendToServer("screen_del Menu menuWidget2");
-    sendToServer("screen_del Menu menuWidget3");
-    sendToServer("screen_del Menu menuWidget4");
-    sendToServer("screen_del Menu menuWidget5");
+    sendToServer("widget_del Menu topWidget");
+    sendToServer("widget_del Menu menuWidget1");
+    sendToServer("widget_del Menu menuWidget2");
+    sendToServer("widget_del Menu menuWidget3");
+    sendToServer("widget_del Menu menuWidget4");
+    sendToServer("widget_del Menu menuWidget5");
+    sendToServer("screen_del Menu");
 
     sendToServer("widget_del Music progressBar");
     sendToServer("widget_del Music infoWidget");
