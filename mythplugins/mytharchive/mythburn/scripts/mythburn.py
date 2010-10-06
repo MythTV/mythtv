@@ -2605,13 +2605,13 @@ def BurnDVDISO(title):
                 if drivespeed != 0:
                     command += "-speed=%d " % drivespeed
                 command += " -use-the-force-luke -Z " + dvddrivepath 
-                command += " -dvd-video -V " + quoteFilename(title) + " "
+                command += " -dvd-video -V '" + title.replace("'", "'\\''") + "' "
                 command += os.path.join(getTempPath(),'dvd')
             else:
                 command = path_growisofs[0] + " -dvd-compat "
                 if drivespeed != 0:
                     command += "-speed=%d " % drivespeed
-                command += " -Z " + dvddrivepath + " -dvd-video -V " + quoteFilename(title) + " "
+                command += " -Z " + dvddrivepath + " -dvd-video -V '" + title.replace("'", "'\\''") + "' "
                 command += os.path.join(getTempPath(),'dvd')
 
             write(command)
