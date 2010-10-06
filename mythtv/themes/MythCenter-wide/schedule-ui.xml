@@ -1010,6 +1010,7 @@
 
         <button name="ok_button" from="basebutton">
             <position>220,114</position>
+            <value>OK</value>
         </button>
 
     </window>
@@ -1108,20 +1109,21 @@
             <position>60,260</position>
         </textedit>
 
-        <buttonlist name="category_list" from="basewideselector">
-            <position>60,330</position>
+        <buttonlist name="category_list" from="basemediumselector">
+            <area>60,330,200,40</area>
         </buttonlist>
 
-        <buttonlist name="genre_list" from="basewideselector">
+        <buttonlist name="genre_list" from="basemediumselector">
             <position>60,380</position>
         </buttonlist>
 
-        <buttonlist name="channel_list" from="basewideselector">
+        <buttonlist name="channel_list" from="basemediumselector">
             <position>60,430</position>
         </buttonlist>
 
         <button name="ok_button" from="basebutton">
             <position>170,490</position>
+            <value>OK</value>
         </button>
 
     </window>

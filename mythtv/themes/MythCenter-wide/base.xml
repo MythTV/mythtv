@@ -642,6 +642,30 @@
         </statetype>
     </buttonlist>
 
+    <!-- Base definition of a list in medium 'selector' configuration -->
+    <buttonlist name="basemediumselector" from="baseselector">
+        <area>0,0,376,44</area>
+        <buttonarea>0,0,376,44</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,376,44</area>
+                <textarea name="buttontext">
+                    <area>14,2,348,40</area>
+                </textarea>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
+            <state name="selectedinactive" from="active" />
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>380,2</position>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>380,22</position>
+        </statetype>
+    </buttonlist>
+
     <!-- Base definition of a list in wide 'selector' configuration -->
     <buttonlist name="basewideselector" from="baseselector">
         <area>0,0,696,44</area>
