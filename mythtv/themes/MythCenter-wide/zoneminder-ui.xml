@@ -46,19 +46,17 @@
         <fontdef name="listlabel" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="date" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="running" from="basesmall">
             <color>#00ff00</color>
             <size>16</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="stopped" from="running">
@@ -68,13 +66,11 @@
         <fontdef name="footer" from="basesmall">
             <color>#ffffff</color>
             <size>16</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="info" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
-            <bold>no</bold>
         </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
@@ -254,67 +250,62 @@
         <fontdef name="active" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="inactive" from="basesmall">
             <color>#9999cc</color>
             <size>18</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="selected" from="basesmall">
             <color>#00ff00</color>
             <size>18</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="date" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="description" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="listlabel" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="subtitle_active" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="subtitle_inactive" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="subtitle_selected" from="basesmall">
             <color>#ff0000</color>
             <size>14</size>
-            <bold>no</bold>
         </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
@@ -664,19 +655,19 @@
         <font name="label" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </font>
 
         <font name="data" from="basesmall">
             <color>#ffffff</color>
             <size>14</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </font>
 
         <font name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </font>
 
         <textarea name="pagetitle" from="basetextarea">
@@ -786,25 +777,21 @@
         <fontdef name="monitor" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="idle" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="alarm" from="basesmall">
             <color>#ff0000</color>
             <size>16</size>
-            <bold>no</bold>
         </fontdef>
 
         <fontdef name="alert" from="basesmall">
             <color>#ffa500</color>
             <size>16</size>
-            <bold>no</bold>
         </fontdef>
 
         <textarea name="pagetitle" from="basetextarea">
