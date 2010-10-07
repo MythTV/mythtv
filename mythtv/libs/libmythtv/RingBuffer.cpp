@@ -46,6 +46,7 @@ using namespace std;
 // about one second at 35mbit
 const uint RingBuffer::kBufferSize = 4 * 1024 * 1024;
 const int  RingBuffer::kDefaultOpenTimeout = 2000; // ms
+const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 
 #define CHUNK 32768 /* readblocksize increments */
 

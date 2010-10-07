@@ -116,6 +116,7 @@ class MPUBLIC RingBuffer : protected QThread
     }
 
     static const int kDefaultOpenTimeout;
+    static const int kLiveTVOpenTimeout;
 
   protected:
     void run(void); // QThread
