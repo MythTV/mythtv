@@ -1869,64 +1869,6 @@
 
 </category>
 
-<category name="YouTube">
-
-   <item>
-        <title>YouTube Most Viewed - Today</title>
-        <url>http://youtube.com/rss/global/top_viewed_today.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item>
-
-    <item>
-        <title>YouTube Most Viewed - This Week</title>
-        <url>http://youtube.com/rss/global/top_viewed_week.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item>
-
-    <item>
-        <title>YouTube Most Viewed - This Month</title>
-        <url>http://youtube.com/rss/global/top_viewed_month.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item>
-
-    <item>
-        <title>YouTube Most Viewed - All Time</title>
-        <url>http://youtube.com/rss/global/top_viewed.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item>
-    
-    <item>
-        <title>YouTube Recently Added</title>
-        <url>http://youtube.com/rss/global/recently_added.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube MythTV Channel</title>
-        <url>http://www.youtube.com/rss/tag/mythtv.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube Recently Featured</title>
-        <url>http://youtube.com/rss/global/recently_featured.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube Top Favorites</title>
-        <url>http://youtube.com/rss/global/top_favorites.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube Top Rated</title>
-        <url>http://youtube.com/rss/global/top_rated.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-</category>
-
 <category name="Weather (non-US)">
 
     <item>
