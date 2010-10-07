@@ -245,13 +245,15 @@ bool MythDB::SaveSettingOnHost(const QString &key,
 
     if (d->m_DBparams.dbHostName.isEmpty())  // Bootstrapping without database?
     {
-        VERBOSE(VB_IMPORTANT, LOC + "- No database yet");
+        if (!d->suppressDBMessages)
+            VERBOSE(VB_IMPORTANT, LOC + "- No database yet");
         return false;
     }
 
     if (key.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "- Illegal null key");
+        if (!d->suppressDBMessages)
+            VERBOSE(VB_IMPORTANT, LOC + "- Illegal null key");
         return false;
     }
 
@@ -329,7 +331,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
     }
     d->settingsCacheLock.unlock();
 
-    if (d->ignoreDatabase)
+    if (d->ignoreDatabase || d->suppressDBMessages)
         return value;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -347,7 +349,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
         "WHERE value = :KEY AND hostname = :HOSTNAME");
     query.bindValue(":KEY", key);
     query.bindValue(":HOSTNAME", d->m_localhostname);
-    
+
     if (query.exec() && query.next())
     {
         value = query.value(0).toString();
@@ -430,7 +432,8 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
 
         // Avoid extra work if everything was in the caches and
         // also don't try to access the DB if ignoreDatabase is set
-        if (((uint)done.size()) == done_cnt || d->ignoreDatabase)
+        if (((uint)done.size()) == done_cnt || d->ignoreDatabase ||
+            d->suppressDBMessages)
             return true;
     }
 
@@ -483,7 +486,7 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
         if (it != keymap.end())
             **it = query.value(1).toString();
     }
-  
+
     if (d->useSettingsCache)
     {
         d->settingsCacheLock.lockForWrite();
@@ -503,7 +506,7 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
         }
         d->settingsCacheLock.unlock();
     }
-  
+
     return true;
 }
 
@@ -576,7 +579,7 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
     }
     d->settingsCacheLock.unlock();
 
-    if (d->ignoreDatabase)
+    if (d->ignoreDatabase || d->suppressDBMessages)
         return value;
 
     MSqlQuery query(MSqlQuery::InitCon());
