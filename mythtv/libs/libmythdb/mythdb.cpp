@@ -331,7 +331,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
     }
     d->settingsCacheLock.unlock();
 
-    if (d->ignoreDatabase || d->suppressDBMessages)
+    if (d->ignoreDatabase)
         return value;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -432,8 +432,7 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
 
         // Avoid extra work if everything was in the caches and
         // also don't try to access the DB if ignoreDatabase is set
-        if (((uint)done.size()) == done_cnt || d->ignoreDatabase ||
-            d->suppressDBMessages)
+        if (((uint)done.size()) == done_cnt || d->ignoreDatabase)
             return true;
     }
 
@@ -579,7 +578,7 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
     }
     d->settingsCacheLock.unlock();
 
-    if (d->ignoreDatabase || d->suppressDBMessages)
+    if (d->ignoreDatabase)
         return value;
 
     MSqlQuery query(MSqlQuery::InitCon());
