@@ -339,8 +339,8 @@ void MythPlayer::SetWatchingRecording(bool mode)
     QMutexLocker locker(&decoder_change_lock);
 
     watchingrecording = mode;
-    if (GetDecoder())
-        GetDecoder()->setWatchingRecording(mode);
+    if (decoder)
+        decoder->setWatchingRecording(mode);
 }
 
 void MythPlayer::PauseBuffer(void)
@@ -384,12 +384,11 @@ bool MythPlayer::Pause(void)
     audio.Pause(true);
     PauseBuffer();
     allpaused = decoderPaused && videoPaused && bufferPaused;
-    QMutexLocker locker(&decoder_change_lock);
-    if (GetDecoder() && videoOutput)
     {
-        if (using_null_videoout)
-            GetDecoder()->UpdateFramesPlayed();
-        else
+        QMutexLocker locker(&decoder_change_lock);
+        if (using_null_videoout && decoder)
+            decoder->UpdateFramesPlayed();
+        else if (videoOutput && !using_null_videoout)
             framesPlayed = videoOutput->GetFramesPlayed();
     }
     pauseLock.unlock();
@@ -489,9 +488,9 @@ bool MythPlayer::InitVideo(void)
 
     PIPState pipState = player_ctx->GetPIPState();
 
-    if (using_null_videoout && GetDecoder())
+    if (using_null_videoout && decoder)
     {
-        MythCodecID codec = GetDecoder()->GetVideoCodecID();
+        MythCodecID codec = decoder->GetVideoCodecID();
         videoOutput = new VideoOutputNull();
         if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
                                video_aspect, 0, 0, 0, 0, 0, codec, 0))
@@ -533,12 +532,12 @@ bool MythPlayer::InitVideo(void)
         else
             display_rect = QRect(0, 0, widget->width(), widget->height());
 
-        if (GetDecoder())
+        if (decoder)
         {
             videoOutput = VideoOutput::Create(
-                GetDecoder()->GetCodecDecoderName(),
-                GetDecoder()->GetVideoCodecID(),
-                GetDecoder()->GetVideoCodecPrivate(),
+                decoder->GetCodecDecoderName(),
+                decoder->GetVideoCodecID(),
+                decoder->GetVideoCodecPrivate(),
                 pipState,
                 video_disp_dim, video_aspect,
                 widget->winId(), display_rect, (video_frame_rate * play_speed),
@@ -586,8 +585,8 @@ void MythPlayer::CheckExtraAudioDecode(void)
         force = true;
     }
 
-    if (GetDecoder())
-        GetDecoder()->SetLowBuffers(decode_extra_audio || force);
+    if (decoder)
+        decoder->SetLowBuffers(decode_extra_audio || force);
 }
 
 void MythPlayer::ReinitOSD(void)
@@ -648,8 +647,8 @@ void MythPlayer::ReinitVideo(void)
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
         if (!videoOutput->InputChanged(video_disp_dim, aspect,
-                                       GetDecoder()->GetVideoCodecID(),
-                                       GetDecoder()->GetVideoCodecPrivate(),
+                                       decoder->GetVideoCodecID(),
+                                       decoder->GetVideoCodecPrivate(),
                                        aspect_only))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -970,12 +969,12 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
                                            player_ctx->GetSpecialDecode()));
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-        if (GetDecoder() || (bigTimer.elapsed() > timeout))
+        if (decoder || (bigTimer.elapsed() > timeout))
             break;
         testreadsize <<= 1;
     }
 
-    if (!GetDecoder())
+    if (!decoder)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Couldn't find an A/V decoder for: '%1'")
@@ -983,20 +982,19 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
 
         return -1;
     }
-    else if (GetDecoder()->IsErrored())
+    else if (decoder->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not initialize A/V decoder.");
         SetDecoder(NULL);
         return -1;
     }
 
-    GetDecoder()->setExactSeeks(exactseeks);
-    GetDecoder()->setLiveTVMode(livetv);
-    GetDecoder()->setWatchingRecording(watchingrecording);
-    GetDecoder()->setTranscoding(transcoding);
+    decoder->setExactSeeks(exactseeks);
+    decoder->setLiveTVMode(livetv);
+    decoder->setWatchingRecording(watchingrecording);
+    decoder->setTranscoding(transcoding);
     CheckExtraAudioDecode();
-    noVideoTracks = GetDecoder() &&
-                   !GetDecoder()->GetTrackCount(kTrackTypeVideo);
+    noVideoTracks = !decoder->GetTrackCount(kTrackTypeVideo);
 
 
     eof = false;
@@ -1006,7 +1004,7 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
 
     // We want to locate decoder for video even if using_null_videoout
     // is true, only disable if no_video_decode is true.
-    int ret = GetDecoder()->OpenFile(
+    int ret = decoder->OpenFile(
         player_ctx->buffer, no_video_decode, testbuf, testreadsize);
 
     if (ret < 0)
@@ -1405,10 +1403,10 @@ void MythPlayer::SetupTeletextViewer(void)
     if (GetOSD())
     {
         TeletextViewer* ttview =  (TeletextViewer*)osd->InitTeletext();
-        if (ttview && GetDecoder())
+        if (ttview && decoder)
         {
             initTeletext = false;
-            GetDecoder()->SetTeletextDecoderViewer(ttview);
+            decoder->SetTeletextDecoderViewer(ttview);
         }
     }
 }
@@ -1449,8 +1447,8 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 QStringList MythPlayer::GetTracks(uint type)
 {
     QMutexLocker locker(&decoder_change_lock);
-    if (GetDecoder())
-        return GetDecoder()->GetTracks(type);
+    if (decoder)
+        return decoder->GetTracks(type);
     return QStringList();
 }
 
@@ -1506,20 +1504,20 @@ void MythPlayer::TracksChanged(uint trackType)
 int MythPlayer::GetTrack(uint type)
 {
     QMutexLocker locker(&decoder_change_lock);
-    if (GetDecoder())
-        return GetDecoder()->GetTrack(type);
+    if (decoder)
+        return decoder->GetTrack(type);
     return -1;
 }
 
 int MythPlayer::ChangeTrack(uint type, int dir)
 {
     QMutexLocker locker(&decoder_change_lock);
-    if (GetDecoder())
+    if (decoder)
     {
-        int retval = GetDecoder()->ChangeTrack(type, dir);
+        int retval = decoder->ChangeTrack(type, dir);
         if (retval >= 0)
         {
-            SetOSDMessage(GetDecoder()->GetTrackDesc(type, GetTrack(type)),
+            SetOSDMessage(decoder->GetTrackDesc(type, GetTrack(type)),
                           kOSDTimeout_Med);
             return retval;
         }
@@ -1951,7 +1949,7 @@ void MythPlayer::PreProcessNormalFrame(void)
 {
 #ifdef USING_MHEG
     // handle Interactive TV
-    if (GetInteractiveTV() && GetDecoder())
+    if (GetInteractiveTV() && decoder)
     {
         QMutexLocker locker(&itvLock);
 
@@ -2076,8 +2074,8 @@ bool MythPlayer::VideoLoop(void)
     else
         DisplayNormalFrame();
 
-    if (using_null_videoout)
-        GetDecoder()->UpdateFramesPlayed();
+    if (using_null_videoout && decoder)
+        decoder->UpdateFramesPlayed();
     else
         framesPlayed = videoOutput->GetFramesPlayed();
     return !IsErrored();
@@ -2147,9 +2145,12 @@ void MythPlayer::ResetPlaying(bool resetframes)
     ffrew_skip = 1;
     if (resetframes)
         framesPlayed = 0;
-    GetDecoder()->Reset();
-    if (GetDecoder()->IsErrored())
-        SetErrored("Unable to reset video decoder");
+    if (decoder)
+    {
+        decoder->Reset();
+        if (decoder->IsErrored())
+            SetErrored("Unable to reset video decoder");
+    }
 }
 
 void MythPlayer::CheckTVChain(void)
@@ -2214,7 +2215,7 @@ void MythPlayer::SwitchToProgram(void)
     if (discontinuity || newtype)
     {
         player_ctx->tvchain->SetProgram(*pginfo);
-        GetDecoder()->SetProgramInfo(*pginfo);
+        decoder->SetProgramInfo(*pginfo);
 
         player_ctx->buffer->Reset(true);
         if (newtype)
@@ -2228,8 +2229,11 @@ void MythPlayer::SwitchToProgram(void)
     else
     {
         player_ctx->SetPlayerChangingBuffers(true);
-        GetDecoder()->SetReadAdjust(player_ctx->buffer->SetAdjustFilesize());
-        GetDecoder()->SetWaitForChange();
+        if (decoder)
+        {
+            decoder->SetReadAdjust(player_ctx->buffer->SetAdjustFilesize());
+            decoder->SetWaitForChange();
+        }
     }
     delete pginfo;
 
@@ -2241,7 +2245,8 @@ void MythPlayer::SwitchToProgram(void)
     }
 
     // the bitrate is reset by player_ctx->buffer->OpenFile()...
-    player_ctx->buffer->UpdateRawBitrate(GetDecoder()->GetRawBitrate());
+    if (decoder)
+        player_ctx->buffer->UpdateRawBitrate(decoder->GetRawBitrate());
     player_ctx->buffer->Unpause();
 
     if (discontinuity || newtype)
@@ -2261,7 +2266,7 @@ void MythPlayer::FileChangedCallback(void)
 
     Pause();
     ChangeSpeed();
-    if (dynamic_cast<AvFormatDecoder *>(GetDecoder()))
+    if (dynamic_cast<AvFormatDecoder *>(decoder))
         player_ctx->buffer->Reset(false, true);
     else
         player_ctx->buffer->Reset(false, true, true);
@@ -2273,7 +2278,8 @@ void MythPlayer::FileChangedCallback(void)
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     player_ctx->tvchain->SetProgram(*player_ctx->playingInfo);
-    GetDecoder()->SetProgramInfo(*player_ctx->playingInfo);
+    if (decoder)
+        decoder->SetProgramInfo(*player_ctx->playingInfo);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     CheckTVChain();
@@ -2336,7 +2342,7 @@ void MythPlayer::JumpToProgram(void)
     else
         ResetPlaying();
 
-    if (IsErrored() || !GetDecoder())
+    if (IsErrored() || !decoder)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram failed.");
         if (!IsErrored())
@@ -2346,10 +2352,10 @@ void MythPlayer::JumpToProgram(void)
     }
 
     // the bitrate is reset by player_ctx->buffer->OpenFile()...
-    player_ctx->buffer->UpdateRawBitrate(GetDecoder()->GetRawBitrate());
+    player_ctx->buffer->UpdateRawBitrate(decoder->GetRawBitrate());
     player_ctx->buffer->IgnoreLiveEOF(false);
 
-    GetDecoder()->SetProgramInfo(*pginfo);
+    decoder->SetProgramInfo(*pginfo);
     delete pginfo;
 
     CheckTVChain();
@@ -2484,7 +2490,7 @@ void MythPlayer::EventLoop(void)
         JumpToProgram();
     }
     else if ((!allpaused || eof) && player_ctx->tvchain &&
-             !GetDecoder()->GetWaitForChange())
+             (decoder && !decoder->GetWaitForChange()))
     {
         // Switch to the next program in livetv
         if (player_ctx->tvchain->NeedsToSwitch())
@@ -2739,24 +2745,24 @@ void MythPlayer::DecoderLoop(bool pause)
 
     while (!killdecoder && !IsErrored())
     {
-        noVideoTracks = GetDecoder() &&
-                    !GetDecoder()->GetTrackCount(kTrackTypeVideo);
+        noVideoTracks = decoder &&
+                    !decoder->GetTrackCount(kTrackTypeVideo);
 
         DecoderPauseCheck();
 
         if (forcePositionMapSync)
         {
             forcePositionMapSync = false;
-            GetDecoder()->SyncPositionMap();
+            decoder->SyncPositionMap();
         }
 
         if (decoderSeek >= 0)
         {
             decoderSeekLock.lock();
-            if (((uint64_t)decoderSeek < framesPlayed) && GetDecoder())
-                GetDecoder()->DoRewind(decoderSeek);
-            else if (GetDecoder())
-                GetDecoder()->DoFastForward(decoderSeek);
+            if (((uint64_t)decoderSeek < framesPlayed) && decoder)
+                decoder->DoRewind(decoderSeek);
+            else if (decoder)
+                decoder->DoFastForward(decoderSeek);
             decoderSeek = -1;
             decoderSeekLock.unlock();
         }
@@ -2787,27 +2793,27 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
 {
     if (ffrew_skip > 0)
     {
-        long long delta = GetDecoder()->GetFramesRead() - framesPlayed;
+        long long delta = decoder->GetFramesRead() - framesPlayed;
         long long real_skip = CalcMaxFFTime(ffrew_skip + delta) - delta;
         if (real_skip >= 0)
         {
-            long long frame = GetDecoder()->GetFramesRead() + real_skip;
-            GetDecoder()->DoFastForward(frame, false);
+            long long frame = decoder->GetFramesRead() + real_skip;
+            decoder->DoFastForward(frame, false);
         }
     }
     else if (CalcRWTime(-ffrew_skip) >= 0)
     {
         DecoderGetFrameREW();
     }
-    return GetDecoder()->GetFrame(kDecodeVideo);
+    return decoder->GetFrame(kDecodeVideo);
 }
 
 bool MythPlayer::DecoderGetFrameREW(void)
 {
-    long long curFrame  = GetDecoder()->GetFramesRead();
+    long long curFrame  = decoder->GetFramesRead();
     bool      toBegin   = -curFrame > ffrew_skip;
     long long real_skip = (toBegin) ? -curFrame : ffrew_skip;
-    return GetDecoder()->DoRewind(curFrame + real_skip, false);
+    return decoder->DoRewind(curFrame + real_skip, false);
 }
 
 bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
@@ -2837,13 +2843,13 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
 
     if (killdecoder)
         return false;
-    if (!GetDecoder())
+    if (!decoder)
     {
         VERBOSE(VB_IMPORTANT, LOC + "DecoderGetFrame() called with NULL decoder.");
         return false;
     }
     else if (ffrew_skip == 1 || decodeOneFrame)
-        ret = GetDecoder()->GetFrame(decodetype);
+        ret = decoder->GetFrame(decodetype);
     else if (ffrew_skip != 0)
         ret = DecoderGetFrameFFREW();
     return ret;
@@ -2853,8 +2859,8 @@ void MythPlayer::SetTranscoding(bool value)
 {
     transcoding = value;
 
-    if (GetDecoder())
-        GetDecoder()->setTranscoding(value);
+    if (decoder)
+        decoder->setTranscoding(value);
 }
 
 bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
@@ -3220,11 +3226,11 @@ long long MythPlayer::CalcMaxFFTime(long long ff, bool setjump) const
  */
 bool MythPlayer::IsReallyNearEnd(void) const
 {
-    if (!videoOutput)
+    if (!videoOutput || !decoder)
         return false;
 
     return player_ctx->buffer->IsNearEnd(
-        GetDecoder()->GetFPS(), videoOutput->ValidVideoFrames());
+        decoder->GetFPS(), videoOutput->ValidVideoFrames());
 }
 
 /** \brief Returns true iff near end of recording.
@@ -3240,7 +3246,7 @@ bool MythPlayer::IsNearEnd(int64_t margin)
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (!player_ctx->playingInfo || player_ctx->playingInfo->IsVideo() ||
-        !GetDecoder())
+        !decoder)
     {
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         return false;
@@ -3252,7 +3258,7 @@ bool MythPlayer::IsNearEnd(int64_t margin)
     bool watchingTV = watchingrecording && player_ctx->recorder &&
         player_ctx->recorder->IsValidRecorder();
 
-    framesRead = GetDecoder()->GetFramesRead();
+    framesRead = decoder->GetFramesRead();
 
     if (!player_ctx->IsPIP() &&
         player_ctx->GetState() == kState_WatchingPreRecorded)
@@ -3315,13 +3321,13 @@ void MythPlayer::DoJumpToFrame(uint64_t frame, bool override_seeks,
 void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                              bool seeks_wanted)
 {
-    if (!GetDecoder())
+    if (!decoder)
         return;
 
     bool after  = exactseeks && (ffrew_skip == 1);
     bool before = override_seeks ? seeks_wanted :
                            (allpaused && !deleteMap.IsEditing()) ? true: after;
-    GetDecoder()->setExactSeeks(before);
+    decoder->setExactSeeks(before);
 
     uint64_t max = totalFrames;
     if ((livetv || (watchingrecording && player_ctx->recorder &&
@@ -3355,7 +3361,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
     }
     if (need_clear && osd)
         osd->HideWindow("osd_message");
-    GetDecoder()->setExactSeeks(after);
+    decoder->setExactSeeks(after);
 }
 
 /** \fn MythPlayer::ClearAfterSeek(bool)
@@ -3956,7 +3962,9 @@ VideoFrame* MythPlayer::GetRawVideoFrame(long long frameNumber)
 
 QString MythPlayer::GetEncodingType(void) const
 {
-    return get_encoding_type(GetDecoder()->GetVideoCodecID());
+    if (decoder)
+        return get_encoding_type(decoder->GetVideoCodecID());
+    return QString();
 }
 
 void MythPlayer::GetCodecDescription(InfoMap &infoMap)
@@ -3967,7 +3975,8 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
     int width  = video_disp_dim.width();
     int height = video_disp_dim.height();
     infoMap["videocodec"]     = GetEncodingType();
-    infoMap["videocodecdesc"] = GetDecoder()->GetRawEncodingType();
+    if (decoder)
+        infoMap["videocodecdesc"] = decoder->GetRawEncodingType();
     infoMap["videowidth"]     = QString::number(width);
     infoMap["videoheight"]    = QString::number(height);
     infoMap["videoframerate"] = QString::number(video_frame_rate, 'f', 2);
@@ -3986,14 +3995,16 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
 
 bool MythPlayer::GetRawAudioState(void) const
 {
-    return GetDecoder()->GetRawAudioState();
+    if (decoder)
+        return decoder->GetRawAudioState();
+    return false;
 }
 
 QString MythPlayer::GetXDS(const QString &key) const
 {
-    if (!GetDecoder())
+    if (!decoder)
         return QString::null;
-    return GetDecoder()->GetXDS(key);
+    return decoder->GetXDS(key);
 }
 
 void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
@@ -4013,14 +4024,17 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     framesPlayed = 0;
     ClearAfterSeek();
 
-    if (copyvideo)
-        GetDecoder()->SetRawVideoState(true);
-    if (copyaudio)
-        GetDecoder()->SetRawAudioState(true);
+    if (copyvideo && decoder)
+        decoder->SetRawVideoState(true);
+    if (copyaudio && decoder)
+        decoder->SetRawAudioState(true);
 
     SetExactSeeks(true);
-    GetDecoder()->setExactSeeks(exactseeks);
-    GetDecoder()->SetLowBuffers(true);
+    if (decoder)
+    {
+        decoder->setExactSeeks(exactseeks);
+        decoder->SetLowBuffers(true);
+    }
 }
 
 bool MythPlayer::TranscodeGetNextFrame(
@@ -4041,8 +4055,12 @@ bool MythPlayer::TranscodeGetNextFrame(
     if (!decoderThread)
         DecoderStart(true/*start paused*/);
 
-    if (!GetDecoder()->GetFrame(kDecodeAV))
+    if (!decoder)
         return false;
+
+    if (!decoder->GetFrame(kDecodeAV))
+        return false;
+
     if (eof)
         return false;
 
@@ -4062,21 +4080,23 @@ bool MythPlayer::TranscodeGetNextFrame(
 
             // For 0.25, move this to DoJumpToFrame(jumpto)
             WaitForSeek(jumpto);
-            GetDecoder()->ClearStoredData();
+            decoder->ClearStoredData();
             ClearAfterSeek();
-            GetDecoder()->GetFrame(kDecodeAV);
+            decoder->GetFrame(kDecodeAV);
             did_ff = 1;
         }
     }
     if (eof)
       return false;
-    is_key = GetDecoder()->isLastFrameKey();
+    is_key = decoder->isLastFrameKey();
     return true;
 }
 
 long MythPlayer::UpdateStoredFrameNum(long curFrameNum)
 {
-    return GetDecoder()->UpdateStoredFrameNum(curFrameNum);
+    if (decoder)
+        return decoder->UpdateStoredFrameNum(curFrameNum);
+    return 0;
 }
 
 void MythPlayer::SetCutList(const frm_dir_map_t &newCutList)
@@ -4087,9 +4107,11 @@ void MythPlayer::SetCutList(const frm_dir_map_t &newCutList)
 bool MythPlayer::WriteStoredData(RingBuffer *outRingBuffer,
                                  bool writevideo, long timecodeOffset)
 {
-    if (writevideo && !GetDecoder()->GetRawVideoState())
+    if (!decoder)
+        return false;
+    if (writevideo && !decoder->GetRawVideoState())
         writevideo = false;
-    GetDecoder()->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
+    decoder->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
     return writevideo;
 }
 
@@ -4231,22 +4253,22 @@ void MythPlayer::calcSliderPosPriv(osdInfo &info, bool paddedFields,
 
 int MythPlayer::GetNumChapters()
 {
-    if (GetDecoder())
-        return GetDecoder()->GetNumChapters();
+    if (decoder)
+        return decoder->GetNumChapters();
     return 0;
 }
 
 int MythPlayer::GetCurrentChapter()
 {
-    if (GetDecoder())
-        return GetDecoder()->GetCurrentChapter(framesPlayed);
+    if (decoder)
+        return decoder->GetCurrentChapter(framesPlayed);
     return 0;
 }
 
 void MythPlayer::GetChapterTimes(QList<long long> &times)
 {
-    if (GetDecoder())
-        return GetDecoder()->GetChapterTimes(times);
+    if (decoder)
+        return decoder->GetChapterTimes(times);
 }
 
 bool MythPlayer::DoJumpChapter(int chapter)
@@ -4290,8 +4312,8 @@ bool MythPlayer::DoJumpChapter(int chapter)
 
 int64_t MythPlayer::GetChapter(int chapter)
 {
-    if (GetDecoder())
-        return GetDecoder()->GetChapter(chapter);
+    if (decoder)
+        return decoder->GetChapter(chapter);
     return 0;
 }
 
@@ -4312,7 +4334,7 @@ bool MythPlayer::ITVHandleAction(const QString &action)
 
     QMutexLocker locker(&decoder_change_lock);
 
-    if (GetDecoder())
+    if (decoder)
     {
         QMutexLocker locker(&itvLock);
         if (GetInteractiveTV())
@@ -4332,7 +4354,7 @@ void MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
     QMutexLocker locker(&decoder_change_lock);
 
     OSD *osd = GetOSD();
-    if (!GetDecoder() || !osd)
+    if (!decoder || !osd)
         return;
 
     {
@@ -4358,8 +4380,8 @@ void MythPlayer::SetVideoResize(const QRect &videoRect)
 bool MythPlayer::SetAudioByComponentTag(int tag)
 {
     QMutexLocker locker(&decoder_change_lock);
-    if (GetDecoder())
-        return GetDecoder()->SetAudioByComponentTag(tag);
+    if (decoder)
+        return decoder->SetAudioByComponentTag(tag);
     return false;
 }
 
@@ -4369,8 +4391,8 @@ bool MythPlayer::SetAudioByComponentTag(int tag)
 bool MythPlayer::SetVideoByComponentTag(int tag)
 {
     QMutexLocker locker(&decoder_change_lock);
-    if (GetDecoder())
-        return GetDecoder()->SetVideoByComponentTag(tag);
+    if (decoder)
+        return decoder->SetVideoByComponentTag(tag);
     return false;
 }
 
