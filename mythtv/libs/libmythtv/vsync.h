@@ -77,6 +77,8 @@ class VideoSync
     /// \brief Returns the (minimum) refresh interval of the output device.
     int getRefreshInterval(void) const { return m_refresh_interval; }
 
+    virtual void setFrameInterval(int fi) { m_frame_interval = fi; };
+
     /** \brief Stops VSync; must be called from main thread.
      *
      *   Start(void), WaitForFrame(void), and Stop(void) should

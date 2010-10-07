@@ -870,6 +870,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         float temp_speed = (play_speed == 0.0f) ?
             audio.GetStretchFactor() : play_speed;
         frame_interval = (int)(1000000.0f / video_frame_rate / temp_speed);
+        videosync->setFrameInterval(frame_interval);
     }
 
     if (videoOutput)
@@ -3089,6 +3090,7 @@ void MythPlayer::ChangeSpeed(void)
     float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
     frame_interval = (int) (1000000.0f * ffrew_skip / video_frame_rate /
                             temp_speed);
+    videosync->setFrameInterval(frame_interval);
 
     VERBOSE(VB_PLAYBACK, LOC + "Play speed: " +
             QString("rate: %1 speed: %2 skip: %3 => new interval %4")
