@@ -260,6 +260,11 @@ void VideoOutputXv::MoveResize(void)
 
 void VideoOutputXv::WindowResized(const QSize &new_size)
 {
+    // This is causing problems in association with xrandr/display resolution
+    // switching. Disabling for 0.24 as this is the only videooutput class
+    // that implements this method
+    // see http://cvs.mythtv.org/trac/ticket/7408
+    /*
     QMutexLocker locker(&global_lock);
 
     window.SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
@@ -273,6 +278,7 @@ void VideoOutputXv::WindowResized(const QSize &new_size)
         ((float)display_dim.width()) / display_dim.height());
 
     MoveResize();
+    */
 }
 
 // documented in videooutbase.cpp
