@@ -276,14 +276,24 @@ void DVBStreamHandler::RunTS(void)
     bzero(buffer, buffer_size);
 
     QByteArray dvr_dev_path = _dvr_dev_path.toAscii();
-    int dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
-    if (dvr_fd < 0)
+    int dvr_fd;
+    for (int tries = 1; ; ++tries)
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Failed to open DVR device %1 : %2")
+        dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
+        if (dvr_fd >= 0)
+            break;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Opening DVR device %1 failed : %2")
                 .arg(_dvr_dev_path).arg(strerror(errno)));
-        delete[] buffer;
-        return;
+        if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    QString("Failed to open DVR device %1 : %2")
+                    .arg(_dvr_dev_path).arg(strerror(errno)));
+            delete[] buffer;
+            return;
+        }
+        usleep(50000);
     }
 
     bool _error = false;
