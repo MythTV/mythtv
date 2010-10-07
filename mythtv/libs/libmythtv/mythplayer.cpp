@@ -3082,6 +3082,7 @@ void MythPlayer::ChangeSpeed(void)
     if (skip_changed && videoOutput)
     {
         videoOutput->SetPrebuffering(ffrew_skip == 1);
+        decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
         if (play_speed != 0.0f && !(last_speed == 0.0f && ffrew_skip == 1))
             DoJumpToFrame(framesPlayed);
     }
@@ -3315,7 +3316,7 @@ void MythPlayer::DoJumpToFrame(uint64_t frame, bool override_seeks,
 {
     if (frame > framesPlayed)
         DoFastForward(frame - framesPlayed, override_seeks, seeks_wanted);
-    else if (frame < framesPlayed)
+    else if (frame <= framesPlayed)
         DoRewind(framesPlayed - frame, override_seeks, seeks_wanted);
 }
 
