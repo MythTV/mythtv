@@ -71,6 +71,8 @@ class MPUBLIC MythDB
 
     void SetSetting(const QString &key, const QString &newValue);
 
+    void WriteDelayedSettings(void);
+
     static MythDB *getMythDB();
     static void destroyMythDB();
     static QString toCommaList(const QMap<QString, QVariant> &bindings,

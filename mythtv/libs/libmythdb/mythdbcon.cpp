@@ -118,6 +118,8 @@ bool MSqlDatabase::OpenDatabase()
             VERBOSE(VB_GENERAL,
                     QString("Connected to database '%1' at host: %2")
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
+
+            GetMythDB()->WriteDelayedSettings();
         }
     }
 
@@ -477,7 +479,7 @@ bool MSqlQuery::exec()
 {
     // Database connection down.  Try to restart it, give up if it's still
     // down
-    if (!m_db->isOpen() && !m_db->Reconnect()) 
+    if (!m_db->isOpen() && !m_db->Reconnect())
     {
         VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
         return false;
@@ -486,7 +488,7 @@ bool MSqlQuery::exec()
     bool result = QSqlQuery::exec();
 
     // if the query failed with "MySQL server has gone away"
-    // Close and reopen the database connection and retry the query if it 
+    // Close and reopen the database connection and retry the query if it
     // connects again
     if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
         result = QSqlQuery::exec();
@@ -521,7 +523,7 @@ bool MSqlQuery::exec(const QString &query)
 {
     // Database connection down.  Try to restart it, give up if it's still
     // down
-    if (!m_db->isOpen() && !m_db->Reconnect()) 
+    if (!m_db->isOpen() && !m_db->Reconnect())
     {
         VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
         return false;
@@ -530,12 +532,12 @@ bool MSqlQuery::exec(const QString &query)
     bool result = QSqlQuery::exec(query);
 
     // if the query failed with "MySQL server has gone away"
-    // Close and reopen the database connection and retry the query if it 
+    // Close and reopen the database connection and retry the query if it
     // connects again
     if (!result && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
         result = QSqlQuery::exec(query);
 
-    VERBOSE(VB_DATABASE, 
+    VERBOSE(VB_DATABASE,
             QString("MSqlQuery::exec(%1) %2%3")
                     .arg(m_db->MSqlDatabase::GetConnectionName()).arg(query)
                     .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
@@ -547,7 +549,7 @@ bool MSqlQuery::exec(const QString &query)
 
 bool MSqlQuery::next()
 {
-    bool result = QSqlQuery::next();    
+    bool result = QSqlQuery::next();
 
     if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE|VB_EXTRA))
     {
@@ -586,7 +588,7 @@ bool MSqlQuery::prepare(const QString& query)
 
     // Database connection down.  Try to restart it, give up if it's still
     // down
-    if (!m_db->isOpen() && !m_db->Reconnect()) 
+    if (!m_db->isOpen() && !m_db->Reconnect())
     {
         VERBOSE(VB_IMPORTANT, "MySQL server disconnected");
         return false;
@@ -595,7 +597,7 @@ bool MSqlQuery::prepare(const QString& query)
     bool ok = QSqlQuery::prepare(query);
 
     // if the prepare failed with "MySQL server has gone away"
-    // Close and reopen the database connection and retry the query if it 
+    // Close and reopen the database connection and retry the query if it
     // connects again
     if (!ok && QSqlQuery::lastError().number() == 2006 && m_db->Reconnect())
         ok = QSqlQuery::prepare(query);
