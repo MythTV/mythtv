@@ -8,6 +8,7 @@
 #include "iso639.h"
 #include "BDRingBuffer.h"
 #include "mythverbose.h"
+#include "mythcorecontext.h"
 #include "mythdirs.h"
 #include "bluray.h"
 
@@ -60,6 +61,21 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
     const char *keyfilepath = keyarray.data();
 
     bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
+
+    // The following settings affect HDMV navigation (default audio track selection,
+    // parental controls, menu language, etc.  They are not yet used.
+
+    // Set parental level "age" to 99 for now.  TODO: Add support for FE level
+    bd_set_player_setting(bdnav, BLURAY_PLAYER_SETTING_PARENTAL, 99);
+    // Set preferred language to FE guide language
+    const char *langpref = gCoreContext->GetSetting("ISO639Language0", "eng").toLatin1().data();
+    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_AUDIO_LANG, langpref);
+    // Set preferred presentation graphics language to the FE guide language
+    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_PG_LANG, langpref);
+    // Set preferred menu language to the FE guide language
+    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_MENU_LANG, langpref);
+    // Set player country code to NULL.  This player is region free.
+    bd_set_player_setting_str(bdnav, BLURAY_PLAYER_SETTING_COUNTRY_CODE, NULL);
 
     VERBOSE(VB_IMPORTANT, LOC + QString("Using %1 as keyfile...")
             .arg(QString(keyfilepath)));
