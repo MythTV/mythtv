@@ -239,7 +239,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     if mode == 'w':
         # check for pre-existing file
         path = FileOps(host, db=db).fileExists(filename, sgroup)
-        sgs = db.getStorageGroup(groupname=sgroup)
+        sgs = list(db.getStorageGroup(groupname=sgroup))
         if path is not None:
             if nooverwrite:
                 raise MythFileError(MythError.FILE_FAILED_WRITE, file,
@@ -252,7 +252,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                         return protoopen(host, filename, sgroup)
 
         # prefer local storage for new files
-        for i,v in reversed(enumerate(sgs)):
+        for i,v in reversed(list(enumerate(sgs))):
             if not v.local:
                 sgs.pop(i)
             else:

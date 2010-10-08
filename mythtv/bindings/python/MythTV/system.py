@@ -4,7 +4,7 @@
 Provides base classes for managing system calls.
 """
 
-from exceptions import MythError, MythDBError
+from exceptions import MythError, MythDBError, MythFileError
 from logging import MythLog
 from altdict import DictData, OrdDict
 from utility import levenshtein
@@ -12,6 +12,7 @@ from database import DBCache
 
 from subprocess import Popen
 import xml.etree.cElementTree as etree
+import os
 
 class System( DBCache ):
     """
@@ -25,16 +26,18 @@ class System( DBCache ):
     def __init__(self, path=None, setting=None, db=None):
         DBCache.__init__(self, db=db)
         self.log = MythLog(self.logmodule, db=self)
-        self.path = ''
-        if path is not None:
-            self.path = path
-        elif setting is not None:
+        self.path = None
+        if setting is not None:
             host = self.gethostname()
             self.path = self.settings[host][setting]
-            if self.path is None:
+            if (self.path is None) and (path is None):
                 raise MythDBError(MythError.DB_SETTING, setting, host)
-        else:
-            raise MythError('Invalid input to System()')
+        if self.path is None:
+            if path is None:
+                raise MythError('Invalid input to System()')
+            self.path = path
+        if not os.access(self.path, os.F_OK):
+            raise MythFileError('Defined grabber path does not exist.')
         self.returncode = 0
         self.stderr = ''
 

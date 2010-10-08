@@ -12,6 +12,7 @@ MUSICSCHEMA_VERSION = 1017
 PROTO_VERSION = '63'
 PROTO_TOKEN = '3875641D'
 BACKEND_SEP = '[]:[]'
+INSTALL_PREFIX = '/usr/local'
 
 class MARKUP( object ):
     MARK_UNSET          = -10
