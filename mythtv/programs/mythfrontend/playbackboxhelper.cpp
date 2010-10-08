@@ -36,7 +36,7 @@ QString toLocalDir(ArtworkType t)
 {
     static QMutex m;
     static bool initrun = false;
-    QString kFanDir, kBannerDir, kCoverDir;
+    static QString kFanDir, kBannerDir, kCoverDir;
 
     QMutexLocker locker(&m);
     if (!initrun)
