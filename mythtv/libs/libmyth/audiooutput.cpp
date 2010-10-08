@@ -10,6 +10,7 @@ using namespace std;
 
 #include "mythconfig.h"
 #include "audiooutput.h"
+#include "util.h"
 #include "compat.h"
 
 #include "audiooutputnull.h"
@@ -66,7 +67,16 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
 #ifdef USING_PULSE
     bool pulsestatus = false;
-#endif 
+#else
+    {
+        static bool warned = false;
+        if (!warned && IsPulseAudioRunning())
+        {
+            warned = true;
+            VERBOSE(VB_IMPORTANT, "WARNING: ***Pulse Audio is running***");
+        }
+    }
+#endif
 
     settings.FixPassThrough();
 
