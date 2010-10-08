@@ -33,7 +33,7 @@ using namespace std;
 #include "audiooutputpulse.h"
 #endif
 #ifdef USING_PULSE
-#include "audiopulseutil.h"
+#include "audiopulsehandler.h"
 #endif
 
 AudioOutput *AudioOutput::OpenAudio(
@@ -87,10 +87,9 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
 #ifdef USING_PULSE
     if (willsuspendpa &&
-        !main_device.contains("pulse", Qt::CaseInsensitive) &&
-        pulseaudio_handle_startup() > 0)
+        !main_device.contains("pulse", Qt::CaseInsensitive))
     {
-        pulsestatus = true;
+        pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
     }
 #endif
 
@@ -147,7 +146,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                               "not running on Linux.");
 #ifdef USING_PULSE
         if (pulsestatus)
-            pulseaudio_handle_teardown();
+            PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
         return NULL;
     }
@@ -161,7 +160,7 @@ AudioOutput::~AudioOutput()
 {
 #ifdef USING_PULSE
     if (pulsewassuspended)
-        pulseaudio_handle_teardown();
+        PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
 }
 
@@ -275,7 +274,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     AudioDeviceConfig *adc;
 
 #ifdef USING_PULSE
-    bool pasuspended = (pulseaudio_handle_startup() > 0);
+    bool pasuspended = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
 #endif
 
 #ifdef USE_ALSA
@@ -375,7 +374,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 
 #ifdef USING_PULSE
     if (pasuspended)
-        pulseaudio_handle_teardown();
+        PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
 
 #ifdef USING_PULSEOUTPUT

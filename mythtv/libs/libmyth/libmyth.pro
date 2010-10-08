@@ -28,7 +28,7 @@ HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroupeditor.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
 HEADERS += mythhttppool.h mythhttphandler.h
-HEADERS += audiopulseutil.h       remoteutil.h
+HEADERS += remoteutil.h
 HEADERS += rawsettingseditor.h    autodeletedeque.h
 HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
@@ -55,7 +55,7 @@ SOURCES += volumebase.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroupeditor.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp
-SOURCES += audiopulseutil.cpp     remoteutil.cpp
+SOURCES += remoteutil.cpp
 SOURCES += rawsettingseditor.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
 SOURCES += programtypes.cpp       recordingtypes.cpp
@@ -126,6 +126,8 @@ using_oss {
 
 using_pulse {
     DEFINES += USING_PULSE
+    HEADERS += audiopulsehandler.h
+    SOURCES += audiopulsehandler.cpp
     using_pulseoutput {
         DEFINES += USING_PULSEOUTPUT
         HEADERS += audiooutputpulse.h
