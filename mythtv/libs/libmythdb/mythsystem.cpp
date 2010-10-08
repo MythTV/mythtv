@@ -363,11 +363,12 @@ pid_t myth_system_fork(const QString &command, uint &result)
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
     VERBOSE(VB_GENERAL, QString("Launching: %1") .arg(command));
+
     pid_t child = fork();
 
     if (child < 0)
     {
-        /* Fork failed */
+        /* Fork failed, still in parent */
         VERBOSE(VB_GENERAL, (LOC_ERR + "fork() failed because %1")
                 .arg(strerror(errno)));
         result = GENERIC_EXIT_NOT_OK;
@@ -375,12 +376,9 @@ pid_t myth_system_fork(const QString &command, uint &result)
     }
     else if (child == 0)
     {
-        /* Child */
-        /* In case we forked WHILE it was locked */
-        bool unlocked = verbose_mutex.tryLock();
-        verbose_mutex.unlock();
-        if( !unlocked )
-            VERBOSE(VB_GENERAL, "Cleared parent's verbose lock");
+        /* Child - NOTE: it is not safe to use VERBOSE between the fork and
+         * execl calls in the child.  It causes occasional locking issues that
+         * cause deadlocked child processes. */
 
         /* Close all open file descriptors except stdout/stderr */
         for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
@@ -393,24 +391,30 @@ pid_t myth_system_fork(const QString &command, uint &result)
             // Note: dup2() will close old stdin descriptor.
             if (dup2(fd, 0) < 0)
             {
-                VERBOSE(VB_GENERAL, LOC_ERR +
+                // Can't use VERBOSE due to locking fun.
+		        QString message = LOC_ERR + 
                         "Cannot redirect /dev/null to standard input,"
-                        "\n\t\t\tfailed to duplicate file descriptor." + ENO);
+                        "\n\t\t\tfailed to duplicate file descriptor." + ENO;
+                cerr << message.constData() << endl;
             }
             close(fd);
         }
         else
         {
-            VERBOSE(VB_GENERAL, LOC_ERR + "Cannot redirect /dev/null "
-                    "to standard input, failed to open." + ENO);
+            // Can't use VERBOSE due to locking fun.
+            QString message = LOC_ERR + "Cannot redirect /dev/null "
+                    "to standard input, failed to open." + ENO;
+            cerr << message.constData() << endl;
         }
 
         /* Run command */
         execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), (char *)0);
         if (errno)
         {
-            VERBOSE(VB_GENERAL, (LOC_ERR + "execl() failed because %1")
-                    .arg(strerror(errno)));
+            // Can't use VERBOSE due to locking fun.
+            QString message = LOC_ERR + QString("execl() failed because %1")
+                    .arg(strerror(errno));
+            cerr << message.constData() << endl;
         }
 
         /* Failed to exec */
