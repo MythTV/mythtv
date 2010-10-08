@@ -36,11 +36,14 @@ bool PulseHandler::Suspend(enum PulseAction action)
     QMutexLocker locker(&global_lock);
 
     // cleanup the PulseAudio server connection if requested
-    if ((kPulseCleanup == action) && g_pulseHandler)
+    if (kPulseCleanup == action)
     {
-        VERBOSE(VB_GENERAL, LOC + "Cleaning up PulseHandler");
-        delete g_pulseHandler;
-        g_pulseHandler = NULL;
+        if (g_pulseHandler)
+        {
+            VERBOSE(VB_GENERAL, LOC + "Cleaning up PulseHandler");
+            delete g_pulseHandler;
+            g_pulseHandler = NULL;
+        }
         return true;
     }
 
