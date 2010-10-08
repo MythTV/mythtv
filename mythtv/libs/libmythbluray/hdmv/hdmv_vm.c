@@ -279,6 +279,7 @@ static void _suspend_object(HDMV_VM *p)
     p->suspended_object = p->object;
     p->suspended_pc     = p->pc;
 
+    p->object = NULL;
 }
 
 static int _resume_object(HDMV_VM *p)
@@ -855,7 +856,7 @@ int hdmv_vm_select_object(HDMV_VM *p, int object)
 {
     if (object >= 0) {
         if (object >= p->movie_objects->num_objects) {
-            DEBUG(DBG_HDMV|DBG_CRIT, "hdmv_vm_select_program(): invalid object reference (%d) !\n", object);
+            DEBUG(DBG_HDMV|DBG_CRIT, "hdmv_vm_select_object(): invalid object reference (%d) !\n", object);
             return -1;
         }
         p->pc     = 0;
@@ -897,6 +898,25 @@ int hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds)
 int hdmv_vm_get_event(HDMV_VM *p, HDMV_EVENT *ev)
 {
     return _get_event(p, ev);
+}
+
+int hdmv_vm_running(HDMV_VM *p)
+{
+    return !!p->object;
+}
+
+int hdmv_vm_resume(HDMV_VM *p)
+{
+    return _resume_object(p);
+}
+
+int hdmv_vm_suspend(HDMV_VM *p)
+{
+    if (p->object && !p->ig_object) {
+        _suspend_object(p);
+        return 0;
+    }
+    return -1;
 }
 
 /* terminate program after MAX_LOOP instructions */

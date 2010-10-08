@@ -72,4 +72,8 @@ BD_PRIVATE int      hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_c
 BD_PRIVATE int      hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev);
 BD_PRIVATE int      hdmv_vm_get_event(HDMV_VM *p, HDMV_EVENT *ev);
 
+BD_PRIVATE int      hdmv_vm_running(HDMV_VM *p);
+BD_PRIVATE int      hdmv_vm_suspend(HDMV_VM *p);
+BD_PRIVATE int      hdmv_vm_resume(HDMV_VM *p);
+
 #endif // _HDMV_VM_H_

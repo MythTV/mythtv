@@ -31,6 +31,7 @@
 #include "bdnav/navigation.h"
 #include "bdnav/index_parse.h"
 #include "hdmv/hdmv_vm.h"
+#include "decoders/graphics_controller.h"
 #include "file/file.h"
 #ifdef DLOPEN_CRYPTO_LIBS
 #include "file/dl.h"
@@ -131,6 +132,9 @@ struct bluray {
     uint8_t        hdmv_suspended;
 
     void           *bdjava;
+
+    /* graphics */
+    GRAPHICS_CONTROLLER *graphics_controller;
 };
 
 #ifdef DLOPEN_CRYPTO_LIBS
@@ -534,6 +538,7 @@ void bd_close(BLURAY *bd)
 
     hdmv_vm_free(&bd->hdmv_vm);
 
+    gc_free(&bd->graphics_controller);
     indx_free(&bd->index);
     bd_registers_free(bd->regs);
 
@@ -1130,7 +1135,7 @@ int bd_set_player_setting(BLURAY *bd, uint32_t idx, uint32_t value)
 
     for (i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
         if (idx == map[i].idx) {
-            return bd_psr_setting_write(bd->regs, idx, value);
+            return !bd_psr_setting_write(bd->regs, idx, value);
         }
     }
 
@@ -1159,7 +1164,7 @@ int bd_set_player_setting_str(BLURAY *bd, uint32_t idx, const char *s)
             return bd_set_player_setting(bd, idx, s ? _string_to_uint(s, 3) : 0xffffff);
 
         case BLURAY_PLAYER_SETTING_COUNTRY_CODE:
-            return bd_set_player_setting(bd, idx, s ? _string_to_uint(s, 3) : 0xffff  );
+            return bd_set_player_setting(bd, idx, s ? _string_to_uint(s, 2) : 0xffff  );
 
         default:
             return 0;
@@ -1394,6 +1399,19 @@ int bd_menu_call(BLURAY *bd)
     return bd_play_title(bd, TITLE_TOP_MENU);
 }
 
+static void _run_gc(BLURAY *bd, gc_ctrl_e msg, uint32_t param)
+{
+    if (bd && bd->graphics_controller && bd->hdmv_vm) {
+        GC_NAV_CMDS cmds;
+
+        gc_run(bd->graphics_controller, msg, param, &cmds);
+
+        if (cmds.num_nav_cmds > 0) {
+            hdmv_vm_set_object(bd->hdmv_vm, cmds.num_nav_cmds, cmds.nav_cmds);
+        }
+    }
+}
+
 static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
 {
     DEBUG(DBG_BLURAY, "HDMV event: %d %d\n", hev->event, hev->param);
@@ -1432,14 +1450,21 @@ static void _process_hdmv_vm_event(BLURAY *bd, HDMV_EVENT *hev)
 
         case HDMV_EVENT_ENABLE_BUTTON:
             _queue_event(bd, (BD_EVENT){BD_EVENT_ENABLE_BUTTON, hev->param});
+            _run_gc(bd, GC_CTRL_ENABLE_BUTTON, hev->param);
             break;
 
         case HDMV_EVENT_DISABLE_BUTTON:
             _queue_event(bd, (BD_EVENT){BD_EVENT_DISABLE_BUTTON, hev->param});
+            _run_gc(bd, GC_CTRL_DISABLE_BUTTON, hev->param);
+            break;
+
+        case HDMV_EVENT_SET_BUTTON_PAGE:
+            _run_gc(bd, GC_CTRL_SET_BUTTON_PAGE, hev->param);
             break;
 
         case HDMV_EVENT_POPUP_OFF:
             _queue_event(bd, (BD_EVENT){BD_EVENT_POPUP_OFF, 0});
+            _run_gc(bd, GC_CTRL_POPUP, 0);
             break;
         case HDMV_EVENT_END:
         case HDMV_EVENT_NONE:
@@ -1517,4 +1542,30 @@ int bd_get_event(BLURAY *bd, BD_EVENT *event)
     }
 
     return _get_event(bd, event);
+}
+
+/*
+ * user interaction
+ */
+
+void bd_user_input(BLURAY *bd, int64_t pts, uint32_t key)
+{
+    if (pts >= 0) {
+        bd_psr_write(bd->regs, PSR_TIME, (uint32_t)(((uint64_t)pts) >> 1));
+    }
+
+    _run_gc(bd, GC_CTRL_VK_KEY, key);
+}
+
+void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func)
+{
+    if (!bd) {
+        return;
+    }
+
+    gc_free(&bd->graphics_controller);
+
+    if (func) {
+        bd->graphics_controller = gc_init(bd->regs, handle, func);
+    }
 }

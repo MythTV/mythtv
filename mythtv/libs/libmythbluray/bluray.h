@@ -373,16 +373,28 @@ uint64_t bd_tell_time(BLURAY *bd);
  * player settings
  */
 
-#define BLURAY_PLAYER_SETTING_PARENTAL       13  /* Age for parental control (years) */
-#define BLURAY_PLAYER_SETTING_AUDIO_CAP      15  /* Player capability for audio (bit mask) */
-#define BLURAY_PLAYER_SETTING_AUDIO_LANG     16  /* Initial audio language: ISO 639-2 string, ex. "eng" */
-#define BLURAY_PLAYER_SETTING_PG_LANG        17  /* Initial PG/SPU language: ISO 639-2 string, ex. "eng" */
-#define BLURAY_PLAYER_SETTING_MENU_LANG      18  /* Initial menu language: ISO 639-2 string, ex. "eng" */
-#define BLURAY_PLAYER_SETTING_COUNTRY_CODE   19  /* Player country code: ISO 3166-1 string, ex. "de" */
-#define BLURAY_PLAYER_SETTING_REGION_CODE    20  /* Player region code: 1 - region A, 2 - B, 4 - C */
-#define BLURAY_PLAYER_SETTING_VIDEO_CAP      29  /* Player capability for video (bit mask) */
-#define BLURAY_PLAYER_SETTING_TEXT_CAP       30  /* Player capability for text subtitle (bit mask) */
-#define BLURAY_PLAYER_SETTING_PLAYER_PROFILE 31  /* Profile1: 0, Profile1+: 1, Profile2: 3, Profile3: 8 */
+typedef enum {
+    BLURAY_PLAYER_SETTING_PARENTAL       = 13,  /* Age for parental control (years) */
+    BLURAY_PLAYER_SETTING_AUDIO_CAP      = 15,  /* Player capability for audio (bit mask) */
+    BLURAY_PLAYER_SETTING_AUDIO_LANG     = 16,  /* Initial audio language: ISO 639-2 string, ex. "eng" */
+    BLURAY_PLAYER_SETTING_PG_LANG        = 17,  /* Initial PG/SPU language: ISO 639-2 string, ex. "eng" */
+    BLURAY_PLAYER_SETTING_MENU_LANG      = 18,  /* Initial menu language: ISO 639-2 string, ex. "eng" */
+    BLURAY_PLAYER_SETTING_COUNTRY_CODE   = 19,  /* Player country code: ISO 3166-1 string, ex. "de" */
+    BLURAY_PLAYER_SETTING_REGION_CODE    = 20,  /* Player region code: 1 - region A, 2 - B, 4 - C */
+    BLURAY_PLAYER_SETTING_VIDEO_CAP      = 29,  /* Player capability for video (bit mask) */
+    BLURAY_PLAYER_SETTING_TEXT_CAP       = 30,  /* Player capability for text subtitle (bit mask) */
+    BLURAY_PLAYER_SETTING_PLAYER_PROFILE = 31,  /* Profile1: 0, Profile1+: 1, Profile2: 3, Profile3: 8 */
+} bd_player_setting;
+
+/**
+ *
+ *  Update player setting registers
+ *
+ * @param bd  BLURAY object
+ * @param idx Player setting register
+ * @param value New value for player setting register
+ * @return 1 on success, 0 on error (invalid setting)
+ */
 
 int bd_set_player_setting(BLURAY *bd, uint32_t idx, uint32_t value);
 int bd_set_player_setting_str(BLURAY *bd, uint32_t idx, const char *s);
@@ -412,10 +424,12 @@ typedef enum {
     BD_EVENT_AUDIO_STREAM,           /* 1..32,  0xff  = none */
     BD_EVENT_IG_STREAM,              /* 1..32                */
     BD_EVENT_PG_TEXTST_STREAM,       /* 1..255, 0xfff = none */
+    BD_EVENT_PIP_PG_TEXTST_STREAM,   /* 1..255, 0xfff = none */
     BD_EVENT_SECONDARY_AUDIO_STREAM, /* 1..32,  0xff  = none */
     BD_EVENT_SECONDARY_VIDEO_STREAM, /* 1..32,  0xff  = none */
 
     BD_EVENT_PG_TEXTST,              /* 0 - disable, 1 - enable */
+    BD_EVENT_PIP_PG_TEXTST,          /* 0 - disable, 1 - enable */
     BD_EVENT_SECONDARY_AUDIO,        /* 0 - disable, 1 - enable */
     BD_EVENT_SECONDARY_VIDEO,        /* 0 - disable, 1 - enable */
     BD_EVENT_SECONDARY_VIDEO_SIZE,   /* 0 - PIP, 0xf - fullscreen */
@@ -433,9 +447,12 @@ typedef enum {
 } bd_event_e;
 
 typedef struct {
-  uint32_t   event;  /* bd_event_e */
-  uint32_t   param;
+    uint32_t   event;  /* bd_event_e */
+    uint32_t   param;
 } BD_EVENT;
+
+struct bd_overlay_s;
+typedef void (*bd_overlay_proc_f)(void *, const struct bd_overlay_s * const);
 
 int  bd_play(BLURAY *bd); /* start playing disc in navigation mode */
 int  bd_read_ext(BLURAY *bd, unsigned char *buf, int len, BD_EVENT *event);
@@ -447,5 +464,8 @@ int  bd_menu_call(BLURAY *bd);                  /* open disc root menu */
 #ifdef __cplusplus
 };
 #endif
+
+void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func);
+void bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
 
 #endif /* BLURAY_H_ */
