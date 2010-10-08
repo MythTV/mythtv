@@ -164,8 +164,6 @@ void MythSystemReaper::run(void)
         else
             pidData->mutex.unlock();
     }
-
-    VERBOSE(VB_GENERAL, "Exiting reaper thread");
 }
 
 uint MythSystemReaper::waitPid( pid_t pid, time_t timeout, bool background,
