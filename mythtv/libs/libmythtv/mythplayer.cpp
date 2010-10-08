@@ -2477,7 +2477,7 @@ void MythPlayer::EventLoop(void)
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     // Disable timestretch if we are too close to the end of the buffer
-    if ((play_speed > 1.01f) && IsNearEnd())
+    if (ffrew_skip == 1 && (play_speed > 1.0f) && IsNearEnd())
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near end, Slowing down playback.");
         Play(1.0f, true, true);
