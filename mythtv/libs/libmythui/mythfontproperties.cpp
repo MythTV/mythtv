@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QFontInfo>
+#include <QRect>
 
 #include "mythverbose.h"
 #include "mythdb.h"
@@ -115,6 +116,30 @@ void MythFontProperties::CalcHash(void)
         if (m_shadowOffset.y() < 0 && m_shadowOffset.y() < -m_outlineSize)
             m_drawingOffset.setY(-m_shadowOffset.y());
     }
+}
+
+void MythFontProperties::Rescale(int height)
+{
+    m_face.setPixelSize(m_relativeSize * height);
+}
+
+void MythFontProperties::Rescale(void)
+{
+    QRect rect = GetMythMainWindow()->GetUIScreenRect();
+    Rescale(rect.height());
+}
+
+void MythFontProperties::SetPixelSize(float size)
+{
+    QSize baseSize = GetMythUI()->GetBaseSize();
+    m_relativeSize = size / (float)(baseSize.height());
+    m_face.setPixelSize(GetMythMainWindow()->NormY((int)(size + 0.5)));
+}
+
+void MythFontProperties::SetPointSize(uint points)
+{
+    float pixels = (float)points / 72.0 * 100.0;
+    SetPixelSize(pixels);
 }
 
 void MythFontProperties::Freeze(void)
@@ -382,12 +407,11 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     }
     else if (pixelsize > 0)
     {
-        newFont->m_face.setPixelSize(GetMythMainWindow()->NormY(pixelsize));
+        newFont->SetPixelSize(pixelsize);
     }
     else if (size > 0)
     {
-        newFont->m_face.setPointSize(
-            GetMythMainWindow()->NormalizeFontSize(size));
+        newFont->SetPointSize(size);
     }
 
     newFont->Unfreeze();
@@ -469,6 +493,21 @@ void FontMap::Clear(void)
 
     //FIXME: remove
     globalFontMap.clear();
+}
+
+void FontMap::Rescale(int height)
+{
+    if (height <= 0)
+    {
+        QRect rect = GetMythMainWindow()->GetUIScreenRect();
+        height = rect.height();
+    }
+
+    QMap<QString, MythFontProperties>::iterator it;
+    for (it = m_FontMap.begin(); it != m_FontMap.end(); ++it)
+    {
+        (*it).Rescale(height);
+    }
 }
 
 FontMap *FontMap::GetGlobalFontMap(void)

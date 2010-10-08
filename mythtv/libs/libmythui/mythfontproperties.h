@@ -8,6 +8,7 @@
 #include <QMap>
 
 #include "xmlparsebase.h"
+#include "mythmainwindow.h"
 
 class MPUBLIC MythFontProperties: public XMLParseBase
 {
@@ -40,6 +41,13 @@ class MPUBLIC MythFontProperties: public XMLParseBase
 
     void GetOffset(QPoint &offset) const;
 
+    void SetRelativeSize(float rSize) { m_relativeSize = rSize; }
+    float GetRelativeSize(void) const { return m_relativeSize; }
+    void SetPixelSize(float size);
+    void SetPointSize(uint size);
+    void Rescale(void);
+    void Rescale(int height);
+
   private:
     void Freeze(void); // no hash updates
     void Unfreeze(void);
@@ -61,6 +69,8 @@ class MPUBLIC MythFontProperties: public XMLParseBase
 
     QPoint  m_drawingOffset;
 
+    float   m_relativeSize;
+
     QString m_hash;
 
     bool    m_bFreeze;
@@ -78,6 +88,7 @@ class MPUBLIC FontMap
     bool Contains(const QString &text);
 
     void Clear(void);
+    void Rescale(int height = 0);
 
     static FontMap *GetGlobalFontMap(void);
 
