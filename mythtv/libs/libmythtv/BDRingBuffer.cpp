@@ -16,7 +16,8 @@
 #define LOC     QString("BDRingBuffer: ")
 
 BDRingBufferPriv::BDRingBufferPriv()
-    : bdnav(NULL), m_numTitles(0)
+    : bdnav(NULL), m_overlay(NULL),
+      m_overlayhandle(NULL), m_numTitles(0)
 {
 }
 
@@ -113,10 +114,21 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
         }
     }
 
+    // Initialize the Menu Overlay
+//    bd_register_overlay_proc(bdnav, m_overlayhandle, m_overlay);
+
     // Now that we've settled on which index the main title is, get info.
     SwitchTitle(m_mainTitle);
 
     return true;
+}
+
+void BDRingBufferPriv::StartFromBeginning(void)
+{
+    if (bdnav)
+    {
+        bd_play(bdnav);
+    }
 }
 
 uint64_t BDRingBufferPriv::GetReadPosition(void)
@@ -318,4 +330,18 @@ int BDRingBufferPriv::GetSubtitleLanguage(uint streamID)
         }
     }
     return iso639_str3_to_key("und");
+}
+
+void BDRingBufferPriv::PressButton(int32_t key, int64_t pts)
+{
+    if (!bdnav)
+        return;
+
+    if (pts <= 0)
+        return;
+
+    if (key < 0)
+        return;
+
+    bd_user_input(bdnav, pts, key);
 }

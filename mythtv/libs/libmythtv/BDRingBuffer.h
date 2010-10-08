@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "libmythbluray/bluray.h"
+#include "libmythbluray/keys.h"
 
 #include "util.h"
 
@@ -48,6 +49,7 @@ class MPUBLIC BDRingBufferPriv
 
     // commands
     bool OpenFile(const QString &filename);
+    void StartFromBeginning(void);
     void close(void);
 
     bool SwitchTitle(uint title);
@@ -56,8 +58,13 @@ class MPUBLIC BDRingBufferPriv
     int  safe_read(void *data, unsigned sz);
     uint64_t Seek(uint64_t pos);
 
+    // navigation
+    void PressButton(int32_t key, int64_t pts);
+
   protected:
     BLURAY            *bdnav;
+    bd_overlay_proc_f  m_overlay;
+    void              *m_overlayhandle;
     uint32_t           m_numTitles;
     uint32_t           m_mainTitle; // Index number of main title
     uint64_t           m_currentTitleLength; // Selected title's duration, in ticks (90Khz)
