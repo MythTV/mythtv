@@ -37,6 +37,13 @@ using namespace std;
 #include "audiopulsehandler.h"
 #endif
 
+void AudioOutput::Cleanup(void)
+{
+#ifdef USING_PULSE
+    PulseHandler::Suspend(PulseHandler::kPulseCleanup);
+#endif
+}
+
 AudioOutput *AudioOutput::OpenAudio(
     const QString &main_device, const QString &passthru_device,
     AudioFormat format, int channels, int codec, int samplerate,

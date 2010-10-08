@@ -145,6 +145,8 @@ namespace
         delete exitPopup;
         exitPopup = NULL;
 
+        AudioOutput::Cleanup();
+
         if (g_pUPnp)
         {
             // This takes a few seconds, so inform the user:

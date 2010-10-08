@@ -31,6 +31,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     typedef QVector<AudioDeviceConfig> ADCVect;
 
+    static void Cleanup(void);
     static ADCVect* GetOutputList(void);
     static AudioDeviceConfig* GetAudioDeviceConfig(
         QString &name, QString &desc, bool willsuspendpa = false);
