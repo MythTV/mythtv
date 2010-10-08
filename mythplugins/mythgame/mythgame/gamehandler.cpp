@@ -910,16 +910,16 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
              ++cmd )
         {
             VERBOSE(VB_GENERAL, LOC + QString("Executing : %1").arg(*cmd));
-            myth_system(*cmd);
+            myth_system(*cmd, kMSProcessEvents);
         }
     }
     else
     {
         VERBOSE(VB_GENERAL, LOC + QString("Executing : %1").arg(exec));
-        myth_system(exec);
+        myth_system(exec, kMSProcessEvents);
     }
 
-    (void)d.cd(savedir);      
+    (void)d.cd(savedir);
 }
 
 RomInfo *GameHandler::CreateRomInfo(RomInfo *parent)
