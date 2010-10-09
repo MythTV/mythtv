@@ -216,15 +216,22 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 // size before the video was converted. We need to guess the
                 // original size and allow for the difference
 
-                if (subs->fixPosition ||
-                   (currentFrame->height < (rect->y + rect->h)) ||
-                   (currentFrame->width  < (rect->x + rect->w)))
+                int right  = rect->x + rect->w;
+                int bottom = rect->y + rect->h;
+                if (subs->fixPosition || (currentFrame->height < bottom) ||
+                   (currentFrame->width  < right))
                 {
-                    int sd_height = (m_player->GetFrameRate() > 26.0f) ? 480 : 576;
-                    int height = (currentFrame->height <= 576)  ? sd_height :
-                                 (currentFrame->height <= 720)  ? 720 : 1080;
-                    int width  = (currentFrame->width  <= 720)  ? 720 :
-                                 (currentFrame->width  <= 1280) ? 1280 : 1920;
+                    int sd_height = 576;
+                    if ((m_player->GetFrameRate() > 26.0f) && bottom <= 480)
+                        sd_height = 480;
+                    int height = ((currentFrame->height <= sd_height) &&
+                                  (bottom <= sd_height)) ? sd_height :
+                                 ((currentFrame->height <= 720) && bottom <= 720)
+                                   ? 720 : 1080;
+                    int width  = ((currentFrame->width  <= 720) &&
+                                  (right <= 720)) ? 720 :
+                                 ((currentFrame->width  <= 1280) &&
+                                  (right <= 1280)) ? 1280 : 1920;
                     display = QRect(0, 0, width, height);
                 }
 
