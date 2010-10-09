@@ -212,10 +212,13 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 QRect display(rect->display_x, rect->display_y,
                               rect->display_w, rect->display_h);
 
-                // XSUB images are based on the original video size before
-                // they were converted to DivX. We need to guess the original
-                // size and allow for the difference
-                if (subs->fixPosition)
+                // XSUB and some DVD/DVB subs are based on the original video
+                // size before the video was converted. We need to guess the
+                // original size and allow for the difference
+
+                if (subs->fixPosition ||
+                   (currentFrame->height < (rect->y + rect->h)) ||
+                   (currentFrame->width  < (rect->x + rect->w)))
                 {
                     int height = (currentFrame->height <= 576)  ? 576 :
                                  (currentFrame->height <= 720)  ? 720 : 1080;
