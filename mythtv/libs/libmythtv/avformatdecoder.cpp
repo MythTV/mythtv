@@ -2986,6 +2986,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     AVCodecContext *context = curstream->codec;
     AVFrame mpa_pic;
     avcodec_get_frame_defaults(&mpa_pic);
+    mpa_pic.reordered_opaque = AV_NOPTS_VALUE;
 
     if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
         pts_detected = true;
