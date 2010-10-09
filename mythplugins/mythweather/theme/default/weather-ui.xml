@@ -670,7 +670,7 @@
         </spinbox>
 
         <textarea name="backgroundlbl" from="basetextarea">
-            <area>25,270,500,60</area>
+            <area>25,160,500,60</area>
             <value>Retrieve data in the background:</value>
         </textarea>
 
