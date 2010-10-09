@@ -20,6 +20,9 @@
 #   Convert script to output in new grabber output format for .23.  Leave backwards compat.
 #   02-11-2009: Geoffroy Geerseau
 #   Allocine have, once again, change their templates...
+#   09-10-2010: Geoffroy Geerseau
+#   EOL correction. Cast, Genre, Rates
+
    
 use File::Basename;
 use File::Copy;
@@ -126,7 +129,7 @@ sub getMovieData {
   
    # parse user rating
    my $userrating=0;
-   my $tmpratings = parseBetween(parseBetween($response,"/film/critiquepublic_gen_cfilm=$movieid.html'><img", "</span></p></div>"),'(',')');
+   my $tmpratings = parseBetween(parseBetween($response,"/film/critiquepublic_gen_cfilm=$movieid.html\"><img", "</span></p></div>"),'(',')');
    $tmpratings =~ s/,/./gm;
    if($tmpratings =~ /^(\d+\.?\d*|\.\d+)$/ && !$tmpratings eq "")
    {   
@@ -165,17 +168,20 @@ sub getMovieData {
    # parse cast 
 
    my $castchunk;
-
-   $castchunk = parseBetween($response, "Avec ",", <a class=\"underline\" href=\"/film/casting_gen_cfilm=$movieid.html\">plus</a>");
+   $castchunk = parseBetween($response,"Réalisé par ","$movieid.html\">plus</a>");
+   $castchunk = parseBetween($castchunk, "Avec ","<a class=\"underline\" href=\"/film/casting_gen_cfilm=");
    
    my $cast = "";
    $cast = trim(join(',', removeTag($castchunk)));
+   $cast =~ s/,\s([a-zA-Z0-9])/--$1/gm;
+   $cast =~ s/,//gm;
+   $cast =~ s/\-\-/, /gm;
    #genres
    my $genres = parseBetween($response,"Genre :","<br");
    $genres =~ s/\s*\n*(.*)\s*$/ $1/;
    $genres = trim(removeTag($genres));
-   $genres =~ s/\s*\n*(.*)\s*$/ $1/;
-   
+   $genres =~ s/\s\s//gm;
+   $genres =~ s/,\s*/, /gm;
    #countries
    my $countries = parseBetween($response,"Long-métrage",".");
    $countries = trim(removeTag($countries));
