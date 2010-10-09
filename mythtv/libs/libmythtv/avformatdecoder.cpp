@@ -266,6 +266,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       last_pts_for_fault_detection(0),
       last_dts_for_fault_detection(0),
       pts_detected(false),
+      reordered_pts_detected(false),
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
@@ -2986,10 +2987,15 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     AVFrame mpa_pic;
     avcodec_get_frame_defaults(&mpa_pic);
 
+    if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
+        pts_detected = true;
+
     avcodeclock->lock();
     if (private_dec)
     {
         if (QString(ic->iformat->name).contains("avi"))
+            pkt->pts = pkt->dts;
+        if (!pts_detected)
             pkt->pts = pkt->dts;
         if (decodeStillFrame)
         {
@@ -3097,7 +3103,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         faulty_pts += (mpa_pic.reordered_opaque <= last_pts_for_fault_detection);
         last_pts_for_fault_detection = mpa_pic.reordered_opaque;
-        pts_detected = true;
+        reordered_pts_detected = true;
     }
 
     // Explicity use DTS for DVD since they should always be valid for every
@@ -3122,7 +3128,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         pts = (long long)mpa_pic.reordered_opaque;
     }
-    else if ((faulty_dts < faulty_pts || !pts_detected) &&
+    else if ((faulty_dts < faulty_pts || !reordered_pts_detected) &&
              pkt->dts != (int64_t)AV_NOPTS_VALUE)
     {
         pts = (long long)pkt->dts;
