@@ -260,32 +260,39 @@
         </textarea>
 
         <textarea name="commandlabel" from="basetextarea">
-            <area>30,150,200,30</area>
+            <area>20,150,250,30</area>
             <align>right,vcenter</align>
             <value>Browser Command:</value>
         </textarea>
 
         <textedit name="command" from="basetextedit">
-            <position>245,140</position>
+            <position>295,140</position>
         </textedit>
 
-        <textarea name="zoomlabel" from="basetextarea">
-            <area>30,250,200,30</area>
-            <align>right,vcenter</align>
+        <textarea name="zoomlabel" from="commandlabel">
+            <position>20,250</position>
             <value>Text Size:</value>
         </textarea>
 
         <textedit name="zoom" from="basetextedit">
-            <position>245,240</position>
+            <position>295,240</position>
         </textedit>
 
-        <imagetype name="bgimage">
-            <area>50,445,700,100</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <textarea name="pluginlabel" from="commandlabel">
+           <position>20,350</position>
+            <value>Enable plugins:</value>
+        </textarea>
+
+        <checkbox name="enablepluginscheck" from="basecheckbox">
+            <position>295,350</position>
+        </checkbox>
+
+        <shape name="descbackground" from="basebackground" >
+            <area>20,425,760,100</area>
+        </shape>
 
         <textarea name="description" from="basetextarea">
-            <area>70,455,660,90</area>
+            <area>30,435,740,90</area>
             <multiline>yes</multiline>
         </textarea>
 

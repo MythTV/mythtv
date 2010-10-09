@@ -1,18 +1,11 @@
 #ifndef BOOKMARKMANAGER_H
 #define BOOKMARKMANAGER_H
 
-#include <uitypes.h>
-#include <xmlparse.h>
-#include <oldsettings.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
-
 // libmythui
-#include <mythuibuttonlist.h>
 #include <mythscreentype.h>
-#include <mythdialogbox.h>
 
 class MythBrowser;
+class MythDialogBox;
 
 class Bookmark
 {
@@ -54,6 +47,7 @@ class BrowserConfig : public MythScreenType
 
     MythUIText       *m_descriptionText;
     MythUIText       *m_titleText;
+    MythUICheckBox   *m_enablePluginsCheck;
 
     MythUIButton     *m_okButton;
     MythUIButton     *m_cancelButton;

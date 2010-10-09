@@ -6,9 +6,13 @@ using namespace std;
 #include <QString>
 
 // MythTV
+#include <mythmainwindow.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythdirs.h>
+#include <mythuicheckbox.h>
+#include <mythuibuttonlist.h>
+#include <mythsystem.h>
 
 // mythbrowser
 #include "bookmarkmanager.h"
@@ -43,13 +47,14 @@ bool BrowserConfig::Create()
 
     m_commandEdit = dynamic_cast<MythUITextEdit *> (GetChild("command"));
     m_zoomEdit = dynamic_cast<MythUITextEdit *> (GetChild("zoom"));
+    m_enablePluginsCheck = dynamic_cast<MythUICheckBox *> (GetChild("enablepluginscheck"));
 
     m_descriptionText = dynamic_cast<MythUIText *> (GetChild("description"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-    if (!m_commandEdit || !m_zoomEdit || !m_okButton || !m_cancelButton)
+    if (!m_commandEdit || !m_zoomEdit || !m_enablePluginsCheck || !m_okButton || !m_cancelButton)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
@@ -60,11 +65,16 @@ bool BrowserConfig::Create()
 
     m_zoomEdit->SetText(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4"));
 
+    int setting = gCoreContext->GetNumSetting("WebBrowserEnablePlugins", 1);
+    if (setting == 1)
+        m_enablePluginsCheck->SetCheckState(MythUIStateType::Full);
+
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
     connect(m_commandEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_zoomEdit   ,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_enablePluginsCheck,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_okButton,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_cancelButton, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
 
@@ -88,6 +98,10 @@ void BrowserConfig::slotSave(void)
         zoom = 0.3; 
     gCoreContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
     gCoreContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
+    int checkstate = 0;
+    if (m_enablePluginsCheck->GetCheckState() == MythUIStateType::Full)
+        checkstate = 1;
+    gCoreContext->SaveSetting("WebBrowserEnablePlugins", checkstate);
 
     Close();
 }
@@ -120,6 +134,9 @@ void BrowserConfig::slotFocusChanged(void)
                  "for the Internal browser are from 0.3 to 5.0 with 1.0 being "
                  "normal size less than 1 is smaller and greater than 1 is "
                  "larger than normal size.");
+    else if (GetFocusWidget() == m_enablePluginsCheck)
+        msg = tr("If checked this will enable browser plugins if the 'Internal' "
+                 "browser is being used.");
     else if (GetFocusWidget() == m_cancelButton)
         msg = tr("Exit without saving settings");
     else if (GetFocusWidget() == m_okButton)

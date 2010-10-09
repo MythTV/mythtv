@@ -277,8 +277,8 @@
             <position>445,140</position>
         </textedit>
 
-        <textarea name="zoomlabel" from="basetextarea">
-            <area>130,250,300,30</area>
+        <textarea name="zoomlabel" from="commandlabel">
+            <position>130,250</position>
             <align>right,vcenter</align>
             <value>Text Size:</value>
         </textarea>
@@ -287,25 +287,34 @@
             <position>445,240</position>
         </textedit>
 
+        <textarea name="pluginlabel" from="commandlabel">
+           <position>130,350</position>
+            <value>Enable plugins:</value>
+        </textarea>
+
+        <checkbox name="enablepluginscheck" from="basecheckbox">
+            <position>445,350</position>
+        </checkbox>
+
         <shape name="background">
-            <area>200,400,800,140</area>
+            <area>200,420,800,140</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="70" />
             <cornerradius>8</cornerradius>
         </shape>
 
         <textarea name="description" from="basetextarea">
-            <area>210,410,780,120</area>
+            <area>210,430,780,120</area>
             <multiline>yes</multiline>
         </textarea>
 
         <button name="cancel" from="basebutton">
-            <position>260,570</position>
+            <position>260,610</position>
             <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
-            <position>790,570</position>
+            <position>790,610</position>
             <value>OK</value>
         </button>
 
