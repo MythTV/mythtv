@@ -736,10 +736,9 @@
             <area>30,145,220,348</area>
         </buttonlist>
 
-        <imagetype name="srclines">
-            <area>285,95,500,370</area>
-            <filename>cr-background.png</filename>
-        </imagetype>
+        <shape name="infobackground" from="basebackground">
+            <area>275,115,500,340</area>
+        </shape>
 
         <textarea name="updatetxt" from="basetextarea">
             <area>290,150,300,60</area>
