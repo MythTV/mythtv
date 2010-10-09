@@ -29,6 +29,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
+#include "mythcorecontext.h"
 
 /**
  * @class MythWebView
@@ -287,9 +288,20 @@ void MythUIWebBrowser::Init(void)
     if (!dir.exists())
         dir.mkdir(path);
     QWebSettings::setIconDatabasePath(path);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
-                                                 true);
 
+    if (gCoreContext->GetNumSetting("WebBrowserEnablePlugins", 1) == 1)
+    {
+        VERBOSE(VB_GENERAL, "MythUIWebBrowser: enabling plugins");
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
+                                                     true);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, "MythUIWebBrowser: disabling plugins");
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
+                                                     false);
+    }
+    
     QImage image = QImage(m_Area.size(), QImage::Format_ARGB32);
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
     m_image->Assign(image);
