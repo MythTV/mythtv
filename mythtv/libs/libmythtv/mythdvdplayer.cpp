@@ -66,8 +66,8 @@ bool MythDVDPlayer::PrebufferEnoughFrames(bool pause_audio, int  min_buffers)
 
 bool MythDVDPlayer::DecoderGetFrameFFREW(void)
 {
-    if (GetDecoder())
-        GetDecoder()->UpdateDVDFramesPlayed();
+    if (decoder)
+        decoder->UpdateDVDFramesPlayed();
     return MythPlayer::DecoderGetFrameFFREW();
 }
 
@@ -151,8 +151,8 @@ bool MythDVDPlayer::VideoLoop(void)
     else
         DisplayNormalFrame();
 
-    if (using_null_videoout)
-        GetDecoder()->UpdateFramesPlayed();
+    if (using_null_videoout && decoder)
+        decoder->UpdateFramesPlayed();
     else
         framesPlayed = videoOutput->GetFramesPlayed();
     return !IsErrored();
@@ -160,22 +160,22 @@ bool MythDVDPlayer::VideoLoop(void)
 
 bool MythDVDPlayer::FastForward(float seconds)
 {
-    if (GetDecoder())
-        GetDecoder()->UpdateDVDFramesPlayed();
+    if (decoder)
+        decoder->UpdateDVDFramesPlayed();
     return MythPlayer::FastForward(seconds);
 }
 
 bool MythDVDPlayer::Rewind(float seconds)
 {
-    if (GetDecoder())
-        GetDecoder()->UpdateDVDFramesPlayed();
+    if (decoder)
+        decoder->UpdateDVDFramesPlayed();
     return MythPlayer::Rewind(seconds);
 }
 
 bool MythDVDPlayer::JumpToFrame(uint64_t frame)
 {
-    if (GetDecoder())
-        GetDecoder()->UpdateDVDFramesPlayed();
+    if (decoder)
+        decoder->UpdateDVDFramesPlayed();
     return MythPlayer::JumpToFrame(frame);
 }
 
@@ -301,8 +301,8 @@ uint64_t MythDVDPlayer::GetBookmark(void)
 void MythDVDPlayer::ChangeSpeed(void)
 {
     MythPlayer::ChangeSpeed();
-    if (GetDecoder())
-        GetDecoder()->UpdateDVDFramesPlayed();
+    if (decoder)
+        decoder->UpdateDVDFramesPlayed();
     if (play_speed != normal_speed && player_ctx->buffer->isDVD())
         player_ctx->buffer->DVD()->SetDVDSpeed(-1);
     else if (player_ctx->buffer->isDVD())
@@ -381,7 +381,8 @@ void MythDVDPlayer::ChangeDVDTrack(bool ffw)
 void MythDVDPlayer::DoChangeDVDTrack(void)
 {
     SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
-    GetDecoder()->ChangeDVDTrack(need_change_dvd_track > 0);
+    if (decoder)
+        decoder->ChangeDVDTrack(need_change_dvd_track > 0);
     ClearAfterSeek(!player_ctx->buffer->InDVDMenuOrStillFrame());
 }
 
