@@ -19,8 +19,8 @@ clean:
 distclean: clean
 
 python_build: setup.py setprefix.py
-	$(PYTHON) setprefix.py "$(REAL_PREFIX)"
 	$(PYTHON) setup.py build
+	$(PYTHON) setprefix.py "$(REAL_PREFIX)"
 
 install: setup.py
 	$(PYTHON) setup.py install --skip-build $(ROOT_FLAGS) $(PREFIX_FLAGS)
