@@ -131,7 +131,7 @@ bool avfDecoder::initialize()
     // give up if we dont have an audiooutput set
     if (!output())
     {
-        VERBOSE(VB_IMPORTANT, QString("avfDecoder: initialise called with a NULL audiooutput"));
+        error("avfDecoder: initialise called with a NULL audiooutput"); 
         return false;
     }
 
@@ -167,8 +167,8 @@ bool avfDecoder::initialize()
 
         if (!m_inputFormat)
         {
-            VERBOSE(VB_GENERAL, "Could not identify the stream type in "
-                                "avfDecoder::initialize");
+            error("Could not identify the stream type in "
+                  "avfDecoder::initialize"); 
             deinit();
             return false;
         }
@@ -182,8 +182,9 @@ bool avfDecoder::initialize()
                                           sizeof(int32_t));
         if (!m_samples)
         {
-            VERBOSE(VB_GENERAL, "Could not allocate output buffer in "
-                                "avfDecoder::initialize");
+            error("Could not allocate output buffer in "
+                  "avfDecoder::initialize");
+
             deinit();
             return false;
         }
@@ -191,18 +192,20 @@ bool avfDecoder::initialize()
 
     // open the media file
     // this should populate the input context
-    int error;
+    int err;
     if (m_inputIsFile)
-        error = av_open_input_file(&m_inputContext, filename.toLocal8Bit().constData(),
+        err = av_open_input_file(&m_inputContext, filename.toLocal8Bit().constData(),
                                     m_inputFormat, 0, &m_params);
     else
-        error = av_open_input_stream(&m_inputContext, m_byteIOContext, "decoder",
+        err = av_open_input_stream(&m_inputContext, m_byteIOContext, "decoder",
                                       m_inputFormat, &m_params);
 
-    if (error < 0)
+    if (err < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("Could not open file (%1)").arg(filename));
-        VERBOSE(VB_IMPORTANT, QString("AV decoder. Error: %1").arg(error));
+        VERBOSE(VB_IMPORTANT, QString("AV decoder. Error: %1").arg(err));
+        error(QString("Could not open file  (%1)").arg(filename) +
+              QString("\nAV decoder. Error: %1").arg(err));
         deinit();
         return false;
     }
@@ -211,7 +214,7 @@ bool avfDecoder::initialize()
     // this also populates information needed for metadata
     if (av_find_stream_info(m_inputContext) < 0)
     {
-        VERBOSE(VB_GENERAL, "Could not determine the stream format.");
+        error("Could not determine the stream format.");
         deinit();
         return false;
     }
@@ -229,18 +232,19 @@ bool avfDecoder::initialize()
     m_codec = avcodec_find_decoder(m_audioDec->codec_id);
     if (!m_codec)
     {
-        VERBOSE(VB_GENERAL, QString("Could not find audio codec: %1")
-                                                    .arg(m_audioDec->codec_id));
+        error(QString("Could not find audio codec: %1")
+                              .arg(m_audioDec->codec_id));
         deinit();
         return false;
     }
+
     if (avcodec_open(m_audioDec,m_codec) < 0)
     {
-        VERBOSE(VB_GENERAL, QString("Could not open audio codec: %1")
-                                                    .arg(m_audioDec->codec_id));
+        error(QString("Could not open audio codec: %1").arg(m_audioDec->codec_id));
         deinit();
         return false;
     }
+
     if (AV_TIME_BASE > 0)
         totalTime = (m_inputContext->duration / AV_TIME_BASE) * 1000;
 
@@ -249,7 +253,7 @@ bool avfDecoder::initialize()
 
     if (m_channels <= 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("AVCodecContext tells us %1 channels are "
+        error(QString("AVCodecContext tells us %1 channels are "
                                       "available, this is bad, bailing.")
                                       .arg(m_channels));
         deinit();
@@ -283,8 +287,8 @@ bool avfDecoder::initialize()
         {
             bps = m_audioDec->bits_per_raw_sample;
         }
-        VERBOSE(VB_IMPORTANT, QString("Error: Unsupported sample format "
-                                        "with %1 bits").arg(bps));
+        error(QString("Error: Unsupported sample format "
+                      "with %1 bits").arg(bps));
         return false;
     }
 

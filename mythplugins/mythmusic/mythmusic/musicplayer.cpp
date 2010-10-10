@@ -1039,8 +1039,9 @@ void MusicPlayer::decoderHandlerReady(void)
     }
     else
     {
-        VERBOSE(VB_PLAYBACK, QString ("Cannot initialise decoder for %1")
-                .arg (getDecoder()->getFilename ()));
+        VERBOSE(VB_PLAYBACK, QString("Cannot initialise decoder for %1")
+                .arg(getDecoder()->getFilename()));
+        return;
     }
 
     // tell any listeners we've started playing a new track

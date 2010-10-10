@@ -1001,9 +1001,7 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderEvent::Error)
     {
-        stop();
-
-        QApplication::sendPostedEvents(); //TODO do we need this?
+        stopAll();
 
         statusString = tr("Decoder error.");
 
@@ -1011,11 +1009,9 @@ void MusicCommon::customEvent(QEvent *event)
 
         VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
-        //TODO change to mythui
-        MythPopupBox::showOkPopup(GetMythMainWindow(),
-                                    statusString,
-                                    QString("MythMusic has encountered the following error:\n%1")
-                                    .arg(*dxe->errorMessage()));
+
+        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+                    .arg(*dxe->errorMessage()));
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {

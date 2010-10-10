@@ -2026,7 +2026,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderEvent::Error)
     {
-        stop();
+        stopAll();
 
         QApplication::sendPostedEvents();
 
