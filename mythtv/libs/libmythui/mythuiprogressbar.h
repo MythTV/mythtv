@@ -5,8 +5,6 @@
 #include "mythuiimage.h"
 #include "mythuishape.h"
 
-class MythFontProperties;
-
 /** \class MythUIProgressBar
  *
  * \brief Progress bar widget.

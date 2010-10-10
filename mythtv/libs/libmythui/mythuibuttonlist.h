@@ -12,7 +12,6 @@
 #include "mythuigroup.h"
 
 class MythUIButtonList;
-class MythFontProperties;
 class MythUIStateType;
 
 class MPUBLIC MythUIButtonListItem

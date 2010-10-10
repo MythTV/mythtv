@@ -7,8 +7,6 @@
 #include "mythuitype.h"
 #include "mythuitext.h"
 
-class MythFontProperties;
-
 /** \class MythUIClock
  *
  * \brief A simple text clock widget.
