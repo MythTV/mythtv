@@ -12,6 +12,7 @@ use lib dirname(abs_path($0 or $PROGRAM_NAME)),
         '/usr/local/share/mythtv/mythweather/scripts/wunderground';
 
 use utf8;
+use encoding 'utf8';
 use Getopt::Std;
 use POSIX qw(strftime);
 
