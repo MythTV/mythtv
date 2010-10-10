@@ -220,6 +220,11 @@ void SignalMonitor::Start(bool waitfor_tune)
 
         // When used for scanning, don't wait for the tuning thread
         is_tuned = !waitfor_tune;
+        if (waitfor_tune)
+        {
+            m_channelTimeout = 40000; // 40 seconds (in milliseconds)
+            m_channelTimer.start();
+        }
 
         if (!running)
         {
@@ -489,7 +494,21 @@ bool SignalMonitor::IsChannelTuned(void)
 
     switch (status) {
       case ChannelBase::changePending:
-        channelTuned.SetValue(1);
+        if (HasFlags(SignalMonitor::kDVBSigMon_WaitForPos))
+        {
+            // Still waiting on rotor
+            m_channelTimer.start();
+            channelTuned.SetValue(1);
+        }
+        else if (m_channelTimer.elapsed() > m_channelTimeout)
+        {
+            // channel change is taking too long
+            VERBOSE(VB_IMPORTANT, "SignalMonitor: channel change timed-out");
+            error = QObject::tr("Error: channel change failed");
+            channelTuned.SetValue(2);
+        }
+        else
+            channelTuned.SetValue(1);
         break;
       case ChannelBase::changeFailed:
         VERBOSE(VB_IMPORTANT, "SignalMonitor: channel change failed");

@@ -20,6 +20,7 @@ using namespace std;
 #include "signalmonitorlistener.h"
 #include "channelbase.h"
 #include "cardutil.h"
+#include "mythtimer.h"
 
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
@@ -64,6 +65,8 @@ class SignalMonitor
     /// \brief Returns milliseconds between signal monitoring events.
     int GetUpdateRate() const { return update_rate; }
     virtual QStringList GetStatusList(bool kick = true);
+
+    bool IsTuned(void) const { return is_tuned; }
 
     /// \brief Returns true iff signalLock.IsGood() returns true
     bool HasSignalLock(void) const
@@ -210,6 +213,9 @@ class SignalMonitor
     bool         tablemon;
     bool         eit_scan;
     QString      error;
+
+    MythTimer    m_channelTimer;
+    int          m_channelTimeout;
 
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;
