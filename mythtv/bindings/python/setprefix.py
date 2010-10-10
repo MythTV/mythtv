@@ -8,17 +8,18 @@ if len(sys.argv) < 2:
 prefix = sys.argv[1]
 
 buff = []
-path = 'build/lib/MythTV/static.py'
-if not os.access(path, os.F_OK):
-    raise Exception("Cannot access '%s' to update." % path)
+for path,dirs,files in os.walk('build'):
+    if 'static.py' in files:
+        break
+else:
+    raise Exception("Cannot find temporary build file for 'setup.py'.")
+
+path = os.path.join(path,'static.py')
 with open(path) as fi:
     for line in fi:
         if 'INSTALL_PREFIX' in line:
             line = "INSTALL_PREFIX = '%s'\n" % prefix
         buff.append(line)
-
-#print ''.join(buff)
-#sys.exit(0)
 
 with open(path,'w') as fo:
     fo.write(''.join(buff))
