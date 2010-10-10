@@ -748,48 +748,6 @@ void AvFormatDecoder::Reset()
 
     if (ringBuffer->isDVD())
         SyncPositionMap();
-
-#if 0
-// This is causing problems, and may not be needed anymore since
-// we do not reuse the same file for different streams anymore. -- dtk
-
-    // mpeg ts reset
-    if (QString("mpegts") == ic->iformat->name)
-    {
-        AVInputFormat *fmt = (AVInputFormat*) av_mallocz(sizeof(AVInputFormat));
-        memcpy(fmt, ic->iformat, sizeof(AVInputFormat));
-        fmt->flags |= AVFMT_NOFILE;
-
-        CloseContext();
-        ic = avformat_alloc_context();
-        if (!ic)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Reset(): Could not allocate format context.");
-            av_free(fmt);
-            errored = true;
-            return;
-        }
-
-        InitByteContext();
-        ic->streams_changed = HandleStreamChange;
-        ic->stream_change_data = this;
-
-        QString    fnames = ringBuffer->GetFilename();
-        QByteArray fnamea = fnames.toAscii();
-        int err = av_open_input_file(&ic, fnamea.constData(), fmt, 0, &params);
-        if (err < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Reset(): "
-                    "avformat err("<<err<<") on av_open_input_file call.");
-            av_free(fmt);
-            errored = true;
-            return;
-        }
-
-        fmt->flags &= ~AVFMT_NOFILE;
-    }
-#endif
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
