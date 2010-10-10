@@ -203,6 +203,7 @@ class OSD
     float           m_SavedHMult;
     QRect           m_SavedUIRect;
     int             m_fontStretch;
+    int             m_savedFontStretch;
 
     enum OSDFunctionalType m_FunctionalType;
     QString                m_FunctionalWindow;

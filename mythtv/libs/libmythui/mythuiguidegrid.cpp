@@ -81,6 +81,9 @@ MythUIGuideGrid::~MythUIGuideGrid()
 
     delete [] allData;
 
+    delete m_font;
+    m_font = NULL;
+
     for (uint x = 0; x < RECSTATUSSIZE; x++)
     {
         if (m_recImages[x])
@@ -185,7 +188,14 @@ bool MythUIGuideGrid::ParseElement(
             font = GetGlobalFontMap()->GetFont(fontname);
 
         if (font)
-            m_font = font;
+        {
+            MythFontProperties fontcopy = *font;
+            int screenHeight = GetMythMainWindow()->GetUIScreenRect().height();
+            fontcopy.Rescale(screenHeight);
+            int fontStretch = GetMythUI()->GetFontStretch();
+            fontcopy.AdjustStretch(fontStretch);
+            *m_font = fontcopy;
+        }
         else
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown font: " + fontname);
     }
@@ -250,7 +260,7 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
     m_textOffset = gg->m_textOffset;
     m_justification = gg->m_justification;
     m_multilineText = gg->m_multilineText;
-    m_font = gg->m_font;
+    *m_font = *gg->m_font;
     m_solidColor = gg->m_solidColor;
 
     m_selType = gg->m_selType;

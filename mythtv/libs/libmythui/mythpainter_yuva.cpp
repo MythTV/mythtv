@@ -53,8 +53,8 @@ void MythYUVAPainter::DrawRect(const QRect &area, bool drawFill,
                                 lineWidth, yuv_line_color);
 }
 
-void MythYUVAPainter::DrawRoundRect(const QRect &area, int radius, 
-                                    bool drawFill, const QColor &fillColor, 
+void MythYUVAPainter::DrawRoundRect(const QRect &area, int radius,
+                                    bool drawFill, const QColor &fillColor,
                                     bool drawLine, int lineWidth,
                                     const QColor &lineColor)
 {
@@ -70,7 +70,7 @@ void MythYUVAPainter::DrawRoundRect(const QRect &area, int radius,
 
 MythFontProperties* MythYUVAPainter::GetConvertedFont(const MythFontProperties &font)
 {
-    QString original = QString::number(m_fontStretch) + font.GetHash();
+    QString original = font.GetHash();
 
     if (m_convertedFonts.contains(original))
     {
@@ -103,10 +103,6 @@ MythFontProperties* MythYUVAPainter::GetConvertedFont(const MythFontProperties &
             yuv_color = rgb_to_yuv(color);
             new_font->SetOutline(true, yuv_color, size, alpha);
         }
-
-        int stretch = font.face().stretch();
-        stretch = (int)(((float)stretch * ((float)m_fontStretch / 100.0f)) + 0.5f);
-        new_font->GetFace()->setStretch(stretch);
 
         m_convertedFonts.insert(original, new_font);
         m_expireList.push_back(original);

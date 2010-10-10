@@ -20,7 +20,7 @@
 
 MythFontProperties::MythFontProperties() :
     m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
-    m_hasOutline(false), m_outlineAlpha(255), m_bFreeze(false)
+    m_hasOutline(false), m_outlineAlpha(255), m_bFreeze(false), m_stretch(100)
 {
     CalcHash();
 }
@@ -129,11 +129,21 @@ void MythFontProperties::Rescale(void)
     Rescale(rect.height());
 }
 
+void MythFontProperties::AdjustStretch(int stretch)
+{
+    int newStretch = (int)(((float)m_stretch * ((float)stretch / 100.0f)) + 0.5f);
+
+    if (newStretch <= 0)
+        newStretch = 1;
+
+    m_face.setStretch(newStretch);
+}
+
 void MythFontProperties::SetPixelSize(float size)
 {
     QSize baseSize = GetMythUI()->GetBaseSize();
     m_relativeSize = size / (float)(baseSize.height());
-    m_face.setPixelSize(GetMythMainWindow()->NormY((int)(size + 0.5)));
+    m_face.setPixelSize(GetMythMainWindow()->NormY((int)(size + 0.5f)));
 }
 
 void MythFontProperties::SetPointSize(uint points)
@@ -359,33 +369,35 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 
                 if (stretch == "ultracondensed" ||
                     stretch == "1")
-                    newFont->m_face.setStretch(QFont::UltraCondensed);
+                    newFont->m_stretch = QFont::UltraCondensed;
                 else if (stretch == "extracondensed" ||
                          stretch == "2")
-                    newFont->m_face.setStretch(QFont::ExtraCondensed);
+                    newFont->m_stretch = QFont::ExtraCondensed;
                 else if (stretch == "condensed" ||
                          stretch == "3")
-                    newFont->m_face.setStretch(QFont::Condensed);
+                    newFont->m_stretch = QFont::Condensed;
                 else if (stretch == "semicondensed" ||
                          stretch == "4")
-                    newFont->m_face.setStretch(QFont::SemiCondensed);
+                    newFont->m_stretch = QFont::SemiCondensed;
                 else if (stretch == "unstretched" ||
                          stretch == "5")
-                    newFont->m_face.setStretch(QFont::Unstretched);
+                    newFont->m_stretch = QFont::Unstretched;
                 else if (stretch == "semiexpanded" ||
                          stretch == "6")
-                    newFont->m_face.setStretch(QFont::SemiExpanded);
+                    newFont->m_stretch = QFont::SemiExpanded;
                 else if (stretch == "expanded" ||
                          stretch == "7")
-                    newFont->m_face.setStretch(QFont::Expanded);
+                    newFont->m_stretch = QFont::Expanded;
                 else if (stretch == "extraexpanded" ||
                          stretch == "8")
-                    newFont->m_face.setStretch(QFont::ExtraExpanded);
+                    newFont->m_stretch = QFont::ExtraExpanded;
                 else if (stretch == "ultraexpanded" ||
                          stretch == "9")
-                    newFont->m_face.setStretch(QFont::UltraExpanded);
+                    newFont->m_stretch = QFont::UltraExpanded;
                 else
-                    newFont->m_face.setStretch(QFont::Unstretched);
+                    newFont->m_stretch = QFont::Unstretched;
+
+                newFont->m_face.setStretch(newFont->m_stretch);
             }
             else
             {

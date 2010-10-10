@@ -1323,7 +1323,6 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
             return false;
     }
 
-    osd_painter->SetFontStretch(osd->GetFontStretch());
     QRegion dirty   = QRegion();
     QRegion visible = osd->Draw(osd_painter, osd_image, osd_size, dirty,
                                 frame->codec == FMT_YV12 ? ALIGN_X_MMX : 0,

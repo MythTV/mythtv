@@ -10,7 +10,7 @@ class MythFontProperties;
 class MPUBLIC MythYUVAPainter : public MythQImagePainter
 {
   public:
-    MythYUVAPainter() : MythQImagePainter(), m_fontStretch(100) { }
+    MythYUVAPainter() : MythQImagePainter() { }
    ~MythYUVAPainter();
 
     QString GetName(void) { return QString("YUVA"); }
@@ -19,12 +19,11 @@ class MPUBLIC MythYUVAPainter : public MythQImagePainter
     void DrawText(const QRect &dest, const QString &msg, int flags,
                   const MythFontProperties &font, int alpha,
                   const QRect &boundRect);
-    void DrawRect(const QRect &area, bool drawFill, const QColor &fillColor, 
+    void DrawRect(const QRect &area, bool drawFill, const QColor &fillColor,
                   bool drawLine, int lineWidth, const QColor &lineColor);
-    void DrawRoundRect(const QRect &area, int radius, 
-                       bool drawFill, const QColor &fillColor, 
+    void DrawRoundRect(const QRect &area, int radius,
+                       bool drawFill, const QColor &fillColor,
                        bool drawLine, int lineWidth, const QColor &lineColor);
-    void SetFontStretch(int font_stretch) { m_fontStretch = font_stretch; }
 
   protected:
     MythFontProperties* GetConvertedFont(const MythFontProperties &font);

@@ -200,6 +200,9 @@ void OSD::OverrideUIScale(void)
     if (uirect == m_Rect)
         return;
 
+    m_savedFontStretch = GetMythUI()->GetFontStretch();
+    GetMythUI()->SetFontStretch(m_fontStretch);
+
     int width, height;
     MythUIHelper::getMythUI()->GetScreenSettings(width,  m_SavedWMult,
                                                  height, m_SavedHMult);
@@ -220,6 +223,7 @@ void OSD::RevertUIScale(void)
 {
     if (m_UIScaleOverride)
     {
+        GetMythUI()->SetFontStretch(m_savedFontStretch);
         GetMythMainWindow()->SetScalingFactors(m_SavedWMult, m_SavedHMult);
         GetMythMainWindow()->SetUIScreenRect(m_SavedUIRect);
     }

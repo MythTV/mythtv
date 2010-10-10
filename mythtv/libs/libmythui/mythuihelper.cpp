@@ -137,6 +137,8 @@ class MythUIHelperPrivate
     MythUIMenuCallbacks callbacks;
 
     MythUIHelper *parent;
+
+    int m_fontStretch;
 };
 
 int MythUIHelperPrivate::x_override = -1;
@@ -154,7 +156,8 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_cacheSizeLock(new QMutex(QMutex::Recursive)),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
-      screenSetup(false), m_imageThreadPool(new QThreadPool()), parent(p)
+      screenSetup(false), m_imageThreadPool(new QThreadPool()), parent(p),
+      m_fontStretch(100)
 {
 }
 
@@ -334,12 +337,16 @@ void MythUIHelperPrivate::StoreGUIsettings()
     m_wmult = m_screenwidth  / (float)m_baseWidth;
     m_hmult = m_screenheight / (float)m_baseHeight;
 
+    // Default font, _ALL_ fonts inherit from this!
+    // e.g All fonts will be 19 pixels unless a new size is explicitly defined.
     QFont font = QFont("Arial");
     if (!font.exactMatch())
         font = QFont();
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPointSize((int)floor(14 * m_hmult));
-    font.setStretch((int)(100 / GetPixelAspectRatio()));
+    font.setPixelSize((int)((19.0f * m_hmult) + 0.5f));
+    int stretch = (int)(100 / GetPixelAspectRatio());
+    font.setStretch(stretch); // QT
+    m_fontStretch = stretch; // MythUI
 
     QApplication::setFont(font);
 }
@@ -1666,4 +1673,14 @@ double MythUIHelper::GetPixelAspectRatio(void) const
 QSize MythUIHelper::GetBaseSize(void) const
 {
     return QSize(d->m_baseWidth, d->m_baseHeight);
+}
+
+void MythUIHelper::SetFontStretch(int stretch)
+{
+    d->m_fontStretch = stretch;
+}
+
+int MythUIHelper::GetFontStretch(void) const
+{
+    return d->m_fontStretch;
 }

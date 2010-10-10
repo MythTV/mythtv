@@ -130,6 +130,9 @@ class MPUBLIC MythUIHelper
     double GetPixelAspectRatio(void) const;
     QSize GetBaseSize(void) const;
 
+    void SetFontStretch(int stretch);
+    int GetFontStretch(void) const;
+
   protected:
     MythUIHelper();
    ~MythUIHelper();

@@ -605,14 +605,19 @@ bool MythUIText::ParseElement(
             fp = GetGlobalFontMap()->GetFont(fontname);
         if (fp)
         {
+            MythFontProperties font = *fp;
+            int screenHeight = GetMythMainWindow()->GetUIScreenRect().height();
+            font.Rescale(screenHeight);
+            int fontStretch = GetMythUI()->GetFontStretch();
+            font.AdjustStretch(fontStretch);
             QString state = element.attribute("state","");
             if (!state.isEmpty())
             {
-                m_FontStates.insert(state, *fp);
+                m_FontStates.insert(state, font);
             }
             else
             {
-                m_FontStates.insert("default", *fp);
+                m_FontStates.insert("default", font);
                 *m_Font = m_FontStates["default"];
             }
         }

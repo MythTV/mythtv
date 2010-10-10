@@ -47,6 +47,7 @@ class MPUBLIC MythFontProperties: public XMLParseBase
     void SetPointSize(uint size);
     void Rescale(void);
     void Rescale(int height);
+    void AdjustStretch(int stretch);
 
   private:
     void Freeze(void); // no hash updates
@@ -74,6 +75,8 @@ class MPUBLIC MythFontProperties: public XMLParseBase
     QString m_hash;
 
     bool    m_bFreeze;
+
+    int     m_stretch;
 
     friend class FontMap;
 };
