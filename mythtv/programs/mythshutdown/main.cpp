@@ -443,6 +443,17 @@ static int shutdown()
     QDateTime dtCurrent = QDateTime::currentDateTime();
     QDateTime dtNextDailyWakeup = QDateTime();
 
+    // Make sure Period1 is before Period2
+    if (dtPeriod2Start < dtPeriod1Start)
+    {
+        QDateTime temp = dtPeriod1Start;
+        dtPeriod1Start = dtPeriod2Start;
+        dtPeriod2Start = temp;
+        temp = dtPeriod1End;
+        dtPeriod1End = dtPeriod2End;
+        dtPeriod2End = temp;
+    }
+
     // Check for time periods that cross midnight
     if (dtPeriod1End < dtPeriod1Start)
     {
