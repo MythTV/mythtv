@@ -125,8 +125,9 @@ bool LanguageSelection::prompt(bool force)
 {
     m_languageChanged = false;
     QString language = gCoreContext->GetSetting("Language", "");
+    QString country = gCoreContext->GetSetting("Country", "");
     // Ask for language if we don't already know.
-    if (force || language.isEmpty())
+    if (force || language.isEmpty() || country.isEmpty())
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         if (!mainStack)
