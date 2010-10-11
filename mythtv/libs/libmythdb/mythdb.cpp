@@ -260,6 +260,8 @@ bool MythDB::SaveSettingOnHost(const QString &key,
 
     if (d->m_DBparams.dbHostName.isEmpty())  // Bootstrapping without database?
     {
+        if (host.toLower() == d->m_localhostname)
+            OverrideSettingForSession(key, newValue);
         if (!d->suppressDBMessages)
             VERBOSE(VB_IMPORTANT, LOC + "- No database yet");
         SingleSetting setting;
