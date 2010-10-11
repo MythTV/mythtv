@@ -310,7 +310,7 @@ class FileTransfer( BEEvent ):
             res = self.backendCommand('ANN FileTransfer %s %d %d %s' \
                       % (self.localname, write, False,
                          BACKEND_SEP.join(
-                                ['-1', self.filename, self.sgroup])))
+                                ['2000', self.filename, self.sgroup])))
             if res.split(BACKEND_SEP)[0] != 'OK':
                 raise MythBEError(MythError.PROTO_ANNOUNCE,
                                   self.host, self.port, res)
@@ -877,6 +877,7 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                             ('c','chanid') ):
             tmp = unicode(self[data]).replace('/','-')
             path = path.replace('%'+tag, tmp)
+
         for (data, pre) in (   ('recstartts','%'), ('recendts','%e'),
                                ('starttime','%p'),('endtime','%pe') ):
             for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
@@ -884,9 +885,14 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                                   ('h','%I'),('H','%H'),('i','%M'),('s','%S'),
                                   ('a','%p'),('A','%p') ):
                 path = path.replace(pre+tag, self[data].strftime(format))
+
+        airdate = self.airdate
+        if airdate is None:
+            airdate = date(1900,1,1)
         for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
                               ('j','%d'),('d','%d')):
-            path = path.replace('%o'+tag, self.airdate.strftime(format))
+            path = path.replace('%o'+tag, airdate.strftime(format))
+
         path = path.replace('%-','-')
         path = path.replace('%%','%')
         path += '.'+self.filename.split('.')[-1]
@@ -908,12 +914,11 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
             cmd = cmd.replace('%%%s%%' % tag.upper(), str(self[tag]))
         for (tag, data) in (('STARTTIME','recstartts'),('ENDTIME','recendts'),
                             ('PROGSTART','starttime'),('PROGEND','endtime')):
-            cmd = cmd.replace('%%%s%%' % tag, \
-                        self[data].mythformat())
-            cmd = cmd.replace('%%%sISO%%' % tag, \
-                        self[data].isoformat())
+            dat = self[data]
+            cmd = cmd.replace('%%%s%%' % tag, t.mythformat())
+            cmd = cmd.replace('%%%sISO%%' % tag, t.isoformat())
             cmd = cmd.replace('%%%sISOUTC%%' % tag, \
-                        (self[data]+timedelta(0,altzone)).isoformat())
+                        (t+timedelta(0,altzone)).isoformat())
         cmd = cmd.replace('%VERBOSELEVEL%', MythLog._parselevel())
         cmd = cmd.replace('%RECID%', str(self.recordid))
 

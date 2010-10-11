@@ -12,7 +12,7 @@ for path,dirs,files in os.walk('build'):
     if 'static.py' in files:
         break
 else:
-    raise Exception("Cannot find temporary build file for 'setup.py'.")
+    raise Exception("Cannot find temporary build file for 'static.py'.")
 
 path = os.path.join(path,'static.py')
 with open(path) as fi:
