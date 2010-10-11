@@ -451,6 +451,8 @@ class MPUBLIC MythPlayer
     void UnpauseBuffer(void);
 
     // Private decoder stuff
+    virtual void CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel);
     void  SetDecoder(DecoderBase *dec);
     /// Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder(void) const { return decoder; }

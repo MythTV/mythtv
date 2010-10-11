@@ -909,6 +909,22 @@ void MythPlayer::OpenDummy(void)
     SetDecoder(dec);
 }
 
+void MythPlayer::CreateDecoder(char *testbuf, int testreadsize,
+                               bool allow_libmpeg2, bool no_accel)
+{
+    if (NuppelDecoder::CanHandle(testbuf, testreadsize))
+        SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
+    else if (AvFormatDecoder::CanHandle(testbuf,
+                                        player_ctx->buffer->GetFilename(),
+                                        testreadsize))
+    {
+        SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
+                                       using_null_videoout,
+                                       allow_libmpeg2, no_accel,
+                                       player_ctx->GetSpecialDecode()));
+    }
+}
+
 int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
 {
     isDummy = false;
@@ -956,18 +972,9 @@ int MythPlayer::OpenFile(uint retries, bool allow_libmpeg2)
         }
 
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (NuppelDecoder::CanHandle(testbuf, testreadsize))
-            SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
-        else if (AvFormatDecoder::CanHandle(
-                     testbuf, player_ctx->buffer->GetFilename(), testreadsize))
-        {
-            bool noaccel = no_hardware_decoders ||
-                          (player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP());
-            SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
-                                           using_null_videoout,
-                                           allow_libmpeg2, noaccel,
-                                           player_ctx->GetSpecialDecode()));
-        }
+        bool noaccel = no_hardware_decoders ||
+                       (player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP());
+        CreateDecoder(testbuf, testreadsize, allow_libmpeg2, noaccel);
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         if (decoder || (bigTimer.elapsed() > timeout))
             break;
