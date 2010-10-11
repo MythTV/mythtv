@@ -99,7 +99,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_backend(false),
       m_database(GetMythDB()),
       m_UIThread(QThread::currentThread()),
-      m_locale(new MythLocale())
+      m_locale(NULL)
 {
 }
 
@@ -1166,8 +1166,17 @@ void MythCoreContext::ResetLanguage(void)
     d->language.clear();
 }
 
+void MythCoreContext::InitLocale(void )
+{
+    if (!d->m_locale)
+        d->m_locale = new MythLocale();
+}
+
 void MythCoreContext::SaveLocaleDefaults(void)
 {
+    if (!d->m_locale)
+        InitLocale();
+
     if (!d->m_locale->GetLocaleCode().isEmpty())
     {
         VERBOSE(VB_GENERAL, QString("Current locale %1")

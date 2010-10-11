@@ -164,6 +164,7 @@ class MPUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
 
+    void InitLocale(void);
     const MythLocale *GetLocale(void);
     void SaveLocaleDefaults(void);
     QString GetLanguage(void);

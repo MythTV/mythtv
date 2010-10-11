@@ -66,9 +66,14 @@ bool LanguageSelection::Create(void)
 
 void LanguageSelection::Load(void)
 {
-    QString langCode = gCoreContext->GetLocale()->GetLanguageCode();
-    QString localeCode = gCoreContext->GetLocale()->GetLocaleCode();
-    QString countryCode = gCoreContext->GetLocale()->GetCountryCode();
+    MythLocale *locale = new MythLocale();
+
+    if (gCoreContext->GetLocale())
+        *locale = *gCoreContext->GetLocale();
+
+    QString langCode = locale->GetLanguageCode();
+    QString localeCode = locale->GetLocaleCode();
+    QString countryCode = locale->GetCountryCode();
 
     VERBOSE(VB_GENERAL, QString("System Locale (%1), Country (%2), Language "
                                 "(%3)").arg(localeCode).arg(countryCode)
@@ -110,6 +115,8 @@ void LanguageSelection::Load(void)
         if (code == m_country || code == countryCode)
             m_countryList->SetItemCurrent(item);
     }
+
+    delete locale;
 }
 
 bool LanguageSelection::m_languageChanged = false;

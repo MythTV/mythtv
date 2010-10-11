@@ -43,7 +43,7 @@ void MythTranslation::load(const QString &module_name)
     unload(module_name);
 
     // install translator
-    QString lang  = d.m_language.toLower();
+    QString lang = d.m_language.toLower();
 
     if (d.m_language.isEmpty())
     {

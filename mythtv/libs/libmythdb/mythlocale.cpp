@@ -14,15 +14,32 @@
 
 MythLocale::MythLocale(QString localeName)
 {
-    QLocale locale;
+    QLocale locale; // Initialised to system()
+
+    QString dbLanguage = GetMythDB()->GetSetting("Language", "");
+    QString dbCountry = GetMythDB()->GetSetting("Country", "");
 
     if (!localeName.isEmpty())
         locale = QLocale(localeName);
-    else
-        locale = QLocale::system();
+    else if (!dbLanguage.isEmpty() &&
+             !dbCountry.isEmpty())
+    {
+        QString langcode = dbLanguage.section('_',0,0);
+        QString localecode = QString("%1_%2").arg(langcode)
+                                             .arg(dbCountry.toUpper());
+        locale = QLocale(localecode);
+    }
 
     if (locale.name().isEmpty() || locale.name() == "C")
-        locale = QLocale("en_US");
+    {
+        locale = QLocale::system();
+
+        if (locale.name().isEmpty() || locale.name() == "C")
+        {
+            // If all else has failed use the US locale
+            locale = QLocale("en_US");
+        }
+    }
 
     m_localeCode = locale.name();
     m_country = locale.country();
@@ -32,7 +49,7 @@ MythLocale::MythLocale(QString localeName)
 
 QString MythLocale::GetCountryCode(void) const
 {
-    QString isoCountry = m_localeCode.section("_", 1, 1);
+    QString isoCountry = m_localeCode.section('_', 1, 1);
 
     return isoCountry;
 }
@@ -44,7 +61,7 @@ QString MythLocale::GetNativeCountry(void) const
 
 QString MythLocale::GetLanguageCode(void) const
 {
-    QString isoLanguage = m_localeCode.section("_", 0, 0);
+    QString isoLanguage = m_localeCode.section('_', 0, 0);
 
     return isoLanguage;
 }

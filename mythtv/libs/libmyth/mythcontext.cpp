@@ -307,6 +307,7 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
 
     // ---- keep all DB-using stuff below this line ----
 
+    gCoreContext->InitLocale();
     gCoreContext->SaveLocaleDefaults();
 
     if (gui)
