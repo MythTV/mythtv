@@ -1321,16 +1321,29 @@ int main(int argc, char **argv)
         as.Save();
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("update settings set data='en_US' "
-                      "WHERE hostname = :HOSTNAME and value='Language' ;");
+        query.prepare("UPDATE settings SET data = :THEME WHERE "
+                      "hostname = :HOSTNAME AND value = 'Theme' ;");
+        query.bindValue(":THEME", DEFAULT_UI_THEME);
         query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec())
-            MythDB::DBError("Updating language", query);
+            MythDB::DBError("Resetting theme", query);
+
+        query.prepare("DELETE FROM settings WHERE hostname = :HOSTNAME AND "
+                      "value = 'Language' ;");
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+        if (!query.exec())
+            MythDB::DBError("Deleting language", query);
+
+        query.prepare("DELETE FROM settings WHERE hostname = :HOSTNAME AND "
+                      "value = 'Country' ;");
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+        if (!query.exec())
+            MythDB::DBError("Deleting country", query);
 
         return FRONTEND_EXIT_OK;
     }
 
-    // Create priveleged thread, then drop privs
+    // Create privileged thread, then drop privs
     pthread_t priv_thread;
     bool priv_thread_created = true;
 
