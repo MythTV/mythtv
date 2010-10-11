@@ -119,8 +119,10 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
 
     delete m_locale;
 
-    if (m_database)
+    if (m_database) {
         DestroyMythDB();
+        m_database = NULL;
+    }
 }
 
 /// If another thread has already started WOL process, wait on them...
@@ -186,6 +188,7 @@ bool MythCoreContext::Init(void)
 MythCoreContext::~MythCoreContext()
 {
     delete d;
+    d = NULL;
 }
 
 void MythCoreContext::SetAppName(QString appName)

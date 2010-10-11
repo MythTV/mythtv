@@ -97,6 +97,7 @@ MythDBPrivate::MythDBPrivate()
 
 MythDBPrivate::~MythDBPrivate()
 {
+    VERBOSE(VB_DATABASE, "Destroying MythDBPrivate");
     delete m_settings;
 }
 
