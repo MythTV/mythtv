@@ -20,6 +20,9 @@
     <!-- Languages - Self Explanatory -->
     <setting name="Language">da</setting>
 
+    <!-- Country -->
+    <setting name="Country">DK</setting>
+
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd d MMM</setting>
     <setting name="TimeFormat">hh:mm</setting>

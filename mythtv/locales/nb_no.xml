@@ -20,6 +20,9 @@
     <!-- Languages - Self Explanatory -->
     <setting name="Language">nb</setting>
 
+    <!-- Country -->
+    <setting name="Country">NO</setting>
+
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd d MMM</setting>
     <setting name="TimeFormat">hh:mm</setting>

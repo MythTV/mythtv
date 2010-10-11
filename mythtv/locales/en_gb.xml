@@ -20,8 +20,13 @@
     <!-- Languages - Self Explanatory -->
     <setting name="Language">en_GB</setting>
 
-    <!-- Date/Time format -->
+    <!-- Country -->
+    <setting name="Country">GB</setting>
 
+    <!-- Date/Time format -->
+    <setting name="DateFormat">ddd d MMM</setting>
+    <setting name="TimeFormat">hh:mm</setting>
+    <setting name="ShortDateFormat">dd/MM</setting>
 
     <!-- Playback -->
     <setting name="EnableMHEG">1</setting> <!-- Red button, interactive services -->

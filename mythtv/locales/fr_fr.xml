@@ -2,7 +2,7 @@
 
     <!-- Global Settings -->
 
-    <!--EIT, Subtitle, Audio Stream, Language Preferences --> 
+    <!--EIT, Subtitle, Audio Stream, Language Preferences -->
     <setting name="ISO639Language0" global="true">fre</setting>
     <setting name="ISO639Language1" global="true">fre</setting>
 
@@ -17,6 +17,9 @@
 
     <!-- Languages - Self Explanatory -->
     <setting name="Language">fr</setting>
+
+    <!-- Country -->
+    <setting name="Country">FR</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">dddd d MMM</setting>

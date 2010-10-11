@@ -19,6 +19,9 @@
     <!-- Languages - Self Explanatory -->
     <setting name="Language">en_US</setting>
 
+    <!-- Country -->
+    <setting name="Country">US</setting>
+
     <!-- Date/Time format -->
 
 
