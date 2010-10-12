@@ -146,9 +146,9 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
 
     if (input_size == window.GetActualVideoDim())
     {
+        aspect_only = video_codec_id == av_codec_id;
         if (window.GetVideoAspect() != aspect)
         {
-            aspect_only = true;
             VideoAspectRatioChanged(aspect);
             MoveResize();
         }

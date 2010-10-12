@@ -672,9 +672,9 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
 
     if (!res_changed && !cid_changed)
     {
+        aspect_only = true;
         if (asp_changed)
         {
-            aspect_only = true;
             VideoAspectRatioChanged(aspect);
             MoveResize();
         }
