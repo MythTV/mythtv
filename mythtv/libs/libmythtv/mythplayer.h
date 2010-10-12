@@ -195,6 +195,7 @@ class MPUBLIC MythPlayer
     MuteState          GetMuteState(void) { return audio.GetMuteState(); }
 
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
+    float   GetPlaySpeed(void) const          { return play_speed; }
     AudioPlayer* GetAudio(void)               { return &audio; }
     float   GetAudioStretchFactor(void)       { return audio.GetStretchFactor(); }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }

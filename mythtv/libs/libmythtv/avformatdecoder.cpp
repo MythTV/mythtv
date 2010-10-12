@@ -539,7 +539,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     int seekDelta = desiredFrame - framesPlayed;
 
     // avoid using av_frame_seek if we are seeking frame-by-frame when paused
-    if (seekDelta == 0 && !dorewind && GetPlayer()->GetFFRewSkip() == 0)
+    if (seekDelta >= 0 && seekDelta < 2 && !dorewind && GetPlayer()->GetPlaySpeed() == 0.0f)
     {
         SeekReset(framesPlayed, seekDelta, false, true);
         GetPlayer()->SetFramesPlayed(framesPlayed + 1);
