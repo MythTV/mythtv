@@ -4379,6 +4379,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     private_dec->Reset();
             }
 
+#ifdef USING_XVMC
             if (!private_dec)
             {
                 int current_width = curstream->codec->width;
@@ -4419,6 +4420,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     continue;
                 }
             }
+#endif USING_XVMC
         }
 
         enum CodecType codec_type = curstream->codec->codec_type;
