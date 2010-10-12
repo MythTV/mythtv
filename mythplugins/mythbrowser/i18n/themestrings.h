@@ -4,6 +4,7 @@ void strings_null() {
     ThemeUI::tr("Browse your favorite web sites.");
     ThemeUI::tr("Browser:");
     ThemeUI::tr("Text Size:");
+    ThemeUI::tr("Enable browser plugins (Flash, etc):");
     ThemeUI::tr("Cancel");
     ThemeUI::tr("OK");
     ThemeUI::tr("Configure Web Browser");
@@ -22,4 +23,5 @@ void strings_null() {
     ThemeUI::tr("Browser Command:");
     ThemeUI::tr("Find...");
     ThemeUI::tr("Find");
+    ThemeUI::tr("Enable plugins:");
 }

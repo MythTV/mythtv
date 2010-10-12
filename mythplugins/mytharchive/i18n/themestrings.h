@@ -38,6 +38,7 @@ void strings_null() {
     ThemeUI::tr("title goes here");
     ThemeUI::tr("PL:");
     ThemeUI::tr("1");
+    ThemeUI::tr("Ok");
     ThemeUI::tr("Video Category");
     ThemeUI::tr("x.xx Gb");
     ThemeUI::tr("Change Encoding Profile");
