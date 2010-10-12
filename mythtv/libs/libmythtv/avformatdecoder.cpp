@@ -538,8 +538,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     int seekDelta = desiredFrame - framesPlayed;
 
-    // avoid using av_frame_seek if we want to advance forward < 1 second
-    if (seekDelta >= 0 && seekDelta < (int)(fps + 1.0f) && !dorewind)
+    // avoid using av_frame_seek if we are seeking frame-by-frame when paused
+    if (seekDelta == 0 && !dorewind && GetPlayer()->GetFFRewSkip() == 0)
     {
         SeekReset(framesPlayed, seekDelta, false, true);
         GetPlayer()->SetFramesPlayed(framesPlayed + 1);
@@ -548,18 +548,14 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         return true;
     }
 
-    int64_t frameseekadjust = 0;
     AVCodecContext *context = st->codec;
-
-    if (CODEC_IS_MPEG(context->codec_id))
-        frameseekadjust = maxkeyframedist+1;
 
     long long ts = 0;
     if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
         ts = ic->start_time;
 
     // convert framenumber to normalized timestamp
-    long double seekts = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
+    long double seekts = desiredFrame * AV_TIME_BASE / fps;
     ts += (long long)seekts;
 
     bool exactseeks = DecoderBase::getExactSeeks();
