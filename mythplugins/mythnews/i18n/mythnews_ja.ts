@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="ja_JP">
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/main.cpp" line="27"/>
+        <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="31"/>
+        <location filename="../mythnews/main.cpp" line="51"/>
         <source>Update news items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="33"/>
+        <location filename="../mythnews/main.cpp" line="53"/>
         <source>Force update news items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/main.cpp" line="35"/>
+        <location filename="../mythnews/main.cpp" line="55"/>
         <source>Cancel news item updating</source>
         <translation type="unfinished"></translation>
     </message>
@@ -27,22 +27,22 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="437"/>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
         <source>Updated</source>
-        <translation type="unfinished"></translation>
+        <translation>アップデイト</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="444"/>
+        <location filename="../mythnews/mythnews.cpp" line="462"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="917"/>
+        <location filename="../mythnews/mythnews.cpp" line="936"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="913"/>
+        <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Edit News Site</source>
         <translation type="unfinished"></translation>
     </message>
@@ -52,30 +52,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="455"/>
-        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <location filename="../mythnews/mythnews.cpp" line="473"/>
+        <location filename="../mythnews/mythnews.cpp" line="732"/>
         <source>%1 of %2 (%3 percent)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <location filename="../mythnews/mythnews.cpp" line="805"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="914"/>
+        <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Add News Site</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="916"/>
+        <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Delete News Site</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="899"/>
+        <location filename="../mythnews/mythnews.cpp" line="918"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>選択肢</translation>
     </message>
 </context>
 <context>
@@ -93,32 +93,32 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>名前:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーアールエル:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>アイコン:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>ポッドキャスト:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <source>OK</source>
+        <translation>はい</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -159,7 +159,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="705"/>
         <source>Downloading media...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -168,13 +168,125 @@
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <source>%DATE%, %TIME%</source>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
-        <source>Ok</source>
+        <source>Edit RSS News Feeds</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Name:</source>
+        <translation>名前:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>URL:</source>
+        <translation>ユーアールエル:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Icon:</source>
+        <translation>アイコン:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Podcast:</source>
+        <translation>ポッドキャスト:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Genre:</source>
+        <translation>ジャンル:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Channel:</source>
+        <translation>チャンネル:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>OK</source>
+        <translation>はい</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>News Subscriptions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Choose the news sites you would like to read.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>News Feeds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>News Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Category</source>
+        <translation>カテゴリー</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>[x]</source>
+        <translation>[x]</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Web Site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Edit RSS News Feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Contexts</source>
+        <translation>コンテキスト</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Actions</source>
+        <translation>アクション</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>RSS Feeds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>MythNews Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Minutes</source>
+        <translation>分</translation>
     </message>
 </context>
 </TS>

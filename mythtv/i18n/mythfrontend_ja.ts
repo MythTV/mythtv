@@ -420,7 +420,7 @@
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="159"/>
         <source>ScanWizard</source>
-        <translation type="unfinished">スキャンウィザード</translation>
+        <translation>スキャンウィザード</translation>
     </message>
 </context>
 <context>
@@ -970,7 +970,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="345"/>
         <source>Fetching lineups from %1...</source>
-        <translation>Myth Plusサービスからラインナップを取得中...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -983,17 +983,17 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2006"/>
         <source>File info</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルインフォメーション</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2009"/>
         <source>File size</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル サイズ</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2035"/>
         <source>%1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 MB</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2038"/>
@@ -1050,7 +1050,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="82"/>
         <source>Description</source>
-        <translation type="unfinished">内容</translation>
+        <translation>内容</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="83"/>
@@ -1156,14 +1156,14 @@
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="391"/>
         <source>E</source>
         <comment>Eastern Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="394"/>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="422"/>
         <source>W</source>
         <comment>Western Hemisphere</comment>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="460"/>
@@ -1178,7 +1178,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="483"/>
         <source>None</source>
-        <translation type="unfinished">無し</translation>
+        <translation>無し</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="487"/>
@@ -1431,7 +1431,7 @@
     <message>
         <location filename="../programs/mythfrontend/proglist_helpers.cpp" line="601"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>ショウ</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist_helpers.cpp" line="603"/>
@@ -1665,17 +1665,17 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2058"/>
         <source>Probed info</source>
-        <translation type="unfinished">検出情報</translation>
+        <translation>検出情報</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2073"/>
         <source>Failed to open</source>
-        <translation type="unfinished">オープンできませんでした</translation>
+        <translation>オープンできませんでした</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2079"/>
         <source>Failed to probe</source>
-        <translation type="unfinished">検出できませんでした</translation>
+        <translation>検出できませんでした</translation>
     </message>
 </context>
 <context>
@@ -4433,7 +4433,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1174"/>
         <source>H</source>
         <comment>Height</comment>
-        <translation type="unfinished"></translation>
+        <translation>H</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1188"/>
@@ -4890,7 +4890,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/progfind.cpp" line="352"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="385"/>
         <source>There are no available programs under this search. Please select another search.</source>
-        <translation>番組が見つかりませんでした．別の検索を試してください．</translation>
+        <translation>番組が見つかりませんでした．別の検索を試してください.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="224"/>
@@ -5560,7 +5560,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="572"/>
         <source>Changing the volume adjusts the selected mixer.</source>
-        <translation>ボリューム調整ミキサーを変更して下さい．</translation>
+        <translation>ボリューム調整ミキサーを変更して下さい.</translation>
     </message>
     <message>
         <source>Master Mixer Volume</source>
@@ -5582,17 +5582,17 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="83"/>
         <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation>早送り，巻戻しキーを押したときに進む量です．</translation>
+        <translation>早送り，巻戻しキーを押したときに進む量です.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="55"/>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation>速送り時のスキップ秒数です．</translation>
+        <translation>速送り時のスキップ秒数です.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="69"/>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation>巻戻し時のスキップ秒数です．</translation>
+        <translation>巻戻し時のスキップ秒数です.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="718"/>
@@ -5602,7 +5602,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="720"/>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation>有効にすると厳密にフレームを検索します．ただし遅くなります．</translation>
+        <translation>有効にすると厳密にフレームを検索します．ただし遅くなります.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="4335"/>
@@ -5689,7 +5689,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1996"/>
         <source>Adjust this to move the image horizontally.</source>
-        <translation>映像を水平に移動します．</translation>
+        <translation>映像を水平に移動します.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2003"/>
@@ -5699,7 +5699,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2005"/>
         <source>Adjust this to move the image vertically.</source>
-        <translation>映像を縦に移動します．</translation>
+        <translation>映像を縦に移動します.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2141"/>
@@ -5827,7 +5827,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2787"/>
         <source>Your preferred date format.</source>
-        <translation>日付の書式を指定します．</translation>
+        <translation>日付の書式を指定します.</translation>
     </message>
     <message>
         <source>Short Date format</source>
@@ -5836,7 +5836,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2826"/>
         <source>Your preferred short date format.</source>
-        <translation>短い日付の書式を指定します．</translation>
+        <translation>短い日付の書式を指定します.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2834"/>
@@ -5993,7 +5993,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="118"/>
         <source>Sets the audio sampling rate for your DSP. Ensure that you choose a sampling rate appropriate for your device.  btaudio may only allow 32000.</source>
-        <translation>DSPのオーディオサンプリングレートを指定します．オーディオデバイスに適した値を選んでください．btaudioは32000しか受け付けないかもしれません．</translation>
+        <translation>DSPのオーディオサンプリングレートを指定します．オーディオデバイスに適した値を選んでください．btaudioは32000しか受け付けないかもしれません.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="181"/>
@@ -6064,7 +6064,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="487"/>
         <source>Higher is better quality.</source>
-        <translation>高い方がよい品質です．</translation>
+        <translation>高い方がよい品質です.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="498"/>
@@ -6075,7 +6075,7 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="500"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="513"/>
         <source>Lower is better.</source>
-        <translation>低い方が良いです．</translation>
+        <translation>低い方が良いです.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="511"/>
@@ -6101,7 +6101,7 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="569"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="584"/>
         <source>Modifying the default may have severe consequences.</source>
-        <translation>既定値を変更すると深刻な結果を招くかもしれません．</translation>
+        <translation>既定値を変更すると深刻な結果を招くかもしれません.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="567"/>
@@ -6130,7 +6130,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="645"/>
         <source>If set, the MPEG4 encoder will use &apos;4MV&apos; motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.</source>
-        <translation>MPEG4のエンコーダが&apos;4MV&apos;モーションベクターエンコーディングを使うようにします．CPUの負荷は大きくなりますが，ビデオの品質は向上します．4MVを有効にした場合は，HQオプションも有効にすることを強く推奨します．</translation>
+        <translation>MPEG4のエンコーダが&apos;4MV&apos;モーションベクターエンコーディングを使うようにします．CPUの負荷は大きくなりますが，ビデオの品質は向上します．4MVを有効にした場合は，HQオプションも有効にすることを強く推奨します.</translation>
     </message>
     <message>
         <source>Max. Bitrate</source>
@@ -6144,7 +6144,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="731"/>
         <source>Sets the type of stream generated by your PVR.</source>
-        <translation>ビデオレコーダが出力するストリームタイプを指定して下さい．</translation>
+        <translation>ビデオレコーダが出力するストリームタイプを指定して下さい.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="743"/>
@@ -6159,7 +6159,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="750"/>
         <source>Sets the aspect ratio of stream generated by your PVR.</source>
-        <translation>ビデオレコーダが出力するストリームのアスペクト比を指定します．</translation>
+        <translation>ビデオレコーダが出力するストリームのアスペクト比を指定します.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="762"/>
@@ -6229,7 +6229,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="709"/>
         <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation>巻き戻しの直後に早送りをすると，巻き戻した量と同じ分だけ早送りをします．</translation>
+        <translation>巻き戻しの直後に早送りをすると，巻き戻した量と同じ分だけ早送りをします.</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -6357,7 +6357,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="617"/>
         <source>Location of PIP Video window.</source>
-        <translation>PinPビデオウィンドウの位置．</translation>
+        <translation>PinPビデオウィンドウの位置.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1860"/>
@@ -6438,7 +6438,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="125"/>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation>バックエンドでの設定と異なったフォーマットをこのチャンネルで使用したい時にセットします．</translation>
+        <translation>バックエンドでの設定と異なったフォーマットをこのチャンネルで使用したい時にセットします.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="197"/>
@@ -6834,12 +6834,12 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="223"/>
         <source>This showing will be recorded.</source>
-        <translation>この番組は録画されます．</translation>
+        <translation>この番組は録画されます.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="226"/>
         <source>This showing is being recorded.</source>
-        <translation>この番組は録画中です．</translation>
+        <translation>この番組は録画中です.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="229"/>
@@ -6849,7 +6849,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="232"/>
         <source>This showing was recorded.</source>
-        <translation>この番組は録画が終了しました．</translation>
+        <translation>この番組は録画が終了しました.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="250"/>
@@ -6869,7 +6869,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="260"/>
         <source>The status of this showing is unknown.</source>
-        <translation>この番組のステータスは不明です．</translation>
+        <translation>この番組のステータスは不明です.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="269"/>
@@ -6884,22 +6884,22 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="276"/>
         <source>it was manually set to not record.</source>
-        <translation>録画しないように手動で設定されています．</translation>
+        <translation>録画しないように手動で設定されています.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="279"/>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation>このタイトルに対する重複録画設定によると，この番組は以前録画されています．</translation>
+        <translation>このタイトルに対する重複録画設定によると，この番組は以前録画されています.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="284"/>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation>この番組は以前録画されており，録画一覧から閲覧できます．</translation>
+        <translation>この番組は以前録画されており，録画一覧から閲覧できます.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="293"/>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation>この番組の録画数が多すぎます．</translation>
+        <translation>この番組の録画数が多すぎます.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="326"/>
@@ -6977,7 +6977,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2283"/>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
-        <translation>設定中のキャプチャーカードに適切なカードタイプを選択して下さい．</translation>
+        <translation>設定中のキャプチャーカードに適切なカードタイプを選択して下さい.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2294"/>
@@ -7014,7 +7014,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="211"/>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
-        <translation>全般の設定で定義されたシステム全体の周波数テーブルと異なるものを使う以外は，既定値のままにしておいてください．</translation>
+        <translation>全般の設定で定義されたシステム全体の周波数テーブルと異なるものを使う以外は，既定値のままにしておいてください.</translation>
     </message>
     <message>
         <source>Video source setup</source>
@@ -7072,12 +7072,12 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1094"/>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
-        <translation>この設定を変更すると，下にカード名とタイプが表示されます．カードがオープンできない場合はエラーメッセージが表示されます．</translation>
+        <translation>この設定を変更すると，下にカード名とタイプが表示されます．カードがオープンできない場合はエラーメッセージが表示されます.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1182"/>
         <source>Wait for SEQ start header.</source>
-        <translation>SEQスタートヘッダを待つ</translation>
+        <translation>SEQスタートヘッダを待つ.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1724"/>
@@ -7188,7 +7188,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3386"/>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
-        <translation>CD/DVDドライブを監視して，ディスクが挿入された時にプラグインを起動します．</translation>
+        <translation>CD/DVDドライブを監視して，ディスクが挿入された時にプラグインを起動します.</translation>
     </message>
     <message>
         <source>Program Guide Alpha</source>
@@ -7230,7 +7230,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="88"/>
         <source>The TV standard to use for viewing TV.</source>
-        <translation>テレビを見る時のTV規格．</translation>
+        <translation>テレビを見る時のTV規格.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="95"/>
@@ -7252,7 +7252,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="358"/>
         <source>Number of times the frontend will try to wake up the master backend.</source>
-        <translation>フロントエンドがマスターバックエンドを起動させようとする回数を指定します．</translation>
+        <translation>フロントエンドがマスターバックエンドを起動させようとする回数を指定します.</translation>
     </message>
     <message>
         <source>Wake Command</source>
@@ -7296,7 +7296,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="478"/>
         <source>The command used to halt the backends.</source>
-        <translation>バックエンドを停止(halt)させるのに使われるコマンドです．</translation>
+        <translation>バックエンドを停止(halt)させるのに使われるコマンドです.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="963"/>
@@ -16280,7 +16280,7 @@ name cannot be blank.</source>
         <location filename="../libs/libmythtv/scanwizard.cpp" line="148"/>
         <location filename="../libs/libmythtv/scanwizard.cpp" line="167"/>
         <source>ScanWizard</source>
-        <translation type="unfinished">スキャンウィザード</translation>
+        <translation>スキャンウィザード</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/scanwizard.cpp" line="149"/>
@@ -16290,7 +16290,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../libs/libmythtv/scanwizard.cpp" line="168"/>
         <source>Error parsing parameters</source>
-        <translation type="unfinished">パラメータエラー</translation>
+        <translation>パラメータエラー</translation>
     </message>
 </context>
 <context>
@@ -16316,7 +16316,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="550"/>
         <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="unfinished">重複一致にサブタイトル&amp;内容を使う</translation>
+        <translation>重複一致にサブタイトル&amp;内容を使う</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="554"/>
@@ -16592,7 +16592,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="198"/>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>のぼりざか</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="200"/>
@@ -16690,7 +16690,7 @@ Database Name: %2</source>
     <message>
         <location filename="../programs/mythfrontend/screenwizard.cpp" line="256"/>
         <source>Size: %1 x %2</source>
-        <translation type="unfinished"></translation>
+        <translation>サイズ: %1 x %2</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/screenwizard.cpp" line="257"/>
@@ -18235,7 +18235,7 @@ Select a Current Recording</source>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10598"/>
         <source>I</source>
         <comment>Input</comment>
-        <translation type="unfinished"></translation>
+        <translation>I</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10554"/>
@@ -18972,7 +18972,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="398"/>
         <source>%alert_text%</source>
-        <translation type="unfinished"></translation>
+        <translation>%alert_text%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="399"/>
@@ -19317,12 +19317,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="6"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>しい</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="10"/>
         <source>%DATE%, %TIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="11"/>
@@ -19607,7 +19607,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="87"/>
         <source>New:</source>
-        <translation type="unfinished"></translation>
+        <translation>しい:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="88"/>
@@ -19748,8 +19748,8 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="138"/>
         <source>-%n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>-%n</numerusform>
         </translation>
     </message>
     <message>
@@ -19760,8 +19760,8 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="140"/>
         <source>+%n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>+%n</numerusform>
         </translation>
     </message>
     <message>
@@ -20023,7 +20023,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="208"/>
         <source>[x]</source>
-        <translation type="unfinished"></translation>
+        <translation>[x]</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="209"/>
@@ -20098,7 +20098,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="247"/>
         <source>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</source>
-        <translation type="unfinished"></translation>
+        <translation>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="257"/>
@@ -20143,7 +20143,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="306"/>
         <source>%|&quot;SUBTITLE|&quot;%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="307"/>
@@ -20153,7 +20153,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="309"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="311"/>
@@ -20169,7 +20169,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="313"/>
         <source>Edit</source>
-        <translation>エディット...</translation>
+        <translation>エディット</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="315"/>
@@ -20319,32 +20319,32 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="366"/>
         <source>%&quot;|SUBTITLE|&quot; %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="367"/>
         <source>(%STARTTIME% - %ENDTIME%)  %LENMINS%</source>
-        <translation type="unfinished"></translation>
+        <translation>(%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="368"/>
         <source>(%STARTTIME% - %ENDTIME%) %LENMINS%</source>
-        <translation type="unfinished"></translation>
+        <translation>(%STARTTIME% - %ENDTIME%) %LENMINS%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="369"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="370"/>
         <source>%TIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="375"/>
         <source>%YEARSTARS| %%DESCRIPTION%% |LONGREPEAT%</source>
-        <translation type="unfinished"></translation>
+        <translation>%YEARSTARS| %%DESCRIPTION%% |LONGREPEAT%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="376"/>
@@ -20374,7 +20374,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="385"/>
         <source>%&quot;|SUBTITLE|&quot;%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="387"/>
@@ -20784,7 +20784,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="127"/>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンル:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="595"/>
@@ -21298,7 +21298,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="634"/>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンル</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="635"/>
@@ -21318,24 +21318,26 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="497"/>
         <source>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="498"/>
         <source>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%LONGREPEAT%%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="499"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%YEARSTARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+%%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="500"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+%%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="501"/>
@@ -21345,7 +21347,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="502"/>
         <source>%&quot;|SUBTITLE|&quot; %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="503"/>
@@ -21425,7 +21427,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="547"/>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンル:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="548"/>
@@ -21490,17 +21492,17 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="560"/>
         <source>%LENMINS%</source>
-        <translation type="unfinished"></translation>
+        <translation>%LENMINS%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="561"/>
         <source>%STARTTIME%-%ENDTIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STARTTIME%-%ENDTIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="562"/>
         <source>%CHANNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%CHANNUM%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="563"/>
@@ -21601,7 +21603,7 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="583"/>
         <source>%DATE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DATE%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="584"/>
@@ -21636,7 +21638,7 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="604"/>
         <source>%TITLE%  by  %ARTIST%</source>
-        <translation type="unfinished"></translation>
+        <translation>%TITLE%  by  %ARTIST%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="605"/>
@@ -21661,13 +21663,14 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="611"/>
         <source>%VALUE%%UNITS%</source>
-        <translation type="unfinished"></translation>
+        <translation>%VALUE%%UNITS%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="612"/>
         <source>%PLAYEDTIME% of %TOTALTIME%
 %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation type="unfinished"></translation>
+        <translation>%PLAYEDTIME% of %TOTALTIME%
+%(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="613"/>
@@ -21697,7 +21700,7 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="628"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="629"/>
@@ -22017,7 +22020,7 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="326"/>
         <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="308"/>
@@ -22042,13 +22045,14 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="328"/>
         <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="255"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;%
+%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="256"/>
@@ -22100,7 +22104,8 @@ dd MMMM yyyy</source>
         <location filename="../themes/themestrings.h" line="317"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;%
+%LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="296"/>
@@ -22125,7 +22130,7 @@ dd MMMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="278"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="300"/>
@@ -22268,7 +22273,7 @@ dd MMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="670"/>
         <source>Twitter</source>
-        <translation type="unfinished"></translation>
+        <translation>Twitter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="671"/>
@@ -22498,7 +22503,7 @@ dd MMM yyyy</source>
     <message>
         <location filename="../themes/themestrings.h" line="310"/>
         <source>%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="371"/>

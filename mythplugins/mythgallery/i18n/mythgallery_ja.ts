@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="ja_JP">
 <context>
     <name>GLSingleView</name>
     <message>
@@ -49,7 +49,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="128"/>
@@ -463,58 +463,58 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="127"/>
         <source>Folder: </source>
-        <translation type="unfinished">フォルダー: </translation>
+        <translation>フォルダー: </translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="128"/>
         <source>Created: </source>
-        <translation type="unfinished">作成: </translation>
+        <translation>作成: </translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="129"/>
         <source>Modified: </source>
-        <translation type="unfinished">更新: </translation>
+        <translation>更新: </translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="131"/>
         <source>Bytes</source>
-        <translation type="unfinished">バイト</translation>
+        <translation>バイト</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="132"/>
         <source>Width</source>
-        <translation type="unfinished">幅</translation>
+        <translation>幅</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="133"/>
         <location filename="../mythgallery/thumbview.cpp" line="135"/>
         <source>pixels</source>
-        <translation type="unfinished">ピクセル</translation>
+        <translation>ピクセル</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="134"/>
         <source>Height</source>
-        <translation type="unfinished">高さ</translation>
+        <translation>高さ</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="136"/>
         <source>Pixel Count</source>
-        <translation type="unfinished">ピクセルカウント</translation>
+        <translation>ピクセルカウント</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="137"/>
         <source>megapixels</source>
-        <translation type="unfinished">Mピクセル</translation>
+        <translation>Mピクセル</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="139"/>
         <source>Rotation Angle</source>
-        <translation type="unfinished">回転角度</translation>
+        <translation>回転角度</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="140"/>
         <source>degrees</source>
-        <translation type="unfinished">度</translation>
+        <translation>度</translation>
     </message>
 </context>
 <context>
