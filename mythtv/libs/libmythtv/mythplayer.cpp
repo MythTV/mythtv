@@ -232,7 +232,7 @@ MythPlayer::MythPlayer(bool muted)
       next_play_speed(1.0f),        next_normal_speed(true),
       play_speed(1.0f),             normal_speed(true),
       frame_interval((int)(1000000.0f / 30)), m_frame_interval(0),
-      ffrew_skip(1),
+      ffrew_skip(1),ffrew_adjust(0),
       // Audio and video synchronization stuff
       videosync(NULL),              avsync_delay(0),
       avsync_adjustment(0),         avsync_avg(0),
@@ -2801,12 +2801,14 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
     if (ffrew_skip > 0)
     {
         long long delta = decoder->GetFramesRead() - framesPlayed;
-        long long real_skip = CalcMaxFFTime(ffrew_skip + delta) - delta;
+        long long real_skip = CalcMaxFFTime(ffrew_skip - ffrew_adjust + delta) - delta;
+        long long target_frame = decoder->GetFramesRead() + real_skip;
         if (real_skip >= 0)
         {
-            long long frame = decoder->GetFramesRead() + real_skip;
-            decoder->DoFastForward(frame, false);
+            decoder->DoFastForward(target_frame, false);
         }
+        long long seek_frame  = decoder->GetFramesRead();
+        ffrew_adjust = seek_frame - target_frame;
     }
     else if (CalcRWTime(-ffrew_skip) >= 0)
     {
@@ -2817,10 +2819,14 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
 
 bool MythPlayer::DecoderGetFrameREW(void)
 {
-    long long curFrame  = decoder->GetFramesRead();
-    bool      toBegin   = -curFrame > ffrew_skip;
-    long long real_skip = (toBegin) ? -curFrame : ffrew_skip;
-    return decoder->DoRewind(curFrame + real_skip, false);
+    long long cur_frame    = decoder->GetFramesPlayed();
+    bool      toBegin      = -cur_frame > ffrew_skip + ffrew_adjust;
+    long long real_skip    = (toBegin) ? -cur_frame : ffrew_skip + ffrew_adjust;
+    long long target_frame = cur_frame + real_skip;
+    bool ret = decoder->DoRewind(target_frame, false);
+    long long seek_frame  = decoder->GetFramesPlayed();
+    ffrew_adjust = target_frame - seek_frame;
+    return ret;
 }
 
 bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
@@ -3084,6 +3090,7 @@ void MythPlayer::ChangeSpeed(void)
         if (play_speed < 0.0)
             new_skip = -new_skip;
         ffrew_skip = new_skip;
+        ffrew_adjust = 0;
     }
 
     if (skip_changed && videoOutput)

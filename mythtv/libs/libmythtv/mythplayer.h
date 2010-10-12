@@ -668,6 +668,7 @@ class MPUBLIC MythPlayer
     int        m_frame_interval;///< used to detect changes to frame_interval
 
     int        ffrew_skip;
+    int        ffrew_adjust;
 
     // Audio and video synchronization stuff
     VideoSync *videosync;
