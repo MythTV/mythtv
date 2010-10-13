@@ -308,6 +308,7 @@ class deadlinesocket( socket.socket ):
         self.setdeadline(10.0)
 
     def connect(self, *args, **kwargs):
+        self.settimeout(self.getdeadline())
         socket.socket.connect(self, *args, **kwargs)
         self.setblocking(0)
 
