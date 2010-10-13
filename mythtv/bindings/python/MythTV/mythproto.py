@@ -845,7 +845,7 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
                                                  self.hostname, \
                                                  self.filename)
         return ftopen(self.filename, 'r', db=self._db, chanid=self.chanid, \
-                      starttime=self.starttime)
+                      starttime=self.recstartts)
 
     def _openXML(self):
         xml = XMLConnection(self.hostname, 6544)
