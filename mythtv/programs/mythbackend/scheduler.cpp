@@ -2079,12 +2079,6 @@ void Scheduler::RunScheduler(void)
                 nextRecording->SetRecordingStartTime(recstartts);
 
                 QMutexLocker lockit(reclist_lock);
-
-                details = QString("%1: channel %2 on cardid %3, sourceid %4")
-                          .arg(nextRecording->toString(ProgramInfo::kTitleSubtitle))
-                          .arg(nextRecording->GetChanID())
-                          .arg(nextRecording->GetCardID())
-                          .arg(nextRecording->GetSourceID());
             } // if (nextRecording->GetRecordingStatus() != rsTuning)
 
             if (schedulingEnabled && nexttv->IsConnected())
@@ -2118,6 +2112,12 @@ void Scheduler::RunScheduler(void)
             nextRecording->AddHistory(doSchedAfterStart);
 
             statuschanged = true;
+
+            details = QString("%1: channel %2 on cardid %3, sourceid %4")
+                      .arg(nextRecording->toString(ProgramInfo::kTitleSubtitle))
+                      .arg(nextRecording->GetChanID())
+                      .arg(nextRecording->GetCardID())
+                      .arg(nextRecording->GetSourceID());
 
             bool is_rec = (nextRecording->GetRecordingStatus() == rsRecording);
             msg = is_rec ?
