@@ -52,11 +52,10 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_buttonExists(false), m_cellid(0),
       m_lastcellid(0), m_vobid(0),
       m_lastvobid(0), m_cellRepeated(false),
-      m_buttonstreamid(0), m_runningCellStart(false),
+      m_buttonstreamid(0),
       m_menupktpts(0), m_curAudioTrack(0),
       m_curSubtitleTrack(0),
       m_autoselectsubtitle(true),
-      m_seekpos(0), m_seekwhence(0),
       m_dvdname(NULL), m_serialnumber(NULL),
       m_seeking(false), m_seektime(0),
       m_currentTime(0), m_isInMenu(true),
@@ -139,7 +138,7 @@ long long DVDRingBufferPriv::Seek(long long time)
                 QString("Seek() to time %1 failed").arg(time));
         return -1;
     }
-    else if (!IsInMenu(true) && !m_runningCellStart)
+    else if (!IsInMenu(true))
     {
         m_gotStop = false;
         if (time > 0 && ffrewSkip == 1)
@@ -382,19 +381,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                             .arg(m_title).arg(m_part).arg(m_titleParts)
                             .arg(still_time));
 
-                // not sure what this does...
-                if (m_runningCellStart)
-                {
-                    m_lastvobid = m_lastcellid = 0;
-                    m_runningCellStart = false;
-                }
-                else
-                {
-                    m_lastvobid = m_vobid;
-                    m_lastcellid = m_cellid;
-                }
-
                 // clear menus/still frame selections
+                m_lastvobid = m_vobid;
+                m_lastcellid = m_cellid;
                 m_buttonSelected = false;
                 m_vobid = m_cellid = m_menupktpts = 0;
                 m_cellRepeated = false;
@@ -1376,40 +1365,6 @@ double DVDRingBufferPriv::GetFrameRate(void)
     VERBOSE(VB_PLAYBACK, QString("DVD Frame Rate %1").arg(dvdfps));
 
     return dvdfps;
-}
-
-/** \brief check if the current chapter is the same as
- * the previously accessed chapter.
- */
-bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
-{
-    if ((tmpcellid == m_cellid) && (tmpvobid == m_vobid))
-        return true;
-
-    return false;
-}
-
-/** \brief Run SeekCellStart.
- ** ffmpeg for some reason does not output menu spu if seekcellstart
- ** is started too soon after a video codec/resolution change
- */
-void DVDRingBufferPriv::RunSeekCellStart(void)
-{
-    bool ret = true;
-    if (NumMenuButtons() > 0 && !m_buttonExists)
-        ret = false;
-
-    if (ret)
-        ret = SeekCellStart();
-}
-
-/** \brief seek the beginning of a dvd cell
- */
-bool DVDRingBufferPriv::SeekCellStart(void)
-{
-    QMutexLocker lock(&m_seekLock);
-    m_runningCellStart = true;
-    return (Seek(m_cellStart) == 0);
 }
 
 /** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings

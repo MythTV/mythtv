@@ -59,7 +59,6 @@ class MPUBLIC DVDRingBufferPriv
     AVSubtitle *GetMenuSubtitle(void);
     void ReleaseMenuButton(void);
 
-    bool IgnoringStillorWait(void) { return m_skipstillorwait; }
     uint GetAudioLanguage(int id);
     int  GetAudioTrackNum(uint key);
     uint GetSubtitleLanguage(int key);
@@ -73,10 +72,6 @@ class MPUBLIC DVDRingBufferPriv
     bool EndOfTitle(void)   { return    ((!m_titleParts) ||
                                         (m_part == (m_titleParts - 1)) ||
                                         (m_titleParts == 1)); }
-    int GetCellID(void) { return m_cellid; }
-    int GetVobID(void)  { return m_vobid; }
-    bool IsSameChapter(int tmpcellid, int tmpvobid);
-    void RunSeekCellStart(void);
 
     // commands
     bool OpenFile(const QString &filename);
@@ -160,13 +155,11 @@ class MPUBLIC DVDRingBufferPriv
     int            m_lastvobid;
     bool           m_cellRepeated;
     int            m_buttonstreamid;
-    bool           m_runningCellStart;
     long long      m_menupktpts;
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
     bool           m_autoselectsubtitle;
     long long      m_seekpos;
-    int            m_seekwhence;
     const char    *m_dvdname;
     const char    *m_serialnumber;
     bool           m_seeking;
@@ -174,8 +167,6 @@ class MPUBLIC DVDRingBufferPriv
     uint           m_currentTime;
     QMap<uint, uint> m_seekSpeedMap;
     bool           m_isInMenu;
-//    QMap<uint, uint> m_audioTrackMap;
-//    QMap<uint, uint> m_subTrackMap;
 
     MythDVDPlayer *m_parent;
 
@@ -190,7 +181,6 @@ class MPUBLIC DVDRingBufferPriv
     uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void ClearSubtitlesOSD(void);
-    bool SeekCellStart(void);
     void WaitForPlayer(void);
 
     int get_nibble(const uint8_t *buf, int nibble_offset);
