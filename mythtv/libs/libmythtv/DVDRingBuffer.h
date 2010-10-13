@@ -37,7 +37,6 @@ class MPUBLIC DVDRingBufferPriv
     int  GetPart(void)  const { return m_part;         }
     int  GetCurrentAngle(void) const { return m_currentAngle;           };
     int  GetNumAngles(void)          { return m_currentTitleAngleCount; };
-    bool IsInMenu(bool update = false);
     bool IsOpen(void)   const { return m_dvdnav;       }
     long long GetReadPosition(void);
     long long GetTotalReadPosition(void) { return m_titleLength; }
@@ -55,17 +54,27 @@ class MPUBLIC DVDRingBufferPriv
     int  NumPartsInTitle(void) const { return m_titleParts; }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
 
-    QRect GetButtonCoords(void);
-    AVSubtitle *GetMenuSubtitle(void);
-    void ReleaseMenuButton(void);
+    // Public menu/button stuff
+    AVSubtitle *GetMenuSubtitle(uint &version);
+    int         NumMenuButtons(void) const;
+    QRect       GetButtonCoords(void);
+    void        ReleaseMenuButton(void);
+    bool        IsInMenu(bool update = false);
+    void        ActivateButton(void);
+    void        MoveButtonLeft(void);
+    void        MoveButtonRight(void);
+    void        MoveButtonUp(void);
+    void        MoveButtonDown(void);
+
+    // Subtitles
+    uint GetSubtitleLanguage(int key);
+    bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
+                         const uint8_t * buf, int buf_size);
 
     uint GetAudioLanguage(int id);
     int  GetAudioTrackNum(uint key);
-    uint GetSubtitleLanguage(int key);
-    void SetMenuPktPts(long long pts) { m_menupktpts = pts; }
-    long long GetMenuPktPts(void) { return m_menupktpts; }
-    bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
-                         const uint8_t * buf, int buf_size);
+
+
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (m_part == 0); }
@@ -89,12 +98,7 @@ class MPUBLIC DVDRingBufferPriv
     bool GoToMenu(const QString str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
-    void MoveButtonLeft(void);
-    void MoveButtonRight(void);
-    void MoveButtonUp(void);
-    void MoveButtonDown(void);
-    void ActivateButton(void);
-    int NumMenuButtons(void) const;
+
     void IgnoreStillOrWait(bool skip) { m_skipstillorwait = skip; }
     void InStillFrame(bool change, int length);
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
@@ -138,13 +142,6 @@ class MPUBLIC DVDRingBufferPriv
     bool           m_audioStreamsChanged;
     bool           m_dvdWaiting;
     long long      m_titleLength;
-    uint32_t       m_clut[16];
-    uint8_t        m_button_color[4];
-    uint8_t        m_button_alpha[4];
-    QRect          m_hl_button;
-    uint8_t       *m_menuSpuPkt;
-    int            m_menuBuflength;
-    AVSubtitle     m_dvdMenuButton;
     bool           m_skipstillorwait;
     long long      m_cellstartPos;
     bool           m_buttonSelected;
@@ -154,8 +151,7 @@ class MPUBLIC DVDRingBufferPriv
     int            m_vobid;
     int            m_lastvobid;
     bool           m_cellRepeated;
-    int            m_buttonstreamid;
-    long long      m_menupktpts;
+
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
     bool           m_autoselectsubtitle;
@@ -166,21 +162,31 @@ class MPUBLIC DVDRingBufferPriv
     uint64_t       m_seektime;
     uint           m_currentTime;
     QMap<uint, uint> m_seekSpeedMap;
-    bool           m_isInMenu;
 
     MythDVDPlayer *m_parent;
 
-    QMutex m_menuBtnLock;
-    QMutex m_seekLock;
-
-    long long Seek(long long time);
+    // Private menu/button stuff
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
     void ClearMenuButton(void);
-    bool MenuButtonChanged(void);
+
+    bool           m_inMenu;
+    uint           m_buttonVersion;
+    int            m_buttonStreamID;
+    uint32_t       m_clut[16];
+    uint8_t        m_button_color[4];
+    uint8_t        m_button_alpha[4];
+    QRect          m_hl_button;
+    uint8_t       *m_menuSpuPkt;
+    int            m_menuBuflength;
+    AVSubtitle     m_dvdMenuButton;
+    QMutex m_menuBtnLock;
+
+    QMutex m_seekLock;
+    long long Seek(long long time);
+
     uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
-    void ClearSubtitlesOSD(void);
     void WaitForPlayer(void);
 
     int get_nibble(const uint8_t *buf, int nibble_offset);

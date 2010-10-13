@@ -30,7 +30,6 @@ class MythDVDPlayer : public MythPlayer
     virtual void GoToDVDProgram(bool direction);
 
     // DVD ringbuffer methods
-    void HideDVDButton(bool hide) { hidedvdbutton = hide; }
     void ResetStillFrameTimer(void);
     void SetStillFrameTimeout(int length);
     void StillFrameCheck(void);
@@ -94,7 +93,7 @@ class MythDVDPlayer : public MythPlayer
     void SetDVDBookmark(uint64_t frame);
     void DisplayDVDButton(void);
 
-    bool hidedvdbutton;
+    int  m_buttonVersion;
     bool dvd_stillframe_showing;
     int  need_change_dvd_track;
 

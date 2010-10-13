@@ -9,7 +9,7 @@
 #define LOC_ERR  QString("DVDPlayer, Error: ")
 
 MythDVDPlayer::MythDVDPlayer(bool muted)
-  : MythPlayer(muted), hidedvdbutton(true),
+  : MythPlayer(muted), m_buttonVersion(0),
     dvd_stillframe_showing(false), need_change_dvd_track(0),
     m_initial_title(-1), m_initial_audio_track(-1), m_initial_subtitle_track(-1),
     m_stillFrameLength(0xff)
@@ -436,28 +436,30 @@ void MythDVDPlayer::DisplayDVDButton(void)
     if (!osd || !player_ctx->buffer->isDVD())
         return;
 
-    VideoFrame *buffer = videoOutput->GetLastShownFrame();
+    uint buttonversion = 0;
+    AVSubtitle *dvdSubtitle = player_ctx->buffer->DVD()->GetMenuSubtitle(buttonversion);
+    bool numbuttons    = player_ctx->buffer->DVD()->NumMenuButtons();
 
-    bool numbuttons = player_ctx->buffer->DVD()->NumMenuButtons();
-    bool osdshown   = osd->IsWindowVisible(OSD_WIN_SUBTITLE);
-
-    if ((!numbuttons) ||
-        (osdshown) ||
-        (dvd_stillframe_showing && buffer->timecode > 0) ||
-        ((!osdshown) &&
-            (!videoPaused) &&
-            (hidedvdbutton) &&
-            (buffer->timecode > 0)))
+    // nothing to do
+    if (buttonversion == m_buttonVersion)
     {
+        player_ctx->buffer->DVD()->ReleaseMenuButton();
         return;
     }
 
-    AVSubtitle *dvdSubtitle = player_ctx->buffer->DVD()->GetMenuSubtitle();
+    // clear any buttons
+    if (!numbuttons || !dvdSubtitle || (buttonversion == 0))
+    {
+        SetCaptionsEnabled(false, false);
+        m_buttonVersion = 0;
+        player_ctx->buffer->DVD()->ReleaseMenuButton();
+        return;
+    }
+
+    m_buttonVersion = buttonversion;
     QRect buttonPos = player_ctx->buffer->DVD()->GetButtonCoords();
-    if (dvdSubtitle)
-        osd->DisplayDVDButton(dvdSubtitle, buttonPos);
+    osd->DisplayDVDButton(dvdSubtitle, buttonPos);
     player_ctx->buffer->DVD()->ReleaseMenuButton();
-    hidedvdbutton = false;
 }
 
 bool MythDVDPlayer::GoToDVDMenu(QString str)
