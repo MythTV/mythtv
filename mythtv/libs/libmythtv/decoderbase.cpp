@@ -355,8 +355,8 @@ bool DecoderBase::SyncPositionMap(void)
                 length = (int)((totframes * 1.0) / fps);
         }
 
-        GetPlayer()->SetFileLength(length, totframes);
-        GetPlayer()->SetKeyframeDistance(keyframedist);
+        m_parent->SetFileLength(length, totframes);
+        m_parent->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
 
         VERBOSE(VB_PLAYBACK, LOC +
@@ -512,8 +512,8 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     if (ringBuffer->isDVD() || ringBuffer->isBD() || discardFrames)
     {
         // We need to tell the NVP and VideoOutput what frame we're on.
-        GetPlayer()->SetFramesPlayed(framesPlayed+1);
-        GetPlayer()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+        m_parent->SetFramesPlayed(framesPlayed+1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
     return true;
@@ -727,8 +727,8 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     if (discardFrames)
     {
         // We need to tell the NVP and VideoOutput what frame we're on.
-        GetPlayer()->SetFramesPlayed(framesPlayed+1);
-        GetPlayer()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+        m_parent->SetFramesPlayed(framesPlayed+1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
     // Re-enable rawframe state if it was enabled before FF
@@ -798,7 +798,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 
 void DecoderBase::UpdateFramesPlayed(void)
 {
-    GetPlayer()->SetFramesPlayed(framesPlayed);
+    m_parent->SetFramesPlayed(framesPlayed);
 }
 
 void DecoderBase::FileChanged(void)
@@ -810,7 +810,7 @@ void DecoderBase::FileChanged(void)
     waitingForChange = false;
     justAfterChange = true;
 
-    GetPlayer()->FileChangedCallback();
+    m_parent->FileChangedCallback();
 }
 
 void DecoderBase::SetReadAdjust(long long adjust)
@@ -859,10 +859,10 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
     long long desiredTimePos;
     int ffrewSkip = 1;
     int current_speed = 0;
-    if (GetPlayer())
+    if (m_parent)
     {
-        ffrewSkip = GetPlayer()->GetFFRewSkip();
-        current_speed = (int)GetPlayer()->GetNextPlaySpeed();
+        ffrewSkip = m_parent->GetFFRewSkip();
+        current_speed = (int)m_parent->GetNextPlaySpeed();
     }
 
     if (ffrewSkip == 1)
@@ -890,10 +890,10 @@ long long DecoderBase::BDFindPosition(long long desiredFrame)
     long long desiredTimePos;
     int ffrewSkip = 1;
     int current_speed = 0;
-    if (GetPlayer())
+    if (m_parent)
     {
-        ffrewSkip = GetPlayer()->GetFFRewSkip();
-        current_speed = (int)GetPlayer()->GetNextPlaySpeed();
+        ffrewSkip = m_parent->GetFFRewSkip();
+        current_speed = (int)m_parent->GetNextPlaySpeed();
     }
 
     if (ffrewSkip == 1)
@@ -919,8 +919,8 @@ void DecoderBase::UpdateDVDFramesPlayed(void)
         return;
     long long currentpos = (long long)(ringBuffer->DVD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
-    GetPlayer()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
-    GetPlayer()->SetFramesPlayed(currentpos + 1);
+    m_parent->getVideoOutput()->SetFramesPlayed(currentpos + 1);
+    m_parent->SetFramesPlayed(currentpos + 1);
 }
 
 void DecoderBase::UpdateBDFramesPlayed(void)
@@ -929,8 +929,8 @@ void DecoderBase::UpdateBDFramesPlayed(void)
         return;
     long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * fps);
     framesPlayed = framesRead = currentpos ;
-    GetPlayer()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
-    GetPlayer()->SetFramesPlayed(currentpos + 1);
+    m_parent->getVideoOutput()->SetFramesPlayed(currentpos + 1);
+    m_parent->SetFramesPlayed(currentpos + 1);
 }
 
 QStringList DecoderBase::GetTracks(uint type) const
@@ -1018,8 +1018,8 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 
     tracks[type].push_back(info);
 
-    if (GetPlayer())
-        GetPlayer()->TracksChanged(type);
+    if (m_parent)
+        m_parent->TracksChanged(type);
 
     return true;
 }
@@ -1115,8 +1115,8 @@ int DecoderBase::AutoSelectTrack(uint type)
             .arg(currentTrack[type]+1)
             .arg(iso639_key_toName(lang)).arg(lang));
 
-    if (GetPlayer() && (oldTrack != currentTrack[type]))
-        GetPlayer()->TracksChanged(type);
+    if (m_parent && (oldTrack != currentTrack[type]))
+        m_parent->TracksChanged(type);
 
     return selTrack;
 }
