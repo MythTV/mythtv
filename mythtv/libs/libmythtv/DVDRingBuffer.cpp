@@ -181,7 +181,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
     {
         VERBOSE(VB_IMPORTANT, QString("Opened DVD device at %1")
                 .arg(fname.constData()));
-        dvdnav_set_readahead_flag(m_dvdnav, 1);
+        dvdnav_set_readahead_flag(m_dvdnav, 0);
         dvdnav_set_PGC_positioning_flag(m_dvdnav, 1);
 
         int32_t numTitles  = 0;
