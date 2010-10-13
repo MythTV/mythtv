@@ -126,11 +126,14 @@ class MPUBLIC MythPlayer
     MythPlayer(bool muted = false);
    ~MythPlayer();
 
+    // Initialisation
+    virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
+    bool InitVideo(void);
+
     // Public Sets
-   void SetPlayerInfo(TV             *tv,
-                      QWidget        *widget,
-                      bool           frame_exact_seek,
-                      PlayerContext *ctx);
+    void SetPlayerInfo(TV *tv, QWidget *widget, bool frame_exact_seek,
+                       PlayerContext *ctx);
+    void SetNullVideo(void)                   { using_null_videoout = true; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
@@ -299,14 +302,11 @@ class MPUBLIC MythPlayer
 
   protected:
     // Initialization
-    bool InitVideo(void);
-    virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
     void OpenDummy(void);
 
     // Non-public sets
     virtual void SetBookmark(void);
     virtual void ClearBookmark(bool message = true);
-    void SetNullVideo(void)                   { using_null_videoout = true; }
     bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
     bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
     void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
