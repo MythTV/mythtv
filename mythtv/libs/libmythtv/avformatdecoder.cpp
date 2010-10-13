@@ -4327,7 +4327,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     continue;
                 }
             }
-#endif USING_XVMC
+#endif //USING_XVMC
         }
 
         enum CodecType codec_type = curstream->codec->codec_type;
