@@ -303,7 +303,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 0);
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
-    itv = GetPlayer()->GetInteractiveTV();
+    itv = m_parent->GetInteractiveTV();
 
     cc608_build_parity_table(cc608_parity_table);
 
@@ -536,11 +536,11 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     int seekDelta = desiredFrame - framesPlayed;
 
     // avoid using av_frame_seek if we are seeking frame-by-frame when paused
-    if (seekDelta >= 0 && seekDelta < 2 && !dorewind && GetPlayer()->GetPlaySpeed() == 0.0f)
+    if (seekDelta >= 0 && seekDelta < 2 && !dorewind && m_parent->GetPlaySpeed() == 0.0f)
     {
         SeekReset(framesPlayed, seekDelta, false, true);
-        GetPlayer()->SetFramesPlayed(framesPlayed + 1);
-        GetPlayer()->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
+        m_parent->SetFramesPlayed(framesPlayed + 1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
 
         return true;
     }
@@ -618,8 +618,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     if (discardFrames)
     {
-        GetPlayer()->SetFramesPlayed(framesPlayed + 1);
-        GetPlayer()->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
+        m_parent->SetFramesPlayed(framesPlayed + 1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
     }
 
     dorewind = false;
@@ -683,7 +683,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     // Discard all the queued up decoded frames
     if (discardFrames)
-        GetPlayer()->DiscardVideoFrames(doflush);
+        m_parent->DiscardVideoFrames(doflush);
 
     if (doflush)
     {
@@ -714,7 +714,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     {
         GetFrame(kDecodeVideo);
         if (decoded_video_frame)
-            GetPlayer()->DiscardVideoFrame(decoded_video_frame);
+            m_parent->DiscardVideoFrame(decoded_video_frame);
     }
 }
 
@@ -933,7 +933,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 #ifdef USING_MHEG
     {
         int initialAudio = -1, initialVideo = -1;
-        if (itv || (itv = GetPlayer()->GetInteractiveTV()))
+        if (itv || (itv = m_parent->GetInteractiveTV()))
             itv->GetInitialStreams(initialAudio, initialVideo);
         if (initialAudio >= 0)
             SetAudioByComponentTag(initialAudio);
@@ -965,14 +965,14 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         if (dur > 0)
         {
-            GetPlayer()->SetFileLength((int)(dur), (int)(dur * fps));
+            m_parent->SetFileLength((int)(dur), (int)(dur * fps));
         }
         else
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)bitrate / 8 / 2;
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-            GetPlayer()->SetFileLength((int)(secs), (int)(secs * fps));
+            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
         }
 
         // we will not see a position map from db or remote encoder,
@@ -1309,7 +1309,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             aspect = 4.0f / 3.0f;
         }
 
-        GetPlayer()->SetVideoParams(width, height, fps,
+        m_parent->SetVideoParams(width, height, fps,
                                  keyframedist, aspect, kScan_Detect,
                                  dvd_video_codec_changed);
         if (LCD *lcd = LCD::Get())
@@ -1618,7 +1618,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     if (!ic || !ic->cur_pmt_sect)
         return;
 
-    if (!itv && ! (itv = GetPlayer()->GetInteractiveTV()))
+    if (!itv && ! (itv = m_parent->GetInteractiveTV()))
         return;
 
     const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
@@ -2156,18 +2156,18 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             stable_sort(tracks[kTrackTypeSubtitle].begin(),
                         tracks[kTrackTypeSubtitle].end());
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
-            uint captionmode = GetPlayer()->GetCaptionMode();
+            uint captionmode = m_parent->GetCaptionMode();
             int trackcount = (int)GetTrackCount(kTrackTypeSubtitle);
             if (captionmode == kDisplayAVSubtitle &&
                 (trackNo < 0 || trackNo >= trackcount))
             {
-                GetPlayer()->SetCaptionsEnabled(false, false);
+                m_parent->SetCaptionsEnabled(false, false);
             }
             else if (trackNo >= 0 && trackNo < trackcount &&
                     !ringBuffer->InDVDMenuOrStillFrame())
             {
                     SetTrack(kTrackTypeSubtitle, trackNo);
-                    GetPlayer()->SetCaptionsEnabled(true, false);
+                    m_parent->SetCaptionsEnabled(true, false);
             }
         }
     }
@@ -2194,16 +2194,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             tvformat == "pal-m" || tvformat == "atsc")
         {
             fps = 29.97;
-            GetPlayer()->SetVideoParams(-1, -1, 29.97, 1);
+            m_parent->SetVideoParams(-1, -1, 29.97, 1);
         }
         else
         {
             fps = 25.0;
-            GetPlayer()->SetVideoParams(-1, -1, 25.0, 1);
+            m_parent->SetVideoParams(-1, -1, 25.0, 1);
         }
     }
 
-    if (GetPlayer()->IsErrored())
+    if (m_parent->IsErrored())
         scanerror = -1;
 
     ScanDSMCCStreams();
@@ -2650,7 +2650,7 @@ void AvFormatDecoder::HandleGopStart(
             keyframedist    = tempKeyFrameDist;
             maxkeyframedist = max(keyframedist, maxkeyframedist);
 
-            GetPlayer()->SetKeyframeDistance(keyframedist);
+            m_parent->SetKeyframeDistance(keyframedist);
 
 #if 0
             // also reset length
@@ -2660,7 +2660,7 @@ void AvFormatDecoder::HandleGopStart(
                 long long index       = m_positionMap.back().index;
                 long long totframes   = index * keyframedist;
                 uint length = (uint)((totframes * 1.0f) / fps);
-                GetPlayer()->SetFileLength(length, totframes);
+                m_parent->SetFileLength(length, totframes);
             }
 #endif
         }
@@ -2704,7 +2704,7 @@ void AvFormatDecoder::HandleGopStart(
             bitrate = (int)((pkt->pos * 8 * fps) / (framesRead - 1));
             float bytespersec = (float)bitrate / 8;
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-            GetPlayer()->SetFileLength((int)(secs), (int)(secs * fps));
+            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
         }
 #endif
     }
@@ -2748,7 +2748,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             if (changed)
             {
-                GetPlayer()->SetVideoParams(width, height, seqFPS,
+                m_parent->SetVideoParams(width, height, seqFPS,
                                          keyframedist, aspect,
                                          kScan_Detect);
 
@@ -2857,7 +2857,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (changed)
         {
-            GetPlayer()->SetVideoParams(width, height, seqFPS,
+            m_parent->SetVideoParams(width, height, seqFPS,
                                      keyframedist, aspect_ratio,
                                      kScan_Detect);
 
@@ -2999,7 +2999,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         AVPicture tmppicture;
 
         VideoFrame *xf = picframe;
-        picframe = GetPlayer()->GetNextVideoFrame(false);
+        picframe = m_parent->GetNextVideoFrame(false);
 
         unsigned char *buf = picframe->buf;
         avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
@@ -3033,7 +3033,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             xf->interlaced_frame = mpa_pic.interlaced_frame;
             xf->top_field_first = mpa_pic.top_field_first;
             xf->frameNumber = framesPlayed;
-            GetPlayer()->DiscardVideoFrame(xf);
+            m_parent->DiscardVideoFrame(xf);
         }
     }
     else if (!picframe)
@@ -3130,7 +3130,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     picframe->repeat_pict = mpa_pic.repeat_pict;
 
     picframe->frameNumber = framesPlayed;
-    GetPlayer()->ReleaseNextVideoFrame(picframe, temppts);
+    m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec && mpa_pic.data[3])
         context->release_buffer(context, &mpa_pic);
 
@@ -3165,7 +3165,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         AVPicture tmppicture;
 
         VideoFrame *xf = picframe;
-        picframe = GetPlayer()->GetNextVideoFrame(false);
+        picframe = m_parent->GetNextVideoFrame(false);
 
         unsigned char *buf = picframe->buf;
         avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
@@ -3198,7 +3198,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             xf->interlaced_frame = mpa_pic->interlaced_frame;
             xf->top_field_first = mpa_pic->top_field_first;
             xf->frameNumber = framesPlayed;
-            GetPlayer()->DiscardVideoFrame(xf);
+            m_parent->DiscardVideoFrame(xf);
         }
     }
     else if (!picframe)
@@ -3234,7 +3234,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     picframe->repeat_pict = mpa_pic->repeat_pict;
 
     picframe->frameNumber = framesPlayed;
-    GetPlayer()->ReleaseNextVideoFrame(picframe, temppts);
+    m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec && mpa_pic->data[3])
         context->release_buffer(context, mpa_pic);
 
@@ -3380,7 +3380,7 @@ void AvFormatDecoder::ProcessDSMCCPacket(
     const AVStream *str, const AVPacket *pkt)
 {
 #ifdef USING_MHEG
-    if (!itv && ! (itv = GetPlayer()->GetInteractiveTV()))
+    if (!itv && ! (itv = m_parent->GetInteractiveTV()))
         return;
 
     // The packet may contain several tables.
@@ -4255,7 +4255,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             if (!ic || (av_read_frame(ic, pkt) < 0))
             {
                 ateof = true;
-                GetPlayer()->SetEof();
+                m_parent->SetEof();
                 delete pkt;
                 return false;
             }
@@ -4290,8 +4290,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             if (!private_dec)
             {
                 int current_width = curstream->codec->width;
-                int video_width = GetPlayer()->GetVideoSize().width();
-                if (dvd_xvmc_enabled && GetPlayer() && GetPlayer()->getVideoOutput())
+                int video_width = m_parent->GetVideoSize().width();
+                if (dvd_xvmc_enabled && m_parent && m_parent->getVideoOutput())
                 {
                     bool dvd_xvmc_active = false;
                     if (codec_is_xvmc(video_codec_id))
@@ -4348,7 +4348,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
             // If the resolution changed in XXXPreProcessPkt, we may
             // have a fatal error, so check for this before continuing.
-            if (GetPlayer()->IsErrored())
+            if (m_parent->IsErrored())
             {
                 av_free_packet(pkt);
                 delete pkt;
@@ -4485,10 +4485,10 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 
 bool AvFormatDecoder::GenerateDummyVideoFrame(void)
 {
-    if (!GetPlayer()->getVideoOutput())
+    if (!m_parent->getVideoOutput())
         return false;
 
-    VideoFrame *frame = GetPlayer()->GetNextVideoFrame(true);
+    VideoFrame *frame = m_parent->GetNextVideoFrame(true);
     if (!frame)
         return false;
 
@@ -4520,8 +4520,8 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
 
     frame->frameNumber = framesPlayed;
 
-    GetPlayer()->ReleaseNextVideoFrame(frame, lastvpts);
-    GetPlayer()->getVideoOutput()->DeLimboFrame(frame);
+    m_parent->ReleaseNextVideoFrame(frame, lastvpts);
+    m_parent->getVideoOutput()->DeLimboFrame(frame);
 
     decoded_video_frame = frame;
     framesPlayed++;
