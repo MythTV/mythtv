@@ -112,40 +112,25 @@ class DecoderThread : public QThread
 
 class MPUBLIC MythPlayer
 {
+    // Do NOT add a decoder class to this list
     friend class PlayerContext;
     friend class PlayerTimer;
     friend class CC708Reader;
     friend class CC608Reader;
     friend class DecoderThread;
+    friend class TV;
+    friend class DetectLetterbox;
+    friend class PlayerThread;
 
   public:
     MythPlayer(bool muted = false);
    ~MythPlayer();
 
-    // Initialization
-    bool InitVideo(void);
-    virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
-    void OpenDummy(void);
-
-    // Windowing stuff
-    void EmbedInWidget(int x, int y, int w, int h, WId id);
-    void StopEmbedding(void);
-    void ExposeEvent(void);
-    bool IsEmbedding(void);
-    void WindowResized(const QSize &new_size);
-
-    // Audio Sets
-    uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
-    bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
-    MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
-    MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
-
-    // Sets
-    void SetPlayerInfo(TV             *tv,
-                       QWidget        *widget,
-                       bool           frame_exact_seek,
-                       PlayerContext *ctx);
-    void SetNullVideo(void)                   { using_null_videoout = true; }
+    // Public Sets
+   void SetPlayerInfo(TV             *tv,
+                      QWidget        *widget,
+                      bool           frame_exact_seek,
+                      PlayerContext *ctx);
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played)     { framesPlayed = played; }
@@ -153,33 +138,17 @@ class MPUBLIC MythPlayer
     void SetEof(void)                         { eof = true; }
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
-    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
-    bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
-    void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
 
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
-    virtual void SetBookmark(void);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
                         float a = 1.33333, FrameScanType scan = kScan_Ignore,
                         bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
-    void Zoom(ZoomDirection direction);
-    virtual void ClearBookmark(bool message = true);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
-
-    void NextScanType(void)
-        { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
-    void SetScanType(FrameScanType);
-    FrameScanType GetScanType(void) const { return m_scan; }
-    bool IsScanTypeLocked(void) const { return m_scan_locked; }
     void SetVideoResize(const QRect &videoRect);
-
-    // Toggle Sets
-    void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
-    void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }
@@ -229,41 +198,14 @@ class MPUBLIC MythPlayer
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
 
-    // Complicated gets
-    virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
-    long long CalcRWTime(long long rw) const;
-    virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
-
-    /// Non-const gets
-    OSD         *GetOSD(void)                 { return osd; }
+    // Non-const gets
+    OSD         *GetOSD(void)                 { return osd; } // FIXME - protect
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        int &buflen, int &vw, int &vh, float &ar);
-    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
-                                   bool absolute);
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
-
-    // Start/Reset/Stop playing
-    virtual bool StartPlaying(void);
-    virtual void ResetPlaying(bool resetframes = true);
-    virtual void EndPlaying(void) { }
-    virtual void StopPlaying(void);
-
-    // Pause stuff
-    bool PauseDecoder(void);
-    void UnpauseDecoder(void);
-    bool Pause(void);
-    bool Play(float speed = 1.0, bool normal = true, bool unpauseaudio = true);
-
-    // Seek stuff
-    virtual bool FastForward(float seconds);
-    virtual bool Rewind(float seconds);
-    virtual bool JumpToFrame(uint64_t frame);
-
-    // Chapter stuff
-    void JumpChapter(int chapter);
 
     // Title stuff
     virtual bool SwitchTitle(int title) { return false; }
@@ -275,15 +217,6 @@ class MPUBLIC MythPlayer
     virtual bool NextAngle(void) { return false; }
     virtual bool PrevAngle(void) { return false; }
 
-    // Commercial stuff
-    void SetAutoCommercialSkip(CommSkipMode autoskip)
-        { commBreakMap.SetAutoCommercialSkip(autoskip, framesPlayed); }
-    void SkipCommercials(int direction)
-        { commBreakMap.SkipCommercials(direction); }
-    void SetCommBreakMap(frm_dir_map_t &newMap);
-    CommSkipMode GetAutoCommercialSkip(void)
-        { return commBreakMap.GetAutoCommercialSkip(); }
-
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
     bool TranscodeGetNextFrame(frm_dir_map_t::iterator &dm_iter,
@@ -292,16 +225,6 @@ class MPUBLIC MythPlayer
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
     void SetCutList(const frm_dir_map_t &newCutList);
-
-    // Edit mode stuff
-    bool EnableEdit(void);
-    bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
-    bool GetEditMode(void) { return deleteMap.IsEditing(); }
-    void DisableEdit(bool save = true);
-    bool IsInDelete(uint64_t frame);
-    uint64_t GetNearestMark(uint64_t frame, bool right);
-    bool IsTemporaryMark(uint64_t frame);
-    bool HasTemporaryMark(void);
 
     // Decoder stuff..
     VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
@@ -322,65 +245,28 @@ class MPUBLIC MythPlayer
     void SaveScreenshot(void);
 
     // Reinit
-    void    ReinitOSD(void);
-    void    ReinitVideo(void);
+    void ReinitVideo(void);
 
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);
 
-    // OSD conveniences
-    void SetOSDMessage(const QString &msg, OSDTimeout timeout);
-    void SetOSDStatus(const QString &title, OSDTimeout timeout);
-
-    // Closed caption and teletext stuff
-    uint GetCaptionMode(void) const { return textDisplayMode; }
-    void ResetCaptions(void);
-    virtual void DisableCaptions(uint mode, bool osd_msg=true);
-    virtual void EnableCaptions(uint mode, bool osd_msg=true);
-    bool ToggleCaptions(void);
-    bool ToggleCaptions(uint mode);
-    void SetCaptionsEnabled(bool, bool osd_msg=true);
+    // Public Closed caption and teletext stuff
+    void SetupTeletextViewer(void);
+    uint GetCaptionMode(void) const    { return textDisplayMode; }
     CC708Reader* GetCC708Reader(void)  { return &cc708; }
     CC608Reader* GetCC608Reader(void)  { return &cc608; }
     SubtitleReader* GetSubReader(void) { return &subReader; }
-    void SetupTeletextViewer(void);
-    bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
 
-    // Teletext Menu and non-NUV teletext decoder
-    void EnableTeletext(int page = 0x100);
-    void DisableTeletext(void);
-    void ResetTeletext(void);
-    bool HandleTeletextAction(const QString &action);
+    void SetCaptionsEnabled(bool, bool osd_msg=true);           // FIXME - protect
+    virtual void DisableCaptions(uint mode, bool osd_msg=true); // FIXME - protect
+    virtual void EnableCaptions(uint mode, bool osd_msg=true);  // FIXME - protect
 
-    // Teletext NUV Captions
-    void SetTeletextPage(uint page);
-
-    // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    QStringList GetTracks(uint type);
-    virtual int SetTrack(uint type, int trackNo);
-    int  GetTrack(uint type);
-    int  ChangeTrack(uint type, int dir);
-    void ChangeCaptionTrack(int dir);
-    int  NextCaptionTrack(int mode);
+    // Public Audio/Subtitle/EIA-608/EIA-708 stream selection
     void TracksChanged(uint trackType);
 
-    // MHEG/MHI stream selection
-    bool ITVHandleAction(const QString &action);
-    void ITVRestart(uint chanid, uint cardid, bool isLiveTV);
+    // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
     bool SetVideoByComponentTag(int tag);
-
-    // Time Code adjustment stuff
-    int64_t AdjustAudioTimecodeOffset(int64_t v)
-        { tc_wrap[TC_AUDIO] += v;  return tc_wrap[TC_AUDIO]; }
-    int64_t ResetAudioTimecodeOffset(void)
-        { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
-    int64_t ResyncAudioTimecodeOffset(void)
-        { tc_wrap[TC_AUDIO] = INT64_MIN; return 0L; }
-    int64_t GetAudioTimecodeOffset(void) const
-        { return tc_wrap[TC_AUDIO]; }
-    void SaveAudioTimecodeOffset(int64_t v)
-        { savedAudioTimecodeOffset = v; }
 
     // LiveTV public stuff
     void CheckTVChain();
@@ -407,14 +293,86 @@ class MPUBLIC MythPlayer
     virtual bool GoToDVDMenu(QString str)       { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
 
-    // Playback (output) zoom automation
-    DetectLetterbox *detect_letter_box;
-
     // Position Map Stuff
     bool PosMapFromEnc(unsigned long long          start,
                        QMap<long long, long long> &posMap);
 
   protected:
+    // Initialization
+    bool InitVideo(void);
+    virtual int OpenFile(uint retries = 4, bool allow_libmpeg2 = true);
+    void OpenDummy(void);
+
+    // Non-public sets
+    virtual void SetBookmark(void);
+    virtual void ClearBookmark(bool message = true);
+    void SetNullVideo(void)                   { using_null_videoout = true; }
+    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
+    bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
+    void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
+    void NextScanType(void)
+        { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
+    void SetScanType(FrameScanType);
+    FrameScanType GetScanType(void) const { return m_scan; }
+    bool IsScanTypeLocked(void) const { return m_scan_locked; }
+    void Zoom(ZoomDirection direction);
+
+    // Windowing stuff
+    void EmbedInWidget(int x, int y, int w, int h, WId id);
+    void StopEmbedding(void);
+    void ExposeEvent(void);
+    bool IsEmbedding(void);
+    void WindowResized(const QSize &new_size);
+
+    // Audio Sets
+    uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
+    bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
+    MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
+    MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
+
+    // Non-const gets
+    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
+                                   bool absolute);
+
+    // Complicated gets
+    virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
+    long long CalcRWTime(long long rw) const;
+    virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
+
+    // Commercial stuff
+    void SetAutoCommercialSkip(CommSkipMode autoskip)
+        { commBreakMap.SetAutoCommercialSkip(autoskip, framesPlayed); }
+    void SkipCommercials(int direction)
+        { commBreakMap.SkipCommercials(direction); }
+    void SetCommBreakMap(frm_dir_map_t &newMap);
+    CommSkipMode GetAutoCommercialSkip(void)
+        { return commBreakMap.GetAutoCommercialSkip(); }
+
+    // Toggle Sets
+    void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
+    void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
+
+    // Start/Reset/Stop playing
+    virtual bool StartPlaying(void);
+    virtual void ResetPlaying(bool resetframes = true);
+    virtual void EndPlaying(void) { }
+    virtual void StopPlaying(void);
+
+    // Pause stuff
+    bool PauseDecoder(void);
+    void UnpauseDecoder(void);
+    bool Pause(void);
+    bool Play(float speed = 1.0, bool normal = true, bool unpauseaudio = true);
+
+    // Seek stuff
+    virtual bool FastForward(float seconds);
+    virtual bool Rewind(float seconds);
+    virtual bool JumpToFrame(uint64_t frame);
+
+    // Chapter stuff
+    void JumpChapter(int chapter);
+
+    // Playback
     virtual void DisplayPauseFrame(void);
     virtual void DisplayNormalFrame(bool allow_pause = true);
     virtual void PreProcessNormalFrame(void);
@@ -429,6 +387,65 @@ class MPUBLIC MythPlayer
     virtual void EventStart(void);
     virtual void EventLoop(void);
     virtual void InitialSeek(void);
+
+    // Protected MHEG/MHI stuff
+    bool ITVHandleAction(const QString &action);
+    void ITVRestart(uint chanid, uint cardid, bool isLiveTV);
+
+    // Edit mode stuff
+    bool EnableEdit(void);
+    bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
+    bool GetEditMode(void) { return deleteMap.IsEditing(); }
+    void DisableEdit(bool save = true);
+    bool IsInDelete(uint64_t frame);
+    uint64_t GetNearestMark(uint64_t frame, bool right);
+    bool IsTemporaryMark(uint64_t frame);
+    bool HasTemporaryMark(void);
+
+    // Reinit
+    void ReinitOSD(void);
+
+    // OSD conveniences
+    void SetOSDMessage(const QString &msg, OSDTimeout timeout);
+    void SetOSDStatus(const QString &title, OSDTimeout timeout);
+
+    // Closed caption and teletext stuff
+    void ResetCaptions(void);
+    bool ToggleCaptions(void);
+    bool ToggleCaptions(uint mode);
+    bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
+
+    // Audio/Subtitle/EIA-608/EIA-708 stream selection
+    QStringList GetTracks(uint type);
+    virtual int SetTrack(uint type, int trackNo);
+    int  GetTrack(uint type);
+    int  ChangeTrack(uint type, int dir);
+    void ChangeCaptionTrack(int dir);
+    int  NextCaptionTrack(int mode);
+
+    // Teletext Menu and non-NUV teletext decoder
+    void EnableTeletext(int page = 0x100);
+    void DisableTeletext(void);
+    void ResetTeletext(void);
+    bool HandleTeletextAction(const QString &action);
+
+    // Teletext NUV Captions
+    void SetTeletextPage(uint page);
+
+    // Time Code adjustment stuff
+    int64_t AdjustAudioTimecodeOffset(int64_t v)
+        { tc_wrap[TC_AUDIO] += v;  return tc_wrap[TC_AUDIO]; }
+    int64_t ResetAudioTimecodeOffset(void)
+        { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
+    int64_t ResyncAudioTimecodeOffset(void)
+        { tc_wrap[TC_AUDIO] = INT64_MIN; return 0L; }
+    int64_t GetAudioTimecodeOffset(void) const
+        { return tc_wrap[TC_AUDIO]; }
+    void SaveAudioTimecodeOffset(int64_t v)
+        { savedAudioTimecodeOffset = v; }
+
+    // Playback (output) zoom automation
+    DetectLetterbox *detect_letter_box;
 
   protected:
     // Private initialization stuff
