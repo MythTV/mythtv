@@ -241,6 +241,7 @@ void MythDVDPlayer::EventLoop(void)
 
 void MythDVDPlayer::InitialSeek(void)
 {
+    player_ctx->buffer->DVD()->IgnoreStillOrWait(true);
     if (m_initial_title > -1)
         player_ctx->buffer->DVD()->PlayTitleAndPart(m_initial_title, 1);
 
@@ -262,6 +263,7 @@ void MythDVDPlayer::InitialSeek(void)
             usleep(50000);
     }
     MythPlayer::InitialSeek();
+    player_ctx->buffer->DVD()->IgnoreStillOrWait(false);
 }
 
 void MythDVDPlayer::ResetPlaying(bool resetframes)
