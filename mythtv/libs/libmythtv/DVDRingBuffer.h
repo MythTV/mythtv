@@ -33,6 +33,7 @@ class MPUBLIC DVDRingBufferPriv
 
     // gets
     int  GetTitle(void) const { return m_title;        }
+    bool DVDWaitingForPlayer(void) { return m_playerWait; }
     int  GetPart(void)  const { return m_part;         }
     int  GetCurrentAngle(void) const { return m_currentAngle;           };
     int  GetNumAngles(void)          { return m_currentTitleAngleCount; };
@@ -89,6 +90,7 @@ class MPUBLIC DVDRingBufferPriv
     long long NormalSeek(long long time);
     void SkipStillFrame(void);
     void WaitSkip(void);
+    void SkipDVDWaitingForPlayer(void) { m_playerWait = false; }
     bool GoToMenu(const QString str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
@@ -99,7 +101,7 @@ class MPUBLIC DVDRingBufferPriv
     void ActivateButton(void);
     int NumMenuButtons(void) const;
     void IgnoreStillOrWait(bool skip) { m_skipstillorwait = skip; }
-    void InStillFrame(bool change);
+    void InStillFrame(bool change, int length);
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
     uint GetCurrentTime(void) { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);
@@ -129,12 +131,15 @@ class MPUBLIC DVDRingBufferPriv
     dvdnav_t      *m_lastNav; // This really belongs in the player.
     int32_t        m_part;
     int32_t        m_title;
+    int32_t        m_lastTitle;
+    bool           m_playerWait;
     int32_t        m_titleParts;
     bool           m_gotStop;
     int            m_currentAngle;
     int            m_currentTitleAngleCount;
 
     bool           m_cellHasStillFrame;
+    int            m_cellStillLength;
     bool           m_audioStreamsChanged;
     bool           m_dvdWaiting;
     long long      m_titleLength;
@@ -186,6 +191,7 @@ class MPUBLIC DVDRingBufferPriv
     void SelectDefaultButton(void);
     void ClearSubtitlesOSD(void);
     bool SeekCellStart(void);
+    void WaitForPlayer(void);
 
     int get_nibble(const uint8_t *buf, int nibble_offset);
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,

@@ -104,26 +104,64 @@ bool MythDVDPlayer::VideoLoop(void)
     if (videoOutput)
         nbframes = videoOutput->ValidVideoFrames();
 
-    // when DVDRingBuffer is waiting, we drain the video buffers and then
-    // clear the wait state before proceeding
+    //VERBOSE(VB_PLAYBACK, LOC + QString("Validframes %1, FreeFrames %2, VideoPaused %3")
+    //    .arg(nbframes).arg(videoOutput->FreeVideoFrames()).arg(videoPaused));
+
+    // completely drain the video buffers for certain situations
+    bool release_all = player_ctx->buffer->DVD()->DVDWaitingForPlayer() &&
+                      (nbframes > 0);
+    bool release_one = (nbframes > 1) && videoPaused &&
+                       (!videoOutput->EnoughFreeFrames() ||
+                        player_ctx->buffer->DVD()->IsWaiting() ||
+                        player_ctx->buffer->DVD()->InStillFrame());
+    if (release_all || release_one)
+    {
+        // if we go below the pre-buffering limit, the player will pause
+        // so do this 'manually'
+        DisplayNormalFrame(false);
+        dvd_stillframe_showing = false;
+        return !IsErrored();
+    }
+
+    // wait for the video buffers to drain
     if (nbframes < 2)
     {
-        if (player_ctx->buffer->DVD()->IsWaiting())
+        // clear the mythtv imposed wait state
+        if (player_ctx->buffer->DVD()->DVDWaitingForPlayer())
         {
-            player_ctx->buffer->DVD()->WaitSkip();
+            VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv dvd wait state");
+            player_ctx->buffer->DVD()->SkipDVDWaitingForPlayer();
             return !IsErrored();
         }
 
-        if (player_ctx->buffer->InDVDMenuOrStillFrame())
+        // clear the DVD wait state
+        if (player_ctx->buffer->DVD()->IsWaiting())
         {
+            VERBOSE(VB_PLAYBACK, LOC + "Clearing DVD wait state");
+            player_ctx->buffer->DVD()->WaitSkip();
+            if (!player_ctx->buffer->DVD()->InStillFrame() && videoPaused)
+                UnpauseVideo();
+            return !IsErrored();
+        }
+
+        // the still frame is treated as a pause frame
+        if (player_ctx->buffer->DVD()->InStillFrame())
+        {
+            // ensure we refresh the pause frame
+            if (!dvd_stillframe_showing)
+                needNewPauseFrame = true;
+
+            // we are in a still frame so pause video output
             if (!videoPaused)
             {
                 PauseVideo();
                 return !IsErrored();
             }
 
+            // see if the pause frame has timed out
             StillFrameCheck();
 
+            // flag if we have no frame
             if (nbframes == 0)
             {
                 VERBOSE(VB_PLAYBACK, LOC_WARN +
@@ -134,8 +172,13 @@ bool MythDVDPlayer::VideoLoop(void)
 
             dvd_stillframe_showing = true;
         }
+        else
+        {
+            dvd_stillframe_showing = false;
+        }
     }
 
+    // unpause the still frame if more frames become available
     if (dvd_stillframe_showing && nbframes > 1)
     {
         UnpauseVideo();

@@ -285,10 +285,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       disable_passthru(false),
       dummy_frame(NULL),
       // DVD
-      lastdvdtitle(-1),
-      decodeStillFrame(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
-      dvdTitleChanged(false), mpeg_seq_end_seen(false),
       m_fps(0.0f)
 {
     bzero(&params, sizeof(AVFormatParameters));
@@ -820,6 +817,19 @@ extern "C" void HandleStreamChange(void* data)
     decoder->ScanStreams(false);
 }
 
+extern "C" void HandleDVDStreamChange(void* data)
+{
+    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    int cnt = decoder->ic->nb_streams;
+
+    VERBOSE(VB_PLAYBACK, LOC + "HandleDVDStreamChange(): "
+            "streams_changed "<<data<<" -- stream count "<<cnt);
+
+    QMutexLocker locker(avcodeclock);
+    //decoder->SeekReset(0, 0, true, true);
+    decoder->ScanStreams(true);
+}
+
 /**
  *  OpenFile opens a ringbuffer for playback.
  *
@@ -904,6 +914,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
     ic->streams_changed = HandleStreamChange;
+    if (ringBuffer->isDVD())
+        ic->streams_changed = HandleDVDStreamChange;
     ic->stream_change_data = this;
 
     fmt->flags &= ~AVFMT_NOFILE;
@@ -2715,12 +2727,6 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     {
         bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
 
-        if (ringBuffer->isDVD() && start_code_state == SEQ_END_CODE)
-        {
-            mpeg_seq_end_seen = true;
-            return;
-        }
-
         if (start_code_state >= SLICE_MIN && start_code_state <= SLICE_MAX)
             continue;
         else if (SEQ_START == start_code_state)
@@ -2952,28 +2958,17 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             pkt->pts = pkt->dts;
         if (!pts_detected)
             pkt->pts = pkt->dts;
-        if (decodeStillFrame)
-        {
-            int count = 0;
-            // HACK
-            while (!gotpicture && count < 5)
-            {
-                ret = private_dec->GetFrame(curstream, &mpa_pic,
-                                            &gotpicture, pkt);
-                count++;
-            }
-        }
-        else
-        {
-            ret = private_dec->GetFrame(curstream, &mpa_pic, &gotpicture, pkt);
-        }
+        // TODO disallow private decoders for dvd playback
+        // N.B. we do not reparse the frame as it breaks playback for
+        // everything but libmpeg2
+        ret = private_dec->GetFrame(curstream, &mpa_pic, &gotpicture, pkt);
     }
     else
     {
         context->reordered_opaque = pkt->pts;
         ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
         // Reparse it to not drop the DVD still frame
-        if (decodeStillFrame)
+        if (ringBuffer->isDVD() && ringBuffer->DVD()->InStillFrame())
             ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
     }
     avcodeclock->unlock();
@@ -4195,72 +4190,20 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         if (ringBuffer->isDVD())
         {
-            int dvdtitle  = 0;
-            int dvdpart = 0;
-            ringBuffer->DVD()->GetPartAndTitle(dvdpart, dvdtitle);
-            bool cellChanged = ringBuffer->DVD()->CellChanged();
-            bool inDVDStill = ringBuffer->DVD()->InStillFrame();
-            bool inDVDMenu  = ringBuffer->DVD()->IsInMenu();
-            int storedPktCount = storedPackets.count();
+            // Update the title length
+            if (m_parent->AtNormalSpeed() && ringBuffer->DVD()->PGCLengthChanged())
+            {
+                ResetPosMap();
+                SyncPositionMap();
+                UpdateFramesPlayed();
+            }
+
+            // rescan the non-video streams as necessary
+            if (ringBuffer->DVD()->AudioStreamsChanged())
+                ScanStreams(true);
+
+            // always use the first video stream (must come after ScanStreams above)
             selectedTrack[kTrackTypeVideo].av_stream_index = 0;
-            if (dvdTitleChanged)
-            {
-                if ((storedPktCount > 10 && !decodeStillFrame) ||
-                    decodeStillFrame)
-                {
-                    storevideoframes = false;
-                    dvdTitleChanged = false;
-                    ScanStreams(true);
-                }
-                else
-                    storevideoframes = true;
-            }
-            else
-            {
-                storevideoframes = false;
-
-                if (storedPktCount < 2 && !decodeStillFrame)
-                    storevideoframes = true;
-
-                VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("DVD Playback Debugging "
-                    "inDVDMenu %1 storedPacketcount %2 dvdstill %3")
-                    .arg(inDVDMenu).arg(storedPktCount).arg(inDVDStill));
-
-                if (inDVDStill && (storedPktCount == 0) &&
-                    (GetPlayer()->getVideoOutput()->ValidVideoFrames() == 0))
-                {
-                    ringBuffer->DVD()->RunSeekCellStart();
-                }
-            }
-            if (GetPlayer()->AtNormalSpeed() &&
-                ((cellChanged) || (lastdvdtitle != dvdtitle)))
-            {
-                if (dvdtitle != lastdvdtitle)
-                {
-                    VERBOSE(VB_PLAYBACK, LOC + "DVD Title Changed");
-                    lastdvdtitle = dvdtitle;
-                    if (lastdvdtitle != -1 )
-                        dvdTitleChanged = true;
-                    if (GetPlayer() && GetPlayer()->getVideoOutput())
-                    {
-                        if (ringBuffer->DVD()->InStillFrame())
-                            GetPlayer()->getVideoOutput()->SetPrebuffering(false);
-                        else
-                            GetPlayer()->getVideoOutput()->SetPrebuffering(true);
-                    }
-                }
-
-                if (ringBuffer->DVD()->PGCLengthChanged())
-                {
-                    ResetPosMap();
-                    SyncPositionMap();
-                }
-
-                UpdateDVDFramesPlayed();
-                VERBOSE(VB_PLAYBACK, QString(LOC + "DVD Cell Changed. "
-                                             "Update framesPlayed: %1 ")
-                                             .arg(framesPlayed));
-            }
         }
 
         if (gotvideo)
@@ -4317,19 +4260,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 return false;
             }
 
-            if (ringBuffer->isDVD() &&
-                ringBuffer->DVD()->InStillFrame())
-            {
-                AVStream *curstream = ic->streams[pkt->stream_index];
-                if (curstream &&
-                    curstream->codec->codec_type == CODEC_TYPE_VIDEO)
-                {
-                    mpeg_seq_end_seen = false;
-                    decodeStillFrame = false;
-                    ringBuffer->DVD()->InStillFrame(false);
-                }
-            }
-
             if (waitingForChange && pkt->pos >= readAdjust)
                 FileChanged();
 
@@ -4356,25 +4286,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (ringBuffer->isDVD() &&
             curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
-            MpegPreProcessPkt(curstream, pkt);
-
-            if (mpeg_seq_end_seen)
-                ringBuffer->DVD()->InStillFrame(true);
-
-            bool inDVDStill = ringBuffer->DVD()->InStillFrame();
-
-            VERBOSE(VB_PLAYBACK+VB_EXTRA,
-                QString("DVD Playback Debugging: mpeg seq end %1 "
-                " inDVDStill %2 decodeStillFrame %3")
-                .arg(mpeg_seq_end_seen).arg(inDVDStill).arg(decodeStillFrame));
-
-            if (!decodeStillFrame && inDVDStill)
-            {
-                decodeStillFrame = true;
-                if (private_dec)
-                    private_dec->Reset();
-            }
-
 #ifdef USING_XVMC
             if (!private_dec)
             {

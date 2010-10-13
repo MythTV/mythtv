@@ -15,6 +15,7 @@
 
 #define LOC QString("DVDRB: ")
 #define LOC_ERR QString("DVDRB, Error: ")
+#define LOC_WARN QString("DVDRB, Warning: ")
 
 static const char *dvdnav_menu_table[] =
 {
@@ -37,10 +38,11 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_pgcLengthChanged(false), m_pgStart(0),
       m_currentpos(0),
       m_lastNav(NULL),    m_part(0),
-      m_title(0),         m_titleParts(0),
-      m_gotStop(false),   m_currentAngle(0),
+      m_title(0),         m_lastTitle(0),   m_playerWait(false),
+      m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
       m_currentTitleAngleCount(0),
-      m_cellHasStillFrame(false), m_audioStreamsChanged(false),
+      m_cellHasStillFrame(false), m_cellStillLength(0),
+      m_audioStreamsChanged(false),
       m_dvdWaiting(false),
       m_titleLength(0), m_hl_button(0, 0, 0, 0),
       m_menuSpuPkt(0),
@@ -90,11 +92,8 @@ void DVDRingBufferPriv::CloseDVD(void)
 
 bool DVDRingBufferPriv::IsInMenu(bool update)
 {
-    if (m_dvdnav)
-    {
-        if (update)
-            m_isInMenu = !dvdnav_is_domain_vts(m_dvdnav);
-    }
+    if (m_dvdnav && update)
+        m_isInMenu = !dvdnav_is_domain_vts(m_dvdnav);
     return m_isInMenu;
 }
 
@@ -254,6 +253,24 @@ long long DVDRingBufferPriv::GetReadPosition(void)
     return pos * DVD_BLOCK_SIZE;
 }
 
+void DVDRingBufferPriv::WaitForPlayer(void)
+{
+    if (!m_skipstillorwait)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Waiting for player's buffers to drain");
+        m_playerWait = true;
+        int count = 0;
+        while (m_playerWait && count++ < 200)
+            usleep(10000);
+        if (m_playerWait)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Player wait state was not cleared");
+            m_playerWait = false;
+        }
+    }
+}
+
 int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 {
     dvdnav_status_t dvdStat;
@@ -290,6 +307,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
         {
             // Standard packet for decoding
             case DVDNAV_BLOCK_OK:
+            {
                 // copy block
                 if (!m_seeking)
                 {
@@ -301,7 +319,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (blockBuf != m_dvdBlockWriteBuf)
                     dvdnav_free_cache_block(m_dvdnav, blockBuf);
 
-                break;
+                // debug
+                VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + "DVDNAV_BLOCK_OK");
+            }
+            break;
 
             // cell change
             case DVDNAV_CELL_CHANGE:
@@ -319,12 +340,26 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 m_pgStart   = cell_event->pg_start;
                 m_cellChanged = true;
 
-                // if the new cell is a still frame, reset the timer
+                // if the new cell is a still frame, reset the timer and update
+                // our status
                 uint32_t still_time = dvdnav_get_next_still_flag(m_dvdnav);
-                if ((still_time > 0) && (still_time < 0xff) && m_parent)
-                    m_parent->ResetStillFrameTimer();
+                if (still_time > 0)
+                {
+                    // wait for the player to clear the video buffers
+                    WaitForPlayer();
+
+                    // update the player timer
+                    if ((still_time < 0xff) && m_parent)
+                        m_parent->ResetStillFrameTimer();
+                    InStillFrame(true, still_time);
+                }
+                else
+                {
+                    InStillFrame(false, 0);
+                }
 
                 // update title information
+                m_lastTitle = m_title;
                 m_part = m_titleParts = 0;
                 uint32_t pos;
                 uint32_t length;
@@ -363,7 +398,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 m_buttonSelected = false;
                 m_vobid = m_cellid = m_menupktpts = 0;
                 m_cellRepeated = false;
-                InStillFrame(false);
 
                 if (isInMenu)
                 {
@@ -378,6 +412,14 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
                     dvdnav_free_cache_block(m_dvdnav, blockBuf);
+
+                // flag a title change and initiate a wait state so that the
+                // previous title is played out
+                if (m_title != m_lastTitle)
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + "DVD title changed");
+                    WaitForPlayer();
+                }
             }
             break;
 
@@ -502,7 +544,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         m_seektime = 0;
                     }
                     else
+                    {
                         dvdnav_relative_time_search(m_dvdnav, relativetime * 2);
+                    }
                 }
 
                 // debug
@@ -516,9 +560,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
             // channel hop - looks like we don't really need to do anything
             case DVDNAV_HOP_CHANNEL:
+            {
                 // debug
                 VERBOSE(VB_PLAYBACK, LOC + "DVDNAV_HOP_CHANNEL");
-                break;
+            }
+            break;
 
             // no op
             case DVDNAV_NOP:
@@ -585,12 +631,18 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             // dvd still frame
             case DVDNAV_STILL_FRAME:
             {
-                // change the status
-                InStillFrame(true);
-
                 // retrieve still frame details (length)
                 dvdnav_still_event_t* still =
                     (dvdnav_still_event_t*)(blockBuf);
+
+                // sense check
+                if (!InStillFrame())
+                    VERBOSE(VB_GENERAL, LOC_WARN + "DVDNAV_STILL_FRAME in "
+                            "cell that is not marked as a still frame");
+
+                if (still->length != m_cellStillLength)
+                    VERBOSE(VB_GENERAL, LOC_WARN + "DVDNAV_STILL_FRAME "
+                            "length does not match cell still length");
 
                 // pause a little as the dvdnav VM will continue to return
                 // this event until it has been skipped
@@ -651,9 +703,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
             // this shouldn't happen
             default:
+            {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Unknown DVD event: %1").arg(dvdEvent));
-                break;
+            }
+            break;
         }
 
         needed = sz - tot;
@@ -1163,19 +1217,17 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
         return 0;
 }
 
-void DVDRingBufferPriv::InStillFrame(bool change)
+void DVDRingBufferPriv::InStillFrame(bool still, int length)
 {
-    QString str;
+    QString str = still ?
+        QString("Entering DVD Still Frame for %1 seconds").arg(length) :
+        QString("Leaving DVD Still Frame");
 
-    if (change)
-        str = "Entering DVD Still Frame";
-    else
-        str = "Leaving DVD Still Frame";
-
-    if (m_cellHasStillFrame != change)
+    if (m_cellHasStillFrame != still)
         VERBOSE(VB_PLAYBACK, str);
 
-    m_cellHasStillFrame = change;
+    m_cellHasStillFrame = still;
+    m_cellStillLength = length;
 }
 
 /** \brief get the audio language from the dvd
