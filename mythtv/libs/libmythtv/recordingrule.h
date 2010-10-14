@@ -15,7 +15,6 @@
 // libmythtv
 #include "programtypes.h"
 #include "recordingtypes.h"
-#include "recordingprofile.h"
 
 /** \class RecordingRule
  *  \brief Internal representation of a recording rule, mirrors the record

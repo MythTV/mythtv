@@ -10,6 +10,7 @@
 // libmythtv
 #include "scheduledrecording.h" // For signalChange()
 #include "playgroup.h" // For GetInitialName()
+#include "recordingprofile.h" // For constants
 
 RecordingRule::RecordingRule()
   : m_recordID(-1), m_parentRecID(0),

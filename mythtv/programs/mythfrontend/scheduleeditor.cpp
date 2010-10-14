@@ -14,6 +14,7 @@
 // Libmythtv
 #include "playgroup.h"
 #include "tv_play.h"
+#include "recordingprofile.h"
 
 // Libmythui
 #include "mythmainwindow.h"

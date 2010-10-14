@@ -19,6 +19,7 @@ using namespace std;
 #include "mythuiimage.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
+#include "mythmainwindow.h"
 
 typedef struct RecPriorityInfo
 {

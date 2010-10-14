@@ -13,7 +13,6 @@
 // Libmythtv
 #include "recordingrule.h"
 #include "recordinginfo.h"
-#include "recordingprofile.h"
 
 class ProgramInfo;
 class MythUIText;

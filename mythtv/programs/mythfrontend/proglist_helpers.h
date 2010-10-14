@@ -6,7 +6,6 @@
 
 // MythTV headers
 #include "mythscreentype.h"
-#include "mythwidgets.h"
 #include "recordingtypes.h"
 
 class MythUIText;

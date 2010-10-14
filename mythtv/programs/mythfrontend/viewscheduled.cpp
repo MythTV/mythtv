@@ -1,3 +1,6 @@
+
+#include "viewscheduled.h"
+
 #include <QCoreApplication>
 
 #include "customedit.h"
@@ -11,8 +14,7 @@
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
-
-#include "viewscheduled.h"
+#include "mythmainwindow.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {

@@ -7,6 +7,7 @@
 
 // libmythui
 #include "mythscreentype.h"
+#include "mythmainwindow.h"
 
 class ProgramInfo;
 class RecordingInfo;
@@ -19,7 +20,7 @@ class ScheduleCommon : public MythScreenType
     ScheduleCommon(MythScreenStack *parent, const QString &name)
         : MythScreenType(parent, name) {};
    ~ScheduleCommon() {};
-      
+
     void ShowDetails(ProgramInfo *pginfo) const;
     void ShowUpcoming(const QString &title) const;
     void ShowUpcoming(ProgramInfo *pginfo) const;
@@ -35,7 +36,7 @@ class ScheduleCommon : public MythScreenType
 
   private:
     bool IsFindApplicable(const RecordingInfo &recInfo) const;
-        
+
 };
 
 #endif

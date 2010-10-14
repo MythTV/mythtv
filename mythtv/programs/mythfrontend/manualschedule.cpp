@@ -22,6 +22,7 @@
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
+#include "mythmainwindow.h"
 
 // mythfrontend
 #include "scheduleeditor.h"
@@ -119,7 +120,7 @@ bool ManualSchedule::Create(void)
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
     m_titleEdit->SetMaxLength(128);
-    
+
     BuildFocusList();
 
     return true;

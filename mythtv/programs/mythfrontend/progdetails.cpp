@@ -9,6 +9,7 @@
 #include "recordingrule.h"
 #include "mythdb.h"
 #include "mythuihelper.h"
+#include "mythmainwindow.h"
 
 #include "progdetails.h"
 
