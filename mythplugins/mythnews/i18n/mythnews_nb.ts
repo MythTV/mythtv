@@ -153,7 +153,7 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation>XML-filen er ikke en gyldig RSS feed</translation>
+        <translation>XML-filen er ikke en gyldig RSS mating</translation>
     </message>
 </context>
 <context>
@@ -174,16 +174,16 @@
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Edit RSS News Feeds</source>
-        <translation>Rediger RSS nyhetsfeeder</translation>
+        <translation>Rediger RSS nyhetsmatinger</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>Du kan redigere navn, URL og ikonsti for den valgte RSS feeden p√• denne skjermen.  Du kan ogs√• velge at elementet er en podkast.
+        <translation>Du kan redigere navn, URL og ikonsti for den valgte RSS matingen i dette skjermbildet.  Du kan også velge at elementet er en podkast.
 
-N√•r du er ferdig √• redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for √• fortsette.</translation>
+Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for å fortsette.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -233,7 +233,7 @@ N√•r du er ferdig √• redigere, velg &quot;OK&quot; eller &quot;Avbryt&qu
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Edit RSS News Feed</source>
-        <translation>Rediger RSS nyhetsfeed</translation>
+        <translation>Rediger RSS nyhetsmating</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -248,7 +248,7 @@ N√•r du er ferdig √• redigere, velg &quot;OK&quot; eller &quot;Avbryt&qu
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>RSS Feeds</source>
-        <translation>RSS feeder</translation>
+        <translation>RSS matinger</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
@@ -263,7 +263,7 @@ N√•r du er ferdig √• redigere, velg &quot;OK&quot; eller &quot;Avbryt&qu
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>News Feeds</source>
-        <translation>Nyhetsfeeder</translation>
+        <translation>Nyhetsmatinger</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="2"/>
