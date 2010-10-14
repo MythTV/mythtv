@@ -39,7 +39,7 @@ class MPUBLIC ThemeInfo : public XMLParseBase
     QString GetThemeWebSite() const { return m_themesite; }
 
     QString GetLocalURL() const { return m_themeurl; }
-    QString GetDirectoryName() const { return m_theme->baseName(); }
+    QString GetDirectoryName() const { return m_theme.baseName(); }
 
     void ToMap(QHash<QString, QString> &infoMap) const;
 
@@ -47,7 +47,7 @@ class MPUBLIC ThemeInfo : public XMLParseBase
     bool parseThemeInfo();
 
     QString   m_themeurl;
-    QFileInfo  *m_theme;
+    QFileInfo m_theme;
     int       m_type;
     QString   m_aspect;
     QSize     m_baseres;

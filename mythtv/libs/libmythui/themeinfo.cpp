@@ -19,13 +19,13 @@
 ThemeInfo::ThemeInfo(QString theme)
           :XMLParseBase()
 {
-    m_theme = new QFileInfo (theme);
+    m_theme = QFileInfo(theme);
     m_type = THEME_UNKN;
     m_baseres = QSize(800, 600);
     m_majorver = m_minorver = 0;
 
-    if (m_theme->exists())
-        m_themeurl = m_theme->absoluteFilePath();
+    if (m_theme.exists())
+        m_themeurl = m_theme.absoluteFilePath();
     else
         m_themeurl = theme;
 
@@ -39,7 +39,6 @@ ThemeInfo::ThemeInfo(QString theme)
 
 ThemeInfo::~ThemeInfo()
 {
-    delete m_theme;
 }
 
 bool ThemeInfo::parseThemeInfo()
@@ -138,7 +137,7 @@ bool ThemeInfo::parseThemeInfo()
                             else
                             {
                                 VERBOSE_XML(VB_IMPORTANT,
-                                            m_theme->fileName(),
+                                            m_theme.fileName(),
                                             ce, LOC_ERR + "Invalid theme type");
                             }
                         }
