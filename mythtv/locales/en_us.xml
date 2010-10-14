@@ -23,11 +23,17 @@
     <setting name="Country">US</setting>
 
     <!-- Date/Time format -->
-
+    <setting name="DateFormat">ddd MMM d yyyy</setting>
+    <setting name="TimeFormat">h:mm AP</setting>
+    <setting name="ShortDateFormat">M/d</setting>
 
     <!-- Playback -->
 
   <!-- Plugins -->
     <!-- MythArchive -->
     <setting name="MythArchiveVideoFormat">NTSC</setting>
+
+    <!-- Date/Time format -->
+    <setting name="MythArchiveDateFormat">%a %b %d %Y</setting>
+    <setting name="MythArchiveTimeFormat">%I:%M %p</setting>
 </mythlocale>
