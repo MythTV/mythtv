@@ -162,10 +162,10 @@ class MPUBLIC MythPopupBox : public MythDialog
     static bool showOkPopup(MythMainWindow *parent,
                             const QString  &title,
                             const QString  &message,
-                            QString         button_msg = QString::null);
+                            QString         button_msg = QString()) MDEPRECATED;
 
     static bool showOkCancelPopup(MythMainWindow *parent, QString title,
-                                  QString message, bool focusOk);
+                                  QString message, bool focusOk) MDEPRECATED;
 
     static DialogCode Show2ButtonPopup(
         MythMainWindow *parent,
@@ -180,18 +180,18 @@ class MPUBLIC MythPopupBox : public MythDialog
             QString("Button 2") : button2msg;
         return ShowButtonPopup(
             parent, title, message, buttonmsgs, default_button);
-    }
+    }  MDEPRECATED
 
     static DialogCode ShowButtonPopup(
         MythMainWindow *parent,
         const QString &title, const QString &message,
         const QStringList &buttonmsgs,
-        DialogCode default_button);
+        DialogCode default_button) MDEPRECATED;
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
-                                 QString message, QString& text);
+                                 QString message, QString& text) MDEPRECATED;
     static QString showPasswordPopup(MythMainWindow *parent,
-                                     QString title, QString message);
+                                     QString title, QString message) MDEPRECATED;
 
   public slots:
     virtual void AcceptItem(int);
