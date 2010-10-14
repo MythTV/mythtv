@@ -70,6 +70,7 @@
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="587"/>
+        <location filename="../mythgame/gameui.cpp" line="651"/>
         <source>Edit Details</source>
         <translation>Επεξεργασία Λεπτομερειών</translation>
     </message>
@@ -77,11 +78,6 @@
         <location filename="../mythgame/gameui.cpp" line="615"/>
         <source>Game Search</source>
         <translation>Αναζήτηση Παιχνιδιού</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gameui.cpp" line="651"/>
-        <source>Edit Metadata</source>
-        <translation>Επεξεργασία Μεταπληροφοριών</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="1053"/>
@@ -412,6 +408,76 @@ want to do this?</source>
         <source>(New Game Player)</source>
         <translation>(Νέος Προσομοιωτής)</translation>
     </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="23"/>
+        <source>OTHER</source>
+        <translation>Άλλο</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="24"/>
+        <source>AMIGA</source>
+        <translation>AMIGA</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="25"/>
+        <source>ATARI</source>
+        <translation>ATARI</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="26"/>
+        <source>GAMEGEAR</source>
+        <translation>GAMEGEAR</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="27"/>
+        <source>GENESIS/MEGADRIVE</source>
+        <translation>GENESIS/MEGADRIVE</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="28"/>
+        <source>MAME</source>
+        <translation>MAME</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="29"/>
+        <source>N64</source>
+        <translation>N64</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="30"/>
+        <source>NES</source>
+        <translation>NES</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="31"/>
+        <source>PC GAME</source>
+        <translation>PC GAME</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="32"/>
+        <source>PCE/TG16</source>
+        <translation>PCE/TG16</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="33"/>
+        <source>SEGA/MASTER SYSYTEM</source>
+        <translation>SEGA/MASTER SYSTEM</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="34"/>
+        <source>SNES</source>
+        <translation>SNES</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="104"/>
+        <source>Player Name</source>
+        <translation>Όνομα Παιχνιδιού</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="105"/>
+        <source>Name of this Game and or Emulator</source>
+        <translation>Όνομα του παιχνιδιού και/ή του Προσομοιωτή</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -562,106 +628,101 @@ want to do this?</source>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
-        <source>Video Manager</source>
-        <translation>Διαχείριση Εικόνας</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="32"/>
         <source>Game Information</source>
         <translation>Πληροφορίες Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Game:</source>
         <translation>Παιχνίδι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Type:</source>
         <translation>Τύπος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Filename:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Rompath:</source>
         <translation>ΔιαδρομήROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="36"/>
         <source>System(s):</source>
         <translation>Σύστημα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="37"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Edit Game Information</source>
         <translation>Επεξεργασία Πληροφοριών Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Game Name:</source>
         <translation>Όνομα Παιχνιδιού:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Description:</source>
         <translation>Περιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Boxart:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="42"/>
         <source>No Plot.</source>
         <translation>Χωρίς πλοκή.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="43"/>
         <source>General Settings</source>
         <translation>Γενικές Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Game folders and general options</source>
         <translation>Φάκελοι παιχνιδιών και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Game Players</source>
         <translation>Συστηματα Παιχνιδιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Configure an emulator</source>
         <translation>Ρύθμιση Προσομοιωτή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Scan for Games</source>
         <translation>Ανιχνευση για Παιχνιδια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Add games to your library</source>
         <translation>Προσθέστε παιχνίδια στη συλλογή σας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Clear Game Data</source>
         <translation>Εκκαθαριση Συλλογης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Empty your game library</source>
         <translation>Σβήνει τη συλλογή παιχνιδιών σας</translation>
     </message>

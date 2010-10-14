@@ -40,37 +40,37 @@
 <context>
     <name>MetadataSettings</name>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="148"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="84"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation>Εαν επιλεγεί, θα ενεργοποιήσει ένα κουμπί με τίτλο &quot;Αναπαραγωγή με τρέιλερ&quot; που θα παίξει ένα ορισμένο από το χρήστη αριθμό τρέιλερ πριν από την ταινία.</translation>
+        <translation>Εαν επιλεγεί, θα ενεργοποιήσει ένα κουμπί με τίτλο &quot;Προβολή με τρέιλερ&quot; που θα προβάλει ένα ορισμένο από το χρήστη αριθμό τρέιλερ πριν από την ταινία.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="153"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="88"/>
         <source>Number of trailers to play before a film.</source>
-        <translation>Το πλήθος των τρέιλερ που θα παιχτούν πριν από μια ταινία.</translation>
+        <translation>Το πλήθος των τρέιλερ που θα προβληθούν πριν από μια ταινία.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="155"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="90"/>
         <source>If set, all files below the MythVideo directory will be displayed unless their extension is explicitly set to be ignored.</source>
-        <translation>Εαν επιλεγεί, θα εμφανίζονται όλα τα αρχεία κάτω από το φάκελο του Myth εκτός και αν η κατάληξή τους δηλωθεί συγκεκριμένα ως εξαιρούμενη.</translation>
+        <translation>Εαν επιλεγεί, θα εμφανίζονται όλα τα αρχεία κάτω από το φάκελο του MythVideo εκτός και αν η κατάληξή τους δηλωθεί συγκεκριμένα ως εξαιρούμενη.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="159"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="94"/>
         <source>If set, every time a scan for new videos is performed, a mass metadata update of the collection will also occur.</source>
-        <translation>Αν επιλεγεί, κάθε φορά που θα γίνεται έλεγχος για νέες ταινίες, θα γίνεται και μαζική ενημέρωση πληροφοριών για την ταινιοθήκη.</translation>
+        <translation>Αν επιλεγεί, κάθε φορά που θα γίνεται έλεγχος για νέες ταινίες θα γίνεται και μαζική ενημέρωση πληροφοριών για την ταινιοθήκη.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="163"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="98"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
-        <translation>Εαν επιλεγεί μαζί με Παρουσίαση Αρχείων, θα κάνει την Λίστα Ταινιών να δείχνει κάθε γνωστό είδος ταινίας από τη βάση δεδομένων. Καθαρίζοντάς το βελτιώνεται σημαντικά ο χρόνος εμφάνισης της Λίστας Ταινιών.</translation>
+        <translation>Εαν επιλεγεί μαζί με Περιήγηση Αρχείων, θα κάνει την Λίστα Ταινιών να δείχνει κάθε γνωστό είδος ταινίας από τη βάση δεδομένων. Καθαρίζοντάς το βελτιώνεται σημαντικά ο χρόνος εμφάνισης της Λίστας Ταινιών.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="168"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="102"/>
         <source>Exit without saving settings</source>
         <translation>Έξοδος χωρίς αποθήκευση ρυθμίσεων</translation>
     </message>
     <message>
-        <location filename="../mythvideo/metadatasettings.cpp" line="170"/>
+        <location filename="../mythvideo/metadatasettings.cpp" line="103"/>
         <source>Save settings and Exit</source>
         <translation>Αποθήκευση ρυθμίσεων και Έξοδος</translation>
     </message>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="296"/>
         <source>Play selected item in alternate player</source>
-        <translation>Αναπαραγωγή του επιλεγμένου έργου με εναλλακτικό πρόγραμμα</translation>
+        <translation>Προβολή του επιλεγμένου έργου με εναλλακτικό πρόγραμμα</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="299"/>
@@ -135,12 +135,12 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="311"/>
         <source>Download metadata for current item</source>
-        <translation>Κατέβασμα λεπτομερειών για το τρέχον έργο</translation>
+        <translation>Κατέβασμα πληροφοριών για το τρέχον έργο</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="313"/>
         <source>Display Item Detail Popup</source>
-        <translation>Εμφανίζει παράθυρο με Λεπτομέρειες</translation>
+        <translation>Εμφανίζει παράθυρο με Πληροφορίες</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="316"/>
@@ -155,7 +155,7 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="322"/>
         <source>Play a DVD</source>
-        <translation>Αναπαραγωγή ενός DVD</translation>
+        <translation>Προβολή DVD</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="324"/>
@@ -165,7 +165,7 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="328"/>
         <source>Play a VCD</source>
-        <translation>Αναπαραγωγή ενός VCD</translation>
+        <translation>Προβολή VCD</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="330"/>
@@ -176,42 +176,42 @@
 <context>
     <name>PlayerSettings</name>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="141"/>
+        <location filename="../mythvideo/playersettings.cpp" line="84"/>
         <source>This is the command used for any file whose extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>Είναι το πρόγραμμα που χρησιμοποιείται για αρχεία χωρίς συγκεκριμένα δηλωμένη κατάληξη. Μπορείτε επίσης να δώσετε το όνομα ενός από τα πρόσθετα αναπαραγωγής, όπως το &apos;Internal&apos;.</translation>
+        <translation>Είναι το πρόγραμμα που χρησιμοποιείται για αρχεία χωρίς συγκεκριμένα δηλωμένη κατάληξη. Μπορείτε επίσης να δώσετε το όνομα ενός από τα πρόσθετα προβολής, όπως το &apos;Internal&apos;.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="146"/>
+        <location filename="../mythvideo/playersettings.cpp" line="89"/>
         <source>This can be any command to launch a DVD  player. Internal is the default.  For other players, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
         <translation>Μπορεί να είναι οποιοδήποτε πρόγραμμα που παίζει DVD. Η προεπιλογή είναι Internal. Για άλλα προγράμματα, το %d θα αντικατασταθεί από την συσκευή DVD (π.χ. /dev/dvd).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="150"/>
+        <location filename="../mythvideo/playersettings.cpp" line="93"/>
         <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation>Αυτή η συσκευή πρέπει να προϋπάρχει και ο χρήστης που παίζει DVD πρέπει να έχει δικαιώματα ανάγνωσης στη συσκευή. Η &apos;προεπιλογή&apos; θα αφήσει το MediaMonitor να επιλέξει συσκευή.</translation>
+        <translation>Αυτή η συσκευή πρέπει να προϋπάρχει και ο χρήστης που θα δει DVD πρέπει να έχει δικαιώματα ανάγνωσης στη συσκευή. Η &apos;προεπιλογή&apos; θα αφήσει το MediaMonitor να επιλέξει συσκευή.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="155"/>
+        <location filename="../mythvideo/playersettings.cpp" line="98"/>
         <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
         <translation>Μπορεί να είναι οποιοδήποτε πρόγραμμα που παίζει VCD. Το Internal δεν παίζει VCD. Το %d θα αντικατασταθεί από τη συσκευή VCD (π.χ. /dev/cdrom).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="159"/>
+        <location filename="../mythvideo/playersettings.cpp" line="102"/>
         <source>This device must exist, and the user playing the VCD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation>Αυτή η συσκευή πρέπει να προϋπάρχει και ο χρήστης που παίζει VCD πρέπει να έχει δικαιώματα ανάγνωσης στη συσκευή. Η &apos;προεπιλογή&apos; θα αφήσει το MediaMonitor να επιλέξει συσκευή.</translation>
+        <translation>Αυτή η συσκευή πρέπει να προϋπάρχει και ο χρήστης που θα δει VCD πρέπει να έχει δικαιώματα ανάγνωσης στη συσκευή. Η &apos;προεπιλογή&apos; θα αφήσει το MediaMonitor να επιλέξει συσκευή.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="164"/>
+        <location filename="../mythvideo/playersettings.cpp" line="107"/>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
         <translation>Αν για κάποιο λόγο το προεπιλεγμένο πρόγραμμα δεν παίζει κάποια ταινία, μπορείτε να χρησιμοποιήσετε εναλλακτικό πρόγραμμα επιλέγοντας &apos;Προβολή με Εναλλακτικό Πρόγραμμα.&apos;</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="168"/>
+        <location filename="../mythvideo/playersettings.cpp" line="110"/>
         <source>Exit without saving settings</source>
         <translation>Έξοδος χωρίς αποθήκευση ρυθμίσεων</translation>
     </message>
     <message>
-        <location filename="../mythvideo/playersettings.cpp" line="170"/>
+        <location filename="../mythvideo/playersettings.cpp" line="111"/>
         <source>Save settings and Exit</source>
         <translation>Αποθήκευση ρυθμίσεων και έξοδος</translation>
     </message>
@@ -347,7 +347,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="157"/>
         <source>Play DVD</source>
-        <translation>Αναπαραγωγή DVD</translation>
+        <translation>Προβολή DVD</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="155"/>
@@ -472,7 +472,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="178"/>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
-        <translation>Θέτει την ταχύτητα της συσκευής DVD κατά την αναπαραγωγή. Η ταχύτητα είναι σε πολλαπλάσια των 177KB/s. Χαμηλότερες ταχύτητες μειώνουν το θόρυβο αλλά σε μερικές περιπτώσεις προκαλούν διακοπές στην αναπαραγωγή.</translation>
+        <translation>Θέτει την ταχύτητα της συσκευής DVD κατά την προβολή. Η ταχύτητα είναι σε πολλαπλάσια των 177KB/s. Χαμηλότερες ταχύτητες μειώνουν το θόρυβο αλλά σε μερικές περιπτώσεις προκαλούν διακοπές στην προβολή.</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="32"/>
@@ -482,7 +482,7 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="105"/>
         <source>You have no VCD Player command defined.</source>
-        <translation>Δεν έχετε ορίσει εντολή αναπαραγωγής VCD.</translation>
+        <translation>Δεν έχετε ορίσει πρόγραμμα προβολής VCD.</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="378"/>
@@ -616,12 +616,12 @@
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Directed by</source>
         <translation>Σκην/σία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="167"/>
         <source>MythVideo File Associations</source>
         <translation>Συσχετισμοί αρχείων του MythVideo</translation>
     </message>
@@ -646,7 +646,7 @@
         <translation>Αγνόηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="168"/>
         <source>Edit Video Information</source>
         <translation>Επεξεργασία Πληροφοριών Ταινίας</translation>
     </message>
@@ -656,7 +656,7 @@
         <translation>Γονικός Έλεγχος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="169"/>
         <source>File to Always Play Next:</source>
         <translation>Αρχείο που πάντα θα προβάλεται μετά:</translation>
     </message>
@@ -673,7 +673,7 @@
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Unique Player Command:</source>
-        <translation>Ατομική εντολή αναπαραγωγής:</translation>
+        <translation>Εντολή Προγράμματος Προβολής:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="137"/>
@@ -691,7 +691,7 @@
         <translation>Κατηγορία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="176"/>
         <source>Filters video list</source>
         <translation>Φίλτρα λίστας ταινιών</translation>
     </message>
@@ -784,25 +784,25 @@
     <message>
         <location filename="themestrings.h" line="72"/>
         <source>Play</source>
-        <translation>Αναπαραγωγή</translation>
+        <translation>Προβολή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Lowest</source>
         <translation>Χαμηλότερη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="154"/>
         <source>Low</source>
         <translation>Χαμηλή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="155"/>
         <source>Medium</source>
         <translation>Μεσαία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="156"/>
         <source>High</source>
         <translation>Υψηλή</translation>
     </message>
@@ -812,7 +812,7 @@
         <translation>Αριθ. Ταινίας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Parental Level</source>
         <translation>Γονικό Επίπεδο</translation>
     </message>
@@ -837,7 +837,7 @@
         <translation>Επεισόδιο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Item has been watched:</source>
         <translation>Το έχετε δει:</translation>
     </message>
@@ -943,7 +943,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Rating:</source>
-        <translation>Ταξινόμηση:</translation>
+        <translation>Αξιολόγηση:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
@@ -1088,12 +1088,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>This item was released on %1.</source>
-        <translation>Η ταινία προβλήθηκε στις %1.</translation>
+        <translation>Η ταινία προβλήθηκε %1.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>It was added to your collection on %1.</source>
-        <translation>Προστέθηκε στη συλλογή σας στις %1.</translation>
+        <translation>Προστέθηκε στη συλλογή σας %1.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
@@ -1103,7 +1103,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Video Player Settings</source>
-        <translation>Επιλογές Προγράμματος Αναπαραγωγής</translation>
+        <translation>Επιλογές Προγράμματος Προβολής</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
@@ -1133,7 +1133,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>Enable Alternate Player</source>
-        <translation>Χρήση Εφεδρ. Αναπαραγωγέα</translation>
+        <translation>Χρήση Εφεδρ. Προγράμματος</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
@@ -1143,12 +1143,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="81"/>
         <source>Video Metadata Settings</source>
-        <translation>Ρυθμίσεις Μεταπληροφοριών</translation>
+        <translation>Ρυθμίσεις Πληροφοριών</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Update metadata after video scan</source>
-        <translation>Ενημέρωση μεταπληροφοριών μετά την ανίχνευση</translation>
+        <translation>Ενημέρωση πληροφοριών μετά την ανίχνευση</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
@@ -1158,12 +1158,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Enable metadata in file browse mode</source>
-        <translation>Ενεργοποίηση μεταπληροφοριών στην περιήγηση</translation>
+        <translation>Ενεργοποίηση πληροφοριών στην περιήγηση</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Enable Random Trailer Playback</source>
-        <translation>Αναπαραγωγή τυχαίου trailer</translation>
+        <translation>Προβολή τυχαίου trailer</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
@@ -1178,7 +1178,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Edit Video Metadata</source>
-        <translation>Επεξεργασία Μεταπληροφοριών</translation>
+        <translation>Επεξεργασία Πληροφοριών</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
@@ -1293,17 +1293,17 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="121"/>
         <source>Enable Alternate Player:</source>
-        <translation>Ενεργοποίηση Εναλλακτικού Αναπαραγωγέα:</translation>
+        <translation>Ενεργοποίηση Εναλλακτικού Προγράμματος:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="122"/>
         <source>Alternate Player:</source>
-        <translation>Εναλλακτικός Αναπαραγωγέας:</translation>
+        <translation>Εναλλακτικό Πρόγραμμα:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="123"/>
         <source>Metadata Settings</source>
-        <translation>Ρυθμίσεις Μεταπληροφοριών</translation>
+        <translation>Ρυθμισεις Πληροφοριων</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="124"/>
@@ -1318,7 +1318,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="126"/>
         <source>Trailers to Play:</source>
-        <translation>Τρέιλερς για Αναπαραγωγή:</translation>
+        <translation>Τρέιλερς για Προβολή:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="127"/>
@@ -1343,7 +1343,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>Player Command:</source>
-        <translation>Εντολή Αναπαραγωγέα:</translation>
+        <translation>Εντολή Προγράμματος::</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="141"/>
@@ -1366,9 +1366,14 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <translation>Προβλήθηκε :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="159"/>
+        <source>Video Browser</source>
+        <translation>Περιηγηση Ταινιων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="191"/>
         <source>Configure video and DVD playback</source>
-        <translation>Ρυθμίζει την αναπαραγωγή ταινιών και DVD</translation>
+        <translation>Ρυθμίζει την προβολή ταινιών και DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="66"/>
@@ -1376,12 +1381,12 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <translation>Αποτέλεσμα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Save as default</source>
         <translation>Αποθήκευση ως προεπιλογή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="180"/>
         <source>General Settings</source>
         <translation>Γενικες Επιλογες</translation>
     </message>
@@ -1391,22 +1396,22 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <translation>Επιλογες Προγρ. Προβολης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="184"/>
         <source>File Types</source>
         <translation>Τυποι Αρχειων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Browse Videos</source>
         <translation>Περιηγηση Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Video List</source>
         <translation>Λιστα Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="161"/>
         <source>Video Gallery</source>
         <translation>Γκαλερι Ταινιων</translation>
     </message>
@@ -1421,136 +1426,146 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
         <translation>Κύκλ/Επ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="157"/>
         <source>SELECT: Edit</source>
         <translation>ΕΠΙΛΟΓΗ: Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="158"/>
         <source>INFO - Action Menu</source>
         <translation>ΠΛΗΡΟΦ - Επιλογές Ενέργειας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="166"/>
         <source>Background:</source>
         <translation>Φόντο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Visible:</source>
         <translation>Ορατό:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Coverart</source>
         <translation>Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="173"/>
         <source>Screenshots</source>
         <translation>Στιγμιότυπα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Banners</source>
         <translation>Εξώφυλλα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="175"/>
         <source>Fanart</source>
         <translation>Εικόνες Χρηστών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="178"/>
         <source>Perform metadata update after video scan</source>
-        <translation>Ενημέρωση μεταπληροφοριών μετά την ανίχνευση</translation>
+        <translation>Ενημέρωση πληροφοριών μετά την ανίχνευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="179"/>
         <source>Find Online...</source>
         <translation>Εύρεση στο Internet...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="181"/>
         <source>File Paths and general options</source>
         <translation>Διαδρομές αρχείων και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Player Applications and DVD/VCD Drives</source>
-        <translation>Προγράμματα αναπαραγωγής και συσκευές DVD/VCD</translation>
+        <translation>Προγράμματα προβολής και συσκευές DVD/VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Grabber Setup and display preferences</source>
         <translation>Ρυθμίσεις κατεβάσματος και επιλογές εμφάνισης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Associate new file extensions</source>
         <translation>Συσχετισμοί νέων επεκτάσεων αρχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Video Manager</source>
         <translation>Διαχειριση Ταινιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Play DVD</source>
-        <translation>Αναπαραγωγη DVD</translation>
+        <translation>Προβολη DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="188"/>
         <source>Play VCD</source>
-        <translation>Αναπαραγωγη VCD</translation>
+        <translation>Προβολη VCD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="189"/>
         <source>Eject media</source>
         <translation>Εξαγωγη Μεσου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="190"/>
         <source>Videos Settings</source>
         <translation>Ρυθμισεις ταινιων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="164"/>
+        <source>File Associations</source>
+        <translation>Συσχετισμοί Αρχείων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="165"/>
+        <source>Video Filters</source>
+        <translation>Φίλτρα Ταινιών</translation>
     </message>
 </context>
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2546"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2547"/>
         <source>Switch to Browse View</source>
         <translation>Αλλαγή σε Προβολή Περιήγησης</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2550"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2551"/>
         <source>Switch to Gallery View</source>
         <translation>Αλλαγή σε Προβολή Γκαλερί</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2554"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2555"/>
         <source>Switch to List View</source>
         <translation>Αλλαγή στην Προβολή Λίστας</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1319"/>
-        <location filename="../mythvideo/videodlg.cpp" line="1334"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1320"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1335"/>
         <source>Season</source>
         <translation>Κύκλος</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2261"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2262"/>
         <source>Video Search</source>
         <translation>Αναζήτηση Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2322"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2323"/>
         <source>%1 of %2</source>
         <translation>%1 από %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2408"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2409"/>
         <source>Video Options
 %1
 %2</source>
@@ -1559,325 +1574,325 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
 %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2411"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2412"/>
         <source>Video Options
 %1</source>
         <translation>Επιλογές Ταινιών
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2414"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2715"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2415"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2716"/>
         <source>Video Options</source>
         <translation>Επιλογές Ταινιών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2430"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2431"/>
         <source>Play...</source>
-        <translation>Αναπαραγωγή...</translation>
+        <translation>Προβολή...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2432"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2468"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2433"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2469"/>
         <source>Play</source>
-        <translation>Αναπαραγωγή</translation>
+        <translation>Προβολή</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2434"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2727"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2435"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2728"/>
         <source>Mark as Unwatched</source>
         <translation>Σημείωση ως Δεν-Το-Έχω-Δει</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2436"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2729"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2730"/>
         <source>Mark as Watched</source>
         <translation>Σημείωση ως Το-Έχω-Δει</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2437"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2685"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2686"/>
         <source>Video Info</source>
         <translation>Πληροφορίες Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2440"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2441"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2443"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2444"/>
         <source>Play Folder</source>
-        <translation>Αναπαραγωγή Φακέλου</translation>
+        <translation>Προβολή Φακέλου</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2457"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2458"/>
         <source>Playback Options
 %1</source>
-        <translation>Επιλογές Αναπαραγωγής
+        <translation>Επιλογές Προβολής
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2472"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2473"/>
         <source>Play in Alternate Player</source>
-        <translation>Αναπαραγωγή σε Εναλλακτικό Πρόγραμμα</translation>
+        <translation>Προβολή με Εναλλακτικό Πρόγραμμα</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2477"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2478"/>
         <source>Play With Trailers</source>
-        <translation>Αναπαραγωγή με Trailers</translation>
+        <translation>Προβολή με Trailers</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2485"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2486"/>
         <source>Play Trailer</source>
-        <translation>Αναπαραγωγή Trailer</translation>
+        <translation>Προβολή Trailer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2496"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2497"/>
         <source>Video Display Menu</source>
         <translation>Επιλογές Εμφάνισης Ταινιών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2505"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
         <source>Scan For Changes</source>
         <translation>Έλεγχος για Αλλαγές</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2506"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
         <source>Retrieve All Details</source>
-        <translation>Κατέβασμα όλων των Λεπτομερειών</translation>
+        <translation>Κατέβασμα όλων των Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2507"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2508"/>
         <source>Filter Display</source>
         <translation>Εμφάνιση Φίλτρων</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2509"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2510"/>
         <source>Browse By...</source>
         <translation>Εμφάνιση κατά...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2511"/>
-        <location filename="../mythvideo/videodlg.cpp" line="2536"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2512"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2537"/>
         <source>Change View</source>
         <translation>Αλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2514"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2515"/>
         <source>Disable File Browse Mode</source>
         <translation>Ακύρωση Κατάστασης Περιήγησης Αρχείων</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2517"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2518"/>
         <source>Enable File Browse Mode</source>
         <translation>Χρήση Κατάστασης Περιήγησης Αρχείων</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2521"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2522"/>
         <source>Disable Flat View</source>
         <translation>Ακύρωση Επίπεδης Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2524"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2525"/>
         <source>Enable Flat View</source>
         <translation>Χρήση Επίπεδης Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2557"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2558"/>
         <source>Switch to Manage View</source>
         <translation>Αλλαγή σε Προβολή Διαχείρισης</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2629"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2630"/>
         <source>Browse By</source>
         <translation>Περιήγηση κατά</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2639"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2640"/>
         <source>Cast</source>
         <translation>Πρωταγωνιστές</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2643"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2644"/>
         <source>Category</source>
         <translation>Κατηγορία</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2647"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2648"/>
         <source>Date Added</source>
         <translation>Ημερομηνία Προσθήκης</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2651"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2652"/>
         <source>Director</source>
         <translation>Σκηνοθέτη</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2655"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2656"/>
         <source>Studio</source>
         <translation>Στούντιο</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2659"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2660"/>
         <source>Folder</source>
         <translation>Φάκελο</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2663"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2664"/>
         <source>Genre</source>
         <translation>Είδος</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2667"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2668"/>
         <source>TV/Movies</source>
         <translation>TV/Ταινίες</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2671"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2672"/>
         <source>User Rating</source>
         <translation>Ταξινόμηση Χρήστη</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2675"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2676"/>
         <source>Year</source>
         <translation>Έτος</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2695"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2696"/>
         <source>View Details</source>
-        <translation>Προβολή Λεπτομερειών</translation>
+        <translation>Προβολή Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2697"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2698"/>
         <source>View Full Plot</source>
         <translation>Προβολή Πλήρους Πλοκής</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2703"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2704"/>
         <source>View Cast</source>
         <translation>Προβολή Πρωταγωνιστών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2732"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2733"/>
         <source>Mark as Non-Browseable</source>
         <translation>Να μην εμφανίζεται κατά την Περιήγηση</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2734"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2735"/>
         <source>Mark as Browseable</source>
         <translation>Να εμφανίζεται κατά την Περιήγηση</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2757"/>
         <source>Manually Enter Video #</source>
         <translation>Εισαγωγή Προσαρμοσμένου # ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3003"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3004"/>
         <source>An error occurred when switching views.</source>
         <translation>Προέκυψε σφάλμα κατά την αλλαγή προβολής.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3552"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3553"/>
         <source>Fetching details for %1</source>
-        <translation>Κατεβάζω στοιχεία για %1</translation>
+        <translation>Κατεβάζω πληροφορίες για %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3557"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3558"/>
         <source> %1x%2</source>
         <translation> %1x%2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3645"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3646"/>
         <source>Enter Video Unique ID:</source>
         <translation>Δώστε μοναδικό αναγνωριστικό Ταινίας:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3698"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3699"/>
         <source>Are you sure you want to delete:
 %1</source>
         <translation>Σίγουρα θέλετε να διαγράψετε:
 %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3736"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3737"/>
         <source>Failed to delete file</source>
         <translation>Αποτυχία διαγραφής αρχείου</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1151"/>
+        <location filename="../mythvideo/videodlg.cpp" line="1152"/>
         <source>Video dialog loading, or no videos available...</source>
         <translation>Ή καθυστερεί το φόρτωμα ή δεν βρήκα ταινίες...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2438"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2439"/>
         <source>Change Video Details</source>
-        <translation>Αλλαγή Λεπτομερειών Ταινίας</translation>
+        <translation>Αλλαγή Πληροφοριών Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2527"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2528"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2567"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2568"/>
         <source>Video Settings</source>
         <translation>Ρυθμίσεις Ταινιών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2576"/>
-        <source>Player Settings</source>
-        <translation>Ρυθμίσεις Αναπαραγωγέα</translation>
-    </message>
-    <message>
         <location filename="../mythvideo/videodlg.cpp" line="2577"/>
-        <source>Metadata Settings</source>
-        <translation>Ρυθμίσεις Μεταπληροφοριών</translation>
+        <source>Player Settings</source>
+        <translation>Ρυθμίσεις Προβολής</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2578"/>
+        <source>Metadata Settings</source>
+        <translation>Ρυθμίσεις Πληροφοριών</translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/videodlg.cpp" line="2579"/>
         <source>File Type Settings</source>
         <translation>Ρυθμίσεις Τύπων Αρχείων</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2705"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2706"/>
         <source>View Homepage</source>
         <translation>Αρχική Σελίδα</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2743"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2744"/>
         <source>Manage Video Details</source>
-        <translation>Διαχείριση Λεπτομερειών Ταινίας</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2754"/>
-        <source>Edit Details</source>
-        <translation>Επεξεργασία Λεπτομερειών</translation>
+        <translation>Διαχείριση Πληροφοριών Ταινίας</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2755"/>
-        <source>Retrieve Details</source>
-        <translation>Κατέβασμα Λεπτομερειών</translation>
+        <source>Edit Details</source>
+        <translation>Επεξεργασία Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2759"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2756"/>
+        <source>Retrieve Details</source>
+        <translation>Κατέβασμα Πληροφοριών</translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/videodlg.cpp" line="2760"/>
         <source>Allow Updates</source>
         <translation>Επιτρέπονται Ενημερώσεις</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2761"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
         <source>Disable Updates</source>
         <translation>Απαγορεύονται Ενημερώσεις</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2762"/>
+        <location filename="../mythvideo/videodlg.cpp" line="2763"/>
         <source>Reset Details</source>
-        <translation>Διαγραφή Λεπτομερειών</translation>
+        <translation>Διαγραφή Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="3076"/>
+        <location filename="../mythvideo/videodlg.cpp" line="3077"/>
         <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
         <translation>Δεν έχει δοθεί πρόγραμμα περιήγησης! Χρειάζεται το MythBrowser για να δείξει την αρχική σελίδα.</translation>
     </message>
