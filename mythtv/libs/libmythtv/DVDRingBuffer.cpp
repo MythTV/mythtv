@@ -478,15 +478,19 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             case DVDNAV_AUDIO_STREAM_CHANGE:
             {
                 // retrieve the new track
-                m_curAudioTrack = dvdnav_get_active_audio_stream(m_dvdnav);
-
-                // tell the decoder to reset the audio streams
-                m_audioStreamsChanged = true;
+                int new_track = dvdnav_get_active_audio_stream(m_dvdnav);
 
                 // debug
                 VERBOSE(VB_PLAYBACK, LOC +
-                        QString("DVDNAV_AUDIO_STREAM_CHANGE: new stream %1")
-                        .arg(m_curAudioTrack));
+                        QString("DVDNAV_AUDIO_STREAM_CHANGE: old %1 new %2")
+                        .arg(new_track).arg(m_curAudioTrack));
+
+                // tell the decoder to reset the audio streams if necessary
+                if (new_track != m_curAudioTrack)
+                {
+                    m_curAudioTrack = new_track;
+                    m_audioStreamsChanged = true;
+                }
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
