@@ -272,11 +272,6 @@ dvdnav_status_t dvdnav_get_number_of_titles(dvdnav_t *self, int32_t *titles);
 dvdnav_status_t dvdnav_get_number_of_parts(dvdnav_t *self, int32_t title, int32_t *parts);
 
 /*
- * Play DVD from the Beginning
-*/
-void dvdnav_first_play(dvdnav_t *self);
-
-/*
  * Plays the specified title of the DVD from its beginning (that is: part 1).
  */
 dvdnav_status_t dvdnav_title_play(dvdnav_t *self, int32_t title);
