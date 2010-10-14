@@ -456,6 +456,8 @@ void MythDVDPlayer::DisplayDVDButton(void)
     if (!numbuttons || !dvdSubtitle || (buttonversion == 0))
     {
         SetCaptionsEnabled(false, false);
+        if (osd)
+            osd->ClearSubtitles();
         m_buttonVersion = 0;
         player_ctx->buffer->DVD()->ReleaseMenuButton();
         return;
@@ -464,6 +466,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     m_buttonVersion = buttonversion;
     QRect buttonPos = player_ctx->buffer->DVD()->GetButtonCoords();
     osd->DisplayDVDButton(dvdSubtitle, buttonPos);
+    textDisplayMode = kDisplayDVDButton;
     player_ctx->buffer->DVD()->ReleaseMenuButton();
 }
 
