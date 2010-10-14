@@ -344,13 +344,13 @@
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="240"/>
-        <source>ffmpeg Command</source>
-        <translation>ffmpeg käsk</translation>
+        <source>FFmpeg Command</source>
+        <translation>FFmpeg käsk</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="242"/>
-        <source>Command to run ffmpeg.</source>
-        <translation>Käsk ffmpeg-i käivitamiseks.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Käsk FFmpeg-i käivitamiseks.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="249"/>

@@ -444,13 +444,13 @@
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="240"/>
-        <source>ffmpeg Command</source>
-        <translation>ffmpeg command</translation>
+        <source>FFmpeg Command</source>
+        <translation>FFmpeg command</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="242"/>
-        <source>Command to run ffmpeg.</source>
-        <translation>Command to run ffmpeg.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Command to run FFmpeg.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="249"/>

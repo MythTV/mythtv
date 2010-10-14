@@ -289,13 +289,13 @@
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="240"/>
-        <source>ffmpeg Command</source>
-        <translation>Commande ffmpeg</translation>
+        <source>FFmpeg Command</source>
+        <translation>Commande FFmpeg</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="242"/>
-        <source>Command to run ffmpeg.</source>
-        <translation>Commande pour exécuter ffmpeg.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Commande pour exécuter FFmpeg.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="249"/>

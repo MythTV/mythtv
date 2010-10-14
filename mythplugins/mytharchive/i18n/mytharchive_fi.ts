@@ -233,12 +233,12 @@
         <translation>Mitä DVD -asemaa käytetään levyjä poltettaessa.</translation>
     </message>
     <message>
-        <source>ffmpeg Command</source>
-        <translation>ffmpeg-komento</translation>
+        <source>FFmpeg Command</source>
+        <translation>FFmpeg-komento</translation>
     </message>
     <message>
-        <source>Command to run ffmpeg.</source>
-        <translation>Komento, jolla ajetaan ffmpeg.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Komento, jolla ajetaan FFmpeg.</translation>
     </message>
     <message>
         <source>mplex Command</source>

@@ -237,9 +237,9 @@ static HostComboBox *MythArchiveDefaultEncProfile()
 static HostLineEdit *MythArchiveFfmpegCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveFfmpegCmd");
-    gc->setLabel(QObject::tr("ffmpeg Command"));
+    gc->setLabel(QObject::tr("FFmpeg Command"));
     gc->setValue("ffmpeg");
-    gc->setHelpText(QObject::tr("Command to run ffmpeg."));
+    gc->setHelpText(QObject::tr("Command to run FFmpeg."));
     return gc;
 };
 

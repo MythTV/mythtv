@@ -57,7 +57,7 @@ extern "C" {
 #include <swscale.h>
 }
 
-#ifndef INT64_C    // Used in ffmpeg headers to define some constants
+#ifndef INT64_C    // Used in FFmpeg headers to define some constants
 #define INT64_C(v)   (v ## LL)
 #endif
 

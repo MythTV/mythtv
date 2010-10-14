@@ -583,12 +583,12 @@
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="240"/>
-        <source>ffmpeg Command</source>
+        <source>FFmpeg Command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="242"/>
-        <source>Command to run ffmpeg.</source>
+        <source>Command to run FFmpeg.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

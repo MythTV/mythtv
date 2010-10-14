@@ -351,12 +351,12 @@
         <translation>Kateri DVD pogon se naj uporabi pri peki.</translation>
     </message>
     <message>
-        <source>ffmpeg Command</source>
-        <translation>ffmpeg ukaz</translation>
+        <source>FFmpeg Command</source>
+        <translation>FFmpeg ukaz</translation>
     </message>
     <message>
-        <source>Command to run ffmpeg.</source>
-        <translation>Ukaz za zagon ffmpeg.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Ukaz za zagon FFmpeg.</translation>
     </message>
     <message>
         <source>mplex Command</source>

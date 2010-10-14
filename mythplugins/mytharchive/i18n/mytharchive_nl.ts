@@ -351,12 +351,12 @@
         <translation>DVD brander die gebruikt wordt voor het branden van schijven.</translation>
     </message>
     <message>
-        <source>ffmpeg Command</source>
-        <translation>ffmpeg Commando</translation>
+        <source>FFmpeg Command</source>
+        <translation>FFmpeg Commando</translation>
     </message>
     <message>
-        <source>Command to run ffmpeg.</source>
-        <translation>Het commando om ffmpeg te starten.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Het commando om FFmpeg te starten.</translation>
     </message>
     <message>
         <source>mplex Command</source>

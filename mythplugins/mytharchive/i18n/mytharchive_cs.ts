@@ -519,13 +519,13 @@
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="240"/>
-        <source>ffmpeg Command</source>
-        <translation>Příkaz ffmpeg</translation>
+        <source>FFmpeg Command</source>
+        <translation>Příkaz FFmpeg</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="242"/>
-        <source>Command to run ffmpeg.</source>
-        <translation>Příkaz pro spuštění ffmpeg.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Příkaz pro spuštění FFmpeg.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="249"/>

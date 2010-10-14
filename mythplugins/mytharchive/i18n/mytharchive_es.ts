@@ -351,12 +351,12 @@
         <translation>Que unidad DVD a usar para grabar discos.</translation>
     </message>
     <message>
-        <source>ffmpeg Command</source>
-        <translation>Comando ffmpeg</translation>
+        <source>FFmpeg Command</source>
+        <translation>Comando FFmpeg</translation>
     </message>
     <message>
-        <source>Command to run ffmpeg.</source>
-        <translation>Comando para ejecutar ffmpeg.</translation>
+        <source>Command to run FFmpeg.</source>
+        <translation>Comando para ejecutar FFmpeg.</translation>
     </message>
     <message>
         <source>mplex Command</source>
