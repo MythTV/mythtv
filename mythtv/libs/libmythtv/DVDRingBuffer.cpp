@@ -176,8 +176,8 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
     m_dvdFilename.detach();
     QByteArray fname = m_dvdFilename.toLocal8Bit();
 
-    dvdnav_status_t dvdRet = dvdnav_open(&m_dvdnav, fname.constData());
-    if (dvdRet == DVDNAV_STATUS_ERR)
+    dvdnav_status_t res = dvdnav_open(&m_dvdnav, fname.constData());
+    if (res == DVDNAV_STATUS_ERR)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to open DVD device at %1")
                 .arg(fname.constData()));
@@ -190,21 +190,20 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_set_readahead_flag(m_dvdnav, 0);
         dvdnav_set_PGC_positioning_flag(m_dvdnav, 1);
 
-        int32_t numTitles  = 0;
-        m_titleParts = 0;
+        int32_t num_titles = 0;
+        int32_t num_parts  = 0;
 
-        dvdnav_title_play(m_dvdnav, 0);
-        dvdRet = dvdnav_get_number_of_titles(m_dvdnav, &numTitles);
-        if (numTitles == 0 )
+        res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
+        if (num_titles == 0 || res == DVDNAV_STATUS_ERR)
         {
             char buf[DVD_BLOCK_SIZE * 5];
             VERBOSE(VB_IMPORTANT, QString("Reading %1 bytes from the drive")
                     .arg(DVD_BLOCK_SIZE * 5));
             safe_read(buf, DVD_BLOCK_SIZE * 5);
-            dvdRet = dvdnav_get_number_of_titles(m_dvdnav, &numTitles);
+            res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
         }
 
-        if ( dvdRet == DVDNAV_STATUS_ERR)
+        if (res == DVDNAV_STATUS_ERR)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Failed to get the number of titles on the DVD" ));
@@ -212,17 +211,26 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         else
         {
             VERBOSE(VB_IMPORTANT, QString("There are %1 titles on the disk")
-                    .arg(numTitles));
+                    .arg(num_titles));
 
-            for( int curTitle = 0; curTitle < numTitles; curTitle++)
+            for(int i = 1; i < num_titles + 1; i++)
             {
-                dvdnav_get_number_of_parts(m_dvdnav, curTitle, &m_titleParts);
-                VERBOSE(VB_IMPORTANT,
-                        QString("Title %1 has %2 parts.")
-                        .arg(curTitle).arg(m_titleParts));
+                res = dvdnav_get_number_of_parts(m_dvdnav, i, &num_parts);
+                if (res != DVDNAV_STATUS_ERR)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC + QString("Title %1 has %2 parts.")
+                        .arg(i).arg(num_parts));
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Failed to get number of parts for title %1")
+                        .arg(i));
+                }
             }
         }
 
+        dvdnav_title_play(m_dvdnav, 1);
         dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
         dvdnav_get_title_string(m_dvdnav, &m_dvdname);
         dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);
@@ -238,7 +246,8 @@ void DVDRingBufferPriv::StartFromBeginning(void)
     if (m_dvdnav)
     {
         QMutexLocker lock(&m_seekLock);
-        dvdnav_first_play(m_dvdnav);
+        dvdnav_reset(m_dvdnav);
+        dvdnav_title_play(m_dvdnav, 0);
     }
 }
 
