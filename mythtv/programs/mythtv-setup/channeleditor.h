@@ -3,7 +3,7 @@
 
 #include "mythscreentype.h"
 
-#include "settings.h"
+#include "mythconfigdialogs.h"
 
 class MythUIButton;
 class MythUIButtonList;

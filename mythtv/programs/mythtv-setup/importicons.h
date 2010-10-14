@@ -18,8 +18,6 @@
 
 #include "mythscreentype.h"
 
-#include "settings.h"
-
 class MythUIButton;
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -158,7 +156,7 @@ class ImportIconsWizard : public MythScreenType
 
   protected:
     void Init(void);
-    
+
   private:
     ListSearchEntries m_listSearch;  //!< the list of SearchEntry
     QString m_strMatches;            //!< the string for the submit() call
