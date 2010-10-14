@@ -188,7 +188,7 @@ bool DecoderBase::PosMapFromDb(void)
 
     if (!m_positionMap.empty())
     {
-        VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
+        VERBOSE(VB_PLAYBACK, LOC + QString("Position map filled from DB to: %1")
                 .arg(m_positionMap.back().index));
     }
 
@@ -479,7 +479,7 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
 
 #if 0
     cout<<'\n';
-    VERBOSE(VB_IMPORTANT,
+    VERBOSE(VB_IMPORTANT, LOC +
             QString("Saving position map [%1,%2] w/%3 keyframes, "
                     "took (%4,%5,%6) ms\n")
             .arg(first).arg(last).arg(saved)

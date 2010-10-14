@@ -607,7 +607,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     }
     else
     {
-        VERBOSE(VB_GENERAL, "No DTS Seeking Hack!");
+        VERBOSE(VB_GENERAL, LOC + "No DTS Seeking Hack!");
         no_dts_hack = true;
         framesPlayed = desiredFrame;
         framesRead = desiredFrame;
@@ -1407,7 +1407,7 @@ static int cc608_good_parity(const int *parity_table, uint16_t data)
     int ret = parity_table[data & 0xff] && parity_table[(data & 0xff00) >> 8];
     if (!ret)
     {
-        VERBOSE(VB_VBI, QString("VBI: Bad parity in EIA-608 data (%1)")
+        VERBOSE(VB_VBI, LOC_ERR + QString("VBI: Bad parity in EIA-608 data (%1)")
                 .arg(data,0,16));
     }
     return ret;
@@ -4225,7 +4225,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             else if (decodetype & kDecodeVideo)
             {
                 if (storedPackets.count() >= max_video_queue_size)
-                    VERBOSE(VB_IMPORTANT,
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
                             QString("Audio %1 ms behind video but already %2 "
                                "video frames queued. AV-Sync might be broken.")
                             .arg(lastvpts-lastapts).arg(storedPackets.count()));
