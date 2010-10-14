@@ -51,7 +51,7 @@ SOURCES += mythdisplay.cpp
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
 inc.files  = mythrect.h mythmainwindow.h mythpainter.h mythimage.h
-inc.files += myththemebase.h
+inc.files += myththemebase.h themeinfo.h
 inc.files += mythpainter_qt.h mythuistatetype.h mythuihelper.h
 inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
