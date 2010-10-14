@@ -1,7 +1,7 @@
 #ifndef WELCOMESETTINGS_H
 #define WELCOMESETTINGS_H
 
-#include <settings.h>
+#include <mythconfigdialogs.h>
 
 class MythWelcomeSettings : public ConfigurationWizard
 {

@@ -15,10 +15,10 @@
 #include "mythdbcon.h"
 #include "lcddevice.h"
 #include "tv.h"
-#include "uitypes.h"
 #include "compat.h"
 #include "mythdirs.h"
 #include "remoteutil.h"
+#include "mythsystem.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"
@@ -30,9 +30,9 @@
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
               :MythScreenType(parent, name),
     m_status_text(NULL),        m_recording_text(NULL), m_scheduled_text(NULL),
-    m_warning_text(NULL),       m_startfrontend_button(NULL), 
+    m_warning_text(NULL),       m_startfrontend_button(NULL),
     m_menuPopup(NULL),          m_updateStatusTimer(new QTimer(this)),
-    m_updateScreenTimer(new QTimer(this)),              m_isRecording(false),      
+    m_updateScreenTimer(new QTimer(this)),              m_isRecording(false),
     m_hasConflicts(false),      m_bWillShutdown(false),
     m_secondsToShutdown(-1),    m_preRollSeconds(0),    m_idleWaitForRecordingTime(0),
     m_idleTimeoutSecs(0),       m_screenTunerNo(0),     m_screenScheduledNo(0),
@@ -52,7 +52,7 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
     m_bWillShutdown = (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
-    
+
     m_idleTimeoutSecs = gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
 
     connect(m_updateStatusTimer, SIGNAL(timeout()),
@@ -126,7 +126,7 @@ void WelcomeDialog::startFrontendClick(void)
 void WelcomeDialog::checkAutoStart(void)
 {
     // mythshutdown --startup returns 0 for automatic startup
-    //                                1 for manual startup 
+    //                                1 for manual startup
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --startup";
     int state = system(mythshutdown_exe.toLocal8Bit().constData());
 
@@ -340,7 +340,7 @@ void WelcomeDialog::updateScreen(void)
     }
     else
     {
-        // update recording 
+        // update recording
         if (m_isRecording && m_tunerList.size())
         {
             if (m_screenTunerNo >= m_tunerList.size())
@@ -354,9 +354,9 @@ void WelcomeDialog::updateScreen(void)
                     .arg(tuner.id);
                 status += tuner.channame;
                 status += "\n" + tuner.title;
-                if (!tuner.subtitle.isEmpty()) 
+                if (!tuner.subtitle.isEmpty())
                     status += "\n("+tuner.subtitle+")";
-                status += "\n" + tuner.startTime.toString(m_timeFormat) + 
+                status += "\n" + tuner.startTime.toString(m_timeFormat) +
                           " " + tr("to") + " " + tuner.endTime.toString(m_timeFormat);
             }
             else
@@ -518,8 +518,8 @@ void WelcomeDialog::updateStatusMessage(void)
 
     QDateTime curtime = QDateTime::currentDateTime();
 
-    if (!m_isRecording && !m_nextRecordingStart.isNull() && 
-        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds < 
+    if (!m_isRecording && !m_nextRecordingStart.isNull() &&
+        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds <
         (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
     {
          m_statusList.append(tr("MythTV is about to start recording."));
@@ -665,8 +665,8 @@ void WelcomeDialog::shutdownNow(void)
     QDateTime curtime = QDateTime::currentDateTime();
 
     // don't shutdown if we are about to start recording
-    if (!m_nextRecordingStart.isNull() && 
-        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds < 
+    if (!m_nextRecordingStart.isNull() &&
+        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds <
         (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
     {
         MythPopupBox::showOkPopup(GetMythMainWindow(), "Cannot shutdown",

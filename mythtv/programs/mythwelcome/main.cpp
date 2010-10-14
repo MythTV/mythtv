@@ -12,7 +12,6 @@
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
-#include "settings.h"
 #include "mythtranslation.h"
 #include "mythdbcon.h"
 #include "exitcodes.h"
