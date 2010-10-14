@@ -1105,13 +1105,13 @@ void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
                   "ffmpeg", 1, true, "xv-blit", "softblend", false,
                   "onefield", "onefield", "");
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "xv-blit", "softblend", true,
+                  "ffmpeg", 1, true, "xv-blit", "softblend", false,
                   "linearblend", "linearblend", "");
     CreateProfile(groupid, 3, ">=", 1280, 720, "", 0, 0,
                   "ffmpeg", 1, true, "quartz-blit", "softblend", false,
                   "onefield", "onefield", "");
     CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", 1, true, "quartz-blit", "softblend", true,
+                  "ffmpeg", 1, true, "quartz-blit", "softblend", false,
                   "linearblend", "linearblend", "");
 }
 
@@ -1141,8 +1141,9 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
     DeleteProfileGroup("VDPAU Slim", hostname);
     groupid = CreateProfileGroup("VDPAU Slim", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                  "vdpau", 1, true, "vdpau", "vdpau", false,
-                  "vdpaubobdeint", "vdpauonefield", "vdpauskipchroma,vdpaucolorspace=auto");
+                  "vdpau", 1, true, "vdpau", "vdpau", true,
+                  "vdpaubobdeint", "vdpauonefield",
+                  "vdpauskipchroma,vdpaucolorspace=auto");
 }
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
