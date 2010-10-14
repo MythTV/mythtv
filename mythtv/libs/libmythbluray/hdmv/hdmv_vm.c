@@ -246,16 +246,21 @@ HDMV_VM *hdmv_vm_init(const char *disc_root, BD_REGISTERS *regs)
     return  p;
 }
 
+static void _free_ig_object(HDMV_VM *p)
+{
+    if (p->ig_object) {
+        X_FREE(p->ig_object->cmds);
+        X_FREE(p->ig_object);
+    }
+}
+
 void hdmv_vm_free(HDMV_VM **p)
 {
     if (p && *p) {
 
-      mobj_free(&(*p)->movie_objects);
+        mobj_free(&(*p)->movie_objects);
 
-        if ((*p)->ig_object) {
-            X_FREE((*p)->ig_object->cmds);
-            X_FREE((*p)->ig_object);
-        }
+        _free_ig_object(*p);
 
         X_FREE(*p);
     }
@@ -290,7 +295,7 @@ static int _resume_object(HDMV_VM *p)
     }
 
     p->object = p->suspended_object;
-    p->pc     = p->suspended_pc;
+    p->pc     = p->suspended_pc + 1;
 
     bd_psr_restore_state(p->regs);
 
@@ -371,6 +376,23 @@ static int _call_title(HDMV_VM *p, int title)
 
 static int _play_at(HDMV_VM *p, int playlist, int playitem, int playmark)
 {
+    if (p->ig_object && playlist >= 0) {
+        DEBUG(DBG_HDMV, "play_at(list %d, item %d, mark %d): "
+              "playlist change not allowed in interactive composition\n",
+              playlist, playitem, playmark);
+        return -1;
+    }
+
+    if (!p->ig_object && playlist < 0) {
+        DEBUG(DBG_HDMV, "play_at(list %d, item %d, mark %d): "
+              "playlist not given in movie object (link commands not allowed)\n",
+              playlist, playitem, playmark);
+        return -1;
+    }
+
+    DEBUG(DBG_HDMV, "play_at(list %d, item %d, mark %d)\n",
+          playlist, playitem, playmark);
+
     if (playlist >= 0) {
         _queue_event(p, HDMV_EVENT_PLAY_PL, playlist);
     }
@@ -383,14 +405,16 @@ static int _play_at(HDMV_VM *p, int playlist, int playitem, int playmark)
         _queue_event(p, HDMV_EVENT_PLAY_PM, playmark);
     }
 
-    DEBUG(DBG_HDMV, "play_at: list %d, item %d, mark %d\n",
-          playlist, playitem, playmark);
-
     return 0;
 }
 
 static int _play_stop(HDMV_VM *p)
 {
+    if (!p->ig_object) {
+        DEBUG(DBG_HDMV, "_play_stop() not allowed in movie object\n");
+        return -1;
+    }
+
     DEBUG(DBG_HDMV, "_play_stop()\n");
     _queue_event(p, HDMV_EVENT_PLAY_STOP, 0);
     return 0;
@@ -859,6 +883,9 @@ int hdmv_vm_select_object(HDMV_VM *p, int object)
             DEBUG(DBG_HDMV|DBG_CRIT, "hdmv_vm_select_object(): invalid object reference (%d) !\n", object);
             return -1;
         }
+
+        _free_ig_object(p);
+
         p->pc     = 0;
         p->object = &p->movie_objects->objects[object];
     }
@@ -870,10 +897,7 @@ int hdmv_vm_set_object(HDMV_VM *p, int num_nav_cmds, void *nav_cmds)
 {
     p->object = NULL;
 
-    if (p->ig_object) {
-        X_FREE(p->ig_object->cmds);
-        X_FREE(p->ig_object);
-    }
+    _free_ig_object(p);
 
     if (nav_cmds && num_nav_cmds > 0) {
         MOBJ_OBJECT *ig_object = calloc(1, sizeof(MOBJ_OBJECT));
@@ -944,6 +968,12 @@ int hdmv_vm_run(HDMV_VM *p, HDMV_EVENT *ev)
             DEBUG(DBG_HDMV, "terminated with PC=%d\n", p->pc);
             p->object = NULL;
             ev->event = HDMV_EVENT_END;
+
+            if (p->ig_object) {
+                ev->event = HDMV_EVENT_IG_END;
+                _free_ig_object(p);
+            }
+
             return 0;
         }
 

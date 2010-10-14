@@ -72,21 +72,43 @@ GRAPHICS_CONTROLLER *gc_init(BD_REGISTERS *regs, void *handle, gc_overlay_proc_f
     return p;
 }
 
+static void _gc_clear_osd(GRAPHICS_CONTROLLER *gc, int plane)
+{
+    if (gc->overlay_proc) {
+        /* clear plane */
+        BD_OVERLAY ov = { -1, plane, 0, 0, 1920, 1080, NULL, NULL };
+        gc->overlay_proc(gc->overlay_proc_handle, &ov);
+    }
+
+    if (plane) {
+        gc->ig_drawn      = 0;
+        gc->popup_visible = 0;
+    } else {
+        gc->pg_drawn      = 0;
+    }
+}
+
+static void _gc_reset(GRAPHICS_CONTROLLER *gc)
+{
+    _gc_clear_osd(gc, 0);
+    _gc_clear_osd(gc, 1);
+
+    graphics_processor_free(&gc->igp);
+    graphics_processor_free(&gc->pgp);
+
+    pg_display_set_free(&gc->pgs);
+    pg_display_set_free(&gc->igs);
+}
+
 void gc_free(GRAPHICS_CONTROLLER **p)
 {
     if (p && *p) {
 
-        GRAPHICS_CONTROLLER *gc = *p;
+        _gc_reset(*p);
 
-        if (gc->overlay_proc) {
-            gc->overlay_proc((*p)->overlay_proc_handle, NULL);
+        if ((*p)->overlay_proc) {
+            (*p)->overlay_proc((*p)->overlay_proc_handle, NULL);
         }
-
-        graphics_processor_free(&gc->igp);
-        graphics_processor_free(&gc->pgp);
-
-        pg_display_set_free(&gc->pgs);
-        pg_display_set_free(&gc->igs);
 
         X_FREE(*p);
     }
@@ -248,28 +270,20 @@ static void _render_button(GRAPHICS_CONTROLLER *gc, BD_IG_BUTTON *button, BD_PG_
 }
 
 static void _render_page(GRAPHICS_CONTROLLER *gc,
-                         unsigned page_id,
-                         unsigned selected_button_id, unsigned activated_button_id,
+                         unsigned activated_button_id,
                          GC_NAV_CMDS *cmds)
 {
     PG_DISPLAY_SET *s       = gc->igs;
     BD_IG_PAGE     *page    = NULL;
     BD_PG_PALETTE  *palette = NULL;
-    unsigned       ii;
-
-    if (!s || !s->ics) {
-        ERROR("_render_page(): no interactive composition\n");
-        return;
-    }
+    unsigned        page_id = bd_psr_read(gc->regs, PSR_MENU_PAGE_ID);
+    unsigned        ii;
+    unsigned        selected_button_id = bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID);
 
     if (s->ics->interactive_composition.ui_model == 1 && !gc->popup_visible) {
         TRACE("_render_page(): popup menu not visible\n");
 
-        if (gc->overlay_proc) {
-            /* clear IG plane */
-            BD_OVERLAY ov = { -1, 1, 0, 0, 1920, 1080, NULL, NULL };
-            gc->overlay_proc(gc->overlay_proc_handle, &ov);
-        }
+        _gc_clear_osd(gc, 1);
 
         return;
     }
@@ -340,10 +354,6 @@ static void _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *c
     unsigned        ii;
     int             activated_btn_id = -1;
 
-    if (!s || !s->ics) {
-        ERROR("_user_input(): no interactive composition\n");
-        return;
-    }
     if (s->ics->interactive_composition.ui_model == 1 && !gc->popup_visible) {
         TRACE("_user_input(): popup menu not visible\n");
         return;
@@ -405,7 +415,7 @@ static void _user_input(GRAPHICS_CONTROLLER *gc, bd_vk_key_e key, GC_NAV_CMDS *c
 
         bd_psr_write(gc->regs, PSR_SELECTED_BUTTON_ID, new_btn_id);
 
-        _render_page(gc, page_id, new_btn_id, activated_btn_id, cmds);
+        _render_page(gc, activated_btn_id, cmds);
     }
 }
 
@@ -423,11 +433,6 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
 
     TRACE("_set_button_page(0x%08x): page flag %d, id %d, effects %d   button flag %d, id %d",
           param, !!page_flag, page_id, !!effect_flag, !!button_flag, button_id);
-
-    if (!s || !s->ics) {
-        ERROR("_set_button_page(): no interactive composition\n");
-        return;
-    }
 
     /* 10.4.3.4 (D) */
 
@@ -488,7 +493,7 @@ static void _set_button_page(GRAPHICS_CONTROLLER *gc, uint32_t param, GC_NAV_CMD
 
     gc->ig_drawn = 0;
 
-    _render_page(gc, page_id, button_id, -1, cmds);
+    _render_page(gc, 0xffff, cmds);
 }
 
 void gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS *cmds)
@@ -496,6 +501,11 @@ void gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS
     cmds->num_nav_cmds = 0;
     cmds->nav_cmds     = NULL;
     cmds->sound_id_ref = -1;
+
+    if (!gc || !gc->igs || !gc->igs->ics) {
+        ERROR("gc_run(): no interactive composition\n");
+        return;
+    }
 
     switch (ctrl) {
 
@@ -523,8 +533,6 @@ void gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS
 
         case GC_CTRL_NOP:
             _render_page(gc,
-                         bd_psr_read(gc->regs, PSR_MENU_PAGE_ID),
-                         bd_psr_read(gc->regs, PSR_SELECTED_BUTTON_ID),
                          0xffff,
                          cmds);
             break;

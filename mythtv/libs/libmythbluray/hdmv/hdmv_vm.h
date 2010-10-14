@@ -30,7 +30,8 @@
 
 typedef enum {
     HDMV_EVENT_NONE = 0,       /* no events */
-    HDMV_EVENT_END,            /* end of program */
+    HDMV_EVENT_END,            /* end of program (movie object) */
+    HDMV_EVENT_IG_END,         /* end of program (interactive) */
 
     HDMV_EVENT_TITLE,          /* play title (from disc index) */
     HDMV_EVENT_PLAY_PL,        /* select playlist */
