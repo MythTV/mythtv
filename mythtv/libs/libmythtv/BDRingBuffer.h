@@ -49,7 +49,6 @@ class MPUBLIC BDRingBufferPriv
 
     // commands
     bool OpenFile(const QString &filename);
-    void StartFromBeginning(void);
     void close(void);
 
     bool SwitchTitle(uint title);
@@ -64,7 +63,8 @@ class MPUBLIC BDRingBufferPriv
   protected:
     BLURAY            *bdnav;
     bd_overlay_proc_f  m_overlay;
-    void              *m_overlayhandle;
+    bool               m_is_hdmv_navigation;
+    BD_EVENT          *m_currentEvent;
     uint32_t           m_numTitles;
     uint32_t           m_mainTitle; // Index number of main title
     uint64_t           m_currentTitleLength; // Selected title's duration, in ticks (90Khz)

@@ -17,7 +17,8 @@
 
 BDRingBufferPriv::BDRingBufferPriv()
     : bdnav(NULL), m_overlay(NULL),
-      m_overlayhandle(NULL), m_numTitles(0)
+      m_is_hdmv_navigation(false),
+      m_currentEvent(NULL), m_numTitles(0)
 {
 }
 
@@ -114,21 +115,23 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
         }
     }
 
-    // Initialize the Menu Overlay
-//    bd_register_overlay_proc(bdnav, m_overlayhandle, m_overlay);
+    bd_free_title_info(titleInfo);
 
-    // Now that we've settled on which index the main title is, get info.
+    // First, attempt to initialize the disc in HDMV navigation mode.
+    // If this fails, fall back to the traditional built-in title switching
+    // mode.
+    //if (bd_play(bdnav) < 0)
     SwitchTitle(m_mainTitle);
+    //else
+    //{
+    //    m_is_hdmv_navigation = true;
+    //
+    //    Register the Menu Overlay Callback
+    //    bd_register_overlay_proc(bdnav, handleevent, m_overlay);
+    //    TODO: Initialize the title info, start listening for BD_EVENTs
+    //}
 
     return true;
-}
-
-void BDRingBufferPriv::StartFromBeginning(void)
-{
-    if (bdnav)
-    {
-        bd_play(bdnav);
-    }
 }
 
 uint64_t BDRingBufferPriv::GetReadPosition(void)
@@ -252,7 +255,11 @@ uint64_t BDRingBufferPriv::GetTotalReadPosition(void)
 
 int BDRingBufferPriv::safe_read(void *data, unsigned sz)
 {
-    bd_read(bdnav, (unsigned char *)data, sz);
+    if (m_is_hdmv_navigation)
+        bd_read_ext(bdnav, (unsigned char *)data, sz, m_currentEvent);
+    else
+        bd_read(bdnav, (unsigned char *)data, sz);
+
     m_currentTime = bd_tell(bdnav);
 
     return sz;
