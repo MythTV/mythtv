@@ -116,6 +116,9 @@ bool MythDVDPlayer::VideoLoop(void)
                         player_ctx->buffer->DVD()->InStillFrame());
     if (release_all || release_one)
     {
+        if (nbframes < 5 && videoOutput)
+            videoOutput->UpdatePauseFrame();
+
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
         DisplayNormalFrame(false);
@@ -131,6 +134,8 @@ bool MythDVDPlayer::VideoLoop(void)
         {
             VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv dvd wait state");
             player_ctx->buffer->DVD()->SkipDVDWaitingForPlayer();
+            if (!player_ctx->buffer->DVD()->InStillFrame() && videoPaused)
+                UnpauseVideo();
             return !IsErrored();
         }
 
