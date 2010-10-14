@@ -156,7 +156,7 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     </message>
     <message>
         <source>URL:</source>
-        <translation>URL:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Icon:</source>
@@ -232,7 +232,7 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation>Peru</translation>
     </message>
 </context>
 </TS>

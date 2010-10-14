@@ -9398,7 +9398,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>Loading XMLTV configuration...</source>
-        <translation>Lataa XMLTV asetuksia...</translation>
+        <translation type="obsolete">Lataa XMLTV asetuksia...</translation>
     </message>
     <message>
         <source>North America (SchedulesDirect.org) (Internal)</source>
@@ -9414,7 +9414,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Lataa...</translation>
+        <translation type="obsolete">Lataa...</translation>
     </message>
     <message>
         <source>Decode VBI format</source>
@@ -14136,7 +14136,7 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation>Peru</translation>
     </message>
     <message>
         <source>0%</source>
@@ -14649,7 +14649,7 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation>Näytösaika</translation>
+        <translation>Kesto</translation>
     </message>
     <message>
         <source>User Rating</source>

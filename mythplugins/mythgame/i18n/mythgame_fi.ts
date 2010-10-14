@@ -174,7 +174,7 @@
     </message>
     <message>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation>Tämä hakemisto tulee olemaan selaimen oletus kohde kun nimetään pakkauksen kuvitusta.</translation>
+        <translation>Tämä hakemisto tulee olemaan selaimen oletuskohde kun nimetään pakkauksen kuvitusta.</translation>
     </message>
     <message>
         <source>Allow games to span multiple roms/disks</source>
@@ -570,7 +570,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Cover Art:</source>
-        <translation>Kansikuvitus:</translation>
+        <translation>Kansikuva:</translation>
     </message>
 </context>
 </TS>

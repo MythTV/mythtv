@@ -86,6 +86,10 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
         <translation>MythBrowser asetukset</translation>
     </message>
     <message>
+        <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
+        <translation>Valinta sallii selaimen liitännäiset käytettäessä sisäistä selainta.</translation>
+    </message>
+    <message>
         <source>Exit without saving settings</source>
         <translation>Poistu tallentamatta asetuksia</translation>
     </message>
@@ -199,6 +203,10 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
         <translation>Selain:</translation>
     </message>
     <message>
+        <source>Enable browser plugins (Flash, etc):</source>
+        <translation>Käytä selaimen liitännäisiä (Flash, jne):</translation>
+    </message>
+    <message>
         <source>OK</source>
         <translation></translation>
     </message>
@@ -233,6 +241,10 @@ Kun olet valmis, paina &quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tran
     <message>
         <source>Find</source>
         <translation>Etsi</translation>
+    </message>
+    <message>
+        <source>Enable plugins:</source>
+        <translation>Salli liitännäiset:</translation>
     </message>
     <message>
         <source>Name:</source>

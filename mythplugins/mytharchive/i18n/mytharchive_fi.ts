@@ -793,6 +793,10 @@ Aseta tyhjä DVD asemaan ja valitse alla oleva optio.</translation>
         <translation>Videon luokka:</translation>
     </message>
     <message>
+        <source>Ok</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>12.34 GB</source>
         <translation>12,34 Gt</translation>
     </message>

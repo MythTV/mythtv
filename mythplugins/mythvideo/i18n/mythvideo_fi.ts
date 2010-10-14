@@ -590,7 +590,7 @@
     </message>
     <message>
         <source>Runtime</source>
-        <translation>Pituus</translation>
+        <translation>Kesto</translation>
     </message>
     <message>
         <source>User Rating</source>
@@ -1214,7 +1214,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     </message>
     <message>
         <source>Video Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoselain</translation>
     </message>
 </context>
 <context>
