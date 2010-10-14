@@ -51,6 +51,7 @@ class MPUBLIC BDRingBufferPriv
     bool OpenFile(const QString &filename);
     void close(void);
 
+    bool GoToMenu(const QString str);
     bool SwitchTitle(uint title);
     bool SwitchAngle(uint angle);
 

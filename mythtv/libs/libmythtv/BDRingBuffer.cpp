@@ -352,3 +352,33 @@ void BDRingBufferPriv::PressButton(int32_t key, int64_t pts)
 
     bd_user_input(bdnav, pts, key);
 }
+
+/** \brief jump to a dvd root or chapter menu
+ */
+bool BDRingBufferPriv::GoToMenu(const QString str)
+{
+    if (!m_is_hdmv_navigation)
+        return false;
+
+    VERBOSE(VB_PLAYBACK, QString("BDRingBuf: GoToMenu %1").arg(str));
+
+    if (str.compare("popup") == 0)
+    {
+//        if (bd_popup_call(bdnav) < 0)
+//            return false;
+//        else
+//            return true;
+    }
+    else if (str.compare("root") == 0)
+    {
+        if (bd_menu_call(bdnav) < 0)
+            return false;
+        else
+            return true;
+    }
+    else
+        return false;
+
+    return false;
+}
+
