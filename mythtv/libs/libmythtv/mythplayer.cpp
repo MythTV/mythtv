@@ -2477,6 +2477,20 @@ void MythPlayer::EventLoop(void)
     if (initTeletext)
         SetupTeletextViewer();
 
+    // refresh the position map for an in-progress recording while editing
+    if (hasFullPositionMap && watchingrecording && player_ctx->recorder &&
+        player_ctx->recorder->IsValidRecorder() && deleteMap.IsEditing())
+    {
+        if (editUpdateTimer.elapsed() > 2000)
+        {
+            // N.B. the positionmap update and osd refresh are asynchronous
+            forcePositionMapSync = true;
+            deleteMap.UpdateOSD(framesPlayed, totalFrames, video_frame_rate,
+                                player_ctx, osd);
+            editUpdateTimer.start();
+        }
+    }
+
     // Refresh the programinfo in use status
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
@@ -3452,6 +3466,7 @@ bool MythPlayer::EnableEdit(void)
     if (player_ctx->playingInfo)
         player_ctx->playingInfo->SaveEditing(true);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    editUpdateTimer.start();
     return deleteMap.IsEditing();
 }
 

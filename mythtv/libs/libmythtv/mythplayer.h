@@ -673,6 +673,7 @@ class MPUBLIC MythPlayer
     // Manual editing
     DeleteMap  deleteMap;
     bool       pausedBeforeEdit;
+    QTime      editUpdateTimer;
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
