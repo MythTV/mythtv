@@ -2077,8 +2077,6 @@ void Scheduler::RunScheduler(void)
                 recstartts.setTime
                     (QTime(recstartts.time().hour(), recstartts.time().minute()));
                 nextRecording->SetRecordingStartTime(recstartts);
-
-                QMutexLocker lockit(reclist_lock);
             } // if (nextRecording->GetRecordingStatus() != rsTuning)
 
             if (schedulingEnabled && nexttv->IsConnected())
@@ -2104,6 +2102,7 @@ void Scheduler::RunScheduler(void)
             }
             else
                 nextRecording->SetRecordingStatus(rsOffLine);
+
             bool doSchedAfterStart =
                 nextRecording->GetRecordingStatus() != rsRecording ||
                 schedAfterStartMap[nextRecording->GetRecordingRuleID()] ||
