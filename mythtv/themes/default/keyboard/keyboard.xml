@@ -4,9 +4,9 @@
 
         <area>0,0,552,208</area>
 
-        <font name="key" from="basesmall">
+        <fontdef name="key" from="basesmall">
             <size>12</size>
-        </font>
+        </fontdef>
 
         <imagetype name="backimg">
             <filename>keyboard/keyboard-background.png</filename>
