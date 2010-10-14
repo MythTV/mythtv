@@ -914,7 +914,7 @@ class Program( DictData, RECSTATUS, AUDIO_PROPS, VIDEO_PROPS, \
             cmd = cmd.replace('%%%s%%' % tag.upper(), str(self[tag]))
         for (tag, data) in (('STARTTIME','recstartts'),('ENDTIME','recendts'),
                             ('PROGSTART','starttime'),('PROGEND','endtime')):
-            dat = self[data]
+            t = self[data]
             cmd = cmd.replace('%%%s%%' % tag, t.mythformat())
             cmd = cmd.replace('%%%sISO%%' % tag, t.isoformat())
             cmd = cmd.replace('%%%sISOUTC%%' % tag, \
