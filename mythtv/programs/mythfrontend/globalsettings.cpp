@@ -1872,26 +1872,12 @@ static HostComboBox *MenuTheme()
     HostComboBox *gc = new HostComboBox("MenuTheme");
     gc->setLabel(QObject::tr("Menu theme"));
 
-    QDir themes(GetThemesParentDir());
-    themes.setFilter(QDir::Dirs);
-    themes.setSorting(QDir::Name | QDir::IgnoreCase);
-    gc->addSelection(QObject::tr("Default"), "defaultmenu");
+    QList<ThemeInfo> themelist = GetMythUI()->GetThemes(THEME_MENU);
 
-    QFileInfoList fil = themes.entryInfoList(QDir::Dirs);
-
-    for( QFileInfoList::iterator it =  fil.begin();
-                                 it != fil.end();
-                               ++it )
+    QList<ThemeInfo>::iterator it;
+    for( it =  themelist.begin(); it != themelist.end(); ++it )
     {
-        QFileInfo  &theme = *it;
-
-        QFileInfo xml(theme.absoluteFilePath() + "/mainmenu.xml");
-
-        if (theme.fileName()[0] == '.' || theme.fileName() == "defaultmenu")
-            continue;
-
-        if (xml.exists())
-            gc->addSelection(theme.fileName());
+        gc->addSelection((*it).GetName(), (*it).GetDirectoryName());
     }
 
     return gc;

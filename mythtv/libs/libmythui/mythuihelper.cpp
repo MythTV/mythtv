@@ -1090,6 +1090,38 @@ QStringList MythUIHelper::GetThemeSearchPath(void)
     return searchpath;
 }
 
+QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
+{
+    QFileInfoList fileList;
+    QList<ThemeInfo> themeList;
+    QDir themeDirs(GetThemesParentDir());
+    themeDirs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+    themeDirs.setSorting(QDir::Name | QDir::IgnoreCase);
+
+    fileList.append(themeDirs.entryInfoList());
+
+    themeDirs.setPath(GetConfDir() + "/themes/");
+
+    fileList.append(themeDirs.entryInfoList());
+
+    for (QFileInfoList::iterator it =  fileList.begin();
+         it != fileList.end(); ++it)
+    {
+        QFileInfo  &theme = *it;
+
+        if (theme.baseName() == "default" ||
+            theme.baseName() == "default-wide")
+            continue;
+
+        ThemeInfo themeInfo(theme.absoluteFilePath());
+
+        if (themeInfo.GetType() & type)
+            themeList.append(themeInfo);
+    }
+
+    return themeList;
+}
+
 void MythUIHelper::SetPalette(QWidget *widget)
 {
     QPalette pal = widget->palette();

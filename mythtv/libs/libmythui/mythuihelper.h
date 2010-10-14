@@ -8,6 +8,7 @@
 #include <QThreadPool>
 
 #include "mythexp.h"
+#include "themeinfo.h"
 
 #define DEFAULT_UI_THEME "Terra"
 #define FALLBACK_UI_THEME "MythCenter-wide"
@@ -90,6 +91,7 @@ class MPUBLIC MythUIHelper
     QString GetThemeName(void);
     QStringList GetThemeSearchPath(void);
     QString GetMenuThemeDir(void);
+    QList<ThemeInfo> GetThemes(ThemeType type);
 
     bool FindThemeFile(QString &filename);
 
