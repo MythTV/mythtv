@@ -7,13 +7,12 @@
  */
 
 // MythTV headers
-#include "mythdialogs.h"
-#include "mythdb.h"
 #include "channelimporter.h"
-#include "mpegstreamdata.h" // for kEncDecrypted
-#include "channelutil.h"
 #include "mythdialogs.h"
 #include "mythwidgets.h"
+#include "mythdb.h"
+#include "mpegstreamdata.h" // for kEncDecrypted
+#include "channelutil.h"
 
 #define LOC QString("ChanImport: ")
 #define LOC_ERR QString("ChanImport, Error: ")

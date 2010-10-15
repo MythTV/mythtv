@@ -20,6 +20,7 @@
 #include "mythexp.h"
 #include "scaninfo.h"
 #include "channelscantypes.h"
+#include "mythmainwindow.h"
 
 typedef enum {
     kOCTCancelAll = -1,
