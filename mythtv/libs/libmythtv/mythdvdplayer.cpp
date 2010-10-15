@@ -382,17 +382,22 @@ void MythDVDPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progafter",  0);
     if (!player_ctx->buffer->isDVD())
         return;
-    if (player_ctx->buffer->DVD()->IsInMenu())
-        return;
 
     int playbackLen = totalLength;
     float secsplayed = 0.0f;
-    if (!player_ctx->buffer->DVD()->IsInMenu())
 #if !CONFIG_CYGWIN
+    if (m_stillFrameLength > 0)
+    {
+        playbackLen = m_stillFrameLength;
+        secsplayed  = m_stillFrameTimer.elapsed() / 1000;
+    }
+    else
+    {
         secsplayed = player_ctx->buffer->DVD()->GetCurrentTime();
+    }
 #else
-        // DVD playing non-functional under windows for now
-        secsplayed = 0.0f;
+    // DVD playing non-functional under windows for now
+    secsplayed = 0.0f;
 #endif
     calcSliderPosPriv(info, paddedFields, playbackLen, secsplayed, islive);
 }
