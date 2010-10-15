@@ -368,7 +368,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     m_cellstartPos = GetReadPosition();
 
                 // debug
-                VERBOSE(VB_PLAYBACK, LOC + "---- DVDNAV_CELL_CHANGE ----");
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("---- DVDNAV_CELL_CHANGE - Cell #%1 Length %2")
+                    .arg(cell_event->cellN)
+                    .arg((float)cell_event->cell_length / 90000.0f, 0, 'f', 1));
                 QString still = m_still ? ((m_still < 0xff) ?
                     QString("Stillframe: %1 seconds").arg(m_still) :
                     QString("Infinite stillframe")) :
@@ -381,8 +384,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 }
                 else
                 {
-                    VERBOSE(VB_PLAYBACK, LOC + QString("Title #%1: Part %2 of %3, %4")
-                        .arg(m_title).arg(m_part).arg(m_titleParts).arg(still));
+                    VERBOSE(VB_PLAYBACK, LOC + QString("Title #%1: %2 Part %3 of %4")
+                        .arg(m_title).arg(still).arg(m_part).arg(m_titleParts));
                 }
 
                 // wait unless it is a transition from one normal video cell to
