@@ -3214,17 +3214,17 @@
         <translation>System beenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/main.cpp" line="38"/>
+        <location filename="../programs/mythwelcome/main.cpp" line="37"/>
         <source>Open an Xterm window</source>
         <translation>ein Xterm-Fenster öffnen</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/main.cpp" line="40"/>
+        <location filename="../programs/mythwelcome/main.cpp" line="39"/>
         <source>Show Mythshutdown settings</source>
         <translation>Mythshutdown-Einstellungen anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/main.cpp" line="42"/>
+        <location filename="../programs/mythwelcome/main.cpp" line="41"/>
         <source>Start Mythtv-Setup</source>
         <translation>MythTV-Setup starten</translation>
     </message>
@@ -7067,17 +7067,17 @@ Möchten Sie weitersehen?</translation>
         <translation>Schnittlisten Editor beenden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11606"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11608"/>
         <source>Cannot delete program</source>
         <translation>Sendung kann nicht gelöscht werden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11612"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11614"/>
         <source>because it is not a recording.</source>
         <translation>da es keine Aufnahme ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11616"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11618"/>
         <source>because it is in use by</source>
         <translation>da sie in Benutzung ist.</translation>
     </message>
@@ -9704,7 +9704,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Suche</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="303"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="304"/>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3053"/>
         <source>Position</source>
         <translation>Position</translation>
@@ -10023,7 +10023,7 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
         <translation>QAM Auto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="482"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="488"/>
         <source>DVD Menu Not Available</source>
         <translation>DVD-Menü nicht vorhanden</translation>
     </message>
@@ -10433,7 +10433,7 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
     </message>
     <message>
         <location filename="../libs/libmythtv/BDRingBuffer.cpp" line="52"/>
-        <location filename="../libs/libmythtv/DVDRingBuffer.cpp" line="169"/>
+        <location filename="../libs/libmythtv/DVDRingBuffer.cpp" line="167"/>
         <source>Title %1 chapter %2</source>
         <translation>Titel %1 Kapitel %2</translation>
     </message>
@@ -13084,13 +13084,13 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation>Nicht behebbarer Rekorderfehler</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="304"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="305"/>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3054"/>
         <source>Bookmark Saved</source>
         <translation>Position gespeichert</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="312"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="313"/>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3066"/>
         <source>Bookmark Cleared</source>
         <translation>Position gelöscht</translation>
@@ -14849,7 +14849,7 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythbdplayer.cpp" line="119"/>
-        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="570"/>
+        <location filename="../libs/libmythtv/mythdvdplayer.cpp" line="576"/>
         <source>Angle %1</source>
         <translation>Winkel %1</translation>
     </message>
@@ -16119,22 +16119,22 @@ aus der Speichergruppe entfernen?</translation>
         <translation>Nicht aufnehmen, ich will fernsehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11549"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11551"/>
         <source>Save this position and go to the menu</source>
         <translation>Position merken und ins Menü wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11551"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11553"/>
         <source>Do not save, just exit to the menu</source>
         <translation>Einfach zurück ins Menü wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11562"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11564"/>
         <source>Keep watching</source>
         <translation>Weiter ansehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11559"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11561"/>
         <source>Delete this recording</source>
         <translation>Diese Aufnahme löschen</translation>
     </message>
@@ -16152,7 +16152,7 @@ aus der Speichergruppe entfernen?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="4111"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="4505"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="5864"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11454"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11456"/>
         <source>Jump Ahead</source>
         <translation>Vorwärts</translation>
     </message>
@@ -16453,7 +16453,7 @@ aus der Speichergruppe entfernen?</translation>
         <translation>Vorheriges Kapitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11443"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11445"/>
         <source>Next Chapter</source>
         <translation>Nächstes Kapitel</translation>
     </message>
@@ -16502,7 +16502,7 @@ aus der Speichergruppe entfernen?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="7501"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11230"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11378"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11631"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11633"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
@@ -16575,12 +16575,12 @@ aus der Speichergruppe entfernen?</translation>
         <translation>Zeitraffer 8x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11434"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11436"/>
         <source>Skip Still Frame</source>
         <translation>Standbild auslassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11463"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11465"/>
         <source>Next Title</source>
         <translation>Nächster Titel</translation>
     </message>
@@ -16723,7 +16723,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="4515"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11708"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11710"/>
         <source>Delete this recording?</source>
         <translation>Diese Aufnahme löschen?</translation>
     </message>
@@ -16758,12 +16758,12 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation>DVD-Kapitelmenü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11802"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11804"/>
         <source>&apos;%1&apos; Group Password:</source>
         <translation>&quot;%1&quot; Gruppenpasswort:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11814"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11816"/>
         <source>Password Failed</source>
         <translation>Falsches Passwort</translation>
     </message>
@@ -16883,12 +16883,12 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11545"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11547"/>
         <source>You are exiting %1</source>
         <translation>Sie verlassen %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11555"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11557"/>
         <source>Exit %1</source>
         <translation>Beende %1</translation>
     </message>
@@ -16920,52 +16920,52 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation>MythTV benutzt schon alle verfügbaren Eingänge für Aufnahmen. Wenn Sie eine gerade laufende Aufnahme ansehen wollen, wählen Sie sie aus dem Wiedergabe-Menü. Wenn Sie dennoch fernsehen wollen, brechen Sie im Löschen-Menü eine laufende Aufnahme ab.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11529"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11531"/>
         <source>Live TV</source>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11531"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11533"/>
         <source>this DVD</source>
         <translation>diese DVD</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11535"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11537"/>
         <source>this Video</source>
         <translation>dieses Video</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11539"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11541"/>
         <source>this recording</source>
         <translation>diese Aufnahme</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11656"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11658"/>
         <source>Delete it, but allow it to re-record</source>
         <translation>Löschen, aber wieder aufnehmen lassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11658"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11660"/>
         <source>Delete it</source>
         <translation>Bitte löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11660"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11662"/>
         <source>Save it so I can watch it again</source>
         <translation>Behalten, ich möchte es noch einmal sehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11665"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11667"/>
         <source>Yes, and allow re-record</source>
         <translation>Ja, aber erneut aufnehmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11667"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11669"/>
         <source>Yes, delete it</source>
         <translation>Ja, bitte löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11669"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11671"/>
         <source>No, keep it, I changed my mind</source>
         <translation>Nein</translation>
     </message>
@@ -18486,17 +18486,17 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="613"/>
         <source>Video Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Editor</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="614"/>
         <source>Move by %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewegen um %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="616"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Platz</translation>
+        <translation>Sendernummer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="628"/>
@@ -18506,13 +18506,13 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="648"/>
         <source>Enable random trailer playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Zufällige Trailer-Wiedergabe aktivieren</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="649"/>
         <source>Play %n trailer(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Spiele %n Vorschau(en)</numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
