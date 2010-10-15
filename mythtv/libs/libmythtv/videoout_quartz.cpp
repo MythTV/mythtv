@@ -44,7 +44,6 @@ using namespace std;
 
 #include "DisplayRes.h"
 #include "yuv2rgb.h"
-#include "uitypes.h"
 #include "mythcorecontext.h"
 #include "filtermanager.h"
 #define AVCODEC_AVCODEC_H   // prevent clash with QuickTime CodecType

@@ -15,7 +15,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "util.h"
 #include "mythdialogs.h"
-#include "virtualkeyboard_qt.h"
 #include "mythverbose.h"
 #include "mythmainwindow.h"
 
@@ -83,7 +82,7 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     bool handled = false, updated = false;
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions,
-                                                     !allowVirtualKeyboard); 
+                                                     !allowVirtualKeyboard);
 
     if ((!popup || popup->isHidden()) && !handled)
     {
