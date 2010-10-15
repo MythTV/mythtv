@@ -247,6 +247,7 @@ void DVDRingBufferPriv::StartFromBeginning(void)
         QMutexLocker lock(&m_seekLock);
         dvdnav_reset(m_dvdnav);
         dvdnav_title_play(m_dvdnav, 0);
+        m_audioStreamsChanged = true;
     }
 }
 
@@ -593,6 +594,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                             "aspect %3, perm %4")
                             .arg(vts->old_vtsN).arg(vts->new_vtsN)
                             .arg(aspect).arg(permission));
+
+                // trigger a rescan of the audio streams
+                if (vts->old_vtsN != vts->new_vtsN)
+                    m_audioStreamsChanged = true;
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
