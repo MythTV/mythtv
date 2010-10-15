@@ -415,7 +415,7 @@ void MythUIButtonTree::SwitchList(bool right)
     if (right)
     {
         if ((m_activeListID < m_visibleLists - 1) &&
-            (m_activeListID < m_buttonlists.count() - 1))
+            (m_activeListID < (uint)m_buttonlists.count() - 1))
             m_activeListID++;
         else if (m_currentNode && m_currentNode->visibleChildCount() > 0)
         {
@@ -444,7 +444,7 @@ void MythUIButtonTree::SwitchList(bool right)
     {
         if (m_activeList)
             m_activeList->Deselect();
-        if (m_activeListID < m_buttonlists.count())
+        if (m_activeListID < (uint)m_buttonlists.count())
         {
             m_activeList = m_buttonlists[m_activeListID];
             m_activeList->Select();
