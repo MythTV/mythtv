@@ -16,10 +16,12 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "mythdbcon.h"
-#include "mythdialogs.h"
 #include "compat.h"
-#include "mythuihelper.h"
 #include "dbcheck.h"
+
+// libmythui
+#include "mythuihelper.h"
+#include "mythmainwindow.h"
 
 static void *run_priv_thread(void *data)
 {

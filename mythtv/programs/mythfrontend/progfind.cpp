@@ -7,7 +7,6 @@
 #include <QEvent>
 
 // MythTV
-#include "oldsettings.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"

@@ -19,7 +19,6 @@
 
 // mythtv
 #include "mythcontext.h"
-#include "mythdialogs.h"
 #include "mythdbcon.h"
 #include "tv.h"
 #include "compat.h"

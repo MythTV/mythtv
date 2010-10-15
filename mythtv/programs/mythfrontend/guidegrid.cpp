@@ -20,7 +20,6 @@ using namespace std;
 #include "dbchannelinfo.h"
 #include "programinfo.h"
 #include "recordingrule.h"
-#include "oldsettings.h"
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "customedit.h"

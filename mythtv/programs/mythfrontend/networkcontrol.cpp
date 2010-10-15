@@ -10,7 +10,6 @@
 #include <QMap>
 
 #include "mythcorecontext.h"
-#include "mythdialogs.h"
 #include "mythversion.h"
 #include "networkcontrol.h"
 #include "programinfo.h"
@@ -18,9 +17,12 @@
 #include "previewgenerator.h"
 #include "compat.h"
 #include "mythverbose.h"
-#include "mythuihelper.h"
 #include "mythsystemevent.h"
 #include "mythdirs.h"
+
+// libmythui
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -876,12 +878,12 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         QString message = QString("NETWORK_CONTROL QUERY VOLUME");
         MythEvent me(message);
         gCoreContext->dispatch(me);
-        
+
         QTime timer;
         timer.start();
         while (timer.elapsed() < 2000  && !gotAnswer)
             usleep(10000);
-    
+
         if (gotAnswer)
             str = answer;
         else
@@ -1328,13 +1330,13 @@ QString NetworkControl::listChannels(const uint start, const uint limit) const
 
     queryStr = "select chanid, callsign, name from channel where visible=1";
     queryStr += " ORDER BY callsign";
-    
+
     if (limit > 0)  // only if a limit is specified, we limit the results
     {
       QString limitStr = QString(" LIMIT %1,%2").arg(sqlStart).arg(limit);
       queryStr += limitStr;
     }
-    
+
     query.prepare(queryStr);
     if (!query.exec())
     {
@@ -1384,7 +1386,7 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
             height = size[1].toInt();
         }
 
-        MythMainWindow *window = GetMythMainWindow(); 
+        MythMainWindow *window = GetMythMainWindow();
         emit window->remoteScreenShot(outFile, width, height);
         return "OK";
     }

@@ -25,7 +25,6 @@
 #include "mythverbose.h"
 #include "mythuiimage.h"
 #include "programinfo.h"
-#include "oldsettings.h"
 #include "mythplayer.h"
 #include "mythuitext.h"
 #include "remoteutil.h"
