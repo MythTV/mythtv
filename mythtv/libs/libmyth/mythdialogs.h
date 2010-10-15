@@ -180,7 +180,7 @@ class MPUBLIC MythPopupBox : public MythDialog
             QString("Button 2") : button2msg;
         return ShowButtonPopup(
             parent, title, message, buttonmsgs, default_button);
-    }  MDEPRECATED
+    }
 
     static DialogCode ShowButtonPopup(
         MythMainWindow *parent,
