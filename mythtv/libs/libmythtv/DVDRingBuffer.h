@@ -48,7 +48,7 @@ class MPUBLIC DVDRingBufferPriv
     uint GetCellStart(void);
     bool PGCLengthChanged(void);
     bool CellChanged(void);
-    bool InStillFrame(void) const { return m_cellHasStillFrame; }
+    bool InStillFrame(void) const { return m_still > 0; }
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const { return m_dvdWaiting; }
     int  NumPartsInTitle(void) const { return m_titleParts; }
@@ -100,7 +100,6 @@ class MPUBLIC DVDRingBufferPriv
     void GoToPreviousProgram(void);
 
     void IgnoreStillOrWait(bool skip) { m_skipstillorwait = skip; }
-    void InStillFrame(bool change, int length);
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
     uint GetCurrentTime(void) { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);
@@ -129,6 +128,7 @@ class MPUBLIC DVDRingBufferPriv
     long long      m_currentpos;
     dvdnav_t      *m_lastNav; // This really belongs in the player.
     int32_t        m_part;
+    int32_t        m_lastPart;
     int32_t        m_title;
     int32_t        m_lastTitle;
     bool           m_playerWait;
@@ -137,8 +137,8 @@ class MPUBLIC DVDRingBufferPriv
     int            m_currentAngle;
     int            m_currentTitleAngleCount;
 
-    bool           m_cellHasStillFrame;
-    int            m_cellStillLength;
+    int            m_still;
+    int            m_lastStill;
     bool           m_audioStreamsChanged;
     bool           m_dvdWaiting;
     long long      m_titleLength;

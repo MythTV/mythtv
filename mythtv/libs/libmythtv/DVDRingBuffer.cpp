@@ -41,11 +41,11 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_cellStart(0),     m_cellChanged(false),
       m_pgcLengthChanged(false), m_pgStart(0),
       m_currentpos(0),
-      m_lastNav(NULL),    m_part(0),
+      m_lastNav(NULL),    m_part(0), m_lastPart(0),
       m_title(0),         m_lastTitle(0),   m_playerWait(false),
       m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
       m_currentTitleAngleCount(0),
-      m_cellHasStillFrame(false), m_cellStillLength(0),
+      m_still(0), m_lastStill(0),
       m_audioStreamsChanged(false),
       m_dvdWaiting(false),
       m_titleLength(0),
@@ -98,9 +98,7 @@ void DVDRingBufferPriv::CloseDVD(void)
 
 bool DVDRingBufferPriv::IsInMenu(bool update)
 {
-    if (m_dvdnav && update)
-        m_inMenu = !dvdnav_is_domain_vts(m_dvdnav);
-    return m_inMenu;
+    return m_title == 0;
 }
 
 long long DVDRingBufferPriv::NormalSeek(long long time)
@@ -245,6 +243,7 @@ void DVDRingBufferPriv::StartFromBeginning(void)
 {
     if (m_dvdnav)
     {
+        VERBOSE(VB_IMPORTANT, LOC + "Resetting DVD device.");
         QMutexLocker lock(&m_seekLock);
         dvdnav_reset(m_dvdnav);
         dvdnav_title_play(m_dvdnav, 0);
@@ -346,37 +345,21 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     (dvdnav_cell_change_event_t*) (blockBuf);
 
                 // update information for the current cell
-                m_pgLength  = cell_event->pg_length;
+                m_cellChanged = true;
                 if (m_pgcLength != cell_event->pgc_length)
                     m_pgcLengthChanged = true;
+                m_pgLength  = cell_event->pg_length;
                 m_pgcLength = cell_event->pgc_length;
                 m_cellStart = cell_event->cell_start;
                 m_pgStart   = cell_event->pg_start;
-                m_cellChanged = true;
 
-                // if the new cell is a still frame, reset the timer and update
-                // our status
-                uint32_t still_time = dvdnav_get_next_still_flag(m_dvdnav);
-                if (still_time > 0)
-                {
-                    // wait for the player to clear the video buffers
-                    WaitForPlayer();
-
-                    // update the player timer
-                    if ((still_time < 0xff) && m_parent)
-                        m_parent->ResetStillFrameTimer();
-                    InStillFrame(true, still_time);
-                }
-                else
-                {
-                    InStillFrame(false, 0);
-                }
-
-                // update title information
+                // update title/part/still/menu information
                 m_lastTitle = m_title;
-                m_part = m_titleParts = 0;
+                m_lastPart  = m_part;
+                m_lastStill = m_still;
                 uint32_t pos;
                 uint32_t length;
+                m_still = dvdnav_get_next_still_flag(m_dvdnav);
                 dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
                 dvdnav_get_number_of_parts(m_dvdnav, m_title, &m_titleParts);
                 dvdnav_get_position(m_dvdnav, &pos, &length);
@@ -385,16 +368,39 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     m_cellstartPos = GetReadPosition();
 
                 // debug
-                VERBOSE(VB_PLAYBACK, LOC +
-                        QString("DVDNAV_CELL_CHANGE: "
-                                "pglength %1, pgclength %2, "
-                                "cellstart %3, pgstart %4, "
-                                "title %5, part %6, titleParts %7, "
-                                "stilltime %8")
-                            .arg(m_pgLength).arg(m_pgcLength)
-                            .arg(m_cellStart).arg(m_pgStart)
-                            .arg(m_title).arg(m_part).arg(m_titleParts)
-                            .arg(still_time));
+                VERBOSE(VB_PLAYBACK, LOC + "---- DVDNAV_CELL_CHANGE ----");
+                QString still = m_still ? ((m_still < 0xff) ?
+                    QString("Stillframe: %1 seconds").arg(m_still) :
+                    QString("Infinite stillframe")) :
+                    QString("Length: %1 seconds")
+                        .arg((float)m_pgcLength / 90000.0f, 0, 'f', 1);
+                if (m_title == 0)
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + QString("Menu #%1 %2")
+                        .arg(m_part).arg(still));
+                }
+                else
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + QString("Title #%1: Part %2 of %3, %4")
+                        .arg(m_title).arg(m_part).arg(m_titleParts).arg(still));
+                }
+
+                // wait unless it is a transition from one normal video cell to
+                // another or the same menu id
+                if (((m_still != m_lastStill) || (m_title != m_lastTitle)) &&
+                    !((m_title == 0 && m_lastTitle == 0) && (m_part == m_lastPart)))
+                {
+                    WaitForPlayer();
+                }
+
+                // if the new cell is a still frame, reset the timer
+                if (m_parent)
+                {
+                    if (m_still && (m_still < 0xff))
+                        m_parent->ResetStillFrameTimer();
+                    else
+                        m_parent->SetStillFrameTimeout(0);
+                }
 
                 // clear menus/still frame selections
                 m_lastvobid = m_vobid;
@@ -415,14 +421,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
                     dvdnav_free_cache_block(m_dvdnav, blockBuf);
-
-                // flag a title change and initiate a wait state so that the
-                // previous title is played out
-                if (m_title != m_lastTitle)
-                {
-                    VERBOSE(VB_PLAYBACK, LOC + "DVD title changed");
-                    WaitForPlayer();
-                }
             }
             break;
 
@@ -635,11 +633,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     (dvdnav_still_event_t*)(blockBuf);
 
                 // sense check
-                if (!InStillFrame())
+                if (!m_still)
                     VERBOSE(VB_GENERAL, LOC_WARN + "DVDNAV_STILL_FRAME in "
                             "cell that is not marked as a still frame");
 
-                if (still->length != m_cellStillLength)
+                if (still->length != m_still)
                     VERBOSE(VB_GENERAL, LOC_WARN + "DVDNAV_STILL_FRAME "
                             "length does not match cell still length");
 
@@ -651,9 +649,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 // otherwise update the timeout in the player
                 if (m_skipstillorwait)
                     SkipStillFrame();
-                else
+                else if (m_parent)
                 {
-                    if (m_parent)
+                    if ((still->length > 0) && (still->length < 0xff))
                         m_parent->SetStillFrameTimeout(still->length);
                 }
 
@@ -778,6 +776,7 @@ bool DVDRingBufferPriv::PGCLengthChanged(void)
 void DVDRingBufferPriv::SkipStillFrame(void)
 {
     QMutexLocker locker(&m_seekLock);
+    VERBOSE(VB_PLAYBACK, LOC + "Skipping still frame.");
     dvdnav_still_skip(m_dvdnav);
 }
 
@@ -1212,19 +1211,6 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
         return 0;
 }
 
-void DVDRingBufferPriv::InStillFrame(bool still, int length)
-{
-    QString str = still ?
-        QString("Entering DVD Still Frame for %1 seconds").arg(length) :
-        QString("Leaving DVD Still Frame");
-
-    if (m_cellHasStillFrame != still)
-        VERBOSE(VB_PLAYBACK, str);
-
-    m_cellHasStillFrame = still;
-    m_cellStillLength = length;
-}
-
 /** \brief get the audio language from the dvd
  */
 uint DVDRingBufferPriv::GetAudioLanguage(int id)
@@ -1355,9 +1341,7 @@ double DVDRingBufferPriv::GetFrameRate(void)
     int format = dvdnav_get_video_format(m_dvdnav);
 
     dvdfps = (format == 1)? 25.00 : 29.97;
-
-    VERBOSE(VB_PLAYBACK, QString("DVD Frame Rate %1").arg(dvdfps));
-
+    VERBOSE(VB_PLAYBACK, LOC + QString("DVD Frame Rate %1").arg(dvdfps));
     return dvdfps;
 }
 

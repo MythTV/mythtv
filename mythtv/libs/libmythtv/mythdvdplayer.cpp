@@ -12,7 +12,7 @@ MythDVDPlayer::MythDVDPlayer(bool muted)
   : MythPlayer(muted), m_buttonVersion(0),
     dvd_stillframe_showing(false), need_change_dvd_track(0),
     m_initial_title(-1), m_initial_audio_track(-1), m_initial_subtitle_track(-1),
-    m_stillFrameLength(0xff)
+    m_stillFrameLength(0)
 {
 }
 
@@ -61,7 +61,7 @@ void MythDVDPlayer::DecoderPauseCheck(void)
 bool MythDVDPlayer::PrebufferEnoughFrames(bool pause_audio, int  min_buffers)
 {
     bool instill = player_ctx->buffer->InDVDMenuOrStillFrame();
-    return MythPlayer::PrebufferEnoughFrames(!instill, (int)instill);
+    return MythPlayer::PrebufferEnoughFrames(!instill, 1);
 }
 
 bool MythDVDPlayer::DecoderGetFrameFFREW(void)
@@ -134,6 +134,7 @@ bool MythDVDPlayer::VideoLoop(void)
         {
             VERBOSE(VB_PLAYBACK, LOC + "Clearing Mythtv dvd wait state");
             player_ctx->buffer->DVD()->SkipDVDWaitingForPlayer();
+            ClearAfterSeek(true);
             if (!player_ctx->buffer->DVD()->InStillFrame() && videoPaused)
                 UnpauseVideo();
             return !IsErrored();
@@ -601,12 +602,18 @@ void MythDVDPlayer::StillFrameCheck(void)
 {
     if (player_ctx->buffer->isDVD() &&
         player_ctx->buffer->DVD()->InStillFrame() &&
-        m_stillFrameLength < 0xff)
+       (m_stillFrameLength > 0) && (m_stillFrameLength < 0xff))
     {
         m_stillFrameTimerLock.lock();
         int elapsedTime = m_stillFrameTimer.elapsed() / 1000;
         m_stillFrameTimerLock.unlock();
         if (elapsedTime >= m_stillFrameLength)
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("Stillframe timeout after %1 seconds")
+                .arg(m_stillFrameLength));
             player_ctx->buffer->DVD()->SkipStillFrame();
+            m_stillFrameLength = 0;
+        }
     }
 }
