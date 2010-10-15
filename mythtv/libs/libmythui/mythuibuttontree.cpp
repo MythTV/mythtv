@@ -37,7 +37,7 @@ MythUIButtonTree::~MythUIButtonTree()
 }
 
 /*!
- * \brief Initialise the tree having loaded the formatting options from the 
+ * \brief Initialise the tree having loaded the formatting options from the
  *        theme
  */
 void MythUIButtonTree::Init()
@@ -355,7 +355,7 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
         return;
 
     MythGenericTree *node = qVariantValue<MythGenericTree*>(item->GetData());
-    
+
     if (node && node->getParent())
     {
         SetCurrentNode(node->getParent());
@@ -414,9 +414,10 @@ void MythUIButtonTree::SwitchList(bool right)
     bool doUpdate = false;
     if (right)
     {
-        if (m_activeListID < m_visibleLists-1)
+        if ((m_activeListID < m_visibleLists - 1) &&
+            (m_activeListID < m_buttonlists.count() - 1))
             m_activeListID++;
-        else if (m_currentNode->visibleChildCount() > 0)
+        else if (m_currentNode && m_currentNode->visibleChildCount() > 0)
         {
             m_currentDepth++;
             doUpdate = true;
@@ -443,8 +444,11 @@ void MythUIButtonTree::SwitchList(bool right)
     {
         if (m_activeList)
             m_activeList->Deselect();
-        m_activeList = m_buttonlists[m_activeListID];
-        m_activeList->Select();
+        if (m_activeListID < m_buttonlists.count())
+        {
+            m_activeList = m_buttonlists[m_activeListID];
+            m_activeList->Select();
+        }
     }
 }
 
