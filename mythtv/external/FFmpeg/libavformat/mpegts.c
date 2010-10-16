@@ -799,9 +799,6 @@ static int mpegts_set_stream_info(AVStream *st, PESContext *pes,
             sub_pes->sub_st = pes->sub_st = sub_st;
         }
     }
-    if (pes->stream_type == 0x11)
-        av_log(pes->stream, AV_LOG_WARNING,
-               "AAC LATM not currently supported, patch welcome\n");
     if (st->codec->codec_id == CODEC_ID_NONE)
         mpegts_find_stream_type(st, pes->stream_type, MISC_types);
 

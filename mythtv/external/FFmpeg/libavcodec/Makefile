@@ -61,6 +61,7 @@ OBJS-$(CONFIG_AAC_ENCODER)             += aacenc.o aaccoder.o    \
                                           aacpsy.o aactab.o      \
                                           psymodel.o iirfilter.o \
                                           mpeg4audio.o
+OBJS-$(CONFIG_AAC_LATM_DECODER)        += aaclatmdec.o
 OBJS-$(CONFIG_AASC_DECODER)            += aasc.o msrledec.o
 OBJS-$(CONFIG_AC3_DECODER)             += ac3dec.o ac3dec_data.o ac3.o
 OBJS-$(CONFIG_AC3_ENCODER)             += ac3enc.o ac3tab.o ac3.o
@@ -583,6 +584,7 @@ OBJS-$(CONFIG_H264_PARSER)             += h264_parser.o h264.o            \
                                           h264_loopfilter.o h264_cabac.o \
                                           h264_cavlc.o h264_ps.o \
                                           mpegvideo.o error_resilience.o
+OBJS-$(CONFIG_AAC_LATM_PARSER)         += latm_parser.o
 OBJS-$(CONFIG_MJPEG_PARSER)            += mjpeg_parser.o
 OBJS-$(CONFIG_MLP_PARSER)              += mlp_parser.o mlp.o
 OBJS-$(CONFIG_MPEG4VIDEO_PARSER)       += mpeg4video_parser.o h263.o \

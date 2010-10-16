@@ -293,7 +293,6 @@ enum CodecID {
     CODEC_ID_MP2= 0x15000,
     CODEC_ID_MP3, ///< preferred ID for decoding MPEG audio layer 1, 2 or 3
     CODEC_ID_AAC,
-    CODEC_ID_AAC_LATM,
     CODEC_ID_AC3,
     CODEC_ID_DTS,
     CODEC_ID_VORBIS,
@@ -343,6 +342,7 @@ enum CodecID {
     CODEC_ID_ATRAC1,
     CODEC_ID_BINKAUDIO_RDFT,
     CODEC_ID_BINKAUDIO_DCT,
+    CODEC_ID_AAC_LATM,
 
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000,
