@@ -440,47 +440,47 @@ Could not copy file to: %1</translation>
         <translation>Finished playing stream.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1008"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1006"/>
         <source>Decoder error.</source>
         <translation>Decoder error.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1033"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1029"/>
         <source>Sync List With Current Track</source>
         <translation>Sync List With Current Track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1037"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1033"/>
         <source>Remove Selected Track</source>
         <translation>Remove Selected Track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1049"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1045"/>
         <source>Remove All Tracks</source>
         <translation>Remove All Tracks</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1053"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1049"/>
         <source>Save As New Playlist</source>
         <translation>Save As New Playlist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1057"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1053"/>
         <source>Switch To Move Mode</source>
         <translation>Switch To Move Mode</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1064"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1060"/>
         <source>Switch To Select Mode</source>
         <translation>Switch To Select Mode</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1074"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1070"/>
         <source>No - Exit, Stop Playing</source>
         <translation>No - Exit, Stop Playing</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1080"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1076"/>
         <source>Yes - Exit, Continue Playing</source>
         <translation>Yes - Exit, Continue Playing</translation>
     </message>
@@ -692,199 +692,199 @@ Do you want to continue playing in the background?</translation>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="617"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="618"/>
         <source>Change Filter</source>
         <translation>Change Filter</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="621"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="622"/>
         <source>Smart playlists</source>
         <translation>Smart playlists</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="631"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="632"/>
         <source>Search</source>
         <translation>Search</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="633"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="634"/>
         <source>From CD</source>
         <translation>From CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="635"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="636"/>
         <source>All Tracks</source>
         <translation>All Tracks</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="639"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="640"/>
         <source>Tracks by current Artist</source>
         <translation>Tracks by current Artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="641"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="642"/>
         <source>Tracks from current Album</source>
         <translation>Tracks from current Album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="643"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="644"/>
         <source>Tracks from current Genre</source>
         <translation>Tracks from current Genre</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="645"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="646"/>
         <source>Tracks from current Year</source>
         <translation>Tracks from current Year</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="647"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="648"/>
         <source>Tracks with same Title</source>
         <translation>Tracks with same Title</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1305"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1306"/>
         <source>Speed: </source>
         <translation>Speed: </translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1614"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1615"/>
         <source>Smart</source>
         <translation>Smart</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1619"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1620"/>
         <source>Rand</source>
         <translation>Rand</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1624"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1625"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1629"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1630"/>
         <source>Artist</source>
         <translation>Artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1634"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1723"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1635"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1724"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1646"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1649"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1653"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1647"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1650"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1654"/>
         <source>Shuffle</source>
         <translation>Shuffle</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1713"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1714"/>
         <source>All</source>
         <translation>All</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1718"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1719"/>
         <source>Track</source>
         <translation>Track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1736"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1739"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1743"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1737"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1740"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1744"/>
         <source>Repeat</source>
         <translation>Repeat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1931"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1932"/>
         <source>Playing stream.</source>
         <translation>Playing stream.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1936"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1937"/>
         <source>Buffering stream.</source>
         <translation>Buffering stream.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1940"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1941"/>
         <source>Stream paused.</source>
         <translation>Stream paused.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
         <source>kbps</source>
         <translation>kbps</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1982"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1983"/>
         <source>kHz</source>
         <translation>kHz</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1976"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1982"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1977"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1983"/>
         <source>ch</source>
         <translation>ch</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2003"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2004"/>
         <source>Output error.</source>
         <translation>Output error.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2018"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2019"/>
         <source>Stream stopped.</source>
         <translation>Stream stopped.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2023"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2024"/>
         <source>Finished playing stream.</source>
         <translation>Finished playing stream.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2032"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2033"/>
         <source>Decoder error.</source>
         <translation>Decoder error.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2354"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2355"/>
         <source>Update Playlist Options</source>
         <translation>Update Playlist Options</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2357"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2358"/>
         <source>Replace</source>
         <translation>Replace</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2358"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2359"/>
         <source>Insert after current track</source>
         <translation>Insert after current track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2359"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2360"/>
         <source>Append to end</source>
         <translation>Append to end</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2374"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2375"/>
         <source>Continue playing current track</source>
         <translation>Continue playing current track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2375"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2376"/>
         <source>Play first track</source>
         <translation>Play first track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2376"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2377"/>
         <source>Play first new track</source>
         <translation>Play first new track</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="2382"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="2383"/>
         <source>Remove Duplicates</source>
         <translation>Remove Duplicates</translation>
     </message>
@@ -892,7 +892,7 @@ Do you want to continue playing in the background?</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="530"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="534"/>
         <source>Internal Decoder</source>
         <translation>Internal Decoder</translation>
     </message>
@@ -1607,7 +1607,7 @@ Do you want to continue playing in the background?</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1677"/>
-        <location filename="../mythmusic/playbackbox.cpp" line="1033"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1034"/>
         <source>Rebuilding music tree</source>
         <translation>Rebuilding music tree</translation>
     </message>
@@ -1691,7 +1691,7 @@ Do you want to continue playing in the background?</translation>
         <translation>cover</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="1155"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1156"/>
         <source>Loading Music</source>
         <translation>Loading Music</translation>
     </message>
