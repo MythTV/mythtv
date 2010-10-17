@@ -126,7 +126,7 @@ bool SourceManager::findScripts()
         if (!fi.isExecutable())
         {
             toRemove << db.value(0).toString();
-            VERBOSE(VB_IMPORTANT, 
+            VERBOSE(VB_IMPORTANT,
                     QString("'%1' no longer exists")
                     .arg(fi.absoluteFilePath()));
         }
@@ -188,7 +188,8 @@ void SourceManager::setupSources()
         units_t units = db.value(2).toUInt();
         uint screen = db.value(3).toUInt();
         const WeatherSource *src = needSourceFor(sourceid, loc, units);
-        m_sourcemap.insert((long)screen, src);
+        if (src)
+            m_sourcemap.insert((long)screen, src);
     }
 }
 
@@ -227,11 +228,11 @@ QStringList SourceManager::getLocationList(ScriptInfo *si, const QString &str)
     if (!m_scripts.contains(si))
         return QStringList();
     WeatherSource *ws = new WeatherSource(si);
-    
+
     QStringList locationList(ws->getLocationList(str));
-    
+
     delete ws;
-    
+
     return locationList;
 }
 
@@ -408,7 +409,7 @@ void SourceManager::recurseDirs( QDir dir )
             if (info)
             {
                 m_scripts.append(info);
-                VERBOSE(VB_FILE, 
+                VERBOSE(VB_FILE,
                         QString("Found Script '%1'")
                         .arg(file.absoluteFilePath()));
             }
