@@ -224,7 +224,7 @@ void startGuide(void)
     uint chanid = 0;
     QString channum = gContext->GetSetting("DefaultTVChannel");
     channum = (channum.isEmpty()) ? "3" : channum;
-    GuideGrid::RunProgramGuide(chanid, channum);
+    GuideGrid::RunProgramGuide(chanid, channum, NULL, false, true, -2);
 }
 
 void startFinder(void)
