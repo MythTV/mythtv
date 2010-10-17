@@ -14,9 +14,6 @@
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
            : MythUIText(parent, name)
 {
-    m_Time = QDateTime::currentDateTime();
-    m_Message = m_Time.toString(m_Format);
-
     m_DateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMMM");
     m_ShortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd d");
     m_TimeFormat = GetMythDB()->GetSetting("TimeFormat", "hh:mm");
@@ -24,8 +21,6 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
     m_Format = QString("%1, %2").arg(m_DateFormat).arg(m_TimeFormat);
 
     m_Flash = false;
-
-    MythUIText::SetText(GetTimeText());
 }
 
 MythUIClock::~MythUIClock()
@@ -92,9 +87,11 @@ bool MythUIClock::ParseElement(
         format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
         m_Format = format;
+        m_Message = QDateTime::currentDateTime().toString(m_Format);
     }
     else
     {
+        m_Message = QDateTime::currentDateTime().toString(m_Format);
         return MythUIText::ParseElement(filename, element, showWarnings);
     }
 
