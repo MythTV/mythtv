@@ -2073,7 +2073,7 @@ PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
             : MythScreenType(parentStack, "phrasepopup"),
               m_parent(parent), m_searchType(searchType), m_list(list),
               m_currentValue(currentValue),
-              m_titleText(NULL), m_phraseList(NULL), m_phraseEdit(NULL),
+              m_titleText(NULL), m_phraseList(NULL),
               m_editButton(NULL), m_deleteButton(NULL), m_recordButton(NULL)
 {
 }
@@ -2204,14 +2204,14 @@ void PowerSearchPopup::deleteClicked(void)
         m_parent->m_curView = -1;
 
     if (m_parent->m_viewList.count() < 1)
-        SetFocusWidget(m_phraseEdit);
+        SetFocusWidget(m_phraseList);
     else
-        SetFocusWidget(m_phraseEdit);
+        SetFocusWidget(m_phraseList);
 }
 
 void PowerSearchPopup::recordClicked(void)
 {
-    QString text = m_phraseEdit->GetText();
+    QString text = m_phraseList->GetValue();
     bool genreflag = false;
 
     QString what = text;
@@ -2252,7 +2252,7 @@ void PowerSearchPopup::recordClicked(void)
     {
         record->LoadBySearch(m_searchType, text, what);
     }
-    
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
