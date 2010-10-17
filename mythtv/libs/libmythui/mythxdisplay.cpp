@@ -129,7 +129,7 @@ MythXDisplay::MythXDisplay()
 
 MythXDisplay::~MythXDisplay()
 {
-    MythXLocker(this);
+    MythXLocker locker(this);
     if (m_disp)
     {
         if (m_gc)
@@ -144,7 +144,7 @@ MythXDisplay::~MythXDisplay()
 
 bool MythXDisplay::Open(void)
 {
-    MythXLocker(this);
+    MythXLocker locker(this);
 
     QString dispStr = GetMythUI()->GetX11Display();
     const char *dispCStr = NULL;
@@ -197,7 +197,7 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
 
 int MythXDisplay::GetNumberXineramaScreens(void)
 {
-    MythXLocker(this);
+    MythXLocker locker(this);
     int nr_xinerama_screens = 0;
     int event_base = 0, error_base = 0;
     if (XineramaQueryExtension(m_disp, &event_base, &error_base) &&
@@ -210,7 +210,7 @@ int MythXDisplay::GetNumberXineramaScreens(void)
 
 QSize MythXDisplay::GetDisplaySize(void)
 {
-    MythXLocker(this);
+    MythXLocker locker(this);
     int displayWidthPixel  = DisplayWidth( m_disp, m_screen_num);
     int displayHeightPixel = DisplayHeight(m_disp, m_screen_num);
     return QSize(displayWidthPixel, displayHeightPixel);
@@ -218,7 +218,7 @@ QSize MythXDisplay::GetDisplaySize(void)
 
 QSize MythXDisplay::GetDisplayDimensions(void)
 {
-    MythXLocker(this);
+    MythXLocker locker(this);
     int displayWidthMM  = DisplayWidthMM( m_disp, m_screen_num);
     int displayHeightMM = DisplayHeightMM(m_disp, m_screen_num);
     return QSize(displayWidthMM, displayHeightMM);
@@ -228,7 +228,7 @@ float MythXDisplay::GetRefreshRate(void)
 {
     XF86VidModeModeLine mode_line;
     int dot_clock;
-    MythXLocker(this);
+    MythXLocker locker(this);
 
     if (!XF86VidModeGetModeLine(m_disp, m_screen_num, &dot_clock, &mode_line))
     {
@@ -308,7 +308,7 @@ bool MythXDisplay::CheckErrors(Display *disp)
     if (!xerrors.count(d))
         return true;
 
-    MythXLocker(this);
+    MythXLocker locker(this);
     Sync();
     const std::vector<XErrorEvent>& events = xerrors[d];
 
