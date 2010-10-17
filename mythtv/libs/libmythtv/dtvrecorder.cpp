@@ -437,8 +437,15 @@ void DTVRecorder::HandleKeyframe(uint64_t extra)
         long long startpos = ringBuffer->GetWritePosition();
         // FIXME: handle keyframes with start code spanning over two ts packets
         startpos += _payload_buffer.size() + extra;
-        positionMapDelta[frameNum] = startpos;
-        positionMap[frameNum]      = startpos;
+
+        // Don't put negative offsets into the database, they get munged into
+        // MAX_INT64 - offset, which is an exceedingly large number, and
+        // certainly not valid.
+        if (startpos >= 0)
+        {
+            positionMapDelta[frameNum] = startpos;
+            positionMap[frameNum]      = startpos;
+        }
     }
     positionMapLock.unlock();
 
@@ -649,12 +656,6 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         const int stream_id = _start_code & 0x000000ff;
         if (_video_bytes_remaining)
         {
-            if ((stream_id >= PESStreamID::SliceStartCodeBegin) &&
-                (stream_id <= PESStreamID::SliceStartCodeEnd))
-            { // pes_packet_length is meaningless
-                _other_bytes_remaining =
-                    std::max(_other_bytes_remaining, _video_bytes_remaining);
-            }
             if (PESStreamID::PictureStartCode == stream_id)
             { // pes_packet_length is meaningless
                 pes_packet_length = -1;
@@ -718,7 +719,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         if (hasKeyFrame)
         {
             _last_keyframe_seen = _frames_seen_count;
-            HandleKeyframe(bufstart - bufptr);
+            HandleKeyframe(bufptr - bufstart);
         }
 
         if (hasFrame)
