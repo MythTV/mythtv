@@ -562,11 +562,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             }
             break;
 
-            // channel hop - looks like we don't really need to do anything
             case DVDNAV_HOP_CHANNEL:
             {
                 // debug
                 VERBOSE(VB_PLAYBACK, LOC + "DVDNAV_HOP_CHANNEL");
+                WaitForPlayer();
             }
             break;
 
@@ -1579,4 +1579,3 @@ bool DVDRingBufferPriv::SwitchAngle(uint angle)
     }
     return false;
 }
-
