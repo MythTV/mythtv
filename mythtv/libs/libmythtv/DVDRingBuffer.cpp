@@ -44,7 +44,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_lastNav(NULL),    m_part(0), m_lastPart(0),
       m_title(0),         m_lastTitle(0),   m_playerWait(false),
       m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
-      m_currentTitleAngleCount(0),
+      m_currentTitleAngleCount(0), m_newSequence(false),
       m_still(0), m_lastStill(0),
       m_audioStreamsChanged(false),
       m_dvdWaiting(false),
@@ -1578,4 +1578,21 @@ bool DVDRingBufferPriv::SwitchAngle(uint angle)
         return true;
     }
     return false;
+}
+
+bool DVDRingBufferPriv::NewSequence(bool new_sequence)
+{
+    bool result = false;
+    if (new_sequence)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "New sequence");
+        m_newSequence = true;
+        return result;
+    }
+
+    result = m_newSequence && IsInMenu();
+    m_newSequence = false;
+    if (result)
+        VERBOSE(VB_PLAYBACK, LOC + "Asking for still frame");
+    return result;
 }

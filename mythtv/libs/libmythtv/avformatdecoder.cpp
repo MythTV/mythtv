@@ -2727,6 +2727,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     {
         bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
 
+        if (ringBuffer->isDVD() && (start_code_state == SEQ_END_CODE))
+            ringBuffer->DVD()->NewSequence(true);
+
         if (start_code_state >= SLICE_MIN && start_code_state <= SLICE_MAX)
             continue;
         else if (SEQ_START == start_code_state)
@@ -2898,8 +2901,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
     if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
     {
-        if (!ringBuffer->isDVD())
-            MpegPreProcessPkt(curstream, pkt);
+        MpegPreProcessPkt(curstream, pkt);
     }
     else if (CODEC_IS_H264(context->codec_id))
     {
@@ -2968,7 +2970,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         context->reordered_opaque = pkt->pts;
         ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
         // Reparse it to not drop the DVD still frame
-        if (ringBuffer->isDVD() && ringBuffer->DVD()->InStillFrame())
+        if (ringBuffer->isDVD() && ringBuffer->DVD()->NeedsStillFrame())
             ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
     }
     avcodeclock->unlock();

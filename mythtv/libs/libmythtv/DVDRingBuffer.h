@@ -49,6 +49,8 @@ class MPUBLIC DVDRingBufferPriv
     bool PGCLengthChanged(void);
     bool CellChanged(void);
     bool InStillFrame(void) const { return m_still > 0; }
+    bool NeedsStillFrame(void) { return InStillFrame() || NewSequence(); }
+    bool NewSequence(bool new_sequence = false);
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const { return m_dvdWaiting; }
     int  NumPartsInTitle(void) const { return m_titleParts; }
@@ -137,6 +139,7 @@ class MPUBLIC DVDRingBufferPriv
     int            m_currentAngle;
     int            m_currentTitleAngleCount;
 
+    bool           m_newSequence;
     int            m_still;
     int            m_lastStill;
     bool           m_audioStreamsChanged;
