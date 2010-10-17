@@ -12,7 +12,8 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 
-MythLocale::MythLocale(QString localeName)
+MythLocale::MythLocale(QString localeName) :
+    m_defaultsLoaded(false)
 {
     QLocale locale; // Initialised to system()
 
@@ -73,6 +74,7 @@ QString MythLocale::GetNativeLanguage(void) const
 
 bool MythLocale::LoadDefaultsFromXML(void)
 {
+    m_defaultsLoaded = true;
     m_globalSettings.clear();
     QDomDocument doc;
 
@@ -150,7 +152,8 @@ bool MythLocale::LoadDefaultsFromXML(void)
 
 void MythLocale::SaveLocaleDefaults(bool overwrite)
 {
-    if (!LoadDefaultsFromXML())
+    if (!m_defaultsLoaded &&
+        !LoadDefaultsFromXML())
         return;
 
     SettingsMap::iterator it;
@@ -188,3 +191,15 @@ void MythLocale::ResetToStandardDefaults(void)
     return;
 }
 
+QString MythLocale::GetLocaleSetting(const QString &key)
+{
+    if (!m_defaultsLoaded &&
+        !LoadDefaultsFromXML())
+        return QString();
+
+    QString value = m_globalSettings.value(key);
+    if (m_hostSettings.contains(key))
+        value = m_hostSettings.value(key);
+
+    return value;
+}

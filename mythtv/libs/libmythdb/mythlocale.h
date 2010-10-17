@@ -38,10 +38,13 @@ class MPUBLIC MythLocale
     void ResetToLocaleDefaults(void);
     void ResetToStandardDefaults(void);
 
+    QString GetLocaleSetting(const QString &key);
+
   private:
     QLocale::Country m_country;
     QLocale::Language m_language;
     QString m_localeCode;
+    bool m_defaultsLoaded;
 
     typedef QMap<QString, QString> SettingsMap;
     SettingsMap m_globalSettings;
