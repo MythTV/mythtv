@@ -1350,7 +1350,6 @@ void GuideGrid::customEvent(QEvent *event)
                     VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
                 delete record;
             }
-            EmbedTVWindow();
         }
         else if (resultid == "menu")
         {
