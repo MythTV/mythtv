@@ -704,12 +704,6 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         const int stream_id = _start_code & 0x000000ff;
         if (_video_bytes_remaining)
         {
-            if ((stream_id >= PESStreamID::SliceStartCodeBegin) &&
-                (stream_id <= PESStreamID::SliceStartCodeEnd))
-            { // pes_packet_length is meaningless
-                _other_bytes_remaining =
-                    std::max(_other_bytes_remaining, _video_bytes_remaining);
-            }
             if (PESStreamID::PictureStartCode == stream_id)
             { // pes_packet_length is meaningless
                 pes_packet_length = -1;
