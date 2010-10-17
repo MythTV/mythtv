@@ -93,6 +93,8 @@ class MythDVDPlayer : public MythPlayer
     void SetDVDBookmark(uint64_t frame);
     void DisplayDVDButton(void);
 
+    void DisplayLastFrame(void);
+
     int  m_buttonVersion;
     bool dvd_stillframe_showing;
     int  need_change_dvd_track;

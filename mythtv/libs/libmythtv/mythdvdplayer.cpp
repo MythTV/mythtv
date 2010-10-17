@@ -150,6 +150,14 @@ bool MythDVDPlayer::VideoLoop(void)
             return !IsErrored();
         }
 
+        // we need a custom presentation method for still frame menus with audio
+        if (player_ctx->buffer->DVD()->IsInMenu() &&
+           !player_ctx->buffer->DVD()->InStillFrame())
+        {
+            DisplayLastFrame();
+            return !IsErrored();
+        }
+
         // the still frame is treated as a pause frame
         if (player_ctx->buffer->DVD()->InStillFrame())
         {
@@ -205,6 +213,27 @@ bool MythDVDPlayer::VideoLoop(void)
     else
         framesPlayed = videoOutput->GetFramesPlayed();
     return !IsErrored();
+}
+
+void MythDVDPlayer::DisplayLastFrame(void)
+{
+    videoOutput->StartDisplayingFrame();
+    VideoFrame *frame = videoOutput->GetLastShownFrame();
+    frame->timecode = audio.GetAudioTime();
+    DisplayDVDButton();
+
+    AutoDeint(frame);
+    detect_letter_box->SwitchTo(frame);
+
+    FrameScanType ps = m_scan;
+    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+        ps = kScan_Progressive;
+
+    videofiltersLock.lock();
+    videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players, ps);
+    videofiltersLock.unlock();
+
+    AVSync();
 }
 
 bool MythDVDPlayer::FastForward(float seconds)
