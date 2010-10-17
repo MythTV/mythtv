@@ -7,9 +7,8 @@
 // myth
 #include <mythcontext.h>
 #include <mythversion.h>
-#include <mythdialogs.h>
-#include <mythplugin.h>
-#include <mythtranslation.h>
+#include <mythscreenstack.h>
+#include <mythmainwindow.h>
 #include <mythpluginapi.h>
 
 // mythbrowser
@@ -57,7 +56,6 @@ int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythbrowser", libversion, MYTH_BINARY_VERSION))
         return -1;
-    MythTranslation::load("mythbrowser");
 
     UpgradeBrowserDatabaseSchema();
 
