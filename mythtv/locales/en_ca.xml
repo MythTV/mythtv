@@ -42,6 +42,4 @@
     <!-- MythZoneMinder  -->
     <setting name="ZoneMinderDateFormat">ddd MMM d yyyy</setting>
     <setting name="ZoneMinderTimeFormat">hh:mm AP</setting>
-
-
 </mythlocale>
