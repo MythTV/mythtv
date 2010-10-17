@@ -3851,7 +3851,7 @@ enabled debug && add_cxxflags -g"$debuglevel"
 check_cflags -Wall
 check_cflags -Wno-parentheses
 check_cflags -Wno-switch
-check_cflags -Wdisabled-optimization
+! disabled optimizations && check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
 check_cflags -Wredundant-decls
 check_cflags -Wno-pointer-sign
