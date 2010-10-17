@@ -33,7 +33,7 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
 
     void Reset(void);
 
-    void SetText(const QString &text);
+    virtual void SetText(const QString &text);
     QString GetText(void) const;
     QString GetDefaultText(void) const;
 

@@ -29,12 +29,15 @@ class MPUBLIC MythUIClock : public MythUIText
    ~MythUIClock();
 
     virtual void Pulse(void);
+    virtual void SetText(const QString &text);
 
   protected:
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+
+    QString GetTimeText(void);
 
     QDateTime m_Time;
     QDateTime m_nextUpdate;
