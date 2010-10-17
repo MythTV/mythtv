@@ -19,7 +19,7 @@ meta data, video and image URLs from youtube. These routines are based on the ap
 for this api are published at http://developer.youtubenservices.com/docs
 '''
 
-__version__="v0.2.4"
+__version__="v0.2.5"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view display option
 # 0.1.2 Modified Tree view internals to be consistent in approach and structure.
@@ -33,6 +33,7 @@ __version__="v0.2.4"
 #       Removed the use of the feedparser library
 # 0.2.3 Fixed an exception message output code error in two places
 # 0.2.4 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
+# 0.2.5 Fixed the Foreign Film icon file name
 
 import os, struct, sys, re, time
 import urllib, urllib2
@@ -266,7 +267,7 @@ class Videos(object):
                 'TV': 'directories/topics/tv',
                 'Movies': 'directories/topics/movies',
                 'Trailers': 'directories/film_genres/trailers',
-                'Movies_Action_adventure': 'directories/film_genres/action_adventure', 'Movies_Drama': 'directories/film_genres/drama', 'Movies_Sci_fi_fantasy': 'directories/film_genres/scifi', 'Movies_Thriller': 'directories/film_genres/thriller', 'Movies_Comedy': 'directories/film_genres/comedy', 'Movies_Classics': 'directories/film_genres/classics', 'Movies_Horror': 'directories/film_genres/horror', 'Movies_Family': 'directories/film_genres/family_films', 'Movies_Anime_animation': 'directories/film_genres/animation', 'Movies_Foreign': 'directories/film_genres/foriegn_films', 'Movies_Documentary': 'directories/film_genres/documentaries', 'Movies_Shorts': 'directories/film_genres/short_film',
+                'Movies_Action_adventure': 'directories/film_genres/action_adventure', 'Movies_Drama': 'directories/film_genres/drama', 'Movies_Sci_fi_fantasy': 'directories/film_genres/scifi', 'Movies_Thriller': 'directories/film_genres/thriller', 'Movies_Comedy': 'directories/film_genres/comedy', 'Movies_Classics': 'directories/film_genres/classics', 'Movies_Horror': 'directories/film_genres/horror', 'Movies_Family': 'directories/film_genres/family_films', 'Movies_Anime_animation': 'directories/film_genres/animation', 'Movies_Foreign': 'directories/film_genres/foreign_films', 'Movies_Documentary': 'directories/film_genres/documentaries', 'Movies_Shorts': 'directories/film_genres/short_film',
                 'Shortmov': 'directories/film_genres/short_film', 'Film': 'directories/film_genres/animation',
                 'Shows': 'directories/topics/tv', 'Comedy': 'directories/film_genres/comedy',
                 'Sports': 'directories/topics/sports',
