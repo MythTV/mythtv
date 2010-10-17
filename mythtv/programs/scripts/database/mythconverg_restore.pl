@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.14';
+    $VERSION        = '1.0.15';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -1068,7 +1068,7 @@ EOF
         verbose($verbose_level_debug, 'Setting database character set.');
         $query = qq{ALTER DATABASE $mysql_conf{'db_name'}
                     DEFAULT CHARACTER SET latin1
-                    COLLATE latin1_general_ci;};
+                    COLLATE latin1_swedish_ci;};
         $sth = $dbh->prepare($query);
         if (! $sth->execute())
         {
