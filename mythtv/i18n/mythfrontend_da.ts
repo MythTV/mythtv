@@ -2532,12 +2532,12 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="623"/>
         <source>Toggle Teletext Captions</source>
-        <translation>Aktiver/deaktiver tekst TV undertekster</translation>
+        <translation>Tekst TV undertekster til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="625"/>
         <source>Toggle Subtitles</source>
-        <translation>Aktiver/deaktiver undertekster</translation>
+        <translation>Undertekster til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="627"/>
@@ -2552,18 +2552,17 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="631"/>
         <source>Toggle Teletext Menu</source>
-        <translation>Aktiver/deaktiver tekst TV menu</translation>
+        <translation>Tekst TV menu til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="633"/>
         <source>Toggle External Subtitles</source>
-        <translatorcomment>Skal dette være &quot;Skift&quot; eller &quot;Aktiver/deaktiver&quot;? (Kommer an på om funktionen kan skifte mellem flere undertekster)</translatorcomment>
-        <translation>Skift eksterne undertekster</translation>
+        <translation>Eksterne undertekster fra/til</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="635"/>
         <source>Toggle Text Subtitles</source>
-        <translation>Skift undertekster</translation>
+        <translation>Undertekster (tekst) til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="638"/>
@@ -2588,7 +2587,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="646"/>
         <source>Display Text Subtitle 1</source>
-        <translation>Vis undertekst 1</translation>
+        <translation>Vis undertekst (tekst) 1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="648"/>
@@ -2897,7 +2896,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="786"/>
         <source>Toggle Teletext</source>
-        <translation>Aktiver/deaktiver tekst TV</translation>
+        <translation>Tekst TV til/fra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="796"/>
@@ -9629,7 +9628,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1330"/>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1356"/>
         <source>Text subtitles</source>
-        <translation>Undertekster</translation>
+        <translation>Undertekster (tekst)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1442"/>
@@ -10248,7 +10247,7 @@ De fleste DVB-S transponders overfører med 27,5 millioner symboler pr. sekund.<
         <location filename="../programs/mythtv-setup/checksetup.cpp" line="63"/>
         <location filename="../programs/mythtv-setup/checksetup.cpp" line="88"/>
         <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
-        <translation>Der er ikke defineret nogen opbevaringsgruppe mapper. Du skal tilføje mindst en mappe til standard opbevaringsgruppen, hvor nye optagelser vil blive gemt.</translation>
+        <translation>Der er ikke defineret nogen mapper for opbevaringsgrupperne. Du skal tilføje mindst en mappe til standard opbevaringsgruppen, hvor nye optagelser vil blive gemt.</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="129"/>
@@ -10809,7 +10808,7 @@ De fleste DVB-S transponders overfører med 27,5 millioner symboler pr. sekund.<
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="171"/>
         <source>Storage Group disk scheduler</source>
-        <translation>Opbevaringsgruppe diskplanlægning</translation>
+        <translation>Diskplanlægning for opbevaringsgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="172"/>
@@ -10824,7 +10823,7 @@ De fleste DVB-S transponders overfører med 27,5 millioner symboler pr. sekund.<
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="176"/>
         <source>This setting controls how the Storage Group scheduling code will balance new recordings across directories. &apos;Balanced Free Space&apos; is the recommended method for most users.</source>
-        <translation>Denne indstilling styrer hvordan opbevaringsgruppe diskplanlægningen vil fordele nye optagelser mellem biblioteker. &apos;Balanceret fri plads&apos; er den anbefalede metode for de fleste brugere.</translation>
+        <translation>Denne indstilling styrer hvordan diskplanlægningen for opbevaringsgrupper vil fordele nye optagelser mellem biblioteker. &apos;Balanceret fri plads&apos; er den anbefalede metode for de fleste brugere.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="186"/>
@@ -12433,17 +12432,17 @@ Du er formentlig nødt til at benytte eject-knappen på drevet.</translation>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="2338"/>
         <source>Error opening jump program file buffer</source>
-        <translation>Fejl under åbning af filbuffer for udsendelseshop</translation>
+        <translation>Fejl under åbning af filbuffer for udsendelsesskift</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="2347"/>
         <source>Error opening jump program file</source>
-        <translation>Fejl under åbning af fil for udsendelseshop</translation>
+        <translation>Fejl under åbning af fil for udsendelsesskift</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="2356"/>
         <source>Error reopening video decoder</source>
-        <translation>Fejl under genåbning af video decoder</translation>
+        <translation>Fejl under genåbning af video dekoder</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="2549"/>
@@ -13404,7 +13403,7 @@ Du er formentlig nødt til at benytte eject-knappen på drevet.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1893"/>
         <source>Decode VBI format</source>
-        <translation>Decode VBI format</translation>
+        <translation>VBI format dekodning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1935"/>
@@ -13785,7 +13784,7 @@ Du er formentlig nødt til at benytte eject-knappen på drevet.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="909"/>
         <source>If enabled, move deleted recordings to the &apos;Deleted&apos; recgroup and turn on autoexpire instead of deleting immediately.</source>
-        <translation>Hvis aktiv, flyt slettede optagelser til &apos;Slettet&apos; optagegruppen og slå autoudløb til, fremfor at slette øjeblikkeligt.</translation>
+        <translation>Hvis aktiv, flyttes slettede optagelser til optagelsesgruppen &apos;Slettet&apos; og autoudløb aktiveres, fremfor at slette optagelserne øjeblikkeligt.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="918"/>
@@ -13947,7 +13946,7 @@ må ikke være blankt.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1898"/>
         <source>If enabled, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
-        <translation>Hvis aktiv, vil dette tilsidesætte indstillingen fra mythtv-setup, som bruges under optagelse når tekst-TV/undertekster decodes.</translation>
+        <translation>Hvis aktiv, vil dette tilsidesætte indstillingen fra mythtv-setup, som bruges under optagelse når tekst-TV/undertekster dekodes.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1921"/>
@@ -15389,7 +15388,7 @@ Vær venlig at lukke dem før opgradering.</translation>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="378"/>
         <source>Please run mythtv-setup or mythbackend to update your database.</source>
-        <translation>Kør venligst &apos;mythtv-setup&apos; or &apos;mythbackend&apos; for at opdatere din database.</translation>
+        <translation>Kør venligst &apos;mythtv-setup&apos; eller &apos;mythbackend&apos; for at opdatere din database.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="385"/>
@@ -15978,17 +15977,17 @@ Ikke flere oplysninger</translation>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="72"/>
         <source>&apos;%1&apos; Storage Group Directories</source>
-        <translation>&apos;%1&apos; opbevaringsgruppemapper</translation>
+        <translation>Mapper for opbevaringsgruppen &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="76"/>
         <source>Local &apos;%1&apos; Storage Group Directories</source>
-        <translation>Lokale &apos;%1&apos; opbevaringsgruppemapper</translation>
+        <translation>Lokale mapper for opbevaringsgruppen &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="92"/>
         <source>Add Storage Group Directory</source>
-        <translation>Tilføj opbevaringsgruppemappe</translation>
+        <translation>Tilføj mappe for opbevaringsgruppe</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="93"/>
@@ -15999,14 +15998,14 @@ Ikke flere oplysninger</translation>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="117"/>
         <source>Edit Storage Group Directory</source>
-        <translation>Rediger opbevaringsgruppemappe</translation>
+        <translation>Rediger mappe for opbevaringsgruppe</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="157"/>
         <source>Remove &apos;%1&apos;
 Directory From Storage Group?</source>
-        <translation>Fjern &apos;%1&apos;
-mappen fra opbevaringsgruppen?</translation>
+        <translation>Fjern mappen &apos;%1&apos;
+fra opbevaringsgruppen?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="161"/>
@@ -17100,7 +17099,7 @@ Vælg en aktuel optagelse</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10231"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10270"/>
         <source>Text Subtitles</source>
-        <translation>Undertekster</translation>
+        <translation>Undertekster (tekst)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10249"/>
@@ -17266,7 +17265,7 @@ Vælg en aktuel optagelse</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10272"/>
         <source>Toggle External Subtitles</source>
-        <translation>Skift eksterne undertekster</translation>
+        <translation>Eksterne undertekster fra/til</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10690"/>
@@ -17298,7 +17297,7 @@ Vælg en aktuel optagelse</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11217"/>
         <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
-        <translation>MythTV har ikke nogle optagelseskort defineret. Kør venligst &apos;mythtv-setup&apos;.</translation>
+        <translation>MythTV har ikke nogle optagekort defineret. Kør venligst &apos;mythtv-setup&apos;.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11531"/>
@@ -17907,7 +17906,6 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
         <source>-%n</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -17987,32 +17985,32 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
     <message>
         <location filename="../themes/themestrings.h" line="152"/>
         <source>Rec. Profile:</source>
-        <translation>Optageprofil:</translation>
+        <translation>Opt.profil:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="153"/>
         <source>Rec. Group:</source>
-        <translation>Optagelsesgruppe:</translation>
+        <translation>Opt.gruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="154"/>
         <source>Strg. Group:</source>
-        <translation>Opbevaringsgruppe:</translation>
+        <translation>Opbevar.gruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="155"/>
         <source>Play Group:</source>
-        <translation>Afspilningsgruppe:</translation>
+        <translation>Afspil.gruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="156"/>
         <source>Max to Keep:</source>
-        <translation>Maksimum at beholde:</translation>
+        <translation>Maks. at beholde:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="157"/>
         <source>Max Newest:</source>
-        <translation>Maks nyeste:</translation>
+        <translation>Maks. nyeste:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="158"/>
