@@ -1,12 +1,6 @@
 #ifndef NETTREE_H
 #define NETTREE_H
 
-#include <uitypes.h>
-#include <xmlparse.h>
-#include <oldsettings.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
-
 // libmythui
 #include <mythuibuttonlist.h>
 #include <mythuibuttontree.h>

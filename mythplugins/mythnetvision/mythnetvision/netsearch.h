@@ -1,12 +1,6 @@
 #ifndef NETSEARCH_H
 #define NETSEARCH_H
 
-#include <uitypes.h>
-#include <xmlparse.h>
-#include <oldsettings.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
-
 // libmythui
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>
