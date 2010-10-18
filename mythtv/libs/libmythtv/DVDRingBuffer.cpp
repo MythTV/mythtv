@@ -65,7 +65,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_parent(NULL),
 
       // Menu/buttons
-      m_inMenu(true), m_buttonVersion(1), m_buttonStreamID(0),
+      m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
       m_hl_button(0, 0, 0, 0), m_menuSpuPkt(0), m_menuBuflength(0)
 {
     memset(&m_dvdMenuButton, 0, sizeof(AVSubtitle));
@@ -94,11 +94,6 @@ void DVDRingBufferPriv::CloseDVD(void)
         dvdnav_close(m_dvdnav);
         m_dvdnav = NULL;
     }
-}
-
-bool DVDRingBufferPriv::IsInMenu(bool update)
-{
-    return m_title == 0;
 }
 
 long long DVDRingBufferPriv::NormalSeek(long long time)
@@ -143,7 +138,7 @@ long long DVDRingBufferPriv::Seek(long long time)
                 QString("Seek() to time %1 failed").arg(time));
         return -1;
     }
-    else if (!IsInMenu(true))
+    else if (!m_inMenu)
     {
         m_gotStop = false;
         if (time > 0 && ffrewSkip == 1)
@@ -155,7 +150,7 @@ long long DVDRingBufferPriv::Seek(long long time)
 
 void DVDRingBufferPriv::GetDescForPos(QString &desc)
 {
-    if (IsInMenu())
+    if (m_inMenu)
     {
         if ((m_part <= DVD_MENU_MAX) && dvdnav_menu_table[m_part] )
         {
@@ -345,6 +340,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 dvdnav_cell_change_event_t *cell_event =
                     (dvdnav_cell_change_event_t*) (blockBuf);
 
+                // a menu is anything that isn't in the VTS domain
+                m_inMenu = !dvdnav_is_domain_vts(m_dvdnav);
+
                 // update information for the current cell
                 m_cellChanged = true;
                 if (m_pgcLength != cell_event->pgc_length)
@@ -370,8 +368,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 // debug
                 VERBOSE(VB_PLAYBACK, LOC +
-                    QString("---- DVDNAV_CELL_CHANGE - Cell #%1 Length %2")
-                    .arg(cell_event->cellN)
+                    QString("---- DVDNAV_CELL_CHANGE - Cell #%1 Menu %2 Length %3")
+                    .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
                     .arg((float)cell_event->cell_length / 90000.0f, 0, 'f', 1));
                 QString still = m_still ? ((m_still < 0xff) ?
                     QString("Stillframe: %1 seconds").arg(m_still) :
@@ -414,7 +412,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 m_cellRepeated = false;
 
                 IncrementButtonVersion;
-                if (IsInMenu(true))
+                if (m_inMenu)
                 {
                     m_autoselectsubtitle = true;
                     GetMythUI()->RestoreScreensaver();
@@ -453,7 +451,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 IncrementButtonVersion;
 
                 // update the stream number
-                if (IsInMenu(true) || NumMenuButtons() > 0)
+                if (m_inMenu || NumMenuButtons() > 0)
                 {
                     m_buttonStreamID = 32;
                     int aspect = dvdnav_get_video_aspect(m_dvdnav);
@@ -527,7 +525,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     m_vobid  = dsi->dsi_gi.vobu_vob_idn;
                     m_cellid = dsi->dsi_gi.vobu_c_idn;
                     if ((m_lastvobid == m_vobid) && (m_lastcellid == m_cellid)
-                         && IsInMenu(true))
+                         && m_inMenu)
                     {
                         m_cellRepeated = true;
                     }
@@ -582,7 +580,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     (dvdnav_vts_change_event_t*)(blockBuf);
 
                 // update player
-                IsInMenu(true);
                 int aspect = dvdnav_get_video_aspect(m_dvdnav);
                 int permission = dvdnav_get_video_scale_permission(m_dvdnav);
                 if (m_parent)
@@ -1590,7 +1587,7 @@ bool DVDRingBufferPriv::NewSequence(bool new_sequence)
         return result;
     }
 
-    result = m_newSequence && IsInMenu();
+    result = m_newSequence && m_inMenu;
     m_newSequence = false;
     if (result)
         VERBOSE(VB_PLAYBACK, LOC + "Asking for still frame");

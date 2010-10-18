@@ -61,7 +61,7 @@ class MPUBLIC DVDRingBufferPriv
     int         NumMenuButtons(void) const;
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
-    bool        IsInMenu(bool update = false);
+    bool        IsInMenu(void) { return m_inMenu; }
     void        ActivateButton(void);
     void        MoveButtonLeft(void);
     void        MoveButtonRight(void);
