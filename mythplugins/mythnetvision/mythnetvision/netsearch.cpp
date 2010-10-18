@@ -15,6 +15,7 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythdirs.h>
+#include <mythsystem.h>
 #include <mythprogressdialog.h>
 #include <storagegroup.h>
 #include <remotefile.h>

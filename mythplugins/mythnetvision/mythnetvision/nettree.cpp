@@ -8,6 +8,7 @@
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdirs.h>
+#include <mythsystem.h>
 #include <remoteutil.h>
 #include <remotefile.h>
 #include <mythprogressdialog.h>
@@ -575,9 +576,9 @@ void NetTree::showManageMenu()
         menuPopup->AddButton(tr("Manage RSS Subscriptions"), SLOT(runRSSEditor()));
         if (!m_treeAutoUpdate)
             menuPopup->AddButton(tr("Enable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
-        else 
+        else
             menuPopup->AddButton(tr("Disable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
-//        if (!m_rssAutoUpdate) 
+//        if (!m_rssAutoUpdate)
 //            menuPopup->AddButton(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
 //        else
 //            menuPopup->AddButton(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
