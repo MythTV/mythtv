@@ -4,6 +4,7 @@
     <!-- EIT, Subtitle, Audio Stream Language Preferences -->
     <setting name="ISO639Language0" global="true">dan</setting>
     <setting name="ISO639Language1" global="true">eng</setting>
+    <setting name="DefaultCCMode">1</setting>
 
     <!-- Recording -->
     <setting name="TVFormat" global="true">PAL</setting>
