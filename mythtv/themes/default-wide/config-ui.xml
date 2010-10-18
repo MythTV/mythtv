@@ -102,15 +102,21 @@
 
         <textarea name="countrylabel">
             <font>baselarge</font>
-            <area>40,20,510,40</area>
+            <area>60,20,510,40</area>
             <value>Country</value>
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist name="countries" from="basebuttonlist">
-            <area>40,80,530,530</area>
+        <shape name="countrybackground" from="basebackground">
+            <area>40,65,550,550</area>
+        </shape>
+
+        <buttonlist name="countries">
+            <area>50,75,530,530</area>
             <scrollstyle>center</scrollstyle>
             <spacing>2</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,100%,97%</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,100%,55</area>
@@ -136,6 +142,7 @@
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
+                <state name="inactive" from="active" />
                 <state name="selectedactive" from="active">
                     <shape name="buttonbackground">
                         <fill style="gradient">
@@ -149,23 +156,104 @@
                             <gradient start="#52CA38" end="#349838" alpha="100" />
                         </fill>
                     </shape>
-                    <textarea name="buttontext">
-                        <font>basesmallpurple</font>
-                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>10,97%</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>40,97%</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
             <helptext>Select the country in which you currently reside</helptext>
         </buttonlist>
 
         <textarea name="languagelabel" from="countrylabel">
-            <position>640,20</position>
+            <position>680,20</position>
             <value>Language</value>
         </textarea>
 
-        <buttonlist name="languages" from="basebuttonlist">
-            <area>640,80,530,530</area>
-            <spacing>4</spacing>
+        <shape name="languagebackground" from="basebackground">
+            <area>660,65,550,550</area>
+        </shape>
+
+        <buttonlist name="languages" from="countries">
+            <area>670,75,530,530</area>
+            <spacing>2</spacing>
             <scrollstyle>center</scrollstyle>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,55</area>
+                    <textarea name="buttontext">
+                        <position>10,0</position>
+                    </textarea>
+                    <textarea name="language" from="nativecountry">
+                        <position>10,30</position>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active" />
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>10,97%</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>40,97%</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
             <helptext>Select your preferred language</helptext>
         </buttonlist>
 
