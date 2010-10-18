@@ -17,7 +17,7 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">en_US</setting>
+    <setting name="Language">en_CA</setting>
 
     <!-- Country -->
     <setting name="Country">CA</setting>
