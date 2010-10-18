@@ -9,3 +9,4 @@ TRANSLATIONS += mythnews_ja.ts mythnews_sl.ts mythnews_et.ts
 TRANSLATIONS += mythnews_fi.ts mythnews_nb.ts mythnews_ru.ts
 TRANSLATIONS += mythnews_cs.ts mythnews_pl.ts mythnews_hu.ts
 TRANSLATIONS += mythnews_en_gb.ts mythnews_en_us.ts mythnews_el.ts
+TRANSLATIONS += mythnews_en_ca.ts

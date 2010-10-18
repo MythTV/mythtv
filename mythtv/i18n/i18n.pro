@@ -10,6 +10,7 @@ trans.files += mythfrontend_cs.qm
 trans.files += mythfrontend_da.qm
 trans.files += mythfrontend_de.qm
 trans.files += mythfrontend_el.qm
+trans.files += mythfrontend_en_ca.qm
 trans.files += mythfrontend_en_gb.qm
 trans.files += mythfrontend_en_us.qm
 trans.files += mythfrontend_es.qm

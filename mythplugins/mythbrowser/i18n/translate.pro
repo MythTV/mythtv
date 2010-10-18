@@ -9,3 +9,4 @@ TRANSLATIONS += mythbrowser_et.ts mythbrowser_ru.ts mythbrowser_da.ts
 TRANSLATIONS += mythbrowser_cs.ts mythbrowser_sl.ts mythbrowser_en_gb.ts
 TRANSLATIONS += mythbrowser_hu.ts mythbrowser_en_us.ts mythbrowser_el.ts
 TRANSLATIONS += mythbrowser_pt.ts mythbrowser_ja.ts mythbrowser_pl.ts
+TRANSLATIONS += mythbrowser_en_ca.ts

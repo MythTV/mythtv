@@ -16,3 +16,4 @@ TRANSLATIONS += mythvideo_fr.ts mythvideo_sl.ts mythvideo_nb.ts
 TRANSLATIONS += mythvideo_fi.ts mythvideo_et.ts mythvideo_ru.ts
 TRANSLATIONS += mythvideo_cs.ts mythvideo_hu.ts mythvideo_en_gb.ts
 TRANSLATIONS += mythvideo_el.ts mythvideo_pl.ts mythvideo_en_us.ts
+TRANSLATIONS += mythvideo_en_ca.ts

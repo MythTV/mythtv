@@ -12,6 +12,7 @@ trans.files += mythmusic_ja.qm mythmusic_sl.qm mythmusic_fi.qm
 trans.files += mythmusic_nb.qm mythmusic_et.qm mythmusic_cs.qm
 trans.files += mythmusic_pl.qm mythmusic_hu.qm mythmusic_en_gb.qm
 trans.files += mythmusic_en_us.qm mythmusic_ru.qm mythmusic_el.qm
+trans.files += mythmusic_en_ca.qm
 
 INSTALLS += trans
 
