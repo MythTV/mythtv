@@ -1,12 +1,6 @@
 #ifndef METADATASETTINGS_H
 #define METADATASETTINGS_H
 
-#include <uitypes.h>
-#include <xmlparse.h>
-#include <oldsettings.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
-
 // libmythui
 #include <mythuispinbox.h>
 #include <mythuibutton.h>
