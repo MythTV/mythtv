@@ -3091,21 +3091,37 @@ void MythPlayer::ChangeSpeed(void)
     play_speed   = next_play_speed;
     normal_speed = next_normal_speed;
 
+    float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
+
     bool skip_changed;
-    if (play_speed > 0.0f && play_speed <= 3.0f)
+    if (play_speed >= 0.0f && play_speed <= 3.0f)
     {
         skip_changed = (ffrew_skip != 1);
+        frame_interval = (int) (1000000.0f / video_frame_rate / temp_speed);
         ffrew_skip = 1;
     }
     else
     {
         skip_changed = true;
-        int new_skip = ((uint)ceil(4.0 * fabs(play_speed) / 30)) * 30;
-        if (play_speed < 0.0)
-            new_skip = -new_skip;
-        ffrew_skip = new_skip;
+        switch (abs((int)(play_speed)))
+        {
+            case   3: frame_interval = 333666; break;
+            case   5: frame_interval = 200200; break;
+            case  10: frame_interval = 200200; break;
+            case  20: frame_interval = 150150; break;
+            case  30: frame_interval = 133466; break;
+            case  60: frame_interval = 133466; break;
+            case 120: frame_interval = 133466; break;
+            case 180: frame_interval = 133466; break;
+            default:  frame_interval = 200000; break;
+        }
+        float ffw_fps = fabs(play_speed) * video_frame_rate;
+        float dis_fps = 1000000.0f / frame_interval;
+        ffrew_skip = (int)ceil(ffw_fps / dis_fps);
+        ffrew_skip = play_speed < 0.0f ? -ffrew_skip : ffrew_skip;
         ffrew_adjust = 0;
     }
+    videosync->setFrameInterval(frame_interval);
 
     if (skip_changed && videoOutput)
     {
@@ -3114,11 +3130,6 @@ void MythPlayer::ChangeSpeed(void)
         if (play_speed != 0.0f && !(last_speed == 0.0f && ffrew_skip == 1))
             DoJumpToFrame(framesPlayed);
     }
-
-    float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
-    frame_interval = (int) (1000000.0f * ffrew_skip / video_frame_rate /
-                            temp_speed);
-    videosync->setFrameInterval(frame_interval);
 
     VERBOSE(VB_PLAYBACK, LOC + "Play speed: " +
             QString("rate: %1 speed: %2 skip: %3 => new interval %4")
