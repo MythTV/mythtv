@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.9';
+    $VERSION        = '1.0.10';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -83,10 +83,11 @@
                'compress=s'                         => \$compress,
                'rotate=i'                           => \$rotate,
                'rotateglob|glob=s'                  => \$rotateglob,
-               'backup_xmltvids|xmltvids'           => \$backup_xmltvids,
+               'backup_xmltvids|backup-xmltvids|'.
+               'xmltvids'                           => \$backup_xmltvids,
                'usage|help|h+'                      => \$usage,
                'version'                            => \$show_version,
-               'script_version|v'                   => \$show_version_script,
+               'script_version|script-version|v'    => \$show_version_script,
                'verbose|debug|d+'                   => \$debug
               );
 
@@ -861,9 +862,9 @@ EOF
             verbose($verbose_level_error,
                     '', 'ERROR: DBBackupDirectory is not a directory or is '.
                     'not writable. Please specify',
-                    '        a directory in your database information file'.
+                    '       a directory in your database information file'.
                     ' using DBBackupDirectory.',
-                    '        If not using a database information file,'.
+                    '       If not using a database information file,'.
                     ' please specify the ',
                     '        --directory command-line option.');
             die("\nInvalid backup directory, stopped");
@@ -1048,7 +1049,7 @@ EOF
             verbose($verbose_level_error,
                     '', 'ERROR: Unable to backup xmltvids without Perl'.
                     ' database libraries.',
-                    '        Please ensure the Perl DBI and DBD::mysql'.
+                    '       Please ensure the Perl DBI and DBD::mysql'.
                     ' modules are installed.');
             die("\nPerl database libraries missing, stopped");
         }

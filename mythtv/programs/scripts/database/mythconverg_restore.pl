@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.15';
+    $VERSION        = '1.0.16';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -67,19 +67,24 @@
                'schemaver|DBSchemaVer=s'            => \$db_schema_version,
                'directory|DBBackupDirectory=s'      => \$backup_directory,
                'filename|DBBackupFilename=s'        => \$backup_filename,
-               'partial_restore|new_hardware'       => \$partial_restore,
-               'with_plugin_data|plugin_data'       => \$with_plugin_data,
-               'restore_xmltvids|xmltvids'          => \$restore_xmltvids,
-               'mysql_client|client=s'              => \$mysql_client,
+               'partial_restore|new_hardware|'.
+               'partial-restore|new-hardware'       => \$partial_restore,
+               'with_plugin_data|plugin_data|'.
+               'with-plugin-data|plugin-data'       => \$with_plugin_data,
+               'restore_xmltvids|'.
+               'restore-xmltvids|xmltvids'          => \$restore_xmltvids,
+               'mysql_client|mysql-client|client=s' => \$mysql_client,
                'uncompress=s'                       => \$uncompress,
-               'drop_database|drop_db'              => \$drop_database,
-               'create_database|create_db|mc_sql'   => \$create_database,
-               'change_hostname'                    => \$change_hostname,
-               'new_hostname=s'                     => \$new_hostname,
-               'old_hostname=s'                     => \$old_hostname,
+               'drop_database|drop_db|'.
+               'drop-database|drop-db'              => \$drop_database,
+               'create_database|create_db|mc_sql|'.
+               'create-database|create-db|mc-sql'   => \$create_database,
+               'change_hostname|change-hostname'    => \$change_hostname,
+               'new_hostname|new-hostname=s'        => \$new_hostname,
+               'old_hostname|old-hostname=s'        => \$old_hostname,
                'usage|help|h+'                      => \$usage,
                'version'                            => \$show_version,
-               'script_version|v'                   => \$show_version_script,
+               'script_version|script-version|v'    => \$show_version_script,
                'verbose|debug|d+'                   => \$debug
               );
 
