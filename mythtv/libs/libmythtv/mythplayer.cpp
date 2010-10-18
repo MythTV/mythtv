@@ -3104,7 +3104,7 @@ void MythPlayer::ChangeSpeed(void)
     {
         skip_changed = true;
         frame_interval = 200000;
-        frame_interval = (fabs(play_speed) >=   3.0) ? 333666 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   3.0) ? 133466 : frame_interval;
         frame_interval = (fabs(play_speed) >=   5.0) ? 133466 : frame_interval;
         frame_interval = (fabs(play_speed) >=   8.0) ? 250250 : frame_interval;
         frame_interval = (fabs(play_speed) >=  10.0) ? 133466 : frame_interval;
@@ -3114,7 +3114,6 @@ void MythPlayer::ChangeSpeed(void)
         frame_interval = (fabs(play_speed) >=  60.0) ? 133466 : frame_interval;
         frame_interval = (fabs(play_speed) >= 120.0) ? 133466 : frame_interval;
         frame_interval = (fabs(play_speed) >= 180.0) ? 133466 : frame_interval;
-        frame_interval = (int)ceil(frame_interval / (video_frame_rate / 29.97f));
         float ffw_fps = fabs(play_speed) * video_frame_rate;
         float dis_fps = 1000000.0f / frame_interval;
         ffrew_skip = (int)ceil(ffw_fps / dis_fps);
