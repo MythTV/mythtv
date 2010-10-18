@@ -923,7 +923,7 @@ AVSubtitle *DVDRingBufferPriv::GetMenuSubtitle(uint &version)
     // this is unlocked by ReleaseMenuButton
     m_menuBtnLock.lock();
 
-    if ((m_menuBuflength > 4) && m_buttonExists && IsInMenu() &&
+    if ((m_menuBuflength > 4) && m_buttonExists && (NumMenuButtons() > 0) &&
         (m_dvdMenuButton.rects[0]->h >= m_hl_button.height()) &&
         (m_dvdMenuButton.rects[0]->w >= m_hl_button.width()))
     {
